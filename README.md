@@ -4,7 +4,7 @@ Wire Sysio is a fork of Leap, a C++ implementation of the [Antelope](https://git
 
 ## Branches
 
-The `main` branch is the latest stable branch.
+The `master` branch is the latest stable branch.
 
 ## Supported Operating Systems
 
@@ -245,7 +245,7 @@ ctest -L "long_running_tests"
 
 ---
 
-<!-- <!-- markdownlint-disable MD033 --> -->
+<!-- <!-- markdownlint-disable MD033 -->
 <table>
   <tr>
     <td><img src="https://wire.foundation/favicon.ico" alt="Wire Network" width="50"/></td>
