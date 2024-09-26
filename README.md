@@ -18,9 +18,13 @@ We currently support the following operating systems.
 
 <!-- TODO: needs to add and test build on unsupported environments -->
 
-## Installation
+## Installation 
 
-In the future, we plan to support the installation of Debian packages directly from our release page, providing a more streamlined and convenient setup process. However, for the time being, installation requires *building the software from source*.
+In the future, we plan to support downloading Debian packages directly from our [release page](https://github.com/Wire-Network/wire-sysio/releases), providing a more streamlined and convenient setup process. However, for the time being, installation requires *building the software from source*.
+
+
+
+## Building from source
 
 ### Prerequisites
 
@@ -74,7 +78,7 @@ cd wire-sysio
 
 ### Step 2 - Build
 
-Select build instructions below for to [build](#build).
+Select build instructions below based on OS.
 
 > ⚠️ **A Warning On Parallel Compilation Jobs (`-j` flag)** ⚠️  
 When building C/C++ software, often the build is performed in parallel via a command such as `make -j "$(nproc)"` which uses all available CPU threads. However, be aware that some compilation units (`*.cpp` files) in Wire Sysion will consume nearly 4GB of memory. Failures due to memory exhaustion will typically, but not always, manifest as compiler crashes. Using all available CPU threads may also prevent you from doing other things on your computer during compilation. For these reasons, consider reducing this value.
@@ -84,7 +88,7 @@ If you are in an Ubuntu docker container, omit `sudo` from all commands because 
 
 #### Build
 
-Note: If you are in an Ubuntu docker container, omit `sudo` because you run as `root` by default.
+**Note**: If you are in an Ubuntu docker container, omit `sudo` because you run as `root` by default.
 
 **Ubuntu 22.04 Jammy & Ubuntu 20.04 Focal**
 
@@ -113,7 +117,6 @@ mkdir -p build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..
 make -j $(nproc) package
-cpack
 ```
 
 </details>
@@ -169,11 +172,11 @@ make -j "$(nproc)" package
 After building, you may remove the `~/boost1.79` directory or you may keep it around for your next build.
 </details>
 
-Now you can optionally [test](#step-4---test) your build, or [install](#step-5---install) the `*.deb` binary packages, which will be in the root of your build directory.
+Now you can optionally [test](#step-4---test) your build, or [install](#step-3---install) the `*.deb` binary packages, which will be in the root of your build directory.
 
 ### Step 3 - Install
 
-Once you have [built](#step-3---build-the-source-code) Wire Sysio and [tested](#step-4---test) your build, you can install it on your system. Don't forget to omit `sudo` if you are running in a docker container.
+Once you have [built](#build) Wire Sysio and [tested](#step-4---test) your build, you can install it on your system. Don't forget to omit `sudo` if you are running in a docker container.
 
 We recommend installing the binary package you just built. Navigate to your build directory in a terminal and run this command:
 
