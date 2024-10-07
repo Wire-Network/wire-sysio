@@ -10,7 +10,7 @@ import inspect
 import json
 import shlex
 import socket
-from datetime import datetime
+from datetime import datetime, UTC
 from sys import stdout
 from sys import exit
 import traceback
@@ -77,7 +77,7 @@ class Utils:
 
     @staticmethod
     def timestamp():
-        return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
     @staticmethod
     def checkOutputFileWrite(time, cmd, output, error):
