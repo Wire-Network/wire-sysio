@@ -108,7 +108,7 @@ class PluginHttpTest(unittest.TestCase):
         ACT_FEATURE_DEFAULT_LIMIT = 10
 
         # Actual expected activated features total
-        ACT_FEATURE_CURRENT_EXPECTED_TOTAL = 19
+        ACT_FEATURE_CURRENT_EXPECTED_TOTAL = 20
 
         # Extemely high value to attempt to always get full list of activated features
         ACT_FEATURE_EXTREME = 10000
@@ -702,7 +702,8 @@ class PluginHttpTest(unittest.TestCase):
                      "\"signatures\": [\"SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp\"]",
                      "\"context_free_data\": []")
         ret_str = Utils.runCmdReturnStr(valid_cmd)
-        self.assertEqual(ret_str, "\"0be762a6406bab15530e87f21e02d1c58e77944ee55779a76f4112e3b65cac48\"")
+        # verify the returned transaction id.
+        self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
 
         # push_block with empty parameter
         default_cmd = cmd_base + "push_block"

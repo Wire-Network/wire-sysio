@@ -101,8 +101,10 @@ set_property(TEST ship_streamer_test PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST p2p_dawn515_test PROPERTY LABELS nonparallelizable_tests)
 
-add_test(NAME producer-preactivate-feature-test COMMAND tests/prod_preactivation_test.py --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST producer-preactivate-feature-test PROPERTY LABELS nonparallelizable_tests)
+# Disable producer-preactivate-feature-test because it verifies unsupported legacy functionality
+#add_test(NAME producer-preactivate-feature-test COMMAND tests/prod_preactivation_test.py --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+#set_property(TEST producer-preactivate-feature-test PROPERTY LABELS nonparallelizable_tests)
+
 add_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feature_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST nodeop_protocol_feature_test PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME compute_transaction_test COMMAND tests/compute_transaction_test.py -v -p 2 -n 3 --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
