@@ -1,7 +1,7 @@
 from testUtils import Utils
 from Cluster import Cluster
 from WalletMgr import WalletMgr
-from datetime import datetime
+from datetime import datetime, UTC
 import platform
 
 import argparse
@@ -123,7 +123,7 @@ class TestHelper(object):
         if prefix:
             Utils.Print(str(prefix))
         clientVersion=Cluster.getClientVersion()
-        Utils.Print("UTC time: %s" % str(datetime.utcnow()))
+        Utils.Print("UTC time: %s" % str(datetime.now(UTC)))
         Utils.Print("SYS Client version: %s" % (clientVersion))
         Utils.Print("Processor: %s" % (platform.processor()))
         Utils.Print("OS name: %s" % (platform.platform()))
