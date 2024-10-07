@@ -129,7 +129,10 @@ echo ==== End: $step ============== >> $logfile
 step=$(($step + 1))
 
 ecmd set contract sysio unittests/contracts/sysio.system sysio.system.wasm sysio.system.abi
-programs/clio/clio --wallet-url $wdurl --url http://$bioshost:$biosport push action sysio init '[0, "4,'$bioscurrencysymbol'"]' -p sysio >> $logfile 2>&1
+
+ecmd push action sysio setpriv '["sysio.msig",1]' -p sysio
+
+ecmd push action sysio init '[0,"4,'$bioscurrencysymbol'"]' -p sysio@active
 
 # Manual deployers, add a series of lines below this block that looks like:
 #    cacmd $PRODNAME[0] $OWNERKEY[0] $ACTIVEKEY[0]
