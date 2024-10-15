@@ -610,7 +610,7 @@ try:
         errorExit("Failed to unlock wallet %s" % (defproduceraWallet.name))
 
     Print("Get account defproducera")
-    account=node.getEosAccount(defproduceraAccount.name, exitOnError=True)
+    account=node.getSysioAccount(defproduceraAccount.name, exitOnError=True)
 
     Print("Unlocking wallet \"%s\"." % (defproduceraWallet.name))
     if not walletMgr.unlockWallet(testWallet):
@@ -618,7 +618,7 @@ try:
         errorExit("Failed to unlock wallet %s" % (testWallet.name))
 
     Print("Verify non-JSON call works")
-    rawAccount = node.getEosAccount(defproduceraAccount.name, exitOnError=True, returnType=ReturnType.raw)
+    rawAccount = node.getSysioAccount(defproduceraAccount.name, exitOnError=True, returnType=ReturnType.raw)
     coreLiquidBalance = account['core_liquid_balance']
     match = re.search(r'\bliquid:\s*%s\s' % (coreLiquidBalance), rawAccount, re.MULTILINE | re.DOTALL)
     assert match is not None, "did not find the core liquid balance (\"liquid:\") of %d in \"%s\"" % (coreLiquidBalance, rawAccount)
