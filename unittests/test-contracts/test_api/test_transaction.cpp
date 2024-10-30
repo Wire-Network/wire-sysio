@@ -1,6 +1,6 @@
-#include <sysiolib/action.hpp>
-#include <sysiolib/crypto.h>
-#include <sysiolib/transaction.hpp>
+#include <sysio/action.hpp>
+#include <sysio/crypto.hpp>
+#include <sysio/transaction.hpp>
 
 #include "test_api.hpp"
 
@@ -84,17 +84,15 @@ void test_transaction::send_action_empty() {
 }
 
 /**
- * cause failure due to a large action payload
+ * cause failure due to a large action payload, larger than max_inline_action_size of 512K
  */
 void test_transaction::send_action_large() {
    using namespace sysio;
-   static char large_message[8 * 1024];
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action_normal" )> test_action;
-   copy_data( large_message, 8*1024, test_action.data );
+   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action" )> test_action;
+   test_action.data.resize(512*1024+1);
 
    std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action_normal")}, test_action );
-
+   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action")}, test_action );
    act.send();
    sysio_assert( false, "send_message_large() should've thrown an error" );
 }
@@ -104,14 +102,57 @@ void test_transaction::send_action_large() {
  */
 void test_transaction::send_action_4k() {
    using namespace sysio;
-   static char large_message[4 * 1024];
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "test_action_ordinal4" )> test_action;
-   copy_data( large_message, 4*1024, test_action.data );
+   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action" )> test_action;
+   test_action.data.resize(4*1024);
 
    std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "test_action_ordinal4")}, test_action );
+   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action")}, test_action );
 
    act.send();
+}
+
+/**
+ * send an inline action that is 512K (limit is < 512K)
+ * the limit includes the size of the action
+ */
+void test_transaction::send_action_512k() {
+   using namespace sysio;
+   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action" )> test_action;
+
+   test_action.data.resize(1);
+   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
+   action temp_act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action")}, test_action );
+
+   size_t action_size = pack_size(temp_act);
+   test_action.data.resize(512*1024-action_size-2); // check is < 512K
+
+   // send at limit (512K - 1)
+   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action")}, test_action );
+
+   if (pack_size(act) != 512*1024-1) {
+      std::string err = "send_action_512k action size is: " + std::to_string(action_size) + " not 512K-1";
+      sysio_assert(false, err.c_str());
+   }
+
+   act.send();
+}
+
+/**
+ * send many inline actions that are 512K (limit is < 512K)
+ * the limit includes the size of the action
+ */
+void test_transaction::send_many_actions_512k() {
+   using namespace sysio;
+   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_transaction", "send_action_512k" )> test_action;
+
+   test_action.data.resize(1);
+   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
+   action act( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_transaction", "send_action_512k")}, test_action );
+
+   // 65 * 512K > wasm memory limit, which is ok because each gets their own wasm instantiation
+   for (size_t i = 0; i < 65; ++i) {
+      act.send();
+   }
 }
 
 /**
@@ -120,7 +161,7 @@ void test_transaction::send_action_4k() {
 void test_transaction::send_action_recurse() {
    using namespace sysio;
    char buffer[1024];
-   read_action_data( buffer, 1024 );
+   sysio::read_action_data( buffer, 1024 );
 
    test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_transaction", "send_action_recurse" )> test_action;
    copy_data( buffer, 1024, test_action.data );
@@ -147,23 +188,23 @@ void test_transaction::send_action_inline_fail() {
 void test_transaction::test_tapos_block_prefix() {
    using namespace sysio;
    int tbp;
-   read_action_data( (char*)&tbp, sizeof(int) );
-   sysio_assert( tbp == tapos_block_prefix(), "tapos_block_prefix does not match" );
+   sysio::read_action_data( (char*)&tbp, sizeof(int) );
+   sysio_assert( tbp == sysio::tapos_block_prefix(), "tapos_block_prefix does not match" );
 }
 
 void test_transaction::test_tapos_block_num() {
    using namespace sysio;
    int tbn;
-   read_action_data( (char*)&tbn, sizeof(int) );
-   sysio_assert( tbn == tapos_block_num(), "tapos_block_num does not match" );
+   sysio::read_action_data( (char*)&tbn, sizeof(int) );
+   sysio_assert( tbn == sysio::tapos_block_num(), "tapos_block_num does not match" );
 }
 
 void test_transaction::test_read_transaction() {
    using namespace sysio;
    checksum256 h;
-   auto size = transaction_size();
+   auto size = sysio::transaction_size();
    char buf[size];
-   uint32_t read = read_transaction( buf, size );
+   uint32_t read = sysio::read_transaction( buf, size );
    sysio_assert( size == read, "read_transaction failed");
    h = sysio::sha256(buf, read);
    print(h);
@@ -172,9 +213,9 @@ void test_transaction::test_read_transaction() {
 void test_transaction::test_transaction_size() {
    using namespace sysio;
    uint32_t trans_size = 0;
-   read_action_data( (char*)&trans_size, sizeof(uint32_t) );
-   print( "size: ", transaction_size() );
-   sysio_assert( trans_size == transaction_size(), "transaction size does not match" );
+   sysio::read_action_data( (char*)&trans_size, sizeof(uint32_t) );
+   print( "size: ", sysio::transaction_size() );
+   sysio_assert( trans_size == sysio::transaction_size(), "transaction size does not match" );
 }
 
 void test_transaction::send_transaction(uint64_t receiver, uint64_t, uint64_t) {
@@ -194,7 +235,7 @@ void test_transaction::send_transaction(uint64_t receiver, uint64_t, uint64_t) {
 void test_transaction::send_action_sender( uint64_t receiver, uint64_t, uint64_t ) {
    using namespace sysio;
    uint64_t cur_send;
-   read_action_data( &cur_send, sizeof(name) );
+   sysio::read_action_data( &cur_send, sizeof(name) );
 
    auto trx = transaction();
    std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
@@ -296,7 +337,7 @@ void test_transaction::send_deferred_transaction_replace( uint64_t receiver, uin
 void test_transaction::send_deferred_tx_with_dtt_action() {
    using namespace sysio;
    dtt_action dtt_act;
-   read_action_data( &dtt_act, action_data_size() );
+   sysio::read_action_data( &dtt_act, sysio::action_data_size() );
 
    action deferred_act;
    deferred_act.account = name{dtt_act.deferred_account};
@@ -312,13 +353,13 @@ void test_transaction::send_deferred_tx_with_dtt_action() {
 
 void test_transaction::cancel_deferred_transaction_success() {
    using namespace sysio;
-   auto r = cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
+   auto r = sysio::cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
    sysio_assert( (bool)r, "transaction was not found" );
 }
 
 void test_transaction::cancel_deferred_transaction_not_found() {
    using namespace sysio;
-   auto r = cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
+   auto r = sysio::cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
    sysio_assert( !r, "transaction was canceled, whild should not be found" );
 }
 
@@ -342,7 +383,7 @@ void test_transaction::stateful_api() {
 
 void test_transaction::context_free_api() {
    char buf[128] = {0};
-   get_context_free_data( 0, buf, sizeof(buf) );
+   sysio::get_context_free_data( 0, buf, sizeof(buf) );
 }
 
 void test_transaction::repeat_deferred_transaction( uint64_t receiver, uint64_t code, uint64_t action ) {
@@ -353,7 +394,7 @@ void test_transaction::repeat_deferred_transaction( uint64_t receiver, uint64_t 
    uint32_t payload = unpack_action_data<uint32_t>();
    print("repeat_deferred_transaction called: payload = ", payload);
 
-   bool res = cancel_deferred( sender_id );
+   bool res = sysio::cancel_deferred( sender_id );
 
    print("\nrepeat_deferred_transaction cancelled trx with sender_id = ", sender_id, ", result is ", res);
 

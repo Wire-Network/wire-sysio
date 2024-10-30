@@ -1,12 +1,9 @@
-#include <sysiolib/action.hpp>
-#include <sysiolib/chain.h>
-#include <sysiolib/crypto.h>
-#include <sysiolib/datastream.hpp>
-#include <sysiolib/db.h>
-#include <sysiolib/sysio.hpp>
-#include <sysiolib/print.hpp>
-#include <sysiolib/privileged.h>
-#include <sysiolib/transaction.hpp>
+#include <sysio/action.hpp>
+#include <sysio/crypto.hpp>
+#include <sysio/datastream.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/print.hpp>
+#include <sysio/transaction.hpp>
 
 #include "test_api.hpp"
 
@@ -65,6 +62,12 @@ void test_action::test_dummy_action() {
    }
 }
 
+void test_action::read_action() {
+   print("action size: " + std::to_string(action_data_size()));
+   void* p = malloc(action_data_size());
+   read_action_data(p, action_data_size());
+}
+
 void test_action::read_action_to_0() {
    read_action_data( (void *)0, action_data_size() );
 }
@@ -88,14 +91,13 @@ void test_action::test_cf_action() {
       sysio_assert( v == cfa.payload, "invalid value" );
 
       // verify crypto api access
-      capi_checksum256 hash;
       char test[] = "test";
-      sha256( test, sizeof(test), &hash );
-      assert_sha256( test, sizeof(test), &hash );
+      auto hash = sha256( test, sizeof(test) );
+      assert_sha256( test, sizeof(test), hash );
       // verify action api access
       action_data_size();
       // verify console api access
-      sysio::print("test\n");
+      print("test\n");
       // verify memory api access
       uint32_t i = 42;
       memccpy( &v, &i, sizeof(i), sizeof(i) );
@@ -137,20 +139,17 @@ void test_action::test_cf_action() {
    } else if ( cfa.payload == 206 ) {
       sysio::require_auth("test"_n);
       sysio_assert( false, "authorization_api should not be allowed" );
-   } else if ( cfa.payload == 207 ) {
-      now();
-      sysio_assert( false, "system_api should not be allowed" );
-   } else if ( cfa.payload == 208 ) {
+   } else if ( cfa.payload == 207 || cfa.payload == 208 ) {
       current_time();
       sysio_assert( false, "system_api should not be allowed" );
    } else if ( cfa.payload == 209 ) {
       publication_time();
       sysio_assert( false, "system_api should not be allowed" );
    } else if ( cfa.payload == 210 ) {
-      send_inline( (char*)"hello", 6 );
+      sysio::internal_use_do_not_use::send_inline( (char*)"hello", 6 );
       sysio_assert( false, "transaction_api should not be allowed" );
    } else if ( cfa.payload == 211 ) {
-      send_deferred( "testapi"_n.value, "testapi"_n.value, "hello", 6, 0 );
+      sysio::send_deferred( "testapi"_n.value, "testapi"_n, "hello", 6, 0 );
       sysio_assert( false, "transaction_api should not be allowed" );
    } else if ( cfa.payload == 212 ) {
       set_action_return_value("hi", 2);
@@ -173,18 +172,18 @@ void test_action::require_notice( uint64_t receiver, uint64_t code, uint64_t act
 }
 
 void test_action::require_notice_tests( uint64_t receiver, uint64_t code, uint64_t action ) {
-   sysio::print( "require_notice_tests" );
+   print( "require_notice_tests" );
    if( receiver == "testapi"_n.value ) {
-      sysio::print("require_recipient( \"acc5\"_n )");
+      print("require_recipient( \"acc5\"_n )");
       sysio::require_recipient("acc5"_n);
    } else if( receiver == "acc5"_n.value ) {
-      sysio::print("require_recipient( \"testapi\"_n )");
+      print("require_recipient( \"testapi\"_n )");
       sysio::require_recipient("testapi"_n);
    }
 }
 
 void test_action::require_auth() {
-   prints("require_auth");
+   print("require_auth");
    sysio::require_auth("acc3"_n);
    sysio::require_auth("acc4"_n);
 }
@@ -210,7 +209,8 @@ void test_action::test_publication_time() {
    uint64_t pub_time = 0;
    uint32_t total = read_action_data( &pub_time, sizeof(uint64_t) );
    sysio_assert( total == sizeof(uint64_t), "total == sizeof(uint64_t)" );
-   sysio_assert( pub_time == publication_time(), "pub_time == publication_time()" );
+   time_point msec{ microseconds{static_cast<int64_t>(pub_time)}};
+   sysio_assert( msec == publication_time(), "pub_time == publication_time()" );
 }
 
 void test_action::test_current_receiver( uint64_t receiver, uint64_t code, uint64_t action ) {
@@ -237,7 +237,7 @@ void test_action::test_assert_code() {
 
 void test_action::test_ram_billing_in_notify( uint64_t receiver, uint64_t code, uint64_t action ) {
    uint128_t tmp = 0;
-   uint32_t total = read_action_data( &tmp, sizeof(uint128_t) );
+   uint32_t total = sysio::read_action_data( &tmp, sizeof(uint128_t) );
    sysio_assert( total == sizeof(uint128_t), "total == sizeof(uint128_t)" );
 
    uint64_t to_notify = tmp >> 64;
