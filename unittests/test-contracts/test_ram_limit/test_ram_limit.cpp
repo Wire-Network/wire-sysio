@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include <sysiolib/sysio.hpp>
+#include <sysio/sysio.hpp>
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wsign-conversion"

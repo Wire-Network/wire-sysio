@@ -1,6 +1,8 @@
-#include <sysiolib/sysio.hpp>
+#include <sysio/sysio.hpp>
 
 #include "test_api.hpp"
+
+using namespace sysio::internal_use_do_not_use;
 
 void test_print::test_prints_l() {
   char ab[] = { 'a', 'b' };

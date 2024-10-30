@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include <sysiolib/sysio.hpp>
-#include <sysiolib/datastream.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/datastream.hpp>
 
 #include "test_api.hpp"
 
@@ -14,7 +14,7 @@ struct testtype {
         T v2;
         ds.seekp(0);
         ds >> v2;
-        sysio_assert ( v == v2, errmsg );   
+        sysio_assert ( v == v2, errmsg );
     }
 };
 
@@ -66,7 +66,7 @@ void test_datastream::test_basic()
     struct Pair {
         int a;
         double d;
-          bool operator==( const Pair &p ) const { return a == p.a && std::abs(d - p.d) < 1e-20; } 
+          bool operator==( const Pair &p ) const { return a == p.a && std::abs(d - p.d) < 1e-20; }
     };
     testtype<Pair>::run({ 1, 1.23456}, "struct" );
 
@@ -74,7 +74,25 @@ void test_datastream::test_basic()
         int a[2];
         bool operator==( const StaticArray &o ) const { return a[0] == o.a[0] && a[1] == o.a[1]; }
     };
-    testtype<StaticArray>::run( {{10,20}}, "StaticArray" );
+    /**
+      * Removed test:
+      * testtype<StaticArray>::run( {{10,20}}, "StaticArray" );
+      *
+      * Reason:
+      * it was working in c++14 but fails in c++17 due to braces elision
+      *
+      * Details:
+      * In c++17 StaticArray can be constructed with {10,20} or {{10,20}} using braces elision feature
+      * boost::pfr::for_each_field chosing constructor with maximum parameters available
+      * which is 2 in commented out example and then it fails to compile here
+      *    <skipped>/include/boost/pfr/detail/core17_generated.hpp:51:9: error: type 'StaticArray'
+      *    decomposes into 1 elements, but 2 names were provided
+      *    auto& [a,b] = val;
+      * this issue is known by author of the library and is not resolved yet:
+      * https://github.com/apolukhin/magic_get/issues/16
+      *
+      * Possible more up to date ("will not fix" issue): https://github.com/boostorg/pfr/issues/36
+      */
 
     testtype<std::string>::run( "hello", "string" );
 

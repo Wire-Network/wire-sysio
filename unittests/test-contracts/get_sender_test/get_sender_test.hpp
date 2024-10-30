@@ -2,21 +2,6 @@
 
 #include <sysio/sysio.hpp>
 
-namespace sysio {
-   namespace internal_use_do_not_use {
-      extern "C" {
-         __attribute__((sysio_wasm_import))
-         uint64_t get_sender();
-      }
-   }
-}
-
-namespace sysio {
-   name get_sender() {
-      return name( internal_use_do_not_use::get_sender() );
-   }
-}
-
 class [[sysio::contract]] get_sender_test : public sysio::contract {
 public:
    using sysio::contract::contract;

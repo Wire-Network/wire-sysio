@@ -1,6 +1,5 @@
-#include <sysiolib/action.h>
-#include <sysiolib/chain.h>
-#include <sysiolib/sysio.hpp>
+#include <sysio/action.hpp>
+#include <sysio/sysio.hpp>
 
 #include "test_api.hpp"
 
