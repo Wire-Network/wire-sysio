@@ -1325,9 +1325,9 @@ BOOST_FIXTURE_TEST_CASE(transaction_tests, TESTER) { try {
    CALL_TEST_FUNCTION(*this, "test_transaction", "send_action_empty", {});
 
    // test send_action_large
-   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION(*this, "test_transaction", "send_action_large", {}), inline_action_too_big_nonprivileged,
+   BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION(*this, "test_transaction", "send_action_large", {}), inline_action_too_big,
          [](const fc::exception& e) {
-            return expect_assert_message(e, "inline action too big for nonprivileged account");
+            return expect_assert_message(e, "inline action too big");
          }
       );
 
@@ -1337,7 +1337,7 @@ BOOST_FIXTURE_TEST_CASE(transaction_tests, TESTER) { try {
                           sysio_assert_message_is("test_action::assert_false")                          );
 
    //   test send_transaction
-      CALL_TEST_FUNCTION(*this, "test_transaction", "send_transaction", {});
+   CALL_TEST_FUNCTION(*this, "test_transaction", "send_transaction", {});
 
    // test send_transaction_empty
    BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION(*this, "test_transaction", "send_transaction_empty", {}), tx_no_auths,
@@ -1563,7 +1563,7 @@ BOOST_AUTO_TEST_CASE(deferred_inline_action_subjective_limit) { try {
 
    //confirm printed message
    BOOST_TEST(!trace->action_traces.empty());
-   BOOST_TEST(trace->action_traces.back().console == "exec 8");
+   BOOST_TEST(trace->action_traces.back().console == "action size: 4096");
    c.disconnect();
 
    for (int n=0; n < 10; ++n) {
