@@ -48,6 +48,7 @@ extern "C" {
 
       //test_action
       WASM_TEST_HANDLER   ( test_action, read_action_normal         );
+      WASM_TEST_HANDLER   ( test_action, read_action                );
       WASM_TEST_HANDLER   ( test_action, read_action_to_0           );
       WASM_TEST_HANDLER   ( test_action, read_action_to_64k         );
       WASM_TEST_HANDLER_EX( test_action, require_notice             );
