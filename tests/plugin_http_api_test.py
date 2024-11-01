@@ -857,9 +857,7 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"max_transaction_time":30,
                    "max_irreversible_block_age":1,
                    "cpu_effort_us":400000,
-                   "max_scheduled_transaction_time_per_block_ms":10000,
                    "subjective_cpu_leeway_us":0,
-                   "incoming_defer_ratio":1.0,
                    "greylist_limit":100}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn(ret_json["payload"]["result"], "ok")
@@ -869,9 +867,7 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"max_transaction_time":499,
                    "max_irreversible_block_age":-1,
                    "cpu_effort_us":400000,
-                   "max_scheduled_transaction_time_per_block_ms":10000,
                    "subjective_cpu_leeway_us":31000,
-                   "incoming_defer_ratio":1.0,
                    "greylist_limit":1000}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn(ret_json["payload"]["result"], "ok")
