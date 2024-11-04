@@ -93,9 +93,9 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
    sysio::chain_apis::read_only::get_table_by_scope_params param{"sysio.token"_n, "accounts"_n, "inita", "", 10};
    sysio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param);
 
-   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
+   BOOST_REQUIRE_EQUAL(5u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
-   if (result.rows.size() >= 4) {
+   if (result.rows.size() >= 5) {
       BOOST_REQUIRE_EQUAL(name("sysio.token"_n), result.rows[0].code);
       BOOST_REQUIRE_EQUAL(name("inita"_n), result.rows[0].scope);
       BOOST_REQUIRE_EQUAL(name("accounts"_n), result.rows[0].table);
@@ -105,6 +105,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, TESTER ) try {
       BOOST_REQUIRE_EQUAL(name("initb"_n), result.rows[1].scope);
       BOOST_REQUIRE_EQUAL(name("initc"_n), result.rows[2].scope);
       BOOST_REQUIRE_EQUAL(name("initd"_n), result.rows[3].scope);
+      BOOST_REQUIRE_EQUAL(name("sysio"_n), result.rows[4].scope);
    }
 
    param.lower_bound = "initb";
