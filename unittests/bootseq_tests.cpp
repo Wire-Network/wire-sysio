@@ -261,7 +261,9 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Vote for producers
         auto votepro = [&]( account_name voter, vector<account_name> producers ) {
           std::sort( producers.begin(), producers.end() );
-          base_tester::push_action(config::system_account_name, "voteproducer"_n, voter, mvo()
+          // special case, b1 voting is done by system account
+          auto actor = (voter == "b1"_n) ? config::system_account_name : voter;
+          base_tester::push_action(config::system_account_name, "voteproducer"_n, actor, mvo()
                                 ("voter",  name(voter))
                                 ("proxy", name(0) )
                                 ("producers", producers)
