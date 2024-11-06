@@ -149,11 +149,11 @@ add_test(NAME full-version-label-test COMMAND tests/full-version-label.sh "v${VE
 
 # Long running tests
 add_test(NAME nodeop_sanity_lr_test COMMAND tests/nodeop_run_test.py -v --sanity-test --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_sanity_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_sanity_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME nodeop_run_check_lr_test COMMAND tests/nodeop_run_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_run_check_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_run_check_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME nodeop_remote_lr_test COMMAND tests/nodeop_run_remote_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_remote_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_remote_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 # needs iproute-tc or iproute2 depending on platform
 #add_test(NAME p2p_high_latency_test COMMAND tests/p2p_high_latency_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -163,33 +163,31 @@ set_property(TEST nodeop_remote_lr_test PROPERTY LABELS long_running_tests)
 #set_property(TEST distributed_transactions_lr_test PROPERTY LABELS long_running_tests)
 
 add_test(NAME nodeop_forked_chain_lr_test COMMAND tests/nodeop_forked_chain_test.py -v --wallet-port 9901 --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_forked_chain_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_forked_chain_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_contrl_c_lr_test COMMAND tests/nodeop_contrl_c_test.py -v --wallet-port 9901 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_contrl_c_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_contrl_c_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_voting_lr_test COMMAND tests/nodeop_voting_test.py -v --wallet-port 9902 --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_voting_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_voting_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES TIMEOUT 3000)
-set_property(TEST nodeop_under_min_avail_ram_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE TIMEOUT 3000)
 
 add_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_irreversible_mode_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_irreversible_mode_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_read_terminate_at_block_lr_test COMMAND tests/nodeop_read_terminate_at_block_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_read_terminate_at_block_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_read_terminate_at_block_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_chainbase_allocation_lr_test COMMAND tests/nodeop_chainbase_allocation_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_chainbase_allocation_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_chainbase_allocation_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_startup_catchup_lr_test COMMAND tests/nodeop_startup_catchup.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_startup_catchup_lr_test PROPERTIES TIMEOUT 3000)
-set_property(TEST nodeop_startup_catchup_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_startup_catchup_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE TIMEOUT 3000)
 
 add_test(NAME nodeop_short_fork_take_over_lr_test COMMAND tests/nodeop_short_fork_take_over_test.py -v --wallet-port 9905 --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_short_fork_take_over_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_short_fork_take_over_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 if(ENABLE_MULTIVERSION_PROTOCOL_TEST)
   set(ALTERNATE_VERSION_LABELS_FILE "${CMAKE_BINARY_DIR}/tests/multiversion_paths.conf")
@@ -200,13 +198,13 @@ if(ENABLE_MULTIVERSION_PROTOCOL_TEST)
 endif()
 
 add_test(NAME nodeop_producer_watermark_lr_test COMMAND tests/nodeop_producer_watermark_test.py -v --clean-run --dump-error-detail WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_producer_watermark_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_producer_watermark_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_high_transaction_lr_test COMMAND tests/nodeop_high_transaction_test.py -v --clean-run --dump-error-detail -p 4 -n 8 --num-transactions 10000 --max-transactions-per-second 500 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_high_transaction_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_high_transaction_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_retry_transaction_lr_test COMMAND tests/nodeop_retry_transaction_test.py -v --clean-run --dump-error-detail --num-transactions 100 --max-transactions-per-second 10 --total-accounts 5 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST nodeop_retry_transaction_lr_test PROPERTY LABELS long_running_tests)
+set_tests_properties(nodeop_retry_transaction_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 
 add_test(NAME cli_test COMMAND tests/cli_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
