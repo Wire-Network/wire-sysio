@@ -128,6 +128,7 @@ programs/clio/clio --wallet-url $wdurl --url http://$bioshost:$biosport push act
 echo ==== End: $step ============== >> $logfile
 step=$(($step + 1))
 
+sleep 1
 ecmd set contract sysio unittests/contracts/sysio.system sysio.system.wasm sysio.system.abi
 
 ecmd push action sysio setpriv '["sysio.msig",1]' -p sysio
