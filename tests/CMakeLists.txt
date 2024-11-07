@@ -221,7 +221,7 @@ set_tests_properties(plugin_http_api_test PROPERTIES TIMEOUT 40)
 set_tests_properties(plugin_http_api_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST resource_monitor_plugin_test PROPERTY LABELS long_running_tests)
+set_tests_properties(resource_monitor_plugin_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 if(ENABLE_COVERAGE_TESTING)
 
