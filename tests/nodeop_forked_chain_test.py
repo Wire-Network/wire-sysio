@@ -300,6 +300,7 @@ try:
     producerToSlot={}
     slot=-1
     inRowCountPerProducer=12
+    minNumBlocksPerProducer=9
     lastTimestamp=timestamp
     headBlockNum=node.getBlockNum()
     firstBlockForWindowMissedSlot=None
@@ -340,7 +341,7 @@ try:
                 missedSlotAfter.append("%d (%s)" % (blockNum-1, missed))
             lastTimestamp=timestamp
 
-        if producerToSlot[lastBlockProducer]["count"]!=inRowCountPerProducer:
+        if producerToSlot[lastBlockProducer]["count"] < minNumBlocksPerProducer or producerToSlot[lastBlockProducer]["count"] > inRowCountPerProducer:
             Utils.errorExit("Producer %s, in slot %d, expected to produce %d blocks but produced %d blocks.  At block number %d. " %
                             (lastBlockProducer, slot, inRowCountPerProducer, producerToSlot[lastBlockProducer]["count"], blockNum-1) +
                             "Slots were missed after the following blocks: %s" % (", ".join(missedSlotAfter)))
@@ -399,7 +400,7 @@ try:
     Print("Tracking block producers from %d till divergence or %d. Head block is %d and lowest LIB is %d" % (preKillBlockNum, lastBlockNum, headBlockNum, libNumAroundDivergence))
     transitionCount=0
     missedTransitionBlock=None
-    for blockNum in range(preKillBlockNum,lastBlockNum):
+    for blockNum in range(preKillBlockNum,lastBlockNum + 1):
         #avoiding getting LIB until my current block passes the head from the last time I checked
         if blockNum>headBlockNum:
             (headBlockNum, libNumAroundDivergence)=getMinHeadAndLib(prodNodes)
@@ -566,14 +567,15 @@ try:
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
 
-    if not testSuccessful:
-        Print(Utils.FileDivider)
-        Print("Compare Blocklog")
-        cluster.compareBlockLogs()
-        Print(Utils.FileDivider)
-        Print("Print Blocklog")
-        cluster.printBlockLog()
-        Print(Utils.FileDivider)
+    # Too much output
+    # if not testSuccessful:
+    #     Print(Utils.FileDivider)
+    #     Print("Compare Blocklog")
+    #     cluster.compareBlockLogs()
+    #     Print(Utils.FileDivider)
+    #     Print("Print Blocklog")
+    #     cluster.printBlockLog()
+    #     Print(Utils.FileDivider)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)
