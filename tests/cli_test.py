@@ -101,7 +101,7 @@ def clio_sign_test():
     assert(b'"permission": "active"' in output)
     assert(b'"data": "000000000000a6690000000000ea305501000000000000000453595300000000016d"' in output)
 
-    packed_trx = ' { "signatures": [], "compression": "none", "packed_context_free_data": "", "packed_trx": "a591425d4188b19d31b1000000000100a6823403ea3055000000572d3ccdcd010000000000ea305500000000a8ed323222000000000000a6690000000000ea305501000000000000000453595300000000016d00" } '
+    packed_trx = ' { "signatures": [], "compression": "none", "packed_context_free_data": "", "packed_trx": "a591425d4188b19d31b1000000000100a6823403eab0c7000000572d3ccdcd010000000000eab0c700000000a8ed323222000000000000a6690000000000ea305501000000000000000453595300000000016d00" } '
 
     # Test packed transaction is unpacked. Only with options --print-request and --public-key
     # the sign request is dumped to stderr.
