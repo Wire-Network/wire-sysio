@@ -837,19 +837,6 @@ struct controller_impl {
       resource_limits.add_to_snapshot(snapshot);
    }
 
-   static std::optional<genesis_state> extract_legacy_genesis_state( snapshot_reader& snapshot, uint32_t version ) {
-      std::optional<genesis_state> genesis;
-      using v2 = legacy::snapshot_global_property_object_v2;
-
-      if (std::clamp(version, v2::minimum_version, v2::maximum_version) == version ) {
-         genesis.emplace();
-         snapshot.read_section<genesis_state>([&genesis=*genesis]( auto &section ){
-            section.read_row(genesis);
-         });
-      }
-      return genesis;
-   }
-
    void read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
       chain_snapshot_header header;
       snapshot->read_section<chain_snapshot_header>([this, &header]( auto &section ){
@@ -859,19 +846,10 @@ struct controller_impl {
 
       { /// load and upgrade the block header state
          block_header_state head_header_state;
-         using v2 = legacy::snapshot_block_header_state_v2;
 
-         if (std::clamp(header.version, v2::minimum_version, v2::maximum_version) == header.version ) {
-            snapshot->read_section<block_state>([this, &head_header_state]( auto &section ) {
-               legacy::snapshot_block_header_state_v2 legacy_header_state;
-               section.read_row(legacy_header_state, db);
-               head_header_state = block_header_state(std::move(legacy_header_state));
-            });
-         } else {
-            snapshot->read_section<block_state>([this,&head_header_state]( auto &section ){
-               section.read_row(head_header_state, db);
-            });
-         }
+         snapshot->read_section<block_state>([this,&head_header_state]( auto &section ){
+            section.read_row(head_header_state, db);
+         });
 
          snapshot_head_block = head_header_state.block_num;
          SYS_ASSERT( blog_start <= (snapshot_head_block + 1) && snapshot_head_block <= blog_end,
@@ -897,55 +875,6 @@ struct controller_impl {
          // skip the database_header as it is only relevant to in-memory database
          if (std::is_same<value_t, database_header_object>::value) {
             return;
-         }
-
-         // special case for in-place upgrade of global_property_object
-         if (std::is_same<value_t, global_property_object>::value) {
-            using v2 = legacy::snapshot_global_property_object_v2;
-            using v3 = legacy::snapshot_global_property_object_v3;
-            using v4 = legacy::snapshot_global_property_object_v4;
-
-            if (std::clamp(header.version, v2::minimum_version, v2::maximum_version) == header.version ) {
-               std::optional<genesis_state> genesis = extract_legacy_genesis_state(*snapshot, header.version);
-               SYS_ASSERT( genesis, snapshot_exception,
-                           "Snapshot indicates chain_snapshot_header version 2, but does not contain a genesis_state. "
-                           "It must be corrupted.");
-               snapshot->read_section<global_property_object>([&db=this->db,gs_chain_id=genesis->compute_chain_id()]( auto &section ) {
-                  v2 legacy_global_properties;
-                  section.read_row(legacy_global_properties, db);
-
-                  db.create<global_property_object>([&legacy_global_properties,&gs_chain_id](auto& gpo ){
-                     gpo.initalize_from(legacy_global_properties, gs_chain_id, kv_database_config{},
-                                       genesis_state::default_initial_wasm_configuration);
-                  });
-               });
-               return; // early out to avoid default processing
-            }
-
-            if (std::clamp(header.version, v3::minimum_version, v3::maximum_version) == header.version ) {
-               snapshot->read_section<global_property_object>([&db=this->db]( auto &section ) {
-                  v3 legacy_global_properties;
-                  section.read_row(legacy_global_properties, db);
-
-                  db.create<global_property_object>([&legacy_global_properties](auto& gpo ){
-                     gpo.initalize_from(legacy_global_properties, kv_database_config{},
-                                        genesis_state::default_initial_wasm_configuration);
-                  });
-               });
-               return; // early out to avoid default processing
-            }
-
-            if (std::clamp(header.version, v4::minimum_version, v4::maximum_version) == header.version) {
-               snapshot->read_section<global_property_object>([&db = this->db](auto& section) {
-                  v4 legacy_global_properties;
-                  section.read_row(legacy_global_properties, db);
-
-                  db.create<global_property_object>([&legacy_global_properties](auto& gpo) {
-                     gpo.initalize_from(legacy_global_properties);
-                  });
-               });
-               return; // early out to avoid default processing
-            }
          }
 
          snapshot->read_section<value_t>([this]( auto& section ) {
@@ -3492,29 +3421,13 @@ chain_id_type controller::extract_chain_id(snapshot_reader& snapshot) {
       header.validate();
    });
 
-   // check if this is a legacy version of the snapshot, which has a genesis state instead of chain id
-   std::optional<genesis_state> genesis = controller_impl::extract_legacy_genesis_state(snapshot, header.version);
-   if (genesis) {
-      return genesis->compute_chain_id();
-   }
-
    chain_id_type chain_id;
 
-   using v4 = legacy::snapshot_global_property_object_v4;
-   if (header.version <= v4::maximum_version) {
-      snapshot.read_section<global_property_object>([&chain_id]( auto &section ){
-         v4 global_properties;
-         section.read_row(global_properties);
-         chain_id = global_properties.chain_id;
-      });
-   }
-   else {
-      snapshot.read_section<global_property_object>([&chain_id]( auto &section ){
-         snapshot_global_property_object global_properties;
-         section.read_row(global_properties);
-         chain_id = global_properties.chain_id;
-      });
-   }
+   snapshot.read_section<global_property_object>([&chain_id]( auto &section ){
+      snapshot_global_property_object global_properties;
+      section.read_row(global_properties);
+      chain_id = global_properties.chain_id;
+   });
 
    return chain_id;
 }

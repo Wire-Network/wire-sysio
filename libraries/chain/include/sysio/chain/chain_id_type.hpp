@@ -54,8 +54,6 @@ namespace chain {
          friend struct controller_impl;
          friend class global_property_object;
          friend struct snapshot_global_property_object;
-         friend struct legacy::snapshot_global_property_object_v3;
-         friend struct legacy::snapshot_global_property_object_v4;
    };
 
 } }  // namespace sysio::chain

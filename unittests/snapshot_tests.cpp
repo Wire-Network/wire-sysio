@@ -395,10 +395,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
    std::string current_version = "v6";
 
    int ordinal = 0;
-   for(std::string version : {"v2", "v3", "v4" , "v5", "v6"})
+   for(std::string version : {"v6"})
    {
       if(save_snapshot && version == current_version) continue;
-      static_assert(chain_snapshot_header::minimum_compatible_version <= 2, "version 2 unit test is no longer needed.  Please clean up data files");
+      static_assert(chain_snapshot_header::minimum_compatible_version <= 6, "version 6 unit test is no longer needed.  Please clean up data files");
       auto old_snapshot = SNAPSHOT_SUITE::load_from_file("snap_" + version);
       BOOST_TEST_CHECKPOINT("loading snapshot: " << version);
       snapshotted_tester old_snapshot_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(old_snapshot), ordinal++);
@@ -424,56 +424,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
 
       SNAPSHOT_SUITE::write_to_file("snap_" + current_version, latest);
    }
-}
-
-/*
-When WTMSIG changes were introduced in 1.8.x, the snapshot had to be able 
-to store more than a single producer key.
-This test intends to make sure that a snapshot from before that change could 
-be correctly loaded into a new version to facilitate upgrading from 1.8.x
-to v2.0.x without a replay.
-
-The original test simulated a snapshot from 1.8.x with an inflight schedule change, loaded it on the newer version and reconstructed the chain via 
-push_transaction. This is too fragile. 
-
-The fix is to save block.log and its corresponding snapshot with infight
-schedule changes, load the snapshot and replay the block.log on the new
-version, and verify their integrity.
-*/
-BOOST_AUTO_TEST_CASE_TEMPLATE(test_pending_schedule_snapshot, SNAPSHOT_SUITE, snapshot_suites)
-{
-   static_assert(chain_snapshot_header::minimum_compatible_version <= 2, "version 2 unit test is no longer needed.  Please clean up data files");
-
-   // consruct a chain by replaying the saved blocks.log
-   std::string source_log_dir_str = snapshot_file<snapshot::binary>::base_path;
-   source_log_dir_str += "prod_sched";
-   const auto source_log_dir = bfs::path(source_log_dir_str.c_str());
-   const uint32_t legacy_default_max_inline_action_size = 4 * 1024;
-   auto config = tester::default_config(fc::temp_directory(), legacy_default_max_inline_action_size).first;
-   auto genesis = sysio::chain::block_log::extract_genesis_state(source_log_dir);
-   bfs::create_directories(config.blocks_dir);
-   bfs::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
-   tester blockslog_chain(config, *genesis);
-
-   // consruct a chain by loading the saved snapshot
-   auto ordinal = 0;
-   auto old_snapshot = SNAPSHOT_SUITE::load_from_file("snap_v2_prod_sched");
-   snapshotted_tester snapshot_chain(blockslog_chain.get_config(), SNAPSHOT_SUITE::get_reader(old_snapshot), ordinal++);
-
-   // make sure blockslog_chain and snapshot_chain agree to each other 
-   verify_integrity_hash<SNAPSHOT_SUITE>(*blockslog_chain.control, *snapshot_chain.control);
-   
-   // extra round of testing
-   // create a latest snapshot
-   auto latest_writer = SNAPSHOT_SUITE::get_writer();
-   snapshot_chain.control->write_snapshot(latest_writer);
-   auto latest = SNAPSHOT_SUITE::finalize(latest_writer);
-   
-   // construct a chain from the latest snapshot
-   snapshotted_tester latest_chain(blockslog_chain.get_config(), SNAPSHOT_SUITE::get_reader(latest), ordinal++);
-
-   // make sure both chains agree
-   verify_integrity_hash<SNAPSHOT_SUITE>(*blockslog_chain.control, *latest_chain.control);
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_block_log, SNAPSHOT_SUITE, snapshot_suites)
