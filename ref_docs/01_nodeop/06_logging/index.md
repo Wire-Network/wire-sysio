@@ -65,7 +65,7 @@ Example:
     "name": "net",
     "type": "gelf",
     "args": {
-        "endpoint": "104.198.210.18:12202”,
+        "endpoint": "104.198.210.18:12202",
         "host": <YOURNAMEHERE IN QUOTES>
     },
     "enabled": true
