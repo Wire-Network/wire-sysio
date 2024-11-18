@@ -180,7 +180,7 @@ try:
 
 
     # Sleep for 1 min
-    time.sleep(60)
+    time.sleep(72)
 
     # Verify subjective decay
     acct1 = fdnode.getAccountSubjectiveInfo("account1")
