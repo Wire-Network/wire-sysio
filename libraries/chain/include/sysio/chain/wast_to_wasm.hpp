@@ -1,6 +1,8 @@
 #pragma once
-#include <vector>
+
+#include <cstdint>
 #include <string>
+#include <vector>
 
 namespace sysio { namespace chain {
 
