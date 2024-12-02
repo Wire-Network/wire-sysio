@@ -57,7 +57,7 @@ try:
     specificExtraNodeosArgs={}
     # non-producing nodes are at the end of the cluster's nodes, so reserving the last one for state_history_plugin
     shipNodeNum = totalNodes - 1
-    specificExtraNodeosArgs[shipNodeNum]="--plugin eosio::state_history_plugin --sync-fetch-span 200 --plugin eosio::net_api_plugin "
+    specificExtraNodeosArgs[shipNodeNum]="--plugin sysio::state_history_plugin --sync-fetch-span 200 --plugin sysio::net_api_plugin "
 
     if args.unix_socket:
         specificExtraNodeosArgs[shipNodeNum] += "--state-history-unix-socket-path ship.sock"
@@ -108,7 +108,7 @@ try:
         out.close()
         err.close()
 
-    Print("Shutdown state_history_plugin nodeos")
+    Print("Shutdown state_history_plugin nodeop")
     shipNode.kill(signal.SIGTERM)
 
     files = None

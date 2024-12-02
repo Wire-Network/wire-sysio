@@ -4,7 +4,7 @@ Push a transaction
 
 ## Before you begin
 
-* Install the currently supported version of `cleos`
+* Install the currently supported version of `clio`
 
 * Understand the following:
   * What is a transaction
@@ -24,7 +24,7 @@ Push a transaction
   "delay_sec": 0,
   "context_free_actions": [],
   "actions": [{
-      "account": "eosio.token",
+      "account": "sysio.token",
       "name": "transfer",
       "authorization": [{
           "actor": "han",
@@ -42,7 +42,7 @@ Push a transaction
 * You can also create a JSON snippet that uses clear text JSON for `data` field.
 
 [[info]]
-| Be aware that if a clear text `data` field is used, cleos need to fetch copies of required ABIs using `nodeos` API. That operation has a performance overhead on `nodeos`
+| Be aware that if a clear text `data` field is used, clio need to fetch copies of required ABIs using `nodeop` API. That operation has a performance overhead on `nodeop`
 
 ```JSON
 {
@@ -54,7 +54,7 @@ Push a transaction
   "delay_sec": 0,
   "context_free_actions": [],
   "actions": [{
-      "account": "eosio.token",
+      "account": "sysio.token",
       "name": "transfer",
       "authorization": [{
           "actor": "han",
@@ -63,7 +63,7 @@ Push a transaction
       ],
       "data": {
         "from": "han",
-        "to": "eosio",
+        "to": "sysio",
         "quantity": "0.0001 SYS",
         "memo": "m"
       }
@@ -77,13 +77,13 @@ Push a transaction
 * Execute the following command:
 
 ```sh
-cleos push transaction TRX_FILE.json
+clio push transaction TRX_FILE.json
 ```
 
 * Submit a transaction from a JSON:
 
 ```sh
-cleos push transaction JSON
+clio push transaction JSON
 ```
 
 <!---

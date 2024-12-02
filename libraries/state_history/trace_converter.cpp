@@ -1,7 +1,7 @@
-#include <eosio/state_history/serialization.hpp>
-#include <eosio/state_history/trace_converter.hpp>
+#include <sysio/state_history/serialization.hpp>
+#include <sysio/state_history/trace_converter.hpp>
 
-namespace eosio {
+namespace sysio {
 namespace state_history {
 
 void trace_converter::add_transaction(const transaction_trace_ptr& trace, const chain::packed_transaction_ptr& transaction) {
@@ -26,7 +26,7 @@ void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool tr
       else
          id = std::get<chain::packed_transaction>(r.trx).id();
       auto it = cached_traces.find(id);
-      EOS_ASSERT(it != cached_traces.end() && it->second.trace->receipt, chain::plugin_exception,
+      SYS_ASSERT(it != cached_traces.end() && it->second.trace->receipt, chain::plugin_exception,
                  "missing trace for transaction ${id}", ("id", id));
       traces.push_back(it->second);
    }
@@ -38,4 +38,4 @@ void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool tr
 }
 
 } // namespace state_history
-} // namespace eosio
+} // namespace sysio

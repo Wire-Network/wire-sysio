@@ -1,6 +1,6 @@
-#include <eosio/template_plugin/template_plugin.hpp>
+#include <sysio/template_plugin/template_plugin.hpp>
 
-namespace eosio {
+namespace sysio {
    static auto _template_plugin = application::register_plugin<template_plugin>();
 
 class template_plugin_impl {

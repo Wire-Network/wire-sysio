@@ -1,7 +1,7 @@
 #include "bls_primitives_test.hpp"
-#include <eosio/transaction.hpp>
+#include <sysio/transaction.hpp>
 
-using namespace eosio;
+using namespace sysio;
 
 void bls_primitives_test::testg1add(const std::vector<uint8_t>& op1, const std::vector<uint8_t>& op2, const std::vector<uint8_t>& res, int32_t expected_error)
 {

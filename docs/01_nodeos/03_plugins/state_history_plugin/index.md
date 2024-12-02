@@ -1,36 +1,36 @@
 
 ## Description
 
-The `state_history_plugin` is useful for capturing historical data about the blockchain state. The plugin receives blockchain data from other connected nodes and caches the data into files. The plugin listens on a socket for applications to connect and sends blockchain data back based on the plugin options specified when starting `nodeos`.
+The `state_history_plugin` is useful for capturing historical data about the blockchain state. The plugin receives blockchain data from other connected nodes and caches the data into files. The plugin listens on a socket for applications to connect and sends blockchain data back based on the plugin options specified when starting `nodeop`.
 
 ## Usage
 
 ```console
 # config.ini
-plugin = eosio::state_history_plugin
+plugin = sysio::state_history_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::state_history_plugin [operations] [options]
+nodeop ... --plugin sysio::state_history_plugin [operations] [options]
 ```
 
 ## Operations
 
-These can only be specified from the `nodeos` command-line:
+These can only be specified from the `nodeop` command-line:
 
 ```console
-Command Line Options for eosio::state_history_plugin:
+Command Line Options for sysio::state_history_plugin:
 
   --delete-state-history                clear state history files
 ```
 
 ## Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::state_history_plugin:
+Config Options for sysio::state_history_plugin:
   --state-history-dir arg (="state-history")
                                         the location of the state-history
                                         directory (absolute path or relative to

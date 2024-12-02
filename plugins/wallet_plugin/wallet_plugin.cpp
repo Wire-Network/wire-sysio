@@ -1,13 +1,13 @@
-#include <eosio/wallet_plugin/wallet_plugin.hpp>
-#include <eosio/wallet_plugin/wallet_manager.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/wallet_plugin/wallet_plugin.hpp>
+#include <sysio/wallet_plugin/wallet_manager.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <chrono>
 
 #include <fc/io/json.hpp>
 
 namespace fc { class variant; }
 
-namespace eosio {
+namespace sysio {
 
 static auto _wallet_plugin = application::register_plugin<wallet_plugin>();
 
@@ -43,11 +43,11 @@ void wallet_plugin::plugin_initialize(const variables_map& options) {
       }
       if (options.count("unlock-timeout")) {
          auto timeout = options.at("unlock-timeout").as<int64_t>();
-         EOS_ASSERT(timeout > 0, chain::invalid_lock_timeout_exception, "Please specify a positive timeout ${t}", ("t", timeout));
+         SYS_ASSERT(timeout > 0, chain::invalid_lock_timeout_exception, "Please specify a positive timeout ${t}", ("t", timeout));
          std::chrono::seconds t(timeout);
          wallet_manager_ptr->set_timeout(t);
       }
    } FC_LOG_AND_RETHROW()
 }
 
-} // namespace eosio
+} // namespace sysio

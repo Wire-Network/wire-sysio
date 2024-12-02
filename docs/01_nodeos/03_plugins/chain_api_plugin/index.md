@@ -6,11 +6,11 @@ The `chain_api_plugin` exposes functionality from the [`chain_plugin`](../chain_
 
 ```console
 # config.ini
-plugin = eosio::chain_api_plugin
+plugin = sysio::chain_api_plugin
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_api_plugin
+nodeop ... --plugin sysio::chain_api_plugin
 ```
 
 ## Options
@@ -26,13 +26,13 @@ None
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin
+plugin = sysio::chain_plugin
 [options]
-plugin = eosio::http_plugin
+plugin = sysio::http_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [operations] [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::chain_plugin [operations] [options]  \
+           --plugin sysio::http_plugin [options]
 ```

@@ -2,7 +2,7 @@
 
 #include "Platform/Platform.h"
 
-#include "../../../chain/include/eosio/chain/wasm_eosio_constraints.hpp"
+#include "../../../chain/include/sysio/chain/wasm_sysio_constraints.hpp"
 #include <string>
 #include <vector>
 #include <string.h>
@@ -134,7 +134,7 @@ namespace Serialization
 	{ memcpy(stream.advance(numBytes),bytes,numBytes); }
 	FORCEINLINE void serializeBytes(InputStream& stream,U8* bytes,Uptr numBytes)
 	{ 
-      if ( numBytes < eosio::chain::wasm_constraints::wasm_page_size || !WASM::check_limits)
+      if ( numBytes < sysio::chain::wasm_constraints::wasm_page_size || !WASM::check_limits)
          memcpy(bytes,stream.advance(numBytes),numBytes); 
       else
          throw FatalSerializationException(std::string("Trying to deserialize bytes of size : " + std::to_string((uint64_t)numBytes)));
@@ -263,7 +263,7 @@ namespace Serialization
 	template<typename Stream>
 	void serialize(Stream& stream,std::string& string)
 	{
-      constexpr size_t max_size = eosio::chain::wasm_constraints::maximum_func_local_bytes;
+      constexpr size_t max_size = sysio::chain::wasm_constraints::maximum_func_local_bytes;
 		Uptr size = string.size();
 		serializeVarUInt32(stream,size);
 		if(Stream::isInput)
@@ -283,7 +283,7 @@ namespace Serialization
 	template<typename Stream,typename Element,typename Allocator,typename SerializeElement>
 	void serializeArray(Stream& stream,std::vector<Element,Allocator>& vector,SerializeElement serializeElement)
 	{
-      constexpr size_t max_size = eosio::chain::wasm_constraints::maximum_func_local_bytes;
+      constexpr size_t max_size = sysio::chain::wasm_constraints::maximum_func_local_bytes;
 		Uptr size = vector.size();
 		serializeVarUInt32(stream,size);
 		if(Stream::isInput)

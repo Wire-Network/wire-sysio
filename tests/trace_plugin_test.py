@@ -17,15 +17,15 @@ class TraceApiPluginTest(unittest.TestCase):
     accounts = []
     cluster.setWalletMgr(walletMgr)
 
-    # start keosd and nodeos
+    # start keosd and nodeop
     def startEnv(self) :
         account_names = ["alice", "bob", "charlie"]
-        abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/eosio.token/eosio.token.abi')
-        traceNodeosArgs = " --verbose-http-errors --trace-rpc-abi eosio.token=" + abs_path
+        abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
+        traceNodeosArgs = " --verbose-http-errors --trace-rpc-abi sysio.token=" + abs_path
         self.cluster.launch(totalNodes=2, extraNodeosArgs=traceNodeosArgs)
         self.walletMgr.launch()
         testWalletName="testwallet"
-        testWallet=self.walletMgr.create(testWalletName, [self.cluster.eosioAccount, self.cluster.defproduceraAccount])
+        testWallet=self.walletMgr.create(testWalletName, [self.cluster.sysioAccount, self.cluster.defproduceraAccount])
         self.cluster.validateAccounts(None)
         self.accounts=createAccountKeys(len(account_names))
         node = self.cluster.getNode(1)
@@ -33,7 +33,7 @@ class TraceApiPluginTest(unittest.TestCase):
             self.accounts[idx].name =  account_names[idx]
             self.walletMgr.importKey(self.accounts[idx], testWallet)
         for account in self.accounts:
-            node.createInitializeAccount(account, self.cluster.eosioAccount, buyRAM=1000000, stakedDeposit=5000000, waitForTransBlock=True if account == self.accounts[-1] else False, exitOnError=True)
+            node.createInitializeAccount(account, self.cluster.sysioAccount, buyRAM=1000000, stakedDeposit=5000000, waitForTransBlock=True if account == self.accounts[-1] else False, exitOnError=True)
 
     def get_block(self, params: str, node: Node) -> json:
         resource = "trace_api"

@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.16 )
 
-project( leap )
+project( wire-sysio )
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
 
@@ -30,9 +30,9 @@ option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
 option(ENABLE_WEXTRA "Enable `-Wextra` compilation flag." Off)
 
 
-set( CLI_CLIENT_EXECUTABLE_NAME cleos )
-set( NODE_EXECUTABLE_NAME nodeos )
-set( KEY_STORE_EXECUTABLE_NAME keosd )
+set( CLI_CLIENT_EXECUTABLE_NAME clio )
+set( NODE_EXECUTABLE_NAME nodeop )
+set( KEY_STORE_EXECUTABLE_NAME kiod )
 set( LEAP_UTIL_EXECUTABLE_NAME leap-util )
 
 # http://stackoverflow.com/a/18369825
@@ -52,17 +52,17 @@ endif()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 set(BUILD_DOXYGEN FALSE CACHE BOOL "Build doxygen documentation on every make")
-set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeos multiversion protocol test")
+set(ENABLE_MULTIVERSION_PROTOCOL_TEST FALSE CACHE BOOL "Enable nodeop multiversion protocol test")
 
 option(ENABLE_OC "Enable eosvm-oc on supported platforms" ON)
 
 # WASM runtimes to enable. Each runtime in this list will have:
-#  * definition EOSIO_<RUNTIME>_RUNTIME_ENABLED defined in public libchain interface
+#  * definition SYSIO_<RUNTIME>_RUNTIME_ENABLED defined in public libchain interface
 #  * ctest entries with --runtime
 if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
    if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
-      list(APPEND EOSIO_WASM_RUNTIMES eos-vm-oc)
-      # EOS VM OC requires LLVM, but move the check up here to a central location so that the EosioTester.cmakes
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm-oc)
+      # EOS VM OC requires LLVM, but move the check up here to a central location so that the SysioTester.cmakes
       # can be created with the exact version found
       find_package(LLVM REQUIRED CONFIG)
       if(LLVM_VERSION_MAJOR VERSION_LESS 7 OR LLVM_VERSION_MAJOR VERSION_GREATER_EQUAL 12)
@@ -73,9 +73,9 @@ endif()
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
    if(CMAKE_SYSTEM_PROCESSOR STREQUAL x86_64 OR CMAKE_SYSTEM_PROCESSOR STREQUAL amd64)
-      list(APPEND EOSIO_WASM_RUNTIMES eos-vm eos-vm-jit)
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm sys-vm-jit)
    else()
-      list(APPEND EOSIO_WASM_RUNTIMES eos-vm)
+      list(APPEND SYSIO_WASM_RUNTIMES sys-vm)
    endif()
 endif()
 
@@ -123,7 +123,7 @@ if(ENABLE_WEXTRA)
 endif()
 
 
-option(EOSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for Leap" OFF)
+option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for Leap" OFF)
 
 # based on http://www.delorie.com/gnu/docs/gdb/gdb_70.html
 # uncomment this line to tell GDB about macros (slows compile times)
@@ -153,11 +153,11 @@ endif()
 
 message( STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name" )
 
-if ("${EOSIO_ROOT_KEY}" STREQUAL "")
-   set(EOSIO_ROOT_KEY "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
+if ("${SYSIO_ROOT_KEY}" STREQUAL "")
+   set(SYSIO_ROOT_KEY "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
 endif()
 
-message( STATUS "Using '${EOSIO_ROOT_KEY}' as public key for 'eosio' account" )
+message( STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account" )
 
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if( ENABLE_TCMALLOC )
@@ -179,6 +179,7 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 # is effectively --catch_system_errors=no broadly across all tests
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
 
+add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
 add_subdirectory( libraries )
 add_subdirectory( plugins )
 add_subdirectory( programs )
@@ -190,40 +191,40 @@ add_subdirectory( benchmark )
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/eosio.version.in ${CMAKE_CURRENT_BINARY_DIR}/eosio.version.hpp)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/eosio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR} COMPONENT dev EXCLUDE_FROM_ALL)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR} COMPONENT dev EXCLUDE_FROM_ALL)
 
 set(EOS_ROOT_DIR "${CMAKE_BINARY_DIR}/lib")
-# legacy eosio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/eosio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/eosio/eosio-config.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/eosio/EosioTester.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/eosio/EosioCheckVersion.cmake COPYONLY)
+# legacy sysio CMake files
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 # new leap CMake files
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/leap-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/leap/leap-config.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/leap/EosioTester.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/leap/EosioCheckVersion.cmake COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/leap/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/leap/SysioCheckVersion.cmake COPYONLY)
 
 set(EOS_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/EosioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/EosioTester.cmake @ONLY)
-# legacy eosio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/eosio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/eosio-config.cmake @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/modules/eosio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/eosio COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_BINARY_DIR}/modules/EosioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/eosio COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/EosioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/eosio COMPONENT dev EXCLUDE_FROM_ALL)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake @ONLY)
+# legacy sysio CMake files
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 # new leap CMake files
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/leap-config.cmake.in ${CMAKE_BINARY_DIR}/modules/leap-config.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/modules/leap-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_BINARY_DIR}/modules/EosioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/EosioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
 
 configure_file(LICENSE                                                     licenses/leap/LICENSE           COPYONLY)
 configure_file(libraries/softfloat/COPYING.txt                             licenses/leap/LICENSE.softfloat COPYONLY)
 configure_file(libraries/wasm-jit/LICENSE                                  licenses/leap/LICENSE.wavm      COPYONLY)
 configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/leap/LICENSE.secp256k1 COPYONLY)
 configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/leap/LICENSE.rapidjson COPYONLY)
-configure_file(libraries/eos-vm/LICENSE                                    licenses/leap/LICENSE.eos-vm    COPYONLY)
+configure_file(libraries/sys-vm/LICENSE                                    licenses/leap/LICENSE.sys-vm    COPYONLY)
 configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/leap/LICENSE.prom      COPYONLY)
-configure_file(programs/cleos/LICENSE.CLI11                                licenses/leap/LICENSE.CLI11     COPYONLY)
+configure_file(programs/clio/LICENSE.CLI11                                licenses/leap/LICENSE.CLI11     COPYONLY)
 configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/leap/LICENSE.bls12-381 COPYONLY)
 configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/leap/LICENSE.boringssl COPYONLY)
 
@@ -267,11 +268,11 @@ endif()
 
 configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/leap-util
                ${CMAKE_BINARY_DIR}/programs/leap-util/bash-completion/completions/leap-util COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/cleos
-               ${CMAKE_BINARY_DIR}/programs/cleos/bash-completion/completions/cleos COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/clio
+               ${CMAKE_BINARY_DIR}/programs/clio/bash-completion/completions/clio COPYONLY)
 
 install(FILES libraries/cli11/bash-completion/completions/leap-util DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
-install(FILES libraries/cli11/bash-completion/completions/cleos DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
+install(FILES libraries/cli11/bash-completion/completions/clio DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
 
 # Add the boost submodule we used to build to our install package, so headers can be found for libtester
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries/boost/"

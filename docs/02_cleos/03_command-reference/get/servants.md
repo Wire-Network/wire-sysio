@@ -6,12 +6,12 @@ Retrieve accounts which are servants of a given account
 **Command**
 
 ```sh
-cleos get servants
+clio get servants
 ```
 **Output**
 
 ```console
-Usage: cleos get servants account
+Usage: clio get servants account
 
 Positionals:
   account TEXT                The name of the controlling account
@@ -20,7 +20,7 @@ Positionals:
 ## Command
 
 ```sh
-cleos get servants inita
+clio get servants inita
 ```
 
 ## Output

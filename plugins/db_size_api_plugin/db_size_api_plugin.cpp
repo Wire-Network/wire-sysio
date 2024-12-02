@@ -1,13 +1,13 @@
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
-#include <eosio/db_size_api_plugin/db_size_api_plugin.hpp>
-#include <eosio/http_plugin/http_plugin.hpp>
+#include <sysio/db_size_api_plugin/db_size_api_plugin.hpp>
+#include <sysio/http_plugin/http_plugin.hpp>
 
-namespace eosio {
+namespace sysio {
 
    static auto _db_size_api_plugin = application::register_plugin<db_size_api_plugin>();
 
-using namespace eosio;
+using namespace sysio;
 
 #define CALL_WITH_400(api_name, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \

@@ -207,7 +207,7 @@ component:
           properties:
             from:
               type: string
-              example: eosio
+              example: sysio
             to:
               type: string
               example: myproducer

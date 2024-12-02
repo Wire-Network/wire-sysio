@@ -13,9 +13,9 @@ set parameters dealing with account permissions
 
 `-h,--help` Print this help message and exit
 
-`--add-code` [code] add 'eosio.code' permission to specified permission authority
+`--add-code` [code] add 'sysio.code' permission to specified permission authority
 
-`--remove-code` [code] remove 'eosio.code' permission from specified permission authority
+`--remove-code` [code] remove 'sysio.code' permission from specified permission authority
 
 `-x,--expiration` _TEXT_ - set the time in seconds before a transaction expires, defaults to 30s
 
@@ -41,18 +41,18 @@ To modify the permissions of an account, you must have the authority over the ac
 The first example associates a new key to the active permissions of an account.
 
 ```sh
-cleos set account permission test active '{"threshold":1,"keys":[{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":1}],"accounts":[{"permission":{"actor":"acc2","permission":"active"},"weight":50}]}' owner
+clio set account permission test active '{"threshold":1,"keys":[{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":1}],"accounts":[{"permission":{"actor":"acc2","permission":"active"},"weight":50}]}' owner
 ```
 This second example modifies the same account permission, but removes the key set in the last example, and grants active authority of the test account to another account.
 
 ```sh
-cleos set account permission test active '{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"acc1","permission":"active"},"weight":50},{"permission":{"actor":"sandwich","permission":"active"},"weight":1}]}' owner
+clio set account permission test active '{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"acc1","permission":"active"},"weight":50},{"permission":{"actor":"sandwich","permission":"active"},"weight":1}]}' owner
 ```
 
 The third example demonstrates how to set up permissions for multisig.
 
 ```sh
-cleos set account permission test active '{"threshold" : 100, "keys" : [{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":25}], "accounts" : [{"permission":{"actor":"sandwich","permission":"active"},"weight":75}]}' owner
+clio set account permission test active '{"threshold" : 100, "keys" : [{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":25}], "accounts" : [{"permission":{"actor":"sandwich","permission":"active"},"weight":75}]}' owner
 ```
 The JSON object used in this command is actually composed of two different types of objects
 

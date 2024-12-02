@@ -1,15 +1,15 @@
-#include <eosio/net_plugin/net_plugin.hpp>
-#include <eosio/net_plugin/protocol.hpp>
-#include <eosio/net_plugin/net_utils.hpp>
-#include <eosio/net_plugin/auto_bp_peering.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/block.hpp>
-#include <eosio/chain/plugin_interface.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/producer_plugin/producer_plugin.hpp>
-#include <eosio/chain/contract_types.hpp>
+#include <sysio/net_plugin/net_plugin.hpp>
+#include <sysio/net_plugin/protocol.hpp>
+#include <sysio/net_plugin/net_utils.hpp>
+#include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/block.hpp>
+#include <sysio/chain/plugin_interface.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/chain/contract_types.hpp>
 
 #include <fc/bitutil.hpp>
 #include <fc/network/message_buffer.hpp>
@@ -43,7 +43,7 @@
    [[maybe_unused]] constexpr std::size_t hardware_destructive_interference_size = 64;
 #endif
 
-using namespace eosio::chain::plugin_interface;
+using namespace sysio::chain::plugin_interface;
 
 using namespace std::chrono_literals;
 
@@ -62,7 +62,7 @@ namespace boost
    }
 }
 
-namespace eosio {
+namespace sysio {
    static auto _net_plugin = application::register_plugin<net_plugin>();
 
    using std::vector;
@@ -75,8 +75,8 @@ namespace eosio {
 
    using fc::time_point;
    using fc::time_point_sec;
-   using eosio::chain::transaction_id_type;
-   using eosio::chain::sha256_less;
+   using sysio::chain::transaction_id_type;
+   using sysio::chain::sha256_less;
 
    class connection;
 
@@ -134,13 +134,13 @@ namespace eosio {
    struct by_connection_id;
 
    typedef multi_index_container<
-      eosio::peer_block_state,
+      sysio::peer_block_state,
       indexed_by<
          ordered_unique< tag<by_connection_id>,
                composite_key< peer_block_state,
-                     const_mem_fun<peer_block_state, uint32_t , &eosio::peer_block_state::block_num>,
-                     member<peer_block_state, block_id_type, &eosio::peer_block_state::id>,
-                     member<peer_block_state, uint32_t, &eosio::peer_block_state::connection_id>
+                     const_mem_fun<peer_block_state, uint32_t , &sysio::peer_block_state::block_num>,
+                     member<peer_block_state, block_id_type, &sysio::peer_block_state::id>,
+                     member<peer_block_state, uint32_t, &sysio::peer_block_state::connection_id>
                >,
                composite_key_compare< std::less<>, sha256_less, std::less<> >
          >
@@ -162,12 +162,12 @@ namespace eosio {
       struct by_block_num_id;
       struct by_prev;
       using unlinkable_block_state_index = multi_index_container<
-            eosio::unlinkable_block_state,
+            sysio::unlinkable_block_state,
             indexed_by<
                   ordered_unique<tag<by_block_num_id>,
                         composite_key<unlinkable_block_state,
-                              const_mem_fun<unlinkable_block_state, uint32_t, &eosio::unlinkable_block_state::block_num>,
-                              member<unlinkable_block_state, block_id_type, &eosio::unlinkable_block_state::id>
+                              const_mem_fun<unlinkable_block_state, uint32_t, &sysio::unlinkable_block_state::block_num>,
+                              member<unlinkable_block_state, block_id_type, &sysio::unlinkable_block_state::id>
                         >,
                         composite_key_compare<std::less<>, sha256_less>
                   >,
@@ -501,7 +501,7 @@ namespace eosio {
       compat::channels::transaction_ack::channel_type::handle  incoming_transaction_ack_subscription;
 
       uint16_t                                    thread_pool_size = 4;
-      eosio::chain::named_thread_pool<struct net> thread_pool;
+      sysio::chain::named_thread_pool<struct net> thread_pool;
 
       boost::asio::deadline_timer           accept_error_timer{thread_pool.get_executor()};
 
@@ -655,12 +655,12 @@ namespace eosio {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
    constexpr uint16_t proto_base = 0;
-   constexpr uint16_t proto_explicit_sync = 1;       // version at time of eosio 1.0
+   constexpr uint16_t proto_explicit_sync = 1;       // version at time of sysio 1.0
    constexpr uint16_t proto_block_id_notify = 2;     // reserved. feature was removed. next net_version should be 3
-   constexpr uint16_t proto_pruned_types = 3;        // eosio 2.1: supports new signed_block & packed_transaction types
-   constexpr uint16_t proto_heartbeat_interval = 4;        // eosio 2.1: supports configurable heartbeat interval
-   constexpr uint16_t proto_dup_goaway_resolution = 5;     // eosio 2.1: support peer address based duplicate connection resolution
-   constexpr uint16_t proto_dup_node_id_goaway = 6;        // eosio 2.1: support peer node_id based duplicate connection resolution
+   constexpr uint16_t proto_pruned_types = 3;        // sysio 2.1: supports new signed_block & packed_transaction types
+   constexpr uint16_t proto_heartbeat_interval = 4;        // sysio 2.1: supports configurable heartbeat interval
+   constexpr uint16_t proto_dup_goaway_resolution = 5;     // sysio 2.1: support peer address based duplicate connection resolution
+   constexpr uint16_t proto_dup_node_id_goaway = 6;        // sysio 2.1: support peer node_id based duplicate connection resolution
    constexpr uint16_t proto_leap_initial = 7;              // leap client, needed because none of the 2.1 versions are supported
    constexpr uint16_t proto_block_range = 8;               // include block range in notice_message
 #pragma GCC diagnostic pop
@@ -737,7 +737,7 @@ namespace eosio {
             fill_out_buffer( bufs, _sync_write_queue );
          } else { // postpone real_time write_queue if sync queue is not empty
             fill_out_buffer( bufs, _write_queue );
-            EOS_ASSERT( _write_queue_size == 0, plugin_exception, "write queue size expected to be zero" );
+            SYS_ASSERT( _write_queue_size == 0, plugin_exception, "write queue size expected to be zero" );
          }
       }
 
@@ -1130,7 +1130,7 @@ namespace eosio {
 
       template<typename T>
       void operator()( const T& ) const {
-         EOS_ASSERT( false, plugin_config_exception, "Not implemented, call handle_message directly instead" );
+         SYS_ASSERT( false, plugin_config_exception, "Not implemented, call handle_message directly instead" );
       }
 
       void operator()( const handshake_message& msg ) const {
@@ -2394,7 +2394,7 @@ namespace eosio {
    // called from c's connection strand
    void sync_manager::sync_recv_notice( const connection_ptr& c, const notice_message& msg) {
       peer_dlog( c, "sync_manager got ${m} block notice", ("m", modes_str( msg.known_blocks.mode )) );
-      EOS_ASSERT( msg.known_blocks.mode == catch_up || msg.known_blocks.mode == last_irr_catch_up, plugin_exception,
+      SYS_ASSERT( msg.known_blocks.mode == catch_up || msg.known_blocks.mode == last_irr_catch_up, plugin_exception,
                   "sync_recv_notice only called on catch_up" );
       if (msg.known_blocks.mode == catch_up) {
          if (msg.known_blocks.ids.empty()) {
@@ -2927,7 +2927,7 @@ namespace eosio {
                         peer_elog( conn, "async_read_some callback: bytes_transfered = ${bt}, buffer.bytes_to_write = ${btw}",
                                    ("bt",bytes_transferred)("btw",conn->pending_message_buffer.bytes_to_write()) );
                      }
-                     EOS_ASSERT(bytes_transferred <= conn->pending_message_buffer.bytes_to_write(), plugin_exception, "");
+                     SYS_ASSERT(bytes_transferred <= conn->pending_message_buffer.bytes_to_write(), plugin_exception, "");
                      conn->pending_message_buffer.advance_write_ptr(bytes_transferred);
                      while (conn->pending_message_buffer.bytes_to_read() > 0) {
                         uint32_t bytes_in_buffer = conn->pending_message_buffer.bytes_to_read();
@@ -4125,7 +4125,7 @@ namespace eosio {
 
          use_socket_read_watermark = options.at( "use-socket-read-watermark" ).as<bool>();
          keepalive_interval = std::chrono::milliseconds( options.at( "p2p-keepalive-interval-ms" ).as<int>() );
-         EOS_ASSERT( keepalive_interval.count() > 0, chain::plugin_config_exception,
+         SYS_ASSERT( keepalive_interval.count() > 0, chain::plugin_config_exception,
                      "p2p-keepalive_interval-ms must be greater than 0" );
 
          // To avoid unnecessary transitions between LIB <-> head catchups,
@@ -4155,7 +4155,7 @@ namespace eosio {
                   fc_wlog( logger, "Removed ${count} duplicate p2p-listen-endpoint entries", ("count", addr_diff));
                }
                for( const auto& addr : p2p_addresses ) {
-                  EOS_ASSERT( addr.length() <= max_p2p_address_length, chain::plugin_config_exception,
+                  SYS_ASSERT( addr.length() <= max_p2p_address_length, chain::plugin_config_exception,
                               "p2p-listen-endpoint ${a} too long, must be less than ${m}", 
                               ("a", addr)("m", max_p2p_address_length) );
                }
@@ -4163,10 +4163,10 @@ namespace eosio {
          }
          if( options.count( "p2p-server-address" ) ) {
             p2p_server_addresses = options.at( "p2p-server-address" ).as<vector<string>>();
-            EOS_ASSERT( p2p_server_addresses.size() <= p2p_addresses.size(), chain::plugin_config_exception,
+            SYS_ASSERT( p2p_server_addresses.size() <= p2p_addresses.size(), chain::plugin_config_exception,
                         "p2p-server-address may not be specified more times than p2p-listen-endpoint" );
             for( const auto& addr: p2p_server_addresses ) {
-               EOS_ASSERT( addr.length() <= max_p2p_address_length, chain::plugin_config_exception,
+               SYS_ASSERT( addr.length() <= max_p2p_address_length, chain::plugin_config_exception,
                            "p2p-server-address ${a} too long, must be less than ${m}", 
                            ("a", addr)("m", max_p2p_address_length) );
             }
@@ -4174,7 +4174,7 @@ namespace eosio {
          p2p_server_addresses.resize(p2p_addresses.size()); // extend with empty entries as needed
 
          thread_pool_size = options.at( "net-threads" ).as<uint16_t>();
-         EOS_ASSERT( thread_pool_size > 0, chain::plugin_config_exception,
+         SYS_ASSERT( thread_pool_size > 0, chain::plugin_config_exception,
                      "net-threads ${num} must be greater than 0", ("num", thread_pool_size) );
 
          std::vector<std::string> peers;
@@ -4184,14 +4184,14 @@ namespace eosio {
          }
          if( options.count( "agent-name" )) {
             user_agent_name = options.at( "agent-name" ).as<string>();
-            EOS_ASSERT( user_agent_name.length() <= max_handshake_str_length, chain::plugin_config_exception,
+            SYS_ASSERT( user_agent_name.length() <= max_handshake_str_length, chain::plugin_config_exception,
                         "agent-name too long, must be less than ${m}", ("m", max_handshake_str_length) );
          }
 
          if ( options.count( "p2p-auto-bp-peer")) {
             set_bp_peers(options.at( "p2p-auto-bp-peer" ).as<vector<string>>());
             for_each_bp_peer_address([&peers](const auto& addr) {
-               EOS_ASSERT(std::find(peers.begin(), peers.end(), addr) == peers.end(), chain::plugin_config_exception,
+               SYS_ASSERT(std::find(peers.begin(), peers.end(), addr) == peers.end(), chain::plugin_config_exception,
                           "\"${addr}\" should only appear in either p2p-peer-address or p2p-auto-bp-peer option, not both.",
                           ("addr",addr));
             });
@@ -4212,7 +4212,7 @@ namespace eosio {
          }
 
          if( allowed_connections & net_plugin_impl::Specified )
-            EOS_ASSERT( options.count( "peer-key" ),
+            SYS_ASSERT( options.count( "peer-key" ),
                         plugin_config_exception,
                        "At least one peer-key must accompany 'allowed-connection=specified'" );
 
@@ -4233,7 +4233,7 @@ namespace eosio {
          }
 
          chain_plug = app().find_plugin<chain_plugin>();
-         EOS_ASSERT( chain_plug, chain::missing_chain_plugin_exception, ""  );
+         SYS_ASSERT( chain_plug, chain::missing_chain_plugin_exception, ""  );
          chain_id = chain_plug->get_chain_id();
          fc::rand_pseudo_bytes( node_id.data(), node_id.data_size());
          const controller& cc = chain_plug->chain();
@@ -4273,7 +4273,7 @@ namespace eosio {
 
       std::vector<string> listen_addresses = p2p_addresses;
 
-      EOS_ASSERT( p2p_addresses.size() == p2p_server_addresses.size(), chain::plugin_config_exception, "" );
+      SYS_ASSERT( p2p_addresses.size() == p2p_server_addresses.size(), chain::plugin_config_exception, "" );
       std::transform(p2p_addresses.begin(), p2p_addresses.end(), p2p_server_addresses.begin(), 
                      p2p_addresses.begin(), [](const string& p2p_address, const string& p2p_server_address) {
          auto [host, port] = fc::split_host_port(p2p_address);
@@ -4766,4 +4766,4 @@ namespace eosio {
       update_p2p_connection_metrics({num_peers+num_bp_peers, num_clients, std::move(per_connection)});
       start_conn_timer( connector_period, {}, timer_type::stats );
    }
-} // namespace eosio
+} // namespace sysio

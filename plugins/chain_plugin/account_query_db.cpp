@@ -1,8 +1,8 @@
-#include <eosio/chain_plugin/account_query_db.hpp>
+#include <sysio/chain_plugin/account_query_db.hpp>
 
-#include <eosio/chain/contract_types.hpp>
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/permission_object.hpp>
+#include <sysio/chain/contract_types.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/permission_object.hpp>
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
@@ -15,8 +15,8 @@
 
 #include <shared_mutex>
 
-using namespace eosio;
-using namespace eosio::chain::literals;
+using namespace sysio;
+using namespace sysio::chain::literals;
 using namespace boost::multi_index;
 using namespace boost::bimaps;
 
@@ -69,12 +69,12 @@ namespace {
       if (p->action_traces.empty())
          return false;
       const auto& act = p->action_traces[0].act;
-      if (act.account != eosio::chain::config::system_account_name || act.name != "onblock"_n ||
+      if (act.account != sysio::chain::config::system_account_name || act.name != "onblock"_n ||
           act.authorization.size() != 1)
          return false;
       const auto& auth = act.authorization[0];
-      return auth.actor == eosio::chain::config::system_account_name &&
-             auth.permission == eosio::chain::config::active_name;
+      return auth.actor == sysio::chain::config::system_account_name &&
+             auth.permission == sysio::chain::config::active_name;
    }
 
    template<typename T>
@@ -124,7 +124,7 @@ namespace std {
 
 }
 
-namespace eosio::chain_apis {
+namespace sysio::chain_apis {
    /**
     * Implementation details of the account query DB
     */
@@ -150,7 +150,7 @@ namespace eosio::chain_apis {
 
          for (uint32_t block_num = lib_num + 1; block_num <= head_num; block_num++) {
             const auto block_p = controller.fetch_block_by_number(block_num);
-            EOS_ASSERT(block_p, chain::plugin_exception, "cannot fetch reversible block ${block_num}, required for account_db initialization", ("block_num", block_num));
+            SYS_ASSERT(block_p, chain::plugin_exception, "cannot fetch reversible block ${block_num}, required for account_db initialization", ("block_num", block_num));
             time_to_block_num.emplace(block_p->timestamp.to_time_point(), block_num);
          }
 
@@ -218,7 +218,7 @@ namespace eosio::chain_apis {
          uint32_t last_updated_height = lib_num;
          if (last_updated > lib_time) {
             const auto iter = time_to_block_num.find(last_updated);
-            EOS_ASSERT(iter != time_to_block_num.end(), chain::plugin_exception, "invalid block time encountered in on-chain accounts ${time}", ("time", last_updated));
+            SYS_ASSERT(iter != time_to_block_num.end(), chain::plugin_exception, "invalid block time encountered in on-chain accounts ${time}", ("time", last_updated));
             last_updated_height = iter->second;
          }
 
@@ -384,7 +384,7 @@ namespace eosio::chain_apis {
             for (const auto& up: updated) {
                auto key = std::make_tuple(up.actor, up.permission);
                auto source_itr = permission_by_owner.find(key);
-               EOS_ASSERT(source_itr != permission_by_owner.end(), chain::plugin_exception, "chain data is missing");
+               SYS_ASSERT(source_itr != permission_by_owner.end(), chain::plugin_exception, "chain data is missing");
                auto itr = index.find(key);
                if (itr == index.end()) {
                   const auto& po = *source_itr;

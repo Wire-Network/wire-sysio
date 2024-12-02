@@ -1,8 +1,8 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
-#include <eosio_system_tester.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio_system_tester.hpp>
 
 #include <fc/variant_object.hpp>
 
@@ -10,21 +10,21 @@
 
 
 BOOST_AUTO_TEST_SUITE(get_producers_tests)
-using namespace eosio::testing;
+using namespace sysio::testing;
 
 // this test verifies the exception case of get_producer, where it is populated by the active schedule of producers
 BOOST_AUTO_TEST_CASE( get_producers) { try {
       tester chain;
 
-      eosio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-      eosio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
+      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+      sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
 
       auto results = plugin.get_producers(params, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(results.more, "");
       BOOST_REQUIRE_EQUAL(results.rows.size(), 1u);
       const auto& row = results.rows[0].get_object();
       BOOST_REQUIRE(row.contains("owner"));
-      BOOST_REQUIRE_EQUAL(row["owner"].as_string(), "eosio");
+      BOOST_REQUIRE_EQUAL(row["owner"].as_string(), "sysio");
       // check for producer_authority, since it is only set when the producer schedule is used
       BOOST_REQUIRE(row.contains("producer_authority"));
 
@@ -47,13 +47,13 @@ BOOST_AUTO_TEST_CASE( get_producers) { try {
 
 // this test verifies the normal case of get_producer, where the contents of the system contract's producers table is used
 BOOST_AUTO_TEST_CASE( get_producers_from_table) { try {
-      eosio_system::eosio_system_tester chain;
+      sysio_system::sysio_system_tester chain;
 
       // ensure that enough voting is occurring so that producer1111 is elected as the producer
       chain.cross_15_percent_threshold();
 
-      eosio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-      eosio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
+      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+      sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
 
       auto results = plugin.get_producers(params, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(results.more, "");

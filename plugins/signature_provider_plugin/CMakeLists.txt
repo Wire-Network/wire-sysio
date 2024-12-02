@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/eosio/signature_provider_plugin/*.hpp")
+file(GLOB HEADERS "include/sysio/signature_provider_plugin/*.hpp")
 add_library( signature_provider_plugin
              signature_provider_plugin.cpp
              ${HEADERS} )

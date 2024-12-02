@@ -10,14 +10,14 @@
    static std::vector<std::uint8_t> CN ## _wasm();                                          \
    static std::string CN ## _abi();
 
-namespace eosio {
+namespace sysio {
    namespace testing {
       struct contracts {
          // Contracts in `libraries/testing/contracts' directory
-         MAKE_EMBD_WASM_ABI(eosio_bios)
+         MAKE_EMBD_WASM_ABI(sysio_bios)
 
-         MAKE_EMBD_WASM_ABI(before_producer_authority_eosio_bios)
-         MAKE_EMBD_WASM_ABI(before_preactivate_eosio_bios)
+         MAKE_EMBD_WASM_ABI(before_producer_authority_sysio_bios)
+         MAKE_EMBD_WASM_ABI(before_preactivate_sysio_bios)
       };
-   } /// eosio::testing
-}  /// eosio
+   } /// sysio::testing
+}  /// sysio

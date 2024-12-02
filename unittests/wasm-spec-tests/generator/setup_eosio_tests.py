@@ -11,7 +11,7 @@ import tempfile
 from compile_tests import CompileError
 
 import compile_tests
-import generate_eosio_tests
+import generate_sysio_tests
 
 WASM_DIR = ''
 TEST_DIR = ''
@@ -110,12 +110,12 @@ def compile_wasm():
     # Otherwise, we can just do serially.
     if len(fs) > 5:
         with Pool(os.cpu_count() - 2) as p:
-            p.map(compile_eosio, fs_m)
+            p.map(compile_sysio, fs_m)
     else:
         for d in fs_m:
-            compile_eosio(d)
+            compile_sysio(d)
 
-def compile_eosio(f):
+def compile_sysio(f):
     d, name = f
     compile_tests.main(
         d,
@@ -141,10 +141,10 @@ def generate_wasm_and_copy():
             o_wast_file = os.path.join(d, f'{name}.{d}.wast')
             map_file = os.path.join(d, f'{name}.{d}.wasm.map')
             try:
-                generate_eosio_tests.main(g_wasm_file, t_wasm_file, o_wast_file, map_file)
+                generate_sysio_tests.main(g_wasm_file, t_wasm_file, o_wast_file, map_file)
                 wasm_file_path = os.path.join(d, wasm_file)
                 out = subprocess.run(
-                    ['eosio-wast2wasm', o_wast_file, '-o', os.path.join(d, wasm_file)],
+                    ['sysio-wast2wasm', o_wast_file, '-o', os.path.join(d, wasm_file)],
                     capture_output=True
                 )
 
@@ -176,7 +176,7 @@ if __name__ == '__main__':
                 (optional) Arg 3: Directory for intermediate test files <defaults to a temp directory>
 
                 ex:
-                python setup_eosio_tests.py ~/code/eos-vm-test-wasms ~/code/eos ~/wasm_spec_tests
+                python setup_sysio_tests.py ~/code/sys-vm-test-wasms ~/code/eos ~/wasm_spec_tests
               """)
         sys.exit(1)
 
@@ -197,6 +197,6 @@ if __name__ == '__main__':
     GENERATOR_DIR = os.path.join(REPO_ROOT, 'build', 'generator')
     ALTERED_WASMS_DIR = os.path.join(REPO_ROOT, 'generator', 'altered-wasms')
 
-    generator = os.path.join(GENERATOR_DIR, 'eosio_test_generator')
+    generator = os.path.join(GENERATOR_DIR, 'sysio_test_generator')
 
     main()

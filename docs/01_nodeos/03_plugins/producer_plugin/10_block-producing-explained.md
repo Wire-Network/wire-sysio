@@ -8,7 +8,7 @@ For simplicity of the explanation let's consider the following notations:
 * `m` = `max_block_cpu_usage` (on-chain consensus value)
 * `u` = `max_block_net_usage` (on-chain consensus value)
 * `t` = `block-time`
-* `e` = `produce-block-offset-ms` (nodeos configuration)
+* `e` = `produce-block-offset-ms` (nodeop configuration)
 * `w` = `block-time-interval = 500ms` (hard-coded value)
 * `a` = `produce-block-early-amount = w - (w - (e / r)) = e / r ms` (how much to release each block of round early by)
 * `l` = `produce-block-time = t - a`
@@ -84,4 +84,4 @@ Starting in Leap 5.0, blocks in a round are started immediately after the comple
 * `BP-A` starts b12 at `t11-3025ms`, sends b12 at `t12-3300ms` => `BP-A-Peer` processes `h=10ms`, sends at `t12-3290ms` =(200ms)> `BP-B-Peer` processes `h=10ms`, sends at `t12-3080ms` => arrives at `BP-B` at `t12-3080ms`
 
 
-Running wasm-runtime=eos-vm-jit eos-vm-oc-enable on relay node will reduce the validation time.
+Running wasm-runtime=sys-vm-jit sys-vm-oc-enable on relay node will reduce the validation time.

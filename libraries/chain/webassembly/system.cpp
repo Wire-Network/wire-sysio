@@ -1,8 +1,8 @@
-#include <eosio/chain/webassembly/interface.hpp>
-#include <eosio/chain/transaction_context.hpp>
-#include <eosio/chain/apply_context.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/transaction_context.hpp>
+#include <sysio/chain/apply_context.hpp>
 
-namespace eosio { namespace chain { namespace webassembly {
+namespace sysio { namespace chain { namespace webassembly {
    /* these are both unfortunate that we didn't make the return type an int64_t */
    uint64_t interface::current_time() const {
       return static_cast<uint64_t>( context.control.pending_block_time().time_since_epoch().count() );
@@ -24,4 +24,4 @@ namespace eosio { namespace chain { namespace webassembly {
       return context.control.pending_block_num();
    }
 
-}}} // ns eosio::chain::webassembly
+}}} // ns sysio::chain::webassembly

@@ -1,7 +1,7 @@
-#include <eosio/resource_monitor_plugin/system_file_space_provider.hpp>
+#include <sysio/resource_monitor_plugin/system_file_space_provider.hpp>
 
 
-namespace eosio::resource_monitor {
+namespace sysio::resource_monitor {
    int system_file_space_provider::get_stat(const char *path, struct stat *buf) const {
       return stat(path, buf);
    }

@@ -89,31 +89,31 @@ def readMetrics(host: str, port: str):
 class netUtil:
     def __init__(self):
         self.prometheusMetrics = {
-            ('nodeos_info', 'server_version'): 'Nodeos Version ID:',
-            ('nodeos_info', 'chain_id'): 'Chain ID:',
-            ('nodeos_info', 'server_version_string'): 'Nodeos Version:',
-            ('nodeos_info', 'server_full_version_string'): 'Nodeos Full Version:',
-            ('nodeos_info', 'earliest_available_block_num'): 'Earliest Available Block:',
-            'nodeos_head_block_num': 'Head Block Num:',
-            'nodeos_last_irreversible': 'LIB:',
-            'nodeos_p2p_clients': 'Inbound P2P Connections:',
-            'nodeos_p2p_peers': 'Outbound P2P Connections:',
-            'nodeos_blocks_incoming_total': 'Total Incoming Blocks:',
-            'nodeos_trxs_incoming_total': 'Total Incoming Trxs:',
-            'nodeos_blocks_produced_total': 'Blocks Produced:',
-            'nodeos_trxs_produced_total': 'Trxs Produced:',
-            'nodeos_scheduled_trxs_total': 'Scheduled Trxs:',
-            'nodeos_unapplied_transactions_total': 'Unapplied Trxs:',
-            'nodeos_p2p_dropped_trxs_total': 'Dropped Trxs:',
-            'nodeos_p2p_failed_connections_total': 'Failed P2P Connections:',
-            'nodeos_http_requests_total': 'HTTP Requests:',
+            ('nodeop_info', 'server_version'): 'Nodeos Version ID:',
+            ('nodeop_info', 'chain_id'): 'Chain ID:',
+            ('nodeop_info', 'server_version_string'): 'Nodeos Version:',
+            ('nodeop_info', 'server_full_version_string'): 'Nodeos Full Version:',
+            ('nodeop_info', 'earliest_available_block_num'): 'Earliest Available Block:',
+            'nodeop_head_block_num': 'Head Block Num:',
+            'nodeop_last_irreversible': 'LIB:',
+            'nodeop_p2p_clients': 'Inbound P2P Connections:',
+            'nodeop_p2p_peers': 'Outbound P2P Connections:',
+            'nodeop_blocks_incoming_total': 'Total Incoming Blocks:',
+            'nodeop_trxs_incoming_total': 'Total Incoming Trxs:',
+            'nodeop_blocks_produced_total': 'Blocks Produced:',
+            'nodeop_trxs_produced_total': 'Trxs Produced:',
+            'nodeop_scheduled_trxs_total': 'Scheduled Trxs:',
+            'nodeop_unapplied_transactions_total': 'Unapplied Trxs:',
+            'nodeop_p2p_dropped_trxs_total': 'Dropped Trxs:',
+            'nodeop_p2p_failed_connections_total': 'Failed P2P Connections:',
+            'nodeop_http_requests_total': 'HTTP Requests:',
         }
         self.ignoredPrometheusMetrics = [
-            'nodeos_exposer_scrapes_total',
-            'nodeos_exposer_transferred_bytes_total',
-            'nodeos_subjective_bill_account_size_total',
-            'nodeos_net_usage_us_total',
-            'nodeos_cpu_usage_us_total',
+            'nodeop_exposer_scrapes_total',
+            'nodeop_exposer_transferred_bytes_total',
+            'nodeop_subjective_bill_account_size_total',
+            'nodeop_net_usage_us_total',
+            'nodeop_cpu_usage_us_total',
         ]
         self.leftFieldLabels = [
             'Host:',
@@ -177,7 +177,7 @@ class netUtil:
         self.fields.update({k:v for k, v in zip(self.rightFieldLabels[1:], [labelToAttrName(e) for e in self.rightFieldLabels[1:]])})
         self.fields.update({k:v for k, v in zip(self.infoFieldLabels, [labelToAttrName(e) for e in self.infoFieldLabels])})
         
-        parser = argparse.ArgumentParser(description='Terminal UI for monitoring nodeos P2P connections',
+        parser = argparse.ArgumentParser(description='Terminal UI for monitoring nodeop P2P connections',
                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter)
         parser.add_argument('--host', help='hostname or IP address to connect to', default='127.0.0.1')
         parser.add_argument('-p', '--port', help='port number to connect to', default='8888')
@@ -316,7 +316,7 @@ class netUtil:
                         fieldName = self.fields.get(self.prometheusMetrics[sample.name])
                         field = getattr(self, fieldName)
                         field.set_text(str(int(sample.value)))
-                    elif sample.name == 'nodeos_p2p_addr':
+                    elif sample.name == 'nodeop_p2p_addr':
                         listwalker = getattr(self, 'ipAddressLW')
                         addr = ipaddress.ip_address(sample.labels["ipv6"])
                         host = f'{str(addr.ipv4_mapped) if addr.ipv4_mapped else str(addr)}'
@@ -324,36 +324,36 @@ class netUtil:
                         listwalker = getattr(self, 'hostnameLW')
                         addr = sample.labels["address"]
                         listwalker[startOffset:endOffset] = [AttrMap(Text(addr), None, 'reversed')]
-                    elif sample.name == 'nodeos_p2p_bytes_sent':
+                    elif sample.name == 'nodeop_p2p_bytes_sent':
                         stats = bandwidths.get(connID, bandwidthStats())
                         stats.bytesSent = int(sample.value)
                         bandwidths[connID] = stats
-                    elif fieldName == 'nodeos_p2p_block_sync_bytes_sent':
+                    elif fieldName == 'nodeop_p2p_block_sync_bytes_sent':
                         stats = bandwidths.get(connID, bandwidthStats())
                         stats.blockSyncBytesSent = int(sample.value)
                         bandwidths[connID] = stats
-                    elif sample.name == 'nodeos_p2p_bytes_received':
+                    elif sample.name == 'nodeop_p2p_bytes_received':
                         stats = bandwidths.get(connID, bandwidthStats())
                         stats.bytesReceived = int(sample.value)
                         bandwidths[connID] = stats
-                    elif sample.name == 'nodeos_p2p_connection_start_time':
+                    elif sample.name == 'nodeop_p2p_connection_start_time':
                         stats = bandwidths.get(connID, bandwidthStats())
                         stats.connectionStarted = int(sample.value)
                         bandwidths[connID] = stats
-                    elif sample.name == 'nodeos_p2p_connection_number':
+                    elif sample.name == 'nodeop_p2p_connection_number':
                         pass
-                    elif sample.name.startswith('nodeos_p2p_'):
-                        fieldName = sample.name[len('nodeos_p2p_'):]
+                    elif sample.name.startswith('nodeop_p2p_'):
+                        fieldName = sample.name[len('nodeop_p2p_'):]
                         attrname = fieldName[:1] + fieldName.replace('_', ' ').title().replace(' ', '')[1:] + 'LW'
                         if hasattr(self, attrname):
                             listwalker = getattr(self, attrname)
                             listwalker[startOffset:endOffset] = [AttrMap(Text(self.peerMetricConversions[fieldName](sample.value)), None, 'reversed')]
-                    elif sample.name == 'nodeos_p2p_connections':
+                    elif sample.name == 'nodeop_p2p_connections':
                         if 'direction' in sample.labels:
                             fieldName = self.fields.get(self.prometheusMetrics[(sample.name, sample.labels['direction'])])
                             field = getattr(self, fieldName)
                             field.set_text(str(int(sample.value)))
-                    elif sample.name == 'nodeos_info':
+                    elif sample.name == 'nodeop_info':
                         for infoLabel, infoValue in sample.labels.items():
                             fieldName = self.fields.get(self.prometheusMetrics[(sample.name, infoLabel)])
                             field = getattr(self, fieldName)
@@ -365,7 +365,7 @@ class netUtil:
                         if sample.name not in self.ignoredPrometheusMetrics:
                             logger.warning(f'Received unhandled Prometheus metric {sample.name}')
                 else:
-                    if sample.name == 'nodeos_p2p_bytes_sent' or sample.name == 'nodeos_p2p_bytes_received' or sample.name == 'nodeos_p2p_block_sync_bytes_sent':
+                    if sample.name == 'nodeop_p2p_bytes_sent' or sample.name == 'nodeop_p2p_bytes_received' or sample.name == 'nodeop_p2p_block_sync_bytes_sent':
                         now = time.time_ns()
                         def updateBandwidth(connectedSeconds, listwalker, byteCount, startOffset, endOffset):
                             bps = byteCount/connectedSeconds

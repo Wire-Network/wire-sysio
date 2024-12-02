@@ -267,7 +267,7 @@ class PerformanceTest:
         return report
 
     def createReport(self, producerThreadResult: PluginThreadOptResult=None, chainThreadResult: PluginThreadOptResult=None, netThreadResult: PluginThreadOptResult=None,
-                     tpsTestResult: dict=None, nodeosVers: str="") -> dict:
+                     tpsTestResult: dict=None, nodeopVers: str="") -> dict:
         report = {}
         report['perfTestsBegin'] = self.testsStart
         report['perfTestsFinish'] = self.testsFinish
@@ -287,7 +287,7 @@ class PerformanceTest:
 
         report['args'] =  self.prepArgsDict()
         report['env'] = {'system': system(), 'os': os.name, 'release': release(), 'logical_cpu_count': os.cpu_count()}
-        report['nodeosVersion'] = nodeosVers
+        report['nodeopVersion'] = nodeopVers
         return report
 
     def testDirsCleanup(self):
@@ -413,7 +413,7 @@ class PerformanceTest:
 
         self.testsFinish = datetime.utcnow()
 
-        self.report = self.createReport(producerThreadResult=prodResults, chainThreadResult=chainResults, netThreadResult=netResults, tpsTestResult=tpsTestResult, nodeosVers=self.clusterConfig.nodeosVers)
+        self.report = self.createReport(producerThreadResult=prodResults, chainThreadResult=chainResults, netThreadResult=netResults, tpsTestResult=tpsTestResult, nodeopVers=self.clusterConfig.nodeopVers)
         jsonReport = JsonReportHandler.reportAsJSON(self.report)
 
         if not self.ptConfig.quiet:

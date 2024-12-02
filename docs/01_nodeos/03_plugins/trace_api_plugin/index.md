@@ -17,20 +17,20 @@ Therefore, one crucial goal of the `trace_api_plugin` is to improve the maintena
 
 ```console
 # config.ini
-plugin = eosio::trace_api_plugin
+plugin = sysio::trace_api_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::trace_api_plugin [options]
+nodeop ... --plugin sysio::trace_api_plugin [options]
 ```
 
 ## Configuration Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::trace_api_plugin:
+Config Options for sysio::trace_api_plugin:
 
   --trace-dir arg (="traces")           the location of the trace directory 
                                         (absolute path or relative to 
@@ -88,28 +88,28 @@ The following plugins are loaded with default settings if not specified on the c
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin
+plugin = sysio::chain_plugin
 [options]
-plugin = eosio::http_plugin 
+plugin = sysio::http_plugin 
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::chain_plugin [options]  \
+           --plugin sysio::http_plugin [options]
 ```
 
 ## Configuration Example
 
-Here is a `nodeos` configuration example for the `trace_api_plugin` when tracing some Antelope reference contracts:
+Here is a `nodeop` configuration example for the `trace_api_plugin` when tracing some Antelope reference contracts:
 
 ```sh
-nodeos --data-dir data_dir --config-dir config_dir --trace-dir traces_dir
---plugin eosio::trace_api_plugin 
---trace-rpc-abi=eosio=abis/eosio.abi 
---trace-rpc-abi=eosio.token=abis/eosio.token.abi 
---trace-rpc-abi=eosio.msig=abis/eosio.msig.abi 
---trace-rpc-abi=eosio.wrap=abis/eosio.wrap.abi
+nodeop --data-dir data_dir --config-dir config_dir --trace-dir traces_dir
+--plugin sysio::trace_api_plugin 
+--trace-rpc-abi=sysio=abis/sysio.abi 
+--trace-rpc-abi=sysio.token=abis/sysio.token.abi 
+--trace-rpc-abi=sysio.msig=abis/sysio.msig.abi 
+--trace-rpc-abi=sysio.wrap=abis/sysio.wrap.abi
 ```
 
 ## Definitions
@@ -134,7 +134,7 @@ The trace data log is an append only log that stores the actual binary serialize
 
 The data log begins with a basic header that includes versioning information about the data stored in the log. `block_trace_v0` includes the block ID, block number, previous block ID, the production timestamp, the producer that signed the block, and the actual trace data. `block_trace_v1` adds both merkle root hashes for the list of transactions and the list of actions included in the block as well as the production schedule count since genesis.
 
-The log may include blocks that have been forked out of the blockchain as part of the normal operations of the chain. The next entry in the file will always have a block number one higher than the previous one or the same number or less because of forking.  Every trace entry will have a corresponding entry in the corresponding slice file for trace indexes. Note that forked blocks can be avoided by running nodeos in `read-mode=irreversible`.
+The log may include blocks that have been forked out of the blockchain as part of the normal operations of the chain. The next entry in the file will always have a block number one higher than the previous one or the same number or less because of forking.  Every trace entry will have a corresponding entry in the corresponding slice file for trace indexes. Note that forked blocks can be avoided by running nodeop in `read-mode=irreversible`.
 
 #### trace_index&#95;&lt;S&gt;-&lt;E&gt;.log
 
@@ -191,7 +191,7 @@ If resource usage cannot be effectively managed via the `trace-minimum-irreversi
 
 ## Manual Maintenance
 
-The `trace-dir` option defines the directory on the filesystem where the trace log files are stored by the `trace_api_plugin`. These files are stable once the LIB block has progressed past a given slice and then can be deleted at any time to reclaim filesystem space. The deployed Antelope system will tolerate any out-of-process management system that removes some or all of these files in this directory regardless of what data they represent, or whether there is a running `nodeos` instance accessing them or not.  Data which would nominally be available, but is no longer so due to manual maintenance, will result in a HTTP 404 response from the appropriate API endpoint(s).
+The `trace-dir` option defines the directory on the filesystem where the trace log files are stored by the `trace_api_plugin`. These files are stable once the LIB block has progressed past a given slice and then can be deleted at any time to reclaim filesystem space. The deployed Antelope system will tolerate any out-of-process management system that removes some or all of these files in this directory regardless of what data they represent, or whether there is a running `nodeop` instance accessing them or not.  Data which would nominally be available, but is no longer so due to manual maintenance, will result in a HTTP 404 response from the appropriate API endpoint(s).
 
 [[info | For node operators]]
 | Node operators can take full control over the lifetime of the historical data available in their nodes via the `trace-api-plugin` and the `trace-minimum-irreversible-history-blocks` and `trace-minimum-uncompressed-irreversible-history-blocks` options in conjunction with any external filesystem resource manager.

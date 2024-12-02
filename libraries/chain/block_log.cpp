@@ -1,9 +1,9 @@
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/block_log_config.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/log_catalog.hpp>
-#include <eosio/chain/log_data_base.hpp>
-#include <eosio/chain/log_index.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/block_log_config.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/log_catalog.hpp>
+#include <sysio/chain/log_data_base.hpp>
+#include <sysio/chain/log_index.hpp>
 #include <fc/bitutil.hpp>
 #include <fc/io/raw.hpp>
 #include <mutex>
@@ -13,7 +13,7 @@
 static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__);
 #endif
 
-namespace eosio { namespace chain {
+namespace sysio { namespace chain {
 
    enum versions {
       initial_version = 1,                  ///< complete block log from genesis
@@ -70,8 +70,8 @@ namespace eosio { namespace chain {
       template <typename Stream>
       void read_from(Stream& ds, const std::filesystem::path& log_path) {
          ds.read((char*)&ver, sizeof(ver));
-         EOS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
-         EOS_ASSERT(block_log::is_supported_version(version()), block_log_unsupported_version,
+         SYS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
+         SYS_ASSERT(block_log::is_supported_version(version()), block_log_unsupported_version,
                     "Unsupported version of block log. Block log version is ${version} while code supports version(s) "
                     "[${min},${max}], log file: ${log}",
                     ("version", version())("min", block_log::min_supported_version)(
@@ -89,7 +89,7 @@ namespace eosio { namespace chain {
             chain_context = chain_id_type::empty_chain_id();
             ds >> std::get<chain_id_type>(chain_context);
          } else {
-            EOS_THROW(block_log_exception,
+            SYS_THROW(block_log_exception,
                       "Block log is not supported. version: ${ver} and first_block_num: ${fbn} does not contain "
                       "a genesis_state nor a chain_id.",
                       ("ver", version())("fbn", first_block_num));
@@ -100,7 +100,7 @@ namespace eosio { namespace chain {
             std::decay_t<decltype(block_log::npos)> actual_totem;
             ds.read((char*)&actual_totem, sizeof(actual_totem));
 
-            EOS_ASSERT(actual_totem == expected_totem, block_log_exception,
+            SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
                        "Expected separator between block log header and blocks was not found( expected: ${e}, actual: "
                        "${a} )",
                        ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem)))(
@@ -178,7 +178,7 @@ namespace eosio { namespace chain {
          auto block = std::make_shared<signed_block>();
          fc::raw::unpack(ds, *block);
          if (expect_block_num != 0) {
-            EOS_ASSERT(!!block && block->block_num() == expect_block_num, block_log_exception,
+            SYS_ASSERT(!!block && block->block_num() == expect_block_num, block_log_exception,
                        "Wrong block was read from block log.");
          }
 
@@ -190,7 +190,7 @@ namespace eosio { namespace chain {
          signed_block_header bh;
          fc::raw::unpack(ds, bh);
 
-         EOS_ASSERT(bh.block_num() == expect_block_num, block_log_exception,
+         SYS_ASSERT(bh.block_num() == expect_block_num, block_log_exception,
                     "Wrong block header was read from block log.",
                     ("returned", bh.block_num())("expected", expect_block_num));
 
@@ -245,7 +245,7 @@ namespace eosio { namespace chain {
             //   block_id_type        previous;                   //bytes 14:45, low 4 bytes is big endian block number
             //   of previous block
 
-            EOS_ASSERT(position <= size(), block_log_exception, "Invalid block position ${position}",
+            SYS_ASSERT(position <= size(), block_log_exception, "Invalid block position ${position}",
                        ("position", position));
 
             int      blknum_offset  = 14;
@@ -265,7 +265,7 @@ namespace eosio { namespace chain {
          void light_validate_block_entry_at(uint64_t pos, uint32_t expected_block_num) {
             const uint32_t actual_block_num = block_num_at(pos);
 
-            EOS_ASSERT(actual_block_num == expected_block_num, block_log_exception,
+            SYS_ASSERT(actual_block_num == expected_block_num, block_log_exception,
                        "At position ${pos} expected to find block number ${exp_bnum} but found ${act_bnum}",
                        ("pos", pos)("exp_bnum", expected_block_num)("act_bnum", actual_block_num));
          }
@@ -306,7 +306,7 @@ namespace eosio { namespace chain {
                file.read(reinterpret_cast<char*>(&tmp_pos), sizeof(tmp_pos));
             }
 
-            EOS_ASSERT(pos == tmp_pos, block_log_exception,
+            SYS_ASSERT(pos == tmp_pos, block_log_exception,
                        "the block position for block ${num} at the end of a block entry is incorrect",
                        ("num", block_num));
             return std::make_tuple(block_num, id);
@@ -318,7 +318,7 @@ namespace eosio { namespace chain {
          void construct_index(const std::filesystem::path& index_file_path);
       };
 
-      using block_log_index = eosio::chain::log_index<block_log_exception>;
+      using block_log_index = sysio::chain::log_index<block_log_exception>;
 
       /// Provide the read only view for both blocks.log and blocks.index files
       struct block_log_bundle {
@@ -332,7 +332,7 @@ namespace eosio { namespace chain {
             log_data.open(block_file_name);
             log_index.open(index_file_name);
 
-            EOS_ASSERT(!log_data.get_preamble().is_currently_pruned(), block_log_unsupported_version,
+            SYS_ASSERT(!log_data.get_preamble().is_currently_pruned(), block_log_unsupported_version,
                        "Block log is currently in pruned format, it must be vacuumed before doing this operation");
 
             if (validate_indx)
@@ -347,7 +347,7 @@ namespace eosio { namespace chain {
             uint32_t log_num_blocks   = log_data.num_blocks();
             uint32_t index_num_blocks = log_index.num_blocks();
 
-            EOS_ASSERT(
+            SYS_ASSERT(
                   log_num_blocks == index_num_blocks, block_log_exception,
                   "${block_file_name} says it has ${log_num_blocks} blocks which disagrees with ${index_num_blocks} "
                   "indicated by ${index_file_name}",
@@ -364,7 +364,7 @@ namespace eosio { namespace chain {
          uint64_t                   current_position;
 
          uint64_t get_value() {
-            EOS_ASSERT(
+            SYS_ASSERT(
                   current_position > first_block_pos && current_position <= end_of_block_pos, block_log_exception,
                   "Block log file formatting is incorrect, it contains a block position value: ${pos}, which is not "
                   "in the range of (${begin_pos},${last_pos})",
@@ -449,12 +449,12 @@ namespace eosio { namespace chain {
          if (chain_id.empty()) {
             chain_id = log.chain_id();
          } else {
-            EOS_ASSERT(chain_id == log.chain_id(), block_log_exception,
+            SYS_ASSERT(chain_id == log.chain_id(), block_log_exception,
                        "block log file ${path} has a different chain id", ("path", log_path));
          }
       }
    };
-   using block_log_catalog = eosio::chain::log_catalog<block_log_data, block_log_index, block_log_verifier>;
+   using block_log_catalog = sysio::chain::log_catalog<block_log_data, block_log_index, block_log_verifier>;
 
    namespace detail {
 
@@ -567,7 +567,7 @@ namespace eosio { namespace chain {
          void append(const signed_block_ptr& b, const block_id_type& id,
                      const std::vector<char>& packed_block) override {
             try {
-               EOS_ASSERT(genesis_written_to_block_log, block_log_append_fail,
+               SYS_ASSERT(genesis_written_to_block_log, block_log_append_fail,
                           "Cannot append to block log until the genesis is first written");
 
                block_file.seek_end(0);
@@ -577,7 +577,7 @@ namespace eosio { namespace chain {
                   block_file.skip(-sizeof(uint32_t));
                uint64_t pos = block_file.tellp();
 
-               EOS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - preamble.first_block_num),
+               SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - preamble.first_block_num),
                           block_log_append_fail, "Append to index file occuring at wrong position.",
                           ("position", (uint64_t)index_file.tellp())(
                                 "expected", (b->block_num() - preamble.first_block_num) * sizeof(uint64_t)));
@@ -669,10 +669,10 @@ namespace eosio { namespace chain {
                uint32_t number_of_blocks = log_data.number_of_blocks();
                ilog("Log has ${n} blocks", ("n", number_of_blocks));
 
-               EOS_ASSERT(index_size || number_of_blocks == 0, block_log_exception,
+               SYS_ASSERT(index_size || number_of_blocks == 0, block_log_exception,
                           "${index_file} file is empty, please use leap-util to fix the problem.",
                           ("index_file", index_file.get_file_path().string()));
-               EOS_ASSERT(index_size % sizeof(uint64_t) == 0, block_log_exception,
+               SYS_ASSERT(index_size % sizeof(uint64_t) == 0, block_log_exception,
                           "${index_file} file is invalid, please use leap-util to reconstruct the index.",
                           ("index_file", index_file.get_file_path().string()));
 
@@ -681,7 +681,7 @@ namespace eosio { namespace chain {
                   auto last_block_pos = log_data.last_block_position();
                   auto last_index_pos = index.back();
 
-                  EOS_ASSERT(last_block_pos == last_index_pos, block_log_exception,
+                  SYS_ASSERT(last_block_pos == last_index_pos, block_log_exception,
                              "The last block position from ${block_file} is at ${block_pos} "
                              "which does not match the last block postion ${index_pos} from ${index_file}, please use "
                              "leap-util to fix the inconsistency.",
@@ -737,7 +737,7 @@ namespace eosio { namespace chain {
          }
 
          void reset(const chain_id_type& chain_id, uint32_t first_block_num) override {
-            EOS_ASSERT(
+            SYS_ASSERT(
                   first_block_num > 1, block_log_exception,
                   "Block log version ${ver} needs to be created with a genesis state if starting from block number 1.");
 
@@ -865,7 +865,7 @@ namespace eosio { namespace chain {
             block_file.seek(0);
             fc::raw::unpack(block_file, old_version);
             fc::raw::unpack(block_file, old_first_block_num);
-            EOS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception,
+            SYS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception,
                        "Trying to vacuumed a non-pruned block log");
 
             if (block_log::contains_genesis_state(old_version, old_first_block_num)) {
@@ -879,7 +879,7 @@ namespace eosio { namespace chain {
                fc::raw::pack(block_file, block_log::max_supported_version);
                fc::raw::pack(block_file, first_block_num);
                if (first_block_num == 1) {
-                  EOS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
+                  SYS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
                   fc::raw::pack(block_file, gs);
                } else
                   fc::raw::pack(block_file, gs.compute_chain_id());
@@ -960,7 +960,7 @@ namespace eosio { namespace chain {
                basic_block_log::reset(catalog.verifier.chain_id, catalog.last_block_num() + 1);
                update_head(read_block_by_num(catalog.last_block_num()));
             } else {
-               EOS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == preamble.chain_id(),
+               SYS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == preamble.chain_id(),
                           block_log_exception, "block log file ${path} has a different chain id",
                           ("path", block_file.get_file_path()));
             }
@@ -1041,7 +1041,7 @@ namespace eosio { namespace chain {
 
          void reset(const chain_id_type& chain_id, uint32_t first_block_num) final {
 
-            EOS_ASSERT(catalog.verifier.chain_id.empty() || chain_id == catalog.verifier.chain_id, block_log_exception,
+            SYS_ASSERT(catalog.verifier.chain_id.empty() || chain_id == catalog.verifier.chain_id, block_log_exception,
                        "Trying to reset to the chain to a different chain id");
             basic_block_log::reset(chain_id, first_block_num);
          }
@@ -1053,7 +1053,7 @@ namespace eosio { namespace chain {
 
          punch_hole_block_log(const std::filesystem::path& data_dir, const prune_blocklog_config& prune_conf)
              : prune_config(prune_conf) {
-            EOS_ASSERT(__builtin_popcount(prune_config.prune_threshold) == 1, block_log_exception,
+            SYS_ASSERT(__builtin_popcount(prune_config.prune_threshold) == 1, block_log_exception,
                        "block log prune threshold must be power of 2");
             // switch this over to the mask that will be used
             prune_config.prune_threshold = ~(prune_config.prune_threshold - 1);
@@ -1285,7 +1285,7 @@ namespace eosio { namespace chain {
       block_id_type block_id;
 
       file.seek(pos);
-      EOS_ASSERT(!is_currently_pruned(), block_log_exception, "pruned block log cannot be repaired");
+      SYS_ASSERT(!is_currently_pruned(), block_log_exception, "pruned block log cannot be repaired");
       try {
          try {
             signed_block entry;
@@ -1314,7 +1314,7 @@ namespace eosio { namespace chain {
    std::filesystem::path block_log::repair_log(const std::filesystem::path& data_dir, uint32_t truncate_at_block,
                                   const char* reversible_block_dir_name) {
       ilog("Recovering Block Log...");
-      EOS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
+      SYS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
                  "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir));
 
       if (truncate_at_block == 0)
@@ -1326,7 +1326,7 @@ namespace eosio { namespace chain {
       auto blocks_dir_name = blocks_dir.filename();
       auto backup_dir      = blocks_dir.parent_path() / blocks_dir_name.generic_string().append("-").append(now.to_iso_string());
 
-      EOS_ASSERT(!std::filesystem::exists(backup_dir), block_log_backup_dir_exist,
+      SYS_ASSERT(!std::filesystem::exists(backup_dir), block_log_backup_dir_exist,
                  "Cannot move existing blocks directory to already existing directory '${new_blocks_dir}'",
                  ("new_blocks_dir", backup_dir));
 
@@ -1510,7 +1510,7 @@ namespace eosio { namespace chain {
    // static
    bool block_log::trim_blocklog_front(const std::filesystem::path& block_dir, const std::filesystem::path& temp_dir,
                                        uint32_t truncate_at_block) {
-      EOS_ASSERT(block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories");
+      SYS_ASSERT(block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories");
 
       ilog("In directory ${dir} will trim all blocks before block ${n} from blocks.log and blocks.index.",
            ("dir", block_dir)("n", truncate_at_block));
@@ -1616,7 +1616,7 @@ namespace eosio { namespace chain {
 
       block_log_bundle log_bundle(block_dir);
 
-      EOS_ASSERT(start_block_num >= log_bundle.log_data.first_block_num(), block_log_exception,
+      SYS_ASSERT(start_block_num >= log_bundle.log_data.first_block_num(), block_log_exception,
                  "The first available block is block ${first_block}.",
                  ("first_block", log_bundle.log_data.first_block_num()));
 
@@ -1729,4 +1729,4 @@ namespace eosio { namespace chain {
       }
    }
 
-}} // namespace eosio::chain
+}} // namespace sysio::chain

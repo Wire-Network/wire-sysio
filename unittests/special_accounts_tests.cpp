@@ -2,11 +2,11 @@
 #include <iterator>
 #include <vector>
 
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/permission_object.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <fc/crypto/digest.hpp>
 
@@ -15,9 +15,9 @@
 #include <boost/range/algorithm/permutation.hpp>
 #include <boost/test/unit_test.hpp>
 
-using namespace eosio;
+using namespace sysio;
 using namespace chain;
-using tester = eosio::testing::tester;
+using tester = sysio::testing::tester;
 
 BOOST_AUTO_TEST_SUITE(special_account_tests)
 

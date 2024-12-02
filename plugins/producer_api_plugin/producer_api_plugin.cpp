@@ -1,24 +1,24 @@
-#include <eosio/producer_api_plugin/producer_api_plugin.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/producer_api_plugin/producer_api_plugin.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <fc/time.hpp>
 #include <fc/variant.hpp>
 
 #include <chrono>
 
-namespace eosio { namespace detail {
+namespace sysio { namespace detail {
   struct producer_api_plugin_response {
      std::string result;
   };
 }}
 
-FC_REFLECT(eosio::detail::producer_api_plugin_response, (result));
+FC_REFLECT(sysio::detail::producer_api_plugin_response, (result));
 
-namespace eosio {
+namespace sysio {
 
    static auto _producer_api_plugin = application::register_plugin<producer_api_plugin>();
 
-using namespace eosio;
+using namespace sysio;
 
 #define CALL_WITH_400(api_name, category, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \
@@ -79,12 +79,12 @@ using namespace eosio;
 #define INVOKE_V_R(api_handle, call_name, in_param) \
      auto params = parse_params<in_param, http_params_types::params_required>(body);\
      api_handle.call_name(std::move(params)); \
-     eosio::detail::producer_api_plugin_response result{"ok"};
+     sysio::detail::producer_api_plugin_response result{"ok"};
 
 #define INVOKE_V_V(api_handle, call_name) \
      body = parse_params<std::string, http_params_types::no_params>(body); \
      api_handle.call_name(); \
-     eosio::detail::producer_api_plugin_response result{"ok"};
+     sysio::detail::producer_api_plugin_response result{"ok"};
 
 
 void producer_api_plugin::plugin_startup() {

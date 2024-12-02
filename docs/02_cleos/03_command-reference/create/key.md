@@ -5,7 +5,7 @@ Creates a new keypair and prints the public and private keys
 ## Usage
 
 ```console
-Usage: cleos create key [OPTIONS]
+Usage: clio create key [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
@@ -17,7 +17,7 @@ Options:
 ## Command
 
 ```sh
-cleos create key -f passwd
+clio create key -f passwd
 ```
 
 ## Output

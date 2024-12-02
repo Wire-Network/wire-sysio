@@ -1,6 +1,6 @@
 #include "payloadless.hpp"
 
-using namespace eosio;
+using namespace sysio;
 
 void payloadless::doit() {
    print("Im a payloadless action");
@@ -45,7 +45,7 @@ void payloadless::doitslow() {
    for (size_t p = 2; p <= cpu_prime_max; p += 1) {
       if (is_prime(p) && is_mersenne_prime(p)) {
          // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
-         //eosio::print_f(" %u", p);
+         //sysio::print_f(" %u", p);
       }
    }
 }

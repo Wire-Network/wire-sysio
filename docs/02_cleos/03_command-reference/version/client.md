@@ -7,5 +7,5 @@ none
 ## Usage
 
 ```sh
-cleos version client
+clio version client
 ```

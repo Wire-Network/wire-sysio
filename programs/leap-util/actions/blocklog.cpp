@@ -1,8 +1,8 @@
 #include "blocklog.hpp"
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/fork_database.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/fork_database.hpp>
 #include <memory>
 
 #include <fc/bitutil.hpp>
@@ -23,7 +23,7 @@
 #define FOPEN(p, m) _wfopen(p, PREL(m))
 #endif
 
-using namespace eosio::chain;
+using namespace sysio::chain;
 namespace bpo = boost::program_options;
 using bpo::options_description;
 using bpo::variables_map;
@@ -219,7 +219,7 @@ bool blocklog_actions::trim_blocklog_front(std::filesystem::path block_dir, uint
 
 void blocklog_actions::extract_block_range(std::filesystem::path block_dir, std::filesystem::path output_dir, uint32_t start, uint32_t last) {
    report_time rt("extracting block range");
-   EOS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
+   SYS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
    block_log::extract_block_range(block_dir, output_dir, start, last);
    rt.report();
 }
@@ -242,7 +242,7 @@ int blocklog_actions::do_vacuum() {
       return -1;
    }
 
-   if(!std::holds_alternative<eosio::chain::prune_blocklog_config>(opt->blog_conf)) {
+   if(!std::holds_alternative<sysio::chain::prune_blocklog_config>(opt->blog_conf)) {
       std::cerr << "blocks.log is not a pruned log; nothing to vacuum" << std::endl;
       return -1;
    }
@@ -256,8 +256,8 @@ int blocklog_actions::read_log() {
    report_time rt("reading log");
    block_log block_logger(opt->blocks_dir, opt->blog_conf);
    const auto end = block_logger.read_head();
-   EOS_ASSERT(end, block_log_exception, "No blocks found in block log");
-   EOS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
+   SYS_ASSERT(end, block_log_exception, "No blocks found in block log");
+   SYS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
 
    //fix message below, first block might not be 1, first_block_num is not set yet
    ilog("existing block log contains block num ${first} through block num ${n}",
@@ -266,7 +266,7 @@ int blocklog_actions::read_log() {
       opt->first_block = block_logger.first_block_num();
    }
 
-   eosio::chain::branch_type fork_db_branch;
+   sysio::chain::branch_type fork_db_branch;
 
    if(std::filesystem::exists(std::filesystem::path(opt->blocks_dir) / config::reversible_blocks_dir_name / config::forkdb_filename)) {
       ilog("opening fork_db");
@@ -284,7 +284,7 @@ int blocklog_actions::read_log() {
          auto last = fork_db_branch.rend() - 1;
          ilog("existing reversible fork_db block num ${first} through block num ${last} ",
               ("first", (*first)->block_num)("last", (*last)->block_num));
-         EOS_ASSERT(end->block_num() + 1 == (*first)->block_num, block_log_exception,
+         SYS_ASSERT(end->block_num() + 1 == (*first)->block_num, block_log_exception,
                     "fork_db does not start at end of block log");
       }
    }

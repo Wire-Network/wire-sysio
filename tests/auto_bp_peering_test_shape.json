@@ -17,7 +17,7 @@
         ],
         "peers": [],
         "producers": [
-          "eosio"
+          "sysio"
         ],
         "dont_start": false
       },

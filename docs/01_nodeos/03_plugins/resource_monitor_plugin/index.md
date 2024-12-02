@@ -1,7 +1,7 @@
 
 ## Overview
 
-The `resource_monitor_plugin` monitors space usage in the computing system where `nodeos` is running. Specifically, every `resource-monitor-interval-seconds` seconds, it measures the individual space used by each of the file systems mounted by `data-dir`, `state-dir`, `blocks-log-dir`, `snapshots-dir`, `state-history-dir`, and `trace-dir`. When space usage in any of the monitored file system is within `5%` of the threshold specified by `resource-monitor-space-threshold`, a warning containing the file system path and percentage of space has used is printed out. When space usage exceeds the threshold, if `resource-monitor-not-shutdown-on-threshold-exceeded` is not set, `nodeos` gracefully shuts down; if `resource-monitor-not-shutdown-on-threshold-exceeded` is set, `nodeos` prints out warnings periodically until space usage goes under the threshold.
+The `resource_monitor_plugin` monitors space usage in the computing system where `nodeop` is running. Specifically, every `resource-monitor-interval-seconds` seconds, it measures the individual space used by each of the file systems mounted by `data-dir`, `state-dir`, `blocks-log-dir`, `snapshots-dir`, `state-history-dir`, and `trace-dir`. When space usage in any of the monitored file system is within `5%` of the threshold specified by `resource-monitor-space-threshold`, a warning containing the file system path and percentage of space has used is printed out. When space usage exceeds the threshold, if `resource-monitor-not-shutdown-on-threshold-exceeded` is not set, `nodeop` gracefully shuts down; if `resource-monitor-not-shutdown-on-threshold-exceeded` is set, `nodeop` prints out warnings periodically until space usage goes under the threshold.
 
 `resource_monitor_plugin` is always loaded.
 
@@ -9,20 +9,20 @@ The `resource_monitor_plugin` monitors space usage in the computing system where
 
 ```console
 # config.ini
-plugin = eosio::resource_monitor_plugin
+plugin = sysio::resource_monitor_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::resource_monitor_plugin [options]
+nodeop ... --plugin sysio::resource_monitor_plugin [options]
 ```
 
 ## Configuration Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::resource_monitor_plugin:
+Config Options for sysio::resource_monitor_plugin:
   --resource-monitor-interval-seconds arg (=2)
                                         Time in seconds between two consecutive
                                         checks of resource usage. Should be
@@ -38,7 +38,7 @@ Config Options for eosio::resource_monitor_plugin:
                                         above the threshold. The value should
                                         be between 6 and 99
   --resource-monitor-not-shutdown-on-threshold-exceeded
-                                        Used to indicate nodeos will not
+                                        Used to indicate nodeop will not
                                         shutdown when threshold is exceeded.
   --resource-monitor-warning-interval arg (=30)
                                         Number of resource monitor intervals

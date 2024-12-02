@@ -1,8 +1,8 @@
-#include <eosio/chain/block_header_state.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/block_header_state.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <limits>
 
-namespace eosio { namespace chain {
+namespace sysio { namespace chain {
 
    namespace detail {
       bool is_builtin_activated( const protocol_feature_activation_set_ptr& pfa,
@@ -41,7 +41,7 @@ namespace eosio { namespace chain {
       pending_block_header_state result;
 
       if( when != block_timestamp_type() ) {
-        EOS_ASSERT( when > header.timestamp, block_validate_exception, "next block must be in the future" );
+        SYS_ASSERT( when > header.timestamp, block_validate_exception, "next block must be in the future" );
       } else {
         (when = header.timestamp).slot++;
       }
@@ -50,7 +50,7 @@ namespace eosio { namespace chain {
 
       auto itr = producer_to_last_produced.find( proauth.producer_name );
       if( itr != producer_to_last_produced.end() ) {
-        EOS_ASSERT( itr->second < (block_num+1) - num_prev_blocks_to_confirm, producer_double_confirm,
+        SYS_ASSERT( itr->second < (block_num+1) - num_prev_blocks_to_confirm, producer_double_confirm,
                     "producer ${prod} double-confirming known range",
                     ("prod", proauth.producer_name)("num", block_num+1)
                     ("confirmed", num_prev_blocks_to_confirm)("last_produced", itr->second) );
@@ -210,7 +210,7 @@ namespace eosio { namespace chain {
             for (const auto &p : new_producers->producers) {
                std::visit([&downgraded_producers, &p](const auto& auth)
                {
-                  EOS_ASSERT(auth.keys.size() == 1 && auth.keys.front().weight == auth.threshold, producer_schedule_exception, "multisig block signing present before enabled!");
+                  SYS_ASSERT(auth.keys.size() == 1 && auth.keys.front().weight == auth.threshold, producer_schedule_exception, "multisig block signing present before enabled!");
                   downgraded_producers.producers.emplace_back(legacy::producer_key{p.producer_name, auth.keys.front().key});
                }, p.authority);
             }
@@ -230,11 +230,11 @@ namespace eosio { namespace chain {
 
    )&&
    {
-      EOS_ASSERT( h.timestamp == timestamp, block_validate_exception, "timestamp mismatch" );
-      EOS_ASSERT( h.previous == previous, unlinkable_block_exception, "previous mismatch" );
-      EOS_ASSERT( h.confirmed == confirmed, block_validate_exception, "confirmed mismatch" );
-      EOS_ASSERT( h.producer == producer, wrong_producer, "wrong producer specified" );
-      EOS_ASSERT( h.schedule_version == active_schedule_version, producer_schedule_exception, "schedule_version in signed block is corrupted" );
+      SYS_ASSERT( h.timestamp == timestamp, block_validate_exception, "timestamp mismatch" );
+      SYS_ASSERT( h.previous == previous, unlinkable_block_exception, "previous mismatch" );
+      SYS_ASSERT( h.confirmed == confirmed, block_validate_exception, "confirmed mismatch" );
+      SYS_ASSERT( h.producer == producer, wrong_producer, "wrong producer specified" );
+      SYS_ASSERT( h.schedule_version == active_schedule_version, producer_schedule_exception, "schedule_version in signed block is corrupted" );
 
       auto exts = h.validate_and_extract_header_extensions();
 
@@ -247,13 +247,13 @@ namespace eosio { namespace chain {
       }
 
       if( h.new_producers ) {
-         EOS_ASSERT(!wtmsig_enabled, producer_schedule_exception, "Block header contains legacy producer schedule outdated by activation of WTMsig Block Signatures" );
+         SYS_ASSERT(!wtmsig_enabled, producer_schedule_exception, "Block header contains legacy producer schedule outdated by activation of WTMsig Block Signatures" );
 
-         EOS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
+         SYS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
 
          const auto& new_producers = *h.new_producers;
-         EOS_ASSERT( new_producers.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
-         EOS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
+         SYS_ASSERT( new_producers.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
+         SYS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
                     "cannot set new pending producers until last pending is confirmed" );
 
          maybe_new_producer_schedule_hash.emplace(digest_type::hash(new_producers));
@@ -261,13 +261,13 @@ namespace eosio { namespace chain {
       }
 
       if ( exts.count(producer_schedule_change_extension::extension_id()) > 0 ) {
-         EOS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block header producer_schedule_change_extension before activation of WTMsig Block Signatures" );
-         EOS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
+         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block header producer_schedule_change_extension before activation of WTMsig Block Signatures" );
+         SYS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
 
          const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(exts.lower_bound(producer_schedule_change_extension::extension_id())->second);
 
-         EOS_ASSERT( new_producer_schedule.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
-         EOS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
+         SYS_ASSERT( new_producer_schedule.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
+         SYS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
                      "cannot set new pending producers until last pending is confirmed" );
 
          maybe_new_producer_schedule_hash.emplace(digest_type::hash(new_producer_schedule));
@@ -330,7 +330,7 @@ namespace eosio { namespace chain {
       if( !additional_signatures.empty() ) {
          bool wtmsig_enabled = detail::is_builtin_activated(prev_activated_protocol_features, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
 
-         EOS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block contains multiple signatures before WTMsig block signatures are enabled" );
+         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block contains multiple signatures before WTMsig block signatures are enabled" );
       }
 
       auto result = std::move(*this)._finish_next( h, pfs, validator );
@@ -364,7 +364,7 @@ namespace eosio { namespace chain {
 
       if( !result.additional_signatures.empty() ) {
          bool wtmsig_enabled = detail::is_builtin_activated(pfa, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
-         EOS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block was signed with multiple signatures before WTMsig block signatures are enabled" );
+         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block was signed with multiple signatures before WTMsig block signatures are enabled" );
       }
 
       return result;
@@ -399,7 +399,7 @@ namespace eosio { namespace chain {
       auto d = sig_digest();
       auto sigs = signer( d );
 
-      EOS_ASSERT(!sigs.empty(), no_block_signatures, "Signer returned no signatures");
+      SYS_ASSERT(!sigs.empty(), no_block_signatures, "Signer returned no signatures");
       header.producer_signature = sigs.back();
       sigs.pop_back();
 
@@ -411,7 +411,7 @@ namespace eosio { namespace chain {
    void block_header_state::verify_signee( )const {
 
       auto num_keys_in_authority = std::visit([](const auto &a){ return a.keys.size(); }, valid_block_signing_authority);
-      EOS_ASSERT(1 + additional_signatures.size() <= num_keys_in_authority, wrong_signing_key,
+      SYS_ASSERT(1 + additional_signatures.size() <= num_keys_in_authority, wrong_signing_key,
                  "number of block signatures (${num_block_signatures}) exceeds number of keys in block signing authority (${num_keys})",
                  ("num_block_signatures", 1 + additional_signatures.size())
                  ("num_keys", num_keys_in_authority)
@@ -424,7 +424,7 @@ namespace eosio { namespace chain {
 
       for (const auto& s: additional_signatures) {
          auto res = keys.emplace(s, digest, true);
-         EOS_ASSERT(res.second, wrong_signing_key, "block signed by same key twice", ("key", *res.first));
+         SYS_ASSERT(res.second, wrong_signing_key, "block signed by same key twice", ("key", *res.first));
       }
 
       bool is_satisfied = false;
@@ -432,11 +432,11 @@ namespace eosio { namespace chain {
 
       std::tie(is_satisfied, relevant_sig_count) = producer_authority::keys_satisfy_and_relevant(keys, valid_block_signing_authority);
 
-      EOS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
+      SYS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
                  "block signed by unexpected key",
                  ("signing_keys", keys)("authority", valid_block_signing_authority));
 
-      EOS_ASSERT(is_satisfied, wrong_signing_key,
+      SYS_ASSERT(is_satisfied, wrong_signing_key,
                  "block signatures do not satisfy the block signing authority",
                  ("signing_keys", keys)("authority", valid_block_signing_authority));
    }
@@ -473,4 +473,4 @@ namespace eosio { namespace chain {
    }
 
 
-} } /// namespace eosio::chain
+} } /// namespace sysio::chain

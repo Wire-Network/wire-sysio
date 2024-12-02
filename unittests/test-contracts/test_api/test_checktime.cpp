@@ -1,18 +1,18 @@
 #include <vector>
 
-#include <eosio/crypto.hpp>
-#include <eosio/eosio.hpp>
-#include <eosio/print.hpp>
+#include <sysio/crypto.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/print.hpp>
 
 #include "test_api.hpp"
-using namespace eosio;
+using namespace sysio;
 
 void test_checktime::checktime_pass() {
    int p = 0;
    for ( int i = 0; i < 10000; i++ )
       p += i;
 
-   eosio::print(p);
+   sysio::print(p);
 }
 
 static void checktime_failure_common() {
@@ -24,7 +24,7 @@ static void checktime_failure_common() {
       for ( unsigned long long j = 0; j < bound; j++ )
          p += i+j+bound;
 
-   eosio::print(p);
+   sysio::print(p);
 }
 
 void test_checktime::checktime_failure() {

@@ -7,7 +7,7 @@
 #include <iostream>
 
 namespace bpo = boost::program_options;
-namespace et = eosio::testing;
+namespace et = sysio::testing;
 
 enum return_codes {
    TERMINATED_EARLY = -3,
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
          cli.print(std::cerr);
          return INITIALIZE_FAIL;
       } else {
-         trx_gen_base_config._chain_id = eosio::chain::chain_id_type(chain_id_in);
+         trx_gen_base_config._chain_id = sysio::chain::chain_id_type(chain_id_in);
       }
 
       if(trx_gen_base_config._log_dir.empty()) {
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
          cli.print(std::cerr);
          return INITIALIZE_FAIL;
       } else {
-         trx_gen_base_config._last_irr_block_id = fc::variant(lib_id_str).as<eosio::chain::block_id_type>();
+         trx_gen_base_config._last_irr_block_id = fc::variant(lib_id_str).as<sysio::chain::block_id_type>();
       }
 
       if(contract_owner_account_in.empty()) {
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
          cli.print(std::cerr);
          return INITIALIZE_FAIL;
       } else {
-         trx_gen_base_config._contract_owner_account = eosio::chain::name(contract_owner_account_in);
+         trx_gen_base_config._contract_owner_account = sysio::chain::name(contract_owner_account_in);
       }
 
       std::vector<std::string> account_str_vector;

@@ -14,5 +14,5 @@ None
 
 
 ```javascript
-cleos wallet private_keys
+clio wallet private_keys
 ```

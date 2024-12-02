@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE custom_appbase_tests
 #include <boost/test/included/unit_test.hpp>
 
-#include <eosio/chain/application.hpp>
+#include <sysio/chain/application.hpp>
 
 #include <fc/log/logger_config.hpp>
 

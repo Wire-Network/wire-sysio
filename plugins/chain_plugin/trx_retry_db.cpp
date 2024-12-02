@@ -1,12 +1,12 @@
-#include <eosio/chain_plugin/trx_retry_db.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain_plugin/trx_retry_db.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/contract_types.hpp>
-#include <eosio/chain/controller.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/contract_types.hpp>
+#include <sysio/chain/controller.hpp>
 
-#include <eosio/chain/application.hpp>
-#include <eosio/chain/plugin_interface.hpp>
+#include <sysio/chain/application.hpp>
+#include <sysio/chain/plugin_interface.hpp>
 
 #include <fc/container/tracked_storage.hpp>
 
@@ -17,9 +17,9 @@
 #include <boost/multi_index/member.hpp>
 
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::chain::literals;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::chain::literals;
 using namespace boost::multi_index;
 
 namespace {
@@ -83,7 +83,7 @@ using tracked_transaction_index_t = multi_index_container<tracked_transaction,
 
 } // anonymous namespace
 
-namespace eosio::chain_apis {
+namespace sysio::chain_apis {
 
 struct trx_retry_db_impl {
    explicit trx_retry_db_impl(const chain::controller& controller, size_t max_mem_usage_size,
@@ -106,7 +106,7 @@ struct trx_retry_db_impl {
    }
 
    void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, next_function<std::unique_ptr<fc::variant>> next ) {
-      EOS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
+      SYS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
                   "Transaction exceeded  transaction-retry-max-storage-size-gb limit: ${m} bytes", ("m", _tracked_trxs.memory_size()) );
       auto i = _tracked_trxs.index().get<by_trx_id>().find( ptrx->id() );
       if( i == _tracked_trxs.index().end() ) {
@@ -333,4 +333,4 @@ void trx_retry_db::on_irreversible_block(const chain::block_state_ptr& block ) {
    } FC_LOG_AND_DROP(("trx retry irreversible_block ERROR"));
 }
 
-} // namespace eosio::chain_apis
+} // namespace sysio::chain_apis

@@ -147,7 +147,7 @@ class NodeosQueries:
 
     @staticmethod
     def getRetryCmdArg(retry):
-        """Returns the cleos cmd arg for retry"""
+        """Returns the clio cmd arg for retry"""
         assert retry is None or isinstance(retry, int) or (isinstance(retry, str) and retry == "lib"), "Invalid retry passed"
         cmdRetry = ""
         if retry is not None:
@@ -347,7 +347,7 @@ class NodeosQueries:
 
     def getTable(self, contract, scope, table, exitOnError=False):
         cmdDesc = "get table"
-        cmd=f"{cmdDesc} {self.cleosLimit} {contract} {scope} {table}"
+        cmd=f"{cmdDesc} {self.clioLimit} {contract} {scope} {table}"
         msg=f"contract={contract}, scope={scope}, table={table}"
         return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
@@ -465,7 +465,7 @@ class NodeosQueries:
         msg="key=%s" % (key);
         return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
-    # Get actions mapped to an account (cleos get actions)
+    # Get actions mapped to an account (clio get actions)
     def getActions(self, account, pos=-1, offset=-1, exitOnError=False):
         assert(isinstance(account, Account))
         assert(isinstance(pos, int))
@@ -496,15 +496,15 @@ class NodeosQueries:
         return servants
 
     def getAccountEosBalanceStr(self, scope):
-        """Returns SYS currency0000 account balance from cleos get table command. Returned balance is string following syntax "98.0311 SYS". """
+        """Returns SYS currency0000 account balance from clio get table command. Returned balance is string following syntax "98.0311 SYS". """
         assert isinstance(scope, str)
-        amount=self.getTableAccountBalance("eosio.token", scope)
+        amount=self.getTableAccountBalance("sysio.token", scope)
         if Utils.Debug: Utils.Print("getNodeAccountEosBalance %s %s" % (scope, amount))
         assert isinstance(amount, str)
         return amount
 
     def getAccountEosBalance(self, scope):
-        """Returns SYS currency0000 account balance from cleos get table command. Returned balance is an integer e.g. 980311. """
+        """Returns SYS currency0000 account balance from clio get table command. Returned balance is an integer e.g. 980311. """
         balanceStr=self.getAccountEosBalanceStr(scope)
         balance=NodeosQueries.currencyStrToInt(balanceStr)
         return balance
@@ -682,7 +682,7 @@ class NodeosQueries:
         return False if info is None else True
 
     def getHeadBlockNum(self):
-        """returns head block number(string) as returned by cleos get info."""
+        """returns head block number(string) as returned by clio get info."""
         info = self.getInfo(exitOnError=True)
         if info is not None:
             headBlockNumTag = "head_block_num"

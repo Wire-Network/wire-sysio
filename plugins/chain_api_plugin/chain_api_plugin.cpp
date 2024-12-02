@@ -1,14 +1,14 @@
-#include <eosio/chain_api_plugin/chain_api_plugin.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/http_plugin/macros.hpp>
+#include <sysio/chain_api_plugin/chain_api_plugin.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/http_plugin/macros.hpp>
 #include <fc/time.hpp>
 #include <fc/io/json.hpp>
 
-namespace eosio {
+namespace sysio {
 
    static auto _chain_api_plugin = application::register_plugin<chain_api_plugin>();
 
-using namespace eosio;
+using namespace sysio;
 
 class chain_api_plugin_impl {
 public:
@@ -30,7 +30,7 @@ template<>
 chain_apis::read_only::get_transaction_status_params
 parse_params<chain_apis::read_only::get_transaction_status_params, http_params_types::params_required>(const std::string& body) {
    if (body.empty()) {
-      EOS_THROW(chain::invalid_http_request, "A Request body is required");
+      SYS_THROW(chain::invalid_http_request, "A Request body is required");
    }
 
    try {
@@ -38,7 +38,7 @@ parse_params<chain_apis::read_only::get_transaction_status_params, http_params_t
       if( v.id == transaction_id_type() ) throw false;
       return v;
    } catch( ... ) {
-      EOS_THROW(chain::invalid_http_request, "Invalid transaction id");
+      SYS_THROW(chain::invalid_http_request, "Invalid transaction id");
    }
 }
 
@@ -47,7 +47,7 @@ template<>
 chain_apis::read_only::get_transaction_id_params
 parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types::params_required>(const std::string& body) {
    if (body.empty()) {
-      EOS_THROW(chain::invalid_http_request, "A Request body is required");
+      SYS_THROW(chain::invalid_http_request, "A Request body is required");
    }
 
    try {
@@ -67,25 +67,25 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
                      vo = mvo;
                   } else if( action_vo.contains( "data" ) ) {
                      if( !action_vo["data"].is_string() ) {
-                        EOS_THROW(chain::invalid_http_request, "Request supports only un-exploded 'data' (hex form)");
+                        SYS_THROW(chain::invalid_http_request, "Request supports only un-exploded 'data' (hex form)");
                      }
                   }
                }
                else {
-                  EOS_THROW(chain::invalid_http_request, "Transaction contains invalid or empty action");
+                  SYS_THROW(chain::invalid_http_request, "Transaction contains invalid or empty action");
                }
             } 
          }
          else {
-            EOS_THROW(chain::invalid_http_request, "Transaction actions are missing or invalid");
+            SYS_THROW(chain::invalid_http_request, "Transaction actions are missing or invalid");
          }
       }
       else {
-         EOS_THROW(chain::invalid_http_request, "Transaction object is missing or invalid");
+         SYS_THROW(chain::invalid_http_request, "Transaction object is missing or invalid");
       }
       auto trx = trx_var.as<chain_apis::read_only::get_transaction_id_params>();
       if( trx.id() == transaction().id() ) {
-         EOS_THROW(chain::invalid_http_request, "Invalid transaction object");
+         SYS_THROW(chain::invalid_http_request, "Invalid transaction object");
       }
       return trx;
    } EOS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Invalid transaction");

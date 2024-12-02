@@ -10,7 +10,7 @@ None
 
 
 ```sh
-cleos wallet lock_all
+clio wallet lock_all
 ```
 
 ## Outputs

@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
    auto generic_subcommand = std::make_shared<generic_actions>();
    generic_subcommand->setup(app);
 
-   // blocklog sc tree from eosio-blocklog
+   // blocklog sc tree from sysio-blocklog
    auto blocklog_subcommand = std::make_shared<blocklog_actions>();
    blocklog_subcommand->setup(app);
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
    auto snapshot_subcommand = std::make_shared<snapshot_actions>();
    snapshot_subcommand->setup(app);
 
-   // chain subcommand from nodeos chain_plugin
+   // chain subcommand from nodeop chain_plugin
    auto chain_subcommand = std::make_shared<chain_actions>();
    chain_subcommand->setup(app);
 

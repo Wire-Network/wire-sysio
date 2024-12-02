@@ -4,7 +4,7 @@ content_title: Nodeos Plugins
 
 ## Overview
 
-Plugins extend the core functionality implemented in `nodeos`. Some plugins are mandatory, such as `chain_plugin`, `net_plugin`, and `producer_plugin`, which reflect the modular design of `nodeos`. The other plugins are optional as they provide nice to have features, but non-essential for the nodes operation.
+Plugins extend the core functionality implemented in `nodeop`. Some plugins are mandatory, such as `chain_plugin`, `net_plugin`, and `producer_plugin`, which reflect the modular design of `nodeop`. The other plugins are optional as they provide nice to have features, but non-essential for the nodes operation.
 
 For information on specific plugins, just select from the list below:
 
@@ -21,4 +21,4 @@ For information on specific plugins, just select from the list below:
 * [`trace_api_plugin`](trace_api_plugin/index.md)
 
 [[info | Nodeos is modular]]
-| Plugins add incremental functionality to `nodeos`. Unlike runtime plugins, `nodeos` plugins are built at compile-time.
+| Plugins add incremental functionality to `nodeop`. Unlike runtime plugins, `nodeop` plugins are built at compile-time.

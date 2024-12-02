@@ -34,7 +34,7 @@
 
 //------------------------------------------------------------------------------
 
-namespace eosio {
+namespace sysio {
 namespace http_client_async {
 
 namespace beast = boost::beast;         // from <boost/beast.hpp>
@@ -169,4 +169,4 @@ inline void async_http_request(http_request_params& req_params, std::string&& re
              std::move(request_body));
 };
 } // namespace http_client_async
-} // namespace eosio
+} // namespace sysio

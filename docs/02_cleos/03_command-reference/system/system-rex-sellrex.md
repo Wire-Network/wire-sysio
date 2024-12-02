@@ -16,5 +16,5 @@
 
 
 ```sh
-cleos system rex sellrex accountname1 "1 REX"
+clio system rex sellrex accountname1 "1 REX"
 ```

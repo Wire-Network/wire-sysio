@@ -6,18 +6,18 @@ This how-to guide provides instructions on how to import a private key into the 
 
 Make sure you meet the following requirements:
 
-* Create a default wallet using the `cleos wallet create` command. See the [How to Create a Wallet](../02_how-to-guides/how-to-create-a-wallet.md) section for instructions.
+* Create a default wallet using the `clio wallet create` command. See the [How to Create a Wallet](../02_how-to-guides/how-to-create-a-wallet.md) section for instructions.
 * Open and unlock the created wallet.
-* Familiarize with the [`cleos wallet import`](../03_command-reference/wallet/import.md) command.
-* Install the currently supported version of `cleos`.
+* Familiarize with the [`clio wallet import`](../03_command-reference/wallet/import.md) command.
+* Install the currently supported version of `clio`.
 [[info | Note]]
-| `cleos` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `cleos`.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `clio`.
 * Understand what a [public key](/glossary.md#public-key) and [private key](/glossary.md#private-key) is.
 
 ## Command Reference
 
-See the following reference guide for `cleos` command line usage and related options:
-* [cleos wallet import](../03_command-reference/wallet/import.md) command and its parameters
+See the following reference guide for `clio` command line usage and related options:
+* [clio wallet import](../03_command-reference/wallet/import.md) command and its parameters
 
 ## Procedure
 
@@ -25,7 +25,7 @@ The following steps show how to import a private key to an existing `keosd` defa
 
 1. Run the following command to import a private key into the default wallet. The command prompts to enter a private key:
 ```sh
-cleos wallet import
+clio wallet import
 ```
 ```console
 private key:

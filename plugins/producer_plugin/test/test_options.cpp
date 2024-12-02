@@ -1,18 +1,18 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/producer_plugin/producer_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 
-#include <eosio/testing/tester.hpp>
+#include <sysio/testing/tester.hpp>
 
-#include <eosio/chain/genesis_state.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/chain/trace.hpp>
-#include <eosio/chain/name.hpp>
+#include <sysio/chain/genesis_state.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/chain/trace.hpp>
+#include <sysio/chain/name.hpp>
 
-#include <eosio/chain/application.hpp>
+#include <sysio/chain/application.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
+using namespace sysio;
+using namespace sysio::chain;
 
 BOOST_AUTO_TEST_SUITE(program_options)
 
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(state_dir) {
              "--data-dir",   temp_dir_str.c_str(),
              "--state-dir",  custom_state_dir_str.c_str(),
              "--config-dir", temp_dir_str.c_str(),
-             "-p", "eosio", "-e" };
+             "-p", "sysio", "-e" };
          app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
          app->startup();
          plugin_promise.set_value( {app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()} );

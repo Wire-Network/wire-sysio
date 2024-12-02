@@ -1,9 +1,9 @@
-#include <eosio/producer_plugin/producer_plugin.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/testing/tester.hpp>
 #include <boost/test/unit_test.hpp>
 
-namespace eosio::test::detail {
-using namespace eosio::chain::literals;
+namespace sysio::test::detail {
+using namespace sysio::chain::literals;
 struct testit {
    uint64_t id;
 
@@ -18,13 +18,13 @@ struct testit {
    }
 };
 }
-FC_REFLECT( eosio::test::detail::testit, (id) )
+FC_REFLECT( sysio::test::detail::testit, (id) )
 
 namespace {
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::test::detail;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::test::detail;
 
 auto make_delayed_trx( const chain_id_type& chain_id ) {
    account_name creator = config::system_account_name;
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
          fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
          std::vector<const char*> argv =
             {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
-               "-p", "eosio", "-e", "--disable-subjective-p2p-billing=true" };
+               "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
          app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
          app->startup();
          plugin_promise.set_value(
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
             }
          ),
          fc::exception,
-         eosio::testing::fc_exception_message_starts_with("transaction cannot be delayed")
+         sysio::testing::fc_exception_message_starts_with("transaction cannot be delayed")
       );
    });
 

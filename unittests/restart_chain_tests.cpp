@@ -1,9 +1,9 @@
 #include <sstream>
 
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/snapshot.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/snapshot.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
@@ -11,7 +11,7 @@
 #include <test_contracts.hpp>
 #include <snapshots.hpp>
 
-using namespace eosio;
+using namespace sysio;
 using namespace testing;
 using namespace chain;
 
@@ -31,8 +31,8 @@ void remove_existing_states(controller::config& config) {
 }
 
 struct dummy_action {
-   static eosio::chain::name get_name() { return "dummyaction"_n; }
-   static eosio::chain::name get_account() { return "testapi"_n; }
+   static sysio::chain::name get_name() { return "dummyaction"_n; }
+   static sysio::chain::name get_account() { return "testapi"_n; }
 
    char     a; // 1
    uint64_t b; // 8
@@ -40,8 +40,8 @@ struct dummy_action {
 };
 
 struct cf_action {
-   static eosio::chain::name get_name() { return "cfaction"_n; }
-   static eosio::chain::name get_account() { return "testapi"_n; }
+   static sysio::chain::name get_name() { return "cfaction"_n; }
+   static sysio::chain::name get_account() { return "testapi"_n; }
 
    uint32_t payload = 100;
    uint32_t cfd_idx = 0; // context free data index
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(test_restart_with_different_chain_id) {
    other.close();
    genesis_state genesis;
    genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:01.000");
-   genesis.initial_key       = eosio::testing::base_tester::get_public_key(config::system_account_name, "active");
+   genesis.initial_key       = sysio::testing::base_tester::get_public_key(config::system_account_name, "active");
    std::optional<chain_id_type> chain_id = genesis.compute_chain_id();
    BOOST_REQUIRE_EXCEPTION(other.open(chain_id), chain_id_type_exception,
                            fc_exception_message_starts_with("chain ID in state "));

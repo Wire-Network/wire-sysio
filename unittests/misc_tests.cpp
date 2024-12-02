@@ -1,9 +1,9 @@
-#include <eosio/chain/asset.hpp>
-#include <eosio/chain/authority.hpp>
-#include <eosio/chain/authority_checker.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/asset.hpp>
+#include <sysio/chain/authority.hpp>
+#include <sysio/chain/authority_checker.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <fc/io/json.hpp>
 #include <fc/log/logger_config.hpp>
@@ -14,8 +14,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio::chain;
+using namespace sysio::testing;
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -74,7 +74,7 @@ FC_REFLECT( base_reflect, (bv) )
 FC_REFLECT_DERIVED( derived_reflect, (base_reflect), (dv) )
 FC_REFLECT_DERIVED( final_reflect, (derived_reflect), (fv) )
 
-namespace eosio
+namespace sysio
 {
 using namespace chain;
 using namespace std;
@@ -149,15 +149,15 @@ BOOST_AUTO_TEST_CASE(name_prefix_tests)
    BOOST_CHECK_EQUAL("abc.xyz.qrt"_n.prefix(), "abc.xyz"_n);
    BOOST_CHECK_EQUAL("."_n.prefix(), ""_n);
 
-   BOOST_CHECK_EQUAL("eosio.any"_n.prefix(), "eosio"_n);
-   BOOST_CHECK_EQUAL("eosio"_n.prefix(), "eosio"_n);
-   BOOST_CHECK_EQUAL("eosio"_n.prefix(), config::system_account_name);
-   BOOST_CHECK_EQUAL("eosio."_n.prefix(), "eosio"_n);
-   BOOST_CHECK_EQUAL("eosio.evm"_n.prefix(), "eosio"_n);
-   BOOST_CHECK_EQUAL(".eosio"_n.prefix(), ""_n);
-   BOOST_CHECK_NE("eosi"_n.prefix(), "eosio"_n);
-   BOOST_CHECK_NE("eosioeosio"_n.prefix(), "eosio"_n);
-   BOOST_CHECK_NE("eosioe"_n.prefix(), "eosio"_n);
+   BOOST_CHECK_EQUAL("sysio.any"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_EQUAL("sysio"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_EQUAL("sysio"_n.prefix(), config::system_account_name);
+   BOOST_CHECK_EQUAL("sysio."_n.prefix(), "sysio"_n);
+   BOOST_CHECK_EQUAL("sysio.evm"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_EQUAL(".sysio"_n.prefix(), ""_n);
+   BOOST_CHECK_NE("eosi"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_NE("sysiosysio"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_NE("sysioe"_n.prefix(), "sysio"_n);
 }
 
 /// Test processing of unbalanced strings
@@ -719,22 +719,22 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", "eosio")
+            ("account", "sysio")
             ("name", "reqauth")
             ("authorization", fc::variants({
                fc::mutable_variant_object()
-                  ("actor", "eosio")
+                  ("actor", "sysio")
                   ("permission", "active")
             }))
             ("data", fc::mutable_variant_object()
-               ("from", "eosio")
+               ("from", "sysio")
             )
          })
       )
       // lets also push a context free action, the multi chain test will then also include a context free action
       ("context_free_actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", "eosio")
+            ("account", "sysio")
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy")))
          })
@@ -884,21 +884,21 @@ BOOST_AUTO_TEST_CASE(transaction_metadata_test) { try {
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", "eosio")
+            ("account", "sysio")
             ("name", "reqauth")
             ("authorization", fc::variants({
                fc::mutable_variant_object()
-                  ("actor", "eosio")
+                  ("actor", "sysio")
                   ("permission", "active")
             }))
             ("data", fc::mutable_variant_object()
-               ("from", "eosio")
+               ("from", "sysio")
             )
          })
       )
       ("context_free_actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", "eosio")
+            ("account", "sysio")
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy data")))
          })
@@ -1297,4 +1297,4 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
 
 BOOST_AUTO_TEST_SUITE_END()
 
-} // namespace eosio
+} // namespace sysio

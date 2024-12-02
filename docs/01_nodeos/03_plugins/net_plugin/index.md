@@ -6,20 +6,20 @@ The `net_plugin` provides an authenticated p2p protocol to persistently synchron
 
 ```console
 # config.ini
-plugin = eosio::net_plugin
+plugin = sysio::net_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::net_plugin [options]
+nodeop ... --plugin sysio::net_plugin [options]
 ```
 
 ## Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::net_plugin:
+Config Options for sysio::net_plugin:
   --p2p-listen-endpoint arg (=0.0.0.0:9876)
                                         The actual host:port used to listen for
                                         incoming p2p connections.

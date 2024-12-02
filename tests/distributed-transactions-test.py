@@ -80,7 +80,7 @@ try:
     Print("Creating wallet %s if one doesn't already exist." % walletName)
     walletAccounts=[cluster.defproduceraAccount,cluster.defproducerbAccount]
     if not dontLaunch:
-        walletAccounts.append(cluster.eosioAccount)
+        walletAccounts.append(cluster.sysioAccount)
     wallet=walletMgr.create(walletName, walletAccounts)
     if wallet is None:
         errorExit("Failed to create wallet %s" % (walletName))
@@ -91,10 +91,10 @@ try:
 
     defproduceraAccount=cluster.defproduceraAccount
     defproducerbAccount=cluster.defproducerbAccount
-    eosioAccount=cluster.eosioAccount
+    sysioAccount=cluster.sysioAccount
 
     Print("Create accounts.")
-    if not cluster.createAccounts(eosioAccount):
+    if not cluster.createAccounts(sysioAccount):
         errorExit("Accounts creation failed.")
 
     Print("Spread funds and validate")

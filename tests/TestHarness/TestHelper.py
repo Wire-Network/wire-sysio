@@ -66,7 +66,7 @@ class TestHelper(object):
             thGrp.add_argument("--kill-sig", type=str, choices=[Utils.SigKillTag, Utils.SigTermTag], help=argparse.SUPPRESS if suppressHelp else "kill signal.",
                     default=Utils.SigKillTag)
         if "--kill-count" in includeArgs:
-            thGrp.add_argument("--kill-count", type=int, help=argparse.SUPPRESS if suppressHelp else "nodeos instances to kill", default=-1)
+            thGrp.add_argument("--kill-count", type=int, help=argparse.SUPPRESS if suppressHelp else "nodeop instances to kill", default=-1)
         if "--terminate-at-block" in includeArgs:
             thGrp.add_argument("--terminate-at-block", type=int, help=argparse.SUPPRESS if suppressHelp else "block to terminate on when replaying", default=0)
         if "--seed" in includeArgs:
@@ -92,7 +92,7 @@ class TestHelper(object):
             thGrp.add_argument("--defproducerb_prvt_key", type=str, help=argparse.SUPPRESS if suppressHelp else "defproducerb private key.")
         if "--dump-error-details" in includeArgs:
             thGrp.add_argument("--dump-error-details",
-                                     help=argparse.SUPPRESS if suppressHelp else "Upon error print etc/eosio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout",
+                                     help=argparse.SUPPRESS if suppressHelp else "Upon error print etc/sysio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout",
                                      action='store_true')
         if "--dont-launch" in includeArgs:
             thGrp.add_argument("--dont-launch", help=argparse.SUPPRESS if suppressHelp else "Don't launch own node. Assume node is already running.",
@@ -107,7 +107,7 @@ class TestHelper(object):
         if "--only-bios" in includeArgs:
             thGrp.add_argument("--only-bios", help=argparse.SUPPRESS if suppressHelp else "Limit testing to bios node.", action='store_true')
         if "--sanity-test" in includeArgs:
-            thGrp.add_argument("--sanity-test", help=argparse.SUPPRESS if suppressHelp else "Validates nodeos and keosd are in path and can be started up.", action='store_true')
+            thGrp.add_argument("--sanity-test", help=argparse.SUPPRESS if suppressHelp else "Validates nodeop and keosd are in path and can be started up.", action='store_true')
         if "--alternate-version-labels-file" in includeArgs:
             thGrp.add_argument("--alternate-version-labels-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Provide a file to define the labels that can be used in the test and the path to the version installation associated with that.")
         if "--error-log-path" in includeArgs:

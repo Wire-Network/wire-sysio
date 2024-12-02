@@ -1,6 +1,6 @@
 ## Command
 ```sh
-cleos net status [OPTIONS] host
+clio net status [OPTIONS] host
 ```
 
 **Where:**
@@ -17,7 +17,7 @@ cleos net status [OPTIONS] host
 Returns the status of a connected peer. This command allows a node operator to check the status of a node's connected peer.
 
 ## Command Usage
-The following information shows the different positionals and options you can use with the `cleos net status` command:
+The following information shows the different positionals and options you can use with the `clio net status` command:
 
 ### Positionals
 * `host` _TEXT_ REQUIRED - The hostname:port to query status of connection
@@ -28,18 +28,18 @@ The following information shows the different positionals and options you can us
 ## Requirements
 Make sure you meet the following requirements:
 
-* Install the currently supported version of `cleos`.
+* Install the currently supported version of `clio`.
 [[info | Note]]
-| `cleos` is bundled with the Antelope software. [Installing Antelope](../../../00_install/index.md) will also install the `cleos` and `keosd` command line tools.
-* You have access to a producing node instance with the [`net_api_plugin`](../../../01_nodeos/03_plugins/net_api_plugin/index.md) loaded.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../../00_install/index.md) will also install the `clio` and `keosd` command line tools.
+* You have access to a producing node instance with the [`net_api_plugin`](../../../01_nodeop/03_plugins/net_api_plugin/index.md) loaded.
 
 ## Examples
-The following examples demonstrate how to use the `cleos net status` command:
+The following examples demonstrate how to use the `clio net status` command:
 
 * List the status of a connected peer listening at p2p address `localhost:9001` for a local node listening at http address `http://127.0.0.1:8002`:
 
 ```sh
-cleos -u http://127.0.0.1:8002 net status localhost:9001
+clio -u http://127.0.0.1:8002 net status localhost:9001
 ```
 **Output:**
 ```json

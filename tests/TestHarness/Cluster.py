@@ -59,7 +59,7 @@ class Cluster(object):
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=8888, walletHost="localhost", walletPort=9899
-                 , defproduceraPrvtKey=None, defproducerbPrvtKey=None, staging=False, loggingLevel="debug", loggingLevelDict={}, nodeosVers="", unshared=False, keepRunning=False, keepLogs=False):
+                 , defproduceraPrvtKey=None, defproducerbPrvtKey=None, staging=False, loggingLevel="debug", loggingLevelDict={}, nodeopVers="", unshared=False, keepRunning=False, keepLogs=False):
         """Cluster container.
         localCluster [True|False] Is cluster local to host.
         host: eos server host
@@ -69,9 +69,9 @@ class Cluster(object):
         defproduceraPrvtKey: Defproducera account private key
         defproducerbPrvtKey: Defproducerb account private key
         staging: [True|False] If true, don't generate new node configurations
-        loggingLevel: Logging level to apply to all nodeos loggers in all nodes
-        loggingLevelDict: Dictionary of node indices and logging level to apply to all nodeos loggers in that node
-        nodeosVers: Nodeos version string for compatibility
+        loggingLevel: Logging level to apply to all nodeop loggers in all nodes
+        loggingLevelDict: Dictionary of node indices and logging level to apply to all nodeop loggers in that node
+        nodeopVers: Nodeos version string for compatibility
         unshared: [True|False] If true, launch all processes in Linux namespace
         keepRunning: [True|False] If true, leave nodes running when Cluster is destroyed. Implies keepLogs.
         keepLogs: [True|False] If true, retain log files after cluster shuts down.
@@ -97,7 +97,7 @@ class Cluster(object):
         self.defProducerAccounts={}
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]= Account("defproducera")
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]= Account("defproducerb")
-        self.eosioAccount=self.defProducerAccounts["eosio"]= Account("eosio")
+        self.sysioAccount=self.defProducerAccounts["sysio"]= Account("sysio")
 
         self.defproduceraAccount.ownerPrivateKey=defproduceraPrvtKey
         self.defproduceraAccount.activePrivateKey=defproduceraPrvtKey
@@ -111,8 +111,8 @@ class Cluster(object):
         self.testFailed=False
         self.alternateVersionLabels=Cluster.__defaultAlternateVersionLabels()
         self.biosNode = None
-        self.nodeosVers=nodeosVers
-        self.nodeosLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}')
+        self.nodeopVers=nodeopVers
+        self.nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}')
 
         self.libTestingContractsPath = Path(__file__).resolve().parents[2] / "libraries" / "testing" / "contracts"
         self.unittestsContractsPath = Path(__file__).resolve().parents[2] / "unittests" / "contracts"
@@ -167,7 +167,7 @@ class Cluster(object):
     # pylint: disable=too-many-statements
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
                totalProducers=None, sharedProducers=0, extraNodeosArgs="", specificExtraNodeosArgs=None, specificNodeosInstances=None, onlySetProds=False,
-               pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True, nodeosLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
+               pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True, nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
                maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True):
         """Launch cluster.
         pnodes: producer nodes count
@@ -179,20 +179,20 @@ class Cluster(object):
           delay 0 exposes a bootstrap bug where producer handover may have a large gap confusing nodes and bringing system to a halt.
         onlyBios: When true, only loads the bios contract (and not more full bootstrapping).
         dontBootstrap: When true, don't do any bootstrapping at all. (even bios is not uploaded)
-        extraNodeosArgs: string of arguments to pass through to each nodeos instance (via --nodeos flag on launcher)
+        extraNodeosArgs: string of arguments to pass through to each nodeop instance (via --nodeop flag on launcher)
         specificExtraNodeosArgs: dictionary of arguments to pass to a specific node (via --specific-num and
-                                 --specific-nodeos flags on launcher), example: { "5" : "--plugin eosio::test_control_api_plugin" }
-        specificNodeosInstances: dictionary of paths to launch specific nodeos binaries (via --spcfc-inst-num and
-                                 --spcfc_inst_nodeos flags to launcher), example: { "4" : "bin/nodeos"}
+                                 --specific-nodeop flags on launcher), example: { "5" : "--plugin sysio::test_control_api_plugin" }
+        specificNodeosInstances: dictionary of paths to launch specific nodeop binaries (via --spcfc-inst-num and
+                                 --spcfc_inst_nodeop flags to launcher), example: { "4" : "bin/nodeop"}
         onlySetProds: Stop the bootstrap process after setting the producers
         pfSetupPolicy: determine the protocol feature setup policy (none, preactivate_feature_only, or full)
         alternateVersionLabelsFile: Supply an alternate version labels file to use with associatedNodeLabels.
         associatedNodeLabels: Supply a dictionary of node numbers to use an alternate label for a specific node.
-        loadSystemContract: indicate whether the eosio.system contract should be loaded
+        loadSystemContract: indicate whether the sysio.system contract should be loaded
         genesisPath: set the path to a specific genesis.json to use
         maximumP2pPerHost:  Maximum number of client nodes from any single IP address. Defaults to totalNodes if not set.
         maximumClients: Maximum number of clients from which connections are accepted, use 0 for no limit. Defaults to 25.
-        prodsEnableTraceApi: Determines whether producer nodes should have eosio::trace_api_plugin enabled. Defaults to True.
+        prodsEnableTraceApi: Determines whether producer nodes should have sysio::trace_api_plugin enabled. Defaults to True.
         """
         assert(isinstance(topo, str))
         assert PFSetupPolicy.isValid(pfSetupPolicy)
@@ -236,7 +236,7 @@ class Cluster(object):
 
         tries = 30
         while not Utils.arePortsAvailable(set(range(self.port, self.port+totalNodes+1))):
-            Utils.Print("ERROR: Another process is listening on nodeos default port. wait...")
+            Utils.Print("ERROR: Another process is listening on nodeop default port. wait...")
             if tries == 0:
                 return False
             tries = tries - 1
@@ -248,28 +248,28 @@ class Cluster(object):
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()
         argsArr.append("--config-dir")
-        argsArr.append(str(nodeosLogPath))
+        argsArr.append(str(nodeopLogPath))
         argsArr.append("--data-dir")
-        argsArr.append(str(nodeosLogPath))
+        argsArr.append(str(nodeopLogPath))
         if self.staging:
             argsArr.append("--nogen")
-        nodeosArgs=""
+        nodeopArgs=""
         if "--max-transaction-time" not in extraNodeosArgs:
-            nodeosArgs += " --max-transaction-time -1"
+            nodeopArgs += " --max-transaction-time -1"
         if "--abi-serializer-max-time-ms" not in extraNodeosArgs:
-            nodeosArgs += " --abi-serializer-max-time-ms 990000"
+            nodeopArgs += " --abi-serializer-max-time-ms 990000"
         if "--p2p-max-nodes-per-host" not in extraNodeosArgs:
-            nodeosArgs += f" --p2p-max-nodes-per-host {maximumP2pPerHost}"
+            nodeopArgs += f" --p2p-max-nodes-per-host {maximumP2pPerHost}"
         if "--max-clients" not in extraNodeosArgs:
-            nodeosArgs += f" --max-clients {maximumClients}"
+            nodeopArgs += f" --max-clients {maximumClients}"
         if Utils.Debug and "--contracts-console" not in extraNodeosArgs:
-            nodeosArgs += " --contracts-console"
+            nodeopArgs += " --contracts-console"
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
-            nodeosArgs += " --plugin eosio::producer_api_plugin"
+            nodeopArgs += " --plugin sysio::producer_api_plugin"
         if prodsEnableTraceApi:
-            nodeosArgs += " --plugin eosio::trace_api_plugin "
+            nodeopArgs += " --plugin sysio::trace_api_plugin "
         if extraNodeosArgs.find("--trace-rpc-abi") == -1:
-            nodeosArgs += " --trace-no-abis "
+            nodeopArgs += " --trace-no-abis "
         httpMaxResponseTimeSet = False
         if specificExtraNodeosArgs is not None:
             assert(isinstance(specificExtraNodeosArgs, dict))
@@ -280,7 +280,7 @@ class Cluster(object):
                     continue
                 argsArr.append("--specific-num")
                 argsArr.append(str(nodeNum))
-                argsArr.append("--specific-nodeos")
+                argsArr.append("--specific-nodeop")
                 if arg.find("--http-max-response-time-ms") != -1:
                     httpMaxResponseTimeSet = True
                 if arg[0] != "'" and arg[-1] != "'":
@@ -294,7 +294,7 @@ class Cluster(object):
                 assert(isinstance(arg, str))
                 argsArr.append("--spcfc-inst-num")
                 argsArr.append(str(nodeNum))
-                argsArr.append("--spcfc-inst-nodeos")
+                argsArr.append("--spcfc-inst-nodeop")
                 argsArr.append(arg)
 
         if not httpMaxResponseTimeSet and extraNodeosArgs.find("--http-max-response-time-ms") == -1:
@@ -302,11 +302,11 @@ class Cluster(object):
 
         if extraNodeosArgs is not None:
             assert(isinstance(extraNodeosArgs, str))
-            nodeosArgs += extraNodeosArgs
+            nodeopArgs += extraNodeosArgs
 
-        if nodeosArgs:
-            argsArr.append("--nodeos")
-            argsArr.append(nodeosArgs)
+        if nodeopArgs:
+            argsArr.append("--nodeop")
+            argsArr.append(nodeopArgs)
 
         if genesisPath is None:
             argsArr.append("--max-block-cpu-usage")
@@ -326,7 +326,7 @@ class Cluster(object):
                     Utils.errorExit("associatedNodeLabels passed in indicates label %s for node num %s, but it was not identified in %s" % (label, nodeNum, alternateVersionLabelsFile))
                 argsArr.append("--spcfc-inst-num")
                 argsArr.append(str(nodeNum))
-                argsArr.append("--spcfc-inst-nodeos")
+                argsArr.append("--spcfc-inst-nodeop")
                 argsArr.append(path)
 
         # must be last cmdArr.append before subprocess.call, so that everything is on the command line
@@ -336,7 +336,7 @@ class Cluster(object):
             shapeFile=shapeFilePrefix+".json"
             cmdArrForOutput=copy.deepcopy(argsArr)
             cmdArrForOutput.append("--output")
-            cmdArrForOutput.append(str(nodeosLogPath / shapeFile))
+            cmdArrForOutput.append(str(nodeopLogPath / shapeFile))
             cmdArrForOutput.append("--shape")
             cmdArrForOutput.append("line")
             s=" ".join(cmdArrForOutput)
@@ -344,8 +344,8 @@ class Cluster(object):
             bridgeLauncher.define_network()
             bridgeLauncher.generate()
 
-            Utils.Print(f"opening {topo} shape file: {nodeosLogPath / shapeFile}")
-            f = open(nodeosLogPath / shapeFile, "r")
+            Utils.Print(f"opening {topo} shape file: {nodeopLogPath / shapeFile}")
+            f = open(nodeopLogPath / shapeFile, "r")
             shapeFileJsonStr = f.read()
             f.close()
             shapeFileObject = json.loads(shapeFileJsonStr)
@@ -458,12 +458,12 @@ class Cluster(object):
 
         if type(specificExtraNodeosArgs) is dict:
             for args in specificExtraNodeosArgs.values():
-                if "--plugin eosio::history_api_plugin" in args:
-                    argsArr.append("--is-nodeos-v2")
+                if "--plugin sysio::history_api_plugin" in args:
+                    argsArr.append("--is-nodsys-v2")
                     break
 
         # Handle common case of specifying no block offset for older versions
-        if "v2" in self.nodeosVers or "v3" in self.nodeosVers or "v4" in self.nodeosVers:
+        if "v2" in self.nodeopVers or "v3" in self.nodeopVers or "v4" in self.nodeopVers:
             argsArr = list(map(lambda st: str.replace(st, "--produce-block-offset-ms 0", "--last-block-time-offset-us 0 --last-block-cpu-effort-percent 100"), argsArr))
 
         Cluster.__LauncherCmdArr = argsArr.copy()
@@ -478,7 +478,7 @@ class Cluster(object):
             nodeNum = instance.index
             node = Node(self.host, self.port + nodeNum, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), eosdcmd, unstarted=instance.dont_start,
-                        launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeosVers=self.nodeosVers)
+                        launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
             if nodeNum == Node.biosNodeId:
                 self.biosNode = node
             else:
@@ -541,7 +541,7 @@ class Cluster(object):
             initAccountKeys(account, producerKeys[name])
             self.defProducerAccounts[name] = account
 
-        self.eosioAccount=self.defProducerAccounts["eosio"]
+        self.sysioAccount=self.defProducerAccounts["sysio"]
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]
 
@@ -552,7 +552,7 @@ class Cluster(object):
         port=Cluster.__BiosPort if onlyBios else self.port
         host=Cluster.__BiosHost if onlyBios else self.host
         nodeNum="bios" if onlyBios else 0
-        node=Node(host, port, nodeNum, walletMgr=self.walletMgr, nodeosVers=self.nodeosVers)
+        node=Node(host, port, nodeNum, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
         if Utils.Debug: Utils.Print("Node: %s", str(node))
 
         node.checkPulse(exitOnError=True)
@@ -591,7 +591,7 @@ class Cluster(object):
         for n in nArr:
             port=n["port"]
             host=n["host"]
-            node=Node(host, port, nodeId=len(nodes), walletMgr=self.walletMgr, nodeosVers=self.nodeosVers)
+            node=Node(host, port, nodeId=len(nodes), walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
             if Utils.Debug: Utils.Print("Node:", node)
 
             node.checkPulse(exitOnError=True)
@@ -872,7 +872,7 @@ class Cluster(object):
 
         myAccounts = []
         if testSysAccounts:
-            myAccounts += [self.eosioAccount, self.defproduceraAccount, self.defproducerbAccount]
+            myAccounts += [self.sysioAccount, self.defproduceraAccount, self.defproducerbAccount]
         if accounts:
             assert(isinstance(accounts, list))
             myAccounts += accounts
@@ -977,7 +977,7 @@ class Cluster(object):
         nodeName=Utils.nodeExtensionToName("bios")
         producerKeys=Cluster.parseProducerKeys(startFile, nodeName)
         if producerKeys is None:
-            Utils.Print("ERROR: Failed to parse eosio private keys from cluster start files.")
+            Utils.Print("ERROR: Failed to parse sysio private keys from cluster start files.")
             return None
 
         for i in range(0, totalNodes):
@@ -1015,19 +1015,19 @@ class Cluster(object):
 
         ignWallet=self.walletMgr.create("ignition")
 
-        eosioName="eosio"
-        eosioKeys=producerKeys[eosioName]
-        eosioAccount=Account(eosioName)
-        eosioAccount.ownerPrivateKey=eosioKeys["private"]
-        eosioAccount.ownerPublicKey=eosioKeys["public"]
-        eosioAccount.activePrivateKey=eosioKeys["private"]
-        eosioAccount.activePublicKey=eosioKeys["public"]
+        sysioName="sysio"
+        sysioKeys=producerKeys[sysioName]
+        sysioAccount=Account(sysioName)
+        sysioAccount.ownerPrivateKey=sysioKeys["private"]
+        sysioAccount.ownerPublicKey=sysioKeys["public"]
+        sysioAccount.activePrivateKey=sysioKeys["private"]
+        sysioAccount.activePublicKey=sysioKeys["public"]
 
-        if not self.walletMgr.importKey(eosioAccount, ignWallet):
-            Utils.Print("ERROR: Failed to import %s account keys into ignition wallet." % (eosioName))
+        if not self.walletMgr.importKey(sysioAccount, ignWallet):
+            Utils.Print("ERROR: Failed to import %s account keys into ignition wallet." % (sysioName))
             return None
 
-        contract="eosio.bios"
+        contract="sysio.bios"
         contractDir= str(self.libTestingContractsPath / contract)
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
             contractDir=str(self.libTestingContractsPath / "old_versions" / "v1.7.0-develop-preactivate_feature" / contract)
@@ -1036,7 +1036,7 @@ class Cluster(object):
         wasmFile="%s.wasm" % (contract)
         abiFile="%s.abi" % (contract)
         Utils.Print("Publish %s contract" % (contract))
-        trans=biosNode.publishContract(eosioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
         if trans is None:
             Utils.Print("ERROR: Failed to publish contract %s." % (contract))
             return None
@@ -1047,7 +1047,7 @@ class Cluster(object):
         Node.validateTransaction(trans)
 
         Utils.Print("Creating accounts: %s " % ", ".join(producerKeys.keys()))
-        producerKeys.pop(eosioName)
+        producerKeys.pop(sysioName)
         accounts=[]
         for name, keys in producerKeys.items():
             initx = Account(name)
@@ -1055,7 +1055,7 @@ class Cluster(object):
             initx.ownerPublicKey=keys["public"]
             initx.activePrivateKey=keys["private"]
             initx.activePublicKey=keys["public"]
-            trans=biosNode.createAccount(initx, eosioAccount, 0)
+            trans=biosNode.createAccount(initx, sysioAccount, 0)
             if trans is None:
                 Utils.Print("ERROR: Failed to create account %s" % (name))
                 return None
@@ -1078,8 +1078,8 @@ class Cluster(object):
                     setProdsStr=f.read()
 
                     Utils.Print("Setting producers.")
-                    opts="--permission eosio@active"
-                    myTrans=biosNode.pushMessage("eosio", "setprods", setProdsStr, opts)
+                    opts="--permission sysio@active"
+                    myTrans=biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
                     if myTrans is None or not myTrans[0]:
                         Utils.Print("ERROR: Failed to set producers.")
                         return None
@@ -1099,9 +1099,9 @@ class Cluster(object):
                 setProdsStr += ' }'
                 if Utils.Debug: Utils.Print("setprods: %s" % (setProdsStr))
                 Utils.Print("Setting producers: %s." % (", ".join(prodNames)))
-                opts="--permission eosio@active"
+                opts="--permission sysio@active"
                 # pylint: disable=redefined-variable-type
-                trans=biosNode.pushMessage("eosio", "setprods", setProdsStr, opts)
+                trans=biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
                 if trans is None or not trans[0]:
                     Utils.Print("ERROR: Failed to set producer %s." % (keys["name"]))
                     return None
@@ -1112,8 +1112,8 @@ class Cluster(object):
                 Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
                 return None
 
-            # wait for block production handover (essentially a block produced by anyone but eosio).
-            lam = lambda: biosNode.getInfo(exitOnError=True)["head_block_producer"] != "eosio"
+            # wait for block production handover (essentially a block produced by anyone but sysio).
+            lam = lambda: biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio"
             ret=Utils.waitForBool(lam)
             if not ret:
                 Utils.Print("ERROR: Block production handover failed.")
@@ -1122,15 +1122,15 @@ class Cluster(object):
         if onlySetProds: return biosNode
 
         def createSystemAccount(accountName):
-            newAccount = copy.deepcopy(eosioAccount)
+            newAccount = copy.deepcopy(sysioAccount)
             newAccount.name = accountName
-            trans=biosNode.createAccount(newAccount, eosioAccount, 0)
+            trans=biosNode.createAccount(newAccount, sysioAccount, 0)
             if trans is None:
                 Utils.Print(f'ERROR: Failed to create account {newAccount.name}')
                 return None
             return trans
 
-        systemAccounts = ['eosio.bpay', 'eosio.msig', 'eosio.names', 'eosio.ram', 'eosio.ramfee', 'eosio.saving', 'eosio.stake', 'eosio.token', 'eosio.vpay', 'eosio.wrap']
+        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1141,27 +1141,27 @@ class Cluster(object):
             Utils.Print('ERROR: Failed to validate creation of system accounts')
             return None
 
-        eosioTokenAccount = copy.deepcopy(eosioAccount)
-        eosioTokenAccount.name = 'eosio.token'
-        contract="eosio.token"
+        sysioTokenAccount = copy.deepcopy(sysioAccount)
+        sysioTokenAccount.name = 'sysio.token'
+        contract="sysio.token"
         contractDir=str(self.unittestsContractsPath / contract)
         wasmFile="%s.wasm" % (contract)
         abiFile="%s.abi" % (contract)
         Utils.Print("Publish %s contract" % (contract))
-        trans=biosNode.publishContract(eosioTokenAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        trans=biosNode.publishContract(sysioTokenAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
         if trans is None:
             Utils.Print("ERROR: Failed to publish contract %s." % (contract))
             return None
 
         # Create currency0000, followed by issue currency0000
-        contract=eosioTokenAccount.name
+        contract=sysioTokenAccount.name
         Utils.Print("push create action to %s contract" % (contract))
         action="create"
-        data="{\"issuer\":\"%s\",\"maximum_supply\":\"1000000000.0000 %s\"}" % (eosioAccount.name, CORE_SYMBOL)
+        data="{\"issuer\":\"%s\",\"maximum_supply\":\"1000000000.0000 %s\"}" % (sysioAccount.name, CORE_SYMBOL)
         opts="--permission %s@active" % (contract)
         trans=biosNode.pushMessage(contract, action, data, opts)
         if trans is None or not trans[0]:
-            Utils.Print("ERROR: Failed to push create action to eosio contract.")
+            Utils.Print("ERROR: Failed to push create action to sysio contract.")
             return None
 
         Node.validateTransaction(trans[1])
@@ -1170,14 +1170,14 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
             return None
 
-        contract=eosioTokenAccount.name
+        contract=sysioTokenAccount.name
         Utils.Print("push issue action to %s contract" % (contract))
         action="issue"
-        data="{\"to\":\"%s\",\"quantity\":\"1000000000.0000 %s\",\"memo\":\"initial issue\"}" % (eosioAccount.name, CORE_SYMBOL)
-        opts="--permission %s@active" % (eosioAccount.name)
+        data="{\"to\":\"%s\",\"quantity\":\"1000000000.0000 %s\",\"memo\":\"initial issue\"}" % (sysioAccount.name, CORE_SYMBOL)
+        opts="--permission %s@active" % (sysioAccount.name)
         trans=biosNode.pushMessage(contract, action, data, opts)
         if trans is None or not trans[0]:
-            Utils.Print("ERROR: Failed to push issue action to eosio contract.")
+            Utils.Print("ERROR: Failed to push issue action to sysio contract.")
             return None
 
         Node.validateTransaction(trans[1])
@@ -1186,20 +1186,20 @@ class Cluster(object):
         biosNode.waitForTransactionInBlock(transId)
 
         expectedAmount="1000000000.0000 {0}".format(CORE_SYMBOL)
-        Utils.Print("Verify eosio issue, Expected: %s" % (expectedAmount))
-        actualAmount=biosNode.getAccountEosBalanceStr(eosioAccount.name)
+        Utils.Print("Verify sysio issue, Expected: %s" % (expectedAmount))
+        actualAmount=biosNode.getAccountEosBalanceStr(sysioAccount.name)
         if expectedAmount != actualAmount:
             Utils.Print("ERROR: Issue verification failed. Excepted %s, actual: %s" %
                         (expectedAmount, actualAmount))
             return None
 
         if loadSystemContract:
-            contract="eosio.system"
+            contract="sysio.system"
             contractDir=str(self.unittestsContractsPath / contract)
             wasmFile="%s.wasm" % (contract)
             abiFile="%s.abi" % (contract)
             Utils.Print("Publish %s contract" % (contract))
-            trans=biosNode.publishContract(eosioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
             if trans is None:
                 Utils.Print("ERROR: Failed to publish contract %s." % (contract))
                 return None
@@ -1209,14 +1209,14 @@ class Cluster(object):
         initialFunds="1000000.0000 {0}".format(CORE_SYMBOL)
         Utils.Print("Transfer initial fund %s to individual accounts." % (initialFunds))
         trans=None
-        contract=eosioTokenAccount.name
+        contract=sysioTokenAccount.name
         action="transfer"
         for name, keys in producerKeys.items():
-            data="{\"from\":\"%s\",\"to\":\"%s\",\"quantity\":\"%s\",\"memo\":\"%s\"}" % (eosioAccount.name, name, initialFunds, "init transfer")
-            opts="--permission %s@active" % (eosioAccount.name)
+            data="{\"from\":\"%s\",\"to\":\"%s\",\"quantity\":\"%s\",\"memo\":\"%s\"}" % (sysioAccount.name, name, initialFunds, "init transfer")
+            opts="--permission %s@active" % (sysioAccount.name)
             trans=biosNode.pushMessage(contract, action, data, opts)
             if trans is None or not trans[0]:
-                Utils.Print("ERROR: Failed to transfer funds from %s to %s." % (eosioTokenAccount.name, name))
+                Utils.Print("ERROR: Failed to transfer funds from %s to %s." % (sysioTokenAccount.name, name))
                 return None
 
             Node.validateTransaction(trans[1])
@@ -1231,8 +1231,8 @@ class Cluster(object):
         if loadSystemContract:
             action="init"
             data="{\"version\":0,\"core\":\"4,%s\"}" % (CORE_SYMBOL)
-            opts="--permission %s@active" % (eosioAccount.name)
-            trans=biosNode.pushMessage(eosioAccount.name, action, data, opts)
+            opts="--permission %s@active" % (sysioAccount.name)
+            trans=biosNode.pushMessage(sysioAccount.name, action, data, opts)
             transId=Node.getTransId(trans[1])
             Utils.Print("Wait for system init transaction to be in a block.")
             if not biosNode.waitForTransactionInBlock(transId):
@@ -1322,7 +1322,7 @@ class Cluster(object):
                 Cluster.dumpErrorDetailImpl(fileName)
 
     def shutdown(self):
-        """Shut down all nodeos instances launched by this Cluster."""
+        """Shut down all nodeop instances launched by this Cluster."""
         if not self.keepRunning:
             Utils.Print('Cluster shutting down.')
             for node in self.nodes:
@@ -1339,7 +1339,7 @@ class Cluster(object):
         self.cleanup()
 
     def bounce(self, nodes, silent=True):
-        """Bounces nodeos instances as indicated by parameter nodes.
+        """Bounces nodeop instances as indicated by parameter nodes.
         nodes should take the form of a comma-separated list as accepted by the launcher --bounce command (e.g. '00' or '00,01')"""
         cmdArr = Cluster.__LauncherCmdArr.copy()
         cmdArr.append("--bounce")
@@ -1352,7 +1352,7 @@ class Cluster(object):
         return True
 
     def down(self, nodes, silent=True):
-        """Brings down nodeos instances as indicated by parameter nodes.
+        """Brings down nodeop instances as indicated by parameter nodes.
         nodes should take the form of a comma-separated list as accepted by the launcher --bounce command (e.g. '00' or '00,01')"""
         cmdArr = Cluster.__LauncherCmdArr.copy()
         cmdArr.append("--down")
@@ -1425,7 +1425,7 @@ class Cluster(object):
         with open(startFile, 'r') as file:
             cmd=file.read()
             Utils.Print("unstarted local node cmd: %s" % (cmd))
-        instance=Node(self.host, port=self.port+nodeId, nodeId=nodeId, pid=None, cmd=cmd, walletMgr=self.walletMgr, nodeosVers=self.nodeosVers)
+        instance=Node(self.host, port=self.port+nodeId, nodeId=nodeId, pid=None, cmd=cmd, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
         if Utils.Debug: Utils.Print("Unstarted Node>", instance)
         return instance
 

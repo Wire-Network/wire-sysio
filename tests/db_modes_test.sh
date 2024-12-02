@@ -28,13 +28,13 @@ while getopts ":lv" opt; do
    esac
 done
 
-EOSIO_STUFF_DIR=$(mktemp -d)
-trap "rm -rf $EOSIO_STUFF_DIR" EXIT
-NODEOS_LAUNCH_PARAMS="./programs/nodeos/nodeos --resource-monitor-not-shutdown-on-threshold-exceeded -d $EOSIO_STUFF_DIR --config-dir $EOSIO_STUFF_DIR \
+SYSIO_STUFF_DIR=$(mktemp -d)
+trap "rm -rf $SYSIO_STUFF_DIR" EXIT
+NODEOS_LAUNCH_PARAMS="./programs/nodeop/nodeop --resource-monitor-not-shutdown-on-threshold-exceeded -d $SYSIO_STUFF_DIR --config-dir $SYSIO_STUFF_DIR \
 --chain-state-db-size-mb 8 --chain-state-db-guard-size-mb 0 \
--e -peosio"
+-e -psysio"
 
-run_nodeos() {
+run_nodeop() {
    if (( $VERBOSE == 0 )); then
       $NODEOS_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" 2>/dev/null &
    else
@@ -43,7 +43,7 @@ run_nodeos() {
 }
 
 run_expect_success() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODEOS_PID=$!
    sleep 10
    kill $NODEOS_PID
@@ -56,7 +56,7 @@ run_expect_success() {
 }
 
 run_and_kill() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODEOS_PID=$!
    sleep 10
    kill -KILL $NODEOS_PID
@@ -64,7 +64,7 @@ run_and_kill() {
 }
 
 run_expect_failure() {
-   run_nodeos "$@"
+   run_nodeop "$@"
    local NODEOS_PID=$!
    MYPID=$$
    (sleep 20; kill -ALRM $MYPID) & local TIMER_PID=$!

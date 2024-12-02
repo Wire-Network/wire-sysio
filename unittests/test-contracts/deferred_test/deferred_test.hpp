@@ -1,32 +1,32 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
+#include <sysio/sysio.hpp>
 #include <vector>
 
-class [[eosio::contract]] deferred_test : public eosio::contract {
+class [[sysio::contract]] deferred_test : public sysio::contract {
 public:
-   using eosio::contract::contract;
+   using sysio::contract::contract;
 
-   [[eosio::action]]
-   void defercall( eosio::name payer, uint64_t sender_id, eosio::name contract, uint64_t payload );
+   [[sysio::action]]
+   void defercall( sysio::name payer, uint64_t sender_id, sysio::name contract, uint64_t payload );
 
-   [[eosio::action]]
-   void delayedcall( eosio::name payer, uint64_t sender_id, eosio::name contract,
+   [[sysio::action]]
+   void delayedcall( sysio::name payer, uint64_t sender_id, sysio::name contract,
                      uint64_t payload, uint32_t delay_sec, bool replace_existing );
 
-   [[eosio::action]]
+   [[sysio::action]]
    void cancelcall( uint64_t sender_id );
 
-   [[eosio::action]]
+   [[sysio::action]]
    void deferfunc( uint64_t payload );
-   using deferfunc_action = eosio::action_wrapper<"deferfunc"_n, &deferred_test::deferfunc>;
+   using deferfunc_action = sysio::action_wrapper<"deferfunc"_n, &deferred_test::deferfunc>;
 
-   [[eosio::action]]
-   void inlinecall( eosio::name contract, eosio::name authorizer, uint64_t payload );
+   [[sysio::action]]
+   void inlinecall( sysio::name contract, sysio::name authorizer, uint64_t payload );
 
-   [[eosio::action]]
+   [[sysio::action]]
    void fail();
 
-   [[eosio::on_notify("eosio::onerror")]]
-   void on_error( uint128_t sender_id, eosio::ignore<std::vector<char>> sent_trx );
+   [[sysio::on_notify("sysio::onerror")]]
+   void on_error( uint128_t sender_id, sysio::ignore<std::vector<char>> sent_trx );
 };

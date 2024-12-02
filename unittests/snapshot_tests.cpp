@@ -1,9 +1,9 @@
 #include <sstream>
 
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/snapshot.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/snapshot.hpp>
+#include <sysio/testing/tester.hpp>
 #include "snapshot_suites.hpp"
 
 #include <boost/mpl/list.hpp>
@@ -12,7 +12,7 @@
 #include <test_contracts.hpp>
 #include <snapshots.hpp>
 
-using namespace eosio;
+using namespace sysio;
 using namespace testing;
 using namespace chain;
 
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
    }
    fc::temp_directory temp_dir;
    auto config = tester::default_config(temp_dir, legacy_default_max_inline_action_size).first;
-   auto genesis = eosio::chain::block_log::extract_genesis_state(source_log_dir);
+   auto genesis = sysio::chain::block_log::extract_genesis_state(source_log_dir);
    std::filesystem::create_directories(config.blocks_dir);
    std::filesystem::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
    std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_pending_schedule_snapshot, SNAPSHOT_SUITE, sn
    const uint32_t legacy_default_max_inline_action_size = 4 * 1024;
    fc::temp_directory temp_dir;
    auto config = tester::default_config(temp_dir, legacy_default_max_inline_action_size).first;
-   auto genesis = eosio::chain::block_log::extract_genesis_state(source_log_dir);
+   auto genesis = sysio::chain::block_log::extract_genesis_state(source_log_dir);
    std::filesystem::create_directories(config.blocks_dir);
    std::filesystem::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
    std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");
@@ -567,7 +567,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_blo
       // create a new child at this snapshot
       int ordinal = 2;
       auto chain_cfg = chain.get_config();
-      chain_cfg.blog = eosio::chain::empty_blocklog_config{}; // use empty block log
+      chain_cfg.blog = sysio::chain::empty_blocklog_config{}; // use empty block log
       snapshotted_tester snap_chain(chain_cfg, SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
       verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
       auto block = chain.produce_block();

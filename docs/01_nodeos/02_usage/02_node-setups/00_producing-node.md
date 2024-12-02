@@ -12,12 +12,12 @@ This section describes how to set up a producing node within the Antelope networ
 ## Before you begin
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
-* It is assumed that `nodeos`, `cleos`, and `keosd` are accessible through the path.
+* It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.
 
 [//]: # ( THIS IS A COMMENT LINK BELOW IS BROKEN )  
 [//]: # ( If you built Antelope using shell scripts, make sure to run the  Install Script ../../../00_install/01_build-from-source/01_shell-scripts/03_install-antelope-binaries.md )  
 
-* Know how to pass [Nodeos options](../../02_usage/00_nodeos-options.md) to enable or disable functionality.
+* Know how to pass [Nodeos options](../../02_usage/00_nodsys-options.md) to enable or disable functionality.
 
 ## Steps
 
@@ -34,7 +34,7 @@ Please follow the steps below to set up a producing node:
 In order for your account to be eligible as a producer, you will need to register the account as a producer:
 
 ```sh
-cleos system regproducer accountname1 EOS1234534... http://producer.site Antarctica
+clio system regproducer accountname1 EOS1234534... http://producer.site Antarctica
 ```
 
 ### 2. Set Producer Name
@@ -44,7 +44,7 @@ Set the `producer-name` option in `config.ini` to your account, as follows:
 ```console
 # config.ini:
 
-# ID of producer controlled by this node (e.g. inita; may specify multiple times) (eosio::producer_plugin)
+# ID of producer controlled by this node (e.g. inita; may specify multiple times) (sysio::producer_plugin)
 producer-name = youraccount
 ```
 
@@ -96,6 +96,6 @@ In your [config.ini](../index.md), confirm the following plugins are loading or 
 ```console
 # config.ini:
 
-plugin = eosio::chain_plugin
-plugin = eosio::producer_plugin
+plugin = sysio::chain_plugin
+plugin = sysio::producer_plugin
 ```

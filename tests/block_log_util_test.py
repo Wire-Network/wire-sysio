@@ -12,7 +12,7 @@ from TestHarness.Node import BlockType
 
 ###############################################################
 # block_log_util_test
-#  Test verifies that the blockLogUtil is still compatible with nodeos
+#  Test verifies that the blockLogUtil is still compatible with nodeop
 ###############################################################
 
 Print=Utils.Print
@@ -42,7 +42,7 @@ walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")

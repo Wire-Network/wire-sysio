@@ -1,13 +1,13 @@
 #include "test_api_multi_index.hpp"
 
-using namespace eosio;
+using namespace sysio;
 
 #include <cmath>
 #include <limits>
 
 namespace _test_multi_index {
 
-   using eosio::checksum256;
+   using sysio::checksum256;
 
    struct record_idx64 {
       uint64_t id;

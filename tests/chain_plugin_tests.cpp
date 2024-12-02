@@ -1,14 +1,14 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/wasm_eosio_constraints.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/wasm_sysio_constraints.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 
 #include <test_contracts.hpp>
 
@@ -20,9 +20,9 @@
 #include <array>
 #include <utility>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 static auto get_account_full = [](chain_apis::read_only& plugin,
@@ -196,7 +196,7 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
 
    chain_apis::read_only::get_account_results result = get_account_full(plugin, p, fc::time_point::maximum());
 
-   auto check_result_basic = [](chain_apis::read_only::get_account_results result, eosio::name nm, bool isPriv) {
+   auto check_result_basic = [](chain_apis::read_only::get_account_results result, sysio::name nm, bool isPriv) {
       BOOST_REQUIRE_EQUAL(nm, result.account_name);
       BOOST_REQUIRE_EQUAL(isPriv, result.privileged);
 
@@ -229,7 +229,7 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
       if (perm.linked_actions.has_value())
          BOOST_REQUIRE_EQUAL(0u, perm.linked_actions->size());
    }
-   BOOST_REQUIRE_EQUAL(0u, result.eosio_any_linked_actions.size());
+   BOOST_REQUIRE_EQUAL(0u, result.sysio_any_linked_actions.size());
 
    // test link authority
    link_authority(name("alice"_n), name("bob"_n), name("active"_n), name("foo"_n));
@@ -247,21 +247,21 @@ BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
          BOOST_REQUIRE_EQUAL(name("foo"_n), la.action.value());
       }
    }
-   BOOST_REQUIRE_EQUAL(0u, result.eosio_any_linked_actions.size());
+   BOOST_REQUIRE_EQUAL(0u, result.sysio_any_linked_actions.size());
 
-   // test link authority to eosio.any
-   link_authority(name("alice"_n), name("bob"_n), name("eosio.any"_n), name("foo"_n));
+   // test link authority to sysio.any
+   link_authority(name("alice"_n), name("bob"_n), name("sysio.any"_n), name("foo"_n));
    produce_block();
    result = get_account_full(plugin, p, fc::time_point::maximum());
    check_result_basic(result, name("alice"_n), false);
-   // active permission should no longer have linked auth, as eosio.any replaces it
+   // active permission should no longer have linked auth, as sysio.any replaces it
    perm = result.permissions[0];
    BOOST_REQUIRE_EQUAL(0u, perm.linked_actions->size());
 
-   auto eosio_any_la = result.eosio_any_linked_actions;
-   BOOST_REQUIRE_EQUAL(1u, eosio_any_la.size());
-   if (eosio_any_la.size() >= 1u) {
-      auto la = eosio_any_la[0];
+   auto sysio_any_la = result.sysio_any_linked_actions;
+   BOOST_REQUIRE_EQUAL(1u, sysio_any_la.size());
+   if (sysio_any_la.size() >= 1u) {
+      auto la = sysio_any_la[0];
       BOOST_REQUIRE_EQUAL(name("bob"_n), la.account);
       BOOST_REQUIRE_EQUAL(true, la.action.has_value());
       if(la.action.has_value()) {

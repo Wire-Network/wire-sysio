@@ -10,7 +10,7 @@ The `PerformanceTestBasic` test performs a single basic performance test that ta
 
 The `TransactionGeneratorsLauncher` provides a means to easily calculate and spawn the number of transaction generator instances to generate a given target TPS, distributing generation load between the instances in a fair manner such that the aggregate load meets the requested test load.
 
-The `log_reader.py` support script is used primarily to analyze `nodeos` log files to glean information about generated blocks and transactions within those blocks after a test has concluded.  This information is used to produce the performance test report.
+The `log_reader.py` support script is used primarily to analyze `nodeop` log files to glean information about generated blocks and transactions within those blocks after a test has concluded.  This information is used to produce the performance test report.
 
 # Getting Started
 ## Prerequisites
@@ -19,7 +19,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
 
 ## Steps
 
-1. Build Leap. For complete instructions on building from source please refer to [Leap: Build and Install from Source](https://github.com/AntelopeIO/leap/#build-and-install-from-source) For older compatible nodeos versions, such as 2.X, the following binaries need to be replaced with the older version: `build/programs/nodeos/nodeos`, `build/programs/cleos/cleos`, `bin/nodeos`, and `bin/cleos`.
+1. Build Leap. For complete instructions on building from source please refer to [Leap: Build and Install from Source](https://github.com/AntelopeIO/leap/#build-and-install-from-source) For older compatible nodeop versions, such as 2.X, the following binaries need to be replaced with the older version: `build/programs/nodeop/nodeop`, `build/programs/clio/clio`, `bin/nodeop`, and `bin/clio`.
 2. Run Performance Tests
     1. Full Performance Harness Test Run (Standard):
         ``` bash
@@ -51,7 +51,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
             │   │   │   │   ├── blockTrxData.txt
             │   │   │   │   └── transaction_metrics.csv
             │   │   │   ├── etc
-            │   │   │   │   └── eosio
+            │   │   │   │   └── sysio
             │   │   │   │       ├── node_00
             │   │   │   │       │   ├── config.ini
             │   │   │   │       │   ├── genesis.json
@@ -114,7 +114,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
             │   │   │           │   │   ├── blocks.index
             │   │   │           │   │   ├── blocks.log
             │   │   │           │   │   └── reversible
-            │   │   │           │   ├── nodeos.pid
+            │   │   │           │   ├── nodeop.pid
             │   │   │           │   ├── snapshots
             │   │   │           │   ├── state
             │   │   │           │   │   └── shared_memory.bin
@@ -126,7 +126,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
             │   │   │           │   │   ├── blocks.index
             │   │   │           │   │   ├── blocks.log
             │   │   │           │   │   └── reversible
-            │   │   │           │   ├── nodeos.pid
+            │   │   │           │   ├── nodeop.pid
             │   │   │           │   ├── snapshots
             │   │   │           │   ├── state
             │   │   │           │   │   └── shared_memory.bin
@@ -143,7 +143,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
             │   │   │               │   ├── blocks.log
             │   │   │               │   └── reversible
             │   │   │               │       └── fork_db.dat
-            │   │   │               ├── nodeos.pid
+            │   │   │               ├── nodeop.pid
             │   │   │               ├── snapshots
             │   │   │               ├── state
             │   │   │               │   └── shared_memory.bin
@@ -171,7 +171,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
                     │   │   └── transaction_metrics.csv
                     │   ├── data.json
                     │   ├── etc
-                    │   │   └── eosio
+                    │   │   └── sysio
                     │   │       ├── node_00
                     │   │       │   ├── config.ini
                     │   │       │   ├── genesis.json
@@ -234,7 +234,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
                     │           │   │   ├── blocks.index
                     │           │   │   ├── blocks.log
                     │           │   │   └── reversible
-                    │           │   ├── nodeos.pid
+                    │           │   ├── nodeop.pid
                     │           │   ├── snapshots
                     │           │   ├── state
                     │           │   │   └── shared_memory.bin
@@ -246,7 +246,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
                     │           │   │   ├── blocks.index
                     │           │   │   ├── blocks.log
                     │           │   │   └── reversible
-                    │           │   ├── nodeos.pid
+                    │           │   ├── nodeop.pid
                     │           │   ├── snapshots
                     │           │   ├── state
                     │           │   │   └── shared_memory.bin
@@ -263,7 +263,7 @@ Please refer to [Leap: Build and Install from Source](https://github.com/Antelop
                     │               │   ├── blocks.log
                     │               │   └── reversible
                     │               │       └── fork_db.dat
-                    │               ├── nodeos.pid
+                    │               ├── nodeop.pid
                     │               ├── snapshots
                     │               ├── state
                     │               │   └── shared_memory.bin
@@ -515,10 +515,10 @@ usage: PerformanceHarnessScenarioRunner.py findMax testBpOpMode overrideBasicTes
        [--print-missing-transactions] [--account-name ACCOUNT_NAME]
        [--contract-dir CONTRACT_DIR] [--wasm-file WASM_FILE]
        [--abi-file ABI_FILE] [--user-trx-data-file USER_TRX_DATA_FILE]
-       [--wasm-runtime {eos-vm-jit,eos-vm}] [--contracts-console]
-       [--eos-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
-       [--eos-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
-       [--non-prods-eos-vm-oc-enable]
+       [--wasm-runtime {sys-vm-jit,sys-vm}] [--contracts-console]
+       [--sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
+       [--sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
+       [--non-prods-sys-vm-oc-enable]
        [--block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS]
        [--http-threads HTTP_THREADS]
        [--chain-state-db-size-mb CHAIN_STATE_DB_SIZE_MB]
@@ -537,7 +537,7 @@ Test Helper Arguments:
   Test Helper configuration items used to configure and spin up the regression test framework and blockchain environment.
 
   -d D                  delay between nodes startup
-  --dump-error-details  Upon error print etc/eosio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout
+  --dump-error-details  Upon error print etc/sysio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout
   -v                    verbose logging
   --leave-running       Leave cluster running after test finishes
   --unshared            Run test in isolated network namespace
@@ -599,7 +599,7 @@ Performance Test Basic Base:
   --save-state          Whether to save node state. (Warning: large disk usage)
   --quiet               Whether to quiet printing intermediate results and reports to stdout
   --prods-enable-trace-api
-                        Determines whether producer nodes should have eosio::trace_api_plugin enabled
+                        Determines whether producer nodes should have sysio::trace_api_plugin enabled
   --print-missing-transactions
                         Toggles if missing transactions are be printed upon test completion.
   --account-name ACCOUNT_NAME
@@ -611,16 +611,16 @@ Performance Test Basic Base:
   --abi-file ABI_FILE   ABI file name for contract
   --user-trx-data-file USER_TRX_DATA_FILE
                         Path to transaction data JSON file
-  --wasm-runtime {eos-vm-jit,eos-vm}
-                        Override default WASM runtime ("eos-vm-jit", "eos-vm")
-                        "eos-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
-                        "eos-vm" : A WebAssembly interpreter.
+  --wasm-runtime {sys-vm-jit,sys-vm}
+                        Override default WASM runtime ("sys-vm-jit", "sys-vm")
+                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
+                        "sys-vm" : A WebAssembly interpreter.
   --contracts-console   print contract's output to console
-  --eos-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
+  --sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
                         Maximum size (in MiB) of the EOS VM OC code cache
-  --eos-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
+  --sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
                         Number of threads to use for EOS VM OC tier-up
-  --non-prods-eos-vm-oc-enable
+  --non-prods-sys-vm-oc-enable
                         Enable EOS VM OC tier-up runtime on non producer nodes
   --block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS
                         If set to greater than 0, periodically prune the block log to store only configured number of most recent blocks.
@@ -676,11 +676,11 @@ The following classes and scripts are typically used by the Performance Harness 
                                   [--contract-dir CONTRACT_DIR]
                                   [--wasm-file WASM_FILE] [--abi-file ABI_FILE]
                                   [--user-trx-data-file USER_TRX_DATA_FILE]
-                                  [--wasm-runtime {eos-vm-jit,eos-vm}]
+                                  [--wasm-runtime {sys-vm-jit,sys-vm}]
                                   [--contracts-console]
-                                  [--eos-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
-                                  [--eos-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
-                                  [--non-prods-eos-vm-oc-enable]
+                                  [--sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
+                                  [--sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
+                                  [--non-prods-sys-vm-oc-enable]
                                   [--block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS]
                                   [--http-threads HTTP_THREADS]
                                   [--chain-state-db-size-mb CHAIN_STATE_DB_SIZE_MB]
@@ -701,7 +701,7 @@ Test Helper Arguments:
   Test Helper configuration items used to configure and spin up the regression test framework and blockchain environment.
 
   -d D                  delay between nodes startup (default: 1)
-  --dump-error-details  Upon error print etc/eosio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout (default: False)
+  --dump-error-details  Upon error print etc/sysio/node_*/config.ini and <test_name><pid>/node_*/stderr.log to stdout (default: False)
   -v                    verbose logging (default: False)
   --leave-running       Leave cluster running after test finishes (default: False)
   --unshared            Run test in isolated network namespace (default: False)
@@ -759,28 +759,28 @@ Performance Test Basic Base:
   --save-state          Whether to save node state. (Warning: large disk usage)
   --quiet               Whether to quiet printing intermediate results and reports to stdout (default: False)
   --prods-enable-trace-api
-                        Determines whether producer nodes should have eosio::trace_api_plugin enabled (default: False)
+                        Determines whether producer nodes should have sysio::trace_api_plugin enabled (default: False)
   --print-missing-transactions
                         Toggles if missing transactions are be printed upon test completion. (default: False)
   --account-name ACCOUNT_NAME
-                        Name of the account to create and assign a contract to (default: eosio)
+                        Name of the account to create and assign a contract to (default: sysio)
   --contract-dir CONTRACT_DIR
-                        Path to contract dir (default: unittests/contracts/eosio.system)
+                        Path to contract dir (default: unittests/contracts/sysio.system)
   --wasm-file WASM_FILE
-                        WASM file name for contract (default: eosio.system.wasm)
-  --abi-file ABI_FILE   ABI file name for contract (default: eosio.system.abi)
+                        WASM file name for contract (default: sysio.system.wasm)
+  --abi-file ABI_FILE   ABI file name for contract (default: sysio.system.abi)
   --user-trx-data-file USER_TRX_DATA_FILE
                         Path to transaction data JSON file (default: None)
-  --wasm-runtime {eos-vm-jit,eos-vm}
-                        Override default WASM runtime ("eos-vm-jit", "eos-vm")
-                        "eos-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
-                        "eos-vm" : A WebAssembly interpreter. (default: eos-vm-jit)
+  --wasm-runtime {sys-vm-jit,sys-vm}
+                        Override default WASM runtime ("sys-vm-jit", "sys-vm")
+                        "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
+                        "sys-vm" : A WebAssembly interpreter. (default: sys-vm-jit)
   --contracts-console   print contract's output to console (default: False)
-  --eos-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
+  --sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
                         Maximum size (in MiB) of the EOS VM OC code cache (default: 1024)
-  --eos-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
+  --sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
                         Number of threads to use for EOS VM OC tier-up (default: 1)
-  --non-prods-eos-vm-oc-enable
+  --non-prods-sys-vm-oc-enable
                         Enable EOS VM OC tier-up runtime on non producer nodes (default: False)
   --block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS
                         If set to greater than 0, periodically prune the block log to store only configured number of most recent blocks.
@@ -1267,7 +1267,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
     "dontKill": false,
     "extraNodeosArgs": {
       "chainPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "chain_plugin",
         "blocksDir": null,
         "_blocksDirNodeosDefault": "\"blocks\"",
@@ -1293,8 +1293,8 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "checkpoint": null,
         "_checkpointNodeosDefault": null,
         "_checkpointNodeosArg": "--checkpoint",
-        "wasmRuntime": "eos-vm-jit",
-        "_wasmRuntimeNodeosDefault": "eos-vm-jit",
+        "wasmRuntime": "sys-vm-jit",
+        "_wasmRuntimeNodeosDefault": "sys-vm-jit",
         "_wasmRuntimeNodeosArg": "--wasm-runtime",
         "profileAccount": null,
         "_profileAccountNodeosDefault": null,
@@ -1364,13 +1364,13 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_databaseMapModeNodeosArg": "--database-map-mode",
         "eosVmOcCacheSizeMb": 1024,
         "_eosVmOcCacheSizeMbNodeosDefault": 1024,
-        "_eosVmOcCacheSizeMbNodeosArg": "--eos-vm-oc-cache-size-mb",
+        "_eosVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
         "eosVmOcCompileThreads": 1,
         "_eosVmOcCompileThreadsNodeosDefault": 1,
-        "_eosVmOcCompileThreadsNodeosArg": "--eos-vm-oc-compile-threads",
+        "_eosVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
         "eosVmOcEnable": null,
         "_eosVmOcEnableNodeosDefault": "auto",
-        "_eosVmOcEnableNodeosArg": "--eos-vm-oc-enable",
+        "_eosVmOcEnableNodeosArg": "--sys-vm-oc-enable",
         "enableAccountQueries": null,
         "_enableAccountQueriesNodeosDefault": 0,
         "_enableAccountQueriesNodeosArg": "--enable-account-queries",
@@ -1446,7 +1446,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_snapshotNodeosArg": "--snapshot"
       },
       "httpPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "http_plugin",
         "unixSocketPath": null,
         "_unixSocketPathNodeosDefault": null,
@@ -1498,7 +1498,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_httpKeepAliveNodeosArg": "--http-keep-alive"
       },
       "netPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "net_plugin",
         "p2pListenEndpoint": null,
         "_p2pListenEndpointNodeosDefault": "0.0.0.0:9876",
@@ -1562,7 +1562,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_p2pKeepaliveIntervalMsNodeosArg": "--p2p-keepalive-interval-ms"
       },
       "producerPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "producer_plugin",
         "enableStaleProduction": null,
         "_enableStaleProductionNodeosDefault": false,
@@ -1638,7 +1638,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_readOnlyReadWindowTimeUsNodeosArg": "--read-only-read-window-time-us"
       },
       "resourceMonitorPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "resource_monitor_plugin",
         "resourceMonitorIntervalSeconds": null,
         "_resourceMonitorIntervalSecondsNodeosDefault": 2,
@@ -1657,14 +1657,14 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_resourceMonitorWarningIntervalNodeosArg": "--resource-monitor-warning-interval"
       },
       "signatureProviderPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "signature_provider_plugin",
         "keosdProviderTimeout": null,
         "_keosdProviderTimeoutNodeosDefault": 5,
         "_keosdProviderTimeoutNodeosArg": "--keosd-provider-timeout"
       },
       "stateHistoryPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "state_history_plugin",
         "stateHistoryDir": null,
         "_stateHistoryDirNodeosDefault": "\"state-history\"",
@@ -1704,7 +1704,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_deleteStateHistoryNodeosArg": "--delete-state-history"
       },
       "traceApiPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "trace_api_plugin",
         "traceDir": null,
         "_traceDirNodeosDefault": "\"traces\"",
@@ -1727,10 +1727,10 @@ Finally, the full detail test report for each of the determined max TPS throughp
       }
     },
     "specifiedContract": {
-      "contractDir": "unittests/contracts/eosio.system",
-      "wasmFile": "eosio.system.wasm",
-      "abiFile": "eosio.system.abi",
-      "account": "Name: eosio"
+      "contractDir": "unittests/contracts/sysio.system",
+      "wasmFile": "sysio.system.wasm",
+      "abiFile": "sysio.system.abi",
+      "account": "Name: sysio"
     },
     "genesisPath": "tests/PerformanceHarness/genesis.json",
     "maximumP2pPerHost": 5000,
@@ -1741,9 +1741,9 @@ Finally, the full detail test report for each of the determined max TPS throughp
       "bios": "off"
     },
     "prodsEnableTraceApi": false,
-    "nodeosVers": "v4.1.0-dev",
+    "nodeopVers": "v4.1.0-dev",
     "specificExtraNodeosArgs": {
-      "1": "--plugin eosio::trace_api_plugin "
+      "1": "--plugin sysio::trace_api_plugin "
     },
     "_totalNodes": 2,
     "_pNodes": 1,
@@ -1789,7 +1789,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
     "release": "5.15.90.1-microsoft-standard-WSL2",
     "logical_cpu_count": 16
   },
-  "nodeosVersion": "v4.1.0-dev"
+  "nodeopVersion": "v4.1.0-dev"
 }
 ```
 </details>
@@ -1927,7 +1927,7 @@ The Performance Test Basic generates, by default, a report that details results 
     "dontKill": false,
     "extraNodeosArgs": {
       "chainPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "chain_plugin",
         "blocksDir": null,
         "_blocksDirNodeosDefault": "\"blocks\"",
@@ -1953,8 +1953,8 @@ The Performance Test Basic generates, by default, a report that details results 
         "checkpoint": null,
         "_checkpointNodeosDefault": null,
         "_checkpointNodeosArg": "--checkpoint",
-        "wasmRuntime": "eos-vm-jit",
-        "_wasmRuntimeNodeosDefault": "eos-vm-jit",
+        "wasmRuntime": "sys-vm-jit",
+        "_wasmRuntimeNodeosDefault": "sys-vm-jit",
         "_wasmRuntimeNodeosArg": "--wasm-runtime",
         "profileAccount": null,
         "_profileAccountNodeosDefault": null,
@@ -2024,13 +2024,13 @@ The Performance Test Basic generates, by default, a report that details results 
         "_databaseMapModeNodeosArg": "--database-map-mode",
         "eosVmOcCacheSizeMb": 1024,
         "_eosVmOcCacheSizeMbNodeosDefault": 1024,
-        "_eosVmOcCacheSizeMbNodeosArg": "--eos-vm-oc-cache-size-mb",
+        "_eosVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
         "eosVmOcCompileThreads": 1,
         "_eosVmOcCompileThreadsNodeosDefault": 1,
-        "_eosVmOcCompileThreadsNodeosArg": "--eos-vm-oc-compile-threads",
+        "_eosVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
         "eosVmOcEnable": null,
         "_eosVmOcEnableNodeosDefault": "auto",
-        "_eosVmOcEnableNodeosArg": "--eos-vm-oc-enable",
+        "_eosVmOcEnableNodeosArg": "--sys-vm-oc-enable",
         "enableAccountQueries": null,
         "_enableAccountQueriesNodeosDefault": 0,
         "_enableAccountQueriesNodeosArg": "--enable-account-queries",
@@ -2106,7 +2106,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_snapshotNodeosArg": "--snapshot"
       },
       "httpPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "http_plugin",
         "unixSocketPath": null,
         "_unixSocketPathNodeosDefault": null,
@@ -2158,7 +2158,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_httpKeepAliveNodeosArg": "--http-keep-alive"
       },
       "netPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "net_plugin",
         "p2pListenEndpoint": null,
         "_p2pListenEndpointNodeosDefault": "0.0.0.0:9876",
@@ -2222,7 +2222,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_p2pKeepaliveIntervalMsNodeosArg": "--p2p-keepalive-interval-ms"
       },
       "producerPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "producer_plugin",
         "enableStaleProduction": null,
         "_enableStaleProductionNodeosDefault": false,
@@ -2298,7 +2298,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_readOnlyReadWindowTimeUsNodeosArg": "--read-only-read-window-time-us"
       },
       "resourceMonitorPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "resource_monitor_plugin",
         "resourceMonitorIntervalSeconds": null,
         "_resourceMonitorIntervalSecondsNodeosDefault": 2,
@@ -2317,14 +2317,14 @@ The Performance Test Basic generates, by default, a report that details results 
         "_resourceMonitorWarningIntervalNodeosArg": "--resource-monitor-warning-interval"
       },
       "signatureProviderPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "signature_provider_plugin",
         "keosdProviderTimeout": null,
         "_keosdProviderTimeoutNodeosDefault": 5,
         "_keosdProviderTimeoutNodeosArg": "--keosd-provider-timeout"
       },
       "stateHistoryPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "state_history_plugin",
         "stateHistoryDir": null,
         "_stateHistoryDirNodeosDefault": "\"state-history\"",
@@ -2364,7 +2364,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_deleteStateHistoryNodeosArg": "--delete-state-history"
       },
       "traceApiPluginArgs": {
-        "_pluginNamespace": "eosio",
+        "_pluginNamespace": "sysio",
         "_pluginName": "trace_api_plugin",
         "traceDir": null,
         "_traceDirNodeosDefault": "\"traces\"",
@@ -2387,10 +2387,10 @@ The Performance Test Basic generates, by default, a report that details results 
       }
     },
     "specifiedContract": {
-      "contractDir": "unittests/contracts/eosio.system",
-      "wasmFile": "eosio.system.wasm",
-      "abiFile": "eosio.system.abi",
-      "account": "Name: eosio"
+      "contractDir": "unittests/contracts/sysio.system",
+      "wasmFile": "sysio.system.wasm",
+      "abiFile": "sysio.system.abi",
+      "account": "Name: sysio"
     },
     "genesisPath": "tests/PerformanceHarness/genesis.json",
     "maximumP2pPerHost": 5000,
@@ -2401,9 +2401,9 @@ The Performance Test Basic generates, by default, a report that details results 
       "bios": "off"
     },
     "prodsEnableTraceApi": false,
-    "nodeosVers": "v4.1.0-dev",
+    "nodeopVers": "v4.1.0-dev",
     "specificExtraNodeosArgs": {
-      "1": "--plugin eosio::trace_api_plugin "
+      "1": "--plugin sysio::trace_api_plugin "
     },
     "_totalNodes": 2,
     "_pNodes": 1,
@@ -2443,7 +2443,7 @@ The Performance Test Basic generates, by default, a report that details results 
     "release": "5.15.90.1-microsoft-standard-WSL2",
     "logical_cpu_count": 16
   },
-  "nodeosVersion": "v4.1.0-dev"
+  "nodeopVersion": "v4.1.0-dev"
 }
 ```
 </details>

@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
-#include <eosio/chain/authority.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/producer_plugin/producer_plugin.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/authority.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <regex>
 
-using namespace eosio;
-using namespace eosio::chain;
+using namespace sysio;
+using namespace sysio::chain;
 
 using snapshot_request_information = snapshot_scheduler::snapshot_request_information;
 using snapshot_request_params = snapshot_scheduler::snapshot_request_params;
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
                fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
                std::vector<const char*> argv =
                      {"test", "--data-dir", temp.c_str(), "--config-dir", temp.c_str(),
-                      "-p", "eosio", "-e"};
+                      "-p", "sysio", "-e"};
                app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**) &argv[0]);
                app->startup();
 
@@ -210,7 +210,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
          fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
          std::vector<const char*> argv =
                {"test", "--data-dir", temp.c_str(), "--config-dir", temp.c_str(),
-                "-p", "eosio", "-e"};
+                "-p", "sysio", "-e"};
          app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**) &argv[0]);
          app->startup();
 

@@ -1,17 +1,17 @@
 
 ## Description
 
-The `test_control_api_plugin` allows to send a control message to the [test_control_plugin](../test_control_plugin/index.md) telling the plugin to shut down the `nodeos` instance when reaching a particular block. It is intended for testing.
+The `test_control_api_plugin` allows to send a control message to the [test_control_plugin](../test_control_plugin/index.md) telling the plugin to shut down the `nodeop` instance when reaching a particular block. It is intended for testing.
 
 ## Usage
 
 ```console
 # config.ini
-plugin = eosio::test_control_api_plugin
+plugin = sysio::test_control_api_plugin
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::test_control_api_plugin
+nodeop ... --plugin sysio::test_control_api_plugin
 ```
 
 ## Options
@@ -34,13 +34,13 @@ curl %s/v1/test_control/kill_node_on_producer -d '{ \"producer\":\"%s\", \"where
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin
+plugin = sysio::chain_plugin
 [options]
-plugin = eosio::http_plugin
+plugin = sysio::http_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [operations] [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::chain_plugin [operations] [options]  \
+           --plugin sysio::http_plugin [options]
 ```

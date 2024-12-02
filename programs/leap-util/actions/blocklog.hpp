@@ -1,8 +1,8 @@
 #include "subcommand.hpp"
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/config.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/config.hpp>
 
-using namespace eosio::chain;
+using namespace sysio::chain;
 
 struct blocklog_options {
    std::string blocks_dir = "blocks";

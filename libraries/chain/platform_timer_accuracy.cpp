@@ -1,5 +1,5 @@
-#include <eosio/chain/platform_timer_accuracy.hpp>
-#include <eosio/chain/platform_timer.hpp>
+#include <sysio/chain/platform_timer_accuracy.hpp>
+#include <sysio/chain/platform_timer.hpp>
 
 #include <fc/time.hpp>
 #include <fc/log/logger.hpp>
@@ -14,7 +14,7 @@
 #include <chrono>
 #include <mutex>
 
-namespace eosio { namespace chain {
+namespace sysio { namespace chain {
 
 namespace bacc = boost::accumulators;
 

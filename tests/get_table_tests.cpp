@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/wasm_eosio_constraints.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/wasm_sysio_constraints.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 
 #include <contracts.hpp>
 #include <test_contracts.hpp>
@@ -20,9 +20,9 @@
 #include <array>
 #include <utility>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 static auto get_table_rows_full = [](chain_apis::read_only& plugin,
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE(get_table_tests)
 
 transaction_trace_ptr
 issue_tokens( validating_tester& t, account_name issuer, account_name to, const asset& amount,
-              std::string memo = "", account_name token_contract = "eosio.token"_n )
+              std::string memo = "", account_name token_contract = "sysio.token"_n )
 {
    signed_transaction trx;
 
@@ -66,41 +66,41 @@ issue_tokens( validating_tester& t, account_name issuer, account_name to, const 
 BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    produce_blocks(2);
 
-   create_accounts({ "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n,
-      "eosio.bpay"_n, "eosio.vpay"_n, "eosio.saving"_n, "eosio.names"_n });
+   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
 
    std::vector<account_name> accs{"inita"_n, "initb"_n, "initc"_n, "initd"_n};
    create_accounts(accs);
    produce_block();
 
-   set_code( "eosio.token"_n, test_contracts::eosio_token_wasm() );
-   set_abi( "eosio.token"_n, test_contracts::eosio_token_abi() );
+   set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+   set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    produce_blocks(1);
 
    // create currency
    auto act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 SYS"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 SYS"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
 
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("999.0000 SYS") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("999.0000 SYS") );
    }
    produce_blocks(1);
 
    // iterate over scope
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-   eosio::chain_apis::read_only::get_table_by_scope_params param{"eosio.token"_n, "accounts"_n, "inita", "", 10};
-   eosio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
+   sysio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   sysio::chain_apis::read_only::get_table_by_scope_params param{"sysio.token"_n, "accounts"_n, "inita", "", 10};
+   sysio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
 
    BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
    if (result.rows.size() >= 4u) {
-      BOOST_REQUIRE_EQUAL(name("eosio.token"_n), result.rows[0].code);
+      BOOST_REQUIRE_EQUAL(name("sysio.token"_n), result.rows[0].code);
       BOOST_REQUIRE_EQUAL(name("inita"_n), result.rows[0].scope);
       BOOST_REQUIRE_EQUAL(name("accounts"_n), result.rows[0].table);
-      BOOST_REQUIRE_EQUAL(name("eosio"_n), result.rows[0].payer);
+      BOOST_REQUIRE_EQUAL(name("sysio"_n), result.rows[0].payer);
       BOOST_REQUIRE_EQUAL(1u, result.rows[0].count);
 
       BOOST_REQUIRE_EQUAL(name("initb"_n), result.rows[1].scope);
@@ -138,66 +138,66 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
 BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    produce_blocks(2);
 
-   create_accounts({ "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n,
-      "eosio.bpay"_n, "eosio.vpay"_n, "eosio.saving"_n, "eosio.names"_n });
+   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
 
    std::vector<account_name> accs{"inita"_n, "initb"_n};
    create_accounts(accs);
    produce_block();
 
-   set_code( "eosio.token"_n, test_contracts::eosio_token_wasm() );
-   set_abi( "eosio.token"_n, test_contracts::eosio_token_abi() );
+   set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+   set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    produce_blocks(1);
 
    // create currency
    auto act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 SYS"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 SYS"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
 
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("10000.0000 SYS") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
    }
    produce_blocks(1);
 
    // create currency 2
    act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 AAA"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 AAA"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("9999.0000 AAA") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("9999.0000 AAA") );
    }
    produce_blocks(1);
 
    // create currency 3
    act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 CCC"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 CCC"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("7777.0000 CCC") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("7777.0000 CCC") );
    }
    produce_blocks(1);
 
    // create currency 3
    act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 BBB"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 BBB"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("8888.0000 BBB") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("8888.0000 BBB") );
    }
    produce_blocks(1);
 
    // get table: normal case
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-   eosio::chain_apis::read_only::get_table_rows_params p;
-   p.code = "eosio.token"_n;
+   sysio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   sysio::chain_apis::read_only::get_table_rows_params p;
+   p.code = "sysio.token"_n;
    p.scope = "inita";
    p.table = "accounts"_n;
    p.json = true;
@@ -236,10 +236,10 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL("8888.0000 BBB", result.rows[2]["data"]["balance"].as_string());
       BOOST_REQUIRE_EQUAL("7777.0000 CCC", result.rows[1]["data"]["balance"].as_string());
       BOOST_REQUIRE_EQUAL("10000.0000 SYS", result.rows[0]["data"]["balance"].as_string());
-      BOOST_REQUIRE_EQUAL("eosio", result.rows[0]["payer"].as_string());
-      BOOST_REQUIRE_EQUAL("eosio", result.rows[1]["payer"].as_string());
-      BOOST_REQUIRE_EQUAL("eosio", result.rows[2]["payer"].as_string());
-      BOOST_REQUIRE_EQUAL("eosio", result.rows[3]["payer"].as_string());
+      BOOST_REQUIRE_EQUAL("sysio", result.rows[0]["payer"].as_string());
+      BOOST_REQUIRE_EQUAL("sysio", result.rows[1]["payer"].as_string());
+      BOOST_REQUIRE_EQUAL("sysio", result.rows[2]["payer"].as_string());
+      BOOST_REQUIRE_EQUAL("sysio", result.rows[3]["payer"].as_string());
    }
    p.show_payer = false;
 
@@ -318,31 +318,31 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
 BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, validating_tester ) try {
    produce_blocks(2);
 
-   create_accounts({ "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n,
-      "eosio.bpay"_n, "eosio.vpay"_n, "eosio.saving"_n, "eosio.names"_n, "eosio.rex"_n });
+   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n, "sysio.rex"_n });
 
    std::vector<account_name> accs{"inita"_n, "initb"_n, "initc"_n, "initd"_n};
    create_accounts(accs);
    produce_block();
 
-   set_code( "eosio.token"_n, test_contracts::eosio_token_wasm() );
-   set_abi( "eosio.token"_n, test_contracts::eosio_token_abi() );
+   set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+   set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    produce_blocks(1);
 
    // create currency
    auto act = mutable_variant_object()
-         ("issuer",       "eosio")
-         ("maximum_supply", eosio::chain::asset::from_string("1000000000.0000 SYS"));
-   push_action("eosio.token"_n, "create"_n, "eosio.token"_n, act );
+         ("issuer",       "sysio")
+         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 SYS"));
+   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
 
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, eosio::chain::asset::from_string("10000.0000 SYS") );
+      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
    }
    produce_blocks(1);
 
-   set_code( config::system_account_name, test_contracts::eosio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::eosio_system_abi() );
+   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
 
    base_tester::push_action(config::system_account_name, "init"_n,
                             config::system_account_name,  mutable_variant_object()
@@ -351,29 +351,29 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, validating_tester ) try {
 
    // bidname
    auto bidname = [this]( const account_name& bidder, const account_name& newname, const asset& bid ) {
-      return push_action( "eosio"_n, "bidname"_n, bidder, fc::mutable_variant_object()
+      return push_action( "sysio"_n, "bidname"_n, bidder, fc::mutable_variant_object()
                           ("bidder",  bidder)
                           ("newname", newname)
                           ("bid", bid)
                           );
    };
 
-   bidname("inita"_n, "com"_n, eosio::chain::asset::from_string("10.0000 SYS"));
-   bidname("initb"_n, "org"_n, eosio::chain::asset::from_string("11.0000 SYS"));
-   bidname("initc"_n, "io"_n, eosio::chain::asset::from_string("12.0000 SYS"));
-   bidname("initd"_n, "html"_n, eosio::chain::asset::from_string("14.0000 SYS"));
+   bidname("inita"_n, "com"_n, sysio::chain::asset::from_string("10.0000 SYS"));
+   bidname("initb"_n, "org"_n, sysio::chain::asset::from_string("11.0000 SYS"));
+   bidname("initc"_n, "io"_n, sysio::chain::asset::from_string("12.0000 SYS"));
+   bidname("initd"_n, "html"_n, sysio::chain::asset::from_string("14.0000 SYS"));
    produce_blocks(1);
 
    // get table: normal case
-   eosio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-   eosio::chain_apis::read_only::get_table_rows_params p;
-   p.code = "eosio"_n;
-   p.scope = "eosio";
+   sysio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   sysio::chain_apis::read_only::get_table_rows_params p;
+   p.code = "sysio"_n;
+   p.scope = "sysio";
    p.table = "namebids"_n;
    p.json = true;
    p.index_position = "secondary"; // ordered by high_bid
    p.key_type = "i64";
-   eosio::chain_apis::read_only::get_table_rows_result result = get_table_rows_full(plugin, p, fc::time_point::maximum());
+   sysio::chain_apis::read_only::get_table_rows_result result = get_table_rows_full(plugin, p, fc::time_point::maximum());
    BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 4u) {

@@ -28,13 +28,13 @@ None
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin
+plugin = sysio::chain_plugin
 [options]
-plugin = eosio::http_plugin
+plugin = sysio::http_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [operations] [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::chain_plugin [operations] [options]  \
+           --plugin sysio::http_plugin [options]
 ```

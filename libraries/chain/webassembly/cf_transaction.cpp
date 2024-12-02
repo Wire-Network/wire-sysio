@@ -1,8 +1,8 @@
-#include <eosio/chain/webassembly/interface.hpp>
-#include <eosio/chain/transaction_context.hpp>
-#include <eosio/chain/apply_context.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/transaction_context.hpp>
+#include <sysio/chain/apply_context.hpp>
 
-namespace eosio { namespace chain { namespace webassembly {
+namespace sysio { namespace chain { namespace webassembly {
    int32_t interface::read_transaction( legacy_span<char> data ) const {
       if( data.size() == 0 ) return transaction_size();
 
@@ -36,4 +36,4 @@ namespace eosio { namespace chain { namespace webassembly {
    int32_t interface::get_action( uint32_t type, uint32_t index, legacy_span<char> buffer ) const {
       return context.get_action( type, index, buffer.data(), buffer.size() );
    }
-}}} // ns eosio::chain::webassembly
+}}} // ns sysio::chain::webassembly

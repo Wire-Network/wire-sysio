@@ -1,7 +1,7 @@
-#include <eosio/trace_api/abi_data_handler.hpp>
-#include <eosio/chain/abi_serializer.hpp>
+#include <sysio/trace_api/abi_data_handler.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 
-namespace eosio::trace_api {
+namespace sysio::trace_api {
 
    void abi_data_handler::add_abi( const chain::name& name, chain::abi_def&& abi ) {
       // currently abis are operator provided so no need to protect against abuse
@@ -22,7 +22,7 @@ namespace eosio::trace_api {
                // abi_serializer expects a yield function that takes a recursion depth
                // abis are user provided, do not use a deadline
                auto abi_yield = [](size_t recursion_depth) {
-                  EOS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth, chain::abi_recursion_depth_exception,
+                  SYS_ASSERT( recursion_depth < chain::abi_serializer::max_recursion_depth, chain::abi_recursion_depth_exception,
                               "exceeded max_recursion_depth ${r} ", ("r", chain::abi_serializer::max_recursion_depth) );
                };
                return std::visit([&](auto &&action) -> std::tuple<fc::variant, std::optional<fc::variant>> {

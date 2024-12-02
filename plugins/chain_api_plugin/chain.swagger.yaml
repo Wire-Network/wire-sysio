@@ -88,7 +88,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "https://eosio.github.io/schemata/v2.1/oas/BlockInfo.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.1/oas/BlockInfo.yaml"
   /get_info:
     post:
       description: Returns an object containing various details about the blockchain.
@@ -715,7 +715,7 @@ paths:
                           description: the sum of weights that must be met or exceeded to satisfy the permission
   /get_transaction_status:
     post:
-      description: Attempts to get current blockchain state and, if available, transaction information given the transaction id. For query to work, the transaction finality status feature must be enabled by configuring the chain plugin with the config option '--transaction-finality-status-max-storage-size-gb' in nodeos.
+      description: Attempts to get current blockchain state and, if available, transaction information given the transaction id. For query to work, the transaction finality status feature must be enabled by configuring the chain plugin with the config option '--transaction-finality-status-max-storage-size-gb' in nodeop.
       operationId: get_transaction_status
       requestBody:
         content:
@@ -738,7 +738,7 @@ paths:
 
   /send_transaction2:
     post:
-      description: Attempts to apply a transaction to the blockchain specified in JSON format. It supports returning the full trace of a failed transaction and automatic nodeos-mediated retry if it is enabled on the node. When transaction retry is enabled on an API node, it will monitor incoming API transactions and ensure they are resubmitted additional times into the P2P network until they expire or are included in a block. Warning, full failure traces are now returned by default instead of exceptions. Be careful to not confuse a returned trace as an indication of speculative execution success. Verify 'receipt' and 'except' fields of the returned trace.
+      description: Attempts to apply a transaction to the blockchain specified in JSON format. It supports returning the full trace of a failed transaction and automatic nodsys-mediated retry if it is enabled on the node. When transaction retry is enabled on an API node, it will monitor incoming API transactions and ensure they are resubmitted additional times into the P2P network until they expire or are included in a block. Warning, full failure traces are now returned by default instead of exceptions. Be careful to not confuse a returned trace as an indication of speculative execution success. Verify 'receipt' and 'except' fields of the returned trace.
       operationId: send_transaction2
       requestBody:
         content:

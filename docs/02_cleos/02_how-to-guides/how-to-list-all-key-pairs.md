@@ -8,20 +8,20 @@ The example in this how-to guide displays all public keys and public/private key
 
 Make sure you meet the following requirements:
 
-* Create a default wallet using the `cleos wallet create` command. See the [How to Create a Wallet](../02_how-to-guides/how-to-create-a-wallet.md) section for instructions.
+* Create a default wallet using the `clio wallet create` command. See the [How to Create a Wallet](../02_how-to-guides/how-to-create-a-wallet.md) section for instructions.
 * [Create a keypair](../03_command-reference/wallet/create_key.md) within the default wallet.
-* Familiarize with the [`cleos wallet`](../03_command-reference/wallet/index.md) commands.
-* Install the currently supported version of `cleos`.
+* Familiarize with the [`clio wallet`](../03_command-reference/wallet/index.md) commands.
+* Install the currently supported version of `clio`.
 [[info | Note]]
-| `cleos` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `cleos`.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `clio`.
 * Understand what a [public key](/glossary.md#public-key) and [private key](/glossary.md#private-key) is.
 
 ## Command Reference
 
-See the following reference guide for `cleos` command line usage and related options:
+See the following reference guide for `clio` command line usage and related options:
 
-* [`cleos wallet keys`](../03_command-reference/wallet/keys.md) command and its parameters
-* [`cleos wallet private_keys`](../03_command-reference/wallet/private_keys.md) command its parameters
+* [`clio wallet keys`](../03_command-reference/wallet/keys.md) command and its parameters
+* [`clio wallet private_keys`](../03_command-reference/wallet/private_keys.md) command its parameters
 
 ## Procedure
 
@@ -29,7 +29,7 @@ The following steps show how to list all public keys and public/private key pair
 
 1. Open the default wallet:
 ```sh
-cleos wallet open
+clio wallet open
 ```
 ```console
 Opened: default
@@ -37,7 +37,7 @@ Opened: default
 
 2. Unlock the default wallet. The command will prompt to enter a password:
 ```sh
-cleos wallet unlock
+clio wallet unlock
 ```
 ```console
 password:
@@ -54,7 +54,7 @@ Unlocked: default
 
 4. List all public keys within the default wallet:
 ```sh
-cleos wallet keys
+clio wallet keys
 ```
 **Example Output**
 ```console
@@ -65,7 +65,7 @@ cleos wallet keys
 
 5. List all public/private key pairs withing the default wallet. The command will prompt to enter a password:
 ```sh
-cleos wallet private_keys
+clio wallet private_keys
 ```
 ```console
 password:
@@ -97,14 +97,14 @@ By following these instructions, you are able to list all the public keys and pu
 
 ## Troubleshooting
 
-When you run the `cleos wallet open/unlock` commands, you may encounter the following CLI error:
+When you run the `clio wallet open/unlock` commands, you may encounter the following CLI error:
 
 ```sh
-cleos wallet open
+clio wallet open
 ```
 ```console
 No wallet service listening on ***. Cannot automatically start keosd because keosd was not found.
-Failed to connect to keosd at unix:///Users/xxx.xxx/eosio-wallet/keosd.sock; is keosd running?
+Failed to connect to keosd at unix:///Users/xxx.xxx/sysio-wallet/keosd.sock; is keosd running?
 ```
 
 To fix this error, make sure the `keosd` utility is running on your machine:

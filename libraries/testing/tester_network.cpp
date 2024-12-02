@@ -1,6 +1,6 @@
-#include <eosio/testing/tester_network.hpp>
+#include <sysio/testing/tester_network.hpp>
 
-namespace eosio { namespace testing {
+namespace sysio { namespace testing {
 
    void tester_network::connect_blockchain(base_tester &new_blockchain) {
       if (blockchains.count(&new_blockchain))
@@ -37,8 +37,8 @@ namespace eosio { namespace testing {
     //  for (const auto &pair : blockchains) {
     //     if (pair.first == &skip_blockchain) continue;
     //     boost::signals2::shared_connection_block blocker(pair.second);
-    //     pair.first->control->push_block(block, eosio::chain::validation_steps::created_block);
+    //     pair.first->control->push_block(block, sysio::chain::validation_steps::created_block);
     //  }
    }
 
-} } /// eosio::testing
+} } /// sysio::testing

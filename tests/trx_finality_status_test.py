@@ -43,10 +43,10 @@ walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
-EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -78,15 +78,15 @@ try:
 
     Print("Creating account1")
     account1 = Account('account1')
-    account1.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    account1.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(account1, cluster.eosioAccount, stakedDeposit=1000)
+    account1.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    account1.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(account1, cluster.sysioAccount, stakedDeposit=1000)
 
     Print("Creating account2")
     account2 = Account('account2')
-    account2.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    account2.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(account2, cluster.eosioAccount, stakedDeposit=1000)
+    account2.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    account2.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(account2, cluster.sysioAccount, stakedDeposit=1000)
 
     Print("Validating accounts after bootstrap")
     cluster.validateAccounts([account1, account2])
@@ -126,7 +126,7 @@ try:
     # through the chain of nodes to node0 to be added to a block. It is still possible to hit the end of a block and state be IN_BLOCK here.
     # defproducera -> defproducerb -> defproducerc -> NPN
     prod0.waitForProducer("defproducera", exitOnError=True)
-    testNode.transferFunds(cluster.eosioAccount, account1, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
+    testNode.transferFunds(cluster.sysioAccount, account1, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
     transId=testNode.getLastTrackedTransactionId()
     retStatus=testNode.getTransactionStatus(transId)
     state = getState(retStatus)

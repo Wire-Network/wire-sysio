@@ -1,14 +1,14 @@
-#include "eosio/chain/block_header.hpp"
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/resource_monitor_plugin/resource_monitor_plugin.hpp>
-#include <eosio/state_history/compression.hpp>
-#include <eosio/state_history/create_deltas.hpp>
-#include <eosio/state_history/log.hpp>
-#include <eosio/state_history/serialization.hpp>
-#include <eosio/state_history/trace_converter.hpp>
-#include <eosio/state_history_plugin/session.hpp>
-#include <eosio/state_history_plugin/state_history_plugin.hpp>
+#include "sysio/chain/block_header.hpp"
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/state_history/compression.hpp>
+#include <sysio/state_history/create_deltas.hpp>
+#include <sysio/state_history/log.hpp>
+#include <sysio/state_history/serialization.hpp>
+#include <sysio/state_history/trace_converter.hpp>
+#include <sysio/state_history_plugin/session.hpp>
+#include <sysio/state_history_plugin/state_history_plugin.hpp>
 
 #include <boost/asio/bind_executor.hpp>
 #include <boost/asio/ip/host_name.hpp>
@@ -23,7 +23,7 @@
 
 namespace ws = boost::beast::websocket;
 
-namespace eosio {
+namespace sysio {
 using namespace chain;
 using namespace state_history;
 using boost::signals2::scoped_connection;
@@ -213,7 +213,7 @@ public:
          // the exception would be caught and drop before reaching main(). The exception is
          // to ensure the block won't be committed.
          appbase::app().quit();
-         EOS_THROW(
+         SYS_THROW(
              chain::state_history_write_exception, // controller_emit_signal_exception, so it flow through emit()
              "State history encountered an Error which it cannot recover from.  Please resolve the error and relaunch "
              "the process");
@@ -289,7 +289,7 @@ void state_history_plugin::set_program_options(options_description& cli, options
    options("state-history-archive-dir", bpo::value<std::filesystem::path>(),
            "the location of the state history archive directory (absolute path or relative to state-history dir).\n"
            "If the value is empty string, blocks files beyond the retained limit will be deleted.\n"
-           "All files in the archive directory are completely under user's control, i.e. they won't be accessed by nodeos anymore.");
+           "All files in the archive directory are completely under user's control, i.e. they won't be accessed by nodeop anymore.");
    options("state-history-stride", bpo::value<uint32_t>(),
          "split the state history log files when the block number is the multiple of the stride\n"
          "When the stride is reached, the current history log and index will be renamed '*-history-<start num>-<end num>.log/index'\n"
@@ -316,7 +316,7 @@ void state_history_plugin::set_program_options(options_description& cli, options
 void state_history_plugin_impl::plugin_initialize(const variables_map& options) {
    try {
       chain_plug = app().find_plugin<chain_plugin>();
-      EOS_ASSERT(chain_plug, chain::missing_chain_plugin_exception, "");
+      SYS_ASSERT(chain_plug, chain::missing_chain_plugin_exception, "");
       auto& chain = chain_plug->chain();
 
       if (!options.at("disable-replay-opts").as<bool>() && options.at("chain-state-history").as<bool>()) {
@@ -371,8 +371,8 @@ void state_history_plugin_impl::plugin_initialize(const variables_map& options) 
          ship_log_prune_conf.prune_blocks = options.at("state-history-log-retain-blocks").as<uint32_t>();
          //the arbitrary limit of 1000 here is mainly so that there is enough buffer for newly applied forks to be delivered to clients
          // before getting pruned out. ideally pruning would have been smart enough to know not to prune reversible blocks
-         EOS_ASSERT(ship_log_prune_conf.prune_blocks >= 1000, plugin_exception, "state-history-log-retain-blocks must be 1000 blocks or greater");
-         EOS_ASSERT(!has_state_history_partition_options, plugin_exception, "state-history-log-retain-blocks cannot be used together with state-history-retained-dir,"
+         SYS_ASSERT(ship_log_prune_conf.prune_blocks >= 1000, plugin_exception, "state-history-log-retain-blocks must be 1000 blocks or greater");
+         SYS_ASSERT(!has_state_history_partition_options, plugin_exception, "state-history-log-retain-blocks cannot be used together with state-history-retained-dir,"
                   " state-history-archive-dir, state-history-stride or max-retained-history-files");
       } else if (has_state_history_partition_options){
          auto& config  = ship_log_conf.emplace<state_history::partition_config>();
@@ -462,4 +462,4 @@ const state_history_log* state_history_plugin::chain_state_log() const {
    return log ? std::addressof(*log) : nullptr;
 }
 
-} // namespace eosio
+} // namespace sysio

@@ -9,7 +9,7 @@ info:
   contact:
     url: https://eosnetwork.com
 tags:
-  - name: eosio
+  - name: sysio
 servers:
   - url: '{protocol}://{host}:{port}/v1/'
     variables:

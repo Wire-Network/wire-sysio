@@ -12,7 +12,7 @@ None
 
 
 ```sh
-cleos wallet list
+clio wallet list
 ```
 
 ## Outputs

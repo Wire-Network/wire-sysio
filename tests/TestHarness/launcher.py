@@ -169,7 +169,7 @@ class cluster_generator:
         parser.add_argument('--bounce', type=comma_separated, help='comma-separated list of node numbers that will be restarted', default=[])
         parser.add_argument('--roll', type=comma_separated, help='comma-separated list of host names where the nodes will be rolled to a new version')
         parser.add_argument('-b', '--base_dir', type=Path, help='base directory where configuration and data files will be written', default=Path('.'))
-        parser.add_argument('--config-dir', type=Path, help='directory containing configuration files such as config.ini', default=Path('etc') / 'eosio')
+        parser.add_argument('--config-dir', type=Path, help='directory containing configuration files such as config.ini', default=Path('etc') / 'sysio')
         parser.add_argument('--data-dir', type=Path, help='name of subdirectory under base-dir where node data will be written', default=Path('var') / 'lib')
         parser.add_argument('-c', '--config', type=Path, help='configuration file name relative to config-dir', default='config.ini')
         parser.add_argument('-v', '--version', action='version', version='%(prog)s 1.0')
@@ -204,7 +204,7 @@ class cluster_generator:
         cfg.add_argument('--max-transaction-cpu-usage', type=int, help='the "max-transaction-cpu-usage" value to use in the genesis.json file', default=None)
         cfg.add_argument('--logging-level', type=fc_log_level, help='Provide the "level" value to use in the logging.json file')
         cfg.add_argument('--logging-level-map', type=json.loads, help='JSON string of a logging level dictionary to use in the logging.json file for specific nodes, matching based on node number. Ex: {"bios":"off","00":"info"}')
-        cfg.add_argument('--is-nodeos-v2', action='store_true', help='Toggles old nodeos compatibility', default=False)
+        cfg.add_argument('--is-nodsys-v2', action='store_true', help='Toggles old nodeop compatibility', default=False)
         r = parser.parse_args(args)
         if r.launch != 'none' and r.topology_filename:
             Utils.Print('Output file specified--overriding launch to "none"')
@@ -289,7 +289,7 @@ class cluster_generator:
             if is_bios:
                 node.keys.append(KeyStrings('EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV',
                                             '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'))
-                node.producers.append('eosio')
+                node.producers.append('sysio')
             else:
                 node.keys.append(KeyStrings(account.ownerPublicKey, account.ownerPrivateKey))
                 if i < non_bios:
@@ -505,15 +505,15 @@ class cluster_generator:
         peers = list(sum([('--p2p-peer-address', self.network.nodes[p].p2p_endpoint) for p in instance.peers], ()))
         eosdcmd.extend(peers)
         if len(instance.producers) > 0:
-            a(a(eosdcmd, '--plugin'), 'eosio::producer_plugin')
+            a(a(eosdcmd, '--plugin'), 'sysio::producer_plugin')
             producer_keys = list(sum([('--signature-provider', f'{key.pubkey}=KEY:{key.privkey}') for key in instance.keys], ()))
             eosdcmd.extend(producer_keys)
             producer_names = list(sum([('--producer-name', p) for p in instance.producers], ()))
             eosdcmd.extend(producer_names)
         else:
             a(a(eosdcmd, '--transaction-retry-max-storage-size-gb'), '100')
-        a(a(eosdcmd, '--plugin'), 'eosio::net_plugin')
-        a(a(eosdcmd, '--plugin'), 'eosio::chain_api_plugin')
+        a(a(eosdcmd, '--plugin'), 'sysio::net_plugin')
+        a(a(eosdcmd, '--plugin'), 'sysio::chain_api_plugin')
 
         if self.args.skip_signature:
             a(eosdcmd, '--skip-transaction-signatures')
@@ -526,7 +526,7 @@ class cluster_generator:
                 specificList = shlex.split(specifics[1:-1])
             else:
                 specificList = shlex.split(specifics)
-            # Allow specific nodeos args to override existing args up to this point.
+            # Allow specific nodeop args to override existing args up to this point.
             # Consider moving specific arg handling to the end to allow overriding all args.
             repeatable = [
                 # appbase
@@ -565,16 +565,16 @@ class cluster_generator:
 
         # Always enable a history query plugin on the bios node
         if is_bios:
-            if self.args.is_nodeos_v2:
-                a(a(eosdcmd, '--plugin'), 'eosio::history_api_plugin')
+            if self.args.is_nodeop_v2:
+                a(a(eosdcmd, '--plugin'), 'sysio::history_api_plugin')
                 a(a(eosdcmd, '--filter-on'), '"*"')
             else:
-                a(a(eosdcmd, '--plugin'), 'eosio::trace_api_plugin')
+                a(a(eosdcmd, '--plugin'), 'sysio::trace_api_plugin')
 
-        if 'eosio::history_api_plugin' in eosdcmd and 'eosio::trace_api_plugin' in eosdcmd:
+        if 'sysio::history_api_plugin' in eosdcmd and 'sysio::trace_api_plugin' in eosdcmd:
             eosdcmd.remove('--trace-no-abis')
             eosdcmd.remove('--trace-rpc-abi')
-            i = eosdcmd.index('eosio::trace_api_plugin')
+            i = eosdcmd.index('sysio::trace_api_plugin')
             eosdcmd.pop(i)
             i -= 1
             eosdcmd.pop(i)

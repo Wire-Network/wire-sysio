@@ -1,8 +1,8 @@
-#include <eosio/test_control_plugin/test_control_plugin.hpp>
+#include <sysio/test_control_plugin/test_control_plugin.hpp>
 
 namespace fc { class variant; }
 
-namespace eosio {
+namespace sysio {
 
    static auto _test_control_plugin = application::register_plugin<test_control_plugin>();
 
@@ -138,4 +138,4 @@ read_write::kill_node_on_producer_results read_write::kill_node_on_producer(cons
 
 } // namespace test_control_apis
 
-} // namespace eosio
+} // namespace sysio

@@ -1,19 +1,19 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/producer_plugin/producer_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 
-#include <eosio/testing/tester.hpp>
+#include <sysio/testing/tester.hpp>
 
-#include <eosio/chain/genesis_state.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/chain/transaction_metadata.hpp>
-#include <eosio/chain/trace.hpp>
-#include <eosio/chain/name.hpp>
+#include <sysio/chain/genesis_state.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/chain/transaction_metadata.hpp>
+#include <sysio/chain/trace.hpp>
+#include <sysio/chain/name.hpp>
 
-#include <eosio/chain/application.hpp>
+#include <sysio/chain/application.hpp>
 
-namespace eosio::test::detail {
-using namespace eosio::chain::literals;
+namespace sysio::test::detail {
+using namespace sysio::chain::literals;
 struct testit {
    uint64_t      id;
 
@@ -29,13 +29,13 @@ struct testit {
    }
 };
 }
-FC_REFLECT( eosio::test::detail::testit, (id) )
+FC_REFLECT( sysio::test::detail::testit, (id) )
 
 namespace {
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::test::detail;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::test::detail;
 
 auto make_unique_trx( const chain_id_type& chain_id ) {
 
@@ -112,7 +112,7 @@ BOOST_AUTO_TEST_CASE(producer) {
             fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
             std::vector<const char*> argv =
                   {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
-                   "-p", "eosio", "-e", "--disable-subjective-p2p-billing=true" };
+                   "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
             app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
             app->startup();
             plugin_promise.set_value(

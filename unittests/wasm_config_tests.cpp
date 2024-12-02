@@ -1,6 +1,6 @@
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
 
 #include <fc/string.hpp>
 #include <fc/variant_object.hpp>
@@ -14,9 +14,9 @@
 #include <contracts.hpp>
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 namespace data = boost::unit_test::data;
 
@@ -29,12 +29,12 @@ struct wasm_config_tester : validating_tester {
    }
    void set_wasm_params(const wasm_config& params) {
       signed_transaction trx;
-      trx.actions.emplace_back(vector<permission_level>{{"eosio"_n,config::active_name}}, "eosio"_n, "setwparams"_n,
+      trx.actions.emplace_back(vector<permission_level>{{"sysio"_n,config::active_name}}, "sysio"_n, "setwparams"_n,
                                bios_abi_ser.variant_to_binary("setwparams", fc::mutable_variant_object()("cfg", params),
                                                               abi_serializer::create_yield_function( abi_serializer_max_time )));
-      trx.actions[0].authorization = vector<permission_level>{{"eosio"_n,config::active_name}};
+      trx.actions[0].authorization = vector<permission_level>{{"sysio"_n,config::active_name}};
       set_transaction_headers(trx);
-      trx.sign(get_private_key("eosio"_n, "active"), control->get_chain_id());
+      trx.sign(get_private_key("sysio"_n, "active"), control->get_chain_id());
       push_transaction(trx);
    }
    // Pushes an empty action
@@ -88,13 +88,13 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_mutable_global_bytes, data::make(
    std::string code = [&] {
       std::ostringstream ss;
       ss << "(module ";
-      ss << " (func $eosio_assert (import \"env\" \"eosio_assert\") (param i32 i32))";
+      ss << " (func $sysio_assert (import \"env\" \"sysio_assert\") (param i32 i32))";
       ss << " (memory 1)";
       for(int i = 0; i < n_globals + oversize; i += 4)
          ss << "(global (mut i32) (i32.const " << i << "))";
       ss << " (func (export \"apply\") (param i64 i64 i64)";
       for(int i = 0; i < n_globals + oversize; i += 4)
-         ss << "(call $eosio_assert (i32.eq (get_global " << i/4 << ") (i32.const " << i << ")) (i32.const 0))";
+         ss << "(call $sysio_assert (i32.eq (get_global " << i/4 << ") (i32.const " << i << ")) (i32.const 0))";
       ss << " )";
       ss << ")";
       return ss.str();
@@ -245,11 +245,11 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_section_elements_export,
 
 static const char max_linear_memory_wast[] = R"=====(
 (module
-  (import "env" "eosio_assert" (func $$eosio_assert (param i32 i32)))
+  (import "env" "sysio_assert" (func $$sysio_assert (param i32 i32)))
   (memory 4)
   (data (i32.const ${OFFSET}) "\11\22\33\44")
   (func (export "apply") (param i64 i64 i64)
-    (call $$eosio_assert (i32.eq (i32.load (i32.const ${OFFSET})) (i32.const 0x44332211)) (i32.const 0))
+    (call $$sysio_assert (i32.eq (i32.load (i32.const ${OFFSET})) (i32.const 0x44332211)) (i32.const 0))
   )
 )
 )=====";
@@ -817,7 +817,7 @@ BOOST_FIXTURE_TEST_CASE( max_pages, wasm_config_tester ) try {
 
          set_transaction_headers(trx);
          trx.sign(get_private_key( "accessmem"_n, "active" ), control->get_chain_id());
-         BOOST_CHECK_THROW(push_transaction(trx), eosio::chain::wasm_exception);
+         BOOST_CHECK_THROW(push_transaction(trx), sysio::chain::wasm_exception);
       };
 
 
@@ -832,7 +832,7 @@ BOOST_FIXTURE_TEST_CASE( max_pages, wasm_config_tester ) try {
 
          set_transaction_headers(trx);
          trx.sign(get_private_key( "intrinsicmem"_n, "active" ), control->get_chain_id());
-         BOOST_CHECK_THROW(push_transaction(trx), eosio::chain::wasm_exception);
+         BOOST_CHECK_THROW(push_transaction(trx), sysio::chain::wasm_exception);
       };
 
       pushit(1);
@@ -857,13 +857,13 @@ BOOST_FIXTURE_TEST_CASE( max_pages, wasm_config_tester ) try {
       --params.max_pages;
       set_wasm_params(params);
       produce_block();
-      BOOST_CHECK_THROW(pushit(0), eosio::chain::wasm_exception);
+      BOOST_CHECK_THROW(pushit(0), sysio::chain::wasm_exception);
 
       params.max_pages = max_pages;
       set_wasm_params(params);
       string too_big_memory_wast_f = fc::format_string(too_big_memory_wast, fc::mutable_variant_object(
                                                        "MAX_WASM_PAGES_PLUS_ONE", params.max_pages+1));
-      BOOST_CHECK_THROW(set_code("bigmem"_n, too_big_memory_wast_f.c_str()), eosio::chain::wasm_exception);
+      BOOST_CHECK_THROW(set_code("bigmem"_n, too_big_memory_wast_f.c_str()), sysio::chain::wasm_exception);
 
       // Check that the max memory defined by the contract is respected
       string memory_over_max_wast = fc::format_string(max_memory_wast, fc::mutable_variant_object()
@@ -957,7 +957,7 @@ BOOST_FIXTURE_TEST_CASE( call_depth, wasm_config_tester ) try {
 
 // This contract is one of the smallest that can be used to reset
 // the wasm parameters.  It should be impossible to set parameters
-// that would prevent it from being set on the eosio account and executing.
+// that would prevent it from being set on the sysio account and executing.
 static const char min_set_parameters_wast[] = R"======(
 (module
   (import "env" "set_wasm_parameters_packed" (func $set_wasm_parameters_packed (param i32 i32)))
@@ -1014,13 +1014,13 @@ BOOST_FIXTURE_TEST_CASE(reset_chain_tests, wasm_config_tester) {
    {
       signed_transaction trx;
       auto make_setcode = [](const std::vector<uint8_t>& code) {
-         return setcode{ "eosio"_n, 0, 0, bytes(code.begin(), code.end()) };
+         return setcode{ "sysio"_n, 0, 0, bytes(code.begin(), code.end()) };
       };
-      trx.actions.push_back({ { { "eosio"_n, config::active_name} }, make_setcode(wast_to_wasm(min_set_parameters_wast)) });
-      trx.actions.push_back({ { { "eosio"_n, config::active_name} }, "eosio"_n, ""_n, fc::raw::pack(genesis_state::default_initial_wasm_configuration) });
-      trx.actions.push_back({ { { "eosio"_n, config::active_name} }, make_setcode(contracts::eosio_bios_wasm()) });
+      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, make_setcode(wast_to_wasm(min_set_parameters_wast)) });
+      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, "sysio"_n, ""_n, fc::raw::pack(genesis_state::default_initial_wasm_configuration) });
+      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, make_setcode(contracts::sysio_bios_wasm()) });
       set_transaction_headers(trx);
-      trx.sign(get_private_key("eosio"_n, "active"), control->get_chain_id());
+      trx.sign(get_private_key("sysio"_n, "active"), control->get_chain_id());
       push_transaction(trx);
    }
    produce_block();
@@ -1038,7 +1038,7 @@ static const char check_get_wasm_parameters_wast[] = R"======(
   (import "env" "memcmp" (func $memcmp (param i32 i32 i32) (result i32)))
   (import "env" "memset" (func $memset (param i32 i32 i32) (result i32)))
   (import "env" "printhex" (func $printhex (param i32 i32)))
-  (import "env" "eosio_assert" (func $eosio_assert (param i32 i32)))
+  (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
   (memory 1)
   (func (export "apply") (param i64 i64 i64)
      (drop (call $read_action_data (i32.const 0) (call $action_data_size)))
@@ -1047,7 +1047,7 @@ static const char check_get_wasm_parameters_wast[] = R"======(
      (if (call $memcmp (i32.const 0) (i32.const 256) (call $action_data_size))
         (then
           (call $printhex (i32.const 256) (call $action_data_size))
-          (call $eosio_assert (i32.const 0) (i32.const 512))
+          (call $sysio_assert (i32.const 0) (i32.const 512))
         )
      )
   )

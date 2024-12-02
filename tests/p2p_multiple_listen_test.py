@@ -7,7 +7,7 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 ###############################################################
 # p2p_multiple_listen_test
 #
-# Test nodeos ability to listen on multiple ports for p2p
+# Test nodeop ability to listen on multiple ports for p2p
 #
 ###############################################################
 
@@ -38,9 +38,9 @@ try:
 
     Print("Stand up cluster")
     specificArgs = {
-        '0': '--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:9876 --p2p-listen-endpoint 0.0.0.0:9779 --p2p-server-address ext-ip0:20000 --p2p-server-address ext-ip1:20001 --plugin eosio::net_api_plugin',
-        '2': '--agent-name node-02 --p2p-peer-address localhost:9779 --plugin eosio::net_api_plugin',
-        '4': '--agent-name node-04 --p2p-peer-address localhost:9876 --plugin eosio::net_api_plugin',
+        '0': '--agent-name node-00 --p2p-listen-endpoint 0.0.0.0:9876 --p2p-listen-endpoint 0.0.0.0:9779 --p2p-server-address ext-ip0:20000 --p2p-server-address ext-ip1:20001 --plugin sysio::net_api_plugin',
+        '2': '--agent-name node-02 --p2p-peer-address localhost:9779 --plugin sysio::net_api_plugin',
+        '4': '--agent-name node-04 --p2p-peer-address localhost:9876 --plugin sysio::net_api_plugin',
     }
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo='line', delay=delay, 
                       specificExtraNodeosArgs=specificArgs) is False:

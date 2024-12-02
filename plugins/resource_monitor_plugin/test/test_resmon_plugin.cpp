@@ -3,11 +3,11 @@
 
 #include <fc/variant_object.hpp>
 
-#include <eosio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
 #include <thread>
 
-using namespace eosio;
+using namespace sysio;
 using namespace boost::system;
 
 
@@ -26,7 +26,7 @@ struct resmon_fixture {
       // We only have at most 3 arguments. OK to hardcodied in test
       // programs.
       const char* argv[10];
-      EOS_ASSERT(args.size() < 10, chain::plugin_exception, "number of arguments  (${size}) must be less than 10", ("size", args.size()));
+      SYS_ASSERT(args.size() < 10, chain::plugin_exception, "number of arguments  (${size}) must be less than 10", ("size", args.size()));
 
       // argv[0] is program name, no need to fill in
       for (size_t i=0; i<args.size(); ++i) {

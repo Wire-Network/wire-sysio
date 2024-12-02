@@ -1,19 +1,19 @@
 #include <boost/test/unit_test.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/permission_object.hpp>
-#include <eosio/chain/authorization_manager.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/resource_limits_private.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/resource_limits_private.hpp>
 
-#include <eosio/testing/tester_network.hpp>
+#include <sysio/testing/tester_network.hpp>
 
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 
 BOOST_AUTO_TEST_SUITE(auth_tests)
 
@@ -273,18 +273,18 @@ BOOST_AUTO_TEST_CASE(link_auths) { try {
 
    // Send req auth action with alice's spending key, it should fail
    BOOST_CHECK_THROW(chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("spending")} }, { spending_priv_key }), irrelevant_auth_exception);
-   // Link authority for eosio reqauth action with alice's spending key
-   chain.link_authority(name("alice"), name("eosio"), name("spending"), name("reqauth"));
+   // Link authority for sysio reqauth action with alice's spending key
+   chain.link_authority(name("alice"), name("sysio"), name("spending"), name("reqauth"));
    // Now, req auth action with alice's spending key should succeed
    chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("spending")} }, { spending_priv_key });
 
    chain.produce_block();
 
    // Relink the same auth should fail
-   BOOST_CHECK_THROW( chain.link_authority(name("alice"), name("eosio"), name("spending"), name("reqauth")), action_validate_exception);
+   BOOST_CHECK_THROW( chain.link_authority(name("alice"), name("sysio"), name("spending"), name("reqauth")), action_validate_exception);
 
-   // Unlink alice with eosio reqauth
-   chain.unlink_authority(name("alice"), name("eosio"), name("reqauth"));
+   // Unlink alice with sysio reqauth
+   chain.unlink_authority(name("alice"), name("sysio"), name("reqauth"));
    // Now, req auth action with alice's spending key should fail
    BOOST_CHECK_THROW(chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("spending")} }, { spending_priv_key }), irrelevant_auth_exception);
 
@@ -292,8 +292,8 @@ BOOST_AUTO_TEST_CASE(link_auths) { try {
 
    // Send req auth action with scud key, it should fail
    BOOST_CHECK_THROW(chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("scud")} }, { scud_priv_key }), irrelevant_auth_exception);
-   // Link authority for any eosio action with alice's scud key
-   chain.link_authority(name("alice"), name("eosio"), name("scud"));
+   // Link authority for any sysio action with alice's scud key
+   chain.link_authority(name("alice"), name("sysio"), name("scud"));
    // Now, req auth action with alice's scud key should succeed
    chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("scud")} }, { scud_priv_key });
    // req auth action with alice's spending key should also be fine, since it is the parent of alice's scud key
@@ -313,7 +313,7 @@ BOOST_AUTO_TEST_CASE(link_then_update_auth) { try {
 
    chain.set_authority(name("alice"), name("first"), authority{first_pub_key}, name("active"));
 
-   chain.link_authority(name("alice"), name("eosio"), name("first"), name("reqauth"));
+   chain.link_authority(name("alice"), name("sysio"), name("first"), name("reqauth"));
    chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("first")} }, { first_priv_key });
 
    chain.produce_blocks(13); // Wait at least 6 seconds for first push_reqauth transaction to expire.
@@ -357,12 +357,12 @@ try {
                          fc_exception_message_is("account names can only be 12 chars long"));
 
 
-   // Creating account with eosio. prefix with privileged account
-   chain.create_account(name("eosio.test1"));
+   // Creating account with sysio. prefix with privileged account
+   chain.create_account(name("sysio.test1"));
 
-   // Creating account with eosio. prefix with non-privileged account, should fail
-   BOOST_CHECK_EXCEPTION(chain.create_account(name("eosio.test2"), name("joe")), action_validate_exception,
-                         fc_exception_message_is("only privileged accounts can have names that start with 'eosio.'"));
+   // Creating account with sysio. prefix with non-privileged account, should fail
+   BOOST_CHECK_EXCEPTION(chain.create_account(name("sysio.test2"), name("joe")), action_validate_exception,
+                         fc_exception_message_is("only privileged accounts can have names that start with 'sysio.'"));
 
 } FC_LOG_AND_RETHROW() }
 
@@ -386,10 +386,10 @@ BOOST_AUTO_TEST_CASE( any_auth ) { try {
 
    //test.push_reqauth( "alice"_n, { permission_level{"alice"_n,"spending"} }, { spending_priv_key });
 
-   chain.link_authority( name("alice"), name("eosio"), name("eosio.any"), name("reqauth") );
-   chain.link_authority( name("bob"), name("eosio"), name("eosio.any"), name("reqauth") );
+   chain.link_authority( name("alice"), name("sysio"), name("sysio.any"), name("reqauth") );
+   chain.link_authority( name("bob"), name("sysio"), name("sysio.any"), name("reqauth") );
 
-   /// this should succeed because eosio::reqauth is linked to any permission
+   /// this should succeed because sysio::reqauth is linked to any permission
    chain.push_reqauth(name("alice"), { permission_level{"alice"_n, name("spending")} }, { spending_priv_key });
 
    /// this should fail because bob cannot authorize for alice, the permission given must be one-of alices
@@ -419,8 +419,8 @@ try {
 
    const chainbase::database &db = chain.control->db();
 
-   using resource_usage_object = eosio::chain::resource_limits::resource_usage_object;
-   using by_owner = eosio::chain::resource_limits::by_owner;
+   using resource_usage_object = sysio::chain::resource_limits::resource_usage_object;
+   using by_owner = sysio::chain::resource_limits::by_owner;
 
    auto create_acc = [&](account_name a) {
 
@@ -536,11 +536,11 @@ BOOST_AUTO_TEST_CASE( linkauth_special ) { try {
       BOOST_REQUIRE_EXCEPTION(
          chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
                ("account", "tester")
-               ("code", "eosio")
+               ("code", "sysio")
                ("type", type)
                ("requirement", "first")),
          action_validate_exception,
-         fc_exception_message_is(std::string("Cannot link eosio::") + std::string(type) + std::string(" to a minimum permission"))
+         fc_exception_message_is(std::string("Cannot link sysio::") + std::string(type) + std::string(" to a minimum permission"))
       );
    };
 
@@ -558,11 +558,11 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    const auto& tester_account = "tester"_n;
 
    chain.produce_blocks();
-   chain.create_account("eosio.token"_n);
+   chain.create_account("sysio.token"_n);
    chain.produce_blocks(10);
 
-   chain.set_code("eosio.token"_n, test_contracts::eosio_token_wasm());
-   chain.set_abi("eosio.token"_n, test_contracts::eosio_token_abi());
+   chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
 
    chain.produce_blocks();
    chain.create_account("tester"_n);
@@ -593,27 +593,27 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    // link auth
    chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
-           ("code", "eosio.token")
+           ("code", "sysio.token")
            ("type", "transfer")
            ("requirement", "first"));
 
    // create CUR token
    chain.produce_blocks();
-   chain.push_action("eosio.token"_n, "create"_n, "eosio.token"_n, mutable_variant_object()
-           ("issuer", "eosio.token" )
+   chain.push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
+           ("issuer", "sysio.token" )
            ("maximum_supply", "9000000.0000 CUR" )
    );
 
-   // issue to account "eosio.token"
-   chain.push_action("eosio.token"_n, name("issue"), "eosio.token"_n, fc::mutable_variant_object()
-           ("to",       "eosio.token")
+   // issue to account "sysio.token"
+   chain.push_action("sysio.token"_n, name("issue"), "sysio.token"_n, fc::mutable_variant_object()
+           ("to",       "sysio.token")
            ("quantity", "1000000.0000 CUR")
            ("memo", "for stuff")
    );
 
-   // transfer from eosio.token to tester
-   trace = chain.push_action("eosio.token"_n, name("transfer"), "eosio.token"_n, fc::mutable_variant_object()
-       ("from", "eosio.token")
+   // transfer from sysio.token to tester
+   trace = chain.push_action("sysio.token"_n, name("transfer"), "sysio.token"_n, fc::mutable_variant_object()
+       ("from", "sysio.token")
        ("to", "tester")
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
@@ -622,12 +622,12 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
    chain.produce_blocks();
 
-   auto liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "eosio.token"_n);
+   auto liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "sysio.token"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("999900.0000 CUR"), liquid_balance);
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "tester"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
-   trace = chain.push_action("eosio.token"_n, name("transfer"), "tester"_n, fc::mutable_variant_object()
+   trace = chain.push_action("sysio.token"_n, name("transfer"), "tester"_n, fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
        ("quantity", "1.0000 CUR")
@@ -636,11 +636,11 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
    BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "eosio.token"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "sysio.token"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("999900.0000 CUR"), liquid_balance);
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "tester"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("99.0000 CUR"), liquid_balance);
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "tester2"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester2"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("1.0000 CUR"), liquid_balance);
 
    // can't delete auth because it's linked
@@ -657,7 +657,7 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    // unlink auth
    trace = chain.push_action(config::system_account_name, unlinkauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
-           ("code", "eosio.token")
+           ("code", "sysio.token")
            ("type", "transfer"));
    BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
    chain.produce_blocks(1);;
 
-   trace = chain.push_action("eosio.token"_n, name("transfer"), "tester"_n, fc::mutable_variant_object()
+   trace = chain.push_action("sysio.token"_n, name("transfer"), "tester"_n, fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
        ("quantity", "3.0000 CUR")
@@ -680,9 +680,9 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
    chain.produce_blocks();
 
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "tester"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("96.0000 CUR"), liquid_balance);
-   liquid_balance = chain.get_currency_balance("eosio.token"_n, symbol(SY(4,CUR)), "tester2"_n);
+   liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester2"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("4.0000 CUR"), liquid_balance);
 
 } FC_LOG_AND_RETHROW() }/// delete_auth

@@ -1,50 +1,50 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
-#include <eosio/singleton.hpp>
-#include <eosio/asset.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/singleton.hpp>
+#include <sysio/asset.hpp>
 
-// Extacted from eosio.token contract:
-namespace eosio {
-   class [[eosio::contract("eosio.token")]] token : public eosio::contract {
+// Extacted from sysio.token contract:
+namespace sysio {
+   class [[sysio::contract("sysio.token")]] token : public sysio::contract {
    public:
-      using eosio::contract::contract;
+      using sysio::contract::contract;
 
-      [[eosio::action]]
-      void transfer( eosio::name        from,
-                     eosio::name        to,
-                     eosio::asset       quantity,
+      [[sysio::action]]
+      void transfer( sysio::name        from,
+                     sysio::name        to,
+                     sysio::asset       quantity,
                      const std::string& memo );
-      using transfer_action = eosio::action_wrapper<"transfer"_n, &token::transfer>;
+      using transfer_action = sysio::action_wrapper<"transfer"_n, &token::transfer>;
    };
 }
 
 // This contract:
-class [[eosio::contract]] proxy : public eosio::contract {
+class [[sysio::contract]] proxy : public sysio::contract {
 public:
-   proxy( eosio::name self, eosio::name first_receiver, eosio::datastream<const char*> ds );
+   proxy( sysio::name self, sysio::name first_receiver, sysio::datastream<const char*> ds );
 
-   [[eosio::action]]
-   void setowner( eosio::name owner, uint32_t delay );
+   [[sysio::action]]
+   void setowner( sysio::name owner, uint32_t delay );
 
-   [[eosio::on_notify("eosio.token::transfer")]]
-   void on_transfer( eosio::name        from,
-                     eosio::name        to,
-                     eosio::asset       quantity,
+   [[sysio::on_notify("sysio.token::transfer")]]
+   void on_transfer( sysio::name        from,
+                     sysio::name        to,
+                     sysio::asset       quantity,
                      const std::string& memo );
 
-   [[eosio::on_notify("eosio::onerror")]]
-   void on_error( uint128_t sender_id, eosio::ignore<std::vector<char>> sent_trx );
+   [[sysio::on_notify("sysio::onerror")]]
+   void on_error( uint128_t sender_id, sysio::ignore<std::vector<char>> sent_trx );
 
-   struct [[eosio::table]] config {
-      eosio::name owner;
+   struct [[sysio::table]] config {
+      sysio::name owner;
       uint32_t    delay   = 0;
       uint32_t    next_id = 0;
 
       EOSLIB_SERIALIZE( config, (owner)(delay)(next_id) )
    };
 
-   using config_singleton = eosio::singleton< "config"_n,  config >;
+   using config_singleton = sysio::singleton< "config"_n,  config >;
 
 protected:
    config_singleton _config;

@@ -19,5 +19,5 @@
 
 
 ```sh
-cleos system rex rexexec accountname1 10
+clio system rex rexexec accountname1 10
 ```

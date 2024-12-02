@@ -1,7 +1,7 @@
-#include <eosio/eosio.hpp>                   /* contract, datastream, check */
-#include <eosio/privileged.hpp>              /* blockchain_parameters */
+#include <sysio/sysio.hpp>                   /* contract, datastream, check */
+#include <sysio/privileged.hpp>              /* blockchain_parameters */
 #include <vector>                            /* vector */
-using namespace eosio;
+using namespace sysio;
 using namespace std;
 
 #define STR_I(x) #x
@@ -10,7 +10,7 @@ using namespace std;
 #define ASSERT_LESS(e1,e2) check((e1) < (e2), STR(__FILE__)STR(:)STR(__LINE__)": " #e1" < "#e2)
 #define ASSERT_LE(e1,e2) check((e1) <= (e2), STR(__FILE__)STR(:)STR(__LINE__)": " #e1" <= "#e2)
 
-#define IMPORT extern "C" __attribute__((eosio_wasm_import))
+#define IMPORT extern "C" __attribute__((sysio_wasm_import))
 
 IMPORT uint32_t get_parameters_packed( const char* ids, uint32_t ids_size, char* params, uint32_t params_size);
 IMPORT     void set_parameters_packed( const char* params, uint32_t params_size );
@@ -94,11 +94,11 @@ struct params_object{
    }
 };
 
-class [[eosio::contract("params_test")]] params_test : public eosio::contract {
+class [[sysio::contract("params_test")]] params_test : public sysio::contract {
 public:
-   using eosio::contract::contract;
+   using sysio::contract::contract;
 
-   [[eosio::action]] void maintest(){
+   [[sysio::action]] void maintest(){
 
       //make sure no throw for zero parameters provided
       params_object(0_ui).set();
@@ -211,32 +211,32 @@ public:
                 params_object(1_ui)(17_ui)(512_32));
    }
 
-   [[eosio::action]] void setthrow1(){
+   [[sysio::action]] void setthrow1(){
       //unknown configuration index
       params_object(1_ui)(100_ui).set();    
    }
 
-   [[eosio::action]] void setthrow2(){
+   [[sysio::action]] void setthrow2(){
       //length=2, only 1 argument provided
       params_object(2_ui)(1_ui).set();    
    }
 
-   [[eosio::action]] void setthrow3(){
+   [[sysio::action]] void setthrow3(){
       //passing argument that will fail validation
       params_object(1_ui)(1_ui)(200*100_32).set();
    }
 
-   [[eosio::action]] void getthrow1(){
+   [[sysio::action]] void getthrow1(){
       //unknown configuration index
       params_object(1_ui)(100_ui).get();    
    }
 
-   [[eosio::action]] void getthrow2(){
+   [[sysio::action]] void getthrow2(){
       //length=2, only 1 argument provided
       params_object(2_ui)(1_ui).get();    
    }
 
-   [[eosio::action]] void getthrow3(){
+   [[sysio::action]] void getthrow3(){
       //buffer too small
       char buffer[4];
       datastream<char*> ds((char*)&buffer, sizeof(buffer));
@@ -244,7 +244,7 @@ public:
       get_parameters_packed(pp.packed.c_str(), pp.packed.size(), buffer, sizeof(buffer));
    }
 
-   [[eosio::action]] void throwrvia1(){
+   [[sysio::action]] void throwrvia1(){
       //throws when setting parameter that is not allowed because of protocol feature for
       //this parameter is not active
       
@@ -254,7 +254,7 @@ public:
                 params_object(1_ui)(17_ui)(1024_32));
    }
 
-   [[eosio::action]] void throwrvia2(){
+   [[sysio::action]] void throwrvia2(){
       //this test tries to get parameter with corresponding inactive protocol feature
       
       //v1 config, max_action_return_value_size

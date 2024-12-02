@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <fc/log/logger.hpp>
 

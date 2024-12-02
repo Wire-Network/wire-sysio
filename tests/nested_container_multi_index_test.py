@@ -50,8 +50,8 @@ testSuccessful=False
 cluster=Cluster(unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True)
-EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 contractDir='unittests/test-contracts/nested_container_multi_index'
 wasmFile='nested_container_multi_index.wasm'
 abiFile='nested_container_multi_index.abi'
@@ -79,20 +79,20 @@ try:
 
     Print("Creating multi_index account")
     MIacct = Account('nestcontnmi')
-    MIacct.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    MIacct.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(MIacct, cluster.eosioAccount, buyRAM=7000000)
+    MIacct.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    MIacct.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(MIacct, cluster.sysioAccount, buyRAM=7000000)
     Print("Creating user account alice")
     useracct_I = Account('alice')
-    useracct_I.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    useracct_I.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(useracct_I, cluster.eosioAccount, buyRAM=7000000)
+    useracct_I.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    useracct_I.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(useracct_I, cluster.sysioAccount, buyRAM=7000000)
 
     Print("Creating user account bob")
     useracct_II = Account('bob')
-    useracct_II.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    useracct_II.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(useracct_II, cluster.eosioAccount, buyRAM=7000000)
+    useracct_II.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    useracct_II.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(useracct_II, cluster.sysioAccount, buyRAM=7000000)
 
     Print("Validating accounts")
     cluster.validateAccounts([MIacct, useracct_I, useracct_II])
@@ -100,7 +100,7 @@ try:
     node = cluster.getNode()
 
     Print("Setting account privilege")
-    node.pushMessage(cluster.eosioAccount.name, 'setpriv', '["nestcontnmi", 1]', '-p eosio@active')
+    node.pushMessage(cluster.sysioAccount.name, 'setpriv', '["nestcontnmi", 1]', '-p sysio@active')
 
     Print("Loading nested container contract")
     node.publishContract(MIacct, contractDir, wasmFile, abiFile, waitForTransBlock=True)

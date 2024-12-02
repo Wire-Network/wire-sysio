@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "eosio_test_generator.hpp"
+#include "sysio_test_generator.hpp"
 
 using namespace std;
 

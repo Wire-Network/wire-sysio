@@ -1,14 +1,14 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
+#include <sysio/sysio.hpp>
 
-class [[eosio::contract]] payloadless : public eosio::contract {
+class [[sysio::contract]] payloadless : public sysio::contract {
 public:
-   using eosio::contract::contract;
+   using sysio::contract::contract;
 
-   [[eosio::action]]
+   [[sysio::action]]
    void doit();
 
-   [[eosio::action]]
+   [[sysio::action]]
    void doitslow();
 };

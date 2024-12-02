@@ -10,11 +10,11 @@ None
 
 
 ```sh
-cleos wallet open
+clio wallet open
 ```
 or
 ```sh
-cleos wallet open -n second-wallet
+clio wallet open -n second-wallet
 ```
 
 ## Outputs

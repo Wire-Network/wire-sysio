@@ -1,8 +1,8 @@
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/generated_transaction_object.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/webassembly/return_codes.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/generated_transaction_object.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/webassembly/return_codes.hpp>
 
 #include <fc/variant_object.hpp>
 
@@ -12,9 +12,9 @@
 
 #include "fork_test_utilities.hpp"
 
-using namespace eosio::chain;
-using namespace eosio::testing;
-using namespace eosio::chain::webassembly;
+using namespace sysio::chain;
+using namespace sysio::testing;
+using namespace sysio::chain::webassembly;
 using namespace std::literals;
 
 std::vector<char> hex2bin(const std::string& source) {

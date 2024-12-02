@@ -22,5 +22,5 @@ excerpt: "Cancel queued REX sell order if one exists"
 
 
 ```sh
-cleos system rex cancelrexorder accountname1
+clio system rex cancelrexorder accountname1
 ```

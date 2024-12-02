@@ -3,8 +3,8 @@
 #include <boost/test/unit_test.hpp>
 #pragma GCC diagnostic pop
 
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
@@ -13,9 +13,9 @@
 
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 class payloadless_tester : public validating_tester {
@@ -35,7 +35,7 @@ BOOST_FIXTURE_TEST_CASE( test_doit, payloadless_tester ) {
    BOOST_CHECK_EQUAL(msg == "Im a payloadless action", true);
 }
 
-// test GH#3916 - contract api action with no parameters fails when called from cleos
+// test GH#3916 - contract api action with no parameters fails when called from clio
 // abi_serializer was failing when action data was empty.
 BOOST_FIXTURE_TEST_CASE( test_abi_serializer, payloadless_tester ) {
 

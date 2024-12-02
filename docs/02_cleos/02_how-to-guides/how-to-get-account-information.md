@@ -1,34 +1,34 @@
 ## Overview
 
-This how-to guide provides instructions on how to query infomation of an Antelope account. The example in this how-to guide retrieves information of the `eosio` account.
+This how-to guide provides instructions on how to query infomation of an Antelope account. The example in this how-to guide retrieves information of the `sysio` account.
 
 ## Before you begin
 
-* Install the currently supported version of `cleos`
+* Install the currently supported version of `clio`
 
 [[info | Note]]
-| The cleos tool is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install the cleos tool.
+| The clio tool is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install the clio tool.
 
 * Acquire functional understanding of [Antelope Accounts and Permissions](/protocol-guides/04_accounts_and_permissions.md)
 
 ## Command Reference
 
-See the following reference guide for command line usage and related options for the cleos command:
+See the following reference guide for command line usage and related options for the clio command:
 
-* [`cleos get account`](../03_command-reference/get/account.md) command and its parameters
+* [`clio get account`](../03_command-reference/get/account.md) command and its parameters
 
 ## Procedure
 
-The following step shows how to query information of the `eosio` account:
+The following step shows how to query information of the `sysio` account:
 
 1. Run the following command:
 
 ```sh
-cleos get account eosio
+clio get account sysio
 ```
 **Where**:
 
-* `eosio` = The name of the default system account in the Antelope blockchain.
+* `sysio` = The name of the default system account in the Antelope blockchain.
 
 **Example Output**
 

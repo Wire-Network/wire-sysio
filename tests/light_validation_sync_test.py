@@ -48,7 +48,7 @@ try:
     payloadlessAcc = Account("payloadless")
     payloadlessAcc.ownerPublicKey = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
     payloadlessAcc.activePublicKey = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
-    producerNode.createAccount(payloadlessAcc, cluster.eosioAccount)
+    producerNode.createAccount(payloadlessAcc, cluster.sysioAccount)
 
 
     contractDir="unittests/test-contracts/payloadless"

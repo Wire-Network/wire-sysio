@@ -1,9 +1,9 @@
 #include "snapshot.hpp"
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/fork_database.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/fork_database.hpp>
 
 #include <memory>
 
@@ -14,8 +14,8 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
+using namespace sysio;
+using namespace sysio::chain;
 
 
 void snapshot_actions::setup(CLI::App& app) {
@@ -79,7 +79,7 @@ int snapshot_actions::run_subcommand() {
    cfg.state_dir = state_dir;
    cfg.state_size = opt->db_size * 1024 * 1024;
    cfg.state_guard_size = opt->guard_size * 1024 * 1024;
-   cfg.eosvmoc_tierup = wasm_interface::vm_oc_enable::oc_none; // wasm not used, no use to fire up oc
+   cfg.sysvmoc_tierup = wasm_interface::vm_oc_enable::oc_none; // wasm not used, no use to fire up oc
    protocol_feature_set pfs = initialize_protocol_features( std::filesystem::path("protocol_features"), false );
 
    try {

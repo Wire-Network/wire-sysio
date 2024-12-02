@@ -48,5 +48,5 @@ This command has no options
 
 
 ```sh
-cleos push transaction {}
+clio push transaction {}
 ```

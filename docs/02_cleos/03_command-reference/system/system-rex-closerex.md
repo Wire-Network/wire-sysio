@@ -22,5 +22,5 @@ excerpt: "Delete unused REX-related user table entries"
 
 
 ```sh
-cleos system rex closerex accountname1
+clio system rex closerex accountname1
 ```

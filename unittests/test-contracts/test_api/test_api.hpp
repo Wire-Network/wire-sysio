@@ -1,12 +1,12 @@
 #pragma once
 
 #include <string>
-#include "../capi/eosio/types.h"
+#include "../capi/sysio/types.h"
 #include "test_api_common.hpp"
 
-namespace eosio { class transaction; }
+namespace sysio { class transaction; }
 
-// NOTE: including eosiolib/transaction.hpp here causes !"unresolvable": env._ZNKSt3__120__vector_base_commonILb1EE20__throw_length_errorEv
+// NOTE: including sysiolib/transaction.hpp here causes !"unresolvable": env._ZNKSt3__120__vector_base_commonILb1EE20__throw_length_errorEv
 //       errors in api_tests/memory_tests
 
 #define WASM_TEST_HANDLER(CLASS, METHOD) \
@@ -28,46 +28,46 @@ namespace eosio { class transaction; }
 }
 
 extern "C" {
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     void set_action_return_value(const char*, size_t);
 
-    __attribute__((eosio_wasm_import))
-    void  eosio_assert( uint32_t test, const char* msg );
+    __attribute__((sysio_wasm_import))
+    void  sysio_assert( uint32_t test, const char* msg );
 
-    __attribute__((eosio_wasm_import))
-    void  eosio_assert_code( uint32_t test, uint64_t code );
+    __attribute__((sysio_wasm_import))
+    void  sysio_assert_code( uint32_t test, uint64_t code );
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     uint64_t  current_time();
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     int get_action( uint32_t type, uint32_t index, char* buff, size_t size );
 
     //db.h
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     int32_t db_store_i64(uint64_t scope, capi_name table, capi_name payer, uint64_t id,  const void* data, uint32_t len);
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     int32_t db_find_i64(capi_name code, uint64_t scope, capi_name table, uint64_t id);
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     int32_t db_idx64_store(uint64_t scope, capi_name table, capi_name payer, uint64_t id, const uint64_t* secondary);
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     void db_remove_i64(int32_t iterator);
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     int32_t db_lowerbound_i64(capi_name code, uint64_t scope, capi_name table, uint64_t id);
 
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     void db_update_i64(int32_t iterator, capi_name payer, const void* data, uint32_t len);
 
     //privilege.h
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     bool is_privileged( capi_name account );
 
     // chain.h
-    __attribute__((eosio_wasm_import))
+    __attribute__((sysio_wasm_import))
     uint32_t get_active_producers( capi_name* producers, uint32_t datalen );
 }
 
@@ -212,7 +212,7 @@ struct test_transaction {
    static void send_transaction(uint64_t receiver, uint64_t code, uint64_t action);
    static void send_transaction_empty(uint64_t receiver, uint64_t code, uint64_t action);
    static void send_transaction_trigger_error_handler(uint64_t receiver, uint64_t code, uint64_t action);
-   static void assert_false_error_handler(const eosio::transaction&);
+   static void assert_false_error_handler(const sysio::transaction&);
    static void send_transaction_max();
    static void send_transaction_large(uint64_t receiver, uint64_t code, uint64_t action);
    static void send_action_sender(uint64_t receiver, uint64_t code, uint64_t action);

@@ -6,11 +6,11 @@ Acquire RAM for contract deployment, database tables, and other blockchain resou
 
 * You have an account
 
-* Ensure the reference system contracts from `eosio.contracts` repository is deployed and used to manage system resources
+* Ensure the reference system contracts from `sysio.contracts` repository is deployed and used to manage system resources
 
 * You have sufficient token allocated to your account
 
-* Install the currently supported version of `cleos`
+* Install the currently supported version of `clio`
 
 * Unlock your wallet
 
@@ -19,5 +19,5 @@ Acquire RAM for contract deployment, database tables, and other blockchain resou
 Buys RAM in value of 0.1 SYS tokens for account `alice`:
 
 ```sh
-cleos system buyram alice alice "0.1 SYS" -p alice@active
+clio system buyram alice alice "0.1 SYS" -p alice@active
 ```

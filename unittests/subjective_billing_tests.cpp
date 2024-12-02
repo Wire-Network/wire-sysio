@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 
-#include "eosio/chain/subjective_billing.hpp"
-#include <eosio/testing/tester.hpp>
+#include "sysio/chain/subjective_billing.hpp"
+#include <sysio/testing/tester.hpp>
 #include <fc/time.hpp>
 
 namespace {
 
-using namespace eosio;
-using namespace eosio::chain;
+using namespace sysio;
+using namespace sysio::chain;
 
 BOOST_AUTO_TEST_SUITE(subjective_billing_test)
 

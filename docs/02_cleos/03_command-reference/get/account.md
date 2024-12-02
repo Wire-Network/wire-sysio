@@ -10,10 +10,10 @@ Retrieves an account from the blockchain
 
 ## Examples
 
-### Get formatted data for user **eosio**
+### Get formatted data for user **sysio**
 
 ```sh
-cleos get account eosio
+clio get account sysio
 ```
 ```console
 privileged: true
@@ -35,14 +35,14 @@ cpu bandwidth: (averaged over 3 days)
 
 producers:     <not voted>
 ```
-### Get JSON data for user **eosio**
+### Get JSON data for user **sysio**
 
 ```sh
-cleos get account eosio --json
+clio get account sysio --json
 ```
 ```json
 {
-  "account_name": "eosio",
+  "account_name": "sysio",
   "privileged": true,
   "last_code_update": "2018-05-23T18:00:25.500",
   "created": "2018-03-02T12:00:00.000",
@@ -91,7 +91,7 @@ cleos get account eosio --json
   "total_resources": null,
   "delegated_bandwidth": null,
   "voter_info": {
-    "owner": "eosio",
+    "owner": "sysio",
     "proxy": "",
     "producers": [],
     "staked": 0,

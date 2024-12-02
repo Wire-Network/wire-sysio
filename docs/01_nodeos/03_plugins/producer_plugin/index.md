@@ -10,19 +10,19 @@ The `producer_plugin` loads functionality required for a node to produce blocks.
 
 ```console
 # config.ini
-plugin = eosio::producer_plugin [options]
+plugin = sysio::producer_plugin [options]
 ```
 ```sh
-# nodeos startup params
-nodeos ... -- plugin eosio::producer_plugin [options]
+# nodeop startup params
+nodeop ... -- plugin sysio::producer_plugin [options]
 ```
 
 ## Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::producer_plugin:
+Config Options for sysio::producer_plugin:
   -e [ --enable-stale-production ]      Enable block production, even if the
                                         chain is stale.
   -x [ --pause-on-startup ]             Start this node in a state where
@@ -126,11 +126,11 @@ Config Options for eosio::producer_plugin:
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin [operations] [options]
+plugin = sysio::chain_plugin [operations] [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [operations] [options]
+nodeop ... --plugin sysio::chain_plugin [operations] [options]
 ```
 
 For details about how blocks are produced please read the following [block producing explainer](10_block-producing-explained.md).

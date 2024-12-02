@@ -1,24 +1,24 @@
 #include <boost/test/unit_test.hpp>
-#include <eosio/chain/permission_object.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
-#include <eosio/chain/abi_serializer.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 #include <fc/variant_object.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
-#include <eosio/chain/contract_table_objects.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
+#include <sysio/chain/contract_table_objects.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
 #include <cstdlib>
 #include <fc/log/logger.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/exceptions.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::chain_apis;
-using namespace eosio::testing;
-using namespace eosio::chain_apis;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::chain_apis;
+using namespace sysio::testing;
+using namespace sysio::chain_apis;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -45,7 +45,7 @@ public:
     }
 
     void transfer( name from, name to, const asset& amount, name manager = config::system_account_name ) {
-      base_tester::push_action( "eosio.token"_n, "transfer"_n, manager, mutable_variant_object()
+      base_tester::push_action( "sysio.token"_n, "transfer"_n, manager, mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
                                 ("quantity", amount)
@@ -68,7 +68,7 @@ public:
     }
 
     asset get_balance( const account_name& act ) {
-      vector<char> data = get_row_by_account( "eosio.token"_n, act, "accounts"_n, name(symbol(CORE_SYMBOL).to_symbol_code().value) );
+      vector<char> data = get_row_by_account( "sysio.token"_n, act, "accounts"_n, name(symbol(CORE_SYMBOL).to_symbol_code().value) );
       return data.empty() ? asset(0, symbol(CORE_SYMBOL)) : token_abi_ser.binary_to_variant("account", data, abi_serializer::create_yield_function( abi_serializer_max_time ))["balance"].as<asset>();
     }
 
@@ -134,10 +134,10 @@ public:
       {
          FC_ASSERT( owner_auth.threshold <= std::numeric_limits<weight_type>::max(), "threshold is too high" );
          FC_ASSERT( active_auth.threshold <= std::numeric_limits<weight_type>::max(), "threshold is too high" );
-         owner_auth.accounts.push_back( permission_level_weight{ {a, config::eosio_code_name},
+         owner_auth.accounts.push_back( permission_level_weight{ {a, config::sysio_code_name},
                                                                  static_cast<weight_type>(owner_auth.threshold) } );
          sort_permissions(owner_auth);
-         active_auth.accounts.push_back( permission_level_weight{ {a, config::eosio_code_name},
+         active_auth.accounts.push_back( permission_level_weight{ {a, config::sysio_code_name},
                                                                   static_cast<weight_type>(active_auth.threshold) } );
          sort_permissions(active_auth);
       }
@@ -182,32 +182,32 @@ public:
     }
 
     void issue( name to, const asset& amount, name manager = config::system_account_name ) {
-        base_tester::push_action( "eosio.token"_n, "issue"_n, manager, mutable_variant_object()
+        base_tester::push_action( "sysio.token"_n, "issue"_n, manager, mutable_variant_object()
                 ("to",      to )
                 ("quantity", amount )
                 ("memo", "")
         );
     }
     void setup_system_accounts(){
-       create_accounts({ "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n,
-                         "eosio.bpay"_n, "eosio.vpay"_n, "eosio.saving"_n, "eosio.names"_n, "eosio.rex"_n });
+       create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+                         "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n, "sysio.rex"_n });
 
-       set_code( "eosio.token"_n, test_contracts::eosio_token_wasm() );
-       set_abi( "eosio.token"_n, test_contracts::eosio_token_abi() );
+       set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+       set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
 
        {
-           const auto& accnt = control->db().get<account_object,by_name>( "eosio.token"_n );
+           const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
            abi_def abi;
            BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
            token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
        }
 
-       create_currency( "eosio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
+       create_currency( "sysio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
        issue(config::system_account_name,      core_from_string("1000000000.0000"));
-       BOOST_CHECK_EQUAL( core_from_string("1000000000.0000"), get_balance( name("eosio") ) );
+       BOOST_CHECK_EQUAL( core_from_string("1000000000.0000"), get_balance( name("sysio") ) );
 
-       set_code( config::system_account_name, test_contracts::eosio_system_wasm() );
-       set_abi( config::system_account_name, test_contracts::eosio_system_abi() );
+       set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+       set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
 
        base_tester::push_action(config::system_account_name, "init"_n,
                                 config::system_account_name,  mutable_variant_object()
@@ -299,7 +299,7 @@ public:
 
     vector<name> active_and_vote_producers() {
         //stake more than 15% of total EOS supply to activate chain
-        transfer( name("eosio"), name("alice1111111"), core_from_string("650000000.0000"), name("eosio") );
+        transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
         BOOST_CHECK_EQUAL( success(), stake( name("alice1111111"), name("alice1111111"), core_from_string("300000000.0000"), core_from_string("300000000.0000") ) );
 
         // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
@@ -323,7 +323,7 @@ public:
                 ("permission", name(config::active_name).to_string())
                 ("parent", name(config::owner_name).to_string())
                 ("auth",  authority(1, {key_weight{get_public_key( config::system_account_name, "active" ), 1}}, {
-                                            permission_level_weight{{config::system_account_name, config::eosio_code_name}, 1},
+                                            permission_level_weight{{config::system_account_name, config::sysio_code_name}, 1},
                                             permission_level_weight{{config::producers_account_name,  config::active_name}, 1}
                                     }
                 ))
@@ -371,7 +371,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     produce_blocks();
     create_account_with_resources("alice1111111"_n, config::system_account_name);
     //stake more than 15% of total EOS supply to activate chain
-    transfer( name("eosio"), name("alice1111111"), core_from_string("650000000.0000"), name("eosio") );
+    transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
 
     read_only::get_account_results results = get_account_info(name("alice1111111"));
     BOOST_CHECK(results.total_resources.get_type() != fc::variant::type_id::null_type);
@@ -397,7 +397,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_self_delegated_bandwidth_test, chain_plu
     BOOST_CHECK_EQUAL(core_from_string("12.0000"), results.total_resources["cpu_weight"].as<asset>());
 
     //self delegate bandwidth
-    transfer( name("eosio"), name("alice1111111"), core_from_string("650000000.0000"), name("eosio") );
+    transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
     BOOST_CHECK_EQUAL(success(), stake(name("alice1111111"), name("alice1111111"), nstake, cstake));
 
     results = get_account_info(name("alice1111111"));
@@ -490,7 +490,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_rex_info_test, chain_plugin_tester) { tr
     create_account_with_resources("alice1111111"_n, config::system_account_name, core_from_string("1.0000"), false);
 
     //stake more than 15% of total EOS supply to activate chain
-    transfer( name("eosio"), name("alice1111111"), core_from_string("650000000.0000"), name("eosio") );
+    transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
     deposit(name("alice1111111"), core_from_string("1000.0000"));
     BOOST_CHECK_EQUAL( success(), buyrex(name("alice1111111"), core_from_string("100.0000")) );
 

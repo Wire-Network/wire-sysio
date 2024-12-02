@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "eosio_test_generator.hpp"
+#include "sysio_test_generator.hpp"
 
 using namespace std;
 
@@ -18,7 +18,7 @@ const set<string> blacklist_memory_clearing = { "address.0",      "address.2",  
 
 const set<string> whitelist_force_check_throw = { "memory.6", "memory.7" };
 
-const string include_eosio = "#include <eosio/eosio.hpp>\n\n";
+const string include_sysio = "#include <sysio/sysio.hpp>\n\n";
 const string extern_c      = "extern \"C\" {\n";
 const string apply_func    = "   void apply(uint64_t, uint64_t, uint64_t test_to_run) {\n";
 const string mem_clear     = "      volatile uint64_t* r = (uint64_t*)0;\n      *r = 0;\n";
@@ -36,7 +36,7 @@ void write_file(ofstream& file, string test_name, string funcs, string sub_appli
    stringstream out;
    string       end_brace = "}";
 
-   out << include_eosio;
+   out << include_sysio;
    out << extern_c;
    out << funcs;
    out << sub_applies;
@@ -246,7 +246,7 @@ string write_test_function_call(string function_name, picojson::object test, int
    if (return_val != "" && return_val != "null") {
       out << "   "
           << "   "
-          << "eosio::check(";
+          << "sysio::check(";
       if (needs_local_return) {
          out << return_cast << "x" << var_index;
       } else {
@@ -311,7 +311,7 @@ int main(int argc, char** argv) {
    ifstream     ifs;
    stringstream ss;
    if (argc != 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
-      usage(argc ? argv[0] : "eosio_test_generator");
+      usage(argc ? argv[0] : "sysio_test_generator");
    }
    ifs.open(argv[1]);
    if (!ifs) {

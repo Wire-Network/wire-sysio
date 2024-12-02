@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/chain_plugin/trx_finality_status_processing.hpp>
+#include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 
-#include <eosio/testing/tester.hpp>
+#include <sysio/testing/tester.hpp>
 
-#include <eosio/chain/block_header.hpp>
-#include <eosio/chain/genesis_state.hpp>
-#include <eosio/chain/name.hpp>
-#include <eosio/chain/trace.hpp>
+#include <sysio/chain/block_header.hpp>
+#include <sysio/chain/genesis_state.hpp>
+#include <sysio/chain/name.hpp>
+#include <sysio/chain/trace.hpp>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <fc/mock_time.hpp>
@@ -16,10 +16,10 @@
 #include <deque>
 #include <memory>
 
-namespace eosio::test::detail {
+namespace sysio::test::detail {
 
-using namespace eosio::chain;
-using namespace eosio::chain::literals;
+using namespace sysio::chain;
+using namespace sysio::chain::literals;
 
 struct testit {
    uint64_t      id;
@@ -34,15 +34,15 @@ struct testit {
    }
 };
 
-} // eosio::test::detail
-FC_REFLECT( eosio::test::detail::testit, (id) )
+} // sysio::test::detail
+FC_REFLECT( sysio::test::detail::testit, (id) )
 
 namespace {
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::chain_apis;
-using namespace eosio::test::detail;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::chain_apis;
+using namespace sysio::test::detail;
 
 auto get_private_key( chain::name keyname, std::string role = "owner" ) {
    auto secret = fc::sha256::hash( keyname.to_string() + role );
@@ -78,8 +78,8 @@ chain::block_id_type make_block_id( uint32_t block_num ) {
    return block_id;
 }
 
-chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number, const eosio::chain::block_state_ptr& bs_ptr,
-                                                     chain::transaction_receipt_header::status_enum status = eosio::chain::transaction_receipt_header::executed ) {
+chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number, const sysio::chain::block_state_ptr& bs_ptr,
+                                                     chain::transaction_receipt_header::status_enum status = sysio::chain::transaction_receipt_header::executed ) {
    return std::make_shared<chain::transaction_trace>(chain::transaction_trace{
          trx->id(),
          block_number,
@@ -169,10 +169,10 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    fc::microseconds max_failure_duration = fc::seconds(45);
    trx_finality_status_processing status(10'000, max_success_duration, max_failure_duration);
 
-   using trx_deque = eosio::chain::deque< std::tuple< chain::transaction_trace_ptr, packed_transaction_ptr > >;
+   using trx_deque = sysio::chain::deque< std::tuple< chain::transaction_trace_ptr, packed_transaction_ptr > >;
 
    uint32_t bn = 20;
-   auto add = [&bn, &status](trx_deque& trx_pairs, const eosio::chain::block_state_ptr& bs_ptr) {
+   auto add = [&bn, &status](trx_deque& trx_pairs, const sysio::chain::block_state_ptr& bs_ptr) {
       auto trx = make_unique_trx(fc::seconds(2));
       auto trace = make_transaction_trace( trx, bn, bs_ptr);
       trx_pairs.push_back(std::tuple(trace, trx));
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    // Create speculative block to begin applying transactions locally
    status.signal_block_start(bn);
-   const eosio::chain::block_state_ptr no_bs;
+   const sysio::chain::block_state_ptr no_bs;
 
    add(trx_pairs_20, no_bs);
    add(trx_pairs_20, no_bs);
@@ -191,39 +191,39 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    add(trx_pairs_20, no_bs);
 
    auto cs = status.get_chain_state();
-   BOOST_CHECK(cs.head_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.head_id == sysio::chain::block_id_type{});
    BOOST_TEST(!std::get<0>(trx_pairs_20[0])->producer_block_id.has_value());
-   BOOST_CHECK(cs.head_block_timestamp == eosio::chain::block_timestamp_type{});
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(cs.earliest_tracked_block_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.head_block_timestamp == sysio::chain::block_timestamp_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(cs.earliest_tracked_block_id == sysio::chain::block_id_type{});
 
-   using op_ts = std::optional<eosio::chain_apis::trx_finality_status_processing::trx_state>;
+   using op_ts = std::optional<sysio::chain_apis::trx_finality_status_processing::trx_state>;
 
    op_ts ts = status.get_trx_state(std::get<1>(trx_pairs_20[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(trx_pairs_20[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(trx_pairs_20[2])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(trx_pairs_20[3])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -264,7 +264,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_20[2])->producer_block_id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_20[3])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_20->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_20->id);
 
    ts = status.get_trx_state(std::get<1>(trx_pairs_20[0])->id());
@@ -298,15 +298,15 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == bs_21->id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_21[0])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_21->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_20->id);
 
    ts = status.get_trx_state(std::get<1>(trx_pairs_20[0])->id());
@@ -360,15 +360,15 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -396,7 +396,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == bs_22->id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_22[0])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_22->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_20->id);
 
 
@@ -430,15 +430,15 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -474,7 +474,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == bs_22_alt->id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_22_alt[0])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_22_alt->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_20->id);
 
 
@@ -508,15 +508,15 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "FAILED");
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "FAILED");
 
@@ -559,7 +559,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == bs_19->id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_19[0])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_19->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_19->id);
 
 
@@ -593,15 +593,15 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[0])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "FAILED");
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "FAILED");
 
@@ -667,7 +667,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK(cs.head_id == bs_19_alt->id);
    BOOST_CHECK(cs.head_id == *std::get<0>(trx_pairs_19[0])->producer_block_id);
    BOOST_CHECK(cs.head_block_timestamp == bs_19_alt->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == bs_19_alt->id);
 
 
@@ -708,8 +708,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -796,8 +796,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    ts = status.get_trx_state(std::get<1>(hold_pairs[1])->id());
    BOOST_REQUIRE(ts);
-   BOOST_CHECK(ts->block_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(ts->block_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(block_timestamp_type(ts->block_timestamp) == sysio::chain::block_timestamp_type{});
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), pre_block_20_time);
    BOOST_CHECK_EQUAL(ts->status, "LOCALLY_APPLIED");
 
@@ -833,8 +833,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 } FC_LOG_AND_RETHROW() }
 
 namespace {
-   using trx_deque = eosio::chain::deque< std::tuple< chain::transaction_trace_ptr, packed_transaction_ptr > >;
-   const eosio::chain::block_state_ptr no_bs;
+   using trx_deque = sysio::chain::deque< std::tuple< chain::transaction_trace_ptr, packed_transaction_ptr > >;
+   const sysio::chain::block_state_ptr no_bs;
 
    struct block_frame {
       static uint32_t last_used_block_num;
@@ -918,7 +918,7 @@ namespace {
          if (end == std::numeric_limits<uint32_t>::max()) {
             end = block.size();
          }
-         const auto id = bs ? bs->id : eosio::chain::transaction_id_type{};
+         const auto id = bs ? bs->id : sysio::chain::transaction_id_type{};
          for (auto i = begin; i < end; ++i) {
             const auto& trx_pair = trx_pairs[i];
             std::string msg = context + ": block_num==" + std::to_string(bn) + ", i==" + std::to_string(i) + ", id: " + std::string(std::get<1>(trx_pair)->id());
@@ -950,8 +950,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_storage_reduction) { try {
    const uint64_t max_storage = 10'000;
    trx_finality_status_processing status(max_storage, max_success_duration, max_failure_duration);
 
-   // auto verify_trx = [&status](trx_deque& trx_pairs, const eosio::chain::block_state_ptr& bs) {
-   //    const auto id = bs ? bs->id : eosio::chain::transaction_id_type{};
+   // auto verify_trx = [&status](trx_deque& trx_pairs, const sysio::chain::block_state_ptr& bs) {
+   //    const auto id = bs ? bs->id : sysio::chain::transaction_id_type{};
    //    for (const auto& trx_pair : trx_pairs) {
    //       auto ts = status.get_trx_state(std::get<1>(trx_pair)->id());
    //       BOOST_REQUIRE(ts);
@@ -1055,7 +1055,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_storage_reduction) { try {
 
    auto cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == b_11.bs->id);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == b_01.bs->id);
 
    // Test expects the next block range to exceed max_storage. Need to adjust
@@ -1073,8 +1073,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_storage_reduction) { try {
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == b_12.bs->id);
    BOOST_CHECK(cs.head_block_timestamp == b_12.bs->block->timestamp);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
-   BOOST_CHECK(cs.irr_block_timestamp == eosio::chain::block_timestamp_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_block_timestamp == sysio::chain::block_timestamp_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == b_03.bs->id);
 
 
@@ -1124,8 +1124,8 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_lifespan) { try {
    const uint64_t max_storage = 10'000;
    trx_finality_status_processing status(max_storage, max_success_duration, max_failure_duration);
 
-   // auto verify_trx = [&status](trx_deque& trx_pairs, const eosio::chain::block_state_ptr& bs) {
-   //    const auto id = bs ? bs->id : eosio::chain::transaction_id_type{};
+   // auto verify_trx = [&status](trx_deque& trx_pairs, const sysio::chain::block_state_ptr& bs) {
+   //    const auto id = bs ? bs->id : sysio::chain::transaction_id_type{};
    //    for (const auto& trx_pair : trx_pairs) {
    //       auto ts = status.get_trx_state(std::get<1>(trx_pair)->id());
    //       BOOST_REQUIRE(ts);
@@ -1192,7 +1192,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_lifespan) { try {
 
    auto cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == b_06.bs->id);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == b_02.bs->id);
 
 
@@ -1211,7 +1211,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_lifespan) { try {
 
    cs = status.get_chain_state();
    BOOST_CHECK(cs.head_id == b_07.bs->id);
-   BOOST_CHECK(cs.irr_id == eosio::chain::block_id_type{});
+   BOOST_CHECK(cs.irr_id == sysio::chain::block_id_type{});
    BOOST_CHECK(cs.earliest_tracked_block_id == b_03.bs->id);
 
 

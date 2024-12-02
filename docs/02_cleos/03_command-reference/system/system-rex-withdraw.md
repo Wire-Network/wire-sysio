@@ -19,5 +19,5 @@
 
 
 ```sh
-cleos system rex withdraw accountname1 "1 SYS"
+clio system rex withdraw accountname1 "1 SYS"
 ```

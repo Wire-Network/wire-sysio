@@ -1,5 +1,5 @@
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <fc/variant_object.hpp>
 
@@ -8,9 +8,9 @@
 #include <contracts.hpp>
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -58,8 +58,8 @@ std::vector<genesis_account> test_genesis( {
 class bootseq_tester : public validating_tester {
 public:
    void deploy_contract( bool call_init = true ) {
-      set_code( config::system_account_name, test_contracts::eosio_system_wasm() );
-      set_abi( config::system_account_name, test_contracts::eosio_system_abi() );
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
       if( call_init ) {
          base_tester::push_action(config::system_account_name, "init"_n,
                                   config::system_account_name,  mutable_variant_object()
@@ -76,7 +76,7 @@ public:
    fc::variant get_global_state() {
       vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
       if (data.empty()) std::cout << "\nData is empty\n" << std::endl;
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "eosio_global_state", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
    }
 
     auto buyram( name payer, name receiver, asset ram ) {
@@ -155,7 +155,7 @@ public:
     }
 
     asset get_balance( const account_name& act ) {
-         return get_currency_balance("eosio.token"_n, symbol(CORE_SYMBOL), act);
+         return get_currency_balance("sysio.token"_n, symbol(CORE_SYMBOL), act);
     }
 
     void set_code_abi(const account_name& account, const vector<uint8_t>& wasm, const std::string& abi, const private_key_type* signer = nullptr) {
@@ -180,39 +180,39 @@ BOOST_AUTO_TEST_SUITE(bootseq_tests)
 BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
 
-        // Create eosio.msig and eosio.token
-        create_accounts({"eosio.msig"_n, "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n, "eosio.vpay"_n, "eosio.bpay"_n, "eosio.saving"_n, "eosio.rex"_n });
+        // Create sysio.msig and sysio.token
+        create_accounts({"sysio.msig"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
         // Set code for the following accounts:
-        //  - eosio (code: eosio.bios) (already set by tester constructor)
-        //  - eosio.msig (code: eosio.msig)
-        //  - eosio.token (code: eosio.token)
-        // set_code_abi("eosio.msig"_n, contracts::eosio_msig_wasm(), contracts::eosio_msig_abi());//, &eosio_active_pk);
-        // set_code_abi("eosio.token"_n, contracts::eosio_token_wasm(), contracts::eosio_token_abi()); //, &eosio_active_pk);
+        //  - sysio (code: sysio.bios) (already set by tester constructor)
+        //  - sysio.msig (code: sysio.msig)
+        //  - sysio.token (code: sysio.token)
+        // set_code_abi("sysio.msig"_n, contracts::sysio_msig_wasm(), contracts::sysio_msig_abi());//, &sysio_active_pk);
+        // set_code_abi("sysio.token"_n, contracts::sysio_token_wasm(), contracts::sysio_token_abi()); //, &sysio_active_pk);
 
-        set_code_abi("eosio.msig"_n,
-                     test_contracts::eosio_msig_wasm(),
-                     test_contracts::eosio_msig_abi());//, &eosio_active_pk);
-        set_code_abi("eosio.token"_n,
-                     test_contracts::eosio_token_wasm(),
-                     test_contracts::eosio_token_abi()); //, &eosio_active_pk);
+        set_code_abi("sysio.msig"_n,
+                     test_contracts::sysio_msig_wasm(),
+                     test_contracts::sysio_msig_abi());//, &sysio_active_pk);
+        set_code_abi("sysio.token"_n,
+                     test_contracts::sysio_token_wasm(),
+                     test_contracts::sysio_token_abi()); //, &sysio_active_pk);
 
-        // Set privileged for eosio.msig and eosio.token
-        set_privileged("eosio.msig"_n);
-        set_privileged("eosio.token"_n);
+        // Set privileged for sysio.msig and sysio.token
+        set_privileged("sysio.msig"_n);
+        set_privileged("sysio.token"_n);
 
-        // Verify eosio.msig and eosio.token is privileged
-        const auto& eosio_msig_acc = get<account_metadata_object, by_name>("eosio.msig"_n);
-        BOOST_TEST(eosio_msig_acc.is_privileged() == true);
-        const auto& eosio_token_acc = get<account_metadata_object, by_name>("eosio.token"_n);
-        BOOST_TEST(eosio_token_acc.is_privileged() == true);
+        // Verify sysio.msig and sysio.token is privileged
+        const auto& sysio_msig_acc = get<account_metadata_object, by_name>("sysio.msig"_n);
+        BOOST_TEST(sysio_msig_acc.is_privileged() == true);
+        const auto& sysio_token_acc = get<account_metadata_object, by_name>("sysio.token"_n);
+        BOOST_TEST(sysio_token_acc.is_privileged() == true);
 
 
-        // Create SYS tokens in eosio.token, set its manager as eosio
+        // Create SYS tokens in sysio.token, set its manager as sysio
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens
         auto initial_supply = core_from_string("1000000000.0000"); /// 1x larger than 1B initial tokens
-        create_currency("eosio.token"_n, config::system_account_name, max_supply);
-        // Issue the genesis supply of 1 billion SYS tokens to eosio.system
-        issue("eosio.token"_n, config::system_account_name, config::system_account_name, initial_supply);
+        create_currency("sysio.token"_n, config::system_account_name, max_supply);
+        // Issue the genesis supply of 1 billion SYS tokens to sysio.system
+        issue("sysio.token"_n, config::system_account_name, config::system_account_name, initial_supply);
 
         auto actual = get_balance(config::system_account_name);
         BOOST_REQUIRE_EQUAL(initial_supply, actual);
@@ -234,7 +234,7 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
            auto r = buyram(config::system_account_name, a.aname, asset(ram));
            BOOST_REQUIRE( !r->except_ptr );
 
-           r = delegate_bandwidth("eosio.stake"_n, a.aname, asset(net), asset(cpu));
+           r = delegate_bandwidth("sysio.stake"_n, a.aname, asset(net), asset(cpu));
            BOOST_REQUIRE( !r->except_ptr );
         }
 
@@ -274,12 +274,12 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         produce_blocks_for_n_rounds(2); // 2 rounds since new producer schedule is set when the first block of next round is irreversible
         auto active_schedule = control->head_block_state()->active_schedule;
         BOOST_TEST(active_schedule.producers.size() == 1u);
-        BOOST_TEST(active_schedule.producers.front().producer_name == name("eosio"));
+        BOOST_TEST(active_schedule.producers.front().producer_name == name("sysio"));
 
         // Spend some time so the producer pay pool is filled by the inflation rate
         produce_min_num_of_blocks_to_spend_time_wo_inactive_prod(fc::seconds(30 * 24 * 3600)); // 30 days
         // Since the total activated stake is less than 150,000,000, it shouldn't be possible to claim rewards
-        BOOST_REQUIRE_THROW(claim_rewards("runnerup1"_n), eosio_assert_message_exception);
+        BOOST_REQUIRE_THROW(claim_rewards("runnerup1"_n), sysio_assert_message_exception);
 
         // This will increase the total vote stake by (40,000,000 - 1,000)
         votepro( "whale4"_n, {"prodq"_n, "prodr"_n, "prods"_n, "prodt"_n, "produ"_n} );
@@ -323,7 +323,7 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
 
         // This should thrown an error, since block one can only unstake all his stake after 10 years
 
-        BOOST_REQUIRE_THROW(undelegate_bandwidth("b1"_n, "b1"_n, core_from_string("49999500.0000"), core_from_string("49999500.0000")), eosio_assert_message_exception);
+        BOOST_REQUIRE_THROW(undelegate_bandwidth("b1"_n, "b1"_n, core_from_string("49999500.0000"), core_from_string("49999500.0000")), sysio_assert_message_exception);
 
         // Skip 10 years
         produce_block(first_june_2028 - control->head_block_time().time_since_epoch());

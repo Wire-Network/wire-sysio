@@ -9,10 +9,10 @@ The `wallet_plugin` adds access to wallet functionality from a node.
 
 ```sh
 # config.ini
-plugin = eosio::wallet_plugin
+plugin = sysio::wallet_plugin
 
 # command-line
-nodeos ... --plugin eosio::wallet_plugin
+nodeop ... --plugin sysio::wallet_plugin
 ```
 
 ## Options
@@ -30,12 +30,12 @@ None
 
 ```sh
 # config.ini
-plugin = eosio::wallet_plugin
+plugin = sysio::wallet_plugin
 [options]
-plugin = eosio::http_plugin
+plugin = sysio::http_plugin
 [options]
 
 # command-line
-nodeos ... --plugin eosio::wallet_plugin [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::wallet_plugin [options]  \
+           --plugin sysio::http_plugin [options]
 ```

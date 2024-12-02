@@ -1,13 +1,13 @@
 #pragma once
 
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
-#include <eosio/chain/application.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/trace.hpp>
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/transaction.hpp>
-#include <eosio/chain/controller.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain/application.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/trace.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/transaction.hpp>
+#include <sysio/chain/controller.hpp>
 
 #include <fc/exception/exception.hpp>
 
@@ -17,10 +17,10 @@
 #include <stdexcept>
 #include <thread>
 
-namespace eosio::test_utils {
+namespace sysio::test_utils {
 
-using namespace eosio::chain;
-using namespace eosio::chain::literals;
+using namespace sysio::chain;
+using namespace sysio::chain::literals;
 
 struct testit {
    uint64_t id;
@@ -35,7 +35,7 @@ struct testit {
 };
 
 // Corresponds to the reqactivated action of the bios contract.
-// See libraries/testing/contracts/eosio.bios/eosio.bios.hpp
+// See libraries/testing/contracts/sysio.bios/sysio.bios.hpp
 struct reqactivated {
    chain::digest_type feature_digest;
 
@@ -51,7 +51,7 @@ struct reqactivated {
 };
 
 // Create a read-only trx that works with bios reqactivated action
-auto make_bios_ro_trx(eosio::chain::controller& control) {
+auto make_bios_ro_trx(sysio::chain::controller& control) {
    const auto& pfm = control.get_protocol_feature_manager();
    static auto feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::replace_deferred);
 
@@ -63,8 +63,8 @@ auto make_bios_ro_trx(eosio::chain::controller& control) {
 }
 
 // Push an input transaction to controller and return trx trace
-// If account is eosio then signs with the default private key
-auto push_input_trx(appbase::scoped_app& app, eosio::chain::controller& control, account_name account, signed_transaction& trx) {
+// If account is sysio then signs with the default private key
+auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, signed_transaction& trx) {
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds(30)};
    trx.set_reference_block( control.head_block_id() );
    if (account == config::system_account_name) {
@@ -109,7 +109,7 @@ auto push_input_trx(appbase::scoped_app& app, eosio::chain::controller& control,
 }
 
 // Push setcode trx to controller and return trx trace
-auto set_code(appbase::scoped_app& app, eosio::chain::controller& control, account_name account, const vector<uint8_t>& wasm) {
+auto set_code(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, const vector<uint8_t>& wasm) {
    signed_transaction trx;
    trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
                             chain::setcode{
@@ -166,12 +166,12 @@ void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chai
    // Wait for next block
    std::this_thread::sleep_for( std::chrono::milliseconds(config::block_interval_ms) );
 
-   auto r = set_code(app, chain_plug->chain(), config::system_account_name, testing::contracts::eosio_bios_wasm());
+   auto r = set_code(app, chain_plug->chain(), config::system_account_name, testing::contracts::sysio_bios_wasm());
    BOOST_CHECK(r->receipt && r->receipt->status == transaction_receipt_header::executed);
 }
 
 
-} // namespace eosio::test_utils
+} // namespace sysio::test_utils
 
-FC_REFLECT( eosio::test_utils::testit, (id) )
-FC_REFLECT( eosio::test_utils::reqactivated, (feature_digest) )
+FC_REFLECT( sysio::test_utils::testit, (id) )
+FC_REFLECT( sysio::test_utils::reqactivated, (feature_digest) )

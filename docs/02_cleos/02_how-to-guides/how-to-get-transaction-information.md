@@ -7,15 +7,15 @@ The example in this how-to retrieves transaction information associated with the
 ## Before you begin
 
 Make sure you meet the following requirements:
-* Install the currently supported version of `cleos`.
+* Install the currently supported version of `clio`.
 [[info | Note]]
-| `cleos` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `cleos`.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `clio`.
 * Understand how transactions work in an Antelope blockchain. For more information on transactions, see the [Transactions Protocol](/protocol-guides/02_transactions_protocol.md) section.
 
 ## Command Reference
 
-See the following reference guide for `cleos` command line usage and related options:
-* [`cleos get transaction`](../03_command-reference/get/transaction.md) command and its parameters
+See the following reference guide for `clio` command line usage and related options:
+* [`clio get transaction`](../03_command-reference/get/transaction.md) command and its parameters
 
 ## Procedure
 
@@ -23,13 +23,13 @@ The following step shows how to retrieve transaction information associated with
 
 1. Retrieve transaction information by transaction ID:
 ```sh
-cleos get transaction 870a6b6e3882061ff0f64016e1eedfdd9439e2499bf978c3fb29fcedadada9b1
+clio get transaction 870a6b6e3882061ff0f64016e1eedfdd9439e2499bf978c3fb29fcedadada9b1
 ```
 * Where `870a6b6e38...dada9b1`= The transaction ID associated with the creation of account **bob**.
 
 **Example Output**
 
-The `cleos` command returns detailed information of the transaction:
+The `clio` command returns detailed information of the transaction:
 
 ```json
 {
@@ -59,15 +59,15 @@ The `cleos` command returns detailed information of the transaction:
       "delay_sec": 0,
       "context_free_actions": [],
       "actions": [{
-          "account": "eosio",
+          "account": "sysio",
           "name": "newaccount",
           "authorization": [{
-              "actor": "eosio",
+              "actor": "sysio",
               "permission": "active"
             }
           ],
           "data": {
-            "creator": "eosio",
+            "creator": "sysio",
             "name": "bob",
             "owner": {
               "threshold": 1,
@@ -108,29 +108,29 @@ The `cleos` command returns detailed information of the transaction:
       "creator_action_ordinal": 0,
       "closest_unnotified_ancestor_action_ordinal": 0,
       "receipt": {
-        "receiver": "eosio",
+        "receiver": "sysio",
         "act_digest": "2640ce4d4a789393dec3b7938cea2f78c5669498d0d22adeab9204c489c2cfd6",
         "global_sequence": 256,
         "recv_sequence": 256,
         "auth_sequence": [[
-            "eosio",
+            "sysio",
             256
           ]
         ],
         "code_sequence": 0,
         "abi_sequence": 0
       },
-      "receiver": "eosio",
+      "receiver": "sysio",
       "act": {
-        "account": "eosio",
+        "account": "sysio",
         "name": "newaccount",
         "authorization": [{
-            "actor": "eosio",
+            "actor": "sysio",
             "permission": "active"
           }
         ],
         "data": {
-          "creator": "eosio",
+          "creator": "sysio",
           "name": "bob",
           "owner": {
             "threshold": 1,
@@ -175,7 +175,7 @@ The `cleos` command returns detailed information of the transaction:
 ```
 
 [[info]]
-| Be aware that you need to connect to a `nodeos` instance that enables both the [history plugin](../../01_nodeos/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeos/03_plugins/history_api_plugin/index.md) to query transaction information.
+| Be aware that you need to connect to a `nodeop` instance that enables both the [history plugin](../../01_nodeop/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeop/03_plugins/history_api_plugin/index.md) to query transaction information.
 
 ## Summary
 
@@ -183,16 +183,16 @@ By following these instructions, you are able to retrieve transaction informatio
 
 ## Trobleshooting
 
-If the [history plugin](../../01_nodeos/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeos/03_plugins/history_api_plugin/index.md) are not enabled in the `nodeos` **config.ini file**, the `cleos get transaction id` command will result in an error as shown below:
+If the [history plugin](../../01_nodeop/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeop/03_plugins/history_api_plugin/index.md) are not enabled in the `nodeop` **config.ini file**, the `clio get transaction id` command will result in an error as shown below:
 
 ```sh
-cleos get transaction 509eee3aa8988d533a336fec7a4c8b067ae3205cd97e2d27b3e9a2da61ef460c
+clio get transaction 509eee3aa8988d533a336fec7a4c8b067ae3205cd97e2d27b3e9a2da61ef460c
 ```
 ```console
 Error 3110003: Missing History API Plugin
-Ensure that you have eosio::history_api_plugin added to your node's configuration!
+Ensure that you have sysio::history_api_plugin added to your node's configuration!
 Error Details:
 History API plugin is not enabled
 ```
 
-To troubleshoot this error, enable the [history plugin](../../01_nodeos/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeos/03_plugins/history_api_plugin/index.md), then run the command again.
+To troubleshoot this error, enable the [history plugin](../../01_nodeop/03_plugins/history_plugin/index.md) and [history API plugin](../../01_nodeop/03_plugins/history_api_plugin/index.md), then run the command again.

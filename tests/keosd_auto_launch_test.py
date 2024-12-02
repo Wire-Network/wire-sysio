@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-# This script tests that cleos launches keosd automatically when keosd is not
+# This script tests that clio launches keosd automatically when keosd is not
 # running yet.
 
 import subprocess
 
 
-def run_cleos_wallet_command(command: str, no_auto_keosd: bool):
-    """Run the given cleos command and return subprocess.CompletedProcess."""
-    args = ['./programs/cleos/cleos']
+def run_clio_wallet_command(command: str, no_auto_keosd: bool):
+    """Run the given clio command and return subprocess.CompletedProcess."""
+    args = ['./programs/clio/clio']
 
     if no_auto_keosd:
         args.append('--no-auto-keosd')
@@ -23,10 +23,10 @@ def run_cleos_wallet_command(command: str, no_auto_keosd: bool):
 
 def stop_keosd():
     """Stop the default keosd instance."""
-    run_cleos_wallet_command('stop', no_auto_keosd=True)
+    run_clio_wallet_command('stop', no_auto_keosd=True)
 
 
-def check_cleos_stderr(stderr: bytes, expected_match: bytes):
+def check_clio_stderr(stderr: bytes, expected_match: bytes):
     if expected_match not in stderr:
         raise RuntimeError("'{}' not found in {}'".format(
             expected_match.decode(), stderr.decode()))
@@ -37,18 +37,18 @@ def keosd_auto_launch_test():
     stop_keosd()
 
     # Make sure that when '--no-auto-keosd' is given, keosd is not started by
-    # cleos.
-    completed_process = run_cleos_wallet_command('list', no_auto_keosd=True)
+    # clio.
+    completed_process = run_clio_wallet_command('list', no_auto_keosd=True)
     assert completed_process.returncode != 0
-    check_cleos_stderr(completed_process.stderr, b'Failed http request to keosd')
+    check_clio_stderr(completed_process.stderr, b'Failed http request to keosd')
 
     # Verify that keosd auto-launching works.
-    completed_process = run_cleos_wallet_command('list', no_auto_keosd=False)
+    completed_process = run_clio_wallet_command('list', no_auto_keosd=False)
     if completed_process.returncode != 0:
         raise RuntimeError("Expected that keosd would be started, "
                            "but got an error instead: {}".format(
                                completed_process.stderr.decode()))
-    check_cleos_stderr(completed_process.stderr, b'launched')
+    check_clio_stderr(completed_process.stderr, b'launched')
 
 
 try:

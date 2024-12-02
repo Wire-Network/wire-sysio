@@ -4,12 +4,12 @@ Sets or updates an action's state on the blockchain.
 **Command**
 
 ```sh
-cleos set action
+clio set action
 ```
 **Output**
 
 ```console
-Usage: cleos set action [OPTIONS] SUBCOMMAND
+Usage: clio set action [OPTIONS] SUBCOMMAND
 
 Options:
   -h,--help                   Print this help message and exit
@@ -20,7 +20,7 @@ Subcommands:
 **Command**
 
 ```sh
-cleos set action permission
+clio set action permission
 ```
 
 ## Positionals
@@ -63,10 +63,10 @@ should be used to sign transaction
 
 ```sh
 #Link a `voteproducer` action to the 'voting' permissions
-cleos set action permission sandwichfarm eosio.system voteproducer voting -p sandwichfarm@voting
+clio set action permission sandwichfarm sysio.system voteproducer voting -p sandwichfarm@voting
 
 #Now can execute the transaction with the previously set permissions.
-cleos system voteproducer approve sandwichfarm someproducer -p sandwichfarm@voting
+clio system voteproducer approve sandwichfarm someproducer -p sandwichfarm@voting
 ```
 
 ## See Also

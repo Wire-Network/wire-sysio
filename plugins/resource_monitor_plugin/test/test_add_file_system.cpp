@@ -1,9 +1,9 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/resource_monitor_plugin/file_space_handler.hpp>
+#include <sysio/resource_monitor_plugin/file_space_handler.hpp>
 
-using namespace eosio;
-using namespace eosio::resource_monitor;
+using namespace sysio;
+using namespace sysio::resource_monitor;
 using namespace boost::system;
 
 struct add_file_system_fixture {

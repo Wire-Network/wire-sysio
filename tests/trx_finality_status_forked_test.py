@@ -37,10 +37,10 @@ walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
 WalletdName=Utils.EosWalletName
-ClientName="cleos"
+ClientName="clio"
 
-EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -49,7 +49,7 @@ try:
     Print("Stand up cluster")
     specificExtraNodeosArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin eosio::test_control_api_plugin"
+    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
     # ensure that transactions don't get cleaned up too early
     successDuration = 360
@@ -101,9 +101,9 @@ try:
 
     Print("Creating account1")
     account1 = Account('account1')
-    account1.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    account1.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(account1, cluster.eosioAccount, stakedDeposit=1000)
+    account1.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    account1.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(account1, cluster.sysioAccount, stakedDeposit=1000)
 
     Print("Validating accounts after bootstrap")
     cluster.validateAccounts([account1])
@@ -136,7 +136,7 @@ try:
         return status["state"]
 
     transferAmount = 10
-    transfer = prodC.transferFunds(cluster.eosioAccount, account1, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
+    transfer = prodC.transferFunds(cluster.sysioAccount, account1, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
     transBlockNum = transfer['processed']['block_num']
     transId = prodC.getLastTrackedTransactionId()
     retStatus = prodC.getTransactionStatus(transId)

@@ -1,19 +1,19 @@
 #include <boost/test/unit_test.hpp>
 
 #include <test_utils.hpp>
-#include <eosio/producer_plugin/producer_plugin.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/block.hpp>
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/genesis_state.hpp>
-#include <eosio/chain/thread_utils.hpp>
-#include <eosio/chain/transaction.hpp>
-#include <eosio/chain/transaction_metadata.hpp>
-#include <eosio/chain/trace.hpp>
-#include <eosio/chain/name.hpp>
-#include <eosio/chain/application.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/block.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/genesis_state.hpp>
+#include <sysio/chain/thread_utils.hpp>
+#include <sysio/chain/transaction.hpp>
+#include <sysio/chain/transaction_metadata.hpp>
+#include <sysio/chain/trace.hpp>
+#include <sysio/chain/name.hpp>
+#include <sysio/chain/application.hpp>
 
 #include <contracts.hpp>
 
@@ -22,9 +22,9 @@
 
 
 namespace {
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::test_utils;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::test_utils;
 
 auto make_unique_trx() {
    static uint64_t nextid = 0;
@@ -69,7 +69,7 @@ void test_configs_common(std::vector<const char*>& specific_args, app_init_statu
 
 // --read-only-thread not allowed on producer node
 BOOST_AUTO_TEST_CASE(read_only_on_producer) {
-   std::vector<const char*> specific_args = {"-p", "eosio", "-e", "--read-only-threads", "2" };
+   std::vector<const char*> specific_args = {"-p", "sysio", "-e", "--read-only-threads", "2" };
    test_configs_common(specific_args, app_init_status::failed);
 }
 
@@ -108,7 +108,7 @@ void test_trxs_common(std::vector<const char*>& specific_args, bool test_disable
                fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
                std::vector<const char*> argv = {
                   "test",  // dummy executible name
-                  "-p", "eosio", "-e", // actual arguments follow
+                  "-p", "sysio", "-e", // actual arguments follow
                   "--data-dir", temp_dir_str.c_str(),
                   "--config-dir", temp_dir_str.c_str(),
                   "--max-transaction-time=100",
@@ -201,8 +201,8 @@ BOOST_AUTO_TEST_CASE(with_3_read_only_threads) {
 // test read-only trxs on 3 threads (with --read-only-threads)
 BOOST_AUTO_TEST_CASE(with_3_read_only_threads_no_tierup) {
    std::vector<const char*> specific_args = { "--read-only-threads=3",
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
-                                             "--eos-vm-oc-enable=none",
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+                                             "--sys-vm-oc-enable=none",
 #endif
                                             };
    test_trxs_common(specific_args, true);
@@ -217,8 +217,8 @@ BOOST_AUTO_TEST_CASE(with_8_read_only_threads) {
 // test read-only trxs on 8 separate threads (with --read-only-threads)
 BOOST_AUTO_TEST_CASE(with_8_read_only_threads_no_tierup) {
    std::vector<const char*> specific_args = { "--read-only-threads=8",
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
-                                             "--eos-vm-oc-enable=none",
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+                                             "--sys-vm-oc-enable=none",
 #endif
                                             };
    test_trxs_common(specific_args, true);

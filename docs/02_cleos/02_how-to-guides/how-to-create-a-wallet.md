@@ -6,12 +6,12 @@ Create a wallet using `keosd`.
 
 Make sure you meet the following requirements:
 
-* Familiarize with the [`cleos wallet create`](../03_command-reference/wallet/create.md) command and its parameters.
-* Familiarize with the other [`cleos wallet`](../03_command-reference/wallet/index.md) commands.
-* Install the currently supported version of `cleos`.
+* Familiarize with the [`clio wallet create`](../03_command-reference/wallet/create.md) command and its parameters.
+* Familiarize with the other [`clio wallet`](../03_command-reference/wallet/index.md) commands.
+* Install the currently supported version of `clio`.
 
 [[info | Note]]
-| `cleos` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `cleos`.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install `clio`.
 
 * Understand what an [account](/glossary.md#account) is and its role in the blockchain.
 * Understand [Accounts and Permissions](/protocol-guides/04_accounts_and_permissions.md) in the protocol documents.
@@ -24,7 +24,7 @@ Perform the step below:
 Create a default or named wallet and save the wallet password to a file:
 
 ```sh
-cleos wallet create [-n named_wallet] -f <file_to_save_pwd>
+clio wallet create [-n named_wallet] -f <file_to_save_pwd>
 ```
 
 Where `file_to_save_pwd` is the name of the file to write the wallet password to and `named_wallet` is an optional parameter to assign a name to the wallet.
@@ -36,7 +36,7 @@ Some examples are provided below:
 **Example Output**
 
 ```sh
-cleos wallet create -f default_wallet.pwd
+clio wallet create -f default_wallet.pwd
 ```
 ```console
 Creating wallet: default
@@ -50,7 +50,7 @@ saving password to default_wallet.pwd
 **Example Output**
 
 ```sh
-cleos wallet create -n my_wallet -f my_wallet.pwd
+clio wallet create -n my_wallet -f my_wallet.pwd
 ```
 ```console
 Creating wallet: my_wallet

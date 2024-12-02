@@ -1,15 +1,15 @@
 #include <algorithm>
 
-#include <eosio/chain/config.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/config.hpp>
-#include <eosio/testing/chainbase_fixture.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/config.hpp>
+#include <sysio/testing/chainbase_fixture.hpp>
 
 #include <boost/test/unit_test.hpp>
 
-using namespace eosio::chain::resource_limits;
-using namespace eosio::testing;
-using namespace eosio::chain;
+using namespace sysio::chain::resource_limits;
+using namespace sysio::testing;
+using namespace sysio::chain;
 
 class resource_limits_fixture: private chainbase_fixture<1024*1024>, public resource_limits_manager
 {
@@ -357,8 +357,8 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
 
       const account_name cpu_test_account("cpuacc");
       const account_name net_test_account("netacc");
-      constexpr uint32_t net_window = eosio::chain::config::account_net_usage_average_window_ms / eosio::chain::config::block_interval_ms;
-      constexpr uint32_t cpu_window = eosio::chain::config::account_cpu_usage_average_window_ms / eosio::chain::config::block_interval_ms;
+      constexpr uint32_t net_window = sysio::chain::config::account_net_usage_average_window_ms / sysio::chain::config::block_interval_ms;
+      constexpr uint32_t cpu_window = sysio::chain::config::account_cpu_usage_average_window_ms / sysio::chain::config::block_interval_ms;
 
       constexpr int64_t unlimited = -1;
 

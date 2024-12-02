@@ -4,8 +4,8 @@
 [submodule "libraries/chainbase"]
 	path = libraries/chainbase
 	url = https://github.com/AntelopeIO/chainbase
-[submodule "libraries/eos-vm"]
-	path = libraries/eos-vm
+[submodule "libraries/sys-vm"]
+	path = libraries/sys-vm
 	url = https://github.com/AntelopeIO/eos-vm
 [submodule "libraries/softfloat"]
 	path = libraries/softfloat

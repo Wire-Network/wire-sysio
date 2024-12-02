@@ -1,15 +1,15 @@
 #include <boost/test/unit_test.hpp>
-#include <eosio/chain/permission_object.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/block_state.hpp>
-#include <eosio/chain_plugin/account_query_db.hpp>
-#include <eosio/chain/thread_utils.hpp>
+#include <sysio/chain/permission_object.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/block_state.hpp>
+#include <sysio/chain_plugin/account_query_db.hpp>
+#include <sysio/chain/thread_utils.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
-using namespace eosio::chain_apis;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
+using namespace sysio::chain_apis;
 
 using params  = account_query_db::get_accounts_by_authorizers_params;
 using results = account_query_db::get_accounts_by_authorizers_result;

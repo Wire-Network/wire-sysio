@@ -1,20 +1,20 @@
-#include <eosio/chain/webassembly/interface.hpp>
-#include <eosio/chain/webassembly/eos-vm.hpp>
-#include <eosio/chain/wasm_interface.hpp>
-#include <eosio/chain/apply_context.hpp>
-#include <eosio/chain/controller.hpp>
-#include <eosio/chain/transaction_context.hpp>
-#include <eosio/chain/producer_schedule.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/webassembly/sys-vm.hpp>
+#include <sysio/chain/wasm_interface.hpp>
+#include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/controller.hpp>
+#include <sysio/chain/transaction_context.hpp>
+#include <sysio/chain/producer_schedule.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <boost/core/ignore_unused.hpp>
-#include <eosio/chain/authorization_manager.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/wasm_interface_private.hpp>
-#include <eosio/chain/wasm_eosio_validation.hpp>
-#include <eosio/chain/wasm_eosio_injection.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/protocol_state_object.hpp>
-#include <eosio/chain/account_object.hpp>
+#include <sysio/chain/authorization_manager.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/wasm_interface_private.hpp>
+#include <sysio/chain/wasm_sysio_validation.hpp>
+#include <sysio/chain/wasm_sysio_injection.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/protocol_state_object.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha1.hpp>
@@ -26,22 +26,22 @@
 #include <fstream>
 #include <string.h>
 
-#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
-#include <eosio/vm/allocator.hpp>
+#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
+#include <sysio/vm/allocator.hpp>
 #endif
 
-namespace eosio { namespace chain {
+namespace sysio { namespace chain {
 
-   wasm_interface::wasm_interface(vm_type vm, vm_oc_enable eosvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, bool profile)
-     : eosvmoc_tierup(eosvmoc_tierup), my( new wasm_interface_impl(vm, eosvmoc_tierup, d, data_dir, eosvmoc_config, profile) ) {}
+   wasm_interface::wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile)
+     : sysvmoc_tierup(sysvmoc_tierup), my( new wasm_interface_impl(vm, sysvmoc_tierup, d, data_dir, sysvmoc_config, profile) ) {}
 
    wasm_interface::~wasm_interface() {}
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
    void wasm_interface::init_thread_local_data() {
       // OC tierup and OC runtime are mutually exclusive
-      if (my->eosvmoc) {
-         my->eosvmoc->init_thread_local_data();
+      if (my->sysvmoc) {
+         my->sysvmoc->init_thread_local_data();
       } else if (my->wasm_runtime_time == wasm_interface::vm_type::eos_vm_oc && my->runtime_interface) {
          my->runtime_interface->init_thread_local_data();
       }
@@ -61,9 +61,9 @@ namespace eosio { namespace chain {
          Serialization::MemoryInputStream stream((U8*)code.data(), code.size());
          WASM::serialize(stream, module);
       } catch(const Serialization::FatalSerializationException& e) {
-         EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
       } catch(const IR::ValidationException& e) {
-         EOS_ASSERT(false, wasm_serialization_error, e.message.c_str());
+         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
       }
 
       wasm_validations::wasm_binary_validation validator(control, module);
@@ -87,13 +87,13 @@ namespace eosio { namespace chain {
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
       if (substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
-      if (my->eosvmoc && (eosvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_eos_vm_oc())) {
-         const chain::eosvmoc::code_descriptor* cd = nullptr;
-         chain::eosvmoc::code_cache_base::get_cd_failure failure = chain::eosvmoc::code_cache_base::get_cd_failure::temporary;
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+      if (my->sysvmoc && (sysvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_eos_vm_oc())) {
+         const chain::sysvmoc::code_descriptor* cd = nullptr;
+         chain::sysvmoc::code_cache_base::get_cd_failure failure = chain::sysvmoc::code_cache_base::get_cd_failure::temporary;
          try {
             const bool high_priority = context.get_receiver().prefix() == chain::config::system_account_name;
-            cd = my->eosvmoc->cc.get_descriptor_for_code(high_priority, code_hash, vm_version, context.control.is_write_window(), failure);
+            cd = my->sysvmoc->cc.get_descriptor_for_code(high_priority, code_hash, vm_version, context.control.is_write_window(), failure);
             if (test_disable_tierup)
                cd = nullptr;
          } catch (...) {
@@ -107,7 +107,7 @@ namespace eosio { namespace chain {
          if (cd) {
             if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
                tlog("${a} speculatively executing ${h} with eos vm oc", ("a", context.get_receiver())("h", code_hash));
-            my->eosvmoc->exec->execute(*cd, *my->eosvmoc->mem, context);
+            my->sysvmoc->exec->execute(*cd, *my->sysvmoc->mem, context);
             return;
          }
       }
@@ -120,7 +120,7 @@ namespace eosio { namespace chain {
       return my->is_code_cached(code_hash, vm_type, vm_version);
    }
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
    bool wasm_interface::is_eos_vm_oc_enabled() const {
       return my->is_eos_vm_oc_enabled();
    }
@@ -129,23 +129,23 @@ namespace eosio { namespace chain {
    wasm_instantiated_module_interface::~wasm_instantiated_module_interface() = default;
    wasm_runtime_interface::~wasm_runtime_interface() = default;
 
-#ifdef EOSIO_EOS_VM_OC_RUNTIME_ENABLED
-   thread_local std::unique_ptr<eosvmoc::executor> wasm_interface_impl::eosvmoc_tier::exec{};
-   thread_local std::unique_ptr<eosvmoc::memory>   wasm_interface_impl::eosvmoc_tier::mem{};
+#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+   thread_local std::unique_ptr<sysvmoc::executor> wasm_interface_impl::sysvmoc_tier::exec{};
+   thread_local std::unique_ptr<sysvmoc::memory>   wasm_interface_impl::sysvmoc_tier::mem{};
 #endif
 
 std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
    std::string s;
    in >> s;
-   if (s == "eos-vm")
-      runtime = eosio::chain::wasm_interface::vm_type::eos_vm;
-   else if (s == "eos-vm-jit")
-      runtime = eosio::chain::wasm_interface::vm_type::eos_vm_jit;
-   else if (s == "eos-vm-oc")
-      runtime = eosio::chain::wasm_interface::vm_type::eos_vm_oc;
+   if (s == "sys-vm")
+      runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
+   else if (s == "sys-vm-jit")
+      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
+   else if (s == "sys-vm-oc")
+      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_oc;
    else
       in.setstate(std::ios_base::failbit);
    return in;
 }
 
-} } /// eosio::chain
+} } /// sysio::chain

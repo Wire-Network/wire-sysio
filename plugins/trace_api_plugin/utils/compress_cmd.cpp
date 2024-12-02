@@ -1,12 +1,12 @@
-#include <eosio/trace_api/compressed_file.hpp>
-#include <eosio/trace_api/cmd_registration.hpp>
+#include <sysio/trace_api/compressed_file.hpp>
+#include <sysio/trace_api/cmd_registration.hpp>
 
 #include <iostream>
 
 #include <boost/program_options.hpp>
 #include <fc/exception/exception.hpp>
 
-using namespace eosio::trace_api;
+using namespace sysio::trace_api;
 namespace bpo = boost::program_options;
 
 namespace {

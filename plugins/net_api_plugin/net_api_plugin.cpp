@@ -1,23 +1,23 @@
-#include <eosio/net_api_plugin/net_api_plugin.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/transaction.hpp>
+#include <sysio/net_api_plugin/net_api_plugin.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/transaction.hpp>
 
 #include <fc/variant.hpp>
 #include <fc/io/json.hpp>
 
 #include <chrono>
 
-namespace eosio { namespace detail {
+namespace sysio { namespace detail {
   struct net_api_plugin_empty {};
 }}
 
-FC_REFLECT(eosio::detail::net_api_plugin_empty, );
+FC_REFLECT(sysio::detail::net_api_plugin_empty, );
 
-namespace eosio {
+namespace sysio {
 
    static auto _net_api_plugin = application::register_plugin<net_api_plugin>();
 
-using namespace eosio;
+using namespace sysio;
 
 #define CALL_WITH_400(api_name, category, api_handle, call_name, INVOKE, http_response_code) \
 {std::string("/v1/" #api_name "/" #call_name), \
@@ -42,12 +42,12 @@ using namespace eosio;
 #define INVOKE_V_R(api_handle, call_name, in_param) \
      auto params = parse_params<in_param, http_params_types::params_required>(body);\
      api_handle.call_name( std::move(params) ); \
-     eosio::detail::net_api_plugin_empty result;
+     sysio::detail::net_api_plugin_empty result;
 
 #define INVOKE_V_V(api_handle, call_name) \
      body = parse_params<std::string, http_params_types::no_params>(body); \
      api_handle.call_name(); \
-     eosio::detail::net_api_plugin_empty result;
+     sysio::detail::net_api_plugin_empty result;
 
 
 void net_api_plugin::plugin_startup() {

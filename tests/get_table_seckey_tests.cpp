@@ -1,13 +1,13 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/chain/wasm_eosio_constraints.hpp>
-#include <eosio/chain/resource_limits.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/wast_to_wasm.hpp>
-#include <eosio/chain_plugin/chain_plugin.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/wasm_sysio_constraints.hpp>
+#include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/wast_to_wasm.hpp>
+#include <sysio/chain_plugin/chain_plugin.hpp>
 
 #include <test_contracts.hpp>
 
@@ -19,9 +19,9 @@
 #include <array>
 #include <utility>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 static auto get_table_rows_full = [](chain_apis::read_only& plugin,

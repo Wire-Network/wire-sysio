@@ -7,8 +7,8 @@
 #include <fc/bitutil.hpp>
 #include <fc/io/cfile.hpp>
 
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/block.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/block.hpp>
 
 namespace bdata = boost::unit_test::data;
 
@@ -25,18 +25,18 @@ struct block_log_fixture {
    void startup(uint32_t first) {
       if(first > 1) {
          //bleh! but don't want to make a new friend in chain_id_type just for this test
-         auto* chainid = reinterpret_cast<eosio::chain::chain_id_type*>(&non_genesis_chain_id);
+         auto* chainid = reinterpret_cast<sysio::chain::chain_id_type*>(&non_genesis_chain_id);
          log->reset(*chainid, first);
 
          //let's go ahead and check that it's empty
          check_n_bounce([&]() {
             BOOST_REQUIRE(log->head() == nullptr);
-            BOOST_REQUIRE(log->read_head() == eosio::chain::signed_block_ptr());
+            BOOST_REQUIRE(log->read_head() == sysio::chain::signed_block_ptr());
          });
       }
       else {
-         eosio::chain::genesis_state gs;
-         log->reset(gs, std::make_shared<eosio::chain::signed_block>());
+         sysio::chain::genesis_state gs;
+         log->reset(gs, std::make_shared<sysio::chain::signed_block>());
 
          //in this case it's not really empty since the "genesis block" is present. These tests only
          // work because the default ctor of a block_header (used above) has previous 0'ed out which
@@ -54,7 +54,7 @@ struct block_log_fixture {
       std::vector<char> a;
       a.assign(size, fillchar);
 
-      eosio::chain::signed_block_ptr p = std::make_shared<eosio::chain::signed_block>();
+      sysio::chain::signed_block_ptr p = std::make_shared<sysio::chain::signed_block>();
       p->previous._hash[0] = fc::endian_reverse_u32(index-1);
       p->header_extensions.push_back(std::make_pair<uint16_t, std::vector<char>>(0, std::vector<char>(a)));
 
@@ -68,12 +68,12 @@ struct block_log_fixture {
    void check_range_present(uint32_t first, uint32_t last) {
       BOOST_REQUIRE_EQUAL(log->first_block_num(), first);
       BOOST_REQUIRE(log->head_id());
-      BOOST_REQUIRE_EQUAL(eosio::chain::block_header::num_from_id(*log->head_id()), last);
+      BOOST_REQUIRE_EQUAL(sysio::chain::block_header::num_from_id(*log->head_id()), last);
       if(enable_read) {
          for(auto i = first; i <= last; i++) {
             std::vector<char> buff;
             buff.resize(written_data.at(i).size());
-            eosio::chain::signed_block_ptr p = log->read_block_by_num(i);
+            sysio::chain::signed_block_ptr p = log->read_block_by_num(i);
             if(i != 1) //don't check "genesis block"
                BOOST_REQUIRE(p->header_extensions.at(0).second == written_data.at(i));
          }
@@ -98,7 +98,7 @@ struct block_log_fixture {
    std::optional<uint32_t> partition_stride;
    fc::temp_directory dir;
 
-   std::optional<eosio::chain::block_log> log;
+   std::optional<sysio::chain::block_log> log;
 
    std::vector<std::vector<char>> written_data;
 
@@ -106,21 +106,21 @@ private:
    void bounce() {
       log.reset();
 
-      eosio::chain::block_log_config conf;
+      sysio::chain::block_log_config conf;
 
       if(prune_blocks) {
          if (*prune_blocks) {
-            eosio::chain::prune_blocklog_config prune_conf;
+            sysio::chain::prune_blocklog_config prune_conf;
             prune_conf.prune_blocks = *prune_blocks;
             prune_conf.prune_threshold = 8; //check to prune every 8 bytes; should guarantee always checking to prune for each block added
             if(vacuum_on_exit_if_small)
                prune_conf.vacuum_on_close = 1024*1024*1024; //something large: will always vacuum on close for these small tests
             conf = prune_conf;
          } else{
-            conf = eosio::chain::empty_blocklog_config{};
+            conf = sysio::chain::empty_blocklog_config{};
          }
       } else if (partition_stride) {
-         conf = eosio::chain::partitioned_blocklog_config{
+         conf = sysio::chain::partitioned_blocklog_config{
             .stride = *partition_stride,
             .max_retained_files = 1
          };
@@ -359,11 +359,11 @@ BOOST_DATA_TEST_CASE(non_prune_to_prune_genesis, bdata::xrange(2), enable_read) 
 
       uint32_t version;
       uint32_t first_block;
-      eosio::chain::genesis_state gs;
+      sysio::chain::genesis_state gs;
       fc::raw::unpack(ds, version);
       fc::raw::unpack(ds, first_block);
       fc::raw::unpack(ds, gs);
-      BOOST_REQUIRE(gs == eosio::chain::genesis_state());
+      BOOST_REQUIRE(gs == sysio::chain::genesis_state());
    }
 
    t.add(7, payload_size(), 'F');
@@ -401,7 +401,7 @@ BOOST_DATA_TEST_CASE(non_prune_to_prune_genesis, bdata::xrange(2), enable_read) 
       fc::raw::unpack(ds, version);
       fc::raw::unpack(ds, first_block);
       fc::raw::unpack(ds, cid);
-      BOOST_REQUIRE(cid == eosio::chain::genesis_state().compute_chain_id());
+      BOOST_REQUIRE(cid == sysio::chain::genesis_state().compute_chain_id());
    }
 
 } FC_LOG_AND_RETHROW() }
@@ -587,8 +587,8 @@ BOOST_DATA_TEST_CASE(no_block_log_basic_nongenesis, bdata::xrange(2) * bdata::xr
 void no_block_log_public_functions_test( block_log_fixture& t) {
    BOOST_REQUIRE_NO_THROW(t.log->flush());
    BOOST_REQUIRE(t.log->read_block_by_num(1) == nullptr);
-   BOOST_REQUIRE(t.log->read_block_id_by_num(1) == eosio::chain::block_id_type{});
-   BOOST_REQUIRE(t.log->get_block_pos(1) == eosio::chain::block_log::npos);
+   BOOST_REQUIRE(t.log->read_block_id_by_num(1) == sysio::chain::block_id_type{});
+   BOOST_REQUIRE(t.log->get_block_pos(1) == sysio::chain::block_log::npos);
    BOOST_REQUIRE(t.log->read_head() == nullptr);
 }
 

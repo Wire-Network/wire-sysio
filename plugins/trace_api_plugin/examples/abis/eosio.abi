@@ -1,5 +1,5 @@
 {
-  "version": "eosio::abi/1.1",
+  "version": "sysio::abi/1.1",
   "types": [],
   "structs": [
     {
@@ -437,7 +437,7 @@
       ]
     },
     {
-      "name": "eosio_global_state",
+      "name": "sysio_global_state",
       "base": "blockchain_parameters",
       "fields": [
         {
@@ -495,7 +495,7 @@
       ]
     },
     {
-      "name": "eosio_global_state2",
+      "name": "sysio_global_state2",
       "base": "",
       "fields": [
         {
@@ -521,7 +521,7 @@
       ]
     },
     {
-      "name": "eosio_global_state3",
+      "name": "sysio_global_state3",
       "base": "",
       "fields": [
         {
@@ -535,7 +535,7 @@
       ]
     },
     {
-      "name": "eosio_global_state4",
+      "name": "sysio_global_state4",
       "base": "",
       "fields": [
         {
@@ -1960,28 +1960,28 @@
       "index_type": "i64",
       "key_names": [],
       "key_types": [],
-      "type": "eosio_global_state"
+      "type": "sysio_global_state"
     },
     {
       "name": "global2",
       "index_type": "i64",
       "key_names": [],
       "key_types": [],
-      "type": "eosio_global_state2"
+      "type": "sysio_global_state2"
     },
     {
       "name": "global3",
       "index_type": "i64",
       "key_names": [],
       "key_types": [],
-      "type": "eosio_global_state3"
+      "type": "sysio_global_state3"
     },
     {
       "name": "global4",
       "index_type": "i64",
       "key_names": [],
       "key_types": [],
-      "type": "eosio_global_state4"
+      "type": "sysio_global_state4"
     },
     {
       "name": "namebids",

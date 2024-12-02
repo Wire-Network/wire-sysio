@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/eosio/prometheus_plugin/*.hpp")
+file(GLOB HEADERS "include/sysio/prometheus_plugin/*.hpp")
 add_library( prometheus_plugin
         prometheus_plugin.cpp
         ${HEADERS} )

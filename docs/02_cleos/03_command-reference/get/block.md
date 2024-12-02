@@ -11,11 +11,11 @@ Retrieves a full block from the blockchain
 ### Get the full block:
 
 ```sh
-cleos get block 1
+clio get block 1
 ```
 or
 ```sh
-cleos get block 0000000130d70e94e0022fd2fa035cabb9e542c34ea27f572ac90b5a7aa3d891
+clio get block 0000000130d70e94e0022fd2fa035cabb9e542c34ea27f572ac90b5a7aa3d891
 ```
 
 This will output a block object similar to the following
@@ -43,7 +43,7 @@ This will output a block object similar to the following
 ### Get the block info:
 
 ```sh
-cleos get block --info 1
+clio get block --info 1
 ```
 
 This will output a block info object similar to the following

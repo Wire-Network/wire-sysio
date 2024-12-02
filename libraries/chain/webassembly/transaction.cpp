@@ -1,11 +1,11 @@
-#include <eosio/chain/webassembly/interface.hpp>
-#include <eosio/chain/global_property_object.hpp>
-#include <eosio/chain/apply_context.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/apply_context.hpp>
 
-namespace eosio { namespace chain { namespace webassembly {
+namespace sysio { namespace chain { namespace webassembly {
    void interface::send_inline( legacy_span<const char> data ) {
       //TODO: Why is this limit even needed? And why is it not consistently checked on actions in input or deferred transactions
-      EOS_ASSERT( data.size() < context.control.get_global_properties().configuration.max_inline_action_size, inline_action_too_big,
+      SYS_ASSERT( data.size() < context.control.get_global_properties().configuration.max_inline_action_size, inline_action_too_big,
                  "inline action too big" );
 
       action act;
@@ -15,7 +15,7 @@ namespace eosio { namespace chain { namespace webassembly {
 
    void interface::send_context_free_inline( legacy_span<const char> data ) {
       //TODO: Why is this limit even needed? And why is it not consistently checked on actions in input or deferred transactions
-      EOS_ASSERT( data.size() < context.control.get_global_properties().configuration.max_inline_action_size, inline_action_too_big,
+      SYS_ASSERT( data.size() < context.control.get_global_properties().configuration.max_inline_action_size, inline_action_too_big,
                 "inline action too big" );
 
       action act;
@@ -32,4 +32,4 @@ namespace eosio { namespace chain { namespace webassembly {
    bool interface::cancel_deferred( legacy_ptr<const uint128_t> val ) {
       return context.cancel_deferred_transaction( *val );
    }
-}}} // ns eosio::chain::webassembly
+}}} // ns sysio::chain::webassembly

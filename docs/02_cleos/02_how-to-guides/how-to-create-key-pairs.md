@@ -5,15 +5,15 @@ This how-to guide provides instructions on how to create a keypair consisting of
 ## Before you begin
 
 Make sure you meet the following requirements:
-* Install the currently supported version of `cleos`
+* Install the currently supported version of `clio`
 [[info | Note]]
-| The cleos tool is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install the cleos tool. 
+| The clio tool is bundled with the Antelope software. [Installing Antelope](../../00_install/index.md) will also install the clio tool. 
 * Learn about asymmetric cryptography (public and private keypair) in the context of an Antelope blockchain.
 
 ## Command Reference
 
-See the following reference guide for `cleos` command line usage and related options:
-* [`cleos create key`](../03_command-reference/create/key.md) command and its parameters
+See the following reference guide for `clio` command line usage and related options:
+* [`clio create key`](../03_command-reference/create/key.md) command and its parameters
 
 ## Procedure
 
@@ -22,7 +22,7 @@ The following steps show how to create a public/private keypair, display them on
 1. Create a public/private keypair and print them to the console:
 
 ```sh
-cleos create key --to-console
+clio create key --to-console
 ```
 
 **Where**:
@@ -39,7 +39,7 @@ Public key: EOS4wSiQ2jbYGrqiiKCm8oWR88NYoqnmK4nNL1RCtSQeSFkGtqsNc
 2. Create a public/private keypair and save it to a file:
 
 ```sh
-cleos create key --file pw.txt
+clio create key --file pw.txt
 ```
 **Where**: 
 

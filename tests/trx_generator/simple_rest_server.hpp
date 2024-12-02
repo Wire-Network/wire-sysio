@@ -4,7 +4,7 @@
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
 
-namespace eosio { namespace rest {
+namespace sysio { namespace rest {
 
    // The majority of the code here are derived from boost source
    // libs/beast/example/http/server/async/http_server_async.cpp
@@ -231,4 +231,4 @@ namespace eosio { namespace rest {
     public:
       void run(net::io_context& ioc, tcp::endpoint endpoint) { std::make_shared<listener>(ioc, endpoint, this)->run(); }
    };
-}} // namespace eosio::rest
+}} // namespace sysio::rest

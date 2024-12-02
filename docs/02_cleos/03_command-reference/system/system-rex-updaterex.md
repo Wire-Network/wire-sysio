@@ -18,5 +18,5 @@
 
 
 ```sh
-cleos system rex updaterex accountname1
+clio system rex updaterex accountname1
 ```

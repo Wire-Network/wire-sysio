@@ -8,16 +8,16 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 
-#include <eosio/chain/block_log.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/block_log.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <chainbase/environment.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <filesystem>
 
-using namespace eosio;
-using namespace eosio::chain;
+using namespace sysio;
+using namespace sysio::chain;
 
 
 // reflect chainbase::environment for --print-build-info option
@@ -74,7 +74,7 @@ int chain_actions::run_subcommand_sstate() {
    // default state dir, if none specified
    if(opt->sstate_state_dir.empty()) {
       auto root = fc::app_path();
-      auto default_data_dir = root / "eosio" / "nodeos" / "data" ;
+      auto default_data_dir = root / "sysio" / "nodeop" / "data" ;
       state_dir  = default_data_dir / config::default_state_dir_name;
    }
    else {

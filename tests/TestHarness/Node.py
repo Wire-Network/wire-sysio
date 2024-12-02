@@ -29,7 +29,7 @@ class Node(Transactions):
 
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-many-arguments
-    def __init__(self, host, port, nodeId: int, data_dir: Path, config_dir: Path, cmd: List[str], unstarted=False, launch_time=None, walletMgr=None, nodeosVers=""):
+    def __init__(self, host, port, nodeId: int, data_dir: Path, config_dir: Path, cmd: List[str], unstarted=False, launch_time=None, walletMgr=None, nodeopVers=""):
         super().__init__(host, port, walletMgr)
         assert isinstance(data_dir, Path), 'data_dir must be a Path instance'
         assert isinstance(config_dir, Path), 'config_dir must be a Path instance'
@@ -61,7 +61,7 @@ class Node(Transactions):
         self.transCache={}
         self.missingTransaction=False
         self.lastTrackedTransactionId=None
-        self.nodeosVers=nodeosVers
+        self.nodeopVers=nodeopVers
         self.data_dir=data_dir
         self.config_dir=config_dir
         self.launch_time=launch_time
@@ -69,14 +69,14 @@ class Node(Transactions):
         self.configureVersion()
 
     def configureVersion(self):
-        if 'v2' in self.nodeosVers:
+        if 'v2' in self.nodeopVers:
             self.fetchTransactionCommand = lambda: "get transaction"
             self.fetchTransactionFromTrace = lambda trx: trx['trx']['id']
             self.fetchBlock = lambda blockNum: self.processUrllibRequest("chain", "get_block", {"block_num_or_id":blockNum}, silentErrors=False, exitOnError=True)
             self.fetchKeyCommand = lambda: "[trx][trx][ref_block_num]"
             self.fetchRefBlock = lambda trans: trans["trx"]["trx"]["ref_block_num"]
             self.fetchHeadBlock = lambda node, headBlock: node.processUrllibRequest("chain", "get_block", {"block_num_or_id":headBlock}, silentErrors=False, exitOnError=True)
-            self.cleosLimit = ""
+            self.clioLimit = ""
 
         else:
             self.fetchTransactionCommand = lambda: "get transaction_trace"
@@ -85,10 +85,10 @@ class Node(Transactions):
             self.fetchKeyCommand = lambda: "[transaction][transaction_header][ref_block_num]"
             self.fetchRefBlock = lambda trans: trans["block_num"]
             self.fetchHeadBlock = lambda node, headBlock: node.processUrllibRequest("chain", "get_block_info", {"block_num":headBlock}, silentErrors=False, exitOnError=True)
-            if 'v3.1' in self.nodeosVers:
-                self.cleosLimit = ""
+            if 'v3.1' in self.nodeopVers:
+                self.clioLimit = ""
             else:
-                self.cleosLimit = "--time-limit 999"
+                self.clioLimit = "--time-limit 999"
 
     def __str__(self):
         return "Host: %s, Port:%d, NodeNum:%s, Pid:%s" % (self.host, self.port, self.nodeId, self.pid)
@@ -348,8 +348,8 @@ class Node(Transactions):
                 break
 
     # pylint: disable=too-many-locals
-    # If nodeosPath is equal to None, it will use the existing nodeos path
-    def relaunch(self, chainArg=None, newChain=False, skipGenesis=True, timeout=Utils.systemWaitTimeout, addSwapFlags=None, nodeosPath=None, waitForTerm=False):
+    # If nodeopPath is equal to None, it will use the existing nodeop path
+    def relaunch(self, chainArg=None, newChain=False, skipGenesis=True, timeout=Utils.systemWaitTimeout, addSwapFlags=None, nodeopPath=None, waitForTerm=False):
 
         assert(self.pid is None)
         assert(self.killed)
@@ -357,7 +357,7 @@ class Node(Transactions):
         if Utils.Debug: Utils.Print(f"Launching node process, Id: {self.nodeId}")
 
         cmdArr=self.cmd[:]
-        if nodeosPath: cmdArr[0] = nodeosPath
+        if nodeopPath: cmdArr[0] = nodeopPath
         toAddOrSwap=copy.deepcopy(addSwapFlags) if addSwapFlags is not None else {}
         if not newChain:
             if skipGenesis:

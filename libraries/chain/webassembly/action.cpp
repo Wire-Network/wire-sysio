@@ -1,8 +1,8 @@
-#include <eosio/chain/webassembly/interface.hpp>
-#include <eosio/chain/apply_context.hpp>
-#include <eosio/chain/global_property_object.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/global_property_object.hpp>
 
-namespace eosio { namespace chain { namespace webassembly {
+namespace sysio { namespace chain { namespace webassembly {
    int32_t interface::read_action_data(legacy_span<char> memory) const {
       auto s = context.get_action().data.size();
       auto copy_size = std::min( static_cast<size_t>(memory.size()), s );
@@ -24,9 +24,9 @@ namespace eosio { namespace chain { namespace webassembly {
       auto max_action_return_value_size = 
          context.control.get_global_properties().configuration.max_action_return_value_size;
       if( !context.trx_context.is_read_only() )
-         EOS_ASSERT(packed_blob.size() <= max_action_return_value_size,
+         SYS_ASSERT(packed_blob.size() <= max_action_return_value_size,
                     action_return_value_exception,
                     "action return value size must be less or equal to ${s} bytes", ("s", max_action_return_value_size));
       context.action_return_value.assign( packed_blob.data(), packed_blob.data() + packed_blob.size() );
    }
-}}} // ns eosio::chain::webassembly
+}}} // ns sysio::chain::webassembly

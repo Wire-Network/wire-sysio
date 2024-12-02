@@ -1,4 +1,4 @@
-file(GLOB HEADERS "include/eosio/resource_monitor_plugin/*.hpp")
+file(GLOB HEADERS "include/sysio/resource_monitor_plugin/*.hpp")
 add_library( resource_monitor_plugin
              resource_monitor_plugin.cpp
              system_file_space_provider.cpp

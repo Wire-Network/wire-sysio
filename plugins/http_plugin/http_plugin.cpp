@@ -1,8 +1,8 @@
 
-#include <eosio/http_plugin/http_plugin.hpp>
-#include <eosio/http_plugin/common.hpp>
-#include <eosio/http_plugin/beast_http_session.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/http_plugin/common.hpp>
+#include <sysio/http_plugin/beast_http_session.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <fc/log/logger_config.hpp>
 #include <fc/reflect/variant.hpp>
@@ -14,7 +14,7 @@
 #include <memory>
 #include <regex>
 
-namespace eosio {
+namespace sysio {
 
    namespace {
       inline fc::logger& logger() {
@@ -79,20 +79,20 @@ namespace eosio {
 
    std::string category_plugin_name(api_category category) {
       if (category == api_category::db_size)
-         return "eosio::db_size_api_plugin";
+         return "sysio::db_size_api_plugin";
       if (category == api_category::trace_api)
-         return "eosio::trace_api_plugin";
+         return "sysio::trace_api_plugin";
       if (category == api_category::prometheus)
-         return "eosio::prometheus_plugin";
+         return "sysio::prometheus_plugin";
       if (category == api_category::test_control)
-         return "eosio::test_control_plugin";
+         return "sysio::test_control_plugin";
       if (api_category_set({api_category::chain_ro, api_category::chain_rw}).contains(category))
-         return "eosio::chain_api_plugin";
+         return "sysio::chain_api_plugin";
       if (api_category_set({api_category::net_ro, api_category::net_rw}).contains(category))
-         return "eosio::net_api_plugin";
+         return "sysio::net_api_plugin";
       if (api_category_set({api_category::producer_ro, api_category::producer_rw, api_category::snapshot})
               .contains(category))
-         return "eosio::producer_api_plugin";
+         return "sysio::producer_api_plugin";
       // It's a programming error when the control flow reaches this point, 
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No correspding plugin for the category value");
@@ -382,11 +382,11 @@ namespace eosio {
          verbose_http_errors = options.at( "verbose-http-errors" ).as<bool>();
 
          my->plugin_state->thread_pool_size = options.at( "http-threads" ).as<uint16_t>();
-         EOS_ASSERT( my->plugin_state->thread_pool_size > 0, chain::plugin_config_exception,
+         SYS_ASSERT( my->plugin_state->thread_pool_size > 0, chain::plugin_config_exception,
                      "http-threads ${num} must be greater than 0", ("num", my->plugin_state->thread_pool_size));
 
          auto max_bytes_mb = options.at( "http-max-bytes-in-flight-mb" ).as<int64_t>();
-         EOS_ASSERT( (max_bytes_mb >= -1 && max_bytes_mb < std::numeric_limits<int64_t>::max() / (1024 * 1024)), chain::plugin_config_exception,
+         SYS_ASSERT( (max_bytes_mb >= -1 && max_bytes_mb < std::numeric_limits<int64_t>::max() / (1024 * 1024)), chain::plugin_config_exception,
                      "http-max-bytes-in-flight-mb (${max_bytes_mb}) must be equal to or greater than -1 and less than ${max}", ("max_bytes_mb", max_bytes_mb) ("max", std::numeric_limits<int64_t>::max() / (1024 * 1024)) );
          if ( max_bytes_mb == -1 ) {
             my->plugin_state->max_bytes_in_flight = std::numeric_limits<size_t>::max();
@@ -395,7 +395,7 @@ namespace eosio {
          }
          my->plugin_state->max_requests_in_flight = options.at( "http-max-in-flight-requests" ).as<int32_t>();
          int64_t max_reponse_time_ms = options.at("http-max-response-time-ms").as<int64_t>();
-         EOS_ASSERT( max_reponse_time_ms == -1 || max_reponse_time_ms >= 0, chain::plugin_config_exception,
+         SYS_ASSERT( max_reponse_time_ms == -1 || max_reponse_time_ms >= 0, chain::plugin_config_exception,
                      "http-max-response-time-ms must be -1, or non-negative: ${m}", ("m", max_reponse_time_ms) );
          my->plugin_state->max_response_time = max_reponse_time_ms == -1 ?
                fc::microseconds::maximum() : fc::microseconds( max_reponse_time_ms * 1000 );
@@ -433,7 +433,7 @@ namespace eosio {
                return std::find(plugins.begin(), plugins.end(), s) != plugins.end();
             };
 
-            EOS_ASSERT(http_server_address == "http-category-address" && options.count("unix-socket-path") == 0,
+            SYS_ASSERT(http_server_address == "http-category-address" && options.count("unix-socket-path") == 0,
                 chain::plugin_config_exception,
                 "when http-category-address is specified, http-server-address must be set as "
                 "`http-category-address` and `unix-socket-path` must be left unspecified");
@@ -442,16 +442,16 @@ namespace eosio {
             auto addresses = options["http-category-address"].as<vector<string>>();
             for (const auto& spec : addresses) {
                auto comma_pos = spec.find(',');
-               EOS_ASSERT(comma_pos > 0 && comma_pos != std::string_view::npos, chain::plugin_config_exception,
+               SYS_ASSERT(comma_pos > 0 && comma_pos != std::string_view::npos, chain::plugin_config_exception,
                           "http-category-address '${spec}' does not contain a required comma to separate the category and address",
                           ("spec", spec));
                auto category_name = spec.substr(0, comma_pos);
                auto category = to_category(category_name);
 
-               EOS_ASSERT(category != api_category::unknown, chain::plugin_config_exception, 
+               SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception, 
                   "invalid category name `${name}` for http_category_address", ("name", std::string(category_name)));
 
-               EOS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception, 
+               SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception, 
                   "--plugin=${plugin_name} is required for --http-category-address=${spec}",
                   ("plugin_name", category_plugin_name(category))("spec", spec));
 
@@ -460,7 +460,7 @@ namespace eosio {
                auto [host, port] = fc::split_host_port(address);
                if (port.size()) {
                   auto [itr, inserted] = hostnames.try_emplace(port, host);
-                  EOS_ASSERT(inserted || host == itr->second, chain::plugin_config_exception,
+                  SYS_ASSERT(inserted || host == itr->second, chain::plugin_config_exception,
                              "unable to listen to port ${port} for both ${host} and ${prev}",
                              ("port", port)("host", host)("prev", itr->second));
                }
@@ -529,14 +529,14 @@ namespace eosio {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, my, content_type));
-      EOS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
+      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
    }
 
    void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
-      EOS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
+      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
    }
 
    void http_plugin::post_http_thread_pool(std::function<void()> f) {

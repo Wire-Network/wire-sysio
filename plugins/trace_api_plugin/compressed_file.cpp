@@ -1,4 +1,4 @@
-#include <eosio/trace_api/compressed_file.hpp>
+#include <sysio/trace_api/compressed_file.hpp>
 
 #include <zlib.h>
 
@@ -17,7 +17,7 @@ namespace {
    static_assert(sizeof(seek_point_count_type) == expected_seek_point_count_size, "Unexpected size for seek point count");
 }
 
-namespace eosio::trace_api {
+namespace sysio::trace_api {
 
 struct compressed_file_impl {
    static constexpr size_t read_buffer_size = 4*1024;

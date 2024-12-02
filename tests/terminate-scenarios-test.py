@@ -7,9 +7,9 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 ###############################################################
 # terminate-scenarios-test
 #
-# Tests terminate scenarios for nodeos.  Uses "-c" flag to indicate "replay" (--replay-blockchain), "resync"
+# Tests terminate scenarios for nodeop.  Uses "-c" flag to indicate "replay" (--replay-blockchain), "resync"
 # (--delete-all-blocks), "hardReplay"(--hard-replay-blockchain), and "none" to indicate what kind of restart flag should
-# be used. This is one of the only test that actually verify that nodeos terminates with a good exit status.
+# be used. This is one of the only test that actually verify that nodeop terminates with a good exit status.
 #
 ###############################################################
 
@@ -61,7 +61,7 @@ try:
     if cluster.killSomeEosInstances(1, killSignal) is False:
         errorExit("Failed to kill Eos instances")
     assert not cluster.getNode(0).verifyAlive()
-    Print("nodeos instances killed.")
+    Print("nodeop instances killed.")
 
     Print ("Relaunch dead cluster node instance.")
     nodeArg = "--terminate-at-block %d" % terminate if terminate > 0 else ""
@@ -70,7 +70,7 @@ try:
             nodeArg += " --truncate-at-block %d" % terminate
     if cluster.relaunchEosInstances(nodeArgs=nodeArg, waitForTerm=(terminate > 0)) is False:
         errorExit("Failed to relaunch Eos instance")
-    Print("nodeos instance relaunched.")
+    Print("nodeop instance relaunched.")
 
     testSuccessful=True
 finally:

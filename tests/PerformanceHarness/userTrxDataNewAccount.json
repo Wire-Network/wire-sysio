@@ -1,16 +1,16 @@
 {
     "initAccounts": [],
-    "abiFile": "unittests/contracts/eosio.system/eosio.system.abi",
+    "abiFile": "unittests/contracts/sysio.system/sysio.system.abi",
     "actions": [
         {
-            "actionAuthAcct": "eosio",
+            "actionAuthAcct": "sysio",
             "actionName": "newaccount",
             "authorization": {
-                "actor": "eosio",
+                "actor": "sysio",
                 "permission": "active"
             },
             "actionData": {
-                "creator": "eosio",
+                "creator": "sysio",
                 "name": "ACCT_PER_TRX",
                 "owner": {
                     "threshold": 1,
@@ -37,14 +37,14 @@
             }
         },
         {
-            "actionAuthAcct": "eosio",
+            "actionAuthAcct": "sysio",
             "actionName": "buyrambytes",
             "authorization": {
-                "actor": "eosio",
+                "actor": "sysio",
                 "permission": "active"
             },
             "actionData": {
-                "payer": "eosio",
+                "payer": "sysio",
                 "receiver": "ACCT_PER_TRX",
                 "bytes": "3000"
             }

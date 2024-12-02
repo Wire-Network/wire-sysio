@@ -1,6 +1,6 @@
 #include "noop.hpp"
 
-using namespace eosio;
+using namespace sysio;
 
 void noop::anyaction( name                       from,
                       const ignore<std::string>& type,

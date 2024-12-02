@@ -14,7 +14,7 @@
         "testnet_00"
       ], 
       "producers": [
-        "eosio"
+        "sysio"
       ], 
       "dont_start": false, 
       "p2p_port": 9776, 
@@ -22,7 +22,7 @@
       "host_name": "localhost", 
       "public_name": "localhost", 
       "listen_addr": "0.0.0.0", 
-      "_dot_label": "localhost:9776\nbios\nprod=eosio"
+      "_dot_label": "localhost:9776\nbios\nprod=sysio"
     }, 
     "testnet_00": {
       "index": 0, 

@@ -1,11 +1,11 @@
-#include <eosio/trace_api/configuration_utils.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/trace_api/configuration_utils.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <regex>
 #include <fc/io/json.hpp>
 
 
-namespace eosio::trace_api::configuration_utils {
-   using namespace eosio;
+namespace sysio::trace_api::configuration_utils {
+   using namespace sysio;
 
    chain::abi_def abi_def_from_file(const std::string& file_name, const std::filesystem::path& data_dir )
    {
@@ -15,7 +15,7 @@ namespace eosio::trace_api::configuration_utils {
          abi_path = data_dir / abi_path;
       }
 
-      EOS_ASSERT(std::filesystem::exists(abi_path) && !std::filesystem::is_directory(abi_path), chain::plugin_config_exception, "${path} does not exist or is not a file", ("path", abi_path));
+      SYS_ASSERT(std::filesystem::exists(abi_path) && !std::filesystem::is_directory(abi_path), chain::plugin_config_exception, "${path} does not exist or is not a file", ("path", abi_path));
       try {
          abi_variant = fc::json::from_file(abi_path);
       } EOS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", abi_path));
@@ -26,11 +26,11 @@ namespace eosio::trace_api::configuration_utils {
    }
 
    std::pair<std::string, std::string> parse_kv_pairs( const std::string& input ) {
-      EOS_ASSERT(!input.empty(), chain::plugin_config_exception, "Key-Value Pair is Empty");
+      SYS_ASSERT(!input.empty(), chain::plugin_config_exception, "Key-Value Pair is Empty");
       auto delim = input.find("=");
-      EOS_ASSERT(delim != std::string::npos, chain::plugin_config_exception, "Missing \"=\"");
-      EOS_ASSERT(delim != 0, chain::plugin_config_exception, "Missing Key");
-      EOS_ASSERT(delim + 1 != input.size(), chain::plugin_config_exception, "Missing Value");
+      SYS_ASSERT(delim != std::string::npos, chain::plugin_config_exception, "Missing \"=\"");
+      SYS_ASSERT(delim != 0, chain::plugin_config_exception, "Missing Key");
+      SYS_ASSERT(delim + 1 != input.size(), chain::plugin_config_exception, "Missing Value");
       return std::make_pair(input.substr(0, delim), input.substr(delim + 1));
    }
 

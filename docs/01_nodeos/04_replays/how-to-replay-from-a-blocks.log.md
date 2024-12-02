@@ -17,9 +17,9 @@ data/blocks/reversible  | shared_memory.meta | Remove
 You can use `blocks-dir = "blocks"` in the `config.ini` file, or use the `--blocks-dir` command line option, to specify where to find the `blocks.log` file to replay.
 
 ```sh
-nodeos --replay-blockchain \
-  --plugin eosio::producer_plugin  \
-  --plugin eosio::chain_api_plugin \
-  --plugin eosio::http_plugin      \
-  >> nodeos.log 2>&1 &
+nodeop --replay-blockchain \
+  --plugin sysio::producer_plugin  \
+  --plugin sysio::chain_api_plugin \
+  --plugin sysio::http_plugin      \
+  >> nodeop.log 2>&1 &
 ```

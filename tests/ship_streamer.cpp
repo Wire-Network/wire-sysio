@@ -1,6 +1,6 @@
-#include <eosio/abi.hpp>
-#include <eosio/from_json.hpp>
-#include <eosio/convert.hpp>
+#include <sysio/abi.hpp>
+#include <sysio/from_json.hpp>
+#include <sysio/convert.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -21,7 +21,7 @@ int main(int argc, char* argv[]) {
    boost::asio::io_context ctx;
    boost::asio::ip::tcp::resolver resolver(ctx);
    boost::beast::websocket::stream<boost::asio::ip::tcp::socket> stream(ctx);
-   eosio::abi abi;
+   sysio::abi abi;
 
    bpo::options_description cli("ship_streamer command line options");
    bool help = false;
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
    }
 
    std::string::size_type colon = socket_address.find(':');
-   eosio::check(colon != std::string::npos, "Missing ':' seperator in Websocket address and port");
+   sysio::check(colon != std::string::npos, "Missing ':' seperator in Websocket address and port");
    std::string statehistory_server = socket_address.substr(0, colon);
    std::string statehistory_port = socket_address.substr(colon+1);
 
@@ -65,13 +65,13 @@ int main(int argc, char* argv[]) {
          boost::beast::flat_buffer abi_buffer;
          stream.read(abi_buffer);
          std::string abi_string((const char*)abi_buffer.data().data(), abi_buffer.data().size());
-         eosio::json_token_stream token_stream(abi_string.data());
-         eosio::abi_def abidef = eosio::from_json<eosio::abi_def>(token_stream);
-         eosio::convert(abidef, abi);
+         sysio::json_token_stream token_stream(abi_string.data());
+         sysio::abi_def abidef = sysio::from_json<sysio::abi_def>(token_stream);
+         sysio::convert(abidef, abi);
       }
 
-      const eosio::abi_type& request_type = abi.abi_types.at("request");
-      const eosio::abi_type& result_type = abi.abi_types.at("result");
+      const sysio::abi_type& request_type = abi.abi_types.at("request");
+      const sysio::abi_type& result_type = abi.abi_types.at("result");
 
       rapidjson::StringBuffer request_sb;
       rapidjson::PrettyWriter<rapidjson::StringBuffer> request_writer(request_sb);
@@ -121,21 +121,21 @@ int main(int argc, char* argv[]) {
          boost::beast::flat_buffer buffer;
          stream.read(buffer);
 
-         eosio::input_stream is((const char*)buffer.data().data(), buffer.data().size());
+         sysio::input_stream is((const char*)buffer.data().data(), buffer.data().size());
          rapidjson::Document result_document;
          result_document.Parse(result_type.bin_to_json(is).c_str());
 
-         eosio::check(!result_document.HasParseError(),                                      "Failed to parse result JSON from abieos");
-         eosio::check(result_document.IsArray(),                                             "result should have been an array (variant) but it's not");
-         eosio::check(result_document.Size() == 2,                                           "result was an array but did not contain 2 items like a variant should");
-         eosio::check(std::string(result_document[0].GetString()) == "get_blocks_result_v0", "result type doesn't look like get_blocks_result_v0");
-         eosio::check(result_document[1].IsObject(),                                         "second item in result array is not an object");
-         eosio::check(result_document[1].HasMember("head"),                                  "cannot find 'head' in result");
-         eosio::check(result_document[1]["head"].IsObject(),                                 "'head' is not an object");
-         eosio::check(result_document[1]["head"].HasMember("block_num"),                     "'head' does not contain 'block_num'");
-         eosio::check(result_document[1]["head"]["block_num"].IsUint(),                      "'head.block_num' isn't a number");
-         eosio::check(result_document[1]["head"].HasMember("block_id"),                      "'head' does not contain 'block_id'");
-         eosio::check(result_document[1]["head"]["block_id"].IsString(),                     "'head.block_id' isn't a string");
+         sysio::check(!result_document.HasParseError(),                                      "Failed to parse result JSON from abieos");
+         sysio::check(result_document.IsArray(),                                             "result should have been an array (variant) but it's not");
+         sysio::check(result_document.Size() == 2,                                           "result was an array but did not contain 2 items like a variant should");
+         sysio::check(std::string(result_document[0].GetString()) == "get_blocks_result_v0", "result type doesn't look like get_blocks_result_v0");
+         sysio::check(result_document[1].IsObject(),                                         "second item in result array is not an object");
+         sysio::check(result_document[1].HasMember("head"),                                  "cannot find 'head' in result");
+         sysio::check(result_document[1]["head"].IsObject(),                                 "'head' is not an object");
+         sysio::check(result_document[1]["head"].HasMember("block_num"),                     "'head' does not contain 'block_num'");
+         sysio::check(result_document[1]["head"]["block_num"].IsUint(),                      "'head.block_num' isn't a number");
+         sysio::check(result_document[1]["head"].HasMember("block_id"),                      "'head' does not contain 'block_id'");
+         sysio::check(result_document[1]["head"]["block_id"].IsString(),                     "'head.block_id' isn't a string");
 
          // stream what was received
          if(is_first) {

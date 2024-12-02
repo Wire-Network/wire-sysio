@@ -25,7 +25,7 @@ WebAssembly spec.
 - Within a spec test suite, each `assert_trap` and `assert_exhaustion` test case is given a unique `sub_apply` function.
     - All tests in a suite are in the same WASM file, so the test that is run is based on the `test.name` passed in to `apply` (which calls the correct `sub_apply`).
 - Within a test suite, `assert_return` tests are grouped into sets of 100.
-    - This is due to the limit on 1024 locals and 1024 func defs built into nodeos. Some spec tests had too many functions to have a `sub_apply` per test, and some had too many variables to be put all into one `sub_apply`.
+    - This is due to the limit on 1024 locals and 1024 func defs built into nodeop. Some spec tests had too many functions to have a `sub_apply` per test, and some had too many variables to be put all into one `sub_apply`.
     - 100 was found to be the number that did not exceed this maximum for all the tests.
     - The tests also have some reliance on ordering (a store may need to be called before a load for example).
     - 100 also works out to make sure the right ordering is achieved.
@@ -35,7 +35,7 @@ WebAssembly spec.
 
 
 ### How to generate tests
-- Run the `setup_eosio_tests.py` script with no options to see the help text.
+- Run the `setup_sysio_tests.py` script with no options to see the help text.
 
 
 ### Known Issues
@@ -43,13 +43,13 @@ WebAssembly spec.
     - Unclear how to hand alter this to have memory properly zeroed where expected.
 
 - start.7 -- Will fail if not deleted from generated tests.
-    - Imports "print" from "spectest". Changing to any of the `eosio::print` functions results in "start function must be nullary" due to their requiring a parameter.
+    - Imports "print" from "spectest". Changing to any of the `sysio::print` functions results in "start function must be nullary" due to their requiring a parameter.
 
 - globals.2 -- Delete from generated tests or it segfaults due to missing wasm.
-    - `eosio-wasm2wast` error "mutable globals cannot be exported" when converting to wast.
+    - `sysio-wasm2wast` error "mutable globals cannot be exported" when converting to wast.
         - `wasm2wat` provided by WABT handles this correctly, implying an error in CDT.
 - globals.3 -- Delete from generated tests or it segfaults due to missing wasm.
-    - `eosio-wasm2wast` error "mutable globals cannot be exported" when converting to wast.
+    - `sysio-wasm2wast` error "mutable globals cannot be exported" when converting to wast.
         - `wasm2wat` provided by WABT handles this correctly, implying an error in CDT.
 - globals.14 -- Delete from generated tests or it segfaults due to missing wasm.
     - Imports "global_i32" from "spectest".

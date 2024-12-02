@@ -1,10 +1,10 @@
-#include <eosio/trace_api/cmd_registration.hpp>
+#include <sysio/trace_api/cmd_registration.hpp>
 
 #include <iostream>
 
 #include <boost/program_options.hpp>
 
-using namespace eosio::trace_api;
+using namespace sysio::trace_api;
 namespace bpo = boost::program_options;
 
 command_registration* command_registration::_list = nullptr;

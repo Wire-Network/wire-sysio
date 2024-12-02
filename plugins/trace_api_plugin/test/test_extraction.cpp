@@ -1,22 +1,22 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/chain/types.hpp>
-#include <eosio/chain/contract_types.hpp>
-#include <eosio/chain/trace.hpp>
-#include <eosio/chain/transaction.hpp>
-#include <eosio/chain/block.hpp>
-#include <eosio/chain/block_state.hpp>
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/contract_types.hpp>
+#include <sysio/chain/trace.hpp>
+#include <sysio/chain/transaction.hpp>
+#include <sysio/chain/block.hpp>
+#include <sysio/chain/block_state.hpp>
 
-#include <eosio/trace_api/test_common.hpp>
-#include <eosio/trace_api/chain_extraction.hpp>
+#include <sysio/trace_api/test_common.hpp>
+#include <sysio/trace_api/chain_extraction.hpp>
 
 #include <fc/bitutil.hpp>
 
-using namespace eosio;
-using namespace eosio::trace_api;
-using namespace eosio::trace_api::test_common;
-using eosio::chain::name;
-using eosio::chain::digest_type;
+using namespace sysio;
+using namespace sysio::trace_api;
+using namespace sysio::trace_api::test_common;
+using sysio::chain::name;
+using sysio::chain::digest_type;
 
 namespace {
    chain::transaction_trace_ptr make_transaction_trace( const chain::transaction_id_type& id, uint32_t block_number,
@@ -53,7 +53,7 @@ namespace {
 
    auto make_transfer_action( chain::name from, chain::name to, chain::asset quantity, std::string memo ) {
       return chain::action( std::vector<chain::permission_level> {{from, chain::config::active_name}},
-                            "eosio.token"_n, "transfer"_n, make_transfer_data( from, to, quantity, std::move(memo) ) );
+                            "sysio.token"_n, "transfer"_n, make_transfer_data( from, to, quantity, std::move(memo) ) );
    }
 
    auto make_onerror_action( chain::name creator, chain::uint128_t sender_id ) {
@@ -156,7 +156,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
       auto act1 = make_transfer_action( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
       auto act2 = make_transfer_action( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
       auto act3 = make_transfer_action( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
-      auto actt1 = make_action_trace( 0, act1, "eosio.token"_n );
+      auto actt1 = make_action_trace( 0, act1, "sysio.token"_n );
       auto actt2 = make_action_trace( 1, act2, "alice"_n );
       auto actt3 = make_action_trace( 2, act3, "bob"_n );
       auto ptrx1 = make_packed_trx( { act1, act2, act3 } );
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                0,
-               "eosio.token"_n, "eosio.token"_n, "transfer"_n,
+               "sysio.token"_n, "sysio.token"_n, "transfer"_n,
                {{"alice"_n, "active"_n}},
                make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
             },
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                1,
-               "alice"_n, "eosio.token"_n, "transfer"_n,
+               "alice"_n, "sysio.token"_n, "transfer"_n,
                {{"alice"_n, "active"_n}},
                make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
             },
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                2,
-               "bob"_n, "eosio.token"_n, "transfer"_n,
+               "bob"_n, "sysio.token"_n, "transfer"_n,
                {{"alice"_n, "active"_n}},
                make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
             },
@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
       auto act1 = make_transfer_action( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
       auto act2 = make_transfer_action( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" );
       auto act3 = make_transfer_action( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" );
-      auto actt1 = make_action_trace( 0, act1, "eosio.token"_n );
+      auto actt1 = make_action_trace( 0, act1, "sysio.token"_n );
       auto actt2 = make_action_trace( 1, act2, "bob"_n );
       auto actt3 = make_action_trace( 2, act3, "fred"_n );
       auto ptrx1 = make_packed_trx( { act1 } );
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                0,
-               "eosio.token"_n, "eosio.token"_n, "transfer"_n,
+               "sysio.token"_n, "sysio.token"_n, "transfer"_n,
                {{"alice"_n, "active"_n}},
                make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
             },
@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                1,
-               "bob"_n, "eosio.token"_n, "transfer"_n,
+               "bob"_n, "sysio.token"_n, "transfer"_n,
                {{ "bob"_n, "active"_n }},
                make_transfer_data( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" )
             },
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                2,
-               "fred"_n, "eosio.token"_n, "transfer"_n,
+               "fred"_n, "sysio.token"_n, "transfer"_n,
                {{ "fred"_n, "active"_n }},
                make_transfer_data( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
             },
@@ -357,7 +357,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
    BOOST_FIXTURE_TEST_CASE(onerror_transaction_block, extraction_test_fixture)
    {
       auto onerror_act = make_onerror_action( "alice"_n, 1 );
-      auto actt1 = make_action_trace( 0, onerror_act, "eosio.token"_n );
+      auto actt1 = make_action_trace( 0, onerror_act, "sysio.token"_n );
       auto ptrx1 = make_packed_trx( { onerror_act } );
 
       auto act2 = make_transfer_action( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" );
@@ -380,7 +380,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             {
                0,
-               "eosio.token"_n, "eosio"_n, "onerror"_n,
+               "sysio.token"_n, "sysio"_n, "onerror"_n,
                {{ "alice"_n, "active"_n }},
                make_onerror_data( chain::onerror{ 1, "test ", 4 } )
             },

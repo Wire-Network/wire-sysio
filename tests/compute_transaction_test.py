@@ -35,8 +35,8 @@ random.seed(seed) # Use a fixed seed for repeatability.
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True)
-EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
 try:
     if dontLaunch: # run test against remote cluster
@@ -65,15 +65,15 @@ try:
 
     Print("Creating account1")
     account1 = Account('account1')
-    account1.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    account1.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(account1, cluster.eosioAccount, stakedDeposit=1000)
+    account1.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    account1.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(account1, cluster.sysioAccount, stakedDeposit=1000)
 
     Print("Creating account2")
     account2 = Account('account2')
-    account2.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    account2.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(account2, cluster.eosioAccount, stakedDeposit=1000, stakeCPU=1)
+    account2.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    account2.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(account2, cluster.sysioAccount, stakedDeposit=1000, stakeCPU=1)
 
     Print("Validating accounts after bootstrap")
     cluster.validateAccounts([account1, account2])
@@ -86,14 +86,14 @@ try:
 
     transferAmount="1000.0000 {0}".format(CORE_SYMBOL)
 
-    npnode.transferFunds(cluster.eosioAccount, account1, transferAmount, "fund account", waitForTransBlock=True)
+    npnode.transferFunds(cluster.sysioAccount, account1, transferAmount, "fund account", waitForTransBlock=True)
     preBalances = node.getEosBalances([account1, account2])
     Print("Starting balances:")
     Print(preBalances)
 
     Print("Sending read-only transfer")
     trx = {
-        "actions": [{"account": "eosio.token","name": "transfer",
+        "actions": [{"account": "sysio.token","name": "transfer",
         "authorization": [{"actor": "account1","permission": "active"}],
         "data": {"from": "account1","to": "account2","quantity": "1.0001 SYS","memo": "tx1"},
         "compression": "none"}]
@@ -119,7 +119,7 @@ try:
         memo = 'tx-{}'.format(x)
         trx2 = {
 
-            "actions": [{"account": "eosio.token","name": "transfer",
+            "actions": [{"account": "sysio.token","name": "transfer",
                          "authorization": [{"actor": "account2","permission": "active"}],
                          "data": {"from": "account2","to": "account1","quantity": "10.0001 SYS","memo": memo},
                          "compression": "none"}]
@@ -137,7 +137,7 @@ try:
         memo = 'tx-{}'.format(x)
         trx2 = {
 
-            "actions": [{"account": "eosio.token","name": "transfer",
+            "actions": [{"account": "sysio.token","name": "transfer",
                          "authorization": [{"actor": "account2","permission": "active"}],
                          "data": {"from": "account2","to": "account1","quantity": "10.0001 SYS","memo": memo},
                          "compression": "none"}]
@@ -153,7 +153,7 @@ try:
     # Test that irrelavent signature doesn't break read-only txn
     trx3 = {
 
-        "actions": [{"account": "eosio.token","name": "transfer",
+        "actions": [{"account": "sysio.token","name": "transfer",
                      "authorization": [{"actor": "account1","permission": "active"},{"actor": "account2","permission": "active"}],
                      "data": {"from": "account1","to": "account2","quantity": "10.0001 SYS","memo": memo},
                      "compression": "none"}]

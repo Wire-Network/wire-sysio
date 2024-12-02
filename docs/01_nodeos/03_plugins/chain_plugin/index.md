@@ -6,20 +6,20 @@ The `chain_plugin` is a core plugin required to process and aggregate chain data
 
 ```console
 # config.ini
-plugin = eosio::chain_plugin
+plugin = sysio::chain_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::chain_plugin [operations] [options]
+nodeop ... --plugin sysio::chain_plugin [operations] [options]
 ```
 
 ## Operations
 
-These can only be specified from the `nodeos` command-line:
+These can only be specified from the `nodeop` command-line:
 
 ```console
-Command Line Options for eosio::chain_plugin:
+Command Line Options for sysio::chain_plugin:
   --genesis-json arg                    File to read Genesis State from
   --genesis-timestamp arg               override the initial timestamp in the
                                         Genesis State file
@@ -56,10 +56,10 @@ Command Line Options for eosio::chain_plugin:
 
 ## Options
 
-These can be specified from both the `nodeos` command-line or the `config.ini` file:
+These can be specified from both the `nodeop` command-line or the `config.ini` file:
 
 ```console
-Config Options for eosio::chain_plugin:
+Config Options for sysio::chain_plugin:
   --blocks-dir arg (="blocks")          the location of the blocks directory
                                         (absolute path or relative to
                                         application data dir)
@@ -72,12 +72,12 @@ Config Options for eosio::chain_plugin:
                                         application config dir)
   --checkpoint arg                      Pairs of [BLOCK_NUM,BLOCK_ID] that
                                         should be enforced as checkpoints.
-  --wasm-runtime runtime (=eos-vm-jit)  Override default WASM runtime (
-                                        "eos-vm-jit", "eos-vm")
-                                        "eos-vm-jit" : A WebAssembly runtime
+  --wasm-runtime runtime (=sys-vm-jit)  Override default WASM runtime (
+                                        "sys-vm-jit", "sys-vm")
+                                        "sys-vm-jit" : A WebAssembly runtime
                                         that compiles WebAssembly code to
                                         native x86 code prior to execution.
-                                        "eos-vm" : A WebAssembly interpreter.
+                                        "sys-vm" : A WebAssembly interpreter.
 
   --profile-account arg                 The name of an account whose code will
                                         be profiled
@@ -178,14 +178,14 @@ Config Options for eosio::chain_plugin:
                                         locked in to memory, and will use huge
                                         pages if available.
 
-  --eos-vm-oc-cache-size-mb arg (=1024) Maximum size (in MiB) of the EOS VM OC
+  --sys-vm-oc-cache-size-mb arg (=1024) Maximum size (in MiB) of the EOS VM OC
                                         code cache
-  --eos-vm-oc-compile-threads arg (=1)  Number of threads to use for EOS VM OC
+  --sys-vm-oc-compile-threads arg (=1)  Number of threads to use for EOS VM OC
                                         tier-up
-  --eos-vm-oc-enable arg (=auto)        Enable EOS VM OC tier-up runtime
+  --sys-vm-oc-enable arg (=auto)        Enable EOS VM OC tier-up runtime
                                         ('auto', 'all', 'none').
                                         'auto' - EOS VM OC tier-up is enabled
-                                        for eosio.* accounts, read-only trxs,
+                                        for sysio.* accounts, read-only trxs,
                                         and applying blocks.
                                         'all'  - EOS VM OC tier-up is enabled
                                         for all contract execution.

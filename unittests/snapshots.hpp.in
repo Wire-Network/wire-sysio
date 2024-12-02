@@ -13,14 +13,14 @@
 #include <string_view>
 #include <type_traits>
 
-namespace eosio {
+namespace sysio {
    namespace testing {
       namespace snapshot {
          // tags for snapshot type
          struct json {};
          struct binary {};
          struct json_snapshot{};
-      } // ns eosio::testing::snapshot
+      } // ns sysio::testing::snapshot
 
       static inline constexpr snapshot::json   json_tag;
       static inline constexpr snapshot::binary binary_tag;
@@ -35,7 +35,7 @@ namespace eosio {
 
          template <typename T>
          static inline constexpr bool is_json_snapshot_v =std::is_same_v<std::decay_t<T>, snapshot::json_snapshot>;
-      } // ns eosio::testing::snapshot
+      } // ns sysio::testing::snapshot
 
       template <typename TypeTag>
       struct snapshot_file {
@@ -113,5 +113,5 @@ namespace eosio {
             boost::iostreams::copy(buf_in, file);
          }
       };
-   } /// eosio::testing
-}  /// eosio
+   } /// sysio::testing
+}  /// sysio

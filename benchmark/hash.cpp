@@ -10,7 +10,7 @@
 
 using namespace fc;
 
-namespace eosio::benchmark {
+namespace sysio::benchmark {
 
 void hash_benchmarking() {
    std::string small_message = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ01";

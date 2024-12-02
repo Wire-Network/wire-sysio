@@ -8,17 +8,17 @@ Retrieve the stats of for a given currency
 ## Options
 There are no options for this subcommand
 ## Example
-Get stats of the SYS token from the eosio.token contract. 
+Get stats of the SYS token from the sysio.token contract. 
 
 ```sh
-cleos get currency stats eosio.token SYS
+clio get currency stats sysio.token SYS
 ```
 ```json
 {
   "SYS": {
     "supply": "1000000000.0000 SYS",
     "max_supply": "10000000000.0000 SYS",
-    "issuer": "eosio"
+    "issuer": "sysio"
   }
 }
 ```

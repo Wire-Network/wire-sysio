@@ -12,7 +12,7 @@ from TestHarness import Node, TestHelper, Utils
 ###############################################################
 # p2p_no_listen_test
 #
-# Test nodeos disabling p2p
+# Test nodeop disabling p2p
 #
 ###############################################################
 
@@ -32,11 +32,11 @@ try:
         Utils.EosServerPath,
         '-e',
         '-p',
-        'eosio',
+        'sysio',
         '--p2p-listen-endpoint',
         '',
         '--plugin',
-        'eosio::chain_api_plugin',
+        'sysio::chain_api_plugin',
         '--config-dir',
         Utils.ConfigDir,
         '--data-dir',

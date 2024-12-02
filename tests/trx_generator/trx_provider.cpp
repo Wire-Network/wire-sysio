@@ -7,9 +7,9 @@
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/exceptions.hpp>
 
-namespace eosio::testing {
+namespace sysio::testing {
    using namespace boost::asio;
    using namespace std::literals::string_literals;
    using ip::tcp;
@@ -47,7 +47,7 @@ namespace eosio::testing {
       _connection_thread_pool.stop();
    };
 
-   fc::time_point provider_connection::get_trx_ack_time(const eosio::chain::transaction_id_type& trx_id) {
+   fc::time_point provider_connection::get_trx_ack_time(const sysio::chain::transaction_id_type& trx_id) {
       fc::time_point              time_acked;
       std::lock_guard<std::mutex> lock(_trx_ack_map_lock);
       auto                        search = _trxs_ack_time_map.find(trx_id);
@@ -61,7 +61,7 @@ namespace eosio::testing {
       return time_acked;
    }
 
-   void provider_connection::trx_acknowledged(const eosio::chain::transaction_id_type& trx_id,
+   void provider_connection::trx_acknowledged(const sysio::chain::transaction_id_type& trx_id,
                                               const fc::time_point&                    ack_time) {
       std::lock_guard<std::mutex> lock(_trx_ack_map_lock);
       _trxs_ack_time_map[trx_id] = ack_time;
@@ -103,7 +103,7 @@ namespace eosio::testing {
       } );
    }
 
-   acked_trx_trace_info p2p_connection::get_acked_trx_trace_info(const eosio::chain::transaction_id_type& trx_id) {
+   acked_trx_trace_info p2p_connection::get_acked_trx_trace_info(const sysio::chain::transaction_id_type& trx_id) {
       return {};
    }
 
@@ -216,14 +216,14 @@ namespace eosio::testing {
       ++_sent;
    }
 
-   void http_connection::record_trx_info(const eosio::chain::transaction_id_type& trx_id, uint32_t block_num,
+   void http_connection::record_trx_info(const sysio::chain::transaction_id_type& trx_id, uint32_t block_num,
                                          uint32_t cpu_usage_us, uint32_t net_usage_words,
                                          const std::string& block_time) {
       std::lock_guard<std::mutex> lock(_trx_info_map_lock);
       _acked_trx_trace_info_map.insert({trx_id, {true, block_num, cpu_usage_us, net_usage_words, block_time}});
    }
 
-   acked_trx_trace_info http_connection::get_acked_trx_trace_info(const eosio::chain::transaction_id_type& trx_id) {
+   acked_trx_trace_info http_connection::get_acked_trx_trace_info(const sysio::chain::transaction_id_type& trx_id) {
       acked_trx_trace_info        info;
       std::lock_guard<std::mutex> lock(_trx_info_map_lock);
       auto                        search = _acked_trx_trace_info_map.find(trx_id);

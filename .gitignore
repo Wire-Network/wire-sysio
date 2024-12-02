@@ -42,17 +42,17 @@ libraries/wasm-jit/Source/Programs/Disassemble
 libraries/wasm-jit/Source/Programs/Test
 libraries/wasm-jit/Source/Programs/wavm
 
-programs/cleos/cleos
+programs/clio/clio
 programs/js_operation_serializer/js_operation_serializer
 programs/data-dir
-programs/eosio-abigen/eosio-abigen
-programs/cleos/config.hpp
-programs/eosio-applesedemo/eosio-applesedemo
-programs/eosio-launcher/config.hpp
-programs/eosio-launcher/eosio-launcher
+programs/sysio-abigen/sysio-abigen
+programs/clio/config.hpp
+programs/sysio-applesedemo/sysio-applesedemo
+programs/sysio-launcher/config.hpp
+programs/sysio-launcher/sysio-launcher
 programs/keosd/keosd
-programs/nodeos/config.hpp
-programs/nodeos/nodeos
+programs/nodeop/config.hpp
+programs/nodeop/nodeop
 
 scripts/tn_init.sh
 
@@ -78,7 +78,7 @@ build.tar.gz
 deps/*
 dependencies/*
 
-etc/eosio/node_*
+etc/sysio/node_*
 TestLogs*
 .vscode
 .idea/

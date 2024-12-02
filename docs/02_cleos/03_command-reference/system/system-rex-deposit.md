@@ -21,5 +21,5 @@ excerpt: "Deposit into owner's REX fund by transfering from owner's liquid token
 
 
 ```sh
-cleos system rex deposit accountname1 "1 SYS"
+clio system rex deposit accountname1 "1 SYS"
 ```

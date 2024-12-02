@@ -2,16 +2,16 @@
 #include <iostream>
 #include <fc/log/logger.hpp>
 #include <boost/algorithm/string.hpp>
-#include <eosio/chain/chain_id_type.hpp>
+#include <sysio/chain/chain_id_type.hpp>
 #include <boost/program_options.hpp>
-#include <eosio/chain/name.hpp>
+#include <sysio/chain/name.hpp>
 #include <fc/bitutil.hpp>
 #include <fc/io/raw.hpp>
 #include <regex>
 
-namespace eosio::testing {
+namespace sysio::testing {
    using namespace chain::literals;
-   namespace chain = eosio::chain;
+   namespace chain = sysio::chain;
 
    void trx_generator_base::set_transaction_headers(chain::transaction& trx, const chain::block_id_type& last_irr_block_id, const fc::microseconds& expiration, uint32_t delay_sec) {
       trx.expiration = fc::time_point_sec{fc::time_point::now() + expiration};
@@ -213,7 +213,7 @@ namespace eosio::testing {
                         }
                         EOS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Fail to parse unpacked action data JSON")
 
-                        std::vector<eosio::chain::permission_level> auth = {};
+                        std::vector<sysio::chain::permission_level> auth = {};
                         if (action_mvo["authorization"].get_object().find("actor") != action_mvo["authorization"].get_object().end() &&
                             action_mvo["authorization"].get_object().find("permission") != action_mvo["authorization"].get_object().end()) {
                            chain::name auth_actor = chain::name(action_mvo["authorization"].get_object()["actor"].as_string());

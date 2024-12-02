@@ -4,7 +4,7 @@ Unlink a linked permission level
 
 ## Before you begin
 
-* Install the currently supported version of `cleos`
+* Install the currently supported version of `clio`
 
 * Understand the following:
   * What is an account
@@ -16,5 +16,5 @@ Unlink a linked permission level
 Remove a linked permission level from an action `transfer` of contract `hodlcontract`
 
 ```sh
-cleos set action permission alice hodlcontract transfer NULL
+clio set action permission alice hodlcontract transfer NULL
 ```

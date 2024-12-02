@@ -1,12 +1,12 @@
 #include <boost/test/unit_test.hpp>
 
-#include <eosio/trace_api/abi_data_handler.hpp>
+#include <sysio/trace_api/abi_data_handler.hpp>
 
-#include <eosio/trace_api/test_common.hpp>
+#include <sysio/trace_api/test_common.hpp>
 
-using namespace eosio;
-using namespace eosio::trace_api;
-using namespace eosio::trace_api::test_common;
+using namespace sysio;
+using namespace sysio::trace_api;
+using namespace sysio::trace_api::test_common;
 
 BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(empty_data)
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
 
       abi_data_handler handler(exception_handler{});
       handler.add_abi("alice"_n, std::move(abi));
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
       abi.action_results = { std::vector<chain::action_result_def>{ chain::action_result_def{ "foo"_n, "foor"} } };
 
       abi_data_handler handler(exception_handler{});
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
 
       abi_data_handler handler(exception_handler{});
       handler.add_abi("alice"_n, std::move(abi));
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
 
       abi_data_handler handler(exception_handler{});
       handler.add_abi("alice"_n, std::move(abi));
@@ -224,7 +224,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
 
       bool log_called = false;
       abi_data_handler handler([&log_called](const exception_with_context& ){log_called = true;});
@@ -258,7 +258,7 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
          },
          {}, {}, {}
       );
-      abi.version = "eosio::abi/1.";
+      abi.version = "sysio::abi/1.";
 
       abi_data_handler handler(exception_handler{});
       handler.add_abi("alice"_n, std::move(abi));

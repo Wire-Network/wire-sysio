@@ -1,19 +1,19 @@
 #include <limits>
 
-#include <eosio/action.hpp>
-#include <eosio/eosio.hpp>
-#include <eosio/permission.hpp>
-#include <eosio/print.hpp>
-#include <eosio/serialize.hpp>
+#include <sysio/action.hpp>
+#include <sysio/sysio.hpp>
+#include <sysio/permission.hpp>
+#include <sysio/print.hpp>
+#include <sysio/serialize.hpp>
 
 #include "test_api.hpp"
 
 
 
 struct check_auth_msg {
-   eosio::name                    account;
-   eosio::name                    permission;
-   std::vector<eosio::public_key> pubkeys;
+   sysio::name                    account;
+   sysio::name                    permission;
+   std::vector<sysio::public_key> pubkeys;
 
    EOSLIB_SERIALIZE( check_auth_msg, (account)(permission)(pubkeys)  )
 };
@@ -21,12 +21,12 @@ struct check_auth_msg {
 void test_permission::check_authorization( uint64_t receiver, uint64_t code, uint64_t action ) {
    (void)code;
    (void)action;
-   using namespace eosio;
+   using namespace sysio;
 
    auto self = receiver;
    auto params = unpack_action_data<check_auth_msg>();
    auto packed_pubkeys = pack(params.pubkeys);
-   int64_t res64 = eosio::check_permission_authorization( params.account,
+   int64_t res64 = sysio::check_permission_authorization( params.account,
                                                      params.permission,
                                                      packed_pubkeys.data(), packed_pubkeys.size(),
                                                      (const char*)0,        0,
@@ -42,8 +42,8 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
 }
 
 struct test_permission_last_used_msg {
-   eosio::name account;
-   eosio::name permission;
+   sysio::name account;
+   sysio::name permission;
    int64_t     last_used_time;
 
    EOSLIB_SERIALIZE( test_permission_last_used_msg, (account)(permission)(last_used_time) )
@@ -52,21 +52,21 @@ struct test_permission_last_used_msg {
 void test_permission::test_permission_last_used( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
    (void)code;
    (void)action;
-   using namespace eosio;
+   using namespace sysio;
 
    auto params = unpack_action_data<test_permission_last_used_msg>();
 
    time_point msec{ microseconds{params.last_used_time}};
-   eosio_assert( eosio::get_permission_last_used(params.account, params.permission) == msec, "unexpected last used permission time" );
+   sysio_assert( sysio::get_permission_last_used(params.account, params.permission) == msec, "unexpected last used permission time" );
 }
 
 void test_permission::test_account_creation_time( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
    (void)code;
    (void)action;
-   using namespace eosio;
+   using namespace sysio;
 
    auto params = unpack_action_data<test_permission_last_used_msg>();
 
    time_point msec{ microseconds{params.last_used_time}};
-   eosio_assert( eosio::get_account_creation_time(params.account) == msec, "unexpected account creation time" );
+   sysio_assert( sysio::get_account_creation_time(params.account) == msec, "unexpected account creation time" );
 }

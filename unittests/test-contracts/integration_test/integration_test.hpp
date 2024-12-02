@@ -1,15 +1,15 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
+#include <sysio/sysio.hpp>
 
-class [[eosio::contract]] integration_test : public eosio::contract {
+class [[sysio::contract]] integration_test : public sysio::contract {
 public:
-   using eosio::contract::contract;
+   using sysio::contract::contract;
 
-   [[eosio::action]]
-   void store( eosio::name from, eosio::name to, uint64_t num );
+   [[sysio::action]]
+   void store( sysio::name from, sysio::name to, uint64_t num );
 
-   struct [[eosio::table("payloads")]] payload {
+   struct [[sysio::table("payloads")]] payload {
       uint64_t              key;
       std::vector<uint64_t> data;
 
@@ -18,6 +18,6 @@ public:
       EOSLIB_SERIALIZE( payload, (key)(data) )
    };
 
-   using payloads_table = eosio::multi_index< "payloads"_n,  payload >;
+   using payloads_table = sysio::multi_index< "payloads"_n,  payload >;
 
 };

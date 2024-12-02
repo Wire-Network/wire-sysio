@@ -4,7 +4,7 @@
    continued to produce blocks and update state but the blocks log was
    "corrupted" in that it no longer contained all the irreversible blocks.
    It was also observed that when file system which "data/state"
-   belons to is running out of space, nodeos will crash with SIGBUS as
+   belons to is running out of space, nodeop will crash with SIGBUS as
    the state file is unable to acquire new pages.
 
    The solution is to have a dedicated plugin to monitor resource
@@ -15,11 +15,11 @@
    is over a predefined threshold, a graceful shutdown is initiated.
 **/
 
-#include <eosio/resource_monitor_plugin/resource_monitor_plugin.hpp>
-#include <eosio/resource_monitor_plugin/file_space_handler.hpp>
-#include <eosio/resource_monitor_plugin/system_file_space_provider.hpp>
+#include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/resource_monitor_plugin/file_space_handler.hpp>
+#include <sysio/resource_monitor_plugin/system_file_space_provider.hpp>
 
-#include <eosio/chain/exceptions.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger_config.hpp> // set_os_thread_name
@@ -28,10 +28,10 @@
 
 #include <sys/stat.h>
 
-using namespace eosio::resource_monitor;
+using namespace sysio::resource_monitor;
 
 
-namespace eosio {
+namespace sysio {
    static auto _resource_monitor_plugin = application::register_plugin<resource_monitor_plugin>();
 
 class resource_monitor_plugin_impl {
@@ -54,7 +54,7 @@ public:
            "If remaining space is less than value for any monitored directories then threshold is considered exceeded."
            "Overrides resource-monitor-space-threshold value.")
          ( "resource-monitor-not-shutdown-on-threshold-exceeded",
-           "Used to indicate nodeos will not shutdown when threshold is exceeded." )
+           "Used to indicate nodeop will not shutdown when threshold is exceeded." )
          ( "resource-monitor-warning-interval", bpo::value<uint32_t>()->default_value(def_monitor_warning_interval),
            "Number of resource monitor intervals between two consecutive warnings when the threshold is hit. Should be between 1 and 450" )
          ;
@@ -64,7 +64,7 @@ public:
       dlog("plugin_initialize");
       try{
          auto interval = options.at("resource-monitor-interval-seconds").as<uint32_t>();
-         EOS_ASSERT(interval >= monitor_interval_min && interval <= monitor_interval_max, chain::plugin_config_exception,
+         SYS_ASSERT(interval >= monitor_interval_min && interval <= monitor_interval_max, chain::plugin_config_exception,
             "\"resource-monitor-interval-seconds\" must be between ${monitor_interval_min} and ${monitor_interval_max}", ("monitor_interval_min", monitor_interval_min) ("monitor_interval_max", monitor_interval_max));
          space_handler.set_sleep_time(interval);
          ilog("Monitoring interval set to ${interval}", ("interval", interval));
@@ -72,14 +72,14 @@ public:
          if (options.count("resource-monitor-space-absolute-gb")) {
             uint64_t v = options.at("resource-monitor-space-absolute-gb").as<uint64_t>();
             auto max = std::numeric_limits<uint64_t>::max()/1024/1024/1024;
-            EOS_ASSERT(v > 0 && v < max, chain::plugin_config_exception,
+            SYS_ASSERT(v > 0 && v < max, chain::plugin_config_exception,
                        "\"resource-monitor-space-absolute-gb\" must be greater than 0 GiB and less than max 64 bit value.");
             uint64_t w = v < 10 ? v+1 : std::min(max, (v + v/10)); // set reasonable absolute warning levels
             space_handler.set_absolute(v*1024*1024*1024, w*1024*1024*1024);
             ilog("Space usage absolute threshold set to ${v} GiB, warning set to ${w} GiB", ("v", v)("w",w));
          } else {
             auto threshold = options.at("resource-monitor-space-threshold").as<uint32_t>();
-            EOS_ASSERT(threshold >= space_threshold_min  && threshold <= space_threshold_max, chain::plugin_config_exception,
+            SYS_ASSERT(threshold >= space_threshold_min  && threshold <= space_threshold_max, chain::plugin_config_exception,
                "\"resource-monitor-space-threshold\" must be between ${space_threshold_min} and ${space_threshold_max}",
                ("space_threshold_min", space_threshold_min) ("space_threshold_max", space_threshold_max));
             space_handler.set_threshold(threshold, threshold - space_threshold_warning_diff);
@@ -97,7 +97,7 @@ public:
          }
 
          auto warning_interval = options.at("resource-monitor-warning-interval").as<uint32_t>();
-         EOS_ASSERT(warning_interval >= warning_interval_min && warning_interval <= warning_interval_max, chain::plugin_config_exception,
+         SYS_ASSERT(warning_interval >= warning_interval_min && warning_interval <= warning_interval_max, chain::plugin_config_exception,
             "\"resource-monitor-warning-interval\" must be between ${warning_interval_min} and ${warning_interval_max}", ("warning_interval_min", warning_interval_min) ("warning_interval_max", warning_interval_max));
          space_handler.set_warning_interval(warning_interval);
          ilog("Warning interval set to ${warning_interval}", ("warning_interval", warning_interval));

@@ -25,8 +25,8 @@ errorExit=Utils.errorExit
 appArgs=AppArgs()
 appArgs.add(flag="--read-only-threads", type=int, help="number of read-only threads", default=0)
 appArgs.add(flag="--num-test-runs", type=int, help="number of times to run the tests", default=1)
-appArgs.add(flag="--eos-vm-oc-enable", type=str, help="specify eos-vm-oc-enable option", default="auto")
-appArgs.add(flag="--wasm-runtime", type=str, help="if set to eos-vm-oc, must compile with EOSIO_EOS_VM_OC_DEVELOPER", default="eos-vm-jit")
+appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default="auto")
+appArgs.add(flag="--wasm-runtime", type=str, help="if set to sys-vm-oc, must compile with SYSIO_EOS_VM_OC_DEVELOPER", default="sys-vm-jit")
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
                             ,"--dump-error-details","-v","--leave-running"
@@ -58,8 +58,8 @@ random.seed(seed) # Use a fixed seed for repeatability.
 cluster=Cluster(loggingLevel="all", unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True)
-EOSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-EOSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
 producerNode = None
 apiNode = None
@@ -102,13 +102,13 @@ def startCluster():
     # set up read-only options for API node
     specificExtraNodeosArgs={}
     # producer nodes will be mapped to 0 through pnodes-1, so the number pnodes is the no-producing API node
-    specificExtraNodeosArgs[pnodes]=" --plugin eosio::net_api_plugin"
+    specificExtraNodeosArgs[pnodes]=" --plugin sysio::net_api_plugin"
     specificExtraNodeosArgs[pnodes]+=" --contracts-console "
     specificExtraNodeosArgs[pnodes]+=" --read-only-write-window-time-us "
     specificExtraNodeosArgs[pnodes]+=" 10000 "
     specificExtraNodeosArgs[pnodes]+=" --read-only-read-window-time-us "
     specificExtraNodeosArgs[pnodes]+=" 490000 "
-    specificExtraNodeosArgs[pnodes]+=" --eos-vm-oc-cache-size-mb "
+    specificExtraNodeosArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
     specificExtraNodeosArgs[pnodes]+=" 1 " # set small so there is churn
     specificExtraNodeosArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeosArgs[pnodes]+=str(args.read_only_threads)
@@ -116,7 +116,7 @@ def startCluster():
         if platform.system() != "Linux":
             Print("OC not run on Linux. Skip the test")
             exit(True) # Do not fail the test
-        specificExtraNodeosArgs[pnodes]+=" --eos-vm-oc-enable "
+        specificExtraNodeosArgs[pnodes]+=" --sys-vm-oc-enable "
         specificExtraNodeosArgs[pnodes]+=args.eos_vm_oc_enable
     if args.wasm_runtime:
         specificExtraNodeosArgs[pnodes]+=" --wasm-runtime "
@@ -133,10 +133,10 @@ def startCluster():
     producerNode = cluster.getNode()
     apiNode = cluster.nodes[-1]
 
-    eosioCodeHash = getCodeHash(producerNode, "eosio.token")
-    # eosio.* should be using oc unless oc tierup disabled
-    Utils.Print(f"search: executing {eosioCodeHash} with eos vm oc")
-    found = producerNode.findInLog(f"executing {eosioCodeHash} with eos vm oc")
+    sysioCodeHash = getCodeHash(producerNode, "sysio.token")
+    # sysio.* should be using oc unless oc tierup disabled
+    Utils.Print(f"search: executing {sysioCodeHash} with eos vm oc")
+    found = producerNode.findInLog(f"executing {sysioCodeHash} with eos vm oc")
     assert( found or (noOC and not found) )
 
     if args.eos_vm_oc_enable:
@@ -167,14 +167,14 @@ def verifyOcVirtualMemory():
 def deployTestContracts():
     Utils.Print("create test accounts")
     testAccount = Account(testAccountName)
-    testAccount.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    testAccount.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(testAccount, cluster.eosioAccount, buyRAM=500000) # 95632 bytes required for test contract
+    testAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    testAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(testAccount, cluster.sysioAccount, buyRAM=500000) # 95632 bytes required for test contract
 
     userAccount = Account(userAccountName)
-    userAccount.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    userAccount.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(userAccount, cluster.eosioAccount, stakeCPU=2000)
+    userAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    userAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(userAccount, cluster.sysioAccount, stakeCPU=2000)
 
     noAuthTableContractDir="unittests/test-contracts/no_auth_table"
     noAuthTableWasmFile="no_auth_table.wasm"
@@ -184,9 +184,9 @@ def deployTestContracts():
 
     Utils.Print("Create payloadless account and deploy payloadless contract")
     payloadlessAccount = Account(payloadlessAccountName)
-    payloadlessAccount.ownerPublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    payloadlessAccount.activePublicKey = EOSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(payloadlessAccount, cluster.eosioAccount, buyRAM=100000)
+    payloadlessAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    payloadlessAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(payloadlessAccount, cluster.sysioAccount, buyRAM=100000)
     payloadlessContractDir="unittests/test-contracts/payloadless"
     payloadlessWasmFile="payloadless.wasm"
     payloadlessAbiFile="payloadless.abi"
@@ -344,10 +344,10 @@ def chainApiTests():
     runReadOnlyTrxAndRpcInParallel("chain", "get_raw_code_and_abi", "account_name", expectedValue=testAccountName, payload = {"account_name":testAccountName})
     runReadOnlyTrxAndRpcInParallel("chain", "get_raw_abi", "account_name", expectedValue=testAccountName, payload = {"account_name":testAccountName})
     runReadOnlyTrxAndRpcInParallel("chain", "get_producers", "rows", payload = {"json":"true","lower_bound":""})
-    runReadOnlyTrxAndRpcInParallel("chain", "get_table_rows", "rows", payload = {"json":"true","code":"eosio","scope":"eosio","table":"global"})
+    runReadOnlyTrxAndRpcInParallel("chain", "get_table_rows", "rows", payload = {"json":"true","code":"sysio","scope":"sysio","table":"global"})
     runReadOnlyTrxAndRpcInParallel("chain", "get_table_by_scope", fieldIn="rows", payload = {"json":"true","table":"noauth"})
-    runReadOnlyTrxAndRpcInParallel("chain", "get_currency_balance", code=200, payload = {"code":"eosio.token", "account":testAccountName})
-    runReadOnlyTrxAndRpcInParallel("chain", "get_currency_stats", fieldIn="SYS", payload = {"code":"eosio.token", "symbol":"SYS"})
+    runReadOnlyTrxAndRpcInParallel("chain", "get_currency_balance", code=200, payload = {"code":"sysio.token", "account":testAccountName})
+    runReadOnlyTrxAndRpcInParallel("chain", "get_currency_stats", fieldIn="SYS", payload = {"code":"sysio.token", "symbol":"SYS"})
     runReadOnlyTrxAndRpcInParallel("chain", "get_required_keys", code=400)
     runReadOnlyTrxAndRpcInParallel("chain", "get_transaction_id", code=400, payload = {"ref_block_num":"1"})
     runReadOnlyTrxAndRpcInParallel("chain", "push_block", code=202, payload = {"block":"signed_block"})

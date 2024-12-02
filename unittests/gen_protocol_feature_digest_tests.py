@@ -9,12 +9,12 @@ pattern = re.compile(r"\*\n(Builtin protocol feature: (.*)(?:\*[^/]|[^\*])*)\*/"
 def main():
     with open(sys.argv[1], "r") as f:
         contents = f.read()
-        print('#include <eosio/chain/protocol_feature_manager.hpp>')
+        print('#include <sysio/chain/protocol_feature_manager.hpp>')
         print('#include <map>')
 
         print('#include <boost/test/unit_test.hpp>')
 
-        print('using namespace eosio::chain;')
+        print('using namespace sysio::chain;')
 
         print('BOOST_AUTO_TEST_CASE(protocol_feature_digest_tests) {')
         print('   std::map<std::string, std::string> digests;')

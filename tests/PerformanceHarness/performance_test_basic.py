@@ -86,10 +86,10 @@ class PerformanceTestBasic:
 
         @dataclass
         class SpecifiedContract:
-            contractDir: str = "unittests/contracts/eosio.system"
-            wasmFile: str = "eosio.system.wasm"
-            abiFile: str = "eosio.system.abi"
-            account: Account = Account("eosio")
+            contractDir: str = "unittests/contracts/sysio.system"
+            wasmFile: str = "sysio.system.wasm"
+            abiFile: str = "sysio.system.abi"
+            account: Account = Account("sysio")
 
         producerNodeCount: int = 1
         validationNodeCount: int = 1
@@ -104,7 +104,7 @@ class PerformanceTestBasic:
         loggingLevel: str = "info"
         loggingDict: dict = field(default_factory=lambda: { "bios": "off" })
         prodsEnableTraceApi: bool = False
-        nodeosVers: str = ""
+        nodeopVers: str = ""
         specificExtraNodeosArgs: dict = field(default_factory=dict)
         _totalNodes: int = 2
         _pNodes: int = 1
@@ -125,23 +125,23 @@ class PerformanceTestBasic:
             def configureValidationNodes():
                 validationNodeSpecificNodeosStr = ""
                 validationNodeSpecificNodeosStr += '--p2p-accept-transactions false '
-                if "v2" in self.nodeosVers:
-                    validationNodeSpecificNodeosStr += '--plugin eosio::history_api_plugin --filter-on "*" '
+                if "v2" in self.nodeopVers:
+                    validationNodeSpecificNodeosStr += '--plugin sysio::history_api_plugin --filter-on "*" '
                 else:
                     #If prodsEnableTraceApi, then Cluster configures all nodes with trace_api_plugin so no need to duplicate here
                     if not self.prodsEnableTraceApi:
-                        validationNodeSpecificNodeosStr += "--plugin eosio::trace_api_plugin "
+                        validationNodeSpecificNodeosStr += "--plugin sysio::trace_api_plugin "
                 if self.nonProdsEosVmOcEnable:
-                    validationNodeSpecificNodeosStr += "--eos-vm-oc-enable all "
+                    validationNodeSpecificNodeosStr += "--sys-vm-oc-enable all "
                 if validationNodeSpecificNodeosStr:
                     self.specificExtraNodeosArgs.update({f"{nodeId}" : validationNodeSpecificNodeosStr for nodeId in self._validationNodeIds})
 
             def configureApiNodes():
                 apiNodeSpecificNodeosStr = ""
                 apiNodeSpecificNodeosStr += "--p2p-accept-transactions false "
-                apiNodeSpecificNodeosStr += "--plugin eosio::chain_api_plugin "
-                apiNodeSpecificNodeosStr += "--plugin eosio::net_api_plugin "
-                if "v4" in self.nodeosVers:
+                apiNodeSpecificNodeosStr += "--plugin sysio::chain_api_plugin "
+                apiNodeSpecificNodeosStr += "--plugin sysio::net_api_plugin "
+                if "v4" in self.nodeopVers:
                     apiNodeSpecificNodeosStr += f"--read-only-threads {self.apiNodesReadOnlyThreadCount} "
                 if apiNodeSpecificNodeosStr:
                     self.specificExtraNodeosArgs.update({f"{nodeId}" : apiNodeSpecificNodeosStr for nodeId in self._apiNodeIds})
@@ -151,8 +151,8 @@ class PerformanceTestBasic:
             if self.apiNodeCount > 0:
                 configureApiNodes()
 
-            assert "v1" not in self.nodeosVers and "v0" not in self.nodeosVers, f"nodeos version {Utils.getNodeosVersion()} is unsupported by performance test"
-            if "v2" in self.nodeosVers:
+            assert "v1" not in self.nodeopVers and "v0" not in self.nodeopVers, f"nodeop version {Utils.getNodeosVersion()} is unsupported by performance test"
+            if "v2" in self.nodeopVers:
                 self.writeTrx = lambda trxDataFile, blockNum, trx: [trxDataFile.write(f"{trx['trx']['id']},{blockNum},{trx['cpu_usage_us']},{trx['net_usage_words']}\n")]
                 self.createBlockData = lambda block, blockTransactionTotal, blockNetTotal, blockCpuTotal: blockData(blockId=block["payload"]["id"], blockNum=block['payload']['block_num'], transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal, producer=block["payload"]["producer"], status=block["payload"]["confirmed"], _timestamp=block["payload"]["timestamp"])
                 self.updateTrxDict = lambda blockNum, transaction, trxDict: trxDict.update(dict([(transaction['trx']['id'], trxData(blockNum, transaction['cpu_usage_us'], transaction['net_usage_words']))]))
@@ -218,7 +218,7 @@ class PerformanceTestBasic:
         self.trxGenLogDirPath = self.loggingConfig.logDirPath/Path("trxGenLogs")
         self.varLogsDirPath = self.loggingConfig.logDirPath/Path("var")
         self.etcLogsDirPath = self.loggingConfig.logDirPath/Path("etc")
-        self.etcEosioLogsDirPath = self.etcLogsDirPath/Path("eosio")
+        self.etcSysioLogsDirPath = self.etcLogsDirPath/Path("sysio")
         self.blockDataLogDirPath = self.loggingConfig.logDirPath/Path("blockDataLogs")
         self.blockDataPath = self.blockDataLogDirPath/Path("blockData.txt")
         self.transactionMetricsDataPath = self.blockDataLogDirPath/Path("transaction_metrics.csv")
@@ -229,13 +229,13 @@ class PerformanceTestBasic:
         self.producerNodeId = self.clusterConfig._producerNodeIds[0]
         self.validationNodeId = self.clusterConfig._validationNodeIds[0]
         pid = os.getpid()
-        self.nodeosLogDir =  Path(self.loggingConfig.logDirPath)/"var"/f"{Utils.DataRoot}{Utils.PID}"
-        self.nodeosLogPath = self.nodeosLogDir/f"node_{str(self.validationNodeId).zfill(2)}"/"stderr.txt"
+        self.nodeopLogDir =  Path(self.loggingConfig.logDirPath)/"var"/f"{Utils.DataRoot}{Utils.PID}"
+        self.nodeopLogPath = self.nodeopLogDir/f"node_{str(self.validationNodeId).zfill(2)}"/"stderr.txt"
 
         # Setup cluster and its wallet manager
         self.walletMgr=WalletMgr(True)
         self.cluster=Cluster(loggingLevel=self.clusterConfig.loggingLevel, loggingLevelDict=self.clusterConfig.loggingDict,
-                             nodeosVers=self.clusterConfig.nodeosVers,unshared=self.testHelperConfig.unshared,
+                             nodeopVers=self.clusterConfig.nodeopVers,unshared=self.testHelperConfig.unshared,
                              keepRunning=self.clusterConfig.dontKill, keepLogs=self.clusterConfig.keepLogs)
         self.cluster.setWalletMgr(self.walletMgr)
 
@@ -250,7 +250,7 @@ class PerformanceTestBasic:
             def removeAllArtifactsExceptFinalReport():
                 removeArtifacts(self.trxGenLogDirPath)
                 removeArtifacts(self.varLogsDirPath)
-                removeArtifacts(self.etcEosioLogsDirPath)
+                removeArtifacts(self.etcSysioLogsDirPath)
                 removeArtifacts(self.etcLogsDirPath)
                 removeArtifacts(self.blockDataLogDirPath)
 
@@ -293,7 +293,7 @@ class PerformanceTestBasic:
             createArtifactsDir(self.trxGenLogDirPath)
             createArtifactsDir(self.varLogsDirPath)
             createArtifactsDir(self.etcLogsDirPath)
-            createArtifactsDir(self.etcEosioLogsDirPath)
+            createArtifactsDir(self.etcSysioLogsDirPath)
             createArtifactsDir(self.blockDataLogDirPath)
 
         except OSError as error:
@@ -308,10 +308,10 @@ class PerformanceTestBasic:
 
     def isOnBlockTransaction(self, transaction):
         # v2 history does not include onblock
-        if "v2" in self.clusterConfig.nodeosVers:
+        if "v2" in self.clusterConfig.nodeopVers:
             return False
         else:
-            if transaction['actions'][0]['account'] != 'eosio' or transaction['actions'][0]['action'] != 'onblock':
+            if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['action'] != 'onblock':
                 return False
         return True
 
@@ -376,7 +376,7 @@ class PerformanceTestBasic:
                     if ret is None:
                         newAccountNames.append(name)
             self.cluster.populateWallet(accountsCount=len(newAccountNames), wallet=self.wallet, accountNames=newAccountNames)
-            self.cluster.createAccounts(self.cluster.eosioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
+            self.cluster.createAccounts(self.cluster.sysioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
             if len(newAccountNames) != 0:
                 for index in range(len(self.accountNames), len(accountNames)):
                     self.accountNames.append(self.cluster.accounts[index].name)
@@ -384,7 +384,7 @@ class PerformanceTestBasic:
                     self.accountPrivKeys.append(self.cluster.accounts[index].ownerPrivateKey)
         else:
             self.cluster.populateWallet(accountsCount=accountCnt, wallet=self.wallet)
-            self.cluster.createAccounts(self.cluster.eosioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
+            self.cluster.createAccounts(self.cluster.sysioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
             for index in range(0, accountCnt):
                 self.accountNames.append(self.cluster.accounts[index].name)
                 self.accountPrivKeys.append(self.cluster.accounts[index].activePrivateKey)
@@ -394,9 +394,9 @@ class PerformanceTestBasic:
             self.userTrxDataDict = json.load(f)
 
     def setupContract(self):
-        if self.clusterConfig.specifiedContract.account.name != self.cluster.eosioAccount.name:
+        if self.clusterConfig.specifiedContract.account.name != self.cluster.sysioAccount.name:
             self.cluster.populateWallet(accountsCount=1, wallet=self.wallet, accountNames=[self.clusterConfig.specifiedContract.account.name], createProducerAccounts=False)
-            self.cluster.createAccounts(self.cluster.eosioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
+            self.cluster.createAccounts(self.cluster.sysioAccount, stakedDeposit=0, validationNodeIndex=self.validationNodeId)
             self.clusterConfig.specifiedContract.account = self.cluster.accounts[0]
             print("Publishing contract")
             transaction=self.cluster.biosNode.publishContract(self.clusterConfig.specifiedContract.account, self.clusterConfig.specifiedContract.contractDir,
@@ -456,8 +456,8 @@ class PerformanceTestBasic:
             for act in self.userTrxDataDict['actions']:
                 actionAuthAcct=act["actionAuthAcct"]
                 actionAuthPrivKey=None
-                if actionAuthAcct == self.cluster.eosioAccount.name:
-                    actionAuthPrivKey = self.cluster.eosioAccount.activePrivateKey
+                if actionAuthAcct == self.cluster.sysioAccount.name:
+                    actionAuthPrivKey = self.cluster.sysioAccount.activePrivateKey
                 else:
                     for account in self.cluster.accounts:
                         if actionAuthAcct == account.name:
@@ -513,9 +513,9 @@ class PerformanceTestBasic:
 
     def captureLowLevelArtifacts(self):
         try:
-            shutil.move(f"{self.cluster.nodeosLogPath}", f"{self.varLogsDirPath}")
+            shutil.move(f"{self.cluster.nodeopLogPath}", f"{self.varLogsDirPath}")
         except Exception as e:
-            print(f"Failed to move '{self.cluster.nodeosLogPath}' to '{self.varLogsDirPath}': {type(e)}: {e}")
+            print(f"Failed to move '{self.cluster.nodeopLogPath}' to '{self.varLogsDirPath}': {type(e)}: {e}")
 
     def createReport(self, logAnalysis: LogAnalysis, tpsTestConfig: TpsTestConfig, argsDict: dict, testResult: PerfTestBasicResult) -> dict:
         report = {}
@@ -555,12 +555,12 @@ class PerformanceTestBasic:
         report['args'] =  argsDict
         report['args']['userTrxData'] = self.userTrxDataDict if self.ptbConfig.userTrxDataFile is not None else "NOT CONFIGURED"
         report['env'] = {'system': system(), 'os': os.name, 'release': release(), 'logical_cpu_count': os.cpu_count()}
-        report['nodeosVersion'] = self.clusterConfig.nodeosVers
+        report['nodeopVersion'] = self.clusterConfig.nodeopVers
         return report
 
     def analyzeResultsAndReport(self, testResult: PtbTpsTestResult):
         args = self.prepArgs()
-        artifactsLocate = ArtifactPaths(nodeosLogDir=self.nodeosLogDir, nodeosLogPath=self.nodeosLogPath, trxGenLogDirPath=self.trxGenLogDirPath, blockTrxDataPath=self.blockTrxDataPath,
+        artifactsLocate = ArtifactPaths(nodeopLogDir=self.nodeopLogDir, nodeopLogPath=self.nodeopLogPath, trxGenLogDirPath=self.trxGenLogDirPath, blockTrxDataPath=self.blockTrxDataPath,
                                                    blockDataPath=self.blockDataPath, transactionMetricsDataPath=self.transactionMetricsDataPath)
         tpsTestConfig = TpsTestConfig(targetTps=self.ptbConfig.targetTps, testDurationSec=self.ptbConfig.testTrxGenDurationSec, tpsLimitPerGenerator=self.ptbConfig.tpsLimitPerGenerator,
                                                  numBlocksToPrune=self.ptbConfig.numAddlBlocksToPrune, numTrxGensUsed=testResult.numGeneratorsUsed, targetTpsPerGenList=testResult.targetTpsPerGenList,
@@ -670,8 +670,8 @@ class PerformanceTestBasic:
         httpPluginArgs = HttpPluginArgs(httpMaxBytesInFlightMb=args.http_max_bytes_in_flight_mb, httpMaxInFlightRequests=args.http_max_in_flight_requests,
                                         httpMaxResponseTimeMs=args.http_max_response_time_ms, httpThreads=args.http_threads)
         netPluginArgs = NetPluginArgs(netThreads=args.net_threads, maxClients=0)
-        nodeosVers=Utils.getNodeosVersion()
-        resourceMonitorPluginArgs = ResourceMonitorPluginArgs(resourceMonitorNotShutdownOnThresholdExceeded=not "v2" in nodeosVers)
+        nodeopVers=Utils.getNodeosVersion()
+        resourceMonitorPluginArgs = ResourceMonitorPluginArgs(resourceMonitorNotShutdownOnThresholdExceeded=not "v2" in nodeopVers)
         ENA = PerformanceTestBasic.ClusterConfig.ExtraNodeosArgs
         extraNodeosArgs = ENA(chainPluginArgs=chainPluginArgs, httpPluginArgs=httpPluginArgs, producerPluginArgs=producerPluginArgs, netPluginArgs=netPluginArgs,
                             resourceMonitorPluginArgs=resourceMonitorPluginArgs)
@@ -681,7 +681,7 @@ class PerformanceTestBasic:
                                                             producerNodeCount=args.producer_nodes, validationNodeCount=args.validation_nodes, apiNodeCount=args.api_nodes,
                                                             genesisPath=args.genesis, prodsEnableTraceApi=args.prods_enable_trace_api, extraNodeosArgs=extraNodeosArgs,
                                                             specifiedContract=specifiedContract, loggingLevel=args.cluster_log_lvl,
-                                                            nodeosVers=nodeosVers, nonProdsEosVmOcEnable=args.non_prods_eos_vm_oc_enable,
+                                                            nodeopVers=nodeopVers, nonProdsEosVmOcEnable=args.non_prods_eos_vm_oc_enable,
                                                             apiNodesReadOnlyThreadCount=args.api_nodes_read_only_threads)
 
 class PtbArgumentsHandler(object):
@@ -732,21 +732,21 @@ class PtbArgumentsHandler(object):
         ptbBaseParserGroup.add_argument("--del-report", help=argparse.SUPPRESS if suppressHelp else "Whether to delete overarching performance run report.", action='store_true')
         ptbBaseParserGroup.add_argument("--save-state", help=argparse.SUPPRESS if suppressHelp else "Whether to save node state. (Warning: large disk usage)", action='store_true')
         ptbBaseParserGroup.add_argument("--quiet", help=argparse.SUPPRESS if suppressHelp else "Whether to quiet printing intermediate results and reports to stdout", action='store_true')
-        ptbBaseParserGroup.add_argument("--prods-enable-trace-api", help=argparse.SUPPRESS if suppressHelp else "Determines whether producer nodes should have eosio::trace_api_plugin enabled", action='store_true')
+        ptbBaseParserGroup.add_argument("--prods-enable-trace-api", help=argparse.SUPPRESS if suppressHelp else "Determines whether producer nodes should have sysio::trace_api_plugin enabled", action='store_true')
         ptbBaseParserGroup.add_argument("--print-missing-transactions", type=bool, help=argparse.SUPPRESS if suppressHelp else "Print missing transactions upon test completion.", default=True)
-        ptbBaseParserGroup.add_argument("--account-name", type=str, help=argparse.SUPPRESS if suppressHelp else "Name of the account to create and assign a contract to", default="eosio")
-        ptbBaseParserGroup.add_argument("--contract-dir", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to contract dir", default="unittests/contracts/eosio.system")
-        ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="eosio.system.wasm")
-        ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="eosio.system.abi")
+        ptbBaseParserGroup.add_argument("--account-name", type=str, help=argparse.SUPPRESS if suppressHelp else "Name of the account to create and assign a contract to", default="sysio")
+        ptbBaseParserGroup.add_argument("--contract-dir", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to contract dir", default="unittests/contracts/sysio.system")
+        ptbBaseParserGroup.add_argument("--wasm-file", type=str, help=argparse.SUPPRESS if suppressHelp else "WASM file name for contract", default="sysio.system.wasm")
+        ptbBaseParserGroup.add_argument("--abi-file", type=str, help=argparse.SUPPRESS if suppressHelp else "ABI file name for contract", default="sysio.system.abi")
         ptbBaseParserGroup.add_argument("--user-trx-data-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Path to transaction data JSON file")
-        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else "Override default WASM runtime (\"eos-vm-jit\", \"eos-vm\")\
-                                         \"eos-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to\
-                                         execution. \"eos-vm\" : A WebAssembly interpreter.",
-                                         choices=["eos-vm-jit", "eos-vm"], default="eos-vm-jit")
+        ptbBaseParserGroup.add_argument("--wasm-runtime", type=str, help=argparse.SUPPRESS if suppressHelp else "Override default WASM runtime (\"sys-vm-jit\", \"sys-vm\")\
+                                         \"sys-vm-jit\" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to\
+                                         execution. \"sys-vm\" : A WebAssembly interpreter.",
+                                         choices=["sys-vm-jit", "sys-vm"], default="sys-vm-jit")
         ptbBaseParserGroup.add_argument("--contracts-console", help=argparse.SUPPRESS if suppressHelp else "print contract's output to console", action='store_true')
-        ptbBaseParserGroup.add_argument("--eos-vm-oc-cache-size-mb", type=int, help=argparse.SUPPRESS if suppressHelp else "Maximum size (in MiB) of the EOS VM OC code cache", default=1024)
-        ptbBaseParserGroup.add_argument("--eos-vm-oc-compile-threads", type=int, help=argparse.SUPPRESS if suppressHelp else "Number of threads to use for EOS VM OC tier-up", default=1)
-        ptbBaseParserGroup.add_argument("--non-prods-eos-vm-oc-enable", help=argparse.SUPPRESS if suppressHelp else "Enable EOS VM OC tier-up runtime on non producer nodes", action='store_true')
+        ptbBaseParserGroup.add_argument("--sys-vm-oc-cache-size-mb", type=int, help=argparse.SUPPRESS if suppressHelp else "Maximum size (in MiB) of the EOS VM OC code cache", default=1024)
+        ptbBaseParserGroup.add_argument("--sys-vm-oc-compile-threads", type=int, help=argparse.SUPPRESS if suppressHelp else "Number of threads to use for EOS VM OC tier-up", default=1)
+        ptbBaseParserGroup.add_argument("--non-prods-sys-vm-oc-enable", help=argparse.SUPPRESS if suppressHelp else "Enable EOS VM OC tier-up runtime on non producer nodes", action='store_true')
         ptbBaseParserGroup.add_argument("--block-log-retain-blocks", type=int, help=argparse.SUPPRESS if suppressHelp else "If set to greater than 0, periodically prune the block log to\
                                          store only configured number of most recent blocks. If set to 0, no blocks are be written to the block log;\
                                          block log file is removed after startup.", default=None)

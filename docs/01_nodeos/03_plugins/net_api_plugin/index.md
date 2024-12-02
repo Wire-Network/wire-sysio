@@ -17,11 +17,11 @@ See [Net API Reference Documentation](https://docs.eosnetwork.com/leap-plugins/l
 
 ```console
 # config.ini
-plugin = eosio::net_api_plugin
+plugin = sysio::net_api_plugin
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::net_api_plugin
+nodeop ... --plugin sysio::net_api_plugin
 ```
 
 ## Options
@@ -37,13 +37,13 @@ None
 
 ```console
 # config.ini
-plugin = eosio::net_plugin
+plugin = sysio::net_plugin
 [options]
-plugin = eosio::http_plugin
+plugin = sysio::http_plugin
 [options]
 ```
 ```sh
 # command-line
-nodeos ... --plugin eosio::net_plugin [options]  \
-           --plugin eosio::http_plugin [options]
+nodeop ... --plugin sysio::net_plugin [options]  \
+           --plugin sysio::http_plugin [options]
 ```

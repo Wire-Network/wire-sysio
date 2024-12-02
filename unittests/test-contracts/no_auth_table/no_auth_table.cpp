@@ -1,18 +1,18 @@
-#include <eosio/eosio.hpp>
+#include <sysio/sysio.hpp>
 
 // This creates a simple table without require_auth used.
 // It is mainly used to test read-only transactions.
 
-using namespace eosio;
+using namespace sysio;
 using namespace std;
 
-class [[eosio::contract]] no_auth_table : public contract {
+class [[sysio::contract]] no_auth_table : public contract {
 public:
    using contract::contract;
 
    no_auth_table(name receiver, name code,  datastream<const char*> ds): contract(receiver, code, ds) {}
 
-   [[eosio::action]]
+   [[sysio::action]]
    uint64_t getage(name user) {
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
@@ -21,7 +21,7 @@ public:
    }
 
    // This is used to create unique transaction by varying id.
-   [[eosio::action]]
+   [[sysio::action]]
    uint64_t age(name user, uint64_t id) {
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
@@ -29,7 +29,7 @@ public:
       return iterator->age;
    }
 
-   [[eosio::action]]
+   [[sysio::action]]
    void insert(name user, uint64_t id, uint64_t age) {
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
@@ -41,7 +41,7 @@ public:
       });
    }
 
-   [[eosio::action]]
+   [[sysio::action]]
    void modify(name user, uint64_t age) {
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
@@ -52,7 +52,7 @@ public:
       });
    }
 
-   [[eosio::action]]
+   [[sysio::action]]
    void modifybyid(uint64_t id, uint64_t age) {
       person_index people( get_self(), get_first_receiver().value );
       auto secondary_index = people.template get_index<"byid"_n>();
@@ -64,7 +64,7 @@ public:
       });
    }
  
-   [[eosio::action]]
+   [[sysio::action]]
    void erase(name user) {
       person_index people( get_self(), get_first_receiver().value);
 
@@ -73,7 +73,7 @@ public:
       people.erase(iterator);
    } 
 
-   [[eosio::action]]
+   [[sysio::action]]
    void erasebyid(uint64_t id) {
       person_index people( get_self(), get_first_receiver().value );
       auto secondary_index = people.template get_index<"byid"_n>();
@@ -83,14 +83,14 @@ public:
    }
 
 private:
-   struct [[eosio::table]] person {
+   struct [[sysio::table]] person {
       name key;
       uint64_t id;
       uint64_t age;
       uint64_t primary_key() const { return key.value; }
       uint64_t sec64_key() const { return id; }
    };
-   using person_index = eosio::multi_index<"people"_n, person,
+   using person_index = sysio::multi_index<"people"_n, person,
      indexed_by<"byid"_n, const_mem_fun<person, uint64_t, &person::sec64_key>>
     >;
 };

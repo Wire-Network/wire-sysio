@@ -42,11 +42,11 @@ cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs
 walletMgr=WalletMgr(True)
 
 def extractPrometheusMetric(connID: str, metric: str, text: str):
-    searchStr = f'nodeos_p2p_{metric}{{connid="{connID}"}} '
+    searchStr = f'nodeop_p2p_{metric}{{connid="{connID}"}} '
     begin = text.find(searchStr) + len(searchStr)
     return int(text[begin:text.find('\n', begin)])
 
-prometheusHostPortPattern = re.compile(r'^nodeos_p2p_port.connid="([a-f0-9]*)". ([0-9]*)', re.MULTILINE)
+prometheusHostPortPattern = re.compile(r'^nodeop_p2p_port.connid="([a-f0-9]*)". ([0-9]*)', re.MULTILINE)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
@@ -56,7 +56,7 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
-    extraNodeosArgs = '--plugin eosio::prometheus_plugin --connection-cleanup-period 3'
+    extraNodeosArgs = '--plugin sysio::prometheus_plugin --connection-cleanup-period 3'
     # Custom topology is a line of singlely connected nodes from highest node number in sequence to lowest,
     # the reverse of the usual TestHarness line topology.
     if cluster.launch(pnodes=pnodes, unstartedNodes=2, totalNodes=total_nodes, prodCount=prod_count, 
@@ -80,15 +80,15 @@ try:
     testWalletName="test"
 
     Print("Creating wallet \"%s\"." % (testWalletName))
-    testWallet=walletMgr.create(testWalletName, [cluster.eosioAccount,accounts[0],accounts[1]])
+    testWallet=walletMgr.create(testWalletName, [cluster.sysioAccount,accounts[0],accounts[1]])
 
-    # create accounts via eosio as otherwise a bid is needed
+    # create accounts via sysio as otherwise a bid is needed
     for account in accounts:
-        Print("Create new account %s via %s" % (account.name, cluster.eosioAccount.name))
-        trans=nonProdNode.createInitializeAccount(account, cluster.eosioAccount, stakedDeposit=0, waitForTransBlock=True, stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
+        Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
+        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0, waitForTransBlock=True, stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
         transferAmount="100000000.0000 {0}".format(CORE_SYMBOL)
-        Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.eosioAccount.name, account.name))
-        nonProdNode.transferFunds(cluster.eosioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
+        Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
+        nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
         trans=nonProdNode.delegatebw(account, 20000000.0000, 20000000.0000, waitForTransBlock=True, exitOnError=True)
 
     beginLargeBlocksHeadBlock = nonProdNode.getHeadBlockNum()
@@ -97,7 +97,7 @@ try:
     targetTpsPerGenerator = 500
     testTrxGenDurationSec=60
     trxGeneratorCnt=1
-    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.eosioAccount.name, acctNamesList=[accounts[0].name,accounts[1].name],
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[accounts[0].name,accounts[1].name],
                                 acctPrivKeysList=[account1PrivKey,account2PrivKey], nodeId=prodNode.nodeId, tpsPerGenerator=targetTpsPerGenerator,
                                 numGenerators=trxGeneratorCnt, durationSec=testTrxGenDurationSec, waitToComplete=True)
 

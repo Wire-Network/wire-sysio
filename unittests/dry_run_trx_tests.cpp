@@ -1,13 +1,13 @@
-#include <eosio/chain/abi_serializer.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 #include <boost/test/unit_test.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/global_property_object.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <fc/variant_object.hpp>
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -204,9 +204,9 @@ BOOST_FIXTURE_TEST_CASE(deleteauth_test, dry_run_trx_tester) { try {
 BOOST_FIXTURE_TEST_CASE(linkauth_test, dry_run_trx_tester) { try {
    produce_blocks( 1 );
 
-   create_account("eosio.token"_n);
-   set_code("eosio.token"_n, test_contracts::eosio_token_wasm());
-   set_abi("eosio.token"_n, test_contracts::eosio_token_abi());
+   create_account("sysio.token"_n);
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
 
    create_accounts( {"alice"_n} );
 
@@ -219,7 +219,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, dry_run_trx_tester) { try {
    );
 
    name account = "alice"_n;
-   name code = "eosio_token"_n;
+   name code = "sysio_token"_n;
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
@@ -234,9 +234,9 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, dry_run_trx_tester) { try {
 BOOST_FIXTURE_TEST_CASE(unlinkauth_test, dry_run_trx_tester) { try {
    produce_blocks( 1 );
 
-   create_account("eosio.token"_n);
-   set_code("eosio.token"_n, test_contracts::eosio_token_wasm());
-   set_abi("eosio.token"_n, test_contracts::eosio_token_abi());
+   create_account("sysio.token"_n);
+   set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
+   set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
 
    create_accounts( {"alice"_n} );
 
@@ -251,12 +251,12 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, dry_run_trx_tester) { try {
    // link auth
    push_action(config::system_account_name, linkauth::get_name(), "alice"_n, fc::mutable_variant_object()
            ("account", "alice")
-           ("code", "eosio.token")
+           ("code", "sysio.token")
            ("type", "transfer")
            ("requirement", "first"));
 
    name account = "alice"_n;
-   name code = "eosio_token"_n;
+   name code = "sysio_token"_n;
    name type = "transfer"_n;
    action act = {
       vector<permission_level>{{"alice"_n, config::active_name}},

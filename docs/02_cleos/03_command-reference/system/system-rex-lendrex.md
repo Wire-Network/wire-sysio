@@ -23,5 +23,5 @@ excerpt: "Deposit tokens to REX fund and use the tokens to buy REX"
 
 
 ```sh
-cleos system rex lendrex accountname1 "1 REX"
+clio system rex lendrex accountname1 "1 REX"
 ```

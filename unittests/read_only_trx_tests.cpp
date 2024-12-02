@@ -1,13 +1,13 @@
-#include <eosio/chain/abi_serializer.hpp>
+#include <sysio/chain/abi_serializer.hpp>
 #include <boost/test/unit_test.hpp>
-#include <eosio/testing/tester.hpp>
-#include <eosio/chain/global_property_object.hpp>
+#include <sysio/testing/tester.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <fc/variant_object.hpp>
 #include <test_contracts.hpp>
 
-using namespace eosio;
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
@@ -93,7 +93,7 @@ BOOST_FIXTURE_TEST_CASE(setcode_test, read_only_trx_tester) { try {
 
    std::vector<uint8_t> code(10);
    action act = {
-      {}, setcode { "eosio"_n, 0, 0, bytes(code.begin(), code.end()) }
+      {}, setcode { "sysio"_n, 0, 0, bytes(code.begin(), code.end()) }
    };
 
    BOOST_CHECK_THROW( send_action(act), action_validate_exception );
@@ -145,7 +145,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "eosio_token"_n;
+   name code = "sysio_token"_n;
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
@@ -160,7 +160,7 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, read_only_trx_tester) { try {
    produce_blocks( 1 );
 
    name account = "alice"_n;
-   name code = "eosio_token"_n;
+   name code = "sysio_token"_n;
    name type = "transfer"_n;
    action act = {
       vector<permission_level>{{config::system_account_name,config::active_name}},

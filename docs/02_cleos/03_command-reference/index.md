@@ -1,4 +1,4 @@
-Documentation for all `cleos` main commands
+Documentation for all `clio` main commands
 
 ## Commands
 - [version](version) - Retrieve version information
@@ -16,4 +16,4 @@ Documentation for all `cleos` main commands
 [//]: # ( THIS IS A COMMENT FOLLOWING LINE HAD JS COMMENTS JS COMMENTS BREAK MDX )  
 [//]: # ( wrap wrap - Wrap contract commands )  
 
-- [system](system) - Send eosio.system contract action to the blockchain.
+- [system](system) - Send sysio.system contract action to the blockchain.

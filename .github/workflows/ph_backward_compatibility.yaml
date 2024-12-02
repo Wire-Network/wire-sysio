@@ -65,12 +65,12 @@ jobs:
         run: |
           apt-get update
           apt-get install -y ./leap*.deb
-          rm build/bin/nodeos
-          rm build/bin/cleos
-          cp /usr/bin/nodeos build/bin
-          cp /usr/bin/cleos build/bin
-          ./build/bin/nodeos --full-version
-          ./build/bin/cleos version full
+          rm build/bin/nodeop
+          rm build/bin/clio
+          cp /usr/bin/nodeop build/bin
+          cp /usr/bin/clio build/bin
+          ./build/bin/nodeop --full-version
+          ./build/bin/clio version full
       - if: ${{ matrix.release == '3.1' || matrix.release == '3.2' }}
         name: Run Performance Tests (<v4.0)
         run: |

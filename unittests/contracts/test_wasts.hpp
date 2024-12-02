@@ -1,5 +1,5 @@
 #pragma once
-#include <eosio/chain/webassembly/common.hpp>
+#include <sysio/chain/webassembly/common.hpp>
 
 static const char huge_tables_wast[] = R"=====(
 (module
@@ -111,7 +111,7 @@ static const char misaligned_const_ref_wast[] = R"=====(
 static const char entry_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
  (import "env" "current_time" (func $current_time (result i64)))
  (table 0 anyfunc)
  (memory $0 1)
@@ -129,7 +129,7 @@ static const char entry_wast[] = R"=====(
  (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
   (block
    (call $require_auth (i64.const 6121376101093867520))
-   (call $eosio_assert
+   (call $sysio_assert
     (i64.eq
      (i64.load offset=4
       (i32.const 0)
@@ -147,7 +147,7 @@ static const char entry_wast[] = R"=====(
 static const char entry_wast_2[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
  (import "env" "current_time" (func $current_time (result i64)))
  (table 0 anyfunc)
  (memory $0 1)
@@ -157,7 +157,7 @@ static const char entry_wast_2[] = R"=====(
  (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
   (block
    (call $require_auth (i64.const 6121376101093867520))
-   (call $eosio_assert
+   (call $sysio_assert
     (i64.eq
      (i64.load offset=4
       (i32.const 0)
@@ -190,7 +190,7 @@ static const char entry_import_wast[] = R"=====(
 
 static const char entry_db_wast[] = R"=====(
 (module
-  (func $exit (import "env" "eosio_exit") (param i32))
+  (func $exit (import "env" "sysio_exit") (param i32))
   (func $db_store_i64 (import "env" "db_store_i64") (param i64 i64 i64 i64 i32 i32) (result i32))
   (func $current_receiver (import "env" "current_receiver") (result i64))
   (memory 1)
@@ -226,7 +226,7 @@ static const char simple_no_memory_wast[] = R"=====(
 static const char mutable_global_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
  (table 0 anyfunc)
  (memory $0 1)
  (export "memory" (memory $0))
@@ -238,10 +238,10 @@ static const char mutable_global_wast[] = R"=====(
     (return)
   ))
   (if (i64.eq (get_local $2) (i64.const 1)) (then
-    (call $eosio_assert (i64.eq (get_global $g0) (i64.const 2)) (i32.const 0))
+    (call $sysio_assert (i64.eq (get_global $g0) (i64.const 2)) (i32.const 0))
     (return)
   ))
-  (call $eosio_assert (i32.const 0) (i32.const 0))
+  (call $sysio_assert (i32.const 0) (i32.const 0))
  )
  (global $g0 (mut i64) (i64.const 2))
 )
@@ -249,7 +249,7 @@ static const char mutable_global_wast[] = R"=====(
 
 static const char biggest_memory_wast[] = R"=====(
 (module
- (import "env" "eosio_assert" (func $$eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $$sysio_assert (param i32 i32)))
  (import "env" "require_auth" (func $$require_auth (param i64)))
  (table 0 anyfunc)
  (memory $$0 ${MAX_WASM_PAGES})
@@ -257,7 +257,7 @@ static const char biggest_memory_wast[] = R"=====(
  (export "apply" (func $$apply))
  (func $$apply (param $$0 i64) (param $$1 i64) (param $$2 i64)
   (call $$require_auth (i64.const 4294504710842351616))
-  (call $$eosio_assert
+  (call $$sysio_assert
    (i32.eq
      (grow_memory (i32.const 1))
      (i32.const -1)
@@ -270,21 +270,21 @@ static const char biggest_memory_wast[] = R"=====(
 
 static const char biggest_memory_variable_wast[] = R"=====(
 (module
- (import "env" "eosio_assert" (func $$eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $$sysio_assert (param i32 i32)))
  (import "env" "require_auth" (func $$require_auth (param i64)))
  (table 0 anyfunc)
  (memory $$0 ${MAX_WASM_PAGES})
  (export "memory" (memory $$0))
  (export "apply" (func $$apply))
  (func $$apply (param $$0 i64) (param $$1 i64) (param $$2 i64)
-  (call $$eosio_assert
+  (call $$sysio_assert
    (i32.eq
      (grow_memory (i32.wrap/i64 (get_local 2)))
      (i32.const ${MAX_WASM_PAGES})
    )
    (i32.const 0)
   )
-  (call $$eosio_assert
+  (call $$sysio_assert
    (i32.eq
      (grow_memory (i32.const 1))
      (i32.const -1)
@@ -309,21 +309,21 @@ static const char too_big_memory_wast[] = R"=====(
 
 static const char max_memory_wast[] = R"=====(
 (module
- (import "env" "eosio_assert" (func $$eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $$sysio_assert (param i32 i32)))
  (import "env" "require_auth" (func $$require_auth (param i64)))
  (table 0 anyfunc)
  (memory $$0 ${INIT_WASM_PAGES} ${MAX_WASM_PAGES})
  (export "memory" (memory $$0))
  (export "apply" (func $$apply))
  (func $$apply (param $$0 i64) (param $$1 i64) (param $$2 i64)
-  (call $$eosio_assert
+  (call $$sysio_assert
    (i32.eq
      (grow_memory (i32.wrap/i64 (get_local 2)))
      (i32.const ${INIT_WASM_PAGES})
    )
    (i32.const 0)
   )
-  (call $$eosio_assert
+  (call $$sysio_assert
    (i32.eq
      (grow_memory (i32.const 1))
      (i32.const -1)
@@ -404,7 +404,7 @@ static const char memory_table_import[] = R"=====(
 static const char table_checker_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $assert (param i32 i32)))
  (type $SIG$vj (func (param i64)))
  (table 1024 anyfunc)
  (memory $0 1)
@@ -447,7 +447,7 @@ static const char table_checker_wast[] = R"=====(
 static const char table_checker_proper_syntax_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $assert (param i32 i32)))
  (import "env" "printi" (func $printi (param i64)))
  (type $SIG$vj (func (param i64)))
  (table 1024 anyfunc)
@@ -491,7 +491,7 @@ static const char table_checker_proper_syntax_wast[] = R"=====(
 static const char table_checker_small_wast[] = R"=====(
 (module
  (import "env" "require_auth" (func $require_auth (param i64)))
- (import "env" "eosio_assert" (func $assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $assert (param i32 i32)))
  (import "env" "printi" (func $printi (param i64)))
  (type $SIG$vj (func (param i64)))
  (table 128 anyfunc)
@@ -728,13 +728,13 @@ static const char apply_wrong_signature_wast[] = R"=====(
 static const char import_injected_wast[] =                                            \
 "(module"                                                                             \
 " (export \"apply\" (func $apply))"                                                   \
-" (import \"" EOSIO_INJECTED_MODULE_NAME "\" \"checktime\" (func $inj (param i32)))"  \
+" (import \"" SYSIO_INJECTED_MODULE_NAME "\" \"checktime\" (func $inj (param i32)))"  \
 " (func $apply (param $0 i64) (param $1 i64) (param $2 i64))"                         \
 ")";
 
 static const char import_wrong_signature_wast[] = R"=====(
 (module
- (import "env" "eosio_assert" (func (param i32 i64)))
+ (import "env" "sysio_assert" (func (param i32 i64)))
  (func (export "apply") (param i64 i64 i64))
 )
 )=====";
@@ -754,18 +754,18 @@ static const char memory_growth_memset_store[] = R"=====(
 static const char memory_growth_memset_test[] = R"=====(
 (module
  (export "apply" (func $apply))
- (import "env" "eosio_assert" (func $eosio_assert (param i32 i32)))
+ (import "env" "sysio_assert" (func $sysio_assert (param i32 i32)))
  (memory $0 1)
  (func $apply (param $0 i64)(param $1 i64)(param $2 i64)
    (drop (grow_memory (i32.const 2)))
-   (call $eosio_assert
+   (call $sysio_assert
      (i32.eq
        (i32.load offset=80000 (i32.const 0))
        (i32.const 0)
      )
      (i32.const 0)
    )
-   (call $eosio_assert
+   (call $sysio_assert
      (i32.eq
        (i32.load offset=140000 (i32.const 0))
        (i32.const 0)
@@ -932,11 +932,11 @@ static const char zero_memory_grow_hi[] = R"=====(
 static const char exit_in_start_wast[] = R"=====(
 (module
  (import "env" "abort" (func $abort))
- (import "env" "eosio_exit" (func $eosio_exit (param i32)))
+ (import "env" "sysio_exit" (func $sysio_exit (param i32)))
  (export "apply" (func $apply))
  (start $dothedew)
  (func $dothedew
-   (call $eosio_exit (i32.const 0))
+   (call $sysio_exit (i32.const 0))
  )
  (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
    (call $abort)

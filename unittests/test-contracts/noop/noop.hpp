@@ -1,13 +1,13 @@
 #pragma once
 
-#include <eosio/eosio.hpp>
+#include <sysio/sysio.hpp>
 
-class [[eosio::contract]] noop : public eosio::contract {
+class [[sysio::contract]] noop : public sysio::contract {
 public:
-   using eosio::contract::contract;
+   using sysio::contract::contract;
 
-   [[eosio::action]]
-   void anyaction( eosio::name                       from,
-                   const eosio::ignore<std::string>& type,
-                   const eosio::ignore<std::string>& data );
+   [[sysio::action]]
+   void anyaction( sysio::name                       from,
+                   const sysio::ignore<std::string>& type,
+                   const sysio::ignore<std::string>& data );
 };

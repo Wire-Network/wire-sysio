@@ -1,20 +1,20 @@
 ### Build contracts with cdt if available ###
 include(ExternalProject)
 
-if( EOSIO_COMPILE_TEST_CONTRACTS )
-   set(EOSIO_WASM_OLD_BEHAVIOR "Off")
-   if( USE_EOSIO_CDT_1_7_X OR USE_EOSIO_CDT_1_8_X )
-      find_package( eosio.cdt REQUIRED )
-      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${EOSIO_CDT_ROOT}/lib/cmake/eosio.cdt/EosioWasmToolchain.cmake -DEOSIO_COMPILE_TEST_CONTRACTS=${EOSIO_COMPILE_TEST_CONTRACTS} )
+if( SYSIO_COMPILE_TEST_CONTRACTS )
+   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
+   if( USE_SYSIO_CDT_1_7_X OR USE_SYSIO_CDT_1_8_X )
+      find_package( sysio.cdt REQUIRED )
+      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${SYSIO_CDT_ROOT}/lib/cmake/sysio.cdt/SysioWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
    else()
       find_package( cdt REQUIRED )
-      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DEOSIO_COMPILE_TEST_CONTRACTS=${EOSIO_COMPILE_TEST_CONTRACTS} )
+      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
    endif()
 
-   if( USE_EOSIO_CDT_1_7_X )
-      list(APPEND CMAKE_ARGS_VAL -DUSE_EOSIO_CDT_1_7_X=${USE_EOSIO_CDT_1_7_X})
-   elseif( USE_EOSIO_CDT_1_8_X )
-      list(APPEND CMAKE_ARGS_VAL -DUSE_EOSIO_CDT_1_8_X=${USE_EOSIO_CDT_1_8_X})
+   if( USE_SYSIO_CDT_1_7_X )
+      list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_7_X=${USE_SYSIO_CDT_1_7_X})
+   elseif( USE_SYSIO_CDT_1_8_X )
+      list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_8_X=${USE_SYSIO_CDT_1_8_X})
    endif()
 
    message( STATUS "Building contracts in directory `./unittests/contracts/`" )
@@ -71,7 +71,7 @@ add_custom_command(
 file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
 add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
 
-target_link_libraries( unit_test eosio_chain_wrap state_history chainbase eosio_testing fc custom_appbase abieos ${PLATFORM_SPECIFIC_LIBS} )
+target_link_libraries( unit_test sysio_chain_wrap state_history chainbase sysio_testing fc custom_appbase abieos ${PLATFORM_SPECIFIC_LIBS} )
 
 target_compile_options(unit_test PUBLIC -DDISABLE_EOSLIB_SERIALIZE)
 target_include_directories( unit_test PUBLIC
@@ -92,7 +92,7 @@ foreach(TEST_SUITE ${UNIT_TESTS}) # create an independent target for each test s
   if (NOT "" STREQUAL "${SUITE_NAME}") # ignore empty lines
     execute_process(COMMAND sh -c "echo ${SUITE_NAME} | sed -e 's/s$//' | sed -e 's/_test$//'" OUTPUT_VARIABLE TRIMMED_SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # trim "_test" or "_tests" from the end of ${SUITE_NAME}
     # to run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
-    foreach(RUNTIME ${EOSIO_WASM_RUNTIMES})
+    foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
       add_test(NAME ${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME} COMMAND unit_test --run_test=${SUITE_NAME} --report_level=detailed --color_output -- --${RUNTIME})
       # build list of tests to run during coverage testing
       if(ctest_tests)
@@ -106,7 +106,7 @@ set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostroph
 
 # The following tests are known to take the longest, bump up their cost (priority) so that they'll run first
 # even on fresh first time test runs before ctest auto-detects costs
-foreach(RUNTIME ${EOSIO_WASM_RUNTIMES})
+foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
    set_tests_properties(api_unit_test_${RUNTIME} PROPERTIES COST 5000)
    set_tests_properties(wasm_unit_test_${RUNTIME} PROPERTIES COST 4000)
    set_tests_properties(delay_unit_test_${RUNTIME} PROPERTIES COST 3000)

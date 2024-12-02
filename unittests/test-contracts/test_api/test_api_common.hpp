@@ -1,6 +1,6 @@
 #pragma once
 
-#include <eosio/serialize.hpp>
+#include <sysio/serialize.hpp>
 
 static constexpr unsigned int DJBH( const char* cp )
 {
@@ -18,10 +18,10 @@ static constexpr unsigned long long WASM_TEST_ACTION( const char* cls, const cha
 #pragma pack(push, 1)
 struct dummy_action {
    static uint64_t get_name() {
-      return eosio::name{"dummy_action"}.value;
+      return sysio::name{"dummy_action"}.value;
    }
    static uint64_t get_account() {
-      return eosio::name{"testapi"}.value;
+      return sysio::name{"testapi"}.value;
    }
 
   char a; //1
@@ -39,10 +39,10 @@ struct u128_action {
 
 struct cf_action {
    static uint64_t get_name() {
-      return eosio::name{"cf_action"}.value;
+      return sysio::name{"cf_action"}.value;
    }
    static uint64_t get_account() {
-      return eosio::name{"testapi"}.value;
+      return sysio::name{"testapi"}.value;
    }
 
    uint32_t       payload = 100;
