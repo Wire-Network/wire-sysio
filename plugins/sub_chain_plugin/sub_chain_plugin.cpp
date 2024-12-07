@@ -18,7 +18,7 @@ sub_chain_plugin::~sub_chain_plugin() {}
 void sub_chain_plugin::set_program_options(options_description&, options_description& cfg) {
     cfg.add_options()
         ("s-chain-contract", bpo::value<std::string>()->default_value("settle.wns"), "Contract name for identifying relevant S-transactions.")
-        ("s-chain-actions", bpo::value<std::vector<std::string>>()->composing(), "List of action names for relevant S-transactions for a given s-chain-contract");
+        ("s-chain-actions", bpo::value<std::vector<std::string>>()->multitoken()->composing(), "List of action names for relevant S-transactions for a given s-chain-contract");
 }
 void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    try {
