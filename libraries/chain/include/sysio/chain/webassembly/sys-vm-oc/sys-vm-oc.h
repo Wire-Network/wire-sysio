@@ -10,7 +10,7 @@
 namespace sysio { namespace chain {class apply_context;}}
 #endif
 
-struct eos_vm_oc_control_block {
+struct sys_vm_oc_control_block {
    uint64_t magic;
    uintptr_t execution_thread_code_start;
    size_t execution_thread_code_length;

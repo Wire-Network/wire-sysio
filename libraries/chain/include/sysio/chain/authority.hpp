@@ -7,7 +7,7 @@
 
 namespace sysio { namespace chain {
 
-using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string>;
+using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string, fc::em::public_key_shim>;
 
 struct shared_public_key {
    explicit shared_public_key( shared_public_key_data&& p ) :
@@ -16,8 +16,8 @@ struct shared_public_key {
    public_key_type to_public_key() const {
       fc::crypto::public_key::storage_type public_key_storage;
       std::visit(overloaded {
-         [&](const auto& k1r1) {
-            public_key_storage = k1r1;
+         [&](const auto& k1r1em) {
+            public_key_storage = k1r1em;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());
@@ -43,6 +43,9 @@ struct shared_public_key {
          [&](const fc::ecc::public_key_shim& k1) {
             return k1._data == std::get<fc::ecc::public_key_shim>(rhs.pubkey)._data;
          },
+         [&](const fc::em::public_key_shim& em) {  // Added EM handling
+            return em._data == std::get<fc::em::public_key_shim>(rhs.pubkey)._data;
+         },
          [&](const fc::crypto::r1::public_key_shim& r1) {
             return r1._data == std::get<fc::crypto::r1::public_key_shim>(rhs.pubkey)._data;
          },
@@ -59,6 +62,9 @@ struct shared_public_key {
       return std::visit(overloaded {
          [&](const fc::ecc::public_key_shim& k1) {
             return k1._data == std::get<fc::ecc::public_key_shim>(r._storage)._data;
+         },
+         [&](const fc::em::public_key_shim& em) {
+            return em._data == std::get<fc::em::public_key_shim>(r._storage)._data;
          },
          [&](const fc::crypto::r1::public_key_shim& r1) {
             return r1._data == std::get<fc::crypto::r1::public_key_shim>(r._storage)._data;
@@ -118,8 +124,8 @@ struct shared_key_weight {
 
    static shared_key_weight convert(chainbase::allocator<char> allocator, const key_weight& k) {
       return std::visit(overloaded {
-         [&](const auto& k1r1) {
-            return shared_key_weight(k1r1, k.weight);
+         [&](const auto& k1r1em) {
+            return shared_key_weight(k1r1em, k.weight);
          },
          [&](const fc::crypto::webauthn::public_key& wa) {
             size_t psz = fc::raw::pack_size(wa);

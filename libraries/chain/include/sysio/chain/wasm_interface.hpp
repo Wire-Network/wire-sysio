@@ -23,17 +23,17 @@ namespace sysio { namespace chain {
    class wasm_interface {
       public:
          enum class vm_type {
-            eos_vm,
-            eos_vm_jit,
-            eos_vm_oc
+            sys_vm,
+            sys_vm_jit,
+            sys_vm_oc
          };
 
          //return string description of vm_type
          static std::string vm_type_string(vm_type vmtype) {
              switch (vmtype) {
-             case vm_type::eos_vm:
+             case vm_type::sys_vm:
                 return "sys-vm";
-             case vm_type::eos_vm_oc:
+             case vm_type::sys_vm_oc:
                 return "sys-vm-oc";
              default:
                  return "sys-vm-jit";
@@ -51,12 +51,12 @@ namespace sysio { namespace chain {
          wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile);
          ~wasm_interface();
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          // initialize exec per thread
          void init_thread_local_data();
 
          // returns true if EOS VM OC is enabled
-         bool is_eos_vm_oc_enabled() const;
+         bool is_sys_vm_oc_enabled() const;
 #endif
 
          //call before dtor to skip what can be minutes of dtor overhead with some runtimes; can cause leaks
@@ -102,4 +102,4 @@ namespace sysio{ namespace chain {
    }
 }}
 
-FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (eos_vm)(eos_vm_jit)(eos_vm_oc) )
+FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (sys_vm)(sys_vm_jit)(sys_vm_oc) )

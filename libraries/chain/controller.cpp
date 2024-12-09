@@ -130,6 +130,7 @@ struct building_block {
    deque<transaction_receipt>                 _pending_trx_receipts; // boost deque in 1.71 with 1024 elements performs better
    std::variant<checksum256_type, digests_t>  _trx_mroot_or_receipt_digests;
    digests_t                                  _action_receipt_digests;
+   std::optional<s_header>                    _s_header;
 };
 
 struct assembled_block {
@@ -342,6 +343,7 @@ struct controller_impl {
       set_activation_handler<builtin_protocol_feature_t::crypto_primitives>();
       set_activation_handler<builtin_protocol_feature_t::bls_primitives>();
       set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
+      set_activation_handler<builtin_protocol_feature_t::em_key>();
 
       self.irreversible_block.connect([this](const block_state_ptr& bsp) {
          wasmif.current_lib(bsp->block_num);
@@ -1875,6 +1877,10 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
+      if (bb._s_header){
+        ilog("s_header present in finalize block, adding to block header: ${s}", ("s", bb._s_header->to_string()));
+      }
+
       auto action_merkle_fut = post_async_task( thread_pool.get_executor(),
                                                 [ids{std::move( bb._action_receipt_digests )}]() mutable {
                                                    return merkle( std::move( ids ) );
@@ -1904,7 +1910,8 @@ struct controller_impl {
          action_merkle_fut.get(),
          bb._new_pending_producer_schedule,
          std::move( bb._new_protocol_feature_activations ),
-         protocol_features.get_protocol_feature_set()
+         protocol_features.get_protocol_feature_set(),
+         bb._s_header // Include optional s_header in block header
       ) );
 
       block_ptr->transactions = std::move( bb._pending_trx_receipts );
@@ -2045,22 +2052,22 @@ struct controller_impl {
 
    void report_block_header_diff( const block_header& b, const block_header& ab ) {
 
-#define EOS_REPORT(DESC,A,B) \
+#define SYS_REPORT(DESC,A,B) \
    if( A != B ) { \
       elog("${desc}: ${bv} != ${abv}", ("desc", DESC)("bv", A)("abv", B)); \
    }
 
-      EOS_REPORT( "timestamp", b.timestamp, ab.timestamp )
-      EOS_REPORT( "producer", b.producer, ab.producer )
-      EOS_REPORT( "confirmed", b.confirmed, ab.confirmed )
-      EOS_REPORT( "previous", b.previous, ab.previous )
-      EOS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
-      EOS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
-      EOS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
-      EOS_REPORT( "new_producers", b.new_producers, ab.new_producers )
-      EOS_REPORT( "header_extensions", b.header_extensions, ab.header_extensions )
+      SYS_REPORT( "timestamp", b.timestamp, ab.timestamp )
+      SYS_REPORT( "producer", b.producer, ab.producer )
+      SYS_REPORT( "confirmed", b.confirmed, ab.confirmed )
+      SYS_REPORT( "previous", b.previous, ab.previous )
+      SYS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
+      SYS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
+      SYS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
+      SYS_REPORT( "new_producers", b.new_producers, ab.new_producers )
+      SYS_REPORT( "header_extensions", b.header_extensions, ab.header_extensions )
 
-#undef EOS_REPORT
+#undef SYS_REPORT
    }
 
 
@@ -2147,6 +2154,16 @@ struct controller_impl {
             SYS_ASSERT( r == static_cast<const transaction_receipt_header&>(receipt),
                         block_validate_exception, "receipt does not match, ${lhs} != ${rhs}",
                         ("lhs", r)("rhs", static_cast<const transaction_receipt_header&>(receipt)) );
+         }
+
+         // New: Process the s_header from block header extensions
+         auto s_header_it = std::find_if(b->header_extensions.begin(), b->header_extensions.end(),
+                                       [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
+         if (s_header_it != b->header_extensions.end()) {
+            ilog("Found s_root_extension in header_extensions, attempting to extract...");
+            s_header extracted_s_header = fc::raw::unpack<s_header>(s_header_it->second);
+            ilog("Extracted s_header: ${s_header}", ("s_header", extracted_s_header.to_string()));
+            self.set_s_header(extracted_s_header); // Attempt to set s-header
          }
 
          finalize_block();
@@ -2704,17 +2721,17 @@ struct controller_impl {
       return app_window == app_window_type::write;
    }
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-   bool is_eos_vm_oc_enabled() const {
-      return wasmif.is_eos_vm_oc_enabled();
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   bool is_sys_vm_oc_enabled() const {
+      return wasmif.is_sys_vm_oc_enabled();
    }
 #endif
 
    // Only called from read-only trx execution threads when producer_plugin
    // starts them. Only OC requires initialize thread specific data.
    void init_thread_local_data() {
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-      if ( is_eos_vm_oc_enabled() ) {
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+      if ( is_sys_vm_oc_enabled() ) {
          wasmif.init_thread_local_data();
       }
 #endif
@@ -3071,6 +3088,24 @@ void controller::set_action_blacklist( const flat_set< pair<account_name, action
 }
 void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_blacklist ) {
    my->conf.key_blacklist = new_key_blacklist;
+}
+
+void controller::set_s_header( const s_header& s_header ) {
+   //  ilog("CONTROLLER - setting s header: ${s}", ("s", s_header.to_string()));
+   SYS_ASSERT( my->pending, block_validate_exception, "it is not valid to set_s_header when there is no pending block");
+   SYS_ASSERT( std::holds_alternative<building_block>(my->pending->_block_stage), block_validate_exception, "already called finalize_block");
+   // SYS_ASSERT( std::get<assembled_block>(pending->_block_stage)._id == id, block_validate_exception, "mismatching block id" );
+   // Try to set it first in the pending block
+   auto& bb = std::get<building_block>(my->pending->_block_stage);
+   bb._s_header = s_header; // Attempt to set s-header
+   auto& check_s_header = std::get<building_block>(my->pending->_block_stage)._s_header;
+   if (check_s_header){
+      ilog("Pending building block s_header set: ${s_header}\n\t\tand matches what was passed: ${match}", 
+         ("s_header", check_s_header->to_string())("match", check_s_header == s_header));
+   }
+   else {
+      ilog("Pending building block s_header NOT SET");
+   }
 }
 
 void controller::set_disable_replay_opts( bool v ) {
@@ -3616,9 +3651,9 @@ vm::wasm_allocator& controller::get_wasm_allocator() {
    return my->wasm_alloc;
 }
 #endif
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-bool controller::is_eos_vm_oc_enabled() const {
-   return my->is_eos_vm_oc_enabled();
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+bool controller::is_sys_vm_oc_enabled() const {
+   return my->is_sys_vm_oc_enabled();
 }
 #endif
 
@@ -3800,6 +3835,13 @@ template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::webauthn_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 3;
+   } );
+}
+
+template<>
+void controller_impl::on_activation<builtin_protocol_feature_t::em_key>() {
+   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
+      ps.num_supported_key_types = 4;
    } );
 }
 

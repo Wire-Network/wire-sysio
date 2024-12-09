@@ -1,6 +1,7 @@
 #pragma once
 #include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
+#include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
@@ -12,14 +13,15 @@ namespace fc { namespace crypto {
       constexpr const char* private_key_base_prefix = "PVT";
       constexpr const char* private_key_prefix[] = {
          "K1",
-         "R1"
+         "R1",
+         "EM"
       };
    };
 
    class private_key
    {
       public:
-         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim>;
+         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim, em::private_key_shim>;
 
          private_key() = default;
          private_key( private_key&& ) = default;

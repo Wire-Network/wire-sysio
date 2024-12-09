@@ -37,12 +37,12 @@ namespace sysio { namespace chain {
 
    wasm_interface::~wasm_interface() {}
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
    void wasm_interface::init_thread_local_data() {
       // OC tierup and OC runtime are mutually exclusive
       if (my->sysvmoc) {
          my->sysvmoc->init_thread_local_data();
-      } else if (my->wasm_runtime_time == wasm_interface::vm_type::eos_vm_oc && my->runtime_interface) {
+      } else if (my->wasm_runtime_time == wasm_interface::vm_type::sys_vm_oc && my->runtime_interface) {
          my->runtime_interface->init_thread_local_data();
       }
    }
@@ -53,7 +53,7 @@ namespace sysio { namespace chain {
 
       if (control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
          const auto& gpo = control.get_global_properties();
-         webassembly::eos_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
+         webassembly::sys_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
          return;
       }
       Module module;
@@ -69,7 +69,7 @@ namespace sysio { namespace chain {
       wasm_validations::wasm_binary_validation validator(control, module);
       validator.validate();
 
-      webassembly::eos_vm_runtime::validate( code, pso.whitelisted_intrinsics );
+      webassembly::sys_vm_runtime::validate( code, pso.whitelisted_intrinsics );
 
       //there are a couple opportunties for improvement here--
       //Easy: Cache the Module created here so it can be reused for instantiaion
@@ -87,8 +87,8 @@ namespace sysio { namespace chain {
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
       if (substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-      if (my->sysvmoc && (sysvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_eos_vm_oc())) {
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+      if (my->sysvmoc && (sysvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_sys_vm_oc())) {
          const chain::sysvmoc::code_descriptor* cd = nullptr;
          chain::sysvmoc::code_cache_base::get_cd_failure failure = chain::sysvmoc::code_cache_base::get_cd_failure::temporary;
          try {
@@ -120,16 +120,16 @@ namespace sysio { namespace chain {
       return my->is_code_cached(code_hash, vm_type, vm_version);
    }
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-   bool wasm_interface::is_eos_vm_oc_enabled() const {
-      return my->is_eos_vm_oc_enabled();
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   bool wasm_interface::is_sys_vm_oc_enabled() const {
+      return my->is_sys_vm_oc_enabled();
    }
 #endif
 
    wasm_instantiated_module_interface::~wasm_instantiated_module_interface() = default;
    wasm_runtime_interface::~wasm_runtime_interface() = default;
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
    thread_local std::unique_ptr<sysvmoc::executor> wasm_interface_impl::sysvmoc_tier::exec{};
    thread_local std::unique_ptr<sysvmoc::memory>   wasm_interface_impl::sysvmoc_tier::mem{};
 #endif
@@ -138,11 +138,11 @@ std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
    std::string s;
    in >> s;
    if (s == "sys-vm")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
    else if (s == "sys-vm-jit")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
    else if (s == "sys-vm-oc")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_oc;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm_oc;
    else
       in.setstate(std::ios_base::failbit);
    return in;

@@ -175,7 +175,8 @@ namespace sysio { namespace chain {
                                                       const checksum256_type& action_mroot,
                                                       const std::optional<producer_authority_schedule>& new_producers,
                                                       vector<digest_type>&& new_protocol_feature_activations,
-                                                      const protocol_feature_set& pfs
+                                                      const protocol_feature_set& pfs,
+                                                      const std::optional<s_header>& s_header
    )const
    {
       signed_block_header h;
@@ -216,6 +217,15 @@ namespace sysio { namespace chain {
             }
             h.new_producers = std::move(downgraded_producers);
          }
+      }
+
+      // Add s_root_extension to header extensions if present & relevant
+      if (s_header) {
+         emplace_extension(
+            h.header_extensions,
+            s_root_extension::extension_id(),
+            fc::raw::pack( s_root_extension ( *s_header ))
+         );
       }
 
       return h;

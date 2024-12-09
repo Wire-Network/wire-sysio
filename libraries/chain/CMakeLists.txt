@@ -168,7 +168,7 @@ endforeach()
 
 if(EOSVMOC_ENABLE_DEVELOPER_OPTIONS)
    message(WARNING "EOS VM OC Developer Options are enabled; these are NOT supported")
-   target_compile_definitions(sysio_chain PUBLIC SYSIO_EOS_VM_OC_DEVELOPER)
+   target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_OC_DEVELOPER)
 endif()
 
 install( TARGETS sysio_chain

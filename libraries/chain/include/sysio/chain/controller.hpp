@@ -9,6 +9,8 @@
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
+#include <sysio/chain/s_root_extension.hpp>
+
 
 namespace chainbase {
    class database;
@@ -211,6 +213,8 @@ namespace sysio { namespace chain {
          void   set_contract_blacklist( const flat_set<account_name>& );
          void   set_action_blacklist( const flat_set< pair<account_name, action_name> >& );
          void   set_key_blacklist( const flat_set<public_key_type>& );
+         void   set_s_header( const s_header& );
+
 
          void   set_disable_replay_opts( bool v );
 
@@ -322,8 +326,8 @@ namespace sysio { namespace chain {
 #if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
          vm::wasm_allocator&  get_wasm_allocator();
 #endif
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-         bool is_eos_vm_oc_enabled() const;
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+         bool is_sys_vm_oc_enabled() const;
 #endif
 
          static std::optional<uint64_t> convert_exception_to_error_code( const fc::exception& e );

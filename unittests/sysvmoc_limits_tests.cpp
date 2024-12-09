@@ -1,4 +1,4 @@
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 
 #include <sysio/testing/tester.hpp>
 #include <test_contracts.hpp>
@@ -29,7 +29,7 @@ void limit_violated_test(const sysvmoc::config& sysvmoc_config) {
    chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
 
-   if (chain.control->is_eos_vm_oc_enabled()) {
+   if (chain.control->is_sys_vm_oc_enabled()) {
       BOOST_CHECK_EXCEPTION(
          chain.push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
             ( "issuer", "sysio.token" )

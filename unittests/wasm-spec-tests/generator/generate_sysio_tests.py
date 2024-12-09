@@ -27,6 +27,7 @@ def main(generated_wasm_file, test_wasm_file, out_wasm_file, map_file):
             num_to_name_map = {v:k for k, v in name_to_num_map.items()}
             return num_to_name_map
 
+
     num_to_name_map = get_map(map_file)
 
     generated_wasm = GeneratedWASM()

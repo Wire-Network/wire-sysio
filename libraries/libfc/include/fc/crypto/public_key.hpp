@@ -6,23 +6,27 @@
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/static_variant.hpp>
+#include <fc/crypto/elliptic_em.hpp>
+
 
 namespace fc { namespace crypto {
    namespace config {
-      constexpr const char* public_key_legacy_prefix = "EOS";
+      constexpr const char* public_key_legacy_prefix = "SYS";
       constexpr const char* public_key_base_prefix = "PUB";
       constexpr const char* public_key_prefix[] = {
          "K1",
          "R1",
-         "WA"
+         "WA",
+         // ** NEW: added em for Ethereum Message sig.
+         "EM"
       };
    };
 
    class public_key
    {
       public:
-         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key>;
-
+         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim>;
+         
          public_key() = default;
          public_key( public_key&& ) = default;
          public_key( const public_key& ) = default;

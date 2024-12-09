@@ -418,11 +418,11 @@ namespace sysio { namespace testing {
 
             for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {
                if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm;
                else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-jit"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_jit;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_jit;
                else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-oc"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_oc;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_oc;
             }
             auto gen = default_genesis();
             if (genesis_max_inline_action_size) {

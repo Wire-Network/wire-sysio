@@ -26,7 +26,7 @@ appArgs=AppArgs()
 appArgs.add(flag="--read-only-threads", type=int, help="number of read-only threads", default=0)
 appArgs.add(flag="--num-test-runs", type=int, help="number of times to run the tests", default=1)
 appArgs.add(flag="--sys-vm-oc-enable", type=str, help="specify sys-vm-oc-enable option", default="auto")
-appArgs.add(flag="--wasm-runtime", type=str, help="if set to sys-vm-oc, must compile with SYSIO_EOS_VM_OC_DEVELOPER", default="sys-vm-jit")
+appArgs.add(flag="--wasm-runtime", type=str, help="if set to sys-vm-oc, must compile with SYSIO_SYS_VM_OC_DEVELOPER", default="sys-vm-jit")
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
                             ,"--dump-error-details","-v","--leave-running"
@@ -50,8 +50,8 @@ numTestRuns=args.num_test_runs
 Utils.Debug=debug
 testSuccessful=False
 errorInThread=False
-noOC = args.eos_vm_oc_enable == "none"
-allOC = args.eos_vm_oc_enable == "all"
+noOC = args.sys_vm_oc_enable == "none"
+allOC = args.sys_vm_oc_enable == "all"
 
 random.seed(seed) # Use a fixed seed for repeatability.
 # all debuglevel so that "executing ${h} with eos vm oc" is logged
@@ -112,12 +112,12 @@ def startCluster():
     specificExtraNodeosArgs[pnodes]+=" 1 " # set small so there is churn
     specificExtraNodeosArgs[pnodes]+=" --read-only-threads "
     specificExtraNodeosArgs[pnodes]+=str(args.read_only_threads)
-    if args.eos_vm_oc_enable:
+    if args.sys_vm_oc_enable:
         if platform.system() != "Linux":
             Print("OC not run on Linux. Skip the test")
             exit(True) # Do not fail the test
         specificExtraNodeosArgs[pnodes]+=" --sys-vm-oc-enable "
-        specificExtraNodeosArgs[pnodes]+=args.eos_vm_oc_enable
+        specificExtraNodeosArgs[pnodes]+=args.sys_vm_oc_enable
     if args.wasm_runtime:
         specificExtraNodeosArgs[pnodes]+=" --wasm-runtime "
         specificExtraNodeosArgs[pnodes]+=args.wasm_runtime
@@ -139,7 +139,7 @@ def startCluster():
     found = producerNode.findInLog(f"executing {sysioCodeHash} with eos vm oc")
     assert( found or (noOC and not found) )
 
-    if args.eos_vm_oc_enable:
+    if args.sys_vm_oc_enable:
         verifyOcVirtualMemory()
 
 def verifyOcVirtualMemory():

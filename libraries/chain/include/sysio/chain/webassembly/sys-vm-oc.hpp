@@ -202,34 +202,34 @@ struct wasm_function_type_provider<Ret(Args...)> {
    }
 };
 
-struct eos_vm_oc_execution_interface {
+struct sys_vm_oc_execution_interface {
    inline const auto& operand_from_back(std::size_t index) const { return *(os - index - 1); }
    sysio::vm::native_value* os;
 };
 
-struct eos_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::interface, eos_vm_oc_execution_interface> {
-   using base_type = sysio::vm::type_converter<webassembly::interface, eos_vm_oc_execution_interface>;
+struct sys_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::interface, sys_vm_oc_execution_interface> {
+   using base_type = sysio::vm::type_converter<webassembly::interface, sys_vm_oc_execution_interface>;
    using base_type::type_converter;
    using base_type::to_wasm;
    using base_type::as_result;
    using base_type::get_host;
 
-   EOS_VM_FROM_WASM(bool, (uint32_t value)) { return value ? 1 : 0; }
+   SYS_VM_FROM_WASM(bool, (uint32_t value)) { return value ? 1 : 0; }
 
-   EOS_VM_FROM_WASM(memcpy_params, (vm::wasm_ptr_t dst, vm::wasm_ptr_t src, vm::wasm_size_t size)) {
+   SYS_VM_FROM_WASM(memcpy_params, (vm::wasm_ptr_t dst, vm::wasm_ptr_t src, vm::wasm_size_t size)) {
       auto d = array_ptr_impl<char>(dst, size);
       auto s = array_ptr_impl<char>(src, size);
       array_ptr_impl<char>(dst, 1);
       return { d, s, size };
    }
 
-   EOS_VM_FROM_WASM(memcmp_params, (vm::wasm_ptr_t lhs, vm::wasm_ptr_t rhs, vm::wasm_size_t size)) {
+   SYS_VM_FROM_WASM(memcmp_params, (vm::wasm_ptr_t lhs, vm::wasm_ptr_t rhs, vm::wasm_size_t size)) {
      auto l = array_ptr_impl<char>(lhs, size);
      auto r = array_ptr_impl<char>(rhs, size);
      return { l, r, size };
    }
 
-   EOS_VM_FROM_WASM(memset_params, (vm::wasm_ptr_t dst, int32_t val, vm::wasm_size_t size)) {
+   SYS_VM_FROM_WASM(memset_params, (vm::wasm_ptr_t dst, int32_t val, vm::wasm_size_t size)) {
      auto d = array_ptr_impl<char>(dst, size);
      array_ptr_impl<char>(dst, 1);
      return { d, val, size };
@@ -269,17 +269,17 @@ struct eos_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::
       return {p};
    }
 
-   EOS_VM_FROM_WASM(null_terminated_ptr, (vm::wasm_ptr_t ptr)) {
+   SYS_VM_FROM_WASM(null_terminated_ptr, (vm::wasm_ptr_t ptr)) {
       auto p = null_terminated_ptr_impl(ptr);
       return {static_cast<const char*>(p)};
    }
-   EOS_VM_FROM_WASM(name, (uint64_t e)) { return name{e}; }
+   SYS_VM_FROM_WASM(name, (uint64_t e)) { return name{e}; }
    uint64_t to_wasm(name&& n) { return n.to_uint64_t(); }
    vm::wasm_ptr_t to_wasm(void*&& ptr) {
       return convert_native_to_wasm(static_cast<char*>(ptr));
    }
-   EOS_VM_FROM_WASM(float32_t, (float f)) { return ::to_softfloat32(f); }
-   EOS_VM_FROM_WASM(float64_t, (double f)) { return ::to_softfloat64(f); }
+   SYS_VM_FROM_WASM(float32_t, (float f)) { return ::to_softfloat32(f); }
+   SYS_VM_FROM_WASM(float64_t, (double f)) { return ::to_softfloat64(f); }
 
    template<typename T>
    inline decltype(auto) as_value(const vm::native_value& val) const {
@@ -322,17 +322,17 @@ auto get_ct_args_i() {
 
 template<typename Args, std::size_t... Is>
 auto get_ct_args(std::index_sequence<Is...>) {
-   return std::tuple_cat(get_ct_args_i<eos_vm_oc_type_converter, std::tuple_element_t<Is, Args>>()...);
+   return std::tuple_cat(get_ct_args_i<sys_vm_oc_type_converter, std::tuple_element_t<Is, Args>>()...);
 }
 
 struct result_resolver {
    // Suppress "expression result unused" warnings
-   result_resolver(eos_vm_oc_type_converter& tc) : tc(tc) {}
+   result_resolver(sys_vm_oc_type_converter& tc) : tc(tc) {}
    template<typename T>
    auto operator,(T&& res) {
       return make_native_type(vm::detail::resolve_result(tc, static_cast<T&&>(res)));
    }
-   eos_vm_oc_type_converter& tc;
+   sys_vm_oc_type_converter& tc;
 };
 
 template<auto F, typename Interface, typename Preconditions, bool is_injected, typename... A>
@@ -366,13 +366,13 @@ auto fn(A... a) {
           : [applyContextOffset] "i" (cb_ctx_ptr_offset)
           );
       Interface host(*ctx);
-      eos_vm_oc_type_converter tc{&host, eos_vm_oc_execution_interface{stack + sizeof...(A)}};
+      sys_vm_oc_type_converter tc{&host, sys_vm_oc_execution_interface{stack + sizeof...(A)}};
       return result_resolver{tc}, sysio::vm::invoke_with_host<F, Preconditions, native_args>(tc, &host, std::make_index_sequence<sizeof...(A)>());
    }
    catch(...) {
-      *reinterpret_cast<std::exception_ptr*>(eos_vm_oc_get_exception_ptr()) = std::current_exception();
+      *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::current_exception();
    }
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 

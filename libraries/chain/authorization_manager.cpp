@@ -320,19 +320,25 @@ namespace sysio { namespace chain {
       SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
-      SYS_ASSERT( auth.actor == update.account, irrelevant_auth_exception,
+      // ** OR statement is custom, added to allow for sysio to add 'auth.ext' and 'auth.session' to users via our custom 'onlinkauth' from system contract.
+      SYS_ASSERT( (auth.actor == update.account || auth.actor == name("sysio")), irrelevant_auth_exception,
                   "the owner of the affected permission needs to be the actor of the declared authorization" );
 
-      const auto* min_permission = find_permission({update.account, update.permission});
-      if( !min_permission ) { // creating a new permission
-         min_permission = &get_permission({update.account, update.parent});
-      }
+      // ** New: Prevents users from updating / adding 'auth.ext' and 'auth.session' special permissions.
+      if(update.permission == name("auth.ext") || update.permission == name("auth.session")) {
+         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Special permission, only assignable by 'sysio' as a result of 'onlinkauth'" );
+      } else {
+         const auto* min_permission = find_permission({update.account, update.permission});
+         if( !min_permission ) { // creating a new permission
+            min_permission = &get_permission({update.account, update.parent});
+         }
 
-      SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
-                                                  _db.get_index<permission_index>().indices() ),
-                  irrelevant_auth_exception,
-                  "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                  ("auth", auth)("min", permission_level{update.account, min_permission->name}) );
+         SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
+                                                   _db.get_index<permission_index>().indices() ),
+                     irrelevant_auth_exception,
+                     "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
+                     ("auth", auth)("min", permission_level{update.account, min_permission->name}) );
+      }
    }
 
    void authorization_manager::check_deleteauth_authorization( const deleteauth& del,

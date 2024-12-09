@@ -1098,7 +1098,7 @@ action_name apply_context::get_sender() const {
 // Speculative P2P trx | baseline, OC for sysio.*
 // Compute trx         | baseline, OC for sysio.*
 // Read only trx       | OC
-bool apply_context::should_use_eos_vm_oc()const {
+bool apply_context::should_use_sys_vm_oc()const {
    return receiver.prefix() == config::system_account_name // "sysio"_n, all cases use OC
           || (is_applying_block() && !control.is_producer_node()) // validating/applying block
           || trx_context.is_read_only();

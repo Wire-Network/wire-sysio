@@ -254,7 +254,11 @@ void apply_sysio_updateauth(apply_context& context) {
    SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "updateauth not allowed in read-only transaction" );
 
    auto update = context.get_action().data_as<updateauth>();
-   context.require_authorization(update.account); // only here to mark the single authority on this action as used
+   
+   // ** NEW ADDED IF STATEMENT **
+   if( update.permission != name("auth.ext") && update.permission != name("auth.session") ) {
+      context.require_authorization(update.account); // only here to mark the single authority on this action as used
+   }
 
    auto& authorization = context.control.get_mutable_authorization_manager();
    auto& db = context.db;

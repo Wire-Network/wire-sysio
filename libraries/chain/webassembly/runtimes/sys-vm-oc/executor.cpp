@@ -75,13 +75,13 @@ notus:
 }
 
 static intrinsic grow_memory_intrinsic EOSVMOC_INTRINSIC_INIT_PRIORITY("sysvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
-  (void*)&eos_vm_oc_grow_memory,
+  (void*)&sys_vm_oc_grow_memory,
   std::integral_constant<std::size_t, find_intrinsic_index("sysvmoc_internal.grow_memory")>::value
 );
 
 //This is effectively overriding the sysio_exit intrinsic in wasm_interface
 static void sysio_exit(int32_t code) {
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_CLEAN_EXIT);
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_CLEAN_EXIT);
    __builtin_unreachable();
 }
 static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32}), (void*)&sysio_exit,
@@ -89,8 +89,8 @@ static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR
 );
 
 static void throw_internal_exception(const char* const s) {
-   *reinterpret_cast<std::exception_ptr*>(eos_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
+   *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 

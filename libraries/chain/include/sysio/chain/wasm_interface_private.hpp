@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/chain/wasm_interface.hpp>
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #else
 #define _REGISTER_EOSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
@@ -45,7 +45,7 @@ namespace sysio { namespace chain {
       struct by_hash;
       struct by_last_block_num;
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 struct sysvmoc_tier {
    // Called from main thread
    sysvmoc_tier(const std::filesystem::path& d, const sysvmoc::config& c, const chainbase::database& db)
@@ -75,27 +75,27 @@ struct sysvmoc_tier {
          , wasm_runtime_time(vm)
       {
 #ifdef SYSIO_SYS_VM_RUNTIME_ENABLED
-         if(vm == wasm_interface::vm_type::eos_vm)
-            runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_runtime<sysio::vm::interpreter>>();
+         if(vm == wasm_interface::vm_type::sys_vm)
+            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::interpreter>>();
 #endif
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
-         if(vm == wasm_interface::vm_type::eos_vm_jit && profile) {
+         if(vm == wasm_interface::vm_type::sys_vm_jit && profile) {
             sysio::vm::set_profile_interval_us(200);
-            runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_profile_runtime>();
+            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_profile_runtime>();
          }
-         if(vm == wasm_interface::vm_type::eos_vm_jit && !profile)
-            runtime_interface = std::make_unique<webassembly::eos_vm_runtime::eos_vm_runtime<sysio::vm::jit>>();
+         if(vm == wasm_interface::vm_type::sys_vm_jit && !profile)
+            runtime_interface = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::jit>>();
 #endif
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-         if(vm == wasm_interface::vm_type::eos_vm_oc)
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+         if(vm == wasm_interface::vm_type::sys_vm_oc)
             runtime_interface = std::make_unique<webassembly::sysvmoc::sysvmoc_runtime>(data_dir, sysvmoc_config, d);
 #endif
          if(!runtime_interface)
             SYS_THROW(wasm_exception, "${r} wasm runtime not supported on this platform and/or configuration", ("r", vm));
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(sysvmoc_tierup != wasm_interface::vm_oc_enable::oc_none) {
-            SYS_ASSERT(vm != wasm_interface::vm_type::eos_vm_oc, wasm_exception, "You can't use EOS VM OC as the base runtime when tier up is activated");
+            SYS_ASSERT(vm != wasm_interface::vm_type::sys_vm_oc, wasm_exception, "You can't use EOS VM OC as the base runtime when tier up is activated");
             sysvmoc = std::make_unique<sysvmoc_tier>(data_dir, sysvmoc_config, d);
          }
 #endif
@@ -131,16 +131,16 @@ struct sysvmoc_tier {
          // Anything last used before or on the LIB can be evicted.
          const auto first_it = wasm_instantiation_cache.get<by_last_block_num>().begin();
          const auto last_it  = wasm_instantiation_cache.get<by_last_block_num>().upper_bound(lib);
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(sysvmoc) for(auto it = first_it; it != last_it; it++)
             sysvmoc->cc.free_code(it->code_hash, it->vm_version);
 #endif
          wasm_instantiation_cache.get<by_last_block_num>().erase(first_it, last_it);
       }
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
-      bool is_eos_vm_oc_enabled() const {
-         return (sysvmoc || wasm_runtime_time == wasm_interface::vm_type::eos_vm_oc);
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+      bool is_sys_vm_oc_enabled() const {
+         return (sysvmoc || wasm_runtime_time == wasm_interface::vm_type::sys_vm_oc);
       }
 #endif
 
@@ -214,7 +214,7 @@ struct sysvmoc_tier {
       const chainbase::database& db;
       const wasm_interface::vm_type wasm_runtime_time;
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       std::unique_ptr<struct sysvmoc_tier> sysvmoc{nullptr}; // used by all threads
 #endif
    };

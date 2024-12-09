@@ -8,6 +8,8 @@
 
 namespace fc { namespace ecc { namespace detail {
 
+void _init_lib();
+
 class public_key_impl
 {
     public:

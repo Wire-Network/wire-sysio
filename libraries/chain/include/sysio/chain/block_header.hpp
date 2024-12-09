@@ -2,6 +2,8 @@
 #include <sysio/chain/block_timestamp.hpp>
 #include <sysio/chain/producer_schedule.hpp>
 #include <sysio/chain/protocol_feature_activation.hpp>
+#include <sysio/chain/s_root_extension.hpp>
+
 
 #include <type_traits>
 
@@ -17,7 +19,8 @@ namespace sysio { namespace chain {
 
    using block_header_extension_types = detail::block_header_extension_types<
       protocol_feature_activation,
-      producer_schedule_change_extension
+      producer_schedule_change_extension,
+      s_root_extension
    >;
 
    using block_header_extension = block_header_extension_types::block_header_extension_t;

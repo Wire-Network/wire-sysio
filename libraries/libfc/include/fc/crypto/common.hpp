@@ -81,6 +81,14 @@ namespace fc { namespace crypto {
          auto data_str = base58str.substr(pivot + 1);
          FC_ASSERT(!data_str.empty(), "Data only has suite type prefix: ${str}", ("str", base58str));
 
+         // ** Original version **
+         // return base58_str_parser_impl<fc::static_variant<Ts...>, Prefixes, 0, Ts...>::apply(prefix_str, data_str);
+         // ** NEW: added ternary for EM / K1
+         // if(prefix_str == std::string("EM")) {
+         //    return base58_str_parser_impl<fc::static_variant<Ts...>, Prefixes, 3, Ts...>::apply(prefix_str, data_str);
+         // } else {
+         // }
+
          return base58_str_parser_impl<std::variant<Ts...>, Prefixes, 0, Ts...>::apply(prefix_str, data_str);
       }
    };

@@ -252,7 +252,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
    delim = ", ";
 #endif
 
-#ifdef SYSIO_EOS_VM_OC_DEVELOPER
+#ifdef SYSIO_SYS_VM_OC_DEVELOPER
    wasm_runtime_opt += delim + "\"sys-vm-oc\"";
    wasm_runtime_desc += "\"sys-vm-oc\" : Unsupported. Instead, use one of the other runtimes along with the option sys-vm-oc-enable.\n";
 #endif
@@ -285,9 +285,9 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "the location of the protocol_features directory (absolute path or relative to application config dir)")
          ("checkpoint", bpo::value<vector<string>>()->composing(), "Pairs of [BLOCK_NUM,BLOCK_ID] that should be enforced as checkpoints.")
          ("wasm-runtime", bpo::value<sysio::chain::wasm_interface::vm_type>()->value_name("runtime")->notifier([](const auto& vm){
-#ifndef SYSIO_EOS_VM_OC_DEVELOPER
+#ifndef SYSIO_SYS_VM_OC_DEVELOPER
             //throwing an exception here (like SYS_ASSERT) is just gobbled up with a "Failed to initialize" error :(
-            if(vm == wasm_interface::vm_type::eos_vm_oc) {
+            if(vm == wasm_interface::vm_type::sys_vm_oc) {
                elog("EOS VM OC is a tier-up compiler and works in conjunction with the configured base WASM runtime. Enable EOS VM OC via 'sys-vm-oc-enable' option");
                SYS_ASSERT(false, plugin_exception, "");
             }
@@ -354,7 +354,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
 #endif
          )
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          ("sys-vm-oc-cache-size-mb", bpo::value<uint64_t>()->default_value(sysvmoc::config().cache_size / (1024u*1024u)), "Maximum size (in MiB) of the EOS VM OC code cache")
          ("sys-vm-oc-compile-threads", bpo::value<uint64_t>()->default_value(1u)->notifier([](const auto t) {
                if(t == 0) {
@@ -927,7 +927,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       chain_config->db_map_mode = options.at("database-map-mode").as<pinnable_mapped_file::map_mode>();
 
-#ifdef SYSIO_EOS_VM_OC_RUNTIME_ENABLED
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       if( options.count("sys-vm-oc-cache-size-mb") )
          chain_config->sysvmoc_config.cache_size = options.at( "sys-vm-oc-cache-size-mb" ).as<uint64_t>() * 1024u * 1024u;
       if( options.count("sys-vm-oc-compile-threads") )

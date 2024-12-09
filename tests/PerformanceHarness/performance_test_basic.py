@@ -657,7 +657,7 @@ class PerformanceTestBasic:
         chainPluginArgs = ChainPluginArgs(signatureCpuBillablePct=args.signature_cpu_billable_pct,
                                         chainThreads=args.chain_threads, databaseMapMode=args.database_map_mode,
                                         wasmRuntime=args.wasm_runtime, contractsConsole=args.contracts_console,
-                                        eosVmOcCacheSizeMb=args.eos_vm_oc_cache_size_mb, eosVmOcCompileThreads=args.eos_vm_oc_compile_threads,
+                                        eosVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, eosVmOcCompileThreads=args.sys_vm_oc_compile_threads,
                                         blockLogRetainBlocks=args.block_log_retain_blocks,
                                         chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000)
 
@@ -681,7 +681,7 @@ class PerformanceTestBasic:
                                                             producerNodeCount=args.producer_nodes, validationNodeCount=args.validation_nodes, apiNodeCount=args.api_nodes,
                                                             genesisPath=args.genesis, prodsEnableTraceApi=args.prods_enable_trace_api, extraNodeosArgs=extraNodeosArgs,
                                                             specifiedContract=specifiedContract, loggingLevel=args.cluster_log_lvl,
-                                                            nodeopVers=nodeopVers, nonProdsEosVmOcEnable=args.non_prods_eos_vm_oc_enable,
+                                                            nodeopVers=nodeopVers, nonProdsEosVmOcEnable=args.non_prods_sys_vm_oc_enable,
                                                             apiNodesReadOnlyThreadCount=args.api_nodes_read_only_threads)
 
 class PtbArgumentsHandler(object):

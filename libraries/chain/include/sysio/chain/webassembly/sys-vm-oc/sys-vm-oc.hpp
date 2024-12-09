@@ -18,7 +18,7 @@ class apply_context;
 
 namespace sysvmoc {
 
-using control_block = eos_vm_oc_control_block;
+using control_block = sys_vm_oc_control_block;
 
 struct no_offset{};
 struct code_offset {
