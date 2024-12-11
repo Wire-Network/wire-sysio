@@ -131,6 +131,8 @@ namespace sysio { namespace chain {
     *
     * UNUSED_ enums can be taken for new purposes but otherwise the offsets
     * in this enumeration are potentially shared_memory breaking
+    * 
+    * Note: sysio_roa_objects.hpp defines usage of: 200 - 202
     */
    enum object_type
    {

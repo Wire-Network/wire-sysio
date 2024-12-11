@@ -89,12 +89,12 @@ namespace sysio { namespace chain {
       }
    }
 
-   void transaction_context::init(uint64_t initial_net_usage)
-   {
+   void transaction_context::init(uint64_t initial_net_usage) {
       SYS_ASSERT( !is_initialized, transaction_exception, "cannot initialize twice" );
 
       // set maximum to a semi-valid deadline to allow for pause math and conversion to dates for logging
-      if( block_deadline == fc::time_point::maximum() ) block_deadline = start + fc::hours(24*7*52);
+      if( block_deadline == fc::time_point::maximum() ) 
+         block_deadline = start + fc::hours(24*7*52);
 
       const auto& cfg = control.get_global_properties().configuration;
       auto& rl = control.get_mutable_resource_limits_manager();
@@ -118,6 +118,7 @@ namespace sysio { namespace chain {
       }
 
       const transaction& trx = packed_trx.get_transaction();
+
       // Possibly lower net_limit to optional limit set in the transaction header
       uint64_t trx_specified_net_usage_limit = static_cast<uint64_t>(trx.max_net_usage_words.value) * 8;
       if( trx_specified_net_usage_limit > 0 && trx_specified_net_usage_limit <= net_limit ) {
@@ -150,9 +151,20 @@ namespace sysio { namespace chain {
             }
          }
       }
-      validate_ram_usage.reserve( bill_to_accounts.size() );
 
-      // Update usage values of accounts to reflect new time
+      // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
+      // Identify the contract account from the first action if possible
+      account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
+
+      // Only add contract_account if it's a valid (non-empty) name
+      if (contract_account.good()) {
+         bill_to_accounts.insert(contract_account);
+      }
+
+      validate_ram_usage.reserve(bill_to_accounts.size());
+      // -------------------------------------------------------------------------
+
+      // Update usage windows for all candidate accounts (user + contract)
       rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot );
 
       // Calculate the highest network usage and CPU time that all of the billed accounts can afford to be billed
@@ -190,7 +202,7 @@ namespace sysio { namespace chain {
          billing_timer_exception_code = deadline_exception::code_value;
       }
 
-      // Explicit billed_cpu_time_us should be used, block_deadline will be maximum unless in test code
+      // Explicit billed_cpu_time_us used
       if( explicit_billed_cpu_time ) {
          _deadline = block_deadline;
          deadline_exception_code = deadline_exception::code_value;
@@ -207,20 +219,21 @@ namespace sysio { namespace chain {
          validate_account_cpu_usage_estimate( billed_cpu_time_us, validate_account_cpu_limit );
       }
 
-      eager_net_limit = (eager_net_limit/8)*8; // Round down to nearest multiple of word size (8 bytes) so check_net_usage can be efficient
+      eager_net_limit = (eager_net_limit/8)*8; // Round down to nearest multiple of word size (8 bytes)
 
       if( initial_net_usage > 0 )
-         add_net_usage( initial_net_usage );  // Fail early if current net usage is already greater than the calculated limit
+         add_net_usage( initial_net_usage );  // Fail early if current net usage exceeds limit
 
       if(control.skip_trx_checks()) {
          transaction_timer.start( fc::time_point::maximum() );
       } else {
          transaction_timer.start( _deadline );
-         checktime(); // Fail early if deadline has already been exceeded
+         checktime(); // Fail early if deadline already exceeded
       }
 
       is_initialized = true;
    }
+
 
    void transaction_context::init_for_implicit_trx( uint64_t initial_net_usage  )
    {
@@ -319,60 +332,157 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::finalize() {
-      SYS_ASSERT( is_initialized, transaction_exception, "must first initialize" );
+      SYS_ASSERT(is_initialized, transaction_exception, "must first initialize");
 
-      if( is_input ) {
+      // Update permission usage if this is an input transaction
+      if (is_input) {
          const transaction& trx = packed_trx.get_transaction();
          auto& am = control.get_mutable_authorization_manager();
-         for( const auto& act : trx.actions ) {
-            for( const auto& auth : act.authorization ) {
-               am.update_permission_usage( am.get_permission(auth) );
+         for (const auto& act : trx.actions) {
+            for (const auto& auth : act.authorization) {
+               am.update_permission_usage(am.get_permission(auth));
             }
          }
       }
 
       auto& rl = control.get_mutable_resource_limits_manager();
-      for( auto a : validate_ram_usage ) {
-         rl.verify_account_ram_usage( a );
+
+      // Verify that all accounts that incurred RAM usage in this transaction have valid RAM usage
+      for (auto a : validate_ram_usage) {
+         rl.verify_account_ram_usage(a);
       }
 
-      // Calculate the new highest network usage and CPU time that all of the billed accounts can afford to be billed
+      // Calculate limits based on what billed accounts can afford
       int64_t account_net_limit = 0;
       int64_t account_cpu_limit = 0;
       bool greylisted_net = false, greylisted_cpu = false;
-      std::tie( account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
+      std::tie(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
+
       net_limit_due_to_greylist |= greylisted_net;
       cpu_limit_due_to_greylist |= greylisted_cpu;
 
-      // Possibly lower net_limit to what the billed accounts can pay
-      if( static_cast<uint64_t>(account_net_limit) <= net_limit ) {
-         // NOTE: net_limit may possibly not be objective anymore due to net greylisting, but it should still be no greater than the truly objective net_limit
+      uint32_t greylist_limit = (greylisted_net || greylisted_cpu) ? 1 : config::maximum_elastic_resource_multiplier;
+
+      // Possibly lower net_limit based on what accounts can pay
+      if (static_cast<uint64_t>(account_net_limit) <= net_limit) {
          net_limit = static_cast<uint64_t>(account_net_limit);
          net_limit_due_to_block = false;
       }
 
-      // Possibly lower objective_duration_limit to what the billed accounts can pay
-      if( account_cpu_limit <= objective_duration_limit.count() ) {
-         // NOTE: objective_duration_limit may possibly not be objective anymore due to cpu greylisting, but it should still be no greater than the truly objective objective_duration_limit
+      // Possibly lower objective_duration_limit based on what accounts can pay
+      if (account_cpu_limit <= objective_duration_limit.count()) {
          objective_duration_limit = fc::microseconds(account_cpu_limit);
          billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
       }
 
-      net_usage = ((net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
-
+      // Round up net_usage to nearest multiple of 8 bytes and verify
+      net_usage = ((net_usage + 7)/8)*8;
       eager_net_limit = net_limit;
       check_net_usage();
 
       auto now = fc::time_point::now();
       trace->elapsed = now - start;
 
-      update_billed_cpu_time( now );
+      // Update CPU time and validate CPU usage
+      update_billed_cpu_time(now);
+      validate_cpu_usage_to_bill(billed_cpu_time_us, account_cpu_limit, true);
 
-      validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true );
+      // ---------------------- BIOS Mode Check ----------------------
+      // Example: If we're before block #500, skip all new billing logic.
+      uint32_t bios_transition_block = 200;
+      if (control.head_block_num() < bios_transition_block) {
+         // BIOS phase: no resource billing, just return
+         return;
+      }
 
-      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
-                                block_timestamp_type(control.pending_block_time()).slot ); // Should never fail
+      // ---------------------- Fallback Logic for CPU/NET/RAM ----------------------
+      const transaction& trx = packed_trx.get_transaction();
+      account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
+
+      // Attempt to find a user account distinct from the contract_account
+      account_name user_account;
+      for (const auto& acct : bill_to_accounts) {
+         if (acct != contract_account) {
+            user_account = acct;
+            break;
+         }
+      }
+
+      // If no separate user found, fallback to using contract_account as payer as well
+      if (!user_account.good()) {
+         // Only one account (the contract) is involved, so it must pay if it can.
+         user_account = contract_account;
+      }
+
+      // Retrieve contract CPU/NET limits
+      auto [contract_cpu, contract_cpu_grey] = rl.get_account_cpu_limit_ex(contract_account, greylist_limit);
+      auto [contract_net, contract_net_grey] = rl.get_account_net_limit_ex(contract_account, greylist_limit);
+
+      int64_t total_ram_used = total_ram_usage;
+
+      // Get contract RAM limits
+      int64_t c_ram_limit, c_net_w, c_cpu_w;
+      rl.get_account_limits(contract_account, c_ram_limit, c_net_w, c_cpu_w);
+      int64_t c_ram_usage = rl.get_account_ram_usage(contract_account);
+
+      // RAM available for contract (no unlimited concept for RAM)
+      int64_t c_ram_available = (c_ram_limit < 0) ? -1 : (c_ram_limit - c_ram_usage);
+
+      // Check unlimited CPU/NET: negative 'available' means unlimited
+      bool contract_cpu_unlimited = (contract_cpu.available < 0);
+      bool contract_net_unlimited = (contract_net.available < 0);
+
+      // Check if contract can pay
+      bool contract_can_pay_cpu = contract_cpu_unlimited || (contract_cpu.available >= billed_cpu_time_us);
+      bool contract_can_pay_net = contract_net_unlimited || (contract_net.available >= (int64_t)net_usage);
+      bool contract_can_pay_ram = (c_ram_available >= total_ram_used);
+
+      bool contract_can_pay = contract_can_pay_cpu && contract_can_pay_net && contract_can_pay_ram;
+
+      if (contract_can_pay) {
+         // Contract pays
+         rl.add_pending_ram_usage(contract_account, total_ram_used);
+         rl.verify_account_ram_usage(contract_account);
+         rl.add_transaction_usage({contract_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
+                                 block_timestamp_type(control.pending_block_time()).slot);
+      } else {
+         // Contract cannot pay. If user_account == contract_account, no fallback is possible.
+         if (user_account == contract_account) {
+            // No distinct user to fallback to, fail transaction
+            SYS_ASSERT(false, resource_exhausted_exception, 
+                     "Contract cannot pay and no distinct user found to fallback");
+         }
+
+         // We have a distinct user, try to charge the user now
+         auto [user_cpu, user_cpu_grey] = rl.get_account_cpu_limit_ex(user_account, greylist_limit);
+         auto [user_net, user_net_grey] = rl.get_account_net_limit_ex(user_account, greylist_limit);
+
+         int64_t u_ram_limit, u_net_w, u_cpu_w;
+         rl.get_account_limits(user_account, u_ram_limit, u_net_w, u_cpu_w);
+         int64_t u_ram_usage = rl.get_account_ram_usage(user_account);
+         int64_t u_ram_available = (u_ram_limit < 0) ? -1 : (u_ram_limit - u_ram_usage);
+
+         bool user_cpu_unlimited = (user_cpu.available < 0);
+         bool user_net_unlimited = (user_net.available < 0);
+
+         bool user_can_pay_cpu = user_cpu_unlimited || (user_cpu.available >= billed_cpu_time_us);
+         bool user_can_pay_net = user_net_unlimited || (user_net.available >= (int64_t)net_usage);
+         bool user_can_pay_ram = (u_ram_available >= total_ram_used);
+
+         bool user_can_pay = user_can_pay_cpu && user_can_pay_net && user_can_pay_ram;
+
+         SYS_ASSERT(user_can_pay, resource_exhausted_exception, "Neither contract nor user can pay for this transaction");
+
+         // User pays
+         rl.add_pending_ram_usage(user_account, total_ram_used);
+         rl.verify_account_ram_usage(user_account);
+         rl.add_transaction_usage({user_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
+                                 block_timestamp_type(control.pending_block_time()).slot);
+      }
+      // ----------------------------------------------------------------------------
    }
+
+
 
    void transaction_context::squash() {
       if (undo_session) undo_session->squash();
@@ -536,8 +646,10 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-      auto& rl = control.get_mutable_resource_limits_manager();
-      rl.add_pending_ram_usage( account, ram_delta );
+      // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
+      total_ram_usage += ram_delta;
+
+      // If ram_delta > 0, we may still track the account in validate_ram_usage if needed.
       if( ram_delta > 0 ) {
          validate_ram_usage.insert( account );
       }
