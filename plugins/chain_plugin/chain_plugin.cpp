@@ -2436,38 +2436,43 @@ read_only::get_account_results read_only::get_account( const get_account_params&
    result.head_block_num  = db.head_block_num();
    result.head_block_time = db.head_block_time();
 
-   rm.get_account_limits( result.account_name, result.ram_quota, result.net_weight, result.cpu_weight );
+   // Get baseline resource limits from the resource manager
+   rm.get_account_limits(result.account_name, result.ram_quota, result.net_weight, result.cpu_weight);
 
-   const auto& accnt_obj = db.get_account( result.account_name );
-   const auto& accnt_metadata_obj = db.db().get<account_metadata_object,by_name>( result.account_name );
+   const auto& accnt_obj = db.get_account(result.account_name);
+   const auto& accnt_metadata_obj = d.get<account_metadata_object,by_name>(result.account_name);
 
    result.privileged       = accnt_metadata_obj.is_privileged();
    result.last_code_update = accnt_metadata_obj.last_code_update;
    result.created          = accnt_obj.creation_date;
 
    uint32_t greylist_limit = db.is_resource_greylisted(result.account_name) ? 1 : config::maximum_elastic_resource_multiplier;
-   result.net_limit = rm.get_account_net_limit_ex( result.account_name, greylist_limit).first;
-   result.cpu_limit = rm.get_account_cpu_limit_ex( result.account_name, greylist_limit).first;
-   result.ram_usage = rm.get_account_ram_usage( result.account_name );
+   auto [net_limit, net_grey] = rm.get_account_net_limit_ex(result.account_name, greylist_limit);
+   auto [cpu_limit, cpu_grey] = rm.get_account_cpu_limit_ex(result.account_name, greylist_limit);
 
-   if ( producer_plug ) {  // producer_plug is null when called from chain_plugin_tests.cpp and get_table_tests.cpp
+   result.net_limit = net_limit;
+   result.cpu_limit = cpu_limit;
+   result.ram_usage = rm.get_account_ram_usage(result.account_name);
+
+   if (producer_plug) {
       account_resource_limit subjective_cpu_bill_limit;
-      subjective_cpu_bill_limit.used = producer_plug->get_subjective_bill( result.account_name, fc::time_point::now() );
+      subjective_cpu_bill_limit.used = producer_plug->get_subjective_bill(result.account_name, fc::time_point::now());
       result.subjective_cpu_bill_limit = subjective_cpu_bill_limit;
    }
 
+   // Gather permission and linked actions info as before
    const auto linked_action_map = ([&](){
       const auto& links = d.get_index<permission_link_index,by_permission_name>();
-      auto iter = links.lower_bound( boost::make_tuple( params.account_name ) );
+      auto iter = links.lower_bound(boost::make_tuple(params.account_name));
 
-      std::multimap<name, linked_action> result;
+      std::multimap<name, linked_action> result_map;
       while (iter != links.end() && iter->account == params.account_name ) {
          auto action = iter->message_type.empty() ? std::optional<name>() : std::optional<name>(iter->message_type);
-         result.emplace(std::make_pair(iter->required_permission, linked_action{iter->code, std::move(action)}));
+         result_map.emplace(std::make_pair(iter->required_permission, linked_action{iter->code, std::move(action)}));
          ++iter;
       }
 
-      return result;
+      return result_map;
    })();
 
    auto get_linked_actions = [&](chain::name perm_name) {
@@ -2481,114 +2486,93 @@ read_only::get_account_results read_only::get_account( const get_account_params&
    };
 
    const auto& permissions = d.get_index<permission_index,by_owner>();
-   auto perm = permissions.lower_bound( boost::make_tuple( params.account_name ) );
-   while( perm != permissions.end() && perm->owner == params.account_name ) {
-      /// TODO: lookup perm->parent name
+   auto perm = permissions.lower_bound(boost::make_tuple(params.account_name));
+   while (perm != permissions.end() && perm->owner == params.account_name) {
       name parent;
-
-      // Don't lookup parent if null
-      if( perm->parent._id ) {
-         const auto* p = d.find<permission_object,by_id>( perm->parent );
-         if( p ) {
-            SYS_ASSERT(perm->owner == p->owner, invalid_parent_permission, "Invalid parent permission");
-            parent = p->name;
-         }
+      if (perm->parent._id) {
+         const auto* p = d.find<permission_object,by_id>(perm->parent);
+         SYS_ASSERT(p && perm->owner == p->owner, invalid_parent_permission, "Invalid parent permission");
+         parent = p->name;
       }
 
       auto linked_actions = get_linked_actions(perm->name);
-
-      result.permissions.push_back( permission{ perm->name, parent, perm->auth.to_authority(), std::move(linked_actions)} );
+      result.permissions.push_back(permission{ perm->name, parent, perm->auth.to_authority(), std::move(linked_actions) });
       ++perm;
    }
 
-   // add sysio.any linked authorizations
    result.sysio_any_linked_actions = get_linked_actions(chain::config::sysio_any_name);
 
-   const auto& code_account = db.db().get<account_object,by_name>( config::system_account_name );
+   // Load system account code/ABI for potentially core symbol extraction
+   const auto& code_account = d.get<account_object,by_name>(config::system_account_name);
 
-   abi_def abi;
-   if( abi_serializer::to_abi(code_account.abi, abi) ) {
-      abi_serializer abis( abi, abi_serializer::create_yield_function( abi_serializer_max_time ) );
-
-      const auto token_code = "sysio.token"_n;
+   abi_def system_abi;
+   fc::microseconds abi_serializer_max_time = fc::microseconds(config::default_abi_serializer_max_time_us);
+   if (abi_serializer::to_abi(code_account.abi, system_abi)) {
+      abi_serializer system_abis(system_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
 
       auto core_symbol = extract_core_symbol();
-
       if (params.expected_core_symbol)
          core_symbol = *(params.expected_core_symbol);
 
-      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( token_code, params.account_name, "accounts"_n ));
-      if( t_id != nullptr ) {
+      const auto token_code = "sysio.token"_n;
+
+      // Check balance of core symbol in sysio.token::accounts table
+      if (const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(token_code, params.account_name, "accounts"_n))) {
          const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, core_symbol.to_symbol_code() ));
-         if( it != idx.end() && it->value.size() >= sizeof(asset) ) {
+         auto it = idx.find(boost::make_tuple(t_id->id, core_symbol.to_symbol_code()));
+         if (it != idx.end() && it->value.size() >= sizeof(asset)) {
             asset bal;
             fc::datastream<const char *> ds(it->value.data(), it->value.size());
             fc::raw::unpack(ds, bal);
-
-            if( bal.get_symbol().valid() && bal.get_symbol() == core_symbol ) {
+            if (bal.get_symbol().valid() && bal.get_symbol() == core_symbol) {
                result.core_liquid_balance = bal;
             }
          }
       }
 
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, "userres"_n ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.total_resources = abis.binary_to_variant( "user_resources", data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors );
+      // ---------------------- New Code for Reslimit from sysio.roa ----------------------
+      // Accessing sysio.roa's ABI
+      const auto& roa_account = d.get<account_object, by_name>("sysio.roa"_n);
+      abi_def roa_abi;
+      if (abi_serializer::to_abi(roa_account.abi, roa_abi)) {
+         abi_serializer roa_abis(roa_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
+
+         // Lookup 'reslimit' table under sysio.roa for the given account
+         auto t_id_reslimit = d.find<chain::table_id_object, chain::by_code_scope_table>(
+            boost::make_tuple("sysio.roa"_n, params.account_name, "reslimit"_n)
+         );
+
+         if (t_id_reslimit != nullptr) {
+            const auto &idx = d.get_index<key_value_index, by_scope_primary>();
+            auto it = idx.find(boost::make_tuple(t_id_reslimit->id, params.account_name.to_uint64_t()));
+            if (it != idx.end()) {
+               vector<char> data;
+               copy_inline_row(*it, data);
+               result.total_resources = roa_abis.binary_to_variant("reslimit", data, abi_serializer::create_yield_function(abi_serializer_max_time), shorten_abi_errors);
+
+               // Extract fields from total_resources
+               const auto& res_obj = result.total_resources.get_object();
+               auto net_weight_str = res_obj["net_weight"].as_string();
+               auto cpu_weight_str = res_obj["cpu_weight"].as_string();
+               auto ram_bytes      = res_obj["ram_bytes"].as_uint64();
+
+               asset net_asset = asset::from_string(net_weight_str);
+               asset cpu_asset = asset::from_string(cpu_weight_str);
+
+               // Set these to result fields (overwrite baseline values from resource_limits_manager)
+               result.ram_quota  = (int64_t)ram_bytes;
+               result.net_weight = (int64_t)net_asset.get_amount();
+               result.cpu_weight = (int64_t)cpu_asset.get_amount();
+            }
          }
       }
 
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, "delband"_n ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.self_delegated_bandwidth = abis.binary_to_variant( "delegated_bandwidth", data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors );
-         }
-      }
-
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, params.account_name, "refunds"_n ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.refund_request = abis.binary_to_variant( "refund_request", data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors );
-         }
-      }
-
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, config::system_account_name, "voters"_n ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
-         if ( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.voter_info = abis.binary_to_variant( "voter_info", data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors );
-         }
-      }
-
-      t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::system_account_name, config::system_account_name, "rexbal"_n ));
-      if (t_id != nullptr) {
-         const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
-         if( it != idx.end() ) {
-            vector<char> data;
-            copy_inline_row(*it, data);
-            result.rex_info = abis.binary_to_variant( "rex_balance", data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors );
-         }
-      }
+      // ROA Change: Since we no longer need legacy system contract tables, we skip refunds, voters, delband, rex_info, etc.
    }
+
    return result;
 }
+
 
 static fc::variant action_abi_to_variant( const abi_def& abi, type_name action_type ) {
    fc::variant v;

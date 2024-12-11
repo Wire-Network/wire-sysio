@@ -169,6 +169,9 @@ namespace sysio { namespace chain {
          int64_t                       billing_timer_exception_code = block_cpu_usage_exceeded::code_value;
          fc::time_point                pseudo_start;
          fc::microseconds              billed_time;
+
+         // Roa Change: Store total RAM usage accumulated during actions here. transaction_context::finalize() will use to finalize charges.
+         int64_t                       total_ram_usage = 0; 
    };
 
 } }

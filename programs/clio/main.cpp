@@ -1149,68 +1149,84 @@ struct create_account_subcommand {
       createAccount->add_option("OwnerKey", owner_key_str, localized("The owner public key or permission level for the new account"))->required();
       createAccount->add_option("ActiveKey", active_key_str, localized("The active public key or permission level for the new account"));
 
-      if (!simple) {
-         createAccount->add_option("--stake-net", stake_net,
-                                   (localized("The amount of tokens delegated for net bandwidth")))->required();
-         createAccount->add_option("--stake-cpu", stake_cpu,
-                                   (localized("The amount of tokens delegated for CPU bandwidth")))->required();
-         createAccount->add_option("--buy-ram-kbytes", buy_ram_bytes_in_kbytes,
-                                   (localized("The amount of RAM bytes to purchase for the new account in kibibytes (KiB)")));
-         createAccount->add_option("--buy-ram-bytes", buy_ram_bytes,
-                                   (localized("The amount of RAM bytes to purchase for the new account in bytes")));
-         createAccount->add_option("--buy-ram", buy_ram_eos,
-                                   (localized("The amount of RAM bytes to purchase for the new account in tokens")));
-         createAccount->add_flag("--transfer", transfer,
-                                 (localized("Transfer voting power and right to unstake tokens to receiver")));
-      }
+      // Commented out for now for reference, these will not be used any longer.
+      // if (!simple) {
+      //    // These options remain defined, but we will not use them at runtime.
+      //    createAccount->add_option("--stake-net", stake_net,
+      //                              (localized("The amount of tokens delegated for net bandwidth")))->required();
+      //    createAccount->add_option("--stake-cpu", stake_cpu,
+      //                              (localized("The amount of tokens delegated for CPU bandwidth")))->required();
+      //    createAccount->add_option("--buy-ram-kbytes", buy_ram_bytes_in_kbytes,
+      //                              (localized("The amount of RAM bytes to purchase for the new account in kibibytes (KiB)")));
+      //    createAccount->add_option("--buy-ram-bytes", buy_ram_bytes,
+      //                              (localized("The amount of RAM bytes to purchase for the new account in bytes")));
+      //    createAccount->add_option("--buy-ram", buy_ram_eos,
+      //                              (localized("The amount of RAM bytes to purchase for the new account in tokens")));
+      //    createAccount->add_flag("--transfer", transfer,
+      //                            (localized("Transfer voting power and right to unstake tokens to receiver")));
+      // }
 
       add_standard_transaction_options(createAccount, "creator@active");
 
       createAccount->callback([this] {
-            auth_type owner, active;
+         auth_type owner, active;
 
-            if( owner_key_str.find('@') != string::npos ) {
-               try {
-                  owner = to_permission_level(owner_key_str);
-               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid owner permission level: ${permission}", ("permission", owner_key_str) )
-            } else {
-               try {
-                  owner = public_key_type(owner_key_str);
-               } SYS_RETHROW_EXCEPTIONS( public_key_type_exception, "Invalid owner public key: ${public_key}", ("public_key", owner_key_str) );
-            }
+         if (owner_key_str.find('@') != string::npos) {
+            try {
+               owner = to_permission_level(owner_key_str);
+            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid owner permission level: ${permission}", ("permission", owner_key_str))
+         } else {
+            try {
+               owner = public_key_type(owner_key_str);
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid owner public key: ${public_key}", ("public_key", owner_key_str));
+         }
 
-            if( active_key_str.empty() ) {
-               active = owner;
-            } else if( active_key_str.find('@') != string::npos ) {
-               try {
-                  active = to_permission_level(active_key_str);
-               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid active permission level: ${permission}", ("permission", active_key_str) )
-            } else {
-               try {
-                  active = public_key_type(active_key_str);
-               } SYS_RETHROW_EXCEPTIONS( public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str) );
-            }
+         if (active_key_str.empty()) {
+            active = owner;
+         } else if (active_key_str.find('@') != string::npos) {
+            try {
+               active = to_permission_level(active_key_str);
+            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid active permission level: ${permission}", ("permission", active_key_str))
+         } else {
+            try {
+               active = public_key_type(active_key_str);
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
+         }
 
-            auto create = create_newaccount(name(creator), name(account_name), owner, active);
-            if (!simple) {
-               SYSC_ASSERT( buy_ram_eos.size() || buy_ram_bytes_in_kbytes || buy_ram_bytes, "ERROR: One of --buy-ram, --buy-ram-kbytes or --buy-ram-bytes should have non-zero value" );
-               SYSC_ASSERT( !buy_ram_bytes_in_kbytes || !buy_ram_bytes, "ERROR: --buy-ram-kbytes and --buy-ram-bytes cannot be set at the same time" );
-               action buyram = !buy_ram_eos.empty() ? create_buyram(name(creator), name(account_name), to_asset(buy_ram_eos))
-                  : create_buyrambytes(name(creator), name(account_name), (buy_ram_bytes_in_kbytes) ? (buy_ram_bytes_in_kbytes * 1024) : buy_ram_bytes);
-               auto net = to_asset(stake_net);
-               auto cpu = to_asset(stake_cpu);
-               if ( net.get_amount() != 0 || cpu.get_amount() != 0 ) {
-                  action delegate = create_delegate( name(creator), name(account_name), net, cpu, transfer);
-                  send_actions( { create, buyram, delegate } );
-               } else {
-                  send_actions( { create, buyram } );
-               }
+         auto create = create_newaccount(name(creator), name(account_name), owner, active);
+
+         // Previously, if !simple, we enforced RAM and staking requirements and then called buyram, buyrambytes, and/or delegatebw.
+         // We are now commenting this logic out so that no additional actions are sent.
+         /*
+         if (!simple) {
+            SYSC_ASSERT( buy_ram_eos.size() || buy_ram_bytes_in_kbytes || buy_ram_bytes, "ERROR: One of --buy-ram, --buy-ram-kbytes or --buy-ram-bytes should have non-zero value" );
+            SYSC_ASSERT( !buy_ram_bytes_in_kbytes || !buy_ram_bytes, "ERROR: --buy-ram-kbytes and --buy-ram-bytes cannot be set at the same time" );
+
+            action buyram = !buy_ram_eos.empty() 
+               ? create_buyram(name(creator), name(account_name), to_asset(buy_ram_eos))
+               : create_buyrambytes(name(creator), name(account_name), 
+                                    (buy_ram_bytes_in_kbytes) ? (buy_ram_bytes_in_kbytes * 1024) : buy_ram_bytes);
+
+            auto net = to_asset(stake_net);
+            auto cpu = to_asset(stake_cpu);
+
+            if (net.get_amount() != 0 || cpu.get_amount() != 0) {
+               action delegate = create_delegate(name(creator), name(account_name), net, cpu, transfer);
+               send_actions({ create, buyram, delegate });
             } else {
-               send_actions( { create } );
+               send_actions({ create, buyram });
             }
+         } else {
+            send_actions({ create });
+         }
+         */
+
+         // New logic: Always just send the create action.
+         send_actions({ create });
       });
    }
 };
+
 
 struct unregister_producer_subcommand {
    string producer_str;
