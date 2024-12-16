@@ -187,30 +187,34 @@ BOOST_AUTO_TEST_SUITE(bootseq_tests)
 
 BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
-
         // Create sysio.msig and sysio.token
-        create_accounts({"sysio.msig"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n });
+        create_accounts({"sysio.msig"_n, "sysio.roa"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n });
         // Set code for the following accounts:
         //  - sysio (code: sysio.bios) (already set by tester constructor)
         //  - sysio.msig (code: sysio.msig)
         //  - sysio.token (code: sysio.token)
         // set_code_abi("sysio.msig"_n, contracts::sysio_msig_wasm(), contracts::sysio_msig_abi().data());//, &sysio_active_pk);
         // set_code_abi("sysio.token"_n, contracts::sysio_token_wasm(), contracts::sysio_token_abi().data()); //, &sysio_active_pk);
-
         set_code_abi("sysio.msig"_n,
                      contracts::sysio_msig_wasm(),
                      contracts::sysio_msig_abi().data());//, &sysio_active_pk);
+        set_code_abi("sysio.roa"_n,
+                     contracts::sysio_roa_wasm(),
+                     contracts::sysio_roa_abi().data());//, &sysio_active_pk);
         set_code_abi("sysio.token"_n,
                      contracts::sysio_token_wasm(),
                      contracts::sysio_token_abi().data()); //, &sysio_active_pk);
 
         // Set privileged for sysio.msig and sysio.token
         set_privileged("sysio.msig"_n);
+        set_privileged("sysio.roa"_n);
         set_privileged("sysio.token"_n);
 
         // Verify sysio.msig and sysio.token is privileged
         const auto& sysio_msig_acc = get<account_metadata_object, by_name>("sysio.msig"_n);
         BOOST_TEST(sysio_msig_acc.is_privileged() == true);
+        const auto& sysio_roa_acc = get<account_metadata_object, by_name>("sysio.roa"_n);
+        BOOST_TEST(sysio_roa_acc.is_privileged() == true);
         const auto& sysio_token_acc = get<account_metadata_object, by_name>("sysio.token"_n);
         BOOST_TEST(sysio_token_acc.is_privileged() == true);
 

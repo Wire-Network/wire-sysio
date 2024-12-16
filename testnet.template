@@ -106,6 +106,7 @@ echo sysio.* keys: $prisyskey $pubsyskey >> $logfile
 wcmd import -n ignition --private-key $prisyskey
 ecmd create account sysio sysio.bpay $pubsyskey $pubsyskey
 ecmd create account sysio sysio.msig $pubsyskey $pubsyskey
+ecmd create account sysio sysio.roa $pubsyskey $pubsyskey
 ecmd create account sysio sysio.names $pubsyskey $pubsyskey
 ecmd create account sysio sysio.ram $pubsyskey $pubsyskey
 ecmd create account sysio sysio.ramfee $pubsyskey $pubsyskey
@@ -117,6 +118,7 @@ ecmd create account sysio sysio.wrap $pubsyskey $pubsyskey
 
 ecmd set contract sysio.token unittests/contracts/sysio.token sysio.token.wasm sysio.token.abi
 ecmd set contract sysio.msig unittests/contracts/sysio.msig sysio.msig.wasm sysio.msig.abi
+ecmd set contract sysio.roa unittests/contracts/sysio.roa sysio.roa.wasm sysio.roa.abi
 ecmd set contract sysio.wrap unittests/contracts/sysio.wrap sysio.wrap.wasm sysio.wrap.abi
 
 echo ===== Start: $step ============ >> $logfile
@@ -132,6 +134,7 @@ sleep 1
 ecmd set contract sysio unittests/contracts/sysio.system sysio.system.wasm sysio.system.abi
 
 ecmd push action sysio setpriv '["sysio.msig",1]' -p sysio
+ecmd push action sysio setpriv '["sysio.roa",1]' -p sysio
 
 ecmd push action sysio init '[0,"4,'$bioscurrencysymbol'"]' -p sysio@active
 
