@@ -69,7 +69,6 @@ void apply_sysio_newaccount(apply_context& context) {
    auto create = context.get_action().data_as<newaccount>();
    try {
       context.require_authorization(create.creator);
-      // context.require_write_lock( config::sysio_auth_scope ); // If not needed, can remain commented out
 
       auto& authorization = context.control.get_mutable_authorization_manager();
 
@@ -83,14 +82,15 @@ void apply_sysio_newaccount(apply_context& context) {
       SYS_ASSERT(!create.name.empty(), action_validate_exception, "account name cannot be empty");
       SYS_ASSERT(name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long");
 
-      // Ensure only sysio can create new accounts at this stage
+      // Ensure only sysio can create new accounts
       SYS_ASSERT(create.creator == config::system_account_name,
                  action_validate_exception,
                  "Only sysio can create new accounts");
 
-      // Check if the creator is privileged for sysio. prefixed accounts
+      // Check for privileged account names
       const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
       if (!creator.is_privileged()) {
+         // If creator isn't privileged, disallow accounts starting with 'sysio.'
          SYS_ASSERT(name_str.find("sysio.") != 0, action_validate_exception,
                     "only privileged accounts can have names that start with 'sysio.'");
       }
@@ -120,8 +120,15 @@ void apply_sysio_newaccount(apply_context& context) {
 
       context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
 
-      // Set CPU and NET to 0 for the newly created account
-      context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0);
+      // Determine if this is a system account
+      bool is_system_account = (create.name == config::system_account_name) || 
+                               (name_str.size() > 5 && name_str.find("sysio.") == 0);
+
+      // If it's not a system account, set CPU, NET, RAM to 0
+      if (!is_system_account) {
+         // Non-system accounts start with zero resources
+         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0);
+      }
 
       int64_t ram_delta = config::overhead_per_account_ram_bytes;
       ram_delta += 2 * config::billable_size_v<permission_object>;
@@ -132,7 +139,7 @@ void apply_sysio_newaccount(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
       }
 
-      // Charge the RAM usage to sysio instead of the new account
+      // Charge the RAM usage to sysio (system payer)
       context.add_ram_usage(config::system_account_name, ram_delta);
 
    } FC_CAPTURE_AND_RETHROW((create))
