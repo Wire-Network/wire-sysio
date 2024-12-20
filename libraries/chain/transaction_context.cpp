@@ -375,7 +375,7 @@ namespace sysio { namespace chain {
          billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
       }
 
-      // Round up net_usage to nearest multiple of 8 bytes and verify
+      // Round up net_usage to the nearest multiple of 8 bytes and verify
       net_usage = ((net_usage + 7)/8)*8;
       eager_net_limit = net_limit;
       check_net_usage();
@@ -387,19 +387,11 @@ namespace sysio { namespace chain {
       update_billed_cpu_time(now);
       validate_cpu_usage_to_bill(billed_cpu_time_us, account_cpu_limit, true);
 
-      // ---------------------- BIOS Mode Check ----------------------
-      // Example: If we're before block #500, skip all new billing logic.
-      uint32_t bios_transition_block = 200;
-      if (control.head_block_num() < bios_transition_block) {
-         // BIOS phase: no resource billing, just return
-         return;
-      }
-
       // ---------------------- Fallback Logic for CPU/NET/RAM ----------------------
       const transaction& trx = packed_trx.get_transaction();
       account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
 
-      // Attempt to find a user account distinct from the contract_account
+      // Try to find a user account distinct from the contract_account to fallback to if needed
       account_name user_account;
       for (const auto& acct : bill_to_accounts) {
          if (acct != contract_account) {
@@ -408,9 +400,8 @@ namespace sysio { namespace chain {
          }
       }
 
-      // If no separate user found, fallback to using contract_account as payer as well
+      // If no separate user found, fallback to using the contract_account itself
       if (!user_account.good()) {
-         // Only one account (the contract) is involved, so it must pay if it can.
          user_account = contract_account;
       }
 
@@ -425,61 +416,65 @@ namespace sysio { namespace chain {
       rl.get_account_limits(contract_account, c_ram_limit, c_net_w, c_cpu_w);
       int64_t c_ram_usage = rl.get_account_ram_usage(contract_account);
 
-      // RAM available for contract (no unlimited concept for RAM)
-      int64_t c_ram_available = (c_ram_limit < 0) ? -1 : (c_ram_limit - c_ram_usage);
+      // If c_ram_limit == -1, it means unlimited RAM
+      bool contract_has_unlimited_ram = (c_ram_limit == -1);
+      int64_t c_ram_available = contract_has_unlimited_ram ? -1 : (c_ram_limit - c_ram_usage);
 
-      // Check unlimited CPU/NET: negative 'available' means unlimited
-      bool contract_cpu_unlimited = (contract_cpu.available < 0);
+      // Check if contract can pay CPU/NET
+      bool contract_cpu_unlimited = (contract_cpu.available < 0); // -1 in CPU/NET is represented by negative
       bool contract_net_unlimited = (contract_net.available < 0);
 
-      // Check if contract can pay
       bool contract_can_pay_cpu = contract_cpu_unlimited || (contract_cpu.available >= billed_cpu_time_us);
       bool contract_can_pay_net = contract_net_unlimited || (contract_net.available >= (int64_t)net_usage);
-      bool contract_can_pay_ram = (c_ram_available >= total_ram_used);
+      // RAM check now accounts for unlimited scenario
+      bool contract_can_pay_ram = contract_has_unlimited_ram || (c_ram_available >= total_ram_used);
 
       bool contract_can_pay = contract_can_pay_cpu && contract_can_pay_net && contract_can_pay_ram;
 
       if (contract_can_pay) {
-         // Contract pays
+         // Contract pays for the resources
          rl.add_pending_ram_usage(contract_account, total_ram_used);
          rl.verify_account_ram_usage(contract_account);
          rl.add_transaction_usage({contract_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
                                  block_timestamp_type(control.pending_block_time()).slot);
       } else {
-         // Contract cannot pay. If user_account == contract_account, no fallback is possible.
+         // Contract cannot pay. Attempt to fallback to the user if distinct.
          if (user_account == contract_account) {
-            // No distinct user to fallback to, fail transaction
-            SYS_ASSERT(false, resource_exhausted_exception, 
+            // No distinct user found, fail the transaction
+            SYS_ASSERT(false, resource_exhausted_exception,
                      "Contract cannot pay and no distinct user found to fallback");
          }
 
-         // We have a distinct user, try to charge the user now
+         // Retrieve user limits
          auto [user_cpu, user_cpu_grey] = rl.get_account_cpu_limit_ex(user_account, greylist_limit);
          auto [user_net, user_net_grey] = rl.get_account_net_limit_ex(user_account, greylist_limit);
 
          int64_t u_ram_limit, u_net_w, u_cpu_w;
          rl.get_account_limits(user_account, u_ram_limit, u_net_w, u_cpu_w);
          int64_t u_ram_usage = rl.get_account_ram_usage(user_account);
-         int64_t u_ram_available = (u_ram_limit < 0) ? -1 : (u_ram_limit - u_ram_usage);
+
+         // If u_ram_limit == -1, user has unlimited RAM
+         bool user_has_unlimited_ram = (u_ram_limit == -1);
+         int64_t u_ram_available = user_has_unlimited_ram ? -1 : (u_ram_limit - u_ram_usage);
 
          bool user_cpu_unlimited = (user_cpu.available < 0);
          bool user_net_unlimited = (user_net.available < 0);
 
          bool user_can_pay_cpu = user_cpu_unlimited || (user_cpu.available >= billed_cpu_time_us);
          bool user_can_pay_net = user_net_unlimited || (user_net.available >= (int64_t)net_usage);
-         bool user_can_pay_ram = (u_ram_available >= total_ram_used);
+         bool user_can_pay_ram = user_has_unlimited_ram || (u_ram_available >= total_ram_used);
 
          bool user_can_pay = user_can_pay_cpu && user_can_pay_net && user_can_pay_ram;
 
-         SYS_ASSERT(user_can_pay, resource_exhausted_exception, "Neither contract nor user can pay for this transaction");
+         SYS_ASSERT(user_can_pay, resource_exhausted_exception,
+                  "Neither contract nor user can pay for this transaction");
 
-         // User pays
+         // User pays for the resources
          rl.add_pending_ram_usage(user_account, total_ram_used);
          rl.verify_account_ram_usage(user_account);
          rl.add_transaction_usage({user_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
                                  block_timestamp_type(control.pending_block_time()).slot);
       }
-      // ----------------------------------------------------------------------------
    }
 
 
