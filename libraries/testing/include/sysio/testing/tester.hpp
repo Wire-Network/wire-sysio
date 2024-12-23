@@ -245,6 +245,7 @@ namespace sysio { namespace testing {
          void                  set_before_preactivate_bios_contract();
          void                  set_before_producer_authority_bios_contract();
          void                  set_bios_contract();
+         void                  init_roa();
 
          vector<producer_authority>  get_producer_authorities( const vector<account_name>& producer_names )const;
          transaction_trace_ptr       set_producers(const vector<account_name>& producer_names);
