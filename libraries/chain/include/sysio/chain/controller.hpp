@@ -235,6 +235,8 @@ namespace sysio { namespace chain {
          std::optional<block_id_type>   pending_producer_block_id()const;
          uint32_t                       pending_block_num()const;
 
+         const deque<transaction_receipt>& get_pending_trx_receipts()const;
+
          const producer_authority_schedule&         active_producers()const;
          const producer_authority_schedule&         pending_producers()const;
          std::optional<producer_authority_schedule> proposed_producers()const;
