@@ -17,7 +17,6 @@ namespace fc { namespace crypto {
          "K1",
          "R1",
          "WA",
-         // ** NEW: added em for Ethereum Message sig.
          "EM"
       };
    };
@@ -25,7 +24,7 @@ namespace fc { namespace crypto {
    class public_key
    {
       public:
-         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim>;
+         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim>;
          
          public_key() = default;
          public_key( public_key&& ) = default;

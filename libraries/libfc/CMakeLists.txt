@@ -48,10 +48,8 @@ set( fc_sources
      src/crypto/elliptic_common.cpp
      src/crypto/elliptic_em_common.cpp
      src/crypto/elliptic_impl_priv.cpp
-     src/crypto/elliptic_impl_pub.cpp
      src/crypto/elliptic_secp256k1.cpp
      src/crypto/elliptic_r1.cpp
-     src/crypto/elliptic_em_impl_pub.cpp
      src/crypto/elliptic_em_impl_priv.cpp
      src/crypto/elliptic_em.cpp
      src/crypto/elliptic_webauthn.cpp
