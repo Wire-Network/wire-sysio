@@ -16,7 +16,7 @@ class memory {
       static constexpr uint64_t mutable_global_size               = 8u  * sysio::chain::wasm_constraints::maximum_mutable_globals/4u;
       static constexpr uint64_t table_size                        = 16u * sysio::chain::wasm_constraints::maximum_table_elements;
       static constexpr size_t   wcb_allowance                     = 512u;
-      static_assert(sizeof(control_block) <= wcb_allowance, "EOS VM OC memory doesn't set aside enough memory for control block");
+      static_assert(sizeof(control_block) <= wcb_allowance, "SYS VM OC memory doesn't set aside enough memory for control block");
 
       //round up the prologue to multiple of 4K page
       static constexpr uint64_t memory_prologue_size = ((memory::wcb_allowance + mutable_global_size + table_size + intrinsic_count*UINT64_C(8))+UINT64_C(4095))/UINT64_C(4096)*UINT64_C(4096);
@@ -55,8 +55,8 @@ class memory {
 
       // Changed from -cb_offset == SYS_VM_OC_CONTROL_BLOCK_OFFSET to get around
       // of compile warning about comparing integers of different signedness
-      static_assert(SYS_VM_OC_CONTROL_BLOCK_OFFSET + cb_offset == 0, "EOS VM OC control block offset has slid out of place somehow");
-      static_assert(stride == SYS_VM_OC_MEMORY_STRIDE, "EOS VM OC memory stride has slid out of place somehow");
+      static_assert(SYS_VM_OC_CONTROL_BLOCK_OFFSET + cb_offset == 0, "SYS VM OC control block offset has slid out of place somehow");
+      static_assert(stride == SYS_VM_OC_MEMORY_STRIDE, "SYS VM OC memory stride has slid out of place somehow");
 
    private:
       uint8_t* mapbase;

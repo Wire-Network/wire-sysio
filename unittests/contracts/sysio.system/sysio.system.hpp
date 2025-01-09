@@ -76,7 +76,7 @@ struct [[sysio::table("global"), sysio::contract("sysio.system")]] sysio_global_
    block_timestamp      last_name_close;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
+   SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
    (max_ram_size)(total_ram_bytes_reserved)(total_ram_stake)
          (last_producer_schedule_update)(last_pervote_bucket_fill)
          (pervote_bucket)(perblock_bucket)(total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
@@ -95,7 +95,7 @@ struct [[sysio::table("global2"), sysio::contract("sysio.system")]] sysio_global
    double            total_producer_votepay_share = 0;
    uint8_t           revision = 0; ///< used to track version updates in the future.
 
-   EOSLIB_SERIALIZE( sysio_global_state2, (new_ram_per_block)(last_ram_increase)(last_block_num)
+   SYSLIB_SERIALIZE( sysio_global_state2, (new_ram_per_block)(last_ram_increase)(last_block_num)
          (total_producer_votepay_share)(revision) )
 };
 
@@ -104,7 +104,7 @@ struct [[sysio::table("global3"), sysio::contract("sysio.system")]] sysio_global
    time_point        last_vpay_state_update;
    double            total_vpay_share_change_rate = 0;
 
-   EOSLIB_SERIALIZE( sysio_global_state3, (last_vpay_state_update)(total_vpay_share_change_rate) )
+   SYSLIB_SERIALIZE( sysio_global_state3, (last_vpay_state_update)(total_vpay_share_change_rate) )
 };
 
 struct [[sysio::table, sysio::contract("sysio.system")]] producer_info {
@@ -123,7 +123,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] producer_info {
    void     deactivate()       { producer_key = public_key(); is_active = false; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( producer_info, (owner)(total_votes)(producer_key)(is_active)(url)
+   SYSLIB_SERIALIZE( producer_info, (owner)(total_votes)(producer_key)(is_active)(url)
          (unpaid_blocks)(last_claim_time)(location) )
 };
 
@@ -135,7 +135,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] producer_info2 {
    uint64_t primary_key()const { return owner.value; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( producer_info2, (owner)(votepay_share)(last_votepay_share_update) )
+   SYSLIB_SERIALIZE( producer_info2, (owner)(votepay_share)(last_votepay_share_update) )
 };
 
 struct [[sysio::table, sysio::contract("sysio.system")]] voter_info {
@@ -166,7 +166,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] voter_info {
    uint64_t primary_key()const { return owner.value; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(last_vote_weight)(proxied_vote_weight)(is_proxy)(reserved1)(reserved2)(reserved3) )
+   SYSLIB_SERIALIZE( voter_info, (owner)(proxy)(producers)(staked)(last_vote_weight)(proxied_vote_weight)(is_proxy)(reserved1)(reserved2)(reserved3) )
 };
 
 typedef sysio::multi_index< "voters"_n, voter_info >  voters_table;

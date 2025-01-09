@@ -37,7 +37,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] user_resources {
    uint64_t primary_key()const { return owner.value; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
+   SYSLIB_SERIALIZE( user_resources, (owner)(net_weight)(cpu_weight)(ram_bytes) )
 };
 
 
@@ -54,7 +54,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] delegated_bandwidth {
    uint64_t  primary_key()const { return to.value; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( delegated_bandwidth, (from)(to)(net_weight)(cpu_weight) )
+   SYSLIB_SERIALIZE( delegated_bandwidth, (from)(to)(net_weight)(cpu_weight) )
 
 };
 
@@ -68,7 +68,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] refund_request {
    uint64_t  primary_key()const { return owner.value; }
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( refund_request, (owner)(request_time)(net_amount)(cpu_amount) )
+   SYSLIB_SERIALIZE( refund_request, (owner)(request_time)(net_amount)(cpu_amount) )
 };
 
 /**

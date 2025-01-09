@@ -1,5 +1,5 @@
 if(NOT SYSIO_ROOT)
-   list(APPEND CMAKE_MODULE_PATH @EOS_ROOT_DIR@/cmake/sysio)
+   list(APPEND CMAKE_MODULE_PATH @SYSIO_ROOT_DIR@/cmake/sysio)
 else()
    # legacy behavior for anyone configuring with -DSYSIO_ROOT=/foo or such
    list(APPEND CMAKE_MODULE_PATH ${SYSIO_ROOT}/lib/cmake/sysio)

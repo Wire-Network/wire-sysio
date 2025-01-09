@@ -77,7 +77,9 @@ checksum256_type sub_chain_plugin::calculate_s_root(const std::vector<transactio
       s_leaves.emplace_back( trx.id() );
    }
    // Create and return the merkle S-Root 
-   return merkle( std::move(s_leaves) );
+   // return merkle( std::move(s_leaves) );
+   return merkle(sysio::chain::deque<fc::sha256>(s_leaves.begin(), s_leaves.end()));
+
 }
 
 /**

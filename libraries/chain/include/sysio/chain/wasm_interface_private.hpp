@@ -4,7 +4,7 @@
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
 #include <sysio/chain/webassembly/sys-vm-oc.hpp>
 #else
-#define _REGISTER_EOSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
+#define _REGISTER_SYSVMOC_INTRINSIC(CLS, MOD, METHOD, WASM_SIG, NAME, SIG)
 #endif
 #include <sysio/chain/webassembly/runtime_interface.hpp>
 #include <sysio/chain/wasm_sysio_injection.hpp>

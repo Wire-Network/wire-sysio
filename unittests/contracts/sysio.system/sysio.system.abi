@@ -433,104 +433,6 @@
             ]
         },
         {
-            "name": "sysio_global_state",
-            "base": "blockchain_parameters",
-            "fields": [
-                {
-                    "name": "max_ram_size",
-                    "type": "uint64"
-                },
-                {
-                    "name": "total_ram_bytes_reserved",
-                    "type": "uint64"
-                },
-                {
-                    "name": "total_ram_stake",
-                    "type": "int64"
-                },
-                {
-                    "name": "last_producer_schedule_update",
-                    "type": "block_timestamp_type"
-                },
-                {
-                    "name": "last_pervote_bucket_fill",
-                    "type": "time_point"
-                },
-                {
-                    "name": "pervote_bucket",
-                    "type": "int64"
-                },
-                {
-                    "name": "perblock_bucket",
-                    "type": "int64"
-                },
-                {
-                    "name": "total_unpaid_blocks",
-                    "type": "uint32"
-                },
-                {
-                    "name": "total_activated_stake",
-                    "type": "int64"
-                },
-                {
-                    "name": "thresh_activated_stake_time",
-                    "type": "time_point"
-                },
-                {
-                    "name": "last_producer_schedule_size",
-                    "type": "uint16"
-                },
-                {
-                    "name": "total_producer_vote_weight",
-                    "type": "float64"
-                },
-                {
-                    "name": "last_name_close",
-                    "type": "block_timestamp_type"
-                }
-            ]
-        },
-        {
-            "name": "sysio_global_state2",
-            "base": "",
-            "fields": [
-                {
-                    "name": "new_ram_per_block",
-                    "type": "uint16"
-                },
-                {
-                    "name": "last_ram_increase",
-                    "type": "block_timestamp_type"
-                },
-                {
-                    "name": "last_block_num",
-                    "type": "block_timestamp_type"
-                },
-                {
-                    "name": "total_producer_votepay_share",
-                    "type": "float64"
-                },
-                {
-                    "name": "revision",
-                    "type": "uint8"
-                }
-            ]
-        },
-        {
-            "name": "sysio_global_state3",
-            "base": "",
-            "fields": [
-                {
-                    "name": "last_vpay_state_update",
-                    "type": "time_point"
-                },
-                {
-                    "name": "total_vpay_share_change_rate",
-                    "type": "float64"
-                }
-            ]
-        },
-        {
             "name": "exchange_state",
             "base": "",
             "fields": [
@@ -1249,6 +1151,104 @@
                 {
                     "name": "bytes_per_block",
                     "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "sysio_global_state",
+            "base": "blockchain_parameters",
+            "fields": [
+                {
+                    "name": "max_ram_size",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_ram_bytes_reserved",
+                    "type": "uint64"
+                },
+                {
+                    "name": "total_ram_stake",
+                    "type": "int64"
+                },
+                {
+                    "name": "last_producer_schedule_update",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "last_pervote_bucket_fill",
+                    "type": "time_point"
+                },
+                {
+                    "name": "pervote_bucket",
+                    "type": "int64"
+                },
+                {
+                    "name": "perblock_bucket",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_unpaid_blocks",
+                    "type": "uint32"
+                },
+                {
+                    "name": "total_activated_stake",
+                    "type": "int64"
+                },
+                {
+                    "name": "thresh_activated_stake_time",
+                    "type": "time_point"
+                },
+                {
+                    "name": "last_producer_schedule_size",
+                    "type": "uint16"
+                },
+                {
+                    "name": "total_producer_vote_weight",
+                    "type": "float64"
+                },
+                {
+                    "name": "last_name_close",
+                    "type": "block_timestamp_type"
+                }
+            ]
+        },
+        {
+            "name": "sysio_global_state2",
+            "base": "",
+            "fields": [
+                {
+                    "name": "new_ram_per_block",
+                    "type": "uint16"
+                },
+                {
+                    "name": "last_ram_increase",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "last_block_num",
+                    "type": "block_timestamp_type"
+                },
+                {
+                    "name": "total_producer_votepay_share",
+                    "type": "float64"
+                },
+                {
+                    "name": "revision",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "sysio_global_state3",
+            "base": "",
+            "fields": [
+                {
+                    "name": "last_vpay_state_update",
+                    "type": "time_point"
+                },
+                {
+                    "name": "total_vpay_share_change_rate",
+                    "type": "float64"
                 }
             ]
         },

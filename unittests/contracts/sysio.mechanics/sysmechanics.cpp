@@ -108,12 +108,13 @@ CONTRACT sysmechanics : public sysio::contract {
             uint64_t id;
             std::string one;
 
-            auto primary_key()const { return id; }
-            EOSLIB_SERIALIZE(ramdata, (id)(one))
+            uint64_t primary_key() const { return id; }
+
+            SYSLIB_SERIALIZE(ramdata, (id)(one))
         };
 
         typedef sysio::multi_index<"ramdata"_n, ramdata> ramdata_index;
 
 };
 
-SYSIO_DISPATCH(eosmechanics, (cpu)(ram)(net))
+SYSIO_DISPATCH(sysmechanics, (cpu)(ram)(net))

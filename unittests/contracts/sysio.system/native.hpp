@@ -21,7 +21,7 @@ struct permission_level_weight {
    uint16_t          weight;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( permission_level_weight, (permission)(weight) )
+   SYSLIB_SERIALIZE( permission_level_weight, (permission)(weight) )
 };
 
 struct key_weight {
@@ -29,7 +29,7 @@ struct key_weight {
    uint16_t           weight;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( key_weight, (key)(weight) )
+   SYSLIB_SERIALIZE( key_weight, (key)(weight) )
 };
 
 struct wait_weight {
@@ -37,7 +37,7 @@ struct wait_weight {
    uint16_t           weight;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( wait_weight, (wait_sec)(weight) )
+   SYSLIB_SERIALIZE( wait_weight, (wait_sec)(weight) )
 };
 
 struct authority {
@@ -47,7 +47,7 @@ struct authority {
    std::vector<wait_weight>              waits;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE( authority, (threshold)(keys)(accounts)(waits) )
+   SYSLIB_SERIALIZE( authority, (threshold)(keys)(accounts)(waits) )
 };
 
 struct block_header {
@@ -61,7 +61,7 @@ struct block_header {
    std::optional<sysio::producer_schedule>   new_producers;
 
    // explicit serialization macro is not necessary, used here only to improve compilation time
-   EOSLIB_SERIALIZE(block_header, (timestamp)(producer)(confirmed)(previous)(transaction_mroot)(action_mroot)
+   SYSLIB_SERIALIZE(block_header, (timestamp)(producer)(confirmed)(previous)(transaction_mroot)(action_mroot)
          (schedule_version)(new_producers))
 };
 
@@ -71,7 +71,7 @@ struct [[sysio::table("abihash"), sysio::contract("sysio.system")]] abi_hash {
    checksum256       hash;
    uint64_t primary_key()const { return owner.value; }
 
-   EOSLIB_SERIALIZE( abi_hash, (owner)(hash) )
+   SYSLIB_SERIALIZE( abi_hash, (owner)(hash) )
 };
 
 /*

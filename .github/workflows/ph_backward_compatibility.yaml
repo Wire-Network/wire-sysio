@@ -58,13 +58,13 @@ jobs:
         uses: AntelopeIO/asset-artifact-download-action@v3
         with:
           owner: AntelopeIO
-          repo: leap
-          file: '(leap).*${{matrix.platform}}.04.*(x86_64|amd64).deb'
+          repo: sysio
+          file: '(sysio).*${{matrix.platform}}.04.*(x86_64|amd64).deb'
           target: '${{matrix.release}}'
-      - name: Install leap & replace binaries for PH use
+      - name: Install sysio & replace binaries for PH use
         run: |
           apt-get update
-          apt-get install -y ./leap*.deb
+          apt-get install -y ./sysio*.deb
           rm build/bin/nodeop
           rm build/bin/clio
           cp /usr/bin/nodeop build/bin

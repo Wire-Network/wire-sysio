@@ -372,7 +372,7 @@ auto fn(A... a) {
    catch(...) {
       *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::current_exception();
    }
-   siglongjmp(*sys_vm_oc_get_jmp_buf(), EOSVMOC_EXIT_EXCEPTION);
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 

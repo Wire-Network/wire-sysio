@@ -6,10 +6,10 @@
 
 int arch_prctl(int code, unsigned long* addr);
 
-#define EOSVMOC_MEMORY_PTR_cb_ptr GS_PTR struct sys_vm_oc_control_block* const cb_ptr = ((GS_PTR struct sys_vm_oc_control_block* const)(SYS_VM_OC_CONTROL_BLOCK_OFFSET));
+#define SYSVMOC_MEMORY_PTR_cb_ptr GS_PTR struct sys_vm_oc_control_block* const cb_ptr = ((GS_PTR struct sys_vm_oc_control_block* const)(SYS_VM_OC_CONTROL_BLOCK_OFFSET));
 
 int32_t sys_vm_oc_grow_memory(int32_t grow, int32_t max) {
-   EOSVMOC_MEMORY_PTR_cb_ptr;
+   SYSVMOC_MEMORY_PTR_cb_ptr;
    uint64_t previous_page_count = cb_ptr->current_linear_memory_pages;
    int32_t grow_amount = grow;
    uint64_t max_pages = max;
@@ -51,16 +51,16 @@ int32_t sys_vm_oc_grow_memory(int32_t grow, int32_t max) {
 }
 
 sigjmp_buf* sys_vm_oc_get_jmp_buf() {
-   EOSVMOC_MEMORY_PTR_cb_ptr;
+   SYSVMOC_MEMORY_PTR_cb_ptr;
    return cb_ptr->jmp;
 }
 
 void* sys_vm_oc_get_exception_ptr() {
-   EOSVMOC_MEMORY_PTR_cb_ptr;
+   SYSVMOC_MEMORY_PTR_cb_ptr;
    return cb_ptr->eptr;
 }
 
 void* sys_vm_oc_get_bounce_buffer_list() {
-   EOSVMOC_MEMORY_PTR_cb_ptr;
+   SYSVMOC_MEMORY_PTR_cb_ptr;
    return cb_ptr->bounce_buffers;
 }

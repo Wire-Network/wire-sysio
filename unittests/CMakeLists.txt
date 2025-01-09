@@ -73,7 +73,7 @@ add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # bui
 
 target_link_libraries( unit_test sysio_chain_wrap state_history chainbase sysio_testing fc custom_appbase abieos ${PLATFORM_SPECIFIC_LIBS} )
 
-target_compile_options(unit_test PUBLIC -DDISABLE_EOSLIB_SERIALIZE)
+target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 target_include_directories( unit_test PUBLIC
                             ${CMAKE_SOURCE_DIR}/libraries/testing/include
                             ${CMAKE_SOURCE_DIR}/test-contracts

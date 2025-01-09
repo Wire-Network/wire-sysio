@@ -41,7 +41,7 @@ public:
       uint32_t    delay   = 0;
       uint32_t    next_id = 0;
 
-      EOSLIB_SERIALIZE( config, (owner)(delay)(next_id) )
+      SYSLIB_SERIALIZE( config, (owner)(delay)(next_id) )
    };
 
    using config_singleton = sysio::singleton< "config"_n,  config >;

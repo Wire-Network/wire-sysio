@@ -44,10 +44,10 @@ struct code_descriptor {
 };
 
 enum sysvmoc_exitcode : int {
-   EOSVMOC_EXIT_CLEAN_EXIT = 1,
-   EOSVMOC_EXIT_CHECKTIME_FAIL,
-   EOSVMOC_EXIT_SEGV,
-   EOSVMOC_EXIT_EXCEPTION
+   SYSVMOC_EXIT_CLEAN_EXIT = 1,
+   SYSVMOC_EXIT_CHECKTIME_FAIL,
+   SYSVMOC_EXIT_SEGV,
+   SYSVMOC_EXIT_EXCEPTION
 };
 
 static constexpr uint8_t current_codegen_version = 1;
@@ -59,4 +59,4 @@ FC_REFLECT(sysio::chain::sysvmoc::code_offset, (offset));
 FC_REFLECT(sysio::chain::sysvmoc::intrinsic_ordinal, (ordinal));
 FC_REFLECT(sysio::chain::sysvmoc::code_descriptor, (code_hash)(vm_version)(codegen_version)(code_begin)(start)(apply_offset)(starting_memory_pages)(initdata_begin)(initdata_size)(initdata_prologue_size));
 
-#define EOSVMOC_INTRINSIC_INIT_PRIORITY __attribute__((init_priority(198)))
+#define SYSVMOC_INTRINSIC_INIT_PRIORITY __attribute__((init_priority(198)))

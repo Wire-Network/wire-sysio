@@ -19,7 +19,7 @@ endif()
 
 if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    enable_language(ASM)
-   set(CHAIN_EOSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/code_cache.cpp
+   set(CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/code_cache.cpp
                              webassembly/runtimes/sys-vm-oc/executor.cpp
                              webassembly/runtimes/sys-vm-oc/memory.cpp
                              webassembly/runtimes/sys-vm-oc/intrinsic.cpp
@@ -40,10 +40,10 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
 
    if(LLVM_VERSION VERSION_LESS 7.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       enable_language(ASM-LLVMWAR)
-      list(APPEND CHAIN_EOSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar)
       set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    else()
-      list(APPEND CHAIN_EOSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp)
+      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp)
       set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    endif()
 
@@ -51,12 +51,12 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
 
-   option(EOSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for EOS VM OC" OFF)
+   option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for EOS VM OC" OFF)
 endif()
 
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
-   set(CHAIN_EOSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
-   set(CHAIN_EOSVM_LIBRARIES sys-vm)
+   set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
+   set(CHAIN_SYSVM_LIBRARIES sys-vm)
 endif()
 
 set(CHAIN_WEBASSEMBLY_SOURCES
@@ -116,8 +116,8 @@ add_library( sysio_chain
               snapshot_scheduler.cpp
               deep_mind.cpp
 
-             ${CHAIN_EOSVMOC_SOURCES}
-             ${CHAIN_EOSVM_SOURCES}
+             ${CHAIN_SYSVMOC_SOURCES}
+             ${CHAIN_SYSVM_SOURCES}
              ${CHAIN_WEBASSEMBLY_SOURCES}
 
              authority.cpp
@@ -144,7 +144,7 @@ add_library(boost_numeric_ublas INTERFACE)
 add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
 
 target_link_libraries( sysio_chain PUBLIC bn256 fc chainbase sysio_rapidjson Logging IR WAST WASM
-                       softfloat builtins ${CHAIN_EOSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
+                       softfloat builtins ${CHAIN_SYSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
                        Boost::signals2 Boost::hana Boost::property_tree Boost::multi_index Boost::asio Boost::lockfree
                        Boost::assign Boost::accumulators
                      )
@@ -166,7 +166,7 @@ foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
    target_compile_definitions(sysio_chain PUBLIC "SYSIO_${RUNTIMEUC}_RUNTIME_ENABLED")
 endforeach()
 
-if(EOSVMOC_ENABLE_DEVELOPER_OPTIONS)
+if(SYSVMOC_ENABLE_DEVELOPER_OPTIONS)
    message(WARNING "EOS VM OC Developer Options are enabled; these are NOT supported")
    target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_OC_DEVELOPER)
 endif()

@@ -1,4 +1,4 @@
-name: "Build leap"
+name: "Build sysio"
 
 on:
   workflow_call:
@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   Build:
-    name: Build leap
+    name: Build sysio
     strategy:
       fail-fast: false
       matrix:

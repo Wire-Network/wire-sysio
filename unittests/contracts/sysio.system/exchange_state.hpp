@@ -20,7 +20,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] exchange_state {
       asset balance;
       double weight = .5;
 
-      EOSLIB_SERIALIZE( connector, (balance)(weight) )
+      SYSLIB_SERIALIZE( connector, (balance)(weight) )
    };
 
    connector base;
@@ -32,7 +32,7 @@ struct [[sysio::table, sysio::contract("sysio.system")]] exchange_state {
    asset convert_from_exchange( connector& c, asset in );
    asset convert( asset from, const symbol& to );
 
-   EOSLIB_SERIALIZE( exchange_state, (supply)(base)(quote) )
+   SYSLIB_SERIALIZE( exchange_state, (supply)(base)(quote) )
 };
 
 typedef sysio::multi_index< "rammarket"_n, exchange_state > rammarket;

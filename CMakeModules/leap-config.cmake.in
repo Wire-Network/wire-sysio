@@ -1,3 +1,0 @@
-list(APPEND CMAKE_MODULE_PATH @EOS_ROOT_DIR@/cmake/leap)
-include(SysioTester)
-include(SysioCheckVersion)

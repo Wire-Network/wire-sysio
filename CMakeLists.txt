@@ -171,7 +171,7 @@ if( ENABLE_TCMALLOC )
     set(CMAKE_CXX_STANDARD_LIBRARIES "${CMAKE_CXX_STANDARD_LIBRARIES} ${GPERFTOOLS_TCMALLOC}")
 endif()
 
-# leap includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
+# sysio includes a bundled BoringSSL which conflicts with OpenSSL. Make sure any other bundled libraries (such as boost)
 # do not attempt to use an external OpenSSL in any manner
 set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 
@@ -199,10 +199,10 @@ set(SYSIO_ROOT_DIR "${CMAKE_BINARY_DIR}/lib")
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
-# new leap CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/leap-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/leap/leap-config.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/leap/SysioTester.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/leap/SysioCheckVersion.cmake COPYONLY)
+# new sysio CMake files
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 
 set(SYSIO_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake @ONLY)
@@ -211,24 +211,24 @@ configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BI
 install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
-# new leap CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/leap-config.cmake.in ${CMAKE_BINARY_DIR}/modules/leap-config.cmake @ONLY)
-install(FILES ${CMAKE_BINARY_DIR}/modules/leap-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/leap COMPONENT dev EXCLUDE_FROM_ALL)
+# new sysio CMake files
+configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
+install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
-configure_file(LICENSE                                                     licenses/leap/LICENSE           COPYONLY)
-configure_file(libraries/softfloat/COPYING.txt                             licenses/leap/LICENSE.softfloat COPYONLY)
-configure_file(libraries/wasm-jit/LICENSE                                  licenses/leap/LICENSE.wavm      COPYONLY)
-configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/leap/LICENSE.secp256k1 COPYONLY)
-configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/leap/LICENSE.rapidjson COPYONLY)
-configure_file(libraries/sys-vm/LICENSE                                    licenses/leap/LICENSE.sys-vm    COPYONLY)
-configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/leap/LICENSE.prom      COPYONLY)
-configure_file(programs/clio/LICENSE.CLI11                                licenses/leap/LICENSE.CLI11     COPYONLY)
-configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/leap/LICENSE.bls12-381 COPYONLY)
-configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/leap/LICENSE.boringssl COPYONLY)
+configure_file(LICENSE                                                     licenses/sysio/LICENSE           COPYONLY)
+configure_file(libraries/softfloat/COPYING.txt                             licenses/sysio/LICENSE.softfloat COPYONLY)
+configure_file(libraries/wasm-jit/LICENSE                                  licenses/sysio/LICENSE.wavm      COPYONLY)
+configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/sysio/LICENSE.secp256k1 COPYONLY)
+configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/sysio/LICENSE.rapidjson COPYONLY)
+configure_file(libraries/sys-vm/LICENSE                                    licenses/sysio/LICENSE.sys-vm    COPYONLY)
+configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/sysio/LICENSE.prom      COPYONLY)
+configure_file(programs/clio/LICENSE.CLI11                                licenses/sysio/LICENSE.CLI11     COPYONLY)
+configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/sysio/LICENSE.bls12-381 COPYONLY)
+configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/sysio/LICENSE.boringssl COPYONLY)
 
-install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/leap" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/" COMPONENT base)
+install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/" COMPONENT base)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libraries/testing/contracts DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/leap_testing/libraries/testing COMPONENT dev EXCLUDE_FROM_ALL
         PATTERN "CMakeFiles" EXCLUDE
@@ -295,7 +295,7 @@ add_custom_target(dev-install
 
 include(doxygen)
 
-option(ENABLE_LEAP_DEV_DEB "Enable building the leap-dev .deb package" OFF)
+option(ENABLE_LEAP_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
 
 include(package.cmake)
 include(CPack)

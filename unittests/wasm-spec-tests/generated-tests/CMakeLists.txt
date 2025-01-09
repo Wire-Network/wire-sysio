@@ -10,7 +10,7 @@ add_executable( wasm_spec_test ${WASM_TESTS}) # build unit tests as one executab
 
 target_link_libraries( wasm_spec_test sysio_chain_wrap chainbase sysio_testing fc appbase ${PLATFORM_SPECIFIC_LIBS} )
 
-target_compile_options(wasm_spec_test PUBLIC -DDISABLE_EOSLIB_SERIALIZE)
+target_compile_options(wasm_spec_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 target_include_directories( wasm_spec_test PUBLIC
                             ${CMAKE_SOURCE_DIR}/libraries/testing/include
                             ${CMAKE_CURRENT_BINARY_DIR}/include )
