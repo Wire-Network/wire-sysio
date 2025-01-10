@@ -261,6 +261,17 @@ Enables new `get_block_num` intrinsic which returns the current block number.
 */
             {}
          } )
+           (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
+            "EM_KEY",
+            fc::variant("44454e39d7192100f75c2e4895be95c0d56226f8a33e886d537c10126f6b1d60").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: EM_KEY
+
+Enables usage of EM ( Ethereum Message ) keys and signatures.
+*/
+            {}
+         }  )
          (  builtin_protocol_feature_t::bls_primitives, builtin_protocol_feature_spec{
             "BLS_PRIMITIVES2",
             fc::variant("c0cce5bcd8ea19a28d9e12eafda65ebe6d0e0177e280d4f20c7ad66dcd9e011b").as<digest_type>(),
@@ -308,17 +319,6 @@ retires a deferred transaction is invalid.
 */
             {builtin_protocol_feature_t::disable_deferred_trxs_stage_1}
          } )
-         (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
-            "EM_KEY",
-            fc::variant("44454e39d7192100f75c2e4895be95c0d56226f8a33e886d537c10126f6b1d60").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: EM_KEY
-
-Enables usage of EM ( Ethereum Message ) keys and signatures.
-*/
-            {}
-         }  )
    ;
 
 

@@ -35,10 +35,10 @@ enum class builtin_protocol_feature_t : uint32_t {
    configurable_wasm_limits = 18, // configurable_wasm_limits2,
    crypto_primitives = 19,
    get_block_num = 20,
-   bls_primitives = 21,
-   disable_deferred_trxs_stage_1 = 22,
-   disable_deferred_trxs_stage_2 = 23,
-   em_key = 24,
+   em_key = 21,
+   bls_primitives = 22,
+   disable_deferred_trxs_stage_1 = 23,
+   disable_deferred_trxs_stage_2 = 24,
    reserved_private_fork_protocol_features = 500000,
 };
 
