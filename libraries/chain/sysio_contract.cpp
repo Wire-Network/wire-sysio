@@ -82,18 +82,11 @@ void apply_sysio_newaccount(apply_context& context) {
       SYS_ASSERT(!create.name.empty(), action_validate_exception, "account name cannot be empty");
       SYS_ASSERT(name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long");
 
-      // Ensure only sysio can create new accounts
-      SYS_ASSERT(create.creator == config::system_account_name,
-                 action_validate_exception,
-                 "Only sysio can create new accounts");
-
-      // Check for privileged account names
+      // Ensure only privileged accounts can create new accounts
       const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
-      if (!creator.is_privileged()) {
-         // If creator isn't privileged, disallow accounts starting with 'sysio.'
-         SYS_ASSERT(name_str.find("sysio.") != 0, action_validate_exception,
-                    "only privileged accounts can have names that start with 'sysio.'");
-      }
+      SYS_ASSERT(creator.is_privileged(),
+                 action_validate_exception,
+                 "Only privileged accounts can create new accounts");
 
       auto existing_account = db.find<account_object, by_name>(create.name);
       SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
