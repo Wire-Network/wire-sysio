@@ -1169,6 +1169,8 @@ struct controller_impl {
                                                      uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
    { try {
 
+      fc::logger::get("default").set_log_level(fc::log_level::debug);
+      wlog("Pushing scheduled transaction with head block ${block_num} with id ${id}", ("block_num", self.head_block_num())("id", gto.id));
       const bool validating = !self.is_producing_block();
       SYS_ASSERT( !validating || explicit_billed_cpu_time, transaction_exception, "validating requires explicit billing" );
 

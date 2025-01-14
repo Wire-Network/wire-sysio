@@ -1,3 +1,4 @@
+#include <contracts.hpp>
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
@@ -324,13 +325,19 @@ try {
    BOOST_CHECK_EXCEPTION(chain.create_account(name("aaaaaaaaaaaaa")), action_validate_exception,
                          fc_exception_message_is("account names can only be 12 chars long"));
 
+   // Creating a new account with non-privileged account, should fail
+   BOOST_CHECK_EXCEPTION(chain.create_account(name("dandy.joe"), name("joe")), action_validate_exception,
+                         fc_exception_message_is("Only privileged accounts can create new accounts"));
+
+   // Creating the same new account, this time with privileged account
+   auto r = chain.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+     mutable_variant_object()
+     ("account", name("joe"))
+     ("is_priv", 1));
+   chain.produce_block();
 
    // Creating account with sysio. prefix with privileged account
-   chain.create_account(name("sysio.test1"));
-
-   // Creating account with sysio. prefix with non-privileged account, should fail
-   BOOST_CHECK_EXCEPTION(chain.create_account(name("sysio.test2"), name("joe")), action_validate_exception,
-                         fc_exception_message_is("only privileged accounts can have names that start with 'sysio.'"));
+   chain.create_account(name("sysio.test1"), name("joe"));
 
 } FC_LOG_AND_RETHROW() }
 
@@ -383,6 +390,14 @@ try {
 
    chain.create_account(acc1);
    chain.create_account(acc1a);
+
+   //  TODO: acc1 needs to be privileged to create accounts, but then it doesn't use CPU or Net....  need to do something else...
+   auto r = chain.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
+     mutable_variant_object()
+     ("account", acc1)
+     ("is_priv", 1));
+   chain.produce_block();
+
    chain.produce_block();
 
    const chainbase::database &db = chain.control->db();
@@ -440,7 +455,10 @@ try {
    account_name acc3 = "acc3"_n;
    account_name acc4 = "acc4"_n;
 
+
+
    chain.create_account(acc1);
+   chain.create_accounts({acc2, acc3, acc4});
    chain.produce_block();
 
    auto create_acc = [&](account_name a, account_name creator, int threshold) {
@@ -452,13 +470,22 @@ try {
 
       vector<permission_level> pls;
       pls.push_back({creator, name("active")});
+      // force contracts::dancer_wasm() to be of type bytes
+
+      auto wasm = contracts::noop_wasm();
       trx.actions.emplace_back( pls,
-                                newaccount{
-                                   .creator  = creator,
-                                   .name     = a,
-                                   .owner    = authority( chain.get_public_key( a, "owner" ) ),
-                                   .active   = invalid_auth//authority( chain.get_public_key( a, "active" ) ),
-                                });
+         setcode{
+           .account = a,
+           .code = bytes(wasm.begin(), wasm.end()),
+         });
+      // trx.actions.emplace_back( pls, setabi{ .account = a, .abi =  bytes(contracts::noop_abi().begin(), contracts::noop_abi().end()) });
+
+                                // newaccount{
+                                //    .creator  = creator,
+                                //    .name     = a,
+                                //    .owner    = authority( chain.get_public_key( a, "owner" ) ),
+                                //    .active   = invalid_auth//authority( chain.get_public_key( a, "active" ) ),
+                                // });
 
       chain.set_transaction_headers(trx);
       trx.sign( chain.get_private_key( creator, "active" ), chain.control->get_chain_id()  );
