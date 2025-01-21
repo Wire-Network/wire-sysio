@@ -738,7 +738,7 @@ paths:
 
   /send_transaction2:
     post:
-      description: Attempts to apply a transaction to the blockchain specified in JSON format. It supports returning the full trace of a failed transaction and automatic nodsys-mediated retry if it is enabled on the node. When transaction retry is enabled on an API node, it will monitor incoming API transactions and ensure they are resubmitted additional times into the P2P network until they expire or are included in a block. Warning, full failure traces are now returned by default instead of exceptions. Be careful to not confuse a returned trace as an indication of speculative execution success. Verify 'receipt' and 'except' fields of the returned trace.
+      description: Attempts to apply a transaction to the blockchain specified in JSON format. It supports returning the full trace of a failed transaction and automatic nodeop-mediated retry if it is enabled on the node. When transaction retry is enabled on an API node, it will monitor incoming API transactions and ensure they are resubmitted additional times into the P2P network until they expire or are included in a block. Warning, full failure traces are now returned by default instead of exceptions. Be careful to not confuse a returned trace as an indication of speculative execution success. Verify 'receipt' and 'except' fields of the returned trace.
       operationId: send_transaction2
       requestBody:
         content:

@@ -15,7 +15,7 @@ Connect to a specific `nodeop` or `keosd` host to send COMMAND
 ### Connecting to Nodeos
 
 ```sh
-clio -url http://nodsys-host:8888 COMMAND
+clio -url http://nodeop-host:8888 COMMAND
 ```
 
 ### Connecting to Keosd

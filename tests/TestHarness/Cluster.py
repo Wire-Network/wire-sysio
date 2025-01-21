@@ -459,7 +459,7 @@ class Cluster(object):
         if type(specificExtraNodeosArgs) is dict:
             for args in specificExtraNodeosArgs.values():
                 if "--plugin sysio::history_api_plugin" in args:
-                    argsArr.append("--is-nodsys-v2")
+                    argsArr.append("--is-nodeop-v2")
                     break
 
         # Handle common case of specifying no block offset for older versions

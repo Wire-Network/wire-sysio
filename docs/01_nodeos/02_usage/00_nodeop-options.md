@@ -2,11 +2,11 @@
 content_title: Nodeos Options
 ---
 
-`Nodeos` is a command line interface (CLI) application. As such, it can be started manually from the command line or through an automated script. The behavior of `nodeop` is determined mainly by which plugins are loaded and which plugin options are used. The `nodeop` application features two main option categories: *nodsys-specific* options and *plugin-specific* options.
+`Nodeos` is a command line interface (CLI) application. As such, it can be started manually from the command line or through an automated script. The behavior of `nodeop` is determined mainly by which plugins are loaded and which plugin options are used. The `nodeop` application features two main option categories: *nodeop-specific* options and *plugin-specific* options.
 
-## Nodsys-specific Options
+## Nodeop-specific Options
 
-Nodsys-specific options are used mainly for housekeeping purposes, such as setting the directory where the blockchain data resides, specifying the name of the `nodeop` configuraton file, setting the name and path of the logging configuration file, etc. A sample output from running  `nodeop --help` is displayed below, showing the nodsys-specific options (Note: the plugin-specific options have been excluded for clarity):
+Nodeop-specific options are used mainly for housekeeping purposes, such as setting the directory where the blockchain data resides, specifying the name of the `nodeop` configuraton file, setting the name and path of the logging configuration file, etc. A sample output from running  `nodeop --help` is displayed below, showing the nodeop-specific options (Note: the plugin-specific options have been excluded for clarity):
 
 ```console
 Application Config Options:

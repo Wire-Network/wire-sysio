@@ -12,7 +12,7 @@ This section describes how to set up a multi-node blockchain configuration runni
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
 * It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.
-* Know how to pass [Nodeos options](../../02_usage/00_nodsys-options.md) to enable or disable functionality.
+* Know how to pass [Nodeos options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
 
