@@ -51,7 +51,7 @@ cluster=Cluster(unshared=args.unshared, keepRunning=True if nodesFile is not Non
 
 walletMgr=WalletMgr(True)
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 contractDir='unittests/test-contracts/nested_container_multi_index'
 wasmFile='nested_container_multi_index.wasm'
 abiFile='nested_container_multi_index.abi'

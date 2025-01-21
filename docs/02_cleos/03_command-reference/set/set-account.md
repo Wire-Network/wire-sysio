@@ -41,7 +41,7 @@ To modify the permissions of an account, you must have the authority over the ac
 The first example associates a new key to the active permissions of an account.
 
 ```sh
-clio set account permission test active '{"threshold":1,"keys":[{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":1}],"accounts":[{"permission":{"actor":"acc2","permission":"active"},"weight":50}]}' owner
+clio set account permission test active '{"threshold":1,"keys":[{"key":"SYS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":1}],"accounts":[{"permission":{"actor":"acc2","permission":"active"},"weight":50}]}' owner
 ```
 This second example modifies the same account permission, but removes the key set in the last example, and grants active authority of the test account to another account.
 
@@ -52,7 +52,7 @@ clio set account permission test active '{"threshold":1,"keys":[],"accounts":[{"
 The third example demonstrates how to set up permissions for multisig.
 
 ```sh
-clio set account permission test active '{"threshold" : 100, "keys" : [{"key":"EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":25}], "accounts" : [{"permission":{"actor":"sandwich","permission":"active"},"weight":75}]}' owner
+clio set account permission test active '{"threshold" : 100, "keys" : [{"key":"SYS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB","weight":25}], "accounts" : [{"permission":{"actor":"sandwich","permission":"active"},"weight":75}]}' owner
 ```
 The JSON object used in this command is actually composed of two different types of objects
 
@@ -71,7 +71,7 @@ The authority JSON object ...
 /*Set Permission with Key*/
 {
   "permission" : {
-    "key"           : "EOS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB",
+    "key"           : "SYS8X7Mp7apQWtL6T2sfSZzBcQNUqZB7tARFEm9gA9Tn9nbMdsvBB",
     "permission"    : "active"
   },
   weight            : 25      /*Set the weight of a signature from this permission*/

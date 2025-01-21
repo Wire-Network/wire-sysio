@@ -135,7 +135,7 @@ clio --wallet-url http://127.0.0.1:8899 create account sysio inita EOS6hMjoWRF2L
 
 ```console
 executed transaction: d1ea511977803d2d88f46deb554f5b6cce355b9cc3174bec0da45fc16fe9d5f3  352 bytes  102400 cycles
-#         sysio <= sysio::newaccount            {"creator":"sysio","name":"inita","owner":{"threshold":1,"keys":[{"key":"EOS6hMjoWRF2L8x9YpeqtUEcsDK...
+#         sysio <= sysio::newaccount            {"creator":"sysio","name":"inita","owner":{"threshold":1,"keys":[{"key":"SYS6hMjoWRF2L8x9YpeqtUEcsDK...
 ```
 
 We now have an account that is available to have a contract assigned to it, enabling it to do meaningful work. In other tutorials, the account has been used to establish simple contracts. In this case, the account will be designated as a block producer.
@@ -163,12 +163,12 @@ The output from this new node will show a little activity but will stop reportin
 At this point, the second `nodeop` is an idle producer. To turn it into an active producer, `inita` needs to be registered as a producer with the bios node, and the bios node needs to perform an action to update the producer schedule.
 
 ```sh
-clio --wallet-url http://127.0.0.1:8899 push action sysio setprods "{ \"schedule\": [{\"producer_name\": \"inita\",\"block_signing_key\": \"EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg\"}]}" -p sysio@active
+clio --wallet-url http://127.0.0.1:8899 push action sysio setprods "{ \"schedule\": [{\"producer_name\": \"inita\",\"block_signing_key\": \"SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg\"}]}" -p sysio@active
 ```
 
 ```console
 executed transaction: 2cff4d96814752aefaf9908a7650e867dab74af02253ae7d34672abb9c58235a  272 bytes  105472 cycles
-#         sysio <= sysio::setprods              {"version":1,"producers":[{"producer_name":"inita","block_signing_key":"EOS6hMjoWRF2L8x9YpeqtUEcsDKA...
+#         sysio <= sysio::setprods              {"version":1,"producers":[{"producer_name":"inita","block_signing_key":"SYS6hMjoWRF2L8x9YpeqtUEcsDKA...
 ```
 
 Congratulations, you have now configured a two-node testnet! You can see that the original node is no longer producing blocks but it is receiving them. You can verify this by running the `get info` commmand against each node.

@@ -565,7 +565,7 @@ class cluster_generator:
 
         # Always enable a history query plugin on the bios node
         if is_bios:
-            if self.args.is_nodeop_v2:
+            if self.args.is_nodsys_v2:
                 a(a(eosdcmd, '--plugin'), 'sysio::history_api_plugin')
                 a(a(eosdcmd, '--filter-on'), '"*"')
             else:

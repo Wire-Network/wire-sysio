@@ -516,8 +516,8 @@ usage: PerformanceHarnessScenarioRunner.py findMax testBpOpMode overrideBasicTes
        [--contract-dir CONTRACT_DIR] [--wasm-file WASM_FILE]
        [--abi-file ABI_FILE] [--user-trx-data-file USER_TRX_DATA_FILE]
        [--wasm-runtime {sys-vm-jit,sys-vm}] [--contracts-console]
-       [--sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
-       [--sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
+       [--sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB]
+       [--sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS]
        [--non-prods-sys-vm-oc-enable]
        [--block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS]
        [--http-threads HTTP_THREADS]
@@ -616,9 +616,9 @@ Performance Test Basic Base:
                         "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
                         "sys-vm" : A WebAssembly interpreter.
   --contracts-console   print contract's output to console
-  --sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
+  --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB
                         Maximum size (in MiB) of the EOS VM OC code cache
-  --sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
+  --sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS
                         Number of threads to use for EOS VM OC tier-up
   --non-prods-sys-vm-oc-enable
                         Enable EOS VM OC tier-up runtime on non producer nodes
@@ -678,8 +678,8 @@ The following classes and scripts are typically used by the Performance Harness 
                                   [--user-trx-data-file USER_TRX_DATA_FILE]
                                   [--wasm-runtime {sys-vm-jit,sys-vm}]
                                   [--contracts-console]
-                                  [--sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB]
-                                  [--sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS]
+                                  [--sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB]
+                                  [--sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS]
                                   [--non-prods-sys-vm-oc-enable]
                                   [--block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS]
                                   [--http-threads HTTP_THREADS]
@@ -776,9 +776,9 @@ Performance Test Basic Base:
                         "sys-vm-jit" : A WebAssembly runtime that compiles WebAssembly code to native x86 code prior to execution.
                         "sys-vm" : A WebAssembly interpreter. (default: sys-vm-jit)
   --contracts-console   print contract's output to console (default: False)
-  --sys-vm-oc-cache-size-mb EOS_VM_OC_CACHE_SIZE_MB
+  --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB
                         Maximum size (in MiB) of the EOS VM OC code cache (default: 1024)
-  --sys-vm-oc-compile-threads EOS_VM_OC_COMPILE_THREADS
+  --sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS
                         Number of threads to use for EOS VM OC tier-up (default: 1)
   --non-prods-sys-vm-oc-enable
                         Enable EOS VM OC tier-up runtime on non producer nodes (default: False)
@@ -1362,15 +1362,15 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "databaseMapMode": "mapped",
         "_databaseMapModeNodeosDefault": "mapped",
         "_databaseMapModeNodeosArg": "--database-map-mode",
-        "eosVmOcCacheSizeMb": 1024,
-        "_eosVmOcCacheSizeMbNodeosDefault": 1024,
-        "_eosVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
-        "eosVmOcCompileThreads": 1,
-        "_eosVmOcCompileThreadsNodeosDefault": 1,
-        "_eosVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
-        "eosVmOcEnable": null,
-        "_eosVmOcEnableNodeosDefault": "auto",
-        "_eosVmOcEnableNodeosArg": "--sys-vm-oc-enable",
+        "sysVmOcCacheSizeMb": 1024,
+        "_sysVmOcCacheSizeMbNodeosDefault": 1024,
+        "_sysVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
+        "sysVmOcCompileThreads": 1,
+        "_sysVmOcCompileThreadsNodeosDefault": 1,
+        "_sysVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
+        "sysVmOcEnable": null,
+        "_sysVmOcEnableNodeosDefault": "auto",
+        "_sysVmOcEnableNodeosArg": "--sys-vm-oc-enable",
         "enableAccountQueries": null,
         "_enableAccountQueriesNodeosDefault": 0,
         "_enableAccountQueriesNodeosArg": "--enable-account-queries",
@@ -1580,7 +1580,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_producerNameNodeosDefault": null,
         "_producerNameNodeosArg": "--producer-name",
         "signatureProvider": null,
-        "_signatureProviderNodeosDefault": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3",
+        "_signatureProviderNodeosDefault": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3",
         "_signatureProviderNodeosArg": "--signature-provider",
         "greylistAccount": null,
         "_greylistAccountNodeosDefault": null,
@@ -1756,7 +1756,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
     "_apiNodeIds": [
       2
     ],
-    "nonProdsEosVmOcEnable": false,
+    "nonProdsSysVmOcEnable": false,
     "apiNodesReadOnlyThreadCount": 0,
     "testDurationSec": 10,
     "finalDurationSec": 30,
@@ -2022,15 +2022,15 @@ The Performance Test Basic generates, by default, a report that details results 
         "databaseMapMode": "mapped",
         "_databaseMapModeNodeosDefault": "mapped",
         "_databaseMapModeNodeosArg": "--database-map-mode",
-        "eosVmOcCacheSizeMb": 1024,
-        "_eosVmOcCacheSizeMbNodeosDefault": 1024,
-        "_eosVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
-        "eosVmOcCompileThreads": 1,
-        "_eosVmOcCompileThreadsNodeosDefault": 1,
-        "_eosVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
-        "eosVmOcEnable": null,
-        "_eosVmOcEnableNodeosDefault": "auto",
-        "_eosVmOcEnableNodeosArg": "--sys-vm-oc-enable",
+        "sysVmOcCacheSizeMb": 1024,
+        "_sysVmOcCacheSizeMbNodeosDefault": 1024,
+        "_sysVmOcCacheSizeMbNodeosArg": "--sys-vm-oc-cache-size-mb",
+        "sysVmOcCompileThreads": 1,
+        "_sysVmOcCompileThreadsNodeosDefault": 1,
+        "_sysVmOcCompileThreadsNodeosArg": "--sys-vm-oc-compile-threads",
+        "sysVmOcEnable": null,
+        "_sysVmOcEnableNodeosDefault": "auto",
+        "_sysVmOcEnableNodeosArg": "--sys-vm-oc-enable",
         "enableAccountQueries": null,
         "_enableAccountQueriesNodeosDefault": 0,
         "_enableAccountQueriesNodeosArg": "--enable-account-queries",
@@ -2240,7 +2240,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_producerNameNodeosDefault": null,
         "_producerNameNodeosArg": "--producer-name",
         "signatureProvider": null,
-        "_signatureProviderNodeosDefault": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3",
+        "_signatureProviderNodeosDefault": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3",
         "_signatureProviderNodeosArg": "--signature-provider",
         "greylistAccount": null,
         "_greylistAccountNodeosDefault": null,
@@ -2416,7 +2416,7 @@ The Performance Test Basic generates, by default, a report that details results 
     "_apiNodeIds": [
       2
     ],
-    "nonProdsEosVmOcEnable": false,
+    "nonProdsSysVmOcEnable": false,
     "apiNodesReadOnlyThreadCount": 0,
     "targetTps": 14001,
     "testTrxGenDurationSec": 10,
