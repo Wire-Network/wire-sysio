@@ -40,7 +40,7 @@ clio create account sysio bob EOS87TQktA5RVse2EguhztfQVEh6XXxBmgkU8b4Y5YnGvtYAoL
 
 ```console
 executed transaction: 4d65a274de9f809f9926b74c3c54aadc0947020bcfb6dd96043d1bcd9c46604c  200 bytes  166 us
-#         sysio <= sysio::newaccount            {"creator":"sysio","name":"bob","owner":{"threshold":1,"keys":[{"key":"EOS87TQktA5RVse2EguhztfQVEh6X...
+#         sysio <= sysio::newaccount            {"creator":"sysio","name":"bob","owner":{"threshold":1,"keys":[{"key":"SYS87TQktA5RVse2EguhztfQVEh6X...
 warning: transaction executed locally, but may not be confirmed by the network yet         ]
 ```
 

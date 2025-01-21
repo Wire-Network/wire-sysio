@@ -1277,7 +1277,7 @@ BOOST_AUTO_TEST_CASE(named_thread_pool_test) {
 
 BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    auto private_key_string = std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-   auto expected_public_key = std::string("EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
+   auto expected_public_key = std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
    auto test_private_key = fc::crypto::private_key(private_key_string);
    auto test_public_key = test_private_key.get_public_key();
    fc::crypto::public_key eos_pk(expected_public_key);

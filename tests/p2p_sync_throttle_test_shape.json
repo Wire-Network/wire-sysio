@@ -6,7 +6,7 @@
       "name": "bios", 
       "keys": [
         {
-          "pubkey": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV", 
+          "pubkey": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
           "privkey": "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
         }
       ], 
@@ -29,7 +29,7 @@
       "name": "testnet_00", 
       "keys": [
         {
-          "pubkey": "EOS7D6jfN6bbJD9cYheyhnBT4bmUWc3Qf4Yphf5GBeAAy58okcwHU", 
+          "pubkey": "SYS7D6jfN6bbJD9cYheyhnBT4bmUWc3Qf4Yphf5GBeAAy58okcwHU",
           "privkey": "5KkmnyunnpCQzgFoLMEtU3j7BRBa5aWmsBNru49ke7LdnZKFhmt"
         }
       ], 
@@ -70,7 +70,7 @@
       "name": "testnet_01", 
       "keys": [
         {
-          "pubkey": "EOS5tZqxLB8y9q2yHkgcXU4QFBEV6QKN3NQ54ygaFLWHJbjqYzFhw", 
+          "pubkey": "SYS5tZqxLB8y9q2yHkgcXU4QFBEV6QKN3NQ54ygaFLWHJbjqYzFhw",
           "privkey": "5KBs4qR7T8shJjCJUeFQXd77iKrok5TCtZiQhWJpCpc1VRxpNAs"
         }
       ], 
@@ -91,7 +91,7 @@
       "name": "testnet_02", 
       "keys": [
         {
-          "pubkey": "EOS5FBPf5EN9bYEqmsKfPx9bxyUZ9grDiE24zqLFXtPa6UpVzMjE7", 
+          "pubkey": "SYS5FBPf5EN9bYEqmsKfPx9bxyUZ9grDiE24zqLFXtPa6UpVzMjE7",
           "privkey": "5HtVDiAsD24seDm5sdswTcdZpx672XbBW9gBkyrzbsj2j9Y9JeC"
         }
       ],
@@ -112,7 +112,7 @@
       "name": "testnet_03", 
       "keys": [
         {
-          "pubkey": "EOS8XH2gKxsef9zxmMHm4vaSvxQUhg7W4GC3nK2KSRxyYrNG5gZFS", 
+          "pubkey": "SYS8XH2gKxsef9zxmMHm4vaSvxQUhg7W4GC3nK2KSRxyYrNG5gZFS",
           "privkey": "5JcoRRhDcgm51dkBrRTmErceTqrYhrq22UnmUjTZToMpH91B9N1"
         }
       ], 

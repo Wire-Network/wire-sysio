@@ -389,7 +389,7 @@ constexpr auto create_function() {
 }
 
 template<auto F, bool injected, typename Preconditions, typename Name>
-void register_eosvm_oc(Name n) {
+void register_sysvm_oc(Name n) {
    // Has special handling
    if(n == BOOST_HANA_STRING("env.sysio_exit")) return;
    constexpr auto fn = create_function<F, Preconditions, injected>();

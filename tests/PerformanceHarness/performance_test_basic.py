@@ -111,7 +111,7 @@ class PerformanceTestBasic:
         _producerNodeIds: list = field(default_factory=list)
         _validationNodeIds: list = field(default_factory=list)
         _apiNodeIds: list = field(default_factory=list)
-        nonProdsEosVmOcEnable: bool = False
+        nonProdsSysVmOcEnable: bool = False
         apiNodesReadOnlyThreadCount: int = 0
 
         def __post_init__(self):
@@ -131,7 +131,7 @@ class PerformanceTestBasic:
                     #If prodsEnableTraceApi, then Cluster configures all nodes with trace_api_plugin so no need to duplicate here
                     if not self.prodsEnableTraceApi:
                         validationNodeSpecificNodeosStr += "--plugin sysio::trace_api_plugin "
-                if self.nonProdsEosVmOcEnable:
+                if self.nonProdsSysVmOcEnable:
                     validationNodeSpecificNodeosStr += "--sys-vm-oc-enable all "
                 if validationNodeSpecificNodeosStr:
                     self.specificExtraNodeosArgs.update({f"{nodeId}" : validationNodeSpecificNodeosStr for nodeId in self._validationNodeIds})
@@ -657,7 +657,7 @@ class PerformanceTestBasic:
         chainPluginArgs = ChainPluginArgs(signatureCpuBillablePct=args.signature_cpu_billable_pct,
                                         chainThreads=args.chain_threads, databaseMapMode=args.database_map_mode,
                                         wasmRuntime=args.wasm_runtime, contractsConsole=args.contracts_console,
-                                        eosVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, eosVmOcCompileThreads=args.sys_vm_oc_compile_threads,
+                                        sysVmOcCacheSizeMb=args.sys_vm_oc_cache_size_mb, sysVmOcCompileThreads=args.sys_vm_oc_compile_threads,
                                         blockLogRetainBlocks=args.block_log_retain_blocks,
                                         chainStateDbSizeMb=args.chain_state_db_size_mb, abiSerializerMaxTimeMs=990000)
 
@@ -681,7 +681,7 @@ class PerformanceTestBasic:
                                                             producerNodeCount=args.producer_nodes, validationNodeCount=args.validation_nodes, apiNodeCount=args.api_nodes,
                                                             genesisPath=args.genesis, prodsEnableTraceApi=args.prods_enable_trace_api, extraNodeosArgs=extraNodeosArgs,
                                                             specifiedContract=specifiedContract, loggingLevel=args.cluster_log_lvl,
-                                                            nodeopVers=nodeopVers, nonProdsEosVmOcEnable=args.non_prods_sys_vm_oc_enable,
+                                                            nodeopVers=nodeopVers, nonProdsSysVmOcEnable=args.non_prods_sys_vm_oc_enable,
                                                             apiNodesReadOnlyThreadCount=args.api_nodes_read_only_threads)
 
 class PtbArgumentsHandler(object):

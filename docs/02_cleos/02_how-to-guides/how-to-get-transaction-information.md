@@ -72,7 +72,7 @@ The `clio` command returns detailed information of the transaction:
             "owner": {
               "threshold": 1,
               "keys": [{
-                  "key": "EOS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
+                  "key": "SYS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
                   "weight": 1
                 }
               ],
@@ -82,7 +82,7 @@ The `clio` command returns detailed information of the transaction:
             "active": {
               "threshold": 1,
               "keys": [{
-                  "key": "EOS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
+                  "key": "SYS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
                   "weight": 1
                 }
               ],
@@ -135,7 +135,7 @@ The `clio` command returns detailed information of the transaction:
           "owner": {
             "threshold": 1,
             "keys": [{
-                "key": "EOS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
+                "key": "SYS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
                 "weight": 1
               }
             ],
@@ -145,7 +145,7 @@ The `clio` command returns detailed information of the transaction:
           "active": {
             "threshold": 1,
             "keys": [{
-                "key": "EOS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
+                "key": "SYS6b4ENeXffuKGmsk3xCk3kbFM5M8dcANrUa9Mj9RzKLNhPKhzyj",
                 "weight": 1
               }
             ],

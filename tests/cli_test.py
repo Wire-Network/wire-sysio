@@ -203,7 +203,7 @@ def clio_abi_file_test():
         "owner": {
           "threshold": 1,
           "keys": [{
-              "key": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+              "key": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
               "weight": 1
             }
           ],
@@ -213,7 +213,7 @@ def clio_abi_file_test():
         "active": {
           "threshold": 1,
           "keys": [{
-              "key": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+              "key": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
               "weight": 1
             }
           ],
@@ -257,7 +257,7 @@ def clio_abi_file_test():
                 "owner": {
                 "threshold": 1,
                 "keys": [{
-                    "key": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+                    "key": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
                     "weight": 1
                     }
                 ],
@@ -267,7 +267,7 @@ def clio_abi_file_test():
                 "active": {
                 "threshold": 1,
                 "keys": [{
-                    "key": "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
+                    "key": "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV",
                     "weight": 1
                     }
                 ],
@@ -364,7 +364,7 @@ def abi_file_with_nodeop_test():
         for name in accountNames:
             account = Account(name)
             account.ownerPrivateKey = account.activePrivateKey = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
-            account.ownerPublicKey = account.activePublicKey = "EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
+            account.ownerPublicKey = account.activePublicKey = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
             accounts.append(account)
         walletMgr.create('sysio', [accounts[0]])
         node.createAccount(accounts[1], accounts[0], stakedDeposit=0)
