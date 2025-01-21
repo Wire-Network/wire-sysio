@@ -14,7 +14,7 @@ This section describes how to set up a non-producing node within the Antelope ne
 [//]: # ( THIS IS A COMMENT NEXT LINK CONTAINS A BROKEN LINK )  
 [//]: # (  If you built Antelope using shell scripts, make sure to run the Install Script ../../../00_install/01_build-from-source/01_shell-scripts/03_install-antelope-binaries.md )  
 
-* Know how to pass [Nodeos options](../../02_usage/00_nodsys-options.md) to enable or disable functionality.
+* Know how to pass [Nodeos options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
 
