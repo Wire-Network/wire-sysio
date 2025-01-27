@@ -47,16 +47,16 @@ try:
 
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
     # ensure that transactions don't get cleaned up too early
     successDuration = 360
     failure_duration = 360
-    extraNodeosArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
+    extraNodeopArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
                    f"--transaction-finality-status-success-duration-sec {successDuration} --transaction-finality-status-failure-duration-sec {failure_duration}"
-    extraNodeosArgs+=" --http-max-response-time-ms 990000"
+    extraNodeopArgs+=" --http-max-response-time-ms 990000"
 
 
     # ***   setup topogrophy   ***
@@ -65,8 +65,8 @@ try:
     # and the only connection between those 2 groups is through the bridge node
     if cluster.launch(prodCount=2, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs,
-                      extraNodeosArgs=extraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs,
+                      extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
     Print("Validating system accounts after bootstrap")

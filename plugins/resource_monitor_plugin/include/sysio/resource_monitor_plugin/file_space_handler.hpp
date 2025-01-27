@@ -161,7 +161,7 @@ namespace sysio::resource_monitor {
    void space_monitor_loop() {
       if ( is_threshold_exceeded() && shutdown_on_exceeded ) {
          elog("Gracefully shutting down, exceeded file system configured threshold.");
-         appbase::app().quit(); // This will gracefully stop Nodeos
+         appbase::app().quit(); // This will gracefully stop Nodeop
          return;
       }
       update_warning_interval_counter();

@@ -614,5 +614,5 @@ class Utils:
         return data.decode(enc)
 
     @staticmethod
-    def getNodeosVersion():
+    def getNodeopVersion():
         return os.popen(f"{Utils.EosServerPath} --full-version").read().replace("\n", "")

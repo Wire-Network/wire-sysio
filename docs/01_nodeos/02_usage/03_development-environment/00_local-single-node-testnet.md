@@ -18,7 +18,7 @@ This section describes how to set up a single-node blockchain configuration runn
 [//]: # (THIS IS A COMMENT, NEXT LINK HAS BROKEN LINK)  
 [//]: # (If you built Antelope using shell scripts, make sure to run the Install Script ../../../00_install/01_build-from-source/01_shell-scripts/03_install-antelope-binaries.md .)  
 
-* Know how to pass [Nodeos options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
+* Know how to pass [Nodeop options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
 
@@ -35,7 +35,7 @@ Start your own single-node blockchain with this single command:
 nodeop -e -p sysio --plugin sysio::chain_api_plugin --plugin sysio::history_api_plugin
 ```
 
-[[info | Nodeos Minimal Options]]
+[[info | Nodeop Minimal Options]]
 | A minimal `nodeop` instance setup for block production requires both `chain_api_plugin` and `history_api_plugin` with the `-e` option (enable stale production) and `-p sysio` option (producer name `sysio`). Alternatively, you can also setup and specify your own account as the producer name.
 
 After running `nodeop`, you should get log messages similar as below. It means the blocks are successfully produced.

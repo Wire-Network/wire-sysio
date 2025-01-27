@@ -14,7 +14,7 @@ from pathlib import Path, PurePath
 sys.path.append(str(PurePath(PurePath(Path(__file__).absolute()).parent).parent))
 
 from .log_reader import blockData, trxData, chainData, scrapeTrxGenTrxSentDataLogs, JsonReportHandler, analyzeLogResults, TpsTestConfig, ArtifactPaths, LogAnalysis
-from .NodeosPluginArgs import ChainPluginArgs, HttpPluginArgs, NetPluginArgs, ProducerPluginArgs, ResourceMonitorPluginArgs, SignatureProviderPluginArgs, StateHistoryPluginArgs, TraceApiPluginArgs
+from .NodeopPluginArgs import ChainPluginArgs, HttpPluginArgs, NetPluginArgs, ProducerPluginArgs, ResourceMonitorPluginArgs, SignatureProviderPluginArgs, StateHistoryPluginArgs, TraceApiPluginArgs
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr, TransactionGeneratorsLauncher, TpsTrxGensConfig
 from TestHarness.TestHelper import AppArgs
 from dataclasses import dataclass, asdict, field
@@ -65,7 +65,7 @@ class PerformanceTestBasic:
     @dataclass
     class ClusterConfig:
         @dataclass
-        class ExtraNodeosArgs:
+        class ExtraNodeopArgs:
 
             chainPluginArgs: ChainPluginArgs = field(default_factory=ChainPluginArgs)
             httpPluginArgs: HttpPluginArgs = field(default_factory=HttpPluginArgs)
@@ -95,7 +95,7 @@ class PerformanceTestBasic:
         validationNodeCount: int = 1
         apiNodeCount: int = 0
         dontKill: bool = False # leave_running
-        extraNodeosArgs: ExtraNodeosArgs = field(default_factory=ExtraNodeosArgs)
+        extraNodeopArgs: ExtraNodeopArgs = field(default_factory=ExtraNodeopArgs)
         specifiedContract: SpecifiedContract = field(default_factory=SpecifiedContract)
         genesisPath: Path = Path("tests")/"PerformanceHarness"/"genesis.json"
         maximumP2pPerHost: int = 5000
@@ -105,7 +105,7 @@ class PerformanceTestBasic:
         loggingDict: dict = field(default_factory=lambda: { "bios": "off" })
         prodsEnableTraceApi: bool = False
         nodeopVers: str = ""
-        specificExtraNodeosArgs: dict = field(default_factory=dict)
+        specificExtraNodeopArgs: dict = field(default_factory=dict)
         _totalNodes: int = 2
         _pNodes: int = 1
         _producerNodeIds: list = field(default_factory=list)
@@ -123,35 +123,35 @@ class PerformanceTestBasic:
             self._apiNodeIds = list(range(self.producerNodeCount + self.validationNodeCount, self.producerNodeCount + self.validationNodeCount + self.validationNodeCount))
 
             def configureValidationNodes():
-                validationNodeSpecificNodeosStr = ""
-                validationNodeSpecificNodeosStr += '--p2p-accept-transactions false '
+                validationNodeSpecificNodeopStr = ""
+                validationNodeSpecificNodeopStr += '--p2p-accept-transactions false '
                 if "v2" in self.nodeopVers:
-                    validationNodeSpecificNodeosStr += '--plugin sysio::history_api_plugin --filter-on "*" '
+                    validationNodeSpecificNodeopStr += '--plugin sysio::history_api_plugin --filter-on "*" '
                 else:
                     #If prodsEnableTraceApi, then Cluster configures all nodes with trace_api_plugin so no need to duplicate here
                     if not self.prodsEnableTraceApi:
-                        validationNodeSpecificNodeosStr += "--plugin sysio::trace_api_plugin "
+                        validationNodeSpecificNodeopStr += "--plugin sysio::trace_api_plugin "
                 if self.nonProdsSysVmOcEnable:
-                    validationNodeSpecificNodeosStr += "--sys-vm-oc-enable all "
-                if validationNodeSpecificNodeosStr:
-                    self.specificExtraNodeosArgs.update({f"{nodeId}" : validationNodeSpecificNodeosStr for nodeId in self._validationNodeIds})
+                    validationNodeSpecificNodeopStr += "--sys-vm-oc-enable all "
+                if validationNodeSpecificNodeopStr:
+                    self.specificExtraNodeopArgs.update({f"{nodeId}" : validationNodeSpecificNodeopStr for nodeId in self._validationNodeIds})
 
             def configureApiNodes():
-                apiNodeSpecificNodeosStr = ""
-                apiNodeSpecificNodeosStr += "--p2p-accept-transactions false "
-                apiNodeSpecificNodeosStr += "--plugin sysio::chain_api_plugin "
-                apiNodeSpecificNodeosStr += "--plugin sysio::net_api_plugin "
+                apiNodeSpecificNodeopStr = ""
+                apiNodeSpecificNodeopStr += "--p2p-accept-transactions false "
+                apiNodeSpecificNodeopStr += "--plugin sysio::chain_api_plugin "
+                apiNodeSpecificNodeopStr += "--plugin sysio::net_api_plugin "
                 if "v4" in self.nodeopVers:
-                    apiNodeSpecificNodeosStr += f"--read-only-threads {self.apiNodesReadOnlyThreadCount} "
-                if apiNodeSpecificNodeosStr:
-                    self.specificExtraNodeosArgs.update({f"{nodeId}" : apiNodeSpecificNodeosStr for nodeId in self._apiNodeIds})
+                    apiNodeSpecificNodeopStr += f"--read-only-threads {self.apiNodesReadOnlyThreadCount} "
+                if apiNodeSpecificNodeopStr:
+                    self.specificExtraNodeopArgs.update({f"{nodeId}" : apiNodeSpecificNodeopStr for nodeId in self._apiNodeIds})
 
             if self.validationNodeCount > 0:
                 configureValidationNodes()
             if self.apiNodeCount > 0:
                 configureApiNodes()
 
-            assert "v1" not in self.nodeopVers and "v0" not in self.nodeopVers, f"nodeop version {Utils.getNodeosVersion()} is unsupported by performance test"
+            assert "v1" not in self.nodeopVers and "v0" not in self.nodeopVers, f"nodeop version {Utils.getNodeopVersion()} is unsupported by performance test"
             if "v2" in self.nodeopVers:
                 self.writeTrx = lambda trxDataFile, blockNum, trx: [trxDataFile.write(f"{trx['trx']['id']},{blockNum},{trx['cpu_usage_us']},{trx['net_usage_words']}\n")]
                 self.createBlockData = lambda block, blockTransactionTotal, blockNetTotal, blockCpuTotal: blockData(blockId=block["payload"]["id"], blockNum=block['payload']['block_num'], transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal, producer=block["payload"]["producer"], status=block["payload"]["confirmed"], _timestamp=block["payload"]["timestamp"])
@@ -355,9 +355,9 @@ class PerformanceTestBasic:
             genesisPath=self.clusterConfig.genesisPath,
             maximumP2pPerHost=self.clusterConfig.maximumP2pPerHost,
             maximumClients=self.clusterConfig.maximumClients,
-            extraNodeosArgs=str(self.clusterConfig.extraNodeosArgs),
+            extraNodeopArgs=str(self.clusterConfig.extraNodeopArgs),
             prodsEnableTraceApi=self.clusterConfig.prodsEnableTraceApi,
-            specificExtraNodeosArgs=self.clusterConfig.specificExtraNodeosArgs
+            specificExtraNodeopArgs=self.clusterConfig.specificExtraNodeopArgs
             )
 
     def setupWalletAndAccounts(self, accountCnt: int=2, accountNames: list=None):
@@ -670,16 +670,16 @@ class PerformanceTestBasic:
         httpPluginArgs = HttpPluginArgs(httpMaxBytesInFlightMb=args.http_max_bytes_in_flight_mb, httpMaxInFlightRequests=args.http_max_in_flight_requests,
                                         httpMaxResponseTimeMs=args.http_max_response_time_ms, httpThreads=args.http_threads)
         netPluginArgs = NetPluginArgs(netThreads=args.net_threads, maxClients=0)
-        nodeopVers=Utils.getNodeosVersion()
+        nodeopVers=Utils.getNodeopVersion()
         resourceMonitorPluginArgs = ResourceMonitorPluginArgs(resourceMonitorNotShutdownOnThresholdExceeded=not "v2" in nodeopVers)
-        ENA = PerformanceTestBasic.ClusterConfig.ExtraNodeosArgs
-        extraNodeosArgs = ENA(chainPluginArgs=chainPluginArgs, httpPluginArgs=httpPluginArgs, producerPluginArgs=producerPluginArgs, netPluginArgs=netPluginArgs,
+        ENA = PerformanceTestBasic.ClusterConfig.ExtraNodeopArgs
+        extraNodeopArgs = ENA(chainPluginArgs=chainPluginArgs, httpPluginArgs=httpPluginArgs, producerPluginArgs=producerPluginArgs, netPluginArgs=netPluginArgs,
                             resourceMonitorPluginArgs=resourceMonitorPluginArgs)
         SC = PerformanceTestBasic.ClusterConfig.SpecifiedContract
         specifiedContract=SC(contractDir=args.contract_dir, wasmFile=args.wasm_file, abiFile=args.abi_file, account=Account(args.account_name))
         return PerformanceTestBasic.ClusterConfig(dontKill=args.leave_running, keepLogs=not args.del_perf_logs,
                                                             producerNodeCount=args.producer_nodes, validationNodeCount=args.validation_nodes, apiNodeCount=args.api_nodes,
-                                                            genesisPath=args.genesis, prodsEnableTraceApi=args.prods_enable_trace_api, extraNodeosArgs=extraNodeosArgs,
+                                                            genesisPath=args.genesis, prodsEnableTraceApi=args.prods_enable_trace_api, extraNodeopArgs=extraNodeopArgs,
                                                             specifiedContract=specifiedContract, loggingLevel=args.cluster_log_lvl,
                                                             nodeopVers=nodeopVers, nonProdsSysVmOcEnable=args.non_prods_sys_vm_oc_enable,
                                                             apiNodesReadOnlyThreadCount=args.api_nodes_read_only_threads)

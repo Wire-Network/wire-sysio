@@ -1,5 +1,5 @@
 ---
-content_title: Nodeos Configuration
+content_title: Nodeop Configuration
 ---
 
 The plugin-specific options can be configured using either CLI options or a configuration file, `config.ini`. Nodeop-specific options can only be configured from the command line. All CLI options and `config.ini` options can be found by running `nodeop --help` as shown above.
@@ -15,7 +15,7 @@ The default `config.ini` can be found in the following folder on Linux:
 
 A custom `config.ini` file can be set by passing the `nodeop` option `--config path/to/config.ini`.
 
-## Nodeos Example
+## Nodeop Example
 
 The example below shows a typical usage of `nodeop` when starting a block producing node:
 

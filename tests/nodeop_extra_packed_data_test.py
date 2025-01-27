@@ -59,18 +59,18 @@ try:
 
     if localTest and not dontLaunch:
         Print("Stand up cluster")
-        specificExtraNodeosArgs = {}
+        specificExtraNodeopArgs = {}
         associatedNodeLabels = {}
         if pnodes > 1:
-            specificExtraNodeosArgs[pnodes - 1] = ""
+            specificExtraNodeopArgs[pnodes - 1] = ""
         if pnodes > 3:
-            specificExtraNodeosArgs[pnodes - 2] = ""
+            specificExtraNodeopArgs[pnodes - 2] = ""
 
         if cluster.launch(totalNodes=totalNodes, 
                           pnodes=pnodes,
                           dontBootstrap=dontBootstrap,
                           pfSetupPolicy=PFSetupPolicy.PREACTIVATE_FEATURE_ONLY,
-                          specificExtraNodeosArgs=specificExtraNodeosArgs,
+                          specificExtraNodeopArgs=specificExtraNodeopArgs,
                           associatedNodeLabels=associatedNodeLabels) is False:
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")

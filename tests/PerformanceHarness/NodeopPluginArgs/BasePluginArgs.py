@@ -8,10 +8,10 @@ from dataclasses import dataclass
 @dataclass
 class BasePluginArgs:
 
-    def supportedNodeosArgs(self) -> list:
+    def supportedNodeopArgs(self) -> list:
         args = []
         for field in dataclasses.fields(self):
-            match = re.search("\w*NodeosArg", field.name)
+            match = re.search("\w*NodeopArg", field.name)
             if match is not None:
                 args.append(getattr(self, field.name))
         return args
@@ -21,12 +21,12 @@ class BasePluginArgs:
         for field in dataclasses.fields(self):
             match = re.search("[^_]", field.name[0])
             if match is not None:
-                default = getattr(self, f"_{field.name}NodeosDefault")
+                default = getattr(self, f"_{field.name}NodeopDefault")
                 current = getattr(self, field.name)
                 if current is not None and current != default:
                     if type(current) is bool:
-                        args.append(f"{getattr(self, f'_{field.name}NodeosArg')}")
+                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')}")
                     else:
-                        args.append(f"{getattr(self, f'_{field.name}NodeosArg')} {getattr(self, field.name)}")
+                        args.append(f"{getattr(self, f'_{field.name}NodeopArg')} {getattr(self, field.name)}")
 
         return "--plugin " + self._pluginNamespace + "::" + self._pluginName + " " + " ".join(args) if len(args) > 0 else ""

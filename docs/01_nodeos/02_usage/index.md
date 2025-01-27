@@ -1,5 +1,5 @@
 ---
-content_title: Nodeos Usage
+content_title: Nodeop Usage
 ---
 
 This section explains how to use `nodeop`, lists its configuration options, describes its local file layout, provides common setups, and discusses the potential test environments for development.

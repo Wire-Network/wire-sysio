@@ -1,5 +1,5 @@
 ---
-content_title: Nodeos Plugins
+content_title: Nodeop Plugins
 ---
 
 ## Overview
@@ -20,5 +20,5 @@ For information on specific plugins, just select from the list below:
 * [`test_control_plugin`](test_control_plugin/index.md)
 * [`trace_api_plugin`](trace_api_plugin/index.md)
 
-[[info | Nodeos is modular]]
+[[info | Nodeop is modular]]
 | Plugins add incremental functionality to `nodeop`. Unlike runtime plugins, `nodeop` plugins are built at compile-time.

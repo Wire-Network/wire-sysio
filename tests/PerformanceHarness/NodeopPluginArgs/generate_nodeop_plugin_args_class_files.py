@@ -10,7 +10,7 @@ to encapsulate the configurations options available for each plugin as currently
 It makes use of the compiled nodeop program and runs the --help command, capturing the output.
 It then parses the output, breaking down the presented configuration options by plugin section (ignoring application and test plugin config options).
 This provides a rudimentary list of plugins supported, config options for each plugin, and attempts to acertain default values and types.
-The script then uses the parsed output to generate *PluginArgs.py scripts, placing them in the NodeosPluginArgs directory.
+The script then uses the parsed output to generate *PluginArgs.py scripts, placing them in the NodeopPluginArgs directory.
 
 Currently it generates the following scripts:
 - ChainPluginArgs.py
@@ -27,14 +27,14 @@ Each *PluginArgs.py file contains one dataclass that captures the available conf
 Each config option is represented by 3 member variables, for example:
 1) blocksDir: str=None
     --This is the field that will be populated when the dataclass is used by other scripts to configure nodeop
-2) _blocksDirNodeosDefault: str='"blocks"'
+2) _blocksDirNodeopDefault: str='"blocks"'
     --This field captures the default value in the nodeop output.  This will be compared against the first field to see if the configuration
     option will be required on the command line to override the default value when running nodeop.
-3) _blocksDirNodeosArg: str="--blocks-dir"
+3) _blocksDirNodeopArg: str="--blocks-dir"
     --This field captures the command line config option for use when creating the command line string
 
 The BasePluginArgs class provides implementations for 2 useful functions for each of these classes:
-1) supportedNodeosArgs
+1) supportedNodeopArgs
     -- Provides a list of all the command line config options currently supported by the dataclass
 2) __str__
     -- Provides the command line argument string for the current configuration to pass to nodeop
@@ -128,14 +128,14 @@ def main():
                     try:
                         numVal = int(value)
                         dataclassFile.write(f"    {newKey}: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosDefault: int={numVal}\n")
-                        dataclassFile.write(f"    _{newKey}NodeosArg: str=\"{key}\"\n")
+                        dataclassFile.write(f"    _{newKey}NodeopDefault: int={numVal}\n")
+                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
                     except ValueError:
                         strValue = str(value)
                         quote = "\'" if re.search("\"", strValue) else "\""
                         dataclassFile.write(f"    {newKey}: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosDefault: str={quote}{strValue}{quote}\n")
-                        dataclassFile.write(f"    _{newKey}NodeosArg: str=\"{key}\"\n")
+                        dataclassFile.write(f"    _{newKey}NodeopDefault: str={quote}{strValue}{quote}\n")
+                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
                 else:
                     if re.search("deepmind", newKey, re.IGNORECASE) or \
                        re.search("tracehistory", newKey, re.IGNORECASE) or \
@@ -155,24 +155,24 @@ def main():
                        re.search("enable", newKey, re.IGNORECASE) or \
                        re.search("disable", newKey, re.IGNORECASE):
                         dataclassFile.write(f"    {newKey}: bool=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosDefault: bool=False\n")
-                        dataclassFile.write(f"    _{newKey}NodeosArg: str=\"{key}\"\n")
+                        dataclassFile.write(f"    _{newKey}NodeopDefault: bool=False\n")
+                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
                     elif re.search("sizegb", newKey, re.IGNORECASE) or \
                          re.search("maxage", newKey, re.IGNORECASE) or \
                          re.search("retainblocks", newKey, re.IGNORECASE):
                         dataclassFile.write(f"    {newKey}: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosDefault: int=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosArg: str=\"{key}\"\n")
+                        dataclassFile.write(f"    _{newKey}NodeopDefault: int=None\n")
+                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
                     else:
                         dataclassFile.write(f"    {newKey}: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosDefault: str=None\n")
-                        dataclassFile.write(f"    _{newKey}NodeosArg: str=\"{key}\"\n")
+                        dataclassFile.write(f"    _{newKey}NodeopDefault: str=None\n")
+                        dataclassFile.write(f"    _{newKey}NodeopArg: str=\"{key}\"\n")
 
             def writeMainFxn(pluginName: str) -> str:
                 return f"""\
 def main():\n\
     pluginArgs = {pluginName}()\n\
-    print(pluginArgs.supportedNodeosArgs())\n\
+    print(pluginArgs.supportedNodeopArgs())\n\
     exit(0)\n\n\
 if __name__ == '__main__':\n\
     main()\n"""

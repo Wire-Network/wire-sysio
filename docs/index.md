@@ -4,7 +4,7 @@ content_title: Antelope Overview
 
 Antelope is the next-generation blockchain platform for creating and deploying smart contracts and distributed applications. Antelope comes with a number of programs. The primary ones included in Antelope are the following:
 
-* [Nodeos](01_nodeop/index.md) - Core service daemon that runs a node for block production, API endpoints, or local development.
+* [Nodeop](01_nodeop/index.md) - Core service daemon that runs a node for block production, API endpoints, or local development.
 * [Cleos](02_clio/index.md) - Command line interface to interact with the blockchain (via `nodeop`) and manage wallets (via `keosd`).
 * [Keosd](03_keosd/index.md) - Component that manages Antelope keys in wallets and provides a secure enclave for digital signing.
 

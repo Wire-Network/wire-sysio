@@ -60,10 +60,10 @@ try:
         Print("Stand up cluster")
 
         abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
-        traceNodeosArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
-        extraNodeosArgs=traceNodeosArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
-        specificNodeosInstances={0: "bin/nodeop"}
-        if cluster.launch(totalNodes=2, prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeosArgs=extraNodeosArgs, specificNodeosInstances=specificNodeosInstances) is False:
+        traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
+        extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
+        specificNodeopInstances={0: "bin/nodeop"}
+        if cluster.launch(totalNodes=2, prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")
     else:

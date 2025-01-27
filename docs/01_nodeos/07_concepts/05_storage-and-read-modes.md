@@ -19,11 +19,11 @@ Every `nodeop` instance creates some internal files to housekeep the blockchain 
 
 Antelope provides a set of [services](../../) and [interfaces](https://docs.eosnetwork.com/cdt/latest/reference/Files/) that enable contract developers to persist state across action, and consequently transaction, boundaries. Contracts may use these services and interfaces for various purposes. For example, `sysio.token` contract keeps balances for all users in the chain database. Each instance of `nodeop` keeps the database in memory, so contracts can read and write data with ease.
 
-### Nodeos RPC API
+### Nodeop RPC API
 
 The `nodeop` service provides query access to the chain database via the HTTP [RPC API](../05_rpc_apis/index.md).
 
-## Nodeos Read Modes
+## Nodeop Read Modes
 
 The `nodeop` service can be run in different "read" modes. These modes control how the node operates and how it processes blocks and transactions:
 

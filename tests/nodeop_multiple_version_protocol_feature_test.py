@@ -85,8 +85,8 @@ try:
     # version 1.7 did not provide a default value for "--last-block-time-offset-us" so this is needed to
     # avoid dropping late blocks
     assert cluster.launch(pnodes=4, totalNodes=4, prodCount=1, totalProducers=4,
-                          extraNodeosArgs=" --plugin sysio::producer_api_plugin ",
-                          specificExtraNodeosArgs={
+                          extraNodeopArgs=" --plugin sysio::producer_api_plugin ",
+                          specificExtraNodeopArgs={
                              0:"--http-max-response-time-ms 990000",
                              1:"--http-max-response-time-ms 990000",
                              2:"--http-max-response-time-ms 990000",

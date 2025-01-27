@@ -44,7 +44,7 @@ try:
         totalProducers=1,
         totalNodes=3,
         loadSystemContract=False,
-        specificExtraNodeosArgs={
+        specificExtraNodeopArgs={
             1:"--read-mode irreversible --plugin sysio::producer_api_plugin"})
 
     producerNodeId = 0

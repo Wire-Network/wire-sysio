@@ -1,5 +1,5 @@
 ---
-content_title: Nodeos Concepts
+content_title: Nodeop Concepts
 ---
 
 This section contains `nodeop`-specific explainers, best practices, and implementation insights.

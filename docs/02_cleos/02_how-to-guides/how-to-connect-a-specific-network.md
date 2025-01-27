@@ -12,7 +12,7 @@ Connect to a specific `nodeop` or `keosd` host to send COMMAND
 * Install the currently supported version of `clio`
 
 ## Steps
-### Connecting to Nodeos
+### Connecting to Nodeop
 
 ```sh
 clio -url http://nodeop-host:8888 COMMAND

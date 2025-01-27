@@ -16,6 +16,6 @@ add_custom_command(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gene
                    DEPENDS ${NODE_EXECUTABLE_NAME}
                    OUTPUT ${GEN_FILES})
 
-add_custom_target(GenNodeosPluginArgs ALL
+add_custom_target(GenNodeopPluginArgs ALL
                   DEPENDS ${GEN_FILES}
-                  COMMENT "Generating NodeosPluginArgs files")
+                  COMMENT "Generating NodeopPluginArgs files")

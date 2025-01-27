@@ -43,7 +43,7 @@ try:
         '4': '--agent-name node-04 --p2p-peer-address localhost:9876 --plugin sysio::net_api_plugin',
     }
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo='line', delay=delay, 
-                      specificExtraNodeosArgs=specificArgs) is False:
+                      specificExtraNodeopArgs=specificArgs) is False:
         errorExit("Failed to stand up eos cluster.")
 
     # Be sure all nodes start out connected   (bios node omitted from diagram for brevity)
