@@ -417,7 +417,7 @@ commands = [
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
 ]
 
-parser.add_argument('--public-key', metavar='', help="SYSIO Public Key", default='EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
+parser.add_argument('--public-key', metavar='', help="SYSIO Public Key", default='SYS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
 parser.add_argument('--private-Key', metavar='', help="SYSIO Private Key", default='5K463ynhZoCDDa4RDcr63cUwWLTnKqmdcoTKTHBjqoKfv4u5V7p', dest="private_key")
 parser.add_argument('--clio', metavar='', help="Cleos command", default='../../build/programs/clio/clio --wallet-url http://127.0.0.1:6666 ')
 parser.add_argument('--nodeop', metavar='', help="Path to nodeop binary", default='../../build/programs/nodeop/nodeop')

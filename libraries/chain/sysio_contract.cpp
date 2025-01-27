@@ -123,6 +123,9 @@ void apply_sysio_newaccount(apply_context& context) {
       dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
    }
 
+      // This charges the RAM to the newly-created account (which does not yet have any ram).
+      // To keep this as-is, all account creation needs to be bundled in a transaction that transfers sufficient RAM to the new account.
+      // Alternatively, we could just bill the creator and not have to over-complicate life...
    context.add_ram_usage(create.name, ram_delta);
 
 } FC_CAPTURE_AND_RETHROW( (create) ) }

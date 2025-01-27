@@ -12,7 +12,7 @@ Retrieves all accounts associated with a defined public key
 
 
 ```sh
-clio get accounts EOS8mUftJXepGzdQ2TaCduNuSPAfXJHf22uex4u41ab1EVv9EAhWt
+clio get accounts SYS8mUftJXepGzdQ2TaCduNuSPAfXJHf22uex4u41ab1EVv9EAhWt
 {
   "account_names": [
     "testaccount"

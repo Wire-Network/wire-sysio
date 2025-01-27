@@ -27,7 +27,7 @@ The following step shows how to create a new account **bob** authorized by the d
 1. Run the following command to create the new account **bob**:
 
 ```sh
-clio create account sysio bob EOS87TQktA5RVse2EguhztfQVEh6XXxBmgkU8b4Y5YnGvtYAoLGNN
+clio create account sysio bob SYS87TQktA5RVse2EguhztfQVEh6XXxBmgkU8b4Y5YnGvtYAoLGNN
 ```
 **Where**:
 * `sysio` = the system account that authorizes the creation of a new account

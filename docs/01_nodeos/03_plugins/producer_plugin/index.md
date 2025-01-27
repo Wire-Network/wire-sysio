@@ -40,7 +40,7 @@ Config Options for sysio::producer_plugin:
   -p [ --producer-name ] arg            ID of producer controlled by this node
                                         (e.g. inita; may specify multiple
                                         times)
-  --signature-provider arg (=EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3)
+  --signature-provider arg (=SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3)
                                         Key=Value pairs in the form
                                         <public-key>=<provider-spec>
                                         Where:
