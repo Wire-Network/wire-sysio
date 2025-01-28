@@ -28,7 +28,7 @@ Make sure you meet the following requirements:
 
 * Install the currently supported version of `clio`.
 [[info | Note]]
-| `clio` is bundled with the Antelope software. [Installing Antelope](../../../00_install/index.md) will also install the `clio` and `keosd` command line tools.
+| `clio` is bundled with the Antelope software. [Installing Antelope](../../../00_install/index.md) will also install the `clio` and `kiod` command line tools.
 * You have access to a producing node instance with the [`net_api_plugin`](../../../01_nodeop/03_plugins/net_api_plugin/index.md) loaded.
 
 ## Examples

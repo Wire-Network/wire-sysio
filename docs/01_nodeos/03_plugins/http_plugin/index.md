@@ -1,6 +1,6 @@
 ## Description
 
-The `http_plugin` is a core plugin supported by both `nodeop` and `keosd`. The plugin is required to enable any RPC API functionality provided by a `nodeop` or `keosd` instance.
+The `http_plugin` is a core plugin supported by both `nodeop` and `kiod`. The plugin is required to enable any RPC API functionality provided by a `nodeop` or `kiod` instance.
 
 ## Usage
 
@@ -13,7 +13,7 @@ plugin = sysio::http_plugin
 # command-line
 nodeop ... --plugin sysio::http_plugin [options]
  (or)
-keosd ... --plugin sysio::http_plugin [options]
+kiod ... --plugin sysio::http_plugin [options]
 ```
 
 ## Options

@@ -1659,9 +1659,9 @@ Finally, the full detail test report for each of the determined max TPS throughp
       "signatureProviderPluginArgs": {
         "_pluginNamespace": "sysio",
         "_pluginName": "signature_provider_plugin",
-        "keosdProviderTimeout": null,
-        "_keosdProviderTimeoutNodeopDefault": 5,
-        "_keosdProviderTimeoutNodeopArg": "--keosd-provider-timeout"
+        "kiodProviderTimeout": null,
+        "_kiodProviderTimeoutNodeopDefault": 5,
+        "_kiodProviderTimeoutNodeopArg": "--kiod-provider-timeout"
       },
       "stateHistoryPluginArgs": {
         "_pluginNamespace": "sysio",
@@ -2319,9 +2319,9 @@ The Performance Test Basic generates, by default, a report that details results 
       "signatureProviderPluginArgs": {
         "_pluginNamespace": "sysio",
         "_pluginName": "signature_provider_plugin",
-        "keosdProviderTimeout": null,
-        "_keosdProviderTimeoutNodeopDefault": 5,
-        "_keosdProviderTimeoutNodeopArg": "--keosd-provider-timeout"
+        "kiodProviderTimeout": null,
+        "_kiodProviderTimeoutNodeopDefault": 5,
+        "_kiodProviderTimeoutNodeopArg": "--kiod-provider-timeout"
       },
       "stateHistoryPluginArgs": {
         "_pluginNamespace": "sysio",

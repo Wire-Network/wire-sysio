@@ -1,44 +1,44 @@
 ---
-content_title: Keosd Usage
+content_title: Kiod Usage
 ---
 
 [[info | Recommended Usage]]
-| For most users, the easiest way to use `keosd` is to have `clio` launch it automatically. Wallet files will be created in the default directory (`~/sysio-wallet`).
+| For most users, the easiest way to use `kiod` is to have `clio` launch it automatically. Wallet files will be created in the default directory (`~/sysio-wallet`).
 
-## Launching keosd manually
+## Launching kiod manually
 
-`keosd` can be launched manually from the terminal by running:
+`kiod` can be launched manually from the terminal by running:
 
 ```sh
-keosd
+kiod
 ```
 
-By default, `keosd` creates the folder `~/sysio-wallet` and populates it with a basic `config.ini` file.  The location of the config file can be specified on the command line using the `--config-dir` argument.  The configuration file contains the HTTP server endpoint for incoming HTTP connections and other parameters for cross-origin resource sharing.
+By default, `kiod` creates the folder `~/sysio-wallet` and populates it with a basic `config.ini` file.  The location of the config file can be specified on the command line using the `--config-dir` argument.  The configuration file contains the HTTP server endpoint for incoming HTTP connections and other parameters for cross-origin resource sharing.
 
 [[info | Wallet Location]]
 | The location of the wallet data folder can be specified on the command line with the `--data-dir` option.
 
 ## Auto-locking
 
-By default, `keosd` is set to lock your wallet after 15 minutes of inactivity. This is configurable in the `config.ini` by setting the timeout seconds in `unlock-timeout`. Setting it to 0 will cause `keosd` to always lock your wallet.
+By default, `kiod` is set to lock your wallet after 15 minutes of inactivity. This is configurable in the `config.ini` by setting the timeout seconds in `unlock-timeout`. Setting it to 0 will cause `kiod` to always lock your wallet.
 
-## Stopping keosd
+## Stopping kiod
 
-The most effective way to stop `keosd` is to find the keosd process and send a SIGTERM signal to it.
+The most effective way to stop `kiod` is to find the kiod process and send a SIGTERM signal to it.
 
 ## Other options
 
-For a list of all commands known to `keosd`, simply run it with no arguments:
+For a list of all commands known to `kiod`, simply run it with no arguments:
 
 ```sh
-keosd --help
+kiod --help
 ```
 
 ```console
 Application Options:
 
 Config Options for sysio::http_plugin:
-  --unix-socket-path arg (=keosd.sock)  The filename (relative to data-dir) to
+  --unix-socket-path arg (=kiod.sock)  The filename (relative to data-dir) to
                                         create a unix socket for HTTP RPC; set
                                         blank to disable.
   --http-server-address arg             The local IP and port to listen for

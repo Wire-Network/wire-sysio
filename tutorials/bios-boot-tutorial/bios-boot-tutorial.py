@@ -70,7 +70,7 @@ def sleep(t):
 def startWallet():
     run('rm -rf ' + os.path.abspath(args.wallet_dir))
     run('mkdir -p ' + os.path.abspath(args.wallet_dir))
-    background(args.keosd + ' --unlock-timeout %d --http-server-address 127.0.0.1:6666 --http-max-response-time-ms 99999 --wallet-dir %s' % (unlockTimeout, os.path.abspath(args.wallet_dir)))
+    background(args.kiod + ' --unlock-timeout %d --http-server-address 127.0.0.1:6666 --http-max-response-time-ms 99999 --wallet-dir %s' % (unlockTimeout, os.path.abspath(args.wallet_dir)))
     sleep(.4)
     run(args.clio + 'wallet create --to-console')
 
@@ -398,7 +398,7 @@ def stepLog():
 parser = argparse.ArgumentParser()
 
 commands = [
-    ('w', 'wallet',             stepStartWallet,            True,    "Start keosd, create wallet, fill with keys"),
+    ('w', 'wallet',             stepStartWallet,            True,    "Start kiod, create wallet, fill with keys"),
     ('b', 'boot',               stepStartBoot,              True,    "Start boot node"),
     ('s', 'sys',                createSystemAccounts,       True,    "Create system accounts (sysio.*)"),
     ('c', 'contracts',          stepInstallSystemContracts, True,    "Install system contracts (token, msig)"),
@@ -421,7 +421,7 @@ parser.add_argument('--public-key', metavar='', help="SYSIO Public Key", default
 parser.add_argument('--private-Key', metavar='', help="SYSIO Private Key", default='5K463ynhZoCDDa4RDcr63cUwWLTnKqmdcoTKTHBjqoKfv4u5V7p', dest="private_key")
 parser.add_argument('--clio', metavar='', help="Cleos command", default='../../build/programs/clio/clio --wallet-url http://127.0.0.1:6666 ')
 parser.add_argument('--nodeop', metavar='', help="Path to nodeop binary", default='../../build/programs/nodeop/nodeop')
-parser.add_argument('--keosd', metavar='', help="Path to keosd binary", default='../../build/programs/keosd/keosd')
+parser.add_argument('--kiod', metavar='', help="Path to kiod binary", default='../../build/programs/kiod/kiod')
 parser.add_argument('--contracts-dir', metavar='', help="Path to latest contracts directory", default='../../build/contracts/')
 parser.add_argument('--old-contracts-dir', metavar='', help="Path to 1.8.x contracts directory", default='../../build/contracts/')
 parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", default='./nodes/')

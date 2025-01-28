@@ -59,11 +59,11 @@ class Utils:
     testBinPath = Path(__file__).resolve().parents[2] / 'bin'
 
     EosClientPath=str(testBinPath / "clio")
-    MiscEosClientArgs="--no-auto-keosd"
+    MiscEosClientArgs="--no-auto-kiod"
 
     LeapClientPath=str(testBinPath / "leap-util")
 
-    EosWalletName="keosd"
+    EosWalletName="kiod"
     EosWalletPath=str(testBinPath / EosWalletName)
 
     EosServerName="nodeop"

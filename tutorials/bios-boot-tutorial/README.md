@@ -41,5 +41,5 @@ $ pip install numpy
 $ cd ~
 $ git clone -b release/*latest* https://github.com/AntelopeIO/leap
 $ cd ./leap/tutorials/bios-boot-tutorial/
-$ python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --keosd=keosd --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
+$ python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --kiod=kiod --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
 ```

@@ -1,6 +1,6 @@
 ## Overview
 
-This how-to guide provides instructions on how to list all public keys and public/private key pairs within the `keosd` default wallet. You can use the public and private keys to authorize transactions in an Antelope blockchain.
+This how-to guide provides instructions on how to list all public keys and public/private key pairs within the `kiod` default wallet. You can use the public and private keys to authorize transactions in an Antelope blockchain.
 
 The example in this how-to guide displays all public keys and public/private key pairs stored within the existing default wallet.
 
@@ -25,7 +25,7 @@ See the following reference guide for `clio` command line usage and related opti
 
 ## Procedure
 
-The following steps show how to list all public keys and public/private key pairs stored within the `keosd` default wallet:
+The following steps show how to list all public keys and public/private key pairs stored within the `kiod` default wallet:
 
 1. Open the default wallet:
 ```sh
@@ -93,7 +93,7 @@ password: [[
 
 ## Summary
 
-By following these instructions, you are able to list all the public keys and public/private key pairs stored within the `keosd` default wallet.
+By following these instructions, you are able to list all the public keys and public/private key pairs stored within the `kiod` default wallet.
 
 ## Troubleshooting
 
@@ -103,11 +103,11 @@ When you run the `clio wallet open/unlock` commands, you may encounter the follo
 clio wallet open
 ```
 ```console
-No wallet service listening on ***. Cannot automatically start keosd because keosd was not found.
-Failed to connect to keosd at unix:///Users/xxx.xxx/sysio-wallet/keosd.sock; is keosd running?
+No wallet service listening on ***. Cannot automatically start kiod because kiod was not found.
+Failed to connect to kiod at unix:///Users/xxx.xxx/sysio-wallet/kiod.sock; is kiod running?
 ```
 
-To fix this error, make sure the `keosd` utility is running on your machine:
+To fix this error, make sure the `kiod` utility is running on your machine:
 ```sh
-keosd
+kiod
 ```

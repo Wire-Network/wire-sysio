@@ -50,7 +50,7 @@ programs/clio/config.hpp
 programs/sysio-applesedemo/sysio-applesedemo
 programs/sysio-launcher/config.hpp
 programs/sysio-launcher/sysio-launcher
-programs/keosd/keosd
+programs/kiod/kiod
 programs/nodeop/config.hpp
 programs/nodeop/nodeop
 

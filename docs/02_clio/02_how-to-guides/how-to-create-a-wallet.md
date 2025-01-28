@@ -1,6 +1,6 @@
 ## Goal
 
-Create a wallet using `keosd`.
+Create a wallet using `kiod`.
 
 ## Before you begin
 

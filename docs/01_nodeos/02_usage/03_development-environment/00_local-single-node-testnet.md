@@ -8,12 +8,12 @@ This section describes how to set up a single-node blockchain configuration runn
 
 ![Single host single node testnet](single-host-single-node-testnet.png)
 
-`clio` is used to manage the wallets, manage the accounts, and invoke actions on the blockchain.  `keosd` performs wallet management, including digital signing.  If not started explicitly, `keosd` is started by `clio` by default.
+`clio` is used to manage the wallets, manage the accounts, and invoke actions on the blockchain.  `kiod` performs wallet management, including digital signing.  If not started explicitly, `kiod` is started by `clio` by default.
 
 ## Before you begin
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
-* It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.  
+* It is assumed that `nodeop`, `clio`, and `kiod` are accessible through the path.  
 
 [//]: # (THIS IS A COMMENT, NEXT LINK HAS BROKEN LINK)  
 [//]: # (If you built Antelope using shell scripts, make sure to run the Install Script ../../../00_install/01_build-from-source/01_shell-scripts/03_install-antelope-binaries.md .)  

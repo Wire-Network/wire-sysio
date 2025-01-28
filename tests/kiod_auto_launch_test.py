@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
-# This script tests that clio launches keosd automatically when keosd is not
+# This script tests that clio launches kiod automatically when kiod is not
 # running yet.
 
 import subprocess
 
 
-def run_clio_wallet_command(command: str, no_auto_keosd: bool):
+def run_clio_wallet_command(command: str, no_auto_kiod: bool):
     """Run the given clio command and return subprocess.CompletedProcess."""
     args = ['./programs/clio/clio']
 
-    if no_auto_keosd:
-        args.append('--no-auto-keosd')
+    if no_auto_kiod:
+        args.append('--no-auto-kiod')
 
     args += 'wallet', command
 
@@ -21,9 +21,9 @@ def run_clio_wallet_command(command: str, no_auto_keosd: bool):
                           stderr=subprocess.PIPE)
 
 
-def stop_keosd():
-    """Stop the default keosd instance."""
-    run_clio_wallet_command('stop', no_auto_keosd=True)
+def stop_kiod():
+    """Stop the default kiod instance."""
+    run_clio_wallet_command('stop', no_auto_kiod=True)
 
 
 def check_clio_stderr(stderr: bytes, expected_match: bytes):
@@ -32,26 +32,26 @@ def check_clio_stderr(stderr: bytes, expected_match: bytes):
             expected_match.decode(), stderr.decode()))
 
 
-def keosd_auto_launch_test():
+def kiod_auto_launch_test():
     """Test that keos auto-launching works but can be optionally inhibited."""
-    stop_keosd()
+    stop_kiod()
 
-    # Make sure that when '--no-auto-keosd' is given, keosd is not started by
+    # Make sure that when '--no-auto-kiod' is given, kiod is not started by
     # clio.
-    completed_process = run_clio_wallet_command('list', no_auto_keosd=True)
+    completed_process = run_clio_wallet_command('list', no_auto_kiod=True)
     assert completed_process.returncode != 0
-    check_clio_stderr(completed_process.stderr, b'Failed http request to keosd')
+    check_clio_stderr(completed_process.stderr, b'Failed http request to kiod')
 
-    # Verify that keosd auto-launching works.
-    completed_process = run_clio_wallet_command('list', no_auto_keosd=False)
+    # Verify that kiod auto-launching works.
+    completed_process = run_clio_wallet_command('list', no_auto_kiod=False)
     if completed_process.returncode != 0:
-        raise RuntimeError("Expected that keosd would be started, "
+        raise RuntimeError("Expected that kiod would be started, "
                            "but got an error instead: {}".format(
                                completed_process.stderr.decode()))
     check_clio_stderr(completed_process.stderr, b'launched')
 
 
 try:
-    keosd_auto_launch_test()
+    kiod_auto_launch_test()
 finally:
-    stop_keosd()
+    stop_kiod()

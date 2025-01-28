@@ -52,7 +52,7 @@ Config Options for sysio::producer_plugin:
                                                            form <provider-type>
                                                            :<data>
 
-                                           <provider-type> is KEY, KEOSD, or SE
+                                           <provider-type> is KEY, KIOD, or SE
 
                                            KEY:<data>      is a string form of
                                                            a valid EOS
@@ -60,8 +60,8 @@ Config Options for sysio::producer_plugin:
                                                            maps to the provided
                                                            public key
 
-                                           KEOSD:<data>    is the URL where
-                                                           keosd is available
+                                           KIOD:<data>    is the URL where
+                                                           kiod is available
                                                            and the approptiate
                                                            wallet(s) are
                                                            unlocked

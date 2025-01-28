@@ -10,7 +10,7 @@ from TestHarness.TestHelper import AppArgs
 ###############################################################
 # nodeop_run_test
 #
-# General test that tests a wide range of general use actions around nodeop and keosd
+# General test that tests a wide range of general use actions around nodeop and kiod
 #
 ###############################################################
 

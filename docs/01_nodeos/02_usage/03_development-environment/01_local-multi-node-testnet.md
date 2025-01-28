@@ -4,14 +4,14 @@ content_title: Local Multi-Node Testnet
 
 ## Goal
 
-This section describes how to set up a multi-node blockchain configuration running on a single host.  This is referred to as a _**single host, multi-node testnet**_.  We will set up two nodes on your local computer and have them communicate with each other.  The examples in this section rely on three command-line applications, `nodeop`, `keosd`, and `clio`.  The following diagram depicts the desired testnet configuration.
+This section describes how to set up a multi-node blockchain configuration running on a single host.  This is referred to as a _**single host, multi-node testnet**_.  We will set up two nodes on your local computer and have them communicate with each other.  The examples in this section rely on three command-line applications, `nodeop`, `kiod`, and `clio`.  The following diagram depicts the desired testnet configuration.
 
 ![Single host multi node testnet](single-host-multi-node-testnet.png)
 
 ## Before you begin
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
-* It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.
+* It is assumed that `nodeop`, `clio`, and `kiod` are accessible through the path.
 * Know how to pass [Nodeop options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
@@ -27,13 +27,13 @@ Open four "terminal" windows and perform the following steps:
 
 ### 1. Start the Wallet Manager
 
-In the first terminal window, start `keosd`, the wallet management application:
+In the first terminal window, start `kiod`, the wallet management application:
 
 ```sh
-keosd --http-server-address 127.0.0.1:8899
+kiod --http-server-address 127.0.0.1:8899
 ```
 
-If successful, `keosd` will display some information, starting with:
+If successful, `kiod` will display some information, starting with:
 
 ```console
 2493323ms thread-0   wallet_plugin.cpp:39          plugin_initialize    ] initializing wallet plugin
@@ -43,9 +43,9 @@ If successful, `keosd` will display some information, starting with:
 2493324ms thread-0   wallet_api_plugin.cpp:70      plugin_startup       ] starting wallet_api_plugin
 ```
 
-Look for a line saying the wallet is listening on 127.0.0.1:8899. This will indicate that `keosd` started correctly and is listening on the correct port. If you see anything else, or you see some error report prior to "starting wallet_api_plugin", then you need to diagnose the issue and restart.
+Look for a line saying the wallet is listening on 127.0.0.1:8899. This will indicate that `kiod` started correctly and is listening on the correct port. If you see anything else, or you see some error report prior to "starting wallet_api_plugin", then you need to diagnose the issue and restart.
 
-When `keosd` is running correctly, leave that window open with the wallet app running and move to the next terminal window.
+When `kiod` is running correctly, leave that window open with the wallet app running and move to the next terminal window.
 
 ### 2. Create a Default Wallet
 
@@ -64,7 +64,7 @@ Without password imported keys will not be retrievable.
 "PW5JsmfYz2wrdUEotTzBamUCAunAA8TeRZGT57Ce6PkvM12tre8Sm"
 ```
 
-`keosd` will generate some status output in its window. We will continue to use this second window for subsequent `clio` commands.
+`kiod` will generate some status output in its window. We will continue to use this second window for subsequent `clio` commands.
 
 ### 3. Loading the Antelope Key
 

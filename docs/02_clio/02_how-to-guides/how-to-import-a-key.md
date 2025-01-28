@@ -1,6 +1,6 @@
 ## Overview
 
-This how-to guide provides instructions on how to import a private key into the `keosd` default wallet. You can use the private key to authorize transactions in an Antelope blockchain.
+This how-to guide provides instructions on how to import a private key into the `kiod` default wallet. You can use the private key to authorize transactions in an Antelope blockchain.
 
 ## Before you Begin
 
@@ -21,7 +21,7 @@ See the following reference guide for `clio` command line usage and related opti
 
 ## Procedure
 
-The following steps show how to import a private key to an existing `keosd` default wallet:
+The following steps show how to import a private key to an existing `kiod` default wallet:
 
 1. Run the following command to import a private key into the default wallet. The command prompts to enter a private key:
 ```sh

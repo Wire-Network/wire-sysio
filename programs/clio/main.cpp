@@ -17,7 +17,7 @@ Options:
   -u,--url TEXT=http://localhost:8888/
                               the http URL where nodeop is running
   --wallet-url TEXT=http://localhost:8888/
-                              the http URL where keosd is running
+                              the http URL where kiod is running
   -r,--header                 pass specific HTTP header, repeat this option to pass multiple headers
   -n,--no-verify              don't verify peer certificate when using HTTPS
   -v,--verbose                output verbose errors and action output
@@ -133,7 +133,7 @@ FC_DECLARE_EXCEPTION( localized_exception, 10000000, "an error occured" );
     FC_MULTILINE_MACRO_END \
   )
 
-//copy pasta from keosd's main.cpp
+//copy pasta from kiod's main.cpp
 std::filesystem::path determine_home_directory()
 {
    std::filesystem::path home;
@@ -177,7 +177,7 @@ bool   tx_use_old_rpc = false;
 bool   tx_use_old_send_rpc = false;
 string tx_json_save_file;
 sysio::client::http::config_t http_config;
-bool   no_auto_keosd = false;
+bool   no_auto_kiod = false;
 bool   verbose = false;
 int    return_code = 0;
 
@@ -1104,10 +1104,10 @@ void try_local_port(uint32_t duration) {
    }
 }
 
-void ensure_keosd_running(CLI::App* app) {
-    if (no_auto_keosd)
+void ensure_kiod_running(CLI::App* app) {
+    if (no_auto_kiod)
         return;
-    // get, version, net, convert do not require keosd
+    // get, version, net, convert do not require kiod
     if (tx_skip_sign || app->got_subcommand("get") || app->got_subcommand("version") || app->got_subcommand("net") || app->got_subcommand("convert"))
         return;
     if (app->get_subcommand("create")->got_subcommand("key")) // create key does not require wallet
@@ -1127,7 +1127,7 @@ void ensure_keosd_running(CLI::App* app) {
     auto parent_path = boost::dll::program_location().parent_path();
     auto binPath = parent_path / key_store_executable_name;
     if (!std::filesystem::exists(binPath)) {
-        binPath = parent_path.parent_path() / "keosd"/ key_store_executable_name;
+        binPath = parent_path.parent_path() / "kiod"/ key_store_executable_name;
     }
 
     if (std::filesystem::exists(binPath)) {
@@ -2806,8 +2806,8 @@ int main( int argc, char** argv ) {
    app.add_option( "--abi-file", abi_files_overide_callback, localized("In form of <contract name>:<abi file path>, use a local abi file for serialization and deserialization instead of getting the abi data from the blockchain; repeat this option to pass multiple abi files for different contracts"))->type_size(0, 1000);
    app.add_option( "-r,--header", header_opt_callback, localized("Pass specific HTTP header; repeat this option to pass multiple headers"));
    app.add_flag( "-n,--no-verify", http_config.no_verify_cert, localized("Don't verify peer certificate when using HTTPS"));
-   app.add_flag( "--no-auto-" + string(key_store_executable_name), no_auto_keosd, localized("Don't automatically launch a ${k} if one is not currently running", ("k", key_store_executable_name)));
-   app.parse_complete_callback([&app]{ ensure_keosd_running(&app);});
+   app.add_flag( "--no-auto-" + string(key_store_executable_name), no_auto_kiod, localized("Don't automatically launch a ${k} if one is not currently running", ("k", key_store_executable_name)));
+   app.parse_complete_callback([&app]{ ensure_kiod_running(&app);});
 
    app.add_flag( "-v,--verbose", verbose, localized("Output verbose errors and action console output"));
    app.add_flag("--print-request", http_config.print_request, localized("Print HTTP request to STDERR"));
@@ -3819,10 +3819,10 @@ int main( int argc, char** argv ) {
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
-   auto stopKeosd = wallet->add_subcommand("stop", localized("Stop ${k}.", ("k", key_store_executable_name)));
-   stopKeosd->callback([] {
-      const auto& v = call(wallet_url, keosd_stop);
-      if ( !v.is_object() || v.get_object().size() != 0 ) { //on success keosd responds with empty object
+   auto stopKiod = wallet->add_subcommand("stop", localized("Stop ${k}.", ("k", key_store_executable_name)));
+   stopKiod->callback([] {
+      const auto& v = call(wallet_url, kiod_stop);
+      if ( !v.is_object() || v.get_object().size() != 0 ) { //on success kiod responds with empty object
          std::cerr << fc::json::to_pretty_string(v) << std::endl;
       } else {
          std::cout << "OK" << std::endl;
