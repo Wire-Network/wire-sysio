@@ -1,27 +1,27 @@
 [submodule "libraries/appbase"]
 	path = libraries/appbase
-	url = ../appbase
+	url = https://github.com/wire-network/appbase
 [submodule "libraries/chainbase"]
 	path = libraries/chainbase
-	url = ../chainbase
+	url = https://github.com/wire-network/chainbase
 # [submodule "libraries/eos-vm"]
 # 	path = libraries/eos-vm
-# 	url = ../eos-vm
+# 	url = https://github.com/wire-network/eos-vm
 [submodule "libraries/softfloat"]
 	path = libraries/softfloat
-	url = ../berkeley-softfloat-3
+	url = https://github.com/wire-network/berkeley-softfloat-3
 [submodule "libraries/yubihsm"]
 	path = libraries/yubihsm
-	url = ../yubihsm-shell
+	url = https://github.com/wire-network/yubihsm-shell
 [submodule "tests/abieos"]
 	path = tests/abieos
-	url = ../abieos
+	url = https://github.com/wire-network/abieos
 [submodule "wasm-spec-tests"]
 	path = wasm-spec-tests
-	url = ../wasm-spec-tests
+	url = https://github.com/wire-network/wasm-spec-tests
 [submodule "libraries/fc"]
 	path = libraries/fc
-	url = ../fc
+	url = https://github.com/wire-network/fc
 [submodule "libraries/sys-vm"]
 	path = libraries/sys-vm
-	url = ../eos-vm
+	url = https://github.com/wire-network/eos-vm
