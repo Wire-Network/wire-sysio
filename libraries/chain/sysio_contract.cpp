@@ -20,7 +20,8 @@
 
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/sysio_roa_objects.hpp> // **Roa Change** needed for multi index access in reduce policy
+#include <sysio/chain/sysio_roa_objects.hpp> 
+#include <fc/io/raw.hpp>
 
 namespace sysio { namespace chain {
 
@@ -464,250 +465,188 @@ void apply_sysio_canceldelay(apply_context& context) {
 }
 
 void apply_roa_reducepolicy(apply_context& context) {
-   // Parse action arguments
+   // 1. Parse action arguments
    auto args = context.get_action().data_as<reducepolicy>();
-   const name& owner = args.owner;
-   const name& issuer = args.issuer;
-   const asset& net_weight = args.net_weight;
-   const asset& cpu_weight = args.cpu_weight;
-   const asset& ram_weight = args.ram_weight;
-   uint8_t network_gen = args.network_gen;
+   const sysio::chain::name& owner       = args.owner;
+   const sysio::chain::name& issuer      = args.issuer;
+   const sysio::chain::asset& net_weight = args.net_weight;
+   const sysio::chain::asset& cpu_weight = args.cpu_weight;
+   const sysio::chain::asset& ram_weight = args.ram_weight;
+   name network_gen(static_cast<uint64_t>(args.network_gen));
 
+   // 2. Authorization & info
    context.require_authorization(issuer);
 
-   auto& db = context.db; // chainbase database reference
+   // 3. Locate the "nodeowners" row
+   {
+      int itr = context.db_find_i64(context.get_receiver(), network_gen, name("nodeowners"), issuer.to_uint64_t());
+      SYS_ASSERT(itr != -1, action_validate_exception, "Issuer is not a registered Node Owner");
 
-   // Fetch Node Owner by (network_gen, issuer)
-   const auto& nodeowners_by_ng_owner = db.get_index<nodeowners_index, by_network_gen_owner>();
-   auto node_itr = nodeowners_by_ng_owner.find(boost::make_tuple(network_gen, issuer));
-   SYS_ASSERT(node_itr != nodeowners_by_ng_owner.end(), action_validate_exception, "Issuer is not a registered Node Owner");
+      // Read and deserialize
+      int size = context.db_get_i64(itr, nullptr, 0);
+      SYS_ASSERT(size >= 0, action_validate_exception, "Error reading nodeowners row");
 
-   // Fetch Policy by (issuer, owner)
-   const auto& policies_by_issuer_owner = db.get_index<policies_index, by_issuer_owner>();
-   auto policy_itr = policies_by_issuer_owner.find(boost::make_tuple(issuer, owner));
-   SYS_ASSERT(policy_itr != policies_by_issuer_owner.end(), action_validate_exception, "Policy does not exist under this issuer for the owner");
+      std::vector<char> buffer(size);
+      context.db_get_i64(itr, buffer.data(), size);
 
-   // Ensure current block >= policy time_block
-   uint32_t current_block = context.control.head_block_num();
-   SYS_ASSERT(current_block >= policy_itr->time_block, action_validate_exception, "Cannot reduce policy before time_block");
+      fc::datastream<const char*> ds(buffer.data(), buffer.size());
+      sysio::roa::nodeowners node_row;
+      fc::raw::unpack(ds, node_row);
 
-   std::string acc_str = owner.to_string();
-   bool sysio_acct = (acc_str == "sysio") || (acc_str.size() > 5 && acc_str.rfind("sysio.", 0) == 0);
-   if (sysio_acct && policy_itr->time_block == 1 && policy_itr->issuer == issuer) {
-      SYS_ASSERT(false, action_validate_exception, "Cannot reduce the sysio policies created at node registration");
+      // Ensure the row's owner matches issuer
+      SYS_ASSERT(node_row.owner == issuer, action_validate_exception, "Mismatched nodeowner row: stored owner != issuer");
+
+      // 4. Locate "policies" row
+      {
+         int pol_itr = context.db_find_i64(context.get_receiver(), issuer, name("policies"), owner.to_uint64_t());
+         SYS_ASSERT(pol_itr != -1, action_validate_exception,
+                    "Policy does not exist under this issuer for the owner");
+
+         int pol_size = context.db_get_i64(pol_itr, nullptr, 0);
+         SYS_ASSERT(pol_size >= 0, action_validate_exception, "Error reading policies row");
+
+         std::vector<char> pol_buffer(pol_size);
+         context.db_get_i64(pol_itr, pol_buffer.data(), pol_size);
+
+         fc::datastream<const char*> pds(pol_buffer.data(), pol_buffer.size());
+         sysio::roa::policies pol_row;
+         fc::raw::unpack(pds, pol_row);
+
+         // 5. Validate time block
+         uint32_t current_block = context.control.head_block_num();
+         SYS_ASSERT(current_block >= pol_row.time_block, action_validate_exception,
+                    "Cannot reduce policy before time_block");
+
+         // Special sysio check
+         {
+            std::string acc_str = owner.to_string();
+            bool sysio_acct = (acc_str == "sysio") ||
+                              (acc_str.size() > 5 && acc_str.rfind("sysio.", 0) == 0);
+            if (sysio_acct && pol_row.time_block == 1 && pol_row.issuer == issuer) {
+               SYS_ASSERT(false, action_validate_exception,
+                          "Cannot reduce the sysio policies created at node registration");
+            }
+         }
+
+         // 6. Locate "reslimit" row
+         {
+            int rl_itr = context.db_find_i64(context.get_receiver(), owner, name("reslimit"), owner.to_uint64_t());
+            SYS_ASSERT(rl_itr != -1, action_validate_exception,
+                       "reslimit row does not exist for this owner");
+
+            int rl_size = context.db_get_i64(rl_itr, nullptr, 0);
+            SYS_ASSERT(rl_size >= 0, action_validate_exception, "Error reading reslimit row");
+
+            std::vector<char> rl_buffer(rl_size);
+            context.db_get_i64(rl_itr, rl_buffer.data(), rl_size);
+
+            fc::datastream<const char*> rlds(rl_buffer.data(), rl_buffer.size());
+            sysio::roa::reslimit rl_row;
+            fc::raw::unpack(rlds, rl_row);
+
+            // 7. Validate the new weights
+            SYS_ASSERT(net_weight.get_amount() >= 0, action_validate_exception, "NET weight cannot be negative");
+            SYS_ASSERT(cpu_weight.get_amount() >= 0, action_validate_exception, "CPU weight cannot be negative");
+            SYS_ASSERT(ram_weight.get_amount() >= 0, action_validate_exception, "RAM weight cannot be negative");
+            SYS_ASSERT(net_weight.get_amount()  > 0 ||
+                       cpu_weight.get_amount()  > 0 ||
+                       ram_weight.get_amount() > 0,
+                       action_validate_exception, "All weights are 0, nothing to reduce.");
+
+            // Ensure we don't reduce below zero
+            SYS_ASSERT(net_weight.get_amount() <= pol_row.net_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce NET below zero");
+            SYS_ASSERT(cpu_weight.get_amount() <= pol_row.cpu_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce CPU below zero");
+            SYS_ASSERT(ram_weight.get_amount() <= pol_row.ram_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce RAM below zero");
+
+            // 8. Adjust resource limits
+            auto& resource_manager = context.control.get_mutable_resource_limits_manager();
+
+            int64_t ram_bytes, net_limit, cpu_limit;
+            resource_manager.get_account_limits(owner, ram_bytes, net_limit, cpu_limit);
+
+            uint64_t bytes_per_unit = pol_row.bytes_per_unit;
+            int64_t divisible_ram_to_reclaim = 0;
+            sysio::chain::asset reclaimed_ram_weight(0, ram_weight.get_symbol());
+
+            if (ram_weight.get_amount() > 0) {
+               int64_t ram_usage = resource_manager.get_account_ram_usage(owner);
+               int64_t ram_unused = ram_bytes - ram_usage;
+               int64_t requested_ram_bytes = ram_weight.get_amount() * (int64_t)bytes_per_unit;
+               int64_t ram_to_reclaim = std::min(ram_unused, requested_ram_bytes);
+
+               SYS_ASSERT(ram_to_reclaim >= 0, action_validate_exception, "Invalid RAM reclaim calculation");
+
+               int64_t remainder = ram_to_reclaim % (int64_t)bytes_per_unit;
+               divisible_ram_to_reclaim = ram_to_reclaim - remainder;
+
+               int64_t reclaimed_units = divisible_ram_to_reclaim / (int64_t)bytes_per_unit;
+               reclaimed_ram_weight = sysio::chain::asset(reclaimed_units, ram_weight.get_symbol());
+
+               SYS_ASSERT(reclaimed_ram_weight.get_amount() <= ram_weight.get_amount(),
+                          action_validate_exception, "Cannot reclaim more RAM than requested");
+            }
+
+            resource_manager.set_account_limits(
+               owner,
+               ram_bytes - divisible_ram_to_reclaim,
+               net_limit - net_weight.get_amount(),
+               cpu_limit - cpu_weight.get_amount()
+            );
+
+            // 9. Update reslimit row
+            {
+               rl_row.net_weight -= net_weight;
+               rl_row.cpu_weight -= cpu_weight;
+               rl_row.ram_bytes  = static_cast<uint64_t>(rl_row.ram_bytes - divisible_ram_to_reclaim);
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, rl_row);
+               auto out = ds.storage();
+               
+               // TODO: If we want to remove the reslimit row if all values are 0 do it here.
+               context.db_update_i64(rl_itr, context.get_receiver(), out.data(), out.size());
+            }
+
+            // 10. Update / remove the policies row
+            {
+               pol_row.net_weight -= net_weight;
+               pol_row.cpu_weight -= cpu_weight;
+               pol_row.ram_weight -= reclaimed_ram_weight;
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, pol_row);
+               auto pol_out = ds.storage();
+
+               bool all_zero = (pol_row.net_weight.get_amount() == 0 &&
+                                pol_row.cpu_weight.get_amount() == 0 &&
+                                pol_row.ram_weight.get_amount() == 0);
+               if (all_zero) {
+                  context.db_remove_i64(pol_itr);
+               } else {
+                  context.db_update_i64(pol_itr, context.get_receiver(), pol_out.data(), pol_out.size());
+               }
+            }
+
+            // 11. Update nodeowners row
+            {
+               sysio::chain::asset total_reclaimed_sys = net_weight + cpu_weight + reclaimed_ram_weight;
+               node_row.allocated_sys -= total_reclaimed_sys;
+               node_row.allocated_bw  -= (net_weight + cpu_weight);
+               node_row.allocated_ram -= reclaimed_ram_weight;
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, node_row);
+               auto node_out = ds.storage();
+
+               context.db_update_i64(itr, context.get_receiver(), node_out.data(), node_out.size());
+            }
+
+         } // end reslimit block
+      } // end policies block
    }
-
-   // Fetch the reslimit row for this owner
-   const auto& reslimit_by_owner = db.get_index<reslimit_index, by_reslimit_owner>();
-   auto rl_itr = reslimit_by_owner.find(owner);
-   SYS_ASSERT(rl_itr != reslimit_by_owner.end(), action_validate_exception, "reslimit row does not exist for this owner");
-
-   // Validate weights
-   SYS_ASSERT(net_weight.get_amount() >= 0, action_validate_exception, "NET weight cannot be negative");
-   SYS_ASSERT(cpu_weight.get_amount() >= 0, action_validate_exception, "CPU weight cannot be negative");
-   SYS_ASSERT(ram_weight.get_amount() >= 0, action_validate_exception, "RAM weight cannot be negative");
-   SYS_ASSERT(net_weight.get_amount() > 0 || cpu_weight.get_amount() > 0 || ram_weight.get_amount() > 0, action_validate_exception, "All weights are 0, nothing to reduce.");
-
-   // Ensure reductions do not exceed allocations
-   SYS_ASSERT(net_weight.get_amount() <= policy_itr->net_weight.get_amount(), action_validate_exception, "Cannot reduce NET below zero");
-   SYS_ASSERT(cpu_weight.get_amount() <= policy_itr->cpu_weight.get_amount(), action_validate_exception, "Cannot reduce CPU below zero");
-   SYS_ASSERT(ram_weight.get_amount() <= policy_itr->ram_weight.get_amount(), action_validate_exception, "Cannot reduce RAM below zero");
-
-   uint64_t bytes_per_unit = policy_itr->bytes_per_unit;
-
-   auto& resource_manager = context.control.get_mutable_resource_limits_manager();
-
-   int64_t ram_bytes, net_limit, cpu_limit;
-   resource_manager.get_account_limits(owner, ram_bytes, net_limit, cpu_limit);
-   
-   // If we're not reducing RAM, skip the RAM logic
-   int64_t divisible_ram_to_reclaim = 0;
-   asset reclaimed_ram_weight(0, ram_weight.get_symbol());
-
-   if (ram_weight.get_amount() > 0) {
-      int64_t ram_usage = resource_manager.get_account_ram_usage(owner);
-      int64_t ram_unused = ram_bytes - ram_usage;
-
-      // Convert requested ram_weight to bytes
-      int64_t requested_ram_bytes = ram_weight.get_amount() * (int64_t)bytes_per_unit;
-
-      // Determine how many bytes we can reclaim
-      int64_t ram_to_reclaim = std::min(ram_unused, requested_ram_bytes);
-      SYS_ASSERT(ram_to_reclaim >= 0, action_validate_exception, "Invalid RAM reclaim calculation");
-
-      // Adjust ram_to_reclaim down to the nearest multiple of bytes_per_unit
-      int64_t remainder = ram_to_reclaim % (int64_t)bytes_per_unit;
-      divisible_ram_to_reclaim = ram_to_reclaim - remainder;
-
-      int64_t reclaimed_units = divisible_ram_to_reclaim / (int64_t)bytes_per_unit;
-      reclaimed_ram_weight = asset(reclaimed_units, ram_weight.get_symbol());
-
-      // Ensure we don't reclaim more RAM than requested
-      SYS_ASSERT(reclaimed_ram_weight.get_amount() <= ram_weight.get_amount(), action_validate_exception, "Cannot reclaim more RAM than requested");
-   }
-
-   // Update resource limits
-   resource_manager.set_account_limits(
-      owner,
-      ram_bytes - divisible_ram_to_reclaim,
-      net_limit - net_weight.get_amount(),
-      cpu_limit - cpu_weight.get_amount()
-   );
-
-   // Update reslimit row
-   db.modify(*rl_itr, [&](auto& row) {
-      row.net_weight -= net_weight;
-      row.cpu_weight -= cpu_weight;
-      row.ram_bytes = static_cast<uint64_t>(row.ram_bytes - divisible_ram_to_reclaim);
-   });
-
-   // Modify the policy object
-   db.modify(*policy_itr, [&](auto& row) {
-      row.net_weight -= net_weight;
-      row.cpu_weight -= cpu_weight;
-      row.ram_weight -= reclaimed_ram_weight;
-   });
-
-   // If policy goes to zero allocation, remove it
-   if (policy_itr->net_weight.get_amount() == 0 && policy_itr->cpu_weight.get_amount() == 0 && policy_itr->ram_weight.get_amount() == 0) {
-      db.remove(*policy_itr);
-   }
-
-   // Update Node Owner's allocations
-   asset total_reclaimed_sys = net_weight + cpu_weight + reclaimed_ram_weight;
-   db.modify(*node_itr, [&](auto& row) {
-      row.allocated_sys -= total_reclaimed_sys;
-      row.allocated_bw -= (net_weight + cpu_weight);
-      row.allocated_ram -= reclaimed_ram_weight;
-   });
-
-   std::string msg = "Reclaimed resources: owner = " + owner.to_string() +
-                  ", issuer = " + issuer.to_string() +
-                  ", RAM = " + std::to_string(divisible_ram_to_reclaim) + " bytes, NET = " +
-                  net_weight.to_string() + ", CPU = " + cpu_weight.to_string() + "\n";
-
-   context.console_append(msg);
 }
 
-// Old function that built, remove once new one builds
-// void apply_roa_reducepolicy(apply_context& context) {
-//    // Parse action arguments
-//    auto args = context.get_action().data_as<reducepolicy>();
-//    const name& owner = args.owner;
-//    const name& issuer = args.issuer;
-//    const asset& net_weight = args.net_weight;
-//    const asset& cpu_weight = args.cpu_weight;
-//    const asset& ram_weight = args.ram_weight;
-//    uint8_t network_gen = args.network_gen; // Newly added
-
-//    // Ensure the issuer is authorized
-//    context.require_authorization(issuer);
-
-//    auto& db = context.db; // chainbase database reference
-
-//    // Fetch Node Owner by (network_gen, issuer)
-//    const auto& nodeowners_by_ng_owner = db.get_index<nodeowners_index, by_network_gen_owner>();
-//    auto node_itr = nodeowners_by_ng_owner.find(boost::make_tuple(network_gen, issuer));
-//    SYS_ASSERT(node_itr != nodeowners_by_ng_owner.end(), action_validate_exception, "Issuer is not a registered Node Owner");
-
-//    // Fetch Policy by (issuer, owner)
-//    const auto& policies_by_issuer_owner = db.get_index<policies_index, by_issuer_owner>();
-//    auto policy_itr = policies_by_issuer_owner.find(boost::make_tuple(issuer, owner));
-//    SYS_ASSERT(policy_itr != policies_by_issuer_owner.end(), action_validate_exception, "Policy does not exist under this issuer for the owner");
-
-//    // Ensure time_block has passed
-//    uint32_t current_block = context.control.head_block_num();
-//    SYS_ASSERT(current_block >= policy_itr->time_block, action_validate_exception, "Cannot reduce policy before time_block");
-
-//    // Fetch the reslimit row for this owner
-//    const auto& reslimit_by_owner = db.get_index<reslimit_index, by_reslimit_owner>();
-//    auto rl_itr = reslimit_by_owner.find(owner);
-//    SYS_ASSERT(rl_itr != reslimit_by_owner.end(), action_validate_exception, "reslimit row does not exist for this owner");
-
-//    // Validate weights (allow zero values)
-//    SYS_ASSERT(net_weight.get_amount() >= 0, action_validate_exception, "NET weight cannot be negative");
-//    SYS_ASSERT(cpu_weight.get_amount() >= 0, action_validate_exception, "CPU weight cannot be negative");
-//    SYS_ASSERT(ram_weight.get_amount() >= 0, action_validate_exception, "RAM weight cannot be negative");
-
-//    // Validate at least one weight > 0
-//    SYS_ASSERT(net_weight.get_amount() > 0 || cpu_weight.get_amount() > 0 || ram_weight.get_amount() > 0, action_validate_exception, "All weights are 0, nothing to reduce.");
-
-//    // Ensure reductions do not exceed allocations
-//    SYS_ASSERT(net_weight.get_amount() <= policy_itr->net_weight.get_amount(), action_validate_exception, "Cannot reduce NET below zero");
-//    SYS_ASSERT(cpu_weight.get_amount() <= policy_itr->cpu_weight.get_amount(), action_validate_exception, "Cannot reduce CPU below zero");
-//    SYS_ASSERT(ram_weight.get_amount() <= policy_itr->ram_weight.get_amount(), action_validate_exception, "Cannot reduce RAM below zero");
-
-//    asset ram_byte_price = policy_itr->ram_byte_price;
-
-//    // Determine the total bytes allocated by the policy
-//    int64_t policy_ram_bytes = policy_itr->ram_weight.get_amount() / ram_byte_price.get_amount();
-
-//    // Get the current resource limits
-//    auto& resource_manager = context.control.get_mutable_resource_limits_manager();
-//    int64_t ram_bytes, net_limit, cpu_limit;
-//    resource_manager.get_account_limits(owner, ram_bytes, net_limit, cpu_limit);
-
-//    // Calculate unused RAM
-//    int64_t ram_usage = resource_manager.get_account_ram_usage(owner);
-//    int64_t ram_unused = ram_bytes - ram_usage;
-
-//    // Cap reclaimable bytes by unused RAM and policy's total allocation
-//    int64_t ram_bytes_to_reclaim = ram_weight.get_amount() / ram_byte_price.get_amount();
-//    int64_t ram_to_reclaim = std::min({ram_unused, ram_bytes_to_reclaim, policy_ram_bytes});
-
-//    // Calculate reclaimed RAM weight (in SYS)
-//    asset reclaimed_ram_weight(ram_to_reclaim * ram_byte_price.get_amount(), ram_weight.get_symbol());
-
-//    // Ensure reclaimed_ram_weight calculation is precise
-//    SYS_ASSERT(
-//        reclaimed_ram_weight.get_amount() == ram_to_reclaim * ram_byte_price.get_amount(),
-//        action_validate_exception,
-//        "Reclaimed RAM weight calculation is imprecise"
-//    );
-
-//    // Ensure we don’t exceed the policy’s ram_weight allocation
-//    SYS_ASSERT(reclaimed_ram_weight.get_amount() <= policy_itr->ram_weight.get_amount(), action_validate_exception, "Cannot reclaim more RAM than the policy allocates");
-
-//    // Apply changes to resource limits
-//    resource_manager.set_account_limits(
-//        owner,
-//        ram_bytes - ram_to_reclaim,  // Reduce RAM allocation
-//        net_limit - net_weight.get_amount(), // net_limt (int64_t)
-//        cpu_limit - cpu_weight.get_amount()  // cpu_limt (int64_t)
-//    );
-
-//    // We know how many bytes we reclaimed: ram_to_reclaim
-//    // net and cpu are straightforward: just subtract the same amounts we reduced.
-//    db.modify(*rl_itr, [&](auto& row) {
-//        row.net_weight -= net_weight;
-//        row.cpu_weight -= cpu_weight;
-//        row.ram_bytes = static_cast<uint64_t>(row.ram_bytes - ram_to_reclaim);
-//    });
-
-//    // Modify the policy object
-//    db.modify(*policy_itr, [&](auto& row) {
-//        row.net_weight -= net_weight;
-//        row.cpu_weight -= cpu_weight;
-//        row.ram_weight -= reclaimed_ram_weight;
-//    });
-
-//    // Check if policy should be erased (after modification)
-//    if (policy_itr->net_weight.get_amount() == 0 && policy_itr->cpu_weight.get_amount() == 0 && policy_itr->ram_weight.get_amount() == 0) {
-//        db.remove(*policy_itr);
-//    }
-
-//    // Update Node Owner's allocated SYS
-//    asset total_reclaimed_sys = net_weight + cpu_weight + reclaimed_ram_weight;
-//    db.modify(*node_itr, [&](auto& row) {
-//        row.allocated_sys -= total_reclaimed_sys;
-//    });
-
-//    std::string msg = "Reclaimed resources: owner = " + owner.to_string() +
-//                   ", issuer = " + issuer.to_string() +
-//                   ", RAM = " + std::to_string(ram_to_reclaim) + " bytes, NET = " +
-//                   net_weight.to_string() + ", CPU = " + cpu_weight.to_string() + "\n";
-
-//    // Log reclaimed resources
-//    context.console_append(msg);
-// }
 } } // namespace sysio::chain
