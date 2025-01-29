@@ -12,7 +12,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
-#include <sysio/chain/sysio_roa_objects.hpp> // **Roa Change** Added for db initialization of sysio.roa tables.
+
 #include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
@@ -349,8 +349,10 @@ struct controller_impl {
    SET_APP_HANDLER( sysio, sysio, deleteauth );
    SET_APP_HANDLER( sysio, sysio, linkauth );
    SET_APP_HANDLER( sysio, sysio, unlinkauth );
-   // **Roa Change** Handler for native action reducepolicy
-   SET_APP_HANDLER( sysio.roa, roa, reducepolicy );
+   
+   // **Roa Change** Handler for native action reducepolicy: Had to manually expand due to sysio.roa account name
+   set_apply_handler( account_name("sysio.roa"), account_name("sysio.roa"),
+      action_name("reducepolicy"), &apply_roa_reducepolicy );
 /*
    SET_APP_HANDLER( sysio, sysio, postrecovery );
    SET_APP_HANDLER( sysio, sysio, passrecovery );
@@ -988,11 +990,6 @@ struct controller_impl {
 
       authorization.initialize_database();
       resource_limits.initialize_database();
-
-      // **Roa Changes** New sysio.roa contract multi indexes for resource management.
-      db.add_index<sysio::chain::nodeowners_index>();
-      db.add_index<sysio::chain::policies_index>();
-      db.add_index<sysio::chain::reslimit_index>();
 
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, config::system_account_name, system_auth, system_auth, true );
