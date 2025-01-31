@@ -54,17 +54,17 @@ try:
 
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # non-producing nodes are at the end of the cluster's nodes, so reserving the last one for state_history_plugin
     shipNodeNum = totalNodes - 1
-    specificExtraNodeosArgs[shipNodeNum]="--plugin sysio::state_history_plugin --sync-fetch-span 200 --plugin sysio::net_api_plugin "
+    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --sync-fetch-span 200 --plugin sysio::net_api_plugin "
 
     if args.unix_socket:
-        specificExtraNodeosArgs[shipNodeNum] += "--state-history-unix-socket-path ship.sock"
+        specificExtraNodeopArgs[shipNodeNum] += "--state-history-unix-socket-path ship.sock"
 
     if cluster.launch(pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 

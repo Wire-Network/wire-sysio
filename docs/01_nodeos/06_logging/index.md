@@ -1,5 +1,5 @@
 ---
-content_title: Nodeos Logging
+content_title: Nodeop Logging
 ---
 
 Logging for `nodeop` is controlled by the `logging.json` file. CLI options can be passed to `nodeop` to [setup `logging.json`](00_setup-logging.json.md). The logging configuration file can be used to define [appenders](#appenders) and tie them to [loggers](#loggers) and [logging levels](01_logging-levels.md).

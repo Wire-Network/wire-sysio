@@ -26,7 +26,7 @@ addEnum(BlockType, "head")
 addEnum(BlockType, "lib")
 
 
-class NodeosQueries:
+class NodeopQueries:
     def __init__(self, host, port, walletMgr=None):
         self.endpointHttp = f'http://{host}:{port}'
         self.endpointArgs = f'--url {self.endpointHttp}'
@@ -93,12 +93,12 @@ class NodeosQueries:
 
         executed="executed"
 
-        transStatus=NodeosQueries.getTransStatus(trans)
+        transStatus=NodeopQueries.getTransStatus(trans)
         assert transStatus == executed, f"ERROR: Valid transaction should be '{executed}' but it was '{transStatus}'.\nTransaction: {json.dumps(trans, indent=1)}"
 
     @staticmethod
     def getTransStatus(trans):
-        cntxt=NodeosQueries.Context(trans, "trans")
+        cntxt=NodeopQueries.Context(trans, "trans")
         # could be a transaction response
         if cntxt.hasKey("processed"):
             cntxt.add("processed")
@@ -114,7 +114,7 @@ class NodeosQueries:
 
     @staticmethod
     def getTransBlockNum(trans):
-        cntxt=NodeosQueries.Context(trans, "trans")
+        cntxt=NodeopQueries.Context(trans, "trans")
         # could be a transaction response
         if cntxt.hasKey("processed"):
             cntxt.add("processed")
@@ -506,7 +506,7 @@ class NodeosQueries:
     def getAccountEosBalance(self, scope):
         """Returns SYS currency0000 account balance from clio get table command. Returned balance is an integer e.g. 980311. """
         balanceStr=self.getAccountEosBalanceStr(scope)
-        balance=NodeosQueries.currencyStrToInt(balanceStr)
+        balance=NodeopQueries.currencyStrToInt(balanceStr)
         return balance
 
     def getAccountCodeHash(self, account):
@@ -707,17 +707,17 @@ class NodeosQueries:
         if waitForBlock:
             self.waitForBlock(blockNum, timeout=timeout, blockType=BlockType.head)
         block=self.getBlock(blockNum, exitOnError=exitOnError)
-        return NodeosQueries.getBlockAttribute(block, "producer", blockNum, exitOnError=exitOnError)
+        return NodeopQueries.getBlockAttribute(block, "producer", blockNum, exitOnError=exitOnError)
 
     def getBlockProducer(self, timeout=None, waitForBlock=True, exitOnError=True, blockType=BlockType.head):
         blockNum=self.getBlockNum(blockType=blockType)
         block=self.getBlock(blockNum, exitOnError=exitOnError, blockType=blockType)
-        return NodeosQueries.getBlockAttribute(block, "producer", blockNum, exitOnError=exitOnError)
+        return NodeopQueries.getBlockAttribute(block, "producer", blockNum, exitOnError=exitOnError)
 
     def getNextCleanProductionCycle(self, trans):
         rounds=21*12*2  # max time to ensure that at least 2/3+1 of producers x blocks per producer x at least 2 times
         if trans is not None:
-            transId=NodeosQueries.getTransId(trans)
+            transId=NodeopQueries.getTransId(trans)
             self.waitForTransFinalization(transId, timeout=rounds/2)
         else:
             transId="Null"

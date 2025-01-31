@@ -287,7 +287,7 @@ class cluster_generator:
         for account, node in zip(accounts, self.network.nodes.values()):
             is_bios = node.name == 'bios'
             if is_bios:
-                node.keys.append(KeyStrings('EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV',
+                node.keys.append(KeyStrings('SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV',
                                             '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'))
                 node.producers.append('sysio')
             else:

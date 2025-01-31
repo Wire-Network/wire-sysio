@@ -93,9 +93,9 @@ int main(int argc, char** argv)
       app->set_default_data_dir(home / "sysio-wallet");
       app->set_default_config_dir(home / "sysio-wallet");
       http_plugin::set_defaults({
-         .default_unix_socket_path = keosd::config::key_store_executable_name + ".sock",
+         .default_unix_socket_path = kiod::config::key_store_executable_name + ".sock",
          .default_http_port = 0,
-         .server_header = keosd::config::key_store_executable_name + "/" + app->version_string(),
+         .server_header = kiod::config::key_store_executable_name + "/" + app->version_string(),
          .support_categories = false
       });
       application::register_plugin<wallet_api_plugin>();
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
          return INITIALIZE_FAIL;
       }
       auto& http = app->get_plugin<http_plugin>();
-      http.add_handler({"/v1/" + keosd::config::key_store_executable_name + "/stop",
+      http.add_handler({"/v1/" + kiod::config::key_store_executable_name + "/stop",
                        api_category::node,
                        [&a=app](string, string, url_response_callback cb) {
          cb(200, fc::variant(fc::variant_object()));

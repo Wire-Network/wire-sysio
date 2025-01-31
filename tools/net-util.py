@@ -89,10 +89,10 @@ def readMetrics(host: str, port: str):
 class netUtil:
     def __init__(self):
         self.prometheusMetrics = {
-            ('nodeop_info', 'server_version'): 'Nodeos Version ID:',
+            ('nodeop_info', 'server_version'): 'Nodeop Version ID:',
             ('nodeop_info', 'chain_id'): 'Chain ID:',
-            ('nodeop_info', 'server_version_string'): 'Nodeos Version:',
-            ('nodeop_info', 'server_full_version_string'): 'Nodeos Full Version:',
+            ('nodeop_info', 'server_version_string'): 'Nodeop Version:',
+            ('nodeop_info', 'server_full_version_string'): 'Nodeop Full Version:',
             ('nodeop_info', 'earliest_available_block_num'): 'Earliest Available Block:',
             'nodeop_head_block_num': 'Head Block Num:',
             'nodeop_last_irreversible': 'LIB:',
@@ -127,7 +127,7 @@ class netUtil:
             'HTTP Requests:',
         ]
         self.rightFieldLabels = [
-            'Nodeos Version:',
+            'Nodeop Version:',
             'LIB:',
             'Outbound P2P Connections:',
             'Total Incoming Trxs:',
@@ -148,9 +148,9 @@ class netUtil:
             'last_bytes_sent': lambda x: str(datetime.timedelta(microseconds=(time.time_ns() - int(x))/1000)),
         }
         self.infoFieldLabels = [
-            'Nodeos Version ID:',
+            'Nodeop Version ID:',
             'Chain ID:',
-            'Nodeos Full Version:',
+            'Nodeop Full Version:',
             'Earliest Available Block:',
         ]
         self.peerColumns = [

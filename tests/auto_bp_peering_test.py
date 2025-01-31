@@ -70,12 +70,12 @@ peer_names["localhost:9776"] = "bios"
 
 testSuccessful = False
 try:
-    specificNodeosArgs = {}
+    specificNodeopArgs = {}
     for nodeId in range(0, producerNodes):
-        specificNodeosArgs[nodeId] = auto_bp_peer_args
+        specificNodeopArgs[nodeId] = auto_bp_peer_args
 
-    specificNodeosArgs[5] = specificNodeosArgs[5] + ' --p2p-server-address ext-ip0:9999'
-    specificNodeosArgs[10] = specificNodeosArgs[10] + ' --p2p-server-address ""'
+    specificNodeopArgs[5] = specificNodeopArgs[5] + ' --p2p-server-address ext-ip0:9999'
+    specificNodeopArgs[10] = specificNodeopArgs[10] + ' --p2p-server-address ""'
 
     TestHelper.printSystemInfo("BEGIN")
     cluster.launch(
@@ -84,8 +84,8 @@ try:
         pnodes=producerNodes,
         totalProducers=producerNodes,
         topo="./tests/auto_bp_peering_test_shape.json",
-        extraNodeosArgs=" --plugin sysio::net_api_plugin ",
-        specificExtraNodeosArgs=specificNodeosArgs,
+        extraNodeopArgs=" --plugin sysio::net_api_plugin ",
+        specificExtraNodeopArgs=specificNodeopArgs,
     )
 
     # wait until produceru is seen by every node

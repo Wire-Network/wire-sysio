@@ -59,17 +59,17 @@ dumpErrorDetails=args.dump_error_details
 
 testSuccessful=False
 
-specificExtraNodeosArgs={}
+specificExtraNodeopArgs={}
 producerNodeId=0
 syncingNodeId=1
 
-specificExtraNodeosArgs[producerNodeId]=" --p2p-listen-endpoint 0.0.0.0:{}".format(9876+producerNodeId)
-specificExtraNodeosArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(9876+producerNodeId)
+specificExtraNodeopArgs[producerNodeId]=" --p2p-listen-endpoint 0.0.0.0:{}".format(9876+producerNodeId)
+specificExtraNodeopArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(9876+producerNodeId)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
-    traceNodeosArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
-    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, specificExtraNodeosArgs=specificExtraNodeosArgs, extraNodeosArgs=traceNodeosArgs) is False:
+    traceNodeopArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
+    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 

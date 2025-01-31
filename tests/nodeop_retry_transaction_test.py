@@ -68,7 +68,7 @@ try:
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
 
-    specificExtraNodeosArgs={
+    specificExtraNodeopArgs={
         3:"--transaction-retry-max-storage-size-gb 5", # api node
         4:"",                                          # relay only, will be killed
         5:"--transaction-retry-max-storage-size-gb 5", # api node, will be isolated
@@ -78,7 +78,7 @@ try:
     # topo=ring all nodes are connected in a ring but also to the bios node
     if cluster.launch(pnodes=totalProducerNodes, totalNodes=totalNodes, totalProducers=totalProducers,
                       topo="ring",
-                      specificExtraNodeosArgs=specificExtraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 

@@ -38,11 +38,11 @@ try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
-    specificExtraNodeosArgs = {}
+    specificExtraNodeopArgs = {}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes] = "--plugin sysio::producer_plugin --plugin sysio::chain_api_plugin --plugin sysio::http_plugin "
+    specificExtraNodeopArgs[totalProducerNodes] = "--plugin sysio::producer_plugin --plugin sysio::chain_api_plugin --plugin sysio::http_plugin "
     "--plugin sysio::producer_api_plugin "
-    extraNodeosArgs = " --http-max-response-time-ms 990000 "
+    extraNodeopArgs = " --http-max-response-time-ms 990000 "
 
     # ***   setup topogrophy   ***
 
@@ -51,8 +51,8 @@ try:
 
     if cluster.launch(prodCount=1, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs,
-                      extraNodeosArgs=extraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs,
+                      extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
     Print("Validating system accounts after bootstrap")

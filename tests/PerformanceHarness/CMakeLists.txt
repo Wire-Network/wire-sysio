@@ -9,4 +9,4 @@ configure_file(readOnlySlowTrxData.json . COPYONLY)
 configure_file(userTrxDataTransfer.json . COPYONLY)
 configure_file(userTrxDataNewAccount.json . COPYONLY)
 
-add_subdirectory( NodeosPluginArgs )
+add_subdirectory( NodeopPluginArgs )

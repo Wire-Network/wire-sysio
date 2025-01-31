@@ -181,7 +181,7 @@ cluster.setWalletMgr(walletMgr)
 testResultMsgs = []
 testSuccessful = False
 try:
-    specificNodeosArgs = {
+    specificNodeopArgs = {
         0 : "--enable-stale-production",
         1 : "--read-mode irreversible --terminate-at-block 75",
         2 : "--read-mode head --terminate-at-block 100",
@@ -195,7 +195,7 @@ try:
         totalNodes=totalNodes,
         pnodes=1,
         topo="mesh",
-        specificExtraNodeosArgs=specificNodeosArgs,
+        specificExtraNodeopArgs=specificNodeopArgs,
     )
 
     producingNodeId = 0
@@ -209,7 +209,7 @@ try:
     # Start executing test cases here
     Utils.Print("Script Begin .............................")
 
-    for nodeId, nodeArgs in specificNodeosArgs.items():
+    for nodeId, nodeArgs in specificNodeopArgs.items():
         # The test only needs to be run on the non-producer nodes.
         if nodeId == producingNodeId:
             continue

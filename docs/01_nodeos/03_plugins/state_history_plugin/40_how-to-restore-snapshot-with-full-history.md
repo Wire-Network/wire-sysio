@@ -9,7 +9,7 @@ This procedure restores an existing snapshot with full history, so the node can 
 ## Before you begin
 
 * Make sure [Antelope is installed](../../../00_install/index.md).
-* Learn about [Using Nodeos](../../02_usage/index.md).
+* Learn about [Using Nodeop](../../02_usage/index.md).
 * Get familiar with [state_history_plugin](../../03_plugins/state_history_plugin/index.md).
 
 ## Steps

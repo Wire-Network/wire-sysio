@@ -1,8 +1,8 @@
 ---
-content_title: Nodeos Options
+content_title: Nodeop Options
 ---
 
-`Nodeos` is a command line interface (CLI) application. As such, it can be started manually from the command line or through an automated script. The behavior of `nodeop` is determined mainly by which plugins are loaded and which plugin options are used. The `nodeop` application features two main option categories: *nodeop-specific* options and *plugin-specific* options.
+`Nodeop` is a command line interface (CLI) application. As such, it can be started manually from the command line or through an automated script. The behavior of `nodeop` is determined mainly by which plugins are loaded and which plugin options are used. The `nodeop` application features two main option categories: *nodeop-specific* options and *plugin-specific* options.
 
 ## Nodeop-specific Options
 

@@ -74,12 +74,12 @@ def prepareDirectories():
     with open(loggingFile, "w") as textFile:
         print(logging,file=textFile)
 
-def runNodeos(extraNodeosArgs, myTimeout):
+def runNodeop(extraNodeopArgs, myTimeout):
     """Startup nodeop, wait for timeout (before forced shutdown) and collect output."""
     if debug: Print("Launching nodeop process.")
     cmd="programs/nodeop/nodeop --config-dir rsmStaging/etc -e -p sysio --plugin sysio::chain_api_plugin --data-dir " + dataDir + " "
 
-    cmd=cmd + extraNodeosArgs
+    cmd=cmd + extraNodeopArgs
     if debug: Print("cmd: %s" % (cmd))
     with open(stderrFile, 'w') as serr:
         proc=subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=serr)
@@ -99,7 +99,7 @@ def isMsgInStderrFile(msg):
                 break
     return msgFound
 
-def testCommon(title, extraNodeosArgs, expectedMsgs):
+def testCommon(title, extraNodeopArgs, expectedMsgs):
     global testNum
     testNum+=1
     Print("Test %d: %s" % (testNum, title))
@@ -107,7 +107,7 @@ def testCommon(title, extraNodeosArgs, expectedMsgs):
     prepareDirectories()
 
     timeout=max_start_time_secs  # Leave sufficient time such nodeop can start up fully in any platforms
-    runNodeos(extraNodeosArgs, timeout)
+    runNodeop(extraNodeopArgs, timeout)
 
     for msg in expectedMsgs:
         if not isMsgInStderrFile(msg):
@@ -149,7 +149,7 @@ def fillFS(dir, threshold):
 
 testIntervalMaxTimeout = 300 # Assume nodeop at most runs 300 sec for this test
 
-def testInterval(title, extraNodeosArgs, interval, expectedMsgs, warningThreshold):
+def testInterval(title, extraNodeopArgs, interval, expectedMsgs, warningThreshold):
     global testNum
     testNum += 1
     Print("Test %d: %s" % (testNum, title))
@@ -160,7 +160,7 @@ def testInterval(title, extraNodeosArgs, interval, expectedMsgs, warningThreshol
     timeout = max_start_time_secs + interval * 2 # Leave sufficient time so nodeop can start up fully in any platforms, and at least two warnings can be output
     if timeout > testIntervalMaxTimeout: 
         errorExit ("Max timeout for testInterval is %d sec" % (testIntervalMaxTimeout))
-    runNodeos(extraNodeosArgs, timeout)
+    runNodeop(extraNodeopArgs, timeout)
 
     for msg in expectedMsgs:
         hasMsg, validInterval = isMsgIntervalValid(msg, interval)

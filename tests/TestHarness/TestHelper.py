@@ -107,7 +107,7 @@ class TestHelper(object):
         if "--only-bios" in includeArgs:
             thGrp.add_argument("--only-bios", help=argparse.SUPPRESS if suppressHelp else "Limit testing to bios node.", action='store_true')
         if "--sanity-test" in includeArgs:
-            thGrp.add_argument("--sanity-test", help=argparse.SUPPRESS if suppressHelp else "Validates nodeop and keosd are in path and can be started up.", action='store_true')
+            thGrp.add_argument("--sanity-test", help=argparse.SUPPRESS if suppressHelp else "Validates nodeop and kiod are in path and can be started up.", action='store_true')
         if "--alternate-version-labels-file" in includeArgs:
             thGrp.add_argument("--alternate-version-labels-file", type=str, help=argparse.SUPPRESS if suppressHelp else "Provide a file to define the labels that can be used in the test and the path to the version installation associated with that.")
         if "--error-log-path" in includeArgs:

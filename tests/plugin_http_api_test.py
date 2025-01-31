@@ -47,7 +47,7 @@ class HttpCategoryConfig:
 class PluginHttpTest(unittest.TestCase):
     sleep_s = 2
     base_wallet_cmd_str = f"http://{TestHelper.LOCAL_HOST}:{TestHelper.DEFAULT_WALLET_PORT}"
-    keosd = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT, TestHelper.LOCAL_HOST)
+    kiod = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT, TestHelper.LOCAL_HOST)
     node_id = 1
     data_dir = Path(Utils.getNodeDataDir(node_id))
     config_dir = Path(Utils.getNodeConfigDir(node_id))
@@ -71,7 +71,7 @@ class PluginHttpTest(unittest.TestCase):
             shutil.rmtree(self.config_dir)
         self.config_dir.mkdir()
 
-   # kill nodeop. keosd shuts down automatically
+   # kill nodeop. kiod shuts down automatically
     def killNodes(self):
         self.nodeop.kill(signal.SIGTERM)
 
@@ -83,11 +83,11 @@ class PluginHttpTest(unittest.TestCase):
             shutil.rmtree(self.config_dir)
         time.sleep(self.sleep_s)
 
-    # start keosd and nodeop
+    # start kiod and nodeop
     def startEnv(self) :
         self.createDataDir(self)
         self.createConfigDir(self)
-        self.keosd.launch()
+        self.kiod.launch()
         plugin_names = ["trace_api_plugin", "test_control_api_plugin", "test_control_plugin", "net_plugin",
                         "net_api_plugin", "producer_plugin", "producer_api_plugin", "chain_api_plugin",
                         "http_plugin", "db_size_api_plugin", "prometheus_plugin"]
@@ -98,7 +98,7 @@ class PluginHttpTest(unittest.TestCase):
         nodeop_flags += category_config.nodeopArgs()
 
         start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.EosServerPath, nodeop_plugins, nodeop_flags)
-        self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.keosd)
+        self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.kiod)
         time.sleep(self.sleep_s*2)
         self.nodeop.waitForBlock(1, timeout=30)
 
@@ -116,7 +116,7 @@ class PluginHttpTest(unittest.TestCase):
 
         testWalletName = "test"
         walletAccounts = [sysioAccount]
-        self.keosd.create(testWalletName, walletAccounts)
+        self.kiod.create(testWalletName, walletAccounts)
 
         retMap = self.nodeop.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
 

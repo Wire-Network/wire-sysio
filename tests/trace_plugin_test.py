@@ -17,12 +17,12 @@ class TraceApiPluginTest(unittest.TestCase):
     accounts = []
     cluster.setWalletMgr(walletMgr)
 
-    # start keosd and nodeop
+    # start kiod and nodeop
     def startEnv(self) :
         account_names = ["alice", "bob", "charlie"]
         abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
-        traceNodeosArgs = " --verbose-http-errors --trace-rpc-abi sysio.token=" + abs_path
-        self.cluster.launch(totalNodes=2, extraNodeosArgs=traceNodeosArgs)
+        traceNodeopArgs = " --verbose-http-errors --trace-rpc-abi sysio.token=" + abs_path
+        self.cluster.launch(totalNodes=2, extraNodeopArgs=traceNodeopArgs)
         self.walletMgr.launch()
         testWalletName="testwallet"
         testWallet=self.walletMgr.create(testWalletName, [self.cluster.sysioAccount, self.cluster.defproduceraAccount])

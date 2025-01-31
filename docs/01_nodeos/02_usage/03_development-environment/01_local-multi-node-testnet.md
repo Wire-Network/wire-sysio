@@ -4,15 +4,15 @@ content_title: Local Multi-Node Testnet
 
 ## Goal
 
-This section describes how to set up a multi-node blockchain configuration running on a single host.  This is referred to as a _**single host, multi-node testnet**_.  We will set up two nodes on your local computer and have them communicate with each other.  The examples in this section rely on three command-line applications, `nodeop`, `keosd`, and `clio`.  The following diagram depicts the desired testnet configuration.
+This section describes how to set up a multi-node blockchain configuration running on a single host.  This is referred to as a _**single host, multi-node testnet**_.  We will set up two nodes on your local computer and have them communicate with each other.  The examples in this section rely on three command-line applications, `nodeop`, `kiod`, and `clio`.  The following diagram depicts the desired testnet configuration.
 
 ![Single host multi node testnet](single-host-multi-node-testnet.png)
 
 ## Before you begin
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
-* It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.
-* Know how to pass [Nodeos options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
+* It is assumed that `nodeop`, `clio`, and `kiod` are accessible through the path.
+* Know how to pass [Nodeop options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
 
@@ -27,13 +27,13 @@ Open four "terminal" windows and perform the following steps:
 
 ### 1. Start the Wallet Manager
 
-In the first terminal window, start `keosd`, the wallet management application:
+In the first terminal window, start `kiod`, the wallet management application:
 
 ```sh
-keosd --http-server-address 127.0.0.1:8899
+kiod --http-server-address 127.0.0.1:8899
 ```
 
-If successful, `keosd` will display some information, starting with:
+If successful, `kiod` will display some information, starting with:
 
 ```console
 2493323ms thread-0   wallet_plugin.cpp:39          plugin_initialize    ] initializing wallet plugin
@@ -43,9 +43,9 @@ If successful, `keosd` will display some information, starting with:
 2493324ms thread-0   wallet_api_plugin.cpp:70      plugin_startup       ] starting wallet_api_plugin
 ```
 
-Look for a line saying the wallet is listening on 127.0.0.1:8899. This will indicate that `keosd` started correctly and is listening on the correct port. If you see anything else, or you see some error report prior to "starting wallet_api_plugin", then you need to diagnose the issue and restart.
+Look for a line saying the wallet is listening on 127.0.0.1:8899. This will indicate that `kiod` started correctly and is listening on the correct port. If you see anything else, or you see some error report prior to "starting wallet_api_plugin", then you need to diagnose the issue and restart.
 
-When `keosd` is running correctly, leave that window open with the wallet app running and move to the next terminal window.
+When `kiod` is running correctly, leave that window open with the wallet app running and move to the next terminal window.
 
 ### 2. Create a Default Wallet
 
@@ -64,7 +64,7 @@ Without password imported keys will not be retrievable.
 "PW5JsmfYz2wrdUEotTzBamUCAunAA8TeRZGT57Ce6PkvM12tre8Sm"
 ```
 
-`keosd` will generate some status output in its window. We will continue to use this second window for subsequent `clio` commands.
+`kiod` will generate some status output in its window. We will continue to use this second window for subsequent `clio` commands.
 
 ### 3. Loading the Antelope Key
 
@@ -75,7 +75,7 @@ clio --wallet-url http://127.0.0.1:8899 wallet import --private-key 5KQwrPbwdL6P
 ```
 
 ```console
-imported private key for: EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+imported private key for: SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
 ```
 
 ### 4. Start the First Producer Node
@@ -114,7 +114,7 @@ This will report newly generated public and private keypairs that will look simi
 
 ```console
 Private key: 5JgbL2ZnoEAhTudReWH1RnMuQS6DBeLZt4ucV6t8aymVEuYg7sr
-Public key: EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
+Public key: SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
 ```
 
 Now import the private key portion into your wallet. If successful, the matching public key will be reported. This should match the previously generated public key:
@@ -124,13 +124,13 @@ clio --wallet-url http://127.0.0.1:8899 wallet import 5JgbL2ZnoEAhTudReWH1RnMuQS
 ```
 
 ```console
-imported private key for: EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
+imported private key for: SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
 ```
 
 Create the `inita` account that we will use to become a producer. The `create account` command requires two public keys, one for the account's owner key and one for its active key.  In this example, the newly created public key is used twice, as both the owner key and the active key. Example output from the create command is shown:
 
 ```sh
-clio --wallet-url http://127.0.0.1:8899 create account sysio inita EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
+clio --wallet-url http://127.0.0.1:8899 create account sysio inita SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg
 ```
 
 ```console
@@ -143,7 +143,7 @@ We now have an account that is available to have a contract assigned to it, enab
 In the fourth terminal window, start a second `nodeop` instance. Notice that this command line is substantially longer than the one we used above to create the first producer. This is necessary to avoid collisions with the first `nodeop` instance. Fortunately, you can just cut and paste this command line and adjust the keys:
 
 ```sh
-nodeop --producer-name inita --plugin sysio::chain_api_plugin --plugin sysio::net_api_plugin --http-server-address 127.0.0.1:8889 --p2p-listen-endpoint 127.0.0.1:9877 --p2p-peer-address 127.0.0.1:9876 --config-dir node2 --data-dir node2 --signature-provider EOS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg=KEY:5JgbL2ZnoEAhTudReWH1RnMuQS6DBeLZt4ucV6t8aymVEuYg7sr
+nodeop --producer-name inita --plugin sysio::chain_api_plugin --plugin sysio::net_api_plugin --http-server-address 127.0.0.1:8889 --p2p-listen-endpoint 127.0.0.1:9877 --p2p-peer-address 127.0.0.1:9876 --config-dir node2 --data-dir node2 --signature-provider SYS6hMjoWRF2L8x9YpeqtUEcsDKAyxSuM1APicxgRU1E3oyV5sDEg=KEY:5JgbL2ZnoEAhTudReWH1RnMuQS6DBeLZt4ucV6t8aymVEuYg7sr
 ```
 
 The output from this new node will show a little activity but will stop reporting until the last step in this tutorial, when the `inita` account is registered as a producer account and activated. Here is some example output from a newly started node. Your output might look a little different, depending on how much time you took entering each of these commands. Furthermore, this example is only the last few lines of output:

@@ -56,12 +56,12 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
-    extraNodeosArgs = '--plugin sysio::prometheus_plugin --connection-cleanup-period 3'
+    extraNodeopArgs = '--plugin sysio::prometheus_plugin --connection-cleanup-period 3'
     # Custom topology is a line of singlely connected nodes from highest node number in sequence to lowest,
     # the reverse of the usual TestHarness line topology.
     if cluster.launch(pnodes=pnodes, unstartedNodes=2, totalNodes=total_nodes, prodCount=prod_count, 
                       topo='./tests/p2p_sync_throttle_test_shape.json', delay=delay, 
-                      extraNodeosArgs=extraNodeosArgs) is False:
+                      extraNodeopArgs=extraNodeopArgs) is False:
         errorExit("Failed to stand up eos cluster.")
 
     prodNode = cluster.getNode(0)

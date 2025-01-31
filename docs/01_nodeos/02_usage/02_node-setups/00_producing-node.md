@@ -7,17 +7,17 @@ content_title: Producing Node Setup
 
 ## Goal
 
-This section describes how to set up a producing node within the Antelope network. A producing node, as its name implies, is a node that is configured to produce blocks in an `Antelope` based blockchain. This functionality if provided through the `producer_plugin` as well as other [Nodeos Plugins](../../03_plugins/index.md).
+This section describes how to set up a producing node within the Antelope network. A producing node, as its name implies, is a node that is configured to produce blocks in an `Antelope` based blockchain. This functionality if provided through the `producer_plugin` as well as other [Nodeop Plugins](../../03_plugins/index.md).
 
 ## Before you begin
 
 * [Install the Antelope software](../../../00_install/index.md) before starting this section.
-* It is assumed that `nodeop`, `clio`, and `keosd` are accessible through the path.
+* It is assumed that `nodeop`, `clio`, and `kiod` are accessible through the path.
 
 [//]: # ( THIS IS A COMMENT LINK BELOW IS BROKEN )  
 [//]: # ( If you built Antelope using shell scripts, make sure to run the  Install Script ../../../00_install/01_build-from-source/01_shell-scripts/03_install-antelope-binaries.md )  
 
-* Know how to pass [Nodeos options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
+* Know how to pass [Nodeop options](../../02_usage/00_nodeop-options.md) to enable or disable functionality.
 
 ## Steps
 
@@ -55,7 +55,7 @@ You will need to set the private key for your producer. The public key should ha
 `signature-provider` is defined with a 3-field tuple:
 * `public-key` - A valid Antelope public key in form of a string.
 * `provider-spec` - It's a string formatted like `<provider-type>:<data>`
-* `provider-type` - KEY or KEOSD
+* `provider-type` - KEY or KIOD
 
 #### Using a Key:
 
@@ -65,19 +65,19 @@ You will need to set the private key for your producer. The public key should ha
 signature-provider = PUBLIC_SIGNING_KEY=KEY:PRIVATE_SIGNING_KEY
 
 //Example
-//signature-provider = EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+//signature-provider = SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
 ```
 
-#### Using Keosd:
-You can also use `keosd` instead of hard-defining keys.
+#### Using Kiod:
+You can also use `kiod` instead of hard-defining keys.
 
 ```console
 # config.ini:
 
-signature-provider = KEOSD:<data>   
+signature-provider = KIOD:<data>   
 
 //Example
-//EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KEOSD:https://127.0.0.1:88888
+//EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KIOD:https://127.0.0.1:88888
 ```
 
 ### 4. Define a peers list
