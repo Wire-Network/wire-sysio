@@ -48,7 +48,6 @@ namespace sysio { namespace testing {
       return os;
    }
 
-
    std::string read_wast( const char* fn ) {
       std::ifstream wast_file(fn);
       FC_ASSERT( wast_file.is_open(), "wast file cannot be found" );
@@ -278,6 +277,7 @@ namespace sysio { namespace testing {
             }
             produce_block();
             set_bios_contract();
+            init_roa();
             break;
          }
          case setup_policy::none:
@@ -1123,6 +1123,27 @@ namespace sysio { namespace testing {
       set_abi(config::system_account_name, contracts::sysio_bios_abi());
    }
 
+   void base_tester::init_roa() {
+      const auto& roa = "sysio.roa"_n;
+
+      // Create the ROA account and mark it as privileged
+      create_account(roa, config::system_account_name);
+      set_code(roa, contracts::sysio_roa_wasm());
+      set_abi(roa, contracts::sysio_roa_abi().data());
+      push_action(config::system_account_name, "setpriv"_n,
+                  config::system_account_name,
+                  fc::mutable_variant_object()("account", roa)("is_priv", 1)
+      );
+
+      // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
+      push_action("sysio.roa"_n, "activateroa"_n, "sysio.roa"_n,
+                  fc::mutable_variant_object()
+                  ("total_sys", asset::from_string("75496.0000 SYS"))
+                  ("bytes_per_unit", 104)
+      );
+
+      produce_block();
+   }
 
    vector<producer_authority> base_tester::get_producer_authorities( const vector<account_name>& producer_names )const {
        // Create producer schedule

@@ -22,7 +22,7 @@ class HttpCategoryConfig:
     def __init__(self, use_category: bool):
         if use_category:
             self.ports = dict(zip(HttpCategoryConfig.categories, range(
-                HttpCategoryConfig.default_port, HttpCategoryConfig.default_port+len(HttpCategoryConfig.categories)))) 
+                HttpCategoryConfig.default_port, HttpCategoryConfig.default_port+len(HttpCategoryConfig.categories))))
         else:
             self.ports = None
 
@@ -692,8 +692,8 @@ class PluginHttpTest(unittest.TestCase):
                 "signatures": ["SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp"],
                 "context_free_data": []}
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload_hex, returnType=ReturnType.raw).decode('ascii')
-        self.assertEqual(ret_str, "\"0be762a6406bab15530e87f21e02d1c58e77944ee55779a76f4112e3b65cac48\"")
-
+        # verify the returned transaction id.
+        self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
 
         # push_block with empty parameter
         endpoint=self.endpoint("chain_rw")
@@ -1569,7 +1569,7 @@ class PluginHttpTest(unittest.TestCase):
         if unittest.TestResult().wasSuccessful() and not keepLogs:
             self.cleanEnv(self)
 
-    
+
 if __name__ == "__main__":
     test_category = True if os.environ.get("PLUGIN_HTTP_TEST_CATEGORY") == "ON" else False
     category_config = HttpCategoryConfig(test_category)

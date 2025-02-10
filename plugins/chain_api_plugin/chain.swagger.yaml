@@ -37,14 +37,14 @@ paths:
                 - account_name
               properties:
                 account_name:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/Account.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.0/oas/Account.yaml"
   /get_block:
     post:
       description: Returns an object containing various details about a specific block on the blockchain.
@@ -66,7 +66,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/Block.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.0/oas/Block.yaml"
   /get_block_info:
     post:
       description: Similar to `get_block` but returns a fixed-size smaller subset of the block data.
@@ -100,7 +100,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/Info.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.0/oas/Info.yaml"
 
   /push_transaction:
     post:
@@ -116,7 +116,7 @@ paths:
                   type: array
                   description: array of signatures required to authorize transaction
                   items:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Signature.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Signature.yaml"
                 compression:
                   type: boolean
                   description: Compression used, usually false
@@ -148,7 +148,7 @@ paths:
                   type: array
                   description: array of signatures required to authorize transaction
                   items:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Signature.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Signature.yaml"
                 compression:
                   type: boolean
                   description: Compression used, usually false
@@ -177,7 +177,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/Transaction.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.0/oas/Transaction.yaml"
       responses:
         "200":
           description: OK
@@ -208,7 +208,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/BlockHeaderState.yaml"
+                $ref: "https://eosio.github.io/schemata/v2.0/oas/BlockHeaderState.yaml"
 
   /get_abi:
     post:
@@ -223,14 +223,14 @@ paths:
                 - account_name
               properties:
                 account_name:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: "https://docs.eosnetwork.com/openapi/v2.0/Abi.yaml"
+                $ref: "https://sysio.github.io/schemata/v2.0/oas/Abi.yaml"
   /get_currency_balance:
     post:
       description: Retrieves the current balance
@@ -246,11 +246,11 @@ paths:
                 - symbol
               properties:
                 code:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                 account:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                 symbol:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Symbol.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Symbol.yaml"
 
       responses:
         "200":
@@ -260,7 +260,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Symbol.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Symbol.yaml"
 
   /get_currency_stats:
     post:
@@ -273,9 +273,9 @@ paths:
               type: object
               properties:
                 code:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                 symbol:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Symbol.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Symbol.yaml"
 
       responses:
         "200":
@@ -299,12 +299,12 @@ paths:
                 - available_keys
               properties:
                 transaction:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Transaction.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Transaction.yaml"
                 available_keys:
                   type: array
                   description: Provide the available keys
                   items:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/PublicKey.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/PublicKey.yaml"
       responses:
         "200":
           description: OK
@@ -350,8 +350,8 @@ paths:
                     type: array
                     nullable: true
                     items:
-                      $ref: "https://docs.eosnetwork.com/openapi/v2.0/Producer.yaml"
-                  total_producer_vote_weight: 
+                      $ref: "https://sysio.github.io/schemata/v2.0/oas/Producer.yaml"
+                  total_producer_vote_weight:
                     type: string
                     description: The sum of all producer votes.
                   more:
@@ -371,7 +371,7 @@ paths:
                 - account_name
               properties:
                 account_name:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
 
       responses:
         "200":
@@ -382,7 +382,7 @@ paths:
                 type: object
                 properties:
                   account_name:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                   wasm:
                     type: string
                     description: base64 encoded wasm
@@ -401,7 +401,7 @@ paths:
               type: object
               properties:
                 lower_bound:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/DateTimeSeconds.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/DateTimeSeconds.yaml"
                 limit:
                   description: The maximum number of transactions to return
                   type: integer
@@ -419,7 +419,7 @@ paths:
                   transactions:
                     type: array
                     items:
-                      $ref: "https://docs.eosnetwork.com/openapi/v2.0/Transaction.yaml"
+                      $ref: "https://sysio.github.io/schemata/v2.0/oas/Transaction.yaml"
 
 
   /get_table_by_scope:
@@ -470,9 +470,9 @@ paths:
                   rows:
                     type: array
                     items:
-                      $ref: "https://docs.eosnetwork.com/openapi/v2.0/TableScope.yaml"
+                      $ref: "https://sysio.github.io/schemata/v2.0/oas/TableScope.yaml"
                   more:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
 
   /get_table_rows:
     post:
@@ -551,7 +551,7 @@ paths:
                 - code_as_wasm
               properties:
                 account_name:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                 code_as_wasm:
                   type: integer
                   default: 1
@@ -566,15 +566,15 @@ paths:
                 title: GetCodeResponse.yaml
                 properties:
                   name:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                   code_hash:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Sha256.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Sha256.yaml"
                   wast:
                     type: string
                   wasm:
                     type: string
                   abi:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Abi.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Abi.yaml"
 
   /get_raw_abi:
     post:
@@ -589,7 +589,7 @@ paths:
                 - account_name
               properties:
                 account_name:
-                  $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                  $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
       responses:
         "200":
           description: OK
@@ -599,12 +599,12 @@ paths:
                 type: object
                 properties:
                   account_name:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                   code_hash:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/Sha256.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/Sha256.yaml"
                   abi_hash:
                     allOf:
-                      - $ref: "https://docs.eosnetwork.com/openapi/v2.0/Sha256.yaml"
+                      - $ref: "https://sysio.github.io/schemata/v2.0/oas/Sha256.yaml"
                   abi:
                     type: string
 
@@ -668,13 +668,13 @@ paths:
                   description: List of authorizing accounts and/or actor/permissions
                   items:
                     anyOf:
-                      - $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
-                      - $ref: "https://docs.eosnetwork.com/openapi/v2.0/Authority.yaml"
+                      - $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
+                      - $ref: "https://sysio.github.io/schemata/v2.0/oas/Authority.yaml"
                 keys:
                   type: array
                   description: List of authorizing keys
                   items:
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/PublicKey.yaml"
+                    $ref: "https://sysio.github.io/schemata/v2.0/oas/PublicKey.yaml"
       responses:
         "200":
           description: OK
@@ -700,13 +700,13 @@ paths:
                         - threshold
                       properties:
                         account_name:
-                          $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                          $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                         permission_name:
-                          $ref: "https://docs.eosnetwork.com/openapi/v2.0/Name.yaml"
+                          $ref: "https://sysio.github.io/schemata/v2.0/oas/Name.yaml"
                         authorizer:
                           oneOf:
-                            - $ref: "https://docs.eosnetwork.com/openapi/v2.0/PublicKey.yaml"
-                            - $ref: "https://docs.eosnetwork.com/openapi/v2.0/Authority.yaml"
+                            - $ref: "https://sysio.github.io/schemata/v2.0/oas/PublicKey.yaml"
+                            - $ref: "https://sysio.github.io/schemata/v2.0/oas/Authority.yaml"
                         weight:
                           type: "integer"
                           description: the weight that this authorizer adds to satisfy the permission
@@ -727,7 +727,7 @@ paths:
               properties:
                 id:
                   type: string
-                  description: The transaction ID of the transaction to retrieve the status for. 
+                  description: The transaction ID of the transaction to retrieve the status for.
       responses:
         "200":
           description: OK
@@ -874,7 +874,7 @@ paths:
                 properties:
                   active:
                     description: A JSON object that encapsulates the list of active producers schedule and its version.
-                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/ProducerSchedule.yaml"                              
+                    $ref: "https://docs.eosnetwork.com/openapi/v2.0/ProducerSchedule.yaml"
                   pending:
                     description: A JSON object that encapsulates the list of pending producers schedule and its version.
                     $ref: "https://docs.eosnetwork.com/openapi/v2.0/ProducerSchedule.yaml"

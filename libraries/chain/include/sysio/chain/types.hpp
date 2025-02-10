@@ -76,12 +76,12 @@ namespace sysio::chain {
    using public_key_type  = fc::crypto::public_key;
    using private_key_type = fc::crypto::private_key;
    using signature_type   = fc::crypto::signature;
-   
+
    // configurable boost deque (for boost >= 1.71) performs much better than std::deque in our use cases
    using block_1024_option_t = boost::container::deque_options< boost::container::block_size<1024u> >::type;
    template<typename T>
    using deque = boost::container::deque< T, void, block_1024_option_t >;
-   
+
    struct void_t{};
 
    using chainbase::allocator;
@@ -136,6 +136,8 @@ namespace sysio::chain {
     *
     * UNUSED_ enums can be taken for new purposes but otherwise the offsets
     * in this enumeration are potentially shared_memory breaking
+    *
+    * Note: sysio_roa_objects.hpp defines usage of: 200 - 202
     */
    enum object_type
    {

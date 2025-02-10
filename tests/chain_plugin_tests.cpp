@@ -27,7 +27,7 @@ using namespace fc;
 
 static auto get_account_full = [](chain_apis::read_only& plugin,
                                   chain_apis::read_only::get_account_params& params,
-                                  const fc::time_point& deadline) -> chain_apis::read_only::get_account_results {   
+                                  const fc::time_point& deadline) -> chain_apis::read_only::get_account_results {
    auto res =  plugin.get_account(params, deadline)();
    BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(res));
    return std::get<chain_apis::read_only::get_account_results>(std::move(res));

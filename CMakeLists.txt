@@ -217,14 +217,14 @@ install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE
 install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
-configure_file(LICENSE                                                     licenses/sysio/LICENSE           COPYONLY)
+configure_file(LICENSE.md                                                  licenses/sysio/LICENSE.md        COPYONLY)
 configure_file(libraries/softfloat/COPYING.txt                             licenses/sysio/LICENSE.softfloat COPYONLY)
 configure_file(libraries/wasm-jit/LICENSE                                  licenses/sysio/LICENSE.wavm      COPYONLY)
 configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/sysio/LICENSE.secp256k1 COPYONLY)
 configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/sysio/LICENSE.rapidjson COPYONLY)
 configure_file(libraries/sys-vm/LICENSE                                    licenses/sysio/LICENSE.sys-vm    COPYONLY)
 configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/sysio/LICENSE.prom      COPYONLY)
-configure_file(programs/clio/LICENSE.CLI11                                licenses/sysio/LICENSE.CLI11     COPYONLY)
+configure_file(programs/clio/LICENSE.CLI11                                 licenses/sysio/LICENSE.CLI11     COPYONLY)
 configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/sysio/LICENSE.bls12-381 COPYONLY)
 configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/sysio/LICENSE.boringssl COPYONLY)
 

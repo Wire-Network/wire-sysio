@@ -7,6 +7,8 @@
 #include "test_api.hpp"
 using namespace sysio;
 
+using namespace sysio;
+
 void test_checktime::checktime_pass() {
    int p = 0;
    for ( int i = 0; i < 10000; i++ )

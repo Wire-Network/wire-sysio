@@ -6,6 +6,7 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <algorithm>
 
 namespace sysio { namespace chain { namespace resource_limits {
@@ -244,7 +245,6 @@ void resource_limits_manager::verify_account_ram_usage( const account_name accou
 int64_t resource_limits_manager::get_account_ram_usage( const account_name& name )const {
    return _db.get<resource_usage_object,by_owner>( name ).ram_usage;
 }
-
 
 bool resource_limits_manager::set_account_limits( const account_name& account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight, bool is_trx_transient) {
    //const auto& usage = _db.get<resource_usage_object,by_owner>( account );

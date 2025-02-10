@@ -6,7 +6,7 @@ Interested in contributing? That's awesome! Here are some guidelines to get star
   - [Bug Reports](#bug-reports)
   - [Feature Requests](#feature-requests)
   - [Change Requests](#change-requests)
-- [Working on Leap](#working-on-leap)
+- [Working on Leap](#working-on-wire_sysio)
   - [Feature Branches](#feature-branches)
   - [Submitting Pull Requests](#submitting-pull-requests)
   - [Testing and Quality Assurance](#testing-and-quality-assurance)
@@ -34,12 +34,12 @@ Guidelines for bug reports:
    reported.
 
 1. **Check if the issue has been fixed** &mdash; look for [closed issues in the
-   current milestone](https://github.com/AntelopeIO/leap/issues?q=is%3Aissue+is%3Aclosed) or try to reproduce it
+   current milestone](https://github.com/AntelopeIO/wire_sysio/issues?q=is%3Aissue+is%3Aclosed) or try to reproduce it
    using the latest `main` branch.
 
 A good bug report shouldn't leave others needing to chase you up for more information. Be sure to include the details of your environment and relevant tests that demonstrate the failure.
 
-[Report a bug](https://github.com/AntelopeIO/leap/issues/new?title=Bug%3A)
+[Report a bug](https://github.com/AntelopeIO/wire_sysio/issues/new?title=Bug%3A)
 
 ### Feature Requests
 
@@ -59,7 +59,7 @@ Change requests cover both architectural and functional changes to how Leap work
 
 ## Working on Leap
 
-Code contributions are welcome and encouraged! If you are looking for a good place to start, check out the [good first issue](https://github.com/AntelopeIO/leap/labels/good%20first%20issue) label in GitHub issues.
+Code contributions are welcome and encouraged! If you are looking for a good place to start, check out the [good first issue](https://github.com/AntelopeIO/wire_sysio/labels/good%20first%20issue) label in GitHub issues.
 
 Also, please follow these guidelines when submitting code:
 
@@ -67,7 +67,7 @@ Also, please follow these guidelines when submitting code:
 
 To get it out of the way:
 
-- **[main](https://github.com/AntelopeIO/leap/tree/main)** is the development branch. All work on the next release happens here so you should generally branch off `main`. Do **NOT** use this branch for a production site.
+- **[main](https://github.com/AntelopeIO/wire_sysio/tree/main)** is the development branch. All work on the next release happens here so you should generally branch off `main`. Do **NOT** use this branch for a production site.
 - **release/** branches contain stable releases of Leap. Some of these branches may be obsolete, a prerelease (release candidate), or designated as stable and ready for use in production. Generally do **NOT** use these branches to work on Leap's source unless you are working on a defect or change that would apply to a current stable release or release candidate. If in doubt, branch off of `main` and a Leap maintainer will chime in if you should switch to a release branch.
 
 ### Submitting Pull Requests
@@ -78,7 +78,7 @@ Pull requests are awesome. If you're looking to raise a PR for something which d
 
 Never underestimate just how useful quality assurance is. If you're looking to get involved with the code base and don't know where to start, checking out and testing a pull request is one of the most useful things you could do.
 
-Essentially, [check out the main branch](#working-on-leap), take it for a spin, and if you find anything odd, please follow the [bug report guidelines](#bug-reports) and let us know!
+Essentially, [check out the main branch](#working-on-wire_sysio), take it for a spin, and if you find anything odd, please follow the [bug report guidelines](#bug-reports) and let us know!
 
 ## Conduct
 

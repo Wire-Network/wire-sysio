@@ -18,6 +18,8 @@ struct check_auth_msg {
    SYSLIB_SERIALIZE( check_auth_msg, (account)(permission)(pubkeys)  )
 };
 
+using namespace sysio;
+
 void test_permission::check_authorization( uint64_t receiver, uint64_t code, uint64_t action ) {
    (void)code;
    (void)action;

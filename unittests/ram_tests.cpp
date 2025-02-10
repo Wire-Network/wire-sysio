@@ -69,7 +69,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
    auto initial_ram_usage = rlm.get_account_ram_usage("testram11111"_n);
 
    // calculate how many more bytes we need to have table_allocation_bytes for database stores
-   auto more_ram = table_allocation_bytes + init_bytes - init_request_bytes;
+   const long more_ram = table_allocation_bytes + init_bytes - init_request_bytes;
    BOOST_REQUIRE_MESSAGE(more_ram >= 0, "Underlying understanding changed, need to reduce size of init_request_bytes");
    wdump((init_bytes)(initial_ram_usage)(init_request_bytes)(more_ram) );
    buyrambytes(config::system_account_name, "testram11111"_n, more_ram);
@@ -96,7 +96,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                            ("payer", "testram11111")
                            ("from", 1)
                            ("to", 10)
-                           ("size", 1790 /*1920*/)),
+                           ("size", 1920)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    wlog("ram_tests 2    %%%%%%");
@@ -108,7 +108,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 10)
-                        ("size", 1680/*1810*/));
+                        ("size", 1680));
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(ram_usage - 1000, rlm.get_account_ram_usage("testram11111"_n));
 
@@ -118,7 +118,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                            ("payer", "testram11111")
                            ("from", 1)
                            ("to", 11)
-                           ("size", 1680/*1810*/)),
+                           ("size", 1810)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram11111 has insufficient ram"));
    produce_blocks(1);
@@ -141,7 +141,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 1)
                         ("to", 11)
-                        ("size", 1600/*1720*/));
+                        ("size", 1720));
    produce_blocks(1);
 
    tester->push_action( "testram11111"_n, "rmentry"_n, "testram11111"_n, mvo()
@@ -165,7 +165,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                         ("payer", "testram11111")
                         ("from", 12)
                         ("to", 12)
-                        ("size", 1620/*1720*/));
+                        ("size", 1720));
    produce_blocks(1);
 
    // verify that anoth new entry will exceed the allocation bytes limit, to setup testing of new payer
@@ -206,24 +206,26 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                         ("to", 13)
                         ("size", 1720));
    produce_blocks(1);
-   
+
+   wlog("ram_tests 19    %%%%%%");
    // verify that new entries for testram22222 exceed the allocation bytes limit
    BOOST_REQUIRE_EXCEPTION(
       tester->push_action( "testram11111"_n, "setentry"_n, {"testram11111"_n,"testram22222"_n}, mvo()
                            ("payer", "testram22222")
                            ("from", 12)
                            ("to", 21)
-                           ("size", 1930)),
+                           ("size", 2040)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram22222 has insufficient ram"));
    produce_blocks(1);
 
+   wlog("ram_tests 20    %%%%%%");
    // verify that new entries for testram22222 are under the allocation bytes limit
    tester->push_action( "testram11111"_n, "setentry"_n, {"testram11111"_n,"testram22222"_n}, mvo()
                         ("payer", "testram22222")
                         ("from", 12)
                         ("to", 21)
-                        ("size", 1910));
+                        ("size", 2020));
    produce_blocks(1);
 
    // verify that new entry for testram22222 exceed the allocation bytes limit
@@ -232,7 +234,7 @@ BOOST_FIXTURE_TEST_CASE(ram_tests, sysio_system::sysio_system_tester) { try {
                            ("payer", "testram22222")
                            ("from", 22)
                            ("to", 22)
-                           ("size", 1910)),
+                           ("size", 2020)),
                            ram_usage_exceeded,
                            fc_exception_message_starts_with("account testram22222 has insufficient ram"));
    produce_blocks(1);

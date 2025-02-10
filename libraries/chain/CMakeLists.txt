@@ -51,7 +51,7 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
 
-   option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for EOS VM OC" OFF)
+   option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
 endif()
 
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
@@ -167,7 +167,7 @@ foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
 endforeach()
 
 if(SYSVMOC_ENABLE_DEVELOPER_OPTIONS)
-   message(WARNING "EOS VM OC Developer Options are enabled; these are NOT supported")
+   message(WARNING "SYS VM OC Developer Options are enabled; these are NOT supported")
    target_compile_definitions(sysio_chain PUBLIC SYSIO_SYS_VM_OC_DEVELOPER)
 endif()
 

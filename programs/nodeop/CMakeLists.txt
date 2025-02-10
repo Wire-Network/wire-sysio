@@ -43,7 +43,6 @@ target_link_libraries( ${NODE_EXECUTABLE_NAME}
         PRIVATE sysio_chain_wrap fc ${CMAKE_DL_LIBS} ${PLATFORM_SPECIFIC_LIBS}
         Boost::dll )
 
-
 include(additionalPlugins)
 
 copy_bin( ${NODE_EXECUTABLE_NAME} )

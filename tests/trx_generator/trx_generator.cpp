@@ -122,12 +122,12 @@ namespace sysio::testing {
       if ( !regex_search(file_or_str, r) && std::filesystem::is_regular_file(file_or_str) ) {
          try {
             return fc::json::from_file(file_or_str, ptype);
-         } EOS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", file_or_str));
+         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", file_or_str));
 
       } else {
          try {
             return fc::json::from_string(file_or_str, ptype);
-         } EOS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", file_or_str));
+         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", file_or_str));
       }
    }
 
@@ -211,7 +211,7 @@ namespace sysio::testing {
                            FC_ASSERT(!action_type.empty(), "Unknown action ${action} in contract ${contract}", ("action", action_name)("contract", action_auth_acct));
                            packed_action_data = _abi.variant_to_binary(action_type, action_mvo["actionData"], chain::abi_serializer::create_yield_function(abi_serializer_max_time));
                         }
-                        EOS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Fail to parse unpacked action data JSON")
+                        SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Fail to parse unpacked action data JSON")
 
                         std::vector<sysio::chain::permission_level> auth = {};
                         if (action_mvo["authorization"].get_object().find("actor") != action_mvo["authorization"].get_object().end() &&

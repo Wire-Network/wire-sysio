@@ -1004,7 +1004,7 @@ void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& r
 
 using abi_serializer_cache_t = std::unordered_map<account_name, std::optional<abi_serializer>>;
 using resolver_fn_t = std::function<std::optional<abi_serializer>(const account_name& name)>;
-   
+
 class abi_resolver {
 public:
    explicit abi_resolver(abi_serializer_cache_t&& abi_serializers) :
@@ -1073,7 +1073,7 @@ private:
 };
 
 /*
- * This is equivalent to a resolver, except that everytime the abi_serializer for an account 
+ * This is equivalent to a resolver, except that everytime the abi_serializer for an account
  * is retrieved, it is stored in an unordered_map, so we won't waste time retrieving it again.
  * This is handy when parsing packed_transactions received in a fc::variant.
  */
@@ -1102,13 +1102,13 @@ public:
          dest = abi_serializer_cache_t::mapped_type{std::move(*serializer)};
          return *dest; // and return a reference to it
       }
-      return {}; 
+      return {};
    };
 
 private:
    const resolver_fn_t resolver_;
    mutable abi_serializer_cache_t abi_serializers;
 };
-      
+
 
 } // sysio::chain

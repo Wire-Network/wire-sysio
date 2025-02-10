@@ -159,7 +159,7 @@ public:
    template <typename Protocol>
    void create_listener(const std::string& address) {
       const boost::posix_time::milliseconds accept_timeout(200);
-      using socket_type = typename Protocol::socket; 
+      using socket_type = typename Protocol::socket;
       fc::create_listener<Protocol>(
           thread_pool.get_executor(), _log, accept_timeout, address, "", [this](socket_type&& socket) {
              // Create a session object and run it
@@ -222,7 +222,7 @@ public:
       // avoid accumulating all these posts during replay before ship threads started
       // that can lead to a large memory consumption and failures
       // this is safe as there are no clients connected until after replay is complete
-      // this method is called from the main thread and "plugin_started" is set on the main thread as well when plugin is started 
+      // this method is called from the main thread and "plugin_started" is set on the main thread as well when plugin is started
       if (plugin_started) {
          boost::asio::post(get_ship_executor(), [self = this->shared_from_this(), block_state]() {
             self->get_session_manager().send_update(block_state);
@@ -398,7 +398,7 @@ void state_history_plugin::plugin_initialize(const variables_map& options) {
    handle_sighup(); // setup logging
    my->plugin_initialize(options);
 }
-   
+
 void state_history_plugin_impl::plugin_startup() {
    try {
       const auto& chain = chain_plug->chain();
@@ -427,7 +427,7 @@ void state_history_plugin_impl::plugin_startup() {
          fc_elog( _log, "Exception in SHiP thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
          app().quit();
       });
-      plugin_started = true; 
+      plugin_started = true;
    } catch (std::exception& ex) {
       appbase::app().quit();
    }

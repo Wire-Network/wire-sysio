@@ -367,7 +367,7 @@ namespace sysio { namespace chain {
                const auto& new_protocol_features = std::get<protocol_feature_activation>(exts.lower_bound(protocol_feature_activation::extension_id())->second).protocol_features;
                validator( n->header.timestamp, prev_bh->activated_protocol_features->protocol_features, new_protocol_features );
             }
-         } EOS_RETHROW_EXCEPTIONS( fork_database_exception, "serialized fork database is incompatible with configured protocol features"  )
+         } SYS_RETHROW_EXCEPTIONS( fork_database_exception, "serialized fork database is incompatible with configured protocol features"  )
       }
 
       auto inserted = index.insert(n);

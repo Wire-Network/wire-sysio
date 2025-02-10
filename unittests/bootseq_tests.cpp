@@ -181,7 +181,7 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
 
         // Create sysio.msig and sysio.token
-        create_accounts({"sysio.msig"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
+        create_accounts({"sysio.msig"_n, "sysio.roa"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
         // Set code for the following accounts:
         //  - sysio (code: sysio.bios) (already set by tester constructor)
         //  - sysio.msig (code: sysio.msig)
@@ -192,20 +192,25 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         set_code_abi("sysio.msig"_n,
                      test_contracts::sysio_msig_wasm(),
                      test_contracts::sysio_msig_abi());//, &sysio_active_pk);
+        set_code_abi("sysio.roa"_n,
+                     test_contracts::sysio_roa_wasm(),
+                     test_contracts::sysio_roa_abi());//, &sysio_active_pk);
         set_code_abi("sysio.token"_n,
                      test_contracts::sysio_token_wasm(),
                      test_contracts::sysio_token_abi()); //, &sysio_active_pk);
 
         // Set privileged for sysio.msig and sysio.token
         set_privileged("sysio.msig"_n);
+        set_privileged("sysio.roa"_n);
         set_privileged("sysio.token"_n);
 
         // Verify sysio.msig and sysio.token is privileged
         const auto& sysio_msig_acc = get<account_metadata_object, by_name>("sysio.msig"_n);
         BOOST_TEST(sysio_msig_acc.is_privileged() == true);
+        const auto& sysio_roa_acc = get<account_metadata_object, by_name>("sysio.roa"_n);
+        BOOST_TEST(sysio_roa_acc.is_privileged() == true);
         const auto& sysio_token_acc = get<account_metadata_object, by_name>("sysio.token"_n);
         BOOST_TEST(sysio_token_acc.is_privileged() == true);
-
 
         // Create SYS tokens in sysio.token, set its manager as sysio
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens
@@ -253,7 +258,9 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Vote for producers
         auto votepro = [&]( account_name voter, vector<account_name> producers ) {
           std::sort( producers.begin(), producers.end() );
-          base_tester::push_action(config::system_account_name, "voteproducer"_n, voter, mvo()
+          // special case, b1 voting is done by system account
+          auto actor = (voter == "b1"_n) ? config::system_account_name : voter;
+          base_tester::push_action(config::system_account_name, "voteproducer"_n, actor, mvo()
                                 ("voter",  name(voter))
                                 ("proxy", name(0) )
                                 ("producers", producers)

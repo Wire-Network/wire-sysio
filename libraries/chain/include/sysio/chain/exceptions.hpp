@@ -18,7 +18,7 @@
  * The main difference here is that if the exception caught isn't of type "sysio::chain::chain_exception"
  * This macro will rethrow the exception as the specified "exception_type"
  */
-#define EOS_RETHROW_EXCEPTIONS(exception_type, FORMAT, ... ) \
+#define SYS_RETHROW_EXCEPTIONS(exception_type, FORMAT, ... ) \
    catch( const std::bad_alloc& ) {\
       throw;\
    } catch( const boost::interprocess::bad_alloc& ) {\
@@ -45,7 +45,7 @@
  * The main difference here is that if the exception caught isn't of type "sysio::chain::chain_exception"
  * This macro will rethrow the exception as the specified "exception_type"
  */
-#define EOS_CAPTURE_AND_RETHROW( exception_type, ... ) \
+#define SYS_CAPTURE_AND_RETHROW( exception_type, ... ) \
    catch( const std::bad_alloc& ) {\
       throw;\
    } catch( const boost::interprocess::bad_alloc& ) {\
@@ -107,7 +107,7 @@
       return return_type(e.dynamic_copy_exception());\
    }
 
-#define EOS_RECODE_EXC( cause_type, effect_type ) \
+#define SYS_RECODE_EXC( cause_type, effect_type ) \
    catch( const cause_type& e ) \
    { throw( effect_type( e.what(), e.get_log() ) ); }
 

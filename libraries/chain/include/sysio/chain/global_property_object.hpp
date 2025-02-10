@@ -17,44 +17,6 @@
 namespace sysio { namespace chain {
 
    /**
-    * a fc::raw::unpack compatible version of the old global_property_object structure stored in
-    * version 2 snapshots and before
-    */
-   namespace legacy {
-      struct snapshot_global_property_object_v2 {
-         static constexpr uint32_t minimum_version = 0;
-         static constexpr uint32_t maximum_version = 2;
-         static_assert(chain_snapshot_header::minimum_compatible_version <= maximum_version, "snapshot_global_property_object_v2 is no longer needed");
-
-         std::optional<block_num_type>    proposed_schedule_block_num;
-         producer_schedule_type           proposed_schedule;
-         chain_config_v0                  configuration;
-      };
-      struct snapshot_global_property_object_v3 {
-         static constexpr uint32_t minimum_version = 3;
-         static constexpr uint32_t maximum_version = 3;
-         static_assert(chain_snapshot_header::minimum_compatible_version <= maximum_version, "snapshot_global_property_object_v3 is no longer needed");
-
-         std::optional<block_num_type>       proposed_schedule_block_num;
-         producer_authority_schedule         proposed_schedule;
-         chain_config_v0                     configuration;
-         chain_id_type                       chain_id;
-      };
-      struct snapshot_global_property_object_v4 {
-         static constexpr uint32_t minimum_version = 4;
-         static constexpr uint32_t maximum_version = 4;
-         static_assert(chain_snapshot_header::minimum_compatible_version <= maximum_version, "snapshot_global_property_object_v4 is no longer needed");
-
-         std::optional<block_num_type>       proposed_schedule_block_num;
-         producer_authority_schedule         proposed_schedule;
-         chain_config_v0                     configuration;
-         chain_id_type                       chain_id;
-         kv_database_config                  kv_configuration;
-         wasm_config                         wasm_configuration;
-      };
-   }
-
-   /**
     * @class global_property_object
     * @brief Maintains global state information about block producer schedules and chain configuration parameters
     * @ingroup object
@@ -73,32 +35,6 @@ namespace sysio { namespace chain {
       kv_database_config                  kv_configuration;
       wasm_config                         wasm_configuration;
 
-     void initalize_from( const legacy::snapshot_global_property_object_v2& legacy, const chain_id_type& chain_id_val, const kv_database_config& kv_config_val, const wasm_config& wasm_config_val ) {
-         proposed_schedule_block_num = legacy.proposed_schedule_block_num;
-         proposed_schedule = producer_authority_schedule(legacy.proposed_schedule).to_shared(proposed_schedule.producers.get_allocator());
-         configuration = legacy.configuration;
-         chain_id = chain_id_val;
-         kv_configuration = kv_config_val;
-         wasm_configuration = wasm_config_val;
-      }
-
-      void initalize_from( const legacy::snapshot_global_property_object_v3& legacy, const kv_database_config& kv_config_val, const wasm_config& wasm_config_val ) {
-         proposed_schedule_block_num = legacy.proposed_schedule_block_num;
-         proposed_schedule = legacy.proposed_schedule.to_shared(proposed_schedule.producers.get_allocator());
-         configuration = legacy.configuration;
-         chain_id = legacy.chain_id;
-         kv_configuration = kv_config_val;
-         wasm_configuration = wasm_config_val;
-      }
-
-      void initalize_from( const legacy::snapshot_global_property_object_v4& legacy ) {
-         proposed_schedule_block_num = legacy.proposed_schedule_block_num;
-         proposed_schedule = legacy.proposed_schedule.to_shared(proposed_schedule.producers.get_allocator());
-         configuration = legacy.configuration;
-         chain_id = legacy.chain_id;
-         kv_configuration = legacy.kv_configuration;
-         wasm_configuration = legacy.wasm_configuration;
-      }
    };
 
 
@@ -171,18 +107,6 @@ CHAINBASE_SET_INDEX_TYPE(sysio::chain::dynamic_global_property_object,
                          sysio::chain::dynamic_global_property_multi_index)
 
 FC_REFLECT(sysio::chain::global_property_object,
-            (proposed_schedule_block_num)(proposed_schedule)(configuration)(chain_id)(kv_configuration)(wasm_configuration)
-          )
-
-FC_REFLECT(sysio::chain::legacy::snapshot_global_property_object_v2,
-            (proposed_schedule_block_num)(proposed_schedule)(configuration)
-          )
-
-FC_REFLECT(sysio::chain::legacy::snapshot_global_property_object_v3,
-            (proposed_schedule_block_num)(proposed_schedule)(configuration)(chain_id)
-          )
-
-FC_REFLECT(sysio::chain::legacy::snapshot_global_property_object_v4,
             (proposed_schedule_block_num)(proposed_schedule)(configuration)(chain_id)(kv_configuration)(wasm_configuration)
           )
 

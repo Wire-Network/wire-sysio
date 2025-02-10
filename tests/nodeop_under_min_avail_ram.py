@@ -142,7 +142,7 @@ try:
     #spread the actions to all accounts, to use each accounts tps bandwidth
     fromIndexStart=fromIndex+1 if fromIndex+1<namedAccounts.numAccounts else 0
 
-    # min and max are subjective, just assigned to make sure that many small changes in nodeop don't 
+    # min and max are subjective, just assigned to make sure that many small changes in nodeop don't
     # result in the test not correctly validating behavior
     if count < 12 or count > 24:
         strMsg="little" if count < 25 else "much"

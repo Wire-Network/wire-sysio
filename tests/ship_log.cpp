@@ -10,7 +10,6 @@
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 
-
 namespace bdata = boost::unit_test::data;
 
 struct ship_log_fixture {

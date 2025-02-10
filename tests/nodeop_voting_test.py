@@ -188,7 +188,7 @@ try:
         node=cluster.getNode(i)
         node.producers=Cluster.parseProducers(i)
         for prod in node.producers:
-            trans=nonProdNode.regproducer(cluster.defProducerAccounts[prod], "http::/mysite.com", 0, 
+            trans=nonProdNode.regproducer(cluster.defProducerAccounts[prod], "http::/mysite.com", 0,
                                           waitForTransBlock=True if prod == node.producers[-1] else False,
                                           silentErrors=False if prod == node.producers[-1] else True, exitOnError=True)
 
@@ -202,17 +202,17 @@ try:
     transferAmount="100000000.0000 {0}".format(CORE_SYMBOL)
     for account in accounts:
         Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
-        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0, 
-                                                  waitForTransBlock=True if account == accounts[-1] else False, 
+        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0,
+                                                  waitForTransBlock=True if account == accounts[-1] else False,
                                                   stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
 
     for account in accounts:
         Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
-        nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", 
+        nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer",
                                   waitForTransBlock=True if account == accounts[-1] else False)
 
     for account in accounts:
-        trans=nonProdNode.delegatebw(account, 20000000.0000, 20000000.0000, 
+        trans=nonProdNode.delegatebw(account, 20000000.0000, 20000000.0000,
                                      waitForTransBlock=True if account == accounts[-1] else False, exitOnError=True)
 
     # containers for tracking producers

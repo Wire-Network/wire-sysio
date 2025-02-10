@@ -254,13 +254,13 @@ namespace sysio { namespace chain {
    { try {
       SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.find<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } EOS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
 
    const permission_object&  authorization_manager::get_permission( const permission_level& level )const
    { try {
       SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.get<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } EOS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
 
    std::optional<permission_name> authorization_manager::lookup_linked_permission( account_name authorizer_account,
                                                                                    account_name scope,
@@ -320,6 +320,7 @@ namespace sysio { namespace chain {
       SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
+
       // ** OR statement is custom, added to allow for sysio to add 'auth.ext' and 'auth.session' to users via our custom 'onlinkauth' from system contract.
       SYS_ASSERT( (auth.actor == update.account || auth.actor == name("sysio")), irrelevant_auth_exception,
                   "the owner of the affected permission needs to be the actor of the declared authorization" );

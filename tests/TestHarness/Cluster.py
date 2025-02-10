@@ -55,7 +55,7 @@ class Cluster(object):
     __BiosHost="localhost"
     __BiosPort=8788
     __LauncherCmdArr=[]
-    __bootlog="leap-ignition-wd/bootlog.txt"
+    __bootlog="wire_sysio-ignition-wd/bootlog.txt"
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=8888, walletHost="localhost", walletPort=9899
@@ -243,7 +243,7 @@ class Cluster(object):
             time.sleep(2)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
-              f'-i {datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
+              f'-i {datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
               f'--unstarted-nodes {unstartedNodes} --logging-level {self.loggingLevel} '
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()

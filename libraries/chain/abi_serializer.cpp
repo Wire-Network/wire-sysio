@@ -404,7 +404,7 @@ namespace sysio { namespace chain {
       if( btype != built_in_types.end() ) {
          try {
             return btype->second.first(stream, is_array(rtype), is_optional(rtype), ctx.get_yield_function());
-         } EOS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack ${class} type '${type}' while processing '${p}'",
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack ${class} type '${type}' while processing '${p}'",
                                    ("class", is_array(rtype) ? "array of built-in" : is_optional(rtype) ? "optional of built-in" : "built-in")
                                    ("type", impl::limit_size(ftype))("p", ctx.get_path_string()) )
       }
@@ -413,7 +413,7 @@ namespace sysio { namespace chain {
          fc::unsigned_int size;
          try {
             fc::raw::unpack(stream, size);
-         } EOS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack size of array '${p}'", ("p", ctx.get_path_string()) )
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack size of array '${p}'", ("p", ctx.get_path_string()) )
          vector<fc::variant> vars;
          vars.reserve(std::min(size.value, 1024u)); // limit the maximum size that can be reserved before data is read
          auto h1 = ctx.push_to_path( impl::array_index_path_item{} );
@@ -434,7 +434,7 @@ namespace sysio { namespace chain {
          char flag;
          try {
             fc::raw::unpack(stream, flag);
-         } EOS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '${p}'", ("p", ctx.get_path_string()) )
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '${p}'", ("p", ctx.get_path_string()) )
          return flag ? _binary_to_variant(ftype, stream, ctx) : fc::variant();
       } else {
          auto v_itr = variants.find(rtype);
@@ -443,7 +443,7 @@ namespace sysio { namespace chain {
             fc::unsigned_int select;
             try {
                fc::raw::unpack(stream, select);
-            } EOS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack tag of variant '${p}'", ("p", ctx.get_path_string()) )
+            } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack tag of variant '${p}'", ("p", ctx.get_path_string()) )
             SYS_ASSERT( (size_t)select < v_itr->second.types.size(), unpack_exception,
                         "Unpacked invalid tag (${select}) for variant '${p}'", ("select", select.value)("p",ctx.get_path_string()) );
             auto h1 = ctx.push_to_path( impl::variant_path_item{ .variant_itr = v_itr, .variant_ordinal = static_cast<uint32_t>(select) } );

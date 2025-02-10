@@ -4,7 +4,6 @@
 #include <sysio/chain/protocol_feature_activation.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 
-
 #include <type_traits>
 
 namespace sysio { namespace chain {

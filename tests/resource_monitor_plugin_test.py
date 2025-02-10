@@ -182,13 +182,13 @@ def testAll():
 
     # Only test minimum warning threshold (i.e. 6) to trigger warning as much as possible
     testInterval("Resmon enabled: set warning interval", 
-        "--plugin sysio::resource_monitor_plugin --resource-monitor-space-threshold=6 --resource-monitor-warning-interval=5 --resource-monitor-not-shutdown-on-threshold-exceeded", 
+        "--plugin sysio::resource_monitor_plugin --resource-monitor-space-threshold=6 --resource-monitor-warning-interval=5 --resource-monitor-not-shutdown-on-threshold-exceeded",
         2 * 5, # Default monitor interval is 2 sec
         ["Space usage warning"],
         6)
 
     testInterval("Resmon enabled: default warning interval", 
-        "--plugin sysio::resource_monitor_plugin --resource-monitor-space-threshold=6 --resource-monitor-interval-seconds=1 --resource-monitor-not-shutdown-on-threshold-exceeded", 
+        "--plugin sysio::resource_monitor_plugin --resource-monitor-space-threshold=6 --resource-monitor-interval-seconds=1 --resource-monitor-not-shutdown-on-threshold-exceeded",
         1 * 30, # Default warning interval is 30
         ["Space usage warning"],
         6)
