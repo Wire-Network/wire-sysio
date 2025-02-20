@@ -23,10 +23,9 @@ class Transactions(NodeopQueries):
         retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
         retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
         cmd=(f'{cmdDesc} -j {signStr} {creatorAccount.name} {account.name} \'{account.ownerPublicKey}\' '
-             f'\'{account.activePublicKey}\' --stake-net "{stakeNet} {CORE_SYMBOL}" --stake-cpu '
-             f'"{stakeCPU} {CORE_SYMBOL}" --buy-ram "{buyRAM} {CORE_SYMBOL}" {additionalArgs} {retryStr}')
+             f'\'{account.activePublicKey}\' {additionalArgs} {retryStr}')
         msg="(creator account=%s, account=%s)" % (creatorAccount.name, account.name);
-        trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
         transId=NodeopQueries.getTransId(trans)
 
@@ -48,7 +47,7 @@ class Transactions(NodeopQueries):
         cmd=(f"{cmdDesc} -j {signStr} {creatorAccount.name} {account.name} {account.ownerPublicKey} "
              f"{account.activePublicKey} {retryStr}")
         msg="(creator account=%s, account=%s)" % (creatorAccount.name, account.name);
-        trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
         transId=NodeopQueries.getTransId(trans)
 
@@ -294,7 +293,7 @@ class Transactions(NodeopQueries):
         signStr = NodeopQueries.sign_str(sign, [ account.activePublicKey ])
         cmdDesc="set action permission"
         cmd="%s -j %s %s %s %s %s" % (cmdDesc, signStr, account.name, code.name, pType, requirement)
-        trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)
 
         return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
@@ -311,7 +310,7 @@ class Transactions(NodeopQueries):
         cmd=(f'{cmdDesc} -j {signStr} {fromAccount.name} {toAccount.name} "{netQuantity} {CORE_SYMBOL}" '
              f'"{cpuQuantity} {CORE_SYMBOL}" {transferStr} {retryStr}')
         msg="fromAccount=%s, toAccount=%s" % (fromAccount.name, toAccount.name);
-        trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans, reportStatus=reportStatus)
 
         return trans
@@ -327,7 +326,7 @@ class Transactions(NodeopQueries):
         cmd=(f'{cmdDesc} -j {signStr} {fromAccount.name} {toAccount.name} "{netQuantity} {CORE_SYMBOL}" '
              f'"{cpuQuantity} {CORE_SYMBOL}" {retryStr}')
         msg="fromAccount=%s, toAccount=%s" % (fromAccount.name, toAccount.name);
-        trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
 
         return trans
@@ -339,7 +338,7 @@ class Transactions(NodeopQueries):
         retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
         cmd = f'{cmdDesc} -j {signStr} {producer.name} {producer.activePublicKey} {url} {location} {retryStr}'
         msg = f"producer={producer.name}"
-        trans = self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans = self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
 
         return trans
@@ -351,7 +350,7 @@ class Transactions(NodeopQueries):
         retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
         cmd = f'{cmdDesc} -j {signStr} {account.name} {" ".join(producers)} {retryStr}'
         msg = "account=%s, producers=[ %s ]" % (account.name, ", ".join(producers));
-        trans = self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        trans = self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
 
         return trans

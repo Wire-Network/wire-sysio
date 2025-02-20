@@ -649,7 +649,7 @@ try:
         raise
 
     signCmd = "sign --public-key {0} {1} -p".format(currencyAccount.activePublicKey, unsignedTrxJsonFile)
-    node.processCleosCmd(signCmd, "Sign and push a transaction", False, True)
+    node.processClioCmd(signCmd, "Sign and push a transaction", False, True)
     os.remove(unsignedTrxJsonFile)
 
     testeraAccountAmountAfterSign=node.getAccountEosBalanceStr(testeraAccount.name)

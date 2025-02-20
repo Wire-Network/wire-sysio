@@ -140,7 +140,7 @@ try:
         cmdDesc = "convert pack_transaction"
         cmd     = "%s --pack-action-data '%s'" % (cmdDesc, json.dumps(trx))
         exitMsg = "failed to pack transaction: %s" % (trx)
-        packedTrx = node.processCleosCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True, exitMsg=exitMsg)
+        packedTrx = node.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True, exitMsg=exitMsg)
 
         packed_trx_param = packedTrx["packed_trx"]
         if packed_trx_param is None:

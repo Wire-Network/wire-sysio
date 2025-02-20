@@ -114,7 +114,17 @@ void apply_sysio_newaccount(apply_context& context) {
    const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
                                                                     std::move(create.active), context.trx_context.is_transient() );
 
-   context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
+      context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
+
+      // Determine if this is a system account
+      bool is_system_account = (create.name == config::system_account_name) ||
+                               (name_str.size() > 5 && name_str.find("sysio.") == 0);
+
+      // If it's not a system account, set CPU, NET, RAM to 0
+      if (!is_system_account) {
+         // Non-system accounts start with zero resources
+         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0, context.trx_context.is_transient());
+      }
 
       int64_t ram_delta = config::overhead_per_account_ram_bytes;
       ram_delta += 2 * config::billable_size_v<permission_object>;

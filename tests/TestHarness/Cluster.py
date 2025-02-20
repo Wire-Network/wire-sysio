@@ -1130,7 +1130,7 @@ class Cluster(object):
                 return None
             return trans
 
-        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap']
+        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1393,7 +1393,7 @@ class Cluster(object):
             return True
         transId=None
         for account in self.accounts:
-            ret = self.biosNode.getEosAccount(account.name)
+            ret = self.biosNode.getSysioAccount(account.name)
             if ret is None:
                 if Utils.Debug: Utils.Print("Create account %s." % (account.name))
                 if Utils.Debug: Utils.Print("Validation node %s" % validationNodeIndex)

@@ -141,7 +141,7 @@ def clio_sign_test():
     assert(b'signatures' in output)
     assert(b'"signatures": []' not in output)
 
-def processCleosCommand(cmd):
+def processClioCommand(cmd):
     outs = None
     errs = None
     try:
@@ -166,13 +166,13 @@ def clio_abi_file_test():
     unpacked_action_data = '{"from":"aaa","to":"bbb","quantity":"10.0000 SYS","memo":"hello"}'
     # use URL http://127.0.0.1:12345 to make sure clio not to connect to any running nodeop
     cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', 'convert', 'pack_action_data', account, action, unpacked_action_data]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(b'Failed http request to nodeop' in errs)
 
     # invalid option --abi-file
     invalid_abi_arg = 'sysio.token' + ' ' + token_abi_path
     cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', invalid_abi_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(b'please specify --abi-file in form of <contract name>:<abi file path>.' in errs)
 
     # pack token transfer data
@@ -181,13 +181,13 @@ def clio_abi_file_test():
     unpacked_action_data = '{"from":"aaa","to":"bbb","quantity":"10.0000 SYS","memo":"hello"}'
     packed_action_data = '0000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f'
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', token_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     actual = outs.strip()
     assert(actual.decode('utf-8') == packed_action_data)
 
     # unpack token transfer data
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', token_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(b'"from": "aaa"' in outs)
     assert(b'"to": "bbb"' in outs)
     assert(b'"quantity": "10.0000 SYS"' in outs)
@@ -224,13 +224,13 @@ def clio_abi_file_test():
 
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'pack_action_data', account, action, unpacked_action_data]
     packed_action_data = '0000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf01000000'
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     actual = outs.strip()
     assert(actual.decode('utf-8') == packed_action_data)
 
     # unpack account create data
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, 'convert', 'unpack_action_data', account, action, packed_action_data]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(b'"creator": "sysio"' in outs)
     assert(b'"name": "bob"' in outs)
 
@@ -302,7 +302,7 @@ def clio_abi_file_test():
 
     expected_output = b'3aacf360ee010b864b7e00000000020000000000ea305500409e9a2264b89a010000000000ea305500000000a8ed3232660000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403ea3055000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00'
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'pack_transaction', '--pack-action-data', unpacked_trx]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(expected_output in outs)
 
     # unpack transaction
@@ -315,7 +315,7 @@ def clio_abi_file_test():
         "packed_trx": "3aacf360ee010b864b7e00000000020000000000ea305500409e9a2264b89a010000000000ea305500000000a8ed3232660000000000ea30550000000000000e3d01000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000001000000010002c0ded2bc1f1305fb0faac5e6c03ee3a1924234985427b6167ca569d13df435cf0100000000a6823403ea3055000000572d3ccdcd010000000000008c3100000000a8ed3232260000000000008c31000000000000ce39a08601000000000004535953000000000568656c6c6f00"
     }"""
     cmd = ['./programs/clio/clio', '-u','http://127.0.0.1:12345', '--abi-file', system_abi_file_arg, token_abi_file_arg, 'convert', 'unpack_transaction', '--unpack-action-data', packed_trx]
-    outs, errs = processCleosCommand(cmd)
+    outs, errs = processClioCommand(cmd)
     assert(b'"creator": "sysio"' in outs)
     assert(b'"name": "bob"' in outs)
 
@@ -382,7 +382,7 @@ def abi_file_with_nodeop_test():
 
         node.transferFunds(accounts[1], accounts[2], '100.0000 SYS')
 
-        node.processCleosCmd('set abi sysio.token ' + malicious_token_abi_path, 'set malicious sysio.token abi', returnType=ReturnType.raw)
+        node.processClioCmd('set abi sysio.token ' + malicious_token_abi_path, 'set malicious sysio.token abi', returnType=ReturnType.raw)
 
         cmdArr = node.transferFundsCmdArr(accounts[2], accounts[3], '25.0000 SYS', 'm', False, None, False, False, 90, False)
         cmdArr.insert(6, '--print-request')

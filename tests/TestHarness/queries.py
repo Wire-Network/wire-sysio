@@ -203,7 +203,7 @@ class NodeopQueries:
         cmdDesc="get block"
         cmd="%s %d" % (cmdDesc, blockNum)
         msg="(block number=%s)" % (blockNum);
-        return self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
 
     def isBlockPresent(self, blockNum, blockType=BlockType.head):
         """Does node have head_block_num/last_irreversible_block_num >= blockNum"""
@@ -246,7 +246,7 @@ class NodeopQueries:
         cmd="%s %s" % (cmdDesc, transId)
         msg="(transaction id=%s)" % (transId);
         for i in range(0,(int(60/timeout) - 1)):
-            trans=self.processCleosCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg)
+            trans=self.processClioCmd(cmd, cmdDesc, silentErrors=True, exitOnError=exitOnErrorForDelayed, exitMsg=msg)
             if trans is not None or not delayedRetry:
                 return trans
             if Utils.Debug: Utils.Print("Could not find transaction with id %s, delay and retry" % (transId))
@@ -254,7 +254,7 @@ class NodeopQueries:
 
         self.missingTransaction=True
         # either it is there or the transaction has timed out
-        return self.processCleosCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
 
     def isTransInBlock(self, transId, blockId):
         """Check if transId is within block identified by blockId"""
@@ -337,19 +337,19 @@ class NodeopQueries:
         assert(isinstance(blockNum, int))
         return self.isBlockPresent(blockNum, blockType=BlockType.lib)
 
-    def getEosAccount(self, name, exitOnError=False, returnType=ReturnType.json):
+    def getSysioAccount(self, name, exitOnError=False, returnType=ReturnType.json):
         assert(isinstance(name, str))
         cmdDesc="get account"
         jsonFlag="-j" if returnType==ReturnType.json else ""
         cmd="%s %s %s" % (cmdDesc, jsonFlag, name)
-        msg="( getEosAccount(name=%s) )" % (name);
-        return self.processCleosCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError, exitMsg=msg, returnType=returnType)
+        msg="( getSysioAccount(name=%s) )" % (name);
+        return self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError, exitMsg=msg, returnType=returnType)
 
     def getTable(self, contract, scope, table, exitOnError=False):
         cmdDesc = "get table"
         cmd=f"{cmdDesc} {self.clioLimit} {contract} {scope} {table}"
         msg=f"contract={contract}, scope={scope}, table={table}"
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
     def getTableAccountBalance(self, contract, scope):
         assert(isinstance(contract, str))
@@ -373,7 +373,7 @@ class NodeopQueries:
         cmdDesc = "get currency balance"
         cmd="%s %s %s %s" % (cmdDesc, contract, account, symbol)
         msg="contract=%s, account=%s, symbol=%s" % (contract, account, symbol);
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg, returnType=ReturnType.raw)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg, returnType=ReturnType.raw)
 
     def getCurrencyStats(self, contract, symbol=CORE_SYMBOL, exitOnError=False):
         """returns Json output from get currency stats."""
@@ -384,12 +384,12 @@ class NodeopQueries:
         cmdDesc = "get currency stats"
         cmd="%s %s %s" % (cmdDesc, contract, symbol)
         msg="contract=%s, symbol=%s" % (contract, symbol);
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
     # Verifies account. Returns "get account" json return object
     def verifyAccount(self, account):
         assert(account)
-        ret = self.getEosAccount(account.name)
+        ret = self.getSysioAccount(account.name)
         if ret is not None:
             account_name = ret["account_name"]
             if account_name is None:
@@ -399,7 +399,7 @@ class NodeopQueries:
 
     def verifyAccountMdb(self, account):
         assert(account)
-        ret=self.getEosAccountFromDb(account.name)
+        ret=self.getSysioAccountFromDb(account.name)
         if ret is not None:
             account_name=ret["name"]
             if account_name is None:
@@ -455,7 +455,7 @@ class NodeopQueries:
 
     # Gets subjective bill info for an account
     def getAccountSubjectiveInfo(self, account):
-        acct = self.getEosAccount(account)
+        acct = self.getSysioAccount(account)
         return acct["subjective_cpu_bill_limit"]
 
     # Gets accounts mapped to key. Returns json object
@@ -463,7 +463,7 @@ class NodeopQueries:
         cmdDesc = "get accounts"
         cmd="%s %s" % (cmdDesc, key)
         msg="key=%s" % (key);
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
     # Get actions mapped to an account (clio get actions)
     def getActions(self, account, pos=-1, offset=-1, exitOnError=False):
@@ -474,7 +474,7 @@ class NodeopQueries:
         cmdDesc = "get actions"
         cmd = "%s -j %s %d %d" % (cmdDesc, account.name, pos, offset)
         msg = "account=%s, pos=%d, offset=%d" % (account.name, pos, offset);
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
     # Gets accounts mapped to key. Returns array
     def getAccountsArrByKey(self, key):
@@ -488,7 +488,7 @@ class NodeopQueries:
         cmdDesc = "get servants"
         cmd="%s %s" % (cmdDesc, name)
         msg="name=%s" % (name);
-        return self.processCleosCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
+        return self.processClioCmd(cmd, cmdDesc, exitOnError=exitOnError, exitMsg=msg)
 
     def getServantsArr(self, name):
         trans=self.getServants(name, exitOnError=True)
@@ -556,7 +556,7 @@ class NodeopQueries:
         keys=list(row.keys())
         return keys
 
-    def processCleosCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):
+    def processClioCmd(self, cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):
         assert(isinstance(returnType, ReturnType))
         cmd="%s %s %s" % (Utils.EosClientPath, self.eosClientArgs(), cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
@@ -662,7 +662,7 @@ class NodeopQueries:
 
     def getInfo(self, silentErrors=False, exitOnError=False):
         cmdDesc = "get info"
-        info=self.processCleosCmd(cmdDesc, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError)
+        info=self.processClioCmd(cmdDesc, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError)
         if info is None:
             self.infoValid=False
         else:
@@ -674,7 +674,7 @@ class NodeopQueries:
 
     def getTransactionStatus(self, transId, silentErrors=False, exitOnError=True):
         cmdDesc = f"get transaction-status {transId}"
-        status=self.processCleosCmd(cmdDesc, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError)
+        status=self.processClioCmd(cmdDesc, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError)
         return status
 
     def checkPulse(self, exitOnError=False):
@@ -773,7 +773,7 @@ class NodeopQueries:
     def getLatestBlockHeaderState(self):
         headBlockNum = self.getHeadBlockNum()
         cmdDesc = "get block {} --header-state".format(headBlockNum)
-        latestBlockHeaderState = self.processCleosCmd(cmdDesc, cmdDesc)
+        latestBlockHeaderState = self.processClioCmd(cmdDesc, cmdDesc)
         return latestBlockHeaderState
 
     def getActivatedProtocolFeatures(self):

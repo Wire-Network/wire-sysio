@@ -598,6 +598,46 @@ namespace sysio { namespace testing {
       return push_transaction( trx );
    }
 
+   transaction_trace_ptr base_tester::register_node_owner(account_name owner, uint32_t tier) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
+
+      trx.actions.emplace_back(get_action(config::roa_account_name, "regnodeowner"_n,
+                                          vector<permission_level>{{config::roa_account_name, config::active_name}},
+                                          mutable_variant_object()
+                                          ("owner", owner)
+                                          ("tier", tier)
+      ));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::roa_account_name, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   transaction_trace_ptr base_tester::add_roa_policy(account_name owner, account_name issuer, string net_weight,
+                                                     string cpu_weight, string ram_weight, int64_t network_gen,
+                                                     uint32_t time_block) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back(get_action("sysio.roa"_n, "addpolicy"_n,
+                                          vector<permission_level>{{issuer, config::active_name}},
+                                          fc::mutable_variant_object
+                                          ("owner", owner)
+                                          ("issuer", issuer)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
+                                          ("time_block", time_block)
+      ));
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(issuer, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
    transaction_trace_ptr base_tester::push_transaction( packed_transaction& trx,
                                                         fc::time_point deadline,
                                                         uint32_t billed_cpu_time_us

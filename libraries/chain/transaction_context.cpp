@@ -463,7 +463,8 @@ namespace sysio { namespace chain {
          rl.add_pending_ram_usage(contract_account, total_ram_used);
          rl.verify_account_ram_usage(contract_account);
          rl.add_transaction_usage({contract_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
-                                block_timestamp_type(control.pending_block_time()).slot, is_transient() ); } else {
+                                block_timestamp_type(control.pending_block_time()).slot, is_transient() );
+      } else {
          // Contract cannot pay. Attempt to fallback to the user if distinct.
          if (user_account == contract_account) {
             // No distinct user found, fail the transaction

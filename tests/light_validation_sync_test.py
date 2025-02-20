@@ -65,7 +65,7 @@ try:
     } 
 
     cmd = "push transaction '{}' -p payloadless".format(json.dumps(trx))
-    trans = producerNode.processCleosCmd(cmd, cmd, silentErrors=False)
+    trans = producerNode.processClioCmd(cmd, cmd, silentErrors=False)
     assert trans, "Failed to push transaction with context free data"
     
     cfTrxBlockNum = int(trans["processed"]["block_num"])
@@ -78,12 +78,12 @@ try:
     
     Utils.Print("verify the account payloadless from validation node")
     cmd = "get account -j payloadless"
-    trans = validationNode.processCleosCmd(cmd, cmd, silentErrors=False)
+    trans = validationNode.processClioCmd(cmd, cmd, silentErrors=False)
     assert trans["account_name"], "Failed to get the account payloadless"
 
     Utils.Print("verify the context free transaction from validation node")
     cmd = "get transaction_trace " + cfTrxId
-    trans = validationNode.processCleosCmd(cmd, cmd, silentErrors=False)
+    trans = validationNode.processClioCmd(cmd, cmd, silentErrors=False)
     assert trans, "Failed to get the transaction with context free data from the light validation node"
 
     testSuccessful = True

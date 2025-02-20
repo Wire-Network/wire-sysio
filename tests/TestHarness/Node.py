@@ -139,7 +139,7 @@ class Node(Transactions):
             assert(account)
             assert(isinstance(account, Account))
             if Utils.Debug: Utils.Print("Validating account %s" % (account.name))
-            accountInfo=self.getEosAccount(account.name, exitOnError=True)
+            accountInfo=self.getSysioAccount(account.name, exitOnError=True)
             try:
                 assert(accountInfo["account_name"] == account.name)
             except (AssertionError, TypeError, KeyError) as _:

@@ -372,7 +372,7 @@ class PerformanceTestBasic:
                     self.accountPrivKeys.append(self.clusterConfig.specifiedContract.account.ownerPrivateKey)
                     self.accountPrivKeys.append(self.clusterConfig.specifiedContract.account.activePrivateKey)
                 else:
-                    ret = self.cluster.biosNode.getEosAccount(name)
+                    ret = self.cluster.biosNode.getSysioAccount(name)
                     if ret is None:
                         newAccountNames.append(name)
             self.cluster.populateWallet(accountsCount=len(newAccountNames), wallet=self.wallet, accountNames=newAccountNames)

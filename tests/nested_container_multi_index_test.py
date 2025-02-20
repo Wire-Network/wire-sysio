@@ -238,7 +238,7 @@ try:
 
     cmd="get table %s %s people2" % (MIacct.name, MIacct.name)   
 
-    transaction = node.processCleosCmd(cmd, cmd, False, returnType=ReturnType.raw)
+    transaction = node.processClioCmd(cmd, cmd, False, returnType=ReturnType.raw)
     transaction_json = json.loads(transaction)
 
     assert "[[3], [10], [400, 500, 600]]" == str(transaction_json['rows'][0]['stst']), \
