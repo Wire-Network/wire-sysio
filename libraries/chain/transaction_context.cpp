@@ -515,7 +515,23 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::check_net_usage()const {
-      // This pre-check was checking the wrong resource limits and, if needed, must be updated for ROA policy awareness.
+      if (!control.skip_trx_checks()) {
+         if( BOOST_UNLIKELY(net_usage > eager_net_limit) ) {
+            if ( net_limit_due_to_block ) {
+               SYS_THROW( block_net_usage_exceeded,
+                          "not enough space left in block: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            }  else if (net_limit_due_to_greylist) {
+               SYS_THROW( greylist_net_usage_exceeded,
+                          "greylisted transaction net usage is too high: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            } else {
+               SYS_THROW( tx_net_usage_exceeded,
+                          "transaction net usage is too high: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            }
+         }
+      }
    }
 
    std::string transaction_context::get_tx_cpu_usage_exceeded_reason_msg(fc::microseconds& limit) const {
