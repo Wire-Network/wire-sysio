@@ -2,6 +2,7 @@ file(GLOB HEADERS "include/sysio/producer_plugin/*.hpp")
 
 add_library( producer_plugin
              producer_plugin.cpp
+             block_s_root_processing.cpp
              ${HEADERS}
            )
 
