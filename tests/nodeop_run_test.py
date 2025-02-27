@@ -201,6 +201,10 @@ try:
     Print("Validating accounts before user accounts creation")
     cluster.validateAccounts(None)
 
+    # Make pefproducera privileged so they can create accounts
+    Print("Set privileged for account %s" % (cluster.defproduceraAccount.name))
+    transId=node.setPriv(cluster.defproduceraAccount, cluster.sysioAccount, waitForTransBlock=True, exitOnError=True)
+
     Print("Create new account %s via %s" % (testeraAccount.name, cluster.defproduceraAccount.name))
     transId=node.createInitializeAccount(testeraAccount, cluster.defproduceraAccount, stakedDeposit=0, waitForTransBlock=True, exitOnError=True)
 

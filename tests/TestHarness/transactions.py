@@ -298,6 +298,18 @@ class Transactions(NodeopQueries):
 
         return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
 
+    def setPriv(self, account, grantingAccount, isPriv=True, waitForTransBlock=False, exitOnError=False, sign=False):
+        assert(isinstance(account, Account))
+        assert(isinstance(grantingAccount, Account))
+        signStr = NodeopQueries.sign_str(sign, [ grantingAccount.activePublicKey ])
+        cmdDesc="push action"
+        argsStr = "{" + f'"account":"{account.name}", "is_priv":{1 if isPriv else 0}' + "}"
+        cmd=f"{cmdDesc} -j {signStr} sysio setpriv '{argsStr}' -p {grantingAccount.name}@active"
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
+        self.trackCmdTransaction(trans)
+
+        return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
+
     def delegatebw(self, fromAccount, netQuantity, cpuQuantity, toAccount=None, transferTo=False, waitForTransBlock=False, silentErrors=True, exitOnError=False, reportStatus=True, sign=False, retry_num_blocks=None):
         if toAccount is None:
             toAccount=fromAccount
