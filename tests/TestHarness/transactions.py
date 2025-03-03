@@ -17,7 +17,7 @@ class Transactions(NodeopQueries):
         super().__init__(host, port, walletMgr)
 
     # Create & initialize account and return creation transactions. Return transaction json object
-    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, silentErrors=False, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False, sign=False, additionalArgs='', retry_num_blocks=None):
+    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, silentErrors=False, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False, sign=False, additionalArgs='', retry_num_blocks=None):
         signStr = NodeopQueries.sign_str(sign, [ creatorAccount.activePublicKey ])
         cmdDesc="system newaccount"
         retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
@@ -33,6 +33,14 @@ class Transactions(NodeopQueries):
             if not waitForTransBlock: # Wait for account creation to be finalized if we haven't already
                 self.waitForTransactionInBlock(transId)
             trans = self.transferFunds(creatorAccount, account, NodeopQueries.currencyIntToStr(stakedDeposit, CORE_SYMBOL), "init", waitForTransBlock=waitForTransBlock)
+            transId=NodeopQueries.getTransId(trans)
+
+        if stakeNet > 0 or stakeCPU > 0 or buyRAM > 0:
+            if not nodeOwner:
+                nodeOwner = creatorAccount
+            if not waitForTransBlock:
+                self.waitForTransactionInBlock(transId)
+            trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM)
             transId=NodeopQueries.getTransId(trans)
 
         return trans
@@ -305,6 +313,19 @@ class Transactions(NodeopQueries):
         cmdDesc="push action"
         argsStr = "{" + f'"account":"{account.name}", "is_priv":{1 if isPriv else 0}' + "}"
         cmd=f"{cmdDesc} -j {signStr} sysio setpriv '{argsStr}' -p {grantingAccount.name}@active"
+        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
+        self.trackCmdTransaction(trans)
+
+        return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
+
+    def addRoaPolicy(self, issuer, owner, net=0, cpu=0, ram=0, waitForTransBlock=False, exitOnError=false, sign=False):
+        assert(isinstance(owner, Account))
+        assert(isinstance(issuer, Account))
+        signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
+        cmdDesc="push action"
+        time_block = self.getHeadBlockNum()
+        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":{net}", "cpu_weight":{cpu}, "ram_weight":{ram}, "time_block":"{time_block}", network_gen:0' + "}"
+        cmd = f"{cmdDesc} -j {signStr} sysio.roa addpolicy -p {owner.name}@active"
         trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)
 

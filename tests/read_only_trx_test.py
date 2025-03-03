@@ -169,12 +169,12 @@ def deployTestContracts():
     testAccount = Account(testAccountName)
     testAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     testAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(testAccount, cluster.sysioAccount, buyRAM=500000) # 95632 bytes required for test contract
+    cluster.createAccountAndVerify(testAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=500000) # 95632 bytes required for test contract
 
     userAccount = Account(userAccountName)
     userAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     userAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(userAccount, cluster.sysioAccount, stakeCPU=2000)
+    cluster.createAccountAndVerify(userAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakeCPU=2000)
 
     noAuthTableContractDir="unittests/test-contracts/no_auth_table"
     noAuthTableWasmFile="no_auth_table.wasm"
@@ -186,7 +186,7 @@ def deployTestContracts():
     payloadlessAccount = Account(payloadlessAccountName)
     payloadlessAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     payloadlessAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(payloadlessAccount, cluster.sysioAccount, buyRAM=100000)
+    cluster.createAccountAndVerify(payloadlessAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
     payloadlessContractDir="unittests/test-contracts/payloadless"
     payloadlessWasmFile="payloadless.wasm"
     payloadlessAbiFile="payloadless.abi"

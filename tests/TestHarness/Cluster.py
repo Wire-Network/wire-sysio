@@ -98,6 +98,7 @@ class Cluster(object):
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]= Account("defproducera")
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]= Account("defproducerb")
         self.sysioAccount=self.defProducerAccounts["sysio"]= Account("sysio")
+        self.carlAccount=None
 
         self.defproduceraAccount.ownerPrivateKey=defproduceraPrvtKey
         self.defproduceraAccount.activePrivateKey=defproduceraPrvtKey
@@ -879,11 +880,11 @@ class Cluster(object):
 
         node.validateAccounts(myAccounts)
 
-    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
+    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
         """create account, verify account and return transaction id"""
         node=self.nodes[validationNodeIndex]
         waitViaRetry =  self.totalNodesCount > self.productionNodesCount
-        trans=node.createInitializeAccount(account, creator, stakedDeposit, waitForTransBlock=waitViaRetry, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM, exitOnError=True)
+        trans=node.createInitializeAccount(account, creator, stakedDeposit, waitForTransBlock=waitViaRetry, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM, exitOnError=True)
         if not waitViaRetry:
             node.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
         assert(node.verifyAccount(account))
@@ -902,10 +903,10 @@ class Cluster(object):
     #         return transId
     #     return None
 
-    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
+    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
         assert(len(self.nodes) > 0)
         node=self.nodes[0]
-        trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
+        trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
         return trans
 
     @staticmethod
@@ -1130,7 +1131,7 @@ class Cluster(object):
                 return None
             return trans
 
-        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa']
+        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1226,6 +1227,39 @@ class Cluster(object):
         if not biosNode.waitForTransactionInBlock(transId):
             Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
             return None
+
+        sysioRoaAccount = copy.deepcopy(sysioAccount)
+        sysioRoaAccount.name = 'sysio.roa'
+        contract="sysio.roa"
+        contractDir=str(self.unittestsContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioRoaAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioRoaAccount, sysioAccount, isPriv=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.roa as privileged")
+            return None
+
+        Utils.Print("Activate ROA")
+        action="activateroa"
+        data="{\"total_sys\":\"75496.0000 SYS\",\"bytes_per_unit\":\"104\"}"
+        opts="--permission %s" % (sysioRoaAccount.name)
+        trans=biosNode.pushMessage(sysioRoaAccount.name, action, data, opts)
+        transId=Node.getTransId(trans[1])
+        Utils.Print("Wait for system init transaction to be in a block.")
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to validate transaction %s in block on server port %d." % (transId, biosNode.port))
+            return None
+
+        # Register carl as a tier 1 node owner
+        self.carlAccount = copy.deepcopy(sysioAccount)
+        self.carlAccount.name = 'carl'
+        biosNode.pushMessage('sysio.roa', 'regnodeowner', '{"owner": carl, "tier": 1}', '-p sysio.roa')
 
         # Only call init if the system contract is loaded
         if loadSystemContract:
