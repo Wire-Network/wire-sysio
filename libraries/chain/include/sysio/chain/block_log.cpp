@@ -1,4 +1,3 @@
-#include <eosio/chain/block_log.hpp>
 #include <eosio/chain/block_header_state.hpp>
 #include <eosio/chain/block_log_config.hpp>
 #include <eosio/chain/exceptions.hpp>
@@ -22,66 +21,51 @@ namespace sysio { namespace chain {
                                             ///< this is in the form of an first_block_num that is written immediately after the version
       genesis_state_or_chain_id_version = 3 ///< improvement on version 2 to not require the genesis state be provided when not starting from block 1
    };
-   block_log<signed_block> bl_sb_b{std::filesystem::path{"./"}, basic_blocklog_config{}};
-   block_log<signed_block> bl_sb_e{std::filesystem::path{"./"}, empty_blocklog_config{}};
-   block_log<signed_block> bl_sb_part{std::filesystem::path{"./"}, partitioned_blocklog_config{}};
-   block_log<signed_block> bl_sb_prune{std::filesystem::path{"./"}, prune_blocklog_config{}};
 
-   block_log<block_header_state> bl_bhs_b{std::filesystem::path{"./"}, basic_blocklog_config{}};
-   block_log<block_header_state> bl_bhs_e{std::filesystem::path{"./"}, empty_blocklog_config{}};
-   block_log<block_header_state> bl_bhs_part{std::filesystem::path{"./"}, partitioned_blocklog_config{}};
-   block_log<block_header_state> bl_bhs_prune{std::filesystem::path{"./"}, prune_blocklog_config{}};
-/*
-namespace REMOVE {
-   uint64_t get_npos() {
-      return std::numeric_limits<uint64_t>::max();
-   }   
-}
-*/
    template<typename StoredType>
    constexpr uint32_t block_log<StoredType>::min_supported_version = initial_version;
    template<typename StoredType>
    constexpr uint32_t block_log<StoredType>::max_supported_version = genesis_state_or_chain_id_version;
 
    template<typename StoredType>
-   std::string filename_prefix();
+   inline std::string filename_prefix();
    template<>
-   std::string filename_prefix<signed_block>() { return std::string("blocks"); }
+   inline std::string filename_prefix<signed_block>() { return std::string("blocks"); }
    template<>
-   std::string filename_prefix<block_header_state>() { return std::string("block_state"); }
+   inline std::string filename_prefix<block_header_state>() { return std::string("block_state"); }
 
    template<typename StoredType>
-   std::string log_filename();
+   inline std::string log_filename();
    template<>
-   std::string log_filename<signed_block>() { return std::string("blocks.log"); }
+   inline std::string log_filename<signed_block>() { return std::string("blocks.log"); }
    template<>
-   std::string log_filename<block_header_state>() { return std::string("block_state.log"); }
+   inline std::string log_filename<block_header_state>() { return std::string("block_state.log"); }
 
    template<typename StoredType>
-   std::string index_filename();
+   inline std::string index_filename();
    template<>
-   std::string index_filename<signed_block>() { return std::string("blocks.index"); }
+   inline std::string index_filename<signed_block>() { return std::string("blocks.index"); }
    template<>
-   std::string index_filename<block_header_state>() { return std::string("block_state.index"); }
+   inline std::string index_filename<block_header_state>() { return std::string("block_state.index"); }
 
    namespace detail {
       constexpr uint32_t pruned_version_flag = 1 << 31;
   
-      block_id_type retrieve_id(const signed_block& b) { return b.calculate_id(); }
-      block_id_type retrieve_id(const block_header_state& b) { return b.id; }
+      inline block_id_type retrieve_id(const signed_block& b) { return b.calculate_id(); }
+      inline block_id_type retrieve_id(const block_header_state& b) { return b.id; }
 
-      uint32_t retrieve_block_num(const signed_block& b) { return b.block_num(); }
-      uint32_t retrieve_block_num(const block_header_state& b) { return b.block_num; }
+      inline uint32_t retrieve_block_num(const signed_block& b) { return b.block_num(); }
+      inline uint32_t retrieve_block_num(const block_header_state& b) { return b.block_num; }
 
-      signed_block_header retrieve_header(const signed_block& b) { return b; }
-      signed_block_header retrieve_header(const block_header_state& b) { return b.header; }
+      inline signed_block_header retrieve_header(const signed_block& b) { return b; }
+      inline signed_block_header retrieve_header(const block_header_state& b) { return b.header; }
       
       static const uint64_t npos = std::numeric_limits<uint64_t>::max();
 //      static const uint64_t npos = REMOVE::get_npos();
   }
 
    // copy up to n bytes from src to dest
-   void copy_file_content(fc::cfile& src, fc::cfile& dest, uint64_t n) {
+   inline void copy_file_content(fc::cfile& src, fc::cfile& dest, uint64_t n) {
       // calculate the number of bytes remaining in the src file can be copied
       auto current_pos = src.tellp();
       src.seek_end(0);
@@ -633,7 +617,7 @@ namespace REMOVE {
             // convert from  pruned block log to non-pruned if necessary
             if (preamble.is_currently_pruned()) {
                block_file.open(fc::cfile::update_rw_mode);
-               block_log_impl<stored_type>::update_head(block_log_impl<stored_type>::read_head());
+               this->update_head(this->read_head());
                if (this->head) {
                   index_file.open(fc::cfile::update_rw_mode);
                   vacuum(first_block_num_from_pruned_log(), preamble.first_block_num);
@@ -673,7 +657,7 @@ namespace REMOVE {
                block_file.write((char*)&pos, sizeof(pos));
                index_file.write((char*)&pos, sizeof(pos));
                index_file.flush();
-               block_log_impl<stored_type>::update_head(b, id);
+               this->update_head(b, id);
 
                post_append(pos);
                block_file.flush();
@@ -793,7 +777,7 @@ namespace REMOVE {
             if (!index_file.is_open())
                index_file.open(fc::cfile::update_rw_mode);
             if (log_size && !this->head)
-               block_log_impl<stored_type>::update_head(block_log_impl<stored_type>::read_head());
+               this->update_head(this->read_head());
          }
 
          uint64_t first_block_num_from_pruned_log() {
@@ -1052,7 +1036,7 @@ namespace REMOVE {
 
             if (log_size == 0 && !catalog.empty()) {
                basic_block_log<stored_type>::reset(catalog.verifier.chain_id, catalog.last_block_num() + 1);
-               block_log_impl<stored_type>::update_head(block_log_impl<stored_type>::read_block_by_num(catalog.last_block_num()));
+               this->update_head(this->read_block_by_num(catalog.last_block_num()));
             } else {
                EOS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == this->preamble.chain_id(),
                           block_log_exception, "block log file ${path} has a different chain id",
@@ -1177,7 +1161,7 @@ namespace REMOVE {
             // convert from  non-pruned block log to pruned if necessary
             if (!this->preamble.is_currently_pruned()) {
                this->block_file.open(fc::cfile::update_rw_mode);
-               block_log_impl<stored_type>::update_head(block_log_impl<stored_type>::read_head());
+               this->update_head(this->read_head());
                first_block_number = this->preamble.first_block_num;
                // need to convert non-pruned log to pruned log. prune any blocks to start with
                uint32_t num_blocks_in_log = this->prune(fc::log_level::info);
@@ -1203,7 +1187,7 @@ namespace REMOVE {
                   basic_block_log<StoredType>::vacuum(first_block_number, this->preamble.first_block_num);
                   first_block_number = this->preamble.first_block_num;
                } else {
-                  const size_t first_data_pos = block_log_impl<stored_type>::get_block_pos(first_block_number);
+                  const size_t first_data_pos = this->get_block_pos(first_block_number);
                   this->block_file.seek_end(-sizeof(uint32_t));
                   const size_t last_data_pos = this->block_file.tellp();
                   if (last_data_pos - first_data_pos < prune_config.vacuum_on_close) {
@@ -1256,7 +1240,7 @@ namespace REMOVE {
                   sizeof(uint32_t) + sizeof(uint32_t) + sizeof(chain_id_type) + sizeof(uint64_t);
             const auto max_header_size = std::max(max_header_size_v1, max_header_size_v23);
 
-            this->block_file.punch_hole(max_header_size, block_log_impl<stored_type>::get_block_pos(prune_to_num));
+            this->block_file.punch_hole(max_header_size, this->get_block_pos(prune_to_num));
 
             first_block_number = prune_to_num;
             this->block_file.flush();
@@ -1741,7 +1725,7 @@ namespace REMOVE {
    std::pair<std::filesystem::path, std::filesystem::path> blocklog_files(const std::filesystem::path& dir, uint32_t start_block_num, uint32_t num_blocks) {
       const int bufsize = 64;
       char      buf[bufsize];
-      snprintf(buf, bufsize, "%s-%u-%u.log", filename_prefix<StoredType>(), start_block_num, start_block_num + num_blocks - 1);
+      snprintf(buf, bufsize, "%s-%u-%u.log", filename_prefix<StoredType>().c_str(), start_block_num, start_block_num + num_blocks - 1);
       std::filesystem::path new_block_filename = dir / buf;
       std::filesystem::path new_index_filename(new_block_filename);
       new_index_filename.replace_extension(".index");
@@ -1801,7 +1785,7 @@ namespace REMOVE {
       std::filesystem::rename(src_dir / (index_filename<StoredType>()), new_index_filename);
    }
 
-   uint32_t get_blocklog_version(const std::filesystem::path& blocklog_file) {
+   inline uint32_t get_blocklog_version(const std::filesystem::path& blocklog_file) {
       uint32_t  version;
       fc::cfile f;
       f.set_file_path(blocklog_file.generic_string());

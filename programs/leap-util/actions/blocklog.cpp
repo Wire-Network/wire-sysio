@@ -128,7 +128,7 @@ void blocklog_actions::initialize() {
 
       //if the log is pruned, keep it that way by passing in a config with a large block pruning value. There is otherwise no
       // way to tell block_log "keep the current non/pruneness of the log"
-      if(block_log::is_pruned_log(opt->blocks_dir))
+      if(block_log<signed_block>::is_pruned_log(opt->blocks_dir))
          opt->blog_conf = prune_blocklog_config { .prune_blocks = UINT32_MAX };
    }
    FC_LOG_AND_RETHROW()
@@ -143,7 +143,7 @@ int blocklog_actions::make_index() {
    report_time rt("making index");
    const auto log_level = fc::logger::get(DEFAULT_LOGGER).get_log_level();
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
-   block_log::construct_index(block_file.generic_string(), out_file.generic_string());
+   block_log<signed_block>::construct_index(block_file.generic_string(), out_file.generic_string());
    fc::logger::get(DEFAULT_LOGGER).set_log_level(log_level);
    rt.report();
 
@@ -168,7 +168,7 @@ int blocklog_actions::extract_blocks() {
 int blocklog_actions::do_genesis() {
    std::filesystem::path bld = opt->blocks_dir;
 
-   auto context = block_log::extract_chain_context(opt->blocks_dir,opt->blocks_dir);
+   auto context = block_log<signed_block>::extract_chain_context(opt->blocks_dir,opt->blocks_dir);
    
    if (!context) {
       std::cerr << "No blocks log found at '" << opt->blocks_dir.c_str() << "'." << std::endl;
@@ -205,22 +205,22 @@ int blocklog_actions::do_genesis() {
 int blocklog_actions::trim_blocklog_end(std::filesystem::path block_dir, uint32_t n) {//n is last block to keep (remove later blocks)
    report_time rt("trimming blocklog end");
    using namespace std;
-   int ret = block_log::trim_blocklog_end(block_dir, n);
+   int ret = block_log<signed_block>::trim_blocklog_end(block_dir, n);
    rt.report();
    return ret;
 }
 
 bool blocklog_actions::trim_blocklog_front(std::filesystem::path block_dir, uint32_t n) {//n is first block to keep (remove prior blocks)
    report_time rt("trimming blocklog start");
-   const bool status = block_log::trim_blocklog_front(block_dir, block_dir / "old", n);
+   const bool status = block_log<signed_block>::trim_blocklog_front(block_dir, block_dir / "old", n);
    rt.report();
    return status;
 }
 
 void blocklog_actions::extract_block_range(std::filesystem::path block_dir, std::filesystem::path output_dir, uint32_t start, uint32_t last) {
    report_time rt("extracting block range");
-   SYS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
-   block_log::extract_block_range(block_dir, output_dir, start, last);
+   EOS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
+   block_log<signed_block>::extract_block_range(block_dir, output_dir, start, last);
    rt.report();
 }
 
@@ -228,7 +228,7 @@ int blocklog_actions::smoke_test() {
    using namespace std;
    std::filesystem::path block_dir = opt->blocks_dir;
    cout << "\nSmoke test of blocks.log and blocks.index in directory " << block_dir << '\n';
-   block_log::smoke_test(block_dir, 0);
+   block_log<signed_block>::smoke_test(block_dir, 0);
    cout << "\nno problems found\n"; // if get here there were no exceptions
    return 0;
 }
@@ -246,7 +246,7 @@ int blocklog_actions::do_vacuum() {
       std::cerr << "blocks.log is not a pruned log; nothing to vacuum" << std::endl;
       return -1;
    }
-   block_log blocks(opt->blocks_dir);// turns off pruning this performs a vacuum
+   block_log<signed_block> blocks(opt->blocks_dir);// turns off pruning this performs a vacuum
    std::cout << "Successfully vacuumed block log" << std::endl;
    return 0;
 }
@@ -254,7 +254,7 @@ int blocklog_actions::do_vacuum() {
 int blocklog_actions::read_log() {
    initialize();
    report_time rt("reading log");
-   block_log block_logger(opt->blocks_dir, opt->blog_conf);
+   block_log<signed_block> block_logger(opt->blocks_dir, opt->blog_conf);
    const auto end = block_logger.read_head();
    SYS_ASSERT(end, block_log_exception, "No blocks found in block log");
    SYS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
@@ -350,12 +350,12 @@ int blocklog_actions::read_log() {
 }
 
 int blocklog_actions::split_blocks() {
-   block_log::split_blocklog(opt->blocks_dir, opt->output_dir, opt->stride);
+   block_log<signed_block>::split_blocklog(opt->blocks_dir, opt->output_dir, opt->stride);
    return 0;
 
 }
 
 int blocklog_actions::merge_blocks() {
-   block_log::merge_blocklogs(opt->blocks_dir, opt->output_dir);
+   block_log<signed_block>::merge_blocklogs(opt->blocks_dir, opt->output_dir);
    return 0;
 }

@@ -15,7 +15,9 @@
 
 BOOST_AUTO_TEST_SUITE(partitioned_block_log_tests)
 
-void remove_existing_states(sysio::chain::controller::config& config) {
+using signed_block_log = eosio::chain::block_log<eosio::chain::signed_block>;
+
+void remove_existing_states(eosio::chain::controller::config& config) {
    auto state_path = config.state_dir;
    remove_all(state_path);
    std::filesystem::create_directories(state_path);
@@ -58,7 +60,7 @@ struct restart_from_block_log_test_fixture {
    void restart_chain() {
       sysio::chain::controller::config copied_config = chain.get_config();
 
-      auto genesis = sysio::chain::block_log::extract_genesis_state(copied_config.blocks_dir, 
+      auto genesis = signed_block_log::extract_genesis_state(copied_config.blocks_dir, 
                                                                     get_retained_dir(copied_config));
       BOOST_REQUIRE(genesis);
 
@@ -184,8 +186,8 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
 
    uint32_t head_block_num = chain.control->head_block_num();
 
-   sysio::chain::controller::config copied_config = chain.get_config();
-   auto genesis = sysio::chain::block_log::extract_genesis_state(chain.get_config().blocks_dir,
+   eosio::chain::controller::config copied_config = chain.get_config();
+   auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir,
                                                                  get_retained_dir(chain.get_config()));
    BOOST_REQUIRE(genesis);
 
@@ -193,7 +195,7 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
 
    auto blocks_dir   = chain.get_config().blocks_dir;
    auto retained_dir = blocks_dir / "retained";
-   sysio::chain::block_log::split_blocklog(blocks_dir, retained_dir, 50);
+   signed_block_log::split_blocklog(blocks_dir, retained_dir, 50);
 
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-1-50.log"));
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-1-50.index"));
@@ -284,7 +286,7 @@ void split_log_replay(uint32_t replay_max_retained_block_files) {
 
    auto copied_config = chain.get_config();
    auto genesis =
-       sysio::chain::block_log::extract_genesis_state(copied_config.blocks_dir, get_retained_dir(copied_config));
+       signed_block_log::extract_genesis_state(copied_config.blocks_dir, get_retained_dir(copied_config));
    BOOST_REQUIRE(genesis);
 
    chain.close();
@@ -339,8 +341,8 @@ BOOST_AUTO_TEST_CASE(test_restart_without_blocks_log_file) {
          true);
    chain.produce_blocks(160);
 
-   sysio::chain::controller::config copied_config = chain.get_config();
-   auto genesis = sysio::chain::block_log::extract_genesis_state(chain.get_config().blocks_dir, get_retained_dir(copied_config));
+   eosio::chain::controller::config copied_config = chain.get_config();
+   auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir, get_retained_dir(copied_config));
    BOOST_REQUIRE(genesis);
 
    chain.close();
@@ -407,8 +409,8 @@ BOOST_FIXTURE_TEST_CASE(start_with_corrupted_log_and_index, restart_from_block_l
 }
 
 struct blocklog_version_setter {
-   blocklog_version_setter(uint32_t ver) { sysio::chain::block_log::set_initial_version(ver); };
-   ~blocklog_version_setter() { sysio::chain::block_log::set_initial_version(sysio::chain::block_log::max_supported_version); };
+   blocklog_version_setter(uint32_t ver) { signed_block_log::set_initial_version(ver); };
+   ~blocklog_version_setter() { signed_block_log::set_initial_version(signed_block_log::max_supported_version); };
 };
 
 BOOST_AUTO_TEST_CASE(test_split_from_v1_log) {
@@ -442,11 +444,11 @@ void trim_blocklog_front(uint32_t version) {
    fc::temp_directory temp1, temp2;
    std::filesystem::copy(blocks_dir / "blocks.log", temp1.path() / "blocks.log");
    std::filesystem::copy(blocks_dir / "blocks.index", temp1.path() / "blocks.index");
-   BOOST_REQUIRE_NO_THROW(sysio::chain::block_log::trim_blocklog_front(temp1.path(), temp2.path(), 10));
-   BOOST_REQUIRE_NO_THROW(sysio::chain::block_log::smoke_test(temp1.path(), 1));
+   BOOST_REQUIRE_NO_THROW(signed_block_log::trim_blocklog_front(temp1.path(), temp2.path(), 10));
+   BOOST_REQUIRE_NO_THROW(signed_block_log::smoke_test(temp1.path(), 1));
 
-   sysio::chain::block_log old_log(blocks_dir, chain.get_config().blog);
-   sysio::chain::block_log new_log(temp1.path());
+   signed_block_log old_log(blocks_dir, chain.get_config().blog);
+   signed_block_log new_log(temp1.path());
    // double check if the version has been set to the desired version
    BOOST_CHECK(old_log.version() == version);
    BOOST_CHECK(new_log.first_block_num() == 10u);
@@ -456,7 +458,7 @@ void trim_blocklog_front(uint32_t version) {
    BOOST_CHECK(std::filesystem::file_size(temp1.path() / "blocks.index") == old_index_size - sizeof(uint64_t) * num_blocks_trimmed);
 }
 
-BOOST_AUTO_TEST_CASE(test_trim_blocklog_front) { trim_blocklog_front(sysio::chain::block_log::max_supported_version); }
+BOOST_AUTO_TEST_CASE(test_trim_blocklog_front) { trim_blocklog_front(signed_block_log::max_supported_version); }
 
 BOOST_AUTO_TEST_CASE(test_trim_blocklog_front_v1) { trim_blocklog_front(1); }
 
@@ -472,10 +474,10 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    auto               retained_dir = blocks_dir / "retained";
    fc::temp_directory temp_dir;
 
-   BOOST_REQUIRE_NO_THROW(sysio::chain::block_log::trim_blocklog_front(blocks_dir, temp_dir.path(), 50));
-   BOOST_REQUIRE_NO_THROW(sysio::chain::block_log::trim_blocklog_end(blocks_dir, 150));
+   BOOST_REQUIRE_NO_THROW(signed_block_log::trim_blocklog_front(blocks_dir, temp_dir.path(), 50));
+   BOOST_REQUIRE_NO_THROW(signed_block_log::trim_blocklog_end(blocks_dir, 150));
 
-   BOOST_CHECK_NO_THROW(sysio::chain::block_log::split_blocklog(blocks_dir, retained_dir, 50));
+   BOOST_CHECK_NO_THROW(signed_block_log::split_blocklog(blocks_dir, retained_dir, 50));
 
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-50-50.log"));
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-50-50.index"));
@@ -487,20 +489,20 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    std::filesystem::remove(blocks_dir / "blocks.log");
    std::filesystem::remove(blocks_dir / "blocks.index");
 
-   sysio::chain::block_log blog(blocks_dir, sysio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
+   signed_block_log blog(blocks_dir, eosio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
 
    BOOST_CHECK(blog.version() != 0);
    BOOST_CHECK_EQUAL(blog.head()->block_num(), 150u);
 
    // test blocklog merge
    fc::temp_directory dest_dir;
-   BOOST_CHECK_NO_THROW(sysio::chain::block_log::merge_blocklogs(retained_dir, dest_dir.path()));
+   BOOST_CHECK_NO_THROW(signed_block_log::merge_blocklogs(retained_dir, dest_dir.path()));
    BOOST_CHECK(std::filesystem::exists(dest_dir.path() / "blocks-50-150.log"));
 
    if (std::filesystem::exists(dest_dir.path() / "blocks-50-150.log")) {
       std::filesystem::rename(dest_dir.path() / "blocks-50-150.log", dest_dir.path() / "blocks.log");
       std::filesystem::rename(dest_dir.path() / "blocks-50-150.index", dest_dir.path() / "blocks.index");
-      BOOST_CHECK_NO_THROW(sysio::chain::block_log::smoke_test(dest_dir.path(), 1));
+      BOOST_CHECK_NO_THROW(signed_block_log::smoke_test(dest_dir.path(), 1));
    }
 
    std::filesystem::remove(dest_dir.path() / "blocks.log");
@@ -509,7 +511,7 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    std::filesystem::remove(retained_dir / "blocks-51-100.log");
    std::filesystem::remove(retained_dir / "blocks-51-100.index");
 
-   BOOST_CHECK_NO_THROW(sysio::chain::block_log::merge_blocklogs(retained_dir, dest_dir.path()));
+   BOOST_CHECK_NO_THROW(signed_block_log::merge_blocklogs(retained_dir, dest_dir.path()));
    BOOST_CHECK(std::filesystem::exists(dest_dir.path() / "blocks-50-50.log"));
    BOOST_CHECK(std::filesystem::exists(dest_dir.path() / "blocks-50-50.index"));
 

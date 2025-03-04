@@ -120,3 +120,5 @@ namespace sysio { namespace chain {
          std::unique_ptr<detail::block_log_impl<stored_type> > my;
    };
 } }
+
+#include <eosio/chain/block_log.cpp>

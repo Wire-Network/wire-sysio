@@ -94,7 +94,6 @@ add_library( sysio_chain
              controller.cpp
              authorization_manager.cpp
              resource_limits.cpp
-             block_log.cpp
              transaction_context.cpp
              sysio_contract.cpp
              sysio_contract_abi.cpp

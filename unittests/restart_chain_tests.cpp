@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(test_restart_from_block_log) {
    chain.close();
 
    controller::config copied_config = chain.get_config();
-   auto               genesis       = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
+   auto               genesis       = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
 
    // remove the state files to make sure we are starting from block log & fork_db.dat
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    chain.close();
 
    controller::config copied_config = chain.get_config();
-   auto               genesis       = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
+   auto               genesis       = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
 
    // remove the state files to make sure we are starting from block log

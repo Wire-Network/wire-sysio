@@ -98,7 +98,7 @@ struct block_log_fixture {
    std::optional<uint32_t> partition_stride;
    fc::temp_directory dir;
 
-   std::optional<sysio::chain::block_log> log;
+   std::optional<eosio::chain::block_log<eosio::chain::signed_block>> log;
 
    std::vector<std::vector<char>> written_data;
 
