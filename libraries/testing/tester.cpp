@@ -314,7 +314,7 @@ namespace sysio { namespace testing {
                if (retained_dir.is_relative())
                   retained_dir = cfg.blocks_dir/retained_dir;
             }
-            expected_chain_id = block_log::extract_chain_id( cfg.blocks_dir, retained_dir );
+            expected_chain_id = block_log<signed_block>::extract_chain_id( cfg.blocks_dir, retained_dir );
          }
       }
 

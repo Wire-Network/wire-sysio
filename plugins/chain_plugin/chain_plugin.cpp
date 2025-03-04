@@ -488,7 +488,7 @@ void
 chain_plugin_impl::do_hard_replay(const variables_map& options) {
          ilog( "Hard replay requested: deleting state database" );
          clear_directory_contents( chain_config->state_dir );
-         auto backup_dir = block_log::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
+         auto backup_dir = block_log<signed_block>::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
 }
 
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
@@ -707,9 +707,9 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       if( options.count( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
-
-         gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
-         SYS_ASSERT( gs,
+         
+         gs = block_log<signed_block>::extract_genesis_state( blocks_dir, retained_dir );
+         EOS_ASSERT( gs,
                      plugin_config_exception,
                      "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
                      ("path", (blocks_dir / "blocks.log").generic_string())
@@ -782,7 +782,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                  plugin_config_exception,
                  "Snapshot can only be used to initialize an empty database." );
 
-         auto block_log_chain_id = block_log::extract_chain_id(blocks_dir, retained_dir);
+         auto block_log_chain_id = block_log<signed_block>::extract_chain_id(blocks_dir, retained_dir);
 
          if (block_log_chain_id) {
             SYS_ASSERT( *chain_id == *block_log_chain_id,
@@ -797,7 +797,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          chain_id = controller::extract_chain_id_from_db( chain_config->state_dir );
 
-         auto chain_context = block_log::extract_chain_context( blocks_dir, retained_dir );
+         auto chain_context = block_log<signed_block>::extract_chain_context( blocks_dir, retained_dir );
          std::optional<genesis_state> block_log_genesis;
          std::optional<chain_id_type> block_log_chain_id;
 

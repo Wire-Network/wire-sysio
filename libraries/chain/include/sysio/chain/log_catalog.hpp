@@ -31,7 +31,7 @@ struct null_verifier {
    void verify(const LogData&, const std::filesystem::path&) {}
 };
 
-template <typename LogData, typename LogIndex, typename LogVerifier = null_verifier>
+template <typename StoredType, typename LogData, typename LogIndex, typename LogVerifier = null_verifier>
 struct log_catalog {
    using block_num_t = uint32_t;
 
@@ -90,7 +90,9 @@ struct log_catalog {
          const auto& index_path      = path.replace_extension("index");
          auto path_without_extension = log_path.parent_path() / log_path.stem().string();
 
-         LogData log(log_path);
+         LogData log;
+         const StoredType* const just_to_derive_type = nullptr;
+         log.open(log_path, just_to_derive_type);
 
          verifier.verify(log, log_path);
 
@@ -147,7 +149,8 @@ struct log_catalog {
 
          if (block_num <= it->second.last_block_num) {
             auto name = it->second.filename_base;
-            log_data.open(name.replace_extension("log"));
+            const StoredType* const just_to_derive_type = nullptr;
+            log_data.open(name.replace_extension("log"), just_to_derive_type);
             log_index.open(name.replace_extension("index"));
             active_index = std::distance(collection.begin(), it);
             return log_index.nth_block_position(block_num - log_data.first_block_num());

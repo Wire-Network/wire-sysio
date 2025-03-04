@@ -29,6 +29,10 @@ struct state_history_test_fixture;
 namespace sysio {
 namespace bio = boost::iostreams;
 
+namespace chain {
+   struct signed_block;
+}
+
 /*
  *   *.log:
  *   +---------+----------------+-----------+------------------+-----+---------+----------------+
@@ -294,7 +298,7 @@ class state_history_log {
    uint32_t                _end_block   = 0;
    chain::block_id_type    last_block_id;
 
-   using catalog_t = chain::log_catalog<detail::state_history_log_data, chain::log_index<chain::plugin_exception>>;
+   using catalog_t = chain::log_catalog<chain::signed_block, detail::state_history_log_data, chain::log_index<chain::plugin_exception>>;
    catalog_t catalog;
 
  public:

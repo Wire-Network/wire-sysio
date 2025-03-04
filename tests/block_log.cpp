@@ -587,8 +587,8 @@ BOOST_DATA_TEST_CASE(no_block_log_basic_nongenesis, bdata::xrange(2) * bdata::xr
 void no_block_log_public_functions_test( block_log_fixture& t) {
    BOOST_REQUIRE_NO_THROW(t.log->flush());
    BOOST_REQUIRE(t.log->read_block_by_num(1) == nullptr);
-   BOOST_REQUIRE(t.log->read_block_id_by_num(1) == sysio::chain::block_id_type{});
-   BOOST_REQUIRE(t.log->get_block_pos(1) == sysio::chain::block_log::npos);
+   BOOST_REQUIRE(t.log->read_block_id_by_num(1) == eosio::chain::block_id_type{});
+   BOOST_REQUIRE(t.log->get_block_pos(1) == std::numeric_limits<uint64_t>::max());
    BOOST_REQUIRE(t.log->read_head() == nullptr);
 }
 

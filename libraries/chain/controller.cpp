@@ -231,7 +231,7 @@ struct controller_impl {
    controller&                     self;
    std::function<void()>           shutdown;
    chainbase::database             db;
-   block_log                       blog;
+   block_log<signed_block>         blog;
    std::optional<pending_state>    pending;
    block_state_ptr                 head;
    fork_database                   fork_db;

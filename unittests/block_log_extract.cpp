@@ -43,7 +43,7 @@ struct block_log_extract_fixture {
 
    genesis_state gs;
    fc::temp_directory dir;
-   std::optional<block_log> log;
+   std::optional<block_log<signed_block>> log;
 };
 
 BOOST_AUTO_TEST_SUITE(block_log_extraction_tests)
