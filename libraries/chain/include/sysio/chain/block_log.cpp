@@ -1487,7 +1487,7 @@ namespace sysio { namespace chain {
                                                                             const std::filesystem::path& retained_dir) {
       std::filesystem::path first_block_file;
       if (!retained_dir.empty() && std::filesystem::exists(retained_dir)) {
-         for_each_file_in_dir_matches(retained_dir, R"(" + filename_prefix<stored_type>() + R"-1-\d+\.log)",
+         for_each_file_in_dir_matches(retained_dir, std::string("(") + filename_prefix<stored_type>() + "-1-\\d+\\.log)",
                                       [&](std::filesystem::path log_path) {
                                           first_block_file = std::move(log_path);
                                       });
