@@ -318,7 +318,7 @@ class Transactions(NodeopQueries):
 
         return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
 
-    def addRoaPolicy(self, issuer, owner, net=0, cpu=0, ram=0, waitForTransBlock=False, exitOnError=false, sign=False):
+    def addRoaPolicy(self, issuer, owner, net=0, cpu=0, ram=0, waitForTransBlock=False, exitOnError=False, sign=False):
         assert(isinstance(owner, Account))
         assert(isinstance(issuer, Account))
         signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
