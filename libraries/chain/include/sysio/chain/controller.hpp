@@ -101,6 +101,8 @@ namespace sysio { namespace chain {
             uint32_t                 greylist_limit         = chain::config::maximum_elastic_resource_multiplier;
 
             flat_set<account_name>   profile_accounts;
+
+            bool                     keep_state_log         = false;
          };
 
          enum class block_status {
@@ -257,6 +259,8 @@ namespace sysio { namespace chain {
          block_state_ptr fetch_block_state_by_number( uint32_t block_num )const;
          // return block_state from forkdb, thread-safe
          block_state_ptr fetch_block_state_by_id( block_id_type id )const;
+         // return the irreversible block header_state from block state log, thread-safe
+         block_header_state_ptr fetch_irr_block_header_state_by_number( uint32_t block_num )const;
          // thread-safe
          block_id_type get_block_id_for_num( uint32_t block_num )const;
 
@@ -325,7 +329,9 @@ namespace sysio { namespace chain {
          void enable_deep_mind( deep_mind_handler* logger );
          uint32_t earliest_available_block_num() const;
 
-#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
+         bool is_irreversible_state_available() const;
+
+#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
          vm::wasm_allocator&  get_wasm_allocator();
 #endif
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED

@@ -232,6 +232,8 @@ struct controller_impl {
    std::function<void()>           shutdown;
    chainbase::database             db;
    block_log<signed_block>         blog;
+   using state_log = block_log<block_header_state>;
+   std::optional<state_log>        slog;
    std::optional<pending_state>    pending;
    block_state_ptr                 head;
    fork_database                   fork_db;
@@ -302,6 +304,13 @@ struct controller_impl {
       apply_handlers[receiver][make_pair(contract,action)] = v;
    }
 
+   std::optional<state_log> create_slog(bool keep_state_log, const std::filesystem::path& blocks_dir, const block_log_config& config) {
+      if( !keep_state_log ) {
+         return {};
+      }
+      return state_log( blocks_dir, config );
+   }
+
    controller_impl( const controller::config& cfg, controller& s, protocol_feature_set&& pfs, const chain_id_type& chain_id )
    :rnh(),
     self(s),
@@ -309,6 +318,7 @@ struct controller_impl {
         cfg.read_only ? database::read_only : database::read_write,
         cfg.state_size, false, cfg.db_map_mode ),
     blog( cfg.blocks_dir, cfg.blog ),
+    slog( create_slog(cfg.keep_state_log, cfg.blocks_dir, cfg.blog ) ),
     fork_db( cfg.blocks_dir / config::reversible_blocks_dir_name ),
     resource_limits( db, [&s](bool is_trx_transient) { return s.get_deep_mind_logger(is_trx_transient); }),
     authorization( s, db ),
@@ -445,11 +455,21 @@ struct controller_impl {
       try {
 
          std::vector<std::future<std::vector<char>>> v;
+         std::vector<std::future<std::vector<char>>> sv;
          v.reserve( branch.size() );
+         if (!!slog) {
+            sv.reserve( branch.size() );
+         }
          for( auto bitr = branch.rbegin(); bitr != branch.rend(); ++bitr ) {
             v.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)->block]() { return fc::raw::pack(*b); } ) );
+            if (!!slog) {
+               sv.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)]() {
+                  return fc::raw::pack(static_cast<const block_header_state&>(*b));
+               } ) );
+            }
          }
          auto it = v.begin();
+         auto sit = sv.begin();
 
          for( auto bitr = branch.rbegin(); bitr != branch.rend(); ++bitr ) {
             if( read_mode == db_read_mode::IRREVERSIBLE ) {
@@ -462,6 +482,11 @@ struct controller_impl {
             // blog.append could fail due to failures like running out of space.
             // Do it before commit so that in case it throws, DB can be rolled back.
             blog.append( (*bitr)->block, (*bitr)->id, it->get() );
+            if( !!slog ) {
+               slog->append( *bitr, (*bitr)->id, sit->get() );
+               ++sit;
+            }
+
             ++it;
 
             db.commit( (*bitr)->block_num );
@@ -655,6 +680,9 @@ struct controller_impl {
          );
       } else {
          blog.reset( genesis, head->block );
+         if( !!slog ) {
+            slog->reset( genesis, std::static_pointer_cast<block_header_state>(head) );
+         }
       }
       init(std::move(check_shutdown));
    }
@@ -678,6 +706,9 @@ struct controller_impl {
       } else {
          if( first_block_num != (lib_num + 1) ) {
             blog.reset( chain_id, lib_num + 1 );
+         }
+         if( !!slog ) {
+            slog->reset( chain_id, lib_num + 1 );
          }
       }
 
@@ -3200,6 +3231,11 @@ block_state_ptr controller::fetch_block_state_by_number( uint32_t block_num )con
    return my->fork_db.search_on_branch( fork_db_head_block_id(), block_num );
 } FC_CAPTURE_AND_RETHROW( (block_num) ) }
 
+block_header_state_ptr controller::fetch_irr_block_header_state_by_number( uint32_t block_num )const  { try {
+   EOS_ASSERT(my->slog, block_log_exception, "Block State log is not configured.");
+   return my->slog->read_block_by_num(block_num);
+} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+
 block_id_type controller::get_block_id_for_num( uint32_t block_num )const { try {
    const auto& blog_head = my->blog.head();
 
@@ -3716,6 +3752,10 @@ bool controller::is_write_window() const {
 
 void controller::code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, uint32_t block_num) {
    return my->code_block_num_last_used(code_hash, vm_type, vm_version, block_num);
+}
+
+bool controller::is_irreversible_state_available() const {
+   return !!my->slog;
 }
 
 /// Protocol feature activation handlers:

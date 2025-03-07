@@ -124,8 +124,94 @@ BOOST_AUTO_TEST_CASE(test_split_log) {
    BOOST_CHECK(chain.control->fetch_block_by_number(140)->block_num() == 140u);
 
    BOOST_CHECK(chain.control->fetch_block_by_number(145)->block_num() == 145u);
+   BOOST_CHECK(chain.control->fetch_block_by_number(150)->block_num() == 150u);
 
    BOOST_CHECK(!chain.control->fetch_block_by_number(160));
+}
+
+BOOST_AUTO_TEST_CASE(test_split_state_log) {
+   fc::temp_directory temp_dir;
+
+   eosio::testing::tester chain(
+         temp_dir,
+         [](eosio::chain::controller::config& config) {
+            config.blog = eosio::chain::partitioned_blocklog_config{ .archive_dir        = "archive",
+                                                                     .stride             = 20,
+                                                                     .max_retained_files = 5 };
+            config.keep_state_log = true;
+         },
+         true);
+   chain.produce_blocks(150);
+
+   auto blocks_dir         = chain.get_config().blocks_dir;
+   auto blocks_archive_dir = blocks_dir / "archive";
+
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir));
+
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-1-20.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-1-20.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-21-40.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-21-40.index"));
+
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-41-60.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-41-60.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-61-80.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-61-80.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-81-100.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-81-100.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-101-120.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-101-120.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-121-140.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-121-140.index"));
+
+   // ensure that block state log logic being turened on doesn't affect the block log
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-1-20.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-1-20.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-21-40.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-21-40.index"));
+
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-41-60.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-41-60.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-80.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-80.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-81-100.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-81-100.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-101-120.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-101-120.index"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.log"));
+   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.index"));
+
+
+   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(40));
+
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(81)->block_num == 81u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(90)->block_num == 90u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(100)->block_num == 100u);
+
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(41)->block_num == 41u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(50)->block_num == 50u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(60)->block_num == 60u);
+
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(121)->block_num == 121u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(130)->block_num == 130u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(140)->block_num == 140u);
+
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(145)->block_num == 145u);
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(150)->block_num == 150u);
+   BOOST_CHECK(chain.control->fetch_block_by_number(150)->block_num() == 150u);
+   // block 151 won't be irreversible till the next block is published
+   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(151));
+   BOOST_CHECK(chain.control->fetch_block_by_number(151)->block_num() == 151u);
+   BOOST_CHECK(!chain.control->fetch_block_by_number(152));
+
+   chain.produce_block();
+
+   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(151)->block_num == 151u);
+   BOOST_CHECK(chain.control->fetch_block_by_number(151)->block_num() == 151u);
+   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(152));
+   BOOST_CHECK(chain.control->fetch_block_by_number(152)->block_num() == 152u);
+   BOOST_CHECK(!chain.control->fetch_block_by_number(153));
+
 }
 
 BOOST_AUTO_TEST_CASE(test_split_log_zero_retained_file) {
