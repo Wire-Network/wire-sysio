@@ -1240,7 +1240,7 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to publish contract %s." % (contract))
             return None
 
-        trans=biosNode.setPriv(sysioRoaAccount, sysioAccount, isPriv=True)
+        trans=biosNode.setPriv(sysioRoaAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
         if trans is None:
             Utils.Print("ERROR: Failed to set sysio.roa as privileged")
             return None

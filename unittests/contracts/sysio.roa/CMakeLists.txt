@@ -1,8 +1,5 @@
 if( SYSIO_COMPILE_TEST_CONTRACTS )
-   # add_contract( sysio.roa sysio.roa sysio.roa.cpp )
-   # Not including ROA source here, so we can't compile...
-   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.wasm COPYONLY )
-   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.abi  COPYONLY )
+    add_contract( sysio.roa sysio.roa sysio.roa.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.wasm COPYONLY )
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.abi  COPYONLY )
