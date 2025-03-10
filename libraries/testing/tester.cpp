@@ -1178,7 +1178,7 @@ namespace sysio { namespace testing {
       // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
       push_action("sysio.roa"_n, "activateroa"_n, "sysio.roa"_n,
                   fc::mutable_variant_object()
-                  ("total_sys", asset::from_string(""))
+                  ("total_sys", asset::from_string("75496.0000 SYS"))
                   ("bytes_per_unit", 104)
       );
 
