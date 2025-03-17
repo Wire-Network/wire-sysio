@@ -128,9 +128,9 @@ try:
 
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
 
     # ***   setup topogrophy   ***
@@ -139,7 +139,7 @@ try:
     # and the only connection between those 2 groups is through the bridge node
     if cluster.launch(prodCount=2, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs, onlySetProds=True) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs, onlySetProds=True) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
     Print("Validating system accounts after bootstrap")

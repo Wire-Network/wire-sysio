@@ -50,7 +50,7 @@ programs/clio/config.hpp
 programs/sysio-applesedemo/sysio-applesedemo
 programs/sysio-launcher/config.hpp
 programs/sysio-launcher/sysio-launcher
-programs/keosd/keosd
+programs/kiod/kiod
 programs/nodeop/config.hpp
 programs/nodeop/nodeop
 
@@ -58,9 +58,10 @@ scripts/tn_init.sh
 
 tests/plugin_test
 unittests/unit_test
+tutorials/sig-em-tutorial/contracts
 
 doxygen
-eos.doxygen
+wire.doxygen
 
 wallet.json
 witness_node_data_dir
@@ -69,12 +70,14 @@ witness_node_data_dir
 
 *.pyc
 *.pyo
+*.pwd
 
 *.gdb_history
 
 Testing/*
 build.tar.gz
 [Bb]uild*/*
+build**
 deps/*
 dependencies/*
 
@@ -85,6 +88,7 @@ TestLogs*
 *.iws
 .DS_Store
 CMakeLists.txt.user
+.!*
 
 !*.swagger.*
 

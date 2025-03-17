@@ -104,7 +104,7 @@ auto smatch_to_variant(const std::smatch& smatch) {
 };
 
 const char* error_advice_name_type_exception = R"=====(Name should be less than 13 characters and only contains the following symbol .12345abcdefghijklmnopqrstuvwxyz)=====";
-const char* error_advice_public_key_type_exception = R"=====(Public key should be encoded in base58 and starts with EOS prefix)=====";
+const char* error_advice_public_key_type_exception = R"=====(Public key should be encoded in base58 and starts with SYS prefix)=====";
 const char* error_advice_private_key_type_exception = R"=====(Private key should be encoded in base58 WIF)=====";
 const char* error_advice_authority_type_exception = R"=====(Ensure that your authority JSON is valid follows the following format!
 {
@@ -112,7 +112,7 @@ const char* error_advice_authority_type_exception = R"=====(Ensure that your aut
   "keys": [         <keys must be alpha-numerically sorted by their string representations and unique>
     ...
     {
-      "key":        <STRING: EOS.IO compatible Public Key>,
+      "key":        <STRING: SYS.IO compatible Public Key>,
       "weight":     <INTEGER [1-2^16): a signature from this key contributes this to satisfying the threshold>
     }
     ...
@@ -213,7 +213,7 @@ const char* error_advice_missing_chain_api_plugin_exception =  "Ensure that you 
                                                                "http-server-address   = http-category-address\n"
                                                                "http-category-address = chain_ro,127.0.0.1:8081\n"
                                                                "http-category-address = chain_rw,[::]:8083";
-const char* error_advice_missing_wallet_api_plugin_exception =  "Ensure that you have keosd enabled on the \033[2m--wallet-url\033[0m\033[32m specified endpoint.";
+const char* error_advice_missing_wallet_api_plugin_exception =  "Ensure that you have kiod enabled on the \033[2m--wallet-url\033[0m\033[32m specified endpoint.";
 const char* error_advice_missing_history_api_plugin_exception =  "The \033[2msysio::history_api_plugin\033[0m\033[32m has been removed. Verify endpoint simulates removed history_api_plugin or use a different option.";
 const char* error_advice_missing_net_api_plugin_exception =  "Ensure that you have \033[2msysio::net_api_plugin\033[0m\033[32m added to your node's configuration and enabled on the specified endpoint.\n"
                                                              "For example:\n"

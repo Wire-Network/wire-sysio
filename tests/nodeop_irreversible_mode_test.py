@@ -165,7 +165,7 @@ try:
       totalNodes=totalNodes,
       pnodes=1,
       topo="mesh",
-      specificExtraNodeosArgs={
+      specificExtraNodeopArgs={
          0:"--enable-stale-production",
          4:"--read-mode irreversible",
          6:"--read-mode irreversible",

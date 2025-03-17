@@ -10,7 +10,7 @@ import inspect
 import json
 import shlex
 import socket
-from datetime import datetime
+from datetime import datetime, UTC
 from sys import stdout
 from sys import exit
 import traceback
@@ -59,11 +59,11 @@ class Utils:
     testBinPath = Path(__file__).resolve().parents[2] / 'bin'
 
     EosClientPath=str(testBinPath / "clio")
-    MiscEosClientArgs="--no-auto-keosd"
+    MiscEosClientArgs="--no-auto-kiod"
 
     LeapClientPath=str(testBinPath / "leap-util")
 
-    EosWalletName="keosd"
+    EosWalletName="kiod"
     EosWalletPath=str(testBinPath / EosWalletName)
 
     EosServerName="nodeop"
@@ -83,7 +83,7 @@ class Utils:
 
     @staticmethod
     def timestamp():
-        return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")
+        return datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")
 
     @staticmethod
     def checkOutputFileWrite(time, cmd, output, error):
@@ -614,5 +614,5 @@ class Utils:
         return data.decode(enc)
 
     @staticmethod
-    def getNodeosVersion():
+    def getNodeopVersion():
         return os.popen(f"{Utils.EosServerPath} --full-version").read().replace("\n", "")

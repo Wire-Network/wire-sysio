@@ -20,6 +20,8 @@
 
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/sysio_roa_objects.hpp>
+#include <fc/io/raw.hpp>
 
 namespace sysio { namespace chain {
 
@@ -68,62 +70,73 @@ void apply_sysio_newaccount(apply_context& context) {
    SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "newaccount not allowed in read-only transaction" );
    auto create = context.get_action().data_as<newaccount>();
    try {
-   context.require_authorization(create.creator);
-//   context.require_write_lock( config::sysio_auth_scope );
+      context.require_authorization(create.creator);
+
+   //   context.require_write_lock( config::sysio_auth_scope );
    auto& authorization = context.control.get_mutable_authorization_manager();
 
-   SYS_ASSERT( validate(create.owner), action_validate_exception, "Invalid owner authority");
-   SYS_ASSERT( validate(create.active), action_validate_exception, "Invalid active authority");
+      SYS_ASSERT(validate(create.owner), action_validate_exception, "Invalid owner authority");
+      SYS_ASSERT(validate(create.active), action_validate_exception, "Invalid active authority");
 
-   auto& db = context.db;
+      auto& db = context.db;
 
-   auto name_str = name(create.name).to_string();
+      auto name_str = name(create.name).to_string();
 
-   SYS_ASSERT( !create.name.empty(), action_validate_exception, "account name cannot be empty" );
-   SYS_ASSERT( name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long" );
+      SYS_ASSERT(!create.name.empty(), action_validate_exception, "account name cannot be empty");
+      SYS_ASSERT(name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long");
 
-   // Check if the creator is privileged
-   const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
-   if( !creator.is_privileged() ) {
-      SYS_ASSERT( name_str.find( "sysio." ) != 0, action_validate_exception,
-                  "only privileged accounts can have names that start with 'sysio.'" );
-   }
+      // Ensure only privileged accounts can create new accounts
+      const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
+      SYS_ASSERT(creator.is_privileged(),
+                 action_validate_exception,
+                 "Only privileged accounts can create new accounts");
 
-   auto existing_account = db.find<account_object, by_name>(create.name);
-   SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
-              "Cannot create account named ${name}, as that name is already taken",
-              ("name", create.name));
+      auto existing_account = db.find<account_object, by_name>(create.name);
+      SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
+                 "Cannot create account named ${name}, as that name is already taken",
+                 ("name", create.name));
 
-   db.create<account_object>([&](auto& a) {
-      a.name = create.name;
-      a.creation_date = context.control.pending_block_time();
-   });
+      db.create<account_object>([&](auto& a) {
+         a.name = create.name;
+         a.creation_date = context.control.pending_block_time();
+      });
 
-   db.create<account_metadata_object>([&](auto& a) {
-      a.name = create.name;
-   });
+      db.create<account_metadata_object>([&](auto& a) {
+         a.name = create.name;
+      });
 
-   for( const auto& auth : { create.owner, create.active } ){
-      validate_authority_precondition( context, auth );
-   }
+      for (const auto& auth : { create.owner, create.active }) {
+         validate_authority_precondition(context, auth);
+      }
 
    const auto& owner_permission  = authorization.create_permission( create.name, config::owner_name, 0,
                                                                     std::move(create.owner), context.trx_context.is_transient() );
    const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
                                                                     std::move(create.active), context.trx_context.is_transient() );
 
-   context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
+      context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
 
-   int64_t ram_delta = config::overhead_per_account_ram_bytes;
-   ram_delta += 2*config::billable_size_v<permission_object>;
-   ram_delta += owner_permission.auth.get_billable_size();
-   ram_delta += active_permission.auth.get_billable_size();
+      // Determine if this is a system account
+      bool is_system_account = (create.name == config::system_account_name) ||
+                               (name_str.size() > 5 && name_str.find("sysio.") == 0);
+
+      // If it's not a system account, set CPU, NET, RAM to 0
+      if (!is_system_account) {
+         // Non-system accounts start with zero resources
+         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0, context.trx_context.is_transient());
+      }
+
+      int64_t ram_delta = config::overhead_per_account_ram_bytes;
+      ram_delta += 2 * config::billable_size_v<permission_object>;
+      ram_delta += owner_permission.auth.get_billable_size();
+      ram_delta += active_permission.auth.get_billable_size();
 
    if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
       dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
    }
 
-   context.add_ram_usage(create.name, ram_delta);
+      // Charge the RAM usage to sysio (system payer)
+      context.add_ram_usage(config::system_account_name, ram_delta);
 
 } FC_CAPTURE_AND_RETHROW( (create) ) }
 
@@ -254,7 +267,7 @@ void apply_sysio_updateauth(apply_context& context) {
    SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "updateauth not allowed in read-only transaction" );
 
    auto update = context.get_action().data_as<updateauth>();
-   
+
    // ** NEW ADDED IF STATEMENT **
    if( update.permission != name("auth.ext") && update.permission != name("auth.session") ) {
       context.require_authorization(update.account); // only here to mark the single authority on this action as used
@@ -460,6 +473,192 @@ void apply_sysio_canceldelay(apply_context& context) {
    const auto& trx_id = cancel.trx_id;
 
    context.cancel_deferred_transaction(transaction_id_to_sender_id(trx_id), account_name());
+}
+
+void apply_roa_reducepolicy(apply_context& context) {
+   // 1. Parse action arguments
+   auto args = context.get_action().data_as<reducepolicy>();
+   const sysio::chain::name& owner       = args.owner;
+   const sysio::chain::name& issuer      = args.issuer;
+   const sysio::chain::asset& net_weight = args.net_weight;
+   const sysio::chain::asset& cpu_weight = args.cpu_weight;
+   const sysio::chain::asset& ram_weight = args.ram_weight;
+   name network_gen(static_cast<uint64_t>(args.network_gen));
+
+   // 2. Authorization & info
+   context.require_authorization(issuer);
+
+   // 3. Locate the "nodeowners" row
+   {
+      int itr = context.db_find_i64(context.get_receiver(), network_gen, name("nodeowners"), issuer.to_uint64_t());
+      SYS_ASSERT(itr != -1, action_validate_exception, "Issuer is not a registered Node Owner");
+
+      // Read and deserialize
+      int size = context.db_get_i64(itr, nullptr, 0);
+      SYS_ASSERT(size >= 0, action_validate_exception, "Error reading nodeowners row");
+
+      std::vector<char> buffer(size);
+      context.db_get_i64(itr, buffer.data(), size);
+
+      fc::datastream<const char*> ds(buffer.data(), buffer.size());
+      sysio::roa::nodeowners node_row;
+      fc::raw::unpack(ds, node_row);
+
+      // Ensure the row's owner matches issuer
+      SYS_ASSERT(node_row.owner == issuer, action_validate_exception, "Mismatched nodeowner row: stored owner != issuer");
+
+      // 4. Locate "policies" row
+      {
+         int pol_itr = context.db_find_i64(context.get_receiver(), issuer, name("policies"), owner.to_uint64_t());
+         SYS_ASSERT(pol_itr != -1, action_validate_exception,
+                    "Policy does not exist under this issuer for the owner");
+
+         int pol_size = context.db_get_i64(pol_itr, nullptr, 0);
+         SYS_ASSERT(pol_size >= 0, action_validate_exception, "Error reading policies row");
+
+         std::vector<char> pol_buffer(pol_size);
+         context.db_get_i64(pol_itr, pol_buffer.data(), pol_size);
+
+         fc::datastream<const char*> pds(pol_buffer.data(), pol_buffer.size());
+         sysio::roa::policies pol_row;
+         fc::raw::unpack(pds, pol_row);
+
+         // 5. Validate time block
+         uint32_t current_block = context.control.head_block_num();
+         SYS_ASSERT(current_block >= pol_row.time_block, action_validate_exception,
+                    "Cannot reduce policy before time_block");
+
+         // Special sysio check
+         {
+            std::string acc_str = owner.to_string();
+            bool sysio_acct = (acc_str == "sysio") ||
+                              (acc_str.size() > 5 && acc_str.rfind("sysio.", 0) == 0);
+            if (sysio_acct && pol_row.time_block == 1 && pol_row.issuer == issuer) {
+               SYS_ASSERT(false, action_validate_exception,
+                          "Cannot reduce the sysio policies created at node registration");
+            }
+         }
+
+         // 6. Locate "reslimit" row
+         {
+            int rl_itr = context.db_find_i64(context.get_receiver(), owner, name("reslimit"), owner.to_uint64_t());
+            SYS_ASSERT(rl_itr != -1, action_validate_exception,
+                       "reslimit row does not exist for this owner");
+
+            int rl_size = context.db_get_i64(rl_itr, nullptr, 0);
+            SYS_ASSERT(rl_size >= 0, action_validate_exception, "Error reading reslimit row");
+
+            std::vector<char> rl_buffer(rl_size);
+            context.db_get_i64(rl_itr, rl_buffer.data(), rl_size);
+
+            fc::datastream<const char*> rlds(rl_buffer.data(), rl_buffer.size());
+            sysio::roa::reslimit rl_row;
+            fc::raw::unpack(rlds, rl_row);
+
+            // 7. Validate the new weights
+            SYS_ASSERT(net_weight.get_amount() >= 0, action_validate_exception, "NET weight cannot be negative");
+            SYS_ASSERT(cpu_weight.get_amount() >= 0, action_validate_exception, "CPU weight cannot be negative");
+            SYS_ASSERT(ram_weight.get_amount() >= 0, action_validate_exception, "RAM weight cannot be negative");
+            SYS_ASSERT(net_weight.get_amount()  > 0 ||
+                       cpu_weight.get_amount()  > 0 ||
+                       ram_weight.get_amount() > 0,
+                       action_validate_exception, "All weights are 0, nothing to reduce.");
+
+            // Ensure we don't reduce below zero
+            SYS_ASSERT(net_weight.get_amount() <= pol_row.net_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce NET below zero");
+            SYS_ASSERT(cpu_weight.get_amount() <= pol_row.cpu_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce CPU below zero");
+            SYS_ASSERT(ram_weight.get_amount() <= pol_row.ram_weight.get_amount(), action_validate_exception,
+                       "Cannot reduce RAM below zero");
+
+            // 8. Adjust resource limits
+            auto& resource_manager = context.control.get_mutable_resource_limits_manager();
+
+            int64_t ram_bytes, net_limit, cpu_limit;
+            resource_manager.get_account_limits(owner, ram_bytes, net_limit, cpu_limit);
+
+            uint64_t bytes_per_unit = pol_row.bytes_per_unit;
+            int64_t divisible_ram_to_reclaim = 0;
+            sysio::chain::asset reclaimed_ram_weight(0, ram_weight.get_symbol());
+
+            if (ram_weight.get_amount() > 0) {
+               int64_t ram_usage = resource_manager.get_account_ram_usage(owner);
+               int64_t ram_unused = ram_bytes - ram_usage;
+               int64_t requested_ram_bytes = ram_weight.get_amount() * (int64_t)bytes_per_unit;
+               int64_t ram_to_reclaim = std::min(ram_unused, requested_ram_bytes);
+
+               SYS_ASSERT(ram_to_reclaim >= 0, action_validate_exception, "Invalid RAM reclaim calculation");
+
+               int64_t remainder = ram_to_reclaim % (int64_t)bytes_per_unit;
+               divisible_ram_to_reclaim = ram_to_reclaim - remainder;
+
+               int64_t reclaimed_units = divisible_ram_to_reclaim / (int64_t)bytes_per_unit;
+               reclaimed_ram_weight = sysio::chain::asset(reclaimed_units, ram_weight.get_symbol());
+
+               SYS_ASSERT(reclaimed_ram_weight.get_amount() <= ram_weight.get_amount(),
+                          action_validate_exception, "Cannot reclaim more RAM than requested");
+            }
+
+            resource_manager.set_account_limits(
+               owner,
+               ram_bytes - divisible_ram_to_reclaim,
+               net_limit - net_weight.get_amount(),
+               cpu_limit - cpu_weight.get_amount(),
+               context.trx_context.is_transient()
+            );
+
+            // 9. Update reslimit row
+            {
+               rl_row.net_weight -= net_weight;
+               rl_row.cpu_weight -= cpu_weight;
+               rl_row.ram_bytes  = static_cast<uint64_t>(rl_row.ram_bytes - divisible_ram_to_reclaim);
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, rl_row);
+               auto out = ds.storage();
+
+               // TODO: If we want to remove the reslimit row if all values are 0 do it here.
+               context.db_update_i64(rl_itr, context.get_receiver(), out.data(), out.size());
+            }
+
+            // 10. Update / remove the policies row
+            {
+               pol_row.net_weight -= net_weight;
+               pol_row.cpu_weight -= cpu_weight;
+               pol_row.ram_weight -= reclaimed_ram_weight;
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, pol_row);
+               auto pol_out = ds.storage();
+
+               bool all_zero = (pol_row.net_weight.get_amount() == 0 &&
+                                pol_row.cpu_weight.get_amount() == 0 &&
+                                pol_row.ram_weight.get_amount() == 0);
+               if (all_zero) {
+                  context.db_remove_i64(pol_itr);
+               } else {
+                  context.db_update_i64(pol_itr, context.get_receiver(), pol_out.data(), pol_out.size());
+               }
+            }
+
+            // 11. Update nodeowners row
+            {
+               sysio::chain::asset total_reclaimed_sys = net_weight + cpu_weight + reclaimed_ram_weight;
+               node_row.allocated_sys -= total_reclaimed_sys;
+               node_row.allocated_bw  -= (net_weight + cpu_weight);
+               node_row.allocated_ram -= reclaimed_ram_weight;
+
+               fc::datastream<std::vector<char>> ds;
+               fc::raw::pack(ds, node_row);
+               auto node_out = ds.storage();
+
+               context.db_update_i64(itr, context.get_receiver(), node_out.data(), node_out.size());
+            }
+
+         } // end reslimit block
+      } // end policies block
+   }
 }
 
 } } // namespace sysio::chain

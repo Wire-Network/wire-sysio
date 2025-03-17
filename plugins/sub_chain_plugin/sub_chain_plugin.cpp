@@ -41,7 +41,20 @@ void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    } FC_LOG_AND_RETHROW()
 }
 void sub_chain_plugin::plugin_startup() {
+    ilog("sub_chain_plugin starting up, adding /v3/sub_chain/get_last_s_id");
 
+    app().get_plugin<http_plugin>().add_api({
+        {"/v3/sub_chain/get_last_s_id",
+         api_category::chain_ro,
+         [this](string&&, string&& body, auto&& cb) mutable { // Ensure correct use of auto for callback type inference
+            try {
+                checksum256_type last_s_id = get_prev_s_id();
+                cb(200, last_s_id.str());
+            } catch (fc::exception& e) {
+                cb(500, "{\"error\": \"internal_error\", \"details\": \"" + e.to_detail_string() + "\"}");
+            }
+        }
+        }}, appbase::exec_queue::read_only);
 }
 void sub_chain_plugin::plugin_shutdown() {
     ilog("sub_chain_plugin shutting down");

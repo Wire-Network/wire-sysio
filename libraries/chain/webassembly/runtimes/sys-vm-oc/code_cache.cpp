@@ -43,7 +43,7 @@ code_cache_async::code_cache_async(const std::filesystem::path& data_dir, const 
    _result_queue(sysvmoc_config.threads * 2),
    _threads(sysvmoc_config.threads)
 {
-   FC_ASSERT(_threads, "EOS VM OC requires at least 1 compile thread");
+   FC_ASSERT(_threads, "SYS VM OC requires at least 1 compile thread");
 
    wait_on_compile_monitor_message();
 
@@ -90,7 +90,7 @@ std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
                _cache_index.push_front(cd);
             },
             [&](const compilation_result_unknownfailure&) {
-               wlog("code ${c} failed to tier-up with EOS VM OC", ("c", result.code.code_id));
+               wlog("code ${c} failed to tier-up with SYS VM OC", ("c", result.code.code_id));
                _blacklist.emplace(result.code);
             },
             [&](const compilation_result_toofull&) {
@@ -126,7 +126,7 @@ const code_descriptor* const code_cache_async::get_descriptor_for_code(bool high
             _outstanding_compiles_and_poison.emplace(*nextup, false);
             std::vector<wrapped_fd> fds_to_pass;
             fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-            FC_ASSERT(write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ *nextup, _sysvmoc_config }, fds_to_pass), "EOS VM failed to communicate to OOP manager");
+            FC_ASSERT(write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ *nextup, _sysvmoc_config }, fds_to_pass), "SYS VM failed to communicate to OOP manager");
             --count_processed;
          }
          _queued_compiles.erase(nextup);
@@ -190,7 +190,7 @@ code_cache_sync::~code_cache_sync() {
    _compile_monitor_write_socket.shutdown(local::datagram_protocol::socket::shutdown_send);
    auto [success, message, fds] = read_message_with_fds(_compile_monitor_read_socket);
    if(success)
-      elog("unexpected response from EOS VM OC compile monitor during shutdown");
+      elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
 const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const digest_type& code_id, const uint8_t& vm_version, bool is_write_window) {
@@ -236,7 +236,7 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
    auto create_code_cache_file = [&] {
       SYS_ASSERT(sysvmoc_config.cache_size >= allocator_t::get_min_size(total_header_size), database_exception, "configured code cache size is too small");
       std::ofstream ofs(_cache_file_path.generic_string(), std::ofstream::trunc);
-      SYS_ASSERT(ofs.good(), database_exception, "unable to create EOS VM Optimized Compiler code cache");
+      SYS_ASSERT(ofs.good(), database_exception, "unable to create SYS VM Optimized Compiler code cache");
       std::filesystem::resize_file(_cache_file_path, sysvmoc_config.cache_size);
       bip::file_mapping creation_mapping(_cache_file_path.generic_string().c_str(), bip::read_write);
       bip::mapped_region creation_region(creation_mapping, bip::read_write);
@@ -310,7 +310,7 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
       }
       allocator->deallocate(code_mapping + cache_header.serialized_descriptor_index);
 
-      ilog("EOS VM Optimized Compiler code cache loaded with ${c} entries; ${f} of ${t} bytes free", ("c", number_entries)("f", allocator->get_free_memory())("t", allocator->get_size()));
+      ilog("SYS VM Optimized Compiler code cache loaded with ${c} entries; ${f} of ${t} bytes free", ("c", number_entries)("f", allocator->get_free_memory())("t", allocator->get_size()));
    }
    munmap(code_mapping, sysvmoc_config.cache_size);
 

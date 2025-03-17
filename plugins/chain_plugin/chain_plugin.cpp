@@ -1,5 +1,6 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -11,10 +12,10 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/snapshot.hpp>
-#include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain/permission_link_object.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/global_property_object.hpp>
 
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
@@ -288,7 +289,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
 #ifndef SYSIO_SYS_VM_OC_DEVELOPER
             //throwing an exception here (like SYS_ASSERT) is just gobbled up with a "Failed to initialize" error :(
             if(vm == wasm_interface::vm_type::sys_vm_oc) {
-               elog("EOS VM OC is a tier-up compiler and works in conjunction with the configured base WASM runtime. Enable EOS VM OC via 'sys-vm-oc-enable' option");
+               elog("SYS VM OC is a tier-up compiler and works in conjunction with the configured base WASM runtime. Enable SYS VM OC via 'sys-vm-oc-enable' option");
                SYS_ASSERT(false, plugin_exception, "");
             }
 #endif
@@ -355,15 +356,15 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          )
 
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-         ("sys-vm-oc-cache-size-mb", bpo::value<uint64_t>()->default_value(sysvmoc::config().cache_size / (1024u*1024u)), "Maximum size (in MiB) of the EOS VM OC code cache")
+         ("sys-vm-oc-cache-size-mb", bpo::value<uint64_t>()->default_value(sysvmoc::config().cache_size / (1024u*1024u)), "Maximum size (in MiB) of the SYS VM OC code cache")
          ("sys-vm-oc-compile-threads", bpo::value<uint64_t>()->default_value(1u)->notifier([](const auto t) {
                if(t == 0) {
                   elog("sys-vm-oc-compile-threads must be set to a non-zero value");
                   SYS_ASSERT(false, plugin_exception, "");
                }
-         }), "Number of threads to use for EOS VM OC tier-up")
+         }), "Number of threads to use for SYS VM OC tier-up")
          ("sys-vm-oc-enable", bpo::value<chain::wasm_interface::vm_oc_enable>()->default_value(chain::wasm_interface::vm_oc_enable::oc_auto),
-          "Enable EOS VM OC tier-up runtime ('auto', 'all', 'none').\n"
+          "Enable SYS VM OC tier-up runtime ('auto', 'all', 'none').\n"
           "'auto' - EOS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
           "'all'  - EOS VM OC tier-up is enabled for all contract execution.\n"
           "'none' - EOS VM OC tier-up is completely disabled.\n")
@@ -679,7 +680,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                                                                  : std::filesystem::path("");
          if (retained_dir.is_relative())
             retained_dir = std::filesystem::path{blocks_dir}/retained_dir;
-            
+
          chain_config->blog = sysio::chain::partitioned_blocklog_config{
             .retained_dir = retained_dir,
             .archive_dir  = options.count("blocks-archive-dir") ? options.at("blocks-archive-dir").as<std::filesystem::path>()
@@ -702,18 +703,18 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      
+
 
       if( options.count( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
-         
+
          gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
          SYS_ASSERT( gs,
                      plugin_config_exception,
                      "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
                      ("path", (blocks_dir / "blocks.log").generic_string())
          );
-         
+
 
          if( options.at( "print-genesis-json" ).as<bool>()) {
             ilog( "Genesis JSON:\n${genesis}", ("genesis", json::to_pretty_string( *gs )));
@@ -798,7 +799,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          auto chain_context = block_log::extract_chain_context( blocks_dir, retained_dir );
          std::optional<genesis_state> block_log_genesis;
-         std::optional<chain_id_type> block_log_chain_id;  
+         std::optional<chain_id_type> block_log_chain_id;
 
          if (chain_context) {
             std::visit(overloaded {
@@ -808,7 +809,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                },
                [&](const chain_id_type& id) {
                   block_log_chain_id = id;
-               } 
+               }
             }, *chain_context);
 
             if( chain_id ) {
@@ -1468,7 +1469,7 @@ uint64_t convert_to_type(const string& str, const string& desc) {
       return s.to_uint64_t();
    } catch( ... ) { }
 
-   if (str.find(',') != string::npos) { // fix #6274 only match formats like 4,EOS
+   if (str.find(',') != string::npos) { // fix #6274 only match formats like 4,SYS
       try {
          auto symb = sysio::chain::symbol::from_string(str);
          return symb.value();
@@ -1929,7 +1930,7 @@ chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_
    } else {
       try {
          block = db.fetch_block_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-      } EOS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
    }
 
    SYS_ASSERT( block, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num_or_id));
@@ -1970,7 +1971,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
       } else {
          try {
             header = db.fetch_block_header_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-         } EOS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
       }
       SYS_ASSERT( header, unknown_block_exception, "Could not find block header: ${block}", ("block", params.block_num_or_id));
       return { header->calculate_id(), fc::variant{*header}, {}};
@@ -1981,7 +1982,7 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
       } else {
          try {
             block = db.fetch_block_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-         } EOS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
       }
       SYS_ASSERT( block, unknown_block_exception, "Could not find block header: ${block}", ("block", params.block_num_or_id));
       return { block->calculate_id(), fc::variant{static_cast<signed_block_header>(*block)}, block->block_extensions};
@@ -2048,7 +2049,7 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
    } else {
       try {
          b = db.fetch_block_state_by_id(fc::variant(params.block_num_or_id).as<block_id_type>());
-      } EOS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
    }
 
    SYS_ASSERT( b, unknown_block_exception, "Could not find reversible block: ${block}", ("block", params.block_num_or_id));
@@ -2075,7 +2076,7 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
       auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
       try {
          abi_serializer::from_variant(params, *pretty_input, resolver, abi_serializer_max_time);
-      } EOS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
+      } SYS_RETHROW_EXCEPTIONS(chain::packed_transaction_type_exception, "Invalid packed transaction")
 
       app().get_method<incoming::methods::transaction_async>()(pretty_input, true, transaction_metadata::trx_type::input, false,
             [this, next](const next_function_variant<transaction_trace_ptr>& result) -> void {
@@ -2198,7 +2199,7 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
       auto resolver = caching_resolver(make_resolver(api.db, api.abi_serializer_max_time, throw_on_yield::yes));
       try {
          abi_serializer::from_variant(params.transaction, *ptrx, resolver, api.abi_serializer_max_time);
-      } EOS_RETHROW_EXCEPTIONS(packed_transaction_type_exception, "Invalid packed transaction")
+      } SYS_RETHROW_EXCEPTIONS(packed_transaction_type_exception, "Invalid packed transaction")
 
       bool retry = false;
       std::optional<uint16_t> retry_num_blocks;
@@ -2298,7 +2299,7 @@ read_only::get_abi_results read_only::get_abi( const get_abi_params& params, con
    }
 
    return result;
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account abi")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account abi")
 }
 
 read_only::get_code_results read_only::get_code( const get_code_params& params, const fc::time_point& )const {
@@ -2322,7 +2323,7 @@ read_only::get_code_results read_only::get_code( const get_code_params& params, 
    }
 
    return result;
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code")
 }
 
 read_only::get_code_hash_results read_only::get_code_hash( const get_code_hash_params& params, const fc::time_point& )const {
@@ -2336,7 +2337,7 @@ read_only::get_code_hash_results read_only::get_code_hash( const get_code_hash_p
       result.code_hash = accnt.code_hash;
 
    return result;
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code hash")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code hash")
 }
 
 read_only::get_raw_code_and_abi_results read_only::get_raw_code_and_abi( const get_raw_code_and_abi_params& params, const fc::time_point& )const {
@@ -2354,7 +2355,7 @@ read_only::get_raw_code_and_abi_results read_only::get_raw_code_and_abi( const g
    result.abi = blob{{accnt_obj.abi.begin(), accnt_obj.abi.end()}};
 
    return result;
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code/abi")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account code/abi")
 }
 
 read_only::get_raw_abi_results read_only::get_raw_abi( const get_raw_abi_params& params, const fc::time_point& )const {
@@ -2372,7 +2373,7 @@ read_only::get_raw_abi_results read_only::get_raw_abi( const get_raw_abi_params&
       result.abi = blob{{accnt_obj.abi.begin(), accnt_obj.abi.end()}};
 
    return result;
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account abi")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account abi")
 }
 
 read_only::get_account_return_t read_only::get_account( const get_account_params& params, const fc::time_point& ) const {
@@ -2386,10 +2387,11 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.head_block_num  = db.head_block_num();
    result.head_block_time = db.head_block_time();
 
-   rm.get_account_limits( result.account_name, result.ram_quota, result.net_weight, result.cpu_weight );
+   // Get baseline resource limits from the resource manager
+   rm.get_account_limits(result.account_name, result.ram_quota, result.net_weight, result.cpu_weight);
 
-   const auto& accnt_obj = db.get_account( result.account_name );
-   const auto& accnt_metadata_obj = db.db().get<account_metadata_object,by_name>( result.account_name );
+   const auto& accnt_obj = db.get_account(result.account_name);
+   const auto& accnt_metadata_obj = d.get<account_metadata_object,by_name>(result.account_name);
 
    result.privileged       = accnt_metadata_obj.is_privileged();
    result.last_code_update = accnt_metadata_obj.last_code_update;
@@ -2411,18 +2413,19 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    subjective_cpu_bill_limit.used = db.get_subjective_billing().get_subjective_bill( result.account_name, fc::time_point::now() );
    result.subjective_cpu_bill_limit = subjective_cpu_bill_limit;
 
+   // Gather permission and linked actions info as before
    const auto linked_action_map = ([&](){
       const auto& links = d.get_index<permission_link_index,by_permission_name>();
-      auto iter = links.lower_bound( boost::make_tuple( params.account_name ) );
+      auto iter = links.lower_bound(boost::make_tuple(params.account_name));
 
-      std::multimap<name, linked_action> result;
+      std::multimap<name, linked_action> result_map;
       while (iter != links.end() && iter->account == params.account_name ) {
          auto action_name = iter->message_type.empty() ? std::optional<name>() : std::optional<name>(iter->message_type);
-         result.emplace(iter->required_permission, linked_action{iter->code, action_name});
+         result_map.emplace(iter->required_permission, linked_action{iter->code, action_name});
          ++iter;
       }
 
-      return result;
+      return result_map;
    })();
 
    auto get_linked_actions = [&](chain::name perm_name) {
@@ -2436,9 +2439,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    };
 
    const auto& permissions = d.get_index<permission_index,by_owner>();
-   auto perm = permissions.lower_bound( boost::make_tuple( params.account_name ) );
-   while( perm != permissions.end() && perm->owner == params.account_name ) {
-      /// TODO: lookup perm->parent name
+   auto perm = permissions.lower_bound(boost::make_tuple(params.account_name));
+   while (perm != permissions.end() && perm->owner == params.account_name) {
       name parent;
 
       // Don't lookup parent if null
@@ -2451,15 +2453,15 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
       }
 
       auto linked_actions = get_linked_actions(perm->name);
-
-      result.permissions.push_back( permission{ perm->name, parent, perm->auth.to_authority(), std::move(linked_actions)} );
+      result.permissions.push_back(permission{ perm->name, parent, perm->auth.to_authority(), std::move(linked_actions) });
       ++perm;
    }
 
    // add sysio.any linked authorizations
    result.sysio_any_linked_actions = get_linked_actions(chain::config::sysio_any_name);
 
-   const auto& code_account = db.db().get<account_object,by_name>( config::system_account_name );
+   // Load system account code/ABI for potentially core symbol extraction
+   const auto& code_account = d.get<account_object,by_name>(config::system_account_name);
    struct http_params_t {
       std::optional<vector<char>> total_resources;
       std::optional<vector<char>> self_delegated_bandwidth;
@@ -2469,26 +2471,24 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    };
 
    http_params_t http_params;
-   
+
    if( abi_def abi; abi_serializer::to_abi(code_account.abi, abi) ) {
 
       const auto token_code = "sysio.token"_n;
 
       auto core_symbol = extract_core_symbol();
-
       if (params.expected_core_symbol)
          core_symbol = *(params.expected_core_symbol);
 
-      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( token_code, params.account_name, "accounts"_n ));
-      if( t_id != nullptr ) {
+      // Check balance of core symbol in sysio.token::accounts table
+      if (const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(token_code, params.account_name, "accounts"_n))) {
          const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-         auto it = idx.find(boost::make_tuple( t_id->id, core_symbol.to_symbol_code() ));
-         if( it != idx.end() && it->value.size() >= sizeof(asset) ) {
+         auto it = idx.find(boost::make_tuple(t_id->id, core_symbol.to_symbol_code()));
+         if (it != idx.end() && it->value.size() >= sizeof(asset)) {
             asset bal;
             fc::datastream<const char *> ds(it->value.data(), it->value.size());
             fc::raw::unpack(ds, bal);
-
-            if( bal.get_symbol().valid() && bal.get_symbol() == core_symbol ) {
+            if (bal.get_symbol().valid() && bal.get_symbol() == core_symbol) {
                result.core_liquid_balance = bal;
             }
          }
@@ -2507,18 +2507,18 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          }
          return {};
       };
-      
+
       http_params.total_resources          = lookup_object("userres"_n, params.account_name);
       http_params.self_delegated_bandwidth = lookup_object("delband"_n, params.account_name);
       http_params.refund_request           = lookup_object("refunds"_n, params.account_name);
       http_params.voter_info               = lookup_object("voters"_n, config::system_account_name);
       http_params.rex_info                 = lookup_object("rexbal"_n, config::system_account_name);
-      
+
       return [http_params = std::move(http_params), result = std::move(result), abi=std::move(abi), shorten_abi_errors=shorten_abi_errors,
               abi_serializer_max_time=abi_serializer_max_time]() mutable ->  chain::t_or_exception<read_only::get_account_results> {
          auto yield = [&]() { return abi_serializer::create_yield_function(abi_serializer_max_time); };
          abi_serializer abis(std::move(abi), yield());
-         
+
          if (http_params.total_resources)
             result.total_resources = abis.binary_to_variant("user_resources", *http_params.total_resources, yield(), shorten_abi_errors);
          if (http_params.self_delegated_bandwidth)
@@ -2535,7 +2535,7 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    return [result = std::move(result)]() mutable -> chain::t_or_exception<read_only::get_account_results> {
       return std::move(result);
    };
-   } EOS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
+   } SYS_RETHROW_EXCEPTIONS(chain::account_query_exception, "unable to retrieve account info")
 }
 
 read_only::get_required_keys_result read_only::get_required_keys( const get_required_keys_params& params, const fc::time_point& )const {
@@ -2543,7 +2543,7 @@ read_only::get_required_keys_result read_only::get_required_keys( const get_requ
    auto resolver = caching_resolver(make_resolver(db, abi_serializer_max_time, throw_on_yield::yes));
    try {
       abi_serializer::from_variant(params.transaction, pretty_input, resolver, abi_serializer_max_time);
-   } EOS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
+   } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
    auto required_keys_set = db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, fc::seconds( pretty_input.delay_sec ));
    get_required_keys_result result;

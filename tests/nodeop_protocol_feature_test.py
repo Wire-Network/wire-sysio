@@ -35,7 +35,7 @@ cluster.setWalletMgr(walletMgr)
 testSuccessful = False
 try:
     TestHelper.printSystemInfo("BEGIN")
-    cluster.launch(extraNodeosArgs=" --plugin sysio::producer_api_plugin  --http-max-response-time-ms 990000 ",
+    cluster.launch(extraNodeopArgs=" --plugin sysio::producer_api_plugin  --http-max-response-time-ms 990000 ",
                    dontBootstrap=True,
                    pfSetupPolicy=PFSetupPolicy.NONE)
     biosNode = cluster.biosNode

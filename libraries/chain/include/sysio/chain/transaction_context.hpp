@@ -183,6 +183,11 @@ namespace sysio { namespace chain {
          fc::time_point                pseudo_start;
          fc::microseconds              billed_time;
 
+         // Roa Change
+         // Store total RAM usage accumulated during actions here.
+         // transaction_context::finalize() will use to finalize charges.
+         int64_t                       total_ram_usage = 0;
+
          enum class tx_cpu_usage_exceeded_reason {
             account_cpu_limit, // includes subjective billing
             on_chain_consensus_max_transaction_cpu_usage,

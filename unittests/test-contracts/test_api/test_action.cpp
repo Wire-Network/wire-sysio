@@ -212,7 +212,6 @@ void test_action::test_publication_time() {
    sysio_assert( total == sizeof(uint64_t), "total == sizeof(uint64_t)" );
    time_point msec{ microseconds{static_cast<int64_t>(pub_time)}};
    sysio_assert( msec == publication_time(), "pub_time == publication_time()" );
-
 }
 
 void test_action::test_current_receiver( uint64_t receiver, uint64_t code, uint64_t action ) {

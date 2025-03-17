@@ -70,9 +70,9 @@ def sleep(t):
 def startWallet():
     run('rm -rf ' + os.path.abspath(args.wallet_dir))
     run('mkdir -p ' + os.path.abspath(args.wallet_dir))
-    background(args.keosd + ' --unlock-timeout %d --http-server-address 127.0.0.1:6666 --http-max-response-time-ms 99999 --wallet-dir %s' % (unlockTimeout, os.path.abspath(args.wallet_dir)))
+    background(args.kiod + ' --unlock-timeout %d --http-server-address 0.0.0.0:6666 --http-max-response-time-ms 99999 --wallet-dir %s' % (unlockTimeout, os.path.abspath(args.wallet_dir)))
     sleep(.4)
-    run(args.clio + 'wallet create --to-console')
+    run(args.clio + 'wallet create -f wallet.pwd')
 
 def importKeys():
     run(args.clio + 'wallet import --private-key ' + args.private_key)
@@ -112,13 +112,20 @@ def startNode(nodeIndex, account):
         '    --config-dir ' + os.path.abspath(dir) +
         '    --data-dir ' + os.path.abspath(dir) +
         '    --chain-state-db-size-mb 1024'
-        '    --http-server-address 127.0.0.1:' + str(args.http_port + nodeIndex) +
-        '    --p2p-listen-endpoint 127.0.0.1:' + str(9000 + nodeIndex) +
+        '    --http-server-address 0.0.0.0:' + str(args.http_port + nodeIndex) +
+        '    --p2p-listen-endpoint 0.0.0.0:' + str(9000 + nodeIndex) +
         '    --max-clients ' + str(maxClients) +
         '    --p2p-max-nodes-per-host ' + str(maxClients) +
         '    --enable-stale-production'
+        '    --http-validate-host=false'
+        '    --access-control-allow-origin=*'
+        '    --access-control-allow-headers="Origin, X-Requested-With, Content-Type, Accept"'
         '    --producer-name ' + account['name'] +
         '    --signature-provider ' + account['pub'] + '=KEY:' + account['pvt'] +
+        # '    --s-chain-contract settle.wns'
+        # '    --s-chain-actions batchw'
+        # '    --s-chain-actions initcontract'
+        # '    --plugin sysio::sub_chain_plugin'
         '    --plugin sysio::http_plugin'
         '    --plugin sysio::chain_api_plugin'
         '    --plugin sysio::chain_plugin'
@@ -174,7 +181,7 @@ def createStakedAccounts(b, e):
         stakeCpu = stake - stakeNet
         print('%s: total funds=%s, ram=%s, net=%s, cpu=%s, unstaked=%s' % (a['name'], intToCurrency(a['funds']), intToCurrency(ramFunds), intToCurrency(stakeNet), intToCurrency(stakeCpu), intToCurrency(unstaked)))
         assert(funds == ramFunds + stakeNet + stakeCpu + unstaked)
-        retry(args.clio + 'system newaccount --transfer sysio %s %s --stake-net "%s" --stake-cpu "%s" --buy-ram "%s"   ' % 
+        retry(args.clio + 'system newaccount --transfer sysio %s %s --stake-net "%s" --stake-cpu "%s" --buy-ram "%s"   ' %
             (a['name'], a['pub'], intToCurrency(stakeNet), intToCurrency(stakeCpu), intToCurrency(ramFunds)))
         if unstaked:
             retry(args.clio + 'transfer sysio %s "%s"' % (a['name'], intToCurrency(unstaked)))
@@ -249,7 +256,7 @@ def msigProposeReplaceSystem(proposer, proposalName):
     trxPermissions = [{'actor': 'sysio', 'permission': 'active'}]
     with open(fastUnstakeSystem, mode='rb') as f:
         setcode = {'account': 'sysio', 'vmtype': 0, 'vmversion': 0, 'code': f.read().hex()}
-    run(args.clio + 'multisig propose ' + proposalName + jsonArg(requestedPermissions) + 
+    run(args.clio + 'multisig propose ' + proposalName + jsonArg(requestedPermissions) +
         jsonArg(trxPermissions) + 'sysio setcode' + jsonArg(setcode) + ' -p ' + proposer)
 
 def msigApproveReplaceSystem(proposer, proposalName):
@@ -300,14 +307,14 @@ def stepSetSystemContract():
     # contract that makes use of the functionality introduced by that feature to be deployed. 
 
     # activate PREACTIVATE_FEATURE before installing sysio.boot
-    retry('curl -X POST http://127.0.0.1:%d' % args.http_port + 
+    retry('curl -X POST http://0.0.0.0:%d' % args.http_port +
         '/v1/producer/schedule_protocol_feature_activations ' +
         '-d \'{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}\'')
     sleep(3)
 
-    # install sysio.boot which supports the native actions and activate 
+    # install sysio.boot which supports the native actions and activate
     # action that allows activating desired protocol features prior to 
-    # deploying a system contract with more features such as sysio.bios 
+    # deploying a system contract with more features such as sysio.bios
     # or sysio.system
     retry(args.clio + 'set contract sysio ' + args.contracts_dir + '/sysio.boot/')
     sleep(3)
@@ -354,7 +361,7 @@ def stepSetSystemContract():
     # DISABLE_DEFERRED_TRXS_STAGE_1 - DISALLOW NEW DEFERRED TRANSACTIONS
     retry(args.clio + 'push action sysio activate \'["fce57d2331667353a0eac6b4209b67b843a7262a848af0a49a6e2fa9f6584eb4"]\' -p sysio@active')
     # DISABLE_DEFERRED_TRXS_STAGE_2 - PREVENT PREVIOUSLY SCHEDULED DEFERRED TRANSACTIONS FROM REACHING OTHER NODE
-    # THIS DEPENDS ON DISABLE_DEFERRED_TRXS_STAGE_1 
+    # THIS DEPENDS ON DISABLE_DEFERRED_TRXS_STAGE_1
     retry(args.clio + 'push action sysio activate \'["09e86cb0accf8d81c9e85d34bea4b925ae936626d00c984e4691186891f5bc16"]\' -p sysio@active')
     sleep(1)
 
@@ -398,7 +405,7 @@ def stepLog():
 parser = argparse.ArgumentParser()
 
 commands = [
-    ('w', 'wallet',             stepStartWallet,            True,    "Start keosd, create wallet, fill with keys"),
+    ('w', 'wallet',             stepStartWallet,            True,    "Start kiod, create wallet, fill with keys"),
     ('b', 'boot',               stepStartBoot,              True,    "Start boot node"),
     ('s', 'sys',                createSystemAccounts,       True,    "Create system accounts (sysio.*)"),
     ('c', 'contracts',          stepInstallSystemContracts, True,    "Install system contracts (token, msig)"),
@@ -417,11 +424,11 @@ commands = [
     ('l', 'log',                stepLog,                    True,    "Show tail of node's log"),
 ]
 
-parser.add_argument('--public-key', metavar='', help="SYSIO Public Key", default='EOS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
+parser.add_argument('--public-key', metavar='', help="SYSIO Public Key", default='SYS8Znrtgwt8TfpmbVpTKvA2oB8Nqey625CLN8bCN3TEbgx86Dsvr', dest="public_key")
 parser.add_argument('--private-Key', metavar='', help="SYSIO Private Key", default='5K463ynhZoCDDa4RDcr63cUwWLTnKqmdcoTKTHBjqoKfv4u5V7p', dest="private_key")
-parser.add_argument('--clio', metavar='', help="Cleos command", default='../../build/programs/clio/clio --wallet-url http://127.0.0.1:6666 ')
+parser.add_argument('--clio', metavar='', help="Clio command", default='../../build/programs/clio/clio --wallet-url http://0.0.0.0:6666 ')
 parser.add_argument('--nodeop', metavar='', help="Path to nodeop binary", default='../../build/programs/nodeop/nodeop')
-parser.add_argument('--keosd', metavar='', help="Path to keosd binary", default='../../build/programs/keosd/keosd')
+parser.add_argument('--kiod', metavar='', help="Path to kiod binary", default='../../build/programs/kiod/kiod')
 parser.add_argument('--contracts-dir', metavar='', help="Path to latest contracts directory", default='../../build/contracts/')
 parser.add_argument('--old-contracts-dir', metavar='', help="Path to 1.8.x contracts directory", default='../../build/contracts/')
 parser.add_argument('--nodes-dir', metavar='', help="Path to nodes directory", default='./nodes/')
@@ -455,7 +462,7 @@ for (flag, command, function, inAll, help) in commands:
 args = parser.parse_args()
 
 # Leave a space in front of --url in case the user types clio alone
-args.clio += ' --url http://127.0.0.1:%d ' % args.http_port
+args.clio += ' --url http://0.0.0.0:%d ' % args.http_port
 
 logFile = open(args.log_path, 'a')
 

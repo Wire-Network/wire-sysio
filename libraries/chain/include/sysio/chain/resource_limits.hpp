@@ -65,7 +65,7 @@ namespace sysio { namespace chain {
       public:
 
          explicit resource_limits_manager(chainbase::database& db, std::function<deep_mind_handler*(bool is_trx_transient)> get_deep_mind_logger)
-         :_db(db),_get_deep_mind_logger(get_deep_mind_logger)
+         :_db(db), _get_deep_mind_logger(get_deep_mind_logger)
          {
          }
 

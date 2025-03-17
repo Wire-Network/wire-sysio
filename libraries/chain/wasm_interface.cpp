@@ -97,11 +97,11 @@ namespace sysio { namespace chain {
             if (test_disable_tierup)
                cd = nullptr;
          } catch (...) {
-            // swallow errors here, if EOS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
-            // In the future, consider moving bits of EOS VM that can fire exceptions and such out of this call path
+            // swallow errors here, if SYS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
+            // In the future, consider moving bits of SYS VM that can fire exceptions and such out of this call path
             static bool once_is_enough;
             if (!once_is_enough)
-               elog("EOS VM OC has encountered an unexpected failure");
+               elog("SYS VM OC has encountered an unexpected failure");
             once_is_enough = true;
          }
          if (cd) {

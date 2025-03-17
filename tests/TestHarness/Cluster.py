@@ -55,7 +55,7 @@ class Cluster(object):
     __BiosHost="localhost"
     __BiosPort=8788
     __LauncherCmdArr=[]
-    __bootlog="leap-ignition-wd/bootlog.txt"
+    __bootlog="wire_sysio-ignition-wd/bootlog.txt"
 
     # pylint: disable=too-many-arguments
     def __init__(self, localCluster=True, host="localhost", port=8888, walletHost="localhost", walletPort=9899
@@ -71,7 +71,7 @@ class Cluster(object):
         staging: [True|False] If true, don't generate new node configurations
         loggingLevel: Logging level to apply to all nodeop loggers in all nodes
         loggingLevelDict: Dictionary of node indices and logging level to apply to all nodeop loggers in that node
-        nodeopVers: Nodeos version string for compatibility
+        nodeopVers: Nodeop version string for compatibility
         unshared: [True|False] If true, launch all processes in Linux namespace
         keepRunning: [True|False] If true, leave nodes running when Cluster is destroyed. Implies keepLogs.
         keepLogs: [True|False] If true, retain log files after cluster shuts down.
@@ -98,6 +98,7 @@ class Cluster(object):
         self.defproduceraAccount=self.defProducerAccounts["defproducera"]= Account("defproducera")
         self.defproducerbAccount=self.defProducerAccounts["defproducerb"]= Account("defproducerb")
         self.sysioAccount=self.defProducerAccounts["sysio"]= Account("sysio")
+        self.carlAccount=None
 
         self.defproduceraAccount.ownerPrivateKey=defproduceraPrvtKey
         self.defproduceraAccount.activePrivateKey=defproduceraPrvtKey
@@ -166,7 +167,7 @@ class Cluster(object):
     # pylint: disable=too-many-branches
     # pylint: disable=too-many-statements
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
-               totalProducers=None, sharedProducers=0, extraNodeosArgs="", specificExtraNodeosArgs=None, specificNodeosInstances=None, onlySetProds=False,
+               totalProducers=None, sharedProducers=0, extraNodeopArgs="", specificExtraNodeopArgs=None, specificNodeopInstances=None, onlySetProds=False,
                pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True, nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
                maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True):
         """Launch cluster.
@@ -179,10 +180,10 @@ class Cluster(object):
           delay 0 exposes a bootstrap bug where producer handover may have a large gap confusing nodes and bringing system to a halt.
         onlyBios: When true, only loads the bios contract (and not more full bootstrapping).
         dontBootstrap: When true, don't do any bootstrapping at all. (even bios is not uploaded)
-        extraNodeosArgs: string of arguments to pass through to each nodeop instance (via --nodeop flag on launcher)
-        specificExtraNodeosArgs: dictionary of arguments to pass to a specific node (via --specific-num and
+        extraNodeopArgs: string of arguments to pass through to each nodeop instance (via --nodeop flag on launcher)
+        specificExtraNodeopArgs: dictionary of arguments to pass to a specific node (via --specific-num and
                                  --specific-nodeop flags on launcher), example: { "5" : "--plugin sysio::test_control_api_plugin" }
-        specificNodeosInstances: dictionary of paths to launch specific nodeop binaries (via --spcfc-inst-num and
+        specificNodeopInstances: dictionary of paths to launch specific nodeop binaries (via --spcfc-inst-num and
                                  --spcfc_inst_nodeop flags to launcher), example: { "4" : "bin/nodeop"}
         onlySetProds: Stop the bootstrap process after setting the producers
         pfSetupPolicy: determine the protocol feature setup policy (none, preactivate_feature_only, or full)
@@ -243,7 +244,7 @@ class Cluster(object):
             time.sleep(2)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
-              f'-i {datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
+              f'-i {datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
               f'--unstarted-nodes {unstartedNodes} --logging-level {self.loggingLevel} '
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()
@@ -254,26 +255,26 @@ class Cluster(object):
         if self.staging:
             argsArr.append("--nogen")
         nodeopArgs=""
-        if "--max-transaction-time" not in extraNodeosArgs:
+        if "--max-transaction-time" not in extraNodeopArgs:
             nodeopArgs += " --max-transaction-time -1"
-        if "--abi-serializer-max-time-ms" not in extraNodeosArgs:
+        if "--abi-serializer-max-time-ms" not in extraNodeopArgs:
             nodeopArgs += " --abi-serializer-max-time-ms 990000"
-        if "--p2p-max-nodes-per-host" not in extraNodeosArgs:
+        if "--p2p-max-nodes-per-host" not in extraNodeopArgs:
             nodeopArgs += f" --p2p-max-nodes-per-host {maximumP2pPerHost}"
-        if "--max-clients" not in extraNodeosArgs:
+        if "--max-clients" not in extraNodeopArgs:
             nodeopArgs += f" --max-clients {maximumClients}"
-        if Utils.Debug and "--contracts-console" not in extraNodeosArgs:
+        if Utils.Debug and "--contracts-console" not in extraNodeopArgs:
             nodeopArgs += " --contracts-console"
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
             nodeopArgs += " --plugin sysio::producer_api_plugin"
         if prodsEnableTraceApi:
             nodeopArgs += " --plugin sysio::trace_api_plugin "
-        if extraNodeosArgs.find("--trace-rpc-abi") == -1:
+        if extraNodeopArgs.find("--trace-rpc-abi") == -1:
             nodeopArgs += " --trace-no-abis "
         httpMaxResponseTimeSet = False
-        if specificExtraNodeosArgs is not None:
-            assert(isinstance(specificExtraNodeosArgs, dict))
-            for nodeNum,arg in specificExtraNodeosArgs.items():
+        if specificExtraNodeopArgs is not None:
+            assert(isinstance(specificExtraNodeopArgs, dict))
+            for nodeNum,arg in specificExtraNodeopArgs.items():
                 assert(isinstance(nodeNum, (str,int)))
                 assert(isinstance(arg, str))
                 if not len(arg):
@@ -287,9 +288,9 @@ class Cluster(object):
                     argsArr.append("'" + arg + "'")
                 else:
                     argsArr.append(arg)
-        if specificNodeosInstances is not None:
-            assert(isinstance(specificNodeosInstances, dict))
-            for nodeNum,arg in specificNodeosInstances.items():
+        if specificNodeopInstances is not None:
+            assert(isinstance(specificNodeopInstances, dict))
+            for nodeNum,arg in specificNodeopInstances.items():
                 assert(isinstance(nodeNum, (str,int)))
                 assert(isinstance(arg, str))
                 argsArr.append("--spcfc-inst-num")
@@ -297,12 +298,12 @@ class Cluster(object):
                 argsArr.append("--spcfc-inst-nodeop")
                 argsArr.append(arg)
 
-        if not httpMaxResponseTimeSet and extraNodeosArgs.find("--http-max-response-time-ms") == -1:
-            extraNodeosArgs+=" --http-max-response-time-ms 990000 "
+        if not httpMaxResponseTimeSet and extraNodeopArgs.find("--http-max-response-time-ms") == -1:
+            extraNodeopArgs+=" --http-max-response-time-ms 990000 "
 
-        if extraNodeosArgs is not None:
-            assert(isinstance(extraNodeosArgs, str))
-            nodeopArgs += extraNodeosArgs
+        if extraNodeopArgs is not None:
+            assert(isinstance(extraNodeopArgs, str))
+            nodeopArgs += extraNodeopArgs
 
         if nodeopArgs:
             argsArr.append("--nodeop")
@@ -456,8 +457,8 @@ class Cluster(object):
             argsArr.append("--shape")
             argsArr.append(topo)
 
-        if type(specificExtraNodeosArgs) is dict:
-            for args in specificExtraNodeosArgs.values():
+        if type(specificExtraNodeopArgs) is dict:
+            for args in specificExtraNodeopArgs.values():
                 if "--plugin sysio::history_api_plugin" in args:
                     argsArr.append("--is-nodeop-v2")
                     break
@@ -879,11 +880,11 @@ class Cluster(object):
 
         node.validateAccounts(myAccounts)
 
-    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
+    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
         """create account, verify account and return transaction id"""
         node=self.nodes[validationNodeIndex]
         waitViaRetry =  self.totalNodesCount > self.productionNodesCount
-        trans=node.createInitializeAccount(account, creator, stakedDeposit, waitForTransBlock=waitViaRetry, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM, exitOnError=True)
+        trans=node.createInitializeAccount(account, creator, stakedDeposit, waitForTransBlock=waitViaRetry, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM, exitOnError=True)
         if not waitViaRetry:
             node.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
         assert(node.verifyAccount(account))
@@ -902,10 +903,10 @@ class Cluster(object):
     #         return transId
     #     return None
 
-    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
+    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
         assert(len(self.nodes) > 0)
         node=self.nodes[0]
-        trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
+        trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
         return trans
 
     @staticmethod
@@ -1130,7 +1131,7 @@ class Cluster(object):
                 return None
             return trans
 
-        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap']
+        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1226,6 +1227,39 @@ class Cluster(object):
         if not biosNode.waitForTransactionInBlock(transId):
             Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
             return None
+
+        sysioRoaAccount = copy.deepcopy(sysioAccount)
+        sysioRoaAccount.name = 'sysio.roa'
+        contract="sysio.roa"
+        contractDir=str(self.unittestsContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioRoaAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        trans=biosNode.setPriv(sysioRoaAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.roa as privileged")
+            return None
+
+        Utils.Print("Activate ROA")
+        action="activateroa"
+        data="{\"total_sys\":\"75496.0000 SYS\",\"bytes_per_unit\":\"104\"}"
+        opts="--permission %s" % (sysioRoaAccount.name)
+        trans=biosNode.pushMessage(sysioRoaAccount.name, action, data, opts)
+        transId=Node.getTransId(trans[1])
+        Utils.Print("Wait for system init transaction to be in a block.")
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to validate transaction %s in block on server port %d." % (transId, biosNode.port))
+            return None
+
+        # Register carl as a tier 1 node owner
+        self.carlAccount = copy.deepcopy(sysioAccount)
+        self.carlAccount.name = 'carl'
+        biosNode.pushMessage('sysio.roa', 'regnodeowner', '{"owner": carl, "tier": 1}', '-p sysio.roa')
 
         # Only call init if the system contract is loaded
         if loadSystemContract:
@@ -1393,7 +1427,7 @@ class Cluster(object):
             return True
         transId=None
         for account in self.accounts:
-            ret = self.biosNode.getEosAccount(account.name)
+            ret = self.biosNode.getSysioAccount(account.name)
             if ret is None:
                 if Utils.Debug: Utils.Print("Create account %s." % (account.name))
                 if Utils.Debug: Utils.Print("Validation node %s" % validationNodeIndex)

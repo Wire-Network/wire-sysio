@@ -383,7 +383,7 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, validating_tester) { try {
 
    set_code( "test"_n, contracts::sysio_bios_wasm() );
    set_abi( "test"_n, contracts::sysio_bios_abi() );
-	set_code( "test"_n, test_contracts::payloadless_wasm() );
+   set_code( "test"_n, test_contracts::payloadless_wasm() );
 
    call_doit_and_check( "test"_n, "test"_n, [&]( const transaction_trace_ptr& res ) {
       BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed);
@@ -1453,7 +1453,7 @@ void transaction_tests(T& chain) {
                           sysio_assert_message_is("test_action::assert_false")                          );
 
    //   test send_transaction
-      CALL_TEST_FUNCTION(chain, "test_transaction", "send_transaction", {});
+   CALL_TEST_FUNCTION(chain, "test_transaction", "send_transaction", {});
 
    if (std::is_same<T, validating_tester_no_disable_deferred_trx>::value) {
       // test send_transaction_empty

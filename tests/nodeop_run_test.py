@@ -12,7 +12,7 @@ import sys
 ###############################################################
 # nodeop_run_test
 #
-# General test that tests a wide range of general use actions around nodeop and keosd
+# General test that tests a wide range of general use actions around nodeop and kiod
 #
 ###############################################################
 
@@ -60,10 +60,10 @@ try:
         Print("Stand up cluster")
 
         abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
-        traceNodeosArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
-        extraNodeosArgs=traceNodeosArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
-        specificNodeosInstances={0: "bin/nodeop"}
-        if cluster.launch(totalNodes=2, prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeosArgs=extraNodeosArgs, specificNodeosInstances=specificNodeosInstances) is False:
+        traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
+        extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
+        specificNodeopInstances={0: "bin/nodeop"}
+        if cluster.launch(totalNodes=2, prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")
     else:
@@ -200,6 +200,10 @@ try:
 
     Print("Validating accounts before user accounts creation")
     cluster.validateAccounts(None)
+
+    # Make pefproducera privileged so they can create accounts
+    Print("Set privileged for account %s" % (cluster.defproduceraAccount.name))
+    transId=node.setPriv(cluster.defproduceraAccount, cluster.sysioAccount, waitForTransBlock=True, exitOnError=True)
 
     Print("Create new account %s via %s" % (testeraAccount.name, cluster.defproduceraAccount.name))
     transId=node.createInitializeAccount(testeraAccount, cluster.defproduceraAccount, stakedDeposit=0, waitForTransBlock=True, exitOnError=True)
@@ -649,7 +653,7 @@ try:
         raise
 
     signCmd = "sign --public-key {0} {1} -p".format(currencyAccount.activePublicKey, unsignedTrxJsonFile)
-    node.processCleosCmd(signCmd, "Sign and push a transaction", False, True)
+    node.processClioCmd(signCmd, "Sign and push a transaction", False, True)
     os.remove(unsignedTrxJsonFile)
 
     testeraAccountAmountAfterSign=node.getAccountEosBalanceStr(testeraAccount.name)
@@ -701,7 +705,7 @@ try:
         errorExit("Failed to unlock wallet %s" % (defproduceraWallet.name))
 
     Print("Get account defproducera")
-    account=node.getEosAccount(defproduceraAccount.name, exitOnError=True)
+    account=node.getSysioAccount(defproduceraAccount.name, exitOnError=True)
 
     Print("Unlocking wallet \"%s\"." % (defproduceraWallet.name))
     if not walletMgr.unlockWallet(testWallet):
@@ -709,7 +713,7 @@ try:
         errorExit("Failed to unlock wallet %s" % (testWallet.name))
 
     Print("Verify non-JSON call works")
-    rawAccount = node.getEosAccount(defproduceraAccount.name, exitOnError=True, returnType=ReturnType.raw)
+    rawAccount = node.getSysioAccount(defproduceraAccount.name, exitOnError=True, returnType=ReturnType.raw)
     coreLiquidBalance = account['core_liquid_balance']
     match = re.search(r'\bliquid:\s*%s\s' % (coreLiquidBalance), rawAccount, re.MULTILINE | re.DOTALL)
     assert match is not None, "did not find the core liquid balance (\"liquid:\") of %d in \"%s\"" % (coreLiquidBalance, rawAccount)
@@ -761,7 +765,7 @@ try:
     contract="currency1111"
     table="accounts"
     row0=node.getTableRow(contract, currencyAccount.name, table, 0)
-    
+
     # because we set a bad abi (missing type, see "sysio.token.bad.abi") on the contract, the
     # getTableRow() is expected to fail and return None
     try:

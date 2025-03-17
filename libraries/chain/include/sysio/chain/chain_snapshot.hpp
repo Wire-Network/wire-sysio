@@ -25,7 +25,7 @@ struct chain_snapshot_header {
     *   6: Updated for v3.1.0 release
     */
 
-   static constexpr uint32_t minimum_compatible_version = 2;
+   static constexpr uint32_t minimum_compatible_version = 6;
    static constexpr uint32_t current_version = 6;
 
    uint32_t version = current_version;

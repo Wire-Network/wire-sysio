@@ -1392,7 +1392,7 @@ namespace sysio { namespace chain {
       if (!first_block_file.empty()) {
          return block_log_data(first_block_file).get_preamble().chain_context;
       }
-      
+
       if (!retained_dir.empty() && std::filesystem::exists(retained_dir)) {
          const std::regex        my_filter(R"(blocks-\d+-\d+\.log)");
          std::smatch             what;

@@ -8,8 +8,6 @@
 
 #include "test_api.hpp"
 
-
-
 struct check_auth_msg {
    sysio::name                    account;
    sysio::name                    permission;

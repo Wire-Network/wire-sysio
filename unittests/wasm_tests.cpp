@@ -910,7 +910,6 @@ BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::preactivate_feat
    t.set_code("globals"_n, (ss.str() + "(global $z (mut i32) (i32.const -12)))").c_str());
    //1028 should fail
    BOOST_CHECK_THROW(t.set_code("globals"_n, (ss.str() + "(global $z (mut i64) (i64.const -12)))").c_str()), sysio::chain::wasm_exception);
-
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( offset_check_old ) try {
@@ -1986,7 +1985,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu
 
    cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max;
-   cpu_limit -= EOS_PERCENT( cpu_limit, 10 * config::percent_1 ); // transaction_context verifies within 10%, so subtract 10% out
+   cpu_limit -= SYS_PERCENT( cpu_limit, 10 * config::percent_1 ); // transaction_context verifies within 10%, so subtract 10% out
 
    ptrx = create_trx(0);
    BOOST_CHECK_LT( cpu_limit, max_cpu_time_us );
@@ -2016,7 +2015,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    ptrx = create_trx(0);
    uint32_t combined_cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max + leeway.count();
    uint32_t subjective_cpu_bill_us = leeway.count();
-   uint32_t billed_cpu_time_us = EOS_PERCENT( (combined_cpu_limit - subjective_cpu_bill_us), 89 *config::percent_1 );
+   uint32_t billed_cpu_time_us = SYS_PERCENT( (combined_cpu_limit - subjective_cpu_bill_us), 89 *config::percent_1 );
    push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us );
 
    // Allow transaction with billed cpu less than 90% of (account cpu limit + leeway) if subject bill is 0
@@ -2026,7 +2025,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    ptrx = create_trx(0);
    combined_cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max + leeway.count();
    subjective_cpu_bill_us = 0;
-   billed_cpu_time_us = EOS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 89 *config::percent_1 );
+   billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 89 *config::percent_1 );
    push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us );
 
    // Disallow transaction with billed cpu equal to 90% of (account cpu limit + leeway - subjective bill)
@@ -2036,7 +2035,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max;
    combined_cpu_limit = cpu_limit + leeway.count();
    subjective_cpu_bill_us = cpu_limit;
-   billed_cpu_time_us = EOS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 90 * config::percent_1 );
+   billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 90 * config::percent_1 );
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -2045,7 +2044,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    // Disallow transaction with billed cpu greater 90% of (account cpu limit + leeway - subjective bill)
    subjective_cpu_bill_us = 0;
-   billed_cpu_time_us = EOS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 91 * config::percent_1 );
+   billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 91 * config::percent_1 );
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -2066,7 +2065,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    // Allow transaction with billed cpu less than 90% of leeway subjective bill being 0 to run but fail it if no cpu is staked afterwards
    ptrx = create_trx(0);
    subjective_cpu_bill_us = 0;
-   billed_cpu_time_us = EOS_PERCENT( leeway.count(), 89 *config::percent_1 );
+   billed_cpu_time_us = SYS_PERCENT( leeway.count(), 89 *config::percent_1 );
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("billed");
                                                              fc_exception_message_contains contains("reached account cpu limit");

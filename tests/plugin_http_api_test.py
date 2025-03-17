@@ -22,7 +22,7 @@ class HttpCategoryConfig:
     def __init__(self, use_category: bool):
         if use_category:
             self.ports = dict(zip(HttpCategoryConfig.categories, range(
-                HttpCategoryConfig.default_port, HttpCategoryConfig.default_port+len(HttpCategoryConfig.categories)))) 
+                HttpCategoryConfig.default_port, HttpCategoryConfig.default_port+len(HttpCategoryConfig.categories))))
         else:
             self.ports = None
 
@@ -47,7 +47,7 @@ class HttpCategoryConfig:
 class PluginHttpTest(unittest.TestCase):
     sleep_s = 2
     base_wallet_cmd_str = f"http://{TestHelper.LOCAL_HOST}:{TestHelper.DEFAULT_WALLET_PORT}"
-    keosd = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT, TestHelper.LOCAL_HOST)
+    kiod = WalletMgr(True, TestHelper.DEFAULT_PORT, TestHelper.LOCAL_HOST, TestHelper.DEFAULT_WALLET_PORT, TestHelper.LOCAL_HOST)
     node_id = 1
     data_dir = Path(Utils.getNodeDataDir(node_id))
     config_dir = Path(Utils.getNodeConfigDir(node_id))
@@ -71,7 +71,7 @@ class PluginHttpTest(unittest.TestCase):
             shutil.rmtree(self.config_dir)
         self.config_dir.mkdir()
 
-   # kill nodeop. keosd shuts down automatically
+   # kill nodeop. kiod shuts down automatically
     def killNodes(self):
         self.nodeop.kill(signal.SIGTERM)
 
@@ -83,11 +83,11 @@ class PluginHttpTest(unittest.TestCase):
             shutil.rmtree(self.config_dir)
         time.sleep(self.sleep_s)
 
-    # start keosd and nodeop
+    # start kiod and nodeop
     def startEnv(self) :
         self.createDataDir(self)
         self.createConfigDir(self)
-        self.keosd.launch()
+        self.kiod.launch()
         plugin_names = ["trace_api_plugin", "test_control_api_plugin", "test_control_plugin", "net_plugin",
                         "net_api_plugin", "producer_plugin", "producer_api_plugin", "chain_api_plugin",
                         "http_plugin", "db_size_api_plugin", "prometheus_plugin"]
@@ -98,7 +98,7 @@ class PluginHttpTest(unittest.TestCase):
         nodeop_flags += category_config.nodeopArgs()
 
         start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.EosServerPath, nodeop_plugins, nodeop_flags)
-        self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.keosd)
+        self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.kiod)
         time.sleep(self.sleep_s*2)
         self.nodeop.waitForBlock(1, timeout=30)
 
@@ -116,7 +116,7 @@ class PluginHttpTest(unittest.TestCase):
 
         testWalletName = "test"
         walletAccounts = [sysioAccount]
-        self.keosd.create(testWalletName, walletAccounts)
+        self.kiod.create(testWalletName, walletAccounts)
 
         retMap = self.nodeop.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
 
@@ -692,8 +692,8 @@ class PluginHttpTest(unittest.TestCase):
                 "signatures": ["SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp"],
                 "context_free_data": []}
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload_hex, returnType=ReturnType.raw).decode('ascii')
-        self.assertEqual(ret_str, "\"0be762a6406bab15530e87f21e02d1c58e77944ee55779a76f4112e3b65cac48\"")
-
+        # verify the returned transaction id.
+        self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
 
         # push_block with empty parameter
         endpoint=self.endpoint("chain_rw")
@@ -1569,7 +1569,7 @@ class PluginHttpTest(unittest.TestCase):
         if unittest.TestResult().wasSuccessful() and not keepLogs:
             self.cleanEnv(self)
 
-    
+
 if __name__ == "__main__":
     test_category = True if os.environ.get("PLUGIN_HTTP_TEST_CATEGORY") == "ON" else False
     category_config = HttpCategoryConfig(test_category)

@@ -70,7 +70,7 @@ payloadlessAccountName = "payloadless"
 def getCodeHash(node, account):
     # Example get code result: code hash: 67d0598c72e2521a1d588161dad20bbe9f8547beb5ce6d14f3abd550ab27d3dc
     cmd = f"get code {account}"
-    codeHash = node.processCleosCmd(cmd, cmd, silentErrors=False, returnType=ReturnType.raw)
+    codeHash = node.processClioCmd(cmd, cmd, silentErrors=False, returnType=ReturnType.raw)
     if codeHash is None: errorExit(f"Unable to get code {account} from node {node.nodeId}")
     else: codeHash = codeHash.split(' ')[2].strip()
     if Utils.Debug: Utils.Print(f"{account} code hash: {codeHash}")
@@ -94,35 +94,35 @@ def startCluster():
 
         print("Stand up walletd")
         if walletMgr.launch() is False:
-            errorExit("Failed to stand up keosd.")
+            errorExit("Failed to stand up kiod.")
 
     Print ("producing nodes: %d, non-producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d" % (pnodes, total_nodes-pnodes, topo, delay))
 
     Print("Stand up cluster")
     # set up read-only options for API node
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through pnodes-1, so the number pnodes is the no-producing API node
-    specificExtraNodeosArgs[pnodes]=" --plugin sysio::net_api_plugin"
-    specificExtraNodeosArgs[pnodes]+=" --contracts-console "
-    specificExtraNodeosArgs[pnodes]+=" --read-only-write-window-time-us "
-    specificExtraNodeosArgs[pnodes]+=" 10000 "
-    specificExtraNodeosArgs[pnodes]+=" --read-only-read-window-time-us "
-    specificExtraNodeosArgs[pnodes]+=" 490000 "
-    specificExtraNodeosArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
-    specificExtraNodeosArgs[pnodes]+=" 1 " # set small so there is churn
-    specificExtraNodeosArgs[pnodes]+=" --read-only-threads "
-    specificExtraNodeosArgs[pnodes]+=str(args.read_only_threads)
+    specificExtraNodeopArgs[pnodes]=" --plugin sysio::net_api_plugin"
+    specificExtraNodeopArgs[pnodes]+=" --contracts-console "
+    specificExtraNodeopArgs[pnodes]+=" --read-only-write-window-time-us "
+    specificExtraNodeopArgs[pnodes]+=" 10000 "
+    specificExtraNodeopArgs[pnodes]+=" --read-only-read-window-time-us "
+    specificExtraNodeopArgs[pnodes]+=" 490000 "
+    specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-cache-size-mb "
+    specificExtraNodeopArgs[pnodes]+=" 1 " # set small so there is churn
+    specificExtraNodeopArgs[pnodes]+=" --read-only-threads "
+    specificExtraNodeopArgs[pnodes]+=str(args.read_only_threads)
     if args.sys_vm_oc_enable:
         if platform.system() != "Linux":
             Print("OC not run on Linux. Skip the test")
             exit(True) # Do not fail the test
-        specificExtraNodeosArgs[pnodes]+=" --sys-vm-oc-enable "
-        specificExtraNodeosArgs[pnodes]+=args.sys_vm_oc_enable
+        specificExtraNodeopArgs[pnodes]+=" --sys-vm-oc-enable "
+        specificExtraNodeopArgs[pnodes]+=args.sys_vm_oc_enable
     if args.wasm_runtime:
-        specificExtraNodeosArgs[pnodes]+=" --wasm-runtime "
-        specificExtraNodeosArgs[pnodes]+=args.wasm_runtime
-    extraNodeosArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, specificExtraNodeosArgs=specificExtraNodeosArgs, extraNodeosArgs=extraNodeosArgs ) is False:
+        specificExtraNodeopArgs[pnodes]+=" --wasm-runtime "
+        specificExtraNodeopArgs[pnodes]+=args.wasm_runtime
+    extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=extraNodeopArgs ) is False:
         errorExit("Failed to stand up eos cluster.")
 
     Print ("Wait for Cluster stabilization")
@@ -169,12 +169,12 @@ def deployTestContracts():
     testAccount = Account(testAccountName)
     testAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     testAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(testAccount, cluster.sysioAccount, buyRAM=500000) # 95632 bytes required for test contract
+    cluster.createAccountAndVerify(testAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=500000) # 95632 bytes required for test contract
 
     userAccount = Account(userAccountName)
     userAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     userAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(userAccount, cluster.sysioAccount, stakeCPU=2000)
+    cluster.createAccountAndVerify(userAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakeCPU=2000)
 
     noAuthTableContractDir="unittests/test-contracts/no_auth_table"
     noAuthTableWasmFile="no_auth_table.wasm"
@@ -186,7 +186,7 @@ def deployTestContracts():
     payloadlessAccount = Account(payloadlessAccountName)
     payloadlessAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     payloadlessAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    cluster.createAccountAndVerify(payloadlessAccount, cluster.sysioAccount, buyRAM=100000)
+    cluster.createAccountAndVerify(payloadlessAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
     payloadlessContractDir="unittests/test-contracts/payloadless"
     payloadlessWasmFile="payloadless.wasm"
     payloadlessAbiFile="payloadless.abi"

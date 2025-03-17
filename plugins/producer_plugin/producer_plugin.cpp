@@ -407,7 +407,7 @@ public:
                                uint32_t                      billed_cpu_us,
                                const fc::time_point&         start,
                                bool                          is_transient);
-   
+
    void        add_greylist_accounts(const producer_plugin::greylist_params& params) {
       SYS_ASSERT(params.accounts.size() > 0, chain::invalid_http_request, "At least one account is required");
 
@@ -693,7 +693,7 @@ public:
       auto existing = chain.fetch_block_by_id(id);
       if (existing) {
          return true; // return true because the block is valid
-      } 
+      }
 
       // start processing of block
       std::future<block_state_ptr> bsf;
@@ -903,11 +903,11 @@ public:
          }
 
          exhausted = pr.block_exhausted;
-         
+
          if ( !in_producing_mode() && pr.trx_exhausted )
             exhausted = true;  // report transaction exhausted if trx was exhausted in non-producing mode (so we will restart
                                // a speculative block to retry it immediately, instead of waiting to receive a new block)
-         
+
       } catch (const guard_exception& e) {
          chain_plugin::handle_guard_exception(e);
       } catch (boost::interprocess::bad_alloc&) {
@@ -998,7 +998,7 @@ void new_chain_banner(const sysio::chain::controller& db)
       "*******************************\n"
       "*                             *\n"
       "*   ------ NEW CHAIN ------   *\n"
-      "*   - Welcome to Antelope -   *\n"
+      "*   -  Welcome to SYSIO!  -   *\n"
       "*   -----------------------   *\n"
       "*                             *\n"
       "*******************************\n"
@@ -1109,7 +1109,7 @@ if( options.count(op_name) ) { \
 }
 
 void producer_plugin_impl::plugin_initialize(const boost::program_options::variables_map& options)
-{ 
+{
    chain_plug = app().find_plugin<chain_plugin>();
    SYS_ASSERT(chain_plug, plugin_config_exception, "chain_plugin not found" );
    _options = &options;
@@ -1539,7 +1539,7 @@ producer_plugin::schedule_snapshot(const chain::snapshot_scheduler::snapshot_req
 
    // missing start/end is set to head block num, missing end to UINT32_MAX
    chain::snapshot_scheduler::snapshot_request_information sri = {
-      .block_spacing   = srp.block_spacing ? *srp.block_spacing : 0, 
+      .block_spacing   = srp.block_spacing ? *srp.block_spacing : 0,
       .start_block_num = srp.start_block_num ? *srp.start_block_num : head_block_num + 1,
       .end_block_num   = srp.end_block_num ? *srp.end_block_num : std::numeric_limits<uint32_t>::max(),
       .snapshot_description = srp.snapshot_description ? *srp.snapshot_description : ""
@@ -2183,7 +2183,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    if (in_producing_mode() && prev_billed_cpu_time_us > 0) {
       const auto& rl = chain.get_resource_limits_manager();
       if (!subjective_bill.is_account_disabled(first_auth) && !rl.is_unlimited_cpu(first_auth)) {
-         int64_t prev_billed_plus100_us = prev_billed_cpu_time_us + EOS_PERCENT(prev_billed_cpu_time_us, 100 * config::percent_1);
+         int64_t prev_billed_plus100_us = prev_billed_cpu_time_us + SYS_PERCENT(prev_billed_cpu_time_us, 100 * config::percent_1);
          if (prev_billed_plus100_us < max_trx_time.count())
             max_trx_time = fc::microseconds(prev_billed_plus100_us);
       }
@@ -2632,14 +2632,14 @@ void producer_plugin_impl::produce_block() {
       _protocol_features_signaled = false;
    }
 
-   /** 
+   /**
    * S-ROOT HEADER EXTENSION
    */
    auto& sub_chain_plug = app().get_plugin<sub_chain_plugin>();
    // TODO: verify sub chain is enabled, otherwise skip? or require?
    // Step 1: Scans transactions to find relevant transactions by comparing to a list of known contracts.
    auto relevant_s_transactions = sub_chain_plug.find_relevant_transactions(chain);
-   // Only calculate if there are relevant s-transactions   
+   // Only calculate if there are relevant s-transactions
    if (!relevant_s_transactions.empty()) {
       ilog("Relevant S-Transactions found: ${count}", ("count", relevant_s_transactions.size()));
       // Step 2: Builds array of leaves in the same order as they appear in the transaction list.
@@ -2659,7 +2659,7 @@ void producer_plugin_impl::produce_block() {
          s_root
       };
       ilog("S-Header prepared: ${s_header}", ("s_header", s_header.to_string()));
- 
+
       // Set the s_root in the chain controller for the building block state
       // to be referenced and passed to make_block_header on finalize_block below
       chain.set_s_header( s_header );

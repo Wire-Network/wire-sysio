@@ -10,7 +10,7 @@ from TestHarness.TestHelper import AppArgs
 ###############################################################
 # nodeop_run_test
 #
-# General test that tests a wide range of general use actions around nodeop and keosd
+# General test that tests a wide range of general use actions around nodeop and kiod
 #
 ###############################################################
 
@@ -59,18 +59,18 @@ try:
 
     if localTest and not dontLaunch:
         Print("Stand up cluster")
-        specificExtraNodeosArgs = {}
+        specificExtraNodeopArgs = {}
         associatedNodeLabels = {}
         if pnodes > 1:
-            specificExtraNodeosArgs[pnodes - 1] = ""
+            specificExtraNodeopArgs[pnodes - 1] = ""
         if pnodes > 3:
-            specificExtraNodeosArgs[pnodes - 2] = ""
+            specificExtraNodeopArgs[pnodes - 2] = ""
 
         if cluster.launch(totalNodes=totalNodes, 
                           pnodes=pnodes,
                           dontBootstrap=dontBootstrap,
                           pfSetupPolicy=PFSetupPolicy.PREACTIVATE_FEATURE_ONLY,
-                          specificExtraNodeosArgs=specificExtraNodeosArgs,
+                          specificExtraNodeopArgs=specificExtraNodeopArgs,
                           associatedNodeLabels=associatedNodeLabels) is False:
             cmdError("launcher")
             errorExit("Failed to stand up eos cluster.")
@@ -117,6 +117,10 @@ try:
     node=cluster.getNode(0)
     nonProdNode=cluster.getAllNodes()[-1]
 
+    # Make pefproducera privileged so they can create accounts
+    Print("Set privileged for account %s" % (cluster.defproduceraAccount.name))
+    transId=node.setPriv(cluster.defproduceraAccount, cluster.sysioAccount, waitForTransBlock=True, exitOnError=True)
+
     Print("Create new account %s via %s" % (testeraAccount.name, cluster.defproduceraAccount.name))
     transId=node.createInitializeAccount(testeraAccount, cluster.defproduceraAccount, stakedDeposit=0, waitForTransBlock=False, exitOnError=True)
 
@@ -140,7 +144,7 @@ try:
         cmdDesc = "convert pack_transaction"
         cmd     = "%s --pack-action-data '%s'" % (cmdDesc, json.dumps(trx))
         exitMsg = "failed to pack transaction: %s" % (trx)
-        packedTrx = node.processCleosCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True, exitMsg=exitMsg)
+        packedTrx = node.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True, exitMsg=exitMsg)
 
         packed_trx_param = packedTrx["packed_trx"]
         if packed_trx_param is None:

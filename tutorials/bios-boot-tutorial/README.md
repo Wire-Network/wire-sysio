@@ -39,7 +39,7 @@ The last command in the previous step printed the contracts directory. Make note
 ```bash
 $ pip install numpy
 $ cd ~
-$ git clone -b release/*latest* https://github.com/AntelopeIO/leap
-$ cd ./leap/tutorials/bios-boot-tutorial/
-$ python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --keosd=keosd --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
+$ git clone -b release/*latest* https://github.com/AntelopeIO/wire_sysio
+$ cd ./wire_sysio/tutorials/bios-boot-tutorial/
+$ python3 bios-boot-tutorial.py --clio=clio --nodeop=nodeop --kiod=kiod --contracts-dir="${CONTRACTS_DIRECTORY}" -w -a
 ```

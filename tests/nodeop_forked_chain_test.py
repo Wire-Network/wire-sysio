@@ -152,12 +152,12 @@ try:
 
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     shipNodeNum = 0
-    specificExtraNodeosArgs[shipNodeNum]="--plugin sysio::state_history_plugin"
+    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin"
 
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
 
     # ***   setup topogrophy   ***
@@ -167,7 +167,7 @@ try:
 
     if cluster.launch(prodCount=prodCount, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
     Print("Validating system accounts after bootstrap")

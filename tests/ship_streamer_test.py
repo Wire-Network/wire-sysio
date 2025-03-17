@@ -69,14 +69,14 @@ try:
     # and the only connection between those 2 groups is through the bridge node
 
     shipNodeNum = 1
-    specificExtraNodeosArgs={}
-    specificExtraNodeosArgs[shipNodeNum]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
+    specificExtraNodeopArgs={}
+    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin --trace-history --chain-state-history --state-history-stride 200 --plugin sysio::net_api_plugin --plugin sysio::producer_api_plugin "
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin  "
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin  "
 
     if cluster.launch(topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up eos cluster.")
 

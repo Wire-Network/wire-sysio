@@ -47,7 +47,7 @@ namespace sysio { namespace chain { namespace webassembly {
       template <typename T>
       struct is_whitelisted_type<vm::span<T>> {
          // Currently only a span of [const] char is allowed so there are no alignment concerns.
-         // If we wish to expand to general span<T> in the future, changes are needed in EOS VM
+         // If we wish to expand to general span<T> in the future, changes are needed in SYS VM
          // to check proper alignment of the void* within from_wasm before constructing the span.
          static constexpr bool value = std::is_same_v<std::remove_const_t<T>, char>;
       };

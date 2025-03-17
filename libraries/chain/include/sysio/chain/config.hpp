@@ -19,6 +19,7 @@ const static auto default_state_guard_size      =    128*1024*1024ll;
 const static name system_account_name    { "sysio"_n };
 const static name null_account_name      { "sysio.null"_n };
 const static name producers_account_name { "sysio.prods"_n };
+const static name roa_account_name       { "sysio.roa"_n };
 
 // Active permission of producers account requires greater than 2/3 of the producers to authorize
 const static name majority_producers_permission_name { "prod.major"_n }; // greater than 1/2 of producers needed to authorize
@@ -148,11 +149,11 @@ constexpr uint64_t billable_size_v = ((billable_size<T>::value + billable_alignm
 
 } } } // namespace sysio::chain::config
 
-constexpr uint64_t EOS_PERCENT(uint64_t value, uint32_t percentage) {
+constexpr uint64_t SYS_PERCENT(uint64_t value, uint32_t percentage) {
    return (value * percentage) / sysio::chain::config::percent_100;
 }
 
 template<typename Number>
-Number EOS_PERCENT_CEIL(Number value, uint32_t percentage) {
+Number SYS_PERCENT_CEIL(Number value, uint32_t percentage) {
    return ((value * percentage) + sysio::chain::config::percent_100 - sysio::chain::config::percent_1)  / sysio::chain::config::percent_100;
 }

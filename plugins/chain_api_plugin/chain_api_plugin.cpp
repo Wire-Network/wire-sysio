@@ -74,7 +74,7 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
                else {
                   SYS_THROW(chain::invalid_http_request, "Transaction contains invalid or empty action");
                }
-            } 
+            }
          }
          else {
             SYS_THROW(chain::invalid_http_request, "Transaction actions are missing or invalid");
@@ -88,7 +88,7 @@ parse_params<chain_apis::read_only::get_transaction_id_params, http_params_types
          SYS_THROW(chain::invalid_http_request, "Invalid transaction object");
       }
       return trx;
-   } EOS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Invalid transaction");
+   } SYS_RETHROW_EXCEPTIONS(chain::invalid_http_request, "Invalid transaction");
 }
 
 #define CALL_WITH_400(api_name, category, api_handle, api_namespace, call_name, http_response_code, params_type) \
@@ -182,7 +182,7 @@ void chain_api_plugin::plugin_startup() {
    }
 
 }
-   
+
 void chain_api_plugin::plugin_shutdown() {}
 
 }

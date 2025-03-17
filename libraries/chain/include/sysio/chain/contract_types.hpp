@@ -2,6 +2,7 @@
 
 #include <sysio/chain/authority.hpp>
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/asset.hpp> // Included for reducepolicy
 
 namespace sysio { namespace chain {
 
@@ -152,6 +153,24 @@ struct onerror {
    }
 };
 
+// **Roa change** to facilitate native action
+struct reducepolicy {
+   account_name owner;
+   account_name issuer;
+   asset        net_weight;
+   asset        cpu_weight;
+   asset        ram_weight;
+   uint8_t      network_gen;
+
+   static account_name get_account() {
+      return "sysio.roa"_n; // The account this contract is deployed to.
+   }
+
+   static action_name get_name() {
+      return "reducepolicy"_n; // The action name.
+   }
+};
+
 } } /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::newaccount                       , (creator)(name)(owner)(active) )
@@ -163,3 +182,5 @@ FC_REFLECT( sysio::chain::linkauth                         , (account)(code)(typ
 FC_REFLECT( sysio::chain::unlinkauth                       , (account)(code)(type) )
 FC_REFLECT( sysio::chain::canceldelay                      , (canceling_auth)(trx_id) )
 FC_REFLECT( sysio::chain::onerror                          , (sender_id)(sent_trx) )
+// **Roa change**
+FC_REFLECT( sysio::chain::reducepolicy                     , (owner)(issuer)(net_weight)(cpu_weight)(ram_weight)(network_gen))

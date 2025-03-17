@@ -30,26 +30,26 @@ done
 
 SYSIO_STUFF_DIR=$(mktemp -d)
 trap "rm -rf $SYSIO_STUFF_DIR" EXIT
-NODEOS_LAUNCH_PARAMS="./programs/nodeop/nodeop --resource-monitor-not-shutdown-on-threshold-exceeded -d $SYSIO_STUFF_DIR --config-dir $SYSIO_STUFF_DIR \
+NODEOP_LAUNCH_PARAMS="./programs/nodeop/nodeop --resource-monitor-not-shutdown-on-threshold-exceeded -d $SYSIO_STUFF_DIR --config-dir $SYSIO_STUFF_DIR \
 --chain-state-db-size-mb 8 --chain-state-db-guard-size-mb 0 \
 -e -psysio"
 
 run_nodeop() {
    if (( $VERBOSE == 0 )); then
-      $NODEOS_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" 2>/dev/null &
+      $NODEOP_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" 2>/dev/null &
    else
-      $NODEOS_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" &
+      $NODEOP_LAUNCH_PARAMS --http-server-address '' --p2p-listen-endpoint '' "$@" &
    fi
 }
 
 run_expect_success() {
    run_nodeop "$@"
-   local NODEOS_PID=$!
+   local NODEOP_PID=$!
    sleep 10
-   kill $NODEOS_PID
+   kill $NODEOP_PID
    rc=0
-   wait $NODEOS_PID && rc=$? || rc=$?
-   if [[ $rc -eq  127  || $rc -eq  $NODEOS_PID ]]; then
+   wait $NODEOP_PID && rc=$? || rc=$?
+   if [[ $rc -eq  127  || $rc -eq  $NODEOP_PID ]]; then
       rc=0
    fi
    return $rc
@@ -57,20 +57,20 @@ run_expect_success() {
 
 run_and_kill() {
    run_nodeop "$@"
-   local NODEOS_PID=$!
+   local NODEOP_PID=$!
    sleep 10
-   kill -KILL $NODEOS_PID
-   ! wait $NODEOS_PID
+   kill -KILL $NODEOP_PID
+   ! wait $NODEOP_PID
 }
 
 run_expect_failure() {
    run_nodeop "$@"
-   local NODEOS_PID=$!
+   local NODEOP_PID=$!
    MYPID=$$
    (sleep 20; kill -ALRM $MYPID) & local TIMER_PID=$!
-   trap "kill $NODEOS_PID; wait $NODEOS_PID; exit 1" ALRM
+   trap "kill $NODEOP_PID; wait $NODEOP_PID; exit 1" ALRM
    sleep 10
-   if wait $NODEOS_PID; then exit 1; fi
+   if wait $NODEOP_PID; then exit 1; fi
    kill $TIMER_PID
    trap ALRM
 }

@@ -35,24 +35,24 @@ seed=1
 Utils.Debug=debug
 testSuccessful=False
 
-def runNodeosAndGetOutput(myTimeout=3, nodeopLogPath=f"{Utils.TestLogRoot}"):
+def runNodeopAndGetOutput(myTimeout=3, nodeopLogPath=f"{Utils.TestLogRoot}"):
     """Startup nodeop, wait for timeout (before forced shutdown) and collect output. Stdout, stderr and return code are returned in a dictionary."""
     Print("Launching nodeop process.")
     cmd=f"programs/nodeop/nodeop --config-dir etc/sysio/node_bios --data-dir {nodeopLogPath}/node_bios --verbose-http-errors --http-validate-host=false --resource-monitor-not-shutdown-on-threshold-exceeded"
     Print("cmd: %s" % (cmd))
     proc=subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if debug: Print("Nodeos process launched.")
+    if debug: Print("Nodeop process launched.")
 
     output={}
     try:
         if debug: Print("Setting nodeop process timeout.")
         outs,errs = proc.communicate(timeout=myTimeout)
-        if debug: Print("Nodeos process has exited.")
+        if debug: Print("Nodeop process has exited.")
         output["stdout"] = outs.decode("utf-8")
         output["stderr"] = errs.decode("utf-8")
         output["returncode"] = proc.returncode
     except (subprocess.TimeoutExpired) as _:
-        Print("ERROR: Nodeos is running beyond the defined wait time. Hard killing nodeop instance.")
+        Print("ERROR: Nodeop is running beyond the defined wait time. Hard killing nodeop instance.")
         proc.send_signal(signal.SIGKILL)
         return (False, None)
 
@@ -86,7 +86,7 @@ try:
 
     for i in range(1,4):
         Print("Attempt %d." % (i))
-        ret = runNodeosAndGetOutput(timeout, cluster.nodeopLogPath)
+        ret = runNodeopAndGetOutput(timeout, cluster.nodeopLogPath)
         assert(ret)
         assert(isinstance(ret, tuple))
         if not ret[0]:

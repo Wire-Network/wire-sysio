@@ -27,7 +27,7 @@ using namespace fc;
 
 static auto get_table_rows_full = [](chain_apis::read_only& plugin,
                                      chain_apis::read_only::get_table_rows_params& params,
-                                     const fc::time_point& deadline) -> chain_apis::read_only::get_table_rows_result {   
+                                     const fc::time_point& deadline) -> chain_apis::read_only::get_table_rows_result {
    auto res_nm_v =  plugin.get_table_rows(params, deadline)();
    BOOST_REQUIRE(!std::holds_alternative<fc::exception_ptr>(res_nm_v));
    return std::get<chain_apis::read_only::get_table_rows_result>(std::move(res_nm_v));
@@ -94,9 +94,9 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    sysio::chain_apis::read_only::get_table_by_scope_params param{"sysio.token"_n, "accounts"_n, "inita", "", 10};
    sysio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
 
-   BOOST_REQUIRE_EQUAL(4u, result.rows.size());
+   BOOST_REQUIRE_EQUAL(5u, result.rows.size());
    BOOST_REQUIRE_EQUAL("", result.more);
-   if (result.rows.size() >= 4u) {
+   if (result.rows.size() >= 5u) {
       BOOST_REQUIRE_EQUAL(name("sysio.token"_n), result.rows[0].code);
       BOOST_REQUIRE_EQUAL(name("inita"_n), result.rows[0].scope);
       BOOST_REQUIRE_EQUAL(name("accounts"_n), result.rows[0].table);
@@ -106,6 +106,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
       BOOST_REQUIRE_EQUAL(name("initb"_n), result.rows[1].scope);
       BOOST_REQUIRE_EQUAL(name("initc"_n), result.rows[2].scope);
       BOOST_REQUIRE_EQUAL(name("initd"_n), result.rows[3].scope);
+      BOOST_REQUIRE_EQUAL(name("sysio"_n), result.rows[4].scope);
    }
 
    param.lower_bound = "initb";
@@ -203,7 +204,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    p.json = true;
    p.index_position = "primary";
    auto result = get_table_rows_full(plugin, p, fc::time_point::maximum());
-   
+
    BOOST_REQUIRE_EQUAL(4u, result.rows.size());
    BOOST_REQUIRE_EQUAL(false, result.more);
    if (result.rows.size() >= 4u) {

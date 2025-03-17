@@ -14,7 +14,7 @@ from typing import List
 from datetime import datetime
 from datetime import timedelta
 from .core_symbol import CORE_SYMBOL
-from .queries import NodeosQueries, BlockType
+from .queries import NodeopQueries, BlockType
 from .transactions import Transactions
 from .accounts import Account
 from .testUtils import Utils
@@ -139,7 +139,7 @@ class Node(Transactions):
             assert(account)
             assert(isinstance(account, Account))
             if Utils.Debug: Utils.Print("Validating account %s" % (account.name))
-            accountInfo=self.getEosAccount(account.name, exitOnError=True)
+            accountInfo=self.getSysioAccount(account.name, exitOnError=True)
             try:
                 assert(accountInfo["account_name"] == account.name)
             except (AssertionError, TypeError, KeyError) as _:
@@ -224,7 +224,7 @@ class Node(Transactions):
     def waitForTransBlockIfNeeded(self, trans, waitForTransBlock, exitOnError=False):
         if not waitForTransBlock:
             return trans
-        transId=NodeosQueries.getTransId(trans)
+        transId=NodeopQueries.getTransId(trans)
         if not self.waitForTransactionInBlock(transId, exitOnError=exitOnError):
             if exitOnError:
                 Utils.cmdError("transaction with id %s never made it into a block" % (transId))
@@ -465,11 +465,11 @@ class Node(Transactions):
             if Utils.Debug: Utils.Print("  cmd returned transaction: %s" % (trans))
             return
 
-        if ignoreNonTrans and not NodeosQueries.isTrans(trans):
+        if ignoreNonTrans and not NodeopQueries.isTrans(trans):
             if Utils.Debug: Utils.Print("  cmd returned a non-transaction: %s" % (trans))
             return
 
-        transId=NodeosQueries.getTransId(trans)
+        transId=NodeopQueries.getTransId(trans)
         self.lastTrackedTransactionId=transId
         if transId in self.transCache.keys():
             replaceMsg="replacing previous trans=\n%s" % json.dumps(self.transCache[transId], indent=2, sort_keys=True)
@@ -477,8 +477,8 @@ class Node(Transactions):
             replaceMsg=""
 
         if Utils.Debug and reportStatus:
-            status=NodeosQueries.getTransStatus(trans)
-            blockNum=NodeosQueries.getTransBlockNum(trans)
+            status=NodeopQueries.getTransStatus(trans)
+            blockNum=NodeopQueries.getTransBlockNum(trans)
             Utils.Print("  cmd returned transaction id: %s, status: %s, (possible) block num: %s %s" % (transId, status, blockNum, replaceMsg))
         elif Utils.Debug:
             Utils.Print("  cmd returned transaction id: %s %s" % (transId, replaceMsg))

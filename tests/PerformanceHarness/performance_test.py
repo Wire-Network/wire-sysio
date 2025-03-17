@@ -214,7 +214,7 @@ class PerformanceTest:
         for threadCount in range(minThreadCount, maxThreadCount+1):
             print(f"Running {optPlugin.value} thread count optimization check with {threadCount} {optPlugin.value} threads")
 
-            setattr(getattr(clusterConfig.extraNodeosArgs, optPlugin.value + 'PluginArgs'), f"{optPlugin.value}Threads", threadCount)
+            setattr(getattr(clusterConfig.extraNodeopArgs, optPlugin.value + 'PluginArgs'), f"{optPlugin.value}Threads", threadCount)
 
             binSearchResults = self.performPtbBinarySearch(clusterConfig=clusterConfig, logDirRoot=self.loggingConfig.pluginThreadOptLogsDirPath,
                                                             delReport=True, quiet=False, delPerfLogs=True, saveState=False)
@@ -376,9 +376,9 @@ class PerformanceTest:
             else:
                 optType = PerformanceTest.PluginThreadOptRunType.LOCAL_MAX
             prodResults = self.optimizePluginThreadCount(optPlugin=PerformanceTest.PluginThreadOpt.PRODUCER, optType=optType,
-                                                         minThreadCount=self.clusterConfig.extraNodeosArgs.producerPluginArgs._producerThreadsNodeosDefault)
+                                                         minThreadCount=self.clusterConfig.extraNodeopArgs.producerPluginArgs._producerThreadsNodeopDefault)
             print(f"Producer Thread Optimization results: {prodResults}")
-            self.clusterConfig.extraNodeosArgs.producerPluginArgs.threads = prodResults.recommendedThreadCount
+            self.clusterConfig.extraNodeopArgs.producerPluginArgs.threads = prodResults.recommendedThreadCount
 
         chainResults = None
         if self.ptConfig.calcChainThreads != "none":
@@ -388,9 +388,9 @@ class PerformanceTest:
             else:
                 optType = PerformanceTest.PluginThreadOptRunType.LOCAL_MAX
             chainResults = self.optimizePluginThreadCount(optPlugin=PerformanceTest.PluginThreadOpt.CHAIN, optType=optType,
-                                                          minThreadCount=self.clusterConfig.extraNodeosArgs.chainPluginArgs._chainThreadsNodeosDefault)
+                                                          minThreadCount=self.clusterConfig.extraNodeopArgs.chainPluginArgs._chainThreadsNodeopDefault)
             print(f"Chain Thread Optimization results: {chainResults}")
-            self.clusterConfig.extraNodeosArgs.chainPluginArgs.threads = chainResults.recommendedThreadCount
+            self.clusterConfig.extraNodeopArgs.chainPluginArgs.threads = chainResults.recommendedThreadCount
 
         netResults = None
         if self.ptConfig.calcNetThreads != "none":
@@ -400,9 +400,9 @@ class PerformanceTest:
             else:
                 optType = PerformanceTest.PluginThreadOptRunType.LOCAL_MAX
             netResults = self.optimizePluginThreadCount(optPlugin=PerformanceTest.PluginThreadOpt.NET, optType=optType,
-                                                        minThreadCount=self.clusterConfig.extraNodeosArgs.netPluginArgs._netThreadsNodeosDefault)
+                                                        minThreadCount=self.clusterConfig.extraNodeopArgs.netPluginArgs._netThreadsNodeopDefault)
             print(f"Net Thread Optimization results: {netResults}")
-            self.clusterConfig.extraNodeosArgs.netPluginArgs.threads = netResults.recommendedThreadCount
+            self.clusterConfig.extraNodeopArgs.netPluginArgs.threads = netResults.recommendedThreadCount
 
         tpsTestResult = None
         if not self.ptConfig.skipTpsTests:

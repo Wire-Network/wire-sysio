@@ -31,4 +31,4 @@ try:
     assert nodeop.waitForBlock(31)
 finally:
     # clean up
-    Node.killAllNodeos()
+    Node.killAllNodeop()

@@ -44,7 +44,7 @@ try:
         totalProducers=1,
         totalNodes=3,
         loadSystemContract=False,
-        specificExtraNodeosArgs={
+        specificExtraNodeopArgs={
             1:"--read-mode irreversible --plugin sysio::producer_api_plugin"})
 
     producerNodeId = 0
@@ -64,7 +64,7 @@ try:
     setProdsStr += '{"producer_name":' + newProducerAcc.name + ',"block_signing_key":' + newProducerAcc.activePublicKey + '}'
     setProdsStr += ']}'
     cmd="push action -j sysio setprods '{}' -p sysio".format(setProdsStr)
-    trans = producerNode.processCleosCmd(cmd, cmd, silentErrors=False)
+    trans = producerNode.processClioCmd(cmd, cmd, silentErrors=False)
     assert trans
     setProdsBlockNum = int(trans["processed"]["block_num"])
 

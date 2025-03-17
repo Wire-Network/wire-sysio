@@ -48,7 +48,6 @@ namespace sysio { namespace testing {
       return os;
    }
 
-
    std::string read_wast( const char* fn ) {
       std::ifstream wast_file(fn);
       FC_ASSERT( wast_file.is_open(), "wast file cannot be found" );
@@ -278,6 +277,7 @@ namespace sysio { namespace testing {
             }
             produce_block();
             set_bios_contract();
+            init_roa();
             break;
          }
          case setup_policy::none:
@@ -596,6 +596,46 @@ namespace sysio { namespace testing {
       set_transaction_headers(trx);
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
       return push_transaction( trx );
+   }
+
+   transaction_trace_ptr base_tester::register_node_owner(account_name owner, uint32_t tier) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
+
+      trx.actions.emplace_back(get_action(config::roa_account_name, "regnodeowner"_n,
+                                          vector<permission_level>{{config::roa_account_name, config::active_name}},
+                                          mutable_variant_object()
+                                          ("owner", owner)
+                                          ("tier", tier)
+      ));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::roa_account_name, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   transaction_trace_ptr base_tester::add_roa_policy(account_name owner, account_name issuer, string net_weight,
+                                                     string cpu_weight, string ram_weight, int64_t network_gen,
+                                                     uint32_t time_block) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back(get_action("sysio.roa"_n, "addpolicy"_n,
+                                          vector<permission_level>{{issuer, config::active_name}},
+                                          fc::mutable_variant_object
+                                          ("owner", owner)
+                                          ("issuer", issuer)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
+                                          ("time_block", time_block)
+      ));
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(issuer, "active"), control->get_chain_id());
+      return push_transaction(trx);
    }
 
    transaction_trace_ptr base_tester::push_transaction( packed_transaction& trx,
@@ -1123,6 +1163,27 @@ namespace sysio { namespace testing {
       set_abi(config::system_account_name, contracts::sysio_bios_abi());
    }
 
+   void base_tester::init_roa() {
+      const auto& roa = "sysio.roa"_n;
+
+      // Create the ROA account and mark it as privileged
+      create_account(roa, config::system_account_name);
+      set_code(roa, contracts::sysio_roa_wasm());
+      set_abi(roa, contracts::sysio_roa_abi().data());
+      push_action(config::system_account_name, "setpriv"_n,
+                  config::system_account_name,
+                  fc::mutable_variant_object()("account", roa)("is_priv", 1)
+      );
+
+      // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
+      push_action("sysio.roa"_n, "activateroa"_n, "sysio.roa"_n,
+                  fc::mutable_variant_object()
+                  ("total_sys", asset::from_string("75496.0000 SYS"))
+                  ("bytes_per_unit", 104)
+      );
+
+      produce_block();
+   }
 
    vector<producer_authority> base_tester::get_producer_authorities( const vector<account_name>& producer_names )const {
        // Create producer schedule

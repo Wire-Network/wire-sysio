@@ -247,6 +247,7 @@ namespace sysio { namespace testing {
          void                  set_before_preactivate_bios_contract();
          void                  set_before_producer_authority_bios_contract();
          void                  set_bios_contract();
+         void                  init_roa();
 
          vector<producer_authority>  get_producer_authorities( const vector<account_name>& producer_names )const;
          transaction_trace_ptr       set_producers(const vector<account_name>& producer_names);
@@ -267,6 +268,9 @@ namespace sysio { namespace testing {
                                                bool multisig = false,
                                                bool include_code = true
                                              );
+
+         transaction_trace_ptr register_node_owner( account_name account, uint32_t tier );
+         transaction_trace_ptr add_roa_policy( account_name owner, account_name issuer, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen, uint32_t time_block );
 
          transaction_trace_ptr push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
          transaction_trace_ptr push_reqauth(account_name from, string role, bool multi_sig = false);
