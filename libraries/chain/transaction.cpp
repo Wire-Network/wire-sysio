@@ -161,14 +161,11 @@ size_t packed_transaction::get_estimated_size()const {
 
 
 digest_type packed_transaction::packed_digest()const {
-   digest_type::encoder prunable;
-   fc::raw::pack( prunable, signatures );
-   fc::raw::pack( prunable, packed_context_free_data );
-
    digest_type::encoder enc;
+   fc::raw::pack( enc, signatures );
+   fc::raw::pack( enc, packed_context_free_data );
    fc::raw::pack( enc, compression );
-   fc::raw::pack( enc, packed_trx  );
-   fc::raw::pack( enc, prunable.result() );
+   fc::raw::pack( enc, trx_id  );   // all of transaction is represented by trx id/digest
 
    return enc.result();
 }
