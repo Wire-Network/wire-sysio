@@ -6,7 +6,6 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
-#include <sysio/chain/account_object.hpp>
 #include <algorithm>
 
 namespace sysio { namespace chain { namespace resource_limits {
