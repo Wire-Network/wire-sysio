@@ -382,8 +382,8 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, validating_tester) { try {
    set_code( config::system_account_name, contracts::sysio_bios_wasm() );
 
    set_code( "test"_n, contracts::sysio_bios_wasm() );
-   set_abi( "test"_n, contracts::sysio_bios_abi().data() );
-	set_code( "test"_n, test_contracts::payloadless_wasm() );
+   set_abi( "test"_n, contracts::sysio_bios_abi() );
+   set_code( "test"_n, test_contracts::payloadless_wasm() );
 
    call_doit_and_check( "test"_n, "test"_n, [&]( const transaction_trace_ptr& res ) {
       BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed);
