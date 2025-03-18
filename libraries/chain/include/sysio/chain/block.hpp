@@ -37,17 +37,30 @@ namespace sysio { namespace chain {
       explicit transaction_receipt( const packed_transaction& ptrx ):transaction_receipt_header(executed),trx(std::in_place_type<packed_transaction>, ptrx){}
 
       std::variant<transaction_id_type, packed_transaction> trx;
-
-      digest_type digest()const {
+   private:
+      enum packing_type { uncompressed, compressed};
+      digest_type get_digest(packing_type packing)const {
          digest_type::encoder enc;
          fc::raw::pack( enc, status );
          fc::raw::pack( enc, cpu_usage_us );
          fc::raw::pack( enc, net_usage_words );
          if( std::holds_alternative<transaction_id_type>(trx) )
             fc::raw::pack( enc, std::get<transaction_id_type>(trx) );
-         else
-            fc::raw::pack( enc, std::get<packed_transaction>(trx).packed_digest() );
+         else {
+            if (packing == packing_type::compressed)
+               fc::raw::pack( enc, std::get<packed_transaction>(trx).packed_digest() );
+            else
+               fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
+         }
          return enc.result();
+      }
+   public:
+      digest_type digest()const {
+         return get_digest(packing_type::uncompressed);
+      }
+
+      digest_type packed_digest()const {
+         return get_digest(packing_type::compressed);
       }
    };
 

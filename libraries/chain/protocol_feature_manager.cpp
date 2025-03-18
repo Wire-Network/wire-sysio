@@ -319,6 +319,20 @@ retires a deferred transaction is invalid.
 */
             {builtin_protocol_feature_t::disable_deferred_trxs_stage_1}
          } )
+         (  builtin_protocol_feature_t::disable_compression_in_transaction_merkle, builtin_protocol_feature_spec{
+            "DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE",
+            fc::variant("d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
+Depends on: DISABLE_DEFERRED_TRXS_STAGE_2
+
+Once this is turned on, the transaction_mroot will no longer be computed using
+the compressed transaction. It will instead include the transaction via its id,
+which is derived by its own digest.
+*/
+            {builtin_protocol_feature_t::disable_deferred_trxs_stage_2}
+         } )
    ;
 
 
