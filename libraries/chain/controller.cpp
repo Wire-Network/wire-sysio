@@ -1497,8 +1497,12 @@ struct controller_impl {
       r.net_usage_words      = net_usage_words;
       r.status               = status;
       auto& bb = std::get<building_block>(pending->_block_stage);
-      if( std::holds_alternative<digests_t>(bb._trx_mroot_or_receipt_digests) )
-         std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
+      if( std::holds_alternative<digests_t>(bb._trx_mroot_or_receipt_digests) ) {
+         if( self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle ) )
+            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
+         else
+            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.packed_digest() );
+      }
       return r;
    }
 
@@ -2174,7 +2178,8 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    block_state_ptr create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_header_state& prev ) {
-      auto trx_mroot = calculate_trx_merkle( b->transactions );
+      const bool activated = self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle );
+      auto trx_mroot = calculate_trx_merkle( b->transactions, activated );
       SYS_ASSERT( b->transaction_mroot == trx_mroot, block_validate_exception,
                   "invalid block transaction merkle root ${b} != ${c}", ("b", b->transaction_mroot)("c", trx_mroot) );
 
@@ -2428,10 +2433,18 @@ struct controller_impl {
       return applied_trxs;
    }
 
-   static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs ) {
+   const checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs, bool disable_compression_in_transaction_merkle )const {
       deque<digest_type> trx_digests;
-      for( const auto& a : trxs )
-         trx_digests.emplace_back( a.digest() );
+      if (disable_compression_in_transaction_merkle) {
+         for( const auto& a : trxs ) {
+            trx_digests.emplace_back( (a.digest)() );
+         }
+      }
+      else {
+         for( const auto& a : trxs ) {
+            trx_digests.emplace_back( (a.packed_digest)() );
+         }
+      }
 
       return merkle( std::move(trx_digests) );
    }

@@ -169,6 +169,7 @@ namespace sysio { namespace chain {
       size_t get_estimated_size()const;
 
       digest_type packed_digest()const;
+      digest_type digest()const;
 
       const transaction_id_type& id()const { return trx_id; }
       bytes               get_raw_transaction()const;

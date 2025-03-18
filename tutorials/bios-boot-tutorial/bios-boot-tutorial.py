@@ -363,6 +363,8 @@ def stepSetSystemContract():
     # DISABLE_DEFERRED_TRXS_STAGE_2 - PREVENT PREVIOUSLY SCHEDULED DEFERRED TRANSACTIONS FROM REACHING OTHER NODE
     # THIS DEPENDS ON DISABLE_DEFERRED_TRXS_STAGE_1
     retry(args.clio + 'push action sysio activate \'["09e86cb0accf8d81c9e85d34bea4b925ae936626d00c984e4691186891f5bc16"]\' -p sysio@active')
+    # DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
+    retry(args.clio + 'push action sysio activate \'["d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586"]\' -p sysio@active')
     sleep(1)
 
     # install sysio.system latest version
