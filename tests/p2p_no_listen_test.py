@@ -29,7 +29,7 @@ try:
     TestHelper.printSystemInfo("BEGIN")
 
     cmd = [
-        Utils.EosServerPath,
+        Utils.SysServerPath,
         '-e',
         '-p',
         'sysio',

@@ -35,7 +35,7 @@ CONTRACT sysmechanics : public sysio::contract {
         }
 
         /**
-         * Simple EOS RAM benchmark which reads and writes a table.
+         * Simple SYS RAM benchmark which reads and writes a table.
          */
         [[sysio::action]] void ram() {
             ramdata_index ramdata(_self, _self.value);
@@ -66,7 +66,7 @@ CONTRACT sysmechanics : public sysio::contract {
         }
 
         /**
-         * Simple EOS Net benchmark which just accepts any string passed in.
+         * Simple SYS Net benchmark which just accepts any string passed in.
          */
         [[sysio::action]] void net(std::string input) {
             // Only let us run this

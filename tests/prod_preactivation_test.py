@@ -39,7 +39,7 @@ walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 dontBootstrap=sanityTest
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
@@ -54,7 +54,7 @@ try:
                          dontBootstrap=dontBootstrap,
                          pfSetupPolicy=PFSetupPolicy.NONE, extraNodeopArgs=" --plugin sysio::producer_api_plugin  --http-max-response-time-ms 990000 ") is False:
             cmdError("launcher")
-            errorExit("Failed to stand up eos cluster.")
+            errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)

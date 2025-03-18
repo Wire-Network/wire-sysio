@@ -36,7 +36,7 @@ walletPort=args.wallet_port
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
@@ -68,7 +68,7 @@ try:
                       specificExtraNodeopArgs=specificExtraNodeopArgs,
                       extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
 

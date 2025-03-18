@@ -62,7 +62,7 @@ try:
     if cluster.launch(pnodes=pnodes, unstartedNodes=2, totalNodes=total_nodes, prodCount=prod_count, 
                       topo='./tests/p2p_sync_throttle_test_shape.json', delay=delay, 
                       extraNodeopArgs=extraNodeopArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     prodNode = cluster.getNode(0)
     nonProdNode = cluster.getNode(1)

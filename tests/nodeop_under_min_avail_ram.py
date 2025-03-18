@@ -29,7 +29,7 @@ walletPort=args.wallet_port
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
@@ -44,7 +44,7 @@ try:
     extraNodeopArgs=" %s %d %s %d  --http-max-response-time-ms 990000 " % (minRAMFlag, minRAMValue, maxRAMFlag, maxRAMValue)
     if cluster.launch(onlyBios=False, pnodes=pNodes, totalNodes=totalNodes, totalProducers=totalNodes, extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)

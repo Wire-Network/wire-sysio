@@ -62,9 +62,9 @@ class Cluster(object):
                  , defproduceraPrvtKey=None, defproducerbPrvtKey=None, staging=False, loggingLevel="debug", loggingLevelDict={}, nodeopVers="", unshared=False, keepRunning=False, keepLogs=False):
         """Cluster container.
         localCluster [True|False] Is cluster local to host.
-        host: eos server host
-        port: eos server port
-        walletHost: eos wallet host
+        host: sys server host
+        port: sys server port
+        walletHost: sys wallet host
         walletPort: wos wallet port
         defproduceraPrvtKey: Defproducera account private key
         defproducerbPrvtKey: Defproducerb account private key
@@ -208,7 +208,7 @@ class Cluster(object):
         Utils.Print("alternateVersionLabelsFile=%s" % (alternateVersionLabelsFile))
 
         if not self.localCluster:
-            Utils.Print("WARNING: Cluster not local, not launching %s." % (Utils.EosServerName))
+            Utils.Print("WARNING: Cluster not local, not launching %s." % (Utils.SysServerName))
             return True
 
         if len(self.nodes) > 0:
@@ -474,11 +474,11 @@ class Cluster(object):
         launcher.generate()
         self.nodes = []
         for instance in launcher.network.nodes.values():
-            eosdcmd = launcher.construct_command_line(instance)
+            sysdcmd = launcher.construct_command_line(instance)
 
             nodeNum = instance.index
             node = Node(self.host, self.port + nodeNum, nodeNum, Path(instance.data_dir_name),
-                        Path(instance.config_dir_name), eosdcmd, unstarted=instance.dont_start,
+                        Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
             if nodeNum == Node.biosNodeId:
                 self.biosNode = node
@@ -495,7 +495,7 @@ class Cluster(object):
 
         if self.nodes is None or self.startedNodesCount != len(self.nodes):
             Utils.Print("ERROR: Unable to validate %s instances, expected: %d, actual: %d" %
-                          (Utils.EosServerName, self.startedNodesCount, len(self.nodes)))
+                          (Utils.SysServerName, self.startedNodesCount, len(self.nodes)))
             return False
 
         if not self.biosNode or not Utils.waitForBool(self.biosNode.checkPulse, Utils.systemWaitTimeout):
@@ -655,8 +655,8 @@ class Cluster(object):
         """Returns client version (string)"""
         p = re.compile(r'^v?(.+)\n$')
         try:
-            cmd="%s version client" % (Utils.EosClientPath)
-            if fullVersion: cmd="%s version full" % (Utils.EosClientPath)
+            cmd="%s version client" % (Utils.SysClientPath)
+            if fullVersion: cmd="%s version full" % (Utils.SysClientPath)
             if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
             response=Utils.checkOutput(cmd.split())
             assert(response)
@@ -766,7 +766,7 @@ class Cluster(object):
         node=self.nodes[0]
         fromm=source
         to=accounts[0]
-        Utils.Print("Transfer %s units from account %s to %s on eos server port %d" % (
+        Utils.Print("Transfer %s units from account %s to %s on sys server port %d" % (
             transferAmountStr, fromm.name, to.name, node.port))
         trans=node.transferFunds(fromm, to, transferAmountStr)
         transId=Node.getTransId(trans)
@@ -775,15 +775,15 @@ class Cluster(object):
 
         if Utils.Debug: Utils.Print("Funds transfered on transaction id %s." % (transId))
 
-        nextEosIdx=-1
+        nextSysIdx=-1
         for i in range(0, count):
             account=accounts[i]
             nextInstanceFound=False
             for _ in range(0, count):
-                #Utils.Print("nextEosIdx: %d, n: %d" % (nextEosIdx, n))
-                nextEosIdx=(nextEosIdx + 1)%count
-                if not self.nodes[nextEosIdx].killed:
-                    #Utils.Print("nextEosIdx: %d" % (nextEosIdx))
+                #Utils.Print("nextSysIdx: %d, n: %d" % (nextSysIdx, n))
+                nextSysIdx=(nextSysIdx + 1)%count
+                if not self.nodes[nextSysIdx].killed:
+                    #Utils.Print("nextSysIdx: %d" % (nextSysIdx))
                     nextInstanceFound=True
                     break
 
@@ -791,8 +791,8 @@ class Cluster(object):
                 Utils.Print("ERROR: No active nodes found.")
                 return False
 
-            #Utils.Print("nextEosIdx: %d, count: %d" % (nextEosIdx, count))
-            node=self.nodes[nextEosIdx]
+            #Utils.Print("nextSysIdx: %d, count: %d" % (nextSysIdx, count))
+            node=self.nodes[nextSysIdx]
             if Utils.Debug: Utils.Print("Wait for transaction id %s on node port %d" % (transId, node.port))
             if node.waitForTransactionInBlock(transId) is False:
                 Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, node.port))
@@ -802,7 +802,7 @@ class Cluster(object):
             transferAmountStr=Node.currencyIntToStr(transferAmount, CORE_SYMBOL)
             fromm=account
             to=accounts[i+1] if i < (count-1) else source
-            Utils.Print("Transfer %s units from account %s to %s on eos server port %d." %
+            Utils.Print("Transfer %s units from account %s to %s on sys server port %d." %
                     (transferAmountStr, fromm.name, to.name, node.port))
 
             trans=node.transferFunds(fromm, to, transferAmountStr)
@@ -838,10 +838,10 @@ class Cluster(object):
                 continue
 
             if Utils.Debug: Utils.Print("Validate funds on %s server port %d." %
-                                        (Utils.EosServerName, node.port))
+                                        (Utils.SysServerName, node.port))
 
             if node.validateFunds(initialBalances, transferAmount, source, accounts) is False:
-                Utils.Print("ERROR: Failed to validate funds on eos node port: %d" % (node.port))
+                Utils.Print("ERROR: Failed to validate funds on sys node port: %d" % (node.port))
                 return False
 
         return True
@@ -851,7 +851,7 @@ class Cluster(object):
         receiving transferAmount*n SYS and forwarding x-transferAmount funds. Transfer actions are spread round-robin across the cluster to vaidate system cohesiveness."""
 
         if Utils.Debug: Utils.Print("Get initial system balances.")
-        initialBalances=self.nodes[0].getEosBalances([self.defproduceraAccount] + self.accounts)
+        initialBalances=self.nodes[0].getSysBalances([self.defproduceraAccount] + self.accounts)
         assert(initialBalances)
         assert(isinstance(initialBalances, dict))
 
@@ -1188,7 +1188,7 @@ class Cluster(object):
 
         expectedAmount="1000000000.0000 {0}".format(CORE_SYMBOL)
         Utils.Print("Verify sysio issue, Expected: %s" % (expectedAmount))
-        actualAmount=biosNode.getAccountEosBalanceStr(sysioAccount.name)
+        actualAmount=biosNode.getAccountSysBalanceStr(sysioAccount.name)
         if expectedAmount != actualAmount:
             Utils.Print("ERROR: Issue verification failed. Excepted %s, actual: %s" %
                         (expectedAmount, actualAmount))
@@ -1278,8 +1278,8 @@ class Cluster(object):
         return True
 
     @staticmethod
-    def pgrepEosServers(timeout=None):
-        cmd=Utils.pgrepCmd(Utils.EosServerName)
+    def pgrepSysServers(timeout=None):
+        cmd=Utils.pgrepCmd(Utils.SysServerName)
 
         def myFunc():
             psOut=None
@@ -1295,12 +1295,12 @@ class Cluster(object):
 
         return Utils.waitForObj(myFunc, timeout)
 
-    # Kills a percentange of Eos instances starting from the tail and update eosInstanceInfos state
-    def killSomeEosInstances(self, killCount, killSignalStr=Utils.SigKillTag):
+    # Kills a percentange of Sys instances starting from the tail and update sysInstanceInfos state
+    def killSomeSysInstances(self, killCount, killSignalStr=Utils.SigKillTag):
         killSignal=signal.SIGKILL
         if killSignalStr == Utils.SigTermTag:
             killSignal=signal.SIGTERM
-        Utils.Print("Kill %d %s instances with signal %s." % (killCount, Utils.EosServerName, killSignal))
+        Utils.Print("Kill %d %s instances with signal %s." % (killCount, Utils.SysServerName, killSignal))
 
         killedCount=0
         for node in reversed(self.nodes):
@@ -1314,7 +1314,7 @@ class Cluster(object):
         time.sleep(1) # Give processes time to stand down
         return True
 
-    def relaunchEosInstances(self, nodeArgs="", waitForTerm=False):
+    def relaunchSysInstances(self, nodeArgs="", waitForTerm=False):
 
         chainArg=self.__chainSyncStrategy.arg + " " + nodeArgs
 

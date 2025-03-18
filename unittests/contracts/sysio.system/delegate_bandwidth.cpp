@@ -88,9 +88,9 @@ void system_contract::buyrambytes( name payer, name receiver, uint32_t bytes ) {
 
    auto itr = _rammarket.find(ramcore_symbol.raw());
    auto tmp = *itr;
-   auto eosout = tmp.convert( asset(bytes, ram_symbol), core_symbol() );
+   auto sysout = tmp.convert( asset(bytes, ram_symbol), core_symbol() );
 
-   buyram( payer, receiver, eosout );
+   buyram( payer, receiver, sysout );
 }
 
 

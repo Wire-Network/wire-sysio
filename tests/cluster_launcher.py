@@ -49,7 +49,7 @@ try:
         extraNodeopArgs = ''
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, topo=topo, delay=delay, 
                       extraNodeopArgs=extraNodeopArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     testSuccessful=True
 finally:

@@ -44,7 +44,7 @@ try:
     }
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo='line', delay=delay, 
                       specificExtraNodeopArgs=specificArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     # Be sure all nodes start out connected   (bios node omitted from diagram for brevity)
     #     node00              node01            node02            node03            node04

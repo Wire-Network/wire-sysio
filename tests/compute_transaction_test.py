@@ -56,7 +56,7 @@ try:
     Print("Stand up cluster")
     extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,extraNodeopArgs=extraNodeopArgs ) is False:
-       errorExit("Failed to stand up eos cluster.")
+       errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -87,7 +87,7 @@ try:
     transferAmount="1000.0000 {0}".format(CORE_SYMBOL)
 
     npnode.transferFunds(cluster.sysioAccount, account1, transferAmount, "fund account", waitForTransBlock=True)
-    preBalances = node.getEosBalances([account1, account2])
+    preBalances = node.getSysBalances([account1, account2])
     Print("Starting balances:")
     Print(preBalances)
 
@@ -103,14 +103,14 @@ try:
     assert(results[0])
     node.waitForLibToAdvance(30)
 
-    postBalances = node.getEosBalances([account1, account2])
+    postBalances = node.getSysBalances([account1, account2])
     assert(postBalances == preBalances)
 
     results = node.pushTransaction(trx, opts='--dry-run --skip-sign')
     assert(results[0])
     node.waitForLibToAdvance(30)
 
-    postBalances = node.getEosBalances([account1, account2])
+    postBalances = node.getSysBalances([account1, account2])
 
     assert(postBalances == preBalances)
 

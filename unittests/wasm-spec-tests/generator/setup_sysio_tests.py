@@ -176,7 +176,7 @@ if __name__ == '__main__':
                 (optional) Arg 3: Directory for intermediate test files <defaults to a temp directory>
 
                 ex:
-                python setup_sysio_tests.py ~/code/sys-vm-test-wasms ~/code/eos ~/wasm_spec_tests
+                python setup_sysio_tests.py ~/code/sys-vm-test-wasms ~/code/sys ~/wasm_spec_tests
               """)
         sys.exit(1)
 

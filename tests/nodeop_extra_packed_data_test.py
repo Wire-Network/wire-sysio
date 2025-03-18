@@ -46,7 +46,7 @@ walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 dontBootstrap=sanityTest # intent is to limit the scope of the sanity test to just verifying that nodes can be started
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 timeout = .5 * 12 * 2 + 60 # time for finalization with 1 producer + 60 seconds padding
 Utils.setIrreversibleTimeout(timeout)
@@ -73,7 +73,7 @@ try:
                           specificExtraNodeopArgs=specificExtraNodeopArgs,
                           associatedNodeLabels=associatedNodeLabels) is False:
             cmdError("launcher")
-            errorExit("Failed to stand up eos cluster.")
+            errorExit("Failed to stand up sys cluster.")
     else:
         Print("Collecting cluster info.")
         cluster.initializeNodes(defproduceraPrvtKey=defproduceraPrvtKey, defproducerbPrvtKey=defproducerbPrvtKey)
@@ -81,7 +81,7 @@ try:
         print("Stand up walletd")
         if walletMgr.launch() is False:
             cmdError("%s" % (WalletdName))
-            errorExit("Failed to stand up eos walletd.")
+            errorExit("Failed to stand up sys walletd.")
     
     if sanityTest:
         testSuccessful=True

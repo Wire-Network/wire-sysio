@@ -208,8 +208,8 @@ public:
       return push_transaction( trx );
    }
 
-   action_result buyram( const account_name& payer, account_name receiver, const asset& eosin ) {
-      return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",eosin) );
+   action_result buyram( const account_name& payer, account_name receiver, const asset& sysin ) {
+      return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",sysin) );
    }
    action_result buyrambytes( const account_name& payer, account_name receiver, uint32_t numbytes ) {
       return push_action( payer, "buyrambytes"_n, mvo()( "payer",payer)("receiver",receiver)("bytes",numbytes) );
@@ -549,8 +549,8 @@ inline fc::mutable_variant_object proxy( account_name acct ) {
    return voter( acct )( "is_proxy", 1 );
 }
 
-inline uint64_t M( const string& eos_str ) {
-   return core_from_string( eos_str ).get_amount();
+inline uint64_t M( const string& sys_str ) {
+   return core_from_string( sys_str ).get_amount();
 }
 
 }

@@ -43,7 +43,7 @@ struct block_log_extract_fixture {
 
    genesis_state gs;
    fc::temp_directory dir;
-   std::optional<block_log> log;
+   std::optional<block_log<signed_block>> log;
 };
 
 BOOST_AUTO_TEST_SUITE(block_log_extraction_tests)
@@ -52,9 +52,9 @@ BOOST_FIXTURE_TEST_CASE(extract_from_middle, block_log_extract_fixture) try {
 
    fc::temp_directory output_dir;
    block_num_type start=3, end=7;
-   block_log::extract_block_range(dir.path(), output_dir.path(), start, end);
+   block_log<signed_block>::extract_block_range(dir.path(), output_dir.path(), start, end);
    rename_blocks_files(output_dir.path());
-   block_log new_log(output_dir.path());
+   block_log<signed_block> new_log(output_dir.path());
 
    auto id = gs.compute_chain_id();
    auto extracted_id = new_log.extract_chain_id(output_dir.path());
@@ -70,9 +70,9 @@ BOOST_FIXTURE_TEST_CASE(extract_from_start, block_log_extract_fixture) try {
 
    fc::temp_directory output_dir;
    block_num_type start=1, end=7;
-   block_log::extract_block_range(dir.path(), output_dir.path(), start, end);
+   block_log<signed_block>::extract_block_range(dir.path(), output_dir.path(), start, end);
    rename_blocks_files(output_dir.path());
-   block_log new_log(output_dir.path());
+   block_log<signed_block> new_log(output_dir.path());
 
    auto id = gs.compute_chain_id();
    auto extracted_id = new_log.extract_chain_id(output_dir.path());
@@ -87,13 +87,13 @@ BOOST_FIXTURE_TEST_CASE(reextract_from_start, block_log_extract_fixture) try {
 
    fc::temp_directory output_dir;
    block_num_type start=1, end=9;
-   block_log::extract_block_range(dir.path(), output_dir.path(), start, end);
+   block_log<signed_block>::extract_block_range(dir.path(), output_dir.path(), start, end);
    rename_blocks_files(output_dir.path());
    fc::temp_directory output_dir2;
    end=6;
-   block_log::extract_block_range(output_dir.path(), output_dir2.path(), start, end);
+   block_log<signed_block>::extract_block_range(output_dir.path(), output_dir2.path(), start, end);
    rename_blocks_files(output_dir2.path());
-   block_log new_log(output_dir2.path());
+   block_log<signed_block> new_log(output_dir2.path());
 
    auto id = gs.compute_chain_id();
    auto extracted_id = new_log.extract_chain_id(output_dir2.path());
@@ -108,9 +108,9 @@ BOOST_FIXTURE_TEST_CASE(extract_to_end, block_log_extract_fixture) try {
 
    fc::temp_directory output_dir;
    block_num_type start=5, end=std::numeric_limits<block_num_type>::max();
-   block_log::extract_block_range(dir.path(), output_dir.path(), start, end);
+   block_log<signed_block>::extract_block_range(dir.path(), output_dir.path(), start, end);
    rename_blocks_files(output_dir.path());
-   block_log new_log(output_dir.path());
+   block_log<signed_block> new_log(output_dir.path());
 
    auto id = gs.compute_chain_id();
    auto extracted_id = new_log.extract_chain_id(output_dir.path());

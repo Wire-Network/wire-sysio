@@ -58,16 +58,16 @@ class Utils:
 
     testBinPath = Path(__file__).resolve().parents[2] / 'bin'
 
-    EosClientPath=str(testBinPath / "clio")
-    MiscEosClientArgs="--no-auto-kiod"
+    SysClientPath=str(testBinPath / "clio")
+    MiscSysClientArgs="--no-auto-kiod"
 
     LeapClientPath=str(testBinPath / "leap-util")
 
-    EosWalletName="kiod"
-    EosWalletPath=str(testBinPath / EosWalletName)
+    SysWalletName="kiod"
+    SysWalletPath=str(testBinPath / SysWalletName)
 
-    EosServerName="nodeop"
-    EosServerPath=str(testBinPath / EosServerName)
+    SysServerName="nodeop"
+    SysServerPath=str(testBinPath / SysServerName)
 
     ShuttingDown=False
 
@@ -615,4 +615,4 @@ class Utils:
 
     @staticmethod
     def getNodeopVersion():
-        return os.popen(f"{Utils.EosServerPath} --full-version").read().replace("\n", "")
+        return os.popen(f"{Utils.SysServerPath} --full-version").read().replace("\n", "")

@@ -29,6 +29,10 @@ struct state_history_test_fixture;
 namespace sysio {
 namespace bio = boost::iostreams;
 
+namespace chain {
+   struct signed_block;
+}
+
 /*
  *   *.log:
  *   +---------+----------------+-----------+------------------+-----+---------+----------------+
@@ -174,9 +178,10 @@ class state_history_log_data : public chain::log_data_base<state_history_log_dat
 
  public:
    state_history_log_data() = default;
-   explicit state_history_log_data(const std::filesystem::path& path) { open(path); }
+ //  explicit state_history_log_data(const std::filesystem::path& path) { open(path); }
 
-   void open(const std::filesystem::path& path) {
+   template<typename StoredType>
+   void open(const std::filesystem::path& path, const StoredType* const stored_type = nullptr) {
       if (file.is_open())
          file.close();
       file.set_file_path(path);
@@ -294,7 +299,7 @@ class state_history_log {
    uint32_t                _end_block   = 0;
    chain::block_id_type    last_block_id;
 
-   using catalog_t = chain::log_catalog<detail::state_history_log_data, chain::log_index<chain::plugin_exception>>;
+   using catalog_t = chain::log_catalog<chain::signed_block, detail::state_history_log_data, chain::log_index<chain::plugin_exception>>;
    catalog_t catalog;
 
  public:

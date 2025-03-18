@@ -329,7 +329,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapsho
 
    // verifies that chain's block_log has a genesis_state (and blocks starting at 1)
    controller::config copied_config = copy_config_and_files(chain.get_config(), ordinal++);
-   auto genesis = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
+   auto genesis = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
    tester from_block_log_chain(copied_config, *genesis);
    const auto from_block_log_head = from_block_log_chain.control->head_block_num();
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
    }
    fc::temp_directory temp_dir;
    auto config = tester::default_config(temp_dir, legacy_default_max_inline_action_size).first;
-   auto genesis = sysio::chain::block_log::extract_genesis_state(source_log_dir);
+   auto genesis = sysio::chain::block_log<signed_block>::extract_genesis_state(source_log_dir);
    std::filesystem::create_directories(config.blocks_dir);
    std::filesystem::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
    std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");

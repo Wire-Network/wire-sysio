@@ -59,7 +59,7 @@ class PluginHttpTest(unittest.TestCase):
         nodeop_flags = (" --data-dir=%s --trace-dir=%s --trace-no-abis --access-control-allow-origin=%s "
                         "--contracts-console --http-validate-host=%s --verbose-http-errors --s-chain-contract grace --s-chain-actions dance "
                         "--p2p-peer-address localhost:9011 --resource-monitor-not-shutdown-on-threshold-exceeded ") % (self.data_dir, self.data_dir, "\'*\'", "false")
-        start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.EosServerPath, nodeop_plugins, nodeop_flags)
+        start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.SysServerPath, nodeop_plugins, nodeop_flags)
         self.nodeop.launchCmd(start_nodeop_cmd, self.node_id)
         time.sleep(self.sleep_s)
 

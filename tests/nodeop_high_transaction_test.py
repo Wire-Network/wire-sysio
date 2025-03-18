@@ -56,7 +56,7 @@ numRounds = int(numTransactions / args.total_accounts)
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 maxTransactionAttempts = 2            # max number of attempts to try to send a transaction
@@ -72,7 +72,7 @@ try:
                       totalNodes=totalNodes, totalProducers=totalProducers,
                       topo="ring") is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     # ***   create accounts to vote in desired producers   ***
 

@@ -88,7 +88,7 @@ class Transactions(NodeopQueries):
             expirationStr = "--expiration %d " % (expiration)
 
         cmd="%s %s -v transfer %s -j %s %s" % (
-            Utils.EosClientPath, self.eosClientArgs(), self.getRetryCmdArg(retry), dontSendStr, expirationStr)
+            Utils.SysClientPath, self.sysClientArgs(), self.getRetryCmdArg(retry), dontSendStr, expirationStr)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
         if sign:
@@ -162,7 +162,7 @@ class Transactions(NodeopQueries):
     def publishContract(self, account, contractDir, wasmFile, abiFile, waitForTransBlock=True, shouldFail=False, sign=False, retryNum:int=5):
         assert(isinstance(retryNum, int))
         signStr = NodeopQueries.sign_str(sign, [ account.activePublicKey ])
-        cmd=f"{Utils.EosClientPath} {self.eosClientArgs()} -v set contract -j -f {signStr} {account.name} {contractDir}"
+        cmd=f"{Utils.SysClientPath} {self.sysClientArgs()} -v set contract -j -f {signStr} {account.name} {contractDir}"
         cmd += "" if wasmFile is None else (" "+ wasmFile)
         cmd += "" if abiFile is None else (" " + abiFile)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
@@ -217,7 +217,7 @@ class Transactions(NodeopQueries):
 
     # set code or abi and return True for success and False for failure
     def setCodeOrAbi(self, account, setType, setFile):
-        cmd=f"{Utils.EosClientPath} {self.eosClientArgs()} -v set {setType} -j {account.name} {setFile} "
+        cmd=f"{Utils.SysClientPath} {self.sysClientArgs()} -v set {setType} -j {account.name} {setFile} "
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         try:
             trans=Utils.runCmdReturnJson(cmd, trace=False)
@@ -235,7 +235,7 @@ class Transactions(NodeopQueries):
         if isinstance(permissions, str):
             permissions=[permissions]
 
-        cmd="%s %s push transaction -j" % (Utils.EosClientPath, self.eosClientArgs())
+        cmd="%s %s push transaction -j" % (Utils.SysClientPath, self.sysClientArgs())
         cmdArr=cmd.split()
         transStr = json.dumps(trans, separators=(',', ':'))
         transStr = transStr.replace("'", '"')
@@ -266,7 +266,7 @@ class Transactions(NodeopQueries):
 
     # returns tuple with transaction execution status and transaction
     def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True, force=False):
-        cmd="%s %s push action -j %s %s" % (Utils.EosClientPath, self.eosClientArgs(), account, action)
+        cmd="%s %s push action -j %s %s" % (Utils.SysClientPath, self.sysClientArgs(), account, action)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
         if signatures is not None:

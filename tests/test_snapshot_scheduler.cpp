@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
 
    const std::regex snapshotfile_regex(".bin$");
 
-   unsigned found = 0;
+   int found = 0;
    for(const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(temp / "snapshots"))
       found += std::regex_search(dir_entry.path().filename().string(), snapshotfile_regex);
    BOOST_REQUIRE_GE(found, 3);

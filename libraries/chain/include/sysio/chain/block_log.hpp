@@ -6,7 +6,10 @@
 
 namespace sysio { namespace chain {
 
-   namespace detail { struct block_log_impl; }
+   namespace detail {
+      template<typename StoredType>
+      struct block_log_impl;
+   }
 
    /* The block log is an external append only log of the blocks with a header. Blocks should only
     * be written to the log after they irreverisble as the log is append only. The log is a doubly
@@ -39,39 +42,32 @@ namespace sysio { namespace chain {
     * Object thread-safe. Not safe to have multiple block_log objects to same data_dir.
     */
 
-
+   template<typename StoredType>
    class block_log {
       public:
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<StoredType>;
+
          explicit block_log(const std::filesystem::path& data_dir, const block_log_config& config = block_log_config{});
          block_log(block_log&& other) noexcept;
          ~block_log();
 
-         void append(const signed_block_ptr& b, const block_id_type& id);
-         void append(const signed_block_ptr& b, const block_id_type& id, const std::vector<char>& packed_block);
+         void append(const stored_type_ptr& b, const block_id_type& id);
+         void append(const stored_type_ptr& b, const block_id_type& id, const std::vector<char>& packed_block);
 
          void flush();
-         void reset( const genesis_state& gs, const signed_block_ptr& genesis_block );
+         void reset( const genesis_state& gs, const stored_type_ptr& genesis_block );
          void reset( const chain_id_type& chain_id, uint32_t first_block_num );
 
-         signed_block_ptr read_block_by_num(uint32_t block_num)const;
+         stored_type_ptr read_block_by_num(uint32_t block_num)const;
          std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num)const;
          block_id_type    read_block_id_by_num(uint32_t block_num)const;
 
-         signed_block_ptr read_block_by_id(const block_id_type& id)const {
-            return read_block_by_num(block_header::num_from_id(id));
-         }
-
-         /**
-          * Return offset of block in file, or block_log::npos if it does not exist.
-          */
-
-         signed_block_ptr read_head()const; //use blocklog
-         signed_block_ptr head()const;
+         stored_type_ptr read_head()const; //use blocklog
+         stored_type_ptr head()const;
          std::optional<block_id_type> head_id()const;
 
          uint32_t                first_block_num() const;
-
-         static const uint64_t npos = std::numeric_limits<uint64_t>::max();
 
          static const uint32_t min_supported_version;
          static const uint32_t max_supported_version;
@@ -82,9 +78,8 @@ namespace sysio { namespace chain {
 
          static std::filesystem::path repair_log( const std::filesystem::path& data_dir, uint32_t truncate_at_block = 0, const char* reversible_block_dir_name="" );
 
-         using chain_context = std::variant<genesis_state, chain_id_type>;
-         static std::optional<chain_context> extract_chain_context(const std::filesystem::path& data_dir,
-                                                                   const std::filesystem::path& retained_dir);
+         static std::optional<std::variant<genesis_state, chain_id_type>> extract_chain_context(const std::filesystem::path& data_dir,
+                                                                                                const std::filesystem::path& retained_dir);
 
          static std::optional<genesis_state>
          extract_genesis_state(const std::filesystem::path& data_dir,
@@ -122,6 +117,6 @@ namespace sysio { namespace chain {
          static void split_blocklog(const std::filesystem::path& block_dir, const std::filesystem::path& dest_dir, uint32_t stride);
          static void merge_blocklogs(const std::filesystem::path& block_dir, const std::filesystem::path& dest_dir);
    private:
-         std::unique_ptr<detail::block_log_impl> my;
+         std::unique_ptr<detail::block_log_impl<stored_type> > my;
    };
 } }

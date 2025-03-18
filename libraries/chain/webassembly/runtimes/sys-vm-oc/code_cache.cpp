@@ -253,7 +253,7 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
       SYS_ASSERT(!hs.fail(), bad_database_version_exception, "failed to read code cache header");
       memcpy((char*)&cache_header, header_buff + header_offset, sizeof(cache_header));
 
-      SYS_ASSERT(cache_header.id == header_id, bad_database_version_exception, "existing EOS VM OC code cache not compatible with this version");
+      SYS_ASSERT(cache_header.id == header_id, bad_database_version_exception, "existing SYS VM OC code cache not compatible with this version");
       SYS_ASSERT(!cache_header.dirty, database_exception, "code cache is dirty");
    };
 
@@ -267,7 +267,7 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
       if (created_file)
          throw;
 
-      ilog("EOS VM optimized Compiler code cache corrupt, recreating");
+      ilog("SYS VM optimized Compiler code cache corrupt, recreating");
       create_code_cache_file();
       check_code_cache();
    }

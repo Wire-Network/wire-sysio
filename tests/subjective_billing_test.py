@@ -61,7 +61,7 @@ try:
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,
                       extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false ",
                       specificExtraNodeopArgs=specificArgs ) is False:
-       errorExit("Failed to stand up eos cluster.")
+       errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -91,7 +91,7 @@ try:
     # api node configured with decay of 30 min
     fdnode = cluster.nodes[3]
 
-    preBalances = node.getEosBalances([account1, account2])
+    preBalances = node.getSysBalances([account1, account2])
     Print("Starting balances:")
     Print(preBalances)
 

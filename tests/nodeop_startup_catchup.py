@@ -47,7 +47,7 @@ totalNodes=startedNonProdNodes+pnodes+catchupCount
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 trxGenLauncher=None
 
@@ -59,7 +59,7 @@ try:
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount,
                       unstartedNodes=catchupCount, loadSystemContract=True,
                       maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     Print("Create test wallet")
     wallet = walletMgr.create('txntestwallet')

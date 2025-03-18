@@ -17,7 +17,7 @@ if not os.path.exists(config_dir):
     os.makedirs(config_dir)
 
 try:
-    start_nodeop_cmd = f"{Utils.EosServerPath} -e -p sysio --data-dir={data_dir} --config-dir={config_dir} --blocks-log-stride 10" \
+    start_nodeop_cmd = f"{Utils.SysServerPath} -e -p sysio --data-dir={data_dir} --config-dir={config_dir} --blocks-log-stride 10" \
                         " --plugin=sysio::http_plugin --plugin=sysio::chain_api_plugin --http-server-address=localhost:8888"
 
     nodeop.launchCmd(start_nodeop_cmd, node_id)

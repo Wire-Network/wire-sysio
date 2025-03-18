@@ -98,7 +98,7 @@ struct block_log_fixture {
    std::optional<uint32_t> partition_stride;
    fc::temp_directory dir;
 
-   std::optional<sysio::chain::block_log> log;
+   std::optional<sysio::chain::block_log<sysio::chain::signed_block>> log;
 
    std::vector<std::vector<char>> written_data;
 
@@ -588,7 +588,7 @@ void no_block_log_public_functions_test( block_log_fixture& t) {
    BOOST_REQUIRE_NO_THROW(t.log->flush());
    BOOST_REQUIRE(t.log->read_block_by_num(1) == nullptr);
    BOOST_REQUIRE(t.log->read_block_id_by_num(1) == sysio::chain::block_id_type{});
-   BOOST_REQUIRE(t.log->get_block_pos(1) == sysio::chain::block_log::npos);
+   BOOST_REQUIRE(t.log->get_block_pos(1) == std::numeric_limits<uint64_t>::max());
    BOOST_REQUIRE(t.log->read_head() == nullptr);
 }
 

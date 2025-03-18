@@ -45,7 +45,7 @@ namespace sysio { namespace chain { namespace webassembly {
       }
    }
 
-   //be aware that EOS VM OC handles sysio_exit internally and this function will not be called by OC
+   //be aware that SYS VM OC handles sysio_exit internally and this function will not be called by OC
    void interface::sysio_exit( int32_t code ) const {
       throw wasm_exit{};
    }

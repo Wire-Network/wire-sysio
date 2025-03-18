@@ -68,7 +68,7 @@ try:
            extraNodeopArgs = " --read-mode speculative "
 
         if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeopArgs=extraNodeopArgs) is False:
-            errorExit("Failed to stand up eos cluster.")
+            errorExit("Failed to stand up sys cluster.")
 
         Print ("Wait for Cluster stabilization")
         # wait for cluster to start producing blocks

@@ -86,7 +86,7 @@ def gelfServer(stop):
 
 data_dir = Path(Utils.getNodeDataDir(node_id))
 config_dir = Path(Utils.getNodeConfigDir(node_id))
-start_nodeop_cmd = shlex.split(f"{Utils.EosServerPath} -e -p sysio --data-dir={data_dir} --config-dir={config_dir}")
+start_nodeop_cmd = shlex.split(f"{Utils.SysServerPath} -e -p sysio --data-dir={data_dir} --config-dir={config_dir}")
 if os.path.exists(data_dir):
     shutil.rmtree(data_dir)
 os.makedirs(data_dir)

@@ -149,7 +149,7 @@ walletPort=args.wallet_port
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
@@ -159,7 +159,7 @@ try:
     Print("Stand up cluster")
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=prodNodes, totalNodes=totalNodes, totalProducers=prodNodes*21) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)

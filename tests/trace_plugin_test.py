@@ -49,7 +49,7 @@ class TraceApiPluginTest(unittest.TestCase):
         expectedAmount = Node.currencyIntToStr(5000000, CORE_SYMBOL)
         account_balances = []
         for account in self.accounts:
-            amount = node.getAccountEosBalanceStr(account.name)
+            amount = node.getAccountSysBalanceStr(account.name)
             self.assertEqual(amount, expectedAmount)
             account_balances.append(amount)
 
@@ -58,8 +58,8 @@ class TraceApiPluginTest(unittest.TestCase):
         transId = Node.getTransId(trans)
         blockNum = Node.getTransBlockNum(trans)
 
-        self.assertEqual(node.getAccountEosBalanceStr(self.accounts[0].name), Utils.deduceAmount(expectedAmount, xferAmount))
-        self.assertEqual(node.getAccountEosBalanceStr(self.accounts[1].name), Utils.addAmount(expectedAmount, xferAmount))
+        self.assertEqual(node.getAccountSysBalanceStr(self.accounts[0].name), Utils.deduceAmount(expectedAmount, xferAmount))
+        self.assertEqual(node.getAccountSysBalanceStr(self.accounts[1].name), Utils.addAmount(expectedAmount, xferAmount))
         node.waitForBlock(blockNum)
 
         # verify trans via node api before calling trace_api RPC
@@ -104,7 +104,7 @@ class TraceApiPluginTest(unittest.TestCase):
         # Verify get block_trace still works even with no time for http-max-response-time-ms and no time for bi-serializer-max-time-ms
         cmdDesc="get block_trace"
         cmd=" --print-response %s %d" % (cmdDesc, blockNum)
-        cmd="%s %s %s" % (Utils.EosClientPath, node.eosClientArgs(), cmd)
+        cmd="%s %s %s" % (Utils.SysClientPath, node.sysClientArgs(), cmd)
         result=Utils.runCmdReturnStr(cmd, ignoreError=True)
 
         Utils.Print(f"{cmdDesc} returned: {result}")

@@ -310,13 +310,13 @@ BOOST_FIXTURE_TEST_CASE(test_symbol, validating_tester) try {
 
    // invalid - contains lower case characters, no validation
    {
-      BOOST_CHECK_EXCEPTION(symbol malformed(SY(6,EoS)),
-                            symbol_type_exception, fc_exception_message_is("invalid symbol: EoS"));
+      BOOST_CHECK_EXCEPTION(symbol malformed(SY(6,Sys)),
+                            symbol_type_exception, fc_exception_message_is("invalid symbol: Sys"));
    }
 
    // invalid - contains lower case characters, exception thrown
    {
-      BOOST_CHECK_EXCEPTION(symbol(5,"EoS"),
+      BOOST_CHECK_EXCEPTION(symbol(5,"Sys"),
                             symbol_type_exception, fc_exception_message_is("invalid character in symbol name"));
    }
 

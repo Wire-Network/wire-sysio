@@ -73,16 +73,16 @@ class TestHelper(object):
             thGrp.add_argument("--seed", type=int, help=argparse.SUPPRESS if suppressHelp else "random seed", default=1)
 
         if "--host" in includeArgs:
-            thGrp.add_argument("--host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host name" % (Utils.EosServerName),
+            thGrp.add_argument("--host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host name" % (Utils.SysServerName),
                                      default=TestHelper.LOCAL_HOST)
         if "--port" in includeArgs:
-            thGrp.add_argument("--port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s host port" % Utils.EosServerName,
+            thGrp.add_argument("--port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s host port" % Utils.SysServerName,
                                      default=TestHelper.DEFAULT_PORT)
         if "--wallet-host" in includeArgs:
-            thGrp.add_argument("--wallet-host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host" % Utils.EosWalletName,
+            thGrp.add_argument("--wallet-host", type=str, help=argparse.SUPPRESS if suppressHelp else "%s host" % Utils.SysWalletName,
                                      default=TestHelper.LOCAL_HOST)
         if "--wallet-port" in includeArgs:
-            thGrp.add_argument("--wallet-port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s port" % Utils.EosWalletName,
+            thGrp.add_argument("--wallet-port", type=int, help=argparse.SUPPRESS if suppressHelp else "%s port" % Utils.SysWalletName,
                                      default=TestHelper.DEFAULT_WALLET_PORT)
         if "--prod-count" in includeArgs:
             thGrp.add_argument("-c", "--prod-count", type=int, help=argparse.SUPPRESS if suppressHelp else "Per node producer count", default=21)
@@ -142,7 +142,7 @@ class TestHelper(object):
             Utils.Print(str(prefix))
         clientVersion=Cluster.getClientVersion()
         Utils.Print("UTC time: %s" % str(datetime.utcnow()))
-        Utils.Print("EOS Client version: %s" % (clientVersion))
+        Utils.Print("SYS Client version: %s" % (clientVersion))
         Utils.Print("Processor: %s" % (platform.processor()))
         Utils.Print("OS name: %s" % (platform.platform()))
     
@@ -173,7 +173,7 @@ class TestHelper(object):
         if not testSuccessful and dumpErrorDetails:
             cluster.reportStatus()
             Utils.Print(Utils.FileDivider)
-            psOut = Cluster.pgrepEosServers(timeout=60)
+            psOut = Cluster.pgrepSysServers(timeout=60)
             Utils.Print("pgrep output:\n%s" % (psOut))
             reportProductionAnalysis(thresholdMs=0)
             Utils.Print("== Errors see above ==")

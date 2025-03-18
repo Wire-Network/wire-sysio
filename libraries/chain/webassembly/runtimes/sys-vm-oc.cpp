@@ -29,7 +29,7 @@ class sysvmoc_instantiated_module : public wasm_instantiated_module_interface {
 
       void apply(apply_context& context) override {
          const code_descriptor* const cd = _sysvmoc_runtime.cc.get_descriptor_for_code_sync(_code_hash, _vm_version, context.control.is_write_window());
-         SYS_ASSERT(cd, wasm_execution_error, "EOS VM OC instantiation failed");
+         SYS_ASSERT(cd, wasm_execution_error, "SYS VM OC instantiation failed");
 
          if ( is_main_thread() )
             _sysvmoc_runtime.exec.execute(*cd, _sysvmoc_runtime.mem, context);

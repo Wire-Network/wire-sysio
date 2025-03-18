@@ -185,11 +185,11 @@ class cluster_generator:
         cfg.add_argument('-s', '--shape', help='network topology, use "star", "mesh", "ring", "line" or give a filename for custom', default='star')
         cfg.add_argument('-g', '--genesis', type=Path, help='set the path to genesis.json', default='./genesis.json')
         cfg.add_argument('--skip-signature', action='store_true', help='do not require transaction signatures', default=False)
-        cfg.add_argument('--' + Utils.EosServerName, help=f'forward {Utils.EosServerName} command line argument(s) to each instance of {Utils.EosServerName}; enclose all arg(s) in quotes')
-        cfg.add_argument('--specific-num', type=int, action='append', dest='specific_nums', default=[], help=f'forward {Utils.EosServerName} command line argument(s) (using "--specific-{Utils.EosServerName}" flag to this specific instance of {Utils.EosServerName}.  This parameter can be entered multiple times and requires a paired "--specific-{Utils.EosServerName}" flag each time it is used.')
-        cfg.add_argument('--specific-' + Utils.EosServerName, action='append', dest=f'specific_{Utils.EosServerName}es', default=[], help=f'forward {Utils.EosServerName} command line argument(s) to its paired specific instance of {Utils.EosServerName} (using "--specific-num"); enclose arg(s) in quotes')
-        cfg.add_argument('--spcfc-inst-num', type=int, action='append', dest='spcfc_inst_nums', default=[], help=f'specify a path to a binary (using "--spcfc-inst-{Utils.EosServerName}" flag) for launching this numbered instance of {Utils.EosServerName}.  This parameter can be entered multiple times and requires a paired "--spcfc-inst-{Utils.EosServerName}" flag each time it is used.')
-        cfg.add_argument('--spcfc-inst-' + Utils.EosServerName, action='append', dest=f'spcfc_inst_{Utils.EosServerName}es', default=[], help=f'path to a binary to launch for the {Utils.EosServerName} instance number specified by the corresponding "--spcfc-inst-num" flag')
+        cfg.add_argument('--' + Utils.SysServerName, help=f'forward {Utils.SysServerName} command line argument(s) to each instance of {Utils.SysServerName}; enclose all arg(s) in quotes')
+        cfg.add_argument('--specific-num', type=int, action='append', dest='specific_nums', default=[], help=f'forward {Utils.SysServerName} command line argument(s) (using "--specific-{Utils.SysServerName}" flag to this specific instance of {Utils.SysServerName}.  This parameter can be entered multiple times and requires a paired "--specific-{Utils.SysServerName}" flag each time it is used.')
+        cfg.add_argument('--specific-' + Utils.SysServerName, action='append', dest=f'specific_{Utils.SysServerName}es', default=[], help=f'forward {Utils.SysServerName} command line argument(s) to its paired specific instance of {Utils.SysServerName} (using "--specific-num"); enclose arg(s) in quotes')
+        cfg.add_argument('--spcfc-inst-num', type=int, action='append', dest='spcfc_inst_nums', default=[], help=f'specify a path to a binary (using "--spcfc-inst-{Utils.SysServerName}" flag) for launching this numbered instance of {Utils.SysServerName}.  This parameter can be entered multiple times and requires a paired "--spcfc-inst-{Utils.SysServerName}" flag each time it is used.')
+        cfg.add_argument('--spcfc-inst-' + Utils.SysServerName, action='append', dest=f'spcfc_inst_{Utils.SysServerName}es', default=[], help=f'path to a binary to launch for the {Utils.SysServerName} instance number specified by the corresponding "--spcfc-inst-num" flag')
         cfg.add_argument('-d', '--delay', type=int, help='seconds delay before starting each node after the first', default=0)
         cfg.add_argument('--boot', action='store_true', help='after deploying the nodes, boot the network', default=False)
         cfg.add_argument('--nogen', action='store_true', help='launch nodes without writing new config files', default=False)
@@ -211,10 +211,10 @@ class cluster_generator:
             r.launch = 'none'
         if r.shape not in ['star', 'mesh', 'ring', 'line'] and not Path(r.shape).is_file():
             parser.error('-s, --shape must be one of "star", "mesh", "ring", "line", or a file')
-        if len(r.specific_nums) != len(getattr(r, f'specific_{Utils.EosServerName}es')):
-            parser.error(f'Count of uses of --specific-num and --specific-{Utils.EosServerName} must match')
-        if len(r.spcfc_inst_nums) != len(getattr(r, f'spcfc_inst_{Utils.EosServerName}es')):
-            parser.error(f'Count of uses of --spcfc-inst-num and --spcfc-inst-{Utils.EosServerName} must match')
+        if len(r.specific_nums) != len(getattr(r, f'specific_{Utils.SysServerName}es')):
+            parser.error(f'Count of uses of --specific-num and --specific-{Utils.SysServerName} must match')
+        if len(r.spcfc_inst_nums) != len(getattr(r, f'spcfc_inst_{Utils.SysServerName}es')):
+            parser.error(f'Count of uses of --spcfc-inst-num and --spcfc-inst-{Utils.SysServerName} must match')
         r.pnodes += 1 # add one for the bios node
         r.total_nodes += 1
         if r.pnodes > r.producers + 1:
@@ -489,39 +489,39 @@ class cluster_generator:
         is_bios = instance.name == 'bios'
 
         if instance.index in self.args.spcfc_inst_nums:
-            eosdcmd = [f"{getattr(self.args, f'spcfc_inst_{Utils.EosServerName}es')[self.args.spcfc_inst_nums.index(instance.index)]}"]
+            sysdcmd = [f"{getattr(self.args, f'spcfc_inst_{Utils.SysServerName}es')[self.args.spcfc_inst_nums.index(instance.index)]}"]
         else:
-            eosdcmd = [Utils.EosServerPath]
+            sysdcmd = [Utils.SysServerPath]
 
         a = lambda l, e: l.append(e) or l
 
-        a(a(eosdcmd, '--blocks-dir'), block_dir)
-        a(a(eosdcmd, '--p2p-listen-endpoint'), f'{instance.listen_addr}:{instance.p2p_port}')
-        a(a(eosdcmd, '--p2p-server-address'), f'{instance.p2p_endpoint}')
+        a(a(sysdcmd, '--blocks-dir'), block_dir)
+        a(a(sysdcmd, '--p2p-listen-endpoint'), f'{instance.listen_addr}:{instance.p2p_port}')
+        a(a(sysdcmd, '--p2p-server-address'), f'{instance.p2p_endpoint}')
         if is_bios:
-            a(eosdcmd, '--enable-stale-production')
+            a(sysdcmd, '--enable-stale-production')
         else:
-            a(a(eosdcmd, '--p2p-peer-address'), f'{self.network.nodes["bios"].p2p_endpoint}')
+            a(a(sysdcmd, '--p2p-peer-address'), f'{self.network.nodes["bios"].p2p_endpoint}')
         peers = list(sum([('--p2p-peer-address', self.network.nodes[p].p2p_endpoint) for p in instance.peers], ()))
-        eosdcmd.extend(peers)
+        sysdcmd.extend(peers)
         if len(instance.producers) > 0:
-            a(a(eosdcmd, '--plugin'), 'sysio::producer_plugin')
+            a(a(sysdcmd, '--plugin'), 'sysio::producer_plugin')
             producer_keys = list(sum([('--signature-provider', f'{key.pubkey}=KEY:{key.privkey}') for key in instance.keys], ()))
-            eosdcmd.extend(producer_keys)
+            sysdcmd.extend(producer_keys)
             producer_names = list(sum([('--producer-name', p) for p in instance.producers], ()))
-            eosdcmd.extend(producer_names)
+            sysdcmd.extend(producer_names)
         else:
-            a(a(eosdcmd, '--transaction-retry-max-storage-size-gb'), '100')
-        a(a(eosdcmd, '--plugin'), 'sysio::net_plugin')
-        a(a(eosdcmd, '--plugin'), 'sysio::chain_api_plugin')
+            a(a(sysdcmd, '--transaction-retry-max-storage-size-gb'), '100')
+        a(a(sysdcmd, '--plugin'), 'sysio::net_plugin')
+        a(a(sysdcmd, '--plugin'), 'sysio::chain_api_plugin')
 
         if self.args.skip_signature:
-            a(eosdcmd, '--skip-transaction-signatures')
-        if getattr(self.args, Utils.EosServerName):
-            eosdcmd.extend(shlex.split(getattr(self.args, Utils.EosServerName)))
+            a(sysdcmd, '--skip-transaction-signatures')
+        if getattr(self.args, Utils.SysServerName):
+            sysdcmd.extend(shlex.split(getattr(self.args, Utils.SysServerName)))
         if instance.index in self.args.specific_nums:
             i = self.args.specific_nums.index(instance.index)
-            specifics = getattr(self.args, f'specific_{Utils.EosServerName}es')[i]
+            specifics = getattr(self.args, f'specific_{Utils.SysServerName}es')[i]
             if specifics[0] == "'" and specifics[-1] == "'":
                 specificList = shlex.split(specifics[1:-1])
             else:
@@ -545,41 +545,41 @@ class cluster_generator:
                 '--trace-rpc-abi']
             for arg in specificList:
                 if '-' in arg and arg not in repeatable:
-                    if arg in eosdcmd:
-                        i = eosdcmd.index(arg)
-                        if eosdcmd[i+1] != '-':
-                            eosdcmd.pop(i+1)
-                        eosdcmd.pop(i)
-            eosdcmd.extend(specificList)
-        a(a(eosdcmd, '--config-dir'), str(instance.config_dir_name))
-        a(a(eosdcmd, '--data-dir'), str(instance.data_dir_name))
-        a(a(eosdcmd, '--genesis-json'), f'{instance.config_dir_name}/genesis.json')
+                    if arg in sysdcmd:
+                        i = sysdcmd.index(arg)
+                        if sysdcmd[i+1] != '-':
+                            sysdcmd.pop(i+1)
+                        sysdcmd.pop(i)
+            sysdcmd.extend(specificList)
+        a(a(sysdcmd, '--config-dir'), str(instance.config_dir_name))
+        a(a(sysdcmd, '--data-dir'), str(instance.data_dir_name))
+        a(a(sysdcmd, '--genesis-json'), f'{instance.config_dir_name}/genesis.json')
         if self.args.timestamp:
-            a(a(eosdcmd, '--genesis-timestamp'), self.args.timestamp)
+            a(a(sysdcmd, '--genesis-timestamp'), self.args.timestamp)
 
-        if '--http-validate-host' not in eosdcmd:
-            a(a(eosdcmd, '--http-validate-host'), 'false')
+        if '--http-validate-host' not in sysdcmd:
+            a(a(sysdcmd, '--http-validate-host'), 'false')
 
-        if '--http-server-address' not in eosdcmd:
-            a(a(eosdcmd, '--http-server-address'), f'{instance.host_name}:{instance.http_port}')
+        if '--http-server-address' not in sysdcmd:
+            a(a(sysdcmd, '--http-server-address'), f'{instance.host_name}:{instance.http_port}')
 
         # Always enable a history query plugin on the bios node
         if is_bios:
             if self.args.is_nodeop_v2:
-                a(a(eosdcmd, '--plugin'), 'sysio::history_api_plugin')
-                a(a(eosdcmd, '--filter-on'), '"*"')
+                a(a(sysdcmd, '--plugin'), 'sysio::history_api_plugin')
+                a(a(sysdcmd, '--filter-on'), '"*"')
             else:
-                a(a(eosdcmd, '--plugin'), 'sysio::trace_api_plugin')
+                a(a(sysdcmd, '--plugin'), 'sysio::trace_api_plugin')
 
-        if 'sysio::history_api_plugin' in eosdcmd and 'sysio::trace_api_plugin' in eosdcmd:
-            eosdcmd.remove('--trace-no-abis')
-            eosdcmd.remove('--trace-rpc-abi')
-            i = eosdcmd.index('sysio::trace_api_plugin')
-            eosdcmd.pop(i)
+        if 'sysio::history_api_plugin' in sysdcmd and 'sysio::trace_api_plugin' in sysdcmd:
+            sysdcmd.remove('--trace-no-abis')
+            sysdcmd.remove('--trace-rpc-abi')
+            i = sysdcmd.index('sysio::trace_api_plugin')
+            sysdcmd.pop(i)
             i -= 1
-            eosdcmd.pop(i)
+            sysdcmd.pop(i)
 
-        return eosdcmd
+        return sysdcmd
 
     def write_dot_file(self):
         with open(Utils.DataDir + 'testnet.dot', 'w') as f:

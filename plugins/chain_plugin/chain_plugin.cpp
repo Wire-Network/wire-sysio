@@ -172,6 +172,7 @@ public:
    bool                              accept_transactions     = false;
    bool                              api_accept_transactions = true;
    bool                              account_queries_enabled = false;
+   bool                              state_log = false;
 
    std::optional<controller::config> chain_config;
    std::optional<controller>         chain;
@@ -282,6 +283,7 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "All files in the archive directory are completely under user's control, i.e. they won't be accessed by nodeop anymore.")
          ("state-dir", bpo::value<std::filesystem::path>()->default_value(config::default_state_dir_name),
           "the location of the state directory (absolute path or relative to application data dir)")
+         ("state-log", bpo::value<bool>()->default_value(false), "Maintain a block state log, using the same configuration as the block log.")
          ("protocol-features-dir", bpo::value<std::filesystem::path>()->default_value("protocol_features"),
           "the location of the protocol_features directory (absolute path or relative to application config dir)")
          ("checkpoint", bpo::value<vector<string>>()->composing(), "Pairs of [BLOCK_NUM,BLOCK_ID] that should be enforced as checkpoints.")
@@ -365,9 +367,9 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          }), "Number of threads to use for SYS VM OC tier-up")
          ("sys-vm-oc-enable", bpo::value<chain::wasm_interface::vm_oc_enable>()->default_value(chain::wasm_interface::vm_oc_enable::oc_auto),
           "Enable SYS VM OC tier-up runtime ('auto', 'all', 'none').\n"
-          "'auto' - EOS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
-          "'all'  - EOS VM OC tier-up is enabled for all contract execution.\n"
-          "'none' - EOS VM OC tier-up is completely disabled.\n")
+          "'auto' - SYS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
+          "'all'  - SYS VM OC tier-up is enabled for all contract execution.\n"
+          "'none' - SYS VM OC tier-up is completely disabled.\n")
 #endif
          ("enable-account-queries", bpo::value<bool>()->default_value(false), "enable queries to find accounts by various metadata.")
          ("transaction-retry-max-storage-size-gb", bpo::value<uint64_t>(),
@@ -488,7 +490,7 @@ void
 chain_plugin_impl::do_hard_replay(const variables_map& options) {
          ilog( "Hard replay requested: deleting state database" );
          clear_directory_contents( chain_config->state_dir );
-         auto backup_dir = block_log::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
+         auto backup_dir = block_log<signed_block>::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
 }
 
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
@@ -571,6 +573,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             state_dir = sd;
       }
 
+      if( options.count( "state-log" )) {
+         state_log = true;
+      }
+
       protocol_feature_set pfs;
       {
          std::filesystem::path protocol_features_dir;
@@ -611,6 +617,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain_config->blocks_dir = blocks_dir;
       chain_config->state_dir = state_dir;
       chain_config->read_only = readonly;
+      chain_config->keep_state_log = state_log;
 
       if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>()) {
         resmon_plugin->monitor_directory(chain_config->blocks_dir);
@@ -693,8 +700,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          };
       } else if(has_retain_blocks_option) {
          uint32_t block_log_retain_blocks = options.at("block-log-retain-blocks").as<uint32_t>();
-         if (block_log_retain_blocks == 0)
+         if (block_log_retain_blocks == 0) {
             chain_config->blog = sysio::chain::empty_blocklog_config{};
+            chain_config->keep_state_log = false; // an empty blocklog only is needed for the signed block log
+         }
          else {
             SYS_ASSERT(cfile::supports_hole_punching(), plugin_config_exception,
                        "block-log-retain-blocks cannot be greater than 0 because the file system does not support hole "
@@ -707,8 +716,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       if( options.count( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
-
-         gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
+         
+         gs = block_log<signed_block>::extract_genesis_state( blocks_dir, retained_dir );
          SYS_ASSERT( gs,
                      plugin_config_exception,
                      "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
@@ -782,7 +791,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                  plugin_config_exception,
                  "Snapshot can only be used to initialize an empty database." );
 
-         auto block_log_chain_id = block_log::extract_chain_id(blocks_dir, retained_dir);
+         auto block_log_chain_id = block_log<signed_block>::extract_chain_id(blocks_dir, retained_dir);
 
          if (block_log_chain_id) {
             SYS_ASSERT( *chain_id == *block_log_chain_id,
@@ -797,7 +806,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          chain_id = controller::extract_chain_id_from_db( chain_config->state_dir );
 
-         auto chain_context = block_log::extract_chain_context( blocks_dir, retained_dir );
+         auto chain_context = block_log<signed_block>::extract_chain_context( blocks_dir, retained_dir );
          std::optional<genesis_state> block_log_genesis;
          std::optional<chain_id_type> block_log_chain_id;
 
@@ -2037,7 +2046,7 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
 }
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
-   block_state_ptr b;
+   block_header_state_ptr b;
    std::optional<uint64_t> block_num;
    std::exception_ptr e;
    try {
@@ -2052,10 +2061,13 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
       } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
    }
 
+   if( !b && db.is_irreversible_state_available() ) {
+      b = db.fetch_irr_block_header_state_by_number(*block_num);
+   }
    SYS_ASSERT( b, unknown_block_exception, "Could not find reversible block: ${block}", ("block", params.block_num_or_id));
 
    fc::variant vo;
-   fc::to_variant( static_cast<const block_header_state&>(*b), vo );
+   fc::to_variant( *b, vo );
    return vo;
 }
 

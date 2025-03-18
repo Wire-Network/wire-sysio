@@ -440,7 +440,7 @@ class Node(Transactions):
         out = dd / 'stdout.txt'
         err_sl = dd / 'stderr.txt'
         err = dd / Path(f'stderr.{launch_time}.txt')
-        pidf = dd / Path(f'{Utils.EosServerName}.pid')
+        pidf = dd / Path(f'{Utils.SysServerName}.pid')
 
         Utils.Print(f'spawning child: {" ".join(cmd)}')
         dd.mkdir(parents=True, exist_ok=True)

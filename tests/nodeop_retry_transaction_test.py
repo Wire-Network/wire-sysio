@@ -59,7 +59,7 @@ assert numRounds > 3, Print("ERROR: Need more than three rounds: %d" % numRounds
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
@@ -80,7 +80,7 @@ try:
                       topo="ring",
                       specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     cluster.waitOnClusterSync(blockAdvancing=5)
     Utils.Print("Cluster in Sync")
