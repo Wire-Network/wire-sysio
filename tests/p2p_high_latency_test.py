@@ -71,7 +71,7 @@ try:
     traceNodeopArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
     if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     cluster.waitOnClusterSync(blockAdvancing=5)
     Utils.Print("Cluster in Sync")

@@ -585,7 +585,7 @@ public:
    };
 
    uint32_t _ro_thread_pool_size{0};
-   // In EOS VM OC tierup, 10 pages (11 slices) virtual memory is reserved for
+   // In SYS VM OC tierup, 10 pages (11 slices) virtual memory is reserved for
    // each read-only thread and 528 pages (529 slices) for the main-thread memory.
    // With maximum 128 read-only threads, virtual memory required by OC is
    // 15TB (OC's main thread uses 4TB VM (by 529 slices) and the read-only

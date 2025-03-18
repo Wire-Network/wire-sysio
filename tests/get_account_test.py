@@ -56,7 +56,7 @@ try:
     Print("Stand up cluster")
     extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,extraNodeopArgs=extraNodeopArgs ) is False:
-       errorExit("Failed to stand up eos cluster.")
+       errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks

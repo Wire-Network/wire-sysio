@@ -293,12 +293,12 @@ public:
        );
     }
 
-    action_result buyram( const account_name& payer, account_name receiver, const asset& eosin ) {
-        return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",eosin) );
+    action_result buyram( const account_name& payer, account_name receiver, const asset& sysin ) {
+        return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",sysin) );
     }
 
     vector<name> active_and_vote_producers() {
-        //stake more than 15% of total EOS supply to activate chain
+        //stake more than 15% of total SYS supply to activate chain
         transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
         BOOST_CHECK_EQUAL( success(), stake( name("alice1111111"), name("alice1111111"), core_from_string("300000000.0000"), core_from_string("300000000.0000") ) );
 
@@ -370,7 +370,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     setup_system_accounts();
     produce_blocks();
     create_account_with_resources("alice1111111"_n, config::system_account_name);
-    //stake more than 15% of total EOS supply to activate chain
+    //stake more than 15% of total SYS supply to activate chain
     transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
 
     read_only::get_account_results results = get_account_info(name("alice1111111"));

@@ -1,5 +1,5 @@
 /**
-  @defgroup eosclienttool
+  @defgroup sysclienttool
 
   @section intro Introduction to clio
 
@@ -1140,13 +1140,13 @@ void ensure_kiod_running(CLI::App* app) {
         pargs.push_back("--unix-socket-path");
         pargs.push_back(string(key_store_executable_name) + ".sock");
 
-        ::boost::process::child keos(binPath.string(), pargs,
+        ::boost::process::child ksys(binPath.string(), pargs,
                                      bp::std_in.close(),
                                      bp::std_out > bp::null,
                                      bp::std_err > bp::null);
-        if (keos.running()) {
+        if (ksys.running()) {
             std::cerr << binPath << " launched" << std::endl;
-            keos.detach();
+            ksys.detach();
             try_local_port(2000);
         } else {
             std::cerr << "No wallet service listening on " << wallet_url << ". Failed to launch " << binPath << std::endl;
@@ -1202,7 +1202,7 @@ struct create_account_subcommand {
    string stake_cpu;
    uint32_t buy_ram_bytes_in_kbytes = 0;
    uint32_t buy_ram_bytes = 0;
-   string buy_ram_eos;
+   string buy_ram_sys;
    bool transfer = false;
    bool simple = false;
 
@@ -1228,7 +1228,7 @@ struct create_account_subcommand {
       //                              (localized("The amount of RAM bytes to purchase for the new account in kibibytes (KiB)")));
       //    createAccount->add_option("--buy-ram-bytes", buy_ram_bytes,
       //                              (localized("The amount of RAM bytes to purchase for the new account in bytes")));
-      //    createAccount->add_option("--buy-ram", buy_ram_eos,
+      //    createAccount->add_option("--buy-ram", buy_ram_sys,
       //                              (localized("The amount of RAM bytes to purchase for the new account in tokens")));
       //    createAccount->add_flag("--transfer", transfer,
       //                            (localized("Transfer voting power and right to unstake tokens to receiver")));
@@ -1274,9 +1274,9 @@ struct create_account_subcommand {
          // We are now commenting this logic out so that no additional actions are sent.
          /*
          if (!simple) {
-            SYSC_ASSERT( buy_ram_eos.size() || buy_ram_bytes_in_kbytes || buy_ram_bytes, "ERROR: One of --buy-ram, --buy-ram-kbytes or --buy-ram-bytes should have non-zero value" );
+            SYSC_ASSERT( buy_ram_sys.size() || buy_ram_bytes_in_kbytes || buy_ram_bytes, "ERROR: One of --buy-ram, --buy-ram-kbytes or --buy-ram-bytes should have non-zero value" );
             SYSC_ASSERT( !buy_ram_bytes_in_kbytes || !buy_ram_bytes, "ERROR: --buy-ram-kbytes and --buy-ram-bytes cannot be set at the same time" );
-               action buyram = !buy_ram_eos.empty() ? create_buyram(name(creator), name(account_name), to_asset(buy_ram_eos))
+               action buyram = !buy_ram_sys.empty() ? create_buyram(name(creator), name(account_name), to_asset(buy_ram_sys))
                   : create_buyrambytes(name(creator), name(account_name), (buy_ram_bytes_in_kbytes) ? (buy_ram_bytes_in_kbytes * 1024) : buy_ram_bytes);
                auto net = to_asset(stake_net);
                auto cpu = to_asset(stake_cpu);

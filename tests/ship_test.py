@@ -46,7 +46,7 @@ walletPort=TestHelper.DEFAULT_WALLET_PORT
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 shipTempDir=None
 
 try:
@@ -66,7 +66,7 @@ try:
                       totalNodes=totalNodes, totalProducers=totalProducers,
                       specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     # ***   identify each node (producers and non-producing node)   ***
 

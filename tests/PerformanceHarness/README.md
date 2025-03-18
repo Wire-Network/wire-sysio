@@ -617,11 +617,11 @@ Performance Test Basic Base:
                         "sys-vm" : A WebAssembly interpreter.
   --contracts-console   print contract's output to console
   --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB
-                        Maximum size (in MiB) of the EOS VM OC code cache
+                        Maximum size (in MiB) of the SYS VM OC code cache
   --sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS
-                        Number of threads to use for EOS VM OC tier-up
+                        Number of threads to use for SYS VM OC tier-up
   --non-prods-sys-vm-oc-enable
-                        Enable EOS VM OC tier-up runtime on non producer nodes
+                        Enable SYS VM OC tier-up runtime on non producer nodes
   --block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS
                         If set to greater than 0, periodically prune the block log to store only configured number of most recent blocks.
                         If set to 0, no blocks are be written to the block log; block log file is removed after startup.
@@ -777,11 +777,11 @@ Performance Test Basic Base:
                         "sys-vm" : A WebAssembly interpreter. (default: sys-vm-jit)
   --contracts-console   print contract's output to console (default: False)
   --sys-vm-oc-cache-size-mb SYS_VM_OC_CACHE_SIZE_MB
-                        Maximum size (in MiB) of the EOS VM OC code cache (default: 1024)
+                        Maximum size (in MiB) of the SYS VM OC code cache (default: 1024)
   --sys-vm-oc-compile-threads SYS_VM_OC_COMPILE_THREADS
-                        Number of threads to use for EOS VM OC tier-up (default: 1)
+                        Number of threads to use for SYS VM OC tier-up (default: 1)
   --non-prods-sys-vm-oc-enable
-                        Enable EOS VM OC tier-up runtime on non producer nodes (default: False)
+                        Enable SYS VM OC tier-up runtime on non producer nodes (default: False)
   --block-log-retain-blocks BLOCK_LOG_RETAIN_BLOCKS
                         If set to greater than 0, periodically prune the block log to store only configured number of most recent blocks.
                         If set to 0, no blocks are be written to the block log; block log file is removed after startup. (default: None)
@@ -1519,7 +1519,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_p2pAutoBpPeerNodeopDefault": null,
         "_p2pAutoBpPeerNodeopArg": "--p2p-auto-bp-peer",
         "agentName": null,
-        "_agentNameNodeopDefault": "EOS Test Agent",
+        "_agentNameNodeopDefault": "SYS Test Agent",
         "_agentNameNodeopArg": "--agent-name",
         "allowedConnection": null,
         "_allowedConnectionNodeopDefault": "any",
@@ -2179,7 +2179,7 @@ The Performance Test Basic generates, by default, a report that details results 
         "_p2pAutoBpPeerNodeopDefault": null,
         "_p2pAutoBpPeerNodeopArg": "--p2p-auto-bp-peer",
         "agentName": null,
-        "_agentNameNodeopDefault": "EOS Test Agent",
+        "_agentNameNodeopDefault": "SYS Test Agent",
         "_agentNameNodeopArg": "--agent-name",
         "allowedConnection": null,
         "_allowedConnectionNodeopDefault": "any",

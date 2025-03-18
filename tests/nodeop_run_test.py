@@ -45,7 +45,7 @@ walletMgr=WalletMgr(True, port=walletPort, keepRunning=args.leave_running, keepL
 testSuccessful=False
 dontBootstrap=sanityTest # intent is to limit the scope of the sanity test to just verifying that nodes can be started
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 timeout = .5 * 12 * 2 + 60 # time for finalization with 1 producer + 60 seconds padding
 Utils.setIrreversibleTimeout(timeout)
@@ -65,14 +65,14 @@ try:
         specificNodeopInstances={0: "bin/nodeop"}
         if cluster.launch(totalNodes=2, prodCount=prodCount, onlyBios=onlyBios, dontBootstrap=dontBootstrap, extraNodeopArgs=extraNodeopArgs, specificNodeopInstances=specificNodeopInstances) is False:
             cmdError("launcher")
-            errorExit("Failed to stand up eos cluster.")
+            errorExit("Failed to stand up sys cluster.")
     else:
         Print("Collecting cluster info.")
         cluster.initializeNodes(defproduceraPrvtKey=defproduceraPrvtKey, defproducerbPrvtKey=defproducerbPrvtKey)
         Print("Stand up %s" % (WalletdName))
         if walletMgr.launch() is False:
             cmdError("%s" % (WalletdName))
-            errorExit("Failed to stand up eos walletd.")
+            errorExit("Failed to stand up sys walletd.")
 
     if sanityTest:
         testSuccessful=True
@@ -231,7 +231,7 @@ try:
 
     expectedAmount=transferAmount
     Print("Verify transfer, Expected: %s" % (expectedAmount))
-    actualAmount=node.getAccountEosBalanceStr(testeraAccount.name)
+    actualAmount=node.getAccountSysBalanceStr(testeraAccount.name)
     if expectedAmount != actualAmount:
         cmdError("FAILURE - transfer failed")
         errorExit("Transfer verification failed. Excepted %s, actual: %s" % (expectedAmount, actualAmount))
@@ -243,7 +243,7 @@ try:
 
     expectedAmount="97.5421 {0}".format(CORE_SYMBOL)
     Print("Verify transfer, Expected: %s" % (expectedAmount))
-    actualAmount=node.getAccountEosBalanceStr(testeraAccount.name)
+    actualAmount=node.getAccountSysBalanceStr(testeraAccount.name)
     if expectedAmount != actualAmount:
         cmdError("FAILURE - transfer failed")
         errorExit("Transfer verification failed. Excepted %s, actual: %s" % (expectedAmount, actualAmount))
@@ -270,7 +270,7 @@ try:
 
     expectedAmount="98.0311 {0}".format(CORE_SYMBOL) # 5000 initial deposit
     Print("Verify transfer, Expected: %s" % (expectedAmount))
-    actualAmount=node.getAccountEosBalanceStr(currencyAccount.name)
+    actualAmount=node.getAccountSysBalanceStr(currencyAccount.name)
     if expectedAmount != actualAmount:
         cmdError("FAILURE - transfer failed")
         errorExit("Transfer verification failed. Excepted %s, actual: %s" % (expectedAmount, actualAmount))
@@ -635,16 +635,16 @@ try:
 
 
     Print("---- Test for signing transaction ----")
-    testeraAccountAmountBeforeTrx=node.getAccountEosBalanceStr(testeraAccount.name)
-    currencyAccountAmountBeforeTrx=node.getAccountEosBalanceStr(currencyAccount.name)
+    testeraAccountAmountBeforeTrx=node.getAccountSysBalanceStr(testeraAccount.name)
+    currencyAccountAmountBeforeTrx=node.getAccountSysBalanceStr(currencyAccount.name)
 
     xferAmount="1.2345 {0}".format(CORE_SYMBOL)
     unsignedTrxRet = node.transferFunds(currencyAccount, testeraAccount, xferAmount, "unsigned trx", force=False, waitForTransBlock=False, exitOnError=True, reportStatus=False, sign=False, dontSend=True, expiration=None, skipSign=True)
     unsignedTrxJsonFile = "unsigned_trx_file"
     with open(unsignedTrxJsonFile, 'w') as outfile:
         json.dump(unsignedTrxRet, outfile)
-    testeraAccountAmountAftrTrx=node.getAccountEosBalanceStr(testeraAccount.name)
-    currencyAccountAmountAftrTrx=node.getAccountEosBalanceStr(currencyAccount.name)
+    testeraAccountAmountAftrTrx=node.getAccountSysBalanceStr(testeraAccount.name)
+    currencyAccountAmountAftrTrx=node.getAccountSysBalanceStr(currencyAccount.name)
     try:
         assert(testeraAccountAmountBeforeTrx == testeraAccountAmountAftrTrx)
         assert(currencyAccountAmountBeforeTrx == currencyAccountAmountAftrTrx)
@@ -656,8 +656,8 @@ try:
     node.processClioCmd(signCmd, "Sign and push a transaction", False, True)
     os.remove(unsignedTrxJsonFile)
 
-    testeraAccountAmountAfterSign=node.getAccountEosBalanceStr(testeraAccount.name)
-    currencyAccountAmountAfterSign=node.getAccountEosBalanceStr(currencyAccount.name)
+    testeraAccountAmountAfterSign=node.getAccountSysBalanceStr(testeraAccount.name)
+    currencyAccountAmountAfterSign=node.getAccountSysBalanceStr(currencyAccount.name)
     try:
         assert(Utils.addAmount(testeraAccountAmountAftrTrx, xferAmount) == testeraAccountAmountAfterSign)
         assert(Utils.deduceAmount(currencyAccountAmountAftrTrx, xferAmount) == currencyAccountAmountAfterSign)

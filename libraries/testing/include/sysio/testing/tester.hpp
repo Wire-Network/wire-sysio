@@ -411,7 +411,7 @@ namespace sysio { namespace testing {
             cfg.sysvmoc_config.cache_size = 1024*1024*8;
 
             // don't enforce OC compilation subject limits for tests,
-            // particularly EOS EVM tests may run over those limits
+            // particularly SYS EVM tests may run over those limits
             cfg.sysvmoc_config.cpu_limit.reset();
             cfg.sysvmoc_config.vm_limit.reset();
             cfg.sysvmoc_config.stack_size_limit.reset();

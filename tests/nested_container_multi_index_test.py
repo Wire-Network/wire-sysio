@@ -57,8 +57,8 @@ wasmFile='nested_container_multi_index.wasm'
 abiFile='nested_container_multi_index.abi'
 
 def create_action(action, data, contract_account, usr):
-    cmdArr= [Utils.EosClientPath, '-v', 'push', 'action', contract_account, action, data, '-p', usr+'@active']
-    clargs = node.eosClientArgs().split()
+    cmdArr= [Utils.SysClientPath, '-v', 'push', 'action', contract_account, action, data, '-p', usr+'@active']
+    clargs = node.sysClientArgs().split()
     for x in clargs[::-1]:
         cmdArr.insert(1, x)
     result = Utils.checkOutput(cmdArr, ignoreError=False)
@@ -70,7 +70,7 @@ try:
 
     Print("Stand up cluster")
     if cluster.launch(pnodes=1, totalNodes=1) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks

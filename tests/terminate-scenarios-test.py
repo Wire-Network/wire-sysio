@@ -50,7 +50,7 @@ try:
 
     Print("Stand up cluster")
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -58,8 +58,8 @@ try:
         errorExit("Cluster never stabilized")
 
     Print("Kill cluster node instance.")
-    if cluster.killSomeEosInstances(1, killSignal) is False:
-        errorExit("Failed to kill Eos instances")
+    if cluster.killSomeSysInstances(1, killSignal) is False:
+        errorExit("Failed to kill Sys instances")
     assert not cluster.getNode(0).verifyAlive()
     Print("nodeop instances killed.")
 
@@ -68,8 +68,8 @@ try:
     if nodeArg != "":
         if chainSyncStrategyStr == "hardReplay":
             nodeArg += " --truncate-at-block %d" % terminate
-    if cluster.relaunchEosInstances(nodeArgs=nodeArg, waitForTerm=(terminate > 0)) is False:
-        errorExit("Failed to relaunch Eos instance")
+    if cluster.relaunchSysInstances(nodeArgs=nodeArg, waitForTerm=(terminate > 0)) is False:
+        errorExit("Failed to relaunch Sys instance")
     Print("nodeop instance relaunched.")
 
     testSuccessful=True

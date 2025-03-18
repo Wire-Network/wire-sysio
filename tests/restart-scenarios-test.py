@@ -49,7 +49,7 @@ try:
 
     Print("Stand up cluster")
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -82,8 +82,8 @@ try:
         errorExit("Cluster sync wait failed.")
 
     Print("Kill %d cluster node instances." % (killCount))
-    if cluster.killSomeEosInstances(killCount, killSignal) is False:
-        errorExit("Failed to kill Eos instances")
+    if cluster.killSomeSysInstances(killCount, killSignal) is False:
+        errorExit("Failed to kill Sys instances")
     Print("nodeop instances killed.")
 
     Print("Spread funds and validate")
@@ -95,8 +95,8 @@ try:
         errorExit("Cluster sync wait failed.")
 
     Print ("Relaunch dead cluster nodes instances.")
-    if cluster.relaunchEosInstances() is False:
-        errorExit("Failed to relaunch Eos instances")
+    if cluster.relaunchSysInstances() is False:
+        errorExit("Failed to relaunch Sys instances")
     Print("nodeop instances relaunched.")
 
     Print ("Resyncing cluster nodes.")

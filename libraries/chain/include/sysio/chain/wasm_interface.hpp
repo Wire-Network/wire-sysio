@@ -55,7 +55,7 @@ namespace sysio { namespace chain {
          // initialize exec per thread
          void init_thread_local_data();
 
-         // returns true if EOS VM OC is enabled
+         // returns true if SYS VM OC is enabled
          bool is_sys_vm_oc_enabled() const;
 #endif
 

@@ -54,7 +54,7 @@ try:
                       specificExtraNodeopArgs=specificExtraNodeopArgs,
                       extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
 
@@ -87,7 +87,7 @@ try:
 
     testSuccessful = prodNode.kill(signal.SIGTERM)
     if not testSuccessful:
-        TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=True, killWallet=True, keepLogs=True, cleanRun=True, dumpErrorDetails=True)
+        TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killSysInstances=True, killWallet=True, keepLogs=True, cleanRun=True, dumpErrorDetails=True)
         errorExit("Failed to kill the producer node")
 
     #Reset test success flag for next check

@@ -106,7 +106,7 @@ namespace sysio { namespace chain {
          }
          if (cd) {
             if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
-               tlog("${a} speculatively executing ${h} with eos vm oc", ("a", context.get_receiver())("h", code_hash));
+               tlog("${a} speculatively executing ${h} with sys vm oc", ("a", context.get_receiver())("h", code_hash));
             my->sysvmoc->exec->execute(*cd, *my->sysvmoc->mem, context);
             return;
          }

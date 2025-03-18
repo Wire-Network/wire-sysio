@@ -56,7 +56,7 @@ try:
             totalNodes=total_nodes,
             totalProducers=1,
             topo="mesh") is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     producingNode=cluster.getNode(0)
     speculativeNode1=cluster.getNode(1)

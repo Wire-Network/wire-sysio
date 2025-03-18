@@ -367,9 +367,9 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          }), "Number of threads to use for SYS VM OC tier-up")
          ("sys-vm-oc-enable", bpo::value<chain::wasm_interface::vm_oc_enable>()->default_value(chain::wasm_interface::vm_oc_enable::oc_auto),
           "Enable SYS VM OC tier-up runtime ('auto', 'all', 'none').\n"
-          "'auto' - EOS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
-          "'all'  - EOS VM OC tier-up is enabled for all contract execution.\n"
-          "'none' - EOS VM OC tier-up is completely disabled.\n")
+          "'auto' - SYS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
+          "'all'  - SYS VM OC tier-up is enabled for all contract execution.\n"
+          "'none' - SYS VM OC tier-up is completely disabled.\n")
 #endif
          ("enable-account-queries", bpo::value<bool>()->default_value(false), "enable queries to find accounts by various metadata.")
          ("transaction-retry-max-storage-size-gb", bpo::value<uint64_t>(),

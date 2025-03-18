@@ -1003,7 +1003,7 @@ struct controller_impl {
          a.creation_date = initial_timestamp;
 
          if( name == config::system_account_name ) {
-            // The initial sysio ABI value affects consensus; see  https://github.com/SYSIO/eos/issues/7794
+            // The initial sysio ABI value affects consensus; see  https://github.com/SYSIO/sys/issues/7794
             // TODO: This doesn't charge RAM; a fix requires a consensus upgrade.
             a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
          }

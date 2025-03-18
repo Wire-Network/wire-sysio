@@ -54,7 +54,7 @@ noOC = args.sys_vm_oc_enable == "none"
 allOC = args.sys_vm_oc_enable == "all"
 
 random.seed(seed) # Use a fixed seed for repeatability.
-# all debuglevel so that "executing ${h} with eos vm oc" is logged
+# all debuglevel so that "executing ${h} with sys vm oc" is logged
 cluster=Cluster(loggingLevel="all", unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True)
@@ -123,7 +123,7 @@ def startCluster():
         specificExtraNodeopArgs[pnodes]+=args.wasm_runtime
     extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=extraNodeopArgs ) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -135,8 +135,8 @@ def startCluster():
 
     sysioCodeHash = getCodeHash(producerNode, "sysio.token")
     # sysio.* should be using oc unless oc tierup disabled
-    Utils.Print(f"search: executing {sysioCodeHash} with eos vm oc")
-    found = producerNode.findInLog(f"executing {sysioCodeHash} with eos vm oc")
+    Utils.Print(f"search: executing {sysioCodeHash} with sys vm oc")
+    found = producerNode.findInLog(f"executing {sysioCodeHash} with sys vm oc")
     assert( found or (noOC and not found) )
 
     if args.sys_vm_oc_enable:
@@ -312,7 +312,7 @@ def basicTests():
     apiNode.waitForTransactionInBlock(results[1]['transaction_id'])
 
     testAccountCodeHash = getCodeHash(producerNode, testAccountName)
-    found = producerNode.findInLog(f"executing {testAccountCodeHash} with eos vm oc")
+    found = producerNode.findInLog(f"executing {testAccountCodeHash} with sys vm oc")
     assert( (allOC and found) or not found )
 
     # verify the return value (age) from read-only is the same as created.

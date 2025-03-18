@@ -3460,7 +3460,7 @@ namespace sysio {
 
    // some clients before leap 5.0 provided microsecond epoch instead of nanosecond epoch
    std::chrono::nanoseconds normalize_epoch_to_ns(int64_t x) {
-      //        1686211688888 milliseconds - 2023-06-08T08:08:08.888, 5yrs from EOS genesis 2018-06-08T08:08:08.888
+      //        1686211688888 milliseconds - 2023-06-08T08:08:08.888, 5yrs from SYS genesis 2018-06-08T08:08:08.888
       //     1686211688888000 microseconds
       //  1686211688888000000 nanoseconds
       if (x >= 1686211688888000000) // nanoseconds

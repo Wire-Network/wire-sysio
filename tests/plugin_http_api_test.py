@@ -97,7 +97,7 @@ class PluginHttpTest(unittest.TestCase):
                         "--p2p-peer-address localhost:9011 --resource-monitor-not-shutdown-on-threshold-exceeded ") % (self.data_dir, self.config_dir, self.data_dir, "\'*\'", "false")
         nodeop_flags += category_config.nodeopArgs()
 
-        start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.EosServerPath, nodeop_plugins, nodeop_flags)
+        start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.SysServerPath, nodeop_plugins, nodeop_flags)
         self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.kiod)
         time.sleep(self.sleep_s*2)
         self.nodeop.waitForBlock(1, timeout=30)
@@ -686,7 +686,7 @@ class PluginHttpTest(unittest.TestCase):
                 "delay_sec":0,
                 "context_free_actions":[],
                 "actions":[{"account":"sysio.token","name": "transfer","authorization": [{"actor": "han","permission": "active"}],
-                "data": "{\"entry\":774831,\"miner\":\"eosminer1111\",\"nonce\":139429}\"}",
+                "data": "{\"entry\":774831,\"miner\":\"sysminer1111\",\"nonce\":139429}\"}",
                 "hex_data": "000000000000a6690000000000ea305501000000000000000453595300000000016d"}],
                 "transaction_extensions": [],
                 "signatures": ["SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp"],

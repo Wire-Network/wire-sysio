@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(name_prefix_tests)
    BOOST_CHECK_EQUAL("sysio."_n.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL("sysio.evm"_n.prefix(), "sysio"_n);
    BOOST_CHECK_EQUAL(".sysio"_n.prefix(), ""_n);
-   BOOST_CHECK_NE("eosi"_n.prefix(), "sysio"_n);
+   BOOST_CHECK_NE("sysi"_n.prefix(), "sysio"_n);
    BOOST_CHECK_NE("sysiosysio"_n.prefix(), "sysio"_n);
    BOOST_CHECK_NE("sysioe"_n.prefix(), "sysio"_n);
 }
@@ -1280,19 +1280,19 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    auto expected_public_key = std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
    auto test_private_key = fc::crypto::private_key(private_key_string);
    auto test_public_key = test_private_key.get_public_key();
-   fc::crypto::public_key eos_pk(expected_public_key);
+   fc::crypto::public_key sys_pk(expected_public_key);
 
    BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}));
    BOOST_CHECK_EQUAL(expected_public_key, test_public_key.to_string({}));
-   BOOST_CHECK_EQUAL(expected_public_key, eos_pk.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key, sys_pk.to_string({}));
 
    fc::ecc::public_key_data data;
    data.data[0] = 0x80; // not necessary, 0 also works
    fc::sha256 hash = fc::sha256::hash("unknown private key");
    std::memcpy(&data.data[1], hash.data(), hash.data_size() );
    fc::ecc::public_key_shim shim(data);
-   fc::crypto::public_key eos_unknown_pk(std::move(shim));
-   ilog( "public key with no known private key: ${k}", ("k", eos_unknown_pk) );
+   fc::crypto::public_key sys_unknown_pk(std::move(shim));
+   ilog( "public key with no known private key: ${k}", ("k", sys_unknown_pk) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

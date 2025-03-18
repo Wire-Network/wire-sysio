@@ -95,7 +95,7 @@ struct sysvmoc_tier {
 
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(sysvmoc_tierup != wasm_interface::vm_oc_enable::oc_none) {
-            SYS_ASSERT(vm != wasm_interface::vm_type::sys_vm_oc, wasm_exception, "You can't use EOS VM OC as the base runtime when tier up is activated");
+            SYS_ASSERT(vm != wasm_interface::vm_type::sys_vm_oc, wasm_exception, "You can't use SYS VM OC as the base runtime when tier up is activated");
             sysvmoc = std::make_unique<sysvmoc_tier>(data_dir, sysvmoc_config, d);
          }
 #endif
