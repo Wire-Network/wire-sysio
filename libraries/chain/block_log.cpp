@@ -1,4 +1,5 @@
 #include <sysio/chain/block_header_state.hpp>
+#include <sysio/chain/block_log.hpp>
 #include <sysio/chain/block_log_config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/log_catalog.hpp>
@@ -997,7 +998,7 @@ namespace sysio { namespace chain {
             auto&          ds                 = log_data.ro_stream_at(pos);
 
             try {
-               signed_block entry;
+               StoredType entry;
                fc::raw::unpack(ds, entry);
                if (entry.block_num() != expected_block_num) {
                   return false;
@@ -1393,7 +1394,7 @@ namespace sysio { namespace chain {
       SYS_ASSERT(!is_currently_pruned(), block_log_exception, "pruned block log cannot be repaired");
       try {
          try {
-            signed_block entry;
+            StoredType entry;
             while (remaining() > 0 && block_num < last_block_num) {
                std::tie(block_num, block_id) = full_validate_block_entry<StoredType>(block_num, block_id, entry);
                if (block_num % 1000 == 0)
@@ -1855,5 +1856,9 @@ namespace sysio { namespace chain {
          move_blocklog_files<StoredType>(temp_path, dest_dir, start_block, end_block);
       }
    }
+
+   // Force instantiation of the two supported block_log implementations
+   template class block_log<block_header_state>;
+   template class block_log<signed_block>;
 
 }} // namespace sysio::chain
