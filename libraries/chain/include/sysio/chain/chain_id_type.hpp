@@ -45,8 +45,8 @@ namespace chain {
 
          friend class sysio::chain_apis::read_only;
 
-         friend class eosio::net_plugin_impl;
-         friend struct eosio::handshake_message;
+         friend class sysio::net_plugin_impl;
+         friend struct sysio::handshake_message;
          template<typename StoredType>
          friend class block_log;
          friend struct trim_data;

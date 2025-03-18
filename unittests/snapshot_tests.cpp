@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
    }
    fc::temp_directory temp_dir;
    auto config = tester::default_config(temp_dir, legacy_default_max_inline_action_size).first;
-   auto genesis = eosio::chain::block_log<signed_block>::extract_genesis_state(source_log_dir);
+   auto genesis = sysio::chain::block_log<signed_block>::extract_genesis_state(source_log_dir);
    std::filesystem::create_directories(config.blocks_dir);
    std::filesystem::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
    std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");

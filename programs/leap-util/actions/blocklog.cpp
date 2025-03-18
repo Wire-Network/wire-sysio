@@ -219,7 +219,7 @@ bool blocklog_actions::trim_blocklog_front(std::filesystem::path block_dir, uint
 
 void blocklog_actions::extract_block_range(std::filesystem::path block_dir, std::filesystem::path output_dir, uint32_t start, uint32_t last) {
    report_time rt("extracting block range");
-   EOS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
+   SYS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
    block_log<signed_block>::extract_block_range(block_dir, output_dir, start, last);
    rt.report();
 }

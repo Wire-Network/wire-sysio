@@ -3232,7 +3232,7 @@ block_state_ptr controller::fetch_block_state_by_number( uint32_t block_num )con
 } FC_CAPTURE_AND_RETHROW( (block_num) ) }
 
 block_header_state_ptr controller::fetch_irr_block_header_state_by_number( uint32_t block_num )const  { try {
-   EOS_ASSERT(my->slog, block_log_exception, "Block State log is not configured.");
+   SYS_ASSERT(my->slog, block_log_exception, "Block State log is not configured.");
    return my->slog->read_block_by_num(block_num);
 } FC_CAPTURE_AND_RETHROW( (block_num) ) }
 

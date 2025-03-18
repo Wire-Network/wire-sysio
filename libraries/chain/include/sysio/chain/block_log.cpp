@@ -1,9 +1,9 @@
-#include <eosio/chain/block_header_state.hpp>
-#include <eosio/chain/block_log_config.hpp>
-#include <eosio/chain/exceptions.hpp>
-#include <eosio/chain/log_catalog.hpp>
-#include <eosio/chain/log_data_base.hpp>
-#include <eosio/chain/log_index.hpp>
+#include <sysio/chain/block_header_state.hpp>
+#include <sysio/chain/block_log_config.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/log_catalog.hpp>
+#include <sysio/chain/log_data_base.hpp>
+#include <sysio/chain/log_index.hpp>
 #include <fc/bitutil.hpp>
 #include <fc/io/raw.hpp>
 #include <mutex>
@@ -105,8 +105,8 @@ namespace sysio { namespace chain {
       template <typename Stream, typename StoredType>
       void read_from(Stream& ds, const std::filesystem::path& log_path) {
          ds.read((char*)&ver, sizeof(ver));
-         EOS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
-         EOS_ASSERT(block_log<StoredType>::is_supported_version(version()), block_log_unsupported_version,
+         SYS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
+         SYS_ASSERT(block_log<StoredType>::is_supported_version(version()), block_log_unsupported_version,
                     "Unsupported version of block log. Block log version is ${version} while code supports version(s) "
                     "[${min},${max}], log file: ${log}",
                     ("version", version())("min", block_log<StoredType>::min_supported_version)(
@@ -135,7 +135,7 @@ namespace sysio { namespace chain {
             std::decay_t<decltype(detail::npos)> actual_totem;
             ds.read((char*)&actual_totem, sizeof(actual_totem));
 
-            EOS_ASSERT(actual_totem == expected_totem, block_log_exception,
+            SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
                        "Expected separator between log header and block storage was not found( expected: ${e}, actual: "
                        "${a} )",
                        ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem)))(
@@ -213,7 +213,7 @@ namespace sysio { namespace chain {
          auto block = std::make_shared<StoredType>();
          fc::raw::unpack(ds, *block);
          if (expect_block_num != 0) {
-            EOS_ASSERT(!!block && detail::retrieve_block_num(*block) == expect_block_num, block_log_exception,
+            SYS_ASSERT(!!block && detail::retrieve_block_num(*block) == expect_block_num, block_log_exception,
                        "Wrong block was read from the log.");
          }
 
@@ -226,7 +226,7 @@ namespace sysio { namespace chain {
          signed_block_header sbh;
          fc::raw::unpack(ds, sbh);
 
-         EOS_ASSERT(sbh.block_num() == expect_block_num, block_log_exception,
+         SYS_ASSERT(sbh.block_num() == expect_block_num, block_log_exception,
                     "Wrong block header was read from block log.",
                     ("returned", sbh.block_num())("expected", expect_block_num));
          return sbh;
@@ -238,7 +238,7 @@ namespace sysio { namespace chain {
          block_header_state bhs;
          fc::raw::unpack(ds, bhs);
 
-         EOS_ASSERT(bhs.block_num == expect_block_num, block_log_exception,
+         SYS_ASSERT(bhs.block_num == expect_block_num, block_log_exception,
                     "Wrong block header was read from block log.",
                     ("returned", bhs.block_num)("expected", expect_block_num));
          return bhs.header;
@@ -514,7 +514,7 @@ namespace sysio { namespace chain {
       }
    };
    template<typename StoredType>
-   using block_log_catalog = eosio::chain::log_catalog<StoredType, block_log_data, block_log_index, block_log_verifier>;
+   using block_log_catalog = sysio::chain::log_catalog<StoredType, block_log_data, block_log_index, block_log_verifier>;
 
    namespace detail {
 
@@ -649,7 +649,7 @@ namespace sysio { namespace chain {
                   block_file.skip(-sizeof(uint32_t));
                uint64_t pos = block_file.tellp();
 
-               EOS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (retrieve_block_num(*b) - preamble.first_block_num),
+               SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (retrieve_block_num(*b) - preamble.first_block_num),
                           block_log_append_fail, "Append to index file occuring at wrong position.",
                           ("position", (uint64_t)index_file.tellp())(
                                 "expected", (retrieve_block_num(*b) - preamble.first_block_num) * sizeof(uint64_t)));
@@ -1038,7 +1038,7 @@ namespace sysio { namespace chain {
                basic_block_log<stored_type>::reset(catalog.verifier.chain_id, catalog.last_block_num() + 1);
                this->update_head(this->read_block_by_num(catalog.last_block_num()));
             } else {
-               EOS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == this->preamble.chain_id(),
+               SYS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == this->preamble.chain_id(),
                           block_log_exception, "block log file ${path} has a different chain id",
                           ("path", this->block_file.get_file_path()));
             }
@@ -1420,7 +1420,7 @@ namespace sysio { namespace chain {
    std::filesystem::path block_log<StoredType>::repair_log(const std::filesystem::path& data_dir, uint32_t truncate_at_block,
                                   const char* reversible_block_dir_name) {
       ilog("Recovering Block Log...");
-      EOS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / log_filename<StoredType>()), block_log_not_found,
+      SYS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / log_filename<StoredType>()), block_log_not_found,
                  "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir));
 
       if (truncate_at_block == 0)

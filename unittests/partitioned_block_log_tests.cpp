@@ -15,9 +15,9 @@
 
 BOOST_AUTO_TEST_SUITE(partitioned_block_log_tests)
 
-using signed_block_log = eosio::chain::block_log<eosio::chain::signed_block>;
+using signed_block_log = sysio::chain::block_log<sysio::chain::signed_block>;
 
-void remove_existing_states(eosio::chain::controller::config& config) {
+void remove_existing_states(sysio::chain::controller::config& config) {
    auto state_path = config.state_dir;
    remove_all(state_path);
    std::filesystem::create_directories(state_path);
@@ -132,10 +132,10 @@ BOOST_AUTO_TEST_CASE(test_split_log) {
 BOOST_AUTO_TEST_CASE(test_split_state_log) {
    fc::temp_directory temp_dir;
 
-   eosio::testing::tester chain(
+   sysio::testing::tester chain(
          temp_dir,
-         [](eosio::chain::controller::config& config) {
-            config.blog = eosio::chain::partitioned_blocklog_config{ .archive_dir        = "archive",
+         [](sysio::chain::controller::config& config) {
+            config.blog = sysio::chain::partitioned_blocklog_config{ .archive_dir        = "archive",
                                                                      .stride             = 20,
                                                                      .max_retained_files = 5 };
             config.keep_state_log = true;
@@ -272,7 +272,7 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
 
    uint32_t head_block_num = chain.control->head_block_num();
 
-   eosio::chain::controller::config copied_config = chain.get_config();
+   sysio::chain::controller::config copied_config = chain.get_config();
    auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir,
                                                                  get_retained_dir(chain.get_config()));
    BOOST_REQUIRE(genesis);
@@ -427,7 +427,7 @@ BOOST_AUTO_TEST_CASE(test_restart_without_blocks_log_file) {
          true);
    chain.produce_blocks(160);
 
-   eosio::chain::controller::config copied_config = chain.get_config();
+   sysio::chain::controller::config copied_config = chain.get_config();
    auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir, get_retained_dir(copied_config));
    BOOST_REQUIRE(genesis);
 
@@ -575,7 +575,7 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    std::filesystem::remove(blocks_dir / "blocks.log");
    std::filesystem::remove(blocks_dir / "blocks.index");
 
-   signed_block_log blog(blocks_dir, eosio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
+   signed_block_log blog(blocks_dir, sysio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
 
    BOOST_CHECK(blog.version() != 0);
    BOOST_CHECK_EQUAL(blog.head()->block_num(), 150u);

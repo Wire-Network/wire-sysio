@@ -121,4 +121,4 @@ namespace sysio { namespace chain {
    };
 } }
 
-#include <eosio/chain/block_log.cpp>
+#include <sysio/chain/block_log.cpp>

@@ -331,7 +331,7 @@ namespace sysio { namespace chain {
 
          bool is_irreversible_state_available() const;
 
-#if defined(EOSIO_EOS_VM_RUNTIME_ENABLED) || defined(EOSIO_EOS_VM_JIT_RUNTIME_ENABLED)
+#if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
          vm::wasm_allocator&  get_wasm_allocator();
 #endif
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED

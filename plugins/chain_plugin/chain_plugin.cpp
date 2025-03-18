@@ -701,7 +701,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       } else if(has_retain_blocks_option) {
          uint32_t block_log_retain_blocks = options.at("block-log-retain-blocks").as<uint32_t>();
          if (block_log_retain_blocks == 0) {
-            chain_config->blog = eosio::chain::empty_blocklog_config{};
+            chain_config->blog = sysio::chain::empty_blocklog_config{};
             chain_config->keep_state_log = false; // an empty blocklog only is needed for the signed block log
          }
          else {
@@ -718,7 +718,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          std::optional<genesis_state> gs;
          
          gs = block_log<signed_block>::extract_genesis_state( blocks_dir, retained_dir );
-         EOS_ASSERT( gs,
+         SYS_ASSERT( gs,
                      plugin_config_exception,
                      "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
                      ("path", (blocks_dir / "blocks.log").generic_string())
@@ -2064,7 +2064,7 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
    if( !b && db.is_irreversible_state_available() ) {
       b = db.fetch_irr_block_header_state_by_number(*block_num);
    }
-   EOS_ASSERT( b, unknown_block_exception, "Could not find reversible block: ${block}", ("block", params.block_num_or_id));
+   SYS_ASSERT( b, unknown_block_exception, "Could not find reversible block: ${block}", ("block", params.block_num_or_id));
 
    fc::variant vo;
    fc::to_variant( *b, vo );
