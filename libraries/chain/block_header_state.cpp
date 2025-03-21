@@ -228,15 +228,6 @@ namespace sysio { namespace chain {
          );
       }
 
-      // Add s_root_extension to header extensions if present & relevant
-      if (s_header) {
-         emplace_extension(
-            h.header_extensions,
-            s_root_extension::extension_id(),
-            fc::raw::pack( s_root_extension ( *s_header ))
-         );
-      }
-
       return h;
    }
 
