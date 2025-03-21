@@ -244,7 +244,7 @@ class Cluster(object):
             time.sleep(2)
         loggingLevelDictString = json.dumps(self.loggingLevelDict, separators=(',', ':'))
         args=(f'-p {pnodes} -n {totalNodes} -d {delay} '
-              f'-i {datetime.datetime.now(datetime.UTC).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
+              f'-i {datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]} -f {producerFlag} '
               f'--unstarted-nodes {unstartedNodes} --logging-level {self.loggingLevel} '
               f'--logging-level-map {loggingLevelDictString}')
         argsArr=args.split()
