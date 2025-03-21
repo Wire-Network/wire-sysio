@@ -150,17 +150,18 @@ namespace sysio { namespace chain {
                }
             }
          }
-   // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
-      // Identify the contract account from the first action if possible
-      account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
 
-      // Only add contract_account if it's a valid (non-empty) name
-      if (contract_account.good()) {
-         bill_to_accounts.insert(contract_account);
-      }
+         // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
+         // Identify the contract account from the first action if possible
+         account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
 
-      validate_ram_usage.reserve(bill_to_accounts.size());
-      // -------------------------------------------------------------------------
+         // Only add contract_account if it's a valid (non-empty) name
+         if (contract_account.good()) {
+            bill_to_accounts.insert(contract_account);
+         }
+
+         validate_ram_usage.reserve(bill_to_accounts.size());
+         // -------------------------------------------------------------------------
 
          // Update usage windows for all candidate accounts (user + contract)
          rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot );
@@ -410,7 +411,8 @@ namespace sysio { namespace chain {
       auto now = fc::time_point::now();
       trace->elapsed = now - start;
 
-      // Update CPU time and validate CPU usageupdate_billed_cpu_time( now );
+      // Update CPU time and validate CPU usage
+      update_billed_cpu_time( now );
 
       validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true, subjective_cpu_bill_us );
 
