@@ -1291,6 +1291,9 @@ namespace sysio { namespace testing {
    std::vector<builtin_protocol_feature_t> base_tester::get_all_builtin_protocol_features() {
       std::vector<builtin_protocol_feature_t> builtins;
       for( const auto& f : builtin_protocol_feature_codenames ) {
+         if ( f.first ==  builtin_protocol_feature_t::disable_compression_in_transaction_merkle && !shouldAllowBlockProtocolChanges() ) {
+            continue;
+         }
          builtins.push_back( f.first );
       }
 
@@ -1315,6 +1318,9 @@ namespace sysio { namespace testing {
          // maintained. Excluding DISABLE_DEFERRED_TRXS_STAGE_1 and DISABLE_DEFERRED_TRXS_STAGE_2
          // from full protocol feature list such that existing tests can run.
          if( f ==  builtin_protocol_feature_t::disable_deferred_trxs_stage_1 || f  == builtin_protocol_feature_t::disable_deferred_trxs_stage_2 ) {
+            continue;
+         }
+         else if ( f ==  builtin_protocol_feature_t::disable_compression_in_transaction_merkle && !shouldAllowBlockProtocolChanges() ) {
             continue;
          }
 

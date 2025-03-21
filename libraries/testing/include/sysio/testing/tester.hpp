@@ -442,6 +442,7 @@ namespace sysio { namespace testing {
 
          void             _start_block(fc::time_point block_time);
          signed_block_ptr _finish_block();
+         virtual bool     shouldAllowBlockProtocolChanges() const { return true; }
 
       // Fields:
       protected:
@@ -673,6 +674,8 @@ namespace sysio { namespace testing {
 
         return ok;
       }
+
+      bool     shouldAllowBlockProtocolChanges() const override { return false; }
 
       unique_ptr<controller>   validating_node;
       uint32_t                 num_blocks_to_producer_before_shutdown = 0;
