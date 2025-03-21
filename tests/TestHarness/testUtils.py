@@ -10,13 +10,20 @@ import inspect
 import json
 import shlex
 import socket
-from datetime import datetime, UTC
+from datetime import datetime
 from sys import stdout
 from sys import exit
 import traceback
 import shutil
 import sys
 from pathlib import Path
+
+# Fancy import to maintain compatibility with python 3.10
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
 
 ###########################################################################################
 
