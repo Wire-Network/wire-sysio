@@ -4,6 +4,12 @@ from .WalletMgr import WalletMgr
 from datetime import datetime
 import platform
 
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC=timezone.utc
+
 import argparse
 
 class AppArgs:
@@ -141,7 +147,7 @@ class TestHelper(object):
         if prefix:
             Utils.Print(str(prefix))
         clientVersion=Cluster.getClientVersion()
-        Utils.Print("UTC time: %s" % str(datetime.utcnow()))
+        Utils.Print("UTC time: %s" % str(datetime.now(UTC)))
         Utils.Print("SYS Client version: %s" % (clientVersion))
         Utils.Print("Processor: %s" % (platform.processor()))
         Utils.Print("OS name: %s" % (platform.platform()))

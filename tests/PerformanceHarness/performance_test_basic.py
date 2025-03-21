@@ -22,6 +22,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from platform import release, system
 
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
+
 class PerformanceTestBasic:
     @dataclass
     class PtbTpsTestResult:
@@ -186,7 +192,7 @@ class PerformanceTestBasic:
     @dataclass
     class LoggingConfig:
         logDirBase: Path = Path(".")/PurePath(PurePath(__file__).name).stem
-        logDirTimestamp: str = f"{datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S')}"
+        logDirTimestamp: str = f"{datetime.now(UTC).strftime('%Y-%m-%d_%H-%M-%S')}"
         logDirTimestampedOptSuffix: str = ""
         logDirPath: Path = field(default_factory=Path, init=False)
 
@@ -208,7 +214,7 @@ class PerformanceTestBasic:
         self.errorExit = Utils.errorExit
         self.emptyBlockGoal = 1
 
-        self.testStart = datetime.utcnow()
+        self.testStart = datetime.now(UTC)
         self.testEnd = self.testStart
         self.testNamePath = testNamePath
         self.loggingConfig = PerformanceTestBasic.LoggingConfig(logDirBase=Path(self.ptbConfig.logDirRoot)/f"{self.testNamePath}Logs",
@@ -566,7 +572,7 @@ class PerformanceTestBasic:
                                                  numBlocksToPrune=self.ptbConfig.numAddlBlocksToPrune, numTrxGensUsed=testResult.numGeneratorsUsed, targetTpsPerGenList=testResult.targetTpsPerGenList,
                                                  quiet=self.ptbConfig.quiet, printMissingTransactions=self.ptbConfig.printMissingTransactions)
         self.logAnalysis = analyzeLogResults(data=self.data, tpsTestConfig=tpsTestConfig, artifacts=artifactsLocate)
-        self.testEnd = datetime.utcnow()
+        self.testEnd = datetime.now(UTC)
 
         self.testResult = PerformanceTestBasic.PerfTestBasicResult(targetTPS=self.ptbConfig.targetTps, resultAvgTps=self.logAnalysis.tpsStats.avg, expectedTxns=self.ptbConfig.expectedTransactionsSent,
                                                                    resultTxns=self.logAnalysis.trxLatencyStats.samples, testRunCompleted=self.ptbTpsTestResult.completedRun,

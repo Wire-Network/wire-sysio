@@ -18,6 +18,12 @@ from datetime import datetime
 from enum import Enum
 from .log_reader import JsonReportHandler
 
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
+
 class PerformanceTest:
 
     @dataclass
@@ -72,14 +78,14 @@ class PerformanceTest:
 
         binSearchResults: PerfTestSearchResults = field(default_factory=PerfTestSearchResults)
         longRunningSearchResults: PerfTestSearchResults= field(default_factory=PerfTestSearchResults)
-        tpsTestStart: datetime=datetime.utcnow()
-        tpsTestFinish: datetime=datetime.utcnow()
+        tpsTestStart: datetime=datetime.now(UTC)
+        tpsTestFinish: datetime=datetime.now(UTC)
         perfRunSuccessful: bool=False
 
     @dataclass
     class LoggingConfig:
         logDirBase: Path = Path(".")/os.path.basename(sys.argv[0]).rsplit('.',maxsplit=1)[0]
-        logDirTimestamp: str = f"{datetime.utcnow().strftime('%Y-%m-%d_%H-%M-%S')}"
+        logDirTimestamp: str = f"{datetime.now(UTC).strftime('%Y-%m-%d_%H-%M-%S')}"
         logDirPath: Path = field(default_factory=Path, init=False)
         ptbLogsDirPath: Path = field(default_factory=Path, init=False)
         pluginThreadOptLogsDirPath: Path = field(default_factory=Path, init=False)
@@ -95,7 +101,7 @@ class PerformanceTest:
         self.clusterConfig = clusterConfig
         self.ptConfig = ptConfig
 
-        self.testsStart = datetime.utcnow()
+        self.testsStart = datetime.now(UTC)
 
         self.loggingConfig = PerformanceTest.LoggingConfig(logDirBase=Path(self.ptConfig.logDirRoot)/f"PHSRLogs",
                                                            logDirTimestamp=f"{self.testsStart.strftime('%Y-%m-%d_%H-%M-%S')}")
@@ -194,8 +200,8 @@ class PerformanceTest:
     class PluginThreadOptResult:
         recommendedThreadCount: int = 0
         threadToMaxTpsDict: dict = field(default_factory=dict)
-        analysisStart: datetime = datetime.utcnow()
-        analysisFinish: datetime = datetime.utcnow()
+        analysisStart: datetime = datetime.now(UTC)
+        analysisFinish: datetime = datetime.now(UTC)
 
     def optimizePluginThreadCount(self,  optPlugin: PluginThreadOpt, optType: PluginThreadOptRunType=PluginThreadOptRunType.LOCAL_MAX,
                                   minThreadCount: int=2, maxThreadCount: int=os.cpu_count()) -> PluginThreadOptResult:
@@ -205,7 +211,7 @@ class PerformanceTest:
         threadToMaxTpsDict: dict = {}
 
         clusterConfig = copy.deepcopy(self.clusterConfig)
-        analysisStart = datetime.utcnow()
+        analysisStart = datetime.now(UTC)
 
         with open(resultsFile, 'w') as log:
             log.write(f"{optPlugin.value}Threads, maxTpsAchieved\n")
@@ -233,7 +239,7 @@ class PerformanceTest:
                     break
             lastMaxTpsAchieved = binSearchResults.maxTpsAchieved
 
-        analysisFinish = datetime.utcnow()
+        analysisFinish = datetime.now(UTC)
 
         def calcLocalMax(threadToMaxDict: dict):
             localMax = 0
@@ -332,7 +338,7 @@ class PerformanceTest:
         return argsDict
 
     def performTpsTest(self) -> TpsTestResult:
-        tpsTestStart = datetime.utcnow()
+        tpsTestStart = datetime.now(UTC)
         perfRunSuccessful = False
 
         binSearchResults = self.performPtbBinarySearch(clusterConfig=self.clusterConfig, logDirRoot=self.loggingConfig.ptbLogsDirPath,
@@ -356,7 +362,7 @@ class PerformanceTest:
             for i in range(len(longRunningSearchResults.searchResults)):
                 print(f"Search scenario: {i} result: {longRunningSearchResults.searchResults[i]}")
 
-        tpsTestFinish = datetime.utcnow()
+        tpsTestFinish = datetime.now(UTC)
 
         return PerformanceTest.TpsTestResult(binSearchResults=binSearchResults, longRunningSearchResults=longRunningSearchResults,
                                              tpsTestStart=tpsTestStart, tpsTestFinish=tpsTestFinish, perfRunSuccessful=perfRunSuccessful)
@@ -411,7 +417,7 @@ class PerformanceTest:
             tpsTestResult = self.performTpsTest()
             testSuccessful = tpsTestResult.perfRunSuccessful
 
-        self.testsFinish = datetime.utcnow()
+        self.testsFinish = datetime.now(UTC)
 
         self.report = self.createReport(producerThreadResult=prodResults, chainThreadResult=chainResults, netThreadResult=netResults, tpsTestResult=tpsTestResult, nodeopVers=self.clusterConfig.nodeopVers)
         jsonReport = JsonReportHandler.reportAsJSON(self.report)
