@@ -36,8 +36,6 @@ class Transactions(NodeopQueries):
             transId=NodeopQueries.getTransId(trans)
 
         if stakeNet > 0 or stakeCPU > 0 or buyRAM > 0:
-            if not nodeOwner:
-                nodeOwner = creatorAccount
             if not waitForTransBlock:
                 self.waitForTransactionInBlock(transId)
             trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM)
@@ -324,8 +322,8 @@ class Transactions(NodeopQueries):
         signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
         cmdDesc="push action"
         time_block = self.getHeadBlockNum()
-        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":{net}, "cpu_weight":{cpu}, "ram_weight":{ram}, "time_block":"{time_block}", network_gen:0' + "}"
-        cmd = f"{cmdDesc} -j {signStr} sysio.roa addpolicy  {argsStr} -p {owner.name}@active"
+        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{net} SYS", "cpu_weight":"{cpu} SYS", "ram_weight":"{ram} SYS", "time_block":{time_block}, "network_gen":0' + "}"
+        cmd = (f"{cmdDesc} -j {signStr} sysio.roa addpolicy  '{argsStr}' -p {issuer.name}@active")
         trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)
 
