@@ -200,7 +200,7 @@ namespace {
                 auto fiona = "fiona"_n; // a normal user with a policy grant from candice
                 chain.create_accounts({candice, fiona});
                 chain.register_node_owner(candice, 1);
-                chain.add_roa_policy(fiona, candice,
+                chain.add_roa_policy(candice, fiona,
                   "10.0000 SYS", "10.0000 SYS", "10.0000 SYS",
                   0, chain.control->last_irreversible_block_num()
                 );
