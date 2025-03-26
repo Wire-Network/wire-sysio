@@ -615,7 +615,7 @@ namespace sysio { namespace testing {
       return push_transaction(trx);
    }
 
-   transaction_trace_ptr base_tester::add_roa_policy(account_name owner, account_name issuer, string net_weight,
+   transaction_trace_ptr base_tester::add_roa_policy(account_name issuer, account_name owner, string net_weight,
                                                      string cpu_weight, string ram_weight, int64_t network_gen,
                                                      uint32_t time_block) {
       signed_transaction trx;
