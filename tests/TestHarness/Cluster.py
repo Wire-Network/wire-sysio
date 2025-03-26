@@ -912,6 +912,8 @@ class Cluster(object):
     def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
         assert(len(self.nodes) > 0)
         node=self.nodes[0]
+        if nodeOwner is None:
+            nodeOwner = self.carlAccount
         trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
         return trans
 
@@ -1265,7 +1267,12 @@ class Cluster(object):
         # Register carl as a tier 1 node owner
         self.carlAccount = copy.deepcopy(sysioAccount)
         self.carlAccount.name = 'carl'
-        biosNode.pushMessage('sysio.roa', 'regnodeowner', '{"owner": carl, "tier": 1}', '-p sysio.roa')
+        trans=biosNode.pushMessage('sysio.roa', 'regnodeowner', '{"owner": carl, "tier": 1}', '-p sysio.roa')
+        transId=Node.getTransId(trans[1])
+        Utils.Print("Wait for carl.")
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: carl is persona non gratis (tx %s missing)" % transId)
+            return None
 
         # Only call init if the system contract is loaded
         if loadSystemContract:
@@ -1437,7 +1444,7 @@ class Cluster(object):
             if ret is None:
                 if Utils.Debug: Utils.Print("Create account %s." % (account.name))
                 if Utils.Debug: Utils.Print("Validation node %s" % validationNodeIndex)
-                trans=self.createAccountAndVerify(account, creator, stakedDeposit, validationNodeIndex=validationNodeIndex)
+                trans=self.createAccountAndVerify(account, creator, stakedDeposit, nodeOwner=self.carlAccount, validationNodeIndex=validationNodeIndex)
                 if trans is None:
                     Utils.Print("ERROR: Failed to create account %s." % (account.name))
                     return False
