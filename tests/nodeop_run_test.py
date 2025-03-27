@@ -206,16 +206,16 @@ try:
     transId=node.setPriv(cluster.defproduceraAccount, cluster.sysioAccount, waitForTransBlock=True, exitOnError=True)
 
     Print("Create new account %s via %s" % (testeraAccount.name, cluster.defproduceraAccount.name))
-    transId=node.createInitializeAccount(testeraAccount, cluster.defproduceraAccount, stakedDeposit=0, waitForTransBlock=True, exitOnError=True)
+    transId=node.createInitializeAccount(testeraAccount, cluster.defproduceraAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=True, exitOnError=True)
 
     Print("Create new account %s via %s" % (testerbAccount.name, cluster.defproduceraAccount.name))
-    transId=node.createInitializeAccount(testerbAccount, cluster.defproduceraAccount, stakedDeposit=0, waitForTransBlock=False, exitOnError=True)
+    transId=node.createInitializeAccount(testerbAccount, cluster.defproduceraAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=False, exitOnError=True)
 
     Print("Create new account %s via %s" % (currencyAccount.name, cluster.defproduceraAccount.name))
-    transId=node.createInitializeAccount(currencyAccount, cluster.defproduceraAccount, buyRAM=200000, stakedDeposit=5000, exitOnError=True)
+    transId=node.createInitializeAccount(currencyAccount, cluster.defproduceraAccount, nodeOwner=cluster.carlAccount, buyRAM=200000, stakedDeposit=5000, exitOnError=True)
 
     Print("Create new account %s via %s" % (exchangeAccount.name, cluster.defproduceraAccount.name))
-    transId=node.createInitializeAccount(exchangeAccount, cluster.defproduceraAccount, buyRAM=200000, waitForTransBlock=True, exitOnError=True)
+    transId=node.createInitializeAccount(exchangeAccount, cluster.defproduceraAccount, nodeOwner=cluster.carlAccount, buyRAM=200000, waitForTransBlock=True, exitOnError=True)
 
     Print("Validating accounts after user accounts creation")
     accounts=[testeraAccount, currencyAccount, exchangeAccount]
@@ -785,7 +785,7 @@ try:
     setCodeAbiAccount = Account("setcodeabi")
     setCodeAbiAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
     setCodeAbiAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
-    cluster.createAccountAndVerify(setCodeAbiAccount, cluster.sysioAccount, buyRAM=100000)
+    cluster.createAccountAndVerify(setCodeAbiAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
     wasmFile="unittests/test-contracts/payloadless/payloadless.wasm"
     abiFile="unittests/test-contracts/payloadless/payloadless.abi"
     assert(node.setCodeOrAbi(setCodeAbiAccount, "code", wasmFile))
