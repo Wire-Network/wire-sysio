@@ -35,7 +35,7 @@ class Transactions(NodeopQueries):
             trans = self.transferFunds(creatorAccount, account, NodeopQueries.currencyIntToStr(stakedDeposit, CORE_SYMBOL), "init", waitForTransBlock=waitForTransBlock)
             transId=NodeopQueries.getTransId(trans)
 
-        if stakeNet > 0 or stakeCPU > 0 or buyRAM > 0:
+        if nodeOwner is not None and (stakeNet > 0 or stakeCPU > 0 or buyRAM > 0):
             if not waitForTransBlock:
                 self.waitForTransactionInBlock(transId)
             trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM)
