@@ -1074,12 +1074,65 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
    );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_AUTO_TEST_CASE(steal_my_ram) {
+   try {
+      tester c(setup_policy::full);
+      fc::logger::get("default").set_log_level(log_level::debug);
+      wlog("Starting STEAL MY RAM TEST");
+
+      const auto &tester1_account = account_name("tester1");
+      const auto &alice_account = account_name("alice");
+      const auto &bob_account = account_name("bob");
+      const auto &carl_account = account_name("carl");
+
+
+      c.create_accounts({tester1_account, alice_account, bob_account, carl_account});
+      c.produce_block();
+      c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
+      c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
+      c.produce_block();
+
+      c.register_node_owner(alice_account, 1);
+      c.register_node_owner(carl_account, 1);
+      c.produce_block();
+
+      wlog("Adding data using alice");
+      c.push_action(tester1_account, "setdata"_n, alice_account, mutable_variant_object()
+                    ("len1", 10)
+                    ("len2", 0)
+                    ("payer", alice_account)
+      );
+
+      wlog("Moving data around with bob's authorization...");
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+            ("len1", 0)
+            ("len2", 10)
+            ("payer", alice_account)
+         ),
+         resource_exhausted_exception,
+         fc_exception_message_is("Neither contract nor user can pay for this transaction")
+      );
+
+      wlog("Adding a ROA policy for bob...");
+      c.add_roa_policy(carl_account, bob_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
+      c.produce_block();
+
+
+      wlog("Removing data with bob's authorization...");
+      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+                    ("len1", 0)
+                    ("len2", 0)
+                    ("payer", alice_account)
+      );
+   } FC_LOG_AND_RETHROW()
+}
+
 /***
  * Test that ram resource limits are enforced.
  * This test activates ROA, so accounts are limited to the amount of RAM granted them by node owners.
  * The purpose of this testing is to ensure that the RAM is actually billed correctly against a limited balance.
  */
-
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    SKIP_TEST
    tester c( setup_policy::full );
