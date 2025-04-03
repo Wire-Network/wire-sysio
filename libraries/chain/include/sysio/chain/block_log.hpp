@@ -95,8 +95,6 @@ namespace sysio { namespace chain {
 
          static bool contains_chain_id(uint32_t version, uint32_t first_block_num);
 
-         static bool is_supported_version(uint32_t version);
-
          static bool is_pruned_log(const std::filesystem::path& data_dir);
 
          static void extract_block_range(const std::filesystem::path& block_dir, const std::filesystem::path&output_dir, block_num_type start, block_num_type end);

@@ -23,10 +23,17 @@ namespace sysio { namespace chain {
       genesis_state_or_chain_id_version = 3 ///< improvement on version 2 to not require the genesis state be provided when not starting from block 1
    };
 
+   // though the content may be different, the way it is written out will remain identical
+   namespace common_protocol {
+      constexpr uint32_t min_supported_version = initial_version;
+      constexpr uint32_t max_supported_version = genesis_state_or_chain_id_version;
+      uint32_t default_initial_version = max_supported_version;
+   }
+
    template<typename StoredType>
-   constexpr uint32_t block_log<StoredType>::min_supported_version = initial_version;
+   constexpr uint32_t block_log<StoredType>::min_supported_version = common_protocol::min_supported_version;
    template<typename StoredType>
-   constexpr uint32_t block_log<StoredType>::max_supported_version = genesis_state_or_chain_id_version;
+   constexpr uint32_t block_log<StoredType>::max_supported_version = common_protocol::max_supported_version;
 
    template<typename StoredType>
    inline std::string filename_prefix();
@@ -103,25 +110,28 @@ namespace sysio { namespace chain {
       constexpr static int nbytes_with_chain_id = // the bytes count when the preamble contains chain_id
             sizeof(uint32_t) + sizeof(first_block_num) + sizeof(chain_id_type) + sizeof(detail::npos);
 
-      template <typename Stream, typename StoredType>
+      static bool is_supported_version(uint32_t version);
+      static bool contains_genesis_state(uint32_t version, uint32_t first_block_num);
+      static bool contains_chain_id(uint32_t version, uint32_t first_block_num);
+      template <typename Stream>
       void read_from(Stream& ds, const std::filesystem::path& log_path) {
          ds.read((char*)&ver, sizeof(ver));
          SYS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
-         SYS_ASSERT(block_log<StoredType>::is_supported_version(version()), block_log_unsupported_version,
+         SYS_ASSERT(is_supported_version(version()), block_log_unsupported_version,
                     "Unsupported version of block log. Block log version is ${version} while code supports version(s) "
                     "[${min},${max}], log file: ${log}",
-                    ("version", version())("min", block_log<StoredType>::min_supported_version)(
-                          "max", block_log<StoredType>::max_supported_version)("log", log_path));
+                    ("version", version())("min", common_protocol::min_supported_version)(
+                          "max", common_protocol::max_supported_version)("log", log_path));
 
          first_block_num = 1;
          if (version() != initial_version) {
             ds.read(reinterpret_cast<char*>(&first_block_num), sizeof(first_block_num));
          }
 
-         if (block_log<StoredType>::contains_genesis_state(version(), first_block_num)) {
+         if (contains_genesis_state(version(), first_block_num)) {
             chain_context.emplace<genesis_state>();
             fc::raw::unpack(ds, std::get<genesis_state>(chain_context));
-         } else if (block_log<StoredType>::contains_chain_id(version(), first_block_num)) {
+         } else if (contains_chain_id(version(), first_block_num)) {
             chain_context = chain_id_type::empty_chain_id();
             ds >> std::get<chain_id_type>(chain_context);
          } else {
@@ -132,7 +142,7 @@ namespace sysio { namespace chain {
          }
 
          if (version() != initial_version) {
-            const auto                              expected_totem = detail::npos;
+            const auto                           expected_totem = detail::npos;
             std::decay_t<decltype(detail::npos)> actual_totem;
             ds.read((char*)&actual_totem, sizeof(actual_totem));
 
@@ -258,19 +268,17 @@ namespace sysio { namespace chain {
 
        public:
          block_log_data() = default;
-         //template<typename StoredType>
-         //block_log_data(const std::filesystem::path& path) { open<StoredType>(path); }
+         block_log_data(const std::filesystem::path& path) { open(path); }
          uint64_t first_block_position() const { return first_block_pos; }
 
          const block_log_preamble& get_preamble() const { return preamble; }
 
-         template<typename StoredType>
-         void open(const std::filesystem::path& path, const StoredType* const stored_type = nullptr) {
+         void open(const std::filesystem::path& path) {
             if (file.is_open())
                file.close();
             file.set_file_path(path);
             file.open("rb");
-            preamble.read_from<decltype(file), StoredType>(file, file.get_file_path());
+            preamble.read_from(file, file.get_file_path());
             first_block_pos = file.tellp();
             file.seek_end(0);
             size_ = file.tellp();
@@ -389,7 +397,7 @@ namespace sysio { namespace chain {
          block_log_bundle(std::filesystem::path block_file, std::filesystem::path index_file, bool validate_indx)
              : block_file_name(std::move(block_file)), index_file_name(std::move(index_file)) {
 
-            log_data.open<stored_type>(block_file_name);
+            log_data.open(block_file_name);
             log_index.open(index_file_name);
 
             SYS_ASSERT(!log_data.get_preamble().is_currently_pruned(), block_log_unsupported_version,
@@ -529,8 +537,6 @@ namespace sysio { namespace chain {
       struct block_log_impl {
          using stored_type = StoredType;
          using stored_type_ptr = std::shared_ptr<stored_type>;
-
-         inline static uint32_t  default_initial_version = block_log<stored_type>::max_supported_version;
 
          std::mutex       mtx;
          struct stored_type_with_id {
@@ -733,8 +739,7 @@ namespace sysio { namespace chain {
             auto index_size = std::filesystem::file_size(this->index_file.get_file_path());
 
             if (log_size) {
-               block_log_data log_data;
-               log_data.open<StoredType>(block_file.get_file_path());
+               block_log_data log_data(block_file.get_file_path());
                preamble = log_data.get_preamble();
                // genesis state is not going to be useful afterwards, just convert it to chain id to save space
                preamble.chain_context = preamble.chain_id();
@@ -800,14 +805,14 @@ namespace sysio { namespace chain {
             preamble.chain_context = preamble.chain_id();
 
             genesis_written_to_block_log = true;
-            static_assert(block_log<stored_type>::max_supported_version > 0, "a version number of zero is not supported");
+            static_assert(common_protocol::max_supported_version > 0, "a version number of zero is not supported");
 
             index_file.open(fc::cfile::truncate_rw_mode);
             index_file.flush();
          }
 
          void reset(const genesis_state& gs, const stored_type_ptr& first_block) override {
-            this->reset(1, gs, block_log_impl<StoredType>::default_initial_version);
+            this->reset(1, gs, common_protocol::default_initial_version);
             this->append(first_block, retrieve_id(*first_block), fc::raw::pack(*first_block));
          }
 
@@ -816,7 +821,7 @@ namespace sysio { namespace chain {
                   first_block_num > 1, block_log_exception,
                   "Block log version ${ver} needs to be created with a genesis state if starting from block number 1.");
 
-            this->reset(first_block_num, chain_id, block_log<stored_type>::max_supported_version);
+            this->reset(first_block_num, chain_id, common_protocol::max_supported_version);
             this->head.reset();
          }
 
@@ -867,7 +872,7 @@ namespace sysio { namespace chain {
             //  block recovery can get through some blocks.
             size_t copy_to_pos = convert_existing_header_to_vacuumed(first_block_num);
 
-            preamble.ver = block_log<stored_type>::max_supported_version;
+            preamble.ver = common_protocol::max_supported_version;
 
             // if there is no head block though, bail now, otherwise first_block_num won't actually be available
             //  and it'll mess this all up. Be sure to still remove the 4 byte trailer though.
@@ -943,7 +948,7 @@ namespace sysio { namespace chain {
             SYS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception,
                        "Trying to vacuumed a non-pruned block log");
 
-            if (block_log<stored_type>::contains_genesis_state(old_version, old_first_block_num)) {
+            if (block_log_preamble::contains_genesis_state(old_version, old_first_block_num)) {
                // we'll always write a v3 log, but need to possibly mutate the genesis_state to a chainid should we have
                // pruned a log starting with a genesis_state
                genesis_state gs;
@@ -951,7 +956,7 @@ namespace sysio { namespace chain {
                fc::raw::unpack(ds, gs);
 
                block_file.seek(0);
-               fc::raw::pack(block_file, block_log<stored_type>::max_supported_version);
+               fc::raw::pack(block_file, common_protocol::max_supported_version);
                fc::raw::pack(block_file, first_block_num);
                if (first_block_num == 1) {
                   SYS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
@@ -965,7 +970,7 @@ namespace sysio { namespace chain {
                fc::raw::unpack(block_file, chainid);
 
                block_file.seek(0);
-               fc::raw::pack(block_file, block_log<stored_type>::max_supported_version);
+               fc::raw::pack(block_file, common_protocol::max_supported_version);
                fc::raw::pack(block_file, first_block_num);
                fc::raw::pack(block_file, chainid);
                fc::raw::pack(block_file, totem);
@@ -1086,7 +1091,7 @@ namespace sysio { namespace chain {
             this->block_file.set_file_path(block_file_path);
             this->index_file.set_file_path(index_file_path);
 
-            this->preamble.ver             = block_log<stored_type>::max_supported_version;
+            this->preamble.ver             = common_protocol::max_supported_version;
             this->preamble.chain_context   = this->preamble.chain_id();
             this->preamble.first_block_num = retrieve_block_num(*this->head->ptr) + 1;
             this->preamble.write_to(this->block_file);
@@ -1233,7 +1238,7 @@ namespace sysio { namespace chain {
 
             const uint32_t prune_to_num = head_num - prune_config.prune_blocks + 1;
 
-            static_assert(block_log<stored_type>::max_supported_version == 3,
+            static_assert(common_protocol::max_supported_version == 3,
                           "Code was written to support version 3 format, need to update this code for latest format.");
             const genesis_state gs;
             const size_t        max_header_size_v1 = sizeof(uint32_t) + fc::raw::pack_size(gs) + sizeof(uint64_t);
@@ -1281,7 +1286,7 @@ namespace sysio { namespace chain {
    block_log<StoredType>::~block_log() = default;
 
    template<typename StoredType>
-   void     block_log<StoredType>::set_initial_version(uint32_t ver) { detail::block_log_impl<StoredType>::default_initial_version = ver; }
+   void     block_log<StoredType>::set_initial_version(uint32_t ver) { common_protocol::default_initial_version = ver; }
    template<typename StoredType>
    uint32_t block_log<StoredType>::version() const {
       std::lock_guard g(my->mtx);
@@ -1378,7 +1383,7 @@ namespace sysio { namespace chain {
       ilog("Will write new index file ${file}", ("file", index_file_name));
 
       block_log_data log_data;
-      log_data.open<StoredType>(block_file_name);
+      log_data.open(block_file_name);
       log_data.construct_index(index_file_name);
    }
 
@@ -1455,7 +1460,7 @@ namespace sysio { namespace chain {
       ilog("Reconstructing '${new_block_log}' from backed up log", ("new_block_log", block_file_name));
 
       block_log_data log_data;
-      log_data.open<stored_type>(backup_dir / log_filename<stored_type>().c_str());
+      log_data.open(backup_dir / log_filename<stored_type>().c_str());
 
       auto [pos, block_num, error_msg] = log_data.full_validate_blocks<StoredType>(truncate_at_block, blocks_dir, now);
 
@@ -1500,7 +1505,7 @@ namespace sysio { namespace chain {
 
       if (!first_block_file.empty()) {
          block_log_data log_data;
-         log_data.open<StoredType>(first_block_file);
+         log_data.open(first_block_file);
          return log_data.get_preamble().chain_context;
       }
 
@@ -1517,7 +1522,7 @@ namespace sysio { namespace chain {
             if (!std::regex_match(file, what, my_filter))
                continue;
             block_log_data log_data;
-            log_data.open<StoredType>(p->path());
+            log_data.open(p->path());
             return log_data.chain_id();
          }
       }
@@ -1548,21 +1553,30 @@ namespace sysio { namespace chain {
    }
 
    // static
-   template<typename StoredType>
-   bool block_log<StoredType>::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
+   bool block_log_preamble::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
       return version < genesis_state_or_chain_id_version || first_block_num == 1;
    }
 
    // static
    template<typename StoredType>
-   bool block_log<StoredType>::contains_chain_id(uint32_t version, uint32_t first_block_num) {
+   bool block_log<StoredType>::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
+      return block_log_preamble::contains_genesis_state(version, first_block_num);
+   }
+
+   // static
+   bool block_log_preamble::contains_chain_id(uint32_t version, uint32_t first_block_num) {
       return version >= genesis_state_or_chain_id_version && first_block_num > 1;
    }
 
    // static
    template<typename StoredType>
-   bool block_log<StoredType>::is_supported_version(uint32_t version) {
-      return std::clamp(version, min_supported_version, max_supported_version) == version;
+   bool block_log<StoredType>::contains_chain_id(uint32_t version, uint32_t first_block_num) {
+      return block_log_preamble::contains_chain_id(version, first_block_num);
+   }
+
+   // static
+   bool block_log_preamble::is_supported_version(uint32_t version) {
+      return std::clamp(version, common_protocol::min_supported_version, common_protocol::max_supported_version) == version;
    }
 
    // static
@@ -1822,7 +1836,7 @@ namespace sysio { namespace chain {
          if (std::filesystem::exists(temp_block_log)) {
             if (first_block_num == end_block + 1) {
                block_log_data log_data;
-               log_data.open<StoredType>(val.filename_base + ".log");
+               log_data.open(val.filename_base + ".log");
                if (!file.is_open())
                   file.open(fc::cfile::update_rw_mode);
                file.seek_end(0);
