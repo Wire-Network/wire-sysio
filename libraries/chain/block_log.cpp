@@ -56,6 +56,13 @@ namespace sysio { namespace chain {
    template<>
    inline std::string index_filename<block_header_state>() { return std::string("block_state.index"); }
 
+   template<typename StoredType>
+   inline bool needed_for_replay();
+   template<>
+   inline bool needed_for_replay<signed_block>() { return true; }
+   template<>
+   inline bool needed_for_replay<block_header_state>() { return false; }
+
    namespace detail {
       constexpr uint32_t pruned_version_flag = 1 << 31;
   
@@ -547,6 +554,7 @@ namespace sysio { namespace chain {
 
          virtual ~block_log_impl() = default;
 
+         virtual bool     is_initialized() const                                              = 0;
          virtual uint32_t first_block_num()                                                   = 0;
          virtual void     append(const stored_type_ptr& b, const block_id_type& id,
                                  const std::vector<char>& packed_block)                       = 0;
@@ -582,6 +590,7 @@ namespace sysio { namespace chain {
             std::filesystem::remove(log_dir / index_filename<stored_type>());
          }
 
+         bool     is_initialized() const final { return true; }
          uint32_t first_block_num() final { return this->head ? retrieve_block_num(*this->head->ptr) : first_block_number; }
          void append(const stored_type_ptr& b, const block_id_type& id, const std::vector<char>& packed_block) final {
             block_log_impl<stored_type>::update_head(b, id);
@@ -635,6 +644,7 @@ namespace sysio { namespace chain {
             }
          }
 
+         bool     is_initialized() const override { return genesis_written_to_block_log; }
          uint32_t first_block_num() override { return preamble.first_block_num; }
          uint32_t index_first_block_num() const { return preamble.first_block_num; }
 
@@ -647,7 +657,7 @@ namespace sysio { namespace chain {
                      const std::vector<char>& packed_block) override {
             try {
                SYS_ASSERT(genesis_written_to_block_log, block_log_append_fail,
-                          "Cannot append to block log until the genesis is first written");
+                          "Cannot append to ${desc} log until the genesis is first written", ("desc", filename_prefix<StoredType>()));
 
                block_file.seek_end(0);
                index_file.seek_end(0);
@@ -737,6 +747,7 @@ namespace sysio { namespace chain {
             ensure_file_exists(index_file);
             auto log_size   = std::filesystem::file_size(this->block_file.get_file_path());
             auto index_size = std::filesystem::file_size(this->index_file.get_file_path());
+            ilog("${desc} Log file_size: ${size}", ("desc", filename_prefix<StoredType>())("size", log_size));
 
             if (log_size) {
                block_log_data log_data(block_file.get_file_path());
@@ -817,8 +828,12 @@ namespace sysio { namespace chain {
          }
 
          void reset(const chain_id_type& chain_id, uint32_t first_block_num) override {
+            // if this block_log type is required for replay (like the traditional block log)
+            // then don't allow just writing the chain_id, since that will force this instance
+            // to restart with a snapshot, rather than being able to reconstuct it via this
+            // block log
             SYS_ASSERT(
-                  first_block_num > 1, block_log_exception,
+                  first_block_num > 1 || !needed_for_replay<StoredType>(), block_log_exception,
                   "Block log version ${ver} needs to be created with a genesis state if starting from block number 1.");
 
             this->reset(first_block_num, chain_id, common_protocol::max_supported_version);
@@ -1288,9 +1303,12 @@ namespace sysio { namespace chain {
    template<typename StoredType>
    void     block_log<StoredType>::set_initial_version(uint32_t ver) { common_protocol::default_initial_version = ver; }
    template<typename StoredType>
-   uint32_t block_log<StoredType>::version() const {
+   std::optional<uint32_t> block_log<StoredType>::version() const {
       std::lock_guard g(my->mtx);
-      return my->version();
+      if (my->is_initialized())
+         return { my->version() };
+
+      return {};
    }
 
    template<typename StoredType>

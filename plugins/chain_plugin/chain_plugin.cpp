@@ -573,7 +573,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             state_dir = sd;
       }
 
-      if( options.count( "state-log" )) {
+      if( options.at( "state-log" ).as<bool>()) {
          state_log = true;
       }
 
@@ -2493,7 +2493,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
          core_symbol = *(params.expected_core_symbol);
 
       // Check balance of core symbol in sysio.token::accounts table
-      if (const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(token_code, params.account_name, "accounts"_n))) {
+      const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( token_code, params.account_name, "accounts"_n ));
+      if( t_id != nullptr ) {
          const auto &idx = d.get_index<key_value_index, by_scope_primary>();
          auto it = idx.find(boost::make_tuple(t_id->id, core_symbol.to_symbol_code()));
          if (it != idx.end() && it->value.size() >= sizeof(asset)) {

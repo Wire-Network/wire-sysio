@@ -308,6 +308,7 @@ struct controller_impl {
       if( !keep_state_log ) {
          return {};
       }
+      ilog( "Keep a Block State Log");
       return state_log( blocks_dir, config );
    }
 
@@ -457,12 +458,12 @@ struct controller_impl {
          std::vector<std::future<std::vector<char>>> v;
          std::vector<std::future<std::vector<char>>> sv;
          v.reserve( branch.size() );
-         if (!!slog) {
+         if (slog.has_value()) {
             sv.reserve( branch.size() );
          }
          for( auto bitr = branch.rbegin(); bitr != branch.rend(); ++bitr ) {
             v.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)->block]() { return fc::raw::pack(*b); } ) );
-            if (!!slog) {
+            if (slog.has_value()) {
                sv.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)]() {
                   return fc::raw::pack(static_cast<const block_header_state&>(*b));
                } ) );
@@ -482,7 +483,7 @@ struct controller_impl {
             // blog.append could fail due to failures like running out of space.
             // Do it before commit so that in case it throws, DB can be rolled back.
             blog.append( (*bitr)->block, (*bitr)->id, it->get() );
-            if( !!slog ) {
+            if( slog.has_value() ) {
                slog->append( *bitr, (*bitr)->id, sit->get() );
                ++sit;
             }
@@ -632,6 +633,16 @@ struct controller_impl {
             ilog( "Starting initialization from snapshot and block log ${b}-${e}, this may take a significant amount of time",
                   ("b", blog.first_block_num())("e", blog_head->block_num()) );
             read_from_snapshot( snapshot, blog.first_block_num(), blog_head->block_num() );
+            if( !slog ) {
+               // need to reset the slog if
+               // it is not initialized or
+               // its span of block nums are not consistent with the fork_db
+               if( !slog->version() ||
+                  slog->first_block_num() > head->block_num ||
+                  slog->head()->block_num != head->block_num ) {
+                  slog->reset( chain_id, head->block_num + 1 );
+               }
+            }
          } else {
             ilog( "Starting initialization from snapshot and no block log, this may take a significant amount of time" );
             read_from_snapshot( snapshot, 0, std::numeric_limits<uint32_t>::max() );
@@ -639,6 +650,9 @@ struct controller_impl {
                         "Snapshot indicates controller head at block number 0, but that is not allowed. "
                         "Snapshot is invalid." );
             blog.reset( chain_id, head->block_num + 1 );
+            if( !slog ) {
+               slog->reset( chain_id, head->block_num + 1 );
+            }
          }
          ilog( "Snapshot loaded, lib: ${lib}", ("lib", head->block_num) );
 
@@ -678,9 +692,20 @@ struct controller_impl {
          SYS_ASSERT( blog.first_block_num() == 1, block_log_exception,
                      "block log does not start with genesis block"
          );
+         if( !slog ) {
+            // need to reset the slog if
+            // it is not initialized
+            // its span of block nums are not consistent with the fork_db
+            if( !slog->version() ||
+                slog->first_block_num() > head->block_num ||
+                slog->head()->block_num != head->block_num ) {
+               // since the slog is not needed for replay, just initialize it with a chain id
+               slog->reset( genesis_chain_id, head->block_num + 1 );
+            }
+         }
       } else {
          blog.reset( genesis, head->block );
-         if( !!slog ) {
+         if( slog.has_value() ) {
             slog->reset( genesis, std::static_pointer_cast<block_header_state>(head) );
          }
       }
@@ -706,9 +731,12 @@ struct controller_impl {
       } else {
          if( first_block_num != (lib_num + 1) ) {
             blog.reset( chain_id, lib_num + 1 );
-         }
-         if( !!slog ) {
-            slog->reset( chain_id, lib_num + 1 );
+
+            if( slog.has_value() ) {
+               // slog may not need to be reset, but just do this to ensure
+               // slog is consistent with blog
+               slog->reset( chain_id, lib_num + 1 );
+            }
          }
       }
 
