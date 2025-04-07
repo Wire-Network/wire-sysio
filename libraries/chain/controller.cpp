@@ -633,7 +633,7 @@ struct controller_impl {
             ilog( "Starting initialization from snapshot and block log ${b}-${e}, this may take a significant amount of time",
                   ("b", blog.first_block_num())("e", blog_head->block_num()) );
             read_from_snapshot( snapshot, blog.first_block_num(), blog_head->block_num() );
-            if( !slog ) {
+            if( slog.has_value() ) {
                // need to reset the slog if
                // it is not initialized or
                // its span of block nums are not consistent with the fork_db
@@ -650,7 +650,7 @@ struct controller_impl {
                         "Snapshot indicates controller head at block number 0, but that is not allowed. "
                         "Snapshot is invalid." );
             blog.reset( chain_id, head->block_num + 1 );
-            if( !slog ) {
+            if( slog.has_value() ) {
                slog->reset( chain_id, head->block_num + 1 );
             }
          }
@@ -692,7 +692,7 @@ struct controller_impl {
          SYS_ASSERT( blog.first_block_num() == 1, block_log_exception,
                      "block log does not start with genesis block"
          );
-         if( !slog ) {
+         if( slog.has_value() ) {
             // need to reset the slog if
             // it is not initialized
             // its span of block nums are not consistent with the fork_db
