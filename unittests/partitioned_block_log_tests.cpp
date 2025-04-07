@@ -536,7 +536,7 @@ void trim_blocklog_front(uint32_t version) {
    signed_block_log old_log(blocks_dir, chain.get_config().blog);
    signed_block_log new_log(temp1.path());
    // double check if the version has been set to the desired version
-   const auto old_log_version = old_log.version()
+   const auto old_log_version = old_log.version();
    BOOST_CHECK(old_log_version.has_value());
    BOOST_CHECK(*old_log_version == version);
    BOOST_CHECK(new_log.first_block_num() == 10u);
