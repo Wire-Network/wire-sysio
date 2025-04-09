@@ -640,6 +640,7 @@ struct controller_impl {
                         "Snapshot indicates controller head at block number 0, but that is not allowed. "
                         "Snapshot is invalid." );
             blog.reset( chain_id, head->block_num + 1 );
+            // slog will be reset, if need be, after replay is complete
          }
          ilog( "Snapshot loaded, lib: ${lib}", ("lib", head->block_num) );
 
@@ -679,8 +680,12 @@ struct controller_impl {
          SYS_ASSERT( blog.first_block_num() == 1, block_log_exception,
                      "block log does not start with genesis block"
          );
+         // slog will be adjusted after replay, if it needs to be
       } else {
          blog.reset( genesis, head->block );
+         if( slog.has_value() ) {
+            slog->reset( genesis, std::dynamic_pointer_cast<block_header_state>(head) );
+         }
       }
       init(std::move(check_shutdown));
    }
@@ -704,6 +709,7 @@ struct controller_impl {
       } else {
          if( first_block_num != (lib_num + 1) ) {
             blog.reset( chain_id, lib_num + 1 );
+            // slog will be reset, if need be, after replay is complete
          }
       }
 
@@ -785,7 +791,7 @@ struct controller_impl {
              !slog->head() ||
              slog->head()->block_num != head->block_num ) {
             // since the slog is not needed for replay, just initialize it with a chain id
-            slog->reset( chain_id, head->block_num );
+            slog->reset( chain_id, blog.head()->block_num() + 1 );
          }
       }
 

@@ -667,7 +667,8 @@ namespace sysio { namespace chain {
                uint64_t pos = block_file.tellp();
 
                SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (retrieve_block_num(*b) - preamble.first_block_num),
-                          block_log_append_fail, "Append to index file occuring at wrong position.",
+                          block_log_append_fail, "Append to ${desc}'s index file occuring at wrong position.",
+                          ("desc", filename_prefix<StoredType>())
                           ("position", (uint64_t)index_file.tellp())(
                                 "expected", (retrieve_block_num(*b) - preamble.first_block_num) * sizeof(uint64_t)));
                block_file.write(packed_block.data(), packed_block.size());
