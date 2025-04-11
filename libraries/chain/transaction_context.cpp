@@ -141,14 +141,18 @@ namespace sysio { namespace chain {
             validate_cpu_usage_to_bill( billed_cpu_time_us, std::numeric_limits<int64_t>::max(), false, subjective_cpu_bill_us); // Fail early if the amount to be billed is too high
 
          // Record accounts to be billed for network and CPU usage
-         if( control.is_builtin_activated(builtin_protocol_feature_t::only_bill_first_authorizer) ) {
-            bill_to_accounts.insert( trx.first_authorizer() );
-         } else {
-            for( const auto& act : trx.actions ) {
-               for( const auto& auth : act.authorization ) {
-                  bill_to_accounts.insert( auth.actor );
-               }
-            }
+         // if( control.is_builtin_activated(builtin_protocol_feature_t::only_bill_first_authorizer) ) {
+         //    bill_to_accounts.insert( trx.first_authorizer() );
+         // } else {
+         //    for( const auto& act : trx.actions ) {
+         //       for( const auto& auth : act.authorization ) {
+         //          bill_to_accounts.insert( auth.actor );
+         //       }
+         //    }
+         // }
+         // For each action, add either the explicit payer (if present) or the contract (if no payer)
+         for ( const auto &act : trx.actions ) {
+            bill_to_accounts.insert(act.explicit_payer());
          }
 
          // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
@@ -367,7 +371,9 @@ namespace sysio { namespace chain {
          auto& am = control.get_mutable_authorization_manager();
          for (const auto& act : trx.actions) {
             for (const auto& auth : act.authorization) {
-               am.update_permission_usage(am.get_permission(auth));
+               if (auth.permission != config::sysio_payer_name) {
+                  am.update_permission_usage(am.get_permission(auth));
+               }
             }
          }
       }
@@ -416,94 +422,8 @@ namespace sysio { namespace chain {
 
       validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true, subjective_cpu_bill_us );
 
-      // ---------------------- Fallback Logic for CPU/NET/RAM ----------------------
-      const transaction& trx = packed_trx.get_transaction();
-      account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
-
-      // Try to find a user account distinct from the contract_account to fallback to if needed
-      account_name user_account;
-      for (const auto& acct : bill_to_accounts) {
-         if (acct != contract_account) {
-            user_account = acct;
-            break;
-         }
-      }
-
-      // If no separate user found, fallback to using the contract_account itself
-      if (!user_account.good()) {
-         user_account = contract_account;
-      }
-
-      // Retrieve contract CPU/NET limits
-      auto [contract_cpu, contract_cpu_grey] = rl.get_account_cpu_limit_ex(contract_account, greylist_limit);
-      auto [contract_net, contract_net_grey] = rl.get_account_net_limit_ex(contract_account, greylist_limit);
-
-      int64_t total_ram_used = total_ram_usage;
-
-      // Get contract RAM limits
-      int64_t c_ram_limit, c_net_w, c_cpu_w;
-      rl.get_account_limits(contract_account, c_ram_limit, c_net_w, c_cpu_w);
-      int64_t c_ram_usage = rl.get_account_ram_usage(contract_account);
-
-      // If c_ram_limit == -1, it means unlimited RAM
-      bool contract_has_unlimited_ram = (c_ram_limit == -1);
-      int64_t c_ram_available = contract_has_unlimited_ram ? -1 : (c_ram_limit - c_ram_usage);
-
-      // Check if contract can pay CPU/NET
-      bool contract_cpu_unlimited = (contract_cpu.available < 0); // -1 in CPU/NET is represented by negative
-      bool contract_net_unlimited = (contract_net.available < 0);
-
-      bool contract_can_pay_cpu = contract_cpu_unlimited || (contract_cpu.available >= billed_cpu_time_us);
-      bool contract_can_pay_net = contract_net_unlimited || (contract_net.available >= (int64_t)net_usage);
-      // RAM check now accounts for unlimited scenario
-      bool contract_can_pay_ram = contract_has_unlimited_ram || (c_ram_available >= total_ram_used);
-
-      bool contract_can_pay = contract_can_pay_cpu && contract_can_pay_net && contract_can_pay_ram;
-
-      if (contract_can_pay) {
-         // Contract pays for the resources
-         rl.add_pending_ram_usage(contract_account, total_ram_used);
-         rl.verify_account_ram_usage(contract_account);
-         rl.add_transaction_usage({contract_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
-                                block_timestamp_type(control.pending_block_time()).slot, is_transient() );
-      } else {
-         // Contract cannot pay. Attempt to fallback to the user if distinct.
-         if (user_account == contract_account) {
-            // No distinct user found, fail the transaction
-            SYS_ASSERT(false, resource_exhausted_exception,
-                     "Contract cannot pay and no distinct user found to fallback");
-         }
-
-         // Retrieve user limits
-         auto [user_cpu, user_cpu_grey] = rl.get_account_cpu_limit_ex(user_account, greylist_limit);
-         auto [user_net, user_net_grey] = rl.get_account_net_limit_ex(user_account, greylist_limit);
-
-         int64_t u_ram_limit, u_net_w, u_cpu_w;
-         rl.get_account_limits(user_account, u_ram_limit, u_net_w, u_cpu_w);
-         int64_t u_ram_usage = rl.get_account_ram_usage(user_account);
-
-         // If u_ram_limit == -1, user has unlimited RAM
-         bool user_has_unlimited_ram = (u_ram_limit == -1);
-         int64_t u_ram_available = user_has_unlimited_ram ? -1 : (u_ram_limit - u_ram_usage);
-
-         bool user_cpu_unlimited = (user_cpu.available < 0);
-         bool user_net_unlimited = (user_net.available < 0);
-
-         bool user_can_pay_cpu = user_cpu_unlimited || (user_cpu.available >= billed_cpu_time_us);
-         bool user_can_pay_net = user_net_unlimited || (user_net.available >= (int64_t)net_usage);
-         bool user_can_pay_ram = user_has_unlimited_ram || (u_ram_available >= total_ram_used);
-
-         bool user_can_pay = user_can_pay_cpu && user_can_pay_net && user_can_pay_ram;
-
-         SYS_ASSERT(user_can_pay, resource_exhausted_exception,
-                  "Neither contract nor user can pay for this transaction");
-
-         // User pays for the resources
-         rl.add_pending_ram_usage(user_account, total_ram_used);
-         rl.verify_account_ram_usage(user_account);
-         rl.add_transaction_usage({user_account}, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
-                                 block_timestamp_type(control.pending_block_time()).slot);
-      }
+      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
+                                block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
    }
 
 
@@ -651,10 +571,10 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-      // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
-      total_ram_usage += ram_delta;
-
-      // If ram_delta > 0, we may still track the account in validate_ram_usage if needed.
+      wlog("Calling add_ram_usage with account: ${account}, ram_delta: ${ram_delta}",
+           ("account", account)("ram_delta", ram_delta));
+      auto& rl = control.get_mutable_resource_limits_manager();
+      rl.add_pending_ram_usage( account, ram_delta );
       if( ram_delta > 0 ) {
          validate_ram_usage.insert( account );
       }
@@ -784,39 +704,7 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::schedule_transaction() {
-      // Charge ahead of time for the additional net usage needed to retire the delayed transaction
-      // whether that be by successfully executing, soft failure, hard failure, or expiration.
-      const transaction& trx = packed_trx.get_transaction();
-      if( trx.delay_sec.value == 0 ) { // Do not double bill. Only charge if we have not already charged for the delay.
-         const auto& cfg = control.get_global_properties().configuration;
-         add_net_usage( static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
-                         + static_cast<uint64_t>(config::transaction_id_net_usage) ); // Will exit early if net usage cannot be payed.
-      }
-
-      auto first_auth = trx.first_authorizer();
-
-      uint32_t trx_size = 0;
-      const auto& cgto = control.mutable_db().create<generated_transaction_object>( [&]( auto& gto ) {
-        gto.trx_id      = id;
-        gto.payer       = first_auth;
-        gto.sender      = account_name(); /// delayed transactions have no sender
-        gto.sender_id   = transaction_id_to_sender_id( gto.trx_id );
-        gto.published   = control.pending_block_time();
-        gto.delay_until = gto.published + delay;
-        gto.expiration  = gto.delay_until + fc::seconds(control.get_global_properties().configuration.deferred_trx_expiration_window);
-        trx_size = gto.set( trx );
-
-        if (auto dm_logger = control.get_deep_mind_logger(is_transient())) {
-           std::string event_id = RAM_EVENT_ID("${id}", ("id", gto.id));
-
-           dm_logger->on_create_deferred(deep_mind_handler::operation_qualifier::push, gto, packed_trx);
-           dm_logger->on_ram_trace(std::move(event_id), "deferred_trx", "push", "deferred_trx_pushed");
-        }
-      });
-
-      int64_t ram_delta = (config::billable_size_v<generated_transaction_object> + trx_size);
-      add_ram_usage( cgto.payer, ram_delta );
-      trace->account_ram_delta = account_delta( cgto.payer, ram_delta );
+      throw std::runtime_error("Scheduled transaction implementation has been removed");
    }
 
    void transaction_context::record_transaction( const transaction_id_type& id, fc::time_point_sec expire ) {
@@ -850,6 +738,7 @@ namespace sysio { namespace chain {
       flat_set<account_name> actors;
 
       bool one_auth = false;
+      auto payer = ""_n;
       for( const auto& a : trx.actions ) {
          auto* code = db.find<account_object, by_name>(a.account);
          SYS_ASSERT( code != nullptr, transaction_exception,
@@ -858,19 +747,44 @@ namespace sysio { namespace chain {
             SYS_ASSERT( a.authorization.size() == 0, transaction_exception,
                        "read-only action '${name}' cannot have authorizations", ("name", a.name) );
          }
-         for( const auto& auth : a.authorization ) {
-            one_auth = true;
-            auto* actor = db.find<account_object, by_name>(auth.actor);
-            SYS_ASSERT( actor  != nullptr, transaction_exception,
-                        "action's authorizing actor '${account}' does not exist", ("account", auth.actor) );
-            SYS_ASSERT( auth_manager.find_permission(auth) != nullptr, transaction_exception,
-                        "action's authorizations include a non-existent permission: ${permission}",
-                        ("permission", auth) );
-            if( enforce_actor_whitelist_blacklist )
-               actors.insert( auth.actor );
+         payer = ""_n;
+         for (const auto &auth: a.authorization) {
+            if (auth.permission == config::sysio_payer_name) {
+               SYS_ASSERT(payer == ""_n, transaction_exception,
+                          "action cannot have multiple payers");
+
+               auto *actor = db.find<account_object, by_name>(auth.actor);
+               SYS_ASSERT(actor != nullptr, transaction_exception,
+                          "action's paying actor '${account}' does not exist", ("account", auth.actor));
+               payer = auth.actor;
+            } else {
+               one_auth = true;
+               auto *actor = db.find<account_object, by_name>(auth.actor);
+               SYS_ASSERT(actor != nullptr, transaction_exception,
+                          "action's authorizing actor '${account}' does not exist", ("account", auth.actor));
+               SYS_ASSERT(auth_manager.find_permission(auth) != nullptr, transaction_exception,
+                          "action's authorizations include a non-existent permission: ${permission}",
+                          ("permission", auth));
+               if (enforce_actor_whitelist_blacklist)
+                  actors.insert(auth.actor);
+            }
+         }
+         if (payer != ""_n) {
+            bool authPayer = false;
+            for (const auto &auth: a.authorization) {
+               if (auth.permission == config::sysio_payer_name) {
+                  continue;
+               }
+               if (auth.actor == payer) {
+                  authPayer = true;
+                  break;
+               }
+            }
+            SYS_ASSERT(authPayer, transaction_exception,
+                       "Payer '${account}' did not authorize this action", ("account", payer));
          }
       }
-      SYS_ASSERT( one_auth || is_read_only(), tx_no_auths, "transaction must have at least one authorization" );
+      SYS_ASSERT(one_auth || is_read_only(), tx_no_auths, "transaction must have at least one authorization" );
 
       if( enforce_actor_whitelist_blacklist ) {
          control.check_actor_list( actors );

@@ -73,6 +73,7 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test, validating_tester) { try {
    const string role = "first";
    produce_block();
    create_account(tester_account);
+   add_roa_policy(NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
    const auto trace_ptr = push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
          ("account", tester_account)
@@ -107,6 +108,8 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, validating_tester) { try
    const string role = "first";
    produce_block();
    create_account(tester_account);
+   add_roa_policy(NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+
    named_thread_pool<struct test> thread_pool;
    thread_pool.start( 5, {} );
 
@@ -142,8 +145,8 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, validating_tester) { try
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(future_fork_test) { try {
-   tester node_a(setup_policy::none);
-   tester node_b(setup_policy::none);
+   tester node_a(setup_policy::full);
+   tester node_b(setup_policy::full);
 
    // instantiate an account_query_db
    auto aq_db = account_query_db(*node_a.control);
@@ -162,6 +165,7 @@ BOOST_AUTO_TEST_CASE(future_fork_test) { try {
    const auto& tester_account = "tester"_n;
    const string role = "first";
    node_a.create_account(tester_account);
+   node_a.add_roa_policy(node_a.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
    const auto trace_ptr = node_a.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
          ("account", tester_account)
@@ -189,8 +193,8 @@ BOOST_AUTO_TEST_CASE(future_fork_test) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(fork_test) { try {
-      tester node_a(setup_policy::none);
-      tester node_b(setup_policy::none);
+      tester node_a(setup_policy::full);
+      tester node_b(setup_policy::full);
 
       // instantiate an account_query_db
       auto aq_db = account_query_db(*node_a.control);
@@ -200,17 +204,29 @@ BOOST_AUTO_TEST_CASE(fork_test) { try {
          aq_db.commit_block( blk);
       });
 
-      // create 10 blocks synced
+    // const auto& pfm = node_a.control->get_protocol_feature_manager();
+    // const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::get_block_num );
+    // BOOST_REQUIRE( d );
+    // node_a.preactivate_protocol_features( {*d} );
+
+    // create 10 blocks synced
       for (int i = 0; i < 10; i++) {
          node_b.push_block(node_a.produce_block());
       }
 
+      // We need to do full setup to enable ROA policy allocation
+      // node_a.execute_setup_policy(setup_policy::full);
+
       // produce a block on node A with a new account and permission
-      const auto& tester_account = "tester"_n;
+      const auto& tester_account = "testeroonie"_n;
       const auto& tester_account2 = "tester2"_n;
       const string role = "first";
+
+
       node_a.create_account(tester_account);
       node_a.create_account(tester_account2);
+      node_a.add_roa_policy(node_a.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+      node_a.add_roa_policy(node_a.NODE_DADDY, tester_account2, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
       const auto trace_ptr = node_a.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
             ("account", tester_account)
@@ -237,6 +253,8 @@ BOOST_AUTO_TEST_CASE(fork_test) { try {
       // have node B take over from head-1 and also update permissions
       node_b.create_account(tester_account);
       node_b.create_account(tester_account2);
+      node_b.add_roa_policy(node_b.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+      node_b.add_roa_policy(node_b.NODE_DADDY, tester_account2, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
       const auto trace_ptr3 = node_b.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
             ("account", tester_account)
