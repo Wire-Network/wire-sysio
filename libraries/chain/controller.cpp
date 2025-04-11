@@ -787,11 +787,23 @@ struct controller_impl {
          // it is not initialized
          // its span of block nums are not consistent with the current block number
          if( !slog->version() ||
-             slog->first_block_num() > head->block_num ||
-             !slog->head() ||
-             slog->head()->block_num != head->block_num ) {
+             !slog->head() ) {
             // since the slog is not needed for replay, just initialize it with a chain id
             slog->reset( chain_id, blog.head()->block_num() + 1 );
+         }
+         else {
+            auto command = [state_block_num=slog->head()->block_num,head_block_num=blog.head()->block_num()]() {
+               return (state_block_num < head_block_num) ? std::string("block-log") : std::string("block-state-log");
+            };
+            SYS_ASSERT( slog->head()->block_num == blog.head()->block_num(),
+                        block_log_exception,
+                        "Block log and block state log need to be at the same block number. This can be fixed by running"
+                        "\"bin/leap-util ${command} trim-blocklog --last ${last} --blocks-dir <your blocks dir>\". "
+                        "The other log is at block num: ${bn} ",
+                        ("command", command())
+                        ("last", std::min(slog->head()->block_num, blog.head()->block_num()))
+                        ("bn", std::max(slog->head()->block_num, blog.head()->block_num()))
+            );
          }
       }
 
