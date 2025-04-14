@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-import testUtils
 import time
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from Node import BlockType
-from Node import Node
-from TestHelper import TestHelper
-
-import decimal
-import math
-import re
 import signal
+
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
 ###############################################################
 # nodeop_short_fork_take_over_test
@@ -23,8 +14,6 @@ import signal
 #
 ###############################################################
 Print=Utils.Print
-
-from core_symbol import CORE_SYMBOL
 
 def analyzeBPs(bps0, bps1, expectDivergence):
     start=0
@@ -116,40 +105,32 @@ def getMinHeadAndLib(prodNodes):
 
 
 
-args = TestHelper.parse_args({"--prod-count","--dump-error-details","--keep-logs","-v","--leave-running","--clean-run",
-                              "--wallet-port"})
+args = TestHelper.parse_args({"--prod-count","--dump-error-details","--keep-logs","-v","--leave-running",
+                              "--wallet-port","--unshared"})
 Utils.Debug=args.v
 totalProducerNodes=2
 totalNonProducerNodes=1
 totalNodes=totalProducerNodes+totalNonProducerNodes
 maxActiveProducers=3
 totalProducers=maxActiveProducers
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
-killAll=args.clean_run
 walletPort=args.wallet_port
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
 
     cluster.setWalletMgr(walletMgr)
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
     Print("Stand up cluster")
     specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
     specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
-    traceNodeopArgs = " --plugin sysio::trace_api_plugin --trace-no-abis "
 
 
     # ***   setup topogrophy   ***
@@ -157,10 +138,10 @@ try:
     # "bridge" shape connects defprocera through defproducerk (in node0) to each other and defproducerl through defproduceru (in node01)
     # and the only connection between those 2 groups is through the bridge node
     if cluster.launch(prodCount=2, topo="bridge", pnodes=totalProducerNodes,
-                      totalNodes=totalNodes, totalProducers=totalProducers, extraNodeopArgs=traceNodeopArgs,
-                      useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, onlySetProds=True) is False:
+                      totalNodes=totalNodes, totalProducers=totalProducers,
+                      specificExtraNodeopArgs=specificExtraNodeopArgs, onlySetProds=True) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
 
@@ -251,7 +232,7 @@ try:
     Print("Tracking block producers from %d till divergence or %d. Head block is %d and lowest LIB is %d" % (preKillBlockNum, lastBlockNum, headBlockNum, libNumAroundDivergence))
     transitionCount=0
     missedTransitionBlock=None
-    for blockNum in range(preKillBlockNum,lastBlockNum):
+    for blockNum in range(preKillBlockNum,lastBlockNum + 1):
         #avoiding getting LIB until my current block passes the head from the last time I checked
         if blockNum>headBlockNum:
             (headBlockNum, libNumAroundDivergence)=getMinHeadAndLib(prodNodes)
@@ -426,16 +407,17 @@ try:
 
     testSuccessful=True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
-    if not testSuccessful:
-        Print(Utils.FileDivider)
-        Print("Compare Blocklog")
-        cluster.compareBlockLogs()
-        Print(Utils.FileDivider)
-        Print("Compare Blocklog")
-        cluster.printBlockLog()
-        Print(Utils.FileDivider)
+# Too much output for ci/cd
+#     if not testSuccessful:
+#         Print(Utils.FileDivider)
+#         Print("Compare Blocklog")
+#         cluster.compareBlockLogs()
+#         Print(Utils.FileDivider)
+#         Print("Print Blocklog")
+#         cluster.printBlockLog()
+#         Print(Utils.FileDivider)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

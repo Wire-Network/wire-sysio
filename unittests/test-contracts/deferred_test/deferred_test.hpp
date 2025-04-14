@@ -15,6 +15,9 @@ public:
                      uint64_t payload, uint32_t delay_sec, bool replace_existing );
 
    [[sysio::action]]
+   void cancelcall( uint64_t sender_id );
+
+   [[sysio::action]]
    void deferfunc( uint64_t payload );
    using deferfunc_action = sysio::action_wrapper<"deferfunc"_n, &deferred_test::deferfunc>;
 

@@ -1,125 +1,538 @@
+#include <sysio/chain/block_header_state.hpp>
 #include <sysio/chain/block_log.hpp>
+#include <sysio/chain/block_log_config.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <fstream>
+#include <sysio/chain/log_catalog.hpp>
+#include <sysio/chain/log_data_base.hpp>
+#include <sysio/chain/log_index.hpp>
 #include <fc/bitutil.hpp>
-#include <fc/io/cfile.hpp>
 #include <fc/io/raw.hpp>
+#include <mutex>
+#include <string>
 
-
-#define LOG_READ  (std::ios::in | std::ios::binary)
-#define LOG_WRITE (std::ios::out | std::ios::binary | std::ios::app)
-#define LOG_RW ( std::ios::in | std::ios::out | std::ios::binary )
-#define LOG_WRITE_C "ab+"
-#define LOG_RW_C "rb+"
-
-#ifndef _WIN32
-#define FC_FOPEN(p, m) fopen(p, m)
-#else
-#define FC_CAT(s1, s2) s1 ## s2
-#define FC_PREL(s) FC_CAT(L, s)
-#define FC_FOPEN(p, m) _wfopen(p, FC_PREL(m))
+#if defined(__BYTE_ORDER__)
+static_assert(__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__);
 #endif
 
 namespace sysio { namespace chain {
 
-   const uint32_t block_log::min_supported_version = 1;
+   enum versions {
+      initial_version = 1,                  ///< complete block log from genesis
+      block_x_start_version = 2,            ///< adds optional partial block log, cannot be used for replay without snapshot
+                                            ///< this is in the form of an first_block_num that is written immediately after the version
+      genesis_state_or_chain_id_version = 3 ///< improvement on version 2 to not require the genesis state be provided when not starting from block 1
+   };
 
-   /**
-    * History:
-    * Version 1: complete block log from genesis
-    * Version 2: adds optional partial block log, cannot be used for replay without snapshot
-    *            this is in the form of an first_block_num that is written immediately after the version
-    * Version 3: improvement on version 2 to not require the genesis state be provided when not starting
-    *            from block 1
-    */
-   const uint32_t block_log::max_supported_version = 3;
+   // though the content may be different, the way it is written out will remain identical
+   namespace common_protocol {
+      constexpr uint32_t min_supported_version = initial_version;
+      constexpr uint32_t max_supported_version = genesis_state_or_chain_id_version;
+      uint32_t default_initial_version = max_supported_version;
+   }
+
+   template<typename StoredType>
+   constexpr uint32_t block_log<StoredType>::min_supported_version = common_protocol::min_supported_version;
+   template<typename StoredType>
+   constexpr uint32_t block_log<StoredType>::max_supported_version = common_protocol::max_supported_version;
+
+   template<typename StoredType>
+   inline std::string filename_prefix();
+   template<>
+   inline std::string filename_prefix<signed_block>() { return std::string("blocks"); }
+   template<>
+   inline std::string filename_prefix<block_header_state>() { return std::string("block_state"); }
+
+   template<typename StoredType>
+   inline std::string log_filename();
+   template<>
+   inline std::string log_filename<signed_block>() { return std::string("blocks.log"); }
+   template<>
+   inline std::string log_filename<block_header_state>() { return std::string("block_state.log"); }
+
+   template<typename StoredType>
+   inline std::string index_filename();
+   template<>
+   inline std::string index_filename<signed_block>() { return std::string("blocks.index"); }
+   template<>
+   inline std::string index_filename<block_header_state>() { return std::string("block_state.index"); }
+
+   template<typename StoredType>
+   inline bool needed_for_replay();
+   template<>
+   inline bool needed_for_replay<signed_block>() { return true; }
+   template<>
+   inline bool needed_for_replay<block_header_state>() { return false; }
 
    namespace detail {
-      using unique_file = std::unique_ptr<FILE, decltype(&fclose)>;
+      constexpr uint32_t pruned_version_flag = 1 << 31;
+  
+      inline block_id_type retrieve_id(const signed_block& b) { return b.calculate_id(); }
+      inline block_id_type retrieve_id(const block_header_state& b) { return b.id; }
 
-      class block_log_impl {
-         public:
-            signed_block_ptr         head;
-            block_id_type            head_id;
-            fc::cfile                block_file;
-            fc::cfile                index_file;
-            bool                     open_files = false;
-            bool                     genesis_written_to_block_log = false;
-            uint32_t                 version = 0;
-            uint32_t                 first_block_num = 0;       //the first number available to read
-            uint32_t                 index_first_block_num = 0; //the first number in index & the log had it not been pruned
-            std::optional<block_log_prune_config> prune_config;
+      inline uint32_t retrieve_block_num(const signed_block& b) { return b.block_num(); }
+      inline uint32_t retrieve_block_num(const block_header_state& b) { return b.block_num; }
 
-            block_log_impl(std::optional<block_log_prune_config> prune_conf) :
-              prune_config(prune_conf) {
-               if(prune_config) {
-                  SYS_ASSERT(prune_config->prune_blocks, block_log_exception, "block log prune configuration requires at least one block");
-                  SYS_ASSERT(__builtin_popcount(prune_config->prune_threshold) == 1, block_log_exception, "block log prune threshold must be power of 2");
-                  //switch this over to the mask that will be used
-                  prune_config->prune_threshold = ~(prune_config->prune_threshold-1);
-               }
-            }
+      inline signed_block_header retrieve_header(const signed_block& b) { return b; }
+      inline signed_block_header retrieve_header(const block_header_state& b) { return b.header; }
+      
+      static const uint64_t npos = std::numeric_limits<uint64_t>::max();
+//      static const uint64_t npos = REMOVE::get_npos();
+  }
 
-            inline void check_open_files() {
-               if( !open_files ) {
-                  reopen();
-               }
-            }
-            void reopen();
+   // copy up to n bytes from src to dest
+   inline void copy_file_content(fc::cfile& src, fc::cfile& dest, uint64_t n) {
+      // calculate the number of bytes remaining in the src file can be copied
+      auto current_pos = src.tellp();
+      src.seek_end(0);
+      auto end_pos = src.tellp();
+      src.seek(current_pos);
+      uint64_t remaining = end_pos - current_pos;
 
-            //close() is called all over the place. Let's make this an explict call to ensure it only is called when
-            // we really want: when someone is destroying the blog instance
-            void try_exit_vacuum() {
-               //for a pruned log that has at least one block, see if we should vacuum it
-               if( block_file.is_open() && index_file.is_open() && prune_config && prune_config->vacuum_on_close) {
-                  if(!head) {
-                     //disregard vacuum_on_close size if there isn't even a block and just do it silently anyways
-                     vacuum();
-                  }
-                  else {
-                     const size_t first_data_pos = get_block_pos(first_block_num);
-                     block_file.seek_end(-sizeof(uint32_t));
-                     const size_t last_data_pos = block_file.tellp();
-                     if(last_data_pos - first_data_pos < prune_config->vacuum_on_close) {
-                        ilog("Vacuuming pruned block log");
-                        vacuum();
-                     }
-                  }
-               }
-            }
+      // copy up to 4M bytes each iteration until done
+      remaining = std::min<uint64_t>(n, remaining);
+      std::vector<char> buf(4 * 1024 * 1024);
+      while (remaining > 0) {
+         uint64_t len = std::min<uint64_t>(remaining, buf.size());
+         src.read(buf.data(), len);
+         dest.write(buf.data(), len);
+         remaining -= len;
+      }
+   }
 
-            void close() {
-               if( block_file.is_open() )
-                  block_file.close();
-               if( index_file.is_open() )
-                  index_file.close();
-               open_files = false;
-            }
+   struct block_log_preamble {
 
-            template<typename T>
-            void reset( const T& t, const signed_block_ptr& genesis_block, uint32_t first_block_num );
+      uint32_t                                   ver             = 0;
+      uint32_t                                   first_block_num = 0;
+      std::variant<genesis_state, chain_id_type> chain_context;
 
-            void write( const genesis_state& gs );
+      uint32_t version() const { return ver & ~detail::pruned_version_flag; }
+      bool     is_currently_pruned() const { return ver & detail::pruned_version_flag; }
 
-            void write( const chain_id_type& chain_id );
+      chain_id_type chain_id() const {
+         return std::visit(overloaded{ [](const chain_id_type& id) { return id; },
+                                       [](const genesis_state& state) { return state.compute_chain_id(); } },
+                           chain_context);
+      }
 
-            void flush();
+      constexpr static int nbytes_with_chain_id = // the bytes count when the preamble contains chain_id
+            sizeof(uint32_t) + sizeof(first_block_num) + sizeof(chain_id_type) + sizeof(detail::npos);
 
-            void append(const signed_block_ptr& b);
+      static bool is_supported_version(uint32_t version);
+      static bool contains_genesis_state(uint32_t version, uint32_t first_block_num);
+      static bool contains_chain_id(uint32_t version, uint32_t first_block_num);
+      template <typename Stream>
+      void read_from(Stream& ds, const std::filesystem::path& log_path) {
+         ds.read((char*)&ver, sizeof(ver));
+         SYS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
+         SYS_ASSERT(is_supported_version(version()), block_log_unsupported_version,
+                    "Unsupported version of block log. Block log version is ${version} while code supports version(s) "
+                    "[${min},${max}], log file: ${log}",
+                    ("version", version())("min", common_protocol::min_supported_version)(
+                          "max", common_protocol::max_supported_version)("log", log_path));
 
-            void prune(const fc::log_level& loglevel);
+         first_block_num = 1;
+         if (version() != initial_version) {
+            ds.read(reinterpret_cast<char*>(&first_block_num), sizeof(first_block_num));
+         }
 
-            void vacuum();
+         if (contains_genesis_state(version(), first_block_num)) {
+            chain_context.emplace<genesis_state>();
+            fc::raw::unpack(ds, std::get<genesis_state>(chain_context));
+         } else if (contains_chain_id(version(), first_block_num)) {
+            chain_context = chain_id_type::empty_chain_id();
+            ds >> std::get<chain_id_type>(chain_context);
+         } else {
+            SYS_THROW(block_log_exception,
+                      "Block log is not supported. version: ${ver} and first_block_num: ${fbn} does not contain "
+                      "a genesis_state nor a chain_id.",
+                      ("ver", version())("fbn", first_block_num));
+         }
 
-            size_t convert_existing_header_to_vacuumed();
+         if (version() != initial_version) {
+            const auto                           expected_totem = detail::npos;
+            std::decay_t<decltype(detail::npos)> actual_totem;
+            ds.read((char*)&actual_totem, sizeof(actual_totem));
 
-            uint64_t get_block_pos(uint32_t block_num);
+            SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
+                       "Expected separator between log header and block storage was not found( expected: ${e}, actual: "
+                       "${a} )",
+                       ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem)))(
+                             "a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem))));
+         }
+      }
 
-            template <typename ChainContext, typename Lambda>
-            static std::optional<ChainContext> extract_chain_context( const fc::path& data_dir, Lambda&& lambda );
+      template <typename Stream>
+      void write_exclude_version(Stream& ds) const {
+         // write the rest of header without the leading version field
+         if (version() != initial_version) {
+            ds.write(reinterpret_cast<const char*>(&first_block_num), sizeof(first_block_num));
+
+            std::visit(overloaded{ [&ds](const chain_id_type& id) { ds << id; },
+                                   [&ds](const genesis_state& state) {
+                                      auto data = fc::raw::pack(state);
+                                      ds.write(data.data(), data.size());
+                                   } },
+                       chain_context);
+
+            auto totem = detail::npos;
+            ds.write(reinterpret_cast<const char*>(&totem), sizeof(totem));
+         } else {
+            const auto& state = std::get<genesis_state>(chain_context);
+            auto        data  = fc::raw::pack(state);
+            ds.write(data.data(), data.size());
+         }
+      }
+
+      template <typename Stream>
+      void write_to(Stream& ds) const {
+         ds.write(reinterpret_cast<const char*>(&ver), sizeof(ver));
+         write_exclude_version(ds);
+      }
+
+      void write_to(fc::datastream<fc::cfile>& ds) const {
+         uint32_t local_ver = 0;
+         ds.write(reinterpret_cast<const char*>(&local_ver), sizeof(local_ver));
+         write_exclude_version(ds);
+         ds.flush();
+         ds.seek(0);
+         ds.write(reinterpret_cast<const char*>(&ver), sizeof(ver));
+         ds.flush();
+      }
+   };
+
+   namespace {
+
+      class index_writer {
+       public:
+         index_writer(const std::filesystem::path& block_index_name, uint32_t blocks_expected, bool create = true) {
+            index_file.set_file_path(block_index_name);
+            auto mode = create ? fc::cfile::truncate_rw_mode : fc::cfile::update_rw_mode;
+            index_file.open(mode);
+            index_file.seek(sizeof(uint64_t) * (blocks_expected - 1));
+         }
+         void write(uint64_t pos) {
+            index_file.write((const char*)&pos, sizeof(pos));
+            if (index_file.tellp() >= 2 * sizeof(uint64_t))
+               index_file.skip(-2 * sizeof(uint64_t));
+         }
+
+         void close() { index_file.close(); }
+
+       private:
+         fc::cfile index_file;
       };
 
-      constexpr uint32_t pruned_version_flag = 1<<31;
+      struct bad_block_exception {
+         std::exception_ptr inner;
+      };
+
+      template <typename Stream, typename StoredType>
+      std::shared_ptr<StoredType> read_block(Stream& ds, uint32_t expect_block_num = 0) {
+         auto block = std::make_shared<StoredType>();
+         fc::raw::unpack(ds, *block);
+         if (expect_block_num != 0) {
+            SYS_ASSERT(!!block && detail::retrieve_block_num(*block) == expect_block_num, block_log_exception,
+                       "Wrong block was read from the log.");
+         }
+
+         return block;
+      }
+
+      template<typename Stream>
+      signed_block_header retrieve_block_header(Stream& ds, uint32_t expect_block_num, signed_block* n) {
+         // just extract the header to skip having to read the whole block, since we just need the header 
+         signed_block_header sbh;
+         fc::raw::unpack(ds, sbh);
+
+         SYS_ASSERT(sbh.block_num() == expect_block_num, block_log_exception,
+                    "Wrong block header was read from block log.",
+                    ("returned", sbh.block_num())("expected", expect_block_num));
+         return sbh;
+      }
+
+
+      template<typename Stream>
+      signed_block_header retrieve_block_header(Stream& ds, uint32_t expect_block_num, block_header_state* n) {
+         block_header_state bhs;
+         fc::raw::unpack(ds, bhs);
+
+         SYS_ASSERT(bhs.block_num == expect_block_num, block_log_exception,
+                    "Wrong block header was read from block log.",
+                    ("returned", bhs.block_num)("expected", expect_block_num));
+         return bhs.header;
+      }
+
+      template <typename Stream, typename StoredType>
+      signed_block_header read_block_header(Stream& ds, uint32_t expect_block_num) {
+         return retrieve_block_header<Stream>(ds, expect_block_num, (StoredType*)nullptr);
+      }
+
+      /// Provide the read only view of the log file
+      class block_log_data : public chain::log_data_base<block_log_data> {
+         block_log_preamble preamble;
+         uint64_t           first_block_pos = 0;
+         std::size_t        size_ = 0;
+
+       public:
+         block_log_data() = default;
+         block_log_data(const std::filesystem::path& path) { open(path); }
+         uint64_t first_block_position() const { return first_block_pos; }
+
+         const block_log_preamble& get_preamble() const { return preamble; }
+
+         void open(const std::filesystem::path& path) {
+            if (file.is_open())
+               file.close();
+            file.set_file_path(path);
+            file.open("rb");
+            preamble.read_from(file, file.get_file_path());
+            first_block_pos = file.tellp();
+            file.seek_end(0);
+            size_ = file.tellp();
+         }
+
+         uint64_t size() const { return size_; }
+
+         uint32_t      version() { return preamble.version(); }
+         uint32_t      first_block_num() const { return preamble.first_block_num; }
+         uint32_t      number_of_blocks();
+         chain_id_type chain_id() { return preamble.chain_id(); }
+         bool          is_currently_pruned() const { return preamble.is_currently_pruned(); }
+         uint64_t      end_of_block_position() const { return is_currently_pruned() ? size() - sizeof(uint32_t) : size(); }
+
+         std::optional<genesis_state> get_genesis_state() {
+            return std::visit(
+                  overloaded{ [](const chain_id_type&) { return std::optional<genesis_state>{}; },
+                              [](const genesis_state& state) { return std::optional<genesis_state>{ state }; } },
+                  preamble.chain_context);
+         }
+
+         uint32_t block_num_at(uint64_t position) {
+            // to derive blknum_offset==14 see block_header.hpp and note on disk struct is packed
+            //   block_timestamp_type timestamp;                  //bytes 0:3
+            //   account_name         producer;                   //bytes 4:11
+            //   uint16_t             confirmed;                  //bytes 12:13
+            //   block_id_type        previous;                   //bytes 14:45, low 4 bytes is big endian block number
+            //   of previous block
+
+            SYS_ASSERT(position <= size(), block_log_exception, "Invalid block position ${position}",
+                       ("position", position));
+
+            int      blknum_offset  = 14;
+            uint32_t prev_block_num = read_data_at<uint32_t>(file, position + blknum_offset);
+            return fc::endian_reverse_u32(prev_block_num) + 1;
+         }
+
+         auto& ro_stream_at(uint64_t pos) {
+            file.seek(pos);
+            return file;
+         }
+
+         uint64_t remaining() const { return size() - file.tellp(); }
+         /**
+          *  Validate a block log entry WITHOUT deserializing the entire block data.
+          **/
+         void light_validate_block_entry_at(uint64_t pos, uint32_t expected_block_num) {
+            const uint32_t actual_block_num = block_num_at(pos);
+
+            SYS_ASSERT(actual_block_num == expected_block_num, block_log_exception,
+                       "At position ${pos} expected to find block number ${exp_bnum} but found ${act_bnum}",
+                       ("pos", pos)("exp_bnum", expected_block_num)("act_bnum", actual_block_num));
+         }
+
+         /**
+          *  Validate a block log entry by deserializing the entire block data.
+          *
+          *  @returns The tuple of block number and block id in the entry
+          **/
+         template<typename StoredType>
+         std::tuple<uint32_t, block_id_type> full_validate_block_entry(uint32_t             previous_block_num,
+                                                                       const block_id_type& previous_block_id,
+                                                                       StoredType&          entry) {
+            uint64_t pos = file.tellp();
+
+            try {
+               fc::raw::unpack(file, entry);
+            } catch (...) { throw bad_block_exception{ std::current_exception() }; }
+
+            auto id        = detail::retrieve_id(entry);
+            auto block_num = block_header::num_from_id(id);
+
+            if (block_num != previous_block_num + 1) {
+               elog("Block ${num} (${id}) skips blocks. Previous block in log is block ${prev_num} (${previous})",
+                    ("num", block_num)("id", id)("prev_num", previous_block_num)("previous", previous_block_id));
+            }
+
+            const block_header& header = detail::retrieve_header(entry);
+
+            if (!previous_block_id.empty() && previous_block_id != header.previous) {
+               elog("Block ${num} (${id}) does not link back to previous block. "
+                    "Expected previous: ${expected}. Actual previous: ${actual}.",
+                    ("num", block_num)("id", id)("expected", previous_block_id)("actual", header.previous));
+            }
+
+            uint64_t tmp_pos = std::numeric_limits<uint64_t>::max();
+
+            if (remaining() >= sizeof(tmp_pos)) {
+               file.read(reinterpret_cast<char*>(&tmp_pos), sizeof(tmp_pos));
+            }
+
+            SYS_ASSERT(pos == tmp_pos, block_log_exception,
+                       "the block position for block ${num} at the end of a block entry is incorrect",
+                       ("num", block_num));
+            return std::make_tuple(block_num, id);
+         }
+
+         template<typename StoredType>
+         std::tuple<uint64_t, uint32_t, std::string>
+         full_validate_blocks(uint32_t last_block_num, const std::filesystem::path& blocks_dir, fc::time_point now);
+
+         void construct_index(const std::filesystem::path& index_file_path);
+      };
+
+      using block_log_index = sysio::chain::log_index<block_log_exception>;
+
+      /// Provide the read only view for both log and index files
+      template<typename StoredType>
+      struct block_log_bundle {
+         using stored_type = StoredType;
+
+         std::filesystem::path        block_file_name, index_file_name; // full pathname for log and index filenames
+         block_log_data  log_data;
+         block_log_index log_index;
+
+         block_log_bundle(std::filesystem::path block_file, std::filesystem::path index_file, bool validate_indx)
+             : block_file_name(std::move(block_file)), index_file_name(std::move(index_file)) {
+
+            log_data.open(block_file_name);
+            log_index.open(index_file_name);
+
+            SYS_ASSERT(!log_data.get_preamble().is_currently_pruned(), block_log_unsupported_version,
+                       "Block log is currently in pruned format, it must be vacuumed before doing this operation");
+
+            if (validate_indx)
+               validate_index();
+         }
+
+         explicit block_log_bundle(const std::filesystem::path& block_dir, bool validate_index=true)
+             : block_log_bundle(block_dir / log_filename<stored_type>(), block_dir / index_filename<stored_type>(), validate_index) {}
+
+         // throws if not valid
+         void validate_index() {
+            uint32_t log_num_blocks   = log_data.num_blocks();
+            uint32_t index_num_blocks = log_index.num_blocks();
+
+            SYS_ASSERT(
+                  log_num_blocks == index_num_blocks, block_log_exception,
+                  "${block_file_name} says it has ${log_num_blocks} blocks which disagrees with ${index_num_blocks} "
+                  "indicated by ${index_file_name}",
+                  ("block_file_name", block_file_name)("log_num_blocks", log_num_blocks)(
+                        "index_num_blocks", index_num_blocks)("index_file_name", index_file_name));
+         }
+      };
+
+      /// Used to traverse the block position (i.e. the last 8 bytes in each block log entry) of the log file
+      class reverse_block_position_iterator {
+         fc::datastream<fc::cfile>& file;
+         uint64_t                   first_block_pos;
+         uint64_t                   end_of_block_pos;
+         uint64_t                   current_position;
+
+         uint64_t get_value() {
+            SYS_ASSERT(
+                  current_position > first_block_pos && current_position <= end_of_block_pos, block_log_exception,
+                  "Block log file formatting is incorrect, it contains a block position value: ${pos}, which is not "
+                  "in the range of (${begin_pos},${last_pos})",
+                  ("pos", current_position)("begin_pos", first_block_pos)("last_pos", end_of_block_pos));
+
+            uint64_t value;
+            file.seek(current_position - sizeof(uint64_t));
+            fc::raw::unpack(file, value);
+            return value;
+         }
+
+       public:
+         reverse_block_position_iterator(fc::datastream<fc::cfile>& data, uint64_t first_block_pos,
+                                         uint64_t end_of_block_pos)
+             : file(data), first_block_pos(first_block_pos), end_of_block_pos(end_of_block_pos),
+               current_position(end_of_block_pos) {}
+
+         uint64_t get_value_then_advance() {
+            current_position = get_value();
+            return current_position;
+         }
+
+         uint64_t add_value_then_advance(uint64_t offset) {
+            current_position = get_value() + offset;
+            file.skip(-sizeof(uint64_t));
+            fc::raw::pack(file, current_position);
+            return current_position;
+         }
+
+         bool done() const { return current_position <= first_block_pos; }
+      };
+
+      void adjust_block_positions(index_writer& index, fc::datastream<fc::cfile>& block_file,
+                                  uint64_t first_block_position, int64_t offset) {
+
+         block_file.seek_end(0);
+         // walk along the block position of each block entry and add its value by offset
+         auto iter = reverse_block_position_iterator{ block_file, first_block_position, block_file.tellp() };
+         while (!iter.done()) { index.write(iter.add_value_then_advance(offset)); }
+      }
+
+      uint32_t block_log_data::number_of_blocks() {
+         const uint32_t num_blocks =
+               first_block_position() == end_of_block_position() ? 0 : last_block_num() - first_block_num() + 1;
+         return num_blocks;
+      }
+
+      void block_log_data::construct_index(const std::filesystem::path& index_file_path) {
+         std::string index_file_name = index_file_path.generic_string();
+         ilog("Will write new index file ${file}", ("file", index_file_name));
+
+         const uint32_t num_blocks = number_of_blocks();
+
+         ilog("block log version= ${version}, number of blocks ${n}", ("version", this->version())("n", num_blocks));
+
+         if (num_blocks == 0) {
+            return;
+         }
+
+         ilog("first block= ${first}         last block= ${last}",
+              ("first", this->first_block_num())("last", (this->last_block_num())));
+
+         index_writer index(index_file_path, num_blocks);
+         uint32_t     blocks_remaining = this->num_blocks();
+
+         for (auto iter = reverse_block_position_iterator{ file, first_block_position(), end_of_block_position() };
+              !iter.done() && blocks_remaining > 0; --blocks_remaining) {
+            auto pos = iter.get_value_then_advance();
+            index.write(pos);
+            if ((blocks_remaining & 0xfffff) == 0)
+               ilog("blocks remaining to index: ${blocks_left}      position in log file: ${pos}",
+                    ("blocks_left", blocks_remaining)("pos", pos));
+         }
+      }
+
+   } // namespace
+
+   struct block_log_verifier {
+      chain_id_type chain_id = chain_id_type::empty_chain_id();
+
+      void verify(block_log_data& log, const std::filesystem::path& log_path) {
+         if (chain_id.empty()) {
+            chain_id = log.chain_id();
+         } else {
+            SYS_ASSERT(chain_id == log.chain_id(), block_log_exception,
+                       "block log file ${path} has a different chain id", ("path", log_path));
+         }
+      }
+   };
+   template<typename StoredType>
+   using block_log_catalog = sysio::chain::log_catalog<StoredType, block_log_data, block_log_index, block_log_verifier>;
+
+   namespace detail {
 
       static bool is_pruned_log_and_mask_version(uint32_t& version) {
          bool ret = version & pruned_version_flag;
@@ -127,1308 +540,1358 @@ namespace sysio { namespace chain {
          return ret;
       }
 
-      void detail::block_log_impl::reopen() {
-         close();
-
-         // open to create files if they don't exist
-         //ilog("Opening block log at ${path}", ("path", my->block_file.generic_string()));
-         block_file.open( LOG_WRITE_C );
-         index_file.open( LOG_WRITE_C );
-
-         close();
-
-         block_file.open( LOG_RW_C );
-         index_file.open( LOG_RW_C );
-
-         open_files = true;
-      }
-
-      class reverse_iterator {
-      public:
-         reverse_iterator();
-         // open a block log file and return the total number of blocks in it
-         uint32_t open(const fc::path& block_file_name);
-         uint64_t previous();
-         uint32_t version() const { return _version; }
-         uint32_t first_block_num() const { return _first_block_num; }
-         static uint32_t      _buf_len;
-      private:
-         void update_buffer();
-
-         unique_file                    _file;
-         uint32_t                       _version                          = 0;
-         uint32_t                       _first_block_num                  = 0;
-         uint32_t                       _last_block_num                   = 0;
-         uint32_t                       _blocks_found                     = 0;
-         uint32_t                       _blocks_expected                  = 0;
-         std::optional<uint32_t>        _prune_block_limit;
-         uint64_t                       _current_position_in_file         = 0;
-         uint64_t                       _end_of_buffer_position           = _unset_position;
-         uint64_t                       _start_of_buffer_position         = 0;
-         std::unique_ptr<char[]>        _buffer_ptr;
-         std::string                    _block_file_name;
-         constexpr static int64_t       _unset_position                   = -1;
-         constexpr static uint64_t      _position_size                    = sizeof(_current_position_in_file);
-      };
-
-      constexpr uint64_t buffer_location_to_file_location(uint32_t buffer_location) { return buffer_location << 3; }
-      constexpr uint32_t file_location_to_buffer_location(uint32_t file_location) { return file_location >> 3; }
-
-      class index_writer {
-      public:
-         index_writer(const fc::path& block_index_name, uint32_t blocks_expected);
-         void write(uint64_t pos);
-      private:
-         std::optional<boost::interprocess::file_mapping>  _file;
-         std::optional<boost::interprocess::mapped_region> _mapped_file_region;
-
-         uint32_t                                          _blocks_remaining;
-      };
-
-      /*
-       *  @brief datastream adapter that adapts FILE* for use with fc unpack
-       *
-       *  This class supports unpack functionality but not pack.
-       */
-      class fileptr_datastream {
-      public:
-         explicit fileptr_datastream( FILE* file, const std::string& filename ) : _file(file), _filename(filename) {}
-
-         void skip( size_t s ) {
-            auto status = fseek(_file, s, SEEK_CUR);
-            SYS_ASSERT( status == 0, block_log_exception,
-                        "Could not seek past ${bytes} bytes in Block log file at '${blocks_log}'. Returned status: ${status}",
-                        ("bytes", s)("blocks_log", _filename)("status", status) );
-         }
-
-         bool read( char* d, size_t s ) {
-            size_t result = fread( d, 1, s, _file );
-            SYS_ASSERT( result == s, block_log_exception,
-                        "only able to read ${act} bytes of the expected ${exp} bytes in file: ${file}",
-                        ("act",result)("exp",s)("file", _filename) );
-            return true;
-         }
-
-         bool get( unsigned char& c ) { return get( *(char*)&c ); }
-
-         bool get( char& c ) { return read(&c, 1); }
-
-      private:
-         FILE* const _file;
-         const std::string _filename;
-      };
-   }
-
-   block_log::block_log(const fc::path& data_dir, std::optional<block_log_prune_config> prune_config)
-   :my(new detail::block_log_impl(prune_config)) {
-      open(data_dir);
-   }
-
-   block_log::block_log(block_log&& other) {
-      my = std::move(other.my);
-   }
-
-   block_log::~block_log() {
-      if (my) {
-         flush();
-         my->try_exit_vacuum();
-         my->close();
-         my.reset();
-      }
-   }
-
-   void block_log::open(const fc::path& data_dir) {
-      my->close();
-
-      if (!fc::is_directory(data_dir))
-         fc::create_directories(data_dir);
-
-      my->block_file.set_file_path( data_dir / "blocks.log" );
-      my->index_file.set_file_path( data_dir / "blocks.index" );
-
-      my->reopen();
-
-      /* On startup of the block log, there are several states the log file and the index file can be
-       * in relation to each other.
-       *
-       *                          Block Log
-       *                     Exists       Is New
-       *                 +------------+------------+
-       *          Exists |    Check   |   Delete   |
-       *   Index         |    Head    |    Index   |
-       *    File         +------------+------------+
-       *          Is New |   Replay   |     Do     |
-       *                 |    Log     |   Nothing  |
-       *                 +------------+------------+
-       *
-       * Checking the heads of the files has several conditions as well.
-       *  - If they are the same, do nothing.
-       *  - If the index file head is not in the log file, delete the index and replay.
-       *  - If the index file head is in the log, but not up to date, replay from index head.
-       */
-      auto log_size = fc::file_size( my->block_file.get_file_path() );
-      auto index_size = fc::file_size( my->index_file.get_file_path() );
-
-      if (log_size) {
-         ilog("Log is nonempty");
-         my->block_file.seek( 0 );
-         my->version = 0;
-         fc::raw::unpack(my->block_file, my->version);
-         const bool is_currently_pruned = detail::is_pruned_log_and_mask_version(my->version);
-         SYS_ASSERT( my->version > 0, block_log_exception, "Block log was not setup properly" );
-         SYS_ASSERT( is_supported_version(my->version), block_log_unsupported_version,
-                     "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
-                     ("version", my->version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
-
-
-         my->genesis_written_to_block_log = true; // Assume it was constructed properly.
-         if (my->version > 1){
-            my->first_block_num = 0;
-            fc::raw::unpack(my->block_file, my->first_block_num);
-            SYS_ASSERT(my->first_block_num > 0, block_log_exception, "Block log is malformed, first recorded block number is 0 but must be greater than or equal to 1");
-         } else {
-            my->first_block_num = 1;
-         }
-         my->index_first_block_num = my->first_block_num;
-
-         my->head = read_head();
-         if( my->head ) {
-            my->head_id = my->head->calculate_id();
-         } else {
-            my->head_id = {};
-         }
-
-         my->block_file.seek_end(0);
-         if(is_currently_pruned && my->head) {
-            uint32_t prune_log_count;
-            my->block_file.skip(-sizeof(uint32_t));
-            fc::raw::unpack(my->block_file, prune_log_count);
-            my->first_block_num = chain::block_header::num_from_id(my->head_id) - prune_log_count + 1;
-            my->block_file.skip(-sizeof(uint32_t));
-         }
-
-         if (index_size) {
-            ilog("Index is nonempty");
-            uint64_t block_pos;
-            my->block_file.skip(-sizeof(uint64_t));
-            my->block_file.read((char*)&block_pos, sizeof(block_pos));
-
-            uint64_t index_pos;
-            my->index_file.seek_end(-sizeof(uint64_t));
-            my->index_file.read((char*)&index_pos, sizeof(index_pos));
-
-            if (block_pos < index_pos) {
-               ilog("block_pos < index_pos, close and reopen index_file");
-               construct_index();
-            } else if (block_pos > index_pos) {
-               ilog("Index is incomplete");
-               construct_index();
-            }
-         } else {
-            ilog("Index is empty");
-            construct_index();
-         }
-
-         if(!is_currently_pruned && my->prune_config) {
-            //need to convert non-pruned log to pruned log. prune any blocks to start with
-            my->prune(fc::log_level::info);
-
-            //update version
-            my->block_file.seek(0);
-            fc::raw::pack(my->block_file, my->version | detail::pruned_version_flag);
-
-            //and write out the trailing block count
-            my->block_file.seek_end(0);
-            uint32_t num_blocks_in_log = 0;
-            if(my->head)
-               num_blocks_in_log = chain::block_header::num_from_id(my->head_id) - my->first_block_num + 1;
-            fc::raw::pack(my->block_file, num_blocks_in_log);
-         }
-         else if(is_currently_pruned && !my->prune_config) {
-            my->vacuum();
-         }
-      } else if (index_size) {
-         ilog("Index is nonempty, remove and recreate it");
-         my->close();
-         fc::remove_all( my->index_file.get_file_path() );
-         my->reopen();
-      }
-   }
-
-   void block_log::append(const signed_block_ptr& b) {
-      my->append(b);
-   }
-
-   void detail::block_log_impl::append(const signed_block_ptr& b) {
-      try {
-         SYS_ASSERT( genesis_written_to_block_log, block_log_append_fail, "Cannot append to block log until the genesis is first written" );
-
-         check_open_files();
-
-         block_file.seek_end(0);
-         index_file.seek_end(0);
-         //if pruned log, rewind over count trailer if any block is already present
-         if(prune_config && head)
-            block_file.skip(-sizeof(uint32_t));
-         uint64_t pos = block_file.tellp();
-
-         SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - index_first_block_num),
-                   block_log_append_fail,
-                   "Append to index file occuring at wrong position.",
-                   ("position", (uint64_t) index_file.tellp())
-                   ("expected", (b->block_num() - index_first_block_num) * sizeof(uint64_t)));
-         auto data = fc::raw::pack(*b);
-         block_file.write(data.data(), data.size());
-         block_file.write((char*)&pos, sizeof(pos));
-         const uint64_t end = block_file.tellp();
-         index_file.write((char*)&pos, sizeof(pos));
-         head = b;
-         head_id = b->calculate_id();
-
-         if(prune_config) {
-            if((pos&prune_config->prune_threshold) != (end&prune_config->prune_threshold))
-               prune(fc::log_level::debug);
-
-            const uint32_t num_blocks_in_log = chain::block_header::num_from_id(head_id) - first_block_num + 1;
-            fc::raw::pack(block_file, num_blocks_in_log);
-         }
-
-         flush();
-      }
-      FC_LOG_AND_RETHROW()
-   }
-
-   void detail::block_log_impl::prune(const fc::log_level& loglevel) {
-      if(!head)
-         return;
-      const uint32_t head_num = chain::block_header::num_from_id(head_id);
-      if(head_num - first_block_num < prune_config->prune_blocks)
-         return;
-
-      const uint32_t prune_to_num = head_num - prune_config->prune_blocks + 1;
-
-      static_assert( block_log::max_supported_version == 3, "Code was written to support version 3 format, need to update this code for latest format." );
-      const genesis_state gs;
-      const size_t max_header_size_v1  = sizeof(uint32_t) + fc::raw::pack_size(gs) + sizeof(uint64_t);
-      const size_t max_header_size_v23 = sizeof(uint32_t) + sizeof(uint32_t) + sizeof(chain_id_type) + sizeof(uint64_t);
-      const auto max_header_size = std::max(max_header_size_v1, max_header_size_v23);
-
-      block_file.punch_hole(max_header_size, get_block_pos(prune_to_num));
-
-      first_block_num = prune_to_num;
-      block_file.flush();
-
-      if(auto l = fc::logger::get(); l.is_enabled(loglevel))
-         l.log(fc::log_message(fc::log_context(loglevel, __FILE__, __LINE__, __func__),
-                               "blocks.log pruned to blocks ${b}-${e}", fc::mutable_variant_object()("b", first_block_num)("e", head_num)));
-   }
-
-   void block_log::flush() {
-      my->flush();
-   }
-
-   void detail::block_log_impl::flush() {
-      block_file.flush();
-      index_file.flush();
-   }
-
-   size_t detail::block_log_impl::convert_existing_header_to_vacuumed() {
-      uint32_t old_version;
-      uint32_t old_first_block_num;
-      const auto totem = block_log::npos;
-
-      block_file.seek(0);
-      fc::raw::unpack(block_file, old_version);
-      fc::raw::unpack(block_file, old_first_block_num);
-      SYS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception, "Trying to vacuumed a non-pruned block log");
-
-      if(block_log::contains_genesis_state(old_version, old_first_block_num)) {
-         //we'll always write a v3 log, but need to possibly mutate the genesis_state to a chainid should we have pruned a log starting with a genesis_state
-         genesis_state gs;
-         auto ds = block_file.create_datastream();
-         fc::raw::unpack(ds, gs);
-
-         block_file.seek(0);
-         fc::raw::pack(block_file, block_log::max_supported_version);
-         fc::raw::pack(block_file, first_block_num);
-         if(first_block_num == 1) {
-            SYS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
-            fc::raw::pack(block_file, gs);
-         }
-         else
-            fc::raw::pack(block_file, gs.compute_chain_id());
-         fc::raw::pack(block_file, totem);
-      }
-      else {
-         //read in the existing chainid, to parrot back out
-         fc::sha256 chainid;
-         fc::raw::unpack(block_file, chainid);
-
-         block_file.seek(0);
-         fc::raw::pack(block_file, block_log::max_supported_version);
-         fc::raw::pack(block_file, first_block_num);
-         fc::raw::pack(block_file, chainid);
-         fc::raw::pack(block_file, totem);
-      }
-
-      return block_file.tellp();
-   }
-
-   void detail::block_log_impl::vacuum() {
-      //go ahead and write a new valid header now. if the vacuum fails midway, at least this means maybe the
-      // block recovery can get through some blocks.
-      size_t copy_to_pos = convert_existing_header_to_vacuumed();
-
-      version = block_log::max_supported_version;
-      prune_config.reset();
-
-      //if there is no head block though, bail now, otherwise first_block_num won't actually be available
-      // and it'll mess this all up. Be sure to still remove the 4 byte trailer though.
-      if(!head) {
-         block_file.flush();
-         fc::resize_file(block_file.get_file_path(), fc::file_size(block_file.get_file_path()) - sizeof(uint32_t));
-         return;
-      }
-
-      size_t copy_from_pos = get_block_pos(first_block_num);
-      block_file.seek_end(-sizeof(uint32_t));
-      size_t copy_sz = block_file.tellp() - copy_from_pos;
-      const uint32_t num_blocks_in_log = chain::block_header::num_from_id(head_id) - first_block_num + 1;
-
-      const size_t offset_bytes = copy_from_pos - copy_to_pos;
-      const size_t offset_blocks = first_block_num - index_first_block_num;
-
-      std::vector<char> buff;
-      buff.resize(4*1024*1024);
-
-      auto tick = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
-      while(copy_sz) {
-         const size_t copy_this_round = std::min(buff.size(), copy_sz);
-         block_file.seek(copy_from_pos);
-         block_file.read(buff.data(), copy_this_round);
-         block_file.punch_hole(copy_to_pos, copy_from_pos+copy_this_round);
-         block_file.seek(copy_to_pos);
-         block_file.write(buff.data(), copy_this_round);
-
-         copy_from_pos += copy_this_round;
-         copy_to_pos += copy_this_round;
-         copy_sz -= copy_this_round;
-
-         const auto tock = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
-         if(tick < tock - std::chrono::seconds(5)) {
-            ilog("Vacuuming pruned block log, ${b} bytes remaining", ("b", copy_sz));
-            tick = tock;
-         }
-      }
-      block_file.flush();
-      fc::resize_file(block_file.get_file_path(), block_file.tellp());
-
-      index_file.flush();
-      {
-         boost::interprocess::mapped_region index_mapped(index_file, boost::interprocess::read_write);
-         uint64_t* index_ptr = (uint64_t*)index_mapped.get_address();
-
-         for(uint32_t new_block_num = 0; new_block_num < num_blocks_in_log; ++new_block_num) {
-            const uint64_t new_pos = index_ptr[new_block_num + offset_blocks] - offset_bytes;
-            index_ptr[new_block_num] = new_pos;
-
-            if(new_block_num + 1 != num_blocks_in_log)
-               block_file.seek(index_ptr[new_block_num + offset_blocks + 1] - offset_bytes - sizeof(uint64_t));
+      template<typename StoredType>
+      struct block_log_impl {
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<stored_type>;
+
+         std::mutex       mtx;
+         struct stored_type_with_id {
+            stored_type_ptr ptr;
+            block_id_type id;
+         };
+         std::optional<stored_type_with_id> head;
+
+         virtual ~block_log_impl() = default;
+
+         virtual bool     is_initialized() const                                              = 0;
+         virtual uint32_t first_block_num()                                                   = 0;
+         virtual void     append(const stored_type_ptr& b, const block_id_type& id,
+                                 const std::vector<char>& packed_block)                       = 0;
+         virtual uint64_t get_block_pos(uint32_t block_num)                                   = 0;
+         virtual void     reset(const genesis_state& gs, const stored_type_ptr& first_block) = 0;
+         virtual void     reset(const chain_id_type& chain_id, uint32_t first_block_num)      = 0;
+         virtual void     flush()                                                             = 0;
+
+         virtual stored_type_ptr                    read_block_by_num(uint32_t block_num)        = 0;
+         virtual std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num) = 0;
+
+         virtual uint32_t version() const = 0;
+
+         virtual stored_type_ptr read_head() = 0;
+         void                    update_head(const stored_type_ptr& b, const std::optional<block_id_type>& id = {}) {
+            if (b)
+               head = { b, id ? *id : detail::retrieve_id(*b) };
             else
-               block_file.seek_end(-sizeof(uint64_t));
-            block_file.write((char*)&new_pos, sizeof(new_pos));
+               head = {};
          }
-      }
-      fc::resize_file(index_file.get_file_path(), num_blocks_in_log*sizeof(uint64_t));
+      }; // block_log_impl
 
-      index_first_block_num = first_block_num;
-   }
+      /// Would remove pre-existing log and index, never write blocks into disk.
+      template<typename StoredType>
+      struct empty_block_log final : block_log_impl<StoredType> {
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<stored_type>;
 
-   template<typename T>
-   void detail::block_log_impl::reset( const T& t, const signed_block_ptr& first_block, uint32_t first_bnum ) {
-      close();
+         uint32_t first_block_number = std::numeric_limits<uint32_t>::max();
 
-      fc::remove_all( block_file.get_file_path() );
-      fc::remove_all( index_file.get_file_path() );
-
-      reopen();
-
-      version = 0; // version of 0 is invalid; it indicates that subsequent data was not properly written to the block log
-      index_first_block_num = first_block_num = first_bnum;
-
-      block_file.seek_end(0);
-      block_file.write((char*)&version, sizeof(version));
-      block_file.write((char*)&first_block_num, sizeof(first_block_num));
-
-      write(t);
-      genesis_written_to_block_log = true;
-
-      // append a totem to indicate the division between blocks and header
-      auto totem = block_log::npos;
-      block_file.write((char*)&totem, sizeof(totem));
-
-      if (first_block) {
-         append(first_block);
-      } else {
-         head.reset();
-         head_id = {};
-         if(prune_config)
-            fc::raw::pack(block_file, (uint32_t)0);
-      }
-
-      auto pos = block_file.tellp();
-
-      static_assert( block_log::max_supported_version > 0, "a version number of zero is not supported" );
-
-      // going back to write correct version to indicate that all block log header data writes completed successfully
-      version = block_log::max_supported_version;
-      if(prune_config)
-         version |= pruned_version_flag;
-      block_file.seek( 0 );
-      block_file.write( (char*)&version, sizeof(version) );
-      block_file.seek( pos );
-      flush();
-   }
-
-   void block_log::reset( const genesis_state& gs, const signed_block_ptr& first_block ) {
-      my->reset(gs, first_block, 1);
-   }
-
-   void block_log::reset( const chain_id_type& chain_id, uint32_t first_block_num ) {
-      SYS_ASSERT( first_block_num > 1, block_log_exception,
-                  "Block log version ${ver} needs to be created with a genesis state if starting from block number 1." );
-      my->reset(chain_id, signed_block_ptr(), first_block_num);
-   }
-
-   void detail::block_log_impl::write( const genesis_state& gs ) {
-      auto data = fc::raw::pack(gs);
-      block_file.write(data.data(), data.size());
-   }
-
-   void detail::block_log_impl::write( const chain_id_type& chain_id ) {
-      block_file << chain_id;
-   }
-
-   signed_block_ptr block_log::read_block(uint64_t pos)const {
-      my->check_open_files();
-
-      my->block_file.seek(pos);
-      signed_block_ptr result = std::make_shared<signed_block>();
-      auto ds = my->block_file.create_datastream();
-      fc::raw::unpack(ds, *result);
-      return result;
-   }
-
-   void block_log::read_block_header(block_header& bh, uint64_t pos)const {
-      my->check_open_files();
-
-      my->block_file.seek(pos);
-      auto ds = my->block_file.create_datastream();
-      fc::raw::unpack(ds, bh);
-   }
-
-   signed_block_ptr block_log::read_block_by_num(uint32_t block_num)const {
-      try {
-         signed_block_ptr b;
-         uint64_t pos = get_block_pos(block_num);
-         if (pos != npos) {
-            b = read_block(pos);
-            SYS_ASSERT(b->block_num() == block_num, reversible_blocks_exception,
-                      "Wrong block was read from block log.", ("returned", b->block_num())("expected", block_num));
+         explicit empty_block_log(const std::filesystem::path& log_dir) {
+            std::filesystem::remove(log_dir / log_filename<stored_type>());
+            std::filesystem::remove(log_dir / index_filename<stored_type>());
          }
-         return b;
-      } FC_LOG_AND_RETHROW()
-   }
 
-   block_id_type block_log::read_block_id_by_num(uint32_t block_num)const {
-      try {
-         uint64_t pos = get_block_pos(block_num);
-         if (pos != npos) {
-            block_header bh;
-            read_block_header(bh, pos);
-            SYS_ASSERT(bh.block_num() == block_num, reversible_blocks_exception,
-                       "Wrong block header was read from block log.", ("returned", bh.block_num())("expected", block_num));
-            return bh.calculate_id();
+         bool     is_initialized() const final { return true; }
+         uint32_t first_block_num() final { return this->head ? retrieve_block_num(*this->head->ptr) : first_block_number; }
+         void append(const stored_type_ptr& b, const block_id_type& id, const std::vector<char>& packed_block) final {
+            block_log_impl<stored_type>::update_head(b, id);
          }
-         return {};
-      } FC_LOG_AND_RETHROW()
-   }
 
-   uint64_t detail::block_log_impl::get_block_pos(uint32_t block_num) {
-      check_open_files();
-      if (!(head && block_num <= block_header::num_from_id(head_id) && block_num >= first_block_num))
-         return block_log::npos;
-      index_file.seek(sizeof(uint64_t) * (block_num - index_first_block_num));
-      uint64_t pos;
-      index_file.read((char*)&pos, sizeof(pos));
-      return pos;
-   }
+         uint64_t get_block_pos(uint32_t block_num) final { return detail::npos; }
+         void reset(const genesis_state& gs, const stored_type_ptr& first_block) final { block_log_impl<stored_type>::update_head(first_block); }
+         void reset(const chain_id_type& chain_id, uint32_t first_block_num) final { first_block_number = first_block_num; }
+         void flush() final {}
 
-   uint64_t block_log::get_block_pos(uint32_t block_num) const {
-      return my->get_block_pos(block_num);
-   }
+         stored_type_ptr read_block_by_num(uint32_t block_num) final { return {}; };
+         std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num) final { return {}; };
 
-   signed_block_ptr block_log::read_head()const {
-      my->check_open_files();
+         uint32_t        version() const final { return 0; }
+         stored_type_ptr read_head() final { return {}; };
+      };
 
-      uint64_t pos;
+      template<typename StoredType>
+      struct basic_block_log : block_log_impl<StoredType> {
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<stored_type>;
 
-      // Check that the file is not empty
-      my->block_file.seek_end(0);
-      if (my->block_file.tellp() <= sizeof(pos))
-         return {};
+         fc::datastream<fc::cfile> block_file;
+         fc::datastream<fc::cfile> index_file;
+         block_log_preamble        preamble;
+         bool                      genesis_written_to_block_log = false;
 
-      //figure out if this is a pruned log or not. we can't just look at the configuration since
-      // read_head() is called early on, and this isn't hot enough to warrant a member bool to track it
-      my->block_file.seek(0);
-      uint32_t current_version;
-      fc::raw::unpack(my->block_file, current_version);
-      const bool is_currently_pruned = detail::is_pruned_log_and_mask_version(current_version);
+         basic_block_log() = default;
 
-      my->block_file.seek_end(0);
-      if(is_currently_pruned)
-         my->block_file.skip(-sizeof(uint32_t)); //skip the trailer containing block count
-      my->block_file.skip(-sizeof(pos));
-      fc::raw::unpack(my->block_file, pos);
-      if (pos != npos)
-         return read_block(pos);
+         explicit basic_block_log(std::filesystem::path log_dir) { open(log_dir); }
+
+         static void ensure_file_exists(fc::cfile& f) {
+            if (std::filesystem::exists(f.get_file_path()))
+               return;
+            f.open(fc::cfile::create_or_update_rw_mode);
+            f.close();
+         }
+
+         virtual void transform_block_log() {
+            // convert from  pruned block log to non-pruned if necessary
+            if (preamble.is_currently_pruned()) {
+               block_file.open(fc::cfile::update_rw_mode);
+               this->update_head(this->read_head());
+               if (this->head) {
+                  index_file.open(fc::cfile::update_rw_mode);
+                  vacuum(first_block_num_from_pruned_log(), preamble.first_block_num);
+               } else {
+                  std::filesystem::resize_file(index_file.get_file_path(), 0);
+               }
+               preamble.ver = preamble.version();
+            }
+         }
+
+         bool     is_initialized() const override { return genesis_written_to_block_log; }
+         uint32_t first_block_num() override { return preamble.first_block_num; }
+         uint32_t index_first_block_num() const { return preamble.first_block_num; }
+
+         virtual uint32_t         working_block_file_first_block_num() { return preamble.first_block_num; }
+         virtual void             post_append(uint64_t pos) {}
+         virtual stored_type_ptr retry_read_block_by_num(uint32_t block_num) { return {}; }
+         virtual std::optional<signed_block_header> retry_read_block_header_by_num(uint32_t block_num) { return {}; }
+
+         void append(const stored_type_ptr& b, const block_id_type& id,
+                     const std::vector<char>& packed_block) override {
+            try {
+               SYS_ASSERT(genesis_written_to_block_log, block_log_append_fail,
+                          "Cannot append to ${desc} log until the genesis is first written", ("desc", filename_prefix<StoredType>()));
+
+               block_file.seek_end(0);
+               index_file.seek_end(0);
+               // if pruned log, rewind over count trailer if any block is already present
+               if (preamble.is_currently_pruned() && this->head)
+                  block_file.skip(-sizeof(uint32_t));
+               uint64_t pos = block_file.tellp();
+
+               SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (retrieve_block_num(*b) - preamble.first_block_num),
+                          block_log_append_fail, "Append to ${desc}'s index file occuring at wrong position.",
+                          ("desc", filename_prefix<StoredType>())
+                          ("position", (uint64_t)index_file.tellp())(
+                                "expected", (retrieve_block_num(*b) - preamble.first_block_num) * sizeof(uint64_t)));
+               block_file.write(packed_block.data(), packed_block.size());
+               block_file.write((char*)&pos, sizeof(pos));
+               index_file.write((char*)&pos, sizeof(pos));
+               index_file.flush();
+               this->update_head(b, id);
+
+               post_append(pos);
+               block_file.flush();
+            }
+            FC_LOG_AND_RETHROW()
+         }
+
+         uint64_t get_block_pos(uint32_t block_num) final {
+            if (!(this->head && block_num <= block_header::num_from_id(this->head->id) &&
+                  block_num >= working_block_file_first_block_num()))
+               return detail::npos;
+            index_file.seek(sizeof(uint64_t) * (block_num - index_first_block_num()));
+            uint64_t pos;
+            index_file.read((char*)&pos, sizeof(pos));
+            return pos;
+         }
+
+         stored_type_ptr read_block_by_num(uint32_t block_num) final {
+            try {
+               uint64_t pos = get_block_pos(block_num);
+               if (pos != detail::npos) {
+                  block_file.seek(pos);
+                  return read_block<decltype(block_file), stored_type>(block_file,
+                                                                       block_num);
+               }
+               return retry_read_block_by_num(block_num);
+            }
+            FC_LOG_AND_RETHROW()
+         }
+
+         std::optional<signed_block_header> read_block_header_by_num(uint32_t block_num) final {
+            try {
+               uint64_t pos = get_block_pos(block_num);
+               if (pos != detail::npos) {
+                  block_file.seek(pos);
+                  return read_block_header<decltype(block_file), stored_type>(block_file, block_num);
+               }
+               return retry_read_block_header_by_num(block_num);
+            }
+            FC_LOG_AND_RETHROW()
+         }
+
+         void open(const std::filesystem::path& data_dir) {
+
+            if (!std::filesystem::is_directory(data_dir))
+               std::filesystem::create_directories(data_dir);
+
+            this->block_file.set_file_path(data_dir / log_filename<stored_type>());
+            this->index_file.set_file_path(data_dir / index_filename<stored_type>());
+
+            /* On startup of the block log, there are several states the log file and the index file can be
+             * in relation to each other.
+             *
+             *                          Block Log
+             *                     Exists       Is New
+             *                 +------------+------------+
+             *          Exists |    Check   |   Delete   |
+             *   Index         |    Head    |    Index   |
+             *    File         +------------+------------+
+             *          Is New |   Replay   |     Do     |
+             *                 |    Log     |   Nothing  |
+             *                 +------------+------------+
+             *
+             * Checking the heads of the files has several conditions as well.
+             *  - If they are the same, do nothing.
+             *  - If the index file head is not in the log file, delete the index and replay.
+             *  - If the index file head is in the log, but not up to date, replay from index head.
+             */
+            ensure_file_exists(block_file);
+            ensure_file_exists(index_file);
+            auto log_size   = std::filesystem::file_size(this->block_file.get_file_path());
+            auto index_size = std::filesystem::file_size(this->index_file.get_file_path());
+            ilog("${desc} Log file_size: ${size}", ("desc", filename_prefix<StoredType>())("size", log_size));
+
+            if (log_size) {
+               block_log_data log_data(block_file.get_file_path());
+               preamble = log_data.get_preamble();
+               // genesis state is not going to be useful afterwards, just convert it to chain id to save space
+               preamble.chain_context = preamble.chain_id();
+
+               genesis_written_to_block_log = true; // Assume it was constructed properly.
+
+               uint32_t number_of_blocks = log_data.number_of_blocks();
+               ilog("Log has ${n} blocks", ("n", number_of_blocks));
+
+               SYS_ASSERT(index_size || number_of_blocks == 0, block_log_exception,
+                          "${index_file} file is empty, please use leap-util to fix the problem.",
+                          ("index_file", index_file.get_file_path().string()));
+               SYS_ASSERT(index_size % sizeof(uint64_t) == 0, block_log_exception,
+                          "${index_file} file is invalid, please use leap-util to reconstruct the index.",
+                          ("index_file", index_file.get_file_path().string()));
+
+               if (index_size) {
+                  block_log_index index(index_file.get_file_path());
+                  auto last_block_pos = log_data.last_block_position();
+                  auto last_index_pos = index.back();
+
+                  SYS_ASSERT(last_block_pos == last_index_pos, block_log_exception,
+                             "The last block position from ${block_file} is at ${block_pos} "
+                             "which does not match the last block postion ${index_pos} from ${index_file}, please use "
+                             "leap-util to fix the inconsistency.",
+                             ("block_pos", last_block_pos)("index_pos", last_index_pos)
+                             ("block_file", block_file.get_file_path().string())
+                             ("index_file", index_file.get_file_path().string()));
+               }
+               log_data.close();
+
+               transform_block_log();
+
+            } else if (index_size) {
+               ilog("Log file is empty while the index file is nonempty, discard the index file");
+               std::filesystem::resize_file(index_file.get_file_path(), 0);
+            }
+
+            if (!block_file.is_open())
+               block_file.open(fc::cfile::update_rw_mode);
+            if (!index_file.is_open())
+               index_file.open(fc::cfile::update_rw_mode);
+            if (log_size && !this->head)
+               this->update_head(this->read_head());
+         }
+
+         uint64_t first_block_num_from_pruned_log() {
+            uint32_t num_blocks;
+            this->block_file.seek_end(-sizeof(uint32_t));
+            fc::raw::unpack(this->block_file, num_blocks);
+            return retrieve_block_num(*this->head->ptr) - num_blocks + 1;
+         }
+
+         void reset(uint32_t first_bnum, std::variant<genesis_state, chain_id_type>&& chain_context, uint32_t version) {
+
+            block_file.open(fc::cfile::truncate_rw_mode);
+            preamble.ver             = version | (preamble.ver & pruned_version_flag);
+            preamble.first_block_num = first_bnum;
+            preamble.chain_context   = std::move(chain_context);
+            preamble.write_to(block_file);
+
+            // genesis state is not going to be useful afterwards, just convert it to chain id to save space
+            preamble.chain_context = preamble.chain_id();
+
+            genesis_written_to_block_log = true;
+            static_assert(common_protocol::max_supported_version > 0, "a version number of zero is not supported");
+
+            index_file.open(fc::cfile::truncate_rw_mode);
+            index_file.flush();
+         }
+
+         void reset(const genesis_state& gs, const stored_type_ptr& first_block) override {
+            this->reset(1, gs, common_protocol::default_initial_version);
+            this->append(first_block, retrieve_id(*first_block), fc::raw::pack(*first_block));
+         }
+
+         void reset(const chain_id_type& chain_id, uint32_t first_block_num) override {
+            // if this block_log type is required for replay (like the traditional block log)
+            // then don't allow just writing the chain_id, since that will force this instance
+            // to restart with a snapshot, rather than being able to reconstuct it via this
+            // block log
+            SYS_ASSERT(
+                  first_block_num > 1 || !needed_for_replay<StoredType>(), block_log_exception,
+                  "Block log version ${ver} needs to be created with a genesis state if starting from block number 1.");
+
+            this->reset(first_block_num, chain_id, common_protocol::max_supported_version);
+            this->head.reset();
+         }
+
+         void flush() final {
+            block_file.flush();
+            index_file.flush();
+         }
+
+         stored_type_ptr read_head() final {
+            auto pos = read_head_position();
+            if (pos != detail::npos) {
+               block_file.seek(pos);
+               return read_block<decltype(block_file), StoredType>(block_file, 0);
+            } else {
+               return {};
+            }
+         }
+
+         uint64_t read_head_position() {
+            uint64_t pos;
+
+            // Check that the file is not empty
+            this->block_file.seek_end(0);
+            if (this->block_file.tellp() <= sizeof(pos))
+               return detail::npos;
+
+            // figure out if this is a pruned log or not. we can't just look at the configuration since
+            //  read_head() is called early on, and this isn't hot enough to warrant a member bool to track it
+            this->block_file.seek(0);
+            uint32_t current_version;
+            fc::raw::unpack(this->block_file, current_version);
+            const bool is_currently_pruned = detail::is_pruned_log_and_mask_version(current_version);
+
+            this->block_file.seek_end(0);
+            int64_t skip_count = -sizeof(pos);
+
+            if (is_currently_pruned) {
+               skip_count += -sizeof(uint32_t); // skip the trailer containing block count
+            }
+            this->block_file.skip(skip_count);
+            fc::raw::unpack(this->block_file, pos);
+
+            return pos;
+         }
+
+         void vacuum(uint64_t first_block_num, uint64_t index_first_block_num) {
+            // go ahead and write a new valid header now. if the vacuum fails midway, at least this means maybe the
+            //  block recovery can get through some blocks.
+            size_t copy_to_pos = convert_existing_header_to_vacuumed(first_block_num);
+
+            preamble.ver = common_protocol::max_supported_version;
+
+            // if there is no head block though, bail now, otherwise first_block_num won't actually be available
+            //  and it'll mess this all up. Be sure to still remove the 4 byte trailer though.
+            if (!block_log_impl<stored_type>::head) {
+               block_file.flush();
+               std::filesystem::resize_file(block_file.get_file_path(),
+                                            std::filesystem::file_size(block_file.get_file_path()) - sizeof(uint32_t));
+               return;
+            }
+
+            size_t copy_from_pos = get_block_pos(first_block_num);
+            block_file.seek_end(-sizeof(uint32_t));
+            size_t         copy_sz           = block_file.tellp() - copy_from_pos;
+            const uint32_t num_blocks_in_log = chain::block_header::num_from_id(block_log_impl<stored_type>::head->id) - first_block_num + 1;
+
+            const size_t offset_bytes  = copy_from_pos - copy_to_pos;
+            const size_t offset_blocks = first_block_num - index_first_block_num;
+
+            std::vector<char> buff;
+            buff.resize(4 * 1024 * 1024);
+
+            auto tick = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
+            while (copy_sz) {
+               const size_t copy_this_round = std::min(buff.size(), copy_sz);
+               block_file.seek(copy_from_pos);
+               block_file.read(buff.data(), copy_this_round);
+               block_file.punch_hole(copy_to_pos, copy_from_pos + copy_this_round);
+               block_file.seek(copy_to_pos);
+               block_file.write(buff.data(), copy_this_round);
+
+               copy_from_pos += copy_this_round;
+               copy_to_pos += copy_this_round;
+               copy_sz -= copy_this_round;
+
+               const auto tock = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
+               if (tick < tock - std::chrono::seconds(5)) {
+                  ilog("Vacuuming pruned block log, ${b} bytes remaining", ("b", copy_sz));
+                  tick = tock;
+               }
+            }
+            block_file.flush();
+            std::filesystem::resize_file(block_file.get_file_path(), block_file.tellp());
+
+            index_file.flush();
+            {
+               boost::interprocess::mapped_region index_mapped(index_file, boost::interprocess::read_write);
+               uint64_t*                          index_ptr = (uint64_t*)index_mapped.get_address();
+
+               for (uint32_t new_block_num = 0; new_block_num < num_blocks_in_log; ++new_block_num) {
+                  const uint64_t new_pos   = index_ptr[new_block_num + offset_blocks] - offset_bytes;
+                  index_ptr[new_block_num] = new_pos;
+
+                  if (new_block_num + 1 != num_blocks_in_log)
+                     block_file.seek(index_ptr[new_block_num + offset_blocks + 1] - offset_bytes - sizeof(uint64_t));
+                  else
+                     block_file.seek_end(-sizeof(uint64_t));
+                  block_file.write((char*)&new_pos, sizeof(new_pos));
+               }
+            }
+            std::filesystem::resize_file(index_file.get_file_path(), num_blocks_in_log * sizeof(uint64_t));
+
+            preamble.first_block_num = first_block_num;
+         }
+
+         size_t convert_existing_header_to_vacuumed(uint32_t first_block_num) {
+            uint32_t   old_version;
+            uint32_t   old_first_block_num;
+            const auto totem = detail::npos;
+
+            block_file.seek(0);
+            fc::raw::unpack(block_file, old_version);
+            fc::raw::unpack(block_file, old_first_block_num);
+            SYS_ASSERT(is_pruned_log_and_mask_version(old_version), block_log_exception,
+                       "Trying to vacuumed a non-pruned block log");
+
+            if (block_log_preamble::contains_genesis_state(old_version, old_first_block_num)) {
+               // we'll always write a v3 log, but need to possibly mutate the genesis_state to a chainid should we have
+               // pruned a log starting with a genesis_state
+               genesis_state gs;
+               auto          ds = block_file.create_datastream();
+               fc::raw::unpack(ds, gs);
+
+               block_file.seek(0);
+               fc::raw::pack(block_file, common_protocol::max_supported_version);
+               fc::raw::pack(block_file, first_block_num);
+               if (first_block_num == 1) {
+                  SYS_ASSERT(old_first_block_num == 1, block_log_exception, "expected an old first blocknum of 1");
+                  fc::raw::pack(block_file, gs);
+               } else
+                  fc::raw::pack(block_file, gs.compute_chain_id());
+               fc::raw::pack(block_file, totem);
+            } else {
+               // read in the existing chainid, to parrot back out
+               fc::sha256 chainid;
+               fc::raw::unpack(block_file, chainid);
+
+               block_file.seek(0);
+               fc::raw::pack(block_file, common_protocol::max_supported_version);
+               fc::raw::pack(block_file, first_block_num);
+               fc::raw::pack(block_file, chainid);
+               fc::raw::pack(block_file, totem);
+            }
+
+            return block_file.tellp();
+         }
+
+         static void write_incomplete_block_data(const std::filesystem::path& blocks_dir, fc::time_point now, uint32_t block_num,
+                                                 fc::cfile& strm) {
+            auto      tail_path = blocks_dir / filename_prefix<stored_type>().append("-bad-tail-").append(now.to_iso_string()).append(".log");
+            fc::cfile tail;
+            tail.set_file_path(tail_path);
+            tail.open(fc::cfile::create_or_update_rw_mode);
+            copy_file_content(strm, tail);
+
+            ilog("Data at tail end of block log which should contain the (incomplete) serialization of block ${num} "
+                 "has been written out to '${tail_path}'.",
+                 ("num", block_num + 1)("tail_path", tail_path));
+         }
+
+         bool recover_from_incomplete_block_head(block_log_data& log_data, block_log_index& index) {
+            const uint64_t pos = index.back();
+            if (log_data.size() <= pos) {
+               // index refers to an invalid position, we cannot recover from it
+               return false;
+            }
+
+            const uint32_t expected_block_num = log_data.first_block_num() + index.num_blocks() - 1;
+            auto&          ds                 = log_data.ro_stream_at(pos);
+
+            try {
+               StoredType entry;
+               fc::raw::unpack(ds, entry);
+               if (entry.block_num() != expected_block_num) {
+                  return false;
+               }
+               uint64_t tmp_pos = std::numeric_limits<uint64_t>::max();
+               ds.read(reinterpret_cast<char*>(&tmp_pos), sizeof(tmp_pos));
+               if (tmp_pos != pos)
+                  return false;
+
+               const auto trimmed_block_file_size = ds.tellp();
+
+               write_incomplete_block_data(block_file.get_file_path().parent_path(), fc::time_point::now(),
+                                           expected_block_num + 1, ds);
+               std::filesystem::resize_file(block_file.get_file_path(), trimmed_block_file_size);
+               return true;
+            } catch (...) { return false; }
+         }
+
+         uint32_t version() const final { return preamble.version(); }
+      };
+
+      template<typename StoredType>
+      struct partitioned_block_log final : basic_block_log<StoredType> {
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<stored_type>;
+
+         block_log_catalog<StoredType> catalog;
+         const size_t      stride;
+
+         partitioned_block_log(const std::filesystem::path& log_dir, const partitioned_blocklog_config& config) : basic_block_log<StoredType>{}, stride(config.stride) {
+            catalog.open(log_dir, config.retained_dir, config.archive_dir, filename_prefix<stored_type>().c_str());
+            catalog.max_retained_files = config.max_retained_files;
+
+            basic_block_log<StoredType>::open(log_dir);
+            const auto log_size = std::filesystem::file_size(this->block_file.get_file_path());
+
+            if (log_size == 0 && !catalog.empty()) {
+               basic_block_log<stored_type>::reset(catalog.verifier.chain_id, catalog.last_block_num() + 1);
+               this->update_head(this->read_block_by_num(catalog.last_block_num()));
+            } else {
+               SYS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == this->preamble.chain_id(),
+                          block_log_exception, "block log file ${path} has a different chain id",
+                          ("path", this->block_file.get_file_path()));
+            }
+         }
+
+         void split_log() {
+            fc::datastream<fc::cfile> new_block_file;
+            fc::datastream<fc::cfile> new_index_file;
+
+            std::filesystem::path block_file_path = this->block_file.get_file_path();
+            std::filesystem::path index_file_path = this->index_file.get_file_path();
+
+            std::filesystem::path tmp_block_file_path = block_file_path;
+            tmp_block_file_path.replace_extension("log.tmp");
+            std::filesystem::path tmp_index_file_path = index_file_path;
+            tmp_index_file_path.replace_extension("index.tmp");
+
+            new_block_file.set_file_path(tmp_block_file_path);
+            new_index_file.set_file_path(tmp_index_file_path);
+
+            try {
+               new_block_file.open(fc::cfile::truncate_rw_mode);
+               new_index_file.open(fc::cfile::truncate_rw_mode);
+
+            } catch (...) {
+               wlog("Unable to open new block or index file for writing during block log spliting, "
+                    "continue writing to existing block log file\n");
+               return;
+            }
+
+            this->block_file.close();
+            this->index_file.close();
+
+            catalog.add(this->preamble.first_block_num, retrieve_block_num(*this->head->ptr), this->block_file.get_file_path().parent_path(),
+                        filename_prefix<stored_type>().c_str());
+
+            using std::swap;
+            swap(new_block_file, this->block_file);
+            swap(new_index_file, this->index_file);
+
+            std::filesystem::rename(tmp_block_file_path, block_file_path);
+            std::filesystem::rename(tmp_index_file_path, index_file_path);
+
+            this->block_file.set_file_path(block_file_path);
+            this->index_file.set_file_path(index_file_path);
+
+            this->preamble.ver             = common_protocol::max_supported_version;
+            this->preamble.chain_context   = this->preamble.chain_id();
+            this->preamble.first_block_num = retrieve_block_num(*this->head->ptr) + 1;
+            this->preamble.write_to(this->block_file);
+         }
+
+         uint32_t first_block_num() final {
+            if (!catalog.empty())
+               return catalog.collection.begin()->first;
+            return this->preamble.first_block_num;
+         }
+
+         void post_append(uint64_t pos) final {
+            if (retrieve_block_num(*this->head->ptr) % stride == 0) {
+               split_log();
+            }
+         }
+
+         stored_type_ptr retry_read_block_by_num(uint32_t block_num) final {
+            auto ds = catalog.ro_stream_for_block(block_num);
+            if (ds)
+               return read_block<decltype(*ds), stored_type>(*ds, block_num);
+            return {};
+         }
+
+         std::optional<signed_block_header> retry_read_block_header_by_num(uint32_t block_num) final {
+            auto ds = catalog.ro_stream_for_block(block_num);
+            if (ds)
+               return read_block_header<decltype(*ds), stored_type>(*ds, block_num);
+            return {};
+         }
+
+         void reset(const chain_id_type& chain_id, uint32_t first_block_num) final {
+
+            SYS_ASSERT(catalog.verifier.chain_id.empty() || chain_id == catalog.verifier.chain_id, block_log_exception,
+                       "Trying to reset to the chain to a different chain id");
+            basic_block_log<stored_type>::reset(chain_id, first_block_num);
+         }
+      };
+
+      template<typename StoredType>
+      struct punch_hole_block_log final : basic_block_log<StoredType> {
+         using stored_type = StoredType;
+         using stored_type_ptr = std::shared_ptr<stored_type>;
+
+         uint32_t              first_block_number = 0; // the first number available to read
+         prune_blocklog_config prune_config;
+
+         punch_hole_block_log(const std::filesystem::path& data_dir, const prune_blocklog_config& prune_conf)
+             : prune_config(prune_conf) {
+            SYS_ASSERT(__builtin_popcount(prune_config.prune_threshold) == 1, block_log_exception,
+                       "block log prune threshold must be power of 2");
+            // switch this over to the mask that will be used
+            prune_config.prune_threshold = ~(prune_config.prune_threshold - 1);
+            basic_block_log<StoredType>::open(data_dir);
+            if (this->head)
+               first_block_number = basic_block_log<stored_type>::first_block_num_from_pruned_log();
+            else if (this->preamble.first_block_num)
+               first_block_number = this->preamble.first_block_num;
+            else
+               first_block_number = 1;
+            this->preamble.ver |= pruned_version_flag;
+         }
+
+         ~punch_hole_block_log() final {
+            basic_block_log<stored_type>::flush();
+            try_exit_vacuum();
+         }
+
+         uint32_t first_block_num() final { return first_block_number; }
+         uint32_t working_block_file_first_block_num() final { return first_block_number; }
+
+         void transform_block_log() final {
+            // convert from  non-pruned block log to pruned if necessary
+            if (!this->preamble.is_currently_pruned()) {
+               this->block_file.open(fc::cfile::update_rw_mode);
+               this->update_head(this->read_head());
+               first_block_number = this->preamble.first_block_num;
+               // need to convert non-pruned log to pruned log. prune any blocks to start with
+               uint32_t num_blocks_in_log = this->prune(fc::log_level::info);
+
+               // update version
+               this->block_file.seek(0);
+               fc::raw::pack(this->block_file, this->preamble.version() | pruned_version_flag);
+
+               // and write out the trailing block count
+               this->block_file.seek_end(0);
+               fc::raw::pack(this->block_file, num_blocks_in_log);
+               this->block_file.flush();
+            }
+         }
+
+         // close() is called all over the place. Let's make this an explict call to ensure it only is called when
+         //  we really want: when someone is destroying the blog instance
+         void try_exit_vacuum() {
+            // for a pruned log that has at least one block, see if we should vacuum it
+            if (prune_config.vacuum_on_close) {
+               if (!this->head) {
+                  // disregard vacuum_on_close size if there isn't even a block and just do it silently anyways
+                  basic_block_log<StoredType>::vacuum(first_block_number, this->preamble.first_block_num);
+                  first_block_number = this->preamble.first_block_num;
+               } else {
+                  const size_t first_data_pos = this->get_block_pos(first_block_number);
+                  this->block_file.seek_end(-sizeof(uint32_t));
+                  const size_t last_data_pos = this->block_file.tellp();
+                  if (last_data_pos - first_data_pos < prune_config.vacuum_on_close) {
+                     ilog("Vacuuming pruned block log");
+                     basic_block_log<StoredType>::vacuum(first_block_number, this->preamble.first_block_num);
+                     first_block_number = this->preamble.first_block_num;
+                  }
+               }
+            }
+         }
+
+         void post_append(uint64_t pos) final {
+            uint32_t       num_blocks_in_log;
+            const uint64_t end = this->block_file.tellp();
+            if ((pos & prune_config.prune_threshold) != (end & prune_config.prune_threshold))
+               num_blocks_in_log = prune(fc::log_level::debug);
+            else
+               num_blocks_in_log = chain::block_header::num_from_id(this->head->id) - first_block_number + 1;
+            fc::raw::pack(this->block_file, num_blocks_in_log);
+         }
+
+         void reset(const genesis_state& gs, const stored_type_ptr& first_block) final {
+            basic_block_log<stored_type>::reset(gs, first_block);
+            first_block_number = 1;
+         }
+
+         void reset(const chain_id_type& chain_id, uint32_t first_block_num) final {
+            basic_block_log<stored_type>::reset(chain_id, first_block_num);
+            this->block_file.seek_end(0);
+            fc::raw::pack(this->block_file, (uint32_t)0);
+            this->block_file.flush();
+            this->first_block_number = first_block_num;
+         }
+
+         // returns number of blocks after pruned
+         uint32_t prune(const fc::log_level& loglevel) {
+            if (!this->head)
+               return 0;
+            const uint32_t head_num = chain::block_header::num_from_id(this->head->id);
+            if (head_num - first_block_number < prune_config.prune_blocks)
+               return head_num - first_block_number + 1;
+
+            const uint32_t prune_to_num = head_num - prune_config.prune_blocks + 1;
+
+            static_assert(common_protocol::max_supported_version == 3,
+                          "Code was written to support version 3 format, need to update this code for latest format.");
+            const genesis_state gs;
+            const size_t        max_header_size_v1 = sizeof(uint32_t) + fc::raw::pack_size(gs) + sizeof(uint64_t);
+            const size_t        max_header_size_v23 =
+                  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(chain_id_type) + sizeof(uint64_t);
+            const auto max_header_size = std::max(max_header_size_v1, max_header_size_v23);
+
+            this->block_file.punch_hole(max_header_size, this->get_block_pos(prune_to_num));
+
+            first_block_number = prune_to_num;
+            this->block_file.flush();
+
+            if (auto l = fc::logger::get(); l.is_enabled(loglevel))
+               l.log(fc::log_message(fc::log_context(loglevel, __FILE__, __LINE__, __func__),
+                                     "${l} pruned to blocks ${b}-${e}",
+                                     fc::mutable_variant_object()("l", log_filename<stored_type>())
+                                                                 ("b", first_block_number)
+                                                                 ("e", head_num)));
+            return prune_config.prune_blocks;
+         }
+      };
+
+   } // namespace detail
+
+   template<typename StoredType>
+   block_log<StoredType>::block_log(const std::filesystem::path& data_dir, const block_log_config& config)
+       : my(std::visit(overloaded{ [&data_dir](const basic_blocklog_config& conf) -> detail::block_log_impl<StoredType>* {
+                                     return new detail::basic_block_log<StoredType>(data_dir);
+                                  },
+                                   [&data_dir](const empty_blocklog_config&) -> detail::block_log_impl<StoredType>* {
+                                      return new detail::empty_block_log<StoredType>(data_dir);
+                                   },
+                                   [&data_dir](const partitioned_blocklog_config& conf) -> detail::block_log_impl<StoredType>* {
+                                      return new detail::partitioned_block_log<StoredType>(data_dir, conf);
+                                   },
+                                   [&data_dir](const prune_blocklog_config& conf) -> detail::block_log_impl<StoredType>* {
+                                      return new detail::punch_hole_block_log<StoredType>(data_dir, conf);
+                                   } },
+                       config)) {}
+
+   template<typename StoredType>
+   block_log<StoredType>::block_log(block_log&& other) noexcept { my = std::move(other.my); }
+
+   template<typename StoredType>
+   block_log<StoredType>::~block_log() = default;
+
+   template<typename StoredType>
+   void     block_log<StoredType>::set_initial_version(uint32_t ver) { common_protocol::default_initial_version = ver; }
+   template<typename StoredType>
+   std::optional<uint32_t> block_log<StoredType>::version() const {
+      std::lock_guard g(my->mtx);
+      if (my->is_initialized())
+         return { my->version() };
+
       return {};
    }
 
-   const signed_block_ptr& block_log::head()const {
-      return my->head;
+   template<typename StoredType>
+   void block_log<StoredType>::append(const stored_type_ptr& b, const block_id_type& id) {
+      std::vector<char> packed_block = fc::raw::pack(*b);
+      std::lock_guard g(my->mtx);
+      my->append(b, id, packed_block);
    }
 
-   const block_id_type&    block_log::head_id()const {
-      return my->head_id;
+   template<typename StoredType>
+   void block_log<StoredType>::append(const stored_type_ptr& b, const block_id_type& id, const std::vector<char>& packed_block) {
+      std::lock_guard g(my->mtx);
+      my->append(b, id, packed_block);
    }
 
-   uint32_t block_log::first_block_num() const {
-      return my->first_block_num;
+   template<typename StoredType>
+   void block_log<StoredType>::flush() {
+      std::lock_guard g(my->mtx);
+      my->flush();
    }
 
-   void block_log::construct_index() {
-      ilog("Reconstructing Block Log Index...");
-      my->close();
+   template<typename StoredType>
+   void block_log<StoredType>::reset(const genesis_state& gs, const stored_type_ptr& first_block) {
+      // At startup, OK to be called in no log mode from controller.cpp
+      std::lock_guard g(my->mtx);
+      my->reset(gs, first_block);
+   }
 
-      fc::remove_all( my->index_file.get_file_path() );
+   template<typename StoredType>
+   void block_log<StoredType>::reset(const chain_id_type& chain_id, uint32_t first_block_num) {
+      std::lock_guard g(my->mtx);
+      my->reset(chain_id, first_block_num);
+   }
 
-      my->reopen();
+   template<typename StoredType>
+   block_log<StoredType>::stored_type_ptr block_log<StoredType>::read_block_by_num(uint32_t block_num) const {
+      std::lock_guard g(my->mtx);
+      return my->read_block_by_num(block_num);
+   }
 
+   template<typename StoredType>
+   std::optional<signed_block_header> block_log<StoredType>::read_block_header_by_num(uint32_t block_num) const {
+      std::lock_guard g(my->mtx);
+      return my->read_block_header_by_num(block_num);
+   }
 
-      my->close();
+   template<typename StoredType>
+   block_id_type block_log<StoredType>::read_block_id_by_num(uint32_t block_num) const {
+      // read_block_header_by_num acquires mutex
+      auto bh = read_block_header_by_num(block_num);
+      if (bh) { return bh->calculate_id(); }
+      return {};
+   }
 
-      block_log::construct_index(my->block_file.get_file_path(), my->index_file.get_file_path());
+   template<typename StoredType>
+   uint64_t block_log<StoredType>::get_block_pos(uint32_t block_num) const {
+      std::lock_guard g(my->mtx);
+      return my->get_block_pos(block_num);
+   }
 
-      my->reopen();
-   } // construct_index
+   template<typename StoredType>
+   block_log<StoredType>::stored_type_ptr block_log<StoredType>::read_head() const {
+      std::lock_guard g(my->mtx);
+      return my->read_head();
+   }
 
-   void block_log::construct_index(const fc::path& block_file_name, const fc::path& index_file_name) {
-      detail::reverse_iterator block_log_iter;
+   template<typename StoredType>
+   block_log<StoredType>::stored_type_ptr block_log<StoredType>::head() const {
+      std::lock_guard g(my->mtx);
+      return my->head ? my->head->ptr : stored_type_ptr{};
+   }
 
-      ilog("Will read existing blocks.log file ${file}", ("file", block_file_name.generic_string()));
-      ilog("Will write new blocks.index file ${file}", ("file", index_file_name.generic_string()));
+   template<typename StoredType>
+   std::optional<block_id_type> block_log<StoredType>::head_id() const {
+      std::lock_guard g(my->mtx);
+      return my->head ? my->head->id : std::optional<block_id_type>{};
+   }
 
-      //for a pruned log, this will still return blocks in the count that have been removed. that's okay and desirable
-      const uint32_t num_blocks = block_log_iter.open(block_file_name);
+   template<typename StoredType>
+   uint32_t block_log<StoredType>::first_block_num() const {
+      std::lock_guard g(my->mtx);
+      return my->first_block_num();
+   }
 
-      ilog("block log version= ${version}", ("version", block_log_iter.version()));
+   // static
+   template<typename StoredType>
+   void block_log<StoredType>::construct_index(const std::filesystem::path& block_file_name, const std::filesystem::path& index_file_name) {
 
-      if (num_blocks == 0) {
-         return;
+      ilog("Will read existing log file ${file}", ("file", block_file_name));
+      ilog("Will write new index file ${file}", ("file", index_file_name));
+
+      block_log_data log_data;
+      log_data.open(block_file_name);
+      log_data.construct_index(index_file_name);
+   }
+
+   template<typename StoredType>
+   std::tuple<uint64_t, uint32_t, std::string>
+   block_log_data::full_validate_blocks(uint32_t last_block_num, const std::filesystem::path& blocks_dir, fc::time_point now) {
+      uint64_t      pos       = first_block_position();
+      uint32_t      block_num = first_block_num() - 1;
+      std::string   error_msg;
+      block_id_type block_id;
+
+      file.seek(pos);
+      SYS_ASSERT(!is_currently_pruned(), block_log_exception, "pruned block log cannot be repaired");
+      try {
+         try {
+            StoredType entry;
+            while (remaining() > 0 && block_num < last_block_num) {
+               std::tie(block_num, block_id) = full_validate_block_entry<StoredType>(block_num, block_id, entry);
+               if (block_num % 1000 == 0)
+                  ilog("Verified block ${num}", ("num", block_num));
+               pos = file.tellp();
+            }
+         } catch (const bad_block_exception& e) {
+            detail::basic_block_log<StoredType>::write_incomplete_block_data(blocks_dir, now, block_num, ro_stream_at(pos));
+            std::rethrow_exception(e.inner);
+         }
+      // clang-format off
+      } catch (const std::exception& e) {
+         error_msg = e.what();
+      } catch (...) {
+         error_msg = "unrecognized exception";
       }
+      // clang-format on
 
-      ilog("first block= ${first}         last block= ${last}",
-           ("first", block_log_iter.first_block_num())("last", (block_log_iter.first_block_num() + num_blocks)));
-
-      detail::index_writer index(index_file_name, num_blocks);
-      uint64_t position;
-      while ((position = block_log_iter.previous()) != npos) {
-         index.write(position);
-      }
+      return { pos, block_num, error_msg };
    }
 
-   fc::path block_log::repair_log(const fc::path& data_dir, uint32_t truncate_at_block, const char* reversible_block_dir_name) {
+   // static
+   template<typename StoredType>
+   std::filesystem::path block_log<StoredType>::repair_log(const std::filesystem::path& data_dir, uint32_t truncate_at_block,
+                                  const char* reversible_block_dir_name) {
       ilog("Recovering Block Log...");
-      SYS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
-                 "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir)          );
+      SYS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / log_filename<StoredType>()), block_log_not_found,
+                 "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir));
 
-      auto now = fc::time_point::now();
+      if (truncate_at_block == 0)
+         truncate_at_block = UINT32_MAX;
 
-      auto blocks_dir = fc::canonical( data_dir );
-      if( blocks_dir.filename().generic_string() == "." ) {
-         blocks_dir = blocks_dir.parent_path();
-      }
-      auto backup_dir = blocks_dir.parent_path();
+      auto now        = fc::time_point::now();
+      auto blocks_dir = std::filesystem::canonical(
+            data_dir); // canonical always returns an absolute path that has no symbolic link, dot, or dot-dot elements
       auto blocks_dir_name = blocks_dir.filename();
-      SYS_ASSERT( blocks_dir_name.generic_string() != ".", block_log_exception, "Invalid path to blocks directory" );
-      backup_dir = backup_dir / blocks_dir_name.generic_string().append("-").append( now );
+      auto backup_dir      = blocks_dir.parent_path() / blocks_dir_name.generic_string().append("-").append(now.to_iso_string());
 
-      SYS_ASSERT( !fc::exists(backup_dir), block_log_backup_dir_exist,
+      SYS_ASSERT(!std::filesystem::exists(backup_dir), block_log_backup_dir_exist,
                  "Cannot move existing blocks directory to already existing directory '${new_blocks_dir}'",
-                 ("new_blocks_dir", backup_dir) );
+                 ("new_blocks_dir", backup_dir));
 
-      fc::rename( blocks_dir, backup_dir );
-      ilog( "Moved existing blocks directory to backup location: '${new_blocks_dir}'", ("new_blocks_dir", backup_dir) );
-
-      if (strlen(reversible_block_dir_name) && fc::is_directory(blocks_dir/reversible_block_dir_name)) {
-         fc::rename(blocks_dir/ reversible_block_dir_name, backup_dir/ reversible_block_dir_name);
+      std::filesystem::create_directories(backup_dir);
+      std::filesystem::rename(blocks_dir / log_filename<stored_type>(), backup_dir / log_filename<stored_type>());
+      if (std::filesystem::exists(blocks_dir / index_filename<stored_type>())) {
+         std::filesystem::rename(blocks_dir / index_filename<stored_type>(), backup_dir / index_filename<stored_type>());
       }
-
-      fc::create_directories(blocks_dir);
-      auto block_log_path = blocks_dir / "blocks.log";
-
-      ilog( "Reconstructing '${new_block_log}' from backed up block log", ("new_block_log", block_log_path) );
-
-      std::fstream  old_block_stream;
-      std::fstream  new_block_stream;
-
-      old_block_stream.open( (backup_dir / "blocks.log").generic_string().c_str(), LOG_READ );
-      new_block_stream.open( block_log_path.generic_string().c_str(), LOG_WRITE );
-
-      old_block_stream.seekg( 0, std::ios::end );
-      uint64_t end_pos = old_block_stream.tellg();
-      old_block_stream.seekg( 0 );
-
-      uint32_t version = 0;
-      old_block_stream.read( (char*)&version, sizeof(version) );
-      SYS_ASSERT( version > 0, block_log_exception, "Block log was not setup properly" );
-      SYS_ASSERT( is_supported_version(version), block_log_unsupported_version,
-                 "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
-                 ("version", version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
-
-      new_block_stream.write( (char*)&version, sizeof(version) );
-
-      uint32_t first_block_num = 1;
-      if (version != 1) {
-         old_block_stream.read ( (char*)&first_block_num, sizeof(first_block_num) );
-
-         // this assert is only here since repair_log is only used for --hard-replay-blockchain, which removes any
-         // existing state, if another API needs to use it, this can be removed and the check for the first block's
-         // previous block id will need to accommodate this.
-         SYS_ASSERT( first_block_num == 1, block_log_exception,
-                     "Block log ${file} must contain a genesis state and start at block number 1.  This block log "
-                     "starts at block number ${first_block_num}.",
-                     ("file", (backup_dir / "blocks.log").generic_string())("first_block_num", first_block_num));
-
-         new_block_stream.write( (char*)&first_block_num, sizeof(first_block_num) );
+      if (strlen(reversible_block_dir_name) && std::filesystem::is_directory(blocks_dir / reversible_block_dir_name)) {
+         std::filesystem::rename(blocks_dir / reversible_block_dir_name, backup_dir / reversible_block_dir_name);
       }
+      ilog("Moved existing blocks directory to backup location: '${new_blocks_dir}'", ("new_blocks_dir", backup_dir));
 
-      if (contains_genesis_state(version, first_block_num)) {
-         genesis_state gs;
-         fc::raw::unpack(old_block_stream, gs);
+      const auto block_log_path  = blocks_dir / log_filename<stored_type>();
+      const auto block_index_path = blocks_dir / index_filename<stored_type>();
+      const auto block_file_name = block_log_path.generic_string();
+      const auto block_index_file_name = block_index_path.generic_string();
 
-         auto data = fc::raw::pack( gs );
-         new_block_stream.write( data.data(), data.size() );
+      ilog("Reconstructing '${new_block_log}' from backed up log", ("new_block_log", block_file_name));
+
+      block_log_data log_data;
+      log_data.open(backup_dir / log_filename<stored_type>().c_str());
+
+      auto [pos, block_num, error_msg] = log_data.full_validate_blocks<StoredType>(truncate_at_block, blocks_dir, now);
+
+      {
+         fc::cfile new_block_file;
+         new_block_file.set_file_path( block_log_path );
+         new_block_file.open( fc::cfile::create_or_update_rw_mode );
+         copy_file_content( log_data.ro_stream_at( 0 ), new_block_file, pos );
+         new_block_file.close();
       }
-      else if (contains_chain_id(version, first_block_num)) {
-         chain_id_type chain_id;
-         old_block_stream >> chain_id;
+      construct_index(block_log_path, block_index_path);
 
-         new_block_stream << chain_id;
-      }
-      else {
-         SYS_THROW( block_log_exception,
-                    "Block log ${file} is not supported. version: ${ver} and first_block_num: ${fbn} does not contain "
-                    "a genesis_state nor a chain_id.",
-                    ("file", (backup_dir / "blocks.log").generic_string())("ver", version)("fbn", first_block_num));
-      }
-
-      if (version != 1) {
-         auto expected_totem = npos;
-         std::decay_t<decltype(npos)> actual_totem;
-         old_block_stream.read ( (char*)&actual_totem, sizeof(actual_totem) );
-
-         SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
-                    "Expected separator between block log header and blocks was not found( expected: ${e}, actual: ${a} )",
-                    ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem) ))("a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem) )));
-
-         new_block_stream.write( (char*)&actual_totem, sizeof(actual_totem) );
-      }
-
-      std::exception_ptr          except_ptr;
-      vector<char>                incomplete_block_data;
-      std::optional<signed_block> bad_block;
-      uint32_t                    block_num = 0;
-
-      block_id_type previous;
-
-      uint64_t pos = old_block_stream.tellg();
-      while( pos < end_pos ) {
-         signed_block tmp;
-
-         try {
-            fc::raw::unpack(old_block_stream, tmp);
-         } catch( ... ) {
-            except_ptr = std::current_exception();
-            incomplete_block_data.resize( end_pos - pos );
-            old_block_stream.read( incomplete_block_data.data(), incomplete_block_data.size() );
-            break;
-         }
-
-         auto id = tmp.calculate_id();
-         if( block_header::num_from_id(previous) + 1 != block_header::num_from_id(id) ) {
-            elog( "Block ${num} (${id}) skips blocks. Previous block in block log is block ${prev_num} (${previous})",
-                  ("num", block_header::num_from_id(id))("id", id)
-                  ("prev_num", block_header::num_from_id(previous))("previous", previous) );
-         }
-         if( previous != tmp.previous ) {
-            elog( "Block ${num} (${id}) does not link back to previous block. "
-                  "Expected previous: ${expected}. Actual previous: ${actual}.",
-                  ("num", block_header::num_from_id(id))("id", id)("expected", previous)("actual", tmp.previous) );
-         }
-         previous = id;
-
-         uint64_t tmp_pos = std::numeric_limits<uint64_t>::max();
-         if( (static_cast<uint64_t>(old_block_stream.tellg()) + sizeof(pos)) <= end_pos ) {
-            old_block_stream.read( reinterpret_cast<char*>(&tmp_pos), sizeof(tmp_pos) );
-         }
-         if( pos != tmp_pos ) {
-            bad_block.emplace(std::move(tmp));
-            break;
-         }
-
-         auto data = fc::raw::pack(tmp);
-         new_block_stream.write( data.data(), data.size() );
-         new_block_stream.write( reinterpret_cast<char*>(&pos), sizeof(pos) );
-         block_num = tmp.block_num();
-         if(block_num % 1000 == 0)
-            ilog( "Recovered block ${num}", ("num", block_num) );
-         pos = new_block_stream.tellp();
-         if( block_num == truncate_at_block )
-            break;
-      }
-
-      if( bad_block ) {
-         ilog( "Recovered only up to block number ${num}. Last block in block log was not properly committed:\n${last_block}",
-               ("num", block_num)("last_block", *bad_block) );
-      } else if( except_ptr ) {
-         std::string error_msg;
-
-         try {
-            std::rethrow_exception(except_ptr);
-         } catch( const fc::exception& e ) {
-            error_msg = e.what();
-         } catch( const std::exception& e ) {
-            error_msg = e.what();
-         } catch( ... ) {
-            error_msg = "unrecognized exception";
-         }
-
-         ilog( "Recovered only up to block number ${num}. "
-               "The block ${next_num} could not be deserialized from the block log due to error:\n${error_msg}",
-               ("num", block_num)("next_num", block_num+1)("error_msg", error_msg) );
-
-         auto tail_path = blocks_dir / std::string("blocks-bad-tail-").append( now ).append(".log");
-         if( !fc::exists(tail_path) && incomplete_block_data.size() > 0 ) {
-            std::fstream tail_stream;
-            tail_stream.open( tail_path.generic_string().c_str(), LOG_WRITE );
-            tail_stream.write( incomplete_block_data.data(), incomplete_block_data.size() );
-
-            ilog( "Data at tail end of block log which should contain the (incomplete) serialization of block ${num} "
-                  "has been written out to '${tail_path}'.",
-                  ("num", block_num+1)("tail_path", tail_path) );
-         }
-      } else if( block_num == truncate_at_block && pos < end_pos ) {
-         ilog( "Stopped recovery of block log early at specified block number: ${stop}.", ("stop", truncate_at_block) );
+      if (error_msg.size()) {
+         ilog("Recovered only up to block number ${num}. "
+              "The block ${next_num} could not be deserialized from the block log due to error:\n${error_msg}",
+              ("num", block_num)("next_num", block_num + 1)("error_msg", error_msg));
+      } else if (block_num == truncate_at_block && pos < log_data.size()) {
+         ilog("Stopped recovery of block log early at specified block number: ${stop}.", ("stop", truncate_at_block));
       } else {
-         ilog( "Existing block log was undamaged. Recovered all irreversible blocks up to block number ${num}.", ("num", block_num) );
+         ilog("Existing block log was undamaged. Recovered all irreversible blocks up to block number ${num}.",
+              ("num", block_num));
       }
-
       return backup_dir;
    }
 
-   template <typename ChainContext, typename Lambda>
-   std::optional<ChainContext> detail::block_log_impl::extract_chain_context( const fc::path& data_dir, Lambda&& lambda ) {
-      SYS_ASSERT( fc::is_directory(data_dir) && fc::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
-                  "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir)          );
-
-      std::fstream  block_stream;
-      block_stream.open( (data_dir / "blocks.log").generic_string().c_str(), LOG_READ );
-
-      uint32_t version = 0;
-      block_stream.read( (char*)&version, sizeof(version) );
-      is_pruned_log_and_mask_version(version);
-      SYS_ASSERT( version >= block_log::min_supported_version && version <= block_log::max_supported_version, block_log_unsupported_version,
-                  "Unsupported version of block log. Block log version is ${version} while code supports version(s) [${min},${max}]",
-                  ("version", version)("min", block_log::min_supported_version)("max", block_log::max_supported_version) );
-
-      uint32_t first_block_num = 1;
-      if (version != 1) {
-         block_stream.read ( (char*)&first_block_num, sizeof(first_block_num) );
+   // static
+   template<typename StoredType>
+   std::optional<std::variant<genesis_state, chain_id_type>>
+                                           block_log<StoredType>::extract_chain_context(const std::filesystem::path& block_dir,
+                                                                            const std::filesystem::path& retained_dir) {
+      std::filesystem::path first_block_file;
+      if (!retained_dir.empty() && std::filesystem::exists(retained_dir)) {
+         for_each_file_in_dir_matches(retained_dir, std::string("(") + filename_prefix<stored_type>() + "-1-\\d+\\.log)",
+                                      [&](std::filesystem::path log_path) {
+                                          first_block_file = std::move(log_path);
+                                      });
       }
 
-      return lambda(block_stream, version, first_block_num);
-   }
+      if (first_block_file.empty() && std::filesystem::exists(block_dir / log_filename<stored_type>())) {
+         first_block_file = block_dir / log_filename<stored_type>();
+      }
 
-   std::optional<genesis_state> block_log::extract_genesis_state( const fc::path& data_dir ) {
-      return detail::block_log_impl::extract_chain_context<genesis_state>(data_dir, [](std::fstream& block_stream, uint32_t version, uint32_t first_block_num ) -> std::optional<genesis_state> {
-         if (contains_genesis_state(version, first_block_num)) {
-            genesis_state gs;
-            fc::raw::unpack(block_stream, gs);
-            return gs;
+      if (!first_block_file.empty()) {
+         block_log_data log_data;
+         log_data.open(first_block_file);
+         return log_data.get_preamble().chain_context;
+      }
+
+      if (!retained_dir.empty() && std::filesystem::exists(retained_dir)) {
+         const std::regex        my_filter(R"(" + filename_prefix<signed_block>() + R"-\d+-\d+\.log)");
+         std::smatch             what;
+         std::filesystem::directory_iterator end_itr; // Default ctor yields past-the-end
+         for (std::filesystem::directory_iterator p(retained_dir); p != end_itr; ++p) {
+            // Skip if not a file
+            if (!std::filesystem::is_regular_file(p->status()))
+               continue;
+            // skip if it does not match the pattern
+            std::string file = p->path().filename().string();
+            if (!std::regex_match(file, what, my_filter))
+               continue;
+            block_log_data log_data;
+            log_data.open(p->path());
+            return log_data.chain_id();
          }
-
-         // current versions only have a genesis state if they start with block number 1
-         return std::optional<genesis_state>();
-      });
+      }
+      return {};
    }
 
-   chain_id_type block_log::extract_chain_id( const fc::path& data_dir ) {
-      return *(detail::block_log_impl::extract_chain_context<chain_id_type>(data_dir, [](std::fstream& block_stream, uint32_t version, uint32_t first_block_num ) -> std::optional<chain_id_type> {
-         // supported versions either contain a genesis state, or else the chain id only
-         if (contains_genesis_state(version, first_block_num)) {
-            genesis_state gs;
-            fc::raw::unpack(block_stream, gs);
-            return gs.compute_chain_id();
-         }
-         SYS_ASSERT( contains_chain_id(version, first_block_num), block_log_exception,
-                     "Block log error! version: ${version} with first_block_num: ${num} does not contain a "
-                     "chain id or genesis state, so the chain id cannot be determined.",
-                     ("version", version)("num", first_block_num) );
-         chain_id_type chain_id;
-         fc::raw::unpack(block_stream, chain_id);
-         return chain_id;
-      }));
+   // static
+   template<typename StoredType>
+   std::optional<genesis_state> block_log<StoredType>::extract_genesis_state(const std::filesystem::path& block_dir,
+                                                                 const std::filesystem::path& retained_dir) {
+      auto context = extract_chain_context(block_dir, retained_dir);
+      if (!context || std::holds_alternative<chain_id_type>(*context))
+         return {};
+      return std::get<genesis_state>(*context);
    }
 
-   bool block_log::is_pruned_log(const fc::path& data_dir) {
+   // static
+   template<typename StoredType>
+   std::optional<chain_id_type> block_log<StoredType>::extract_chain_id(const std::filesystem::path& block_dir,
+                                                            const std::filesystem::path& retained_dir) {
+      auto context = extract_chain_context(block_dir, retained_dir);
+      if (!context)
+         return {};
+      return std::visit(overloaded{
+         [](const chain_id_type& id){ return id; },
+         [](const genesis_state& gs){ return gs.compute_chain_id(); }
+          } , *context);
+   }
+
+   // static
+   bool block_log_preamble::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
+      return version < genesis_state_or_chain_id_version || first_block_num == 1;
+   }
+
+   // static
+   template<typename StoredType>
+   bool block_log<StoredType>::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
+      return block_log_preamble::contains_genesis_state(version, first_block_num);
+   }
+
+   // static
+   bool block_log_preamble::contains_chain_id(uint32_t version, uint32_t first_block_num) {
+      return version >= genesis_state_or_chain_id_version && first_block_num > 1;
+   }
+
+   // static
+   template<typename StoredType>
+   bool block_log<StoredType>::contains_chain_id(uint32_t version, uint32_t first_block_num) {
+      return block_log_preamble::contains_chain_id(version, first_block_num);
+   }
+
+   // static
+   bool block_log_preamble::is_supported_version(uint32_t version) {
+      return std::clamp(version, common_protocol::min_supported_version, common_protocol::max_supported_version) == version;
+   }
+
+   // static
+   template<typename StoredType>
+   bool block_log<StoredType>::is_pruned_log(const std::filesystem::path& data_dir) {
       uint32_t version = 0;
       try {
          fc::cfile log_file;
-         log_file.set_file_path(data_dir / "blocks.log");
+         log_file.set_file_path(data_dir / log_filename<stored_type>());
          log_file.open("rb");
          fc::raw::unpack(log_file, version);
-      }
-      catch(...) {
-         return false;
-      }
+      } catch (...) { return false; }
       return detail::is_pruned_log_and_mask_version(version);
    }
 
-   detail::reverse_iterator::reverse_iterator()
-   : _file(nullptr, &fclose)
-   , _buffer_ptr(std::make_unique<char[]>(_buf_len)) {
+   template<typename StoredType>
+   void extract_blocklog_i(block_log_bundle<StoredType>& log_bundle, const std::filesystem::path& new_block_filename, const std::filesystem::path& new_index_filename,
+                           uint32_t first_block_num, uint32_t num_blocks) {
+
+      auto position_for_block = [&log_bundle](uint64_t block_num) {
+         uint64_t block_order = block_num - log_bundle.log_data.first_block_num();
+         if (block_order < static_cast<uint64_t>(log_bundle.log_index.num_blocks()))
+            return log_bundle.log_index.nth_block_position(block_order);
+         return log_bundle.log_data.size();
+      };
+
+      first_block_num = std::max(first_block_num, log_bundle.log_data.first_block_num());
+      num_blocks      = std::min(num_blocks, log_bundle.log_data.num_blocks());
+
+      const auto     num_blocks_to_skip   = first_block_num - log_bundle.log_data.first_block_num();
+      const uint64_t first_kept_block_pos = position_for_block(first_block_num);
+      const uint64_t nbytes_to_trim =
+            num_blocks_to_skip == 0 ? 0 : first_kept_block_pos - block_log_preamble::nbytes_with_chain_id;
+      const uint64_t last_block_num      = first_block_num + num_blocks;
+      const uint64_t last_block_pos      = position_for_block(last_block_num);
+      const auto     new_block_file_size = last_block_pos - nbytes_to_trim;
+
+      fc::datastream<fc::cfile> new_block_file;
+      new_block_file.set_file_path(new_block_filename.generic_string());
+      new_block_file.open(fc::cfile::truncate_rw_mode);
+
+      if (num_blocks_to_skip == 0) {
+         copy_file_content(log_bundle.log_data.ro_stream_at(0), new_block_file, new_block_file_size);
+         fc::cfile new_index_file;
+         new_index_file.set_file_path(new_index_filename.generic_string());
+         new_index_file.open(fc::cfile::truncate_rw_mode);
+         const uint64_t index_file_size = num_blocks * sizeof(uint64_t);
+         log_bundle.log_index.copy_to(new_index_file, index_file_size);
+         return;
+      }
+
+      block_log_preamble preamble;
+      preamble.ver             = block_log<StoredType>::max_supported_version;
+      preamble.first_block_num = first_block_num;
+      preamble.chain_context   = log_bundle.log_data.chain_id();
+      preamble.write_to(new_block_file);
+      new_block_file.seek_end(0);
+      copy_file_content(log_bundle.log_data.ro_stream_at(first_kept_block_pos), new_block_file,
+                        last_block_pos - first_kept_block_pos);
+
+      index_writer index(new_index_filename, num_blocks);
+      adjust_block_positions(index, new_block_file, block_log_preamble::nbytes_with_chain_id, -nbytes_to_trim);
    }
 
-   uint32_t detail::reverse_iterator::_buf_len = 1U << 24;
+   // static
+   template<typename StoredType>
+   bool block_log<StoredType>::trim_blocklog_front(const std::filesystem::path& block_dir, const std::filesystem::path& temp_dir,
+                                       uint32_t truncate_at_block) {
+      SYS_ASSERT(block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories");
 
-   uint32_t detail::reverse_iterator::open(const fc::path& block_file_name) {
-      _block_file_name = block_file_name.generic_string();
-      _file.reset( FC_FOPEN(_block_file_name.c_str(), "r"));
-      SYS_ASSERT( _file, block_log_exception, "Could not open Block log file at '${blocks_log}'", ("blocks_log", _block_file_name) );
-      _end_of_buffer_position = _unset_position;
+      ilog("In directory ${dir} will trim all blocks before block ${n} from log and index file.",
+           ("dir", block_dir)("n", truncate_at_block));
 
-      //read block log to see if version 1 or 2 and get first blocknum (implicit 1 if version 1)
-      _version = 0;
-      auto size = fread((char*)&_version, sizeof(_version), 1, _file.get());
-      SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("file", _block_file_name) );
-      const bool is_prune_log = is_pruned_log_and_mask_version(_version);
-      SYS_ASSERT( block_log::is_supported_version(_version), block_log_unsupported_version,
-                  "block log version ${v} is not supported", ("v", _version));
-      if (_version == 1) {
-         _first_block_num = 1;
-      }
-      else {
-         size = fread((char*)&_first_block_num, sizeof(_first_block_num), 1, _file.get());
-         SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with version ${v}.", ("file", _block_file_name)("v", _version) );
-      }
+      block_log_bundle<StoredType> log_bundle(block_dir);
 
-      auto status = fseek(_file.get(), 0, SEEK_END);
-      SYS_ASSERT( status == 0, block_log_exception, "Could not open Block log file at '${blocks_log}'. Returned status: ${status}", ("blocks_log", _block_file_name)("status", status) );
-
-      auto eof_position_in_file = ftell(_file.get());
-      SYS_ASSERT( eof_position_in_file > 0, block_log_exception, "Block log file at '${blocks_log}' could not be read.", ("blocks_log", _block_file_name) );
-
-      if(is_prune_log) {
-         fseek(_file.get(), -sizeof(uint32_t), SEEK_CUR);
-         uint32_t prune_count;
-         size = fread((char*)&prune_count, sizeof(prune_count), 1, _file.get());
-         SYS_ASSERT( size == 1, block_log_exception, "Block log file at '${blocks_log}' not formatted consistently with pruned version ${v}.", ("file", _block_file_name)("v", _version) );
-         _prune_block_limit = prune_count;
-         eof_position_in_file -= sizeof(prune_count);
-      }
-
-      _current_position_in_file = eof_position_in_file - _position_size;
-
-      update_buffer();
-
-      _blocks_found = 0;
-      char* buf = _buffer_ptr.get();
-      const uint32_t index_of_pos = _current_position_in_file - _start_of_buffer_position;
-      const uint64_t block_pos = *reinterpret_cast<uint64_t*>(buf + index_of_pos);
-
-      if (block_pos == block_log::npos) {
-         return 0;
-      }
-
-      uint32_t bnum = 0;
-      if (block_pos >= _start_of_buffer_position) {
-         const uint32_t index_of_block = block_pos - _start_of_buffer_position;
-         bnum = *reinterpret_cast<uint32_t*>(buf + index_of_block + trim_data::blknum_offset);  //block number of previous block (is big endian)
-      }
-      else {
-         const auto blknum_offset_pos = block_pos + trim_data::blknum_offset;
-         auto status = fseek(_file.get(), blknum_offset_pos, SEEK_SET);
-         SYS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos)("status", status) );
-         auto size = fread((void*)&bnum, sizeof(bnum), 1, _file.get());
-         SYS_ASSERT( size == 1, block_log_exception, "Could not read in '${blocks_log}' at position: ${pos}", ("blocks_log", _block_file_name)("pos", blknum_offset_pos) );
-      }
-      _last_block_num = fc::endian_reverse_u32(bnum) + 1;                     //convert from big endian to little endian and add 1
-      _blocks_expected = _last_block_num - _first_block_num + 1;
-      return _blocks_expected;
-   }
-
-   uint64_t detail::reverse_iterator::previous() {
-      SYS_ASSERT( _current_position_in_file != block_log::npos,
-                  block_log_exception,
-                  "Block log file at '${blocks_log}' first block already returned by former call to previous(), it is no longer valid to call this function.", ("blocks_log", _block_file_name) );
-
-      if ((_version == 1 && _blocks_found == _blocks_expected) || (_prune_block_limit && _blocks_found == *_prune_block_limit)) {
-         _current_position_in_file = block_log::npos;
-         return _current_position_in_file;
-      }
-	 
-      if (_start_of_buffer_position > _current_position_in_file) {
-         update_buffer();
-      }
-
-      char* buf = _buffer_ptr.get();
-      auto offset = _current_position_in_file - _start_of_buffer_position;
-      uint64_t block_location_in_file = *reinterpret_cast<uint64_t*>(buf + offset);
-
-      ++_blocks_found;
-      if (block_location_in_file == block_log::npos) {
-         _current_position_in_file = block_location_in_file;
-         SYS_ASSERT( _blocks_found != _blocks_expected,
-                    block_log_exception,
-                    "Block log file at '${blocks_log}' formatting indicated last block: ${last_block_num}, first block: ${first_block_num}, but found ${num} blocks",
-                    ("blocks_log", _block_file_name)("last_block_num", _last_block_num)("first_block_num", _first_block_num)("num", _blocks_found) );
-      }
-      else {
-         const uint64_t previous_position_in_file = _current_position_in_file;
-         _current_position_in_file = block_location_in_file - _position_size;
-         SYS_ASSERT( _current_position_in_file < previous_position_in_file,
-                     block_log_exception,
-                     "Block log file at '${blocks_log}' formatting is incorrect, indicates position later location in file: ${pos}, which was retrieved at: ${orig_pos}.",
-                     ("blocks_log", _block_file_name)("pos", _current_position_in_file)("orig_pos", previous_position_in_file) );
-      }
-
-      return block_location_in_file;
-   }
-
-   void detail::reverse_iterator::update_buffer() {
-      SYS_ASSERT( _current_position_in_file != block_log::npos, block_log_exception, "Block log file not setup properly" );
-
-      // since we need to read in a new section, just need to ensure the next position is at the very end of the buffer
-      _end_of_buffer_position = _current_position_in_file + _position_size;
-      if (_end_of_buffer_position < _buf_len) {
-         _start_of_buffer_position = 0;
-      }
-      else {
-         _start_of_buffer_position = _end_of_buffer_position - _buf_len;
-      }
-
-      auto status = fseek(_file.get(), _start_of_buffer_position, SEEK_SET);
-      SYS_ASSERT( status == 0, block_log_exception, "Could not seek in '${blocks_log}' to position: ${pos}. Returned status: ${status}", ("blocks_log", _block_file_name)("pos", _start_of_buffer_position)("status", status) );
-      char* buf = _buffer_ptr.get();
-      auto size = fread((void*)buf, (_end_of_buffer_position - _start_of_buffer_position), 1, _file.get());//read tail of blocks.log file into buf
-      SYS_ASSERT( size == 1, block_log_exception, "blocks.log read fails" );
-   }
-
-   detail::index_writer::index_writer(const fc::path& block_index_name, uint32_t blocks_expected)
-   : _blocks_remaining(blocks_expected) {
-      const size_t file_sz = blocks_expected*sizeof(uint64_t);
-
-      fc::cfile file;
-      file.set_file_path(block_index_name);
-      file.open(LOG_WRITE_C);
-      file.close();
-
-      fc::resize_file(block_index_name, file_sz);
-      _file.emplace(block_index_name.string().c_str(), boost::interprocess::read_write);
-      _mapped_file_region.emplace(*_file, boost::interprocess::read_write);
-   }
-
-   void detail::index_writer::write(uint64_t pos) {
-      SYS_ASSERT( _blocks_remaining, block_log_exception, "No more blocks were expected for the block log index" );
-
-      char* base = (char*)_mapped_file_region->get_address();
-      base += --_blocks_remaining*sizeof(uint64_t);
-      memcpy(base, &pos, sizeof(pos));
-
-      if ((_blocks_remaining & 0xfffff) == 0)
-         ilog("blocks remaining to index: ${blocks_left}      position in log file: ${pos}", ("blocks_left", _blocks_remaining)("pos",pos));
-   }
-
-   bool block_log::contains_genesis_state(uint32_t version, uint32_t first_block_num) {
-      return version <= 2 || first_block_num == 1;
-   }
-
-   bool block_log::contains_chain_id(uint32_t version, uint32_t first_block_num) {
-      return version >= 3 && first_block_num > 1;
-   }
-
-   bool block_log::is_supported_version(uint32_t version) {
-      return std::clamp(version, min_supported_version, max_supported_version) == version;
-   }
-
-   namespace {
-      template <typename T>
-      T read_buffer(const char* buf) {
-         T result;
-         memcpy(&result, buf, sizeof(T));
-         return result;
-      }
-
-      template <typename T>
-      void write_buffer(char* des, const T* src) {
-          memcpy(des, src, sizeof(T));
-      }
-   }
-
-   bool block_log::trim_blocklog_front(const fc::path& block_dir, const fc::path& temp_dir, uint32_t truncate_at_block) {
-      using namespace std;
-      SYS_ASSERT( block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories" );
-      ilog("In directory ${dir} will trim all blocks before block ${n} from blocks.log and blocks.index.",
-           ("dir", block_dir.generic_string())("n", truncate_at_block));
-      trim_data original_block_log(block_dir);
-      if (truncate_at_block <= original_block_log.first_block) {
-         ilog("There are no blocks before block ${n} so do nothing.", ("n", truncate_at_block));
+      if (truncate_at_block <= log_bundle.log_data.first_block_num()) {
+         dlog("There are no blocks before block ${n} so do nothing.", ("n", truncate_at_block));
          return false;
       }
-      if (truncate_at_block > original_block_log.last_block) {
-         ilog("All blocks are before block ${n} so do nothing (trim front would delete entire blocks.log).", ("n", truncate_at_block));
+      if (truncate_at_block > log_bundle.log_data.last_block_num()) {
+         dlog("All blocks are before block ${n} so do nothing (trim front would delete entire log file).",
+              ("n", truncate_at_block));
          return false;
       }
 
       // ****** create the new block log file and write out the header for the file
-      fc::create_directories(temp_dir);
-      fc::path new_block_filename = temp_dir / "blocks.log";
-      if (fc::remove(new_block_filename)) {
-         ilog("Removing old blocks.out file");
-      }
-      fc::cfile new_block_file;
-      new_block_file.set_file_path(new_block_filename);
-      // need to open as append since the file doesn't already exist, then reopen without append to allow writing the
-      // file in any order
-      new_block_file.open( LOG_WRITE_C );
-      new_block_file.close();
-      new_block_file.open( LOG_RW_C );
+      std::filesystem::create_directories(temp_dir);
+      std::filesystem::path new_block_filename = temp_dir / log_filename<stored_type>();
+      std::filesystem::path new_index_filename = temp_dir / index_filename<stored_type>();
 
-      static_assert( block_log::max_supported_version == 3,
-                     "Code was written to support version 3 format, need to update this code for latest format." );
-      uint32_t version = block_log::max_supported_version;
-      new_block_file.seek(0);
-      new_block_file.write((char*)&version, sizeof(version));
-      new_block_file.write((char*)&truncate_at_block, sizeof(truncate_at_block));
+      extract_blocklog_i<StoredType>(log_bundle, new_block_filename, new_index_filename, truncate_at_block,
+                                     log_bundle.log_data.last_block_num() - truncate_at_block + 1);
 
-      new_block_file << original_block_log.chain_id;
-
-      // append a totem to indicate the division between blocks and header
-      auto totem = block_log::npos;
-      new_block_file.write((char*)&totem, sizeof(totem));
-
-      const auto new_block_file_first_block_pos = new_block_file.tellp();
-      // ****** end of new block log header
-
-      // copy over remainder of block log to new block log
-      auto buffer =  make_unique<char[]>(detail::reverse_iterator::_buf_len);
-      char* buf =  buffer.get();
-
-      // offset bytes to shift from old blocklog position to new blocklog position
-      const uint64_t original_file_block_pos = original_block_log.block_pos(truncate_at_block);
-      const uint64_t pos_delta = original_file_block_pos - new_block_file_first_block_pos;
-      auto status = fseek(original_block_log.blk_in, 0, SEEK_END);
-      SYS_ASSERT( status == 0, block_log_exception, "blocks.log seek failed" );
-
-      // all blocks to copy to the new blocklog
-      const uint64_t to_write = ftell(original_block_log.blk_in) - original_file_block_pos;
-      const auto pos_size = sizeof(uint64_t);
-
-      // start with the last block's position stored at the end of the block
-      uint64_t original_pos = ftell(original_block_log.blk_in) - pos_size;
-
-      const auto num_blocks = original_block_log.last_block - truncate_at_block + 1;
-
-      fc::path new_index_filename = temp_dir / "blocks.index";
-      detail::index_writer index(new_index_filename, num_blocks);
-
-      uint64_t read_size = 0;
-      uint64_t write_size = 0;
-      for(uint64_t to_write_remaining = to_write; to_write_remaining > 0; to_write_remaining -= write_size) {
-         read_size = to_write_remaining;
-         if (read_size > detail::reverse_iterator::_buf_len) {
-            read_size = detail::reverse_iterator::_buf_len;
-         }
-
-         // read in the previous contiguous memory into the read buffer
-         const auto start_of_blk_buffer_pos = original_file_block_pos + to_write_remaining - read_size;
-         status = fseek(original_block_log.blk_in, start_of_blk_buffer_pos, SEEK_SET);
-         const auto num_read = fread(buf, read_size, 1, original_block_log.blk_in);
-         SYS_ASSERT( num_read == 1, block_log_exception, "blocks.log read failed" );
-
-         // walk this memory section to adjust block position to match the adjusted location
-         // of the block start and store in the new index file
-         write_size = read_size;
-         while(original_pos >= start_of_blk_buffer_pos) {
-            const auto buffer_index = original_pos - start_of_blk_buffer_pos;
-            uint64_t pos_content = read_buffer<uint64_t>(buf + buffer_index);
-
-            if ( (pos_content - start_of_blk_buffer_pos) > 0 && (pos_content - start_of_blk_buffer_pos) < pos_size ) {
-               // avoid the whole 8 bytes that contains a blk pos being split by the buffer
-               write_size = read_size - (pos_content - start_of_blk_buffer_pos);
-            }
-            const auto start_of_this_block = pos_content;
-            pos_content = start_of_this_block - pos_delta;
-            write_buffer<uint64_t>(buf + buffer_index, &pos_content);
-            index.write(pos_content);
-            original_pos = start_of_this_block - pos_size;
-         }
-         new_block_file.seek(new_block_file_first_block_pos + to_write_remaining - write_size);
-         uint64_t offset = read_size - write_size;
-         new_block_file.write(buf+offset, write_size);
-      }
-
-      fclose(original_block_log.blk_in);
-      original_block_log.blk_in = nullptr;
-      new_block_file.flush();
-      new_block_file.close();
-
-      fc::path old_log = temp_dir / "old.log";
-      rename(original_block_log.block_file_name, old_log);
-      rename(new_block_filename, original_block_log.block_file_name);
-      fc::path old_ind = temp_dir / "old.index";
-      rename(original_block_log.index_file_name, old_ind);
-      rename(new_index_filename, original_block_log.index_file_name);
+      std::filesystem::path old_log = temp_dir / filename_prefix<stored_type>() + "_old.log";
+      rename(log_bundle.block_file_name, old_log);
+      rename(new_block_filename, log_bundle.block_file_name);
+      std::filesystem::path old_ind = temp_dir / filename_prefix<stored_type>() + "_old.index";
+      rename(log_bundle.index_file_name, old_ind);
+      rename(new_index_filename, log_bundle.index_file_name);
 
       return true;
    }
 
-   trim_data::trim_data(fc::path block_dir) {
+   // static
+   template<typename StoredType>
+   int block_log<StoredType>::trim_blocklog_end(const std::filesystem::path& block_dir, uint32_t n) { // n is last block to keep (remove later blocks)
 
-      // code should follow logic in block_log::repair_log
+      block_log_bundle<StoredType> log_bundle(block_dir);
 
-      using namespace std;
-      block_file_name = block_dir / "blocks.log";
-      index_file_name = block_dir / "blocks.index";
-      blk_in = FC_FOPEN(block_file_name.generic_string().c_str(), "rb");
-      SYS_ASSERT( blk_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",block_file_name.string()) );
-      ind_in = FC_FOPEN(index_file_name.generic_string().c_str(), "rb");
-      SYS_ASSERT( ind_in != nullptr, block_log_not_found, "cannot read file ${file}", ("file",index_file_name.string()) );
-      auto size = fread((void*)&version,sizeof(version), 1, blk_in);
-      SYS_ASSERT( size == 1, block_log_unsupported_version, "invalid format for file ${file}", ("file",block_file_name.string()));
-      ilog("block log version= ${version}",("version",version));
-      bool is_pruned = detail::is_pruned_log_and_mask_version(version);
-      SYS_ASSERT( !is_pruned, block_log_unsupported_version, "Block log is currently in pruned format, it must be vacuumed before doing this operation");
-      SYS_ASSERT( block_log::is_supported_version(version), block_log_unsupported_version, "block log version ${v} is not supported", ("v",version));
+      ilog("In directory ${block_dir} will trim all blocks after block ${n} from ${block_file} and ${index_file}",
+           ("block_dir", block_dir)("n", n)("block_file", log_bundle.block_file_name)(
+                 "index_file", log_bundle.index_file_name));
 
-      detail::fileptr_datastream ds(blk_in, block_file_name.string());
-      if (version == 1) {
-         first_block = 1;
-         genesis_state gs;
-         fc::raw::unpack(ds, gs);
-         chain_id = gs.compute_chain_id();
+      if (n < log_bundle.log_data.first_block_num()) {
+         dlog("All blocks are after block ${n} so do nothing (trim_end would delete entire log)", ("n", n));
+         return 1;
       }
-      else {
-         size = fread((void *) &first_block, sizeof(first_block), 1, blk_in);
-         SYS_ASSERT(size == 1, block_log_exception, "invalid format for file ${file}",
-                    ("file", block_file_name.string()));
-         if (block_log::contains_genesis_state(version, first_block)) {
-            genesis_state gs;
-            fc::raw::unpack(ds, gs);
-            chain_id = gs.compute_chain_id();
-         }
-         else if (block_log::contains_chain_id(version, first_block)) {
-            ds >> chain_id;
-         }
-         else {
-            SYS_THROW( block_log_exception,
-                       "Block log ${file} is not supported. version: ${ver} and first_block: ${first_block} does not contain "
-                       "a genesis_state nor a chain_id.",
-                       ("file", block_file_name.string())("ver", version)("first_block", first_block));
-         }
+      if (n > log_bundle.log_data.last_block_num()) {
+         dlog("There are no blocks after block ${n} so do nothing", ("n", n));
+         return 2;
+      }
+      if (n == log_bundle.log_data.last_block_num())
+         return 0;
 
-         const auto expected_totem = block_log::npos;
-         std::decay_t<decltype(block_log::npos)> actual_totem;
-         size = fread ( (char*)&actual_totem, sizeof(actual_totem), 1, blk_in);
+      const auto to_trim_block_index    = n + 1 - log_bundle.log_data.first_block_num();
+      const auto to_trim_block_position = log_bundle.log_index.nth_block_position(to_trim_block_index);
+      const auto index_file_size        = to_trim_block_index * sizeof(uint64_t);
 
-         SYS_ASSERT(size == 1, block_log_exception,
-                    "Expected to read ${size} bytes, but did not read any bytes", ("size", sizeof(actual_totem)));
-         SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
-                    "Expected separator between block log header and blocks was not found( expected: ${e}, actual: ${a} )",
-                    ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem) ))("a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem) )));
+      std::filesystem::resize_file(log_bundle.block_file_name, to_trim_block_position);
+      std::filesystem::resize_file(log_bundle.index_file_name, index_file_size);
+      ilog("index has been trimmed to ${index_file_size} bytes", ("index_file_size", index_file_size));
+      return 0;
+   }
+
+   // static
+   template<typename StoredType>
+   void block_log<StoredType>::smoke_test(const std::filesystem::path& block_dir, uint32_t interval) {
+
+      block_log_bundle<StoredType> log_bundle(block_dir, false);
+
+      ilog("block log version= ${version}",("version", log_bundle.log_data.version()));
+      ilog("first block= ${first}",("first", log_bundle.log_data.first_block_num()));
+      ilog("last block= ${last}",("last", log_bundle.log_data.last_block_num()));
+
+      log_bundle.validate_index();
+
+      ilog("log and index agree on number of blocks");
+
+      if (interval == 0) {
+         interval = std::max((log_bundle.log_index.num_blocks() + 7) >> 3, 1U);
+      }
+      uint32_t expected_block_num = log_bundle.log_data.first_block_num();
+
+      for (uint32_t pos = 0; pos < log_bundle.log_index.num_blocks(); pos += interval, expected_block_num += interval) {
+         log_bundle.log_data.light_validate_block_entry_at(log_bundle.log_index.nth_block_position(pos),
+                                                           expected_block_num);
+      }
+   }
+
+   template<typename StoredType>
+   std::pair<std::filesystem::path, std::filesystem::path> blocklog_files(const std::filesystem::path& dir, uint32_t start_block_num, uint32_t num_blocks) {
+      const int bufsize = 64;
+      char      buf[bufsize];
+      snprintf(buf, bufsize, "%s-%u-%u.log", filename_prefix<StoredType>().c_str(), start_block_num, start_block_num + num_blocks - 1);
+      std::filesystem::path new_block_filename = dir / buf;
+      std::filesystem::path new_index_filename(new_block_filename);
+      new_index_filename.replace_extension(".index");
+      return std::make_pair(new_block_filename, new_index_filename);
+   }
+
+   // static
+   template<typename StoredType>
+   void block_log<StoredType>::extract_block_range(const std::filesystem::path& block_dir, const std::filesystem::path& dest_dir,
+                                       block_num_type start_block_num, block_num_type last_block_num) {
+
+
+      block_log_bundle<StoredType> log_bundle(block_dir);
+
+      SYS_ASSERT(start_block_num >= log_bundle.log_data.first_block_num(), block_log_exception,
+                 "The first available block is block ${first_block}.",
+                 ("first_block", log_bundle.log_data.first_block_num()));
+
+      if (!std::filesystem::exists(dest_dir))
+         std::filesystem::create_directories(dest_dir);
+
+      uint32_t num_blocks = last_block_num - start_block_num + 1;
+
+      auto [new_block_filename, new_index_filename] = blocklog_files<StoredType>(dest_dir, start_block_num, num_blocks);
+
+      extract_blocklog_i<StoredType>(log_bundle, new_block_filename, new_index_filename, start_block_num, num_blocks);
+   }
+
+   // static
+   template<typename StoredType>
+   void block_log<StoredType>::split_blocklog(const std::filesystem::path& block_dir, const std::filesystem::path& dest_dir, uint32_t stride) {
+
+      block_log_bundle<StoredType> log_bundle(block_dir);
+      const uint32_t   first_block_num = log_bundle.log_data.first_block_num();
+      const uint32_t   last_block_num  = log_bundle.log_data.last_block_num();
+
+      if (!std::filesystem::exists(dest_dir))
+         std::filesystem::create_directories(dest_dir);
+
+      for (uint32_t i = (first_block_num - 1) / stride; i < (last_block_num + stride - 1) / stride; ++i) {
+         uint32_t start_block_num = std::max(i * stride + 1, first_block_num);
+         uint32_t num_blocks      = std::min((i + 1) * stride, last_block_num) - start_block_num + 1;
+
+         auto [new_block_filename, new_index_filename] = blocklog_files<StoredType>(dest_dir, start_block_num, num_blocks);
+
+         extract_blocklog_i<StoredType>(log_bundle, new_block_filename, new_index_filename, start_block_num, num_blocks);
+      }
+   }
+
+   inline std::filesystem::path operator+(const std::filesystem::path& left, const std::filesystem::path& right) { return std::filesystem::path(left) += right; }
+
+   template<typename StoredType>
+   void move_blocklog_files(const std::filesystem::path& src_dir, const std::filesystem::path& dest_dir, uint32_t start_block,
+                            uint32_t end_block) {
+      auto [new_log_filename, new_index_filename] = blocklog_files<StoredType>(dest_dir, start_block, end_block - start_block + 1);
+      std::filesystem::rename(src_dir / (log_filename<StoredType>()), new_log_filename);
+      std::filesystem::rename(src_dir / (index_filename<StoredType>()), new_index_filename);
+   }
+
+   inline uint32_t get_blocklog_version(const std::filesystem::path& blocklog_file) {
+      uint32_t  version;
+      fc::cfile f;
+      f.set_file_path(blocklog_file.generic_string());
+      f.open("r");
+      f.read((char*)&version, sizeof(uint32_t));
+      return version;
+   }
+
+   // static
+   template<typename StoredType>
+   void block_log<StoredType>::merge_blocklogs(const std::filesystem::path& blocks_dir, const std::filesystem::path& dest_dir) {
+      block_log_catalog<StoredType> catalog;
+
+      catalog.open(std::filesystem::path(""), blocks_dir, std::filesystem::path(""), filename_prefix<StoredType>().c_str(), R"(-\d+-\d+\.log)");
+      if (catalog.collection.size() <= 1) {
+         wlog("There's no more than one blocklog files in ${blocks_dir}, skip merge.", ("blocks_dir", blocks_dir));
+         return;
       }
 
-      const uint64_t start_of_blocks = ftell(blk_in);
+      if (!std::filesystem::exists(dest_dir))
+         std::filesystem::create_directories(dest_dir);
 
-      const auto status = fseek(ind_in, 0, SEEK_END);                //get length of blocks.index (gives number of blocks)
-      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} end", ("file", index_file_name.string()) );
-      const uint64_t file_end = ftell(ind_in);                //get length of blocks.index (gives number of blocks)
-      last_block = first_block + file_end/sizeof(uint64_t) - 1;
+      fc::temp_directory    temp_dir;
+      std::filesystem::path temp_path   = temp_dir.path();
+      uint32_t              start_block = 0, end_block = 0;
 
-      first_block_pos = block_pos(first_block);
-      SYS_ASSERT(start_of_blocks == first_block_pos, block_log_exception,
-                 "Block log ${file} was determined to have its first block at ${determined}, but the block index "
-                 "indicates the first block is at ${index}",
-                 ("file", block_file_name.string())("determined", start_of_blocks)("index",first_block_pos));
-      ilog("first block= ${first}",("first",first_block));
-      ilog("last block= ${last}",("last",last_block));
-   }
+      std::filesystem::path     temp_block_log   = temp_path / log_filename<StoredType>();
+      std::filesystem::path     temp_block_index = temp_path / index_filename<StoredType>();
+      fc::datastream<fc::cfile> file;
+      file.set_file_path(temp_block_log);
 
-   trim_data::~trim_data() {
-      if (blk_in != nullptr)
-         fclose(blk_in);
-      if (ind_in != nullptr)
-         fclose(ind_in);
-   }
+      for (auto const& [first_block_num, val] : catalog.collection) {
+         if (std::filesystem::exists(temp_block_log)) {
+            if (first_block_num == end_block + 1) {
+               block_log_data log_data;
+               log_data.open(val.filename_base + ".log");
+               if (!file.is_open())
+                  file.open(fc::cfile::update_rw_mode);
+               file.seek_end(0);
+               auto orig_log_size = file.tellp();
+               copy_file_content(log_data.ro_stream_at(log_data.first_block_position()), file);
+               file.flush();
+               end_block = val.last_block_num;
+               index_writer index(temp_block_index, end_block - start_block + 1, false);
+               adjust_block_positions(index, file, orig_log_size, orig_log_size - log_data.first_block_position());
+               file.flush();
+               continue;
 
-   uint64_t trim_data::block_index(uint32_t n) const {
-      using namespace std;
-      SYS_ASSERT( first_block <= n, block_log_exception,
-                  "cannot seek in ${file} to block number ${b}, block number ${first} is the first block",
-                  ("file", index_file_name.string())("b",n)("first",first_block) );
-      SYS_ASSERT( n <= last_block, block_log_exception,
-                  "cannot seek in ${file} to block number ${b}, block number ${last} is the last block",
-                  ("file", index_file_name.string())("b",n)("last",last_block) );
-      return sizeof(uint64_t) * (n - first_block);
-   }
+            } else
+               wlog("${file}.log cannot be merged with previous block file because of the discontinuity of blocks, "
+                    "skip merging.",
+                    ("file", val.filename_base));
+            // there is a version or block number gap between the stride files
+            move_blocklog_files<StoredType>(temp_path, dest_dir, start_block, end_block);
+         }
 
-   uint64_t trim_data::block_pos(uint32_t n) {
-      using namespace std;
-      // can indicate the location of the block after the last block
-      if (n == last_block + 1) {
-         return ftell(blk_in);
+         std::filesystem::copy(val.filename_base + ".log", temp_block_log);
+         std::filesystem::copy(val.filename_base + ".index", temp_block_index);
+         start_block = first_block_num;
+         end_block   = val.last_block_num;
       }
-      const uint64_t index_pos = block_index(n);
-      auto status = fseek(ind_in, index_pos, SEEK_SET);
-      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file for block ${b}", ("file", index_file_name.string())("pos", index_pos)("b",n) );
-      const uint64_t pos = ftell(ind_in);
-      SYS_ASSERT( pos == index_pos, block_log_exception, "cannot seek to ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
-      uint64_t block_n_pos;
-      auto size = fread((void*)&block_n_pos, sizeof(block_n_pos), 1, ind_in);                   //filepos of block n
-      SYS_ASSERT( size == 1, block_log_exception, "cannot read ${file} entry for block ${b}", ("file", index_file_name.string())("b",n) );
 
-      //read blocks.log and verify block number n is found at the determined file position
-      const auto calc_blknum_pos = block_n_pos + blknum_offset;
-      status = fseek(blk_in, calc_blknum_pos, SEEK_SET);
-      SYS_ASSERT( status == 0, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
-      const uint64_t block_offset_pos = ftell(blk_in);
-      SYS_ASSERT( block_offset_pos == calc_blknum_pos, block_log_exception, "cannot seek to ${file} ${pos} from beginning of file", ("file", block_file_name.string())("pos", calc_blknum_pos) );
-      uint32_t prior_blknum;
-      size = fread((void*)&prior_blknum, sizeof(prior_blknum), 1, blk_in);     //read bigendian block number of prior block
-      SYS_ASSERT( size == 1, block_log_exception, "cannot read prior block");
-      const uint32_t bnum = fc::endian_reverse_u32(prior_blknum) + 1;          //convert to little endian, add 1 since prior block
-      SYS_ASSERT( bnum == n, block_log_exception,
-                  "At position ${pos} in ${file} expected to find ${exp_bnum} but found ${act_bnum}",
-                  ("pos",block_offset_pos)("file", block_file_name.string())("exp_bnum",n)("act_bnum",bnum) );
+      if (file.is_open())
+         file.close();
 
-      return block_n_pos;
+      if (std::filesystem::exists(temp_block_log)) {
+         move_blocklog_files<StoredType>(temp_path, dest_dir, start_block, end_block);
+      }
    }
 
-   } } /// sysio::chain
+   // Force instantiation of the two supported block_log implementations
+   template class block_log<block_header_state>;
+   template class block_log<signed_block>;
 
-// used only for unit test to adjust the buffer length
-void block_log_set_buff_len(uint64_t len){
-    sysio::chain::detail::reverse_iterator::_buf_len = len;
-}
+}} // namespace sysio::chain

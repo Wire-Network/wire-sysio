@@ -1,5 +1,5 @@
 #pragma once
-#include <appbase/application.hpp>
+#include <sysio/chain/application.hpp>
 #include <fc/variant.hpp>
 #include <sysio/chain/contract_types.hpp>
 #include <sysio/chain/transaction.hpp>

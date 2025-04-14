@@ -1,7 +1,7 @@
 if( SYSIO_COMPILE_TEST_CONTRACTS )
    # add_contract( test_ram_limit test_ram_limit test_ram_limit.cpp )
    # target_compile_options(test_ram_limit PUBLIC -Os)
-   message(STATUS "Not building test_ram_limit, read README.txt in eos/unittests/test-contracts/test_ram_limit")
+   message(STATUS "Not building test_ram_limit, read README.txt in sys/unittests/test-contracts/test_ram_limit")
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_ram_limit.wasm ${CMAKE_CURRENT_BINARY_DIR}/test_ram_limit.wasm COPYONLY )
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/test_ram_limit.abi ${CMAKE_CURRENT_BINARY_DIR}/test_ram_limit.abi COPYONLY )
 else()

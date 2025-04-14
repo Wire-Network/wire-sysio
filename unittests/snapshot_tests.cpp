@@ -4,21 +4,20 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/testing/tester.hpp>
-#include <sysio/testing/snapshot_suites.hpp>
+#include "snapshot_suites.hpp"
 
 #include <boost/mpl/list.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <contracts.hpp>
+#include <test_contracts.hpp>
 #include <snapshots.hpp>
 
 using namespace sysio;
 using namespace testing;
 using namespace chain;
-namespace bfs = boost::filesystem;
 
-chainbase::bfs::path get_parent_path(chainbase::bfs::path blocks_dir, int ordinal) {
-   chainbase::bfs::path leaf_dir = blocks_dir.filename();
+std::filesystem::path get_parent_path(std::filesystem::path blocks_dir, int ordinal) {
+   std::filesystem::path leaf_dir = blocks_dir.filename();
    if (leaf_dir.generic_string() == std::string("blocks")) {
       blocks_dir = blocks_dir.parent_path();
       leaf_dir = blocks_dir.filename();
@@ -43,8 +42,9 @@ controller::config copy_config(const controller::config& config, int ordinal) {
 
 controller::config copy_config_and_files(const controller::config& config, int ordinal) {
    controller::config copied_config = copy_config(config, ordinal);
-   fc::create_directories(copied_config.blocks_dir);
-   fc::copy(config.blocks_dir / "blocks.log", copied_config.blocks_dir / "blocks.log");
+   std::filesystem::create_directories(copied_config.blocks_dir);
+   std::filesystem::copy_file(config.blocks_dir / "blocks.log", copied_config.blocks_dir / "blocks.log", std::filesystem::copy_options::none);
+   std::filesystem::copy_file(config.blocks_dir / "blocks.index", copied_config.blocks_dir / "blocks.index", std::filesystem::copy_options::none);
    return copied_config;
 }
 
@@ -172,6 +172,9 @@ namespace {
          auto rhs_latest = SNAPSHOT_SUITE::finalize(rhs_latest_writer);
 
          print_variant_diff(lhs_latest, rhs_latest);
+         // more than print the different, also save snapshots json gz files under path build/unittests/snapshots
+         SNAPSHOT_SUITE::write_to_file("snapshot_debug_verify_integrity_hash_lhs", lhs_latest);
+         SNAPSHOT_SUITE::write_to_file("snapshot_debug_verify_integrity_hash_rhs", rhs_latest);
       }
       BOOST_REQUIRE_EQUAL(lhs_integrity_hash.str(), rhs_integrity_hash.str());
    }
@@ -181,11 +184,30 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot
 {
    tester chain;
 
-   chain.create_account("snapshot"_n);
+   // Create 2 accounts
+   chain.create_accounts({"snapshot"_n, "snapshot1"_n});
+
+   // Set code and increment the first account
    chain.produce_blocks(1);
-   chain.set_code("snapshot"_n, contracts::snapshot_test_wasm());
-   chain.set_abi("snapshot"_n, contracts::snapshot_test_abi().data());
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
    chain.produce_blocks(1);
+   chain.push_action("snapshot"_n, "increment"_n, "snapshot"_n, mutable_variant_object()
+         ( "value", 1 )
+   );
+
+   // Set code and increment the second account
+   chain.produce_blocks(1);
+   chain.set_code("snapshot1"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot1"_n, test_contracts::snapshot_test_abi());
+   chain.produce_blocks(1);
+   // increment the test contract
+   chain.push_action("snapshot1"_n, "increment"_n, "snapshot1"_n, mutable_variant_object()
+         ( "value", 1 )
+   );
+
+   chain.produce_blocks(1);
+
    chain.control->abort_block();
 
    static const int generation_count = 8;
@@ -202,6 +224,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot
 
       // increment the test contract
       chain.push_action("snapshot"_n, "increment"_n, "snapshot"_n, mutable_variant_object()
+         ( "value", 1 )
+      );
+      chain.push_action("snapshot1"_n, "increment"_n, "snapshot1"_n, mutable_variant_object()
          ( "value", 1 )
       );
 
@@ -224,12 +249,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
    tester chain;
-   const chainbase::bfs::path parent_path = chain.get_config().blocks_dir.parent_path();
+   const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 
    chain.create_account("snapshot"_n);
    chain.produce_blocks(1);
-   chain.set_code("snapshot"_n, contracts::snapshot_test_wasm());
-   chain.set_abi("snapshot"_n, contracts::snapshot_test_abi().data());
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
    chain.produce_blocks(1);
    chain.control->abort_block();
 
@@ -304,7 +329,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapsho
 
    // verifies that chain's block_log has a genesis_state (and blocks starting at 1)
    controller::config copied_config = copy_config_and_files(chain.get_config(), ordinal++);
-   auto genesis = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
+   auto genesis = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
    tester from_block_log_chain(copied_config, *genesis);
    const auto from_block_log_head = from_block_log_chain.control->head_block_num();
@@ -319,12 +344,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapsho
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_chain_id_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
    tester chain;
-   const chainbase::bfs::path parent_path = chain.get_config().blocks_dir.parent_path();
+   const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 
    chain.create_account("snapshot"_n);
    chain.produce_blocks(1);
-   chain.set_code("snapshot"_n, contracts::snapshot_test_wasm());
-   chain.set_abi("snapshot"_n, contracts::snapshot_test_abi().data());
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
    chain.produce_blocks(1);
    chain.control->abort_block();
 
@@ -361,16 +386,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
    bool save_snapshot = false;
    bool generate_log = false;
    std::tie(save_snapshot, generate_log) = get_extra_args();
-   const auto source_log_dir = bfs::path(snapshot_file<snapshot::binary>::base_path);
+   const auto source_log_dir = std::filesystem::path(snapshot_file<snapshot::binary>::base_path);
 
    if (generate_log) {
       ///< Begin deterministic code to generate blockchain for comparison
 
-      tester chain(setup_policy::none, db_read_mode::SPECULATIVE, {legacy_default_max_inline_action_size});
+      tester chain(setup_policy::none, db_read_mode::HEAD, {legacy_default_max_inline_action_size});
       chain.create_account("snapshot"_n);
       chain.produce_blocks(1);
-      chain.set_code("snapshot"_n, contracts::snapshot_test_wasm());
-      chain.set_abi("snapshot"_n, contracts::snapshot_test_abi().data());
+      chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+      chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
       chain.produce_blocks(1);
       chain.control->abort_block();
 
@@ -381,15 +406,17 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
       }
 
       auto source = chain.get_config().blocks_dir / "blocks.log";
-      auto dest = bfs::path(snapshot_file<snapshot::binary>::base_path) / "blocks.log";
-      bfs::copy_file(source, source_log_dir / "blocks.log", bfs::copy_option::overwrite_if_exists);
+      std::filesystem::copy_file(source, source_log_dir / "blocks.log", std::filesystem::copy_options::overwrite_existing);
+      auto source_i = chain.get_config().blocks_dir / "blocks.index";
+      std::filesystem::copy_file(source_i, source_log_dir / "blocks.index", std::filesystem::copy_options::overwrite_existing);
       chain.close();
    }
-
-   auto config = tester::default_config(fc::temp_directory(), legacy_default_max_inline_action_size).first;
-   auto genesis = sysio::chain::block_log::extract_genesis_state(source_log_dir);
-   bfs::create_directories(config.blocks_dir);
-   bfs::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
+   fc::temp_directory temp_dir;
+   auto config = tester::default_config(temp_dir, legacy_default_max_inline_action_size).first;
+   auto genesis = sysio::chain::block_log<signed_block>::extract_genesis_state(source_log_dir);
+   std::filesystem::create_directories(config.blocks_dir);
+   std::filesystem::copy(source_log_dir / "blocks.log", config.blocks_dir / "blocks.log");
+   std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");
    tester base_chain(config, *genesis);
 
    std::string current_version = "v6";
@@ -403,12 +430,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
       BOOST_TEST_CHECKPOINT("loading snapshot: " << version);
       snapshotted_tester old_snapshot_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(old_snapshot), ordinal++);
       verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *old_snapshot_tester.control);
-      
+
       // create a latest snapshot
       auto latest_writer = SNAPSHOT_SUITE::get_writer();
       old_snapshot_tester.control->write_snapshot(latest_writer);
       auto latest = SNAPSHOT_SUITE::finalize(latest_writer);
-      
+
       // load the latest snapshot
       snapshotted_tester latest_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(latest), ordinal++);
       verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *latest_tester.control);
@@ -429,12 +456,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_block_log, SNAPSHOT_SUITE, snapshot_suites)
 {
    tester chain;
-   const chainbase::bfs::path parent_path = chain.get_config().blocks_dir.parent_path();
+   const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 
    chain.create_account("snapshot"_n);
    chain.produce_blocks(1);
-   chain.set_code("snapshot"_n, contracts::snapshot_test_wasm());
-   chain.set_abi("snapshot"_n, contracts::snapshot_test_abi().data());
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
    chain.produce_blocks(1);
    chain.control->abort_block();
 
@@ -451,31 +478,127 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_blo
    }
 
    chain.control->abort_block();
+   {
+      // create a new snapshot child
+      auto writer = SNAPSHOT_SUITE::get_writer();
+      chain.control->write_snapshot(writer);
+      auto snapshot = SNAPSHOT_SUITE::finalize(writer);
 
-   // create a new snapshot child
-   auto writer = SNAPSHOT_SUITE::get_writer();
-   chain.control->write_snapshot(writer);
-   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+      // create a new child at this snapshot
+      int ordinal = 1;
 
-   // create a new child at this snapshot
-   int ordinal = 1;
-   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
-   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
-   auto block = chain.produce_block();
+      snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+      auto block = chain.produce_block();
+      chain.control->abort_block();
+      snap_chain.push_block(block);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+      snap_chain.close();
+      auto cfg = snap_chain.get_config();
+      // restart chain with truncated block log and existing state, but no genesis state (chain_id)
+      snap_chain.open();
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+      block = chain.produce_block();
+      chain.control->abort_block();
+      snap_chain.push_block(block);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+   }
+   // test with empty block log
+   {
+      // create a new snapshot child
+      auto writer = SNAPSHOT_SUITE::get_writer();
+      chain.control->write_snapshot(writer);
+      auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+      // create a new child at this snapshot
+      int ordinal = 2;
+      auto chain_cfg = chain.get_config();
+      chain_cfg.blog = sysio::chain::empty_blocklog_config{}; // use empty block log
+      snapshotted_tester snap_chain(chain_cfg, SNAPSHOT_SUITE::get_reader(snapshot), ordinal++);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+      auto block = chain.produce_block();
+      chain.control->abort_block();
+      snap_chain.push_block(block);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+      snap_chain.close();
+      auto cfg = snap_chain.get_config();
+      // restart chain with truncated block log and existing state, but no genesis state (chain_id)
+      snap_chain.open();
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+      block = chain.produce_block();
+      chain.control->abort_block();
+      snap_chain.push_block(block);
+      verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+   }
+
+}
+
+BOOST_AUTO_TEST_CASE(json_snapshot_validity_test)
+{
+   auto ordinal = 0;
+   tester chain;
+
+   // prep the chain
+   chain.create_account("snapshot"_n);
+   chain.produce_blocks(1);
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
+   chain.produce_blocks(10);
    chain.control->abort_block();
-   snap_chain.push_block(block);
-   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
 
-   snap_chain.close();
-   auto cfg = snap_chain.get_config();
-   // restart chain with truncated block log and existing state, but no genesis state (chain_id)
-   snap_chain.open();
-   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+   auto pid_string = std::to_string(getpid());
+   auto bin_file = pid_string + "BinSnapshot";
+   auto json_file = pid_string + "JsonSnapshot";
+   auto bin_from_json_file = pid_string + "BinFromJsonSnapshot";
 
-   block = chain.produce_block();
-   chain.control->abort_block();
-   snap_chain.push_block(block);
-   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+   // create bin snapshot
+   auto writer_bin = buffered_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer_bin);
+   auto snapshot_bin = buffered_snapshot_suite::finalize(writer_bin);
+   buffered_snapshot_suite::write_to_file(bin_file, snapshot_bin);
+
+   // create json snapshot
+   auto writer_json = json_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer_json);
+   auto snapshot_json = json_snapshot_suite::finalize(writer_json);
+   json_snapshot_suite::write_to_file(json_file, snapshot_json);
+
+   // load bin snapshot
+   auto snapshot_bin_read = buffered_snapshot_suite::load_from_file(bin_file);
+   auto reader_bin = buffered_snapshot_suite::get_reader(snapshot_bin_read);
+   snapshotted_tester tester_bin(chain.get_config(), reader_bin, ordinal++);
+
+   // load json snapshot
+   auto snapshot_json_read = json_snapshot_suite::load_from_file(json_file);
+   auto reader_json = json_snapshot_suite::get_reader(snapshot_json_read);
+   snapshotted_tester tester_json(chain.get_config(), reader_json, ordinal++);
+
+   // create bin snapshot from loaded json snapshot
+   auto writer_bin_from_json = buffered_snapshot_suite::get_writer();
+   tester_json.control->write_snapshot(writer_bin_from_json);
+   auto snapshot_bin_from_json = buffered_snapshot_suite::finalize(writer_bin_from_json);
+   buffered_snapshot_suite::write_to_file(bin_from_json_file, snapshot_bin_from_json);
+
+   // load new bin snapshot
+   auto snapshot_bin_from_json_read = buffered_snapshot_suite::load_from_file(bin_from_json_file);
+   auto reader_bin_from_json = buffered_snapshot_suite::get_reader(snapshot_bin_from_json_read);
+   snapshotted_tester tester_bin_from_json(chain.get_config(), reader_bin_from_json, ordinal++);
+
+   // ensure all snapshots are equal
+   verify_integrity_hash<buffered_snapshot_suite>(*tester_bin_from_json.control, *tester_bin.control);
+   verify_integrity_hash<buffered_snapshot_suite>(*tester_bin_from_json.control, *tester_json.control);
+   verify_integrity_hash<buffered_snapshot_suite>(*tester_json.control, *tester_bin.control);
+
+   auto bin_snap_path = std::filesystem::path(snapshot_file<snapshot::binary>::base_path) / bin_file;
+   auto bin_from_json_snap_path = std::filesystem::path(snapshot_file<snapshot::binary>::base_path) / bin_from_json_file;
+   auto json_snap_path = std::filesystem::path(snapshot_file<snapshot::json>::base_path) / json_file;
+   remove(bin_snap_path);
+   remove(bin_from_json_snap_path);
+   remove(json_snap_path);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

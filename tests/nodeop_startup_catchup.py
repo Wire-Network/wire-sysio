@@ -1,25 +1,20 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-import testUtils
 import time
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from Node import BlockType
-from Node import Node
 import signal
-from TestHelper import AppArgs
-from TestHelper import TestHelper
-
 import decimal
 import math
 import re
 
+from TestHarness import Cluster, Node, TestHelper, Utils, WalletMgr
+from TestHarness.Node import BlockType
+from TestHarness.TestHelper import AppArgs
+
 ###############################################################
 # nodeop_startup_catchup
 #
-#  Test configures a producing node and <--txn-plugins count> non-producing nodes with the
-#  txn_test_gen_plugin.  Each non-producing node starts generating transactions and sending them
+#  Test configures a producing node and <--txn-plugins count> non-producing nodes.
+#  Configures trx_generator(s) and starts generating transactions and sending them
 #  to the producing node.
 #  1) After 10 seconds a new node is started.
 #  2) the node is allowed to catch up to the producing node
@@ -33,60 +28,54 @@ import re
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-from core_symbol import CORE_SYMBOL
-
 appArgs=AppArgs()
 extraArgs = appArgs.add(flag="--catchup-count", type=int, help="How many catchup-nodes to launch", default=10)
 extraArgs = appArgs.add(flag="--txn-gen-nodes", type=int, help="How many transaction generator nodes", default=2)
-args = TestHelper.parse_args({"--prod-count","--dump-error-details","--keep-logs","-v","--leave-running","--clean-run",
-                              "-p","--wallet-port"}, applicationSpecificArgs=appArgs)
+args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running",
+                              "-p","--wallet-port","--unshared"}, applicationSpecificArgs=appArgs)
 Utils.Debug=args.v
 pnodes=args.p if args.p > 0 else 1
 startedNonProdNodes = args.txn_gen_nodes if args.txn_gen_nodes >= 2 else 2
-cluster=Cluster(walletd=True)
+trxGeneratorCnt=startedNonProdNodes
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
-prodCount=args.prod_count if args.prod_count > 1 else 2
-killAll=args.clean_run
+prodCount=2
 walletPort=args.wallet_port
 catchupCount=args.catchup_count if args.catchup_count > 0 else 1
 totalNodes=startedNonProdNodes+pnodes+catchupCount
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
+trxGenLauncher=None
 
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
-    specificExtraNodeopArgs={}
-    txnGenNodeNum=pnodes  # next node after producer nodes
-    for nodeNum in range(txnGenNodeNum, txnGenNodeNum+startedNonProdNodes):
-        specificExtraNodeopArgs[nodeNum]="--plugin sysio::txn_test_gen_plugin --txn-test-gen-account-prefix txntestacct"
-    traceNodeopArgs = " --plugin sysio::trace_api_plugin --trace-no-abis "
     Print("Stand up cluster")
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount,
-                      useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, unstartedNodes=catchupCount, loadSystemContract=False, extraNodeopArgs=traceNodeopArgs) is False:
-        Utils.errorExit("Failed to stand up eos cluster.")
+                      unstartedNodes=catchupCount, loadSystemContract=True,
+                      maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
+        Utils.errorExit("Failed to stand up sys cluster.")
+
+    Print("Create test wallet")
+    wallet = walletMgr.create('txntestwallet')
+    cluster.populateWallet(2, wallet)
+
+    Print("Create test accounts for transactions.")
+    cluster.createAccounts(cluster.sysioAccount, stakedDeposit=0)
+
+    account1Name = cluster.accounts[0].name
+    account2Name = cluster.accounts[1].name
+
+    account1PrivKey = cluster.accounts[0].activePrivateKey
+    account2PrivKey = cluster.accounts[1].activePrivateKey
 
     Print("Validating system accounts after bootstrap")
-    cluster.validateAccounts(None)
-
-    Print("Create txn generate nodes")
-    txnGenNodes=[]
-    for nodeNum in range(txnGenNodeNum, txnGenNodeNum+startedNonProdNodes):
-        txnGenNodes.append(cluster.getNode(nodeNum))
-
-    Print("Create accounts for generated txns")
-    txnGenNodes[0].txnGenCreateTestAccounts(cluster.sysioAccount.name, cluster.sysioAccount.activePrivateKey)
+    cluster.validateAccounts([cluster.accounts[0], cluster.accounts[1]])
 
     def lib(node):
         return node.getBlockNum(BlockType.lib)
@@ -113,41 +102,46 @@ try:
     blockNum=head(node0)
     waitForBlock(node0, blockNum, blockType=BlockType.lib)
 
-    Print("Startup txn generation")
-    period=1500
-    transPerPeriod=150
-    for genNum in range(0, len(txnGenNodes)):
-        salt="%d" % genNum
-        txnGenNodes[genNum].txnGenStart(salt, period, transPerPeriod)
-        time.sleep(1)
+    Print("Configure and launch txn generators")
+    targetTpsPerGenerator = 10
+    testTrxGenDurationSec=60*60
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[account1Name, account2Name],
+                                acctPrivKeysList=[account1PrivKey,account2PrivKey], nodeId=node0.nodeId,
+                                tpsPerGenerator=targetTpsPerGenerator, numGenerators=trxGeneratorCnt, durationSec=testTrxGenDurationSec,
+                                waitToComplete=False)
+
+    status = cluster.waitForTrxGeneratorsSpinup(nodeId=node0.nodeId, numGenerators=trxGeneratorCnt)
+    assert status is not None, "ERROR: Failed to spinup Transaction Generators"
 
     blockNum=head(node0)
     timePerBlock=500
-    blocksPerPeriod=period/timePerBlock
-    transactionsPerBlock=transPerPeriod/blocksPerPeriod
+    transactionsPerBlock=targetTpsPerGenerator*trxGeneratorCnt*timePerBlock/1000
     steadyStateWait=20
     startBlockNum=blockNum+steadyStateWait
     numBlocks=20
     endBlockNum=startBlockNum+numBlocks
     waitForBlock(node0, endBlockNum)
-    transactions=0
-    avg=0
-    for blockNum in range(startBlockNum, endBlockNum):
-        block=node0.getBlock(blockNum)
-        transactions+=len(block["transactions"])
+    steadyStateWindowTrxs=0
+    steadyStateAvg=0
+    steadyStateWindowBlks=0
+    for bNum in range(startBlockNum, endBlockNum):
+        steadyStateWindowBlks=steadyStateWindowBlks+1
+        block=node0.getBlock(bNum)
+        steadyStateWindowTrxs+=len(block["transactions"])
 
-    avg=transactions / (blockNum - startBlockNum + 1)
+    steadyStateAvg=steadyStateWindowTrxs / steadyStateWindowBlks
 
     Print("Validate transactions are generating")
-    minRequiredTransactions=transactionsPerBlock
-    assert avg>minRequiredTransactions, "Expected to at least receive %s transactions per block, but only getting %s" % (minRequiredTransactions, avg)
+    minReqPctLeeway=0.9
+    minRequiredTransactions=minReqPctLeeway*transactionsPerBlock
+    assert steadyStateAvg>=minRequiredTransactions, "Expected to at least receive %s transactions per block, but only getting %s" % (minRequiredTransactions, steadyStateAvg)
 
     Print("Cycle through catchup scenarios")
     twoRounds=21*2*12
     twoRoundsTimeout=(twoRounds/2 + 10)  #2 rounds in seconds + some leeway
     for catchup_num in range(0, catchupCount):
         Print("Start catchup node")
-        cluster.launchUnstarted(cachePopen=True)
+        cluster.launchUnstarted()
         lastLibNum=lib(node0)
         # verify producer lib is still advancing
         waitForBlock(node0, lastLibNum+1, timeout=twoRoundsTimeout, blockType=BlockType.lib)
@@ -176,7 +170,10 @@ try:
             waitForBlock(node0, catchupHead+5, timeout=twoRoundsTimeout*2, blockType=BlockType.lib)
 
         Print("Restart catchup node")
-        catchupNode.relaunch(cachePopen=True)
+        addSwapFlags = None
+        if catchup_num % 3 == 0:
+            addSwapFlags = {"--block-log-retain-blocks": "0", "--delete-all": ""}
+        catchupNode.relaunch(skipGenesis=False, addSwapFlags=addSwapFlags)
         waitForNodeStarted(catchupNode)
         lastCatchupLibNum=lib(catchupNode)
 
@@ -195,10 +192,16 @@ try:
         catchupNode.interruptAndVerifyExitStatus(60)
         catchupNode.popenProc=None
 
+        logFile = Utils.getNodeDataDir(catchupNodeNum) + "/stderr.txt"
+        f = open(logFile)
+        contents = f.read()
+        if contents.count("3030001 unlinkable_block_exception: Unlinkable block") > 10: # a few are fine
+            errorExit(f"Node{catchupNodeNum} has unlinkable blocks: {logFile}.")
+
     testSuccessful=True
 
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

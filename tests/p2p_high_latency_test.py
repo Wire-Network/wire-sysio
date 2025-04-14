@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-from testUtils import Utils, WaitSpec
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from TestHelper import TestHelper
+
 import signal
 import platform
 import subprocess
 import time
 import re
+
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness.testUtils import WaitSpec
+from os import getpid
+from pathlib import Path
 
 ###############################################################
 # p2p connection in high latency network for one producer and one syning node cluster.
@@ -19,8 +21,8 @@ import re
 #   loop of sending lib catch up to syncing node.
 ###############################################################
 
-def readlogs(node_num, net_latency):
-    filename = 'var/lib/node_0{}/stderr.txt'.format(node_num)
+def readlogs(node_num, net_latency, nodeopLogPath):
+    filename = nodeopLogPath
     f = subprocess.Popen(['tail','-F',filename], \
                          stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     latRegex = re.compile(r'\d+ms')
@@ -46,20 +48,16 @@ def exec(cmd):
 
 Print=Utils.Print
 
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--clean-run"})
+args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--unshared"})
 Utils.Debug=args.v
 
 producers=1
 syncingNodes=1
 totalNodes=producers+syncingNodes
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
-killAll=args.clean_run
 
 testSuccessful=False
-killEosInstances=not dontKill
 
 specificExtraNodeopArgs={}
 producerNodeId=0
@@ -70,13 +68,10 @@ specificExtraNodeopArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(98
 
 try:
     TestHelper.printSystemInfo("BEGIN")
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
-    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis --plugin sysio::producer_plugin --produce-time-offset-us 0 --last-block-time-offset-us 0 --cpu-effort-percent 100 \
-        --last-block-cpu-effort-percent 100 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
-    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
+    traceNodeopArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
+    if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     cluster.waitOnClusterSync(blockAdvancing=5)
     Utils.Print("Cluster in Sync")
@@ -96,7 +91,7 @@ try:
         print(err.decode("utf-8")) # print error details of network slowdown initialization commands
         Utils.errorExit("failed to initialize network latency, exited with error code {}".format(ReturnCode))
         # processing logs to make sure syncing node doesn't get into lib catch up mode.
-    testSuccessful=readlogs(syncingNodeId, latency)
+    testSuccessful=readlogs(syncingNodeId, latency, cluster.nodeopLogPath)
     if platform.system() == 'Darwin':
         cmd = 'sudo pfctl -f /etc/pf.conf && \
             sudo dnctl -q flush && sudo pfctl -d'
@@ -107,7 +102,7 @@ try:
         print(err.decode("utf-8")) # print error details of network slowdown termination commands
         Utils.errorExit("failed to remove network latency, exited with error code {}".format(ReturnCode))
 finally:
-    TestHelper.shutdown(cluster, None, testSuccessful, killEosInstances, False, keepLogs, killAll, dumpErrorDetails)
+    TestHelper.shutdown(cluster, None, testSuccessful, dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from TestHelper import TestHelper
-
 import random
+
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
 ###############################################################
 # restart-scenarios-test
@@ -21,7 +18,7 @@ Print=Utils.Print
 errorExit=Utils.errorExit
 
 args=TestHelper.parse_args({"-p","-d","-s","-c","--kill-sig","--kill-count","--keep-logs"
-                            ,"--dump-error-details","-v","--leave-running","--clean-run"})
+                            ,"--dump-error-details","-v","--leave-running","--unshared"})
 pnodes=args.p
 topo=args.s
 delay=args.d
@@ -30,17 +27,14 @@ debug=args.v
 total_nodes = pnodes
 killCount=args.kill_count if args.kill_count > 0 else 1
 killSignal=args.kill_sig
-killEosInstances= not args.leave_running
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-killAll=args.clean_run
 
 seed=1
 Utils.Debug=debug
 testSuccessful=False
 
 random.seed(seed) # Use a fixed seed for repeatability.
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 walletMgr=WalletMgr(True)
 
 try:
@@ -50,18 +44,12 @@ try:
     cluster.setChainStrategy(chainSyncStrategyStr)
     cluster.setWalletMgr(walletMgr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
-    walletMgr.killall(allInstances=killAll)
-    walletMgr.cleanup()
-
     Print ("producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d, chain sync strategy: %s" % (
     pnodes, topo, delay, chainSyncStrategyStr))
 
     Print("Stand up cluster")
-    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeopArgs=traceNodeopArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay) is False:
+        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -94,8 +82,8 @@ try:
         errorExit("Cluster sync wait failed.")
 
     Print("Kill %d cluster node instances." % (killCount))
-    if cluster.killSomeEosInstances(killCount, killSignal) is False:
-        errorExit("Failed to kill Eos instances")
+    if cluster.killSomeSysInstances(killCount, killSignal) is False:
+        errorExit("Failed to kill Sys instances")
     Print("nodeop instances killed.")
 
     Print("Spread funds and validate")
@@ -107,8 +95,8 @@ try:
         errorExit("Cluster sync wait failed.")
 
     Print ("Relaunch dead cluster nodes instances.")
-    if cluster.relaunchEosInstances(cachePopen=True) is False:
-        errorExit("Failed to relaunch Eos instances")
+    if cluster.relaunchSysInstances() is False:
+        errorExit("Failed to relaunch Sys instances")
     Print("nodeop instances relaunched.")
 
     Print ("Resyncing cluster nodes.")
@@ -124,7 +112,7 @@ try:
     if not cluster.waitOnClusterSync():
         errorExit("Cluster sync wait failed.")
 
-    if killEosInstances:
+    if not args.leave_running:
         atLeastOne=False
         for node in cluster.getNodes():
             if node.popenProc is not None:
@@ -134,7 +122,7 @@ try:
 
     testSuccessful=True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killEosInstances, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

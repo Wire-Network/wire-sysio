@@ -1,0 +1,16 @@
+name: 'Parallel ctest'
+description: 'Runs a set of labeled ctests in parallel via multiple docker containers'
+inputs:
+  container:
+    required: true
+  error-log-paths:
+    required: true
+  log-tarball-prefix:
+    required: true
+  tests-label:
+    required: true
+  test-timeout:
+    required: true
+runs:
+  using: 'node20'
+  main: 'dist/index.mjs'

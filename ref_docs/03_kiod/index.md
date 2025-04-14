@@ -8,7 +8,7 @@ content_title: Kiod
 
 ## Installation
 
-`kiod` is distributed as part of the [Antelope software suite](https://github.com/AntelopeIO/wire_sysio). To install `kiod` just visit the [Antelope Software Installation](../00_install/index.md) section.
+`kiod` is distributed as part of the [Antelope software suite](https://github.com/AntelopeIO/leap). To install `kiod` just visit the [Antelope Software Installation](../00_install/index.md) section.
 
 ## Operation
 

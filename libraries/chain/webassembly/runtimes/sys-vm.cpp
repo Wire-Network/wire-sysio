@@ -1,5 +1,6 @@
 #include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/global_property_object.hpp>
@@ -13,7 +14,7 @@
 #include <boost/hana/string.hpp>
 #include <boost/hana/equal.hpp>
 
-namespace sysio { namespace chain { namespace webassembly { namespace eos_vm_runtime {
+namespace sysio { namespace chain { namespace webassembly { namespace sys_vm_runtime {
 
 using namespace sysio::vm;
 
@@ -64,9 +65,9 @@ struct setcode_options {
 void validate(const bytes& code, const whitelisted_intrinsics_type& intrinsics) {
    wasm_code_ptr code_ptr((uint8_t*)code.data(), code.size());
    try {
-      eos_vm_null_backend_t<setcode_options> bkend(code_ptr, code.size(), nullptr);
+      sys_vm_null_backend_t<setcode_options> bkend(code_ptr, code.size(), nullptr);
       // check import signatures
-       eos_vm_host_functions_t::resolve(bkend.get_module());
+       sys_vm_host_functions_t::resolve(bkend.get_module());
       // check that the imports are all currently enabled
       const auto& imports = bkend.get_module().imports;
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
@@ -85,9 +86,9 @@ void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intr
    SYS_ASSERT(code.size() <= cfg.max_module_bytes, wasm_serialization_error, "Code too large");
    wasm_code_ptr code_ptr((uint8_t*)code.data(), code.size());
    try {
-      eos_vm_null_backend_t<wasm_config> bkend(code_ptr, code.size(), nullptr, cfg);
+      sys_vm_null_backend_t<wasm_config> bkend(code_ptr, code.size(), nullptr, cfg);
       // check import signatures
-      eos_vm_host_functions_t::resolve(bkend.get_module());
+      sys_vm_host_functions_t::resolve(bkend.get_module());
       // check that the imports are all currently enabled
       const auto& imports = bkend.get_module().imports;
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
@@ -119,17 +120,28 @@ struct apply_options {
 };
 
 template<typename Impl>
-class eos_vm_instantiated_module : public wasm_instantiated_module_interface {
-   using backend_t = eos_vm_backend_t<Impl>;
+class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
+   using backend_t = sys_vm_backend_t<Impl>;
    public:
 
-      eos_vm_instantiated_module(eos_vm_runtime<Impl>* runtime, std::unique_ptr<backend_t> mod) :
+      sys_vm_instantiated_module(sys_vm_runtime<Impl>* runtime, std::unique_ptr<backend_t> mod) :
          _runtime(runtime),
          _instantiated_module(std::move(mod)) {}
 
       void apply(apply_context& context) override {
-         _instantiated_module->set_wasm_allocator(&context.control.get_wasm_allocator());
-         _runtime->_bkend = _instantiated_module.get();
+         // set up backend to share the compiled mod in the instantiated
+         // module of the contract
+         _runtime->_bkend.share(*_instantiated_module);
+         // set exec ctx's mod to instantiated module's mod
+         _runtime->_exec_ctx.set_module(&(_instantiated_module->get_module()));
+         // link exe ctx to backend
+         _runtime->_bkend.set_context(&_runtime->_exec_ctx);
+         // set max_call_depth and max_pages to original values
+         _runtime->_bkend.reset_max_call_depth();
+         _runtime->_bkend.reset_max_pages();
+         // set wasm allocator per apply data
+         _runtime->_bkend.set_wasm_allocator(&context.control.get_wasm_allocator());
+
          apply_options opts;
          if(context.control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
             const wasm_config& config = context.control.get_global_properties().wasm_configuration;
@@ -137,8 +149,8 @@ class eos_vm_instantiated_module : public wasm_instantiated_module_interface {
          }
          auto fn = [&]() {
             sysio::chain::webassembly::interface iface(context);
-            _runtime->_bkend->initialize(&iface, opts);
-            _runtime->_bkend->call(
+            _runtime->_bkend.initialize(&iface, opts);
+            _runtime->_bkend.call(
                 iface, "env", "apply",
                 context.get_receiver().to_uint64_t(),
                 context.get_action().account.to_uint64_t(),
@@ -146,7 +158,7 @@ class eos_vm_instantiated_module : public wasm_instantiated_module_interface {
          };
          try {
             checktime_watchdog wd(context.trx_context.transaction_timer);
-            _runtime->_bkend->timed_run(wd, fn);
+            _runtime->_bkend.timed_run(wd, fn);
          } catch(sysio::vm::timeout_exception&) {
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
@@ -154,19 +166,18 @@ class eos_vm_instantiated_module : public wasm_instantiated_module_interface {
          } catch(sysio::vm::exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure");
          }
-         _runtime->_bkend = nullptr;
       }
 
    private:
-      eos_vm_runtime<Impl>*            _runtime;
+      sys_vm_runtime<Impl>*            _runtime;
       std::unique_ptr<backend_t> _instantiated_module;
 };
 
 #ifdef __x86_64__
-class eos_vm_profiling_module : public wasm_instantiated_module_interface {
-      using backend_t = sysio::vm::backend<eos_vm_host_functions_t, sysio::vm::jit_profile, webassembly::eos_vm_runtime::apply_options, vm::profile_instr_map>;
+class sys_vm_profiling_module : public wasm_instantiated_module_interface {
+      using backend_t = sysio::vm::backend<sys_vm_host_functions_t, sysio::vm::jit_profile, webassembly::sys_vm_runtime::apply_options, vm::profile_instr_map>;
    public:
-      eos_vm_profiling_module(std::unique_ptr<backend_t> mod, const char * code, std::size_t code_size) :
+      sys_vm_profiling_module(std::unique_ptr<backend_t> mod, const char * code, std::size_t code_size) :
          _instantiated_module(std::move(mod)),
          _original_code(code, code + code_size) {}
 
@@ -201,10 +212,6 @@ class eos_vm_profiling_module : public wasm_instantiated_module_interface {
          }
       }
 
-      void fast_shutdown() override {
-         _prof.clear();
-      }
-
       profile_data* start(apply_context& context) {
          name account = context.get_receiver();
          if(!context.control.is_profiling(account)) return nullptr;
@@ -231,68 +238,69 @@ class eos_vm_profiling_module : public wasm_instantiated_module_interface {
 #endif
 
 template<typename Impl>
-eos_vm_runtime<Impl>::eos_vm_runtime() {}
+sys_vm_runtime<Impl>::sys_vm_runtime() {}
 
 template<typename Impl>
-void eos_vm_runtime<Impl>::immediately_exit_currently_running_module() {
-   throw wasm_exit{};
-}
-
-template<typename Impl>
-std::unique_ptr<wasm_instantiated_module_interface> eos_vm_runtime<Impl>::instantiate_module(const char* code_bytes, size_t code_size, std::vector<uint8_t>,
+std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instantiate_module(const char* code_bytes, size_t code_size,
                                                                                              const digest_type&, const uint8_t&, const uint8_t&) {
 
-   using backend_t = eos_vm_backend_t<Impl>;
+   using backend_t = sys_vm_backend_t<Impl>;
    try {
       wasm_code_ptr code((uint8_t*)code_bytes, code_size);
       apply_options options = { .max_pages = 65536,
                                 .max_call_depth = 0 };
-      std::unique_ptr<backend_t> bkend = std::make_unique<backend_t>(code, code_size, nullptr, options);
-      eos_vm_host_functions_t::resolve(bkend->get_module());
-      return std::make_unique<eos_vm_instantiated_module<Impl>>(this, std::move(bkend));
+      std::unique_ptr<backend_t> bkend = nullptr;
+#ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
+      if constexpr (std::is_same_v<Impl, sysio::vm::jit>)
+         bkend = std::make_unique<backend_t>(code, code_size, nullptr, options, true, false); // true, false <--> single parsing, backend does not own execution context (execution context is reused per thread)
+      else
+#endif
+         bkend = std::make_unique<backend_t>(code, code_size, nullptr, options, false, false); // false, false <--> 2-passes parsing, backend does not own execution context (execution context is reused per thread)
+      sys_vm_host_functions_t::resolve(bkend->get_module());
+      return std::make_unique<sys_vm_instantiated_module<Impl>>(this, std::move(bkend));
    } catch(sysio::vm::exception& e) {
       FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
    }
 }
 
-template class eos_vm_runtime<sysio::vm::interpreter>;
+template class sys_vm_runtime<sysio::vm::interpreter>;
 #ifdef __x86_64__
-template class eos_vm_runtime<sysio::vm::jit>;
+template class sys_vm_runtime<sysio::vm::jit>;
 
-eos_vm_profile_runtime::eos_vm_profile_runtime() {}
+sys_vm_profile_runtime::sys_vm_profile_runtime() {}
 
-void eos_vm_profile_runtime::immediately_exit_currently_running_module() {
-   throw wasm_exit{};
-}
-
-std::unique_ptr<wasm_instantiated_module_interface> eos_vm_profile_runtime::instantiate_module(const char* code_bytes, size_t code_size, std::vector<uint8_t>,
+std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::instantiate_module(const char* code_bytes, size_t code_size,
                                                                                                const digest_type&, const uint8_t&, const uint8_t&) {
 
-   using backend_t = sysio::vm::backend<eos_vm_host_functions_t, sysio::vm::jit_profile, webassembly::eos_vm_runtime::apply_options, vm::profile_instr_map>;
+   using backend_t = sysio::vm::backend<sys_vm_host_functions_t, sysio::vm::jit_profile, webassembly::sys_vm_runtime::apply_options, vm::profile_instr_map>;
    try {
       wasm_code_ptr code((uint8_t*)code_bytes, code_size);
       apply_options options = { .max_pages = 65536,
                                 .max_call_depth = 0 };
-      std::unique_ptr<backend_t> bkend = std::make_unique<backend_t>(code, code_size, nullptr, options);
-      eos_vm_host_functions_t::resolve(bkend->get_module());
-      return std::make_unique<eos_vm_profiling_module>(std::move(bkend), code_bytes, code_size);
+      std::unique_ptr<backend_t> bkend = std::make_unique<backend_t>(code, code_size, nullptr, options, true, false); // true, false <--> single parsing, backend does not own execution context (execution context is reused per thread)
+      sys_vm_host_functions_t::resolve(bkend->get_module());
+      return std::make_unique<sys_vm_profiling_module>(std::move(bkend), code_bytes, code_size);
    } catch(sysio::vm::exception& e) {
       FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
    }
 }
 #endif
 
+template<typename Impl>
+thread_local typename sys_vm_runtime<Impl>::context_t sys_vm_runtime<Impl>::_exec_ctx;
+template<typename Impl>
+thread_local sys_vm_backend_t<Impl> sys_vm_runtime<Impl>::_bkend;
 }
 
 template <auto HostFunction, typename... Preconditions>
 struct host_function_registrator {
    template <typename Mod, typename Name>
    constexpr host_function_registrator(Mod mod_name, Name fn_name) {
-      using rhf_t = eos_vm_host_functions_t;
+      using rhf_t = sys_vm_host_functions_t;
       rhf_t::add<HostFunction, Preconditions...>(mod_name.c_str(), fn_name.c_str());
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
       constexpr bool is_injected = (Mod() == BOOST_HANA_STRING(SYSIO_INJECTED_MODULE_NAME));
-      eosvmoc::register_eosvm_oc<HostFunction, is_injected, std::tuple<Preconditions...>>(
+      sysvmoc::register_sysvm_oc<HostFunction, is_injected, std::tuple<Preconditions...>>(
           mod_name + BOOST_HANA_STRING(".") + fn_name);
 #endif
    }
@@ -628,6 +636,18 @@ REGISTER_CF_HOST_FUNCTION( mod_exp );
 REGISTER_CF_HOST_FUNCTION( blake2_f );
 REGISTER_CF_HOST_FUNCTION( sha3 );
 REGISTER_CF_HOST_FUNCTION( k1_recover );
+
+// bls_primitives protocol feature
+REGISTER_CF_HOST_FUNCTION( bls_g1_add );
+REGISTER_CF_HOST_FUNCTION( bls_g2_add );
+REGISTER_CF_HOST_FUNCTION( bls_g1_weighted_sum );
+REGISTER_CF_HOST_FUNCTION( bls_g2_weighted_sum );
+REGISTER_CF_HOST_FUNCTION( bls_pairing );
+REGISTER_CF_HOST_FUNCTION( bls_g1_map );
+REGISTER_CF_HOST_FUNCTION( bls_g2_map );
+REGISTER_CF_HOST_FUNCTION( bls_fp_mod );
+REGISTER_CF_HOST_FUNCTION( bls_fp_mul );
+REGISTER_CF_HOST_FUNCTION( bls_fp_exp ); 
 
 } // namespace webassembly
 } // namespace chain

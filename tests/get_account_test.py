@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
 
-from core_symbol import CORE_SYMBOL
-from testUtils import Account
-from testUtils import Utils
-from testUtils import ReturnType
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from TestHelper import TestHelper
-
 import random
+
+from TestHarness import Account, Cluster, ReturnType, TestHelper, Utils, WalletMgr
 
 ###############################################################
 # get_account_test
@@ -22,7 +16,7 @@ errorExit=Utils.errorExit
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
                             ,"--dump-error-details","-v","--leave-running"
-                            ,"--clean-run","--keep-logs"})
+                            ,"--keep-logs","--unshared"})
 
 pnodes=args.p
 topo=args.s
@@ -32,21 +26,13 @@ debug=args.v
 nodesFile=args.nodes_file
 dontLaunch=nodesFile is not None
 seed=args.seed
-dontKill=args.leave_running
 dumpErrorDetails=args.dump_error_details
-killAll=args.clean_run
-keepLogs=args.keep_logs
-
-killWallet=not dontKill
-killEosInstances=not dontKill
-if nodesFile is not None:
-    killEosInstances=False
 
 Utils.Debug=debug
 testSuccessful=False
 
 random.seed(seed) # Use a fixed seed for repeatability.
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True)
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
@@ -61,21 +47,16 @@ try:
             errorExit("Failed to initilize nodes from Json string.")
         total_nodes=len(cluster.getNodes())
 
-        walletMgr.killall(allInstances=killAll)
-        walletMgr.cleanup()
         print("Stand up walletd")
         if walletMgr.launch() is False:
             errorExit("Failed to stand up kiod.")
-        else:
-            cluster.killall(allInstances=killAll)
-            cluster.cleanup()
 
     Print ("producing nodes: %s, non-producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d" % (pnodes, total_nodes-pnodes, topo, delay))
 
     Print("Stand up cluster")
-    extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false --plugin sysio::trace_api_plugin --trace-no-abis "
+    extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,extraNodeopArgs=extraNodeopArgs ) is False:
-       errorExit("Failed to stand up eos cluster.")
+       errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
     # wait for cluster to start producing blocks
@@ -103,7 +84,7 @@ try:
 
     testSuccessful = True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful, killEosInstances, killWallet, keepLogs, killAll, dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)
 
 errorCode = 0 if testSuccessful else 1
 exit(errorCode)

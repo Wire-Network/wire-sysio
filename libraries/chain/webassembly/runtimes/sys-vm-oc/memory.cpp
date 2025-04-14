@@ -9,12 +9,12 @@
 #include <sys/mman.h>
 #include <linux/memfd.h>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
-memory::memory(uint64_t max_pages) {
-   uint64_t number_slices = max_pages + 1;
-   uint64_t wasm_memory_size = max_pages * wasm_constraints::wasm_page_size;
-   int fd = syscall(SYS_memfd_create, "eosvmoc_mem", MFD_CLOEXEC);
+memory::memory(uint64_t sliced_pages) {
+   uint64_t number_slices = sliced_pages + 1;
+   uint64_t wasm_memory_size = sliced_pages * wasm_constraints::wasm_page_size;
+   int fd = syscall(SYS_memfd_create, "sysvmoc_mem", MFD_CLOEXEC);
    FC_ASSERT(fd >= 0, "Failed to create memory memfd");
    auto cleanup_fd = fc::make_scoped_exit([&fd](){close(fd);});
    int ret = ftruncate(fd, wasm_memory_size+memory_prologue_size);
@@ -25,7 +25,7 @@ memory::memory(uint64_t max_pages) {
    FC_ASSERT(mapbase != MAP_FAILED, "Failed to mmap memory");
 
    uint8_t* next_slice = mapbase;
-   uint8_t* last;
+   uint8_t* last = nullptr;
 
    for(unsigned int p = 0; p < number_slices; ++p) {
       last = (uint8_t*)mmap(next_slice, memory_prologue_size+64u*1024u*p, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0);
@@ -33,6 +33,7 @@ memory::memory(uint64_t max_pages) {
       next_slice += total_memory_per_slice;
    }
 
+   FC_ASSERT(last != nullptr, "expected last not nullptr");
    zeropage_base = mapbase + memory_prologue_size;
    fullpage_base = last + memory_prologue_size;
 
@@ -41,16 +42,6 @@ memory::memory(uint64_t max_pages) {
    const intrinsic_map_t& intrinsics = get_intrinsic_map();
    for(const auto& intrinsic : intrinsics)
       intrinsic_jump_table[-intrinsic.second.ordinal] = (uintptr_t)intrinsic.second.function_ptr;
-}
-
-void memory::reset(uint64_t max_pages) {
-   uint64_t old_max_pages = mapsize / memory::total_memory_per_slice - 1;
-   if(max_pages == old_max_pages) return;
-   memory new_memory{max_pages};
-   std::swap(mapbase, new_memory.mapbase);
-   std::swap(mapsize, new_memory.mapsize);
-   std::swap(zeropage_base, new_memory.zeropage_base);
-   std::swap(fullpage_base, new_memory.fullpage_base);
 }
 
 memory::~memory() {

@@ -1,4 +1,5 @@
-#include <sysio/sysio.hpp>
+ #include <sysio/sysio.hpp>
+ #include <sysio/print.hpp>
 
 #include "test_api.hpp"
 

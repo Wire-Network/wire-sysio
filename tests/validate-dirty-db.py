@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from Cluster import Cluster
-from TestHelper import TestHelper
-
 import random
 import subprocess
 import signal
+
+from TestHarness import Cluster, TestHelper, Utils
+from os import getpid
+from pathlib import Path
 
 ###############################################################
 # validate-dirty-db
@@ -19,7 +19,7 @@ import signal
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-args = TestHelper.parse_args({"--keep-logs","--dump-error-details","-v","--leave-running","--clean-run"})
+args = TestHelper.parse_args({"--keep-logs","--dump-error-details","-v","--leave-running","--unshared"})
 debug=args.v
 pnodes=1
 topo="mesh"
@@ -29,19 +29,16 @@ total_nodes = pnodes
 killCount=1
 killSignal=Utils.SigKillTag
 
-killEosInstances= not args.leave_running
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-killAll=args.clean_run
 
 seed=1
 Utils.Debug=debug
 testSuccessful=False
 
-def runNodeopAndGetOutput(myTimeout=3):
+def runNodeopAndGetOutput(myTimeout=3, nodeopLogPath=f"{Utils.TestLogRoot}"):
     """Startup nodeop, wait for timeout (before forced shutdown) and collect output. Stdout, stderr and return code are returned in a dictionary."""
     Print("Launching nodeop process.")
-    cmd="programs/nodeop/nodeop --config-dir etc/sysio/node_bios --data-dir var/lib/node_bios --verbose-http-errors --http-validate-host=false --resource-monitor-not-shutdown-on-threshold-exceeded"
+    cmd=f"programs/nodeop/nodeop --config-dir etc/sysio/node_bios --data-dir {nodeopLogPath}/node_bios --verbose-http-errors --http-validate-host=false --resource-monitor-not-shutdown-on-threshold-exceeded"
     Print("cmd: %s" % (cmd))
     proc=subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if debug: Print("Nodeop process launched.")
@@ -63,34 +60,33 @@ def runNodeopAndGetOutput(myTimeout=3):
     return (True, output)
 
 random.seed(seed) # Use a fixed seed for repeatability.
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 
 try:
     TestHelper.printSystemInfo("BEGIN")
 
     cluster.setChainStrategy(chainSyncStrategyStr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
-
     Print ("producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d, chain sync strategy: %s" % (
         pnodes, topo, delay, chainSyncStrategyStr))
 
     Print("Stand up cluster")
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, dontBootstrap=True) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     node=cluster.getNode(0)
 
     Print("Kill cluster nodes.")
-    cluster.killall(allInstances=killAll)
+    for node in cluster.nodes:
+        node.kill(signal.SIGKILL)
+    cluster.biosNode.kill(signal.SIGKILL)
 
     Print("Restart nodeop repeatedly to ensure dirty database flag sticks.")
     timeout=6
 
     for i in range(1,4):
         Print("Attempt %d." % (i))
-        ret = runNodeopAndGetOutput(timeout)
+        ret = runNodeopAndGetOutput(timeout, cluster.nodeopLogPath)
         assert(ret)
         assert(isinstance(ret, tuple))
         if not ret[0]:
@@ -111,7 +107,7 @@ try:
     testSuccessful=True
 finally:
     if debug: Print("Cleanup in finally block.")
-    TestHelper.shutdown(cluster, None, testSuccessful, killEosInstances, False, keepLogs, killAll, dumpErrorDetails)
+    TestHelper.shutdown(cluster, None, testSuccessful, dumpErrorDetails)
 
 if debug: Print("Exiting test, exit value 0.")
 

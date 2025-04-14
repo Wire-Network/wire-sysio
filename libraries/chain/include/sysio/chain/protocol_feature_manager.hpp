@@ -36,6 +36,10 @@ enum class builtin_protocol_feature_t : uint32_t {
    crypto_primitives = 19,
    get_block_num = 20,
    em_key = 21,
+   bls_primitives = 22,
+   disable_deferred_trxs_stage_1 = 23,
+   disable_deferred_trxs_stage_2 = 24,
+   disable_compression_in_transaction_merkle = 25,
    reserved_private_fork_protocol_features = 500000,
 };
 
@@ -265,7 +269,7 @@ protected:
 class protocol_feature_manager {
 public:
 
-   protocol_feature_manager( protocol_feature_set&& pfs, std::function<deep_mind_handler*()> get_deep_mind_logger );
+   protocol_feature_manager( protocol_feature_set&& pfs, std::function<deep_mind_handler*(bool is_trx_transient)> get_deep_mind_logger );
 
    class const_iterator {
    public:
@@ -394,8 +398,11 @@ protected:
    bool                                   _initialized = false;
 
 private:
-   std::function<deep_mind_handler*()>           _get_deep_mind_logger;
+   std::function<deep_mind_handler*(bool is_trx_transient)> _get_deep_mind_logger;
 };
+
+std::optional<builtin_protocol_feature> read_builtin_protocol_feature( const std::filesystem::path& p  );
+protocol_feature_set initialize_protocol_features( const std::filesystem::path& p, bool populate_missing_builtins = true );
 
 } } // namespace sysio::chain
 

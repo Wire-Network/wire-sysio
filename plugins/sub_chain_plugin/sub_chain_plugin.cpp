@@ -8,7 +8,7 @@
 #include <fc/log/logger_config.hpp>
 
 namespace sysio {
-    static appbase::abstract_plugin& _sub_chain_plugin = app().register_plugin<sub_chain_plugin>();
+   static auto _sub_chain_plugin = application::register_plugin<sub_chain_plugin>();
 
 using namespace chain;
 
@@ -18,7 +18,7 @@ sub_chain_plugin::~sub_chain_plugin() {}
 void sub_chain_plugin::set_program_options(options_description&, options_description& cfg) {
     cfg.add_options()
         ("s-chain-contract", bpo::value<std::string>()->default_value("settle.wns"), "Contract name for identifying relevant S-transactions.")
-        ("s-chain-actions", bpo::value<std::vector<std::string>>()->multitoken()->composing(), "List of action names for relevant S-transactions for a given s-chain-contract");
+        ("s-chain-actions", bpo::value<std::vector<std::string>>()->composing(), "List of action names for relevant S-transactions for a given s-chain-contract");
 }
 void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    try {
@@ -44,15 +44,17 @@ void sub_chain_plugin::plugin_startup() {
     ilog("sub_chain_plugin starting up, adding /v3/sub_chain/get_last_s_id");
 
     app().get_plugin<http_plugin>().add_api({
-        {"/v3/sub_chain/get_last_s_id", [this](string, string body, auto cb) { // Ensure correct use of auto for callback type inference
+        {"/v3/sub_chain/get_last_s_id",
+         api_category::chain_ro,
+         [this](string&&, string&& body, auto&& cb) mutable { // Ensure correct use of auto for callback type inference
             try {
                 checksum256_type last_s_id = get_prev_s_id();
-                cb(200, last_s_id.str()); 
+                cb(200, last_s_id.str());
             } catch (fc::exception& e) {
                 cb(500, "{\"error\": \"internal_error\", \"details\": \"" + e.to_detail_string() + "\"}");
             }
-        }}
-    });
+        }
+        }}, appbase::exec_queue::read_only);
 }
 void sub_chain_plugin::plugin_shutdown() {
     ilog("sub_chain_plugin shutting down");
@@ -88,7 +90,9 @@ checksum256_type sub_chain_plugin::calculate_s_root(const std::vector<transactio
       s_leaves.emplace_back( trx.id() );
    }
    // Create and return the merkle S-Root 
-   return merkle( move(s_leaves) );
+   // return merkle( std::move(s_leaves) );
+   return merkle(sysio::chain::deque<fc::sha256>(s_leaves.begin(), s_leaves.end()));
+
 }
 
 /**

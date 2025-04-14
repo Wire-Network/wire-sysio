@@ -16,7 +16,7 @@ using namespace sysio::trace_api::configuration_utils;
 using boost::signals2::scoped_connection;
 
 namespace {
-   appbase::abstract_plugin& plugin_reg = app().register_plugin<trace_api_plugin>();
+   static auto plugin_reg = application::register_plugin<trace_api_plugin>();
 
    const std::string logger_name("trace_api");
    fc::logger _log;
@@ -70,7 +70,7 @@ namespace {
 
    template<typename Store>
    struct shared_store_provider {
-      shared_store_provider(const std::shared_ptr<Store>& store)
+      explicit shared_store_provider(const std::shared_ptr<Store>& store)
       :store(store)
       {}
 
@@ -83,8 +83,8 @@ namespace {
          store->append_lib(new_lib);
       }
 
-      get_block_t get_block(uint32_t height, const yield_function& yield) {
-         return store->get_block(height, yield);
+      get_block_t get_block(uint32_t height) {
+         return store->get_block(height);
       }
 
       void append_trx_ids(block_trxs_entry tt){
@@ -103,7 +103,7 @@ namespace sysio {
 struct trace_api_common_impl {
    static void set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
       auto cfg_options = cfg.add_options();
-      cfg_options("trace-dir", bpo::value<bfs::path>()->default_value("traces"),
+      cfg_options("trace-dir", bpo::value<std::filesystem::path>()->default_value("traces"),
                   "the location of the trace directory (absolute path or relative to application data dir)");
       cfg_options("trace-slice-stride", bpo::value<uint32_t>()->default_value(10'000),
                   "the number of blocks each \"slice\" of trace data will contain on the filesystem");
@@ -116,7 +116,7 @@ struct trace_api_common_impl {
    }
 
    void plugin_initialize(const appbase::variables_map& options) {
-      auto dir_option = options.at("trace-dir").as<bfs::path>();
+      auto dir_option = options.at("trace-dir").as<std::filesystem::path>();
       if (dir_option.is_relative())
          trace_dir = app().data_dir() / dir_option;
       else
@@ -161,7 +161,7 @@ struct trace_api_common_impl {
    }
 
    // common configuration paramters
-   boost::filesystem::path trace_dir;
+   std::filesystem::path trace_dir;
    uint32_t slice_stride = 0;
 
    std::optional<uint32_t> minimum_irreversible_history_blocks;
@@ -178,7 +178,7 @@ struct trace_api_common_impl {
  */
 struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api_rpc_plugin_impl>
 {
-   trace_api_rpc_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
+   explicit trace_api_rpc_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
    :common(common) {}
 
    static void set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
@@ -202,6 +202,9 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
       ilog("initializing trace api rpc plugin");
       std::shared_ptr<abi_data_handler> data_handler = std::make_shared<abi_data_handler>([](const exception_with_context& e){
          log_exception(e, fc::log_level::debug);
+         if (std::get<0>(e)) { // rethrow so caller is notified of error
+            std::rethrow_exception(std::get<0>(e));
+         }
       });
 
       if( options.count("trace-rpc-abi") ) {
@@ -213,7 +216,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                auto kv = parse_kv_pairs(entry);
                auto account = chain::name(kv.first);
                auto abi = abi_def_from_file(kv.second, app().data_dir());
-               data_handler->add_abi(account, abi);
+               data_handler->add_abi(account, std::move(abi));
             } catch (...) {
                elog("Malformed trace-rpc-abi provider: \"${val}\"", ("val", entry));
                throw;
@@ -233,22 +236,12 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
       );
    }
 
-   fc::time_point calc_deadline( const fc::microseconds& max_serialization_time ) {
-      fc::time_point deadline = fc::time_point::now();
-      if( max_serialization_time > fc::microseconds::maximum() - deadline.time_since_epoch() ) {
-         deadline = fc::time_point::maximum();
-      } else {
-         deadline += max_serialization_time;
-      }
-      return deadline;
-   }
-
    void plugin_startup() {
       auto& http = app().get_plugin<http_plugin>();
-      fc::microseconds max_response_time = http.get_max_response_time();
 
-      http.add_async_handler("/v1/trace_api/get_block",
-            [wthis=weak_from_this(), max_response_time](std::string, std::string body, url_response_callback cb)
+      http.add_async_handler({"/v1/trace_api/get_block",
+            api_category::trace_api,
+            [wthis=weak_from_this()](std::string, std::string body, url_response_callback cb)
       {
          auto that = wthis.lock();
          if (!that) {
@@ -280,8 +273,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 
          try {
 
-            const auto deadline = that->calc_deadline( max_response_time );
-            auto resp = that->req_handler->get_block_trace(*block_number, [deadline]() { FC_CHECK_DEADLINE(deadline); });
+            auto resp = that->req_handler->get_block_trace(*block_number);
             if (resp.is_null()) {
                error_results results{404, "Trace API: block trace missing"};
                cb( 404, fc::variant( results ));
@@ -291,11 +283,12 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          } catch (...) {
             http_plugin::handle_exception("trace_api", "get_block", body, cb);
          }
-      });
+      }});
 
 
-      http.add_async_handler("/v1/trace_api/get_transaction_trace",
-            [wthis=weak_from_this(), max_response_time, this](std::string, std::string body, url_response_callback cb)
+      http.add_async_handler({"/v1/trace_api/get_transaction_trace",
+            api_category::trace_api,
+            [wthis=weak_from_this(), this](std::string, std::string body, url_response_callback cb)
       {
          auto that = wthis.lock();
          if (!that) {
@@ -325,14 +318,13 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          }
 
          try {
-            const auto deadline = that->calc_deadline( max_response_time );
             // search for the block that contains the transaction
-            get_block_n blk_num = common->store->get_trx_block_number(*trx_id, common->minimum_irreversible_history_blocks, [deadline]() { FC_CHECK_DEADLINE(deadline); });
+            get_block_n blk_num = common->store->get_trx_block_number(*trx_id, common->minimum_irreversible_history_blocks);
             if (!blk_num.has_value()){
                error_results results{404, "Trace API: transaction id missing in the transaction id log files"};
                cb( 404, fc::variant( results ));
             } else {
-               auto resp = that->req_handler->get_transaction_trace(*trx_id, *blk_num, [deadline]() { FC_CHECK_DEADLINE(deadline); });
+               auto resp = that->req_handler->get_transaction_trace(*trx_id, *blk_num);
                if (resp.is_null()) {
                   error_results results{404, "Trace API: transaction trace missing"};
                   cb( 404, fc::variant( results ));
@@ -343,7 +335,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
           } catch (...) {
              http_plugin::handle_exception("trace_api", "get_transaction", body, cb);
           }
-      });
+      }});
    }
 
    void plugin_shutdown() {
@@ -356,11 +348,8 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 };
 
 struct trace_api_plugin_impl {
-   trace_api_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
+   explicit trace_api_plugin_impl( const std::shared_ptr<trace_api_common_impl>& common )
    :common(common) {}
-
-   static void set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
-   }
 
    void plugin_initialize(const appbase::variables_map& options) {
       ilog("initializing trace api plugin");
@@ -422,19 +411,18 @@ struct trace_api_plugin_impl {
    std::optional<scoped_connection>                            irreversible_block_connection;
 };
 
-trace_api_plugin::trace_api_plugin()
-{}
+trace_api_plugin::trace_api_plugin() = default;
 
-trace_api_plugin::~trace_api_plugin()
-{}
+trace_api_plugin::~trace_api_plugin() = default;
 
 void trace_api_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);
-   trace_api_plugin_impl::set_program_options(cli, cfg);
    trace_api_rpc_plugin_impl::set_program_options(cli, cfg);
 }
 
 void trace_api_plugin::plugin_initialize(const appbase::variables_map& options) {
+   handle_sighup(); // setup logging
+
    auto common = std::make_shared<trace_api_common_impl>();
    common->plugin_initialize(options);
 
@@ -446,8 +434,6 @@ void trace_api_plugin::plugin_initialize(const appbase::variables_map& options) 
 }
 
 void trace_api_plugin::plugin_startup() {
-   handle_sighup(); // setup logging
-
    my->plugin_startup();
    rpc->plugin_startup();
 }
@@ -462,11 +448,9 @@ void trace_api_plugin::handle_sighup() {
    fc::logger::update( logger_name, _log );
 }
 
-trace_api_rpc_plugin::trace_api_rpc_plugin()
-{}
+trace_api_rpc_plugin::trace_api_rpc_plugin() = default;
 
-trace_api_rpc_plugin::~trace_api_rpc_plugin()
-{}
+trace_api_rpc_plugin::~trace_api_rpc_plugin() = default;
 
 void trace_api_rpc_plugin::set_program_options(appbase::options_description& cli, appbase::options_description& cfg) {
    trace_api_common_impl::set_program_options(cli, cfg);

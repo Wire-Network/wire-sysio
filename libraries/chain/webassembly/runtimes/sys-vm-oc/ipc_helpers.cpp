@@ -1,22 +1,32 @@
 #include <sysio/chain/webassembly/sys-vm-oc/ipc_helpers.hpp>
 #include <sysio/chain/exceptions.hpp>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 static constexpr size_t max_message_size = 8192;
 static constexpr size_t max_num_fds = 4;
 
-std::tuple<bool, eosvmoc_message, std::vector<wrapped_fd>> read_message_with_fds(boost::asio::local::datagram_protocol::socket& s) {
+std::tuple<bool, sysvmoc_message, std::vector<wrapped_fd>> read_message_with_fds(boost::asio::local::datagram_protocol::socket& s) {
+   // read_message_with_fds() is intended to be blocking, and sockets it is used with are never explicitly set to non-blocking mode.
+   // But when doing an async_wait() on an asio socket, asio will set the underlying file descriptor to non-blocking mode.
+   // It's not clear why, but in some cases after async_wait() indicates readiness, a recvmsg() on the socket can fail with
+   // EAGAIN if the file descriptor is still in non-blocking mode (as asio had set it to).
+   // Always set the file descriptor to blocking mode before performing the recvmsg()
+   boost::system::error_code ec;
+   s.native_non_blocking(false, ec);
+   if(ec)
+      wlog("Failed to set socket's native blocking mode");
+
    return read_message_with_fds(s.native_handle());
 }
 
-std::tuple<bool, eosvmoc_message, std::vector<wrapped_fd>> read_message_with_fds(int fd) {
+std::tuple<bool, sysvmoc_message, std::vector<wrapped_fd>> read_message_with_fds(int fd) {
    char buff[max_message_size];
 
    struct msghdr msg = {};
    struct cmsghdr* cmsg;
 
-   eosvmoc_message message;
+   sysvmoc_message message;
    std::vector<wrapped_fd> fds;
 
    struct iovec io = {
@@ -61,11 +71,11 @@ std::tuple<bool, eosvmoc_message, std::vector<wrapped_fd>> read_message_with_fds
    return {true, message, std::move(fds)};
 }
 
-bool write_message_with_fds(boost::asio::local::datagram_protocol::socket& s, const eosvmoc_message& message, const std::vector<wrapped_fd>& fds) {
+bool write_message_with_fds(boost::asio::local::datagram_protocol::socket& s, const sysvmoc_message& message, const std::vector<wrapped_fd>& fds) {
    return write_message_with_fds(s.native_handle(), message, fds);
 }
 
-bool write_message_with_fds(int fd_to_send_to, const eosvmoc_message& message, const std::vector<wrapped_fd>& fds) {
+bool write_message_with_fds(int fd_to_send_to, const sysvmoc_message& message, const std::vector<wrapped_fd>& fds) {
    struct msghdr msg = {};
    struct cmsghdr* cmsg;
 
@@ -89,7 +99,7 @@ bool write_message_with_fds(int fd_to_send_to, const eosvmoc_message& message, c
       .iov_len = sz
    };
    union {
-      char buf[CMSG_SPACE(max_num_fds * sizeof(int))];
+      char buf[CMSG_SPACE(max_num_fds * sizeof(int))] = {};
       struct cmsghdr align;
    } u;
 
@@ -108,6 +118,7 @@ bool write_message_with_fds(int fd_to_send_to, const eosvmoc_message& message, c
          memcpy(p, &thisfd, sizeof(thisfd));
          p += sizeof(thisfd);
       }
+      msg.msg_controllen = cmsg->cmsg_len;
    }
 
    int wrote;

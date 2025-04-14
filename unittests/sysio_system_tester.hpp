@@ -6,6 +6,7 @@
 #include <fc/variant_object.hpp>
 
 #include <contracts.hpp>
+#include <test_contracts.hpp>
 
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -13,21 +14,13 @@ using namespace fc;
 
 using mvo = fc::mutable_variant_object;
 
-#ifndef TESTER
-#ifdef NON_VALIDATING_TEST
-#define TESTER tester
-#else
-#define TESTER validating_tester
-#endif
-#endif
-
 namespace sysio_system {
 
-class sysio_system_tester : public TESTER {
+class sysio_system_tester : public validating_tester {
 public:
 
    sysio_system_tester()
-   : sysio_system_tester([](TESTER& ) {}){}
+   : sysio_system_tester([](validating_tester& ) {}){}
 
    template<typename Lambda>
    sysio_system_tester(Lambda setup) {
@@ -36,37 +29,37 @@ public:
       produce_blocks( 2 );
 
       create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
-               "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
+               "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n, "sysio.rex"_n });
 
       produce_blocks( 100 );
 
-      set_code( "sysio.token"_n, contracts::sysio_token_wasm() );
-      set_abi( "sysio.token"_n, contracts::sysio_token_abi().data() );
+      set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+      set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
 
       {
          const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-         token_abi_ser.set_abi(abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+         token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
 
       create_currency( "sysio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
       issue(config::system_account_name,      core_from_string("1000000000.0000"));
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( name("sysio") ) );
 
-      set_code( config::system_account_name, contracts::sysio_system_wasm() );
-      set_abi( config::system_account_name, contracts::sysio_system_abi().data() );
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
 
       base_tester::push_action(config::system_account_name, "init"_n,
                             config::system_account_name,  mutable_variant_object()
                             ("version", 0)
-                            ("core", CORE_SYM_STR));
+                            ("core", symbol(CORE_SYMBOL).to_string()));
 
       {
          const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-         abi_ser.set_abi(abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+         abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
 
       produce_blocks();
@@ -215,8 +208,8 @@ public:
       return push_transaction( trx );
    }
 
-   action_result buyram( const account_name& payer, account_name receiver, const asset& eosin ) {
-      return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",eosin) );
+   action_result buyram( const account_name& payer, account_name receiver, const asset& sysin ) {
+      return push_action( payer, "buyram"_n, mvo()( "payer",payer)("receiver",receiver)("quant",sysin) );
    }
    action_result buyrambytes( const account_name& payer, account_name receiver, uint32_t numbytes ) {
       return push_action( payer, "buyrambytes"_n, mvo()( "payer",payer)("receiver",receiver)("bytes",numbytes) );
@@ -421,14 +414,14 @@ public:
                                                ("is_priv", 1)
          );
 
-         set_code( "sysio.msig"_n, contracts::sysio_msig_wasm() );
-         set_abi( "sysio.msig"_n, contracts::sysio_msig_abi().data() );
+         set_code( "sysio.msig"_n, test_contracts::sysio_msig_wasm() );
+         set_abi( "sysio.msig"_n, test_contracts::sysio_msig_abi() );
 
          produce_blocks();
          const auto& accnt = control->db().get<account_object,by_name>( "sysio.msig"_n );
          abi_def msig_abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
-         msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+         msig_abi_ser.set_abi(std::move(msig_abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
       return msig_abi_ser;
    }
@@ -454,7 +447,7 @@ public:
       }
       produce_blocks( 250);
 
-      auto trace_auth = TESTER::push_action(config::system_account_name, updateauth::get_name(), config::system_account_name, mvo()
+      auto trace_auth = validating_tester::push_action(config::system_account_name, updateauth::get_name(), config::system_account_name, mvo()
                                             ("account", name(config::system_account_name).to_string())
                                             ("permission", name(config::active_name).to_string())
                                             ("parent", name(config::owner_name).to_string())
@@ -481,7 +474,7 @@ public:
       produce_blocks( 250 );
 
       auto producer_keys = control->head_block_state()->active_schedule.producers;
-      BOOST_REQUIRE_EQUAL( 21, producer_keys.size() );
+      BOOST_REQUIRE_EQUAL( 21u, producer_keys.size() );
       BOOST_REQUIRE_EQUAL( name("defproducera"), producer_keys[0].producer_name );
 
       return producer_names;
@@ -556,8 +549,8 @@ inline fc::mutable_variant_object proxy( account_name acct ) {
    return voter( acct )( "is_proxy", 1 );
 }
 
-inline uint64_t M( const string& eos_str ) {
-   return core_from_string( eos_str ).get_amount();
+inline uint64_t M( const string& sys_str ) {
+   return core_from_string( sys_str ).get_amount();
 }
 
 }

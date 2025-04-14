@@ -144,7 +144,7 @@ namespace sysio { namespace chain {
          result.threshold = src.threshold;
          result.keys.reserve(src.keys.size());
          for (const auto& k: src.keys) {
-            result.keys.push_back(k);
+            result.keys.push_back(k.to_key_weight());
          }
 
          return result;
@@ -335,4 +335,3 @@ FC_REFLECT_DERIVED( sysio::chain::producer_schedule_change_extension, (sysio::ch
 FC_REFLECT( sysio::chain::shared_block_signing_authority_v0, (threshold)(keys))
 FC_REFLECT( sysio::chain::shared_producer_authority, (producer_name)(authority) )
 FC_REFLECT( sysio::chain::shared_producer_authority_schedule, (version)(producers) )
-

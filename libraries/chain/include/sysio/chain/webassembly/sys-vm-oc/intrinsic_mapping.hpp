@@ -4,7 +4,7 @@
 #include <limits>
 #include <string_view>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 //NEVER reorder or remove indexes; the PIC uses the indexes in this table as an offset in to a jump
 // table. Adding on the bottom is fine and requires no other updates elsewhere
 namespace detail {
@@ -12,16 +12,16 @@ namespace detail {
    inline constexpr auto generate_table( Args&&... args ) {
       return std::array<std::string_view, sizeof...(Args)> { args... };
    }
-} // ns sysio::chain::eosvmoc::detail
+} // ns sysio::chain::sysvmoc::detail
 
 inline constexpr auto get_intrinsic_table() {
    return detail::generate_table(
-      "eosvmoc_internal.unreachable",
-      "eosvmoc_internal.grow_memory",
-      "eosvmoc_internal.div0_or_overflow",
-      "eosvmoc_internal.indirect_call_mismatch",
-      "eosvmoc_internal.indirect_call_oob",
-      "eosvmoc_internal.depth_assert",
+      "sysvmoc_internal.unreachable",
+      "sysvmoc_internal.grow_memory",
+      "sysvmoc_internal.div0_or_overflow",
+      "sysvmoc_internal.indirect_call_mismatch",
+      "sysvmoc_internal.indirect_call_oob",
+      "sysvmoc_internal.depth_assert",
       "sysio_injection.call_depth_assert",  //now unused; left for purposes of not upsetting existing code mappings
       "sysio_injection.checktime",          //now unused; left for purposes of not upsetting existing code mappings
       "env.__ashlti3",
@@ -267,7 +267,17 @@ inline constexpr auto get_intrinsic_table() {
       "env.sha3",
       "env.blake2_f",
       "env.k1_recover",
-      "env.get_block_num"
+      "env.get_block_num",
+      "env.bls_g1_add",
+      "env.bls_g2_add",
+      "env.bls_g1_weighted_sum",
+      "env.bls_g2_weighted_sum",
+      "env.bls_pairing",
+      "env.bls_g1_map",
+      "env.bls_g2_map",
+      "env.bls_fp_mod",
+      "env.bls_fp_mul",
+      "env.bls_fp_exp"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {

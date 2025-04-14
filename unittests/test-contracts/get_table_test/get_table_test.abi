@@ -24,6 +24,16 @@
             ]
         },
         {
+            "name": "erasenumobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
             "name": "hashobj",
             "base": "",
             "fields": [
@@ -42,6 +52,16 @@
                 {
                     "name": "sec160",
                     "type": "checksum160"
+                }
+            ]
+        },
+        {
+            "name": "modifynumobj",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
                 }
             ]
         },
@@ -81,6 +101,16 @@
         {
             "name": "addnumobj",
             "type": "addnumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "erasenumobj",
+            "type": "erasenumobj",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "modifynumobj",
+            "type": "modifynumobj",
             "ricardian_contract": ""
         }
     ],

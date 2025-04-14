@@ -55,7 +55,7 @@ You will need to set the private key for your producer. The public key should ha
 `signature-provider` is defined with a 3-field tuple:
 * `public-key` - A valid Antelope public key in form of a string.
 * `provider-spec` - It's a string formatted like `<provider-type>:<data>`
-* `provider-type` - KEY or KSYSD
+* `provider-type` - KEY or KIOD
 
 #### Using a Key:
 
@@ -74,7 +74,7 @@ You can also use `kiod` instead of hard-defining keys.
 ```console
 # config.ini:
 
-signature-provider = KSYSD:<data>   
+signature-provider = KIOD:<data>   
 
 //Example
 //SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV=KSYSD:https://127.0.0.1:88888

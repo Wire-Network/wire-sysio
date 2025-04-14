@@ -1,13 +1,12 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/testing/tester.hpp>
 
-#include <Runtime/Runtime.h>
-
 #include <fc/variant_object.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <contracts.hpp>
+#include <test_contracts.hpp>
 
 using namespace sysio::testing;
 using namespace sysio;
@@ -27,15 +26,15 @@ public:
       create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n } );
       produce_blocks( 2 );
 
-      set_code( "sysio.token"_n, contracts::sysio_token_wasm() );
-      set_abi( "sysio.token"_n, contracts::sysio_token_abi().data() );
+      set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+      set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
 
       produce_blocks();
 
       const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
    }
 
    action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -152,7 +151,8 @@ BOOST_FIXTURE_TEST_CASE( create_max_supply, sysio_token_tester ) try {
    share_type amount = 4611686018427387904;
    static_assert(sizeof(share_type) <= sizeof(asset), "asset changed so test is no longer valid");
    static_assert(std::is_trivially_copyable<asset>::value, "asset is not trivially copyable");
-   memcpy(&max, &amount, sizeof(share_type)); // hack in an invalid amount
+   // OK to cast as this is a test and it is a hack to construct an invalid amount
+   memcpy((char*)&max, (char*)&amount, sizeof(share_type)); // hack in an invalid amount.
 
    BOOST_CHECK_EXCEPTION( create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
       return expect_assert_message(e, "magnitude of asset amount must be less than 2^62");
@@ -177,7 +177,8 @@ BOOST_FIXTURE_TEST_CASE( create_max_decimals, sysio_token_tester ) try {
    share_type amount = 0x8ac7230489e80000L;
    static_assert(sizeof(share_type) <= sizeof(asset), "asset changed so test is no longer valid");
    static_assert(std::is_trivially_copyable<asset>::value, "asset is not trivially copyable");
-   memcpy(&max, &amount, sizeof(share_type)); // hack in an invalid amount
+   // OK to cast as this is a test and it is a hack to construct an invalid amount
+   memcpy((char*)&max, (char*)&amount, sizeof(share_type)); // hack in an invalid amount
 
    BOOST_CHECK_EXCEPTION( create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
       return expect_assert_message(e, "magnitude of asset amount must be less than 2^62");

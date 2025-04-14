@@ -8,7 +8,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 class memory {
       static constexpr uint64_t intrinsic_count                   = intrinsic_table_size();
@@ -24,11 +24,10 @@ class memory {
       static constexpr uint64_t total_memory_per_slice = memory_prologue_size + UINT64_C(0x200000000) + UINT64_C(4096);
 
    public:
-      explicit memory(uint64_t max_pages);
+      explicit memory(uint64_t sliced_pages);
       ~memory();
       memory(const memory&) = delete;
       memory& operator=(const memory&) = delete;
-      void reset(uint64_t max_pages);
 
       uint8_t* const zero_page_memory_base() const { return zeropage_base; }
       uint8_t* const full_page_memory_base() const { return fullpage_base; }
@@ -49,9 +48,15 @@ class memory {
       static constexpr uintptr_t first_intrinsic_offset = cb_offset + 8u;
       // The maximum amount of data that PIC code can include in the prologue
       static constexpr uintptr_t max_prologue_size = mutable_global_size + table_size;
+      // Number of slices for read-only threads.
+      // Use a small number to save upfront virtual memory consumption.
+      // Memory uses beyond this limit will be handled by mprotect.
+      static constexpr uint32_t sliced_pages_for_ro_thread = 10;
 
-      static_assert(-cb_offset == EOS_VM_OC_CONTROL_BLOCK_OFFSET, "SYS VM OC control block offset has slid out of place somehow");
-      static_assert(stride == EOS_VM_OC_MEMORY_STRIDE, "SYS VM OC memory stride has slid out of place somehow");
+      // Changed from -cb_offset == SYS_VM_OC_CONTROL_BLOCK_OFFSET to get around
+      // of compile warning about comparing integers of different signedness
+      static_assert(SYS_VM_OC_CONTROL_BLOCK_OFFSET + cb_offset == 0, "SYS VM OC control block offset has slid out of place somehow");
+      static_assert(stride == SYS_VM_OC_MEMORY_STRIDE, "SYS VM OC memory stride has slid out of place somehow");
 
    private:
       uint8_t* mapbase;
@@ -63,5 +68,5 @@ class memory {
 
 }}}
 
-#define OFFSET_OF_CONTROL_BLOCK_MEMBER(M) (-(int)sysio::chain::eosvmoc::memory::cb_offset + (int)offsetof(sysio::chain::eosvmoc::control_block, M))
-#define OFFSET_OF_FIRST_INTRINSIC ((int)-sysio::chain::eosvmoc::memory::first_intrinsic_offset)
+#define OFFSET_OF_CONTROL_BLOCK_MEMBER(M) (-(int)sysio::chain::sysvmoc::memory::cb_offset + (int)offsetof(sysio::chain::sysvmoc::control_block, M))
+#define OFFSET_OF_FIRST_INTRINSIC ((int)-sysio::chain::sysvmoc::memory::first_intrinsic_offset)

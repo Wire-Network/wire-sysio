@@ -1,12 +1,12 @@
 #pragma once
 #include <fc/exception/exception.hpp>
+#include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/core_symbol.hpp>
 #include <string>
 #include <functional>
 
-namespace sysio {
-   namespace chain {
+namespace sysio::chain {
 
       /**
          class symbol represents a token and contains precision and name.
@@ -65,20 +65,7 @@ namespace sysio {
             explicit symbol(uint64_t v = CORE_SYMBOL): m_value(v) {
                SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
             }
-            static symbol from_string(const string& from)
-            {
-               try {
-                  string s = fc::trim(from);
-                  SYS_ASSERT(!s.empty(), symbol_type_exception, "creating symbol from empty string");
-                  auto comma_pos = s.find(',');
-                  SYS_ASSERT(comma_pos != string::npos, symbol_type_exception, "missing comma in symbol");
-                  auto prec_part = s.substr(0, comma_pos);
-                  uint8_t p = fc::to_int64(prec_part);
-                  string name_part = s.substr(comma_pos + 1);
-                  SYS_ASSERT( p <= max_precision, symbol_type_exception, "precision ${p} should be <= 18", ("p", p));
-                  return symbol(string_to_symbol(p, name_part.c_str()));
-               } FC_CAPTURE_LOG_AND_RETHROW((from))
-            }
+            static symbol from_string(const string& from);
             uint64_t value() const { return m_value; }
             bool valid() const
             {
@@ -165,8 +152,26 @@ namespace sysio {
          return lhs.value() > rhs.value();
       }
 
-   } // namespace chain
-} // namespace sysio
+      inline bool operator== (const extended_symbol& lhs, const extended_symbol& rhs)
+      {
+         return std::tie(lhs.sym, lhs.contract) == std::tie(rhs.sym, rhs.contract);
+      }
+
+      inline bool operator!= (const extended_symbol& lhs, const extended_symbol& rhs)
+      {
+         return std::tie(lhs.sym, lhs.contract) != std::tie(rhs.sym, rhs.contract);
+      }
+
+      inline bool operator< (const extended_symbol& lhs, const extended_symbol& rhs)
+      {
+         return std::tie(lhs.sym, lhs.contract) < std::tie(rhs.sym, rhs.contract);
+      }
+
+      inline bool operator> (const extended_symbol& lhs, const extended_symbol& rhs)
+      {
+         return std::tie(lhs.sym, lhs.contract) > std::tie(rhs.sym, rhs.contract);
+      }
+} // namespace sysio::chain
 
 namespace fc {
    inline void to_variant(const sysio::chain::symbol& var, fc::variant& vo) { vo = var.to_string(); }

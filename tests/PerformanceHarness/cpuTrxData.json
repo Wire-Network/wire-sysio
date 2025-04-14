@@ -1,0 +1,16 @@
+{
+    "initAccounts": ["c"],
+    "abiFile": "unittests/contracts/sysio.mechanics/sysmechanics.abi",
+    "actions": [
+        {
+            "actionName": "cpu",
+            "actionData": {
+            },
+            "actionAuthAcct": "c",
+            "authorization": {
+                "actor": "c",
+                "permission": "active"
+            }
+        }
+    ]
+}

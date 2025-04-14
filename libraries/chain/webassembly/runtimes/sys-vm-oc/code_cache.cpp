@@ -20,9 +20,8 @@
 #include "LLVMJIT.h"
 
 using namespace IR;
-using namespace Runtime;
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 static constexpr size_t header_offset = 512u;
 static constexpr size_t header_size = 512u;
@@ -39,17 +38,17 @@ static constexpr size_t descriptor_ptr_from_file_start = header_offset + offseto
 
 static_assert(sizeof(code_cache_header) <= header_size, "code_cache_header too big");
 
-code_cache_async::code_cache_async(const bfs::path data_dir, const eosvmoc::config& eosvmoc_config, const chainbase::database& db) :
-   code_cache_base(data_dir, eosvmoc_config, db),
-   _result_queue(eosvmoc_config.threads * 2),
-   _threads(eosvmoc_config.threads)
+code_cache_async::code_cache_async(const std::filesystem::path& data_dir, const sysvmoc::config& sysvmoc_config, const chainbase::database& db) :
+   code_cache_base(data_dir, sysvmoc_config, db),
+   _result_queue(sysvmoc_config.threads * 2),
+   _threads(sysvmoc_config.threads)
 {
    FC_ASSERT(_threads, "SYS VM OC requires at least 1 compile thread");
 
    wait_on_compile_monitor_message();
 
    _monitor_reply_thread = std::thread([this]() {
-      fc::set_os_thread_name("oc-monitor");
+      fc::set_thread_name("oc-monitor");
       _ctx.run();
    });
 }
@@ -106,9 +105,12 @@ std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
    return {gotsome, bytes_remaining};
 }
 
-const code_descriptor* const code_cache_async::get_descriptor_for_code(const digest_type& code_id, const uint8_t& vm_version) {
+
+const code_descriptor* const code_cache_async::get_descriptor_for_code(bool high_priority, const digest_type& code_id, const uint8_t& vm_version, bool is_write_window, get_cd_failure& failure) {
    //if there are any outstanding compiles, process the result queue now
-   if(_outstanding_compiles_and_poison.size()) {
+   //When app is in write window, all tasks are running sequentially and read-only threads
+   //are not running. Safe to update cache entries.
+   if(is_write_window && _outstanding_compiles_and_poison.size()) {
       auto [count_processed, bytes_remaining] = consume_compile_thread_queue();
 
       if(count_processed)
@@ -124,7 +126,7 @@ const code_descriptor* const code_cache_async::get_descriptor_for_code(const dig
             _outstanding_compiles_and_poison.emplace(*nextup, false);
             std::vector<wrapped_fd> fds_to_pass;
             fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-            FC_ASSERT(write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ *nextup }, fds_to_pass), "SYS VM failed to communicate to OOP manager");
+            FC_ASSERT(write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ *nextup, _sysvmoc_config }, fds_to_pass), "SYS VM failed to communicate to OOP manager");
             --count_processed;
          }
          _queued_compiles.erase(nextup);
@@ -134,34 +136,51 @@ const code_descriptor* const code_cache_async::get_descriptor_for_code(const dig
    //check for entry in cache
    code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(boost::make_tuple(code_id, vm_version));
    if(it != _cache_index.get<by_hash>().end()) {
-      _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
+      if (is_write_window)
+         _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
       return &*it;
+   }
+   if(!is_write_window) {
+      failure = get_cd_failure::temporary; // Compile might not be done yet
+      return nullptr;
    }
 
    const code_tuple ct = code_tuple{code_id, vm_version};
 
-   if(_blacklist.find(ct) != _blacklist.end())
+   if(_blacklist.find(ct) != _blacklist.end()) {
+      failure = get_cd_failure::permanent; // Compile will not start
       return nullptr;
+   }
    if(auto it = _outstanding_compiles_and_poison.find(ct); it != _outstanding_compiles_and_poison.end()) {
+      failure = get_cd_failure::temporary; // Compile might not be done yet
       it->second = false;
       return nullptr;
    }
-   if(_queued_compiles.find(ct) != _queued_compiles.end())
+   if(auto it = _queued_compiles.get<by_hash>().find(boost::make_tuple(std::ref(code_id), vm_version)); it != _queued_compiles.get<by_hash>().end()) {
+      failure = get_cd_failure::temporary; // Compile might not be done yet
       return nullptr;
+   }
 
    if(_outstanding_compiles_and_poison.size() >= _threads) {
-      _queued_compiles.emplace(ct);
+      if (high_priority)
+         _queued_compiles.push_front(ct);
+      else
+         _queued_compiles.push_back(ct);
+      failure = get_cd_failure::temporary; // Compile might not be done yet
       return nullptr;
    }
 
    const code_object* const codeobject = _db.find<code_object,by_code_hash>(boost::make_tuple(code_id, 0, vm_version));
-   if(!codeobject) //should be impossible right?
+   if(!codeobject) { //should be impossible right?
+      failure = get_cd_failure::permanent; // Compile will not start
       return nullptr;
+   }
 
    _outstanding_compiles_and_poison.emplace(ct, false);
    std::vector<wrapped_fd> fds_to_pass;
    fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ ct }, fds_to_pass);
+   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ ct, _sysvmoc_config }, fds_to_pass);
+   failure = get_cd_failure::temporary; // Compile might not be done yet
    return nullptr;
 }
 
@@ -174,13 +193,16 @@ code_cache_sync::~code_cache_sync() {
       elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
-const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const digest_type& code_id, const uint8_t& vm_version) {
+const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const digest_type& code_id, const uint8_t& vm_version, bool is_write_window) {
    //check for entry in cache
    code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(boost::make_tuple(code_id, vm_version));
    if(it != _cache_index.get<by_hash>().end()) {
-      _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
+      if (is_write_window)
+         _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
       return &*it;
    }
+   if(!is_write_window)
+      return nullptr;
 
    const code_object* const codeobject = _db.find<code_object,by_code_hash>(boost::make_tuple(code_id, 0, vm_version));
    if(!codeobject) //should be impossible right?
@@ -189,7 +211,7 @@ const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const
    std::vector<wrapped_fd> fds_to_pass;
    fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
 
-   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ {code_id, vm_version} }, fds_to_pass);
+   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ {code_id, vm_version}, _sysvmoc_config }, fds_to_pass);
    auto [success, message, fds] = read_message_with_fds(_compile_monitor_read_socket);
    SYS_ASSERT(success, wasm_execution_error, "failed to read response from monitor process");
    SYS_ASSERT(std::holds_alternative<wasm_compilation_result_message>(message), wasm_execution_error, "unexpected response from monitor process");
@@ -202,61 +224,78 @@ const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const
    return &*_cache_index.push_front(std::move(std::get<code_descriptor>(result.result))).first;
 }
 
-code_cache_base::code_cache_base(const boost::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, const chainbase::database& db) :
+code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sysvmoc::config& sysvmoc_config, const chainbase::database& db) :
    _db(db),
-   _cache_file_path(data_dir/"code_cache.bin")
-{
+   _sysvmoc_config(sysvmoc_config),
+   _cache_file_path(data_dir/"code_cache.bin") {
    static_assert(sizeof(allocator_t) <= header_offset, "header offset intersects with allocator");
 
-   bfs::create_directories(data_dir);
+   std::filesystem::create_directories(data_dir);
 
-   if(!bfs::exists(_cache_file_path)) {
-      SYS_ASSERT(eosvmoc_config.cache_size >= allocator_t::get_min_size(total_header_size), database_exception, "configured code cache size is too small");
+   bool created_file = false;
+   auto create_code_cache_file = [&] {
+      SYS_ASSERT(sysvmoc_config.cache_size >= allocator_t::get_min_size(total_header_size), database_exception, "configured code cache size is too small");
       std::ofstream ofs(_cache_file_path.generic_string(), std::ofstream::trunc);
       SYS_ASSERT(ofs.good(), database_exception, "unable to create SYS VM Optimized Compiler code cache");
-      bfs::resize_file(_cache_file_path, eosvmoc_config.cache_size);
+      std::filesystem::resize_file(_cache_file_path, sysvmoc_config.cache_size);
       bip::file_mapping creation_mapping(_cache_file_path.generic_string().c_str(), bip::read_write);
       bip::mapped_region creation_region(creation_mapping, bip::read_write);
-      new (creation_region.get_address()) allocator_t(eosvmoc_config.cache_size, total_header_size);
+      new (creation_region.get_address()) allocator_t(sysvmoc_config.cache_size, total_header_size);
       new ((char*)creation_region.get_address() + header_offset) code_cache_header;
-   }
+      created_file = true;
+   };
 
    code_cache_header cache_header;
-   {
+   auto check_code_cache = [&] {
       char header_buff[total_header_size];
       std::ifstream hs(_cache_file_path.generic_string(), std::ifstream::binary);
       hs.read(header_buff, sizeof(header_buff));
       SYS_ASSERT(!hs.fail(), bad_database_version_exception, "failed to read code cache header");
       memcpy((char*)&cache_header, header_buff + header_offset, sizeof(cache_header));
+
+      SYS_ASSERT(cache_header.id == header_id, bad_database_version_exception, "existing SYS VM OC code cache not compatible with this version");
+      SYS_ASSERT(!cache_header.dirty, database_exception, "code cache is dirty");
+   };
+
+   if (!std::filesystem::exists(_cache_file_path)) {
+      create_code_cache_file();
    }
 
-   SYS_ASSERT(cache_header.id == header_id, bad_database_version_exception, "existing SYS VM OC code cache not compatible with this version");
-   SYS_ASSERT(!cache_header.dirty, database_exception, "code cache is dirty");
+   try {
+      check_code_cache();
+   } catch (const fc::exception&) {
+      if (created_file)
+         throw;
+
+      ilog("SYS VM optimized Compiler code cache corrupt, recreating");
+      create_code_cache_file();
+      check_code_cache();
+   }
 
    set_on_disk_region_dirty(true);
 
-   auto existing_file_size = bfs::file_size(_cache_file_path);
-   if(eosvmoc_config.cache_size > existing_file_size) {
-      bfs::resize_file(_cache_file_path, eosvmoc_config.cache_size);
+   auto existing_file_size = std::filesystem::file_size(_cache_file_path);
+   if(sysvmoc_config.cache_size > existing_file_size) {
+      std::filesystem::resize_file(_cache_file_path, sysvmoc_config.cache_size);
 
       bip::file_mapping resize_mapping(_cache_file_path.generic_string().c_str(), bip::read_write);
       bip::mapped_region resize_region(resize_mapping, bip::read_write);
 
       allocator_t* resize_allocator = reinterpret_cast<allocator_t*>(resize_region.get_address());
-      resize_allocator->grow(eosvmoc_config.cache_size - existing_file_size);
+      resize_allocator->grow(sysvmoc_config.cache_size - existing_file_size);
    }
 
    _cache_fd = ::open(_cache_file_path.generic_string().c_str(), O_RDWR | O_CLOEXEC);
    SYS_ASSERT(_cache_fd >= 0, database_exception, "failure to open code cache");
 
    //load up the previous cache index
-   char* code_mapping = (char*)mmap(nullptr, eosvmoc_config.cache_size, PROT_READ|PROT_WRITE, MAP_SHARED, _cache_fd, 0);
+   char* code_mapping = (char*)mmap(nullptr, sysvmoc_config.cache_size, PROT_READ|PROT_WRITE, MAP_SHARED, _cache_fd, 0);
    SYS_ASSERT(code_mapping != MAP_FAILED, database_exception, "failure to mmap code cache");
 
    allocator_t* allocator = reinterpret_cast<allocator_t*>(code_mapping);
 
    if(cache_header.serialized_descriptor_index) {
-      fc::datastream<const char*> ds(code_mapping + cache_header.serialized_descriptor_index, eosvmoc_config.cache_size - cache_header.serialized_descriptor_index);
+      fc::datastream<const char*> ds(code_mapping + cache_header.serialized_descriptor_index, sysvmoc_config.cache_size - cache_header.serialized_descriptor_index);
       unsigned number_entries;
       fc::raw::unpack(ds, number_entries);
       for(unsigned i = 0; i < number_entries; ++i) {
@@ -273,9 +312,9 @@ code_cache_base::code_cache_base(const boost::filesystem::path data_dir, const e
 
       ilog("SYS VM Optimized Compiler code cache loaded with ${c} entries; ${f} of ${t} bytes free", ("c", number_entries)("f", allocator->get_free_memory())("t", allocator->get_size()));
    }
-   munmap(code_mapping, eosvmoc_config.cache_size);
+   munmap(code_mapping, sysvmoc_config.cache_size);
 
-   _free_bytes_eviction_threshold = eosvmoc_config.cache_size * .1;
+   _free_bytes_eviction_threshold = sysvmoc_config.cache_size * .1;
 
    wrapped_fd compile_monitor_conn = get_connection_to_compile_monitor(_cache_fd);
 
@@ -333,15 +372,14 @@ code_cache_base::~code_cache_base() {
       }
    }
 
+   uintptr_t ptr_offset = 0;
    if(p) {
       fc::datastream<char*> ds(p, sz);
       serialize_cache_index(ds);
 
-      uintptr_t ptr_offset = p-code_mapping;
-      *((uintptr_t*)(code_mapping+descriptor_ptr_from_file_start)) = ptr_offset;
+      ptr_offset = p-code_mapping;
    }
-   else
-      *((uintptr_t*)(code_mapping+descriptor_ptr_from_file_start)) = 0;
+   memcpy(code_mapping+descriptor_ptr_from_file_start, &ptr_offset, sizeof(ptr_offset));
 
    msync(code_mapping, allocator->get_size(), MS_SYNC);
    munmap(code_mapping, allocator->get_size());
@@ -358,7 +396,8 @@ void code_cache_base::free_code(const digest_type& code_id, const uint8_t& vm_ve
    }
 
    //if it's in the queued list, erase it
-   _queued_compiles.erase({code_id, vm_version});
+   if(auto i = _queued_compiles.get<by_hash>().find(boost::make_tuple(std::ref(code_id), vm_version)); i != _queued_compiles.get<by_hash>().end())
+      _queued_compiles.get<by_hash>().erase(i);
 
    //however, if it's currently being compiled there is no way to cancel the compile,
    //so instead set a poison boolean that indicates not to insert the code in to the cache
@@ -381,5 +420,4 @@ void code_cache_base::check_eviction_threshold(size_t free_bytes) {
    if(free_bytes < _free_bytes_eviction_threshold)
       run_eviction_round();
 }
-
 }}}

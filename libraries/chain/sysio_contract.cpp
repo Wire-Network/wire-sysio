@@ -20,7 +20,7 @@
 
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/sysio_roa_objects.hpp> 
+#include <sysio/chain/sysio_roa_objects.hpp>
 #include <fc/io/raw.hpp>
 
 namespace sysio { namespace chain {
@@ -56,7 +56,7 @@ void validate_authority_precondition( const apply_context& context, const author
       }
    }
 
-   if( context.trx_context.enforce_whiteblacklist && context.control.is_producing_block() ) {
+   if( context.trx_context.enforce_whiteblacklist && context.control.is_speculative_block() ) {
       for( const auto& p : auth.keys ) {
          context.control.check_key_list( p.key );
       }
@@ -67,11 +67,13 @@ void validate_authority_precondition( const apply_context& context, const author
  *  This method is called assuming precondition_system_newaccount succeeds a
  */
 void apply_sysio_newaccount(apply_context& context) {
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "newaccount not allowed in read-only transaction" );
    auto create = context.get_action().data_as<newaccount>();
    try {
       context.require_authorization(create.creator);
 
-      auto& authorization = context.control.get_mutable_authorization_manager();
+   //   context.require_write_lock( config::sysio_auth_scope );
+   auto& authorization = context.control.get_mutable_authorization_manager();
 
       SYS_ASSERT(validate(create.owner), action_validate_exception, "Invalid owner authority");
       SYS_ASSERT(validate(create.active), action_validate_exception, "Invalid active authority");
@@ -107,21 +109,21 @@ void apply_sysio_newaccount(apply_context& context) {
          validate_authority_precondition(context, auth);
       }
 
-      const auto& owner_permission  = authorization.create_permission(create.name, config::owner_name, 0,
-                                                                      std::move(create.owner));
-      const auto& active_permission = authorization.create_permission(create.name, config::active_name, owner_permission.id,
-                                                                      std::move(create.active));
+   const auto& owner_permission  = authorization.create_permission( create.name, config::owner_name, 0,
+                                                                    std::move(create.owner), context.trx_context.is_transient() );
+   const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
+                                                                    std::move(create.active), context.trx_context.is_transient() );
 
-      context.control.get_mutable_resource_limits_manager().initialize_account(create.name);
+      context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
 
       // Determine if this is a system account
-      bool is_system_account = (create.name == config::system_account_name) || 
+      bool is_system_account = (create.name == config::system_account_name) ||
                                (name_str.size() > 5 && name_str.find("sysio.") == 0);
 
       // If it's not a system account, set CPU, NET, RAM to 0
       if (!is_system_account) {
          // Non-system accounts start with zero resources
-         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0);
+         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0, context.trx_context.is_transient());
       }
 
       int64_t ram_delta = config::overhead_per_account_ram_bytes;
@@ -129,17 +131,17 @@ void apply_sysio_newaccount(apply_context& context) {
       ram_delta += owner_permission.auth.get_billable_size();
       ram_delta += active_permission.auth.get_billable_size();
 
-      if (auto dm_logger = context.control.get_deep_mind_logger()) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
-      }
+   if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
+      dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
+   }
 
       // Charge the RAM usage to sysio (system payer)
       context.add_ram_usage(config::system_account_name, ram_delta);
 
-   } FC_CAPTURE_AND_RETHROW((create))
-}
+} FC_CAPTURE_AND_RETHROW( (create) ) }
 
 void apply_sysio_setcode(apply_context& context) {
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "setcode not allowed in read-only transaction" );
    auto& db = context.db;
    auto  act = context.get_action().data_as<setcode>();
    context.require_authorization(act.account);
@@ -171,7 +173,7 @@ void apply_sysio_setcode(apply_context& context) {
       old_size  = (int64_t)old_code_entry.code.size() * config::setcode_ram_bytes_multiplier;
       if( old_code_entry.code_ref_count == 1 ) {
          db.remove(old_code_entry);
-         context.control.get_wasm_interface().code_block_num_last_used(account.code_hash, account.vm_type, account.vm_version, context.control.head_block_num() + 1);
+         context.control.code_block_num_last_used(account.code_hash, account.vm_type, account.vm_version, context.control.head_block_num() + 1);
       } else {
          db.modify(old_code_entry, [](code_object& o) {
             --o.code_ref_count;
@@ -207,7 +209,7 @@ void apply_sysio_setcode(apply_context& context) {
    });
 
    if (new_size != old_size) {
-      if (auto dm_logger = context.control.get_deep_mind_logger()) {
+      if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          const char* operation = "update";
          if (old_size <= 0) {
             operation = "add";
@@ -223,6 +225,7 @@ void apply_sysio_setcode(apply_context& context) {
 }
 
 void apply_sysio_setabi(apply_context& context) {
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "setabi ot allowed in read-only transaction" );
    auto& db  = context.db;
    auto  act = context.get_action().data_as<setabi>();
 
@@ -245,7 +248,7 @@ void apply_sysio_setabi(apply_context& context) {
    });
 
    if (new_size != old_size) {
-      if (auto dm_logger = context.control.get_deep_mind_logger()) {
+      if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          const char* operation = "update";
          if (old_size <= 0) {
             operation = "add";
@@ -261,10 +264,11 @@ void apply_sysio_setabi(apply_context& context) {
 }
 
 void apply_sysio_updateauth(apply_context& context) {
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "updateauth not allowed in read-only transaction" );
 
    auto update = context.get_action().data_as<updateauth>();
 
-   // ** Auth.msg change **
+   // ** NEW ADDED IF STATEMENT **
    if( update.permission != name("auth.ext") && update.permission != name("auth.session") ) {
       context.require_authorization(update.account); // only here to mark the single authority on this action as used
    }
@@ -314,21 +318,21 @@ void apply_sysio_updateauth(apply_context& context) {
 
       int64_t old_size = (int64_t)(config::billable_size_v<permission_object> + permission->auth.get_billable_size());
 
-      authorization.modify_permission( *permission, update.auth );
+      authorization.modify_permission( *permission, update.auth, context.trx_context.is_transient() );
 
       int64_t new_size = (int64_t)(config::billable_size_v<permission_object> + permission->auth.get_billable_size());
 
-      if (auto dm_logger = context.control.get_deep_mind_logger()) {
+      if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", permission->id)), "auth", "update", "updateauth_update");
       }
 
       context.add_ram_usage( permission->owner, new_size - old_size );
    } else {
-      const auto& p = authorization.create_permission( update.account, update.permission, parent_id, update.auth );
+      const auto& p = authorization.create_permission( update.account, update.permission, parent_id, update.auth, context.trx_context.is_transient() );
 
       int64_t new_size = (int64_t)(config::billable_size_v<permission_object> + p.auth.get_billable_size());
 
-      if (auto dm_logger = context.control.get_deep_mind_logger()) {
+      if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", p.id)), "auth", "add", "updateauth_create");
       }
 
@@ -338,6 +342,8 @@ void apply_sysio_updateauth(apply_context& context) {
 
 void apply_sysio_deleteauth(apply_context& context) {
 //   context.require_write_lock( config::sysio_auth_scope );
+
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "deleteauth not allowed in read-only transaction" );
 
    auto remove = context.get_action().data_as<deleteauth>();
    context.require_authorization(remove.account); // only here to mark the single authority on this action as used
@@ -361,11 +367,11 @@ void apply_sysio_deleteauth(apply_context& context) {
    const auto& permission = authorization.get_permission({remove.account, remove.permission});
    int64_t old_size = config::billable_size_v<permission_object> + permission.auth.get_billable_size();
 
-   if (auto dm_logger = context.control.get_deep_mind_logger()) {
+   if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
       dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", permission.id)), "auth", "remove", "deleteauth");
    }
 
-   authorization.remove_permission( permission );
+   authorization.remove_permission( permission, context.trx_context.is_transient() );
 
    context.add_ram_usage( remove.account, -old_size );
 
@@ -373,6 +379,8 @@ void apply_sysio_deleteauth(apply_context& context) {
 
 void apply_sysio_linkauth(apply_context& context) {
 //   context.require_write_lock( config::sysio_auth_scope );
+
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "linkauth not allowed in read-only transaction" );
 
    auto requirement = context.get_action().data_as<linkauth>();
    try {
@@ -418,7 +426,7 @@ void apply_sysio_linkauth(apply_context& context) {
             link.required_permission = requirement.requirement;
          });
 
-         if (auto dm_logger = context.control.get_deep_mind_logger()) {
+         if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
             dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", l.id)), "auth_link", "add", "linkauth");
          }
 
@@ -434,6 +442,8 @@ void apply_sysio_linkauth(apply_context& context) {
 void apply_sysio_unlinkauth(apply_context& context) {
 //   context.require_write_lock( config::sysio_auth_scope );
 
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "unlinkauth not allowed in read-only transaction" );
+
    auto& db = context.db;
    auto unlink = context.get_action().data_as<unlinkauth>();
 
@@ -443,7 +453,7 @@ void apply_sysio_unlinkauth(apply_context& context) {
    auto link = db.find<permission_link_object, by_action_name>(link_key);
    SYS_ASSERT(link != nullptr, action_validate_exception, "Attempting to unlink authority, but no link found");
 
-   if (auto dm_logger = context.control.get_deep_mind_logger()) {
+   if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
       dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", link->id)), "auth_link", "remove", "unlinkauth");
    }
 
@@ -456,6 +466,7 @@ void apply_sysio_unlinkauth(apply_context& context) {
 }
 
 void apply_sysio_canceldelay(apply_context& context) {
+   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "canceldelay not allowed in read-only transaction" );
    auto cancel = context.get_action().data_as<canceldelay>();
    context.require_authorization(cancel.canceling_auth.actor); // only here to mark the single authority on this action as used
 
@@ -593,7 +604,8 @@ void apply_roa_reducepolicy(apply_context& context) {
                owner,
                ram_bytes - divisible_ram_to_reclaim,
                net_limit - net_weight.get_amount(),
-               cpu_limit - cpu_weight.get_amount()
+               cpu_limit - cpu_weight.get_amount(),
+               context.trx_context.is_transient()
             );
 
             // 9. Update reslimit row
@@ -605,7 +617,7 @@ void apply_roa_reducepolicy(apply_context& context) {
                fc::datastream<std::vector<char>> ds;
                fc::raw::pack(ds, rl_row);
                auto out = ds.storage();
-               
+
                // TODO: If we want to remove the reslimit row if all values are 0 do it here.
                context.db_update_i64(rl_itr, context.get_receiver(), out.data(), out.size());
             }

@@ -91,6 +91,42 @@ namespace sysio { namespace chain {
       fc::raw::unpack(ds, static_cast<shared_string &>(b));
       return ds;
    }
+
+namespace detail {
+   struct snapshot_key_value_object {
+      template<typename Stream>
+      friend Stream& operator>>(Stream& ds, snapshot_key_value_object& o) {
+         fc::raw::unpack(ds, o.primary_key);
+         fc::raw::unpack(ds, o.payer);
+
+         fc::unsigned_int sz;
+         fc::raw::unpack(ds, sz);
+         if(sz) {
+            o.value.resize(sz);
+            ds.read(o.value.data(), sz);
+         }
+
+         return ds;
+      }
+
+      template<typename Stream>
+      friend Stream& operator<<(Stream& ds, const snapshot_key_value_object& o) {
+         fc::raw::pack(ds, o.primary_key);
+         fc::raw::pack(ds, o.payer);
+
+         fc::raw::pack(ds, fc::unsigned_int(o.value.size()));
+         if(o.value.size())
+            ds.write(o.value.data(), o.value.size());
+
+         return ds;
+      }
+
+      uint64_t          primary_key;
+      account_name      payer;
+      std::vector<char> value;
+   };
+}
+
 } }
 
 namespace fc {
@@ -170,7 +206,7 @@ namespace fc {
 
    inline
    void from_variant( const variant& v, sysio::chain::shared_string& s ) {
-      string _s;
+      std::string _s;
       from_variant(v, _s);
       s = sysio::chain::shared_string(_s.begin(), _s.end(), s.get_allocator());
    }
@@ -182,19 +218,8 @@ namespace fc {
 
    inline
    void from_variant( const variant& v, sysio::chain::shared_blob& b ) {
-      string _s = base64_decode(v.as_string());
-      b = sysio::chain::shared_blob(_s.begin(), _s.end(), b.get_allocator());
-   }
-
-   inline
-   void to_variant( const blob& b, variant& v ) {
-      v = variant(base64_encode(b.data.data(), b.data.size()));
-   }
-
-   inline
-   void from_variant( const variant& v, blob& b ) {
-      string _s = base64_decode(v.as_string());
-      b.data = std::vector<char>(_s.begin(), _s.end());
+      std::vector<char> b64 = base64_decode(v.as_string());
+      b = sysio::chain::shared_blob(b64.begin(), b64.end(), b.get_allocator());
    }
 
    template<typename T>
@@ -207,6 +232,20 @@ namespace fc {
       std::vector<T> _v;
       from_variant(v, _v);
       sv = sysio::chain::shared_vector<T>(_v.begin(), _v.end(), sv.get_allocator());
+   }
+
+   inline
+   void to_variant(const sysio::chain::detail::snapshot_key_value_object& a, fc::variant& v) {
+      v = fc::mutable_variant_object("primary_key", a.primary_key)
+                                    ("payer", a.payer)
+                                    ("value", base64_encode(a.value.data(), a.value.size()));
+   }
+
+   inline
+   void from_variant(const fc::variant& v, sysio::chain::detail::snapshot_key_value_object& a) {
+      from_variant(v["primary_key"], a.primary_key);
+      from_variant(v["payer"], a.payer);
+      a.value = base64_decode(v["value"].as_string());
    }
 }
 

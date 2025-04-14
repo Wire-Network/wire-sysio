@@ -53,7 +53,7 @@ void test_action::test_dummy_action() {
 
    if ( dum13.b == 200 ) {
       // attempt to access context free only api
-      get_context_free_data( 0, nullptr, 0 );
+      sysio::get_context_free_data( 0, nullptr, 0 );
       sysio_assert( false, "get_context_free_data() not allowed in non-context free action" );
    } else {
       sysio_assert( dum13.a == DUMMY_ACTION_DEFAULT_A, "dum13.a == DUMMY_ACTION_DEFAULT_A" );
@@ -82,10 +82,10 @@ void test_action::test_cf_action() {
    cf_action cfa = act.data_as<cf_action>();
    if ( cfa.payload == 100 ) {
       // verify read of get_context_free_data, also verifies system api access
-      int size = get_context_free_data( cfa.cfd_idx, nullptr, 0 );
+      int size = sysio::get_context_free_data( cfa.cfd_idx, nullptr, 0 );
       sysio_assert( size > 0, "size determination failed" );
       std::vector<char> cfd( static_cast<size_t>(size) );
-      size = get_context_free_data( cfa.cfd_idx, &cfd[0], static_cast<size_t>(size) );
+      size = sysio::get_context_free_data( cfa.cfd_idx, &cfd[0], static_cast<size_t>(size) );
       sysio_assert(static_cast<size_t>(size) == cfd.size(), "get_context_free_data failed" );
       uint32_t v = sysio::unpack<uint32_t>( &cfd[0], cfd.size() );
       sysio_assert( v == cfa.payload, "invalid value" );
@@ -93,16 +93,16 @@ void test_action::test_cf_action() {
       // verify crypto api access
       char test[] = "test";
       auto hash = sha256( test, sizeof(test) );
-      assert_sha256( test, sizeof(test), hash );
+      sysio::assert_sha256( test, sizeof(test), hash );
       // verify action api access
       action_data_size();
       // verify console api access
-      print("test\n");
+      sysio::print("test\n");
       // verify memory api access
       uint32_t i = 42;
       memccpy( &v, &i, sizeof(i), sizeof(i) );
       // verify transaction api access
-      sysio_assert(transaction_size() > 0, "transaction_size failed");
+      sysio_assert(sysio::transaction_size() > 0, "transaction_size failed");
       // verify softfloat api access
       float f1 = 1.0f, f2 = 2.0f;
       float f3 = f1 + f2;
@@ -140,6 +140,7 @@ void test_action::test_cf_action() {
       sysio::require_auth("test"_n);
       sysio_assert( false, "authorization_api should not be allowed" );
    } else if ( cfa.payload == 207 || cfa.payload == 208 ) {
+      // 207 is obsolete as now() is removed from system.h
       current_time();
       sysio_assert( false, "system_api should not be allowed" );
    } else if ( cfa.payload == 209 ) {
@@ -172,12 +173,12 @@ void test_action::require_notice( uint64_t receiver, uint64_t code, uint64_t act
 }
 
 void test_action::require_notice_tests( uint64_t receiver, uint64_t code, uint64_t action ) {
-   print( "require_notice_tests" );
+   sysio::print( "require_notice_tests" );
    if( receiver == "testapi"_n.value ) {
-      print("require_recipient( \"acc5\"_n )");
+      sysio::print("require_recipient( \"acc5\"_n )");
       sysio::require_recipient("acc5"_n);
    } else if( receiver == "acc5"_n.value ) {
-      print("require_recipient( \"testapi\"_n )");
+      sysio::print("require_recipient( \"testapi\"_n )");
       sysio::require_recipient("testapi"_n);
    }
 }

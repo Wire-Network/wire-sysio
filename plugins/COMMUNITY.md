@@ -6,7 +6,7 @@ Third parties are encouraged to make pull requests to this file (`develop` branc
 
 | Description | URL |
 | ----------- | --- |
-| BP Heartbeat  | https://github.com/bancorprotocol/eos-producer-heartbeat-plugin |
+| BP Heartbeat  | https://github.com/bancorprotocol/sys-producer-heartbeat-plugin |
 | ElasticSearch | https://github.com/SYSLaoMao/elasticsearch_plugin |
 | Kafka | https://github.com/TP-Lab/kafka_plugin |
 | MySQL | https://github.com/eosBLACK/sysio_mysqldb_plugin |
@@ -18,7 +18,7 @@ Third parties are encouraged to make pull requests to this file (`develop` branc
 | Mongo History API | https://github.com/CryptoLions/SYS-mongo-history-API |
 | State History API | https://github.com/acoutts/SYS-state-history-API |
 | Hyperion History API | https://github.com/eosrio/Hyperion-History-API |
-| Chronicle	| https://github.com/SYSChronicleProject/eos-chronicle |
+| Chronicle	| https://github.com/SYSChronicleProject/sys-chronicle |
 
 ## DISCLAIMER:
 

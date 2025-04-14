@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/transaction.hpp>
+#include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <fc/utility.hpp>
@@ -13,7 +14,7 @@ namespace chainbase { class database; }
 namespace sysio { namespace chain {
 
 class controller;
-class transaction_context;
+class account_metadata_object;
 
 class apply_context {
    private:
@@ -177,6 +178,7 @@ class apply_context {
             int store( uint64_t scope, uint64_t table, const account_name& payer,
                        uint64_t id, secondary_key_proxy_const_type value )
             {
+               SYS_ASSERT( !context.trx_context.is_read_only(), table_operation_not_permitted, "cannot store a db record when executing a readonly transaction" );
                SYS_ASSERT( payer != account_name(), invalid_table_payer, "must specify a valid account to pay for new record" );
 
 //               context.require_write_lock( scope );
@@ -193,7 +195,7 @@ class apply_context {
                context.db.modify( tab, [&]( auto& t ) {
                  ++t.count;
 
-                  if (auto dm_logger = context.control.get_deep_mind_logger()) {
+                  if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
                      std::string event_id = RAM_EVENT_ID("${code}:${scope}:${table}:${index_name}",
                         ("code", t.code)
                         ("scope", t.scope)
@@ -211,12 +213,13 @@ class apply_context {
             }
 
             void remove( int iterator ) {
+               SYS_ASSERT( !context.trx_context.is_read_only(), table_operation_not_permitted, "cannot remove a db record when executing a readonly transaction" );
                const auto& obj = itr_cache.get( iterator );
 
                const auto& table_obj = itr_cache.get_table( obj.t_id );
                SYS_ASSERT( table_obj.code == context.receiver, table_access_violation, "db access violation" );
 
-               if (auto dm_logger = context.control.get_deep_mind_logger()) {
+               if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
                   std::string event_id = RAM_EVENT_ID("${code}:${scope}:${table}:${index_name}",
                      ("code", table_obj.code)
                      ("scope", table_obj.scope)
@@ -243,6 +246,7 @@ class apply_context {
             }
 
             void update( int iterator, account_name payer, secondary_key_proxy_const_type secondary ) {
+               SYS_ASSERT( !context.trx_context.is_read_only(), table_operation_not_permitted, "cannot update a db record when executing a readonly transaction" );
                const auto& obj = itr_cache.get( iterator );
 
                const auto& table_obj = itr_cache.get_table( obj.t_id );
@@ -255,7 +259,7 @@ class apply_context {
                int64_t billing_size =  config::billable_size_v<ObjectType>;
 
                std::string event_id;
-               if (context.control.get_deep_mind_logger() != nullptr) {
+               if (context.control.get_deep_mind_logger(context.trx_context.is_transient()) != nullptr) {
                   event_id = RAM_EVENT_ID("${code}:${scope}:${table}:${index_name}",
                      ("code", table_obj.code)
                      ("scope", table_obj.scope)
@@ -265,12 +269,12 @@ class apply_context {
                }
 
                if( obj.payer != payer ) {
-                  if (auto dm_logger = context.control.get_deep_mind_logger())
+                  if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient()))
                   {
                      dm_logger->on_ram_trace(std::string(event_id), "secondary_index", "remove", "secondary_index_remove");
                   }
                   context.update_db_usage( obj.payer, -(billing_size) );
-                  if (auto dm_logger = context.control.get_deep_mind_logger())
+                  if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient()))
                   {
                      dm_logger->on_ram_trace(std::move(event_id), "secondary_index", "add", "secondary_index_update_add_new_payer");
                   }
@@ -594,6 +598,9 @@ class apply_context {
       const action& get_action()const { return *act; }
 
       action_name get_sender() const;
+
+      bool is_applying_block() const { return trx_context.explicit_billed_cpu_time; }
+      bool should_use_sys_vm_oc()const;
 
    /// Fields:
    public:

@@ -1,27 +1,42 @@
 [submodule "libraries/appbase"]
 	path = libraries/appbase
-	url = https://github.com/wire-network/appbase
+	url = https://github.com/Wire-Network/appbase
 [submodule "libraries/chainbase"]
 	path = libraries/chainbase
-	url = https://github.com/wire-network/chainbase
-# [submodule "libraries/eos-vm"]
-# 	path = libraries/eos-vm
-# 	url = https://github.com/wire-network/eos-vm
+	url = https://github.com/Wire-Network/chainbase
 [submodule "libraries/softfloat"]
 	path = libraries/softfloat
-	url = https://github.com/wire-network/berkeley-softfloat-3
-[submodule "libraries/yubihsm"]
-	path = libraries/yubihsm
-	url = https://github.com/wire-network/yubihsm-shell
+	url = https://github.com/Wire-Network/berkeley-softfloat-3
+[submodule "libraries/rapidjson"]
+	path = libraries/rapidjson
+	url = https://github.com/Wire-Network/rapidjson
 [submodule "tests/abieos"]
 	path = tests/abieos
-	url = https://github.com/wire-network/abieos
-[submodule "wasm-spec-tests"]
-	path = wasm-spec-tests
-	url = https://github.com/wire-network/wasm-spec-tests
-[submodule "libraries/fc"]
-	path = libraries/fc
-	url = https://github.com/wire-network/fc
+	url = https://github.com/Wire-Network/abieos
+[submodule "libraries/libfc/include/fc/crypto/webauthn_json"]
+	path = libraries/libfc/include/fc/crypto/webauthn_json
+	url = https://github.com/Wire-Network/rapidjson
+[submodule "libraries/libfc/secp256k1/secp256k1"]
+	path = libraries/libfc/secp256k1/secp256k1
+	url = https://github.com/Wire-Network/secp256k1
+[submodule "libraries/prometheus/prometheus-cpp"]
+	path = libraries/prometheus/prometheus-cpp
+	url = https://github.com/jupp0r/prometheus-cpp.git
+[submodule "libraries/libfc/libraries/bn256"]
+	path = libraries/libfc/libraries/bn256
+	url = https://github.com/Wire-Network/bn256
+[submodule "libraries/cli11/cli11"]
+	path = libraries/cli11/cli11
+	url = https://github.com/AntelopeIO/CLI11.git
+[submodule "libraries/libfc/libraries/bls12-381"]
+	path = libraries/libfc/libraries/bls12-381
+	url = https://github.com/AntelopeIO/bls12-381
+[submodule "libraries/boost"]
+	path = libraries/boost
+	url = https://github.com/boostorg/boost.git
+[submodule "libraries/libfc/libraries/boringssl/boringssl"]
+	path = libraries/libfc/libraries/boringssl/boringssl
+	url = https://github.com/AntelopeIO/boringssl-build
 [submodule "libraries/sys-vm"]
 	path = libraries/sys-vm
-	url = https://github.com/wire-network/eos-vm
+	url = https://github.com/Wire-Network/eos-vm.git

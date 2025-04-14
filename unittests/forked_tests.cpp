@@ -4,13 +4,12 @@
 
 #include <sysio/chain/fork_database.hpp>
 
-#include <Runtime/Runtime.h>
-
 #include <fc/variant_object.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <contracts.hpp>
+#include <test_contracts.hpp>
 
 #include "fork_test_utilities.hpp"
 
@@ -142,8 +141,8 @@ BOOST_AUTO_TEST_CASE( forking ) try {
 
    auto r2 = c.create_accounts( {"sysio.token"_n} );
    wdump((fc::json::to_pretty_string(r2)));
-   c.set_code( "sysio.token"_n, contracts::sysio_token_wasm() );
-   c.set_abi( "sysio.token"_n, contracts::sysio_token_abi().data() );
+   c.set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+   c.set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    c.produce_blocks(10);
 
 
@@ -269,7 +268,8 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    auto bad_id = bad_block.calculate_id();
    auto bad_block_bsf = c.control->create_block_state_future( bad_id, std::make_shared<signed_block>(std::move(bad_block)) );
    c.control->abort_block();
-   BOOST_REQUIRE_EXCEPTION(c.control->push_block( bad_block_bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception,
+   controller::block_report br;
+   BOOST_REQUIRE_EXCEPTION(c.control->push_block( br, bad_block_bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception,
       [] (const fc::exception &ex)->bool {
          return ex.to_detail_string().find("block signed by unexpected key") != std::string::npos;
       });
@@ -391,15 +391,9 @@ BOOST_AUTO_TEST_CASE( read_modes ) try {
    BOOST_CHECK_EQUAL(head_block_num, head.control->fork_db_head_block_num());
    BOOST_CHECK_EQUAL(head_block_num, head.control->head_block_num());
 
-   tester read_only(setup_policy::none, db_read_mode::READ_ONLY);
-   push_blocks(c, read_only);
-   BOOST_CHECK_EQUAL(head_block_num, read_only.control->fork_db_head_block_num());
-   BOOST_CHECK_EQUAL(head_block_num, read_only.control->head_block_num());
-
    tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
    push_blocks(c, irreversible);
-   BOOST_CHECK_EQUAL(head_block_num, irreversible.control->fork_db_pending_head_block_num());
-   BOOST_CHECK_EQUAL(last_irreversible_block_num, irreversible.control->fork_db_head_block_num());
+   BOOST_CHECK_EQUAL(head_block_num, irreversible.control->fork_db_head_block_num());
    BOOST_CHECK_EQUAL(last_irreversible_block_num, irreversible.control->head_block_num());
 
 } FC_LOG_AND_RETHROW()
@@ -474,13 +468,13 @@ BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
 
    push_blocks( main, irreversible, hbn1 );
 
-   BOOST_CHECK_EQUAL( irreversible.control->fork_db_pending_head_block_num(), hbn1 );
+   BOOST_CHECK_EQUAL( irreversible.control->fork_db_head_block_num(), hbn1 );
    BOOST_CHECK_EQUAL( irreversible.control->head_block_num(), lib1 );
    BOOST_CHECK_EQUAL( does_account_exist( irreversible, "alice"_n ), false );
 
    push_blocks( other, irreversible, hbn4 );
 
-   BOOST_CHECK_EQUAL( irreversible.control->fork_db_pending_head_block_num(), hbn4 );
+   BOOST_CHECK_EQUAL( irreversible.control->fork_db_head_block_num(), hbn4 );
    BOOST_CHECK_EQUAL( irreversible.control->head_block_num(), lib4 );
    BOOST_CHECK_EQUAL( does_account_exist( irreversible, "alice"_n ), false );
 
@@ -490,7 +484,7 @@ BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
       irreversible.push_block( fb );
    }
 
-   BOOST_CHECK_EQUAL( irreversible.control->fork_db_pending_head_block_num(), hbn3 );
+   BOOST_CHECK_EQUAL( irreversible.control->fork_db_head_block_num(), hbn3 );
    BOOST_CHECK_EQUAL( irreversible.control->head_block_num(), lib3 );
    BOOST_CHECK_EQUAL( does_account_exist( irreversible, "alice"_n ), true );
 
@@ -643,7 +637,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
                                       .owner    = owner_auth,
                                       .active   = active_auth,
                                 });
-      trx.expiration = c.control->head_block_time() + fc::seconds( 60 );
+      trx.expiration = fc::time_point_sec{c.control->head_block_time() + fc::seconds( 60 )};
       trx.set_reference_block( cb->calculate_id() );
       trx.sign( get_private_key( config::system_account_name, "active" ), c.control->get_chain_id()  );
       trace1 = c.push_transaction( trx );
@@ -660,7 +654,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
                                       .owner    = owner_auth,
                                       .active   = active_auth,
                                 });
-      trx.expiration = c.control->head_block_time() + fc::seconds( 60 );
+      trx.expiration = fc::time_point_sec{c.control->head_block_time() + fc::seconds( 60 )};
       trx.set_reference_block( cb->calculate_id() );
       trx.sign( get_private_key( config::system_account_name, "active" ), c.control->get_chain_id()  );
       trace2 = c.push_transaction( trx );
@@ -676,7 +670,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
                                       .owner    = owner_auth,
                                       .active   = active_auth,
                                 });
-      trx.expiration = c.control->head_block_time() + fc::seconds( 60 );
+      trx.expiration = fc::time_point_sec{c.control->head_block_time() + fc::seconds( 60 )};
       trx.set_reference_block( cb->calculate_id() );
       trx.sign( get_private_key( config::system_account_name, "active" ), c.control->get_chain_id()  );
       trace3 = c.push_transaction( trx );
@@ -692,7 +686,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
                                       .owner    = owner_auth,
                                       .active   = active_auth,
                                 });
-      trx.expiration = c.control->head_block_time() + fc::seconds( 60 );
+      trx.expiration = fc::time_point_sec{c.control->head_block_time() + fc::seconds( 60 )};
       trx.set_reference_block( b->calculate_id() ); // tapos to dan's block should be rejected on fork switch
       trx.sign( get_private_key( config::system_account_name, "active" ), c.control->get_chain_id()  );
       trace4 = c.push_transaction( trx );
@@ -726,7 +720,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
       BOOST_CHECK( i == 11 + 12 );
    }
    // verify transaction on fork is reported by push_block in order
-   BOOST_REQUIRE_EQUAL( 4, c.get_unapplied_transaction_queue().size() );
+   BOOST_REQUIRE_EQUAL( 4u, c.get_unapplied_transaction_queue().size() );
    BOOST_REQUIRE_EQUAL( trace1->id, c.get_unapplied_transaction_queue().begin()->id() );
    BOOST_REQUIRE_EQUAL( trace2->id, (++c.get_unapplied_transaction_queue().begin())->id() );
    BOOST_REQUIRE_EQUAL( trace3->id, (++(++c.get_unapplied_transaction_queue().begin()))->id() );
@@ -753,7 +747,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
    std::vector<transaction_trace_ptr> traces;
    c.produce_block( traces );
 
-   BOOST_REQUIRE_EQUAL( 4, traces.size() );
+   BOOST_REQUIRE_EQUAL( 4u, traces.size() );
    BOOST_CHECK_EQUAL( trace1->id, traces.at(0)->id );
    BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(0)->receipt->status );
    BOOST_CHECK_EQUAL( trace2->id, traces.at(1)->id );

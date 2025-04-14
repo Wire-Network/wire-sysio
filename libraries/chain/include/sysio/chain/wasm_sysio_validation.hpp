@@ -332,7 +332,7 @@ namespace sysio { namespace chain { namespace wasm_validations {
       public:
          wasm_binary_validation( const sysio::chain::controller& control, IR::Module& mod ) : _module( &mod ) {
             // initialize validators here
-            nested_validator::init(!control.is_producing_block());
+            nested_validator::init(!control.is_speculative_block());
          }
 
          void validate() {

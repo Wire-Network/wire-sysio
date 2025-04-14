@@ -31,11 +31,11 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_test)
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
 
    // Re-calculate the transaction merkle
-   vector<digest_type> trx_digests;
+   deque<digest_type> trx_digests;
    const auto& trxs = copy_b->transactions;
    for( const auto& a : trxs )
       trx_digests.emplace_back( a.digest() );
-   copy_b->transaction_mroot = merkle( move(trx_digests) );
+   copy_b->transaction_mroot = merkle( std::move(trx_digests) );
 
    // Re-sign the block
    auto header_bmroot = digest_type::hash( std::make_pair( copy_b->digest(), main.control->head_block_state()->blockroot_merkle.get_root() ) );
@@ -46,7 +46,8 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_test)
    tester validator;
    auto bsf = validator.control->create_block_state_future( copy_b->calculate_id(), copy_b );
    validator.control->abort_block();
-   BOOST_REQUIRE_EXCEPTION(validator.control->push_block( bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception ,
+   controller::block_report br;
+   BOOST_REQUIRE_EXCEPTION(validator.control->push_block( br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception ,
    [] (const fc::exception &e)->bool {
       return e.code() == account_name_exists_exception::code_value ;
    }) ;
@@ -84,7 +85,8 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_mroot_test)
    tester validator;
    auto bsf = validator.control->create_block_state_future( copy_b->calculate_id(), copy_b );
    validator.control->abort_block();
-   BOOST_REQUIRE_EXCEPTION(validator.control->push_block( bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception ,
+   controller::block_report br;
+   BOOST_REQUIRE_EXCEPTION(validator.control->push_block( br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} ), fc::exception,
                            [] (const fc::exception &e)->bool {
                               return e.code() == block_validate_exception::code_value &&
                                      e.to_detail_string().find("invalid block transaction merkle root") != std::string::npos;
@@ -109,12 +111,11 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(validating_te
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
 
    // Re-calculate the transaction merkle
-   vector<digest_type> trx_digests;
+   deque<digest_type> trx_digests;
    const auto& trxs = copy_b->transactions;
-   trx_digests.reserve( trxs.size() );
    for( const auto& a : trxs )
-      trx_digests.emplace_back( a.digest() );
-   copy_b->transaction_mroot = merkle( move(trx_digests) );
+      trx_digests.emplace_back( a.packed_digest() ); // validating_tester is not allowing the conversion from packed_digest to digest
+   copy_b->transaction_mroot = merkle( std::move(trx_digests) );
 
    // Re-sign the block
    auto header_bmroot = digest_type::hash( std::make_pair( copy_b->digest(), main.control->head_block_state()->blockroot_merkle.get_root() ) );
@@ -262,10 +263,10 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions, validating_tester) { try {
 
       control->get_account( a ); // throws if it does not exist
 
-      vector<transaction_metadata_ptr> unapplied_trxs = control->abort_block();
+      deque<transaction_metadata_ptr> unapplied_trxs = control->abort_block();
 
       // verify transaction returned from abort_block()
-      BOOST_REQUIRE_EQUAL( 1,  unapplied_trxs.size() );
+      BOOST_REQUIRE_EQUAL( 1u,  unapplied_trxs.size() );
       BOOST_REQUIRE_EQUAL( trx.id(), unapplied_trxs.at(0)->id() );
 
       // account does not exist block was aborted which had transaction
@@ -313,9 +314,9 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions_tester, validating_tester) { t
 
       control->get_account( a ); // throws if it does not exist
 
-      vector<transaction_metadata_ptr> unapplied_trxs = control->abort_block(); // should be empty now
+      deque<transaction_metadata_ptr> unapplied_trxs = control->abort_block(); // should be empty now
 
-      BOOST_REQUIRE_EQUAL( 0,  unapplied_trxs.size() );
+      BOOST_REQUIRE_EQUAL( 0u,  unapplied_trxs.size() );
 
    } FC_LOG_AND_RETHROW() }
 

@@ -218,7 +218,7 @@ namespace sysio { namespace chain {
             h.new_producers = std::move(downgraded_producers);
          }
       }
-      
+
       // Add s_root_extension to header extensions if present & relevant
       if (s_header) {
          emplace_extension(

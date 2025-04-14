@@ -1,5 +1,5 @@
 #include "test_cfd_transaction.hpp"
-#include <contracts.hpp>
+#include <test_contracts.hpp>
 
 using namespace sysio::chain::literals;
 
@@ -8,7 +8,7 @@ std::vector<sysio::chain::signed_block_ptr> deploy_test_api(sysio::testing::test
    chain.create_account("testapi"_n);
    chain.create_account("dummy"_n);
    result.push_back(chain.produce_block());
-   chain.set_code("testapi"_n, sysio::testing::contracts::test_api_wasm());
+   chain.set_code("testapi"_n, sysio::testing::test_contracts::test_api_wasm());
    result.push_back(chain.produce_block());
    return result;
 }

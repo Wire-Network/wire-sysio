@@ -112,7 +112,7 @@ def startNode(nodeIndex, account):
         '    --config-dir ' + os.path.abspath(dir) +
         '    --data-dir ' + os.path.abspath(dir) +
         '    --chain-state-db-size-mb 1024'
-        '    --http-server-address 0.0.0.0:' + str(8000 + nodeIndex) +
+        '    --http-server-address 0.0.0.0:' + str(args.http_port + nodeIndex) +
         '    --p2p-listen-endpoint 0.0.0.0:' + str(9000 + nodeIndex) +
         '    --max-clients ' + str(maxClients) +
         '    --p2p-max-nodes-per-host ' + str(maxClients) +
@@ -121,7 +121,7 @@ def startNode(nodeIndex, account):
         '    --access-control-allow-origin=*'
         '    --access-control-allow-headers="Origin, X-Requested-With, Content-Type, Accept"'
         '    --producer-name ' + account['name'] +
-        '    --private-key \'["' + account['pub'] + '","' + account['pvt'] + '"]\''
+        '    --signature-provider ' + account['pub'] + '=KEY:' + account['pvt'] +
         # '    --s-chain-contract settle.wns'
         # '    --s-chain-actions batchw'
         # '    --s-chain-actions initcontract'
@@ -181,7 +181,7 @@ def createStakedAccounts(b, e):
         stakeCpu = stake - stakeNet
         print('%s: total funds=%s, ram=%s, net=%s, cpu=%s, unstaked=%s' % (a['name'], intToCurrency(a['funds']), intToCurrency(ramFunds), intToCurrency(stakeNet), intToCurrency(stakeCpu), intToCurrency(unstaked)))
         assert(funds == ramFunds + stakeNet + stakeCpu + unstaked)
-        retry(args.clio + 'system newaccount --transfer sysio %s %s --stake-net "%s" --stake-cpu "%s" --buy-ram "%s"   ' % 
+        retry(args.clio + 'system newaccount --transfer sysio %s %s --stake-net "%s" --stake-cpu "%s" --buy-ram "%s"   ' %
             (a['name'], a['pub'], intToCurrency(stakeNet), intToCurrency(stakeCpu), intToCurrency(ramFunds)))
         if unstaked:
             retry(args.clio + 'transfer sysio %s "%s"' % (a['name'], intToCurrency(unstaked)))
@@ -256,7 +256,7 @@ def msigProposeReplaceSystem(proposer, proposalName):
     trxPermissions = [{'actor': 'sysio', 'permission': 'active'}]
     with open(fastUnstakeSystem, mode='rb') as f:
         setcode = {'account': 'sysio', 'vmtype': 0, 'vmversion': 0, 'code': f.read().hex()}
-    run(args.clio + 'multisig propose ' + proposalName + jsonArg(requestedPermissions) + 
+    run(args.clio + 'multisig propose ' + proposalName + jsonArg(requestedPermissions) +
         jsonArg(trxPermissions) + 'sysio setcode' + jsonArg(setcode) + ' -p ' + proposer)
 
 def msigApproveReplaceSystem(proposer, proposalName):
@@ -287,9 +287,6 @@ def produceNewAccounts():
             print(i, name)
             f.write('        {"name":"%s", "pvt":"%s", "pub":"%s"},\n' % (name, r[1], r[2]))
 
-def stepKillAll():
-    run('killall kiod nodeop || true')
-    sleep(1.5)
 def stepStartWallet():
     startWallet()
     importKeys()
@@ -310,14 +307,14 @@ def stepSetSystemContract():
     # contract that makes use of the functionality introduced by that feature to be deployed. 
 
     # activate PREACTIVATE_FEATURE before installing sysio.boot
-    retry('curl -X POST http://0.0.0.0:%d' % args.http_port + 
+    retry('curl -X POST http://0.0.0.0:%d' % args.http_port +
         '/v1/producer/schedule_protocol_feature_activations ' +
         '-d \'{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}\'')
     sleep(3)
 
-    # install sysio.boot which supports the native actions and activate 
+    # install sysio.boot which supports the native actions and activate
     # action that allows activating desired protocol features prior to 
-    # deploying a system contract with more features such as sysio.bios 
+    # deploying a system contract with more features such as sysio.bios
     # or sysio.system
     retry(args.clio + 'set contract sysio ' + args.contracts_dir + '/sysio.boot/')
     sleep(3)
@@ -339,9 +336,9 @@ def stepSetSystemContract():
     retry(args.clio + 'push action sysio activate \'["ad9e3d8f650687709fd68f4b90b41f7d825a365b02c23a636cef88ac2ac00c43"]\' -p sysio@active')
     # DISALLOW_EMPTY_PRODUCER_SCHEDULE
     retry(args.clio + 'push action sysio activate \'["68dcaa34c0517d19666e6b33add67351d8c5f69e999ca1e37931bc410a297428"]\' -p sysio@active')
-     # FIX_LINKAUTH_RESTRICTION
+    # FIX_LINKAUTH_RESTRICTION
     retry(args.clio + 'push action sysio activate \'["e0fb64b1085cc5538970158d05a009c24e276fb94e1a0bf6a528b48fbc4ff526"]\' -p sysio@active')
-     # REPLACE_DEFERRED
+    # REPLACE_DEFERRED
     retry(args.clio + 'push action sysio activate \'["ef43112c6543b88db2283a2e077278c315ae2c84719a8b25f25cc88565fbea99"]\' -p sysio@active')
     # NO_DUPLICATE_DEFERRED_ID
     retry(args.clio + 'push action sysio activate \'["4a90c00d55454dc5b059055ca213579c6ea856967712a56017487886a4d4cc0f"]\' -p sysio@active')
@@ -353,8 +350,21 @@ def stepSetSystemContract():
     retry(args.clio + 'push action sysio activate \'["4fca8bd82bbd181e714e283f83e1b45d95ca5af40fb89ad3977b653c448f78c2"]\' -p sysio@active')
     # WTMSIG_BLOCK_SIGNATURES
     retry(args.clio + 'push action sysio activate \'["299dcb6af692324b899b39f16d5a530a33062804e41f09dc97e9f156b4476707"]\' -p sysio@active')
-    # EM_KEY Sig EM (ADDED)
-    retry(args.clio + 'push action sysio activate \'["5d47703100b35be53772d7caa1ef73e92397e0a876cc4c0af24a5f0353f199c9"]\' -p sysio@active')
+    # GET_CODE_HASH
+    retry(args.clio + 'push action sysio activate \'["bcd2a26394b36614fd4894241d3c451ab0f6fd110958c3423073621a70826e99"]\' -p sysio@active')
+    # GET_BLOCK_NUM
+    retry(args.clio + 'push action sysio activate \'["35c2186cc36f7bb4aeaf4487b36e57039ccf45a9136aa856a5d569ecca55ef2b"]\' -p sysio@active')
+    # CRYPTO_PRIMITIVES
+    retry(args.clio + 'push action sysio activate \'["6bcb40a24e49c26d0a60513b6aeb8551d264e4717f306b81a37a5afb3b47cedc"]\' -p sysio@active')
+    # BLS_PRIMITIVES2
+    retry(args.clio + 'push action sysio activate \'["63320dd4a58212e4d32d1f58926b73ca33a247326c2a5e9fd39268d2384e011a"]\' -p sysio@active')
+    # DISABLE_DEFERRED_TRXS_STAGE_1 - DISALLOW NEW DEFERRED TRANSACTIONS
+    retry(args.clio + 'push action sysio activate \'["fce57d2331667353a0eac6b4209b67b843a7262a848af0a49a6e2fa9f6584eb4"]\' -p sysio@active')
+    # DISABLE_DEFERRED_TRXS_STAGE_2 - PREVENT PREVIOUSLY SCHEDULED DEFERRED TRANSACTIONS FROM REACHING OTHER NODE
+    # THIS DEPENDS ON DISABLE_DEFERRED_TRXS_STAGE_1
+    retry(args.clio + 'push action sysio activate \'["09e86cb0accf8d81c9e85d34bea4b925ae936626d00c984e4691186891f5bc16"]\' -p sysio@active')
+    # DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
+    retry(args.clio + 'push action sysio activate \'["d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586"]\' -p sysio@active')
     sleep(1)
 
     # install sysio.system latest version
@@ -397,7 +407,6 @@ def stepLog():
 parser = argparse.ArgumentParser()
 
 commands = [
-    ('k', 'kill',               stepKillAll,                True,    "Kill all nodeop and kiod processes"),
     ('w', 'wallet',             stepStartWallet,            True,    "Start kiod, create wallet, fill with keys"),
     ('b', 'boot',               stepStartBoot,              True,    "Start boot node"),
     ('s', 'sys',                createSystemAccounts,       True,    "Create system accounts (sysio.*)"),

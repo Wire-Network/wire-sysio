@@ -8,4 +8,7 @@ public:
 
    [[sysio::action]]
    void doit();
+
+   [[sysio::action]]
+   void doitslow();
 };

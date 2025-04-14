@@ -1,6 +1,6 @@
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 static intrinsic_map_t& the_intrinsic_map() {
    static intrinsic_map_t intrinsic_map;

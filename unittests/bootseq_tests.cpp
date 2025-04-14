@@ -1,20 +1,12 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/testing/tester.hpp>
 
-#include <Runtime/Runtime.h>
-
 #include <fc/variant_object.hpp>
 
 #include <boost/test/unit_test.hpp>
 
 #include <contracts.hpp>
-
-#ifdef NON_VALIDATING_TEST
-#define TESTER tester
-#else
-#define TESTER validating_tester
-#endif
-
+#include <test_contracts.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -63,22 +55,22 @@ std::vector<genesis_account> test_genesis( {
   {"masses"_n,   800'000'000'0000ll}
 });
 
-class bootseq_tester : public TESTER {
+class bootseq_tester : public validating_tester {
 public:
    void deploy_contract( bool call_init = true ) {
-      set_code( config::system_account_name, contracts::sysio_system_wasm() );
-      set_abi( config::system_account_name, contracts::sysio_system_abi().data() );
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
       if( call_init ) {
          base_tester::push_action(config::system_account_name, "init"_n,
                                   config::system_account_name,  mutable_variant_object()
                                   ("version", 0)
-                                  ("core", CORE_SYM_STR)
+                                  ("core", symbol(CORE_SYMBOL).to_string())
             );
       }
       const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-      abi_ser.set_abi(abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
    }
 
    fc::variant get_global_state() {
@@ -166,7 +158,7 @@ public:
          return get_currency_balance("sysio.token"_n, symbol(CORE_SYMBOL), act);
     }
 
-    void set_code_abi(const account_name& account, const vector<uint8_t>& wasm, const char* abi, const private_key_type* signer = nullptr) {
+    void set_code_abi(const account_name& account, const vector<uint8_t>& wasm, const std::string& abi, const private_key_type* signer = nullptr) {
        wdump((account));
         set_code(account, wasm, signer);
         set_abi(account, abi, signer);
@@ -174,7 +166,7 @@ public:
            const auto& accnt = control->db().get<account_object,by_name>( account );
            abi_def abi_definition;
            BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi_definition), true);
-           abi_ser.set_abi(abi_definition, abi_serializer::create_yield_function( abi_serializer_max_time ));
+           abi_ser.set_abi(std::move(abi_definition), abi_serializer::create_yield_function( abi_serializer_max_time ));
         }
         produce_blocks();
     }
@@ -187,23 +179,25 @@ BOOST_AUTO_TEST_SUITE(bootseq_tests)
 
 BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
+
         // Create sysio.msig and sysio.token
-        create_accounts({"sysio.msig"_n, "sysio.roa"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n });
+        create_accounts({"sysio.msig"_n, "sysio.roa"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
         // Set code for the following accounts:
         //  - sysio (code: sysio.bios) (already set by tester constructor)
         //  - sysio.msig (code: sysio.msig)
         //  - sysio.token (code: sysio.token)
-        // set_code_abi("sysio.msig"_n, contracts::sysio_msig_wasm(), contracts::sysio_msig_abi().data());//, &sysio_active_pk);
-        // set_code_abi("sysio.token"_n, contracts::sysio_token_wasm(), contracts::sysio_token_abi().data()); //, &sysio_active_pk);
+        // set_code_abi("sysio.msig"_n, contracts::sysio_msig_wasm(), contracts::sysio_msig_abi());//, &sysio_active_pk);
+        // set_code_abi("sysio.token"_n, contracts::sysio_token_wasm(), contracts::sysio_token_abi()); //, &sysio_active_pk);
+
         set_code_abi("sysio.msig"_n,
-                     contracts::sysio_msig_wasm(),
-                     contracts::sysio_msig_abi().data());//, &sysio_active_pk);
+                     test_contracts::sysio_msig_wasm(),
+                     test_contracts::sysio_msig_abi());//, &sysio_active_pk);
         set_code_abi("sysio.roa"_n,
-                     contracts::sysio_roa_wasm(),
-                     contracts::sysio_roa_abi().data());//, &sysio_active_pk);
+                     test_contracts::sysio_roa_wasm(),
+                     test_contracts::sysio_roa_abi());//, &sysio_active_pk);
         set_code_abi("sysio.token"_n,
-                     contracts::sysio_token_wasm(),
-                     contracts::sysio_token_abi().data()); //, &sysio_active_pk);
+                     test_contracts::sysio_token_wasm(),
+                     test_contracts::sysio_token_abi()); //, &sysio_active_pk);
 
         // Set privileged for sysio.msig and sysio.token
         set_privileged("sysio.msig"_n);
@@ -217,7 +211,6 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         BOOST_TEST(sysio_roa_acc.is_privileged() == true);
         const auto& sysio_token_acc = get<account_metadata_object, by_name>("sysio.token"_n);
         BOOST_TEST(sysio_token_acc.is_privileged() == true);
-
 
         // Create SYS tokens in sysio.token, set its manager as sysio
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens
@@ -331,7 +324,6 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         claim_rewards("runnerup1"_n);
         BOOST_TEST(get_balance("runnerup1"_n).get_amount() > 0);
 
-        //const auto first_june_2018 = fc::seconds(1527811200); // 2018-06-01
         const auto first_june_2028 = fc::seconds(1843430400); // 2028-06-01
         // Ensure that now is yet 10 years after 2018-06-01 yet
         BOOST_REQUIRE(control->head_block_time().time_since_epoch() < first_june_2028);

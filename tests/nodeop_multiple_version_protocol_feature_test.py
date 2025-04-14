@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from Cluster import Cluster, PFSetupPolicy
-from TestHelper import TestHelper
-from WalletMgr import WalletMgr
-from Node import Node
-
 import signal
 import json
 import time
 import os
 from os.path import join, exists
 from datetime import datetime
+from typing import List
+
+from TestHarness import  Cluster, Node, TestHelper, Utils, WalletMgr
+from TestHarness.Cluster import PFSetupPolicy
 
 ###############################################################
 # nodeop_multiple_version_protocol_feature_test
@@ -21,26 +19,21 @@ from datetime import datetime
 ###############################################################
 
 # Parse command line arguments
-args = TestHelper.parse_args({"-v","--clean-run","--dump-error-details","--leave-running",
-                              "--keep-logs", "--alternate-version-labels-file"})
+args = TestHelper.parse_args({"-v","--dump-error-details","--leave-running",
+                              "--keep-logs","--alternate-version-labels-file","--unshared"})
 Utils.Debug=args.v
-killAll=args.clean_run
 dumpErrorDetails=args.dump_error_details
-dontKill=args.leave_running
-killEosInstances=not dontKill
-killWallet=not dontKill
-keepLogs=args.keep_logs
 alternateVersionLabelsFile=args.alternate_version_labels_file
 
 walletMgr=WalletMgr(True)
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 cluster.setWalletMgr(walletMgr)
 
 def restartNode(node: Node, chainArg=None, addSwapFlags=None, nodeopPath=None):
     if not node.killed:
         node.kill(signal.SIGTERM)
     isRelaunchSuccess = node.relaunch(chainArg, addSwapFlags=addSwapFlags,
-                                      timeout=5, cachePopen=True, nodeopPath=nodeopPath)
+                                      timeout=5, nodeopPath=nodeopPath)
     assert isRelaunchSuccess, "Fail to relaunch"
 
 def shouldNodeContainPreactivateFeature(node):
@@ -81,8 +74,6 @@ def waitUntilBlockBecomeIrr(node, blockNum, timeout=60):
 testSuccessful = False
 try:
     TestHelper.printSystemInfo("BEGIN")
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
 
     # Create a cluster of 4 nodes, each node has 1 producer. The first 3 nodes use the latest vesion,
     # While the 4th node use the version that doesn't support protocol feature activation (i.e. 1.7.0)
@@ -94,8 +85,7 @@ try:
     # version 1.7 did not provide a default value for "--last-block-time-offset-us" so this is needed to
     # avoid dropping late blocks
     assert cluster.launch(pnodes=4, totalNodes=4, prodCount=1, totalProducers=4,
-                          extraNodeopArgs=" --plugin sysio::producer_api_plugin --plugin sysio::trace_api_plugin --trace-no-abis",
-                          useBiosBootFile=False,
+                          extraNodeopArgs=" --plugin sysio::producer_api_plugin ",
                           specificExtraNodeopArgs={
                              0:"--http-max-response-time-ms 990000",
                              1:"--http-max-response-time-ms 990000",
@@ -114,13 +104,13 @@ try:
 
     def pauseBlockProductions():
         for node in allNodes:
-            if not node.killed: node.processCurlCmd("producer", "pause", "")
+            if not node.killed: node.processUrllibRequest("producer", "pause")
 
     def resumeBlockProductions():
         for node in allNodes:
-            if not node.killed: node.processCurlCmd("producer", "resume", "")
+            if not node.killed: node.processUrllibRequest("producer", "resume")
 
-    def areNodesInSync(nodes:[Node]):
+    def areNodesInSync(nodes: List[Node]):
         # Pause all block production to ensure the head is not moving
         pauseBlockProductions()
         time.sleep(2) # Wait for some time to ensure all blocks are propagated
@@ -203,7 +193,7 @@ try:
 
     testSuccessful = True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful, killEosInstances, killWallet, keepLogs, killAll, dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

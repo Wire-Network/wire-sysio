@@ -4,15 +4,13 @@
 #include <sysio/chain/whitelisted_intrinsics.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <functional>
-#include "Runtime/Linker.h"
-#include "Runtime/Runtime.h"
 
 namespace sysio { namespace chain {
 
    class apply_context;
    class wasm_runtime_interface;
    class controller;
-   namespace eosvmoc { struct config; }
+   namespace sysvmoc { struct config; }
 
    struct wasm_exit {
       int32_t code = 0;
@@ -25,25 +23,41 @@ namespace sysio { namespace chain {
    class wasm_interface {
       public:
          enum class vm_type {
-            eos_vm,
-            eos_vm_jit,
-            eos_vm_oc
+            sys_vm,
+            sys_vm_jit,
+            sys_vm_oc
          };
 
          //return string description of vm_type
          static std::string vm_type_string(vm_type vmtype) {
              switch (vmtype) {
-             case vm_type::eos_vm:
+             case vm_type::sys_vm:
                 return "sys-vm";
-             case vm_type::eos_vm_oc:
+             case vm_type::sys_vm_oc:
                 return "sys-vm-oc";
              default:
                  return "sys-vm-jit";
              }
          }
 
-         wasm_interface(vm_type vm, bool eosvmoc_tierup, const chainbase::database& d, const boost::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, bool profile);
+         enum class vm_oc_enable {
+            oc_auto,
+            oc_all,
+            oc_none
+         };
+
+         inline static bool test_disable_tierup = false; // set by unittests to test tierup failing
+
+         wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile);
          ~wasm_interface();
+
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+         // initialize exec per thread
+         void init_thread_local_data();
+
+         // returns true if SYS VM OC is enabled
+         bool is_sys_vm_oc_enabled() const;
+#endif
 
          //call before dtor to skip what can be minutes of dtor overhead with some runtimes; can cause leaks
          void indicate_shutting_down();
@@ -60,14 +74,15 @@ namespace sysio { namespace chain {
          //Calls apply or error on a given code
          void apply(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context);
 
-         //Immediately exits currently running wasm. UB is called when no wasm running
-         void exit();
+         //Returns true if the code is cached
+         bool is_code_cached(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version) const;
 
          // If substitute_apply is set, then apply calls it before doing anything else. If substitute_apply returns true,
-         // then apply returns immediately.
-         std::function<bool(
-            const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, apply_context& context)> substitute_apply;
+         // then apply returns immediately. Provided function must be multi-thread safe.
+         std::function<bool(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, apply_context& context)> substitute_apply;
+
       private:
+         vm_oc_enable sysvmoc_tierup;
          unique_ptr<struct wasm_interface_impl> my;
    };
 
@@ -75,6 +90,16 @@ namespace sysio { namespace chain {
 
 namespace sysio{ namespace chain {
    std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime);
+   inline std::ostream& operator<<(std::ostream& os, wasm_interface::vm_oc_enable t) {
+      if (t == wasm_interface::vm_oc_enable::oc_auto) {
+         os << "auto";
+      } else if (t == wasm_interface::vm_oc_enable::oc_all) {
+         os << "all";
+      } else if (t == wasm_interface::vm_oc_enable::oc_none) {
+         os << "none";
+      }
+      return os;
+   }
 }}
 
-FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (eos_vm)(eos_vm_jit)(eos_vm_oc) )
+FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (sys_vm)(sys_vm_jit)(sys_vm_oc) )

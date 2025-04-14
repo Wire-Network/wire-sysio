@@ -1,10 +1,11 @@
 #pragma once
-#include <appbase/application.hpp>
+
+#include <sysio/chain/application.hpp>
+#include <sysio/chain/exceptions.hpp>
+#include <sysio/http_plugin/api_category.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/io/json.hpp>
-#include <sysio/chain/exceptions.hpp>
-
 namespace sysio {
    using namespace appbase;
 
@@ -14,19 +15,19 @@ namespace sysio {
     *
     * Arguments: response_code, response_body
     */
-   using url_response_callback = std::function<void(int,fc::variant)>;
+   using url_response_callback = std::function<void(int,std::optional<fc::variant>)>;
 
    /**
     * @brief Callback type for a URL handler
     *
     * URL handlers have this type
     *
-    * The handler must gaurantee that url_response_callback() is called;
+    * The handler must guarantee that url_response_callback() is called;
     * otherwise, the connection will hang and result in a memory leak.
     *
     * Arguments: url, request_body, response_callback
     **/
-   using url_handler = std::function<void(string,string,url_response_callback)>;
+   using url_handler = std::function<void(string&&, string&&, url_response_callback&&)>;
 
    /**
     * @brief An API, containing URLs and handlers
@@ -35,7 +36,18 @@ namespace sysio {
     * a handler. The URL is the path on the web server that triggers the
     * call, and the handler is the function which implements the API call
     */
-   using api_description = std::map<string, url_handler>;
+   struct api_entry {
+      string path;
+      api_category category;
+      url_handler handler;
+   };
+
+   using api_description = std::vector<api_entry>;
+
+   enum class http_content_type {
+      json = 1,
+      plaintext = 2
+   };
 
    struct http_plugin_defaults {
       //If empty, unix socket support will be completely disabled. If not empty,
@@ -45,6 +57,9 @@ namespace sysio {
       //If non 0, HTTP will be enabled by default on the given port number. If
       // 0, HTTP will not be enabled by default
       uint16_t default_http_port{0};
+      //If set, a Server header will be added to the HTTP reply with this value
+      string server_header;
+      bool   support_categories = true;
    };
 
    /**
@@ -65,48 +80,57 @@ namespace sysio {
    {
       public:
         http_plugin();
-        virtual ~http_plugin();
+        ~http_plugin() override;
 
         //must be called before initialize
-        static void set_defaults(const http_plugin_defaults config);
+        static void set_defaults(const http_plugin_defaults& config);
+        static std::string get_server_header();
 
         APPBASE_PLUGIN_REQUIRES()
-        virtual void set_program_options(options_description&, options_description& cfg) override;
+        void set_program_options(options_description&, options_description& cfg) override;
 
         void plugin_initialize(const variables_map& options);
         void plugin_startup();
         void plugin_shutdown();
         void handle_sighup() override;
 
-        void add_handler(const string& url, const url_handler&, int priority = appbase::priority::medium_low);
-        void add_api(const api_description& api, int priority = appbase::priority::medium_low) {
-           for (const auto& call : api)
-              add_handler(call.first, call.second, priority);
+        void add_handler(api_entry&& entry, appbase::exec_queue q, int priority = appbase::priority::medium_low, http_content_type content_type = http_content_type::json);
+        void add_api(api_description&& api, appbase::exec_queue q, int priority = appbase::priority::medium_low, http_content_type content_type = http_content_type::json) {
+           for (auto& call : api)
+              add_handler(std::move(call), q, priority, content_type);
         }
 
-        void add_async_handler(const string& url, const url_handler& handler);
-        void add_async_api(const api_description& api) {
-           for (const auto& call : api)
-              add_handler(call.first, call.second);
+        void add_async_handler(api_entry&& entry, http_content_type content_type = http_content_type::json);
+        void add_async_api(api_description&& api, http_content_type content_type = http_content_type::json) {
+           for (auto& call : api)
+              add_async_handler(std::move(call), content_type);
         }
 
         // standard exception handling for api handlers
-        static void handle_exception( const char *api_name, const char *call_name, const string& body, url_response_callback cb );
+        static void handle_exception( const char *api_name, const char *call_name, const string& body, const url_response_callback& cb );
 
-        bool is_on_loopback() const;
-        bool is_secure() const;
+        void post_http_thread_pool(std::function<void()> f);
 
-        bool verbose_errors()const;
+        bool is_on_loopback(api_category category) const;
+
+        static bool verbose_errors();
 
         struct get_supported_apis_result {
            vector<string> apis;
         };
 
-        get_supported_apis_result get_supported_apis()const;
-
         /// @return the configured http-max-response-time-ms
         fc::microseconds get_max_response_time()const;
 
+        size_t get_max_body_size()const;
+
+        struct metrics {
+           std::string target;
+        };
+
+        void register_update_metrics(std::function<void(metrics)>&& fun);
+
+        std::atomic<bool>& listening();
    private:
         std::shared_ptr<class http_plugin_impl> my;
    };
@@ -134,7 +158,7 @@ namespace sysio {
 
          static const uint8_t details_limit = 10;
 
-         error_info() {};
+         error_info() = default;
 
          error_info(const fc::exception& exc, bool include_full_log) {
             code = exc.code();
@@ -160,7 +184,7 @@ namespace sysio {
    };
 
    /**
-    * @brief Used to trim whitespace from body. 
+    * @brief Used to trim whitespace from body.
     * Returned string_view valid only for lifetime of body
     */
    inline std::string_view make_trimmed_string_view(const std::string& body) {

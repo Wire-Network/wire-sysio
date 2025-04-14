@@ -1,4 +1,5 @@
 #include <sysio/chain/webassembly/interface.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/apply_context.hpp>

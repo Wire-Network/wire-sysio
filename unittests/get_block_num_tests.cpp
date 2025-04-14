@@ -3,13 +3,11 @@
 #include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/testing/tester.hpp>
 
-#include <Runtime/Runtime.h>
-
 #include <fc/variant_object.hpp>
 
 #include <boost/test/unit_test.hpp>
 
-#include <contracts.hpp>
+#include <test_contracts.hpp>
 
 #include "fork_test_utilities.hpp"
 
@@ -33,8 +31,8 @@ BOOST_AUTO_TEST_CASE( get_block_num ) { try {
    c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
-   c.set_code( tester1_account, contracts::get_block_num_test_wasm() );
-   c.set_abi( tester1_account, contracts::get_block_num_test_abi().data() );
+   c.set_code( tester1_account, test_contracts::get_block_num_test_wasm() );
+   c.set_abi( tester1_account, test_contracts::get_block_num_test_abi() );
    c.produce_block();
 
    c.push_action( tester1_account, "testblock"_n, tester1_account, mutable_variant_object()

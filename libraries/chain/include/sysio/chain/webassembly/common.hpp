@@ -115,7 +115,7 @@ namespace sysio { namespace chain {
 
    using type_converter = basic_type_converter<sysio::vm::execution_interface>;
 
-   using eos_vm_host_functions_t = sysio::vm::registered_host_functions<webassembly::interface,
+   using sys_vm_host_functions_t = sysio::vm::registered_host_functions<webassembly::interface,
                                                                         sysio::vm::execution_interface,
                                                                         sysio::chain::type_converter>;
    using wasm_size_t = sysio::vm::wasm_size_t;

@@ -23,7 +23,6 @@
 #include <softfloat.hpp>
 #include <compiler_builtins.hpp>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <fstream>
 #include <string.h>
 
@@ -33,17 +32,28 @@
 
 namespace sysio { namespace chain {
 
-   wasm_interface::wasm_interface(vm_type vm, bool eosvmoc_tierup, const chainbase::database& d, const boost::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, bool profile)
-     : my( new wasm_interface_impl(vm, eosvmoc_tierup, d, data_dir, eosvmoc_config, profile) ) {}
+   wasm_interface::wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile)
+     : sysvmoc_tierup(sysvmoc_tierup), my( new wasm_interface_impl(vm, sysvmoc_tierup, d, data_dir, sysvmoc_config, profile) ) {}
 
    wasm_interface::~wasm_interface() {}
+
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   void wasm_interface::init_thread_local_data() {
+      // OC tierup and OC runtime are mutually exclusive
+      if (my->sysvmoc) {
+         my->sysvmoc->init_thread_local_data();
+      } else if (my->wasm_runtime_time == wasm_interface::vm_type::sys_vm_oc && my->runtime_interface) {
+         my->runtime_interface->init_thread_local_data();
+      }
+   }
+#endif
 
    void wasm_interface::validate(const controller& control, const bytes& code) {
       const auto& pso = control.db().get<protocol_state_object>();
 
       if (control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
          const auto& gpo = control.get_global_properties();
-         webassembly::eos_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
+         webassembly::sys_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
          return;
       }
       Module module;
@@ -59,15 +69,11 @@ namespace sysio { namespace chain {
       wasm_validations::wasm_binary_validation validator(control, module);
       validator.validate();
 
-      webassembly::eos_vm_runtime::validate( code, pso.whitelisted_intrinsics );
+      webassembly::sys_vm_runtime::validate( code, pso.whitelisted_intrinsics );
 
       //there are a couple opportunties for improvement here--
       //Easy: Cache the Module created here so it can be reused for instantiaion
       //Hard: Kick off instantiation in a separate thread at this location
-	 }
-
-   void wasm_interface::indicate_shutting_down() {
-      my->is_shutting_down = true;
    }
 
    void wasm_interface::code_block_num_last_used(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, const uint32_t& block_num) {
@@ -79,47 +85,64 @@ namespace sysio { namespace chain {
    }
 
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
-      if(substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
+      if (substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-      if(my->eosvmoc) {
-         const chain::eosvmoc::code_descriptor* cd = nullptr;
+      if (my->sysvmoc && (sysvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_sys_vm_oc())) {
+         const chain::sysvmoc::code_descriptor* cd = nullptr;
+         chain::sysvmoc::code_cache_base::get_cd_failure failure = chain::sysvmoc::code_cache_base::get_cd_failure::temporary;
          try {
-            cd = my->eosvmoc->cc.get_descriptor_for_code(code_hash, vm_version);
-         }
-         catch(...) {
-            //swallow errors here, if SYS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
-            //In the future, consider moving bits of SYS VM that can fire exceptions and such out of this call path
+            const bool high_priority = context.get_receiver().prefix() == chain::config::system_account_name;
+            cd = my->sysvmoc->cc.get_descriptor_for_code(high_priority, code_hash, vm_version, context.control.is_write_window(), failure);
+            if (test_disable_tierup)
+               cd = nullptr;
+         } catch (...) {
+            // swallow errors here, if SYS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
+            // In the future, consider moving bits of SYS VM that can fire exceptions and such out of this call path
             static bool once_is_enough;
-            if(!once_is_enough)
+            if (!once_is_enough)
                elog("SYS VM OC has encountered an unexpected failure");
             once_is_enough = true;
          }
-         if(cd) {
-            my->eosvmoc->exec.execute(*cd, my->eosvmoc->mem, context);
+         if (cd) {
+            if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
+               tlog("${a} speculatively executing ${h} with sys vm oc", ("a", context.get_receiver())("h", code_hash));
+            my->sysvmoc->exec->execute(*cd, *my->sysvmoc->mem, context);
             return;
          }
       }
 #endif
+
       my->get_instantiated_module(code_hash, vm_type, vm_version, context.trx_context)->apply(context);
    }
 
-   void wasm_interface::exit() {
-      my->runtime_interface->immediately_exit_currently_running_module();
+   bool wasm_interface::is_code_cached(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version) const {
+      return my->is_code_cached(code_hash, vm_type, vm_version);
    }
 
-   wasm_instantiated_module_interface::~wasm_instantiated_module_interface() {}
-   wasm_runtime_interface::~wasm_runtime_interface() {}
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   bool wasm_interface::is_sys_vm_oc_enabled() const {
+      return my->is_sys_vm_oc_enabled();
+   }
+#endif
+
+   wasm_instantiated_module_interface::~wasm_instantiated_module_interface() = default;
+   wasm_runtime_interface::~wasm_runtime_interface() = default;
+
+#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
+   thread_local std::unique_ptr<sysvmoc::executor> wasm_interface_impl::sysvmoc_tier::exec{};
+   thread_local std::unique_ptr<sysvmoc::memory>   wasm_interface_impl::sysvmoc_tier::mem{};
+#endif
 
 std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
    std::string s;
    in >> s;
    if (s == "sys-vm")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
    else if (s == "sys-vm-jit")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
    else if (s == "sys-vm-oc")
-      runtime = sysio::chain::wasm_interface::vm_type::eos_vm_oc;
+      runtime = sysio::chain::wasm_interface::vm_type::sys_vm_oc;
    else
       in.setstate(std::ios_base::failbit);
    return in;

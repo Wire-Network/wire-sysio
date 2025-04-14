@@ -17,27 +17,46 @@
 #include <type_traits>
 
 template <typename T>
-struct history_serial_wrapper {
-   const chainbase::database& db;
-   const T&                   obj;
+struct history_serial_wrapper_stateless {
+   const T& obj;
 };
 
 template <typename T>
+struct history_serial_wrapper : public history_serial_wrapper_stateless<T> {
+   const chainbase::database& db;
+};
+
+template <typename T>
+history_serial_wrapper_stateless<std::decay_t<T>> make_history_serial_wrapper(const T& obj) {
+   return {obj};
+}
+
+template <typename T>
 history_serial_wrapper<std::decay_t<T>> make_history_serial_wrapper(const chainbase::database& db, const T& obj) {
-   return {db, obj};
+   return {{obj}, db};
 }
 
 template <typename P, typename T>
-struct history_context_wrapper {
-   const chainbase::database& db;
-   const P&                   context;
-   const T&                   obj;
+struct history_context_wrapper_stateless {
+   const P& context;
+   const T& obj;
 };
 
 template <typename P, typename T>
-history_context_wrapper<std::decay_t<P>, std::decay_t<T>> make_history_context_wrapper(const chainbase::database& db,
-                                                                                       const P& context, const T& obj) {
-   return {db, context, obj};
+struct history_context_wrapper : public history_context_wrapper_stateless<P, T> {
+   const chainbase::database& db;
+};
+
+template <typename P, typename T>
+history_context_wrapper_stateless<std::decay_t<P>, std::decay_t<T>>
+make_history_context_wrapper(const P& context, const T& obj) {
+   return {context, obj};
+}
+
+template <typename P, typename T>
+history_context_wrapper<std::decay_t<P>, std::decay_t<T>>
+make_history_context_wrapper(const chainbase::database& db, const P& context, const T& obj) {
+   return {{context, obj}, db};
 }
 
 namespace fc {
@@ -56,22 +75,37 @@ datastream<ST>& history_serialize_container(datastream<ST>& ds, const chainbase:
 }
 
 template <typename ST, typename T>
-datastream<ST>& history_serialize_container(datastream<ST>& ds, const chainbase::database& db,
-                                            const std::vector<std::shared_ptr<T>>& v) {
+datastream<ST>& history_serialize_container(datastream<ST>& ds, const T& v) {
+   fc::raw::pack(ds, unsigned_int(v.size()));
+   for (auto& x : v)
+      ds << make_history_serial_wrapper(x);
+   return ds;
+}
+
+template <typename ST, typename T>
+datastream<ST>& history_serialize_container(datastream<ST>& ds, const std::vector<std::shared_ptr<T>>& v) {
    fc::raw::pack(ds, unsigned_int(v.size()));
    for (auto& x : v) {
       SYS_ASSERT(!!x, sysio::chain::plugin_exception, "null inside container");
-      ds << make_history_serial_wrapper(db, *x);
+      ds << make_history_serial_wrapper(*x);
    }
    return ds;
 }
 
 template <typename ST, typename P, typename T>
-datastream<ST>& history_context_serialize_container(datastream<ST>& ds, const chainbase::database& db, const P& context,
-                                                    const std::vector<T>& v) {
+datastream<ST>& history_context_serialize_container(datastream<ST>& ds, const chainbase::database& db, const P& context, const std::vector<T>& v) {
    fc::raw::pack(ds, unsigned_int(v.size()));
    for (const auto& x : v) {
       ds << make_history_context_wrapper(db, context, x);
+   }
+   return ds;
+}
+
+template <typename ST, typename P, typename T>
+datastream<ST>& history_context_serialize_container(datastream<ST>& ds, const P& context, const std::vector<T>& v) {
+   fc::raw::pack(ds, unsigned_int(v.size()));
+   for (const auto& x : v) {
+      ds << make_history_context_wrapper(context, x);
    }
    return ds;
 }
@@ -82,6 +116,13 @@ datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::big_v
    fc::raw::pack(ds, unsigned_int((uint32_t)obj.obj.size()));
    for (auto& x : obj.obj)
       fc::raw::pack(ds, x);
+   return ds;
+}
+
+template <typename ST>
+datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::row_pair& rp) {
+   fc::raw::pack(ds, rp.first);
+   history_pack_big_bytes(ds, rp.second);
    return ds;
 }
 
@@ -103,6 +144,12 @@ void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::bytes& v) {
 }
 
 template <typename ST>
+void history_pack_big_bytes(datastream<ST>& ds, const sysio::chain::shared_blob& b) {
+   fc::raw::pack(ds, unsigned_int((uint32_t)b.size()));
+   ds.write(b.data(), b.size());
+}
+
+template <typename ST>
 void history_pack_big_bytes(datastream<ST>& ds, const std::optional<sysio::chain::bytes>& v) {
    fc::raw::pack(ds, v.has_value());
    if (v)
@@ -114,20 +161,30 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<std:
    return history_serialize_container(ds, obj.db, obj.obj);
 }
 
+template <typename ST, typename T>
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<std::vector<T>>& obj) {
+   return history_serialize_container(ds, obj.obj);
+}
+
 template <typename ST, typename P, typename T>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper<P, std::vector<T>>& obj) {
    return history_context_serialize_container(ds, obj.db, obj.context, obj.obj);
 }
 
+template <typename ST, typename P, typename T>
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<P, std::vector<T>>& obj) {
+   return history_context_serialize_container(ds, obj.context, obj.obj);
+}
+
 template <typename ST, typename First, typename Second>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<std::pair<First, Second>>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<std::pair<First, Second>>& obj) {
    fc::raw::pack(ds, obj.obj.first);
    fc::raw::pack(ds, obj.obj.second);
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::account_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::account_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.name.to_uint64_t()));
    fc::raw::pack(ds, as_type<sysio::chain::block_timestamp_type>(obj.obj.creation_date));
@@ -136,8 +193,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                      ds,
-                           const history_serial_wrapper<sysio::chain::account_metadata_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::account_metadata_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.name.to_uint64_t()));
    fc::raw::pack(ds, as_type<bool>(obj.obj.is_privileged()));
@@ -153,7 +209,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::code_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::code_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint8_t>(obj.obj.vm_type));
    fc::raw::pack(ds, as_type<uint8_t>(obj.obj.vm_version));
@@ -163,7 +219,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::table_id_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::table_id_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.scope.to_uint64_t()));
@@ -173,16 +229,14 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                               ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::key_value_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::key_value_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.context.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.context.scope.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.context.table.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.primary_key));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
-   fc::raw::pack(ds, as_type<sysio::chain::shared_string>(obj.obj.value));
+   history_pack_big_bytes(ds, obj.obj.value);
    return ds;
 }
 
@@ -217,8 +271,7 @@ void serialize_secondary_index_data(datastream<ST>& ds, const sysio::chain::key2
 }
 
 template <typename ST, typename T>
-datastream<ST>& serialize_secondary_index(datastream<ST>& ds, const sysio::chain::table_id_object& context,
-                                          const T& obj) {
+datastream<ST>& serialize_secondary_index(datastream<ST>& ds, const sysio::chain::table_id_object& context, const T& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(context.code.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(context.scope.to_uint64_t()));
@@ -230,46 +283,34 @@ datastream<ST>& serialize_secondary_index(datastream<ST>& ds, const sysio::chain
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                             ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::index64_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index64_object>& obj) {
    return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                              ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::index128_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index128_object>& obj) {
    return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                              ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::index256_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index256_object>& obj) {
    return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                                  ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::index_double_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index_double_object>& obj) {
    return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                                       ds,
-           const history_context_wrapper<sysio::chain::table_id_object, sysio::chain::index_long_double_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<sysio::chain::table_id_object, sysio::chain::index_long_double_object>& obj) {
    return serialize_secondary_index(ds, obj.context, obj.obj);
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                                ds,
-                           const history_serial_wrapper<sysio::chain::shared_block_signing_authority_v0>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::shared_block_signing_authority_v0>& obj) {
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.threshold));
-   history_serialize_container(ds, obj.db,
-                               as_type<sysio::chain::shared_vector<sysio::chain::shared_key_weight>>(obj.obj.keys));
+   history_serialize_container(ds, obj.db, as_type<sysio::chain::shared_vector<sysio::chain::shared_key_weight>>(obj.obj.keys));
 }
 
 template <typename ST>
@@ -284,13 +325,12 @@ template <typename ST>
 datastream<ST>& operator<<(datastream<ST>&                                                                 ds,
                            const history_serial_wrapper<sysio::chain::shared_producer_authority_schedule>& obj) {
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.version));
-   history_serialize_container(
-       ds, obj.db, as_type<sysio::chain::shared_vector<sysio::chain::shared_producer_authority>>(obj.obj.producers));
+   history_serialize_container(ds, obj.db, as_type<sysio::chain::shared_vector<sysio::chain::shared_producer_authority>>(obj.obj.producers));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::chain_config>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::chain_config>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(1));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.max_block_net_usage));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.target_block_net_usage_pct));
@@ -314,7 +354,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::wasm_config>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::wasm_config>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_mutable_global_bytes));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_table_elements));
@@ -331,22 +371,18 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                     ds,
-                           const history_serial_wrapper<sysio::chain::global_property_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::global_property_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(1));
    fc::raw::pack(ds, as_type<std::optional<sysio::chain::block_num_type>>(obj.obj.proposed_schedule_block_num));
-   fc::raw::pack(ds, make_history_serial_wrapper(
-                         obj.db, as_type<sysio::chain::shared_producer_authority_schedule>(obj.obj.proposed_schedule)));
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::chain_config>(obj.obj.configuration)));
+   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::shared_producer_authority_schedule>(obj.obj.proposed_schedule)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::chain_config>(obj.obj.configuration)));
    fc::raw::pack(ds, as_type<sysio::chain::chain_id_type>(obj.obj.chain_id));
-   fc::raw::pack(ds,
-                 make_history_serial_wrapper(obj.db, as_type<sysio::chain::wasm_config>(obj.obj.wasm_configuration)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::wasm_config>(obj.obj.wasm_configuration)));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                           ds,
-                           const history_serial_wrapper<sysio::chain::generated_transaction_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::generated_transaction_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.sender.to_uint64_t()));
    fc::raw::pack(ds, as_type<__uint128_t>(obj.obj.sender_id));
@@ -357,9 +393,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                                ds,
-           const history_serial_wrapper<sysio::chain::protocol_state_object::activated_protocol_feature>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::protocol_state_object::activated_protocol_feature>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<sysio::chain::digest_type>(obj.obj.feature_digest));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.activation_block_num));
@@ -374,29 +408,28 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::shared_key_weight>& obj) {
-   fc::raw::pack(ds, as_type<sysio::chain::public_key_type>(obj.obj.key));
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::shared_key_weight>& obj) {
+   fc::raw::pack(ds, as_type<sysio::chain::public_key_type>(obj.obj.key.to_public_key()));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.weight));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::permission_level>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::permission_level>& obj) {
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.actor.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.permission.to_uint64_t()));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                      ds,
-                           const history_serial_wrapper<sysio::chain::permission_level_weight>& obj) {
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::permission_level>(obj.obj.permission)));
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::permission_level_weight>& obj) {
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::permission_level>(obj.obj.permission)));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.weight));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::wait_weight>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::wait_weight>& obj) {
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.wait_sec));
    fc::raw::pack(ds, as_type<uint16_t>(obj.obj.weight));
    return ds;
@@ -437,8 +470,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                     ds,
-                           const history_serial_wrapper<sysio::chain::permission_link_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::permission_link_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.account.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.code.to_uint64_t()));
@@ -448,8 +480,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                                      ds,
-                           const history_serial_wrapper<sysio::chain::resource_limits::resource_limits_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::resource_limits::resource_limits_object>& obj) {
    SYS_ASSERT(!obj.obj.pending, sysio::chain::plugin_exception,
               "accepted_block sent while resource_limits_object in pending state");
    fc::raw::pack(ds, fc::unsigned_int(0));
@@ -461,8 +492,7 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                                 ds,
-                           const history_serial_wrapper<sysio::chain::resource_limits::usage_accumulator>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::resource_limits::usage_accumulator>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.last_ordinal));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.value_ex));
@@ -471,27 +501,20 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                                     ds,
-                           const history_serial_wrapper<sysio::chain::resource_limits::resource_usage_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::resource_limits::resource_usage_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.owner.to_uint64_t()));
-   fc::raw::pack(ds, make_history_serial_wrapper(
-                         obj.db, as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.net_usage)));
-   fc::raw::pack(ds, make_history_serial_wrapper(
-                         obj.db, as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.cpu_usage)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.net_usage)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.cpu_usage)));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.ram_usage));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                            ds,
-           const history_serial_wrapper<sysio::chain::resource_limits::resource_limits_state_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::resource_limits::resource_limits_state_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::usage_accumulator>(
-                                                             obj.obj.average_block_net_usage)));
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::usage_accumulator>(
-                                                             obj.obj.average_block_cpu_usage)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.average_block_net_usage)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::usage_accumulator>(obj.obj.average_block_cpu_usage)));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.total_net_weight));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.total_cpu_weight));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.total_ram_bytes));
@@ -501,8 +524,7 @@ operator<<(datastream<ST>&                                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                     ds,
-                           const history_serial_wrapper<sysio::chain::resource_limits::ratio>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::resource_limits::ratio>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.numerator));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.denominator));
@@ -510,60 +532,52 @@ datastream<ST>& operator<<(datastream<ST>&                                      
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>&                                                                        ds,
-                           const history_serial_wrapper<sysio::chain::resource_limits::elastic_limit_parameters>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::resource_limits::elastic_limit_parameters>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.target));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.max));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.periods));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.max_multiplier));
-   fc::raw::pack(
-       ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::ratio>(obj.obj.contract_rate)));
-   fc::raw::pack(
-       ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::ratio>(obj.obj.expand_rate)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::ratio>(obj.obj.contract_rate)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::resource_limits::ratio>(obj.obj.expand_rate)));
    return ds;
 }
 
 template <typename ST>
 datastream<ST>&
-operator<<(datastream<ST>&                                                                             ds,
-           const history_serial_wrapper<sysio::chain::resource_limits::resource_limits_config_object>& obj) {
+operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::resource_limits::resource_limits_config_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(
-       ds, make_history_serial_wrapper(
-               obj.db, as_type<sysio::chain::resource_limits::elastic_limit_parameters>(obj.obj.cpu_limit_parameters)));
-   fc::raw::pack(
-       ds, make_history_serial_wrapper(
-               obj.db, as_type<sysio::chain::resource_limits::elastic_limit_parameters>(obj.obj.net_limit_parameters)));
+   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::elastic_limit_parameters>(obj.obj.cpu_limit_parameters)));
+   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::resource_limits::elastic_limit_parameters>(obj.obj.net_limit_parameters)));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.account_cpu_usage_average_window));
    fc::raw::pack(ds, as_type<uint32_t>(obj.obj.account_net_usage_average_window));
    return ds;
 };
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::action>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::action>& obj) {
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.account.to_uint64_t()));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.name.to_uint64_t()));
-   history_serialize_container(ds, obj.db, as_type<std::vector<sysio::chain::permission_level>>(obj.obj.authorization));
+   history_serialize_container(ds, as_type<std::vector<sysio::chain::permission_level>>(obj.obj.authorization));
    fc::raw::pack(ds, as_type<sysio::chain::bytes>(obj.obj.data));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::action_receipt>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::action_receipt>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.receiver.to_uint64_t()));
    fc::raw::pack(ds, as_type<sysio::chain::digest_type>(obj.obj.act_digest));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.global_sequence));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.recv_sequence));
-   history_serialize_container(ds, obj.db, as_type<flat_map<sysio::chain::name, uint64_t>>(obj.obj.auth_sequence));
+   history_serialize_container(ds, as_type<flat_map<sysio::chain::name, uint64_t>>(obj.obj.auth_sequence));
    fc::raw::pack(ds, as_type<fc::unsigned_int>(obj.obj.code_sequence));
    fc::raw::pack(ds, as_type<fc::unsigned_int>(obj.obj.abi_sequence));
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::account_delta>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::account_delta>& obj) {
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.account.to_uint64_t()));
    fc::raw::pack(ds, as_type<int64_t>(obj.obj.delta));
    return ds;
@@ -587,24 +601,24 @@ inline std::optional<uint64_t> cap_error_code(const std::optional<uint64_t>& err
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper<bool, sysio::chain::action_trace>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<bool, sysio::chain::action_trace>& obj) {
    bool debug_mode = obj.context;
    fc::raw::pack(ds, fc::unsigned_int(1));
    fc::raw::pack(ds, as_type<fc::unsigned_int>(obj.obj.action_ordinal));
    fc::raw::pack(ds, as_type<fc::unsigned_int>(obj.obj.creator_action_ordinal));
    fc::raw::pack(ds, bool(obj.obj.receipt));
    if (obj.obj.receipt) {
-      fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::action_receipt>(*obj.obj.receipt)));
+      fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::action_receipt>(*obj.obj.receipt)));
    }
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.receiver.to_uint64_t()));
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::action>(obj.obj.act)));
+   fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::action>(obj.obj.act)));
    fc::raw::pack(ds, as_type<bool>(obj.obj.context_free));
    fc::raw::pack(ds, as_type<int64_t>(debug_mode ? obj.obj.elapsed.count() : 0));
    if (debug_mode)
       fc::raw::pack(ds, as_type<std::string>(obj.obj.console));
    else
       fc::raw::pack(ds, std::string{});
-   history_serialize_container(ds, obj.db, as_type<flat_set<sysio::chain::account_delta>>(obj.obj.account_ram_deltas));
+   history_serialize_container(ds, as_type<flat_set<sysio::chain::account_delta>>(obj.obj.account_ram_deltas));
 
    std::optional<std::string> e;
    if (obj.obj.except) {
@@ -614,17 +628,14 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper<boo
          e = "Y";
    }
    fc::raw::pack(ds, as_type<std::optional<std::string>>(e));
-   fc::raw::pack(ds,
-                 as_type<std::optional<uint64_t>>(debug_mode ? obj.obj.error_code : cap_error_code(obj.obj.error_code)));
+   fc::raw::pack(ds, as_type<std::optional<uint64_t>>(debug_mode ? obj.obj.error_code : cap_error_code(obj.obj.error_code)));
    fc::raw::pack(ds, as_type<sysio::chain::bytes>(obj.obj.return_value));
 
    return ds;
 }
 
 template <typename ST>
-datastream<ST>& operator<<(
-    datastream<ST>&                                                                                             ds,
-    const history_context_wrapper<std::pair<uint8_t, bool>, sysio::state_history::augmented_transaction_trace>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<std::pair<uint8_t, bool>, sysio::state_history::augmented_transaction_trace>& obj) {
    auto& trace      = *obj.obj.trace;
    bool  debug_mode = obj.context.second;
    fc::raw::pack(ds, fc::unsigned_int(0));
@@ -644,13 +655,11 @@ datastream<ST>& operator<<(
    fc::raw::pack(ds, as_type<int64_t>(debug_mode ? trace.elapsed.count() : 0));
    fc::raw::pack(ds, as_type<uint64_t>(trace.net_usage));
    fc::raw::pack(ds, as_type<bool>(trace.scheduled));
-   history_context_serialize_container(ds, obj.db, debug_mode,
-                                       as_type<std::vector<sysio::chain::action_trace>>(trace.action_traces));
+   history_context_serialize_container(ds, debug_mode, as_type<std::vector<sysio::chain::action_trace>>(trace.action_traces));
 
    fc::raw::pack(ds, bool(trace.account_ram_delta));
    if (trace.account_ram_delta) {
-      fc::raw::pack(
-          ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::account_delta>(*trace.account_ram_delta)));
+      fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::account_delta>(*trace.account_ram_delta)));
    }
 
    std::optional<std::string> e;
@@ -669,10 +678,7 @@ datastream<ST>& operator<<(
       if (trace.receipt && trace.receipt->status.value == sysio::chain::transaction_receipt_header::soft_fail)
          stat = sysio::chain::transaction_receipt_header::soft_fail;
       std::pair<uint8_t, bool> context = std::make_pair(stat, debug_mode);
-      fc::raw::pack( //
-          ds, make_history_context_wrapper(
-                  obj.db, context,
-                  sysio::state_history::augmented_transaction_trace{trace.failed_dtrx_trace, obj.obj.partial}));
+      fc::raw::pack(ds, make_history_context_wrapper(context, sysio::state_history::augmented_transaction_trace{trace.failed_dtrx_trace, obj.obj.partial}));
    }
 
    bool include_partial = obj.obj.partial && !trace.failed_dtrx_trace;
@@ -695,11 +701,9 @@ datastream<ST>& operator<<(
 }
 
 template <typename ST>
-datastream<ST>&
-operator<<(datastream<ST>&                                                                         ds,
-           const history_context_wrapper<bool, sysio::state_history::augmented_transaction_trace>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<bool, sysio::state_history::augmented_transaction_trace>& obj) {
    std::pair<uint8_t, bool> context = std::make_pair(sysio::chain::transaction_receipt_header::hard_fail, obj.context);
-   ds << make_history_context_wrapper(obj.db, context, obj.obj);
+   ds << make_history_context_wrapper(context, obj.obj);
    return ds;
 }
 
@@ -712,6 +716,16 @@ datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::get_b
    history_pack_big_bytes(ds, obj.block);
    history_pack_big_bytes(ds, obj.traces);
    history_pack_big_bytes(ds, obj.deltas);
+   return ds;
+}
+
+template <typename ST>
+datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::get_blocks_result_base& obj) {
+   fc::raw::pack(ds, obj.head);
+   fc::raw::pack(ds, obj.last_irreversible);
+   fc::raw::pack(ds, obj.this_block);
+   fc::raw::pack(ds, obj.prev_block);
+   history_pack_big_bytes(ds, obj.block);
    return ds;
 }
 

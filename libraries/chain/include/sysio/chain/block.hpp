@@ -37,17 +37,30 @@ namespace sysio { namespace chain {
       explicit transaction_receipt( const packed_transaction& ptrx ):transaction_receipt_header(executed),trx(std::in_place_type<packed_transaction>, ptrx){}
 
       std::variant<transaction_id_type, packed_transaction> trx;
-
-      digest_type digest()const {
+   private:
+      enum trx_digest_type { uncompressed_digest, compressed_digest};
+      digest_type get_digest(trx_digest_type packing)const {
          digest_type::encoder enc;
          fc::raw::pack( enc, status );
          fc::raw::pack( enc, cpu_usage_us );
          fc::raw::pack( enc, net_usage_words );
          if( std::holds_alternative<transaction_id_type>(trx) )
             fc::raw::pack( enc, std::get<transaction_id_type>(trx) );
-         else
-            fc::raw::pack( enc, std::get<packed_transaction>(trx).packed_digest() );
+         else {
+            if (packing == trx_digest_type::compressed_digest)
+               fc::raw::pack( enc, std::get<packed_transaction>(trx).packed_digest() );
+            else
+               fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
+         }
          return enc.result();
+      }
+   public:
+      digest_type digest()const {
+         return get_digest(trx_digest_type::uncompressed_digest);
+      }
+
+      digest_type packed_digest()const {
+         return get_digest(trx_digest_type::compressed_digest);
       }
    };
 
@@ -97,7 +110,7 @@ namespace sysio { namespace chain {
       signed_block& operator=(signed_block&&) = default;
       signed_block clone() const { return *this; }
 
-      vector<transaction_receipt>   transactions; /// new or generated transactions
+      deque<transaction_receipt>   transactions; /// new or generated transactions
       extensions_type               block_extensions;
 
       flat_multimap<uint16_t, block_extension> validate_and_extract_extensions()const;

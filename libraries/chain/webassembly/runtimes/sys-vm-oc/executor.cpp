@@ -15,6 +15,8 @@
 
 #include <boost/hana/equal.hpp>
 
+#include "IR/Types.h"
+
 #include <asm/prctl.h>
 #include <sys/prctl.h>
 #include <sys/syscall.h>
@@ -28,7 +30,7 @@
 
 extern "C" int arch_prctl(int code, unsigned long* addr);
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 static constexpr auto signal_sentinel = 0x4D56534F45534559ul;
 
@@ -72,14 +74,14 @@ notus:
    __builtin_unreachable();
 }
 
-static intrinsic grow_memory_intrinsic SYSVMOC_INTRINSIC_INIT_PRIORITY("eosvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
-  (void*)&eos_vm_oc_grow_memory,
-  std::integral_constant<std::size_t, find_intrinsic_index("eosvmoc_internal.grow_memory")>::value
+static intrinsic grow_memory_intrinsic SYSVMOC_INTRINSIC_INIT_PRIORITY("sysvmoc_internal.grow_memory", IR::FunctionType::get(IR::ResultType::i32,{IR::ValueType::i32,IR::ValueType::i32}),
+  (void*)&sys_vm_oc_grow_memory,
+  std::integral_constant<std::size_t, find_intrinsic_index("sysvmoc_internal.grow_memory")>::value
 );
 
 //This is effectively overriding the sysio_exit intrinsic in wasm_interface
 static void sysio_exit(int32_t code) {
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_CLEAN_EXIT);
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_CLEAN_EXIT);
    __builtin_unreachable();
 }
 static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32}), (void*)&sysio_exit,
@@ -87,8 +89,8 @@ static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR
 );
 
 static void throw_internal_exception(const char* const s) {
-   *reinterpret_cast<std::exception_ptr*>(eos_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
+   *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 
@@ -99,23 +101,23 @@ static void throw_internal_exception(const char* const s) {
    ); \
 	void name()
 
-DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,depth_assert) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,depth_assert) {
    throw_internal_exception("Exceeded call depth maximum");
 }
 
-DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,div0_or_overflow) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,div0_or_overflow) {
    throw_internal_exception("Division by 0 or integer overflow trapped");
 }
 
-DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_mismatch) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_mismatch) {
    throw_internal_exception("Indirect call function type mismatch");
 }
 
-DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,indirect_call_oob) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_oob) {
    throw_internal_exception("Indirect call index out of bounds");
 }
 
-DEFINE_SYSVMOC_TRAP_INTRINSIC(eosvmoc_internal,unreachable) {
+DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,unreachable) {
    throw_internal_exception("Unreachable reached");
 }
 
@@ -136,10 +138,6 @@ struct executor_signal_init {
 executor::executor(const code_cache_base& cc) {
    //if we're the first executor created, go setup the signal handling. For now we'll just leave this attached forever
    static executor_signal_init the_executor_signal_init;
-
-   uint64_t current_gs;
-   if(arch_prctl(ARCH_GET_GS, &current_gs) || current_gs)
-      wlog("x86_64 GS register is not set as expected. SYS VM OC may not run correctly on this platform");
 
    struct stat s;
    FC_ASSERT(fstat(cc.fd(), &s) == 0, "executor failed to get code cache size");
@@ -223,7 +221,7 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
       cb->bounce_buffers->clear();
       tt.set_expiration_callback(nullptr, nullptr);
 
-      uint64_t base_pages = mem.size_of_memory_slice_mapping()/memory::stride - 1;
+      int64_t base_pages = mem.size_of_memory_slice_mapping()/memory::stride - 1;
       if(cb->current_linear_memory_pages > base_pages) {
          mprotect(mem.full_page_memory_base() + base_pages * sysio::chain::wasm_constraints::wasm_page_size,
                   (cb->current_linear_memory_pages - base_pages) * sysio::chain::wasm_constraints::wasm_page_size, PROT_NONE);
@@ -264,6 +262,7 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
 
 executor::~executor() {
    arch_prctl(ARCH_SET_GS, nullptr);
+   munmap(code_mapping, code_mapping_size);
 }
 
 }}}

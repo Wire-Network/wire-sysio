@@ -20,6 +20,34 @@ sysio::chain::asset core_from_string(const std::string& s) {
 }
 
 namespace sysio { namespace testing {
+
+   // required by boost::unit_test::data
+   std::ostream& operator<<(std::ostream& os, setup_policy p) {
+      switch(p) {
+         case setup_policy::none:
+            os << "none";
+            break;
+         case setup_policy::old_bios_only:
+            os << "old_bios_only";
+            break;
+         case setup_policy::preactivate_feature_only:
+            os << "preactivate_feature_only";
+            break;
+         case setup_policy::preactivate_feature_and_new_bios:
+            os << "preactivate_feature_and_new_bios";
+            break;
+         case setup_policy::old_wasm_parser:
+            os << "old_wasm_parser";
+            break;
+         case setup_policy::full:
+            os << "full";
+            break;
+         default:
+            FC_ASSERT(false, "Unknown setup_policy");
+      }
+      return os;
+   }
+
    std::string read_wast( const char* fn ) {
       std::ifstream wast_file(fn);
       FC_ASSERT( wast_file.is_open(), "wast file cannot be found" );
@@ -150,8 +178,8 @@ namespace sysio { namespace testing {
      return control->head_block_id() == other.control->head_block_id();
    }
 
-   void base_tester::init(const setup_policy policy, db_read_mode read_mode, std::optional<uint32_t> genesis_max_inline_action_size, std::optional<uint32_t> config_max_nonprivileged_inline_action_size) {
-      auto def_conf = default_config(tempdir, genesis_max_inline_action_size, config_max_nonprivileged_inline_action_size);
+   void base_tester::init(const setup_policy policy, db_read_mode read_mode, std::optional<uint32_t> genesis_max_inline_action_size) {
+      auto def_conf = default_config(tempdir, genesis_max_inline_action_size);
       def_conf.first.read_mode = read_mode;
       cfg = def_conf.first;
 
@@ -237,11 +265,16 @@ namespace sysio { namespace testing {
             set_bios_contract();
             break;
          }
-         case setup_policy::full: {
+         case setup_policy::full:
+         case setup_policy::full_except_do_not_disable_deferred_trx: {
             schedule_preactivate_protocol_feature();
             produce_block();
             set_before_producer_authority_bios_contract();
-            preactivate_all_builtin_protocol_features();
+            if( policy == setup_policy::full ) {
+               preactivate_all_builtin_protocol_features();
+            } else {
+               preactivate_all_but_disable_deferred_trx();
+            }
             produce_block();
             set_bios_contract();
             init_roa();
@@ -270,22 +303,24 @@ namespace sysio { namespace testing {
       open( make_protocol_feature_set(), expected_chain_id );
    }
 
-   template <typename Lambda>
-   void base_tester::open( protocol_feature_set&& pfs, std::optional<chain_id_type> expected_chain_id, Lambda lambda ) {
+   void base_tester::open( protocol_feature_set&& pfs, std::optional<chain_id_type> expected_chain_id, const std::function<void()>& lambda ) {
       if( !expected_chain_id ) {
          expected_chain_id = controller::extract_chain_id_from_db( cfg.state_dir );
          if( !expected_chain_id ) {
-            if( fc::is_regular_file( cfg.blocks_dir / "blocks.log" ) ) {
-               expected_chain_id = block_log::extract_chain_id( cfg.blocks_dir );
-            } else {
-               expected_chain_id = genesis_state().compute_chain_id();
+            std::filesystem::path retained_dir;
+            auto partitioned_config = std::get_if<partitioned_blocklog_config>(&cfg.blog);
+            if (partitioned_config) {
+               retained_dir = partitioned_config->retained_dir;
+               if (retained_dir.is_relative())
+                  retained_dir = cfg.blocks_dir/retained_dir;
             }
+            expected_chain_id = block_log<signed_block>::extract_chain_id( cfg.blocks_dir, retained_dir );
          }
       }
 
       control.reset( new controller(cfg, std::move(pfs), *expected_chain_id) );
       control->add_indices();
-      lambda();
+      if (lambda) lambda();
       chain_transactions.clear();
       control->accepted_block.connect([this]( const block_state_ptr& block_state ){
         FC_ASSERT( block_state->block );
@@ -324,7 +359,8 @@ namespace sysio { namespace testing {
    void base_tester::push_block(signed_block_ptr b) {
       auto bsf = control->create_block_state_future(b->calculate_id(), b);
       unapplied_transactions.add_aborted( control->abort_block() );
-      control->push_block( bsf.get(), [this]( const branch_type& forked_branch ) {
+      controller::block_report br;
+      control->push_block( br, bsf.get(), [this]( const branch_type& forked_branch ) {
          unapplied_transactions.add_forked( forked_branch );
       }, [this]( const transaction_id_type& id ) {
          return unapplied_transactions.get_trx( id );
@@ -408,7 +444,8 @@ namespace sysio { namespace testing {
          preactivated_protocol_features.end()
       );
 
-      control->start_block( block_time, head_block_number - last_produced_block_num, feature_to_be_activated );
+      control->start_block( block_time, head_block_number - last_produced_block_num, feature_to_be_activated,
+                            controller::block_status::incomplete );
 
       // Clear the list, if start block finishes successfuly, the protocol features should be assumed to be activated
       protocol_features_to_be_activated_wo_preactivation.clear();
@@ -430,7 +467,8 @@ namespace sysio { namespace testing {
          }
       });
 
-      control->finalize_block( [&]( digest_type d ) {
+      controller::block_report br;
+      control->finalize_block( br, [&]( digest_type d ) {
          std::vector<signature_type> result;
          result.reserve(signing_keys.size());
          for (const auto& k: signing_keys)
@@ -505,7 +543,7 @@ namespace sysio { namespace testing {
 
 
   void base_tester::set_transaction_headers( transaction& trx, uint32_t expiration, uint32_t delay_sec ) const {
-     trx.expiration = control->head_block_time() + fc::seconds(expiration);
+     trx.expiration = fc::time_point_sec{control->head_block_time() + fc::seconds(expiration)};
      trx.set_reference_block( control->head_block_id() );
 
      trx.max_net_usage_words = 0; // No limit
@@ -560,6 +598,46 @@ namespace sysio { namespace testing {
       return push_transaction( trx );
    }
 
+   transaction_trace_ptr base_tester::register_node_owner(account_name owner, uint32_t tier) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
+
+      trx.actions.emplace_back(get_action(config::roa_account_name, "regnodeowner"_n,
+                                          vector<permission_level>{{config::roa_account_name, config::active_name}},
+                                          mutable_variant_object()
+                                          ("owner", owner)
+                                          ("tier", tier)
+      ));
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(config::roa_account_name, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   transaction_trace_ptr base_tester::add_roa_policy(account_name issuer, account_name owner, string net_weight,
+                                                     string cpu_weight, string ram_weight, int64_t network_gen,
+                                                     uint32_t time_block) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back(get_action("sysio.roa"_n, "addpolicy"_n,
+                                          vector<permission_level>{{issuer, config::active_name}},
+                                          fc::mutable_variant_object
+                                          ("owner", owner)
+                                          ("issuer", issuer)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
+                                          ("time_block", time_block)
+      ));
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(issuer, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
    transaction_trace_ptr base_tester::push_transaction( packed_transaction& trx,
                                                         fc::time_point deadline,
                                                         uint32_t billed_cpu_time_us
@@ -582,7 +660,8 @@ namespace sysio { namespace testing {
    transaction_trace_ptr base_tester::push_transaction( signed_transaction& trx,
                                                         fc::time_point deadline,
                                                         uint32_t billed_cpu_time_us,
-                                                        bool no_throw
+                                                        bool no_throw,
+                                                        transaction_metadata::trx_type trx_type
                                                       )
    { try {
       if( !control->is_building_block() )
@@ -597,7 +676,7 @@ namespace sysio { namespace testing {
             fc::microseconds::maximum() :
             fc::microseconds( deadline - fc::time_point::now() );
       auto ptrx = std::make_shared<packed_transaction>( trx, c );
-      auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, transaction_metadata::trx_type::input );
+      auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
       auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
       if (no_throw) return r;
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
@@ -682,7 +761,7 @@ namespace sysio { namespace testing {
                                    const variant_object& data )const { try {
       const auto& acnt = control->get_account(code);
       auto abi = acnt.get_abi();
-      chain::abi_serializer abis(abi, abi_serializer::create_yield_function( abi_serializer_max_time ));
+      chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
       string action_type_name = abis.get_action_type(acttype);
       FC_ASSERT( action_type_name != string(), "unknown action type ${a}", ("a",acttype) );
@@ -863,7 +942,7 @@ namespace sysio { namespace testing {
                                    .account    = account,
                                    .permission = perm,
                                    .parent     = parent,
-                                   .auth       = move(auth),
+                                   .auth       = std::move(auth),
                                 });
 
          set_transaction_headers(trx);
@@ -932,7 +1011,7 @@ namespace sysio { namespace testing {
    } FC_CAPTURE_AND_RETHROW( (account) )
 
 
-   void base_tester::set_abi( account_name account, const char* abi_json, const private_key_type* signer ) {
+   void base_tester::set_abi( account_name account, const std::string& abi_json, const private_key_type* signer ) {
       auto abi = fc::json::from_string(abi_json).template as<abi_def>();
       signed_transaction trx;
       trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
@@ -948,6 +1027,13 @@ namespace sysio { namespace testing {
          trx.sign( get_private_key( account, "active" ), control->get_chain_id()  );
       }
       push_transaction( trx );
+   }
+
+   bool base_tester::is_code_cached( sysio::chain::account_name name ) const {
+      const auto& db  = control->db();
+      const account_metadata_object* receiver_account = &db.template get<account_metadata_object,by_name>( name );
+      if ( receiver_account->code_hash == digest_type() ) return false;
+      return control->get_wasm_interface().is_code_cached( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version );
    }
 
 
@@ -1052,7 +1138,8 @@ namespace sysio { namespace testing {
             if( block ) { //&& !b.control->is_known_block(block->id()) ) {
                auto bsf = b.control->create_block_state_future( block->calculate_id(), block );
                b.control->abort_block();
-               b.control->push_block(bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{}); //, sysio::chain::validation_steps::created_block);
+               controller::block_report br;
+               b.control->push_block(br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{}); //, sysio::chain::validation_steps::created_block);
             }
          }
       };
@@ -1063,17 +1150,17 @@ namespace sysio { namespace testing {
 
    void base_tester::set_before_preactivate_bios_contract() {
       set_code(config::system_account_name, contracts::before_preactivate_sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::before_preactivate_sysio_bios_abi().data());
+      set_abi(config::system_account_name, contracts::before_preactivate_sysio_bios_abi());
    }
 
    void base_tester::set_before_producer_authority_bios_contract() {
       set_code(config::system_account_name, contracts::before_producer_authority_sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::before_producer_authority_sysio_bios_abi().data());
+      set_abi(config::system_account_name, contracts::before_producer_authority_sysio_bios_abi());
    }
 
    void base_tester::set_bios_contract() {
       set_code(config::system_account_name, contracts::sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::sysio_bios_abi().data());
+      set_abi(config::system_account_name, contracts::sysio_bios_abi());
    }
 
    void base_tester::init_roa() {
@@ -1164,20 +1251,7 @@ namespace sysio { namespace testing {
       }
    }
 
-   void base_tester::preactivate_builtin_protocol_features(const std::vector<builtin_protocol_feature_t>& builtin_features) {
-      const auto& pfs = control->get_protocol_feature_manager().get_protocol_feature_set();
-
-      // This behavior is disabled by configurable_wasm_limits
-      std::vector<digest_type> features;
-      for(builtin_protocol_feature_t feature : builtin_features ) {
-         if( auto digest = pfs.get_builtin_digest( feature ) ) {
-            features.push_back( *digest );
-         }
-      }
-      preactivate_protocol_features(features);
-   }
-
-   void base_tester::preactivate_all_builtin_protocol_features() {
+   void base_tester::preactivate_builtin_protocol_features(const std::vector<builtin_protocol_feature_t>& builtins) {
       const auto& pfm = control->get_protocol_feature_manager();
       const auto& pfs = pfm.get_protocol_feature_set();
       const auto current_block_num  =  control->head_block_num() + (control->is_building_block() ? 1 : 0);
@@ -1205,18 +1279,69 @@ namespace sysio { namespace testing {
          preactivations.emplace_back( feature_digest );
       };
 
-      std::vector<builtin_protocol_feature_t> ordered_builtins;
-      for( const auto& f : builtin_protocol_feature_codenames ) {
-         ordered_builtins.push_back( f.first );
-      }
-      std::sort( ordered_builtins.begin(), ordered_builtins.end() );
-      for( const auto& f : ordered_builtins ) {
+      for( const auto& f : builtins ) {
          auto digest = pfs.get_builtin_digest( f);
          if( !digest ) continue;
          add_digests( *digest );
       }
 
       preactivate_protocol_features( preactivations );
+   }
+
+   std::vector<builtin_protocol_feature_t> base_tester::get_all_builtin_protocol_features() {
+      std::vector<builtin_protocol_feature_t> builtins;
+      for( const auto& f : builtin_protocol_feature_codenames ) {
+         if ( f.first ==  builtin_protocol_feature_t::disable_compression_in_transaction_merkle && !shouldAllowBlockProtocolChanges() ) {
+            continue;
+         }
+         builtins.push_back( f.first );
+      }
+
+      // Sorting is here to ensure a consistent order across platforms given that it is
+      // pulling the items from an std::unordered_map. This order is important because
+      // it impacts the block IDs generated and written out to logs for some tests such
+      // as the deep-mind tests.
+      std::sort( builtins.begin(), builtins.end() );
+
+      return builtins;
+   }
+
+   void base_tester::preactivate_all_builtin_protocol_features() {
+      preactivate_builtin_protocol_features( get_all_builtin_protocol_features() );
+   }
+
+   void base_tester::preactivate_all_but_disable_deferred_trx() {
+      std::vector<builtin_protocol_feature_t> builtins;
+      for( const auto& f : get_all_builtin_protocol_features() ) {
+         // Before deferred trxs feature is fully disabled, existing tests involving
+         // deferred trxs need to be exercised to make sure existing behaviors are
+         // maintained. Excluding DISABLE_DEFERRED_TRXS_STAGE_1 and DISABLE_DEFERRED_TRXS_STAGE_2
+         // from full protocol feature list such that existing tests can run.
+         if( f ==  builtin_protocol_feature_t::disable_deferred_trxs_stage_1 || f  == builtin_protocol_feature_t::disable_deferred_trxs_stage_2 ) {
+            continue;
+         }
+         else if ( f ==  builtin_protocol_feature_t::disable_compression_in_transaction_merkle && !shouldAllowBlockProtocolChanges() ) {
+            continue;
+         }
+
+         builtins.push_back( f );
+      }
+
+      preactivate_builtin_protocol_features( builtins );
+   }
+
+   tester::tester(const std::function<void(controller&)>& control_setup, setup_policy policy, db_read_mode read_mode) {
+      auto def_conf            = default_config(tempdir);
+      def_conf.first.read_mode = read_mode;
+      cfg                      = def_conf.first;
+
+      base_tester::open(make_protocol_feature_set(), def_conf.second.compute_chain_id(),
+                        [&genesis = def_conf.second, &control = this->control, &control_setup]() {
+                           control_setup(*control);
+                           control->startup([]() {}, []() { return false; }, genesis);
+                        });
+
+      execute_setup_policy(policy);
    }
 
    bool fc_exception_message_is::operator()( const fc::exception& ex ) {
@@ -1231,6 +1356,15 @@ namespace sysio { namespace testing {
    bool fc_exception_message_starts_with::operator()( const fc::exception& ex ) {
       auto message = ex.get_log().at( 0 ).get_message();
       bool match = boost::algorithm::starts_with( message, expected );
+      if( !match ) {
+         BOOST_TEST_MESSAGE( "LOG: expected: " << expected << ", actual: " << message );
+      }
+      return match;
+   }
+
+   bool fc_exception_message_contains::operator()( const fc::exception& ex ) {
+      auto message = ex.get_log().at( 0 ).get_message();
+      bool match = message.find(expected) != std::string::npos;
       if( !match ) {
          BOOST_TEST_MESSAGE( "LOG: expected: " << expected << ", actual: " << message );
       }

@@ -38,7 +38,8 @@ extern "C" {
       WASM_TEST_HANDLER( test_action, assert_true_cf );
 
       if ( action != WASM_TEST_ACTION("test_transaction", "stateful_api") &&
-           action != WASM_TEST_ACTION("test_transaction", "context_free_api") )
+           action != WASM_TEST_ACTION("test_transaction", "context_free_api") &&
+           action != WASM_TEST_ACTION("test_checktime", "checktime_no_auth_failure") )
          require_auth(code);
 
       //test_types
@@ -118,6 +119,8 @@ extern "C" {
       WASM_TEST_HANDLER   ( test_transaction, send_action_empty                      );
       WASM_TEST_HANDLER   ( test_transaction, send_action_large                      );
       WASM_TEST_HANDLER   ( test_transaction, send_action_4k                         );
+      WASM_TEST_HANDLER   ( test_transaction, send_action_512k                       );
+      WASM_TEST_HANDLER   ( test_transaction, send_many_actions_512k                 );
       WASM_TEST_HANDLER   ( test_transaction, send_action_recurse                    );
       WASM_TEST_HANDLER   ( test_transaction, test_read_transaction                  );
       WASM_TEST_HANDLER   ( test_transaction, test_transaction_size                  );
@@ -145,6 +148,7 @@ extern "C" {
       // test checktime
       WASM_TEST_HANDLER( test_checktime, checktime_pass                     );
       WASM_TEST_HANDLER( test_checktime, checktime_failure                  );
+      WASM_TEST_HANDLER( test_checktime, checktime_no_auth_failure          );
       WASM_TEST_HANDLER( test_checktime, checktime_sha1_failure             );
       WASM_TEST_HANDLER( test_checktime, checktime_assert_sha1_failure      );
       WASM_TEST_HANDLER( test_checktime, checktime_sha256_failure           );

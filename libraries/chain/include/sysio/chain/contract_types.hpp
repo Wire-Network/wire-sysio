@@ -184,4 +184,3 @@ FC_REFLECT( sysio::chain::canceldelay                      , (canceling_auth)(tr
 FC_REFLECT( sysio::chain::onerror                          , (sender_id)(sent_trx) )
 // **Roa change**
 FC_REFLECT( sysio::chain::reducepolicy                     , (owner)(issuer)(net_weight)(cpu_weight)(ram_weight)(network_gen))
-

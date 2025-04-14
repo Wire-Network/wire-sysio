@@ -3,15 +3,12 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/wallet_plugin/wallet_api.hpp>
 
-#include <fc/real128.hpp>
 #include <fc/crypto/base58.hpp>
 
 using namespace std;
 using namespace sysio::chain;
 
 namespace sysio { namespace wallet {
-
-typedef uint16_t transaction_handle_type;
 
 struct wallet_data
 {

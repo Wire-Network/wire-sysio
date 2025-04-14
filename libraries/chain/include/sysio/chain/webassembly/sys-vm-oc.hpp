@@ -16,29 +16,32 @@
 
 #include <boost/hana/string.hpp>
 
-namespace sysio { namespace chain { namespace webassembly { namespace eosvmoc {
+namespace sysio { namespace chain { namespace webassembly { namespace sysvmoc {
 
 using namespace IR;
-using namespace Runtime;
 using namespace fc;
 
-using namespace sysio::chain::eosvmoc;
+using namespace sysio::chain::sysvmoc;
 
-class eosvmoc_instantiated_module;
+class sysvmoc_instantiated_module;
 
-class eosvmoc_runtime : public sysio::chain::wasm_runtime_interface {
+class sysvmoc_runtime : public sysio::chain::wasm_runtime_interface {
    public:
-      eosvmoc_runtime(const boost::filesystem::path data_dir, const eosvmoc::config& eosvmoc_config, const chainbase::database& db);
-      ~eosvmoc_runtime();
-      std::unique_ptr<wasm_instantiated_module_interface> instantiate_module(const char* code_bytes, size_t code_size, std::vector<uint8_t> initial_memory,
+      sysvmoc_runtime(const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, const chainbase::database& db);
+      ~sysvmoc_runtime();
+      std::unique_ptr<wasm_instantiated_module_interface> instantiate_module(const char* code_bytes, size_t code_size,
                                                                              const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version) override;
 
-      void immediately_exit_currently_running_module() override;
+      void init_thread_local_data() override;
 
-      friend eosvmoc_instantiated_module;
-      eosvmoc::code_cache_sync cc;
-      eosvmoc::executor exec;
-      eosvmoc::memory mem;
+      friend sysvmoc_instantiated_module;
+      sysvmoc::code_cache_sync cc;
+      sysvmoc::executor exec;
+      sysvmoc::memory mem;
+
+      // Defined in sys-vm-oc.cpp. Used for non-main thread in multi-threaded execution
+      thread_local static std::unique_ptr<sysvmoc::executor> exec_thread_local;
+      thread_local static std::unique_ptr<sysvmoc::memory> mem_thread_local;
 };
 
 /**
@@ -199,13 +202,13 @@ struct wasm_function_type_provider<Ret(Args...)> {
    }
 };
 
-struct eos_vm_oc_execution_interface {
+struct sys_vm_oc_execution_interface {
    inline const auto& operand_from_back(std::size_t index) const { return *(os - index - 1); }
    sysio::vm::native_value* os;
 };
 
-struct eos_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::interface, eos_vm_oc_execution_interface> {
-   using base_type = sysio::vm::type_converter<webassembly::interface, eos_vm_oc_execution_interface>;
+struct sys_vm_oc_type_converter : public sysio::vm::type_converter<webassembly::interface, sys_vm_oc_execution_interface> {
+   using base_type = sysio::vm::type_converter<webassembly::interface, sys_vm_oc_execution_interface>;
    using base_type::type_converter;
    using base_type::to_wasm;
    using base_type::as_result;
@@ -319,17 +322,17 @@ auto get_ct_args_i() {
 
 template<typename Args, std::size_t... Is>
 auto get_ct_args(std::index_sequence<Is...>) {
-   return std::tuple_cat(get_ct_args_i<eos_vm_oc_type_converter, std::tuple_element_t<Is, Args>>()...);
+   return std::tuple_cat(get_ct_args_i<sys_vm_oc_type_converter, std::tuple_element_t<Is, Args>>()...);
 }
 
 struct result_resolver {
    // Suppress "expression result unused" warnings
-   result_resolver(eos_vm_oc_type_converter& tc) : tc(tc) {}
+   result_resolver(sys_vm_oc_type_converter& tc) : tc(tc) {}
    template<typename T>
    auto operator,(T&& res) {
       return make_native_type(vm::detail::resolve_result(tc, static_cast<T&&>(res)));
    }
-   eos_vm_oc_type_converter& tc;
+   sys_vm_oc_type_converter& tc;
 };
 
 template<auto F, typename Interface, typename Preconditions, bool is_injected, typename... A>
@@ -337,7 +340,7 @@ auto fn(A... a) {
    try {
       if constexpr(!is_injected) {
          constexpr int cb_current_call_depth_remaining_segment_offset = OFFSET_OF_CONTROL_BLOCK_MEMBER(current_call_depth_remaining);
-         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) find_intrinsic_index("eosvmoc_internal.depth_assert") * 8;
+         constexpr int depth_assertion_intrinsic_offset = OFFSET_OF_FIRST_INTRINSIC - (int) find_intrinsic_index("sysvmoc_internal.depth_assert") * 8;
 
          asm volatile("cmpl   $1,%%gs:%c[callDepthRemainOffset]\n"
                       "jne    1f\n"
@@ -349,7 +352,13 @@ auto fn(A... a) {
                       : "cc");
       }
       using native_args = vm::flatten_parameters_t<AUTO_PARAM_WORKAROUND(F)>;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-value"
+      // If a is unpopulated, this reports "statement has no effect [-Werror=unused-value]"
       sysio::vm::native_value stack[] = { a... };
+#pragma GCC diagnostic pop
+
       constexpr int cb_ctx_ptr_offset = OFFSET_OF_CONTROL_BLOCK_MEMBER(ctx);
       apply_context* ctx;
       asm("mov %%gs:%c[applyContextOffset], %[cPtr]\n"
@@ -357,13 +366,13 @@ auto fn(A... a) {
           : [applyContextOffset] "i" (cb_ctx_ptr_offset)
           );
       Interface host(*ctx);
-      eos_vm_oc_type_converter tc{&host, eos_vm_oc_execution_interface{stack + sizeof...(A)}};
+      sys_vm_oc_type_converter tc{&host, sys_vm_oc_execution_interface{stack + sizeof...(A)}};
       return result_resolver{tc}, sysio::vm::invoke_with_host<F, Preconditions, native_args>(tc, &host, std::make_index_sequence<sizeof...(A)>());
    }
    catch(...) {
-      *reinterpret_cast<std::exception_ptr*>(eos_vm_oc_get_exception_ptr()) = std::current_exception();
+      *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::current_exception();
    }
-   siglongjmp(*eos_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
+   siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
 
@@ -380,12 +389,12 @@ constexpr auto create_function() {
 }
 
 template<auto F, bool injected, typename Preconditions, typename Name>
-void register_eosvm_oc(Name n) {
+void register_sysvm_oc(Name n) {
    // Has special handling
    if(n == BOOST_HANA_STRING("env.sysio_exit")) return;
    constexpr auto fn = create_function<F, Preconditions, injected>();
    constexpr auto index = find_intrinsic_index(n.c_str());
-   intrinsic the_intrinsic(
+   [[maybe_unused]] intrinsic the_intrinsic(
       n.c_str(),
       wasm_function_type_provider<std::remove_pointer_t<decltype(fn)>>::type(),
       reinterpret_cast<void*>(fn),
@@ -393,4 +402,4 @@ void register_eosvm_oc(Name n) {
    );
 }
 
-} } } }// sysio::chain::webassembly::eosvmoc
+} } } }// sysio::chain::webassembly::sysvmoc

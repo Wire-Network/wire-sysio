@@ -26,7 +26,7 @@ if(NOT "@LLVM_FOUND@" STREQUAL "")
    link_directories(${LLVM_LIBRARY_DIR})
 endif()
 
-set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_CXX_STANDARD 20 )
 set( CMAKE_CXX_EXTENSIONS ON )
 set( CXX_STANDARD_REQUIRED ON )
 
@@ -41,26 +41,18 @@ else ( APPLE )
    set( CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
 endif ( APPLE )
 
-### Remove after Boost 1.70 CMake fixes are in place
-set( Boost_NO_BOOST_CMAKE ON CACHE STRING "ON or OFF" )
+set( Boost_USE_MULTITHREADED      ON )
 set( Boost_USE_STATIC_LIBS ON CACHE STRING "ON or OFF" )
-find_package(Boost @Boost_MAJOR_VERSION@.@Boost_MINOR_VERSION@ EXACT REQUIRED COMPONENTS
-   date_time
-   filesystem
-   system
-   chrono
-   iostreams
-   unit_test_framework)
+set( BOOST_EXCLUDE_LIBRARIES "mysql" )
+
+add_subdirectory( @CMAKE_INSTALL_FULL_DATAROOTDIR@/leap_boost ${PROJECT_BINARY_DIR}/libraries/boost EXCLUDE_FROM_ALL)
 
 find_library(libtester sysio_testing @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchain sysio_chain @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-if ( "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
-   find_library(libfc fc_debug @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-   find_library(libsecp256k1 secp256k1_debug @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-else()
-   find_library(libfc fc @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-   find_library(libsecp256k1 secp256k1 @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-endif()
+find_library(libfc fc @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libsecp256k1 secp256k1 @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libbn256 bn256 @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libbls12-381 bls12-381 @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 
 find_library(libff ff @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libwasm WASM @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
@@ -69,10 +61,8 @@ find_library(libir IR     @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(liblogging Logging @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libruntime Runtime @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libsoftfloat softfloat @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-get_filename_component(cryptodir @OPENSSL_CRYPTO_LIBRARY@ DIRECTORY)
-find_library(liboscrypto crypto "${cryptodir}" NO_DEFAULT_PATH)
-get_filename_component(ssldir @OPENSSL_SSL_LIBRARY@ DIRECTORY)
-find_library(libosssl ssl "${ssldir}" NO_DEFAULT_PATH)
+find_library(libbscrypto bscrypto @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libdecrepit decrepit @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 
@@ -86,32 +76,36 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    set(WRAP_MAIN "-Wl,-wrap=main")
 endif()
 
-macro(add_sysio_test_executable test_name)
-   add_executable( ${test_name} ${ARGN} )
-   target_link_libraries( ${test_name}
-       ${libtester}
-       ${libchain}
-       ${libfc}
-       ${libwast}
-       ${libwasm}
-       ${libruntime}
-       ${libir}
-       ${libsoftfloat}
-       ${liboscrypto}
-       ${libosssl}
-       ${liblogging}
-       ${libchainbase}
-       ${libbuiltins}
-       ${libsecp256k1}
-       ${libff}
-       @GMP_LIBRARY@
+add_library(SysioChain INTERFACE)
 
-       ${Boost_FILESYSTEM_LIBRARY}
-       ${Boost_SYSTEM_LIBRARY}
-       ${Boost_CHRONO_LIBRARY}
-       ${Boost_IOSTREAMS_LIBRARY}
-       "-lz" # Needed by Boost iostreams
-       ${Boost_DATE_TIME_LIBRARY}
+target_link_libraries(SysioChain INTERFACE
+   ${libchain}
+   ${libfc}
+   ${libwast}
+   ${libwasm}
+   ${libir}
+   ${libsoftfloat}
+   ${libbscrypto}
+   ${libdecrepit}
+   ${liblogging}
+   ${libchainbase}
+   ${libbuiltins}
+   ${libsecp256k1}
+   ${libbn256}
+   ${libbls12-381}
+   @GMP_LIBRARY@
+
+   Boost::date_time
+   Boost::filesystem
+   Boost::system
+   Boost::chrono
+   Boost::multi_index
+   Boost::multiprecision
+   Boost::interprocess
+   Boost::asio
+   Boost::signals2
+   Boost::iostreams
+   "-lz" # Needed by Boost iostreams
 
        ${LLVM_LIBS}
 
@@ -120,19 +114,38 @@ macro(add_sysio_test_executable test_name)
        ${WRAP_MAIN}
        Threads::Threads
       )
-   
+
    #adds -ltr. Ubuntu sysio.contracts build breaks without this
    if(UNIX AND NOT APPLE)
       target_link_libraries(${test_name} ${LIBRT})
    endif()
 
-   target_include_directories( ${test_name} PUBLIC
-                               ${Boost_INCLUDE_DIRS}
-                               @OPENSSL_INCLUDE_DIR@
-                               @CMAKE_INSTALL_PREFIX@
-                               @CMAKE_INSTALL_FULL_INCLUDEDIR@
-                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
-                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat )
+target_include_directories(SysioChain INTERFACE
+                              @OPENSSL_INCLUDE_DIR@
+                              @CMAKE_INSTALL_PREFIX@
+                              @CMAKE_INSTALL_FULL_INCLUDEDIR@
+                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
+                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/leapboringssl
+                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat )
+
+#adds -ltr. Ubuntu sysio.contracts build breaks without this
+if(UNIX AND NOT APPLE)
+   target_link_libraries(SysioChain INTERFACE ${LIBRT})
+endif()
+
+add_library(SysioTester INTERFACE)
+
+target_link_libraries(SysioTester INTERFACE
+   ${libtester}
+   Boost::unit_test_framework
+   SysioChain
+)
+
+macro(add_sysio_test_executable test_name)
+   add_executable( ${test_name} ${ARGN} )
+   target_link_libraries( ${test_name}
+       SysioTester
+      )
 
 endmacro()
 

@@ -42,7 +42,6 @@ namespace sysio { namespace chain {
       >
    >;
 
-   typedef chainbase::generic_index<transaction_multi_index> transaction_index;
 } }
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::transaction_object, sysio::chain::transaction_multi_index)

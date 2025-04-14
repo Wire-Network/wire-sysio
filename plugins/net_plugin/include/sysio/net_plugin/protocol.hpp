@@ -7,9 +7,6 @@ namespace sysio {
    using namespace chain;
    using namespace fc;
 
-   static_assert(sizeof(std::chrono::system_clock::duration::rep) >= 8, "system_clock is expected to be at least 64 bits");
-   typedef std::chrono::system_clock::duration::rep tstamp;
-
    struct chain_size_message {
       uint32_t                   last_irreversible_block_num = 0;
       block_id_type              last_irreversible_block_id;
@@ -19,9 +16,11 @@ namespace sysio {
 
    // Longest domain name is 253 characters according to wikipedia.
    // Addresses include ":port" where max port is 65535, which adds 6 chars.
+   // Addresses may also include ":bitrate" with suffix and separators, which adds 30 chars,
+   // for the maximum comma-separated value that fits in a size_t expressed in decimal plus a suffix.
    // We also add our own extentions of "[:trx|:blk] - xxxxxxx", which adds 14 chars, total= 273.
    // Allow for future extentions as well, hence 384.
-   constexpr size_t max_p2p_address_length = 253 + 6;
+   constexpr size_t max_p2p_address_length = 253 + 6 + 30;
    constexpr size_t max_handshake_str_length = 384;
 
    struct handshake_message {
@@ -83,10 +82,10 @@ namespace sysio {
   };
 
   struct time_message {
-            tstamp  org{0};       //!< origin timestamp
-            tstamp  rec{0};       //!< receive timestamp
-            tstamp  xmt{0};       //!< transmit timestamp
-    mutable tstamp  dst{0};       //!< destination timestamp
+            int64_t  org{0};       //!< origin timestamp, in nanoseconds
+            int64_t  rec{0};       //!< receive timestamp, in nanoseconds
+            int64_t  xmt{0};       //!< transmit timestamp, in nanoseconds
+    mutable int64_t  dst{0};       //!< destination timestamp, in nanoseconds
   };
 
   enum id_list_modes {

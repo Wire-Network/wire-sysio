@@ -4,7 +4,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
 #include <sysio/chain/types.hpp>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 struct initialize_message {
    //Two sent fds: 1) communication socket for this instance  2) the cache file 
@@ -22,6 +22,7 @@ struct code_tuple {
 
 struct compile_wasm_message {
    code_tuple code;
+   sysvmoc::config sysvmoc_config;
    //Two sent fd: 1) communication socket for result, 2) the wasm to compile
 };
 
@@ -30,7 +31,7 @@ struct evict_wasms_message {
 };
 
 struct code_compilation_result_message {
-   eosvmoc_optional_offset_or_import_t start;
+   sysvmoc_optional_offset_or_import_t start;
    unsigned apply_offset;
    int starting_memory_pages;
    unsigned initdata_prologue_size;
@@ -51,7 +52,7 @@ struct wasm_compilation_result_message {
    size_t cache_free_bytes;
 };
 
-using eosvmoc_message = std::variant<initialize_message,
+using sysvmoc_message = std::variant<initialize_message,
                                      initalize_response_message,
                                      compile_wasm_message,
                                      evict_wasms_message,
@@ -59,12 +60,12 @@ using eosvmoc_message = std::variant<initialize_message,
                                      wasm_compilation_result_message>;
 }}}
 
-FC_REFLECT(sysio::chain::eosvmoc::initialize_message, )
-FC_REFLECT(sysio::chain::eosvmoc::initalize_response_message, (error_message))
-FC_REFLECT(sysio::chain::eosvmoc::code_tuple, (code_id)(vm_version))
-FC_REFLECT(sysio::chain::eosvmoc::compile_wasm_message, (code))
-FC_REFLECT(sysio::chain::eosvmoc::evict_wasms_message, (codes))
-FC_REFLECT(sysio::chain::eosvmoc::code_compilation_result_message, (start)(apply_offset)(starting_memory_pages)(initdata_prologue_size))
-FC_REFLECT(sysio::chain::eosvmoc::compilation_result_unknownfailure, )
-FC_REFLECT(sysio::chain::eosvmoc::compilation_result_toofull, )
-FC_REFLECT(sysio::chain::eosvmoc::wasm_compilation_result_message, (code)(result)(cache_free_bytes))
+FC_REFLECT(sysio::chain::sysvmoc::initialize_message, )
+FC_REFLECT(sysio::chain::sysvmoc::initalize_response_message, (error_message))
+FC_REFLECT(sysio::chain::sysvmoc::code_tuple, (code_id)(vm_version))
+FC_REFLECT(sysio::chain::sysvmoc::compile_wasm_message, (code)(sysvmoc_config))
+FC_REFLECT(sysio::chain::sysvmoc::evict_wasms_message, (codes))
+FC_REFLECT(sysio::chain::sysvmoc::code_compilation_result_message, (start)(apply_offset)(starting_memory_pages)(initdata_prologue_size))
+FC_REFLECT(sysio::chain::sysvmoc::compilation_result_unknownfailure, )
+FC_REFLECT(sysio::chain::sysvmoc::compilation_result_toofull, )
+FC_REFLECT(sysio::chain::sysvmoc::wasm_compilation_result_message, (code)(result)(cache_free_bytes))

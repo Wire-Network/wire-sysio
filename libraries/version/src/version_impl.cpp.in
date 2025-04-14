@@ -37,4 +37,8 @@ namespace sysio { namespace version {
       }
    }
 
+   std::string _version_hash() {
+      return version_hash;
+   }
+
 } }

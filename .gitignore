@@ -5,24 +5,20 @@
 *.bc
 *.wast
 *.wast.hpp
-*.s
 *.dot
 *.abi.hpp
-*.cmake
-!.cicd
-!CMakeModules/*.cmake
 *.ninja
 \#*
 \.#*
 CMakeCache.txt
 CMakeFiles
-cmake_install.cmake
-cmake-build-debug/
-cmake-build-release/
+cmake-build-*/
 Makefile
 compile_commands.json
 moc_*
 *.moc
+
+.cache
 
 genesis.json
 hardfork.hpp
@@ -65,7 +61,7 @@ unittests/unit_test
 tutorials/sig-em-tutorial/contracts
 
 doxygen
-eos.doxygen
+wire.doxygen
 
 wallet.json
 witness_node_data_dir
@@ -76,23 +72,29 @@ witness_node_data_dir
 *.pyo
 *.pwd
 
+*.gdb_history
+
 Testing/*
 build.tar.gz
-build/*
-build-debug/*
+[Bb]uild*/*
 build**
 deps/*
 dependencies/*
 
 etc/sysio/node_*
-var/lib/node_*
+TestLogs*
 .vscode
 .idea/
 *.iws
 .DS_Store
+CMakeLists.txt.user
 .!*
 
 !*.swagger.*
 
 node_modules
 package-lock.json
+
+snapshots
+
+find-eosio-wasm.sh

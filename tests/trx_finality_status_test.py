@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
 import copy
 import time
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from Node import BlockType
 import json
 import os
 import signal
 import subprocess
-from TestHelper import AppArgs
-from TestHelper import TestHelper
-from testUtils import Account
+
+from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL
+from TestHarness.Node import BlockType
+from TestHarness.TestHelper import AppArgs
 
 ########################################################################
 # trx_finality_status_test
@@ -30,30 +27,22 @@ from testUtils import Account
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-from core_symbol import CORE_SYMBOL
-
-
 appArgs=AppArgs()
-args = TestHelper.parse_args({"-n", "--dump-error-details","--keep-logs","-v","--leave-running","--clean-run"})
+args = TestHelper.parse_args({"-n", "--dump-error-details","--keep-logs","-v","--leave-running","--unshared"})
 Utils.Debug=args.v
 pnodes=3
 totalNodes=args.n
 if totalNodes<=pnodes+2:
     totalNodes=pnodes+2
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
 prodCount=1
-killAll=args.clean_run
 walletPort=TestHelper.DEFAULT_WALLET_PORT
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
@@ -63,18 +52,15 @@ try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
     Print("Stand up cluster")
     successDuration = 60
     failure_duration = 40
     extraNodeopArgs=" --transaction-finality-status-max-storage-size-gb 1 " + \
                    f"--transaction-finality-status-success-duration-sec {successDuration} --transaction-finality-status-failure-duration-sec {failure_duration}"
-    extraNodeopArgs+=" --plugin sysio::trace_api_plugin --trace-no-abis"
     extraNodeopArgs+=" --http-max-response-time-ms 990000"
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount,
-                      useBiosBootFile=False, topo="line", extraNodeopArgs=extraNodeopArgs) is False:
-        Utils.errorExit("Failed to stand up eos cluster.")
+                      topo="line", extraNodeopArgs=extraNodeopArgs) is False:
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
@@ -221,7 +207,7 @@ try:
     testSuccessful=True
 
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

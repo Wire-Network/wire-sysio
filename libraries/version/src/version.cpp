@@ -12,4 +12,9 @@ namespace sysio { namespace version {
       return version;
    }
 
+   const std::string& version_hash() {
+      static const std::string vhash{_version_hash()};
+      return vhash;
+   }
+
 } }

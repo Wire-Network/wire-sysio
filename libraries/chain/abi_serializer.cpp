@@ -4,6 +4,7 @@
 #include <fc/io/raw.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <fc/io/varint.hpp>
+#include <fc/time.hpp>
 
 namespace sysio { namespace chain {
 
@@ -23,11 +24,11 @@ namespace sysio { namespace chain {
 
    template <typename T>
    inline fc::variant variant_from_stream(fc::datastream<const char*>& stream, const abi_serializer::yield_function_t& yield) {
-      fc::yield_function_t y = [&yield](){ yield(0); }; // create yield function matching fc::variant requirements, 0 for recursive depth
       T temp;
       fc::raw::unpack( stream, temp );
-      y();
-      return fc::variant( temp, y );
+      yield(0);
+      // create yield function matching fc::variant requirements, 0 for recursive depth
+      return fc::variant( temp, [yield](){ yield(0); } );
    }
 
    template <typename T>
@@ -70,14 +71,14 @@ namespace sysio { namespace chain {
       );
    }
 
-   abi_serializer::abi_serializer( const abi_def& abi, const yield_function_t& yield ) {
+   abi_serializer::abi_serializer( abi_def abi, const yield_function_t& yield ) {
       configure_built_in_types();
-      set_abi(abi, yield);
+      set_abi(std::move(abi), yield);
    }
 
    abi_serializer::abi_serializer( const abi_def& abi, const fc::microseconds& max_serialization_time) {
       configure_built_in_types();
-      set_abi(abi, max_serialization_time);
+      set_abi(abi, create_yield_function(max_serialization_time));
    }
 
    void abi_serializer::add_specialized_unpack_pack( const string& name,
@@ -128,10 +129,18 @@ namespace sysio { namespace chain {
       built_in_types.emplace("extended_asset",            pack_unpack<extended_asset>());
    }
 
-   void abi_serializer::set_abi(const abi_def& abi, const yield_function_t& yield) {
-      impl::abi_traverse_context ctx(yield);
+   void abi_serializer::set_abi(abi_def abi, const yield_function_t& yield) {
+      impl::abi_traverse_context ctx(yield, fc::microseconds{});
 
       SYS_ASSERT(starts_with(abi.version, "sysio::abi/1."), unsupported_abi_version_exception, "ABI has an unsupported version");
+
+      size_t types_size = abi.types.size();
+      size_t structs_size = abi.structs.size();
+      size_t actions_size = abi.actions.size();
+      size_t tables_size = abi.tables.size();
+      size_t error_messages_size = abi.error_messages.size();
+      size_t variants_size = abi.variants.value.size();
+      size_t action_results_size = abi.action_results.value.size();
 
       typedefs.clear();
       structs.clear();
@@ -141,41 +150,41 @@ namespace sysio { namespace chain {
       variants.clear();
       action_results.clear();
 
-      for( const auto& st : abi.structs )
-         structs[st.name] = st;
+      for( auto& st : abi.structs )
+         structs[st.name] = std::move(st);
 
-      for( const auto& td : abi.types ) {
+      for( auto& td : abi.types ) {
          SYS_ASSERT(!_is_type(td.new_type_name, ctx), duplicate_abi_type_def_exception,
                     "type already exists", ("new_type_name",impl::limit_size(td.new_type_name)));
-         typedefs[td.new_type_name] = td.type;
+         typedefs[std::move(td.new_type_name)] = std::move(td.type);
       }
 
-      for( const auto& a : abi.actions )
-         actions[a.name] = a.type;
+      for( auto& a : abi.actions )
+         actions[std::move(a.name)] = std::move(a.type);
 
-      for( const auto& t : abi.tables )
-         tables[t.name] = t.type;
+      for( auto& t : abi.tables )
+         tables[std::move(t.name)] = std::move(t.type);
 
-      for( const auto& e : abi.error_messages )
-         error_messages[e.error_code] = e.error_msg;
+      for( auto& e : abi.error_messages )
+         error_messages[std::move(e.error_code)] = std::move(e.error_msg);
 
-      for( const auto& v : abi.variants.value )
-         variants[v.name] = v;
+      for( auto& v : abi.variants.value )
+         variants[v.name] = std::move(v);
 
-      for( const auto& r : abi.action_results.value )
-         action_results[r.name] = r.result_type;
+      for( auto& r : abi.action_results.value )
+         action_results[std::move(r.name)] = std::move(r.result_type);
 
       /**
        *  The ABI vector may contain duplicates which would make it
        *  an invalid ABI
        */
-      SYS_ASSERT( typedefs.size() == abi.types.size(), duplicate_abi_type_def_exception, "duplicate type definition detected" );
-      SYS_ASSERT( structs.size() == abi.structs.size(), duplicate_abi_struct_def_exception, "duplicate struct definition detected" );
-      SYS_ASSERT( actions.size() == abi.actions.size(), duplicate_abi_action_def_exception, "duplicate action definition detected" );
-      SYS_ASSERT( tables.size() == abi.tables.size(), duplicate_abi_table_def_exception, "duplicate table definition detected" );
-      SYS_ASSERT( error_messages.size() == abi.error_messages.size(), duplicate_abi_err_msg_def_exception, "duplicate error message definition detected" );
-      SYS_ASSERT( variants.size() == abi.variants.value.size(), duplicate_abi_variant_def_exception, "duplicate variant definition detected" );
-      SYS_ASSERT( action_results.size() == abi.action_results.value.size(), duplicate_abi_action_results_def_exception, "duplicate action results definition detected" );
+      SYS_ASSERT( typedefs.size() == types_size, duplicate_abi_type_def_exception, "duplicate type definition detected" );
+      SYS_ASSERT( structs.size() == structs_size, duplicate_abi_struct_def_exception, "duplicate struct definition detected" );
+      SYS_ASSERT( actions.size() == actions_size, duplicate_abi_action_def_exception, "duplicate action definition detected" );
+      SYS_ASSERT( tables.size() == tables_size, duplicate_abi_table_def_exception, "duplicate table definition detected" );
+      SYS_ASSERT( error_messages.size() == error_messages_size, duplicate_abi_err_msg_def_exception, "duplicate error message definition detected" );
+      SYS_ASSERT( variants.size() == variants_size, duplicate_abi_variant_def_exception, "duplicate variant definition detected" );
+      SYS_ASSERT( action_results.size() == action_results_size, duplicate_abi_action_results_def_exception, "duplicate action results definition detected" );
 
       validate(ctx);
    }
@@ -209,12 +218,25 @@ namespace sysio { namespace chain {
       return ends_with(type, "[]");
    }
 
+   bool abi_serializer::is_szarray(const string_view& type)const {
+      auto pos1 = type.find_last_of('[');
+      auto pos2 = type.find_last_of(']');
+      if(pos1 == string_view::npos || pos2 == string_view::npos) return false;
+      auto pos = pos1 + 1;
+      if(pos == pos2) return false;
+      while(pos < pos2) {
+         if( ! (type[pos] >= '0' && type[pos] <= '9') ) return false;
+         ++pos;
+      }
+      return true;
+   }
+
    bool abi_serializer::is_optional(const string_view& type)const {
       return ends_with(type, "?");
    }
 
    bool abi_serializer::is_type(const std::string_view& type, const yield_function_t& yield)const {
-      impl::abi_traverse_context ctx(yield);
+      impl::abi_traverse_context ctx(yield, fc::microseconds{});
       return _is_type(type, ctx);
    }
 
@@ -225,6 +247,8 @@ namespace sysio { namespace chain {
    std::string_view abi_serializer::fundamental_type(const std::string_view& type)const {
       if( is_array(type) ) {
          return type.substr(0, type.size()-2);
+      } else if (is_szarray (type) ){
+         return type.substr(0, type.find_last_of('['));
       } else if ( is_optional(type) ) {
          return type.substr(0, type.size()-1);
       } else {
@@ -391,14 +415,13 @@ namespace sysio { namespace chain {
             fc::raw::unpack(stream, size);
          } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack size of array '${p}'", ("p", ctx.get_path_string()) )
          vector<fc::variant> vars;
+         vars.reserve(std::min(size.value, 1024u)); // limit the maximum size that can be reserved before data is read
          auto h1 = ctx.push_to_path( impl::array_index_path_item{} );
          for( decltype(size.value) i = 0; i < size; ++i ) {
             ctx.set_array_index_of_path_back(i);
             auto v = _binary_to_variant(ftype, stream, ctx);
-            // QUESTION: Is it actually desired behavior to require the returned variant to not be null?
-            //           This would disallow arrays of optionals in general (though if all optionals in the array were present it would be allowed).
-            //           Is there any scenario in which the returned variant would be null other than in the case of an empty optional?
-            SYS_ASSERT( !v.is_null(), unpack_exception, "Invalid packed array '${p}'", ("p", ctx.get_path_string()) );
+            // The exception below is commented out to allow array of optional as input data
+            //SYS_ASSERT( !v.is_null(), unpack_exception, "Invalid packed array '${p}'", ("p", ctx.get_path_string()) );
             vars.emplace_back(std::move(v));
          }
          // QUESTION: Why would the assert below ever fail?
@@ -443,23 +466,27 @@ namespace sysio { namespace chain {
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const yield_function_t& yield, bool short_path )const {
-      impl::binary_to_variant_context ctx(*this, yield, type);
+      impl::binary_to_variant_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
       return _binary_to_variant(type, binary, ctx);
    }
 
-   fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const fc::microseconds& max_serialization_time, bool short_path )const {
-      return binary_to_variant( type, binary, create_yield_function(max_serialization_time), short_path );
+   fc::variant abi_serializer::binary_to_variant( const std::string_view& type, const bytes& binary, const fc::microseconds& max_action_data_serialization_time, bool short_path )const {
+      impl::binary_to_variant_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
+      ctx.short_path = short_path;
+      return _binary_to_variant(type, binary, ctx);
    }
 
    fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const yield_function_t& yield, bool short_path )const {
-      impl::binary_to_variant_context ctx(*this, yield, type);
+      impl::binary_to_variant_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
       return _binary_to_variant(type, binary, ctx);
    }
 
-   fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const fc::microseconds& max_serialization_time, bool short_path )const {
-      return binary_to_variant( type, binary, create_yield_function(max_serialization_time), short_path );
+   fc::variant abi_serializer::binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, const fc::microseconds& max_action_data_serialization_time, bool short_path )const {
+      impl::binary_to_variant_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
+      ctx.short_path = short_path;
+      return _binary_to_variant(type, binary, ctx);
    }
 
    void abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char *>& ds, impl::variant_to_binary_context& ctx )const
@@ -475,7 +502,7 @@ namespace sysio { namespace chain {
          btype->second.second(var, ds, is_array(rtype), is_optional(rtype), ctx.get_yield_function());
       } else if ( is_array(rtype) ) {
          ctx.hint_array_type_if_in_array();
-         vector<fc::variant> vars = var.get_array();
+         const vector<fc::variant>& vars = var.get_array();
          fc::raw::pack(ds, (fc::unsigned_int)vars.size());
 
          auto h1 = ctx.push_to_path( impl::array_index_path_item{} );
@@ -522,14 +549,15 @@ namespace sysio { namespace chain {
             bool disallow_additional_fields = false;
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {
                const auto& field = st.fields[i];
-               if( vo.contains( string(field.name).c_str() ) ) {
+               bool present = vo.contains(string(field.name).c_str());
+               if( present || is_optional(field.type) ) {
                   if( disallow_additional_fields )
                      SYS_THROW( pack_exception, "Unexpected field '${f}' found in input object while processing struct '${p}'",
                                 ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
                   {
                      auto h1 = ctx.push_to_path( impl::field_path_item{ .parent_struct_itr = s_itr, .field_ordinal = i } );
                      auto h2 = ctx.disallow_extensions_unless( &field == &st.fields.back() );
-                     _variant_to_binary(_remove_bin_extension(field.type), vo[field.name], ds, ctx);
+                     _variant_to_binary(_remove_bin_extension(field.type), present ? vo[field.name] : fc::variant(nullptr), ds, ctx);
                   }
                } else if( ends_with(field.type, "$") && ctx.extensions_allowed() ) {
                   disallow_additional_fields = true;
@@ -582,23 +610,27 @@ namespace sysio { namespace chain {
    } FC_CAPTURE_AND_RETHROW() }
 
    bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const yield_function_t& yield, bool short_path )const {
-      impl::variant_to_binary_context ctx(*this, yield, type);
+      impl::variant_to_binary_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
       return _variant_to_binary(type, var, ctx);
    }
 
-   bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const fc::microseconds& max_serialization_time, bool short_path ) const {
-       return variant_to_binary( type, var, create_yield_function(max_serialization_time), short_path );
+   bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const fc::microseconds& max_action_data_serialization_time, bool short_path ) const {
+      impl::variant_to_binary_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
+      ctx.short_path = short_path;
+      return _variant_to_binary(type, var, ctx);
    }
 
    void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const yield_function_t& yield, bool short_path )const {
-      impl::variant_to_binary_context ctx(*this, yield, type);
+      impl::variant_to_binary_context ctx(*this, yield, fc::microseconds{}, type);
       ctx.short_path = short_path;
       _variant_to_binary(type, var, ds, ctx);
    }
 
-   void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const fc::microseconds& max_serialization_time, bool short_path ) const {
-       variant_to_binary( type, var, create_yield_function(max_serialization_time), short_path );
+   void  abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds, const fc::microseconds& max_action_data_serialization_time, bool short_path ) const {
+      impl::variant_to_binary_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
+      ctx.short_path = short_path;
+      _variant_to_binary(type, var, ds, ctx);
    }
 
    type_name abi_serializer::get_action_type(name action)const {
@@ -629,9 +661,7 @@ namespace sysio { namespace chain {
    namespace impl {
 
       fc::scoped_exit<std::function<void()>> abi_traverse_context::enter_scope() {
-         std::function<void()> callback = [old_recursion_depth=recursion_depth, this](){
-            recursion_depth = old_recursion_depth;
-         };
+         std::function<void()> callback = [this](){ --recursion_depth; };
 
          ++recursion_depth;
          yield( recursion_depth );

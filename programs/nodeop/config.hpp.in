@@ -7,7 +7,6 @@
 #define CONFIG_HPP_IN
 
 namespace sysio { namespace nodeop { namespace config {
-  constexpr uint64_t version = 0x${nodeop_BUILD_VERSION};
   const string node_executable_name = "${NODE_EXECUTABLE_NAME}";
 }}}
 

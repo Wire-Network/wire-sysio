@@ -15,7 +15,7 @@ namespace sysio { namespace chain {
 
 class apply_context;
 
-namespace eosvmoc {
+namespace sysvmoc {
 
 class code_cache_base;
 class memory;

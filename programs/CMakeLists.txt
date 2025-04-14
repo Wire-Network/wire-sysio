@@ -1,5 +1,4 @@
 add_subdirectory( nodeop )
 add_subdirectory( clio )
 add_subdirectory( kiod )
-add_subdirectory( sysio-launcher )
-add_subdirectory( sysio-blocklog )
+add_subdirectory( leap-util )

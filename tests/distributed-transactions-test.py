@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from TestHelper import TestHelper
-
 import random
+import signal
+
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness.TestHelper import AppArgs
 
 ###############################################################
 # distributed-transactions-test
@@ -22,8 +21,10 @@ import random
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed"
-                           ,"--dump-error-details","-v","--leave-running","--clean-run","--keep-logs"})
+appArgs = AppArgs()
+extraArgs = appArgs.add_bool(flag="--speculative", help="Run nodes in read-mode=speculative")
+args=TestHelper.parse_args({"-p","-n","-d","-s","--nodes-file","--seed", "--speculative"
+                           ,"--dump-error-details","-v","--leave-running","--keep-logs","--unshared"}, applicationSpecificArgs=appArgs)
 
 pnodes=args.p
 topo=args.s
@@ -33,21 +34,14 @@ debug=args.v
 nodesFile=args.nodes_file
 dontLaunch=nodesFile is not None
 seed=args.seed
-dontKill=args.leave_running
 dumpErrorDetails=args.dump_error_details
-killAll=args.clean_run
-keepLogs=args.keep_logs
-
-killWallet=not dontKill
-killEosInstances=not dontKill
-if nodesFile is not None:
-    killEosInstances=False
+speculative=args.speculative
 
 Utils.Debug=debug
 testSuccessful=False
 
 random.seed(seed) # Use a fixed seed for repeatability.
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 walletMgr=WalletMgr(True)
 
 try:
@@ -61,22 +55,20 @@ try:
             errorExit("Failed to initilize nodes from Json string.")
         total_nodes=len(cluster.getNodes())
 
-        walletMgr.killall(allInstances=killAll)
-        walletMgr.cleanup()
         print("Stand up walletd")
         if walletMgr.launch() is False:
             errorExit("Failed to stand up kiod.")
     else:
-        cluster.killall(allInstances=killAll)
-        cluster.cleanup()
-
         Print ("producing nodes: %s, non-producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d" %
                (pnodes, total_nodes-pnodes, topo, delay))
 
         Print("Stand up cluster")
-        traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
-        if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeopArgs=traceNodeopArgs) is False:
-            errorExit("Failed to stand up eos cluster.")
+        extraNodeopArgs = ""
+        if speculative:
+           extraNodeopArgs = " --read-mode speculative "
+
+        if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay, extraNodeopArgs=extraNodeopArgs) is False:
+            errorExit("Failed to stand up sys cluster.")
 
         Print ("Wait for Cluster stabilization")
         # wait for cluster to start producing blocks
@@ -111,16 +103,22 @@ try:
 
     print("Funds spread validated")
 
-    if not dontKill:
-        cluster.killall(allInstances=killAll)
+    if not args.leave_running:
+        for node in cluster.getAllNodes():
+            node.kill(signal.SIGTERM)
     else:
         print("NOTE: Skip killing nodes, block log verification will be limited")
 
     cluster.compareBlockLogs()
 
+    # verify only one start block per block unless interrupted
+    for node in cluster.getAllNodes():
+        if not node.verifyStartingBlockMessages():
+            errorExit("Found more than one Starting block in logs")
+
     testSuccessful=True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful, killEosInstances, killWallet, keepLogs, killAll, dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

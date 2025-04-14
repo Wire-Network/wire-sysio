@@ -2,7 +2,6 @@
 
 #include <sysio/serialize.hpp>
 
-
 static constexpr unsigned int DJBH( const char* cp )
 {
   unsigned int hash = 5381;

@@ -1,0 +1,157 @@
+name: "Performance Harness Run"
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform-choice:
+        description: 'Select Platform'
+        type: choice
+        options:
+        - ubuntu20
+        - ubuntu22
+      override-test-params:
+        description: 'Override perf harness params'
+        type: string
+      override-sysio:
+        description: Override sysio target
+        type: string
+      override-sysio-prerelease:
+        type: choice
+        description: Override sysio prelease
+        options:
+        - default
+        - true
+        - false
+
+permissions:
+  packages: read
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+
+  v:
+    name: Discover Inputs
+    runs-on: ubuntu-latest
+    outputs:
+      test-params: ${{steps.overrides.outputs.test-params}}
+      sysio-target: ${{steps.overrides.outputs.sysio-target}}
+      sysio-prerelease: ${{steps.overrides.outputs.sysio-prerelease}}
+    steps:
+      - name: Setup Input Params
+        id: overrides
+        run: |
+          echo test-params=findMax testBpOpMode >> $GITHUB_OUTPUT
+          echo sysio-target="DEFAULT" >> $GITHUB_OUTPUT
+          echo sysio-prerelease="false" >> $GITHUB_OUTPUT
+
+          if [[ "${{inputs.override-test-params}}" != "" ]]; then
+            echo test-params=${{inputs.override-test-params}} >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{inputs.override-sysio}}" != "" ]]; then
+            echo sysio-target=${{inputs.override-sysio}} >> $GITHUB_OUTPUT
+          fi
+          if [[ "${{inputs.override-sysio-prerelease}}" == +(true|false) ]]; then
+            echo sysio-prerelease=${{inputs.override-sysio-prerelease}} >> $GITHUB_OUTPUT
+          fi
+
+  platform-cache:
+    name: Platform Cache
+    uses: AntelopeIO/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
+    permissions:
+      packages: write
+      contents: read
+    with:
+      runs-on: '["self-hosted", "enf-x86-beefy"]'
+      platform-files: .cicd/platforms
+
+  reuse-build:
+    name: Reuse sysio build
+    needs: [v]
+    runs-on: ubuntu-latest
+    outputs:
+      build-artifact: ${{steps.downloadBuild.outputs.downloaded-file}}
+    steps:
+        - name: Download builddir
+          id: downloadBuild
+          uses: AntelopeIO/asset-artifact-download-action@v3
+          with:
+            owner: AntelopeIO
+            repo: sysio
+            file: build.tar.zst
+            target: ${{github.sha}}
+            artifact-name: ${{github.event.inputs.platform-choice}}-build
+            fail-on-missing-target: false
+
+        - name: Upload builddir
+          if: steps.downloadBuild.outputs.downloaded-file != ''
+          uses: AntelopeIO/upload-artifact-large-chunks-action@v1
+          with:
+            name: ${{github.event.inputs.platform-choice}}-build
+            path: build.tar.zst
+
+  build-base:
+    name: Run Build Workflow
+    needs: [platform-cache, reuse-build]
+    if: needs.reuse-build.outputs.build-artifact == ''
+    uses: ./.github/workflows/build_base.yaml
+    with:
+      platforms: ${{needs.platform-cache.outputs.platforms}}
+      platform-list: '["${{github.event.inputs.platform-choice}}"]'
+
+  tests:
+    name: Tests
+    needs: [v, platform-cache, reuse-build, build-base]
+    if: always() && (needs.build-base.result == 'success' || needs.reuse-build.result == 'success')
+    runs-on: ["Leap-Perf-Ubuntu-22-16x64x600"]
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[github.event.inputs.platform-choice].image}}
+    steps:
+      - name: Download builddir
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{github.event.inputs.platform-choice}}-build
+      - name: Extract Build Directory
+        run: |
+          zstdcat build.tar.zst | tar x
+      - if: ${{ needs.v.outputs.sysio-target != 'DEFAULT' }}
+        name: Download Prev Leap Version
+        uses: AntelopeIO/asset-artifact-download-action@v3
+        with:
+          owner: AntelopeIO
+          repo: sysio
+          target: '${{needs.v.outputs.sysio-target}}'
+          prereleases: ${{fromJSON(needs.v.outputs.sysio-prerelease)}}
+          file: 'sysio.*${{github.event.inputs.platform-choice}}.*(x86_64|amd64).deb'
+      - if: ${{ needs.v.outputs.sysio-target != 'DEFAULT' }}
+        name: Install sysio & replace binaries for PH use
+        run: |
+          apt-get update
+          apt-get install -y ./sysio*.deb
+          rm build/bin/nodeop
+          rm build/bin/clio
+          cp /usr/bin/nodeop build/bin
+          cp /usr/bin/clio build/bin
+          ./build/bin/nodeop --full-version
+          ./build/bin/clio version full
+      - name: Run Performance Test
+        run: |
+          cd build
+          ./tests/PerformanceHarnessScenarioRunner.py ${{needs.v.outputs.test-params}}
+      - name: Prepare results
+        id: prep-results
+        run: |
+          tar -pc build/PHSRLogs | zstd --long -T0 -9 > PHSRLogs.tar.zst
+      - name: Upload results
+        uses: AntelopeIO/upload-artifact-large-chunks-action@v1
+        with:
+          name: performance-test-results
+          path: PHSRLogs.tar.zst
+      - name: Upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-test-report
+          path: ./build/PHSRLogs/**/report.json

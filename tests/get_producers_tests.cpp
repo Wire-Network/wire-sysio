@@ -16,12 +16,12 @@ using namespace sysio::testing;
 BOOST_AUTO_TEST_CASE( get_producers) { try {
       tester chain;
 
-      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), {}, {});
+      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
       sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
 
-      auto results = plugin.get_producers(params);
+      auto results = plugin.get_producers(params, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(results.more, "");
-      BOOST_REQUIRE_EQUAL(results.rows.size(), 1);
+      BOOST_REQUIRE_EQUAL(results.rows.size(), 1u);
       const auto& row = results.rows[0].get_object();
       BOOST_REQUIRE(row.contains("owner"));
       BOOST_REQUIRE_EQUAL(row["owner"].as_string(), "sysio");
@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE( get_producers) { try {
       chain.set_producers( {"dan"_n,"sam"_n,"pam"_n} );
       chain.produce_blocks(30);
 
-      results = plugin.get_producers(params);
-      BOOST_REQUIRE_EQUAL(results.rows.size(), 3);
+      results = plugin.get_producers(params, fc::time_point::maximum());
+      BOOST_REQUIRE_EQUAL(results.rows.size(), 3u);
       auto owners = std::vector<std::string>{"dan", "sam", "pam"};
       auto it     = owners.begin();
       for (const auto& elem : results.rows) {
@@ -52,12 +52,12 @@ BOOST_AUTO_TEST_CASE( get_producers_from_table) { try {
       // ensure that enough voting is occurring so that producer1111 is elected as the producer
       chain.cross_15_percent_threshold();
 
-      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), {}, {});
+      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
       sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
 
-      auto results = plugin.get_producers(params);
+      auto results = plugin.get_producers(params, fc::time_point::maximum());
       BOOST_REQUIRE_EQUAL(results.more, "");
-      BOOST_REQUIRE_EQUAL(results.rows.size(), 1);
+      BOOST_REQUIRE_EQUAL(results.rows.size(), 1u);
       const auto& row = results.rows[0].get_object();
       BOOST_REQUIRE(row.contains("owner"));
       BOOST_REQUIRE_EQUAL(row["owner"].as_string(), "producer1111");

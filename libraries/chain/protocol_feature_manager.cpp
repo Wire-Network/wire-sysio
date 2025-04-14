@@ -4,6 +4,7 @@
 #include <sysio/chain/deep_mind.hpp>
 
 #include <fc/scoped_exit.hpp>
+#include <fc/io/json.hpp>
 
 #include <algorithm>
 #include <boost/assign/list_of.hpp>
@@ -259,8 +260,8 @@ Builtin protocol feature: GET_BLOCK_NUM
 Enables new `get_block_num` intrinsic which returns the current block number.
 */
             {}
-        } )
-         (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
+         } )
+           (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
             "EM_KEY",
             fc::variant("44454e39d7192100f75c2e4895be95c0d56226f8a33e886d537c10126f6b1d60").as<digest_type>(),
             // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
@@ -271,6 +272,67 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 */
             {}
          }  )
+         (  builtin_protocol_feature_t::bls_primitives, builtin_protocol_feature_spec{
+            "BLS_PRIMITIVES2",
+            fc::variant("c0cce5bcd8ea19a28d9e12eafda65ebe6d0e0177e280d4f20c7ad66dcd9e011b").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: BLS_PRIMITIVES2
+
+Adds new cryptographic host functions
+- Add, weighted sum, map, and pairing functions for the bls12-381 elliptic curve.
+*/
+            {}
+         } )
+         (  builtin_protocol_feature_t::disable_deferred_trxs_stage_1, builtin_protocol_feature_spec{
+            "DISABLE_DEFERRED_TRXS_STAGE_1",
+            fc::variant("440c3efaaab212c387ce967c574dc813851cf8332d041beb418dfaf55facd5a9").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: DISABLE_DEFERRED_TRXS_STAGE_1
+
+Once this first disabling deferred transactions protocol feature is activated,
+the behavior of the send_deferred and cancel_deferred host functions and
+canceldelay native action changes so that they become no-ops.
+
+In addition, any block that retires a deferred transaction with a status other
+than expired is invalid.
+
+Also, a deferred transaction can only be retired as expired, and it can be
+retired as expired regardless of whether its delay_util or expiration times
+have been reached.
+*/
+            {}
+         } )
+         (  builtin_protocol_feature_t::disable_deferred_trxs_stage_2, builtin_protocol_feature_spec{
+            "DISABLE_DEFERRED_TRXS_STAGE_2",
+            fc::variant("a857eeb932774c511a40efb30346ec01bfb7796916b54c3c69fe7e5fb70d5cba").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: DISABLE_DEFERRED_TRXS_STAGE_2
+Depends on: DISABLE_DEFERRED_TRXS_STAGE_1
+
+On activation of this second disabling deferred transactions protocol feature,
+all pending deferred transactions are removed from state and the RAM paid by
+the sender of each deferred transaction is refunded. Also, any block that
+retires a deferred transaction is invalid.
+*/
+            {builtin_protocol_feature_t::disable_deferred_trxs_stage_1}
+         } )
+         (  builtin_protocol_feature_t::disable_compression_in_transaction_merkle, builtin_protocol_feature_spec{
+            "DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE",
+            fc::variant("d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
+Depends on: DISABLE_DEFERRED_TRXS_STAGE_2
+
+Once this is turned on, the transaction_mroot will no longer be computed using
+the compressed transaction. It will instead include the transaction via its id,
+which is derived by its own digest.
+*/
+            {builtin_protocol_feature_t::disable_deferred_trxs_stage_2}
+         } )
    ;
 
 
@@ -484,7 +546,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
       for( const auto& d : itr->second.builtin_dependencies ) {
          dependencies.insert( handle_dependency( d ) );
       }
- 
+
       return {itr->first, itr->second.description_digest, std::move(dependencies), itr->second.subjective_restrictions};
    }
 
@@ -579,7 +641,7 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 
    protocol_feature_manager::protocol_feature_manager(
       protocol_feature_set&& pfs,
-      std::function<deep_mind_handler*()> get_deep_mind_logger
+      std::function<deep_mind_handler*(bool is_trx_transient)> get_deep_mind_logger
    ):_protocol_feature_set( std::move(pfs) ), _get_deep_mind_logger(get_deep_mind_logger)
    {
       _builtin_protocol_features.resize( _protocol_feature_set._recognized_builtin_protocol_features.size() );
@@ -760,7 +822,8 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
                   ("digest", feature_digest)
       );
 
-      if (auto dm_logger = _get_deep_mind_logger()) {
+      // activate_feature is called by init. no transaction specific logging is possible
+      if (auto dm_logger = _get_deep_mind_logger(false)) {
          dm_logger->on_activate_feature(*itr);
       }
 
@@ -788,5 +851,203 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
          _activated_protocol_features.pop_back();
       }
    }
+
+   std::optional<builtin_protocol_feature> read_builtin_protocol_feature( const std::filesystem::path& p  ) {
+      try {
+         return fc::json::from_file<builtin_protocol_feature>( p );
+      } catch( const fc::exception& e ) {
+         wlog( "problem encountered while reading '${path}':\n${details}",
+               ("path", p)("details",e.to_detail_string()) );
+      } catch( ... ) {
+         dlog( "unknown problem encountered while reading '${path}'",
+               ("path", p) );
+      }
+      return {};
+   }
+
+   protocol_feature_set initialize_protocol_features( const std::filesystem::path& p, bool populate_missing_builtins ) {
+      using std::filesystem::directory_iterator;
+
+      protocol_feature_set pfs;
+
+      bool directory_exists = true;
+
+      if( std::filesystem::exists( p ) ) {
+         SYS_ASSERT( std::filesystem::is_directory( p ), plugin_exception,
+                     "Path to protocol-features is not a directory: ${path}",
+                     ("path", p)
+         );
+      } else {
+         if( populate_missing_builtins )
+            std::filesystem::create_directories( p );
+         else
+            directory_exists = false;
+      }
+
+      auto log_recognized_protocol_feature = []( const builtin_protocol_feature& f, const digest_type& feature_digest ) {
+         if( f.subjective_restrictions.enabled ) {
+            if( f.subjective_restrictions.preactivation_required ) {
+               if( f.subjective_restrictions.earliest_allowed_activation_time == time_point{} ) {
+                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled with preactivation required",
+                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                              ("digest", feature_digest)
+                  );
+               } else {
+                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled with preactivation required and with an earliest allowed activation time of ${earliest_time}",
+                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                              ("digest", feature_digest)
+                              ("earliest_time", f.subjective_restrictions.earliest_allowed_activation_time)
+                  );
+               }
+            } else {
+               if( f.subjective_restrictions.earliest_allowed_activation_time == time_point{} ) {
+                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled without activation restrictions",
+                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                              ("digest", feature_digest)
+                  );
+               } else {
+                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled without preactivation required but with an earliest allowed activation time of ${earliest_time}",
+                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                              ("digest", feature_digest)
+                              ("earliest_time", f.subjective_restrictions.earliest_allowed_activation_time)
+                  );
+               }
+            }
+         } else {
+            ilog( "Recognized builtin protocol feature '${codename}' (with digest of '${digest}') but support for it is not enabled",
+                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                        ("digest", feature_digest)
+            );
+         }
+      };
+
+      map<builtin_protocol_feature_t, std::filesystem::path>  found_builtin_protocol_features;
+      map<digest_type, std::pair<builtin_protocol_feature, bool> > builtin_protocol_features_to_add;
+      // The bool in the pair is set to true if the builtin protocol feature has already been visited to add
+      map< builtin_protocol_feature_t, std::optional<digest_type> > visited_builtins;
+
+      // Read all builtin protocol features
+      if( directory_exists ) {
+         for( directory_iterator enditr, itr{p}; itr != enditr; ++itr ) {
+            auto file_path = itr->path();
+            if( !std::filesystem::is_regular_file( file_path ) || file_path.extension().generic_string().compare( ".json" ) != 0 )
+               continue;
+
+            auto f = read_builtin_protocol_feature( file_path );
+
+            if( !f ) continue;
+
+            auto res = found_builtin_protocol_features.emplace( f->get_codename(), file_path );
+
+            SYS_ASSERT( res.second, plugin_exception,
+                        "Builtin protocol feature '${codename}' was already included from a previous_file",
+                        ("codename", builtin_protocol_feature_codename(f->get_codename()))
+                              ("current_file", file_path)
+                              ("previous_file", res.first->second)
+            );
+
+            const auto feature_digest = f->digest();
+
+            builtin_protocol_features_to_add.emplace( std::piecewise_construct,
+                                                      std::forward_as_tuple( feature_digest ),
+                                                      std::forward_as_tuple( *f, false ) );
+         }
+      }
+
+      // Add builtin protocol features to the protocol feature manager in the right order (to satisfy dependencies)
+      using itr_type = map<digest_type, std::pair<builtin_protocol_feature, bool>>::iterator;
+      std::function<void(const itr_type&)> add_protocol_feature =
+            [&pfs, &builtin_protocol_features_to_add, &visited_builtins, &log_recognized_protocol_feature, &add_protocol_feature]( const itr_type& itr ) -> void {
+               if( itr->second.second ) {
+                  return;
+               } else {
+                  itr->second.second = true;
+                  visited_builtins.emplace( itr->second.first.get_codename(), itr->first );
+               }
+
+               for( const auto& d : itr->second.first.dependencies ) {
+                  auto itr2 = builtin_protocol_features_to_add.find( d );
+                  if( itr2 != builtin_protocol_features_to_add.end() ) {
+                     add_protocol_feature( itr2 );
+                  }
+               }
+
+               pfs.add_feature( itr->second.first );
+
+               log_recognized_protocol_feature( itr->second.first, itr->first );
+            };
+
+      for( auto itr = builtin_protocol_features_to_add.begin(); itr != builtin_protocol_features_to_add.end(); ++itr ) {
+         add_protocol_feature( itr );
+      }
+
+      auto output_protocol_feature = [&p]( const builtin_protocol_feature& f, const digest_type& feature_digest ) {
+         string filename( "BUILTIN-" );
+         filename += builtin_protocol_feature_codename( f.get_codename() );
+         filename += ".json";
+
+         auto file_path = p / filename;
+
+         SYS_ASSERT( !std::filesystem::exists( file_path ), plugin_exception,
+                     "Could not save builtin protocol feature with codename '${codename}' because a file at the following path already exists: ${path}",
+                     ("codename", builtin_protocol_feature_codename( f.get_codename() ))
+                           ("path", file_path)
+         );
+
+         if( fc::json::save_to_file( f, file_path ) ) {
+            ilog( "Saved default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
+                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                        ("digest", feature_digest)
+                        ("path", file_path)
+            );
+         } else {
+            elog( "Error occurred while writing default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
+                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
+                        ("digest", feature_digest)
+                        ("path", file_path)
+            );
+         }
+      };
+
+      std::function<digest_type(builtin_protocol_feature_t)> add_missing_builtins =
+            [&pfs, &visited_builtins, &output_protocol_feature, &log_recognized_protocol_feature, &add_missing_builtins, populate_missing_builtins]
+                  ( builtin_protocol_feature_t codename ) -> digest_type {
+               auto res = visited_builtins.emplace( codename, std::optional<digest_type>() );
+               if( !res.second ) {
+                  SYS_ASSERT( res.first->second, protocol_feature_exception,
+                              "invariant failure: cycle found in builtin protocol feature dependencies"
+                  );
+                  return *res.first->second;
+               }
+
+               auto f = protocol_feature_set::make_default_builtin_protocol_feature( codename,
+                                                                                     [&add_missing_builtins]( builtin_protocol_feature_t d ) {
+                                                                                        return add_missing_builtins( d );
+                                                                                     } );
+
+               if( !populate_missing_builtins )
+                  f.subjective_restrictions.enabled = false;
+
+               const auto& pf = pfs.add_feature( f );
+               res.first->second = pf.feature_digest;
+
+               log_recognized_protocol_feature( f, pf.feature_digest );
+
+               if( populate_missing_builtins )
+                  output_protocol_feature( f, pf.feature_digest );
+
+               return pf.feature_digest;
+            };
+
+      for( const auto& p : builtin_protocol_feature_codenames ) {
+         auto itr = found_builtin_protocol_features.find( p.first );
+         if( itr != found_builtin_protocol_features.end() ) continue;
+
+         add_missing_builtins( p.first );
+      }
+
+      return pfs;
+   }
+
 
 } }  // sysio::chain

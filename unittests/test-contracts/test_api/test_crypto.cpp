@@ -180,12 +180,9 @@ extern "C" {
       return true;
    }
 
-   // This function is imported from the sysio system contract
-   // definition from libraries/sysiolib/capi/sysio/crypto.h
    __attribute__((sysio_wasm_import))
-   int recover_key( const struct capi_checksum256* digest, const char* sig, size_t siglen, char* pub, size_t publen );
-
-} // extern "C"
+   int recover_key( const capi_checksum256* digest, const char* sig, size_t siglen, char* pub, size_t publen );
+}
 
 struct sig_hash_key_header {
    capi_checksum256 hash;
@@ -200,6 +197,7 @@ struct sig_hash_key_header {
       return ((const char *)this) + 40 + pk_len;
    }
 };
+
 
 using namespace sysio;
 
@@ -231,7 +229,7 @@ void test_crypto::test_recover_key_assert_false() {
    public_key pubkey(std::in_place_index<0>, ecc_pubkey);
 
    assert_recover_key( sh->hash.hash, sig, pubkey );
-   internal_use_do_not_use::sysio_assert( false, "should have thrown an error" );
+   sysio_assert( false, "should have thrown an error" );
 }
 
 void test_crypto::test_recover_key() {
@@ -245,10 +243,10 @@ void test_crypto::test_recover_key() {
 
    auto pubkey = recover_key( digest, sig );
    auto ecc_pubkey = std::get<0>(pubkey);
-   internal_use_do_not_use::sysio_assert(ecc_pubkey.size() == sh->pk_len - 1, "public key does not match");
+   sysio_assert(ecc_pubkey.size() == sh->pk_len - 1, "public key does not match");
    for ( uint32_t i=0; i < sh->pk_len; i++ )
-      if ( ecc_pubkey[i] != sh->pk_base()[i+1] )
-         internal_use_do_not_use::sysio_assert( false, "public key does not match" );
+     if ( ecc_pubkey[i] != sh->pk_base()[i+1] )
+        sysio_assert( false, "public key does not match" );
 }
 
 
@@ -259,116 +257,94 @@ void test_crypto::test_recover_key_partial() {
 
    auto recover_size = std::max<uint32_t>(sh->pk_len / 2, 33);
    char recovered[recover_size];
+   // testing capi recover_key. There is no equivalent C++ recover_key function for this test.
    auto result = ::recover_key( &sh->hash, sh->sig_base(), sh->sig_len, recovered, recover_size );
-   internal_use_do_not_use::sysio_assert(result == sh->pk_len, "recoverable key is not as long as provided key");
+   sysio_assert(result == sh->pk_len, "recoverable key is not as long as provided key");
    for ( uint32_t i=0; i < recover_size; i++ )
       if ( recovered[i] != sh->pk_base()[i] )
-         internal_use_do_not_use::sysio_assert( false, "partial public key does not match" );
+         sysio_assert( false, "partial public key does not match" );
 }
 
 void test_crypto::test_sha1() {
-   checksum160 res;
+   auto tmp = sysio::sha1( test1, my_strlen(test1) ).extract_as_byte_array();
+   my_memcmp((void *)test1_ok_1, tmp.data(), tmp.size());
+   sysio_assert(  my_memcmp((void *)test1_ok_1, tmp.data(), tmp.size()), "sha1 test1" );
 
-   res = sha1( test1, my_strlen(test1) );
-   checksum160 test1_ok = {test1_ok_1};
-   internal_use_do_not_use::sysio_assert( res == test1_ok, "sha1 test1" );
+   tmp = sysio::sha1( test3, my_strlen(test3) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test3_ok_1, tmp.data(), tmp.size()), "sha1 test3" );
 
-   res = sha1( test3, my_strlen(test3) );
-   checksum160 test3_ok = {test3_ok_1};
-   internal_use_do_not_use::sysio_assert( res == test3_ok, "sha1 test3" );
+   tmp = sysio::sha1( test4, my_strlen(test4) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test4_ok_1, tmp.data(), tmp.size()), "sha1 test4" );
 
-   res = sha1( test4, my_strlen(test4) );
-   checksum160 test4_ok = {test4_ok_1};
-   internal_use_do_not_use::sysio_assert( res == test4_ok, "sha1 test4" );
-
-   res = sha1( test5, my_strlen(test5) );
-   checksum160 test5_ok = {test5_ok_1};
-   internal_use_do_not_use::sysio_assert( res == test5_ok, "sha1 test5" );
+   tmp = sysio::sha1( test5, my_strlen(test5) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test5_ok_1, tmp.data(), tmp.size()), "sha1 test5" );
 }
 
 void test_crypto::test_sha256() {
-   checksum256 res;
+   auto tmp = sysio::sha256( test1, my_strlen(test1) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test1_ok_256, tmp.data(), tmp.size()), "sha256 test1" );
 
-   res = sha256( test1, my_strlen(test1) );
-   checksum256 test1_ok = {test1_ok_256};
-   internal_use_do_not_use::sysio_assert( res == test1_ok, "sha256 test1" );
+   tmp = sysio::sha256( test3, my_strlen(test3) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test3_ok_256, tmp.data(), tmp.size()), "sha256 test3" );
 
-   res = sha256( test3, my_strlen(test3) );
-   checksum256 test3_ok = {test3_ok_256};
-   internal_use_do_not_use::sysio_assert( res == test3_ok, "sha256 test3" );
+   tmp = sysio::sha256( test4, my_strlen(test4)).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test4_ok_256, tmp.data(), tmp.size()), "sha256 test4" );
 
-   res = sha256( test4, my_strlen(test4) );
-   checksum256 test4_ok = {test4_ok_256};
-   internal_use_do_not_use::sysio_assert( res == test4_ok, "sha256 test4" );
-
-   res = sha256( test5, my_strlen(test5) );
-   checksum256 test5_ok = {test5_ok_256};
-   internal_use_do_not_use::sysio_assert( res == test5_ok, "sha256 test5" );
+   tmp = sysio::sha256( test5, my_strlen(test5)).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test5_ok_256, tmp.data(), tmp.size()), "sha256 test5" );
 }
 
 void test_crypto::test_sha512() {
-   checksum512 res;
+   auto tmp = sysio::sha512( test1, my_strlen(test1) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test1_ok_512, tmp.data(), tmp.size()), "sha512 test1" );
 
-   res = sha512( test1, my_strlen(test1) );
-   checksum512 test1_ok = {test1_ok_512};
-   internal_use_do_not_use::sysio_assert( res == test1_ok, "sha512 test1" );
+   tmp = sysio::sha512( test3, my_strlen(test3) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test3_ok_512, tmp.data(), tmp.size()), "sha512 test3" );
 
-   res = sha512( test3, my_strlen(test3) );
-   checksum512 test3_ok = {test3_ok_512};
-   internal_use_do_not_use::sysio_assert( res == test3_ok, "sha512 test3" );
+   tmp = sysio::sha512( test4, my_strlen(test4) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test4_ok_512, tmp.data(), tmp.size()), "sha512 test4" );
 
-   res = sha512( test4, my_strlen(test4) );
-   checksum512 test4_ok = {test4_ok_512};
-   internal_use_do_not_use::sysio_assert( res == test4_ok, "sha512 test4" );
-
-   res = sha512( test5, my_strlen(test5) );
-   checksum512 test5_ok = {test5_ok_512};
-   internal_use_do_not_use::sysio_assert( res == test5_ok, "sha512 test5" );
+   tmp = sysio::sha512( test5, my_strlen(test5) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test5_ok_512, tmp.data(), tmp.size()), "sha512 test5" );
 }
 
 void test_crypto::test_ripemd160() {
-   checksum160 res;
+   auto tmp = ripemd160( test1, my_strlen(test1) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test1_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test1" );
 
-   res = ripemd160( test1, my_strlen(test1));
-   checksum160 test1_ok = {test1_ok_ripe};
-   internal_use_do_not_use::sysio_assert( res == test1_ok, "ripemd160 test1" );
+   tmp = ripemd160( test3, my_strlen(test3) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test3_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test3" );
 
-   res = ripemd160( test3, my_strlen(test3) );
-   checksum160 test3_ok = {test3_ok_ripe};
-   internal_use_do_not_use::sysio_assert( res == test3_ok, "ripemd160 test3" );
+   tmp = ripemd160( test4, my_strlen(test4) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test4_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test4" );
 
-   res = ripemd160( test4, my_strlen(test4) );
-   checksum160 test4_ok = {test4_ok_ripe};
-   internal_use_do_not_use::sysio_assert( res == test4_ok, "ripemd160 test4" );
-
-   res = ripemd160( test5, my_strlen(test5) );
-   checksum160 test5_ok = {test5_ok_ripe};
-   internal_use_do_not_use::sysio_assert( res == test5_ok, "ripemd160 test5" );
+   tmp = ripemd160( test5, my_strlen(test5) ).extract_as_byte_array();
+   sysio_assert( my_memcmp((void *)test5_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test5" );
 }
 
 void test_crypto::sha256_null() {
    auto tmp = sha256( nullptr, 100 );
-   internal_use_do_not_use::sysio_assert( false, "should've thrown an error" );
+   sysio_assert( false, "should've thrown an error" );
 }
 
 void test_crypto::sha1_no_data() {
    auto tmp = sha1( test2, my_strlen(test2) ).extract_as_byte_array();
-   internal_use_do_not_use::sysio_assert( my_memcmp((void *)test2_ok_1, tmp.data(), tmp.size()), "sha1 test2" );
+   sysio_assert( my_memcmp((void *)test2_ok_1, tmp.data(), tmp.size()), "sha1 test2" );
 }
 
 void test_crypto::sha256_no_data() {
    auto tmp = sha256( test2, my_strlen(test2) ).extract_as_byte_array();
-   internal_use_do_not_use::sysio_assert( my_memcmp((void *)test2_ok_256, tmp.data(), tmp.size()), "sha256 test2" );
+   sysio_assert( my_memcmp((void *)test2_ok_256, tmp.data(), tmp.size()), "sha256 test2" );
 }
 
 void test_crypto::sha512_no_data() {
    auto tmp = sha512( test2, my_strlen(test2) ).extract_as_byte_array();
-   internal_use_do_not_use::sysio_assert( my_memcmp((void *)test2_ok_512, tmp.data(), tmp.size()), "sha512 test2" );
+   sysio_assert( my_memcmp((void *)test2_ok_512, tmp.data(), tmp.size()), "sha512 test2" );
 }
 
 void test_crypto::ripemd160_no_data() {
    auto tmp = ripemd160( test2, my_strlen(test2) ).extract_as_byte_array();
-   internal_use_do_not_use::sysio_assert( my_memcmp((void *)test2_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test2" );
+   sysio_assert( my_memcmp((void *)test2_ok_ripe, tmp.data(), tmp.size()), "ripemd160 test2" );
 }
 
 
@@ -377,7 +353,7 @@ void test_crypto::assert_sha256_false() {
    tmp.data()[0] ^= (uint128_t)(-1);
    assert_sha256( test1, my_strlen(test1), tmp );
 
-   internal_use_do_not_use::sysio_assert( false, "should have failed" );
+   sysio_assert( false, "should have failed" );
 }
 
 void test_crypto::assert_sha256_true() {
@@ -399,40 +375,39 @@ void test_crypto::assert_sha1_false() {
    tmp.data()[0] ^= (uint128_t)(-1);
    assert_sha1( test1, my_strlen(test1), tmp );
 
-   internal_use_do_not_use::sysio_assert( false, "should have failed" );
+   sysio_assert( false, "should have failed" );
 }
 
 
 void test_crypto::assert_sha1_true() {
-   auto res = sha1( test1, my_strlen(test1) );
-   assert_sha1( test1, my_strlen(test1), res );
+   auto tmp = sha1( test1, my_strlen(test1) );
+   assert_sha1( test1, my_strlen(test1), tmp );
 
-   res = sha1( test3, my_strlen(test3) );
-   assert_sha1( test3, my_strlen(test3), res );
+   tmp = sha1( test3, my_strlen(test3) );
+   assert_sha1( test3, my_strlen(test3), tmp );
 
-   res = sha1( test4, my_strlen(test4) );
-   assert_sha1( test4, my_strlen(test4), res );
+   tmp = sha1( test4, my_strlen(test4));
+   assert_sha1( test4, my_strlen(test4), tmp );
 
-   res = sha1( test5, my_strlen(test5) );
-   assert_sha1( test5, my_strlen(test5), res );
+   tmp = sha1( test5, my_strlen(test5));
+   assert_sha1( test5, my_strlen(test5), tmp );
 }
 
-void test_crypto::assert_sha512_false() {
-   auto res = sha512( test1, my_strlen(test1) );
-   res.data()[0] ^= (uint128_t)(-1);
+void test_crypto::assert_sha512_false() { 
+   auto tmp = sha512( test1, my_strlen(test1));
+   tmp.data()[0] ^= (uint128_t)(-1);
+   assert_sha512( test1, my_strlen(test1), tmp );
 
-   assert_sha512( test1, my_strlen(test1), res );
-
-   internal_use_do_not_use::sysio_assert(false, "should have failed");
+   sysio_assert(false, "should have failed");
 }
 
 
 void test_crypto::assert_sha512_true() {
-   auto tmp = sha512( test1, my_strlen(test1) );
+   auto tmp = sha512( test1, my_strlen(test1));
    assert_sha512( test1, my_strlen(test1), tmp );
 
    tmp = sha512( test3, my_strlen(test3) );
-   assert_sha512( test3, my_strlen(test3), tmp );
+   assert_sha512( test3, my_strlen(test3) , tmp );
 
    tmp = sha512( test4, my_strlen(test4) );
    assert_sha512( test4, my_strlen(test4), tmp );
@@ -442,25 +417,24 @@ void test_crypto::assert_sha512_true() {
 }
 
 void test_crypto::assert_ripemd160_false() {
-   auto res = ripemd160( test1, my_strlen(test1) );
-   res.data()[0] ^= (uint128_t)(-1);
+   auto tmp = ripemd160( test1, my_strlen(test1));
+   tmp.data()[0] ^= (uint128_t)(-1);
+   assert_ripemd160( test1, my_strlen(test1), tmp );
 
-   assert_ripemd160( test1, my_strlen(test1), res );
-
-   internal_use_do_not_use::sysio_assert( false, "should have failed" );
+   sysio_assert( false, "should have failed" );
 }
 
 
 void test_crypto::assert_ripemd160_true() {
-   auto tmp = ripemd160( test1, my_strlen(test1));
+   auto tmp = ripemd160( test1, my_strlen(test1) );
    assert_ripemd160( test1, my_strlen(test1), tmp );
 
-   tmp = ripemd160( test3, my_strlen(test3));
+   tmp = ripemd160( test3, my_strlen(test3) );
    assert_ripemd160( test3, my_strlen(test3), tmp );
 
-   tmp = ripemd160( test4, my_strlen(test4));
+   tmp = ripemd160( test4, my_strlen(test4) );
    assert_ripemd160( test4, my_strlen(test4), tmp );
 
-   tmp = ripemd160( test5, my_strlen(test5));
+   tmp = ripemd160( test5, my_strlen(test5) );
    assert_ripemd160( test5, my_strlen(test5), tmp );
 }

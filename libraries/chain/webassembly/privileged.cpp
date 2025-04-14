@@ -1,9 +1,12 @@
+#include <sysio/chain/account_object.hpp>
 #include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/apply_context.hpp>
+
+#include <fc/io/datastream.hpp>
 
 #include <vector>
 #include <set>
@@ -17,14 +20,16 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::preactivate_feature( legacy_ptr<const digest_type> feature_digest ) {
-      context.control.preactivate_feature( *feature_digest );
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "preactivate_feature not allowed in a readonly transaction");
+      context.control.preactivate_feature( *feature_digest, context.trx_context.is_transient() );
    }
 
    void interface::set_resource_limits( account_name account, int64_t ram_bytes, int64_t net_weight, int64_t cpu_weight ) {
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_resource_limits not allowed in a readonly transaction");
       SYS_ASSERT(ram_bytes >= -1, wasm_execution_error, "invalid value for ram resource limit expected [-1,INT64_MAX]");
       SYS_ASSERT(net_weight >= -1, wasm_execution_error, "invalid value for net resource weight expected [-1,INT64_MAX]");
       SYS_ASSERT(cpu_weight >= -1, wasm_execution_error, "invalid value for cpu resource weight expected [-1,INT64_MAX]");
-      if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight) ) {
+      if( context.control.get_mutable_resource_limits_manager().set_account_limits(account, ram_bytes, net_weight, cpu_weight, context.trx_context.is_transient()) ) {
          context.trx_context.validate_ram_usage.insert( account );
       }
    }
@@ -92,14 +97,15 @@ namespace sysio { namespace chain { namespace webassembly {
          return s;
 
       if ( s <= packed_parameters.size() ) {
-         datastream<char*> ds( packed_parameters.data(), s );
+         fc::datastream<char*> ds( packed_parameters.data(), s );
          fc::raw::pack(ds, version);
          fc::raw::pack(ds, params);
       }
       return s;
    }
    void interface::set_wasm_parameters_packed( span<const char> packed_parameters ) {
-      datastream<const char*> ds( packed_parameters.data(), packed_parameters.size() );
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_wasm_parameters_packed not allowed in a readonly transaction");
+      fc::datastream<const char*> ds( packed_parameters.data(), packed_parameters.size() );
       uint32_t version;
       chain::wasm_config cfg;
       fc::raw::unpack(ds, version);
@@ -113,7 +119,8 @@ namespace sysio { namespace chain { namespace webassembly {
       );
    }
    int64_t interface::set_proposed_producers( legacy_span<const char> packed_producer_schedule) {
-      datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers not allowed in a readonly transaction");
+      fc::datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
       std::vector<producer_authority> producers;
       std::vector<legacy::producer_key> old_version;
       fc::raw::unpack(ds, old_version);
@@ -129,10 +136,11 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, legacy_span<const char> packed_producer_schedule) {
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_proposed_producers_ex not allowed in a readonly transaction");
       if (packed_producer_format == 0) {
          return set_proposed_producers(std::move(packed_producer_schedule));
       } else if (packed_producer_format == 1) {
-         datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
+         fc::datastream<const char*> ds( packed_producer_schedule.data(), packed_producer_schedule.size() );
          vector<producer_authority> producers;
 
          fc::raw::unpack(ds, producers);
@@ -149,7 +157,7 @@ namespace sysio { namespace chain { namespace webassembly {
       if( packed_blockchain_parameters.size() == 0 ) return s;
 
       if ( s <= packed_blockchain_parameters.size() ) {
-         datastream<char*> ds( packed_blockchain_parameters.data(), s );
+         fc::datastream<char*> ds( packed_blockchain_parameters.data(), s );
          fc::raw::pack(ds, gpo.configuration.v0());
          return s;
       }
@@ -157,7 +165,8 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::set_blockchain_parameters_packed( legacy_span<const char> packed_blockchain_parameters ) {
-      datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_blockchain_parameters_packed not allowed in a readonly transaction");
+      fc::datastream<const char*> ds( packed_blockchain_parameters.data(), packed_blockchain_parameters.size() );
       chain::chain_config_v0 cfg;
       fc::raw::unpack(ds, cfg);
       cfg.validate();
@@ -168,7 +177,7 @@ namespace sysio { namespace chain { namespace webassembly {
    }
    
    uint32_t interface::get_parameters_packed( span<const char> packed_parameter_ids, span<char> packed_parameters) const{
-      datastream<const char*> ds_ids( packed_parameter_ids.data(), packed_parameter_ids.size() );
+      fc::datastream<const char*> ds_ids( packed_parameter_ids.data(), packed_parameter_ids.size() );
 
       chain::chain_config cfg = context.control.get_global_properties().configuration;
       std::vector<fc::unsigned_int> ids;
@@ -182,13 +191,14 @@ namespace sysio { namespace chain { namespace webassembly {
                  chain::config_parse_error,
                  "get_parameters_packed: buffer size is smaller than ${size}", ("size", size));
       
-      datastream<char*> ds( packed_parameters.data(), size );
+      fc::datastream<char*> ds( packed_parameters.data(), size );
       fc::raw::pack( ds, config_range );
       return size;
    }
 
    void interface::set_parameters_packed( span<const char> packed_parameters ){
-      datastream<const char*> ds( packed_parameters.data(), packed_parameters.size() );
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_parameters_packed not allowed in a readonly transaction");
+      fc::datastream<const char*> ds( packed_parameters.data(), packed_parameters.size() );
 
       chain::chain_config cfg = context.control.get_global_properties().configuration;
       config_range config_range(cfg, {context.control});
@@ -207,6 +217,7 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::set_privileged( account_name n, bool is_priv ) {
+      SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_privileged not allowed in a readonly transaction");
       const auto& a = context.db.get<account_metadata_object, by_name>( n );
       context.db.modify( a, [&]( auto& ma ){
          ma.set_privileged( is_priv );

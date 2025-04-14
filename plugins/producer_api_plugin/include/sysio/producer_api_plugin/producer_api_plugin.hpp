@@ -3,7 +3,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 
-#include <appbase/application.hpp>
+#include <sysio/chain/application.hpp>
 
 namespace sysio {
 

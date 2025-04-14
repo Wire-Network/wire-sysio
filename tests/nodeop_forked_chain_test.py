@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
 from datetime import datetime
 from datetime import timedelta
 import time
-from Cluster import Cluster
 import json
-from WalletMgr import WalletMgr
-from Node import Node
-from TestHelper import TestHelper
-
 import signal
+import os
+
+from TestHarness import Cluster, Node, TestHelper, Utils, WalletMgr, CORE_SYMBOL, createAccountKeys
+from TestHarness.TestHelper import AppArgs
 
 ###############################################################
 # nodeop_forked_chain_test
@@ -31,12 +29,12 @@ import signal
 #   Time is allowed to progress so that the "bridge" node can catchup and both producer nodes to come to consensus
 #   The block log is then checked for both producer nodes to verify that the 10 producer fork is selected and that
 #       both nodes are in agreement on the block log.
+#   This test also runs a state_history_plugin (SHiP) on node 0 and uses ship_streamer to verify all blocks are received
+#   across the fork.
 #
 ###############################################################
 
 Print=Utils.Print
-
-from core_symbol import CORE_SYMBOL
 
 def analyzeBPs(bps0, bps1, expectDivergence):
     start=0
@@ -127,42 +125,39 @@ def getMinHeadAndLib(prodNodes):
     return (headBlockNum, libNum)
 
 
-
-args = TestHelper.parse_args({"--prod-count","--dump-error-details","--keep-logs","-v","--leave-running","--clean-run",
-                              "--wallet-port"})
+appArgs = AppArgs()
+extraArgs = appArgs.add(flag="--num-ship-clients", type=int, help="How many ship_streamers should be started", default=2)
+args = TestHelper.parse_args({"--prod-count","--dump-error-details","--keep-logs","-v","--leave-running",
+                              "--wallet-port","--unshared"}, applicationSpecificArgs=appArgs)
 Utils.Debug=args.v
 totalProducerNodes=2
 totalNonProducerNodes=1
 totalNodes=totalProducerNodes+totalNonProducerNodes
 maxActiveProducers=21
 totalProducers=maxActiveProducers
-cluster=Cluster(walletd=True)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
 prodCount=args.prod_count
-killAll=args.clean_run
 walletPort=args.wallet_port
+num_clients=args.num_ship_clients
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
 
     cluster.setWalletMgr(walletMgr)
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
     Print("Stand up cluster")
     specificExtraNodeopArgs={}
+    shipNodeNum = 0
+    specificExtraNodeopArgs[shipNodeNum]="--plugin sysio::state_history_plugin"
+
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
     specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
-    traceNodeopArgs = " --plugin sysio::trace_api_plugin --trace-no-abis "
 
 
     # ***   setup topogrophy   ***
@@ -172,16 +167,16 @@ try:
 
     if cluster.launch(prodCount=prodCount, topo="bridge", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducers,
-                      useBiosBootFile=False, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sys cluster.")
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
 
 
     # ***   create accounts to vote in desired producers   ***
 
-    accounts=cluster.createAccountKeys(5)
+    accounts=createAccountKeys(5)
     if accounts is None:
         Utils.errorExit("FAILURE - create keys")
     accounts[0].name="tester111111"
@@ -227,7 +222,7 @@ try:
 
     # ***   delegate bandwidth to accounts   ***
 
-    node=prodNodes[0]
+    node=nonProdNode
     # create accounts via sysio as otherwise a bid is needed
     for account in accounts:
         Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
@@ -293,6 +288,31 @@ try:
     timestampStr=Node.getBlockAttribute(block, "timestamp", blockNum)
     timestamp=datetime.strptime(timestampStr, Utils.TimeFmt)
 
+    shipNode = cluster.getNode(0)
+    block_range = 1000
+    start_block_num = blockNum
+    end_block_num = start_block_num + block_range
+
+    shipClient = "tests/ship_streamer"
+    cmd = f"{shipClient} --start-block-num {start_block_num} --end-block-num {end_block_num} --fetch-block --fetch-traces --fetch-deltas"
+    if Utils.Debug: Utils.Print(f"cmd: {cmd}")
+    clients = []
+    files = []
+    shipTempDir = os.path.join(Utils.DataDir, "ship")
+    os.makedirs(shipTempDir, exist_ok = True)
+    shipClientFilePrefix = os.path.join(shipTempDir, "client")
+
+    starts = []
+    for i in range(0, num_clients):
+        start = time.perf_counter()
+        outFile = open(f"{shipClientFilePrefix}{i}.out", "w")
+        errFile = open(f"{shipClientFilePrefix}{i}.err", "w")
+        Print(f"Start client {i}")
+        popen=Utils.delayedCheckOutput(cmd, stdout=outFile, stderr=errFile)
+        starts.append(time.perf_counter())
+        clients.append((popen, cmd))
+        files.append((outFile, errFile))
+        Utils.Print(f"Client {i} started, Ship node head is: {shipNode.getBlockNum()}")
 
     # ***   Identify what the production cycle is   ***
 
@@ -300,7 +320,7 @@ try:
     producerToSlot={}
     slot=-1
     inRowCountPerProducer=12
-    minNumBlocksPerProducer=9
+    minNumBlocksPerProducer=10
     lastTimestamp=timestamp
     headBlockNum=node.getBlockNum()
     firstBlockForWindowMissedSlot=None
@@ -321,6 +341,7 @@ try:
         if firstBlockForWindowMissedSlot is not None:
             missedSlotAfter.append(firstBlockForWindowMissedSlot)
             firstBlockForWindowMissedSlot=None
+
         while blockProducer==lastBlockProducer:
             producerToSlot[blockProducer]["count"]+=1
             blockNum+=1
@@ -345,9 +366,12 @@ try:
             Utils.errorExit("Producer %s, in slot %d, expected to produce %d blocks but produced %d blocks.  At block number %d. " %
                             (lastBlockProducer, slot, inRowCountPerProducer, producerToSlot[lastBlockProducer]["count"], blockNum-1) +
                             "Slots were missed after the following blocks: %s" % (", ".join(missedSlotAfter)))
-        elif len(missedSlotAfter) > 0:
-            # if there was a full round, then the most recent producer missed a slot
-            firstBlockForWindowMissedSlot=missedSlotAfter[0]
+
+        if len(missedSlotAfter) > 0:
+            # it may be the most recent producer missed a slot
+            possibleMissed=missedSlotAfter[-1]
+            if possibleMissed == blockNum - 1:
+                firstBlockForWindowMissedSlot=possibleMissed
 
         if blockProducer==productionCycle[0]:
             break
@@ -376,6 +400,8 @@ try:
     if preKillBlockProducer == "defproducerj" or preKillBlockProducer == "defproducerk":
         # wait for defproduceri so there is plenty of time to send kill before defproducerk
         nonProdNode.waitForProducer("defproduceri")
+        preKillBlockNum=nonProdNode.getBlockNum()
+        preKillBlockProducer=nonProdNode.getBlockProducerByNum(preKillBlockNum)
     Print("preKillBlockProducer = {}".format(preKillBlockProducer))
     # kill at last block before defproducerl, since the block it is killed on will get propagated
     killAtProducer="defproducerk"
@@ -560,22 +586,41 @@ try:
         Utils.errorExit("Did not find find block %s (the original divergent block) in blockProducers0, test setup is wrong.  blockProducers0: %s" % (killBlockNum, ", ".join(blockProducers0)))
     Print("Fork resolved and determined producer %s for block %s" % (resolvedKillBlockProducer, killBlockNum))
 
+    Print(f"Stopping all {num_clients} clients")
+    for index, (popen, _), (out, err), start in zip(range(len(clients)), clients, files, starts):
+        popen.wait()
+        Print(f"Stopped client {index}.  Ran for {time.perf_counter() - start:.3f} seconds.")
+        out.close()
+        err.close()
+        outFile = open(f"{shipClientFilePrefix}{index}.out", "r")
+        data = json.load(outFile)
+        block_num = start_block_num
+        for i in data:
+            # fork can cause block numbers to be repeated
+            this_block_num = i['get_blocks_result_v0']['this_block']['block_num']
+            if this_block_num < block_num:
+                block_num = this_block_num
+            assert block_num == this_block_num, f"{block_num} != {this_block_num}"
+            assert isinstance(i['get_blocks_result_v0']['block'], str) # verify block in result
+            block_num += 1
+        assert block_num-1 == end_block_num, f"{block_num-1} != {end_block_num}"
+
     blockProducers0=[]
     blockProducers1=[]
 
     testSuccessful=True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
-    # Too much output
-    # if not testSuccessful:
-    #     Print(Utils.FileDivider)
-    #     Print("Compare Blocklog")
-    #     cluster.compareBlockLogs()
-    #     Print(Utils.FileDivider)
-    #     Print("Print Blocklog")
-    #     cluster.printBlockLog()
-    #     Print(Utils.FileDivider)
+# Too much output for ci/cd
+#     if not testSuccessful:
+#         Print(Utils.FileDivider)
+#         Print("Compare Blocklog")
+#         cluster.compareBlockLogs()
+#         Print(Utils.FileDivider)
+#         Print("Print Blocklog")
+#         cluster.printBlockLog()
+#         Print(Utils.FileDivider)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

@@ -5,8 +5,8 @@ file(GLOB HEADERS "include/sysio/chain/*.hpp"
                   "include/sysio/chain/webassembly/*.hpp"
                   "${CMAKE_CURRENT_BINARY_DIR}/include/sysio/chain/core_symbol.hpp" )
 
-if(APPLE AND UNIX)
-   set(PLATFORM_TIMER_IMPL platform_timer_macos.cpp)
+if((APPLE AND UNIX) OR (${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD"))
+   set(PLATFORM_TIMER_IMPL platform_timer_kqueue.cpp)
 else()
    try_run(POSIX_TIMER_TEST_RUN_RESULT POSIX_TIMER_TEST_COMPILE_RESULT ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/platform_timer_posix_test.c)
    if(POSIX_TIMER_TEST_RUN_RESULT EQUAL 0)
@@ -34,15 +34,21 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
                              webassembly/runtimes/sys-vm-oc.cpp
                              webassembly/runtimes/sys-vm-oc/default_real_main.cpp)
 
+   set_source_files_properties(webassembly/runtimes/sys-vm-oc/LLVMJIT.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
+   set_source_files_properties(webassembly/runtimes/sys-vm-oc/LLVMEmitIR.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
+   set_source_files_properties(webassembly/runtimes/sys-vm-oc/switch_stack_linux.s PROPERTIES COMPILE_FLAGS "-Wno-unused-command-line-argument")
+
    if(LLVM_VERSION VERSION_LESS 7.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       enable_language(ASM-LLVMWAR)
       list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar)
+      set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    else()
       list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp)
+      set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    endif()
 
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit)
-   include_directories(${LLVM_INCLUDE_DIRS})
+   include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
 
    option(SYSVMOC_ENABLE_DEVELOPER_OPTIONS "enable developer options for SYS VM OC" OFF)
@@ -71,6 +77,9 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/system.cpp
    webassembly/transaction.cpp
 )
+
+add_library(sysio_rapidjson INTERFACE)
+target_include_directories(sysio_rapidjson INTERFACE ../rapidjson/include)
 
 ## SORT .cpp by most likely to change / break compile
 add_library( sysio_chain
@@ -104,6 +113,7 @@ add_library( sysio_chain
               abi_serializer.cpp
               asset.cpp
               snapshot.cpp
+              snapshot_scheduler.cpp
               deep_mind.cpp
 
              ${CHAIN_SYSVMOC_SOURCES}
@@ -118,6 +128,7 @@ add_library( sysio_chain
              protocol_feature_manager.cpp
              producer_schedule.cpp
              genesis_intrinsics.cpp
+             symbol.cpp
              whitelisted_intrinsics.cpp
              thread_utils.cpp
              platform_timer_accuracy.cpp
@@ -125,8 +136,17 @@ add_library( sysio_chain
              ${HEADERS}
              )
 
-target_link_libraries( sysio_chain PUBLIC fc chainbase Logging IR WAST WASM Runtime
+## Boost::accumulators depends on Boost::numeric_ublas, which is still missing cmake support (see
+## https://github.com/boostorg/cmake/issues/39). Until this is fixed, manually add Boost::numeric_ublas
+## as an interface library
+## ----------------------------------------------------------------------------------------------------
+add_library(boost_numeric_ublas INTERFACE)
+add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
+
+target_link_libraries( sysio_chain PUBLIC bn256 fc chainbase sysio_rapidjson Logging IR WAST WASM
                        softfloat builtins ${CHAIN_SYSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
+                       Boost::signals2 Boost::hana Boost::property_tree Boost::multi_index Boost::asio Boost::lockfree
+                       Boost::assign Boost::accumulators
                      )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
@@ -162,6 +182,3 @@ install( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/sysio/chain/
       FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" EXCLUDE
 )
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/sysio/chain/core_symbol.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/chain COMPONENT dev EXCLUDE_FROM_ALL)
-#if(MSVC)
-#  set_source_files_properties( db_init.cpp db_block.cpp database.cpp block_log.cpp PROPERTIES COMPILE_FLAGS "/bigobj" )
-#endif(MSVC)

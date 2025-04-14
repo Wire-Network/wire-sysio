@@ -2,9 +2,9 @@
 
 #include <cstddef>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
-extern "C" void eosvmoc_switch_stack(void* stack, void(*fn)(void*), void* data);
+extern "C" void sysvmoc_switch_stack(void* stack, void(*fn)(void*), void* data);
 
 // Allows wasm code to run with a stack whose size can be adjusted based
 // on the configurable max_call_depth.  It is assumed that max_call_depth
@@ -28,7 +28,7 @@ struct execution_stack {
    template<typename F>
    void run(F&& f) {
       if (stack_top) {
-         eosvmoc_switch_stack(stack_top, [](void* data) { (*static_cast<F*>(data))(); }, &f);
+         sysvmoc_switch_stack(stack_top, [](void* data) { (*static_cast<F*>(data))(); }, &f);
       } else {
          f();
       }

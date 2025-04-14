@@ -7,25 +7,18 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/generated_transaction_object.hpp>
 
-#include <Runtime/Runtime.h>
-
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
 #include <contracts.hpp>
-
-#ifdef NON_VALIDATING_TEST
-#define TESTER tester
-#else
-#define TESTER validating_tester
-#endif
+#include <test_contracts.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace fc;
 
-class currency_tester : public TESTER {
+class currency_tester : public validating_tester {
    public:
 
       auto push_action(const account_name& signer, const action_name &name, const variant_object &data ) {
@@ -70,11 +63,11 @@ class currency_tester : public TESTER {
          return trace;
       }
 
-      currency_tester()
-         :TESTER(),abi_ser(json::from_string(contracts::sysio_token_abi().data()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ))
+      currency_tester(setup_policy p = setup_policy::full)
+         :validating_tester({}, nullptr, p), abi_ser(json::from_string(test_contracts::sysio_token_abi()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ))
       {
          create_account( "sysio.token"_n);
-         set_code( "sysio.token"_n, contracts::sysio_token_wasm() );
+         set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
 
          auto result = push_action("sysio.token"_n, "create"_n, mutable_variant_object()
                  ("issuer",       sysio_token)
@@ -96,6 +89,11 @@ class currency_tester : public TESTER {
 
       abi_serializer abi_ser;
       static const name sysio_token;
+};
+
+class pre_disable_deferred_trx_currency_tester : public currency_tester {
+   public:
+      pre_disable_deferred_trx_currency_tester() : currency_tester(setup_policy::full_except_do_not_disable_deferred_trx) {}
 };
 
 const name currency_tester::sysio_token = "sysio.token"_n;
@@ -259,7 +257,7 @@ BOOST_FIXTURE_TEST_CASE( test_fullspend, currency_tester ) try {
 
 
 
-BOOST_FIXTURE_TEST_CASE(test_symbol, TESTER) try {
+BOOST_FIXTURE_TEST_CASE(test_symbol, validating_tester) try {
 
    {
       symbol dollar(2, "DLLR");
@@ -312,13 +310,13 @@ BOOST_FIXTURE_TEST_CASE(test_symbol, TESTER) try {
 
    // invalid - contains lower case characters, no validation
    {
-      BOOST_CHECK_EXCEPTION(symbol malformed(SY(6,EoS)),
-                            symbol_type_exception, fc_exception_message_is("invalid symbol: EoS"));
+      BOOST_CHECK_EXCEPTION(symbol malformed(SY(6,Sys)),
+                            symbol_type_exception, fc_exception_message_is("invalid symbol: Sys"));
    }
 
    // invalid - contains lower case characters, exception thrown
    {
-      BOOST_CHECK_EXCEPTION(symbol(5,"EoS"),
+      BOOST_CHECK_EXCEPTION(symbol(5,"Sys"),
                             symbol_type_exception, fc_exception_message_is("invalid character in symbol name"));
    }
 
@@ -396,16 +394,16 @@ BOOST_FIXTURE_TEST_CASE(test_symbol, TESTER) try {
 
 } FC_LOG_AND_RETHROW() /// test_symbol
 
-BOOST_FIXTURE_TEST_CASE( test_proxy, currency_tester ) try {
+BOOST_FIXTURE_TEST_CASE( test_proxy_deferred, pre_disable_deferred_trx_currency_tester ) try {
    produce_blocks(2);
 
    create_accounts( {"alice"_n, "proxy"_n} );
    produce_block();
 
-   set_code("proxy"_n, contracts::proxy_wasm());
+   set_code("proxy"_n, test_contracts::proxy_wasm());
    produce_blocks(1);
 
-   abi_serializer proxy_abi_ser(json::from_string(contracts::proxy_abi().data()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ));
+   abi_serializer proxy_abi_ser(json::from_string(test_contracts::proxy_abi()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
    // set up proxy owner
    {
@@ -449,19 +447,19 @@ BOOST_FIXTURE_TEST_CASE( test_proxy, currency_tester ) try {
    BOOST_REQUIRE_EQUAL(get_balance( "proxy"_n), asset::from_string("0.0000 CUR"));
    BOOST_REQUIRE_EQUAL(get_balance( "alice"_n),   asset::from_string("5.0000 CUR"));
 
-} FC_LOG_AND_RETHROW() /// test_currency
+} FC_LOG_AND_RETHROW() /// test_proxy_deferred
 
-BOOST_FIXTURE_TEST_CASE( test_deferred_failure, currency_tester ) try {
+BOOST_FIXTURE_TEST_CASE( test_deferred_failure, pre_disable_deferred_trx_currency_tester ) try {
    produce_blocks(2);
 
    create_accounts( {"alice"_n, "bob"_n, "proxy"_n} );
    produce_block();
 
-   set_code("proxy"_n, contracts::proxy_wasm());
-   set_code("bob"_n, contracts::proxy_wasm());
+   set_code("proxy"_n, test_contracts::proxy_wasm());
+   set_code("bob"_n, test_contracts::proxy_wasm());
    produce_blocks(1);
 
-   abi_serializer proxy_abi_ser(json::from_string(contracts::proxy_abi().data()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ));
+   abi_serializer proxy_abi_ser(json::from_string(test_contracts::proxy_abi()).as<abi_def>(), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
    // set up proxy owner
    {

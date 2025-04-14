@@ -136,10 +136,10 @@ msgstr ""
 msgid "the port where eosd is running"
 msgstr ""
 
-msgid "the host where eos-walletd is running"
+msgid "the host where sys-walletd is running"
 msgstr ""
 
-msgid "the port where eos-walletd is running"
+msgid "the port where sys-walletd is running"
 msgstr ""
 
 msgid "output verbose messages on error"
@@ -499,7 +499,7 @@ msgstr ""
 msgid "Failed to connect to eosd at ${ip}:${port}; is eosd running?"
 msgstr ""
 
-msgid "Failed to connect to eos-walletd at ${ip}:${port}; is eos-walletd running?"
+msgid "Failed to connect to sys-walletd at ${ip}:${port}; is sys-walletd running?"
 msgstr ""
 
 msgid "Failed to connect"

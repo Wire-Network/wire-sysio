@@ -1,0 +1,53 @@
+{
+    "initAccounts": [],
+    "abiFile": "unittests/contracts/sysio.system/sysio.system.abi",
+    "actions": [
+        {
+            "actionAuthAcct": "sysio",
+            "actionName": "newaccount",
+            "authorization": {
+                "actor": "sysio",
+                "permission": "active"
+            },
+            "actionData": {
+                "creator": "sysio",
+                "name": "ACCT_PER_TRX",
+                "owner": {
+                    "threshold": 1,
+                    "keys": [
+                        {
+                            "key": "SYS65rXebLhtk2aTTzP4e9x1AQZs7c5NNXJp89W8R3HyaA6Zyd4im",
+                            "weight": 1
+                        }
+                    ],
+                    "accounts": [],
+                    "waits": []
+                },
+                "active": {
+                    "threshold": 1,
+                    "keys": [
+                        {
+                            "key": "SYS65rXebLhtk2aTTzP4e9x1AQZs7c5NNXJp89W8R3HyaA6Zyd4im",
+                            "weight": 1
+                        }
+                    ],
+                    "accounts": [],
+                    "waits": []
+                }
+            }
+        },
+        {
+            "actionAuthAcct": "sysio",
+            "actionName": "buyrambytes",
+            "authorization": {
+                "actor": "sysio",
+                "permission": "active"
+            },
+            "actionData": {
+                "payer": "sysio",
+                "receiver": "ACCT_PER_TRX",
+                "bytes": "3000"
+            }
+        }
+    ]
+}

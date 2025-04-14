@@ -1,9 +1,9 @@
-add_executable( test_subjective_billing test_subjective_billing.cpp )
-target_link_libraries( test_subjective_billing producer_plugin sysio_testing )
-
-add_test(NAME test_subjective_billing COMMAND plugins/producer_plugin/test/test_subjective_billing WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-
-add_executable( test_trx_full test_trx_full.cpp )
-target_link_libraries( test_trx_full producer_plugin sysio_testing )
-
-add_test(NAME test_trx_full COMMAND plugins/producer_plugin/test/test_trx_full WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_executable( test_producer_plugin
+        test_trx_full.cpp
+        test_options.cpp
+        test_block_timing_util.cpp
+        test_disallow_delayed_trx.cpp
+        main.cpp
+        )
+target_link_libraries( test_producer_plugin producer_plugin sysio_testing sysio_chain_wrap )
+add_test(NAME test_producer_plugin COMMAND plugins/producer_plugin/test/test_producer_plugin WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

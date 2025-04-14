@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from testUtils import BlockLogAction
 import time
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from Node import BlockType
 import os
 import signal
 import subprocess
-from TestHelper import AppArgs
-from TestHelper import TestHelper
+
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness.testUtils import BlockLogAction
+from TestHarness.TestHelper import AppArgs
+from TestHarness.Node import BlockType
 
 ###############################################################
 # block_log_util_test
@@ -20,12 +18,10 @@ from TestHelper import TestHelper
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-from core_symbol import CORE_SYMBOL
-
 def verifyBlockLog(expected_block_num, trimmedBlockLog):
     firstBlockNum = expected_block_num
     for block in trimmedBlockLog:
-        assert 'block_num' in block, print("ERROR: sysio-blocklog didn't return block output")
+        assert 'block_num' in block, print("ERROR: leap-util didn't return block output")
         block_num = block['block_num']
         assert block_num == expected_block_num
         expected_block_num += 1
@@ -33,36 +29,28 @@ def verifyBlockLog(expected_block_num, trimmedBlockLog):
 
 
 appArgs=AppArgs()
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--clean-run"})
+args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--unshared"})
 Utils.Debug=args.v
 pnodes=2
-cluster=Cluster(walletd=True)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 prodCount=2
-killAll=args.clean_run
 walletPort=TestHelper.DEFAULT_WALLET_PORT
 totalNodes=pnodes+1
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
     Print("Stand up cluster")
-    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
-    if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount, useBiosBootFile=False, extraNodeopArgs=traceNodeopArgs) is False:
-        Utils.errorExit("Failed to stand up eos cluster.")
+    if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount) is False:
+        Utils.errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
@@ -82,7 +70,7 @@ try:
     node0.kill(signal.SIGTERM)
 
     Print("Wait for node0's head block to become irreversible")
-    node1.waitForBlock(headBlockNum, blockType=BlockType.lib)
+    node1.waitForBlock(headBlockNum, blockType=BlockType.lib, timeout=90)
     infoAfter=node1.getInfo(exitOnError=True)
     headBlockNumAfter=infoAfter["head_block_num"]
 
@@ -131,7 +119,7 @@ try:
 
     try:
         Print("Head block num %d will not be in block log (it will be in reversible DB), so --trim will throw an exception" % (headBlockNum))
-        output=cluster.getBlockLog(0, blockLogAction=BlockLogAction.trim, last=headBlockNum, throwException=True)
+        output=cluster.getBlockLog(0, blockLogAction=BlockLogAction.trim, first=0, last=headBlockNum, throwException=True)
         Utils.errorExit("BlockLogUtil --trim should have indicated error for last value set to lib (%d) " +
                         "which should not do anything since only trimming blocklog and not irreversible blocks" % (lib))
     except subprocess.CalledProcessError as ex:
@@ -139,13 +127,13 @@ try:
 
     beforeEndOfBlockLog=lib-20
     Print("Block num %d will definitely be at least one block behind the most recent entry in block log, so --trim will work" % (beforeEndOfBlockLog))
-    output=cluster.getBlockLog(0, blockLogAction=BlockLogAction.trim, last=beforeEndOfBlockLog, throwException=True)
+    output=cluster.getBlockLog(0, blockLogAction=BlockLogAction.trim, first=0, last=beforeEndOfBlockLog, throwException=True)
 
     Print("Kill the non production node, we want to verify its block log")
     cluster.getNode(2).kill(signal.SIGTERM)
 
     Print("Trim off block num 1 to remove genesis block from block log.")
-    output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.trim, first=2, throwException=True)
+    output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.trim, first=2, last=4294967295, throwException=True)
 
     Print("Smoke test the trimmed block log.")
     output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.smoke_test)
@@ -157,7 +145,7 @@ try:
 
     # relaunch the node with the truncated block log and ensure it catches back up with the producers
     current_head_block_num = node1.getInfo()["head_block_num"]
-    cluster.getNode(2).relaunch(cachePopen=True)
+    cluster.getNode(2).relaunch()
     assert cluster.getNode(2).waitForBlock(current_head_block_num, timeout=60, reportInterval=15)
 
     # ensure it continues to advance
@@ -174,7 +162,7 @@ try:
 
     firstBlock = info["last_irreversible_block_num"]
     Print("Trim off block num %s." % (firstBlock))
-    output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.trim, first=firstBlock, throwException=True)
+    output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.trim, first=firstBlock, last=4294967295, throwException=True)
 
     Print("Smoke test the trimmed block log.")
     output=cluster.getBlockLog(2, blockLogAction=BlockLogAction.smoke_test)
@@ -187,7 +175,7 @@ try:
     # relaunch the node with the truncated block log and ensure it catches back up with the producers
     current_head_block_num = node1.getInfo()["head_block_num"]
     assert current_head_block_num >= info["head_block_num"]
-    cluster.getNode(2).relaunch(cachePopen=True)
+    cluster.getNode(2).relaunch()
     assert cluster.getNode(2).waitForBlock(current_head_block_num, timeout=60, reportInterval=15)
 
     # ensure it continues to advance
@@ -207,7 +195,7 @@ try:
     testSuccessful=True
 
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

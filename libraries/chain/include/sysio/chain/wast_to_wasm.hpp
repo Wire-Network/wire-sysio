@@ -1,8 +1,7 @@
 #pragma once
-
-#include <cstdint>
-#include <string>
 #include <vector>
+#include <string>
+#include <stdint.h>
 
 namespace sysio { namespace chain {
 

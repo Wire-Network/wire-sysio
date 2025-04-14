@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
-from testUtils import Utils
-from Cluster import Cluster
-from WalletMgr import WalletMgr
-from Node import Node
-from Node import BlockType
-from TestHelper import TestHelper
-
 import random
 import signal
 import time
+
+from TestHarness import Cluster, Node, ReturnType, TestHelper, Utils, WalletMgr
+from TestHarness.Node import BlockType
 
 ###############################################################
 # large-lib-test
@@ -24,15 +20,12 @@ Print=Utils.Print
 errorExit=Utils.errorExit
 
 args=TestHelper.parse_args({"--kill-sig","--kill-count","--keep-logs"
-                            ,"--dump-error-details","-v","--leave-running","--clean-run"
+                            ,"--dump-error-details","-v","--leave-running","--unshared"
                             })
 pnodes=1
 total_nodes=3 # first one is producer, and last two are speculative nodes
 debug=args.v
-killEosInstances=not args.leave_running
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-killAll=args.clean_run
 relaunchTimeout=10
 # Don't want to set too big, trying to reduce test time, but needs to be large enough for test to finish before
 # restart re-creates this many blocks.
@@ -44,12 +37,12 @@ testSuccessful=False
 
 seed=1
 random.seed(seed) # Use a fixed seed for repeatability.
-cluster=Cluster(walletd=True)
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 walletMgr=WalletMgr(True)
 cluster.setWalletMgr(walletMgr)
 
 def relaunchNode(node: Node, chainArg="", skipGenesis=True, relaunchAssertMessage="Fail to relaunch"):
-   isRelaunchSuccess=node.relaunch(chainArg=chainArg, timeout=relaunchTimeout, skipGenesis=skipGenesis, cachePopen=True)
+   isRelaunchSuccess=node.relaunch(chainArg=chainArg, timeout=relaunchTimeout, skipGenesis=skipGenesis)
    time.sleep(1) # Give a second to replay or resync if needed
    assert isRelaunchSuccess, relaunchAssertMessage
    return isRelaunchSuccess
@@ -57,27 +50,13 @@ def relaunchNode(node: Node, chainArg="", skipGenesis=True, relaunchAssertMessag
 try:
     TestHelper.printSystemInfo("BEGIN")
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
-    walletMgr.killall(allInstances=killAll)
-    walletMgr.cleanup()
-
-    # set the last two nodes as speculative
-    specificExtraNodeopArgs={}
-    specificExtraNodeopArgs[1]="--read-mode speculative "
-    specificExtraNodeopArgs[2]="--read-mode speculative "
-
     Print("Stand up cluster")
-    traceNodeopArgs=" --plugin sysio::trace_api_plugin --trace-no-abis "
     if cluster.launch(
             pnodes=pnodes,
             totalNodes=total_nodes,
             totalProducers=1,
-            useBiosBootFile=False,
-            topo="mesh",
-            specificExtraNodeopArgs=specificExtraNodeopArgs,
-            extraNodeopArgs=traceNodeopArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+            topo="mesh") is False:
+        errorExit("Failed to stand up sys cluster.")
 
     producingNode=cluster.getNode(0)
     speculativeNode1=cluster.getNode(1)
@@ -90,6 +69,7 @@ try:
 
     Print("Wait for producing {} blocks".format(numBlocksToProduceBeforeRelaunch))
     producingNode.waitForBlock(numBlocksToProduceBeforeRelaunch, blockType=BlockType.lib)
+    producingNode.waitForProducer("defproducera")
 
     Print("Kill all node instances.")
     for clusterNode in cluster.nodes:
@@ -104,8 +84,9 @@ try:
     Utils.rmNodeDataDir(2)
 
     Print ("Relaunch all cluster nodes instances.")
-    # -e -p sysio for resuming production, skipGenesis=False for launch the same chain as before
-    relaunchNode(producingNode, chainArg="-e -p sysio --sync-fetch-span 5 ", skipGenesis=False)
+    # -e for resuming production, defproducera only producer at this point
+    # skipGenesis=False for launch the same chain as before
+    relaunchNode(producingNode, chainArg="-e --sync-fetch-span 5 ", skipGenesis=False)
     relaunchNode(speculativeNode1, chainArg="--sync-fetch-span 5 ")
     relaunchNode(speculativeNode2, chainArg="--sync-fetch-span 5 ", skipGenesis=False)
 
@@ -129,7 +110,7 @@ try:
     testSuccessful=True
 
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killEosInstances, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

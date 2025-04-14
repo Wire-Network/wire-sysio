@@ -4,6 +4,10 @@
 #include <sysio/chain/platform_timer.hpp>
 #include <signal.h>
 
+namespace sysio::benchmark {
+   struct interface_in_benchmark; // for benchmark testing
+}
+
 namespace sysio { namespace chain {
 
    struct transaction_checktime_timer {
@@ -37,9 +41,10 @@ namespace sysio { namespace chain {
 
          transaction_context( controller& c,
                               const packed_transaction& t,
+                              const transaction_id_type& trx_id, // trx_id diff than t.id() before replace_deferred
                               transaction_checktime_timer&& timer,
                               fc::time_point start = fc::time_point::now(),
-                              bool read_only=false);
+                              transaction_metadata::trx_type type = transaction_metadata::trx_type::input);
          ~transaction_context();
 
          void init_for_implicit_trx( uint64_t initial_net_usage = 0 );
@@ -83,10 +88,15 @@ namespace sysio { namespace chain {
 
          void validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const;
 
+         bool is_dry_run()const { return trx_type == transaction_metadata::trx_type::dry_run; };
+         bool is_read_only()const { return trx_type == transaction_metadata::trx_type::read_only; };
+         bool is_transient()const { return trx_type == transaction_metadata::trx_type::read_only || trx_type == transaction_metadata::trx_type::dry_run; };
+
       private:
 
          friend struct controller_impl;
          friend class apply_context;
+         friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
 
          void add_ram_usage( account_name account, int64_t ram_delta );
 
@@ -110,17 +120,20 @@ namespace sysio { namespace chain {
          void schedule_transaction();
          void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
 
-         void validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum )const;
-         void validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit )const;
-         void validate_account_cpu_usage_estimate( int64_t billed_us, int64_t account_cpu_limit )const;
+         void validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const;
+         void validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit,  int64_t subjective_billed_us )const;
+         void validate_account_cpu_usage_estimate( int64_t billed_us, int64_t account_cpu_limit, int64_t subjective_billed_us )const;
 
          void disallow_transaction_extensions( const char* error_msg )const;
+
+         std::string get_tx_cpu_usage_exceeded_reason_msg(fc::microseconds& limit) const;
 
       /// Fields:
       public:
 
          controller&                                 control;
          const packed_transaction&                   packed_trx;
+         const transaction_id_type&                  id;
          std::optional<chainbase::database::session> undo_session;
          transaction_trace_ptr                       trace;
          fc::time_point                              start;
@@ -128,7 +141,7 @@ namespace sysio { namespace chain {
          fc::time_point                published;
 
 
-         vector<digest_type>           executed_action_receipt_digests;
+         deque<digest_type>           executed_action_receipt_digests;
          flat_set<account_name>        bill_to_accounts;
          flat_set<account_name>        validate_ram_usage;
 
@@ -148,9 +161,9 @@ namespace sysio { namespace chain {
 
          transaction_checktime_timer   transaction_timer;
 
-         const bool                    is_read_only;
    private:
          bool                          is_initialized = false;
+         transaction_metadata::trx_type trx_type;
 
          uint64_t                      net_limit = 0;
          bool                          net_limit_due_to_block = true;
@@ -170,8 +183,19 @@ namespace sysio { namespace chain {
          fc::time_point                pseudo_start;
          fc::microseconds              billed_time;
 
-         // Roa Change: Store total RAM usage accumulated during actions here. transaction_context::finalize() will use to finalize charges.
-         int64_t                       total_ram_usage = 0; 
+         // Roa Change
+         // Store total RAM usage accumulated during actions here.
+         // transaction_context::finalize() will use to finalize charges.
+         int64_t                       total_ram_usage = 0;
+
+         enum class tx_cpu_usage_exceeded_reason {
+            account_cpu_limit, // includes subjective billing
+            on_chain_consensus_max_transaction_cpu_usage,
+            user_specified_trx_max_cpu_usage_ms,
+            node_configured_max_transaction_time,
+            speculative_executed_adjusted_max_transaction_time // prev_billed_cpu_time_us > 0
+         };
+         tx_cpu_usage_exceeded_reason  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
    };
 
 } }

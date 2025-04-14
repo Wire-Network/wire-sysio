@@ -1,12 +1,9 @@
 if(NOT SYSIO_ROOT)
-    # Ensure it points to the correct 'sysio' directory
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+   list(APPEND CMAKE_MODULE_PATH @SYSIO_ROOT_DIR@/cmake/sysio)
 else()
-    # Correct paths based on SYSIO_ROOT
-    list(APPEND CMAKE_MODULE_PATH "${SYSIO_ROOT}/lib/cmake/sysio")
-    list(APPEND CMAKE_MODULE_PATH "${SYSIO_ROOT}/lib64/cmake/sysio")
+   # legacy behavior for anyone configuring with -DSYSIO_ROOT=/foo or such
+   list(APPEND CMAKE_MODULE_PATH ${SYSIO_ROOT}/lib/cmake/sysio)
+   list(APPEND CMAKE_MODULE_PATH ${SYSIO_ROOT}/lib64/cmake/sysio)
 endif()
-
-# Include the necessary CMake files
-include(${CMAKE_CURRENT_LIST_DIR}/SysioTester.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/SysioCheckVersion.cmake)
+include(SysioTester)
+include(SysioCheckVersion)

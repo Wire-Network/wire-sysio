@@ -19,6 +19,7 @@ const static auto default_state_guard_size      =    128*1024*1024ll;
 const static name system_account_name    { "sysio"_n };
 const static name null_account_name      { "sysio.null"_n };
 const static name producers_account_name { "sysio.prods"_n };
+const static name roa_account_name       { "sysio.roa"_n };
 
 // Active permission of producers account requires greater than 2/3 of the producers to authorize
 const static name majority_producers_permission_name { "prod.major"_n }; // greater than 1/2 of producers needed to authorize
@@ -76,10 +77,9 @@ const static uint32_t   default_max_inline_action_size               = 512 * 102
 const static uint16_t   default_max_inline_action_depth              = 4;
 const static uint16_t   default_max_auth_depth                       = 6;
 const static uint32_t   default_sig_cpu_bill_pct                     = 50 * percent_1; // billable percentage of signature recovery
-const static uint32_t   default_block_cpu_effort_pct                 = 80 * percent_1; // percentage of block time used for producing block
+const static uint32_t   default_produce_block_offset_ms              = 450;
 const static uint16_t   default_controller_thread_pool_size          = 2;
 const static uint32_t   default_max_variable_signature_length        = 16384u;
-const static uint32_t   default_max_nonprivileged_inline_action_size = 4 * 1024; // 4 KB
 const static uint32_t   default_max_action_return_value_size         = 256;
 
 const static uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
@@ -113,9 +113,9 @@ const static uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multip
 const static uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes
 
 #ifdef SYSIO_SYS_VM_JIT_RUNTIME_ENABLED
-const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::eos_vm_jit;
+const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
 #else
-const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::eos_vm;
+const static sysio::chain::wasm_interface::vm_type default_wasm_runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
 #endif
 
 const static uint32_t   default_abi_serializer_max_time_us = 15*1000; ///< default deadline for abi serialization methods

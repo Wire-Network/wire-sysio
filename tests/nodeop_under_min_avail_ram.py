@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 
-from core_symbol import CORE_SYMBOL
-from Cluster import Cluster
-from Cluster import NamedAccounts
-from WalletMgr import WalletMgr
-from Node import Node
-from TestHelper import TestHelper
-from testUtils import Utils
-import testUtils
 import time
 
-import decimal
-import math
-import re
+from TestHarness import Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL, createAccountKeys
+from TestHarness.accounts import NamedAccounts
 
 ###############################################################
 # nodeop_under_min_avail_ram
@@ -27,39 +18,33 @@ import re
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--clean-run","--wallet-port"})
+args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--wallet-port","--unshared"})
 Utils.Debug=args.v
-totalNodes=4
-cluster=Cluster(walletd=True)
+pNodes=4
+totalNodes=5
+cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 dumpErrorDetails=args.dump_error_details
-keepLogs=args.keep_logs
-dontKill=args.leave_running
-killAll=args.clean_run
 walletPort=args.wallet_port
 
 walletMgr=WalletMgr(True, port=walletPort)
 testSuccessful=False
-killEosInstances=not dontKill
-killWallet=not dontKill
 
-WalletdName=Utils.EosWalletName
+WalletdName=Utils.SysWalletName
 ClientName="clio"
 
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
-    cluster.killall(allInstances=killAll)
-    cluster.cleanup()
     Print("Stand up cluster")
     minRAMFlag="--chain-state-db-guard-size-mb"
     minRAMValue=1002
     maxRAMFlag="--chain-state-db-size-mb"
     maxRAMValue=1010
-    extraNodeopArgs=" %s %d %s %d  --http-max-response-time-ms 990000 --plugin sysio::trace_api_plugin --trace-no-abis " % (minRAMFlag, minRAMValue, maxRAMFlag, maxRAMValue)
-    if cluster.launch(onlyBios=False, pnodes=totalNodes, totalNodes=totalNodes, totalProducers=totalNodes, extraNodeopArgs=extraNodeopArgs, useBiosBootFile=False) is False:
+    extraNodeopArgs=" %s %d %s %d  --http-max-response-time-ms 990000 " % (minRAMFlag, minRAMValue, maxRAMFlag, maxRAMValue)
+    if cluster.launch(onlyBios=False, pnodes=pNodes, totalNodes=totalNodes, totalProducers=totalNodes, extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
@@ -84,7 +69,7 @@ try:
     nodes.append(cluster.getNode(2))
     nodes.append(cluster.getNode(3))
     numNodes=len(nodes)
-
+    nonProdNode = cluster.getNode(4)
 
     for account in accounts:
         walletMgr.importKey(account, testWallet)
@@ -92,27 +77,27 @@ try:
     # create accounts via sysio as otherwise a bid is needed
     for account in accounts:
         Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
-        trans=nodes[0].createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=False, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
+        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
         transferAmount="70000000.0000 {0}".format(CORE_SYMBOL)
         Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
-        nodes[0].transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer")
-        trans=nodes[0].delegatebw(account, 1000000.0000, 68000000.0000, waitForTransBlock=True, exitOnError=True)
+        nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
+        trans=nonProdNode.delegatebw(account, 1000000.0000, 68000000.0000, waitForTransBlock=True, exitOnError=True)
 
-    contractAccount=cluster.createAccountKeys(1)[0]
+    contractAccount=createAccountKeys(1)[0]
     contractAccount.name="contracttest"
     walletMgr.importKey(contractAccount, testWallet)
     Print("Create new account %s via %s" % (contractAccount.name, cluster.sysioAccount.name))
-    trans=nodes[0].createInitializeAccount(contractAccount, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=False, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
+    trans=nonProdNode.createInitializeAccount(contractAccount, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
     transferAmount="90000000.0000 {0}".format(CORE_SYMBOL)
     Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, contractAccount.name))
-    nodes[0].transferFunds(cluster.sysioAccount, contractAccount, transferAmount, "test transfer")
-    trans=nodes[0].delegatebw(contractAccount, 1000000.0000, 88000000.0000, waitForTransBlock=True, exitOnError=True)
+    nonProdNode.transferFunds(cluster.sysioAccount, contractAccount, transferAmount, "test transfer", waitForTransBlock=True)
+    trans=nonProdNode.delegatebw(contractAccount, 1000000.0000, 88000000.0000, waitForTransBlock=True, exitOnError=True)
 
     contractDir="unittests/test-contracts/integration_test"
     wasmFile="integration_test.wasm"
     abiFile="integration_test.abi"
     Print("Publish contract")
-    trans=nodes[0].publishContract(contractAccount.name, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+    trans=nodes[0].publishContract(contractAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
     if trans is None:
         Utils.cmdError("%s set contract %s" % (ClientName, contractAccount.name))
         errorExit("Failed to publish contract.")
@@ -157,10 +142,10 @@ try:
     #spread the actions to all accounts, to use each accounts tps bandwidth
     fromIndexStart=fromIndex+1 if fromIndex+1<namedAccounts.numAccounts else 0
 
-    # min and max are subjective, just assigned to make sure that many small changes in nodeop don't 
+    # min and max are subjective, just assigned to make sure that many small changes in nodeop don't
     # result in the test not correctly validating behavior
-    if count < 5 or count > 20:
-        strMsg="little" if count < 20 else "much"
+    if count < 12 or count > 24:
+        strMsg="little" if count < 25 else "much"
         Utils.cmdError("Was able to send %d store actions which was too %s" % (count, strMsg))
         errorExit("Incorrect number of store actions sent")
 
@@ -200,7 +185,7 @@ try:
             addSwapFlags["--enable-stale-production"]=""   # just enable stale production for the first node
             enabledStaleProduction=True
         if not nodes[nodeIndex].relaunch("", newChain=False, addSwapFlags=addSwapFlags):
-            Utils.cmdError("Failed to restart node0 with new capacity %s" % (maxRAMValue))
+            Utils.cmdError(f'Failed to restart {nodes[nodeIndex].name} with new capacity {maxRAMValue}')
             errorExit("Failure - Node should have restarted")
         addSwapFlags={}
         maxRAMValue=currentMinimumMaxRAM+30
@@ -311,7 +296,7 @@ try:
 
     testSuccessful=True
 finally:
-    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, killEosInstances=killEosInstances, killWallet=killWallet, keepLogs=keepLogs, cleanRun=killAll, dumpErrorDetails=dumpErrorDetails)
+    TestHelper.shutdown(cluster, walletMgr, testSuccessful=testSuccessful, dumpErrorDetails=dumpErrorDetails)
 
 exitCode = 0 if testSuccessful else 1
 exit(exitCode)

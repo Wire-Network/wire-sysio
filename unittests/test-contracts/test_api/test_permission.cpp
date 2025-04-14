@@ -8,8 +8,6 @@
 
 #include "test_api.hpp"
 
-
-
 struct check_auth_msg {
    sysio::name                    account;
    sysio::name                    permission;
@@ -17,8 +15,6 @@ struct check_auth_msg {
 
    SYSLIB_SERIALIZE( check_auth_msg, (account)(permission)(pubkeys)  )
 };
-
-using namespace sysio;
 
 void test_permission::check_authorization( uint64_t receiver, uint64_t code, uint64_t action ) {
    (void)code;
@@ -28,11 +24,11 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
    auto self = receiver;
    auto params = unpack_action_data<check_auth_msg>();
    auto packed_pubkeys = pack(params.pubkeys);
-   int64_t res64 = ::check_permission_authorization( params.account,
+   int64_t res64 = sysio::check_permission_authorization( params.account,
                                                      params.permission,
                                                      packed_pubkeys.data(), packed_pubkeys.size(),
                                                      (const char*)0,        0,
-                                                     microseconds( std::numeric_limits<int64_t>::max() )
+                                                     microseconds{ std::numeric_limits<int64_t>::max() }
                                                    );
 
    auto itr = db_lowerbound_i64( self, self, self, 1 );
@@ -58,8 +54,8 @@ void test_permission::test_permission_last_used( uint64_t /* receiver */, uint64
 
    auto params = unpack_action_data<test_permission_last_used_msg>();
 
-   time_point msec{ microseconds(params.last_used_time) };
-   sysio_assert( get_permission_last_used(params.account, params.permission) == msec, "unexpected last used permission time" );
+   time_point msec{ microseconds{params.last_used_time}};
+   sysio_assert( sysio::get_permission_last_used(params.account, params.permission) == msec, "unexpected last used permission time" );
 }
 
 void test_permission::test_account_creation_time( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
@@ -69,6 +65,6 @@ void test_permission::test_account_creation_time( uint64_t /* receiver */, uint6
 
    auto params = unpack_action_data<test_permission_last_used_msg>();
 
-   time_point msec{ microseconds(params.last_used_time) };
-   sysio_assert( get_account_creation_time(params.account) == msec, "unexpected account creation time" );
+   time_point msec{ microseconds{params.last_used_time}};
+   sysio_assert( sysio::get_account_creation_time(params.account) == msec, "unexpected account creation time" );
 }

@@ -9,12 +9,8 @@ The `master` branch is the latest stable branch.
 ## Supported Operating Systems
 
 We currently support the following operating systems.
-
-| **Operating Systems**           |
-|---------------------------------|
-| Ubuntu 22.04 Jammy              |
-| Ubuntu 20.04 Focal              |
-| Ubuntu 18.04 Bionic             |
+- Ubuntu 22.04 Jammy
+- Ubuntu 20.04 Focal
 
 <!-- TODO: needs to add and test build on unsupported environments -->
 
@@ -22,6 +18,14 @@ We currently support the following operating systems.
 
 In the future, we plan to support downloading Debian packages directly from our [release page](https://github.com/Wire-Network/wire-sysio/releases), providing a more streamlined and convenient setup process. However, for the time being, installation requires *building the software from source*.
 
+Finally, verify Leap was installed correctly:
+```bash
+nodeop --full-version
+```
+You should see a [semantic version](https://semver.org) string followed by a `git` commit hash with no errors. For example:
+```
+v3.1.2-0b64f879e3ebe2e4df09d2e62f1fc164cc1125d1
+```
 
 
 ## Building from source
@@ -32,18 +36,15 @@ You will need to build on a [supported operating system](#supported-operating-sy
 
 **Requirements to build:**
 
-- C++17 compiler and standard library
-- boost 1.67+
-- CMake 3.8+
+- C++20 compiler and standard library
+- CMake 3.16+
 - LLVM 7 - 11 - for Linux only
   - newer versions do not work
-- openssl 1.1+
-- libcurl
-- curl
-- libusb
+- libcurl 7.40.0+
 - git
 - GMP
 - Python 3
+- python3-numpy
 - zlib
 
 ### Step 1 - Clone
@@ -78,7 +79,11 @@ cd wire-sysio
 
 ### Step 2 - Build
 
-Select build instructions below based on OS.
+### Step 3 - Build
+Select build instructions below for a [pinned build](#pinned-build) (preferred) or an [unpinned build](#unpinned-build).
+
+> ℹ️ **Pinned vs. Unpinned Build** ℹ️  
+We have two types of builds for Leap: "pinned" and "unpinned." A pinned build is a reproducible build with the build environment and dependency versions fixed by the development team. In contrast, unpinned builds use the dependency versions provided by the build platform. Unpinned builds tend to be quicker because the pinned build environment must be built from scratch. Pinned builds, in addition to being reproducible, ensure the compiler remains the same between builds of different Leap major versions. Leap requires the compiler version to remain the same, otherwise its state might need to be recovered from a portable snapshot or the chain needs to be replayed.
 
 > ⚠️ **A Warning On Parallel Compilation Jobs (`-j` flag)** ⚠️  
 When building C/C++ software, often the build is performed in parallel via a command such as `make -j "$(nproc)"` which uses all available CPU threads. However, be aware that some compilation units (`*.cpp` files) in Wire Sysion will consume nearly 4GB of memory. Failures due to memory exhaustion will typically, but not always, manifest as compiler crashes. Using all available CPU threads may also prevent you from doing other things on your computer during compilation. For these reasons, consider reducing this value.
@@ -86,11 +91,18 @@ When building C/C++ software, often the build is performed in parallel via a com
 > 🐋 **Docker and `sudo`** 🐋  
 If you are in an Ubuntu docker container, omit `sudo` from all commands because you run as `root` by default. Most other docker containers also exclude `sudo`, especially Debian-family containers. If your shell prompt is a hash tag (`#`), omit `sudo`.
 
-#### Build
+#### Pinned Reproducible Build
+The pinned reproducible build requires Docker. Make sure you are in the root of the `leap` repo and then run
+```bash
+DOCKER_BUILDKIT=1 docker build -f tools/reproducible.Dockerfile -o . .
+```
+This command will take a substantial amount of time because a toolchain is built from scratch. Upon completion, the current directory will contain a built `.deb` and `.tar.gz` (you can change the `-o .` argument to place the output in a different directory). If needing to reduce the number of parallel jobs as warned above, run the command as,
+```bash
+DOCKER_BUILDKIT=1 docker build --build-arg LEAP_BUILD_JOBS=4 -f tools/reproducible.Dockerfile -o . .
+```
 
-**Note**: If you are in an Ubuntu docker container, omit `sudo` because you run as `root` by default.
-
-**Ubuntu 22.04 Jammy & Ubuntu 20.04 Focal**
+#### Unpinned Build
+The following instructions are valid for this branch. Other release branches may have different requirements, so ensure you follow the directions in the branch or release you intend to build. If you are in an Ubuntu docker container, omit `sudo` because you run as `root` by default.
 
 Install dependencies:
 
@@ -99,78 +111,34 @@ sudo apt-get update
 sudo apt-get install -y \
         build-essential \
         cmake \
-        curl \
         git \
-        libboost-all-dev \
         libcurl4-openssl-dev \
         libgmp-dev \
-        libssl-dev \
-        libusb-1.0-0-dev \
         llvm-11-dev \
-        pkg-config
-```
-
-To build, make sure you are in the root of the `wire-sysio` repo, then run the following command:
-
-```bash
-mkdir -p build
-cd build
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..
-make -j $(nproc) package
-```
-
-</details>
-
-<details> <summary>**Ubuntu 18.04 Bionic**</summary>
-
-Install dependencies:
-
-```bash
-sudo apt-get update
-sudo apt-get install -y \
-        build-essential \
-        cmake \
-        curl \
-        g++-8 \
-        git \
-        libcurl4-openssl-dev \
-        libgmp-dev \
-        libssl-dev \
-        libusb-1.0-0-dev \
-        llvm-7-dev \
-        pkg-config \
-        python3 \
+        python3-numpy \
+        file \
         zlib1g-dev
 ```
 
-You need to build Boost from source on this distribution:
 
+On Ubuntu 20.04, install gcc-10 which has C++20 support:
 ```bash
-curl -fL https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.bz2 -o ~/Downloads/boost_1_79_0.tar.bz2
-tar -jvxf ~/Downloads/boost_1_79_0.tar.bz2 -C ~/Downloads/
-pushd ~/Downloads/boost_1_79_0
-./bootstrap.sh --prefix="$HOME/boost1.79"
-./b2 --with-iostreams --with-date_time --with-filesystem --with-system --with-program_options --with-chrono --with-test -j "$(nproc)" install
-popd
+sudo apt-get install -y g++-10
 ```
 
-The Boost `*.tar.bz2` download and `boost_1_79_0` folder can be removed now if you want more space.
-
-```bash
-rm -r ~/Downloads/boost_1_79_0.tar.bz2 ~/Downloads/boost_1_79_0
-```
-
-From a terminal in the root of the `wire-sysio` repo, build.
-
+To build, make sure you are in the root of the `wire-sysio` repo, then run the following command:
 ```bash
 mkdir -p build
 cd build
-cmake -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_PREFIX_PATH="$HOME/boost1.79;/usr/lib/llvm-7/" -DCMAKE_BUILD_TYPE=Release ..
+
+## on Ubuntu 20, specify the gcc-10 compiler
+cmake -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10 -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..
+
+## on Ubuntu 22, the default gcc version is 11, using the default compiler is fine
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 ..
+
 make -j "$(nproc)" package
 ```
-
-After building, you may remove the `~/boost1.79` directory or you may keep it around for your next build.
-</details>
 
 Now you can optionally [test](#step-4---test) your build, or [install](#step-3---install) the `*.deb` binary packages, which will be in the root of your build directory.
 

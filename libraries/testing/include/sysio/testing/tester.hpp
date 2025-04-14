@@ -64,8 +64,11 @@ namespace sysio { namespace testing {
       preactivate_feature_only,
       preactivate_feature_and_new_bios,
       old_wasm_parser,
+      full_except_do_not_disable_deferred_trx,
       full
    };
+
+   std::ostream& operator<<(std::ostream& os, setup_policy p);
 
    std::vector<uint8_t> read_wasm( const char* fn );
    std::vector<char>    read_abi( const char* fn );
@@ -154,7 +157,7 @@ namespace sysio { namespace testing {
 
          virtual ~base_tester() {};
 
-         void              init(const setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::SPECULATIVE, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}, std::optional<uint32_t> config_max_nonprivileged_inline_action_size = std::optional<uint32_t>{});
+         void              init(const setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::HEAD, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{});
          void              init(controller::config config, const snapshot_reader_ptr& snapshot);
          void              init(controller::config config, const genesis_state& genesis);
          void              init(controller::config config);
@@ -164,8 +167,7 @@ namespace sysio { namespace testing {
          void              execute_setup_policy(const setup_policy policy);
 
          void              close();
-         template <typename Lambda>
-         void              open( protocol_feature_set&& pfs, std::optional<chain_id_type> expected_chain_id, Lambda lambda );
+         void              open( protocol_feature_set&& pfs, std::optional<chain_id_type> expected_chain_id, const std::function<void()>& lambda );
          void              open( protocol_feature_set&& pfs, const snapshot_reader_ptr& snapshot );
          void              open( protocol_feature_set&& pfs, const genesis_state& genesis );
          void              open( protocol_feature_set&& pfs, std::optional<chain_id_type> expected_chain_id = {} );
@@ -199,7 +201,7 @@ namespace sysio { namespace testing {
          unapplied_transaction_queue& get_unapplied_transaction_queue() { return unapplied_transactions; }
 
          transaction_trace_ptr    push_transaction( packed_transaction& trx, fc::time_point deadline = fc::time_point::maximum(), uint32_t billed_cpu_time_us = DEFAULT_BILLED_CPU_TIME_US );
-         transaction_trace_ptr    push_transaction( signed_transaction& trx, fc::time_point deadline = fc::time_point::maximum(), uint32_t billed_cpu_time_us = DEFAULT_BILLED_CPU_TIME_US, bool no_throw = false );
+         transaction_trace_ptr    push_transaction( signed_transaction& trx, fc::time_point deadline = fc::time_point::maximum(), uint32_t billed_cpu_time_us = DEFAULT_BILLED_CPU_TIME_US, bool no_throw = false, transaction_metadata::trx_type trx_type = transaction_metadata::trx_type::input );
 
          [[nodiscard]]
          action_result            push_action(action&& cert_act, uint64_t authorizer); // TODO/QUESTION: Is this needed?
@@ -267,6 +269,10 @@ namespace sysio { namespace testing {
                                                bool include_code = true
                                              );
 
+         transaction_trace_ptr register_node_owner( account_name account, uint32_t tier );
+         transaction_trace_ptr add_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen, uint32_t time_block );
+
+
          transaction_trace_ptr push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
          transaction_trace_ptr push_reqauth(account_name from, string role, bool multi_sig = false);
          // use when just want any old non-context free action
@@ -282,12 +288,12 @@ namespace sysio { namespace testing {
 
          template<typename ObjectType, typename IndexBy, typename... Args>
          const auto& get( Args&&... args ) {
-            return control->db().get<ObjectType,IndexBy>( forward<Args>(args)... );
+            return control->db().get<ObjectType,IndexBy>( std::forward<Args>(args)... );
          }
 
          template<typename ObjectType, typename IndexBy, typename... Args>
          const auto* find( Args&&... args ) {
-            return control->db().find<ObjectType,IndexBy>( forward<Args>(args)... );
+            return control->db().find<ObjectType,IndexBy>( std::forward<Args>(args)... );
          }
 
          template< typename KeyType = fc::ecc::private_key_shim >
@@ -307,7 +313,9 @@ namespace sysio { namespace testing {
 
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
-         void              set_abi( account_name name, const char* abi_json, const private_key_type* signer = nullptr );
+         void              set_abi( account_name name, const std::string& abi_json, const private_key_type* signer = nullptr );
+
+         bool is_code_cached( account_name name ) const;
 
          bool                          chain_has_transaction( const transaction_id_type& txid ) const;
          const transaction_receipt&    get_transaction_receipt( const transaction_id_type& txid ) const;
@@ -341,9 +349,8 @@ namespace sysio { namespace testing {
             return [this]( const account_name& name ) -> std::optional<abi_serializer> {
                try {
                   const auto& accnt = control->db().get<account_object, by_name>( name );
-                  abi_def abi;
-                  if( abi_serializer::to_abi( accnt.abi, abi )) {
-                     return abi_serializer( abi, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                  if( abi_def abi; abi_serializer::to_abi( accnt.abi, abi )) {
+                     return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
                   }
                   return std::optional<abi_serializer>();
                } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for ${name}", ("name", name))
@@ -385,6 +392,7 @@ namespace sysio { namespace testing {
          void preactivate_protocol_features(const vector<digest_type> feature_digests);
          void preactivate_builtin_protocol_features(const std::vector<builtin_protocol_feature_t>& features);
          void preactivate_all_builtin_protocol_features();
+         void preactivate_all_but_disable_deferred_trx();
 
          static genesis_state default_genesis() {
             genesis_state genesis;
@@ -394,29 +402,36 @@ namespace sysio { namespace testing {
             return genesis;
          }
 
-         static std::pair<controller::config, genesis_state> default_config(const fc::temp_directory& tempdir, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}, std::optional<uint32_t> config_max_nonprivileged_inline_action_size = std::optional<uint32_t>{}) {
+         static std::pair<controller::config, genesis_state> default_config(const fc::temp_directory& tempdir, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}) {
             controller::config cfg;
             cfg.blocks_dir      = tempdir.path() / config::default_blocks_dir_name;
             cfg.state_dir  = tempdir.path() / config::default_state_dir_name;
             cfg.state_size = 1024*1024*16;
             cfg.state_guard_size = 0;
             cfg.contracts_console = true;
-            cfg.eosvmoc_config.cache_size = 1024*1024*8;
+            cfg.sysvmoc_config.cache_size = 1024*1024*8;
+
+            // don't enforce OC compilation subject limits for tests,
+            // particularly SYS EVM tests may run over those limits
+            cfg.sysvmoc_config.cpu_limit.reset();
+            cfg.sysvmoc_config.vm_limit.reset();
+            cfg.sysvmoc_config.stack_size_limit.reset();
+            cfg.sysvmoc_config.generated_code_size_limit.reset();
+
+            // don't use auto tier up for tests, since the point is to test diff vms
+            cfg.sysvmoc_tierup = chain::wasm_interface::vm_oc_enable::oc_none;
 
             for(int i = 0; i < boost::unit_test::framework::master_test_suite().argc; ++i) {
                if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm;
                else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-jit"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_jit;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_jit;
                else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-oc"))
-                  cfg.wasm_runtime = chain::wasm_interface::vm_type::eos_vm_oc;
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_oc;
             }
             auto gen = default_genesis();
             if (genesis_max_inline_action_size) {
                gen.initial_configuration.max_inline_action_size = *genesis_max_inline_action_size;
-            }
-            if (config_max_nonprivileged_inline_action_size) {
-               cfg.max_nonprivileged_inline_action_size = *config_max_nonprivileged_inline_action_size;
             }
             return {cfg, gen};
          }
@@ -428,6 +443,7 @@ namespace sysio { namespace testing {
 
          void             _start_block(fc::time_point block_time);
          signed_block_ptr _finish_block();
+         virtual bool     shouldAllowBlockProtocolChanges() const { return true; }
 
       // Fields:
       protected:
@@ -444,12 +460,15 @@ namespace sysio { namespace testing {
 
       public:
          vector<digest_type>                           protocol_features_to_be_activated_wo_preactivation;
+
+      private:
+         std::vector<builtin_protocol_feature_t> get_all_builtin_protocol_features();
    };
 
    class tester : public base_tester {
    public:
-      tester(setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::SPECULATIVE, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}, std::optional<uint32_t> config_max_nonprivileged_inline_action_size = std::optional<uint32_t>{}) {
-         init(policy, read_mode, genesis_max_inline_action_size, config_max_nonprivileged_inline_action_size);
+      tester(setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::HEAD, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}) {
+         init(policy, read_mode, genesis_max_inline_action_size);
       }
 
       tester(controller::config config, const genesis_state& genesis) {
@@ -490,6 +509,9 @@ namespace sysio { namespace testing {
          }
       }
 
+      tester(const std::function<void(controller&)>& control_setup, setup_policy policy = setup_policy::full,
+             db_read_mode read_mode = db_read_mode::HEAD);
+
       using base_tester::produce_block;
 
       signed_block_ptr produce_block( fc::microseconds skip_time = fc::milliseconds(config::block_interval_ms) )override {
@@ -508,6 +530,12 @@ namespace sysio { namespace testing {
       bool validate() { return true; }
    };
 
+   class tester_no_disable_deferred_trx : public tester {
+   public:
+      tester_no_disable_deferred_trx(): tester(setup_policy::full_except_do_not_disable_deferred_trx) {
+      }
+   };
+
    class validating_tester : public base_tester {
    public:
       virtual ~validating_tester() {
@@ -518,15 +546,15 @@ namespace sysio { namespace testing {
          try {
             if( num_blocks_to_producer_before_shutdown > 0 )
                produce_blocks( num_blocks_to_producer_before_shutdown );
-            if (!skip_validate)
-               BOOST_REQUIRE_EQUAL( validate(), true );
+            if (!skip_validate && std::uncaught_exceptions() == 0)
+               BOOST_CHECK_EQUAL( validate(), true );
          } catch( const fc::exception& e ) {
             wdump((e.to_detail_string()));
          }
       }
       controller::config vcfg;
 
-      validating_tester(const flat_set<account_name>& trusted_producers = flat_set<account_name>(), deep_mind_handler* dmlog = nullptr) {
+      validating_tester(const flat_set<account_name>& trusted_producers = flat_set<account_name>(), deep_mind_handler* dmlog = nullptr, setup_policy p = setup_policy::full) {
          auto def_conf = default_config(tempdir);
 
          vcfg = def_conf.first;
@@ -536,7 +564,7 @@ namespace sysio { namespace testing {
          validating_node = create_validating_node(vcfg, def_conf.second, true, dmlog);
 
          init(def_conf.first, def_conf.second);
-         execute_setup_policy(setup_policy::full);
+         execute_setup_policy(p);
       }
 
       static void config_validator(controller::config& vcfg) {
@@ -598,7 +626,8 @@ namespace sysio { namespace testing {
       signed_block_ptr produce_block( fc::microseconds skip_time = fc::milliseconds(config::block_interval_ms) )override {
          auto sb = _produce_block(skip_time, false);
          auto bsf = validating_node->create_block_state_future( sb->calculate_id(), sb );
-         validating_node->push_block( bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
+         controller::block_report br;
+         validating_node->push_block( br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
 
          return sb;
       }
@@ -609,14 +638,16 @@ namespace sysio { namespace testing {
 
       void validate_push_block(const signed_block_ptr& sb) {
          auto bsf = validating_node->create_block_state_future( sb->calculate_id(), sb );
-         validating_node->push_block( bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
+         controller::block_report br;
+         validating_node->push_block( br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
       }
 
       signed_block_ptr produce_empty_block( fc::microseconds skip_time = fc::milliseconds(config::block_interval_ms) )override {
          unapplied_transactions.add_aborted( control->abort_block() );
          auto sb = _produce_block(skip_time, true);
          auto bsf = validating_node->create_block_state_future( sb->calculate_id(), sb );
-         validating_node->push_block( bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
+         controller::block_report br;
+         validating_node->push_block( br, bsf.get(), forked_branch_callback{}, trx_meta_cache_lookup{} );
 
          return sb;
       }
@@ -645,9 +676,17 @@ namespace sysio { namespace testing {
         return ok;
       }
 
+      bool     shouldAllowBlockProtocolChanges() const override { return false; }
+
       unique_ptr<controller>   validating_node;
       uint32_t                 num_blocks_to_producer_before_shutdown = 0;
       bool                     skip_validate = false;
+   };
+
+   class validating_tester_no_disable_deferred_trx : public validating_tester {
+   public:
+      validating_tester_no_disable_deferred_trx(): validating_tester({}, nullptr, setup_policy::full_except_do_not_disable_deferred_trx) {
+      }
    };
 
    /**
@@ -668,6 +707,18 @@ namespace sysio { namespace testing {
   struct fc_exception_message_starts_with {
      fc_exception_message_starts_with( const string& msg )
            : expected( msg ) {}
+
+     bool operator()( const fc::exception& ex );
+
+     string expected;
+  };
+
+  /**
+   * Utility predicate to check whether an fc::exception message contains a given string
+   */
+  struct fc_exception_message_contains {
+     explicit fc_exception_message_contains( string msg )
+           : expected( std::move(msg) ) {}
 
      bool operator()( const fc::exception& ex );
 
