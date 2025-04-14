@@ -536,7 +536,9 @@ void trim_blocklog_front(uint32_t version) {
    signed_block_log old_log(blocks_dir, chain.get_config().blog);
    signed_block_log new_log(temp1.path());
    // double check if the version has been set to the desired version
-   BOOST_CHECK(old_log.version() == version);
+   const auto old_log_version = old_log.version();
+   BOOST_CHECK(old_log_version.has_value());
+   BOOST_CHECK(*old_log_version == version);
    BOOST_CHECK(new_log.first_block_num() == 10u);
    BOOST_CHECK(new_log.head()->block_num() == old_log.head()->block_num());
 
@@ -576,8 +578,9 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    std::filesystem::remove(blocks_dir / "blocks.index");
 
    signed_block_log blog(blocks_dir, sysio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
-
-   BOOST_CHECK(blog.version() != 0);
+   const auto version = blog.version();
+   BOOST_CHECK(version.has_value());
+   BOOST_CHECK(*version != 0);
    BOOST_CHECK_EQUAL(blog.head()->block_num(), 150u);
 
    // test blocklog merge

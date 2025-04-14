@@ -91,8 +91,7 @@ struct log_catalog {
          auto path_without_extension = log_path.parent_path() / log_path.stem().string();
 
          LogData log;
-         const StoredType* const just_to_derive_type = nullptr;
-         log.open(log_path, just_to_derive_type);
+         log.open(log_path);
 
          verifier.verify(log, log_path);
 
@@ -149,8 +148,7 @@ struct log_catalog {
 
          if (block_num <= it->second.last_block_num) {
             auto name = it->second.filename_base;
-            const StoredType* const just_to_derive_type = nullptr;
-            log_data.open(name.replace_extension("log"), just_to_derive_type);
+            log_data.open(name.replace_extension("log"));
             log_index.open(name.replace_extension("index"));
             active_index = std::distance(collection.begin(), it);
             return log_index.nth_block_position(block_num - log_data.first_block_num());

@@ -177,7 +177,7 @@ digest_type packed_transaction::digest()const {
    digest_type::encoder enc;
    fc::raw::pack( enc, signatures );
    fc::raw::pack( enc, packed_context_free_data );
-   fc::raw::pack( enc, compression );
+   // compression is set by the node, so not actually necessary
    fc::raw::pack( enc, trx_id  );   // all of transaction is represented by trx id/digest
 
    return enc.result();

@@ -178,10 +178,9 @@ class state_history_log_data : public chain::log_data_base<state_history_log_dat
 
  public:
    state_history_log_data() = default;
- //  explicit state_history_log_data(const std::filesystem::path& path) { open(path); }
+   explicit state_history_log_data(const std::filesystem::path& path) { open(path); }
 
-   template<typename StoredType>
-   void open(const std::filesystem::path& path, const StoredType* const stored_type = nullptr) {
+   void open(const std::filesystem::path& path) {
       if (file.is_open())
          file.close();
       file.set_file_path(path);
