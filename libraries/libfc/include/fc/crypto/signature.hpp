@@ -4,6 +4,7 @@
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/elliptic_em.hpp> 
+#include <fc/crypto/elliptic_ed.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 
@@ -14,14 +15,15 @@ namespace fc { namespace crypto {
          "K1",
          "R1",
          "WA",
-         "EM"
+         "EM",
+         "ED"
       };
    };
 
    class signature
    {
       public:
-         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim>;
+         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim, ed::signature_shim>;
 
          signature() = default;
          signature( signature&& ) = default;
