@@ -7,24 +7,28 @@
 #include <fc/reflect/variant.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/crypto/elliptic_em.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 
 
 namespace fc { namespace crypto {
    namespace config {
       constexpr const char* public_key_legacy_prefix = "SYS";
       constexpr const char* public_key_base_prefix = "PUB";
+      // TODO: Do we need to define new prefixes for ED?
+
       constexpr const char* public_key_prefix[] = {
          "K1",
          "R1",
          "WA",
-         "EM"
+         "EM",
+         "ED"
       };
    };
 
    class public_key
    {
       public:
-         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim>;
+         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim, ed::public_key_shim>;
          
          public_key() = default;
          public_key( public_key&& ) = default;
