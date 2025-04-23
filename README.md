@@ -9,8 +9,11 @@ The `master` branch is the latest stable branch.
 ## Supported Operating Systems
 
 We currently support the following operating systems.
-- Ubuntu 22.04 Jammy
-- Ubuntu 20.04 Focal
+
+| **Operating Systems**           |
+|---------------------------------|
+| Ubuntu 22.04 Jammy              |
+| Ubuntu 20.04 Focal              |
 
 <!-- TODO: needs to add and test build on unsupported environments -->
 
@@ -18,7 +21,7 @@ We currently support the following operating systems.
 
 In the future, we plan to support downloading Debian packages directly from our [release page](https://github.com/Wire-Network/wire-sysio/releases), providing a more streamlined and convenient setup process. However, for the time being, installation requires *building the software from source*.
 
-Finally, verify Leap was installed correctly:
+Finally, verify Wire Sysio was installed correctly:
 ```bash
 nodeop --full-version
 ```
@@ -26,7 +29,6 @@ You should see a [semantic version](https://semver.org) string followed by a `gi
 ```
 v3.1.2-0b64f879e3ebe2e4df09d2e62f1fc164cc1125d1
 ```
-
 
 ## Building from source
 
@@ -79,11 +81,7 @@ cd wire-sysio
 
 ### Step 2 - Build
 
-### Step 3 - Build
-Select build instructions below for a [pinned build](#pinned-build) (preferred) or an [unpinned build](#unpinned-build).
-
-> ℹ️ **Pinned vs. Unpinned Build** ℹ️  
-We have two types of builds for Leap: "pinned" and "unpinned." A pinned build is a reproducible build with the build environment and dependency versions fixed by the development team. In contrast, unpinned builds use the dependency versions provided by the build platform. Unpinned builds tend to be quicker because the pinned build environment must be built from scratch. Pinned builds, in addition to being reproducible, ensure the compiler remains the same between builds of different Leap major versions. Leap requires the compiler version to remain the same, otherwise its state might need to be recovered from a portable snapshot or the chain needs to be replayed.
+Select build instructions below based on OS.
 
 > ⚠️ **A Warning On Parallel Compilation Jobs (`-j` flag)** ⚠️  
 When building C/C++ software, often the build is performed in parallel via a command such as `make -j "$(nproc)"` which uses all available CPU threads. However, be aware that some compilation units (`*.cpp` files) in Wire Sysion will consume nearly 4GB of memory. Failures due to memory exhaustion will typically, but not always, manifest as compiler crashes. Using all available CPU threads may also prevent you from doing other things on your computer during compilation. For these reasons, consider reducing this value.
@@ -91,20 +89,9 @@ When building C/C++ software, often the build is performed in parallel via a com
 > 🐋 **Docker and `sudo`** 🐋  
 If you are in an Ubuntu docker container, omit `sudo` from all commands because you run as `root` by default. Most other docker containers also exclude `sudo`, especially Debian-family containers. If your shell prompt is a hash tag (`#`), omit `sudo`.
 
-#### Pinned Reproducible Build
-The pinned reproducible build requires Docker. Make sure you are in the root of the `leap` repo and then run
-```bash
-DOCKER_BUILDKIT=1 docker build -f tools/reproducible.Dockerfile -o . .
-```
-This command will take a substantial amount of time because a toolchain is built from scratch. Upon completion, the current directory will contain a built `.deb` and `.tar.gz` (you can change the `-o .` argument to place the output in a different directory). If needing to reduce the number of parallel jobs as warned above, run the command as,
-```bash
-DOCKER_BUILDKIT=1 docker build --build-arg LEAP_BUILD_JOBS=4 -f tools/reproducible.Dockerfile -o . .
-```
+#### Build
 
-#### Unpinned Build
-The following instructions are valid for this branch. Other release branches may have different requirements, so ensure you follow the directions in the branch or release you intend to build. If you are in an Ubuntu docker container, omit `sudo` because you run as `root` by default.
-
-Install dependencies:
+**Ubuntu 22.04 Jammy & Ubuntu 20.04 Focal**
 
 ```bash
 sudo apt-get update
@@ -120,13 +107,9 @@ sudo apt-get install -y \
         zlib1g-dev
 ```
 
+To build, make sure you are in the root of the `wire-sysio` repo, then run the following commands:
 
-On Ubuntu 20.04, install gcc-10 which has C++20 support:
-```bash
-sudo apt-get install -y g++-10
-```
 
-To build, make sure you are in the root of the `wire-sysio` repo, then run the following command:
 ```bash
 mkdir -p build
 cd build
@@ -144,7 +127,7 @@ Now you can optionally [test](#step-4---test) your build, or [install](#step-3--
 
 ### Step 3 - Install
 
-Once you have [built](#build) Wire Sysio and [tested](#step-4---test) your build, you can install it on your system. Don't forget to omit `sudo` if you are running in a docker container.
+Once you have [built](#build) Wire Sysio and [tested](#step-4---test) your build, you can install it on your system.
 
 We recommend installing the binary package you just built. Navigate to your build directory in a terminal and run this command:
 
@@ -223,7 +206,7 @@ ctest -L "long_running_tests"
 <!-- <!-- markdownlint-disable MD033 -->
 <table>
   <tr>
-    <td><img src="https://wire.foundation/favicon.ico" alt="Wire Network" width="50"/></td>
+    <td><img src="https://bucket.gitgo.app/frontend-assets/icons/favicon.png" alt="Wire Network" width="50"/></td>
     <td>
       <strong>Wire Network</strong><br>
       <a href="https://www.wire.network/">Website</a> |

@@ -98,3 +98,6 @@ package-lock.json
 snapshots
 
 find-eosio-wasm.sh
+
+
+cliff.toml
