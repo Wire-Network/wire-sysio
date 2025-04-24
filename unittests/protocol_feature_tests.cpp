@@ -1128,6 +1128,102 @@ BOOST_AUTO_TEST_CASE(steal_my_ram) {
    } FC_LOG_AND_RETHROW()
 }
 
+BOOST_AUTO_TEST_CASE(steal_contract_ram) {
+   try {
+      tester c(setup_policy::full);
+      fc::logger::get("default").set_log_level(log_level::debug);
+      wlog("Starting STEAL CONTRACT RAM TEST");
+
+      const auto &tester1_account = account_name("tester1");
+      const auto &tester2_account = account_name("tester2");
+      const auto &alice_account = account_name("alice");
+      const auto &bob_account = account_name("bob");
+
+      c.create_accounts({tester1_account, tester2_account, alice_account, bob_account});
+      c.produce_block();
+      c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
+      c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
+      c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
+      c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
+      c.produce_block();
+
+      c.register_node_owner(alice_account, 1);
+      c.produce_block();
+
+      // verify bob cannot add data to either tester1 or tester2
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+            ("len1", 0)
+            ("len2", 10)
+            ("payer", bob_account)
+         ),
+         resource_exhausted_exception,
+         fc_exception_message_is("Neither contract nor user can pay for this transaction")
+      );
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_action(tester2_account, "setdata"_n, bob_account, mutable_variant_object()
+            ("len1", 0)
+            ("len2", 10)
+            ("payer", bob_account)
+         ),
+         resource_exhausted_exception,
+         fc_exception_message_is("Neither contract nor user can pay for this transaction")
+      );
+
+      wlog("Afer Alice grants a roa policy to tester1, Bob should be able to add data to tester1 but not tester2");
+      // Now, Alice will add a ROA policy for tester1
+      c.add_roa_policy(alice_account, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
+      c.produce_block();
+
+      // Verify bob can add data to tester1, but not tester2
+      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+                    ("len1", 0)
+                    ("len2", 10)
+                    ("payer", bob_account)
+      );
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_action(tester2_account, "setdata"_n, bob_account, mutable_variant_object()
+            ("len1", 0)
+            ("len2", 10)
+            ("payer", bob_account)
+         ),
+         resource_exhausted_exception,
+         fc_exception_message_is("Neither contract nor user can pay for this transaction")
+      );
+      c.produce_block();
+
+      // However, if we bundle these two actions in a single transaction...
+      wlog("Repeating the above, only in a transaction...");
+
+      signed_transaction trx;
+      c.set_transaction_headers(trx);
+      trx.actions.emplace_back( c.get_action( tester1_account, "setdata"_n,
+         vector<permission_level>{{bob_account, config::active_name}},
+         mutable_variant_object()
+           ("len1", 0)
+           ("len2", 20)
+           ("payer", bob_account)
+      ) );
+      trx.actions.emplace_back( c.get_action( tester2_account, "setdata"_n,
+         vector<permission_level>{{bob_account, config::active_name}},
+         mutable_variant_object()
+           ("len1", 0)
+           ("len2", 20)
+           ("payer", bob_account)
+      ) );
+
+      c.set_transaction_headers(trx);
+      trx.sign(get_private_key(bob_account, "active"), c.control->get_chain_id());
+
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_transaction(trx),
+         resource_exhausted_exception,
+         fc_exception_message_is("Neither contract nor user can pay for this transaction")
+      );
+
+   } FC_LOG_AND_RETHROW()
+}
+
 /***
  * Test that ram resource limits are enforced.
  * This test activates ROA, so accounts are limited to the amount of RAM granted them by node owners.
