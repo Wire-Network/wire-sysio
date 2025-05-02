@@ -3,7 +3,7 @@
 # Project related configuration options
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Wire Sysio"
-PROJECT_NUMBER         = "Wire Sysion 1.0.0"
+PROJECT_NUMBER         = "Wire Sysio 5.1.0"
 PROJECT_LOGO           = wire-network-logo.png
 OUTPUT_DIRECTORY       = build/docs-wire-sysio
 CREATE_SUBDIRS         = NO
