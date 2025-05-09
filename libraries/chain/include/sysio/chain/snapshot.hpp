@@ -6,6 +6,11 @@
 #include <boost/core/demangle.hpp>
 #include <ostream>
 #include <memory>
+#include <fc/crypto/elliptic_ed.hpp>
+#include <fc/variant.hpp>
+#include <fc/io/raw.hpp>
+#include <fc/reflect/reflect.hpp>
+
 
 namespace sysio { namespace chain {
    /**
@@ -404,6 +409,20 @@ namespace sysio { namespace chain {
       private:
          fc::sha256::encoder&  enc;
 
-   };
-
+   };   
 }}
+namespace sysio { namespace chain { namespace detail {
+
+   inline ostream_wrapper&
+   operator<<(ostream_wrapper& ds, const fc::crypto::ed::public_key_shim& pk) {
+      ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+      return ds;
+   }
+   
+   inline ostream_wrapper&
+   operator<<(ostream_wrapper& ds, const fc::crypto::ed::signature_shim& sig) {
+      ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
+      return ds;
+   }
+   
+}}} // namespace sysio::chain::detail
