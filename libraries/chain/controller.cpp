@@ -363,6 +363,8 @@ struct controller_impl {
       set_activation_handler<builtin_protocol_feature_t::bls_primitives>();
       set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
       set_activation_handler<builtin_protocol_feature_t::em_key>();
+      set_activation_handler<builtin_protocol_feature_t::ed_key>();
+
 
       self.irreversible_block.connect([this](const block_state_ptr& bsp) {
          wasmif.current_lib(bsp->block_num);
@@ -3742,6 +3744,13 @@ template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::em_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 4;
+   } );
+}
+
+template<>
+void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
+   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
+      ps.num_supported_key_types = 5;
    } );
 }
 
