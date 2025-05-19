@@ -13,21 +13,21 @@ namespace sysio {
       using block_state_ptr = std::shared_ptr<block_state>;
    }
 
-   struct block_s_root_processing_impl; 
-   using block_s_root_processing_impl_ptr = std::unique_ptr<block_s_root_processing_impl>;
+   struct block_root_processing_impl; 
+   using block_root_processing_impl_ptr = std::unique_ptr<block_root_processing_impl>;
    /**
     * This class manages the processing related to the transaction finality status feature.
     */
-   class block_s_root_processing {
+   class block_root_processing {
    public:
       using name = sysio::chain::name;
       using contract_action_matches = std::vector<contract_action_match>;
 
       /**
        */
-      block_s_root_processing(contract_action_matches&& matches);
+      block_root_processing(contract_action_matches&& matches);
 
-      ~block_s_root_processing() = default;
+      ~block_root_processing() = default;
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -37,11 +37,11 @@ namespace sysio {
 
       void signal_block_start( uint32_t block_num );
 
-      std::vector<sysio::chain::s_header> get_s_header(const name& contract) const;
+      std::vector<sysio::chain::s_header> get_header(const name& contract) const;
 
    private:
-      block_s_root_processing_impl_ptr _my;
+      block_root_processing_impl_ptr _my;
    };
 
-   using block_s_root_processing_ptr = std::unique_ptr<block_s_root_processing>;
+   using block_root_processing_ptr = std::unique_ptr<block_root_processing>;
 } // namespace sysio
