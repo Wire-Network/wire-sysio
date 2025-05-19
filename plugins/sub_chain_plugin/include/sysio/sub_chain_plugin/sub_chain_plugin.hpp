@@ -34,9 +34,9 @@ class sub_chain_plugin : public appbase::plugin<sub_chain_plugin> {
       sysio::chain::checksum256_type& get_prev_s_id() const;
       void update_prev_s_id(const sysio::chain::checksum256_type& new_s_id);
 
-      sysio::chain::checksum256_type calculate_s_root(const std::vector<sysio::chain::transaction>& transactions);
+      static sysio::chain::checksum256_type calculate_s_root(const std::vector<sysio::chain::transaction>& transactions);
       sysio::chain::checksum256_type compute_curr_s_id(const sysio::chain::checksum256_type& curr_s_root);
-      uint32_t extract_s_block_number(const sysio::chain::checksum256_type& s_id);
+      static uint32_t extract_s_block_number(const sysio::chain::checksum256_type& s_id);
 
       std::vector<sysio::chain::transaction> find_relevant_transactions(sysio::chain::controller& curr_chain);
       bool is_relevant_s_root_transaction(const sysio::chain::transaction& trx);

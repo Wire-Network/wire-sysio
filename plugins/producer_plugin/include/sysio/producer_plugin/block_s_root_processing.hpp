@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/s_root_extension.hpp>
+#include <sysio/producer_plugin/contract_action_match.hpp>
 
 namespace sysio {
    namespace chain {
@@ -11,7 +12,6 @@ namespace sysio {
       struct block_state;
       using block_state_ptr = std::shared_ptr<block_state>;
    }
-   
 
    struct block_s_root_processing_impl; 
    using block_s_root_processing_impl_ptr = std::unique_ptr<block_s_root_processing_impl>;
@@ -20,12 +20,14 @@ namespace sysio {
     */
    class block_s_root_processing {
    public:
+      using name = sysio::chain::name;
+      using contract_action_matches = std::vector<contract_action_match>;
 
       /**
        */
-      block_s_root_processing();
+      block_s_root_processing(contract_action_matches&& matches);
 
-      ~block_s_root_processing();
+      ~block_s_root_processing() = default;
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -35,7 +37,7 @@ namespace sysio {
 
       void signal_block_start( uint32_t block_num );
 
-      std::vector<sysio::chain::s_header> get_s_header() const;
+      std::vector<sysio::chain::s_header> get_s_header(const name& contract) const;
 
    private:
       block_s_root_processing_impl_ptr _my;

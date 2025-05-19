@@ -2,6 +2,7 @@ add_executable( test_producer_plugin
         test_trx_full.cpp
         test_options.cpp
         test_block_timing_util.cpp
+        test_contract_action_match.cpp
         test_disallow_delayed_trx.cpp
         main.cpp
         )

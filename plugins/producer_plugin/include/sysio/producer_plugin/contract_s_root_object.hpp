@@ -19,6 +19,7 @@ namespace sysio {
 
          id_type                       id;
          account_name                  contract;
+         account_name                  root_name;
          block_id_type                 block_id;
          checksum256_type              s_id;
          checksum256_type              s_root;
@@ -36,7 +37,12 @@ namespace sysio {
       contract_s_root_object,
       indexed_by<
          ordered_unique< tag<by_id>, BOOST_MULTI_INDEX_MEMBER(contract_s_root_object, contract_s_root_object::id_type, id)>,
-         ordered_unique< tag<by_contract>, BOOST_MULTI_INDEX_MEMBER( contract_s_root_object, account_name, contract)>,
+         ordered_unique< tag<by_contract>,
+            composite_key< contract_s_root_object
+               BOOST_MULTI_INDEX_MEMBER( contract_s_root_object, account_name, contract),
+               BOOST_MULTI_INDEX_MEMBER( contract_s_root_object, account_name, root_name),
+               const_mem_fun< contract_s_root_object, uint32_t, &contract_s_root_object::block_num>
+            >
          ordered_unique< tag<by_block_num>, const_mem_fun< contract_s_root_object, uint32_t, &contract_s_root_object::block_num> >
    >;
 } // sysio
