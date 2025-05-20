@@ -1,4 +1,4 @@
-#include <sysio/producer_plugin/block_root_processing.hpp>
+#include <sysio/producer_plugin/root_txn_identification.hpp>
 #include <sysio/chain_plugin/finality_status_object.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/merkle.hpp>
@@ -13,15 +13,8 @@ namespace sysio {
    constexpr uint32_t no_block_num = 0;
    using name = root_txn_identification::name;
    using contract_action_matches = std::vector<contract_action_match>;
-
-   using contract_root = std::pair<name, name>;
-   struct root_hash {
-      std::size_t operator()(const contract_root& p) const {
-         return std::hash<name>()(p.first) ^ std::hash<name>()(p.second);
-      }
-   };
    struct root_txn_identification_impl {
-      root_txn_identification_impl(contract_action_matches&& matches);
+      root_txn_identification_impl(contract_action_matches&& matches, root_processor& processor);
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -35,17 +28,19 @@ namespace sysio {
 
       using transactions = std::deque<chain::transaction_id_type>;
 
-      const contract_action_matches          contract_matches;
+      const contract_action_matches                              contract_matches;
       std::unordered_map<contract_root, transactions, root_hash> storage;
+      root_processor&                                            root_storage_processor;
    };
 
-   root_txn_identification::root_txn_identification(contract_action_matches&& matches)
-   : _my(new root_txn_identification_impl(std::move(matches)) )
+   root_txn_identification::root_txn_identification(contract_action_matches&& matches, root_processor& processor)
+   : _my(new root_txn_identification_impl(std::move(matches), processor) )
    {
    }
 
-   root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches)
+   root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches, root_processor& processor)
    : contract_matches(std::move(matches))
+   , root_storage_processor(processor)
    {
    }
 

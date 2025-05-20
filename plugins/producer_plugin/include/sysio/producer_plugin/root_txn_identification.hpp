@@ -1,7 +1,7 @@
 #pragma once
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/s_root_extension.hpp>
 #include <sysio/producer_plugin/contract_action_match.hpp>
+#include <sysio/producer_plugin/root_processor.hpp>
 
 namespace sysio {
    namespace chain {
@@ -15,6 +15,8 @@ namespace sysio {
 
    struct root_txn_identification_impl; 
    using root_txn_identification_impl_ptr = std::unique_ptr<root_txn_identification_impl>;
+   using root_storage = root_processor::root_storage;
+
    /**
     * This class manages the processing related to the transaction finality status feature.
     */
@@ -25,7 +27,7 @@ namespace sysio {
 
       /**
        */
-      root_txn_identification(contract_action_matches&& matches);
+      root_txn_identification(contract_action_matches&& matches, root_processor& processor);
 
       ~root_txn_identification() = default;
 
@@ -36,8 +38,6 @@ namespace sysio {
       void signal_irreversible_block( const chain::block_state_ptr& bsp );
 
       void signal_block_start( uint32_t block_num );
-
-      std::vector<sysio::chain::s_header> get_header(const name& contract) const;
 
    private:
       root_txn_identification_impl_ptr _my;
