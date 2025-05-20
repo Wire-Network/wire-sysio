@@ -11,7 +11,7 @@ using namespace sysio::finality_status;
 
 namespace sysio {
    constexpr uint32_t no_block_num = 0;
-   using name = block_root_processing::name;
+   using name = root_txn_identification::name;
    using contract_action_matches = std::vector<contract_action_match>;
 
    using contract_root = std::pair<name, name>;
@@ -20,8 +20,8 @@ namespace sysio {
          return std::hash<name>()(p.first) ^ std::hash<name>()(p.second);
       }
    };
-   struct block_root_processing_impl {
-      block_root_processing_impl(contract_action_matches&& matches);
+   struct root_txn_identification_impl {
+      root_txn_identification_impl(contract_action_matches&& matches);
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -39,22 +39,22 @@ namespace sysio {
       std::unordered_map<contract_root, transactions, root_hash> storage;
    };
 
-   block_root_processing::block_root_processing(contract_action_matches&& matches)
-   : _my(new block_root_processing_impl(std::move(matches)) )
+   root_txn_identification::root_txn_identification(contract_action_matches&& matches)
+   : _my(new root_txn_identification_impl(std::move(matches)) )
    {
    }
 
-   block_root_processing_impl::block_root_processing_impl(contract_action_matches&& matches)
+   root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches)
    : contract_matches(std::move(matches))
    {
    }
 
-   void block_root_processing::signal_irreversible_block( const chain::block_state_ptr& bsp ) {
+   void root_txn_identification::signal_irreversible_block( const chain::block_state_ptr& bsp ) {
       try {
       } FC_LOG_AND_DROP(("Failed to signal irreversible block for finality status"));
    }
 
-   void block_root_processing::signal_block_start( uint32_t block_num ) {
+   void root_txn_identification::signal_block_start( uint32_t block_num ) {
       try {
          // since a new block is started, no block state was received, so the speculative block did not get eventually produced
          _my->clear_transactions();
@@ -62,19 +62,19 @@ namespace sysio {
       } FC_LOG_AND_DROP(("Failed to signal block start for finality status"));
    }
 
-   void block_root_processing::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
+   void root_txn_identification::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
       try {
          _my->signal_applied_transaction(trace, ptrx);
       } FC_LOG_AND_DROP(("Failed to signal applied transaction for finality status"));
    }
 
-   void block_root_processing::signal_accepted_block( const chain::block_state_ptr& bsp ) {
+   void root_txn_identification::signal_accepted_block( const chain::block_state_ptr& bsp ) {
       try {
          _my->signal_accepted_block(bsp);
       } FC_LOG_AND_DROP(("Failed to signal accepted block for finality status"));
    }
 
-   void block_root_processing_impl::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
+   void root_txn_identification_impl::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
       if (!is_desired_trace(trace)) {
          return;
       }
@@ -82,18 +82,18 @@ namespace sysio {
       process_action_traces(trace->action_traces);
    }
 
-   void block_root_processing_impl::signal_accepted_block( const chain::block_state_ptr& bsp ) {
+   void root_txn_identification_impl::signal_accepted_block( const chain::block_state_ptr& bsp ) {
 
       clear_transactions();
    }
 
-   void block_root_processing_impl::clear_transactions() {
+   void root_txn_identification_impl::clear_transactions() {
       for (auto& str : storage) {
          str.second.clear();
       }
    }
 
-   void block_root_processing_impl::process_action_traces( const std::vector<chain::action_trace>& action_traces ) {
+   void root_txn_identification_impl::process_action_traces( const std::vector<chain::action_trace>& action_traces ) {
       for ( const auto& action_trace : action_traces ) {
          const auto& act = action_trace.act;
          const auto& contract = act.account;
@@ -112,7 +112,7 @@ namespace sysio {
       }
    }
 
-   bool block_root_processing_impl::is_desired_trace(const chain::transaction_trace_ptr& trace) const {
+   bool root_txn_identification_impl::is_desired_trace(const chain::transaction_trace_ptr& trace) const {
       if (!trace->receipt ||
          trace->receipt->status != chain::transaction_receipt_header::executed ||
          trace->scheduled ||

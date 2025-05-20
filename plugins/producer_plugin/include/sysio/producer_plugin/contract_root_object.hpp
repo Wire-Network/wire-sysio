@@ -40,6 +40,7 @@ namespace sysio {
          account_name                  contract;
          account_name                  root_name;
          block_id_type                 block_id;
+         uint32_t                      prev_root_bn = 0;
          checksum256_type              s_id;
          checksum256_type              s_root;
 
@@ -68,4 +69,4 @@ namespace sysio {
 
 CHAINBASE_SET_INDEX_TYPE(sysio::contract_root_object, sysio::contract_s_root_multi_index)
 
-FC_REFLECT(sysio::contract_root_object, (contract)(block_id)(s_id)(s_root))
+FC_REFLECT(sysio::contract_root_object, (contract)(root_name)(block_id)(prev_root_bn)(s_id)(s_root))
