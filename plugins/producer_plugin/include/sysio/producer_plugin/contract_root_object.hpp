@@ -18,7 +18,7 @@ namespace sysio {
     * @class contract_root_object
     * @brief Represents the root object for a contract's state root within the blockchain system.
     *
-    * This object stores information related to a contract's state root at a specific block,
+    * This object stores information related to a contract's root at a specific block,
     * including the contract name, root name, block identifier, and associated checksums.
     * It inherits from chainbase::object and is identified by contract_root_object_type.
     *
@@ -26,10 +26,10 @@ namespace sysio {
     * - id: Unique identifier for this object instance.
     * - contract: The account name of the contract.
     * - root_name: The name associated with the root.
-    * - block_id: The identifier of the block this state root is associated with.
-    * - prev_root_bn: The block number of the previous root block produced for this contract and root name.
-    * - s_id: Checksum representing the state identifier.
-    * - s_root: Checksum representing the state root.
+    * - block_num: The block number this root is associated with.
+    * - prev_root_bn: The block number of the previous block with transactions for this contract and root name.
+    * - root_id: Checksum representing the state identifier.
+    * - root: Checksum representing the state root.
     *
     * Methods:
     * - block_num(): Returns the block number associated with block_id, incremented by one.
@@ -41,21 +41,18 @@ namespace sysio {
          id_type                       id;
          chain::account_name           contract;
          chain::account_name           root_name;
-         chain::block_id_type          block_id;
+         uint32_t                      block_num;
          uint32_t                      prev_root_bn = 0;
-         chain::checksum256_type       s_id;
-         chain::checksum256_type       s_root;
-
-         uint32_t block_num() const {
-            return chain::block_header::num_from_id(block_id) + 1;;
-         }
+         chain::checksum256_type       root_id;
+         chain::checksum256_type       prev_root_id;
+         chain::checksum256_type       merkle_root;
    };
 
    struct by_id;
    struct by_contract;
    struct by_block_num;
 
-   using contract_s_root_multi_index = chainbase::shared_multi_index_container<
+   using contract_root_multi_index = chainbase::shared_multi_index_container<
       contract_root_object,
       indexed_by<
          ordered_unique< tag<by_id>, BOOST_MULTI_INDEX_MEMBER(contract_root_object, contract_root_object::id_type, id)>,
@@ -66,11 +63,18 @@ namespace sysio {
                BOOST_MULTI_INDEX_MEMBER(contract_root_object, chain::account_name, root_name)
             >
          >,
-         ordered_non_unique< tag<by_block_num>, const_mem_fun<contract_root_object, uint32_t, &contract_root_object::block_num> >
+         ordered_unique< tag<by_block_num>,
+            composite_key<
+               contract_root_object,
+               BOOST_MULTI_INDEX_MEMBER(contract_root_object, uint32_t, block_num),
+               BOOST_MULTI_INDEX_MEMBER(contract_root_object, chain::account_name, contract),
+               BOOST_MULTI_INDEX_MEMBER(contract_root_object, chain::account_name, root_name)
+            >
+         >
       >
    >;
 } // sysio
 
-CHAINBASE_SET_INDEX_TYPE(sysio::contract_root_object, sysio::contract_s_root_multi_index)
+CHAINBASE_SET_INDEX_TYPE(sysio::contract_root_object, sysio::contract_root_multi_index)
 
-FC_REFLECT(sysio::contract_root_object, (contract)(root_name)(block_id)(prev_root_bn)(s_id)(s_root))
+FC_REFLECT(sysio::contract_root_object, (contract)(root_name)(block_num)(prev_root_bn)(root_id)(prev_root_id)(merkle_root))

@@ -26,11 +26,12 @@ namespace sysio {
 
       bool is_desired_trace(const chain::transaction_trace_ptr& trace) const;
 
-      using transactions = std::deque<chain::transaction_id_type>;
+      using transactions = chain::deque<chain::transaction_id_type>;
+      using contract_storage = std::unordered_map<contract_root, transactions, root_hash>;
 
-      const contract_action_matches                              contract_matches;
-      std::unordered_map<contract_root, transactions, root_hash> storage;
-      root_processor&                                            root_storage_processor;
+      const contract_action_matches contract_matches;
+      contract_storage              storage;
+      root_processor&               root_storage_processor;
    };
 
    root_txn_identification::root_txn_identification(contract_action_matches&& matches, root_processor& processor)
@@ -79,7 +80,9 @@ namespace sysio {
 
    void root_txn_identification_impl::signal_accepted_block( const chain::block_state_ptr& bsp ) {
 
-      clear_transactions();
+      root_storage_processor.calculate_root_blocks(bsp->block_num, std::move(storage));
+
+      storage = contract_storage{};
    }
 
    void root_txn_identification_impl::clear_transactions() {

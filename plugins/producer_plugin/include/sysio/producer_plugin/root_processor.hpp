@@ -13,12 +13,10 @@ namespace sysio {
       }
    };
 
-   class root_processor {
-      public:
-         using transactions = std::deque<chain::transaction_id_type>;
-         using root_storage = std::unordered_map<contract_root, transactions, root_hash>;
+   struct root_processor {
+      using transactions = chain::deque<chain::transaction_id_type>;
+      using root_storage = std::unordered_map<contract_root, transactions, root_hash>;
 
-         virtual void calculate_root_blocks(const root_storage& root_transactions) = 0;
-      private:
+      virtual void calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions) = 0;
    };
 } // namespace sysio

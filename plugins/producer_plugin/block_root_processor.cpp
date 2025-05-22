@@ -1,0 +1,88 @@
+#include <sysio/producer_plugin/block_root_processor.hpp>
+#include <sysio/chain/merkle.hpp>
+#include <fc/bitutil.hpp>
+
+namespace sysio {
+
+block_root_processor::block_root_processor(chainbase::database& db)
+: _db(db) {
+   _db.add_index<contract_root_multi_index>();
+}
+void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions)
+{
+   for(auto& instance : root_transactions) {
+      const auto& contract = instance.first;
+      auto& transactions = instance.second;
+      if (transactions.empty()) {
+         continue;
+      }
+      auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_contract>();
+      auto itr = contract_root_idx.find(boost::make_tuple(contract.first, contract.second));
+      const auto merkle_root = chain::merkle(transactions);
+      if (itr == contract_root_idx.end()) {
+         const auto previous_root_id = (itr != contract_root_idx.end()) ? itr->root_id : chain::checksum256_type();
+         const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
+         _db.create<contract_root_object>([&](auto& obj) {
+            obj.contract = contract.first;
+            obj.root_name = contract.second;
+            obj.block_num = block_num;
+            obj.root_id = curr_root_id;
+            obj.prev_root_id = previous_root_id;
+            obj.prev_root_bn = 0;
+            obj.merkle_root = merkle_root;
+         });
+      } else {
+         const auto previous_root_id = (itr != contract_root_idx.end()) ? itr->root_id : chain::checksum256_type();
+         const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
+         const auto previous_root_block_number = itr->block_num;
+         _db.modify(*itr, [&](auto& obj) {
+            obj.block_num = block_num;
+            obj.root_id = curr_root_id;
+            obj.prev_root_id = previous_root_id;
+            obj.prev_root_bn = previous_root_block_number;
+            obj.merkle_root = merkle_root;
+         });
+      }
+   }
+}
+
+uint32_t block_root_processor::extract_root_block_number(const chain::checksum256_type& root_id) {
+   // Extract the pointer to the data from the checksum.
+   auto root_id_data = root_id.data();
+    
+   // Since we are dealing with a checksum256_type, which is typically an array of bytes,
+   // we need to correctly handle the conversion to uint32_t considering endianess.
+   uint32_t root_block_number;
+    
+   // Copy the first 4 bytes of the data into a uint32_t variable.
+   // memcpy ensures that we handle any alignment issues.
+   std::memcpy(&root_block_number, root_id_data, sizeof(uint32_t));
+
+   // Reverse the endianess if necessary.
+   // You might need to adjust this based on how the data is stored (big-endian vs little-endian).
+   return fc::endian_reverse_u32(root_block_number);
+}
+
+chain::checksum256_type block_root_processor::compute_curr_root_id(const chain::checksum256_type& prev_root_id, const chain::checksum256_type& curr_root) {
+   // Serialize both the previous Root-ID and the current Root
+   auto data = fc::raw::pack(std::make_pair(prev_root_id, curr_root));
+   // Hash the serialized data to generate the new Root-ID
+   chain::checksum256_type curr_root_id = chain::checksum256_type::hash(data);
+
+   ilog("Computed interim Root-ID: ${curr_root_id}", ("curr_root_id", curr_root_id));
+   // Extract the block number from the previous Root-ID and increment it by 1
+   const uint32_t prev_root_block_number = extract_root_block_number(prev_root_id);
+   const uint32_t next_root_block_number = prev_root_block_number + 1;
+
+   ilog("Extracted prev_root_block_number from prev_root_id: ${prev_root_block_number}, next: ${next_root_block_number}", 
+       ("prev_root_block_number", prev_root_block_number)("next_root_block_number", next_root_block_number));
+
+   // Modify the first 4 bytes directly
+   uint32_t next_root_block_number_reversed = fc::endian_reverse_u32(next_root_block_number);
+   std::memcpy(curr_root_id.data(), &next_root_block_number_reversed, sizeof(uint32_t)); // Modify the first 4 bytes
+
+   // ilog("Computed curr_root_id with block number embedded: ${c}", ("c", curr_root_id.str()));
+   return curr_root_id;
+}
+
+} // namespace sysio
