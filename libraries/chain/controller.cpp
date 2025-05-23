@@ -13,6 +13,7 @@
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/generated_transaction_object.hpp>
+#include <sysio/chain/root_processor.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
@@ -21,6 +22,7 @@
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/root_processor.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/thread_utils.hpp>
@@ -130,7 +132,7 @@ struct building_block {
    deque<transaction_receipt>                 _pending_trx_receipts; // boost deque in 1.71 with 1024 elements performs better
    std::variant<checksum256_type, digests_t>  _trx_mroot_or_receipt_digests;
    digests_t                                  _action_receipt_digests;
-   std::optional<s_header>                    _s_header; // Added new functionality to pass an optional s_header to be included in block header extension
+   std::deque<s_header>                       _s_header; // Added new functionality to pass many state headers to be included in block header extension
 };
 
 struct assembled_block {
@@ -255,6 +257,7 @@ struct controller_impl {
    deep_mind_handler*              deep_mind_logger = nullptr;
    bool                            okay_to_print_integrity_hash_on_stop = false;
    std::atomic<bool>               writing_snapshot = false;
+   root_processor_ptr              root_processor;
 
    thread_local static platform_timer timer; // a copy for main thread and each read-only thread
 #if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
@@ -267,6 +270,7 @@ struct controller_impl {
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
    unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
 
+   void set_s_header( deque<s_header>&& s_headers );
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1873,8 +1877,8 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
-      if (bb._s_header){
-        ilog("s_header present in finalize block, adding to block header: ${s}", ("s", bb._s_header->to_string()));
+      for (const auto& header : bb._s_header){
+        ilog("s_header present in finalize block, adding to block header: ${s}", ("s", header.to_string()));
       }
 
       auto action_merkle_fut = post_async_task( thread_pool.get_executor(),
@@ -1907,7 +1911,7 @@ struct controller_impl {
          bb._new_pending_producer_schedule,
          std::move( bb._new_protocol_feature_activations ),
          protocol_features.get_protocol_feature_set(),
-         bb._s_header // Include optional s_header in block header
+         bb._s_header // Include optional s_headers in block header
       ) );
 
       block_ptr->transactions = std::move( bb._pending_trx_receipts );
@@ -1970,7 +1974,7 @@ struct controller_impl {
          }
 
          emit( self.accepted_block, bsp );
-
+         
          if( s == controller::block_status::incomplete ) {
             log_irreversible();
          }
@@ -2153,9 +2157,16 @@ struct controller_impl {
          }
 
          // New: Process the s_header from block header extensions
+         // Since the multiple state roots feature is not activated, there will only be, at most, one s_header
          auto s_header_it = std::find_if(b->header_extensions.begin(), b->header_extensions.end(),
                                        [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
-         if (s_header_it != b->header_extensions.end()) {
+         if( s_header_it != b->header_extensions.end() ) {
+            if( self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+
+            }
+            else {
+
+            }
             ilog("Found s_root_extension in header_extensions, attempting to extract...");
             s_header extracted_s_header = fc::raw::unpack<s_header>(s_header_it->second);
             ilog("Extracted s_header: ${s_header}", ("s_header", extracted_s_header.to_string()));
@@ -3097,21 +3108,17 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
    my->conf.key_blacklist = new_key_blacklist;
 }
 void controller::set_s_header( const s_header& s_header ) {
-   //  ilog("CONTROLLER - setting s header: ${s}", ("s", s_header.to_string()));
-   SYS_ASSERT( my->pending, block_validate_exception, "it is not valid to set_s_header when there is no pending block");
-   SYS_ASSERT( std::holds_alternative<building_block>(my->pending->_block_stage), block_validate_exception, "already called finalize_block");
-   // SYS_ASSERT( std::get<assembled_block>(pending->_block_stage)._id == id, block_validate_exception, "mismatching block id" );
+   deque<s_header> container;
+   container.push_back(s_header);
+   my->set_s_header(std::move(container));
+}
+
+void controller_impl::set_s_header( deque<s_header>&& s_headers ) {
+   SYS_ASSERT( pending, block_validate_exception, "it is not valid to set_s_header when there is no pending block");
+   SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finalize_block");
    // Try to set it first in the pending block
-   auto& bb = std::get<building_block>(my->pending->_block_stage);
-   bb._s_header = s_header; // Attempt to set s-header
-   auto& check_s_header = std::get<building_block>(my->pending->_block_stage)._s_header;
-   if (check_s_header){
-      ilog("Pending building block s_header set: ${s_header}\n\t\tand matches what was passed: ${match}",
-         ("s_header", check_s_header->to_string())("match", check_s_header == s_header));
-   }
-   else {
-      ilog("Pending building block s_header NOT SET");
-   }
+   auto& bb = std::get<building_block>(pending->_block_stage);
+   bb._s_header = std::move(s_headers); // Attempt to set s-header
 }
 
 void controller::set_disable_replay_opts( bool v ) {
@@ -3795,6 +3802,9 @@ void controller::code_block_num_last_used(const digest_type& code_hash, uint8_t 
 
 bool controller::is_irreversible_state_available() const {
    return !!my->slog;
+}
+void controller::set_root_processor(const root_processor_ptr& root_processor) {
+   my->root_processor = root_processor;
 }
 
 /// Protocol feature activation handlers:

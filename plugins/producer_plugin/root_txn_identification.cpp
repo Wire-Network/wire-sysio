@@ -14,7 +14,7 @@ namespace sysio {
    using name = root_txn_identification::name;
    using contract_action_matches = std::vector<contract_action_match>;
    struct root_txn_identification_impl {
-      root_txn_identification_impl(contract_action_matches&& matches, root_processor& processor);
+      root_txn_identification_impl(contract_action_matches&& matches, chain::root_processor& processor);
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -27,19 +27,19 @@ namespace sysio {
       bool is_desired_trace(const chain::transaction_trace_ptr& trace) const;
 
       using transactions = chain::deque<chain::transaction_id_type>;
-      using contract_storage = std::unordered_map<contract_root, transactions, root_hash>;
+      using contract_storage = std::unordered_map<chain::contract_root, transactions, chain::root_hash>;
 
       const contract_action_matches contract_matches;
       contract_storage              storage;
-      root_processor&               root_storage_processor;
+      chain::root_processor&        root_storage_processor;
    };
 
-   root_txn_identification::root_txn_identification(contract_action_matches&& matches, root_processor& processor)
+   root_txn_identification::root_txn_identification(contract_action_matches&& matches, chain::root_processor& processor)
    : _my(new root_txn_identification_impl(std::move(matches), processor) )
    {
    }
 
-   root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches, root_processor& processor)
+   root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches, chain::root_processor& processor)
    : contract_matches(std::move(matches))
    , root_storage_processor(processor)
    {

@@ -40,6 +40,7 @@ enum class builtin_protocol_feature_t : uint32_t {
    disable_deferred_trxs_stage_1 = 23,
    disable_deferred_trxs_stage_2 = 24,
    disable_compression_in_transaction_merkle = 25,
+   multiple_state_roots_supported = 26,
    reserved_private_fork_protocol_features = 500000,
 };
 

@@ -1,4 +1,5 @@
 #include <sysio/producer_plugin/block_root_processor.hpp>
+#include <sysio/producer_plugin/contract_root_object.hpp>
 #include <sysio/chain/merkle.hpp>
 #include <fc/bitutil.hpp>
 
@@ -83,6 +84,17 @@ chain::checksum256_type block_root_processor::compute_curr_root_id(const chain::
 
    // ilog("Computed curr_root_id with block number embedded: ${c}", ("c", curr_root_id.str()));
    return curr_root_id;
+}
+
+std::deque<chain::s_header> block_root_processor::get_s_headers(uint32_t block_num) const {
+   std::deque<chain::s_header> s_headers;
+   const auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_block_num>();
+   auto itr = contract_root_idx.lower_bound(boost::make_tuple(block_num));
+   while (itr != contract_root_idx.end() && itr->block_num == block_num) {
+      s_headers.emplace_back(itr->contract, itr->prev_root_id, itr->root_id, itr->merkle_root);
+      ++itr;
+   }
+   return s_headers;
 }
 
 } // namespace sysio

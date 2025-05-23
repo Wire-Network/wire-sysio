@@ -23,6 +23,9 @@ namespace sysio { namespace vm { class wasm_allocator; }}
 
 namespace sysio { namespace chain {
 
+   struct root_processor;
+   using root_processor_ptr = std::shared_ptr<root_processor>;
+
    class authorization_manager;
 
    namespace resource_limits {
@@ -380,6 +383,7 @@ namespace sysio { namespace chain {
       bool is_write_window() const;
       void code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, uint32_t block_num);
 
+      void set_root_processor(const root_processor_ptr& root_processor);
       private:
          friend class apply_context;
          friend class transaction_context;
