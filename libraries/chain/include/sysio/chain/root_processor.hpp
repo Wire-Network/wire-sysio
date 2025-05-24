@@ -20,6 +20,6 @@ namespace sysio { namespace chain {
       
 
       virtual void calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions) = 0;
-      virtual std::deque<s_header> get_s_headers(uint32_t block_num) const = 0;
+      virtual chain::deque<s_header> get_s_headers(uint32_t block_num) const = 0;
    };
 } } // namespace sysio::chain

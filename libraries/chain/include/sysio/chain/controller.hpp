@@ -218,8 +218,6 @@ namespace sysio { namespace chain {
          void   set_contract_blacklist( const flat_set<account_name>& );
          void   set_action_blacklist( const flat_set< pair<account_name, action_name> >& );
          void   set_key_blacklist( const flat_set<public_key_type>& );
-         void   set_s_header( const s_header& );
-
 
          void   set_disable_replay_opts( bool v );
 

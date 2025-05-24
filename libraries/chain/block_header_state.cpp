@@ -176,7 +176,7 @@ namespace sysio { namespace chain {
                                                       const std::optional<producer_authority_schedule>& new_producers,
                                                       vector<digest_type>&& new_protocol_feature_activations,
                                                       const protocol_feature_set& pfs,
-                                                      const std::deque<s_header>& s_header
+                                                      const chain::deque<s_header>& s_header
    )const
    {
       signed_block_header h;

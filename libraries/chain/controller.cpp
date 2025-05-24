@@ -132,7 +132,7 @@ struct building_block {
    deque<transaction_receipt>                 _pending_trx_receipts; // boost deque in 1.71 with 1024 elements performs better
    std::variant<checksum256_type, digests_t>  _trx_mroot_or_receipt_digests;
    digests_t                                  _action_receipt_digests;
-   std::deque<s_header>                       _s_header; // Added new functionality to pass many state headers to be included in block header extension
+   deque<s_header>                            _s_header; // Added new functionality to pass many state headers to be included in block header extension
 };
 
 struct assembled_block {
@@ -1877,6 +1877,10 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
+      if( root_processor ) {
+         set_s_header( root_processor->get_s_headers( pbhs.block_num ) );
+      }
+
       for (const auto& header : bb._s_header){
         ilog("s_header present in finalize block, adding to block header: ${s}", ("s", header.to_string()));
       }
@@ -2156,28 +2160,10 @@ struct controller_impl {
                         ("lhs", r)("rhs", static_cast<const transaction_receipt_header&>(receipt)) );
          }
 
-         // New: Process the s_header from block header extensions
-         // Since the multiple state roots feature is not activated, there will only be, at most, one s_header
-         auto s_header_it = std::find_if(b->header_extensions.begin(), b->header_extensions.end(),
-                                       [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
-         if( s_header_it != b->header_extensions.end() ) {
-            if( self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
-
-            }
-            else {
-
-            }
-            ilog("Found s_root_extension in header_extensions, attempting to extract...");
-            s_header extracted_s_header = fc::raw::unpack<s_header>(s_header_it->second);
-            ilog("Extracted s_header: ${s_header}", ("s_header", extracted_s_header.to_string()));
-            self.set_s_header(extracted_s_header); // Attempt to set s-header
-         }
 
          finalize_block();
 
          auto& ab = std::get<assembled_block>(pending->_block_stage);
-
-
 
          if( producer_block_id != ab._id ) {
             elog( "Validation block id does not match producer block id" );
@@ -2185,6 +2171,38 @@ struct controller_impl {
             // this implicitly asserts that all header fields (less the signature) are identical
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
                         ("producer_block_id", producer_block_id)("validator_block_id", ab._id) );
+         }
+
+         if( root_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            // New: Process the s_header from block header extensions
+            // Since the multiple state roots feature is not activated, there will only be, at most, one s_header
+            auto rcvd_it = b->header_extensions.begin();
+            const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()]() { return std::find_if(itr, end,
+               [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            auto crtd_it = ab._unsigned_block->header_extensions.begin();
+            const auto next_crtd = [&itr=crtd_it, end=ab._unsigned_block->header_extensions.end()]() { return std::find_if(itr, end,
+               [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            uint32_t count = 0;
+            bool rcvd = false;
+            bool crtd = false;
+            do {
+               rcvd_it = next_rcvd();
+               crtd_it = next_crtd();
+               ++count;
+               rcvd = rcvd_it != b->header_extensions.end();;
+               crtd = crtd_it != ab._unsigned_block->header_extensions.end();
+               SYS_ASSERT( rcvd == crtd, block_validate_exception,
+                           "The received block did${neg1} have $(count) root header extensions, but the locally constructed one did${neg2}",
+                           ("neg1", (rcvd ? "" : " not"))("count", count)("neg2", (crtd ? "" : " not")) );
+               if( rcvd && rcvd_it->second != crtd_it->second ) {
+                  s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
+                  s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
+                  SYS_THROW( block_validate_exception,
+                             "The received block root header extension, at slot number ${count}: ${rcvd}; and the locally "
+                             "constructed one: ${crdt}; don't match!",
+                             ("count", count)("rcvd", rcvd_s_header.to_string())("crdt", crtd_s_header.to_string()) );
+               }
+            } while( rcvd ); // either they both exist or it already failed
          }
 
          if( !use_bsp_cached ) {
@@ -3106,11 +3124,6 @@ void controller::set_action_blacklist( const flat_set< pair<account_name, action
 }
 void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_blacklist ) {
    my->conf.key_blacklist = new_key_blacklist;
-}
-void controller::set_s_header( const s_header& s_header ) {
-   deque<s_header> container;
-   container.push_back(s_header);
-   my->set_s_header(std::move(container));
 }
 
 void controller_impl::set_s_header( deque<s_header>&& s_headers ) {

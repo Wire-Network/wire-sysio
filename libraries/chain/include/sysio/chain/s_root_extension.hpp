@@ -9,10 +9,11 @@ struct s_header {
     checksum256_type   previous_s_id;
     checksum256_type   current_s_id;
     checksum256_type   current_s_root;
+    uint32_t           previous_block_num = 0;
 
     s_header() = default;
-    s_header(const name& contract, const checksum256_type& prev, const checksum256_type& curr, const checksum256_type& root)
-    : contract_name(contract), previous_s_id(prev), current_s_id(curr), current_s_root(root) {}
+    s_header(const name& contract, const checksum256_type& prev, const checksum256_type& curr, const checksum256_type& root, uint32_t prev_bn = 0)
+    : contract_name(contract), previous_s_id(prev), current_s_id(curr), current_s_root(root), previous_block_num(prev_bn) {}
 
     // Copy constructor (default)
     s_header(const s_header& other) = default;
@@ -24,20 +25,22 @@ struct s_header {
             previous_s_id = other.previous_s_id;
             current_s_id = other.current_s_id;
             current_s_root = other.current_s_root;
+            previous_block_num = other.previous_block_num;
         }
         return *this;
     }
 
     friend bool operator == (const s_header& a, const s_header& b) {
-        return std::tie(a.contract_name, a.previous_s_id, a.current_s_id, a.current_s_root) ==
-               std::tie(b.contract_name, b.previous_s_id, b.current_s_id, b.current_s_root);
+        return std::tie(a.contract_name, a.previous_s_id, a.current_s_id, a.current_s_root, a.previous_block_num) ==
+               std::tie(b.contract_name, b.previous_s_id, b.current_s_id, b.current_s_root, b.previous_block_num);
     }
 
     std::string to_string() const {
         return "\n\tContract Name:  " + contract_name.to_string() +
                "\n\tPrevious S-ID:  " + previous_s_id.str() +
                "\n\tCurrent S-ID:   " + current_s_id.str() +
-               "\n\tCurrent S-Root: " + current_s_root.str();
+               "\n\tCurrent S-Root: " + current_s_root.str() +
+               "\n\tPrevious Block Num: " + std::to_string(previous_block_num);
     }
 };
 
@@ -62,7 +65,8 @@ FC_REFLECT(sysio::chain::s_header,
            (contract_name)
            (previous_s_id)
            (current_s_id)
-           (current_s_root))
+           (current_s_root)
+           (previous_block_num))
 
 FC_REFLECT(sysio::chain::s_root_extension,
            (s_header_data))
