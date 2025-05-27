@@ -193,7 +193,7 @@ namespace {
             };
             // Set the s_root in the chain controller for the building block state
             auto &controller = *chain->control.get();
-            controller.set_s_header(s_header);
+//            controller.set_s_header(s_header);
             sub_chain->update_prev_s_id(curr_s_id);
         }
 

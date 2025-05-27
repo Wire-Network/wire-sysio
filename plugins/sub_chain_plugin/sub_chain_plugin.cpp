@@ -12,6 +12,12 @@ namespace sysio {
 
 using namespace chain;
 
+struct sub_chain_plugin_impl {
+      sysio::chain::account_name contract_name;
+      std::vector<sysio::chain::action_name> action_names;
+      sysio::chain::checksum256_type prev_s_id;
+};
+
 sub_chain_plugin::sub_chain_plugin(): my(new sub_chain_plugin_impl()) {}
 sub_chain_plugin::~sub_chain_plugin() {}
 
@@ -20,6 +26,7 @@ void sub_chain_plugin::set_program_options(options_description&, options_descrip
         ("s-chain-contract", bpo::value<std::string>()->default_value("settle.wns"), "Contract name for identifying relevant S-transactions.")
         ("s-chain-actions", bpo::value<std::vector<std::string>>()->composing(), "List of action names for relevant S-transactions for a given s-chain-contract");
 }
+
 void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    try {
       if (!options.count("s-chain-contract") || !options.count("s-chain-actions")) {

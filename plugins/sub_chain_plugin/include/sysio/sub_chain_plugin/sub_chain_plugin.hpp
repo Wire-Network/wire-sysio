@@ -12,12 +12,8 @@ namespace sysio {
 
 using namespace appbase;
 
-class sub_chain_plugin_impl {
-   public:
-      sysio::chain::account_name contract_name;
-      std::vector<sysio::chain::action_name> action_names;
-      sysio::chain::checksum256_type prev_s_id;
-};
+struct sub_chain_plugin_impl;
+using sub_chain_plugin_impl_ptr = std::unique_ptr<sub_chain_plugin_impl>;
 
 class sub_chain_plugin : public appbase::plugin<sub_chain_plugin> {
    public:
