@@ -2,7 +2,7 @@
 
 namespace sysio {
 
-   class block_root_processor : chain::root_processor {
+   class block_root_processor : public chain::root_processor {
    public:
       block_root_processor(chainbase::database& db);
       void calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions) override;
