@@ -15,8 +15,7 @@ namespace sysio {
 
    struct root_txn_identification_impl; 
    using root_txn_identification_impl_ptr = std::unique_ptr<root_txn_identification_impl>;
-   using root_storage = chain::root_processor::root_storage;
-
+   
    /**
     * This class manages the processing related to the transaction finality status feature.
     */
@@ -29,7 +28,7 @@ namespace sysio {
        */
       root_txn_identification(contract_action_matches&& matches, chain::root_processor& processor);
 
-      ~root_txn_identification() = default;
+      virtual ~root_txn_identification() { _my.reset(); };
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
@@ -42,6 +41,4 @@ namespace sysio {
    private:
       root_txn_identification_impl_ptr _my;
    };
-
-   using root_txn_identification_ptr = std::unique_ptr<root_txn_identification>;
 } // namespace sysio

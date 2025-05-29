@@ -1,9 +1,9 @@
-#include <sysio/producer_plugin/block_root_processor.hpp>
-#include <sysio/producer_plugin/contract_root_object.hpp>
+#include <sysio/chain/block_root_processor.hpp>
+#include <sysio/chain/contract_root_object.hpp>
 #include <sysio/chain/merkle.hpp>
 #include <fc/bitutil.hpp>
 
-namespace sysio {
+namespace sysio { namespace chain {
 
 block_root_processor::block_root_processor(chainbase::database& db)
 : _db(db) {
@@ -97,4 +97,4 @@ chain::deque<chain::s_header> block_root_processor::get_s_headers(uint32_t block
    return s_headers;
 }
 
-} // namespace sysio
+} } // namespace sysio::chain

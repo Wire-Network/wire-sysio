@@ -8,7 +8,7 @@
 
 #include <sysio/chain/multi_index_includes.hpp>
 
-namespace sysio {
+namespace sysio { namespace chain {
    using boost::multi_index_container;
    using namespace boost::multi_index;
    /**
@@ -73,8 +73,8 @@ namespace sysio {
          >
       >
    >;
-} // sysio
+} } // namespace sysio::chain
 
-CHAINBASE_SET_INDEX_TYPE(sysio::contract_root_object, sysio::contract_root_multi_index)
+CHAINBASE_SET_INDEX_TYPE(sysio::chain::contract_root_object, sysio::chain::contract_root_multi_index)
 
-FC_REFLECT(sysio::contract_root_object, (contract)(root_name)(block_num)(prev_root_bn)(root_id)(prev_root_id)(merkle_root))
+FC_REFLECT(sysio::chain::contract_root_object, (contract)(root_name)(block_num)(prev_root_bn)(root_id)(prev_root_id)(merkle_root))

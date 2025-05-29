@@ -13,7 +13,6 @@
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/generated_transaction_object.hpp>
-#include <sysio/chain/root_processor.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
@@ -22,7 +21,7 @@
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/root_processor.hpp>
+#include <sysio/chain/block_root_processor.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/thread_utils.hpp>
@@ -3816,8 +3815,16 @@ void controller::code_block_num_last_used(const digest_type& code_hash, uint8_t 
 bool controller::is_irreversible_state_available() const {
    return !!my->slog;
 }
-void controller::set_root_processor(const root_processor_ptr& root_processor) {
-   my->root_processor = root_processor;
+
+root_processor_ptr controller::create_root_processor() {
+   SYS_ASSERT( !my->root_processor, misc_exception, "Attempting to create the block_root_processor a second time" );
+   SYS_ASSERT( !my->protocol_features.is_initialized(), misc_exception, "Attempting to create the block_root_processor after initialization" );
+   my->root_processor = std::make_shared<block_root_processor>(my->db);
+   return my->root_processor;
+}
+
+root_processor_ptr controller::get_root_processor() {
+   return my->root_processor;
 }
 
 /// Protocol feature activation handlers:

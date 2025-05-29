@@ -1,6 +1,6 @@
 #include <sysio/chain/root_processor.hpp>
 
-namespace sysio {
+namespace sysio { namespace chain {
 
    class block_root_processor : public chain::root_processor {
    public:
@@ -13,4 +13,4 @@ namespace sysio {
    private:
       chainbase::database& _db;
    };
-} // namespace sysio
+} } // namespace sysio::chain
