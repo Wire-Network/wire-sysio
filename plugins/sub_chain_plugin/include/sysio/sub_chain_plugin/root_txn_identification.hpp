@@ -1,6 +1,6 @@
 #pragma once
 #include <sysio/chain/types.hpp>
-#include <sysio/producer_plugin/contract_action_match.hpp>
+#include <sysio/sub_chain_plugin/contract_action_match.hpp>
 #include <sysio/chain/root_processor.hpp>
 
 namespace sysio {
@@ -28,13 +28,11 @@ namespace sysio {
        */
       root_txn_identification(contract_action_matches&& matches, chain::root_processor& processor);
 
-      virtual ~root_txn_identification() { _my.reset(); };
+      ~root_txn_identification();
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
       void signal_accepted_block( const chain::block_state_ptr& bsp );
-
-      void signal_irreversible_block( const chain::block_state_ptr& bsp );
 
       void signal_block_start( uint32_t block_num );
 

@@ -1,4 +1,4 @@
-#include <sysio/producer_plugin/contract_action_match.hpp>
+#include <sysio/sub_chain_plugin/contract_action_match.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 namespace sysio {

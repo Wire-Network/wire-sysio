@@ -1,6 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
-#include <sysio/producer_plugin/contract_action_match.hpp>
+#include <sysio/sub_chain_plugin/contract_action_match.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 BOOST_AUTO_TEST_SUITE(contract_action_match_tests)

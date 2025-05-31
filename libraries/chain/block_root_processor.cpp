@@ -11,9 +11,12 @@ block_root_processor::block_root_processor(chainbase::database& db)
 }
 void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions)
 {
+   ilog("calculate_root_blocks block_num: ${bn}, roots size: ${rs}",("bn", block_num)("rs", root_transactions.size()));
    for(auto& instance : root_transactions) {
       const auto& contract = instance.first;
       auto& transactions = instance.second;
+      ilog("calculate_root_blocks contract: ${contract}, size: ${size}",
+           ("contract",contract.first.to_string())("size",transactions.size()));
       if (transactions.empty()) {
          continue;
       }
@@ -21,7 +24,8 @@ void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storag
       auto itr = contract_root_idx.find(boost::make_tuple(contract.first, contract.second));
       const auto merkle_root = chain::merkle(transactions);
       if (itr == contract_root_idx.end()) {
-         const auto previous_root_id = (itr != contract_root_idx.end()) ? itr->root_id : chain::checksum256_type();
+         ilog("calculate_root_blocks new root");
+         const auto previous_root_id = chain::checksum256_type();
          const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
          _db.create<contract_root_object>([&](auto& obj) {
             obj.contract = contract.first;
@@ -33,7 +37,8 @@ void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storag
             obj.merkle_root = merkle_root;
          });
       } else {
-         const auto previous_root_id = (itr != contract_root_idx.end()) ? itr->root_id : chain::checksum256_type();
+         ilog("calculate_root_blocks update");
+         const auto previous_root_id = itr->root_id;
          const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
          const auto previous_root_block_number = itr->block_num;
          _db.modify(*itr, [&](auto& obj) {

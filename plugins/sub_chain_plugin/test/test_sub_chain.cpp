@@ -54,7 +54,7 @@ namespace {
                 auto parsed_options = test_options(6, argv);
 
                 BOOST_CHECK_EQUAL("fizzbop", parsed_options.at("s-chain-contract").as<std::string>());
-                BOOST_CHECK_EQUAL(2, parsed_options.at("s-chain-actions").as<std::vector<std::string>>().size());
+                BOOST_CHECK_EQUAL(2u, parsed_options.at("s-chain-actions").as<std::vector<std::string>>().size());
                 BOOST_CHECK_EQUAL("fizz", parsed_options.at("s-chain-actions").as<std::vector<std::string>>().at(0));
                 BOOST_CHECK_EQUAL("bop", parsed_options.at("s-chain-actions").as<std::vector<std::string>>().at(1));
 
@@ -126,7 +126,7 @@ namespace {
                 chain.produce_block();
 
                 // Verify no transactions found when there are none to find
-                BOOST_CHECK_EQUAL(0, sub_chain.find_relevant_transactions(*chain.control.get()).size());
+                BOOST_CHECK_EQUAL(0u, sub_chain.find_relevant_transactions(*chain.control.get()).size());
 
                 // Verify default prev_s_id is empty / zero
                 BOOST_CHECK_EQUAL(checksum256_type(), sub_chain.get_prev_s_id());
@@ -155,7 +155,7 @@ namespace {
                 sub_chain.initialize(test_options(5, argv));
 
                 // Verify no transactions found when there are none to find
-                BOOST_CHECK_EQUAL(0, sub_chain.find_relevant_transactions(*chain.control.get()).size());
+                BOOST_CHECK_EQUAL(0u, sub_chain.find_relevant_transactions(*chain.control.get()).size());
 
                 // Create a transaction that should be found
                 chain.push_action(abbie, "dance"_n, abbie, mutable_variant_object());
@@ -163,12 +163,12 @@ namespace {
                 chain.push_action(darcy, "dance"_n, darcy, mutable_variant_object());
 
                 // sub chain should find the transaction in the current queue
-                BOOST_CHECK_EQUAL(1, sub_chain.find_relevant_transactions(*chain.control.get()).size());
+                BOOST_CHECK_EQUAL(1u, sub_chain.find_relevant_transactions(*chain.control.get()).size());
                 BOOST_CHECK_EQUAL(checksum256_type(), sub_chain.get_prev_s_id());
 
                 chain.produce_block();
                 // once the block is produced, sub chain no longer sees the transaction
-                BOOST_CHECK_EQUAL(0, sub_chain.find_relevant_transactions(*chain.control.get()).size());
+                BOOST_CHECK_EQUAL(0u, sub_chain.find_relevant_transactions(*chain.control.get()).size());
             } FC_LOG_AND_RETHROW()
         }
 

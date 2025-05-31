@@ -2,7 +2,8 @@
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/root_processor.hpp>
-#include <sysio/producer_plugin/root_txn_identification.hpp>
+#include <sysio/sub_chain_plugin/contract_action_match.hpp>
+#include <sysio/sub_chain_plugin/root_txn_identification.hpp>
 
 #include <boost/signals2/connection.hpp>
 #include <fc/log/logger.hpp>
@@ -28,6 +29,7 @@ struct sub_chain_plugin_impl {
 };
 
 sub_chain_plugin::sub_chain_plugin(): my(new sub_chain_plugin_impl()) {}
+
 sub_chain_plugin::~sub_chain_plugin() {
    my->accepted_block_connection.reset();
    my->applied_transaction_connection.reset();
@@ -43,17 +45,20 @@ void sub_chain_plugin::plugin_initialize(const variables_map& options) {
       auto chain_plug = app().find_plugin<chain_plugin>();
       chain::controller& chain = chain_plug->chain();
       my->applied_transaction_connection.emplace( chain.applied_transaction.connect(
-         [root_txn_ident=my->root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
+         [self=this]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
+            self->my->root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
          } ) );
       my->accepted_block_connection.emplace( chain.accepted_block.connect(
-         [root_txn_ident=my->root_txn_ident]( const block_state_ptr& blk ) {
-            root_txn_ident->signal_accepted_block(blk);
+         [self=this]( const block_state_ptr& blk ) {
+            self->my->root_txn_ident->signal_accepted_block(blk);
          } ) );
       my->block_start_connection.emplace( chain.block_start.connect(
-         [root_txn_ident=my->root_txn_ident]( uint32_t block_num ) {
-            root_txn_ident->signal_block_start(block_num);
+         [self=this]( uint32_t block_num ) {
+            self->my->root_txn_ident->signal_block_start(block_num);
          } ) );
+
+      my->brp = chain_plug->chain().create_root_processor();
+
    } FC_LOG_AND_RETHROW()
 }
 void sub_chain_plugin::plugin_startup() {
@@ -71,9 +76,6 @@ void sub_chain_plugin::plugin_startup() {
             }
         }
         }}, appbase::exec_queue::read_only);
-
-   auto chain_plug = app().find_plugin<chain_plugin>();
-   my->brp = chain_plug->chain().create_root_processor();
 
    contract_action_matches matches;
    matches.push_back(contract_action_match("s"_n, "utl"_n, contract_action_match::match_type::suffix));

@@ -791,6 +791,34 @@ try:
     assert(node.setCodeOrAbi(setCodeAbiAccount, "code", wasmFile))
     assert(node.setCodeOrAbi(setCodeAbiAccount, "abi", abiFile))
 
+    Print("Verify set code and set abi work")
+    testUtlAccount = Account("test.utl")
+    testUtlAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
+    testUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
+    cluster.createAccountAndVerify(testUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
+    wasmFile="unittests/test-contracts/payloadless/payloadless.wasm"
+    abiFile="unittests/test-contracts/payloadless/payloadless.abi"
+    assert(node.setCodeOrAbi(testUtlAccount, "code", wasmFile))
+    assert(node.setCodeOrAbi(testUtlAccount, "abi", abiFile))
+
+    contract=testUtlAccount.name
+    action="batchw"
+    data="{}"
+    opts="--permission currency1111@active"
+    trans1=node.pushMessage(contract, action, data, opts)
+
+    contract=testUtlAccount.name
+    action="snoop"
+    trans2=node.pushMessage(contract, action, data, opts)
+
+    contract=testUtlAccount.name
+    action="batch"
+    trans3=node.pushMessage(contract, action, data, opts)
+
+    contract=testUtlAccount.name
+    action="snoo"
+    trans4=node.pushMessage(contract, action, data, opts)
+
     testSuccessful=True
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)

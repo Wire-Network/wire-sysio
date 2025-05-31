@@ -1,13 +1,15 @@
-#include <sysio/producer_plugin/root_txn_identification.hpp>
-#include <sysio/chain_plugin/finality_status_object.hpp>
+#include <sysio/sub_chain_plugin/root_txn_identification.hpp>
+#include <sysio/sub_chain_plugin/contract_action_match.hpp>
 #include <sysio/chain/block_state.hpp>
+#include <sysio/chain/root_processor.hpp>
 #include <sysio/chain/merkle.hpp>
 
 #include <sysio/chain/trace.hpp>
+#include <fc/log/logger.hpp>
+#include <fc/log/logger_config.hpp>
 
 
 using namespace sysio;
-using namespace sysio::finality_status;
 
 namespace sysio {
    constexpr uint32_t no_block_num = 0;
@@ -20,8 +22,6 @@ namespace sysio {
 
       void signal_accepted_block( const chain::block_state_ptr& bsp );
 
-      void clear_transactions();
-
       void process_action_traces( const std::vector<chain::action_trace>& action_traces );
 
       bool is_desired_trace(const chain::transaction_trace_ptr& trace) const;
@@ -29,7 +29,7 @@ namespace sysio {
       using transactions = chain::deque<chain::transaction_id_type>;
       using contract_storage = std::unordered_map<chain::contract_root, transactions, chain::root_hash>;
 
-      const contract_action_matches contract_matches;
+      contract_action_matches       contract_matches;
       contract_storage              storage;
       chain::root_processor&        root_storage_processor;
    };
@@ -39,21 +39,20 @@ namespace sysio {
    {
    }
 
+   root_txn_identification::~root_txn_identification()
+   {
+   }
+
    root_txn_identification_impl::root_txn_identification_impl(contract_action_matches&& matches, chain::root_processor& processor)
    : contract_matches(std::move(matches))
    , root_storage_processor(processor)
    {
    }
 
-   void root_txn_identification::signal_irreversible_block( const chain::block_state_ptr& bsp ) {
-      try {
-      } FC_LOG_AND_DROP(("Failed to signal irreversible block for finality status"));
-   }
-
    void root_txn_identification::signal_block_start( uint32_t block_num ) {
       try {
          // since a new block is started, no block state was received, so the speculative block did not get eventually produced
-         _my->clear_transactions();
+         _my->storage = root_txn_identification_impl::contract_storage{};
 
       } FC_LOG_AND_DROP(("Failed to signal block start for finality status"));
    }
@@ -79,16 +78,10 @@ namespace sysio {
    }
 
    void root_txn_identification_impl::signal_accepted_block( const chain::block_state_ptr& bsp ) {
-
+      ilog("Processing accepted block: ${block_num}", ("block_num", bsp->block_num));
       root_storage_processor.calculate_root_blocks(bsp->block_num, std::move(storage));
 
       storage = contract_storage{};
-   }
-
-   void root_txn_identification_impl::clear_transactions() {
-      for (auto& str : storage) {
-         str.second.clear();
-      }
    }
 
    void root_txn_identification_impl::process_action_traces( const std::vector<chain::action_trace>& action_traces ) {
