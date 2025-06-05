@@ -68,7 +68,7 @@ class Utils:
     SysClientPath=str(testBinPath / "clio")
     MiscSysClientArgs="--no-auto-kiod"
 
-    LeapClientPath=str(testBinPath / "leap-util")
+    LeapClientPath=str(testBinPath / "sys-util")
 
     SysWalletName="kiod"
     SysWalletPath=str(testBinPath / SysWalletName)

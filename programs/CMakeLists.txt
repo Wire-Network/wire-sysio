@@ -1,4 +1,4 @@
 add_subdirectory( nodeop )
 add_subdirectory( clio )
 add_subdirectory( kiod )
-add_subdirectory( leap-util )
+add_subdirectory( sys-util )
