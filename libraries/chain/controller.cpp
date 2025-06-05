@@ -798,7 +798,7 @@ struct controller_impl {
             SYS_ASSERT( slog->head()->block_num == blog.head()->block_num(),
                         block_log_exception,
                         "Block log and block state log need to be at the same block number. This can be fixed by running"
-                        "\"leap-util ${command} trim-blocklog --first 1 --last ${last} --blocks-dir <your blocks dir>\". "
+                        "\"sys-util ${command} trim-blocklog --first 1 --last ${last} --blocks-dir <your blocks dir>\". "
                         "The other log is at block num: ${bn} ",
                         ("command", command())
                         ("last", std::min(slog->head()->block_num, blog.head()->block_num()))
