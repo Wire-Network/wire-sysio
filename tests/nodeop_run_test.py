@@ -796,29 +796,64 @@ try:
     testUtlAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
     testUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
     cluster.createAccountAndVerify(testUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
-    wasmFile="unittests/test-contracts/payloadless/payloadless.wasm"
-    abiFile="unittests/test-contracts/payloadless/payloadless.abi"
+    wasmFile="unittests/test-contracts/settlewns/settlewns.wasm"
+    abiFile="unittests/test-contracts/settlewns/settlewns.abi"
     assert(node.setCodeOrAbi(testUtlAccount, "code", wasmFile))
     assert(node.setCodeOrAbi(testUtlAccount, "abi", abiFile))
 
     contract=testUtlAccount.name
     action="batchw"
-    data="{}"
+    data="{\"batch\": 1, \"withdrawals\": [] }"
     opts="--permission currency1111@active"
     trans1=node.pushMessage(contract, action, data, opts)
+    Print(f"push {action} action to {json.dumps(trans1[1], indent=4)} contract")
+    trans1Id=trans1[1]["transaction_id"]
 
     contract=testUtlAccount.name
     action="snoop"
+    data="{ }"
     trans2=node.pushMessage(contract, action, data, opts)
+    Print(f"push {action} action to {json.dumps(trans2[1], indent=4)} contract")
+    trans2Id=trans2[1]["transaction_id"]
 
     contract=testUtlAccount.name
-    action="batch"
+    action="cancelbatch"
+    data="{\"batch\": 1 }"
     trans3=node.pushMessage(contract, action, data, opts)
+    Print(f"push {action} action to {json.dumps(trans3[1], indent=4)} contract")
+    trans3Id=trans3[1]["transaction_id"]
 
     contract=testUtlAccount.name
-    action="snoo"
+    action="selfwithd"
+    data="{\"user\": \"bigguy\", \"utxos\": [] }"
     trans4=node.pushMessage(contract, action, data, opts)
+    Print(f"push {action} action to {json.dumps(trans4[1], indent=4)} contract")
+    trans4Id=trans4[1]["transaction_id"]
 
+    assert(node.waitForTransactionInBlock(trans1Id));
+    assert(node.waitForTransactionInBlock(trans2Id));
+    assert(node.waitForTransactionInBlock(trans3Id));
+    assert(node.waitForTransactionInBlock(trans4Id));
+
+    trans1BlockNum=node.getBlockNumByTransId(trans1Id)
+    trans2BlockNum=node.getBlockNumByTransId(trans2Id)
+    trans3BlockNum=node.getBlockNumByTransId(trans3Id)
+    trans4BlockNum=node.getBlockNumByTransId(trans4Id)
+
+    blocks={}
+
+    blocks[trans1BlockNum]=node.getBlock(trans1BlockNum, headerState=True, exitOnError=True)
+    Print(f"trans1 block: {json.dumps(blocks[trans1BlockNum], indent=4)}")
+ 
+    if trans2BlockNum not in blocks:
+        blocks[trans2BlockNum]=node.getBlock(trans2BlockNum, headerState=True, exitOnError=True)
+        Print(f"trans2 block: {json.dumps(blocks[trans2BlockNum], indent=4)}")
+    if trans3BlockNum not in blocks:
+        blocks[trans3BlockNum]=node.getBlock(trans3BlockNum, headerState=True, exitOnError=True)
+        Print(f"trans3 block: {json.dumps(blocks[trans3BlockNum], indent=4)}")
+    if trans4BlockNum not in blocks:
+        blocks[trans4BlockNum]=node.getBlock(trans4BlockNum, headerState=True, exitOnError=True)
+        Print(f"trans4 block: {json.dumps(blocks[trans4BlockNum], indent=4)}")
     testSuccessful=True
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)

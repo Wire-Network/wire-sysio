@@ -2174,7 +2174,6 @@ struct controller_impl {
 
          if( root_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
             // New: Process the s_header from block header extensions
-            // Since the multiple state roots feature is not activated, there will only be, at most, one s_header
             auto rcvd_it = b->header_extensions.begin();
             const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()]() { return std::find_if(itr, end,
                [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };

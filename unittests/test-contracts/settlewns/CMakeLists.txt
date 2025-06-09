@@ -1,0 +1,6 @@
+if( SYSIO_COMPILE_TEST_CONTRACTS )
+   add_contract( settlewns settlewns settlewns.cpp )
+else()
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/settlewns.wasm ${CMAKE_CURRENT_BINARY_DIR}/settlewns.wasm COPYONLY )
+   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/settlewns.abi  ${CMAKE_CURRENT_BINARY_DIR}/settlewns.abi  COPYONLY )
+endif()
