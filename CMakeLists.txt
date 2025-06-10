@@ -33,7 +33,7 @@ option(ENABLE_WEXTRA "Enable `-Wextra` compilation flag." Off)
 set( CLI_CLIENT_EXECUTABLE_NAME clio )
 set( NODE_EXECUTABLE_NAME nodeop )
 set( KEY_STORE_EXECUTABLE_NAME kiod )
-set( LEAP_UTIL_EXECUTABLE_NAME leap-util )
+set( SYS_UTIL_EXECUTABLE_NAME sys-util )
 
 # http://stackoverflow.com/a/18369825
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -266,12 +266,12 @@ else()
    # The `make package` installation of symlinks happens via the `postinst` script installed in cmake.package via the line below
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/leap-util
-               ${CMAKE_BINARY_DIR}/programs/leap-util/bash-completion/completions/leap-util COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/sys-util
+               ${CMAKE_BINARY_DIR}/programs/sys-util/bash-completion/completions/sys-util COPYONLY)
 configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/clio
                ${CMAKE_BINARY_DIR}/programs/clio/bash-completion/completions/clio COPYONLY)
 
-install(FILES libraries/cli11/bash-completion/completions/leap-util DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
+install(FILES libraries/cli11/bash-completion/completions/sys-util DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
 install(FILES libraries/cli11/bash-completion/completions/clio DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
 
 # Add the boost submodule we used to build to our install package, so headers can be found for libtester
