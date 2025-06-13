@@ -1,7 +1,6 @@
 #include <sysio/sub_chain_plugin/root_txn_identification.hpp>
 #include <sysio/sub_chain_plugin/contract_action_match.hpp>
 #include <sysio/chain/block_state.hpp>
-#include <sysio/chain/root_processor.hpp>
 #include <sysio/chain/merkle.hpp>
 
 #include <sysio/chain/exceptions.hpp>

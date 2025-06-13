@@ -9,7 +9,6 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
-#include <sysio/chain/root_processor.hpp>
 #include <sysio/sub_chain_plugin/sub_chain_plugin.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 
@@ -241,7 +240,6 @@ struct block_time_tracker {
       }
 
     private:
-      sysio::chain::root_processor_ptr _root_processor;
       block_time_tracker& _block_time_tracker;
       time_status _time_status = time_status::fail;
       bool _is_transient;
