@@ -815,7 +815,8 @@ try:
     notUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
     cluster.createAccountAndVerify(notUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
     assert(node.setCodeOrAbi(notUtlAccount, "code", wasmFile))
-    assert(node.setCodeOrAbi(notUtlAccount, "abi", abiFile))
+    abiTrans=node.setCodeOrAbi(notUtlAccount, "abi", abiFile, returnTrans=True)
+    node.waitForTransactionInBlock(abiTrans["transaction_id"])
 
 
     def sendAction(contract, action, data, opts, transArr, ids):
@@ -837,10 +838,13 @@ try:
 
     sendAction(testUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission test.utl@active", testTrans, testIds)
     sendAction(funUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission fun.utl@active", funTrans, funIds)
+    regTrans=node.regproducer(notUtlAccount, url="", location=0)
     sendAction(notUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission notutl@active", notTrans, notIds)
     sendAction(testUtlAccount.name, "snoop", "{ }", "--permission test.utl@active", testTrans, testIds)
     sendAction(testUtlAccount.name, "cancelbatch", "{\"batch\": 1 }", "--permission test.utl@active", testTrans, testIds)
     sendAction(testUtlAccount.name, "selfwithd", "{\"user\": \"bigguy\", \"utxos\": [] }", "--permission test.utl@active", testTrans, testIds)
+    unregTrans=node.unregprod(notUtlAccount, silentErrors=False)
+    Print(f"push unregprod action to contract system: {json.dumps(unregTrans, indent=4)}")
 
     currentBlockNum=node.getHeadBlockNum()
     node.waitForBlock(currentBlockNum + 3)
@@ -854,16 +858,20 @@ try:
     class RootContract(Enum):
         ONE = 0
         TWO = 1
+        THREE = 2
     class SRootCounter:
         def __init__(self):
             self.sRootHeaders={}
-            self.contractOneBlockNum=[ [] , [] ]
+            self.contracts=[]
+            for contract in RootContract:
+               self.contracts.append([])
+            self.maxCount=len(self.contracts)
 
         def add(self, blockNum, rootContract):
             notPresent=True if blockNum not in self.sRootHeaders else False
             if notPresent:
                 self.sRootHeaders[blockNum] = 0
-            contract=self.contractOneBlockNum[rootContract.value]
+            contract=self.contracts[rootContract.value]
             # only need to increment if this contract wasn't already accounted for in this block
             if blockNum not in contract:
                 self.sRootHeaders[blockNum]+=1
@@ -919,6 +927,12 @@ try:
     blockNum=node.getBlockNumByTransId(funIds[2])
     sRootCounter.zero(blockNum)
 
+    blockNum=node.getBlockNumByTransId(regTrans["transaction_id"])
+    sRootCounter.add(blockNum, RootContract.THREE)
+
+    blockNum=node.getBlockNumByTransId(unregTrans["transaction_id"])
+    sRootCounter.add(blockNum, RootContract.THREE)
+
     blockNum=node.getBlockNumByTransId(notIds[0])
     sRootCounter.zero(blockNum)
 
@@ -929,7 +943,8 @@ try:
 
     for key in sRootCounter.keys():
         blocks[key] = node.getBlock(key, headerState=True, exitOnError=True)
-        Print(f"block content: {json.dumps(blocks[key], indent=4)}")
+        headerStr="header"
+        Print(f"block header content: {json.dumps(blocks[key][headerStr], indent=4)}")
 
     def getSHeaders(block):
         headerStr="header"
@@ -968,8 +983,8 @@ try:
             assert(sHeadersContent is None or len(sHeadersContent) == 0)
             continue
 
-        # should be at most 2 state root headers per block, otherwise the test is not setup correctly
-        assert(count < 3)
+        # should be at most maxCount state root headers per block, otherwise the test is not setup correctly
+        assert(count <= sRootCounter.maxCount)
         assert(count == len(sHeadersContent))
         Print(f"NEED TO ADD PARSING OF sHeadersContent: {sHeadersContent}")
 
