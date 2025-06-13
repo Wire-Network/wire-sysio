@@ -8,6 +8,7 @@ import re
 import json
 import os
 import sys
+from enum import Enum
 
 ###############################################################
 # nodeop_run_test
@@ -791,69 +792,189 @@ try:
     assert(node.setCodeOrAbi(setCodeAbiAccount, "code", wasmFile))
     assert(node.setCodeOrAbi(setCodeAbiAccount, "abi", abiFile))
 
-    Print("Verify set code and set abi work")
+    Print("Verify root tracking works")
+    wasmFile="unittests/test-contracts/settlewns/settlewns.wasm"
+    abiFile="unittests/test-contracts/settlewns/settlewns.abi"
+
     testUtlAccount = Account("test.utl")
     testUtlAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
     testUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
     cluster.createAccountAndVerify(testUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
-    wasmFile="unittests/test-contracts/settlewns/settlewns.wasm"
-    abiFile="unittests/test-contracts/settlewns/settlewns.abi"
     assert(node.setCodeOrAbi(testUtlAccount, "code", wasmFile))
     assert(node.setCodeOrAbi(testUtlAccount, "abi", abiFile))
 
-    contract=testUtlAccount.name
-    action="batchw"
-    data="{\"batch\": 1, \"withdrawals\": [] }"
-    opts="--permission currency1111@active"
-    trans1=node.pushMessage(contract, action, data, opts)
-    Print(f"push {action} action to {json.dumps(trans1[1], indent=4)} contract")
-    trans1Id=trans1[1]["transaction_id"]
+    funUtlAccount = Account("fun.utl")
+    funUtlAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
+    funUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
+    cluster.createAccountAndVerify(funUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
+    assert(node.setCodeOrAbi(funUtlAccount, "code", wasmFile))
+    assert(node.setCodeOrAbi(funUtlAccount, "abi", abiFile))
 
-    contract=testUtlAccount.name
-    action="snoop"
-    data="{ }"
-    trans2=node.pushMessage(contract, action, data, opts)
-    Print(f"push {action} action to {json.dumps(trans2[1], indent=4)} contract")
-    trans2Id=trans2[1]["transaction_id"]
+    notUtlAccount = Account("notutl")
+    notUtlAccount.ownerPublicKey = cluster.sysioAccount.ownerPublicKey
+    notUtlAccount.activePublicKey = cluster.sysioAccount.ownerPublicKey
+    cluster.createAccountAndVerify(notUtlAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
+    assert(node.setCodeOrAbi(notUtlAccount, "code", wasmFile))
+    assert(node.setCodeOrAbi(notUtlAccount, "abi", abiFile))
 
-    contract=testUtlAccount.name
-    action="cancelbatch"
-    data="{\"batch\": 1 }"
-    trans3=node.pushMessage(contract, action, data, opts)
-    Print(f"push {action} action to {json.dumps(trans3[1], indent=4)} contract")
-    trans3Id=trans3[1]["transaction_id"]
 
-    contract=testUtlAccount.name
-    action="selfwithd"
-    data="{\"user\": \"bigguy\", \"utxos\": [] }"
-    trans4=node.pushMessage(contract, action, data, opts)
-    Print(f"push {action} action to {json.dumps(trans4[1], indent=4)} contract")
-    trans4Id=trans4[1]["transaction_id"]
+    def sendAction(contract, action, data, opts, transArr, ids):
+        trans=node.pushMessage(contract, action, data, opts)
+        assert(trans[0])
+        transArr.append(trans[1])
+        Print(f"push {action} action to contract {contract}: {json.dumps(transArr[-1], indent=4)}")
+        ids.append(transArr[-1]["transaction_id"])
 
-    assert(node.waitForTransactionInBlock(trans1Id));
-    assert(node.waitForTransactionInBlock(trans2Id));
-    assert(node.waitForTransactionInBlock(trans3Id));
-    assert(node.waitForTransactionInBlock(trans4Id));
 
-    trans1BlockNum=node.getBlockNumByTransId(trans1Id)
-    trans2BlockNum=node.getBlockNumByTransId(trans2Id)
-    trans3BlockNum=node.getBlockNumByTransId(trans3Id)
-    trans4BlockNum=node.getBlockNumByTransId(trans4Id)
+    testTrans=[]
+    testIds=[]
+
+    funTrans=[]
+    funIds=[]
+
+    notTrans=[]
+    notIds=[]
+
+    sendAction(testUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission test.utl@active", testTrans, testIds)
+    sendAction(funUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission fun.utl@active", funTrans, funIds)
+    sendAction(notUtlAccount.name, "batchw", "{\"batch\": 1, \"withdrawals\": [] }", "--permission notutl@active", notTrans, notIds)
+    sendAction(testUtlAccount.name, "snoop", "{ }", "--permission test.utl@active", testTrans, testIds)
+    sendAction(testUtlAccount.name, "cancelbatch", "{\"batch\": 1 }", "--permission test.utl@active", testTrans, testIds)
+    sendAction(testUtlAccount.name, "selfwithd", "{\"user\": \"bigguy\", \"utxos\": [] }", "--permission test.utl@active", testTrans, testIds)
+
+    currentBlockNum=node.getHeadBlockNum()
+    node.waitForBlock(currentBlockNum + 3)
+    sendAction(funUtlAccount.name, "snoop", "{ }", "--permission fun.utl@active", funTrans, funIds)
+
+    currentBlockNum=node.getHeadBlockNum()
+    node.waitForBlock(currentBlockNum + 3)
+    sendAction(funUtlAccount.name, "cancelbatch", "{\"batch\": 1 }", "--permission fun.utl@active", funTrans, funIds)
+    sendAction(notUtlAccount.name, "snoop", "{ }", "--permission notutl@active", notTrans, notIds)
+
+    class RootContract(Enum):
+        ONE = 0
+        TWO = 1
+    class SRootCounter:
+        def __init__(self):
+            self.sRootHeaders={}
+            self.contractOneBlockNum=[ [] , [] ]
+
+        def add(self, blockNum, rootContract):
+            notPresent=True if blockNum not in self.sRootHeaders else False
+            if notPresent:
+                self.sRootHeaders[blockNum] = 0
+            contract=self.contractOneBlockNum[rootContract.value]
+            # only need to increment if this contract wasn't already accounted for in this block
+            if blockNum not in contract:
+                self.sRootHeaders[blockNum]+=1
+                contract.append(blockNum)
+
+        def zero(self, blockNum):
+            notPresent=True if blockNum not in self.sRootHeaders else False
+            if notPresent:
+                self.sRootHeaders[blockNum] = 0
+
+        def validatedNoSRootBlock(self):
+            if 0 not in self.sRootHeaders.values():
+                # test transactions are not ensuring there is a block that is proving there is no state
+                # root header generated when there should not be, so need to reconfigure test scenario
+                Print(f"ERROR: Test setup failed to be setup to verify that a block has no state root header.")
+                assert(False)
+
+        def keys(self):
+            return self.sRootHeaders.keys()
+         
+        def count(self, blockNum):
+            return self.sRootHeaders[blockNum]
+
+    sRootCounter=SRootCounter()
+
+    blockNum=node.getBlockNumByTransId(testIds[0])
+    sRootCounter.add(blockNum, RootContract.ONE)
+
+    # if the 2nd action was in a different block, then each will have its own
+    # state root header in both blocks
+    blockNum=node.getBlockNumByTransId(testIds[1])
+    sRootCounter.add(blockNum, RootContract.ONE)
+
+    # if the 3rd action was in a different block, we need to make sure that
+    # block doesn't have a state root header
+    blockNum=node.getBlockNumByTransId(testIds[2])
+    sRootCounter.zero(blockNum)
+
+    # if the 4th action was in a different block, we need to make sure that
+    # block doesn't have a state root header
+    blockNum=node.getBlockNumByTransId(testIds[3])
+    sRootCounter.zero(blockNum)
+
+    blockNum=node.getBlockNumByTransId(funIds[0])
+    sRootCounter.add(blockNum, RootContract.TWO)
+
+    blockNum=node.getBlockNumByTransId(funIds[1])
+    sRootCounter.add(blockNum, RootContract.TWO)
+
+    blockNum=node.getBlockNumByTransId(funIds[2])
+    sRootCounter.zero(blockNum)
+
+    blockNum=node.getBlockNumByTransId(funIds[2])
+    sRootCounter.zero(blockNum)
+
+    blockNum=node.getBlockNumByTransId(notIds[0])
+    sRootCounter.zero(blockNum)
+
+    blockNum=node.getBlockNumByTransId(notIds[1])
+    sRootCounter.zero(blockNum)
 
     blocks={}
 
-    blocks[trans1BlockNum]=node.getBlock(trans1BlockNum, headerState=True, exitOnError=True)
-    Print(f"trans1 block: {json.dumps(blocks[trans1BlockNum], indent=4)}")
- 
-    if trans2BlockNum not in blocks:
-        blocks[trans2BlockNum]=node.getBlock(trans2BlockNum, headerState=True, exitOnError=True)
-        Print(f"trans2 block: {json.dumps(blocks[trans2BlockNum], indent=4)}")
-    if trans3BlockNum not in blocks:
-        blocks[trans3BlockNum]=node.getBlock(trans3BlockNum, headerState=True, exitOnError=True)
-        Print(f"trans3 block: {json.dumps(blocks[trans3BlockNum], indent=4)}")
-    if trans4BlockNum not in blocks:
-        blocks[trans4BlockNum]=node.getBlock(trans4BlockNum, headerState=True, exitOnError=True)
-        Print(f"trans4 block: {json.dumps(blocks[trans4BlockNum], indent=4)}")
+    for key in sRootCounter.keys():
+        blocks[key] = node.getBlock(key, headerState=True, exitOnError=True)
+        Print(f"block content: {json.dumps(blocks[key], indent=4)}")
+
+    def getSHeaders(block):
+        headerStr="header"
+        headerExtensionsStr="header_extensions"
+        blockNum=block["block_num"]
+        assert(headerStr in block)
+        sHeaderCount=0
+        if headerExtensionsStr not in block[headerStr].keys():
+            raise Exception(f"No \"{headerExtensionsStr}\" found in block")
+
+        headerExtensions = block[headerStr][headerExtensionsStr]
+        sHeadersContent=[]
+        if headerExtensions is None:
+            return sHeadersContent
+
+        for headerExtension in headerExtensions:
+            assert(headerExtension is not None)
+            assert(len(headerExtension) == 2)
+            STATE_ROOT_HEADER_EXTENSION_ID=2 # the extension id that indicates this header extension is a state root
+            ID_SLOT=0
+            DATA_SLOT=1
+            if headerExtension[ID_SLOT] != STATE_ROOT_HEADER_EXTENSION_ID:
+                Print(f"Skipping headerExtension id: ${headerExtension[ID_SLOT]}")
+                continue
+            data=headerExtension[DATA_SLOT]
+            assert(data is not None)
+            sHeadersContent.append(data)  # later add parsing
+        return sHeadersContent
+
+    sHeaders={}    
+    
+    for block_num, block in blocks.items():
+        sHeadersContent=getSHeaders(block)
+        count=sRootCounter.count(block_num)
+        if count == 0:
+            assert(sHeadersContent is None or len(sHeadersContent) == 0)
+            continue
+
+        # should be at most 2 state root headers per block, otherwise the test is not setup correctly
+        assert(count < 3)
+        assert(count == len(sHeadersContent))
+        Print(f"NEED TO ADD PARSING OF sHeadersContent: {sHeadersContent}")
+
+    sRootCounter.validatedNoSRootBlock()
+
     testSuccessful=True
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)

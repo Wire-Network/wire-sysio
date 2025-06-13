@@ -20,7 +20,6 @@ using namespace chain;
 using contract_action_matches = std::vector<contract_action_match>;
 
 struct sub_chain_plugin_impl {
-   std::shared_ptr<root_processor>                   brp;
    std::shared_ptr<root_txn_identification>          root_txn_ident;
    std::optional<boost::signals2::scoped_connection> accepted_block_connection;
    std::optional<boost::signals2::scoped_connection> applied_transaction_connection;
@@ -41,23 +40,23 @@ void sub_chain_plugin::set_program_options(options_description&, options_descrip
 
 void sub_chain_plugin::plugin_initialize(const variables_map& options) {
    try {
-
       auto chain_plug = app().find_plugin<chain_plugin>();
       chain::controller& chain = chain_plug->chain();
       my->applied_transaction_connection.emplace( chain.applied_transaction.connect(
-         [self=this]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            self->my->root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
+         [self=this,&chain]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
+            if( chain.is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) )
+               self->my->root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
          } ) );
       my->accepted_block_connection.emplace( chain.accepted_block.connect(
-         [self=this]( const block_state_ptr& blk ) {
-            self->my->root_txn_ident->signal_accepted_block(blk);
+         [self=this,&chain]( const block_state_ptr& blk ) {
+            if( chain.is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) )
+               self->my->root_txn_ident->signal_accepted_block(blk);
          } ) );
       my->block_start_connection.emplace( chain.block_start.connect(
-         [self=this]( uint32_t block_num ) {
-            self->my->root_txn_ident->signal_block_start(block_num);
+         [self=this,&chain]( uint32_t block_num ) {
+            if( chain.is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) )
+               self->my->root_txn_ident->signal_block_start(block_num);
          } ) );
-
-      my->brp = chain_plug->chain().create_root_processor();
 
    } FC_LOG_AND_RETHROW()
 }
@@ -86,9 +85,10 @@ void sub_chain_plugin::plugin_startup() {
    matches[1].add_action("unregprod"_n, contract_action_match::match_type::exact);
 
    my->root_txn_ident = std::make_shared<root_txn_identification>(
-      std::move(matches),
-      *my->brp
+      std::move(matches)
    );
+   auto chain_plug = app().find_plugin<chain_plugin>();
+   chain_plug->chain().create_root_processor(my->root_txn_ident);
 
 }
 void sub_chain_plugin::plugin_shutdown() {

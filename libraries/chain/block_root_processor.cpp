@@ -5,12 +5,17 @@
 
 namespace sysio { namespace chain {
 
-block_root_processor::block_root_processor(chainbase::database& db)
-: _db(db) {
+block_root_processor::block_root_processor(chainbase::database& db, root_processor_ptr processor)
+: _db(db)
+, _processor(std::move(processor)) {
+   ilog("block_root_processor initialized");
    _db.add_index<contract_root_multi_index>();
 }
-void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions)
+
+bool block_root_processor::calculate_root_blocks(uint32_t block_num)
 {
+   bool stored = false;
+   root_storage root_transactions = _processor->retrieve_root_transactions(block_num);
    ilog("calculate_root_blocks block_num: ${bn}, roots size: ${rs}",("bn", block_num)("rs", root_transactions.size()));
    for(auto& instance : root_transactions) {
       const auto& contract = instance.first;
@@ -20,6 +25,7 @@ void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storag
       if (transactions.empty()) {
          continue;
       }
+      stored = true;
       auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_contract>();
       auto itr = contract_root_idx.find(boost::make_tuple(contract.first, contract.second));
       const auto merkle_root = chain::merkle(transactions);
@@ -50,6 +56,7 @@ void block_root_processor::calculate_root_blocks(uint32_t block_num, root_storag
          });
       }
    }
+   return stored;
 }
 
 uint32_t block_root_processor::extract_root_block_number(const chain::checksum256_type& root_id) {
@@ -91,13 +98,15 @@ chain::checksum256_type block_root_processor::compute_curr_root_id(const chain::
    return curr_root_id;
 }
 
-chain::deque<chain::s_header> block_root_processor::get_s_headers(uint32_t block_num) const {
+chain::deque<chain::s_header> block_root_processor::get_s_headers(uint32_t block_num) {
    chain::deque<chain::s_header> s_headers;
-   const auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_block_num>();
-   auto itr = contract_root_idx.lower_bound(boost::make_tuple(block_num));
-   while (itr != contract_root_idx.end() && itr->block_num == block_num) {
-      s_headers.emplace_back(itr->contract, itr->prev_root_id, itr->root_id, itr->merkle_root);
-      ++itr;
+   if (calculate_root_blocks(block_num)) {
+      const auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_block_num>();
+      auto itr = contract_root_idx.lower_bound(boost::make_tuple(block_num));
+      while (itr != contract_root_idx.end() && itr->block_num == block_num) {
+         s_headers.emplace_back(itr->contract, itr->prev_root_id, itr->root_id, itr->merkle_root);
+         ++itr;
+      }
    }
    return s_headers;
 }

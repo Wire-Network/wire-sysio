@@ -215,6 +215,7 @@ struct pending_state {
 };
 
 struct controller_impl {
+   using block_root_processor_ptr = std::shared_ptr<block_root_processor>;
    enum class app_window_type {
       write, // Only main thread is running; read-only threads are not running.
              // All read-write and read-only tasks are sequentially executed.
@@ -256,7 +257,7 @@ struct controller_impl {
    deep_mind_handler*              deep_mind_logger = nullptr;
    bool                            okay_to_print_integrity_hash_on_stop = false;
    std::atomic<bool>               writing_snapshot = false;
-   root_processor_ptr              root_processor;
+   block_root_processor_ptr        merkle_processor;
 
    thread_local static platform_timer timer; // a copy for main thread and each read-only thread
 #if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
@@ -1876,8 +1877,9 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
-      if( root_processor ) {
-         set_s_header( root_processor->get_s_headers( pbhs.block_num ) );
+      if( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         dlog("finalize_block: merkle_processor is present, setting s_header for block ${n}", ("n", pbhs.block_num));
+         set_s_header( merkle_processor->get_s_headers( pbhs.block_num ) );
       }
 
       for (const auto& header : bb._s_header){
@@ -2171,23 +2173,31 @@ struct controller_impl {
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
                         ("producer_block_id", producer_block_id)("validator_block_id", ab._id) );
          }
-
-         if( root_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         if( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
             // New: Process the s_header from block header extensions
             auto rcvd_it = b->header_extensions.begin();
-            const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()]() { return std::find_if(itr, end,
-               [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
+               if( !include_start ) ++itr;
+               // find the first s_root_extension in the received block header extensions
+               return std::find_if(itr, end,
+                  [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
             auto crtd_it = ab._unsigned_block->header_extensions.begin();
-            const auto next_crtd = [&itr=crtd_it, end=ab._unsigned_block->header_extensions.end()]() { return std::find_if(itr, end,
-               [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            const auto next_crtd = [&itr=crtd_it, end=ab._unsigned_block->header_extensions.end()](bool include_start) {
+               if( !include_start ) ++itr;
+               // find the first s_root_extension in the locally constructed block header extensions
+               // (which should be the same as the received block header extensions)
+               return std::find_if(itr, end,
+                  [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
             uint32_t count = 0;
-            bool rcvd = false;
-            bool crtd = false;
-            do {
-               rcvd_it = next_rcvd();
-               crtd_it = next_crtd();
+            bool rcvd = true;
+            bool crtd = true;
+            bool include_start = true;
+            while( rcvd ) {
+               rcvd_it = next_rcvd(include_start);
+               crtd_it = next_crtd(include_start);
                ++count;
-               rcvd = rcvd_it != b->header_extensions.end();;
+               include_start = false; // only include start for the first iteration
+               rcvd = rcvd_it != b->header_extensions.end();
                crtd = crtd_it != ab._unsigned_block->header_extensions.end();
                SYS_ASSERT( rcvd == crtd, block_validate_exception,
                            "The received block did${neg1} have $(count) root header extensions, but the locally constructed one did${neg2}",
@@ -2200,7 +2210,7 @@ struct controller_impl {
                              "constructed one: ${crdt}; don't match!",
                              ("count", count)("rcvd", rcvd_s_header.to_string())("crdt", crtd_s_header.to_string()) );
                }
-            } while( rcvd ); // either they both exist or it already failed
+            }
          }
 
          if( !use_bsp_cached ) {
@@ -3815,15 +3825,9 @@ bool controller::is_irreversible_state_available() const {
    return !!my->slog;
 }
 
-root_processor_ptr controller::create_root_processor() {
-   SYS_ASSERT( !my->root_processor, misc_exception, "Attempting to create the block_root_processor a second time" );
-   SYS_ASSERT( !my->protocol_features.is_initialized(), misc_exception, "Attempting to create the block_root_processor after initialization" );
-   my->root_processor = std::make_shared<block_root_processor>(my->db);
-   return my->root_processor;
-}
-
-root_processor_ptr controller::get_root_processor() {
-   return my->root_processor;
+void controller::create_root_processor(const root_processor_ptr& rp) {
+   SYS_ASSERT( !my->merkle_processor, misc_exception, "Attempting to create the merkle_processor a second time" );
+   my->merkle_processor = std::make_shared<block_root_processor>(my->db, rp);
 }
 
 /// Protocol feature activation handlers:

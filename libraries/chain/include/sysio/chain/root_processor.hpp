@@ -17,9 +17,7 @@ namespace sysio { namespace chain {
    struct root_processor {
       using transactions = chain::deque<chain::transaction_id_type>;
       using root_storage = std::unordered_map<contract_root, transactions, root_hash>;
-      
 
-      virtual void calculate_root_blocks(uint32_t block_num, root_storage&& root_transactions) = 0;
-      virtual chain::deque<s_header> get_s_headers(uint32_t block_num) const = 0;
+      virtual root_storage retrieve_root_transactions(uint32_t block_num) = 0;
    };
 } } // namespace sysio::chain

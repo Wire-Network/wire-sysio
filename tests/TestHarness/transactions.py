@@ -402,6 +402,7 @@ class Transactions(NodeopQueries):
     def getAllBuiltinFeatureDigestsToPreactivate(self):
         protocolFeatures = {}
         supportedProtocolFeatures = self.getSupportedProtocolFeatures()
+        if Utils.Debug: Utils.Print(f"getSupportedProtocolFeatures: {json.dumps(supportedProtocolFeatures, indent=4)}")
         for protocolFeature in supportedProtocolFeatures["payload"]:
             for spec in protocolFeature["specification"]:
                 if (spec["name"] == "builtin_feature_codename"):

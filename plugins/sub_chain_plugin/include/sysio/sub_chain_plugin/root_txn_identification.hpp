@@ -19,14 +19,14 @@ namespace sysio {
    /**
     * This class manages the processing related to the transaction finality status feature.
     */
-   class root_txn_identification {
+   class root_txn_identification : public chain::root_processor {
    public:
-      using name = sysio::chain::name;
+      using name = chain::name;
       using contract_action_matches = std::vector<contract_action_match>;
 
       /**
        */
-      root_txn_identification(contract_action_matches&& matches, chain::root_processor& processor);
+      root_txn_identification(contract_action_matches&& matches);
 
       ~root_txn_identification();
 
@@ -35,6 +35,8 @@ namespace sysio {
       void signal_accepted_block( const chain::block_state_ptr& bsp );
 
       void signal_block_start( uint32_t block_num );
+
+      root_storage retrieve_root_transactions(uint32_t block_num) override;;
 
    private:
       root_txn_identification_impl_ptr _my;

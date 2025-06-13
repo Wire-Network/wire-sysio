@@ -381,8 +381,7 @@ namespace sysio { namespace chain {
       bool is_write_window() const;
       void code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, uint32_t block_num);
 
-      root_processor_ptr create_root_processor();
-      root_processor_ptr get_root_processor();
+      void create_root_processor(const root_processor_ptr& rp);
 
       private:
          friend class apply_context;
