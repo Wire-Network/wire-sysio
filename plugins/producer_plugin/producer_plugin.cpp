@@ -9,6 +9,7 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/chain/root_processor.hpp>
 #include <sysio/sub_chain_plugin/sub_chain_plugin.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 
@@ -240,6 +241,7 @@ struct block_time_tracker {
       }
 
     private:
+      sysio::chain::root_processor_ptr _root_processor;
       block_time_tracker& _block_time_tracker;
       time_status _time_status = time_status::fail;
       bool _is_transient;
@@ -2630,42 +2632,6 @@ void producer_plugin_impl::produce_block() {
    if (_protocol_features_signaled) {
       _protocol_features_to_activate.clear(); // clear _protocol_features_to_activate as it is already set in pending_block
       _protocol_features_signaled = false;
-   }
-
-   /**
-   * S-ROOT HEADER EXTENSION
-   */
-   auto& sub_chain_plug = app().get_plugin<sub_chain_plugin>();
-   // TODO: verify sub chain is enabled, otherwise skip? or require?
-   // Step 1: Scans transactions to find relevant transactions by comparing to a list of known contracts.
-   auto relevant_s_transactions = sub_chain_plug.find_relevant_transactions(chain);
-   // Only calculate if there are relevant s-transactions
-   if (!relevant_s_transactions.empty()) {
-      ilog("Relevant S-Transactions found: ${count}", ("count", relevant_s_transactions.size()));
-      // Step 2: Builds array of leaves in the same order as they appear in the transaction list.
-      // Step 3: Computes a Merkle root hash: the S-Root.
-      checksum256_type s_root = sub_chain_plug.calculate_s_root(relevant_s_transactions);
-      ilog("s_root calculated: ${root}", ("root", s_root.str()));
-      // Step 4: S-Root is hashed with the previous S-ID using SHA-256
-      // Step 5: Takes the 32 least-significant bits from the previous S-ID to get the previous S-Block number, and increment to get the new S-Block number
-      // Step 6: Hashes the S-Root with the previous S-ID with SHA-256, then replace the 32 least significant bits with the new S-Block number to produce the new S-ID
-      checksum256_type curr_s_id = sub_chain_plug.compute_curr_s_id(s_root);
-      ilog("curr_s_id calculated: ${curr_s_id}", ("curr_s_id", curr_s_id.str()));
-      // Prepare the s_header for the current block to be added to the header extension
-      s_header s_header {
-         sub_chain_plug.get_contract_name(),
-         sub_chain_plug.get_prev_s_id(),
-         curr_s_id,
-         s_root
-      };
-      ilog("S-Header prepared: ${s_header}", ("s_header", s_header.to_string()));
-
-      // Set the s_root in the chain controller for the building block state
-      // to be referenced and passed to make_block_header on finalize_block below
-      chain.set_s_header( s_header );
-
-      // Update the plugin's stored prev_s_id with the newly calculated S-ID
-      sub_chain_plug.update_prev_s_id(curr_s_id);
    }
 
    // idump( (fc::time_point::now() - chain.pending_block_time()) );
