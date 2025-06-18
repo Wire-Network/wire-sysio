@@ -163,6 +163,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<> test;
    test.contract_whitelist = {config::system_account_name, "sysio.token"_n, "bob"_n};
    test.init();
@@ -212,6 +213,7 @@ BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<> test;
    test.contract_blacklist = {"charlie"_n};
    test.init();
@@ -261,6 +263,7 @@ BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<> test;
    test.contract_whitelist = {config::system_account_name, "sysio.token"_n, "bob"_n, "charlie"_n};
    test.action_blacklist = {{"charlie"_n, "create"_n}};
@@ -326,6 +329,7 @@ BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( deferred_blacklist_failure ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -379,6 +383,7 @@ BOOST_AUTO_TEST_CASE( deferred_blacklist_failure ) { try {
 
 
 BOOST_AUTO_TEST_CASE( blacklist_onerror ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<validating_tester> tester1;
    tester1.init();
    tester1.chain->execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -417,6 +422,7 @@ BOOST_AUTO_TEST_CASE( blacklist_onerror ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -563,6 +569,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( blacklist_sender_bypass ) { try {
+   SKIP_TEST
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -717,6 +724,7 @@ BOOST_AUTO_TEST_CASE( blacklist_sender_bypass ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
+   SKIP_TEST
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
 

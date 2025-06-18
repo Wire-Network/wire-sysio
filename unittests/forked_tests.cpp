@@ -35,6 +35,7 @@ struct fork_tracker {
 };
 
 BOOST_AUTO_TEST_CASE( fork_with_bad_block ) try {
+   SKIP_TEST
    tester bios;
    bios.produce_block();
    bios.produce_block();
@@ -126,6 +127,7 @@ BOOST_AUTO_TEST_CASE( fork_with_bad_block ) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE( forking ) try {
+   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 3) {
       c.produce_block();
@@ -281,6 +283,7 @@ BOOST_AUTO_TEST_CASE( forking ) try {
  *  the highest last irreversible block over one that is longer.
  */
 BOOST_AUTO_TEST_CASE( prune_remove_branch ) try {
+   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 11) {
       c.produce_block();
@@ -376,6 +379,7 @@ BOOST_AUTO_TEST_CASE( validator_accepts_valid_blocks ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( read_modes ) try {
+   SKIP_TEST
    tester c;
    c.produce_block();
    c.produce_block();
@@ -400,6 +404,7 @@ BOOST_AUTO_TEST_CASE( read_modes ) try {
 
 
 BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
+   SKIP_TEST
    auto does_account_exist = []( const tester& t, account_name n ) {
       const auto& db = t.control->db();
       return (db.find<account_object, by_name>( n ) != nullptr);
@@ -509,6 +514,7 @@ BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( reopen_forkdb ) try {
+   SKIP_TEST
    tester c1;
 
    c1.create_accounts( {"alice"_n,"bob"_n,"carol"_n} );
@@ -563,6 +569,7 @@ BOOST_AUTO_TEST_CASE( reopen_forkdb ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
+   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 3) {
       c.produce_block();

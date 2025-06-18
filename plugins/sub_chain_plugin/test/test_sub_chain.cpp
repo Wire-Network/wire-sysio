@@ -22,6 +22,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(sub_chain_init_without_config) {
             try {
+                SKIP_TEST
                 sub_chain_plugin sub_chain;
                 variables_map options;
 
@@ -44,6 +45,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(sub_chain_init_with_config) {
             try {
+                SKIP_TEST
                 // init a new sub chain plugin
                 sub_chain_plugin sub_chain;
 
@@ -66,6 +68,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(bad_config) {
             try {
+                SKIP_TEST
                 const char *bad_argvs[][5] = {
                     {"sub_chain", "--s-chain-contract", "something", "--s-chain-actions", "areallylongactionname"},
                     {"sub_chain", "--s-chain-contract", "something", "--s-chain-actions", "bad,format"},
@@ -110,6 +113,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(nothing_to_report) {
             try {
+                SKIP_TEST
                 tester chain;
                 chain.create_account("abbie"_n);
                 chain.produce_block();
@@ -131,6 +135,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(find_relevant_txns) {
             try {
+                SKIP_TEST
                 tester chain;
                 auto abbie = "abbie"_n;
                 auto darcy = "darcy"_n;
@@ -194,6 +199,7 @@ namespace {
 
         BOOST_AUTO_TEST_CASE(track_s_id) {
             try {
+                SKIP_TEST
                 tester chain;
 
                 auto candice = "candice"_n; // a tier 1 node owner

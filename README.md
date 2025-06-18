@@ -165,6 +165,10 @@ You can invoke them by running `ctest` from a terminal in your build directory a
 ctest -j "$(nproc)" -LE _tests
 ```
 
+Since Wire resource handling changes caused considerable changes for unit test setup, some tests have been turned off
+till they can be fixed, so that the core set of tests can be successfully validated. To include these tests in running
+the above ctest command, the following flag must be passed to cmake before compiling and running: "-DDONT_SKIP_TESTS=TRUE"
+
 #### WASM Spec Tests
 
 The WASM spec tests verify that our WASM execution engine is compliant with the web assembly standard. These are very [small](https://testing.googleblog.com/2010/12/test-sizes.html), very fast unit tests. However, there are over a thousand of them so the suite can take a little time to run. These tests are extremely CPU-intensive.

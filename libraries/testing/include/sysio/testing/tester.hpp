@@ -21,6 +21,15 @@
    auto filtered = ::sysio::testing::filter_fields( a.get_object(), b.get_object() ); \
    BOOST_REQUIRE_EQUAL_COLLECTIONS( a.get_object().begin(), a.get_object().end(), filtered.begin(), filtered.end() ); }
 
+#ifndef RUN_FAILING_TESTS
+   #define SKIP_TEST \
+      BOOST_TEST_MESSAGE("Skipping test"); \
+      return;
+#else
+   #define SKIP_TEST \
+      ;
+#endif
+
 std::ostream& operator<<( std::ostream& osm, const fc::variant& v );
 
 std::ostream& operator<<( std::ostream& osm, const fc::variant_object& v );

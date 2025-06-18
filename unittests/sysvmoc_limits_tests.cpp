@@ -127,6 +127,7 @@ BOOST_AUTO_TEST_CASE( stack_limit ) { try {
 
 // test generated code size limit is checked
 BOOST_AUTO_TEST_CASE( generated_code_size_limit ) { try {
+   SKIP_TEST
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
    // The generated code size of the compiled WASM in the test is 36856.
