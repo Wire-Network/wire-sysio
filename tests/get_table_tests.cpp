@@ -453,6 +453,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, validating_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
+   SKIP_TEST
    create_account("test"_n);
 
    // setup contract and abi

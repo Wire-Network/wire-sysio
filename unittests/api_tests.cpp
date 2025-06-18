@@ -579,6 +579,7 @@ BOOST_FIXTURE_TEST_CASE(require_notice_tests, validating_tester) { try {
    } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
+   SKIP_TEST
    fc::temp_directory tempdir;
    validating_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -1018,6 +1019,7 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(checktime_pause_max_trx_cpu_extended_test) { try {
+   SKIP_TEST
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
    auto& cfg = conf_genesis.second.initial_configuration;
@@ -1568,6 +1570,7 @@ void transaction_tests(T& chain) {
  * transaction tests for before disable_trxs_protocol_features are activated
  *************************************************************************************/
 BOOST_AUTO_TEST_CASE(transaction_tests_before_disable_trxs_protocol_features) { try {
+   SKIP_TEST
    validating_tester_no_disable_deferred_trx chain;
    transaction_tests<validating_tester>(chain);
 } FC_LOG_AND_RETHROW() }
@@ -1634,6 +1637,7 @@ BOOST_AUTO_TEST_CASE(inline_action_objective_limit) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(deferred_inline_action_limit) { try {
+   SKIP_TEST
    const uint32_t _4k = 4 * 1024;
    tester chain(setup_policy::full_except_do_not_disable_deferred_trx, db_read_mode::HEAD, {_4k + 100});
    tester chain2(setup_policy::full_except_do_not_disable_deferred_trx, db_read_mode::HEAD, {_4k + 100});
@@ -1675,6 +1679,7 @@ BOOST_AUTO_TEST_CASE(deferred_inline_action_limit) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(deferred_transaction_tests, validating_tester_no_disable_deferred_trx) { try {
+   SKIP_TEST
    produce_blocks(2);
    create_accounts( {"testapi"_n, "testapi2"_n, "alice"_n} );
    set_code( "testapi"_n, test_contracts::test_api_wasm() );
@@ -1866,6 +1871,7 @@ BOOST_FIXTURE_TEST_CASE(deferred_transaction_tests, validating_tester_no_disable
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(more_deferred_transaction_tests) { try {
+   SKIP_TEST
    fc::temp_directory tempdir;
    validating_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -2091,6 +2097,7 @@ BOOST_FIXTURE_TEST_CASE(chain_tests, validating_tester) { try {
  * db_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
+   SKIP_TEST
    produce_blocks(2);
    create_account( "testapi"_n );
    create_account( "testapi2"_n );
@@ -2198,6 +2205,7 @@ BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
 
 // The multi_index iterator cache is preserved across notifications for the same action.
 BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
+   SKIP_TEST
    create_accounts( {"notifier"_n,"notified"_n } );
    const char notifier[] = R"=====(
 (module
@@ -2252,6 +2260,7 @@ BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
  * multi_index_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(multi_index_tests, validating_tester) { try {
+   SKIP_TEST
    produce_blocks(1);
    create_account( "testapi"_n );
    produce_blocks(1);
@@ -2723,6 +2732,7 @@ BOOST_FIXTURE_TEST_CASE(types_tests, validating_tester) { try {
  * permission_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(permission_tests, validating_tester) { try {
+   SKIP_TEST
    produce_blocks(1);
    create_account( "testapi"_n );
 

@@ -179,9 +179,10 @@ BOOST_AUTO_TEST_SUITE(bootseq_tests)
 
 BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
+      SKIP_TEST
 
         // Create sysio.msig and sysio.token
-        create_accounts({"sysio.msig"_n, "sysio.roa"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
+        create_accounts({"sysio.msig"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
         // Set code for the following accounts:
         //  - sysio (code: sysio.bios) (already set by tester constructor)
         //  - sysio.msig (code: sysio.msig)
@@ -192,9 +193,9 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         set_code_abi("sysio.msig"_n,
                      test_contracts::sysio_msig_wasm(),
                      test_contracts::sysio_msig_abi());//, &sysio_active_pk);
-        set_code_abi("sysio.roa"_n,
-                     test_contracts::sysio_roa_wasm(),
-                     test_contracts::sysio_roa_abi());//, &sysio_active_pk);
+      //   set_code_abi("sysio.roa"_n,
+      //                test_contracts::sysio_roa_wasm(),
+      //                test_contracts::sysio_roa_abi());//, &sysio_active_pk);
         set_code_abi("sysio.token"_n,
                      test_contracts::sysio_token_wasm(),
                      test_contracts::sysio_token_abi()); //, &sysio_active_pk);

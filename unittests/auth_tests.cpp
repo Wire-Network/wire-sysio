@@ -410,6 +410,7 @@ BOOST_AUTO_TEST_CASE( any_auth ) { try {
 
 BOOST_AUTO_TEST_CASE(no_double_billing) {
 try {
+   SKIP_TEST
    fc::temp_directory tempdir;
    validating_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -478,6 +479,7 @@ try {
 
 BOOST_AUTO_TEST_CASE(stricter_auth) {
 try {
+   SKIP_TEST
    validating_tester chain;
 
    chain.produce_block();

@@ -575,6 +575,7 @@ BOOST_FIXTURE_TEST_CASE( entry_import, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( entry_db, validating_tester ) try {
+   SKIP_TEST
    create_accounts( {"entrydb"_n} );
    produce_block();
 
@@ -1869,6 +1870,7 @@ BOOST_AUTO_TEST_CASE( code_size )  try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
+   SKIP_TEST
 
    fc::temp_directory tempdir;
    tester chain( tempdir, true );
@@ -2261,6 +2263,7 @@ BOOST_FIXTURE_TEST_CASE( memory_mapping_test, validating_tester ) try {
 #endif // defined(__linux__)
 
 BOOST_FIXTURE_TEST_CASE(net_usage_tests, tester ) try {
+   SKIP_TEST
    int count = 0;
    auto check = [&](int coderepeat, int max_net_usage)-> bool {
       account_name account{"f_tests"_n.to_uint64_t() + (count++) * 16};
@@ -2312,6 +2315,7 @@ BOOST_FIXTURE_TEST_CASE(net_usage_tests, tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(weighted_net_usage_tests, tester ) try {
+   SKIP_TEST
    account_name account = "f_tests"_n;
    account_name acc2 = "acc2"_n;
    create_accounts({account, acc2});

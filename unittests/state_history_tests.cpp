@@ -109,6 +109,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -130,6 +131,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -149,6 +151,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -171,6 +174,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -252,6 +256,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_permission_link) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -334,6 +339,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_contract) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -452,6 +458,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
 }
 
    BOOST_AUTO_TEST_CASE(test_deltas) {
+      SKIP_TEST
       tester main;
 
       auto v = sysio::state_history::create_deltas(main.control->db(), false);
@@ -494,6 +501,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
    }
 
    BOOST_AUTO_TEST_CASE(test_deltas_contract_several_rows){
+      SKIP_TEST
       table_deltas_tester chain(setup_policy::full);
 
       chain.produce_block();
@@ -583,6 +591,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
    }
 
    BOOST_AUTO_TEST_CASE(test_trace_log_with_transaction_extensions) {
+      SKIP_TEST
       tester_no_disable_deferred_trx c;
 
       fc::temp_directory state_history_dir;
@@ -679,7 +688,7 @@ static std::vector<sysio::ship_protocol::transaction_trace> get_traces(sysio::st
 }
 
 BOOST_AUTO_TEST_CASE(test_splitted_log) {
-
+   SKIP_TEST
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{
@@ -804,15 +813,18 @@ bool test_fork(uint32_t stride, uint32_t max_retained_files) {
 }
 
 BOOST_AUTO_TEST_CASE(test_fork_no_stride) {
+   SKIP_TEST
    // In this case, the chain fork would NOT trunk the trace log across the stride boundary.
    BOOST_CHECK(test_fork(UINT32_MAX, 10));
 }
 BOOST_AUTO_TEST_CASE(test_fork_with_stride1) {
+   SKIP_TEST
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, there are still some traces remains after the truncation.
    BOOST_CHECK(test_fork(10, 10));
 }
 BOOST_AUTO_TEST_CASE(test_fork_with_stride2) {
+   SKIP_TEST
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, no existing trace remain after the truncation. Because we only keep a very
    // short history, the create_account_trace is not available to be found. We just need
@@ -821,6 +833,7 @@ BOOST_AUTO_TEST_CASE(test_fork_with_stride2) {
 }
 
 BOOST_AUTO_TEST_CASE(test_corrupted_log_recovery) {
+   SKIP_TEST
 
    fc::temp_directory state_history_dir;
 

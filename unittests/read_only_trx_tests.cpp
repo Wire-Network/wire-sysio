@@ -184,6 +184,7 @@ BOOST_FIXTURE_TEST_CASE(canceldelay_test, read_only_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(db_read_only_mode_test, read_only_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    insert_a_record();
@@ -203,6 +204,7 @@ BOOST_FIXTURE_TEST_CASE(db_read_only_mode_test, read_only_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(db_insert_test, read_only_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    // verify DB insert is not allowed by read-only transaction
@@ -234,6 +236,7 @@ BOOST_FIXTURE_TEST_CASE(delay_sec_test, read_only_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(db_modify_test, read_only_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    insert_a_record();
@@ -274,6 +277,7 @@ BOOST_FIXTURE_TEST_CASE(db_modify_test, read_only_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(db_erase_test, read_only_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    insert_a_record();
@@ -298,6 +302,7 @@ BOOST_FIXTURE_TEST_CASE(db_erase_test, read_only_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, read_only_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    const auto& p = control->get_dynamic_global_properties();

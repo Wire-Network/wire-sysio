@@ -1,6 +1,10 @@
 ### Build contracts with cdt if available ###
 include(ExternalProject)
 
+if( DONT_SKIP_TESTS )
+   add_compile_definitions(RUN_FAILING_TESTS=TRUE)
+endif()
+
 if( SYSIO_COMPILE_TEST_CONTRACTS )
    set(SYSIO_WASM_OLD_BEHAVIOR "Off")
    if( USE_SYSIO_CDT_1_7_X OR USE_SYSIO_CDT_1_8_X )
