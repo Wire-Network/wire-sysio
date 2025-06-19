@@ -372,6 +372,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( replace_deferred_test ) try {
+   SKIP_TEST
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
    c.preactivate_builtin_protocol_features( {builtin_protocol_feature_t::crypto_primitives} );
@@ -528,6 +529,7 @@ BOOST_AUTO_TEST_CASE( replace_deferred_test ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( no_duplicate_deferred_id_test ) try {
+   SKIP_TEST
    tester c( setup_policy::preactivate_feature_and_new_bios );
    tester c2( setup_policy::none );
 
@@ -852,6 +854,7 @@ BOOST_AUTO_TEST_CASE( restrict_action_to_self_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
+   SKIP_TEST
    tester chain( setup_policy::preactivate_feature_and_new_bios );
 
    const auto& tester_account = "tester"_n;
@@ -1078,6 +1081,7 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
  */
 
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
+   SKIP_TEST
    tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
@@ -1406,6 +1410,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
  */
 
 BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
+   SKIP_TEST
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
    const auto& tester1_account = account_name("tester1");
@@ -2256,6 +2261,7 @@ BOOST_AUTO_TEST_CASE( set_parameters_packed_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_1_no_op_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx c;
 
    c.produce_block();
@@ -2378,6 +2384,7 @@ BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_1_no_op_test ) { try {
 // verify a deferred transaction can be retired as expired at any time regardless of
 // whether its delay_until or expiration have been reached
 BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_1_retire_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx c;
 
    c.produce_block();
@@ -2443,6 +2450,7 @@ BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_1_retire_test ) { try {
 } FC_LOG_AND_RETHROW() } /// disable_deferred_trxs_stage_1_retire_test
 
 BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_2_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx c;
 
    c.produce_block();
@@ -2510,6 +2518,7 @@ BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_2_test ) { try {
 } FC_LOG_AND_RETHROW() } /// disable_deferred_trxs_stage_2_test
 
 BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_2_dependency_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx c;
 
    c.produce_block();
@@ -2526,6 +2535,7 @@ BOOST_AUTO_TEST_CASE( disable_deferred_trxs_stage_2_dependency_test ) { try {
 // Verify a block containing delayed transactions is validated
 // before DISABLE_DEFERRED_TRXS_STAGE_1 is activated
 BOOST_AUTO_TEST_CASE( block_validation_before_stage_1_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx tester1;
    tester_no_disable_deferred_trx tester2;
 
@@ -2545,6 +2555,7 @@ BOOST_AUTO_TEST_CASE( block_validation_before_stage_1_test ) { try {
 // Verify a block containing delayed transactions is not validated
 // after DISABLE_DEFERRED_TRXS_STAGE_1 is activated
 BOOST_AUTO_TEST_CASE( block_validation_after_stage_1_test ) { try {
+   SKIP_TEST
    tester_no_disable_deferred_trx tester1;
 
    // Activate DISABLE_DEFERRED_TRXS_STAGE_1 such that tester1

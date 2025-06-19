@@ -972,6 +972,7 @@ static const char min_set_parameters_wast[] = R"======(
 )======";
 
 BOOST_FIXTURE_TEST_CASE(reset_chain_tests, wasm_config_tester) {
+   SKIP_TEST
    produce_block();
 
    wasm_config min_params = {

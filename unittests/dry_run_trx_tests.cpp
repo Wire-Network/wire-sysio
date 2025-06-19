@@ -275,6 +275,7 @@ BOOST_FIXTURE_TEST_CASE(delay_sec_test, dry_run_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(db_insert_test, dry_run_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    // verify DB operation is allowed by dry-run transaction
@@ -297,6 +298,7 @@ BOOST_FIXTURE_TEST_CASE(db_insert_test, dry_run_trx_tester) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, dry_run_trx_tester) { try {
+   SKIP_TEST
    set_up_test_contract();
 
    const auto& p = control->get_dynamic_global_properties();

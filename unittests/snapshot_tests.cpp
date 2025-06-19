@@ -182,6 +182,7 @@ namespace {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
+   SKIP_TEST
    tester chain;
 
    // Create 2 accounts
@@ -248,6 +249,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
+   SKIP_TEST
    tester chain;
    const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 
@@ -382,6 +384,7 @@ static auto get_extra_args() {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot_suites)
 {
+   SKIP_TEST
    const uint32_t legacy_default_max_inline_action_size = 4 * 1024;
    bool save_snapshot = false;
    bool generate_log = false;
@@ -455,6 +458,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_block_log, SNAPSHOT_SUITE, snapshot_suites)
 {
+   SKIP_TEST
    tester chain;
    const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 

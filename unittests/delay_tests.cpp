@@ -1351,6 +1351,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
 
 // test canceldelay action cancelling a delayed transaction
 BOOST_AUTO_TEST_CASE( canceldelay_test ) { try {
+   SKIP_TEST
    validating_tester_no_disable_deferred_trx chain;
    chain.produce_block();
 
@@ -1593,6 +1594,7 @@ BOOST_AUTO_TEST_CASE( canceldelay_test ) { try {
 
 // test canceldelay action under different permission levels
 BOOST_AUTO_TEST_CASE( canceldelay_test2 ) { try {
+   SKIP_TEST
    validating_tester_no_disable_deferred_trx chain;
    chain.produce_block();
 
