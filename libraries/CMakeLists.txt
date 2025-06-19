@@ -11,6 +11,33 @@ set( Boost_USE_STATIC_LIBS ON CACHE STRING "ON or OFF" )
 set( BOOST_EXCLUDE_LIBRARIES "mysql" )
 add_subdirectory( boost EXCLUDE_FROM_ALL )
 
+# Add ExternalProject module for building non-CMake projects
+include(ExternalProject)
+
+# Build libsodium with ExternalProject using the bundled configure script
+ExternalProject_Add( libsodium
+  PREFIX          ${CMAKE_BINARY_DIR}/libraries/libsodium
+  SOURCE_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/libsodium
+  INSTALL_DIR     ${CMAKE_BINARY_DIR}/libraries/libsodium-install    # <<< add this
+  CONFIGURE_COMMAND
+    ${CMAKE_CURRENT_SOURCE_DIR}/libsodium/configure
+      --prefix=<INSTALL_DIR>                                         # <<< use the INSTALL_DIR internally
+  BUILD_COMMAND   make -C <SOURCE_DIR>
+  INSTALL_COMMAND make -C <SOURCE_DIR> install
+  BUILD_IN_SOURCE 1
+)
+
+# Grab the install directory from that ExternalProject
+ExternalProject_Get_Property(libsodium INSTALL_DIR install_dir)
+
+# Now point to the real include/lib under that install prefix
+set(LIBSODIUM_INCLUDE_DIR
+    ${install_dir}/include
+    CACHE PATH "Path to libsodium headers")
+set(LIBSODIUM_LIBRARIES
+    ${install_dir}/lib/libsodium.a
+    CACHE FILEPATH "Path to libsodium static library")
+
 add_subdirectory( libfc )
 add_subdirectory( builtins )
 add_subdirectory( softfloat )
