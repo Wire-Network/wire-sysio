@@ -53,6 +53,7 @@ struct signature_shim {
       FC_THROW_EXCEPTION(exception, "ED25519 signature recovery not supported");
    }
 
+   // TODO: Should we just have this throw an exception as well like recover?
    bool verify(const sha256& digest, const public_key_shim& pub) const;
 };
 
@@ -70,6 +71,7 @@ struct private_key_shim {
    using public_key_type = public_key_shim;
 
    public_key_shim get_public_key() const;
+   // TODO: Maybe just make this throw exception as well? Needs caveats of signing for each chain.
    signature_shim  sign(const sha256& digest, bool require_canonical) const;
    sha512          generate_shared_secret(const public_key_shim&) const;
 

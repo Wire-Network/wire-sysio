@@ -322,13 +322,13 @@ namespace sysio { namespace chain {
                   "updateauth action should only have one declared authorization" );
       const auto& auth = auths[0];
 
-      // ** OR statement is custom, added to allow for sysio to add 'auth.ext' and 'auth.session' to users via our custom 'onlinkauth' from system contract.
+      // ** OR statement is custom, added to allow for sysio to add '**.ext' to users via our custom 'onlinkauth' from system contract.
       SYS_ASSERT( (auth.actor == update.account || auth.actor == name("sysio")), irrelevant_auth_exception,
                   "the owner of the affected permission needs to be the actor of the declared authorization" );
 
-      // ** New: Prevents users from updating / adding 'auth.ext' and 'auth.session' special permissions.
-      if(update.permission == name("auth.ext") || update.permission == name("auth.session")) {
-         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Special permission, only assignable by 'sysio' as a result of 'onlinkauth'" );
+      // ** New: Prevents users from updating / adding '**.ext' special permissions.
+      if(update.permission.suffix() == name("ext")) {
+         SYS_ASSERT( auth.actor == name("sysio"), invalid_permission, "Protected permission namespace. Only 'sysio' can update or add '**.ext' permissions." );
       } else {
          const auto* min_permission = find_permission({update.account, update.permission});
          if( !min_permission ) { // creating a new permission

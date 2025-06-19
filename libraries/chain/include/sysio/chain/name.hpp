@@ -112,7 +112,6 @@ namespace sysio::chain {
 
          return name{ ((value & mask) << shift) + (thirteenth_character << (shift-1)) };
       }
-
       /**
        *  Returns the prefix.
        *  for example:

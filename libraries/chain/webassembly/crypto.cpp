@@ -10,6 +10,7 @@
 #include <bn256/bn256.h>
 #include <bls12-381/bls12-381.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
+#include <openssl/blake2.h>
 
 // local helpers
 namespace {
@@ -51,27 +52,25 @@ namespace sysio::chain::webassembly {
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
 
-      // variant index of "ED" in signature_prefix[] is 4
       if( s.which() == 4 ) {
-         // The raw 'sig' buffer is: [1-byte variant index][64-byte ED25519 sig]
-         auto sig_bytes = reinterpret_cast<const unsigned char*>(sig.data());
-         fc::crypto::ed::signature_shim edsig;
-         // copy the 64 signature bytes, then zero-pad
-         std::copy_n(sig_bytes + 1,
-                     crypto_sign_BYTES,
-                     edsig._data.data);
-         edsig._data.data[crypto_sign_BYTES] = 0;
-         
-         // The raw 'pub' buffer is: [1-byte variant index][32-byte ED25519 pubkey]
-         auto pub_bytes = reinterpret_cast<const unsigned char*>(pub.data());
-         fc::crypto::ed::public_key_shim edpub;
-         std::copy_n(pub_bytes + 1,
-                     crypto_sign_PUBLICKEYBYTES,
-                     edpub._data.data);
-         
-         // digest is already a fc::sha256 pointer
-         bool ok = edsig.verify( *digest, edpub );
-         SYS_ASSERT(ok, crypto_api_exception, "ED25519 signature verify failed");
+         // a) Extract 32 raw bytes from fc::sha256
+         auto sha_data = digest->data(); 
+         const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
+
+         // b) Extract 64-byte signature (skip the 1-byte “which” prefix)
+         const unsigned char* sigptr = reinterpret_cast<const unsigned char*>(sig.data()) + 1;
+
+         // c) Extract 32-byte pubkey (skip the 1-byte “which” prefix)
+         const unsigned char* pubptr = reinterpret_cast<const unsigned char*>(pub.data()) + 1;
+
+         // d) Call libsodium’s raw ED25519 detached-verify
+         int ok = crypto_sign_verify_detached( sigptr,
+                                                msgptr,
+                                                32,
+                                                pubptr );
+         SYS_ASSERT( ok == 0,
+                     crypto_api_exception,
+                     "ED25519 signature verify failed" );
          return;
       }
 
@@ -250,6 +249,22 @@ namespace sysio::chain::webassembly {
       std::memcpy( out.data(), res.data(), res.size() );
       return return_code::success;
    }
+
+   int32_t interface::blake2b_256( span<const char> data, span<char> result ) const {
+      // sanity‐check sizes
+      if( result.size() != BLAKE2B256_DIGEST_LENGTH )
+         return -1;
+  
+      // BLAKE2B256 takes uint8_t*, so cast away const‐char
+      auto in_bytes = reinterpret_cast<const uint8_t*>(data.data());
+      auto out_bytes = reinterpret_cast<uint8_t*>(result.data());
+      try {
+          BLAKE2B256( in_bytes, data.size(), out_bytes );
+      } catch( ... ) {
+          return -1;
+      }
+      return 0;
+  }
 
    void interface::sha3( span<const char> input, span<char> output, int32_t keccak ) const {
       bool _keccak = keccak == 1;

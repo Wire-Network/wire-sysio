@@ -3808,6 +3808,7 @@ void controller_impl::on_activation<builtin_protocol_feature_t::crypto_primitive
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "blake2_f" );
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "sha3" );
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "k1_recover" );
+      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "blake2b_256" );
    } );
 }
 

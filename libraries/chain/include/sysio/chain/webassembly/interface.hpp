@@ -5,6 +5,7 @@
 #include <sysio/chain/webassembly/return_codes.hpp>
 #include <fc/crypto/sha1.hpp>
 #include <boost/hana/string.hpp>
+// #include <fc/crypto/sha256.hpp>
 
 namespace sysio { namespace chain {
 class apply_context;
@@ -1762,6 +1763,16 @@ namespace webassembly {
           * @return                -1 if there was an error, 0 otherwise
          */
          int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, int32_t final, span<char> result) const;
+         
+         /**
+          * BLAKE2b-256 hash
+          *
+          * @ingroup crypto
+          * @param data    - a span pointing at the input bytes to hash
+          * @param result  - a span pointing at 32 bytes of output space
+          * @return        -1 on error (e.g. wrong span sizes), 0 on success
+          */
+         int32_t blake2b_256( span<const char> data, span<char> result ) const;
 
          /**
           * Hashes data using SHA3.
