@@ -357,14 +357,16 @@ def stepSetSystemContract():
     # CRYPTO_PRIMITIVES
     retry(args.clio + 'push action sysio activate \'["6bcb40a24e49c26d0a60513b6aeb8551d264e4717f306b81a37a5afb3b47cedc"]\' -p sysio@active')
     # BLS_PRIMITIVES2
-    retry(args.clio + 'push action sysio activate \'["63320dd4a58212e4d32d1f58926b73ca33a247326c2a5e9fd39268d2384e011a"]\' -p sysio@active')
+    retry(args.clio + 'push action sysio activate \'["7ab0d893e39c01d365ad7f66a2cb8fb02179135c5a0cf16c40645d972e47911d"]\' -p sysio@active')
     # DISABLE_DEFERRED_TRXS_STAGE_1 - DISALLOW NEW DEFERRED TRANSACTIONS
-    retry(args.clio + 'push action sysio activate \'["fce57d2331667353a0eac6b4209b67b843a7262a848af0a49a6e2fa9f6584eb4"]\' -p sysio@active')
+    retry(args.clio + 'push action sysio activate \'["2ce18707fa426ea351704ded644b679a87188967b1098cff60ab4a3f35da106e"]\' -p sysio@active')
     # DISABLE_DEFERRED_TRXS_STAGE_2 - PREVENT PREVIOUSLY SCHEDULED DEFERRED TRANSACTIONS FROM REACHING OTHER NODE
     # THIS DEPENDS ON DISABLE_DEFERRED_TRXS_STAGE_1
-    retry(args.clio + 'push action sysio activate \'["09e86cb0accf8d81c9e85d34bea4b925ae936626d00c984e4691186891f5bc16"]\' -p sysio@active')
+    retry(args.clio + 'push action sysio activate \'["6cefed65f1f6a04fc82e949b06c0df0e9f5370855353cd3b543e4b5d4ff3dabf"]\' -p sysio@active')
     # DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
-    retry(args.clio + 'push action sysio activate \'["d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586"]\' -p sysio@active')
+    retry(args.clio + 'push action sysio activate \'["71d53c85a760da4eaa6934b5a94eb93426713d2ff74d8fa598e245faa469e573"]\' -p sysio@active')
+    # MULTIPLE_STATE_ROOTS_SUPPORTED
+    retry(args.clio + 'push action sysio activate \'["4d2304c58a30f8ee9d5cf2ac9ac04c3c67ae0cd113be15b746de1a1db07d3b18"]\' -p sysio@active')
     sleep(1)
 
     # install sysio.system latest version
