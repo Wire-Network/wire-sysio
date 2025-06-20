@@ -1689,10 +1689,10 @@ namespace sysio { namespace chain {
       extract_blocklog_i<StoredType>(log_bundle, new_block_filename, new_index_filename, truncate_at_block,
                                      log_bundle.log_data.last_block_num() - truncate_at_block + 1);
 
-      std::filesystem::path old_log = temp_dir / filename_prefix<stored_type>() + "_old.log";
+      std::filesystem::path old_log = temp_dir / filename_prefix<stored_type>() / "_old.log";
       rename(log_bundle.block_file_name, old_log);
       rename(new_block_filename, log_bundle.block_file_name);
-      std::filesystem::path old_ind = temp_dir / filename_prefix<stored_type>() + "_old.index";
+      std::filesystem::path old_ind = temp_dir / filename_prefix<stored_type>() / "_old.index";
       rename(log_bundle.index_file_name, old_ind);
       rename(new_index_filename, log_bundle.index_file_name);
 

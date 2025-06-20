@@ -26,21 +26,16 @@ std::vector<char> hex2bin(const std::string& source) {
 BOOST_AUTO_TEST_SUITE(bls_primitives_tests)
 
 BOOST_AUTO_TEST_CASE( bls_testg1add ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full);
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
+   c.register_node_owner( tester1_account, 1 );
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
-   c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
-   c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
+   c.set_contract( tester1_account, test_contracts::bls_primitives_test_wasm(),
+                   test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
 
    using test_add = std::tuple<std::string, std::string, std::string, int32_t>;
@@ -96,19 +91,14 @@ BOOST_AUTO_TEST_CASE( bls_testg1add ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testg2add ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -166,19 +156,14 @@ BOOST_AUTO_TEST_CASE( bls_testg2add ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testg1weightedsum ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -276,19 +261,14 @@ BOOST_AUTO_TEST_CASE( bls_testg1weightedsum ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testg2weightedsum ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -386,19 +366,14 @@ BOOST_AUTO_TEST_CASE( bls_testg2weightedsum ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testpairing ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -465,26 +440,21 @@ BOOST_AUTO_TEST_CASE( bls_testpairing ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testg1map ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
 
    using test_add = std::tuple<std::string, std::string, int32_t>;
    const std::vector<test_add> tests = {
-      //test (valid field element) 
+      //test (valid field element)
       {
          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
          "15a40e7d0c871905db43ac11172e2f59acbc93fbd6f29750faf2d5454cfa732a37504ed19ade305c2d338f2b37a0a91133212273e76ea9ea9fdf2be2e8d42f3963cd476abce81651448cf5556b92ff40e28d78a34bc2519f71a06441990f2c09",
@@ -534,26 +504,21 @@ BOOST_AUTO_TEST_CASE( bls_testg1map ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testg2map ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
 
    using test_add = std::tuple<std::string, std::string, int32_t>;
    const std::vector<test_add> tests = {
-      //test (valid field element)     
+      //test (valid field element)
       {
          "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
          "cebf24b3a427ffb720bdd7a6db5d078bf161cd790cec449d9b1dd32dd013f466e29cc28d8419e6d5f9eec96e89208301928865ac51d20bb4d44daec3277a8a42fa6fe995fa25706db09fe33db90d41237efaebb3862e2db05ba3b51821d1670a4159c35b8671620078d842a0c743b14f6034d3a00651f55df8e6cb9038d1ca95b8d2ba46326b2521c3a2d14436e060025cdfaa769a6e8030aebdee3c9a26c627ae764f9b196d26707fac12617c0e4ecf183fe605589d6707da0b3fa47797c604",
@@ -602,19 +567,14 @@ BOOST_AUTO_TEST_CASE( bls_testg2map ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_empty ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -649,19 +609,14 @@ BOOST_AUTO_TEST_CASE( bls_empty ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testfpmul ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -711,19 +666,14 @@ BOOST_AUTO_TEST_CASE( bls_testfpmul ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( bls_testfpexp ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -780,19 +730,14 @@ BOOST_AUTO_TEST_CASE( bls_testfpexp ) { try {
 
 
 BOOST_AUTO_TEST_CASE( bls_testfpmod ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::bls_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
+   c.register_node_owner(tester1_account, 1);
+   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();

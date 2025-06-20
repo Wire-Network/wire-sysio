@@ -172,6 +172,7 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    chain.create_account("testapi"_n);
    chain.create_account("dummy"_n);
    chain.produce_block();
+   chain.add_roa_policy(chain.NODE_DADDY, "testapi"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    chain.set_code("testapi"_n, test_contracts::test_api_wasm());
    chain.produce_block();
 

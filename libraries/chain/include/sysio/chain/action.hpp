@@ -93,6 +93,8 @@ namespace sysio { namespace chain {
          SYS_ASSERT( name == T::get_name(), action_type_exception, "action name is not consistent with action struct"  );
          return fc::raw::unpack<T>(data);
       }
+
+      account_name explicit_payer() const;
    };
 
    template <typename Hasher>

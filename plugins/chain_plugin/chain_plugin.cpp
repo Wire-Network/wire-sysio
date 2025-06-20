@@ -1887,7 +1887,7 @@ read_only::get_scheduled_transactions( const read_only::get_scheduled_transactio
               ("trx_id", itr->trx_id)
               ("sender", itr->sender)
               ("sender_id", itr->sender_id)
-              ("payer", itr->payer)
+              // ("payer", itr->payer)
               ("delay_until", itr->delay_until)
               ("expiration", itr->expiration)
               ("published", itr->published)

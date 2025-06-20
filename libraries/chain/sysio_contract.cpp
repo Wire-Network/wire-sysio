@@ -43,8 +43,8 @@ void validate_authority_precondition( const apply_context& context, const author
       if( a.permission.permission == config::owner_name || a.permission.permission == config::active_name )
          continue; // account was already checked to exist, so its owner and active permissions should exist
 
-      if( a.permission.permission == config::sysio_code_name ) // virtual sysio.code permission does not really exist but is allowed
-         continue;
+      if( a.permission.permission == config::sysio_code_name || a.permission.permission == config::sysio_payer_name )
+         continue; // virtual sysio.code permission does not really exist but is allowed
 
       try {
          context.control.get_authorization_manager().get_permission({a.permission.actor, a.permission.permission});

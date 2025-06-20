@@ -212,6 +212,7 @@ void resource_limits_manager::add_pending_ram_usage( const account_name account,
    if (ram_delta == 0) {
       return;
    }
+   wlog("Adding pending RAM usage of ${ram_delta} to account ${account}", ("ram_delta", ram_delta)("account", account));
 
    const auto& usage  = _db.get<resource_usage_object,by_owner>( account );
 
