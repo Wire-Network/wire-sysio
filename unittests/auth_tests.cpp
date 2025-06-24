@@ -68,6 +68,8 @@ BOOST_FIXTURE_TEST_CASE( delegate_auth, validating_tester ) { try {
    auto original_auth = control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((original_auth));
 
+   // TODO: need to fix this!
+   elog("BUG HERE: Ram usage delta would underflow UINT64_MAX (crediting Alice for a negative delta)");
    set_authority( "alice"_n, config::active_name,  delegated_auth );
 
    auto new_auth = control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
@@ -656,7 +658,9 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
-   trace = chain.push_action("sysio.token"_n, name("transfer"), "tester"_n, fc::mutable_variant_object()
+   trace = chain.push_action("sysio.token"_n, name("transfer"),
+      vector<permission_level>{{"tester"_n, config::active_name},{"tester"_n, config::sysio_payer_name}},
+      fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
        ("quantity", "1.0000 CUR")
