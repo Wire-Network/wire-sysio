@@ -208,26 +208,15 @@ You can invoke them by running `ctest` from a terminal in your build directory a
 ctest -L "nonparallelizable_tests"
 ```
 
-#### Medium and Long-Running Tests
+#### Long-Running Tests
 
-The medium and long-running tests are [medium-to-large](https://testing.googleblog.com/2010/12/test-sizes.html) integration tests that rely on shared resources and take a very long time to run.
+The long-running tests are [medium-to-large](https://testing.googleblog.com/2010/12/test-sizes.html) integration tests that rely on shared resources and take a very long time to run.
 
 You can invoke them by running `ctest` from a terminal in your `build` directory and specifying the following arguments:
 
 ```bash
-ctest -L "medium_running_tests"
-```
-to run the medium length tests or specify the following arguments:
-
-```bash
 ctest -L "long_running_tests"
 ```
-to run the long length tests or specify the following arguments:
-
-```bash
-ctest -L "_running_tests"
-```
-to run both the medium and long length tests.
 
 ---
 
