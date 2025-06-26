@@ -723,4 +723,94 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
 } FC_LOG_AND_RETHROW() }/// delete_auth
 
+// at the bottom of auth_tests.cpp, inside BOOST_AUTO_TEST_SUITE(auth_tests)
+BOOST_FIXTURE_TEST_CASE(ext_permission_protection, validating_tester) {
+   try {
+      // 1) setup accounts and keys
+      create_account(name("alice"));
+      // 'sysio' already exists in genesis
+      auto alice_ext_priv = get_private_key(name("alice"), "ext");
+      auto alice_ext_pub  = alice_ext_priv.get_public_key();
+      auto sysio_priv     = get_private_key(name("sysio"), "active");
+
+      // build signing‐key vectors
+      std::vector<private_key_type> alice_keys;
+      alice_keys.push_back(alice_ext_priv);
+
+      std::vector<private_key_type> sysio_keys;
+      sysio_keys.push_back(sysio_priv);
+
+      // 2) non-sysio may NOT CREATE foo.ext
+      BOOST_CHECK_THROW(
+         set_authority(
+            name("alice"),                // account
+            name("foo.ext"),              // new .ext permission
+            authority(alice_ext_pub),     // authority ctor from pub_key
+            name("active"),               // parent
+            std::vector<permission_level>{{name("alice"), name("active")}},
+            alice_keys
+         ),
+         invalid_permission
+      );
+
+      // 3) sysio CAN CREATE foo.ext
+      set_authority(
+         name("alice"),
+         name("foo.ext"),
+         authority(alice_ext_pub),
+         name("active"),
+         std::vector<permission_level>{{name("sysio"), name("active")}},
+         sysio_keys
+      );
+      produce_blocks();
+
+      // verify creation succeeded
+      {
+         auto obj = find<permission_object, by_owner>(
+            boost::make_tuple(name("alice"), name("foo.ext"))
+         );
+         BOOST_TEST(obj != nullptr);
+         BOOST_TEST(obj->name == name("foo.ext"));
+      }
+
+      // 4) non-sysio may NOT MODIFY foo.ext
+      BOOST_CHECK_THROW(
+         set_authority(
+            name("alice"),
+            name("foo.ext"),
+            authority(alice_ext_pub),     // same pubkey, wrong actor
+            name("active"),
+            std::vector<permission_level>{{name("alice"), name("active")}},
+            alice_keys
+         ),
+         invalid_permission
+      );
+
+      // 5) sysio CAN MODIFY foo.ext
+      authority two_of_two;
+      two_of_two.threshold = 2;
+      two_of_two.keys.emplace_back(key_weight{alice_ext_pub, 1});
+      two_of_two.accounts.emplace_back(permission_level_weight{{name("alice"), name("active")}, 1});
+
+      set_authority(
+         name("alice"),
+         name("foo.ext"),
+         two_of_two,
+         name("active"),
+         std::vector<permission_level>{{name("sysio"), name("active")}},
+         sysio_keys
+      );
+      produce_blocks();
+
+      // verify the threshold bump
+      {
+         auto obj  = get<permission_object, by_owner>(
+            boost::make_tuple(name("alice"), name("foo.ext"))
+         );
+         auto auth = obj.auth.to_authority();
+         BOOST_TEST(auth.threshold == 2u);
+      }
+
+} FC_LOG_AND_RETHROW() } // ext_permission_protection
+
 BOOST_AUTO_TEST_SUITE_END()
