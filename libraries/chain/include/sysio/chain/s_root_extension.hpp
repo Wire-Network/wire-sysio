@@ -12,7 +12,7 @@ struct s_header {
     uint32_t           previous_block_num = 0;
 
     s_header() = default;
-    s_header(const name& contract, const checksum256_type& prev, const checksum256_type& curr, const checksum256_type& root, uint32_t prev_bn = 0)
+    s_header(const name& contract, const checksum256_type& prev, const checksum256_type& curr, const checksum256_type& root, uint32_t prev_bn)
     : contract_name(contract), previous_s_id(prev), current_s_id(curr), current_s_root(root), previous_block_num(prev_bn) {}
 
     // Copy constructor (default)

@@ -79,7 +79,7 @@ namespace sysio::chain {
 
       /**
        *  Returns the suffix.
-       *  for exmaple:
+       *  for example:
        *    "sysio.any" -> "any"
        *    "sysio" -> "sysio"
        */
@@ -115,7 +115,7 @@ namespace sysio::chain {
 
       /**
        *  Returns the prefix.
-       *  for exmaple:
+       *  for example:
        *    "sysio.any" -> "sysio"
        *    "sysio" -> "sysio"
        */
