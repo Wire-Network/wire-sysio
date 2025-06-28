@@ -164,6 +164,8 @@ namespace sysio { namespace testing {
          static const uint32_t DEFAULT_BILLED_CPU_TIME_US = 2000;
          static const fc::microseconds abi_serializer_max_time;
 
+         static constexpr auto NODE_DADDY = "nodedaddy"_n;
+
          virtual ~base_tester() {};
 
          void              init(const setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::HEAD, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{});
@@ -214,6 +216,7 @@ namespace sysio { namespace testing {
 
          [[nodiscard]]
          action_result            push_action(action&& cert_act, uint64_t authorizer); // TODO/QUESTION: Is this needed?
+         action_result            push_paid_action(action&& cert_act, uint64_t authorizer); // TODO/QUESTION: Is this needed?
 
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
@@ -280,6 +283,8 @@ namespace sysio { namespace testing {
 
          transaction_trace_ptr register_node_owner( account_name account, uint32_t tier );
          transaction_trace_ptr add_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen, uint32_t time_block );
+         transaction_trace_ptr expand_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen );
+         transaction_trace_ptr reduce_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen );
 
 
          transaction_trace_ptr push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
@@ -320,6 +325,8 @@ namespace sysio { namespace testing {
             return get_private_key<KeyType>( keyname, role ).get_public_key();
          }
 
+
+         void              set_contract( account_name contract, const vector<uint8_t>& wasm, const std::string& abi_json );
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
          void              set_abi( account_name name, const std::string& abi_json, const private_key_type* signer = nullptr );

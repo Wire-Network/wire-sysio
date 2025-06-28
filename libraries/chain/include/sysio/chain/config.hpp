@@ -32,6 +32,7 @@ const static name active_name     { "active"_n };
 const static name owner_name      { "owner"_n };
 const static name sysio_any_name  { "sysio.any"_n };
 const static name sysio_code_name { "sysio.code"_n };
+const static name sysio_payer_name { "sysio.payer"_n };
 
 const static int      block_interval_ms = 500;
 const static int      block_interval_us = block_interval_ms*1000;

@@ -24,6 +24,7 @@ public:
       produce_blocks( 2 );
 
       create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n } );
+      add_roa_policy(NODE_DADDY, "alice"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
       produce_blocks( 2 );
 
       set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
@@ -45,7 +46,7 @@ public:
       act.name    = name;
       act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
 
-      return base_tester::push_action( std::move(act), signer.to_uint64_t() );
+      return base_tester::push_paid_action( std::move(act), signer.to_uint64_t() );
    }
 
    fc::variant get_stats( const string& symbolname )

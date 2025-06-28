@@ -350,18 +350,24 @@ public:
          ("issuer",       manager )
          ("maximum_supply", maxsupply );
 
-      base_tester::push_action(contract, "create"_n, contract, act );
+      base_tester::push_action(contract, "create"_n,
+         {permission_level(contract, config::active_name), permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         act );
    }
 
    void issue( name to, const asset& amount, name manager = config::system_account_name ) {
-      base_tester::push_action( "sysio.token"_n, "issue"_n, manager, mutable_variant_object()
+      base_tester::push_action( "sysio.token"_n, "issue"_n,
+         {permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         mutable_variant_object()
                                 ("to",      to )
                                 ("quantity", amount )
                                 ("memo", "")
                                 );
    }
    void transfer( name from, name to, const asset& amount, name manager = config::system_account_name ) {
-      base_tester::push_action( "sysio.token"_n, "transfer"_n, manager, mutable_variant_object()
+      base_tester::push_action( "sysio.token"_n, "transfer"_n,
+         {permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
                                 ("quantity", amount)
