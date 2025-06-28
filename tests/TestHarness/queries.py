@@ -197,11 +197,12 @@ class NodeopQueries:
 
         return value
 
-    def getBlock(self, blockNum, silentErrors=False, exitOnError=False):
+    def getBlock(self, blockNum, silentErrors=False, exitOnError=False, headerState=False):
         """Given a blockId will return block details."""
         assert(isinstance(blockNum, int))
         cmdDesc="get block"
-        cmd="%s %d" % (cmdDesc, blockNum)
+        headerStateArg="--header-state" if headerState else ""
+        cmd="%s %d %s" % (cmdDesc, blockNum, headerStateArg)
         msg="(block number=%s)" % (blockNum);
         return self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
 

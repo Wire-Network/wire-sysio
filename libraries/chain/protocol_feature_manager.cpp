@@ -333,6 +333,21 @@ which is derived by its own digest.
 */
             {builtin_protocol_feature_t::disable_deferred_trxs_stage_2}
          } )
+         (  builtin_protocol_feature_t::multiple_state_roots_supported, builtin_protocol_feature_spec{
+            "MULTIPLE_STATE_ROOTS_SUPPORTED",
+            fc::variant("6ac2d8207483f9cc03dba857167c6a5e3ee1b5e5ddb23fdb968aff30d9310636").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+/*
+Builtin protocol feature: MULTIPLE_STATE_ROOTS_SUPPORTED
+
+Initial implementation of s_root just supported one contract. Now there can
+be multiple and the s_header will use the contract_name to distinguish
+between which s_root is being reported and there is also an Operator
+Registration root for facilitating tracking of the list of operators that
+are acknowledged by all external blockchains.
+*/
+            {}
+         } )
    ;
 
 
