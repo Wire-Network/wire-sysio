@@ -88,9 +88,9 @@ set_tests_properties(nodeop_sanity_test PROPERTIES LABELS nonparallelizable_test
 add_test(NAME nodeop_run_test COMMAND tests/nodeop_run_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_run_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 add_test(NAME block_log_util_test COMMAND tests/block_log_util_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(block_log_util_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(block_log_util_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME block_log_retain_blocks_test COMMAND tests/block_log_retain_blocks_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(block_log_retain_blocks_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(block_log_retain_blocks_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 option(ABIEOS_ONLY_LIBRARY "define and build the ABIEOS library" ON)
 set(ABIEOS_INSTALL_COMPONENT "dev")
@@ -114,68 +114,68 @@ add_executable(ship_streamer ship_streamer.cpp)
 target_link_libraries(ship_streamer abieos Boost::program_options Boost::system Boost::asio Boost::beast Threads::Threads)
 
 add_test(NAME cluster_launcher COMMAND tests/cluster_launcher.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(cluster_launcher PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(cluster_launcher PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME ship_test COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(ship_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(ship_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE} --unix-socket WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(ship_test_unix PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME ship_streamer_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(ship_streamer_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
+set_tests_properties(ship_streamer_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(p2p_dawn515_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME producer-preactivate-feature-test COMMAND tests/prod_preactivation_test.py ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST producer-preactivate-feature-test PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST producer-preactivate-feature-test PROPERTY LABELS nonparallelizable_failing_tests)
 add_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feature_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_protocol_feature_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 add_test(NAME compute_transaction_test COMMAND tests/compute_transaction_test.py -v -p 2 -n 3 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(compute_transaction_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(compute_transaction_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 add_test(NAME read-only-trx-basic-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 1 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST read-only-trx-basic-test PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME read-only-trx-parallel-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 16 --num-test-runs 3 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST read-only-trx-parallel-test PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST read-only-trx-parallel-test PROPERTY LABELS long_running_tests)
 add_test(NAME read-only-trx-parallel-sys-vm-oc-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable all --read-only-threads 16 --num-test-runs 3 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST read-only-trx-parallel-sys-vm-oc-test PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST read-only-trx-parallel-sys-vm-oc-test PROPERTY LABELS long_running_tests)
 add_test(NAME read-only-trx-parallel-no-oc-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable none --read-only-threads 6 --num-test-runs 2 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST read-only-trx-parallel-no-oc-test PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST read-only-trx-parallel-no-oc-test PROPERTY LABELS long_running_tests)
 add_test(NAME subjective_billing_test COMMAND tests/subjective_billing_test.py -v -p 2 -n 4 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(subjective_billing_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(subjective_billing_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 add_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(get_account_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(get_account_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME distributed-transactions-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST distributed-transactions-test PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST distributed-transactions-test PROPERTY LABELS long_running_tests)
 add_test(NAME distributed-transactions-speculative-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 --speculative -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST distributed-transactions-speculative-test PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME restart-scenarios-test-resync COMMAND tests/restart-scenarios-test.py -c resync -p4 -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST restart-scenarios-test-resync PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST restart-scenarios-test-resync PROPERTY LABELS long_running_tests)
 add_test(NAME restart-scenarios-test-hard_replay COMMAND tests/restart-scenarios-test.py -c hardReplay -p4 -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST restart-scenarios-test-hard_replay PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME restart-scenarios-test-none COMMAND tests/restart-scenarios-test.py -c none --kill-sig term -p4 -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST restart-scenarios-test-none PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST restart-scenarios-test-none PROPERTY LABELS long_running_tests)
 add_test(NAME terminate-scenarios-test-resync COMMAND tests/terminate-scenarios-test.py -c resync --terminate-at-block 10 --kill-sig term ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST terminate-scenarios-test-resync PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST terminate-scenarios-test-resync PROPERTY LABELS long_running_tests)
 add_test(NAME terminate-scenarios-test-replay COMMAND tests/terminate-scenarios-test.py -c replay --terminate-at-block 10 --kill-sig term ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST terminate-scenarios-test-replay PROPERTY LABELS nonparallelizable_tests)
 add_test(NAME terminate-scenarios-test-hard_replay COMMAND tests/terminate-scenarios-test.py -c hardReplay --terminate-at-block 10 --kill-sig term ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_property(TEST terminate-scenarios-test-hard_replay PROPERTY LABELS nonparallelizable_tests)
+set_property(TEST terminate-scenarios-test-hard_replay PROPERTY LABELS long_running_tests)
 add_test(NAME validate_dirty_db_test COMMAND tests/validate-dirty-db.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(validate_dirty_db_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 add_test(NAME kiod_auto_launch_test COMMAND tests/kiod_auto_launch_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(kiod_auto_launch_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 add_test(NAME nodeop_snapshot_diff_test COMMAND tests/nodeop_snapshot_diff_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_snapshot_diff_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_snapshot_diff_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME nodeop_snapshot_forked_test COMMAND tests/nodeop_snapshot_forked_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_snapshot_forked_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_snapshot_forked_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME trx_finality_status_test COMMAND tests/trx_finality_status_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(trx_finality_status_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(trx_finality_status_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME trx_finality_status_forked_test COMMAND tests/trx_finality_status_forked_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(trx_finality_status_forked_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(trx_finality_status_forked_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME db_modes_test COMMAND tests/db_modes_test.sh -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(db_modes_test PROPERTIES COST 6000)
@@ -183,14 +183,14 @@ add_test(NAME release-build-test COMMAND tests/release-build.sh WORKING_DIRECTOR
 add_test(NAME version-label-test COMMAND tests/version-label.sh "v${VERSION_FULL}" WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME full-version-label-test COMMAND tests/full-version-label.sh "v${VERSION_FULL}" ${CMAKE_SOURCE_DIR} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME nested_container_multi_index_test COMMAND tests/nested_container_multi_index_test.py -n 2 WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nested_container_multi_index_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nested_container_multi_index_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(p2p_multiple_listen_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(p2p_multiple_listen_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 add_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(p2p_no_listen_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 add_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(p2p_sync_throttle_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(p2p_sync_throttle_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 # needs iproute-tc or iproute2 depending on platform
 #add_test(NAME p2p_high_latency_test COMMAND tests/p2p_high_latency_test.py -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -203,13 +203,15 @@ add_test(NAME nodeop_forked_chain_lr_test COMMAND tests/nodeop_forked_chain_test
 set_tests_properties(nodeop_forked_chain_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v --wallet-port 9901 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_contrl_c_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_contrl_c_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_voting_lr_test COMMAND tests/nodeop_voting_test.py -v --wallet-port 9902 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_voting_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_voting_lr_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
+# ERROR - "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)"
 
 add_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
+# ERROR - "Contract cannot pay and no distinct user found to fallback"
 
 add_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_irreversible_mode_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
@@ -224,10 +226,10 @@ add_test(NAME nodeop_startup_catchup_lr_test COMMAND tests/nodeop_startup_catchu
 set_tests_properties(nodeop_startup_catchup_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_short_fork_take_over_test COMMAND tests/nodeop_short_fork_take_over_test.py -v --wallet-port 9905 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_short_fork_take_over_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_short_fork_take_over_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_extra_packed_data_test COMMAND tests/nodeop_extra_packed_data_test.py -v -p 2 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_extra_packed_data_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_extra_packed_data_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_producer_watermark_lr_test COMMAND tests/nodeop_producer_watermark_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_producer_watermark_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
@@ -239,10 +241,10 @@ add_test(NAME nodeop_retry_transaction_lr_test COMMAND tests/nodeop_retry_transa
 set_tests_properties(nodeop_retry_transaction_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME cli_test COMMAND tests/cli_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(cli_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(cli_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME larger_lib_test COMMAND tests/large-lib-test.py ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(larger_lib_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(larger_lib_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(http_plugin_test PROPERTIES TIMEOUT 100)
@@ -250,15 +252,15 @@ set_tests_properties(http_plugin_test PROPERTIES LABELS nonparallelizable_tests 
 
 add_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(plugin_http_api_test PROPERTIES TIMEOUT 50)
-set_tests_properties(plugin_http_api_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(plugin_http_api_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(plugin_http_category_api_test PROPERTIES TIMEOUT 50 ENVIRONMENT "PLUGIN_HTTP_TEST_CATEGORY=ON")
-set_tests_properties(plugin_http_category_api_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(plugin_http_category_api_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(trace_plugin_test PROPERTIES TIMEOUT 300)
-set_tests_properties(trace_plugin_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(trace_plugin_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(resource_monitor_plugin_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
@@ -267,13 +269,13 @@ add_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_transa
 set_tests_properties(nodeop_repeat_transaction_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(light_validation_sync_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(light_validation_sync_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(auto_bp_peering_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME gelf_test COMMAND tests/gelf_test.py ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(gelf_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(gelf_test PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 add_test(NAME performance_test_bp COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testBpOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_api COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -290,13 +292,13 @@ set_tests_properties(performance_test_bp PROPERTIES LABELS long_running_tests RU
 set_tests_properties(performance_test_api PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 set_tests_properties(performance_test_read_only_trxs PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 set_tests_properties(performance_test_cpu_trx_spec PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_p2p PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_http PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_transfer_trx_spec PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_new_acct_trx_spec PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_cpu_trx_spec PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_ram_trx_spec PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
-set_tests_properties(performance_test_basic_read_only_trxs PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_p2p PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_http PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_transfer_trx_spec PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_new_acct_trx_spec PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_cpu_trx_spec PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_ram_trx_spec PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(performance_test_basic_read_only_trxs PROPERTIES LABELS nonparallelizable_failing_tests RUN_SERIAL TRUE)
 
 if(ENABLE_COVERAGE_TESTING)
 
