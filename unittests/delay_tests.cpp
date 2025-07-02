@@ -36,22 +36,25 @@ static void create_accounts(validating_tester& chain) {
    chain.produce_blocks();
    chain.create_account("tester"_n);
    chain.create_account("tester2"_n);
+   chain.add_roa_policy(chain.NODE_DADDY, "tester"_n, "1.0000 EOS", "1.0000 EOS", "1.0000 EOS", 0, 0);
    chain.produce_blocks(10);
 }
 
-static void propose_approve_msig_trx(validating_tester& chain, const name& proposal_name, const permission_level& perm, const fc::variant& pretty_trx) {
+static void propose_approve_msig_trx(validating_tester& chain, const name& proposal_name, const name& auth, const fc::variant& pretty_trx) {
+   permission_level perm = { auth, config::active_name };
    vector<permission_level> requested_perm = { perm };
+   vector<permission_level> perm_with_payer = { perm, {auth, config::sysio_payer_name} };
    transaction trx;
    abi_serializer::from_variant(pretty_trx, trx, chain.get_resolver(), abi_serializer::create_yield_function(chain.abi_serializer_max_time));
 
-   chain.push_action("sysio.msig"_n, "propose"_n, vector<permission_level>{perm},
+   chain.push_action("sysio.msig"_n, "propose"_n, perm_with_payer,
       mvo()
          ("proposer",      "tester")
          ("proposal_name", proposal_name)
          ("trx",           trx)
          ("requested",     requested_perm)
    );
-   chain.push_action("sysio.msig"_n, "approve"_n, vector<permission_level>{perm},
+   chain.push_action("sysio.msig"_n, "approve"_n, perm_with_payer,
       mvo()
          ("proposer",      "tester")
          ("proposal_name", proposal_name)
@@ -59,7 +62,7 @@ static void propose_approve_msig_trx(validating_tester& chain, const name& propo
    );
 }
 
-static void propose_approve_msig_token_transfer_trx(validating_tester& chain, const name& proposal_name, const permission_level& perm, uint32_t delay_sec, const std::string& quantity) {
+static void propose_approve_msig_token_transfer_trx(validating_tester& chain, const name& proposal_name, const name& auth, uint32_t delay_sec, const std::string& quantity) {
    fc::variant pretty_trx = mvo()
       ("expiration", "2020-01-01T00:30")
       ("ref_block_num", 2)
@@ -71,7 +74,7 @@ static void propose_approve_msig_token_transfer_trx(validating_tester& chain, co
          mvo()
             ("account", name("sysio.token"_n))
             ("name", "transfer")
-            ("authorization", vector<permission_level>{perm})
+            ("authorization", vector<permission_level>{{auth, config::active_name}})
             ("data", fc::mutable_variant_object()
                ("from", name("tester"_n))
                ("to", name("tester2"_n))
@@ -80,11 +83,10 @@ static void propose_approve_msig_token_transfer_trx(validating_tester& chain, co
             )
       })
    );
-
-   propose_approve_msig_trx(chain, proposal_name, perm, pretty_trx);
+   propose_approve_msig_trx(chain, proposal_name, auth, pretty_trx);
 }
 
-static void propose_approve_msig_updateauth_trx(validating_tester& chain, const name& proposal_name, const permission_level& perm, uint32_t delay_sec) {
+static void propose_approve_msig_updateauth_trx(validating_tester& chain, const name& proposal_name, const name& auth, uint32_t delay_sec) {
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("expiration", "2020-01-01T00:30")
       ("ref_block_num", 2)
@@ -106,10 +108,10 @@ static void propose_approve_msig_updateauth_trx(validating_tester& chain, const 
       })
    );
 
-   propose_approve_msig_trx(chain, proposal_name, perm, pretty_trx);
+   propose_approve_msig_trx(chain, proposal_name, auth, pretty_trx);
 }
 
-static void propose_approve_msig_linkauth_trx(validating_tester& chain, const name& proposal_name, const name& requirement, const permission_level& perm, uint32_t delay_sec) {
+static void propose_approve_msig_linkauth_trx(validating_tester& chain, const name& proposal_name, const name& requirement, const name& auth, uint32_t delay_sec) {
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("expiration", "2020-01-01T00:30")
       ("ref_block_num", 2)
@@ -131,10 +133,10 @@ static void propose_approve_msig_linkauth_trx(validating_tester& chain, const na
       })
    );
 
-   propose_approve_msig_trx(chain, proposal_name, perm, pretty_trx);
+   propose_approve_msig_trx(chain, proposal_name, auth, pretty_trx);
 }
 
-static void propose_approve_msig_unlinkauth_trx(validating_tester& chain, const name& proposal_name, const permission_level& perm, uint32_t delay_sec) {
+static void propose_approve_msig_unlinkauth_trx(validating_tester& chain, const name& proposal_name, const name& auth, uint32_t delay_sec) {
    fc::variant pretty_trx = mvo()
       ("expiration", "2020-01-01T00:30")
       ("ref_block_num", 2)
@@ -155,7 +157,7 @@ static void propose_approve_msig_unlinkauth_trx(validating_tester& chain, const 
       })
    );
 
-   propose_approve_msig_trx(chain, proposal_name, perm, pretty_trx);
+   propose_approve_msig_trx(chain, proposal_name, auth, pretty_trx);
 }
 
 static void exec_msig_trx(validating_tester& chain, name proposal_name, const vector<permission_level>& perm) {
@@ -287,7 +289,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
    // propose and approve an msig trx that transfers "quantity" tokens
    // from tester to tester2 with a delay of "delay_seconds"
    constexpr name proposal_name = "prop1"_n;
-   propose_approve_msig_token_transfer_trx(chain, proposal_name, { "tester"_n, config::active_name }, 10, "3.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, proposal_name, "tester"_n, 10, "3.0000 CUR");
 
    chain.produce_blocks();
 
@@ -399,7 +401,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_parent_permission_test ) { try {
    // Propose and approve an msig trx that transfers "quantity" tokens
    // from tester to tester2 with a delay of "delay_seconds"
    constexpr name proposal_name = "prop1"_n;
-   propose_approve_msig_token_transfer_trx(chain, proposal_name, { "tester"_n, config::owner_name }, 15, "3.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, proposal_name, "tester"_n, 15, "3.0000 CUR");
 
    liquid_balance = get_currency_balance(chain, "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("99.0000 CUR"), liquid_balance);
@@ -523,7 +525,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
    // propose and approve an msig trx that transfers "quantity" tokens
    // from tester to tester2 with a delay of "delay_seconds"
    constexpr name proposal_name = "prop1"_n;
-   propose_approve_msig_token_transfer_trx(chain, proposal_name, { "tester"_n, config::active_name }, 20, "3.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, proposal_name, "tester"_n, 20, "3.0000 CUR");
 
    liquid_balance = get_currency_balance(chain, "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("99.0000 CUR"), liquid_balance);
@@ -614,7 +616,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
    constexpr name proposal_1_name     = "prop1"_n;
    constexpr uint32_t delay_seconds = 10;
    constexpr auto quantity          = "1.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, { "tester"_n, config::active_name }, delay_seconds, quantity);
+   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, "tester"_n, delay_seconds, quantity);
 
    chain.produce_blocks();
 
@@ -628,7 +630,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
    // this transaction will be delayed 20 blocks
    constexpr name proposal_2_name     = "prop2"_n;
    constexpr uint32_t delay_seconds_2 = 10;
-   propose_approve_msig_updateauth_trx(chain, proposal_2_name, { "tester"_n, config::active_name }, delay_seconds_2);
+   propose_approve_msig_updateauth_trx(chain, proposal_2_name, "tester"_n, delay_seconds_2);
 
    chain.produce_blocks();
 
@@ -648,7 +650,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
    constexpr name proposal_3_name     = "prop3"_n;
    constexpr uint32_t delay_seconds_3 = 10;
    constexpr auto quantity_3          = "5.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, { "tester"_n, config::active_name }, delay_seconds_3, quantity_3);
+   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, "tester"_n, delay_seconds_3, quantity_3);
 
    chain.produce_blocks();
 
@@ -768,7 +770,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
    constexpr name proposal_1_name     = "prop1"_n;
    constexpr uint32_t delay_seconds = 10;
    constexpr auto quantity          = "1.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, { "tester"_n, config::active_name }, delay_seconds, quantity);
+   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, "tester"_n, delay_seconds, quantity);
 
    chain.produce_blocks();
 
@@ -782,7 +784,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
    // this transaction will be delayed 20 blocks
    constexpr name proposal_2_name     = "prop2"_n;
    constexpr uint32_t delay_seconds_2 = 10;
-   propose_approve_msig_updateauth_trx(chain, proposal_2_name, { "tester"_n, config::active_name }, delay_seconds_2);
+   propose_approve_msig_updateauth_trx(chain, proposal_2_name, "tester"_n, delay_seconds_2);
 
    chain.produce_blocks();
 
@@ -802,7 +804,7 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
    constexpr name proposal_3_name     = "prop3"_n;
    constexpr uint32_t delay_seconds_3 = 10;
    constexpr auto quantity_3          = "5.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, { "tester"_n, config::active_name }, delay_seconds_3, quantity_3);
+   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, "tester"_n, delay_seconds_3, quantity_3);
 
    chain.produce_blocks();
 
@@ -930,7 +932,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_test ) { try {
    constexpr name proposal_1_name     = "prop1"_n;
    constexpr uint32_t delay_seconds = 10;
    constexpr auto quantity          = "1.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, { "tester"_n, config::active_name }, delay_seconds, quantity);
+   propose_approve_msig_token_transfer_trx(chain, proposal_1_name, "tester"_n, delay_seconds, quantity);
 
    chain.produce_blocks();
 
@@ -957,7 +959,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_test ) { try {
    // this transaction will be delayed 20 blocks
    constexpr name proposal_2_name     = "prop2"_n;
    constexpr uint32_t delay_seconds_2 = 10;
-   propose_approve_msig_linkauth_trx(chain, proposal_2_name, "second"_n, { "tester"_n, config::active_name }, delay_seconds_2);
+   propose_approve_msig_linkauth_trx(chain, proposal_2_name, "second"_n, "tester"_n, delay_seconds_2);
 
    chain.produce_blocks();
 
@@ -977,7 +979,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_test ) { try {
    constexpr name proposal_3_name     = "prop3"_n;
    constexpr uint32_t delay_seconds_3 = 10;
    constexpr auto quantity_3          = "5.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, { "tester"_n, config::active_name }, delay_seconds_3, quantity_3);
+   propose_approve_msig_token_transfer_trx(chain, proposal_3_name, "tester"_n, delay_seconds_3, quantity_3);
 
    chain.produce_blocks();
 
@@ -1088,7 +1090,7 @@ BOOST_AUTO_TEST_CASE( link_delay_unlink_test ) { try {
    constexpr name first_trnsfr_propsal_name   = "prop1"_n;
    constexpr uint32_t first_trnsfr_delay_seconds = 10;
    constexpr auto first_trnsfr_quantity          = "1.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, first_trnsfr_propsal_name, { "tester"_n, config::active_name }, first_trnsfr_delay_seconds, first_trnsfr_quantity);
+   propose_approve_msig_token_transfer_trx(chain, first_trnsfr_propsal_name, "tester"_n, first_trnsfr_delay_seconds, first_trnsfr_quantity);
 
    chain.produce_blocks();
 
@@ -1114,7 +1116,7 @@ BOOST_AUTO_TEST_CASE( link_delay_unlink_test ) { try {
 
    // this transaction will be delayed 20 blocks
    constexpr name unlinkauth_proposal_name = "prop2"_n;
-   propose_approve_msig_unlinkauth_trx(chain, unlinkauth_proposal_name, { "tester"_n, config::active_name }, 10);
+   propose_approve_msig_unlinkauth_trx(chain, unlinkauth_proposal_name, "tester"_n, 10);
 
    chain.produce_blocks();
 
@@ -1134,7 +1136,7 @@ BOOST_AUTO_TEST_CASE( link_delay_unlink_test ) { try {
    constexpr name second_trnfr_propsal_name      = "prop3"_n;
    constexpr uint32_t second_trnfr_delay_seconds = 10;
    constexpr auto second_trnfr_quantity          = "5.0000 CUR";
-   propose_approve_msig_token_transfer_trx(chain, second_trnfr_propsal_name, { "tester"_n, config::active_name }, second_trnfr_delay_seconds, second_trnfr_quantity);
+   propose_approve_msig_token_transfer_trx(chain, second_trnfr_propsal_name, "tester"_n, second_trnfr_delay_seconds, second_trnfr_quantity);
 
    chain.produce_blocks();
 
@@ -1257,7 +1259,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
 
    // this transaction will be delayed 20 blocks
    constexpr name first_trnsfr_propsal_name   = "prop1"_n;
-   propose_approve_msig_token_transfer_trx(chain, first_trnsfr_propsal_name, { "tester"_n, config::active_name }, 10, "1.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, first_trnsfr_propsal_name, "tester"_n, 10, "1.0000 CUR");
 
    chain.produce_blocks();
 
@@ -1270,7 +1272,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
 
    // this transaction will be delayed 20 blocks
    constexpr name linkauth_proposal_name  = "prop2"_n;
-   propose_approve_msig_linkauth_trx(chain, linkauth_proposal_name, "third"_n, { "tester"_n, config::active_name }, 10);
+   propose_approve_msig_linkauth_trx(chain, linkauth_proposal_name, "third"_n, "tester"_n, 10);
 
    chain.produce_blocks();
 
@@ -1288,7 +1290,7 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
 
    // this transaction will be delayed 20 blocks
    constexpr name second_trnsfr_propsal_name      = "prop3"_n;
-   propose_approve_msig_token_transfer_trx(chain, second_trnsfr_propsal_name, { "tester"_n, config::active_name }, 10, "5.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, second_trnsfr_propsal_name, "tester"_n, 10, "5.0000 CUR");
 
    chain.produce_blocks();
 
@@ -1926,7 +1928,7 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
    chain.produce_blocks();
    //should be able to create a msig transaction with delay 60 sec, despite permission delay being 30 days, because max_transaction_delay is 60 sec
    constexpr name proposal_name = "prop1"_n;
-   propose_approve_msig_token_transfer_trx(chain, proposal_name, { "tester"_n, config::active_name }, 60, "9.0000 CUR");
+   propose_approve_msig_token_transfer_trx(chain, proposal_name, "tester"_n, 60, "9.0000 CUR");
 
    //check that the delayed msig transaction can be executed after after 60 sec
    chain.produce_blocks(120);
