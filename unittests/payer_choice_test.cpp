@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         const auto &bob_account = account_name("bob");
 
         ilog("Creating accounts: ${a}, ${b}, ${c}", ("a", tester1_account)("b", alice_account)("c", bob_account));
-        c.create_accounts({tester1_account, alice_account, bob_account});
+        c.create_accounts({tester1_account, alice_account, bob_account}, false, true, false);
         c.produce_block();
 
         ilog("Registering bob as node owner and assiging _just_ enough resources to tester1 to load the contract");

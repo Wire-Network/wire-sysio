@@ -552,7 +552,7 @@ namespace sysio { namespace testing {
   }
 
 
-   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code ) {
+   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code, bool include_roa_policy) {
       signed_transaction trx;
       set_transaction_headers(trx);
 
@@ -593,8 +593,29 @@ namespace sysio { namespace testing {
                                    .active   = active_auth,
                                 });
 
+      include_roa_policy &= has_roa;
+      include_roa_policy &= a.prefix() != config::system_account_name;
+      if( include_roa_policy ) {
+         trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
+                                             vector<permission_level>{
+                                                {NODE_DADDY, config::active_name},
+                                             },
+                                             mutable_variant_object()
+                                             ("owner", a)
+                                             ("issuer", NODE_DADDY)
+                                             ("net_weight", "0.0010 SYS")
+                                             ("cpu_weight", "0.0010 SYS")
+                                             ("ram_weight", "1.0000 SYS")
+                                             ("network_gen", 0)
+                                             ("time_block", 0)
+         ));
+      }
+
       set_transaction_headers(trx);
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
+      if (include_roa_policy) {
+         trx.sign( get_private_key( NODE_DADDY, "active" ), control->get_chain_id() );
+      }
       return push_transaction( trx );
    }
 
@@ -1257,7 +1278,7 @@ namespace sysio { namespace testing {
       const auto& roa = "sysio.roa"_n;
 
       // Create the ROA account and mark it as privileged
-      create_account(roa, config::system_account_name);
+      create_account(roa, config::system_account_name, false, true, false);
       set_contract(roa, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,
@@ -1274,9 +1295,10 @@ namespace sysio { namespace testing {
       produce_block();
 
       // Setup default node daddy for easier resource allocation during testing
-      create_account(NODE_DADDY, config::system_account_name);
+      create_account(NODE_DADDY, config::system_account_name, false, true, false);
       register_node_owner(NODE_DADDY, 1);
       produce_block();
+      has_roa = true;
    }
 
    vector<producer_authority> base_tester::get_producer_authorities( const vector<account_name>& producer_names )const {

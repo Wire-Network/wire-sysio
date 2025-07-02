@@ -165,6 +165,7 @@ namespace sysio { namespace testing {
          static const fc::microseconds abi_serializer_max_time;
 
          static constexpr auto NODE_DADDY = "nodedaddy"_n;
+         bool has_roa = false;
 
          virtual ~base_tester() {};
 
@@ -247,12 +248,13 @@ namespace sysio { namespace testing {
 
          vector<transaction_trace_ptr>  create_accounts( vector<account_name> names,
                                                          bool multisig = false,
-                                                         bool include_code = true
+                                                         bool include_code = true,
+                                                         bool include_roa_policy = true
                                                        )
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code, include_roa_policy ) );
             return traces;
          }
 
@@ -278,7 +280,8 @@ namespace sysio { namespace testing {
          transaction_trace_ptr create_account( account_name name,
                                                account_name creator = config::system_account_name,
                                                bool multisig = false,
-                                               bool include_code = true
+                                               bool include_code = true,
+                                               bool include_roa_policy = true
                                              );
 
          transaction_trace_ptr register_node_owner( account_name account, uint32_t tier );
