@@ -522,10 +522,9 @@ vector<account_name> apply_context::get_active_producers() const {
 }
 
 void apply_context::update_db_usage( const account_name& payer, int64_t delta ) {
-   fc::logger::get("default").set_log_level(fc::log_level::debug);
-   wlog("ApplyContext update_db_usage for payer ${payer} of ${delta} bytes,"
-        " privileged ${privileged}, receiver ${receiver}, action ${action} of account ${act_account}",
-        ("payer", payer)("delta", delta)("privileged", privileged)("receiver", receiver)("action", act->name)("act_account", act->account));
+   // wlog("ApplyContext update_db_usage for payer ${payer} of ${delta} bytes,"
+   //      " privileged ${privileged}, receiver ${receiver}, action ${action} of account ${act_account}",
+   //      ("payer", payer)("delta", delta)("privileged", privileged)("receiver", receiver)("action", act->name)("act_account", act->account));
    if( delta > 0 ) {
       if( !(privileged || payer == account_name(receiver)
                || control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) )

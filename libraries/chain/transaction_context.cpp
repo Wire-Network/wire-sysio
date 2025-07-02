@@ -571,8 +571,8 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-      wlog("Calling add_ram_usage with account: ${account}, ram_delta: ${ram_delta}",
-           ("account", account)("ram_delta", ram_delta));
+      // wlog("Calling add_ram_usage with account: ${account}, ram_delta: ${ram_delta}",
+      //      ("account", account)("ram_delta", ram_delta));
       auto& rl = control.get_mutable_resource_limits_manager();
       rl.add_pending_ram_usage( account, ram_delta );
       if( ram_delta > 0 ) {
