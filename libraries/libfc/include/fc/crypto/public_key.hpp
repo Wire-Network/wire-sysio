@@ -14,7 +14,6 @@ namespace fc { namespace crypto {
    namespace config {
       constexpr const char* public_key_legacy_prefix = "SYS";
       constexpr const char* public_key_base_prefix = "PUB";
-      // TODO: Do we need to define new prefixes for ED?
 
       constexpr const char* public_key_prefix[] = {
          "K1",
