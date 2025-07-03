@@ -71,11 +71,23 @@ add_custom_command(
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py
 )
 
+# === locate libsodium ===
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SODIUM REQUIRED libsodium)
+
+if (NOT SODIUM_FOUND)
+  message(FATAL_ERROR "Could not find libsodium (required for ED25519 tests)")
+endif()
+
 ### BUILD UNIT TEST EXECUTABLE ###
 file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
 add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
 
-target_link_libraries( unit_test sysio_chain_wrap state_history chainbase sysio_testing fc custom_appbase abieos ${PLATFORM_SPECIFIC_LIBS} )
+target_link_libraries( unit_test sysio_chain_wrap state_history chainbase sysio_testing fc custom_appbase abieos ${SODIUM_LIBRARIES} ${PLATFORM_SPECIFIC_LIBS} )
+
+# expose sodium include path
+target_include_directories(unit_test PUBLIC ${SODIUM_INCLUDE_DIRS})
+target_compile_options(unit_test PUBLIC ${SODIUM_CFLAGS_OTHER})
 
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 target_include_directories( unit_test PUBLIC

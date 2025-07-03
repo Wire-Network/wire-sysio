@@ -40,3 +40,7 @@
 [submodule "libraries/sys-vm"]
 	path = libraries/sys-vm
 	url = https://github.com/Wire-Network/eos-vm.git
+[submodule "libraries/libsodium"]
+	path = libraries/libsodium
+	url = https://github.com/Wire-Network/libsodium.git
+	branch = stable

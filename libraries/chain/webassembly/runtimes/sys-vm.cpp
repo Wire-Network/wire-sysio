@@ -636,6 +636,7 @@ REGISTER_CF_HOST_FUNCTION( mod_exp );
 REGISTER_CF_HOST_FUNCTION( blake2_f );
 REGISTER_CF_HOST_FUNCTION( sha3 );
 REGISTER_CF_HOST_FUNCTION( k1_recover );
+REGISTER_CF_HOST_FUNCTION( blake2b_256 );
 
 // bls_primitives protocol feature
 REGISTER_CF_HOST_FUNCTION( bls_g1_add );
