@@ -5,7 +5,6 @@
 #include <sysio/chain/webassembly/return_codes.hpp>
 #include <fc/crypto/sha1.hpp>
 #include <boost/hana/string.hpp>
-// #include <fc/crypto/sha256.hpp>
 
 namespace sysio { namespace chain {
 class apply_context;

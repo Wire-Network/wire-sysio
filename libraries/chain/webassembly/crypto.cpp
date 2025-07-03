@@ -47,12 +47,14 @@ namespace sysio::chain::webassembly {
         "Unactivated signature type used during assert_recover_key");
       SYS_ASSERT(p.which() < context.db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
         "Unactivated key type used when creating assert_recover_key");
+      SYS_ASSERT(p.which() == s.which(), crypto_api_exception,
+                 "Public key type does not match signature type");
 
       if(context.control.is_speculative_block())
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
-
-      if( s.which() == 4 ) {
+      // Check if the signature is ED25519
+      if( public_key_prefix[s.which()] == "ED" ) {
          // a) Extract 32 raw bytes from fc::sha256
          auto sha_data = digest->data(); 
          const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
@@ -253,7 +255,7 @@ namespace sysio::chain::webassembly {
    int32_t interface::blake2b_256( span<const char> data, span<char> result ) const {
       // sanity‐check sizes
       if( result.size() != BLAKE2B256_DIGEST_LENGTH )
-         return -1;
+         return return_code::failure;
   
       // BLAKE2B256 takes uint8_t*, so cast away const‐char
       auto in_bytes = reinterpret_cast<const uint8_t*>(data.data());
@@ -261,9 +263,9 @@ namespace sysio::chain::webassembly {
       try {
           BLAKE2B256( in_bytes, data.size(), out_bytes );
       } catch( ... ) {
-          return -1;
+          return return_code::failure;
       }
-      return 0;
+      return return_code::success;
   }
 
    void interface::sha3( span<const char> input, span<char> output, int32_t keccak ) const {

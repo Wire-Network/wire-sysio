@@ -357,7 +357,7 @@ Builtin protocol feature: ED_KEY
 
 Enables usage of ED25519 keys and signatures.
 */
-            {}
+            {builtin_protocol_feature_t::em_key}
          }  )
    ;
 
