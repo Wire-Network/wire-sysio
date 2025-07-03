@@ -221,7 +221,6 @@ BOOST_FIXTURE_TEST_CASE( test_overspend, currency_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( test_fullspend, currency_tester ) try {
    create_accounts( {"alice"_n, "bob"_n} );
-   add_roa_policy(NODE_DADDY, "alice"_n, "1.0000 CUR", "1.0000 CUR", "1.0000 CUR", 0, 0);
 
    // make a transfer from the contract to a user
    {
