@@ -27,7 +27,6 @@ BOOST_AUTO_TEST_SUITE(payloadless_tests)
 BOOST_FIXTURE_TEST_CASE( test_doit, payloadless_tester ) {
    
    create_accounts( {"payloadless"_n} );
-   add_roa_policy(NODE_DADDY, "payloadless"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    set_code( "payloadless"_n, test_contracts::payloadless_wasm() );
    set_abi( "payloadless"_n, test_contracts::payloadless_abi() );
 
@@ -41,7 +40,6 @@ BOOST_FIXTURE_TEST_CASE( test_doit, payloadless_tester ) {
 BOOST_FIXTURE_TEST_CASE( test_abi_serializer, payloadless_tester ) {
 
    create_accounts( {"payloadless"_n} );
-   add_roa_policy(NODE_DADDY, "payloadless"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    set_code( "payloadless"_n, test_contracts::payloadless_wasm() );
    set_abi( "payloadless"_n, test_contracts::payloadless_abi() );
 

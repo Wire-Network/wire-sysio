@@ -73,7 +73,6 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test, validating_tester) { try {
    const string role = "first";
    produce_block();
    create_account(tester_account);
-   add_roa_policy(NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
    const auto trace_ptr = push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
          ("account", tester_account)
@@ -108,7 +107,6 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, validating_tester) { try
    const string role = "first";
    produce_block();
    create_account(tester_account);
-   add_roa_policy(NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
    named_thread_pool<struct test> thread_pool;
    thread_pool.start( 5, {} );
@@ -165,7 +163,6 @@ BOOST_AUTO_TEST_CASE(future_fork_test) { try {
    const auto& tester_account = "tester"_n;
    const string role = "first";
    node_a.create_account(tester_account);
-   node_a.add_roa_policy(node_a.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
    const auto trace_ptr = node_a.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
          ("account", tester_account)
@@ -225,8 +222,6 @@ BOOST_AUTO_TEST_CASE(fork_test) { try {
 
       node_a.create_account(tester_account);
       node_a.create_account(tester_account2);
-      node_a.add_roa_policy(node_a.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
-      node_a.add_roa_policy(node_a.NODE_DADDY, tester_account2, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
       const auto trace_ptr = node_a.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
             ("account", tester_account)
@@ -253,8 +248,6 @@ BOOST_AUTO_TEST_CASE(fork_test) { try {
       // have node B take over from head-1 and also update permissions
       node_b.create_account(tester_account);
       node_b.create_account(tester_account2);
-      node_b.add_roa_policy(node_b.NODE_DADDY, tester_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
-      node_b.add_roa_policy(node_b.NODE_DADDY, tester_account2, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
 
       const auto trace_ptr3 = node_b.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
             ("account", tester_account)

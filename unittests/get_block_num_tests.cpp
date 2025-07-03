@@ -22,7 +22,6 @@ BOOST_AUTO_TEST_CASE( get_block_num ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_contract(tester1_account, test_contracts::get_block_num_test_wasm(),

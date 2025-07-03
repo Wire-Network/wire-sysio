@@ -205,11 +205,6 @@ namespace {
                 auto candice = "candice"_n; // a tier 1 node owner
                 auto fiona = "fiona"_n; // a normal user with a policy grant from candice
                 chain.create_accounts({candice, fiona});
-                chain.register_node_owner(candice, 1);
-                chain.add_roa_policy(candice, fiona,
-                  "10.0000 SYS", "10.0000 SYS", "10.0000 SYS",
-                  0, chain.control->last_irreversible_block_num()
-                );
                 chain.produce_block();
 
                 // Load both accounts with the dancer test contract

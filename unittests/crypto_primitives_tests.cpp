@@ -32,7 +32,6 @@ BOOST_AUTO_TEST_CASE( alt_bn128_add_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -144,7 +143,6 @@ BOOST_AUTO_TEST_CASE( alt_bn128_mul_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -265,7 +263,6 @@ BOOST_AUTO_TEST_CASE( alt_bn128_pair_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -399,7 +396,6 @@ BOOST_AUTO_TEST_CASE( modexp_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -483,7 +479,6 @@ BOOST_AUTO_TEST_CASE( modexp_subjective_limit_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -551,7 +546,6 @@ BOOST_AUTO_TEST_CASE( blake2f_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -672,7 +666,6 @@ BOOST_AUTO_TEST_CASE( keccak256_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -717,7 +710,6 @@ BOOST_AUTO_TEST_CASE( sha3_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -762,7 +754,6 @@ BOOST_AUTO_TEST_CASE( k1_recover_test ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );

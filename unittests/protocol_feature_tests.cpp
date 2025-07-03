@@ -1088,9 +1088,6 @@ BOOST_AUTO_TEST_CASE(steal_my_ram) {
 
       c.create_accounts({tester1_account, alice_account, bob_account, carl_account});
       c.produce_block();
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, alice_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, carl_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
       c.produce_block();
 
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
@@ -1116,8 +1113,6 @@ BOOST_AUTO_TEST_CASE(steal_my_ram) {
          fc_exception_message_is("Requested payer alice did not authorize payment")
       );
 
-      wlog("Adding a ROA policy for bob...");
-      c.add_roa_policy(c.NODE_DADDY, bob_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0, 0);
       c.produce_block();
 
 
@@ -1141,7 +1136,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       const auto &alice_account = account_name("alice");
       const auto &bob_account = account_name("bob");
 
-      c.create_accounts({tester1_account, tester2_account, alice_account, bob_account});
+      c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false);
       // Issuing _only_ enough RAM to load the contracts
       c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
       c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
@@ -1245,7 +1240,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto& bob_account = account_name("bob");
    const auto &carl_account = account_name("carl");
 
-   c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account} );
+   c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
    c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
    c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
    c.produce_block();
