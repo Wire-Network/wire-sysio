@@ -54,7 +54,7 @@ namespace sysio::chain::webassembly {
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
       // Check if the signature is ED25519
-      if( public_key_prefix[s.which()] == "ED" ) {
+      if( fc::crypto::config::public_key_prefix[s.which()] == "ED" ) {
          // a) Extract 32 raw bytes from fc::sha256
          auto sha_data = digest->data(); 
          const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
