@@ -12,7 +12,7 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_test)
    tester main;
 
    // First we create a valid block with valid transaction
-   main.create_account("newacc"_n);
+   main.create_account("newacc"_n, config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_mroot_test)
    tester main;
 
    // First we create a valid block with valid transaction
-   main.create_account("newacc"_n);
+   main.create_account("newacc"_n, config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_mroot_test)
 
 std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(validating_tester& main, account_name act_name) {
    // First we create a valid block with valid transaction
-   main.create_account(act_name);
+   main.create_account(act_name, config::system_account_name, false, true, false);
    signed_block_ptr b = main.produce_block_no_validation();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(trusted_producer_test)
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod);
+       main.create_account(prod, config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(trusted_producer_verify_2nd_test)
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod);
+       main.create_account(prod, config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
@@ -188,7 +188,7 @@ BOOST_AUTO_TEST_CASE(untrusted_producer_test)
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod);
+       main.create_account(prod, config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
