@@ -259,10 +259,12 @@ namespace sysio { namespace testing {
                builtin_protocol_feature_t::ram_restrictions,
                builtin_protocol_feature_t::webauthn_key,
                builtin_protocol_feature_t::wtmsig_block_signatures,
-               builtin_protocol_feature_t::em_key
+               builtin_protocol_feature_t::em_key,
+               builtin_protocol_feature_t::get_block_num,
             });
             produce_block();
             set_bios_contract();
+            init_roa();
             break;
          }
          case setup_policy::full:
@@ -605,7 +607,7 @@ namespace sysio { namespace testing {
                                              ("issuer", NODE_DADDY)
                                              ("net_weight", "0.0010 SYS")
                                              ("cpu_weight", "0.0010 SYS")
-                                             ("ram_weight", "1.0000 SYS")
+                                             ("ram_weight", "2.0000 SYS")
                                              ("network_gen", 0)
                                              ("time_block", 0)
          ));
