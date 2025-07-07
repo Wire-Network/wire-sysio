@@ -270,7 +270,7 @@ struct controller_impl {
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
    unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
 
-   void set_s_header( deque<s_header>&& s_headers );
+   void set_s_headers( deque<s_header>&& s_headers );
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1633,7 +1633,7 @@ struct controller_impl {
                fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
                                 std::move(trx_context.executed_action_receipt_digests) );
                 if ( !trx->is_dry_run() ) {
-                   // call the accept signal but only once for this transaction
+                  // call the accept signal but only once for this transaction
                    if (!trx->accepted) {
                        trx->accepted = true;
                        emit(self.accepted_transaction, trx);
@@ -1879,7 +1879,7 @@ struct controller_impl {
 
       if( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
          dlog("finalize_block: merkle_processor is present, setting s_header for block ${n}", ("n", pbhs.block_num));
-         set_s_header( merkle_processor->get_s_headers( pbhs.block_num ) );
+         set_s_headers( merkle_processor->get_s_headers( pbhs.block_num ) );
       }
 
       for (const auto& header : bb._s_header){
@@ -1979,7 +1979,7 @@ struct controller_impl {
          }
 
          emit( self.accepted_block, bsp );
-         
+
          if( s == controller::block_status::incomplete ) {
             log_irreversible();
          }
@@ -3134,8 +3134,8 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
    my->conf.key_blacklist = new_key_blacklist;
 }
 
-void controller_impl::set_s_header( deque<s_header>&& s_headers ) {
-   SYS_ASSERT( pending, block_validate_exception, "it is not valid to set_s_header when there is no pending block");
+void controller_impl::set_s_headers( deque<s_header>&& s_headers ) {
+   SYS_ASSERT( pending, block_validate_exception, "it is not valid to set_s_headers when there is no pending block");
    SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finalize_block");
    // Try to set it first in the pending block
    auto& bb = std::get<building_block>(pending->_block_stage);

@@ -4,6 +4,7 @@
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/sub_chain_plugin/sub_chain_plugin.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #include <sysio/version/version.hpp>
 
@@ -170,7 +171,7 @@ int main(int argc, char** argv)
          .default_http_port = 8888,
          .server_header = nodeop::config::node_executable_name + "/" + app->version_string()
       });
-      if(!app->initialize<chain_plugin, net_plugin, producer_plugin, resource_monitor_plugin>(argc, argv, initialize_logging)) {
+      if(!app->initialize<chain_plugin, net_plugin, producer_plugin, sub_chain_plugin, resource_monitor_plugin>(argc, argv, initialize_logging)) {
          const auto& opts = app->get_options();
          if( opts.count("help") || opts.count("version") || opts.count("full-version") || opts.count("print-default-config") ) {
             on_exit.cancel();
