@@ -649,9 +649,17 @@ namespace sysio { namespace chain {
 
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
-            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                        "transaction declares authority '${auth}', but does not have signatures for it.",
-                        ("auth", declared_auth) );
+            if (declared_auth.permission == config::sysio_payer_name) {
+               auto active_auth = permission_level{declared_auth.actor, config::active_name};
+               SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
+                           "transaction declares payer authority '${auth}', but does not have signatures for it.",
+                           ("auth", active_auth) );
+
+            } else {
+               SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
+                           "transaction declares authority '${auth}', but does not have signatures for it.",
+                           ("auth", declared_auth) );
+            }
          }
       }
 
