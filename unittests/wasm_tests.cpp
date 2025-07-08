@@ -654,7 +654,7 @@ BOOST_FIXTURE_TEST_CASE( check_global_reset, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 //Make sure we can create a wasm with maximum pages, but not grow it any
-BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
    if(policy != setup_policy::full)
       t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
@@ -691,7 +691,7 @@ BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::preactivate_feature
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
    if(policy != setup_policy::full)
       t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
@@ -887,7 +887,7 @@ BOOST_FIXTURE_TEST_CASE( nested_limit_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
-BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
    if(policy != setup_policy::full)
       t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
@@ -1691,7 +1691,7 @@ BOOST_FIXTURE_TEST_CASE( big_maligned_host_ptr, validating_tester ) try {
    produce_blocks(1);
 } FC_LOG_AND_RETHROW()
 
-BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
    if(policy != setup_policy::full)
       t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
@@ -1749,6 +1749,9 @@ BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::preactivate_featur
 
 BOOST_AUTO_TEST_CASE( varuint_memory_flags_tests ) try {
    validating_tester t(flat_set<account_name>{}, {}, setup_policy::preactivate_feature_and_new_bios);
+   t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::get_block_num});
+   t.produce_block();
+   t.init_roa();
    t.produce_block();
 
    t.create_accounts( {"memflags"_n} );
@@ -2240,7 +2243,8 @@ BOOST_FIXTURE_TEST_CASE( memory_mapping_test, validating_tester ) try {
       uint64_t name_value;
       ss >> name_value;
       auto acct = name(name_value);
-      create_accounts({acct});
+      create_accounts({acct}, false, true, false);
+      add_roa_policy(NODE_DADDY, acct, "0.0001 SYS", "0.0001 SYS", "0.0200 SYS", 0, 0);
 
       std::string contract_wast = mem_map_wast_start + " " + std::to_string(i) + mem_map_wast_end;
       set_code(acct, contract_wast.c_str());
