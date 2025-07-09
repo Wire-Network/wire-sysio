@@ -5,7 +5,7 @@
 
 namespace sysio { namespace chain {
 
-block_root_processor::block_root_processor(chainbase::database& db, root_processor_ptr processor)
+block_root_processor::block_root_processor(chainbase::database& db, root_processor_ptr&& processor)
 : _db(db)
 , _processor(std::move(processor)) {
    ilog("block_root_processor initialized");

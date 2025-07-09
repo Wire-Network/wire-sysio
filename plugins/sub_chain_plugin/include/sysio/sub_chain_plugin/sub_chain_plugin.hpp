@@ -11,9 +11,10 @@
 namespace sysio {
 
 using namespace appbase;
-
-struct sub_chain_plugin_impl;
-using sub_chain_plugin_impl_ptr = std::unique_ptr<sub_chain_plugin_impl>;
+namespace chain {
+   struct root_processor;
+   using root_processor_ptr = std::shared_ptr<root_processor>;
+}
 
 class sub_chain_plugin : public appbase::plugin<sub_chain_plugin> {
    public:
@@ -27,7 +28,6 @@ class sub_chain_plugin : public appbase::plugin<sub_chain_plugin> {
       void plugin_shutdown();
 
    private:
-      std::unique_ptr<sub_chain_plugin_impl> my;
    };
 
 }

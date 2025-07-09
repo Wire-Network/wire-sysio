@@ -9,7 +9,6 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
-#include <sysio/sub_chain_plugin/sub_chain_plugin.hpp>
 #include <sysio/chain/s_root_extension.hpp>
 
 #include <fc/io/json.hpp>

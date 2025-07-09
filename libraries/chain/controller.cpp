@@ -27,6 +27,8 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/platform_timer.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <sysio/chain/contract_action_match.hpp>
+#include <sysio/chain/root_txn_identification.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <sysio/vm/allocator.hpp>
@@ -270,7 +272,9 @@ struct controller_impl {
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
    unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
 
-   void set_s_headers( deque<s_header>&& s_headers );
+   bool are_multiple_state_roots_supported() const;
+
+   void set_s_headers( uint32_t block_num );
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1877,10 +1881,7 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
-      if( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
-         dlog("finalize_block: merkle_processor is present, setting s_header for block ${n}", ("n", pbhs.block_num));
-         set_s_headers( merkle_processor->get_s_headers( pbhs.block_num ) );
-      }
+      set_s_headers( pbhs.block_num );
 
       for (const auto& header : bb._s_header){
         ilog("s_header present in finalize block, adding to block header: ${s}", ("s", header.to_string()));
@@ -2173,7 +2174,7 @@ struct controller_impl {
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
                         ("producer_block_id", producer_block_id)("validator_block_id", ab._id) );
          }
-         if( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         if( are_multiple_state_roots_supported() ) {
             // New: Process the s_header from block header extensions
             auto rcvd_it = b->header_extensions.begin();
             const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
@@ -3134,12 +3135,23 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
    my->conf.key_blacklist = new_key_blacklist;
 }
 
-void controller_impl::set_s_headers( deque<s_header>&& s_headers ) {
+bool controller_impl::are_multiple_state_roots_supported() const {
+   if ( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+      return true;
+   }
+
+   return false;
+}
+
+void controller_impl::set_s_headers( uint32_t block_num ) {
+   if( !are_multiple_state_roots_supported() ) {
+      return; // No need to set s_headers if multiple state roots are not supported
+   }
    SYS_ASSERT( pending, block_validate_exception, "it is not valid to set_s_headers when there is no pending block");
    SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finalize_block");
    // Try to set it first in the pending block
    auto& bb = std::get<building_block>(pending->_block_stage);
-   bb._s_header = std::move(s_headers); // Attempt to set s-header
+   bb._s_header = merkle_processor->get_s_headers( block_num );
 }
 
 void controller::set_disable_replay_opts( bool v ) {
@@ -3825,9 +3837,29 @@ bool controller::is_irreversible_state_available() const {
    return !!my->slog;
 }
 
-void controller::create_root_processor(const root_processor_ptr& rp) {
-   SYS_ASSERT( !my->merkle_processor, misc_exception, "Attempting to create the merkle_processor a second time" );
-   my->merkle_processor = std::make_shared<block_root_processor>(my->db, rp);
+void controller::initialize_root_extensions(contract_action_matches&& matches) {
+      auto root_txn_ident = std::make_shared<root_txn_identification>(
+         std::move(matches)
+      );
+      applied_transaction.connect(
+         [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
+            }
+         } );
+      accepted_block.connect(
+         [self=this,root_txn_ident]( const block_state_ptr& blk ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_accepted_block(blk);
+            }
+         } ) ;
+      block_start.connect(
+         [self=this,root_txn_ident]( uint32_t block_num ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_block_start(block_num);
+            }
+         } ) ;
+      my->merkle_processor = std::make_shared<block_root_processor>(my->db, std::move(root_txn_ident));
 }
 
 /// Protocol feature activation handlers:

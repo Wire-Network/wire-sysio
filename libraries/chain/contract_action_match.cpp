@@ -1,7 +1,7 @@
-#include <sysio/sub_chain_plugin/contract_action_match.hpp>
+#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/exceptions.hpp>
 
-namespace sysio {
+namespace sysio { namespace chain {
    using match_type = contract_action_match::match_type;
    using name = contract_action_match::name;
 
@@ -70,4 +70,4 @@ namespace sysio {
         return false;
     }
 
-} // namespace sysio
+} } // namespace sysio::chain

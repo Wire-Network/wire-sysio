@@ -1,7 +1,5 @@
 file(GLOB HEADERS "include/sysio/sub_chain_plugin/*.hpp")
 add_library( sub_chain_plugin
-             contract_action_match.cpp
-             root_txn_identification.cpp
              sub_chain_plugin.cpp
              ${HEADERS} )
 

@@ -1,5 +1,5 @@
-#include <sysio/sub_chain_plugin/root_txn_identification.hpp>
-#include <sysio/sub_chain_plugin/contract_action_match.hpp>
+#include <sysio/chain/root_txn_identification.hpp>
+#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/merkle.hpp>
 
@@ -11,8 +11,7 @@
 
 using namespace sysio;
 
-namespace sysio {
-   using name = root_txn_identification::name;
+namespace sysio { namespace chain {
    using contract_action_matches = std::vector<contract_action_match>;
    struct root_txn_identification_impl {
       root_txn_identification_impl(contract_action_matches&& matches);
@@ -90,7 +89,7 @@ namespace sysio {
          } else {
             current_block_num = trace->block_num;
          }
-      }
+     }
 
       process_action_traces(trace->action_traces);
    }
@@ -131,4 +130,4 @@ namespace sysio {
       return true;
    }
 
-} // namespace sysio
+} } // namespace sysio::chain

@@ -1,7 +1,7 @@
 #pragma once
 #include <sysio/chain/types.hpp>
 
-namespace sysio {
+namespace sysio { namespace chain {
    class contract_action_match {
    public:
       using name = sysio::chain::name;
@@ -27,4 +27,4 @@ namespace sysio {
       matcher contract_matcher;
       std::vector<matcher> action_matchers;
    };
-} // namespace sysio
+} } // namespace sysio::chain

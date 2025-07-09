@@ -9,6 +9,7 @@
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -1109,6 +1110,17 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             } );
       }
       chain->add_indices();
+
+      contract_action_matches matches;
+      matches.push_back(contract_action_match("s"_n, "utl"_n, contract_action_match::match_type::suffix));
+      matches[0].add_action("batchw"_n, contract_action_match::match_type::exact);
+      matches[0].add_action("snoop"_n, contract_action_match::match_type::exact);
+      matches.push_back(contract_action_match("op"_n, "sysio"_n, contract_action_match::match_type::suffix));
+      matches[1].add_action("regproducer"_n, contract_action_match::match_type::exact);
+      matches[1].add_action("unregprod"_n, contract_action_match::match_type::exact);
+
+      chain->initialize_root_extensions(std::move(matches));
+
    } FC_LOG_AND_RETHROW()
 
 }
