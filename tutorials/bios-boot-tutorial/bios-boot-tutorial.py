@@ -125,7 +125,6 @@ def startNode(nodeIndex, account):
         # '    --s-chain-contract settle.wns'
         # '    --s-chain-actions batchw'
         # '    --s-chain-actions initcontract'
-        # '    --plugin sysio::sub_chain_plugin'
         '    --plugin sysio::http_plugin'
         '    --plugin sysio::chain_api_plugin'
         '    --plugin sysio::chain_plugin'
