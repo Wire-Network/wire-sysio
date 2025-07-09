@@ -72,7 +72,6 @@ uint32_t block_root_processor::extract_root_block_number(const chain::checksum25
    std::memcpy(&root_block_number, root_id_data, sizeof(uint32_t));
 
    // Reverse the endianess if necessary.
-   // You might need to adjust this based on how the data is stored (big-endian vs little-endian).
    return fc::endian_reverse_u32(root_block_number);
 }
 
