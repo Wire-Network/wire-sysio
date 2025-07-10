@@ -1077,7 +1077,6 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
 BOOST_AUTO_TEST_CASE(steal_my_ram) {
    try {
       tester c(setup_policy::full);
-      fc::logger::get("default").set_log_level(log_level::debug);
       wlog("Starting STEAL MY RAM TEST");
 
       const auto &tester1_account = account_name("tester1");
@@ -1128,7 +1127,6 @@ BOOST_AUTO_TEST_CASE(steal_my_ram) {
 BOOST_AUTO_TEST_CASE(steal_contract_ram) {
    try {
       tester c(setup_policy::full);
-      fc::logger::get("default").set_log_level(log_level::debug);
       wlog("Starting STEAL CONTRACT RAM TEST");
 
       const auto &tester1_account = account_name("tester1");

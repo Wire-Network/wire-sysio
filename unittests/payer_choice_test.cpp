@@ -43,7 +43,6 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         auto alice_ram_usage = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
         dlog("{account} ram usage: ${ram}", ("account", alice_account)("ram", alice_ram_usage));
 
-        fc::logger::get("default").set_log_level(fc::log_level::debug);
         ilog("No Resource Testing");
 
         ilog("Attempt by contract to charge itself with no resources should fail with resource_exhausted_exception");
