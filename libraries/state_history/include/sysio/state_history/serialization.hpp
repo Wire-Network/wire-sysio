@@ -386,7 +386,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.sender.to_uint64_t()));
    fc::raw::pack(ds, as_type<__uint128_t>(obj.obj.sender_id));
-   // fc::raw::pack(ds, as_type<uint64_t>(obj.obj.payer.to_uint64_t()));
    fc::raw::pack(ds, as_type<sysio::chain::transaction_id_type>(obj.obj.trx_id));
    fc::raw::pack(ds, as_type<sysio::chain::shared_string>(obj.obj.packed_trx));
    return ds;

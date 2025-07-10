@@ -114,7 +114,7 @@ void apply_context::exec_one()
                bool not_in_notify_context = (receiver == act->account);
                const auto end = _account_ram_deltas.end();
                for( auto itr = _account_ram_deltas.begin(); itr != end; ++itr, ++counter ) {
-                  wlog("pending RAM delta: ${account} ${delta}", ("account", itr->account)("delta", itr->delta) );
+                  // wlog("pending RAM delta: ${account} ${delta}", ("account", itr->account)("delta", itr->delta) );
                   if( counter == checktime_interval ) {
                      trx_context.checktime();
                      counter = 0;
@@ -189,11 +189,11 @@ void apply_context::exec_one()
 
    finalize_trace( trace, start );
 
-   if ( control.contracts_console() ) {
+   if( control.contracts_console() ) {
       print_debug(receiver, trace);
    }
 
-   if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()))
+   if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()))
    {
       dm_logger->on_end_action();
    }
@@ -300,7 +300,7 @@ void apply_context::require_recipient( account_name recipient ) {
          schedule_action( action_ordinal, recipient, false )
       );
 
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()) ) {
          dm_logger->on_require_recipient();
       }
    }
@@ -339,20 +339,21 @@ void apply_context::execute_inline( action&& a ) {
       inherited_authorizations.reserve( a.authorization.size() );
    }
 
-   for( const auto& auth : a.authorization ) {
-      auto* actor = control.db().find<account_object, by_name>(auth.actor);
-      SYS_ASSERT( actor != nullptr, action_validate_exception,
-                  "inline action's authorizing actor ${account} does not exist", ("account", auth.actor) );
+   for (const auto &auth: a.authorization) {
+      auto *actor = control.db().find<account_object, by_name>(auth.actor);
+      SYS_ASSERT(actor != nullptr, action_validate_exception,
+                 "inline action's authorizing actor ${account} does not exist", ("account", auth.actor));
       if (auth.permission != config::sysio_payer_name) {
-         SYS_ASSERT( control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
-                     "inline action's authorizations include a non-existent permission: ${permission}",
-                     ("permission", auth) );
+         SYS_ASSERT(control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
+                    "inline action's authorizations include a non-existent permission: ${permission}",
+                    ("permission", auth));
       }
-      if( enforce_actor_whitelist_blacklist )
-         actors.insert( auth.actor );
+      if (enforce_actor_whitelist_blacklist)
+         actors.insert(auth.actor);
 
-      if( inherit_parent_authorizations && std::find(act->authorization.begin(), act->authorization.end(), auth) != act->authorization.end() ) {
-         inherited_authorizations.insert( auth );
+      if (inherit_parent_authorizations && std::find(act->authorization.begin(), act->authorization.end(), auth) != act
+          ->authorization.end()) {
+         inherited_authorizations.insert(auth);
       }
    }
 
@@ -419,7 +420,7 @@ void apply_context::execute_context_free_inline( action&& a ) {
       schedule_action( std::move(a), inline_receiver, true )
    );
 
-   if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+   if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
       dm_logger->on_send_context_free_inline();
    }
 }
@@ -427,10 +428,10 @@ void apply_context::execute_context_free_inline( action&& a ) {
 
 void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, account_name payer, transaction&& trx, bool replace_existing ) {
    // no-op after DISABLE_DEFERRED_TRXS_STAGE_1 is activated
-   if ( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
+   if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
       return;
    }
-   throw std::runtime_error("Deferred transaction implementation has been removed");
+   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
 }
 
 bool apply_context::cancel_deferred_transaction( const uint128_t& sender_id, account_name sender ) {
@@ -438,7 +439,7 @@ bool apply_context::cancel_deferred_transaction( const uint128_t& sender_id, acc
    if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
       return false;
    }
-   throw std::runtime_error("Deferred transaction implementation has been removed");
+   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
 }
 
 uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free )

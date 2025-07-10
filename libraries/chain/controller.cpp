@@ -1229,11 +1229,7 @@ struct controller_impl {
    }
 
    int64_t remove_scheduled_transaction( const generated_transaction_object& gto ) {
-      // deferred transactions cannot be transient.
-      if (auto dm_logger = get_deep_mind_logger(false)) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", gto.id)), "deferred_trx", "remove", "deferred_trx_removed");
-      }
-      throw std::runtime_error("Deferred transaction implementation has been removed");
+      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
    }
 
    bool failure_is_subjective( const fc::exception& e ) const {
@@ -1326,7 +1322,7 @@ struct controller_impl {
          return trace;
       }
 
-      throw std::runtime_error("Deferred transaction implementation has been removed");
+      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
    } FC_CAPTURE_AND_RETHROW() } /// push_scheduled_transaction
 
 

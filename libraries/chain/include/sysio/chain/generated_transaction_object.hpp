@@ -81,7 +81,6 @@ namespace sysio { namespace chain {
          :trx_id(gto.trx_id)
          ,sender(gto.sender)
          ,sender_id(gto.sender_id)
-         // ,payer(gto.payer)
          ,delay_until(gto.delay_until)
          ,expiration(gto.expiration)
          ,published(gto.published)

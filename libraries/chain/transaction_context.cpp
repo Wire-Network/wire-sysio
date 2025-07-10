@@ -738,7 +738,6 @@ namespace sysio { namespace chain {
       flat_set<account_name> actors;
 
       bool one_auth = false;
-      auto payer = ""_n;
       for( const auto& a : trx.actions ) {
          auto* code = db.find<account_object, by_name>(a.account);
          SYS_ASSERT( code != nullptr, transaction_exception,
@@ -747,10 +746,10 @@ namespace sysio { namespace chain {
             SYS_ASSERT( a.authorization.size() == 0, transaction_exception,
                        "read-only action '${name}' cannot have authorizations", ("name", a.name) );
          }
-         payer = ""_n;
+         name payer;
          for (const auto &auth: a.authorization) {
             if (auth.permission == config::sysio_payer_name) {
-               SYS_ASSERT(payer == ""_n, transaction_exception,
+               SYS_ASSERT(payer.empty(), transaction_exception,
                           "action cannot have multiple payers");
 
                auto *actor = db.find<account_object, by_name>(auth.actor);
@@ -769,7 +768,7 @@ namespace sysio { namespace chain {
                   actors.insert(auth.actor);
             }
          }
-         if (payer != ""_n) {
+         if (!payer.empty()) {
             bool authPayer = false;
             for (const auto &auth: a.authorization) {
                if (auth.permission == config::sysio_payer_name) {

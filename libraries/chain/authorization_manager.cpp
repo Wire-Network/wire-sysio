@@ -519,14 +519,14 @@ namespace sysio { namespace chain {
             }
          }
 
-         account_name payer = ""_n;
+         account_name payer;
          for( const auto& declared_auth : act.authorization ) {
 
             checktime();
 
             // Special case for explicit payer
             if ( declared_auth.permission == config::sysio_payer_name ) {
-               SYS_ASSERT(payer == ""_n, irrelevant_auth_exception, "Multiple payers specified for action");
+               SYS_ASSERT(payer.empty(), irrelevant_auth_exception, "Multiple payers specified for action");
                payer = declared_auth.actor;
                continue;
             }
@@ -550,7 +550,7 @@ namespace sysio { namespace chain {
                }
             }
          }
-         if (payer != ""_n) {
+         if (!payer.empty()) {
             bool foundPayer = false;
             // verify payer is in satisfied_authorizations list by iterating over each entry and checking actor
             for (const auto& auth : act.authorization) {
