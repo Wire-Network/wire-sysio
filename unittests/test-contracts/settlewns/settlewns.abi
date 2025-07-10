@@ -1,0 +1,496 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "B_vector_uint64_E",
+            "type": "uint64[]"
+        }
+    ],
+    "structs": [
+        {
+            "name": "Withdrawal",
+            "base": "",
+            "fields": [
+                {
+                    "name": "value",
+                    "type": "token_value"
+                },
+                {
+                    "name": "to",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "batchstate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "state",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "batchw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "withdrawals",
+                    "type": "Withdrawal[]"
+                }
+            ]
+        },
+        {
+            "name": "blackliste",
+            "base": "",
+            "fields": [
+                {
+                    "name": "ethAddress",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "blacklistw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "wireAddress",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "cancelbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "canceldep",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "cancelwithd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "withdrawal",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "claimbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "trxId",
+                    "type": "bytes"
+                },
+                {
+                    "name": "blockNum",
+                    "type": "uint128"
+                },
+                {
+                    "name": "sig",
+                    "type": "signature"
+                },
+                {
+                    "name": "msgDigest",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "createbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batchOperator",
+                    "type": "name"
+                },
+                {
+                    "name": "fee",
+                    "type": "asset"
+                },
+                {
+                    "name": "tof",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "minParticipants",
+                    "type": "uint16"
+                },
+                {
+                    "name": "maxParticipants",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "depstate",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "exitbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "withdrawal",
+                    "type": "uint64"
+                },
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "initcontract",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "initdeposit",
+            "base": "",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "from",
+                    "type": "bytes"
+                },
+                {
+                    "name": "assetParams",
+                    "type": "token_value"
+                }
+            ]
+        },
+        {
+            "name": "joinbatches",
+            "base": "",
+            "fields": [
+                {
+                    "name": "withdrawal",
+                    "type": "uint64"
+                },
+                {
+                    "name": "batches",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "lockbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "pair_uint64_B_vector_uint64_E",
+            "base": "",
+            "fields": [
+                {
+                    "name": "first",
+                    "type": "uint64"
+                },
+                {
+                    "name": "second",
+                    "type": "B_vector_uint64_E"
+                }
+            ]
+        },
+        {
+            "name": "renewbatch",
+            "base": "",
+            "fields": [
+                {
+                    "name": "batch",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tof",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "selfwithd",
+            "base": "",
+            "fields": [
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "utxos",
+                    "type": "uint64[]"
+                }
+            ]
+        },
+        {
+            "name": "setpending",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                },
+                {
+                    "name": "trxId",
+                    "type": "bytes"
+                },
+                {
+                    "name": "blockNum",
+                    "type": "uint128"
+                },
+                {
+                    "name": "sig",
+                    "type": "signature"
+                },
+                {
+                    "name": "depRoot",
+                    "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "setstatevars",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pendingLimit",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "snoop",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "token_value",
+            "base": "",
+            "fields": [
+                {
+                    "name": "contractAddress",
+                    "type": "bytes"
+                },
+                {
+                    "name": "tokenType",
+                    "type": "uint64"
+                },
+                {
+                    "name": "tokenId",
+                    "type": "uint256_t"
+                },
+                {
+                    "name": "amount",
+                    "type": "uint256_t"
+                }
+            ]
+        },
+        {
+            "name": "uint256_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "low",
+                    "type": "uint128"
+                },
+                {
+                    "name": "high",
+                    "type": "uint128"
+                }
+            ]
+        },
+        {
+            "name": "withdraw",
+            "base": "",
+            "fields": [
+                {
+                    "name": "utxos",
+                    "type": "uint64[]"
+                },
+                {
+                    "name": "user",
+                    "type": "name"
+                },
+                {
+                    "name": "batch",
+                    "type": "uint64[]"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "batchstate",
+            "type": "batchstate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "batchw",
+            "type": "batchw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "blackliste",
+            "type": "blackliste",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "blacklistw",
+            "type": "blacklistw",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelbatch",
+            "type": "cancelbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "canceldep",
+            "type": "canceldep",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "cancelwithd",
+            "type": "cancelwithd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimbatch",
+            "type": "claimbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "createbatch",
+            "type": "createbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "depstate",
+            "type": "depstate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "exitbatch",
+            "type": "exitbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initcontract",
+            "type": "initcontract",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initdeposit",
+            "type": "initdeposit",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "joinbatches",
+            "type": "joinbatches",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "lockbatch",
+            "type": "lockbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "renewbatch",
+            "type": "renewbatch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "selfwithd",
+            "type": "selfwithd",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setpending",
+            "type": "setpending",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setstatevars",
+            "type": "setstatevars",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "snoop",
+            "type": "snoop",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "withdraw",
+            "type": "withdraw",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "createbatch",
+            "result_type": "uint64"
+        },
+        {
+            "name": "initdeposit",
+            "result_type": "uint64"
+        },
+        {
+            "name": "selfwithd",
+            "result_type": "pair_uint64_B_vector_uint64_E"
+        },
+        {
+            "name": "withdraw",
+            "result_type": "uint64[]"
+        }
+    ]
+}

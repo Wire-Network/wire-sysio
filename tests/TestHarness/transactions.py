@@ -214,7 +214,7 @@ class Transactions(NodeopQueries):
         return trans
 
     # set code or abi and return True for success and False for failure
-    def setCodeOrAbi(self, account, setType, setFile):
+    def setCodeOrAbi(self, account, setType, setFile, returnTrans=False):
         cmd=f"{Utils.SysClientPath} {self.sysClientArgs()} -v set {setType} -j {account.name} {setFile} "
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         try:
@@ -223,9 +223,9 @@ class Transactions(NodeopQueries):
         except subprocess.CalledProcessError as ex:
             msg=ex.stderr.decode("utf-8")
             Utils.Print("ERROR: Exception during set %s. stderr: %s." % (setType, msg))
-            return False
+            return False if not returnTrans else None
 
-        return True
+        return True if not returnTrans else trans
 
     # returns tuple with indication if transaction was successfully sent and either the transaction or else the exception output
     def pushTransaction(self, trans, opts="", silentErrors=False, permissions=None):
@@ -374,6 +374,18 @@ class Transactions(NodeopQueries):
 
         return trans
 
+    def unregprod(self, producer, waitForTransBlock=False, silentErrors=True, exitOnError=False, sign=False, retry_num_blocks=None):
+        signStr = NodeopQueries.sign_str(sign, [ producer.activePublicKey ])
+        cmdDesc = "system unregprod"
+        retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
+        retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
+        cmd = f'{cmdDesc} -j {signStr} {producer.name} {retryStr}'
+        msg = f"producer={producer.name}"
+        trans = self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
+        self.trackCmdTransaction(trans)
+
+        return trans
+
     def vote(self, account, producers, waitForTransBlock=False, silentErrors=True, exitOnError=False, sign=False, retry_num_blocks=None):
         signStr = NodeopQueries.sign_str(sign, [ account.activePublicKey ])
         cmdDesc = "system voteproducer prods"
@@ -402,6 +414,7 @@ class Transactions(NodeopQueries):
     def getAllBuiltinFeatureDigestsToPreactivate(self):
         protocolFeatures = {}
         supportedProtocolFeatures = self.getSupportedProtocolFeatures()
+        if Utils.Debug: Utils.Print(f"getSupportedProtocolFeatures: {json.dumps(supportedProtocolFeatures, indent=4)}")
         for protocolFeature in supportedProtocolFeatures["payload"]:
             for spec in protocolFeature["specification"]:
                 if (spec["name"] == "builtin_feature_codename"):

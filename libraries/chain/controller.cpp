@@ -21,11 +21,14 @@
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/block_root_processor.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/chain/platform_timer.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <sysio/chain/contract_action_match.hpp>
+#include <sysio/chain/root_txn_identification.hpp>
 
 #include <chainbase/chainbase.hpp>
 #include <sysio/vm/allocator.hpp>
@@ -130,7 +133,7 @@ struct building_block {
    deque<transaction_receipt>                 _pending_trx_receipts; // boost deque in 1.71 with 1024 elements performs better
    std::variant<checksum256_type, digests_t>  _trx_mroot_or_receipt_digests;
    digests_t                                  _action_receipt_digests;
-   std::optional<s_header>                    _s_header; // Added new functionality to pass an optional s_header to be included in block header extension
+   deque<s_header>                            _s_header; // Added new functionality to pass many state headers to be included in block header extension
 };
 
 struct assembled_block {
@@ -214,6 +217,7 @@ struct pending_state {
 };
 
 struct controller_impl {
+   using block_root_processor_ptr = std::shared_ptr<block_root_processor>;
    enum class app_window_type {
       write, // Only main thread is running; read-only threads are not running.
              // All read-write and read-only tasks are sequentially executed.
@@ -255,6 +259,7 @@ struct controller_impl {
    deep_mind_handler*              deep_mind_logger = nullptr;
    bool                            okay_to_print_integrity_hash_on_stop = false;
    std::atomic<bool>               writing_snapshot = false;
+   block_root_processor_ptr        merkle_processor;
 
    thread_local static platform_timer timer; // a copy for main thread and each read-only thread
 #if defined(SYSIO_SYS_VM_RUNTIME_ENABLED) || defined(SYSIO_SYS_VM_JIT_RUNTIME_ENABLED)
@@ -267,6 +272,9 @@ struct controller_impl {
    map< account_name, map<handler_key, apply_handler> >   apply_handlers;
    unordered_map< builtin_protocol_feature_t, std::function<void(controller_impl&)>, enum_hash<builtin_protocol_feature_t> > protocol_feature_activation_handlers;
 
+   bool are_multiple_state_roots_supported() const;
+
+   void set_s_headers( uint32_t block_num );
 
    void pop_block() {
       auto prev = fork_db.get_block( head->header.previous );
@@ -1629,7 +1637,7 @@ struct controller_impl {
                fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
                                 std::move(trx_context.executed_action_receipt_digests) );
                 if ( !trx->is_dry_run() ) {
-                   // call the accept signal but only once for this transaction
+                  // call the accept signal but only once for this transaction
                    if (!trx->accepted) {
                        trx->accepted = true;
                        emit(self.accepted_transaction, trx);
@@ -1873,8 +1881,10 @@ struct controller_impl {
 
       auto& bb = std::get<building_block>(pending->_block_stage);
 
-      if (bb._s_header){
-        ilog("s_header present in finalize block, adding to block header: ${s}", ("s", bb._s_header->to_string()));
+      set_s_headers( pbhs.block_num );
+
+      for (const auto& header : bb._s_header){
+        ilog("s_header present in finalize block, adding to block header: ${s}", ("s", header.to_string()));
       }
 
       auto action_merkle_fut = post_async_task( thread_pool.get_executor(),
@@ -1907,7 +1917,7 @@ struct controller_impl {
          bb._new_pending_producer_schedule,
          std::move( bb._new_protocol_feature_activations ),
          protocol_features.get_protocol_feature_set(),
-         bb._s_header // Include optional s_header in block header
+         bb._s_header // Include optional s_headers in block header
       ) );
 
       block_ptr->transactions = std::move( bb._pending_trx_receipts );
@@ -2152,21 +2162,10 @@ struct controller_impl {
                         ("lhs", r)("rhs", static_cast<const transaction_receipt_header&>(receipt)) );
          }
 
-         // New: Process the s_header from block header extensions
-         auto s_header_it = std::find_if(b->header_extensions.begin(), b->header_extensions.end(),
-                                       [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
-         if (s_header_it != b->header_extensions.end()) {
-            ilog("Found s_root_extension in header_extensions, attempting to extract...");
-            s_header extracted_s_header = fc::raw::unpack<s_header>(s_header_it->second);
-            ilog("Extracted s_header: ${s_header}", ("s_header", extracted_s_header.to_string()));
-            self.set_s_header(extracted_s_header); // Attempt to set s-header
-         }
 
          finalize_block();
 
          auto& ab = std::get<assembled_block>(pending->_block_stage);
-
-
 
          if( producer_block_id != ab._id ) {
             elog( "Validation block id does not match producer block id" );
@@ -2174,6 +2173,45 @@ struct controller_impl {
             // this implicitly asserts that all header fields (less the signature) are identical
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
                         ("producer_block_id", producer_block_id)("validator_block_id", ab._id) );
+         }
+         if( are_multiple_state_roots_supported() ) {
+            // New: Process the s_header from block header extensions
+            auto rcvd_it = b->header_extensions.begin();
+            const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
+               if( !include_start ) ++itr;
+               // find the first s_root_extension in the received block header extensions
+               return std::find_if(itr, end,
+                  [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            auto crtd_it = ab._unsigned_block->header_extensions.begin();
+            const auto next_crtd = [&itr=crtd_it, end=ab._unsigned_block->header_extensions.end()](bool include_start) {
+               if( !include_start ) ++itr;
+               // find the first s_root_extension in the locally constructed block header extensions
+               // (which should be the same as the received block header extensions)
+               return std::find_if(itr, end,
+                  [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+            uint32_t count = 0;
+            bool rcvd = true;
+            bool crtd = true;
+            bool include_start = true;
+            while( rcvd ) {
+               rcvd_it = next_rcvd(include_start);
+               crtd_it = next_crtd(include_start);
+               ++count;
+               include_start = false; // only include start for the first iteration
+               rcvd = rcvd_it != b->header_extensions.end();
+               crtd = crtd_it != ab._unsigned_block->header_extensions.end();
+               SYS_ASSERT( rcvd == crtd, block_validate_exception,
+                           "The received block did${neg1} have $(count) root header extensions, but the locally constructed one did${neg2}",
+                           ("neg1", (rcvd ? "" : " not"))("count", count)("neg2", (crtd ? "" : " not")) );
+               if( rcvd && rcvd_it->second != crtd_it->second ) {
+                  s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
+                  s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
+                  SYS_THROW( block_validate_exception,
+                             "The received block root header extension, at slot number ${count}: ${rcvd}; and the locally "
+                             "constructed one: ${crdt}; don't match!",
+                             ("count", count)("rcvd", rcvd_s_header.to_string())("crdt", crtd_s_header.to_string()) );
+               }
+            }
          }
 
          if( !use_bsp_cached ) {
@@ -3096,22 +3134,24 @@ void controller::set_action_blacklist( const flat_set< pair<account_name, action
 void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_blacklist ) {
    my->conf.key_blacklist = new_key_blacklist;
 }
-void controller::set_s_header( const s_header& s_header ) {
-   //  ilog("CONTROLLER - setting s header: ${s}", ("s", s_header.to_string()));
-   SYS_ASSERT( my->pending, block_validate_exception, "it is not valid to set_s_header when there is no pending block");
-   SYS_ASSERT( std::holds_alternative<building_block>(my->pending->_block_stage), block_validate_exception, "already called finalize_block");
-   // SYS_ASSERT( std::get<assembled_block>(pending->_block_stage)._id == id, block_validate_exception, "mismatching block id" );
+
+bool controller_impl::are_multiple_state_roots_supported() const {
+   if ( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+      return true;
+   }
+
+   return false;
+}
+
+void controller_impl::set_s_headers( uint32_t block_num ) {
+   if( !are_multiple_state_roots_supported() ) {
+      return; // No need to set s_headers if multiple state roots are not supported
+   }
+   SYS_ASSERT( pending, block_validate_exception, "it is not valid to set_s_headers when there is no pending block");
+   SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finalize_block");
    // Try to set it first in the pending block
-   auto& bb = std::get<building_block>(my->pending->_block_stage);
-   bb._s_header = s_header; // Attempt to set s-header
-   auto& check_s_header = std::get<building_block>(my->pending->_block_stage)._s_header;
-   if (check_s_header){
-      ilog("Pending building block s_header set: ${s_header}\n\t\tand matches what was passed: ${match}",
-         ("s_header", check_s_header->to_string())("match", check_s_header == s_header));
-   }
-   else {
-      ilog("Pending building block s_header NOT SET");
-   }
+   auto& bb = std::get<building_block>(pending->_block_stage);
+   bb._s_header = merkle_processor->get_s_headers( block_num );
 }
 
 void controller::set_disable_replay_opts( bool v ) {
@@ -3795,6 +3835,31 @@ void controller::code_block_num_last_used(const digest_type& code_hash, uint8_t 
 
 bool controller::is_irreversible_state_available() const {
    return !!my->slog;
+}
+
+void controller::initialize_root_extensions(contract_action_matches&& matches) {
+      auto root_txn_ident = std::make_shared<root_txn_identification>(
+         std::move(matches)
+      );
+      applied_transaction.connect(
+         [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
+            }
+         } );
+      accepted_block.connect(
+         [self=this,root_txn_ident]( const block_state_ptr& blk ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_accepted_block(blk);
+            }
+         } ) ;
+      block_start.connect(
+         [self=this,root_txn_ident]( uint32_t block_num ) {
+            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+               root_txn_ident->signal_block_start(block_num);
+            }
+         } ) ;
+      my->merkle_processor = std::make_shared<block_root_processor>(my->db, std::move(root_txn_ident));
 }
 
 /// Protocol feature activation handlers:

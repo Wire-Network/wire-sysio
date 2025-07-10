@@ -54,7 +54,6 @@ class PluginHttpTest(unittest.TestCase):
                                                                                    "sysio::producer_api_plugin",
                                                                                    "sysio::chain_api_plugin",
                                                                                    "sysio::http_plugin",
-                                                                                   "sysio::sub_chain_plugin",
                                                                                    "sysio::db_size_api_plugin")
         nodeop_flags = (" --data-dir=%s --trace-dir=%s --trace-no-abis --access-control-allow-origin=%s "
                         "--contracts-console --http-validate-host=%s --verbose-http-errors --s-chain-contract grace --s-chain-actions dance "
