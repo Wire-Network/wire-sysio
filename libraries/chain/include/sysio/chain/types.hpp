@@ -183,6 +183,7 @@ namespace sysio::chain {
       account_ram_correction_object_type,
       code_object_type,
       database_header_object_type,
+      contract_root_object_type,
       OBJECT_TYPE_COUNT ///< Sentry value which contains the number of different object types
    };
 

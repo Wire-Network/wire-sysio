@@ -23,6 +23,12 @@ namespace sysio { namespace vm { class wasm_allocator; }}
 
 namespace sysio { namespace chain {
 
+   class contract_action_match;
+   using contract_action_matches = std::vector<contract_action_match>;
+
+   struct root_processor;
+   using root_processor_ptr = std::shared_ptr<root_processor>;
+
    class authorization_manager;
 
    namespace resource_limits {
@@ -215,8 +221,6 @@ namespace sysio { namespace chain {
          void   set_contract_blacklist( const flat_set<account_name>& );
          void   set_action_blacklist( const flat_set< pair<account_name, action_name> >& );
          void   set_key_blacklist( const flat_set<public_key_type>& );
-         void   set_s_header( const s_header& );
-
 
          void   set_disable_replay_opts( bool v );
 
@@ -380,6 +384,7 @@ namespace sysio { namespace chain {
       bool is_write_window() const;
       void code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version, uint32_t block_num);
 
+      void initialize_root_extensions(contract_action_matches&& matches);
       private:
          friend class apply_context;
          friend class transaction_context;

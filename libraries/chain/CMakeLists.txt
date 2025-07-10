@@ -96,6 +96,9 @@ add_library( sysio_chain
              authorization_manager.cpp
              resource_limits.cpp
              block_log.cpp
+             block_root_processor.cpp
+             contract_action_match.cpp
+             root_txn_identification.cpp
              transaction_context.cpp
              sysio_contract.cpp
              sysio_contract_abi.cpp
