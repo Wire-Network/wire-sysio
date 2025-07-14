@@ -1749,10 +1749,6 @@ BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::old_wasm_parser, s
 
 BOOST_AUTO_TEST_CASE( varuint_memory_flags_tests ) try {
    validating_tester t(flat_set<account_name>{}, {}, setup_policy::preactivate_feature_and_new_bios);
-   t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::get_block_num});
-   t.produce_block();
-   t.init_roa();
-   t.produce_block();
 
    t.create_accounts( {"memflags"_n} );
    t.produce_block();

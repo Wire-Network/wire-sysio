@@ -240,6 +240,11 @@ namespace sysio { namespace testing {
             schedule_preactivate_protocol_feature();
             produce_block();
             set_before_producer_authority_bios_contract();
+            preactivate_builtin_protocol_features({
+               chain::builtin_protocol_feature_t::get_block_num,
+            });
+            produce_block();
+            init_roa();
             break;
          }
          case setup_policy::old_wasm_parser: {
