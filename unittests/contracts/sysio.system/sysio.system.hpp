@@ -289,6 +289,7 @@ private:
 
 public:
    static constexpr sysio::name active_permission{"active"_n};
+   static constexpr sysio::name payer_permission{"sysio.payer"_n};
    static constexpr sysio::name token_account{"sysio.token"_n};
    static constexpr sysio::name ram_account{"sysio.ram"_n};
    static constexpr sysio::name ramfee_account{"sysio.ramfee"_n};

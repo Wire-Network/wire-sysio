@@ -149,7 +149,7 @@ void system_contract::bidname( name bidder, name newname, asset bid ) {
    check( bid.amount > 0, "insufficient bid" );
 
    INLINE_ACTION_SENDER(sysio::token, transfer)(
-         token_account, { {bidder, active_permission} },
+         token_account, { {bidder, active_permission}, {bidder, payer_permission} },
          { bidder, names_account, bid, std::string("bid name ")+ newname.to_string() }
    );
 
