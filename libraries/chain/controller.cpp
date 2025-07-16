@@ -850,6 +850,9 @@ struct controller_impl {
 
       authorization.add_indices();
       resource_limits.add_indices();
+      if (merkle_processor) {
+         merkle_processor->add_indices();
+      }
    }
 
    void clear_all_undo() {
@@ -953,6 +956,9 @@ struct controller_impl {
 
       authorization.add_to_snapshot(snapshot);
       resource_limits.add_to_snapshot(snapshot);
+      if (merkle_processor) {
+         merkle_processor->add_to_snapshot(snapshot);
+      }
    }
 
    void read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
@@ -1009,6 +1015,10 @@ struct controller_impl {
 
       authorization.read_from_snapshot(snapshot);
       resource_limits.read_from_snapshot(snapshot);
+
+      if (merkle_processor) {
+         merkle_processor->read_from_snapshot(snapshot);
+      }
 
       db.set_revision( head->block_num );
       db.create<database_header_object>([](const auto& header){
@@ -1102,6 +1112,9 @@ struct controller_impl {
 
       authorization.initialize_database();
       resource_limits.initialize_database();
+      if (merkle_processor) {
+         merkle_processor->initialize_database();
+      }
 
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, config::system_account_name, system_auth, system_auth, true );
