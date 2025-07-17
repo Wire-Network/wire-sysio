@@ -140,16 +140,6 @@ namespace sysio { namespace chain {
          if( explicit_billed_cpu_time )
             validate_cpu_usage_to_bill( billed_cpu_time_us, std::numeric_limits<int64_t>::max(), false, subjective_cpu_bill_us); // Fail early if the amount to be billed is too high
 
-         // Record accounts to be billed for network and CPU usage
-         // if( control.is_builtin_activated(builtin_protocol_feature_t::only_bill_first_authorizer) ) {
-         //    bill_to_accounts.insert( trx.first_authorizer() );
-         // } else {
-         //    for( const auto& act : trx.actions ) {
-         //       for( const auto& auth : act.authorization ) {
-         //          bill_to_accounts.insert( auth.actor );
-         //       }
-         //    }
-         // }
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
          for ( const auto &act : trx.actions ) {
             bill_to_accounts.insert(act.explicit_payer());
