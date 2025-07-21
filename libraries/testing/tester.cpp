@@ -240,6 +240,11 @@ namespace sysio { namespace testing {
             schedule_preactivate_protocol_feature();
             produce_block();
             set_before_producer_authority_bios_contract();
+            preactivate_builtin_protocol_features({
+               chain::builtin_protocol_feature_t::get_block_num,
+            });
+            produce_block();
+            init_roa();
             break;
          }
          case setup_policy::old_wasm_parser: {
@@ -259,10 +264,12 @@ namespace sysio { namespace testing {
                builtin_protocol_feature_t::ram_restrictions,
                builtin_protocol_feature_t::webauthn_key,
                builtin_protocol_feature_t::wtmsig_block_signatures,
-               builtin_protocol_feature_t::em_key
+               builtin_protocol_feature_t::em_key,
+               builtin_protocol_feature_t::get_block_num,
             });
             produce_block();
             set_bios_contract();
+            init_roa();
             break;
          }
          case setup_policy::full:
@@ -552,7 +559,7 @@ namespace sysio { namespace testing {
   }
 
 
-   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code ) {
+   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code, bool include_roa_policy) {
       signed_transaction trx;
       set_transaction_headers(trx);
 
@@ -593,8 +600,29 @@ namespace sysio { namespace testing {
                                    .active   = active_auth,
                                 });
 
+      include_roa_policy &= has_roa;
+      include_roa_policy &= a.prefix() != config::system_account_name;
+      if( include_roa_policy ) {
+         trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
+                                             vector<permission_level>{
+                                                {NODE_DADDY, config::active_name},
+                                             },
+                                             mutable_variant_object()
+                                             ("owner", a)
+                                             ("issuer", NODE_DADDY)
+                                             ("net_weight", "0.0010 SYS")
+                                             ("cpu_weight", "0.0010 SYS")
+                                             ("ram_weight", "2.0000 SYS")
+                                             ("network_gen", 0)
+                                             ("time_block", 0)
+         ));
+      }
+
       set_transaction_headers(trx);
       trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
+      if (include_roa_policy) {
+         trx.sign( get_private_key( NODE_DADDY, "active" ), control->get_chain_id() );
+      }
       return push_transaction( trx );
    }
 
@@ -631,6 +659,48 @@ namespace sysio { namespace testing {
                                           ("ram_weight", ram_weight)
                                           ("network_gen", network_gen)
                                           ("time_block", time_block)
+      ));
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(issuer, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   transaction_trace_ptr base_tester::expand_roa_policy(account_name issuer, account_name owner, string net_weight,
+                                                     string cpu_weight, string ram_weight, int64_t network_gen) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back(get_action("sysio.roa"_n, "expandpolicy"_n,
+                                          vector<permission_level>{{issuer, config::active_name}},
+                                          fc::mutable_variant_object
+                                          ("owner", owner)
+                                          ("issuer", issuer)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
+      ));
+
+      set_transaction_headers(trx);
+      trx.sign(get_private_key(issuer, "active"), control->get_chain_id());
+      return push_transaction(trx);
+   }
+
+   transaction_trace_ptr base_tester::reduce_roa_policy(account_name issuer, account_name owner, string net_weight,
+                                                     string cpu_weight, string ram_weight, int64_t network_gen) {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      trx.actions.emplace_back(get_action("sysio.roa"_n, "reducepolicy"_n,
+                                          vector<permission_level>{{issuer, config::active_name}},
+                                          fc::mutable_variant_object
+                                          ("owner", owner)
+                                          ("issuer", issuer)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -689,7 +759,30 @@ namespace sysio { namespace testing {
    typename base_tester::action_result base_tester::push_action(action&& act, uint64_t authorizer) {
       signed_transaction trx;
       if (authorizer) {
-         act.authorization = vector<permission_level>{{account_name(authorizer), config::active_name}};
+         act.authorization = vector<permission_level>{{account_name(authorizer), config::active_name}, {account_name(authorizer), config::sysio_payer_name}};
+      }
+      trx.actions.emplace_back(std::move(act));
+      set_transaction_headers(trx);
+      if (authorizer) {
+         trx.sign(get_private_key(account_name(authorizer), "active"), control->get_chain_id());
+      }
+      try {
+         push_transaction(trx);
+      } catch (const fc::exception& ex) {
+         edump((ex.to_detail_string()));
+         return error(ex.top_message()); // top_message() is assumed by many tests; otherwise they fail
+         //return error(ex.to_detail_string());
+      }
+      produce_block();
+      BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
+      return success();
+   }
+
+   typename base_tester::action_result base_tester::push_paid_action(action&& act, uint64_t authorizer) {
+      signed_transaction trx;
+      if (authorizer) {
+         act.authorization = vector<permission_level>{{account_name(authorizer), config::active_name},
+            {account_name(authorizer), config::sysio_payer_name}};
       }
       trx.actions.emplace_back(std::move(act));
       set_transaction_headers(trx);
@@ -751,6 +844,9 @@ namespace sysio { namespace testing {
       trx.actions.emplace_back( get_action( code, acttype, auths, data ) );
       set_transaction_headers( trx, expiration, delay_sec );
       for (const auto& auth : auths) {
+         if (auth.permission == config::sysio_payer_name) {
+            continue;
+         }
          trx.sign( get_private_key( auth.actor, auth.permission.to_string() ), control->get_chain_id() );
       }
 
@@ -985,6 +1081,27 @@ namespace sysio { namespace testing {
       delete_authority(account, perm, { permission_level{ account, config::owner_name } }, { get_private_key( account, "owner" ) });
    }
 
+   void base_tester::set_contract( account_name account, const vector<uint8_t>& wasm, const std::string& abi_json ) {
+      auto abi = fc::json::from_string(abi_json).template as<abi_def>();
+
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{account, config::active_name}},
+         setcode{
+            .account    = account,
+            .vmtype     = 0,
+            .vmversion  = 0,
+            .code       = bytes(wasm.begin(), wasm.end())
+         });
+      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
+         setabi{
+            .account    = account,
+            .abi        = fc::raw::pack(abi)
+         });
+      set_transaction_headers(trx);
+      trx.sign( get_private_key(account, "active"), control->get_chain_id());
+      push_transaction(trx);
+   }
+
 
    void base_tester::set_code( account_name account, const char* wast, const private_key_type* signer  ) try {
       set_code(account, wast_to_wasm(wast), signer);
@@ -1167,9 +1284,8 @@ namespace sysio { namespace testing {
       const auto& roa = "sysio.roa"_n;
 
       // Create the ROA account and mark it as privileged
-      create_account(roa, config::system_account_name);
-      set_code(roa, contracts::sysio_roa_wasm());
-      set_abi(roa, contracts::sysio_roa_abi().data());
+      create_account(roa, config::system_account_name, false, true, false);
+      set_contract(roa, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,
                   fc::mutable_variant_object()("account", roa)("is_priv", 1)
@@ -1183,6 +1299,12 @@ namespace sysio { namespace testing {
       );
 
       produce_block();
+
+      // Setup default node daddy for easier resource allocation during testing
+      create_account(NODE_DADDY, config::system_account_name, false, true, false);
+      register_node_owner(NODE_DADDY, 1);
+      produce_block();
+      has_roa = true;
    }
 
    vector<producer_authority> base_tester::get_producer_authorities( const vector<account_name>& producer_names )const {

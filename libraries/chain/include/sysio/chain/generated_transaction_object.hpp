@@ -27,7 +27,6 @@ namespace sysio { namespace chain {
          transaction_id_type           trx_id; //< trx_id should not be changed within a chainbase modifier lambda
          account_name                  sender; //< sender should not be changed within a chainbase modifier lambda
          uint128_t                     sender_id = 0; /// ID given this transaction by the sender (should not be changed within a chainbase modifier lambda)
-         account_name                  payer;
          time_point                    delay_until; /// this generated transaction will not be applied until the specified time
          time_point                    expiration; /// this generated transaction will not be applied after this time
          time_point                    published;
@@ -82,7 +81,6 @@ namespace sysio { namespace chain {
          :trx_id(gto.trx_id)
          ,sender(gto.sender)
          ,sender_id(gto.sender_id)
-         ,payer(gto.payer)
          ,delay_until(gto.delay_until)
          ,expiration(gto.expiration)
          ,published(gto.published)
@@ -95,7 +93,7 @@ namespace sysio { namespace chain {
          transaction_id_type           trx_id;
          account_name                  sender;
          uint128_t                     sender_id;
-         account_name                  payer;
+         // account_name                  payer;
          time_point                    delay_until; /// this generated transaction will not be applied until the specified time
          time_point                    expiration; /// this generated transaction will not be applied after this time
          time_point                    published;
@@ -114,4 +112,4 @@ namespace sysio { namespace chain {
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::generated_transaction_object, sysio::chain::generated_transaction_multi_index)
 
-FC_REFLECT(sysio::chain::generated_transaction_object, (trx_id)(sender)(sender_id)(payer)(delay_until)(expiration)(published)(packed_trx))
+FC_REFLECT(sysio::chain::generated_transaction_object, (trx_id)(sender)(sender_id)/*(payer)*/(delay_until)(expiration)(published)(packed_trx))

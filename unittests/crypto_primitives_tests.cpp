@@ -28,17 +28,10 @@ bytes h2bin(const std::string& source) {
 BOOST_AUTO_TEST_SUITE(crypto_primitives_tests)
 
 BOOST_AUTO_TEST_CASE( alt_bn128_add_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full);
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -146,17 +139,10 @@ BOOST_AUTO_TEST_CASE( alt_bn128_add_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( alt_bn128_mul_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -273,17 +259,10 @@ BOOST_AUTO_TEST_CASE( alt_bn128_mul_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( alt_bn128_pair_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -413,17 +392,10 @@ BOOST_AUTO_TEST_CASE( alt_bn128_pair_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( modexp_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -503,17 +475,10 @@ BOOST_AUTO_TEST_CASE( modexp_subjective_limit_test ) { try {
    // To allow mod_exp to be more useful, the limits on bit size need to be removed and the deadline timer plumbing into the implementation
    // needs to occur. When that happens, this test case can be removed.
 
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -577,17 +542,10 @@ BOOST_AUTO_TEST_CASE( modexp_subjective_limit_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( blake2f_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -704,17 +662,10 @@ BOOST_AUTO_TEST_CASE( blake2f_test ) { try {
 
 
 BOOST_AUTO_TEST_CASE( keccak256_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -755,17 +706,10 @@ BOOST_AUTO_TEST_CASE( keccak256_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( sha3_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );
@@ -806,17 +750,10 @@ BOOST_AUTO_TEST_CASE( sha3_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( k1_recover_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.produce_block();
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::crypto_primitives );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_code( tester1_account, test_contracts::crypto_primitives_test_wasm() );

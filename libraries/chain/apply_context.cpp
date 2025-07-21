@@ -114,6 +114,7 @@ void apply_context::exec_one()
                bool not_in_notify_context = (receiver == act->account);
                const auto end = _account_ram_deltas.end();
                for( auto itr = _account_ram_deltas.begin(); itr != end; ++itr, ++counter ) {
+                  // wlog("pending RAM delta: ${account} ${delta}", ("account", itr->account)("delta", itr->delta) );
                   if( counter == checktime_interval ) {
                      trx_context.checktime();
                      counter = 0;
@@ -188,11 +189,11 @@ void apply_context::exec_one()
 
    finalize_trace( trace, start );
 
-   if ( control.contracts_console() ) {
+   if( control.contracts_console() ) {
       print_debug(receiver, trace);
    }
 
-   if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()))
+   if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()))
    {
       dm_logger->on_end_action();
    }
@@ -299,7 +300,7 @@ void apply_context::require_recipient( account_name recipient ) {
          schedule_action( action_ordinal, recipient, false )
       );
 
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+      if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()) ) {
          dm_logger->on_require_recipient();
       }
    }
@@ -338,18 +339,21 @@ void apply_context::execute_inline( action&& a ) {
       inherited_authorizations.reserve( a.authorization.size() );
    }
 
-   for( const auto& auth : a.authorization ) {
-      auto* actor = control.db().find<account_object, by_name>(auth.actor);
-      SYS_ASSERT( actor != nullptr, action_validate_exception,
-                  "inline action's authorizing actor ${account} does not exist", ("account", auth.actor) );
-      SYS_ASSERT( control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
-                  "inline action's authorizations include a non-existent permission: ${permission}",
-                  ("permission", auth) );
-      if( enforce_actor_whitelist_blacklist )
-         actors.insert( auth.actor );
+   for (const auto &auth: a.authorization) {
+      auto *actor = control.db().find<account_object, by_name>(auth.actor);
+      SYS_ASSERT(actor != nullptr, action_validate_exception,
+                 "inline action's authorizing actor ${account} does not exist", ("account", auth.actor));
+      if (auth.permission != config::sysio_payer_name) {
+         SYS_ASSERT(control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
+                    "inline action's authorizations include a non-existent permission: ${permission}",
+                    ("permission", auth));
+      }
+      if (enforce_actor_whitelist_blacklist)
+         actors.insert(auth.actor);
 
-      if( inherit_parent_authorizations && std::find(act->authorization.begin(), act->authorization.end(), auth) != act->authorization.end() ) {
-         inherited_authorizations.insert( auth );
+      if (inherit_parent_authorizations && std::find(act->authorization.begin(), act->authorization.end(), auth) != act
+          ->authorization.end()) {
+         inherited_authorizations.insert(auth);
       }
    }
 
@@ -416,7 +420,7 @@ void apply_context::execute_context_free_inline( action&& a ) {
       schedule_action( std::move(a), inline_receiver, true )
    );
 
-   if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
+   if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
       dm_logger->on_send_context_free_inline();
    }
 }
@@ -427,205 +431,7 @@ void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, a
    if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
       return;
    }
-
-   SYS_ASSERT( !trx_context.is_read_only(), transaction_exception, "cannot schedule a deferred transaction from within a readonly transaction" );
-   SYS_ASSERT( trx.context_free_actions.size() == 0, cfa_inside_generated_tx, "context free actions are not currently allowed in generated transactions" );
-
-   bool enforce_actor_whitelist_blacklist = trx_context.enforce_whiteblacklist && control.is_speculative_block()
-                                             && !control.sender_avoids_whitelist_blacklist_enforcement( receiver );
-   trx_context.validate_referenced_accounts( trx, enforce_actor_whitelist_blacklist );
-
-   if( control.is_builtin_activated( builtin_protocol_feature_t::no_duplicate_deferred_id ) ) {
-      auto exts = trx.validate_and_extract_extensions();
-      if( exts.size() > 0 ) {
-         auto itr = exts.lower_bound( deferred_transaction_generation_context::extension_id() );
-
-         SYS_ASSERT( exts.size() == 1 && itr != exts.end(), invalid_transaction_extension,
-                     "only the deferred_transaction_generation_context extension is currently supported for deferred transactions"
-         );
-
-         const auto& context = std::get<deferred_transaction_generation_context>(itr->second);
-
-         SYS_ASSERT( context.sender == receiver, ill_formed_deferred_transaction_generation_context,
-                     "deferred transaction generaction context contains mismatching sender",
-                     ("expected", receiver)("actual", context.sender)
-         );
-         SYS_ASSERT( context.sender_id == sender_id, ill_formed_deferred_transaction_generation_context,
-                     "deferred transaction generaction context contains mismatching sender_id",
-                     ("expected", sender_id)("actual", context.sender_id)
-         );
-         SYS_ASSERT( context.sender_trx_id == trx_context.packed_trx.id(), ill_formed_deferred_transaction_generation_context,
-                     "deferred transaction generaction context contains mismatching sender_trx_id",
-                     ("expected", trx_context.packed_trx.id())("actual", context.sender_trx_id)
-         );
-      } else {
-         emplace_extension(
-            trx.transaction_extensions,
-            deferred_transaction_generation_context::extension_id(),
-            fc::raw::pack( deferred_transaction_generation_context( trx_context.packed_trx.id(), sender_id, receiver ) )
-         );
-      }
-      trx.expiration = time_point_sec();
-      trx.ref_block_num = 0;
-      trx.ref_block_prefix = 0;
-   } else {
-      trx.expiration = time_point_sec{control.pending_block_time() + fc::microseconds(999'999)}; // Rounds up to nearest second (makes expiration check unnecessary)
-      trx.set_reference_block(control.head_block_id()); // No TaPoS check necessary
-   }
-
-   // Charge ahead of time for the additional net usage needed to retire the deferred transaction
-   // whether that be by successfully executing, soft failure, hard failure, or expiration.
-   const auto& cfg = control.get_global_properties().configuration;
-   trx_context.add_net_usage( static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
-                               + static_cast<uint64_t>(config::transaction_id_net_usage) ); // Will exit early if net usage cannot be payed.
-
-   auto delay = fc::seconds(trx.delay_sec);
-
-   bool ram_restrictions_activated = control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions );
-
-   if( !control.skip_auth_check() && !privileged ) { // Do not need to check authorization if replayng irreversible block or if contract is privileged
-      if( payer != receiver ) {
-         if( ram_restrictions_activated ) {
-            SYS_ASSERT( receiver == act->account, action_validate_exception,
-                        "cannot bill RAM usage of deferred transactions to another account within notify context"
-            );
-            SYS_ASSERT( has_authorization( payer ), action_validate_exception,
-                        "cannot bill RAM usage of deferred transaction to another account that has not authorized the action: ${payer}",
-                        ("payer", payer)
-            );
-         } else {
-            require_authorization(payer); /// uses payer's storage
-         }
-      }
-
-      // Originally this code bypassed authorization checks if a contract was deferring only actions to itself.
-      // The idea was that the code could already do whatever the deferred transaction could do, so there was no point in checking authorizations.
-      // But this is not true. The original implementation didn't validate the authorizations on the actions which allowed for privilege escalation.
-      // It would make it possible to bill RAM to some unrelated account.
-      // Furthermore, even if the authorizations were forced to be a subset of the current action's authorizations, it would still violate the expectations
-      // of the signers of the original transaction, because the deferred transaction would allow billing more CPU and network bandwidth than the maximum limit
-      // specified on the original transaction.
-      // So, the deferred transaction must always go through the authorization checking if it is not sent by a privileged contract.
-      // However, the old logic must still be considered because it cannot objectively change until a consensus protocol upgrade.
-
-      bool disallow_send_to_self_bypass = control.is_builtin_activated( builtin_protocol_feature_t::restrict_action_to_self );
-
-      auto is_sending_only_to_self = [&trx]( const account_name& self ) {
-         bool send_to_self = true;
-         for( const auto& act : trx.actions ) {
-            if( act.account != self ) {
-               send_to_self = false;
-               break;
-            }
-         }
-         return send_to_self;
-      };
-
-      try {
-         control.get_authorization_manager()
-                .check_authorization( trx.actions,
-                                      {},
-                                      {{receiver, config::sysio_code_name}},
-                                      delay,
-                                      std::bind(&transaction_context::checktime, &this->trx_context),
-                                      false
-                                    );
-      } catch( const fc::exception& e ) {
-         if( disallow_send_to_self_bypass || !is_sending_only_to_self(receiver) ) {
-            throw;
-         } else if( control.is_speculative_block() ) {
-            subjective_block_production_exception new_exception(FC_LOG_MESSAGE( error, "Authorization failure with sent deferred transaction consisting only of actions to self"));
-            for (const auto& log: e.get_log()) {
-               new_exception.append_log(log);
-            }
-            throw new_exception;
-         }
-      } catch( ... ) {
-         if( disallow_send_to_self_bypass || !is_sending_only_to_self(receiver) ) {
-            throw;
-         } else if( control.is_speculative_block() ) {
-            SYS_THROW(subjective_block_production_exception, "Unexpected exception occurred validating sent deferred transaction consisting only of actions to self");
-         }
-      }
-   }
-
-   uint32_t trx_size = 0;
-   if ( auto ptr = db.find<generated_transaction_object,by_sender_id>(boost::make_tuple(receiver, sender_id)) ) {
-      SYS_ASSERT( replace_existing, deferred_tx_duplicate, "deferred transaction with the same sender_id and payer already exists" );
-
-      bool replace_deferred_activated = control.is_builtin_activated(builtin_protocol_feature_t::replace_deferred);
-
-      SYS_ASSERT( replace_deferred_activated || !control.is_speculative_block()
-                     || control.all_subjective_mitigations_disabled(),
-                  subjective_block_production_exception,
-                  "Replacing a deferred transaction is temporarily disabled." );
-
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", ptr->id)), "deferred_trx", "cancel", "deferred_trx_cancel");
-      }
-
-      uint64_t orig_trx_ram_bytes = config::billable_size_v<generated_transaction_object> + ptr->packed_trx.size();
-      if( replace_deferred_activated ) {
-         add_ram_usage( ptr->payer, -static_cast<int64_t>( orig_trx_ram_bytes ) );
-      } else {
-         control.add_to_ram_correction( ptr->payer, orig_trx_ram_bytes );
-      }
-
-      transaction_id_type trx_id_for_new_obj;
-      if( replace_deferred_activated ) {
-         trx_id_for_new_obj = trx.id();
-      } else {
-         trx_id_for_new_obj = ptr->trx_id;
-      }
-
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-         dm_logger->on_cancel_deferred(deep_mind_handler::operation_qualifier::modify, *ptr);
-      }
-
-      // Use remove and create rather than modify because mutating the trx_id field in a modifier is unsafe.
-      db.remove( *ptr );
-      db.create<generated_transaction_object>( [&]( auto& gtx ) {
-         gtx.trx_id      = trx_id_for_new_obj;
-         gtx.sender      = receiver;
-         gtx.sender_id   = sender_id;
-         gtx.payer       = payer;
-         gtx.published   = control.pending_block_time();
-         gtx.delay_until = gtx.published + delay;
-         gtx.expiration  = gtx.delay_until + fc::seconds(control.get_global_properties().configuration.deferred_trx_expiration_window);
-
-         trx_size = gtx.set( trx );
-
-         if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-            dm_logger->on_send_deferred(deep_mind_handler::operation_qualifier::modify, gtx);
-            dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", gtx.id)), "deferred_trx", "update", "deferred_trx_add");
-         }
-      } );
-   } else {
-      db.create<generated_transaction_object>( [&]( auto& gtx ) {
-         gtx.trx_id      = trx.id();
-         gtx.sender      = receiver;
-         gtx.sender_id   = sender_id;
-         gtx.payer       = payer;
-         gtx.published   = control.pending_block_time();
-         gtx.delay_until = gtx.published + delay;
-         gtx.expiration  = gtx.delay_until + fc::seconds(control.get_global_properties().configuration.deferred_trx_expiration_window);
-
-         trx_size = gtx.set( trx );
-
-         if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-            dm_logger->on_send_deferred(deep_mind_handler::operation_qualifier::none, gtx);
-            dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", gtx.id)), "deferred_trx", "add", "deferred_trx_add");
-         }
-      } );
-   }
-
-   SYS_ASSERT( ram_restrictions_activated
-               || control.is_ram_billing_in_notify_allowed()
-               || (receiver == act->account) || (receiver == payer) || privileged,
-               subjective_block_production_exception,
-               "Cannot charge RAM to other accounts during notify."
-   );
-   add_ram_usage( payer, (config::billable_size_v<generated_transaction_object> + trx_size) );
+   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
 }
 
 bool apply_context::cancel_deferred_transaction( const uint128_t& sender_id, account_name sender ) {
@@ -633,20 +439,7 @@ bool apply_context::cancel_deferred_transaction( const uint128_t& sender_id, acc
    if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
       return false;
    }
-
-   SYS_ASSERT( !trx_context.is_read_only(), transaction_exception, "cannot cancel a deferred transaction from within a readonly transaction" );
-   auto& generated_transaction_idx = db.get_mutable_index<generated_transaction_multi_index>();
-   const auto* gto = db.find<generated_transaction_object,by_sender_id>(boost::make_tuple(sender, sender_id));
-   if ( gto ) {
-      if (auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient())) {
-         dm_logger->on_cancel_deferred(deep_mind_handler::operation_qualifier::none, *gto);
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", gto->id)), "deferred_trx", "cancel", "deferred_trx_cancel");
-      }
-
-      add_ram_usage( gto->payer, -(config::billable_size_v<generated_transaction_object> + gto->packed_trx.size()) );
-      generated_transaction_idx.remove(*gto);
-   }
-   return gto;
+   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
 }
 
 uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free )
@@ -732,6 +525,9 @@ vector<account_name> apply_context::get_active_producers() const {
 }
 
 void apply_context::update_db_usage( const account_name& payer, int64_t delta ) {
+   // wlog("ApplyContext update_db_usage for payer ${payer} of ${delta} bytes,"
+   //      " privileged ${privileged}, receiver ${receiver}, action ${action} of account ${act_account}",
+   //      ("payer", payer)("delta", delta)("privileged", privileged)("receiver", receiver)("action", act->name)("act_account", act->account));
    if( delta > 0 ) {
       if( !(privileged || payer == account_name(receiver)
                || control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) )
@@ -1072,10 +868,46 @@ uint64_t apply_context::next_auth_sequence( account_name actor ) {
    return amo.auth_sequence;
 }
 
-void apply_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-   trx_context.add_ram_usage( account, ram_delta );
+bool is_system_account(const account_name& name) {
+   return (name == config::system_account_name) ||
+          (name.to_string().size() > 5 && name.to_string().find("sysio.") == 0);
+}
 
-   auto p = _account_ram_deltas.emplace( account, ram_delta );
+void apply_context::add_ram_usage( account_name payer, int64_t ram_delta ) {
+   ilog("System account status: Payer ${payer} ${payer_sys}, receiver ${receiver} ${receiver_sys}", ("payer", payer)("payer_sys", is_system_account(payer))("receiver", receiver)("receiver_sys", is_system_account(receiver)));
+
+   if (payer != receiver && ram_delta > 0) {
+      ilog("Payer is not receiver (${receiver}) or system account and ram_delta is positive, checking authorization for payer ${payer}", ("receiver", receiver)("payer", payer));
+      if (receiver == config::system_account_name) {
+         wlog("Receiver is system account, no need to check authorization for payer ${payer}", ("payer", payer));
+      } else if (payer == config::system_account_name && is_privileged()) {
+         wlog("Payer is system account and receiver is privileged, no need to check authorization for payer ${payer}", ("payer", payer));
+      } else {
+         wlog("We need authorization to charge RAM to payer ${payer}", ("payer", payer));
+         auto payer_found = false;
+         // search act->authorization for a payer permission role
+         for( const auto& auth : act->authorization ) {
+            wlog("Authorization actor: ${actor}, permission: ${permission}, actor is system: ${sys}", ("actor", auth.actor)("permission", auth.permission)("sys", is_system_account(auth.actor)));
+            if( auth.actor == payer && auth.permission == config::sysio_payer_name ) {
+               payer_found = true;
+               wlog("We are authorized!");
+               break;
+            }
+            if ( auth.actor == config::system_account_name ) {
+               // If the payer is the system account, we don't enforce explicit payer authorization.
+               // This avoids a lot of changes for tests and sysio should not be calling untrusted contracts
+               // or spending user's RAM unexpectedly.
+               payer_found = true;
+               wlog("System account authorized, no need to provide explicit payer authorization");
+               break;
+            }
+         }
+         SYS_ASSERT(payer_found, unsatisfied_authorization, "Requested payer ${payer} did not authorize payment", ("payer", payer));
+      }
+   }
+   trx_context.add_ram_usage( payer, ram_delta );
+
+   auto p = _account_ram_deltas.emplace( payer, ram_delta );
    if( !p.second ) {
       p.first->delta += ram_delta;
    }

@@ -804,42 +804,6 @@ BOOST_FIXTURE_TEST_CASE(deferred_cfa_failed, validating_tester_no_disable_deferr
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE(deferred_cfa_success, validating_tester_no_disable_deferred_trx)  try {
-
-   create_account( "testapi"_n );
-	produce_blocks(1);
-	set_code( "testapi"_n, test_contracts::test_api_wasm() );
-
-   account_name a = "testapi2"_n;
-   account_name creator = config::system_account_name;
-   signed_transaction trx;
-   trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                 newaccount{
-                                 .creator  = creator,
-                                 .name     = a,
-                                 .owner    = authority( get_public_key( a, "owner" ) ),
-                                 .active   = authority( get_public_key( a, "active" ) )
-                                 });
-   action act({}, test_api_action<TEST_METHOD("test_transaction", "context_free_api")>{});
-   trx.context_free_actions.push_back(act);
-   set_transaction_headers(trx, 10, 2);
-   trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-   auto trace = push_transaction( trx );
-   BOOST_REQUIRE(trace != nullptr);
-   if (trace) {
-      BOOST_REQUIRE_EQUAL(transaction_receipt_header::status_enum::delayed, trace->receipt->status);
-      BOOST_REQUIRE_EQUAL(1, trace->action_traces.size());
-   }
-   produce_blocks(10);
-
-   // CFA success, testapi2 created
-   BOOST_CHECK_EXCEPTION(create_account( "testapi2"_n ), fc::exception,
-      [&](const fc::exception &e) {
-         return expect_assert_message(e, "Cannot create account named testapi2, as that name is already taken");
-      });
-   BOOST_REQUIRE_EQUAL( validate(), true );
-} FC_LOG_AND_RETHROW()
-
 BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
    tester chain(setup_policy::full);
 
@@ -2944,7 +2908,7 @@ BOOST_AUTO_TEST_CASE( set_producers_legacy ) { try {
       "initu"_n
    };
 
-   t.create_accounts( prods );
+   t.create_accounts( prods, false, true, false );
    t.produce_block();
 
    auto trace = t.set_producers_legacy(prods);

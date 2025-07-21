@@ -1237,17 +1237,7 @@ struct controller_impl {
    }
 
    int64_t remove_scheduled_transaction( const generated_transaction_object& gto ) {
-      // deferred transactions cannot be transient.
-      if (auto dm_logger = get_deep_mind_logger(false)) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", gto.id)), "deferred_trx", "remove", "deferred_trx_removed");
-      }
-
-      int64_t ram_delta = -(config::billable_size_v<generated_transaction_object> + gto.packed_trx.size());
-      resource_limits.add_pending_ram_usage( gto.payer, ram_delta, false ); // false for doing dm logging
-      // No need to verify_account_ram_usage since we are only reducing memory
-
-      db.remove( gto );
-      return ram_delta;
+      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
    }
 
    bool failure_is_subjective( const fc::exception& e ) const {
@@ -1309,12 +1299,6 @@ struct controller_impl {
 
       fc::datastream<const char*> ds( gtrx.packed_trx.data(), gtrx.packed_trx.size() );
 
-      // check delay_until only before disable_deferred_trxs_stage_1 is activated.
-      if( !self.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
-         SYS_ASSERT( gtrx.delay_until <= self.pending_block_time(), transaction_exception, "this transaction isn't ready",
-                    ("gtrx.delay_until",gtrx.delay_until)("pbt",self.pending_block_time()) );
-      }
-
       signed_transaction dtrx;
       fc::raw::unpack(ds,static_cast<transaction&>(dtrx) );
       transaction_metadata_ptr trx =
@@ -1334,7 +1318,7 @@ struct controller_impl {
          trace->producer_block_id = self.pending_producer_block_id();
          trace->scheduled = true;
          trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::expired, billed_cpu_time_us, 0 ); // expire the transaction
-         trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
+         trace->account_ram_delta = account_delta( gtrx.sender, trx_removal_ram_delta );
          trace->elapsed = fc::time_point::now() - start;
          pending->_block_report.total_cpu_usage_us += billed_cpu_time_us;
          pending->_block_report.total_elapsed_time += trace->elapsed;
@@ -1346,173 +1330,7 @@ struct controller_impl {
          return trace;
       }
 
-      auto reset_in_trx_requiring_checks = fc::make_scoped_exit([old_value=in_trx_requiring_checks,this](){
-         in_trx_requiring_checks = old_value;
-      });
-      in_trx_requiring_checks = true;
-
-      uint32_t cpu_time_to_bill_us = billed_cpu_time_us;
-
-      transaction_checktime_timer trx_timer( timer );
-      transaction_context trx_context( self, *trx->packed_trx(), gtrx.trx_id, std::move(trx_timer) );
-      trx_context.leeway =  fc::microseconds(0); // avoid stealing cpu resource
-      trx_context.block_deadline = block_deadline;
-      trx_context.max_transaction_time_subjective = max_transaction_time;
-      trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-      trx_context.billed_cpu_time_us = billed_cpu_time_us;
-      trx_context.enforce_whiteblacklist = gtrx.sender.empty() ? true : !sender_avoids_whitelist_blacklist_enforcement( gtrx.sender );
-      trace = trx_context.trace;
-
-      auto handle_exception = [&](const auto& e)
-      {
-         cpu_time_to_bill_us = trx_context.update_billed_cpu_time( fc::time_point::now() );
-         trace->error_code = controller::convert_exception_to_error_code( e );
-         trace->except = e;
-         trace->except_ptr = std::current_exception();
-         trace->elapsed = fc::time_point::now() - start;
-
-         // deferred transactions cannot be transient
-         if (auto dm_logger = get_deep_mind_logger(false)) {
-            dm_logger->on_fail_deferred();
-         }
-      };
-
-      try {
-         trx_context.init_for_deferred_trx( gtrx.published );
-
-         if( trx_context.enforce_whiteblacklist && self.is_speculative_block() ) {
-            flat_set<account_name> actors;
-            for( const auto& act : trx->packed_trx()->get_transaction().actions ) {
-               for( const auto& auth : act.authorization ) {
-                  actors.insert( auth.actor );
-               }
-            }
-            check_actor_list( actors );
-         }
-
-         trx_context.exec();
-         trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
-
-         auto restore = make_block_restore_point();
-
-         trace->receipt = push_receipt( gtrx.trx_id,
-                                        transaction_receipt::executed,
-                                        trx_context.billed_cpu_time_us,
-                                        trace->net_usage );
-
-         fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
-                          std::move(trx_context.executed_action_receipt_digests) );
-
-         trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
-
-         emit( self.accepted_transaction, trx );
-         dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-
-         trx_context.squash();
-         undo_session.squash();
-
-         restore.cancel();
-
-         pending->_block_report.total_net_usage += trace->net_usage;
-         pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
-         pending->_block_report.total_elapsed_time += trace->elapsed;
-         pending->_block_report.total_time += fc::time_point::now() - start;
-
-         return trace;
-      } catch( const disallowed_transaction_extensions_bad_block_exception& ) {
-         throw;
-      } catch( const protocol_feature_bad_block_exception& ) {
-         throw;
-      } catch ( const std::bad_alloc& ) {
-         throw;
-      } catch ( const boost::interprocess::bad_alloc& ) {
-         throw;
-      } catch( const fc::exception& e ) {
-        handle_exception(e);
-      } catch ( const std::exception& e) {
-        auto wrapper = fc::std_exception_wrapper::from_current_exception(e);
-        handle_exception(wrapper);
-      }
-
-      trx_context.undo();
-
-      // Only subjective OR soft OR hard failure logic below:
-
-      if( gtrx.sender != account_name() && !(validating ? failure_is_subjective(*trace->except) : scheduled_failure_is_subjective(*trace->except))) {
-         // Attempt error handling for the generated transaction.
-
-         auto error_trace = apply_onerror( gtrx, block_deadline, max_transaction_time, trx_context.pseudo_start,
-                                           cpu_time_to_bill_us, billed_cpu_time_us, explicit_billed_cpu_time,
-                                           trx_context.enforce_whiteblacklist );
-         error_trace->failed_dtrx_trace = trace;
-         trace = error_trace;
-         if( !trace->except_ptr ) {
-            trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
-            trace->elapsed = fc::time_point::now() - start;
-            emit( self.accepted_transaction, trx );
-            dmlog_applied_transaction(trace);
-            emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-            undo_session.squash();
-            pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
-            pending->_block_report.total_elapsed_time += trace->elapsed;
-            pending->_block_report.total_time += trace->elapsed;
-            return trace;
-         }
-         trace->elapsed = fc::time_point::now() - start;
-      }
-
-      // Only subjective OR hard failure logic below:
-
-      // subjectivity changes based on producing vs validating
-      bool subjective  = false;
-      if (validating) {
-         subjective = failure_is_subjective(*trace->except);
-      } else {
-         subjective = scheduled_failure_is_subjective(*trace->except);
-      }
-
-      if ( !subjective ) {
-         // hard failure logic
-
-         if( !validating ) {
-            auto& rl = self.get_mutable_resource_limits_manager();
-            rl.update_account_usage( trx_context.bill_to_accounts, block_timestamp_type(self.pending_block_time()).slot );
-            int64_t account_cpu_limit = 0;
-            std::tie( std::ignore, account_cpu_limit, std::ignore, std::ignore ) = trx_context.max_bandwidth_billed_accounts_can_pay( true );
-
-            uint32_t limited_cpu_time_to_bill_us = static_cast<uint32_t>( std::min(
-                  std::min( static_cast<int64_t>(cpu_time_to_bill_us), account_cpu_limit ),
-                  trx_context.initial_objective_duration_limit.count() ) );
-            SYS_ASSERT( !explicit_billed_cpu_time || (cpu_time_to_bill_us == limited_cpu_time_to_bill_us),
-                        transaction_exception, "cpu to bill ${cpu} != limited ${limit}", ("cpu", cpu_time_to_bill_us)("limit", limited_cpu_time_to_bill_us) );
-            cpu_time_to_bill_us = limited_cpu_time_to_bill_us;
-         }
-
-         resource_limits.add_transaction_usage( trx_context.bill_to_accounts, cpu_time_to_bill_us, 0,
-                                                block_timestamp_type(self.pending_block_time()).slot ); // Should never fail
-
-         trace->receipt = push_receipt(gtrx.trx_id, transaction_receipt::hard_fail, cpu_time_to_bill_us, 0);
-         trace->account_ram_delta = account_delta( gtrx.payer, trx_removal_ram_delta );
-
-         emit( self.accepted_transaction, trx );
-         dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-
-         undo_session.squash();
-      } else {
-         emit( self.accepted_transaction, trx );
-         dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-      }
-
-      pending->_block_report.total_net_usage += trace->net_usage;
-      if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
-      pending->_block_report.total_elapsed_time += trace->elapsed;
-      pending->_block_report.total_time += fc::time_point::now() - start;
-
-      return trace;
+      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
    } FC_CAPTURE_AND_RETHROW() } /// push_scheduled_transaction
 
 

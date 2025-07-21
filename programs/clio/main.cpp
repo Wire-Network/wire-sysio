@@ -187,6 +187,7 @@ uint32_t tx_max_net_usage = 0;
 uint32_t delaysec = 0;
 
 vector<string> tx_permission;
+string tx_payer;
 
 enum class tx_compression_type {
    none,
@@ -236,6 +237,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    if(!default_permission.empty())
       msg += " (defaults to '" + default_permission + "')";
    cmd->add_option("-p,--permission", tx_permission, localized(msg.c_str()));
+   cmd->add_option("-P,--payer", tx_payer, localized("Pass in explicit payer permission"));
 
    cmd->add_option("--max-cpu-usage-ms", tx_max_cpu_usage, localized("Set an upper limit on the milliseconds of cpu usage budget, for the execution of the transaction (defaults to 0 which means no limit)"));
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("Set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
@@ -299,6 +301,9 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    });
    vector<chain::permission_level> accountPermissions;
    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
+   if (!tx_payer.empty()) {
+      accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+   }
    return accountPermissions;
 }
 

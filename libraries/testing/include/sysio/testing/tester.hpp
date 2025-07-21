@@ -164,6 +164,9 @@ namespace sysio { namespace testing {
          static const uint32_t DEFAULT_BILLED_CPU_TIME_US = 2000;
          static const fc::microseconds abi_serializer_max_time;
 
+         static constexpr auto NODE_DADDY = "nodedaddy"_n;
+         bool has_roa = false;
+
          virtual ~base_tester() {};
 
          void              init(const setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::HEAD, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{});
@@ -214,6 +217,7 @@ namespace sysio { namespace testing {
 
          [[nodiscard]]
          action_result            push_action(action&& cert_act, uint64_t authorizer); // TODO/QUESTION: Is this needed?
+         action_result            push_paid_action(action&& cert_act, uint64_t authorizer); // TODO/QUESTION: Is this needed?
 
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
@@ -244,12 +248,13 @@ namespace sysio { namespace testing {
 
          vector<transaction_trace_ptr>  create_accounts( vector<account_name> names,
                                                          bool multisig = false,
-                                                         bool include_code = true
+                                                         bool include_code = true,
+                                                         bool include_roa_policy = true
                                                        )
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code, include_roa_policy ) );
             return traces;
          }
 
@@ -275,11 +280,14 @@ namespace sysio { namespace testing {
          transaction_trace_ptr create_account( account_name name,
                                                account_name creator = config::system_account_name,
                                                bool multisig = false,
-                                               bool include_code = true
+                                               bool include_code = true,
+                                               bool include_roa_policy = true
                                              );
 
          transaction_trace_ptr register_node_owner( account_name account, uint32_t tier );
          transaction_trace_ptr add_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen, uint32_t time_block );
+         transaction_trace_ptr expand_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen );
+         transaction_trace_ptr reduce_roa_policy( account_name issuer, account_name owner, string net_weight, string cpu_weight, string ram_weight, int64_t network_gen );
 
 
          transaction_trace_ptr push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys );
@@ -320,6 +328,8 @@ namespace sysio { namespace testing {
             return get_private_key<KeyType>( keyname, role ).get_public_key();
          }
 
+
+         void              set_contract( account_name contract, const vector<uint8_t>& wasm, const std::string& abi_json );
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
          void              set_abi( account_name name, const std::string& abi_json, const private_key_type* signer = nullptr );

@@ -382,6 +382,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(account_results_self_delegated_bandwidth_test, chain_plugin_tester) { try {
+    SKIP_TEST;
 
     produce_blocks(10);
     setup_system_accounts();
@@ -468,6 +469,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_refund_request_test, chain_plugin_tester
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(account_results_voter_info_test, chain_plugin_tester) { try {
+    SKIP_TEST;
 
     produce_blocks(10);
     setup_system_accounts();

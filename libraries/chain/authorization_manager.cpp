@@ -301,6 +301,7 @@ namespace sysio { namespace chain {
                      "cannot call lookup_minimum_permission on native actions that are not allowed to be linked to minimum permissions" );
       }
 
+
       try {
          std::optional<permission_name> linked_permission = lookup_linked_permission(authorizer_account, scope, act_name);
          if( !linked_permission )
@@ -518,9 +519,17 @@ namespace sysio { namespace chain {
             }
          }
 
+         account_name payer;
          for( const auto& declared_auth : act.authorization ) {
 
             checktime();
+
+            // Special case for explicit payer
+            if ( declared_auth.permission == config::sysio_payer_name ) {
+               SYS_ASSERT(payer.empty(), irrelevant_auth_exception, "Multiple payers specified for action");
+               payer = declared_auth.actor;
+               continue;
+            }
 
             if( !special_case ) {
                auto min_permission_name = lookup_minimum_permission(declared_auth.actor, act.account, act.name);
@@ -540,6 +549,18 @@ namespace sysio { namespace chain {
                   res.first->second = delay;
                }
             }
+         }
+         if (!payer.empty()) {
+            bool foundPayer = false;
+            // verify payer is in satisfied_authorizations list by iterating over each entry and checking actor
+            for (const auto& auth : act.authorization) {
+               if (auth.actor == payer && auth.permission != config::sysio_payer_name) {
+                  // found a match, break out of loop
+                  foundPayer = true;
+                  break;
+               }
+            }
+            SYS_ASSERT( foundPayer, unsatisfied_authorization, "Payer authorization for {name} not paired with matching auth", ("name", payer));
          }
       }
 
@@ -628,9 +649,17 @@ namespace sysio { namespace chain {
 
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
-            SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                        "transaction declares authority '${auth}', but does not have signatures for it.",
-                        ("auth", declared_auth) );
+            if (declared_auth.permission == config::sysio_payer_name) {
+               auto active_auth = permission_level{declared_auth.actor, config::active_name};
+               SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
+                           "transaction declares payer authority '${auth}', but does not have signatures for it.",
+                           ("auth", active_auth) );
+
+            } else {
+               SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
+                           "transaction declares authority '${auth}', but does not have signatures for it.",
+                           ("auth", declared_auth) );
+            }
          }
       }
 
