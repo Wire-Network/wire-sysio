@@ -1999,7 +1999,6 @@ struct controller_impl {
          auto& ab = std::get<assembled_block>(pending->_block_stage);
 
          if( producer_block_id != ab._id ) {
-            elog( "Validation block id does not match producer block id" );
             report_block_header_diff( *b, *ab._unsigned_block );
             // this implicitly asserts that all header fields (less the signature) are identical
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
@@ -3674,19 +3673,19 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
       );
       applied_transaction.connect(
          [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
             }
          } );
       accepted_block.connect(
          [self=this,root_txn_ident]( const block_state_ptr& blk ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_accepted_block(blk);
             }
          } ) ;
       block_start.connect(
          [self=this,root_txn_ident]( uint32_t block_num ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_block_start(block_num);
             }
          } ) ;

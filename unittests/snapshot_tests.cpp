@@ -3,6 +3,7 @@
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
+#include <sysio/chain/s_root_extension.hpp>
 #include <sysio/testing/tester.hpp>
 #include "snapshot_suites.hpp"
 
@@ -52,12 +53,16 @@ class snapshotted_tester : public base_tester {
 public:
    enum config_file_handling { dont_copy_config_files, copy_config_files };
    snapshotted_tester(controller::config config, const snapshot_reader_ptr& snapshot, int ordinal,
-           config_file_handling copy_files_from_config = config_file_handling::dont_copy_config_files) {
+           config_file_handling copy_files_from_config = config_file_handling::dont_copy_config_files,
+           std::optional<contract_action_matches> matches = {}) {
       FC_ASSERT(config.blocks_dir.filename().generic_string() != "."
                 && config.state_dir.filename().generic_string() != ".", "invalid path names in controller::config");
 
       controller::config copied_config = (copy_files_from_config == copy_config_files)
                                          ? copy_config_and_files(config, ordinal) : copy_config(config, ordinal);
+      if (matches) {
+         root_matches.emplace(std::move(*matches));
+      }
 
       init(copied_config, snapshot);
    }
@@ -148,13 +153,18 @@ namespace {
    void print_variant_diff(const fc::variant& lhs, const fc::variant& rhs) {
       variant_diff_helper(lhs, rhs, [](const std::string& path, const fc::variant& lhs, const fc::variant& rhs){
          std::cout << path << std::endl;
+         std::cout << "lhs:"  << std::endl;
          if (!lhs.is_null()) {
-            std::cout << " < " << fc::json::to_pretty_string(lhs) << std::endl;
+            std::cout << fc::json::to_pretty_string(lhs) << std::endl;
          }
+         std::cout << std::endl;
+         std::cout << "----------------------------------------------------------------" << std::endl;
 
+         std::cout << "rhs:" << std::endl;
          if (!rhs.is_null()) {
-            std::cout << " > " << fc::json::to_pretty_string(rhs) << std::endl;
+            std::cout << fc::json::to_pretty_string(rhs);
          }
+         std::cout << std::endl;
       });
    }
 
@@ -363,6 +373,120 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_chain_id_in_snapshot, SNAPSHOT_SUITE, snapsho
    snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
    BOOST_REQUIRE_EQUAL(chain.control->get_chain_id(), snap_chain.control->get_chain_id());
    verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
+{
+   contract_action_matches matches;
+   matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+   matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
+   tester chain(matches);
+   const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
+   auto find_s_root_ext = [](const auto& exts) {
+      return std::find_if(exts.begin(), exts.end(),
+         [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
+   };
+
+   const auto block4 = chain.control->fetch_block_by_number(4);
+   BOOST_CHECK_EQUAL(4u, block4->block_num());
+   BOOST_CHECK_EQUAL(2u, block4->header_extensions.size());
+
+   flat_multimap<uint16_t, block_header_extension> header_exts = block4->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
+
+   auto crtd_it = find_s_root_ext(header_exts);
+
+   BOOST_CHECK(crtd_it != header_exts.end());
+   s_root_extension crtd_s_ext4 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header4 = crtd_s_ext4.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header4.contract_name);
+   BOOST_CHECK_EQUAL(checksum256_type(), crtd_s_header4.previous_s_id);
+   BOOST_CHECK_EQUAL(0u, crtd_s_header4.previous_block_num);
+   BOOST_CHECK(checksum256_type() != crtd_s_header4.current_s_id);
+   BOOST_CHECK(checksum256_type() != crtd_s_header4.current_s_root);
+
+   chain.create_account("snapshot"_n);
+   chain.produce_blocks(1);
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
+   chain.produce_blocks(1);
+   chain.control->abort_block();
+
+   const auto block5 = chain.control->fetch_block_by_number(5);
+
+   BOOST_CHECK_EQUAL(5u, block5->block_num());
+   BOOST_CHECK_EQUAL(1u, block5->header_extensions.size());
+   header_exts = block5->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
+
+   crtd_it = find_s_root_ext(header_exts);
+
+   BOOST_CHECK(crtd_it != header_exts.end());
+   s_root_extension crtd_s_ext5 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header5 = crtd_s_ext5.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header5.contract_name);
+   BOOST_CHECK_EQUAL(crtd_s_header4.current_s_id, crtd_s_header5.previous_s_id);
+   BOOST_CHECK_EQUAL(4u, crtd_s_header5.previous_block_num);
+   BOOST_CHECK(checksum256_type() != crtd_s_header5.current_s_id);
+   BOOST_CHECK(checksum256_type() != crtd_s_header5.current_s_root);
+
+   const auto block6 = chain.control->fetch_block_by_number(6);
+
+   BOOST_CHECK_EQUAL(6u, block6->block_num());
+   BOOST_CHECK_EQUAL(0u, block6->header_extensions.size());
+   header_exts = block6->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(0u, header_exts.count(s_root_extension::extension_id()));
+
+   // create a new snapshot child
+   auto writer = SNAPSHOT_SUITE::get_writer();
+   chain.control->write_snapshot(writer);
+   auto snapshot = SNAPSHOT_SUITE::finalize(writer);
+
+   snapshotted_tester snap_chain(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0, snapshotted_tester::dont_copy_config_files, matches);
+   BOOST_REQUIRE_EQUAL(chain.control->get_chain_id(), snap_chain.control->get_chain_id());
+   verify_integrity_hash<SNAPSHOT_SUITE>(*chain.control, *snap_chain.control);
+
+   // verify that the snapshot_chain is producing the same s_header results
+   chain.create_account("tom"_n);
+   const auto block7 = chain.produce_block();
+
+   snap_chain.create_account("bob"_n);
+   
+   snap_chain.push_block(block7);
+
+   BOOST_CHECK_EQUAL(7u, block7->block_num());
+   BOOST_CHECK_EQUAL(1u, block7->header_extensions.size());
+   header_exts = block7->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
+
+   crtd_it = find_s_root_ext(header_exts);
+
+   BOOST_CHECK(crtd_it != header_exts.end());
+   s_root_extension crtd_s_ext7 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header7 = crtd_s_ext7.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header7.contract_name);
+   BOOST_CHECK_EQUAL(crtd_s_header5.current_s_id, crtd_s_header7.previous_s_id);
+   BOOST_CHECK_EQUAL(5u, crtd_s_header7.previous_block_num);
+   BOOST_CHECK(checksum256_type() != crtd_s_header7.current_s_id);
+   BOOST_CHECK(checksum256_type() != crtd_s_header7.current_s_root);
+   
+   const auto snap_block7 = chain.control->fetch_block_by_number(7);
+  
+   BOOST_CHECK_EQUAL(7u, snap_block7->block_num());
+   BOOST_CHECK_EQUAL(1u, snap_block7->header_extensions.size());
+   header_exts = snap_block7->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
+
+   crtd_it = find_s_root_ext(header_exts);
+
+   BOOST_CHECK(crtd_it != header_exts.end());
+   s_root_extension crtd_s_ext_snap7 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header_snap7 = crtd_s_ext_snap7.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_snap7.contract_name);
+   BOOST_CHECK_EQUAL(crtd_s_header5.current_s_id, crtd_s_header_snap7.previous_s_id);
+   BOOST_CHECK_EQUAL(5u, crtd_s_header_snap7.previous_block_num);
+   BOOST_CHECK_EQUAL(crtd_s_header7.current_s_id, crtd_s_header_snap7.current_s_id);
+   BOOST_CHECK_EQUAL(crtd_s_header7.current_s_root, crtd_s_header_snap7.current_s_root);
 }
 
 static auto get_extra_args() {
