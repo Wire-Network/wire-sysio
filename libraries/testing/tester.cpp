@@ -1287,7 +1287,7 @@ namespace sysio { namespace testing {
    void base_tester::init_roa() {
       // Create the ROA account and mark it as privileged
       create_account(config::roa_account_name, config::system_account_name, false, true, false);
-      set_code(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
+      set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,
                   fc::mutable_variant_object()("account", config::roa_account_name)("is_priv", 1)
