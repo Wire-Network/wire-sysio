@@ -850,6 +850,9 @@ struct controller_impl {
 
       authorization.add_indices();
       resource_limits.add_indices();
+      if (merkle_processor) {
+         merkle_processor->add_indices();
+      }
    }
 
    void clear_all_undo() {
@@ -953,6 +956,9 @@ struct controller_impl {
 
       authorization.add_to_snapshot(snapshot);
       resource_limits.add_to_snapshot(snapshot);
+      if (merkle_processor) {
+         merkle_processor->add_to_snapshot(snapshot);
+      }
    }
 
    void read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
@@ -1009,6 +1015,10 @@ struct controller_impl {
 
       authorization.read_from_snapshot(snapshot);
       resource_limits.read_from_snapshot(snapshot);
+
+      if (merkle_processor) {
+         merkle_processor->read_from_snapshot(snapshot);
+      }
 
       db.set_revision( head->block_num );
       db.create<database_header_object>([](const auto& header){
@@ -1102,6 +1112,9 @@ struct controller_impl {
 
       authorization.initialize_database();
       resource_limits.initialize_database();
+      if (merkle_processor) {
+         merkle_processor->initialize_database();
+      }
 
       authority system_auth(genesis.initial_key);
       create_native_account( genesis.initial_timestamp, config::system_account_name, system_auth, system_auth, true );
@@ -1986,7 +1999,6 @@ struct controller_impl {
          auto& ab = std::get<assembled_block>(pending->_block_stage);
 
          if( producer_block_id != ab._id ) {
-            elog( "Validation block id does not match producer block id" );
             report_block_header_diff( *b, *ab._unsigned_block );
             // this implicitly asserts that all header fields (less the signature) are identical
             SYS_ASSERT( producer_block_id == ab._id, block_validate_exception, "Block ID does not match",
@@ -3661,19 +3673,19 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
       );
       applied_transaction.connect(
          [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
             }
          } );
       accepted_block.connect(
          [self=this,root_txn_ident]( const block_state_ptr& blk ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_accepted_block(blk);
             }
          } ) ;
       block_start.connect(
          [self=this,root_txn_ident]( uint32_t block_num ) {
-            if( root_txn_ident && self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
                root_txn_ident->signal_block_start(block_num);
             }
          } ) ;

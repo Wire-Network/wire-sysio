@@ -1,6 +1,10 @@
 #include <sysio/chain/root_processor.hpp>
 
 namespace sysio { namespace chain {
+   class snapshot_writer;
+   using snapshot_writer_ptr = std::shared_ptr<snapshot_writer>;
+   class snapshot_reader;
+   using snapshot_reader_ptr = std::shared_ptr<snapshot_reader>;
 
    class block_root_processor {
    public:
@@ -9,6 +13,10 @@ namespace sysio { namespace chain {
       static uint32_t extract_root_block_number(const chain::checksum256_type& root_id);
       static chain::checksum256_type compute_curr_root_id(const chain::checksum256_type& prev_root_id, const chain::checksum256_type& curr_root);
       chain::deque<chain::s_header> get_s_headers(uint32_t block_num);
+      void initialize_database();
+      void add_indices();
+      void add_to_snapshot( const snapshot_writer_ptr& snapshot ) const;
+      void read_from_snapshot( const snapshot_reader_ptr& snapshot );
 
    private:
       bool calculate_root_blocks(uint32_t block_num);  

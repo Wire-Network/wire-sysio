@@ -1109,7 +1109,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                }
             } );
       }
-      chain->add_indices();
 
       contract_action_matches matches;
       matches.push_back(contract_action_match("s"_n, "utl"_n, contract_action_match::match_type::suffix));
@@ -1120,6 +1119,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       matches[1].add_action("unregprod"_n, contract_action_match::match_type::exact);
 
       chain->initialize_root_extensions(std::move(matches));
+
+      chain->add_indices();
 
    } FC_LOG_AND_RETHROW()
 

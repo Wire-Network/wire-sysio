@@ -326,6 +326,9 @@ namespace sysio { namespace testing {
       }
 
       control.reset( new controller(cfg, std::move(pfs), *expected_chain_id) );
+      if (root_matches) {
+         control->initialize_root_extensions(std::move(*root_matches));
+      }
       control->add_indices();
       if (lambda) lambda();
       chain_transactions.clear();
@@ -485,6 +488,7 @@ namespace sysio { namespace testing {
       } );
 
       control->commit_block();
+
       last_produced_block[control->head_block_state()->header.producer] = control->head_block_state()->id;
 
       return control->head_block_state()->block;
@@ -649,7 +653,7 @@ namespace sysio { namespace testing {
       signed_transaction trx;
       set_transaction_headers(trx);
 
-      trx.actions.emplace_back(get_action("sysio.roa"_n, "addpolicy"_n,
+      trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
                                           vector<permission_level>{{issuer, config::active_name}},
                                           fc::mutable_variant_object
                                           ("owner", owner)
@@ -1281,18 +1285,16 @@ namespace sysio { namespace testing {
    }
 
    void base_tester::init_roa() {
-      const auto& roa = "sysio.roa"_n;
-
       // Create the ROA account and mark it as privileged
-      create_account(roa, config::system_account_name, false, true, false);
-      set_contract(roa, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
+      create_account(config::roa_account_name, config::system_account_name, false, true, false);
+      set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,
-                  fc::mutable_variant_object()("account", roa)("is_priv", 1)
+                  fc::mutable_variant_object()("account", config::roa_account_name)("is_priv", 1)
       );
 
       // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
-      push_action("sysio.roa"_n, "activateroa"_n, "sysio.roa"_n,
+      push_action(config::roa_account_name, "activateroa"_n, config::roa_account_name,
                   fc::mutable_variant_object()
                   ("total_sys", asset::from_string("75496.0000 SYS"))
                   ("bytes_per_unit", 104)

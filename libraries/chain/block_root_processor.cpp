@@ -1,27 +1,29 @@
 #include <sysio/chain/block_root_processor.hpp>
 #include <sysio/chain/contract_root_object.hpp>
 #include <sysio/chain/merkle.hpp>
+#include <sysio/chain/snapshot.hpp>
 #include <fc/bitutil.hpp>
 
 namespace sysio { namespace chain {
+
+using block_root_index_set = index_set<
+   contract_root_multi_index
+>;
+
 
 block_root_processor::block_root_processor(chainbase::database& db, root_processor_ptr&& processor)
 : _db(db)
 , _processor(std::move(processor)) {
    ilog("block_root_processor initialized");
-   _db.add_index<contract_root_multi_index>();
 }
 
 bool block_root_processor::calculate_root_blocks(uint32_t block_num)
 {
    bool stored = false;
    root_storage root_transactions = _processor->retrieve_root_transactions(block_num);
-   ilog("calculate_root_blocks block_num: ${bn}, roots size: ${rs}",("bn", block_num)("rs", root_transactions.size()));
    for(auto& instance : root_transactions) {
       const auto& contract = instance.first;
       auto& transactions = instance.second;
-      ilog("calculate_root_blocks contract: ${contract}, size: ${size}",
-           ("contract",contract.first.to_string())("size",transactions.size()));
       if (transactions.empty()) {
          continue;
       }
@@ -30,7 +32,6 @@ bool block_root_processor::calculate_root_blocks(uint32_t block_num)
       auto itr = contract_root_idx.find(boost::make_tuple(contract.first, contract.second));
       const auto merkle_root = chain::merkle(transactions);
       if (itr == contract_root_idx.end()) {
-         ilog("calculate_root_blocks new root");
          const auto previous_root_id = chain::checksum256_type();
          const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
          _db.create<contract_root_object>([&](auto& obj) {
@@ -43,7 +44,6 @@ bool block_root_processor::calculate_root_blocks(uint32_t block_num)
             obj.merkle_root = merkle_root;
          });
       } else {
-         ilog("calculate_root_blocks update");
          const auto previous_root_id = itr->root_id;
          const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
          const auto previous_root_block_number = itr->block_num;
@@ -108,6 +108,36 @@ chain::deque<chain::s_header> block_root_processor::get_s_headers(uint32_t block
       }
    }
    return s_headers;
+}
+
+void block_root_processor::initialize_database() {
+}
+
+void block_root_processor::add_indices() {
+   block_root_index_set::add_indices(_db);
+}
+
+void block_root_processor::add_to_snapshot( const snapshot_writer_ptr& snapshot ) const {
+   block_root_index_set::walk_indices([this, &snapshot]( auto utils ){
+      snapshot->write_section<typename decltype(utils)::index_t::value_type>([this]( auto& section ){
+         decltype(utils)::walk(_db, [this, &section]( const auto &row ) {
+            section.add_row(row, _db);
+         });
+      });
+   });
+}
+
+void block_root_processor::read_from_snapshot( const snapshot_reader_ptr& snapshot ) {
+   block_root_index_set::walk_indices([this, &snapshot]( auto utils ){
+      snapshot->read_section<typename decltype(utils)::index_t::value_type>([this]( auto& section ) {
+         bool more = !section.empty();
+         while(more) {
+            decltype(utils)::create(_db, [this, &section, &more]( auto &row ) {
+               more = section.read_row(row, _db);
+            });
+         }
+      });
+   });
 }
 
 } } // namespace sysio::chain

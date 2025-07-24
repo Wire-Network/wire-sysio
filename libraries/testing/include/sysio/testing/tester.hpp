@@ -4,6 +4,7 @@
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/account_object.hpp>
 #include <sysio/chain/abi_serializer.hpp>
+#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <fc/io/json.hpp>
 #include <boost/test/unit_test.hpp>
@@ -476,6 +477,7 @@ namespace sysio { namespace testing {
          map<transaction_id_type, transaction_receipt> chain_transactions;
          map<account_name, block_id_type>              last_produced_block;
          unapplied_transaction_queue                   unapplied_transactions;
+         std::optional<contract_action_matches>        root_matches;
 
       public:
          vector<digest_type>                           protocol_features_to_be_activated_wo_preactivation;
@@ -488,6 +490,11 @@ namespace sysio { namespace testing {
    public:
       tester(setup_policy policy = setup_policy::full, db_read_mode read_mode = db_read_mode::HEAD, std::optional<uint32_t> genesis_max_inline_action_size = std::optional<uint32_t>{}) {
          init(policy, read_mode, genesis_max_inline_action_size);
+      }
+
+      tester(contract_action_matches matches) {
+         root_matches = std::move(matches);
+         init(setup_policy::full, db_read_mode::HEAD, std::optional<uint32_t>{});
       }
 
       tester(controller::config config, const genesis_state& genesis) {
