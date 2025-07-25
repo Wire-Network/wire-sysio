@@ -38,6 +38,27 @@ namespace fc { namespace crypto {
 
          size_t variable_size() const;
 
+         template<typename T>
+         bool contains() const { return std::holds_alternative<T>(_storage); }
+
+         template<typename T>
+         const T& get() const { return std::get<T>(_storage); }
+
+         /**  
+          *  True if this signature variant should be handled by recover(sig, digest)  
+          *  rather than a verify(sig, pubkey, digest)  
+          */
+         bool is_recoverable() const {
+            return std::visit([](auto const& shim){
+               return std::decay_t<decltype(shim)>::is_recoverable;
+            }, _storage);
+         }
+
+         template<typename Visitor>
+         decltype(auto) visit( Visitor&& v ) const {
+            return std::visit( std::forward<Visitor>(v), _storage );
+         }
+
       private:
          storage_type _storage;
 

@@ -48,6 +48,13 @@ namespace fc { namespace crypto {
          explicit public_key(const std::string& base58str);
          std::string to_string(const fc::yield_function_t& yield) const;
 
+         template<typename T>
+         bool contains() const { return std::holds_alternative<T>(_storage); }
+
+         template<typename T>
+         const T& get() const { return std::get<T>(_storage); }
+
+
          storage_type _storage;
 
       private:

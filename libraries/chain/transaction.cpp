@@ -11,17 +11,10 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/transaction.hpp>
 
+#include <fc/static_variant.hpp>
+#include <fc/crypto/elliptic_ed.hpp> 
+#include <fc/crypto/signature.hpp>
 namespace sysio { namespace chain {
-
-void deferred_transaction_generation_context::reflector_init() {
-      static_assert( fc::raw::has_feature_reflector_init_on_unpacked_reflected_types,
-                     "deferred_transaction_generation_context expects FC to support reflector_init" );
-
-
-      SYS_ASSERT( sender != account_name(), ill_formed_deferred_transaction_generation_context,
-                  "Deferred transaction generation context extension must have a non-empty sender account",
-      );
-}
 
 void transaction_header::set_reference_block( const block_id_type& reference_block ) {
    ref_block_num    = fc::endian_reverse_u32(reference_block._hash[0]);
@@ -63,19 +56,59 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    auto start = fc::time_point::now();
    recovered_pub_keys.clear();
 
+   // 1) Extract and validate extensions
+   auto validated_ext = validate_and_extract_extensions();
+   vector<public_key_type> ed_pubkeys;
+   for ( auto const& item : validated_ext ) {
+      if ( auto* e = std::get_if<ed_pubkey_extension>(&item.second) ) {
+         ed_pubkeys.emplace_back(e->pubkey);
+      }
+   }
+
+   if( !allow_duplicate_keys ) {
+      flat_set<public_key_type> seen;
+      for( auto& pk : ed_pubkeys ) {
+         auto [it, inserted] = seen.emplace(pk);
+         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key ${k}", ("k", pk) );
+      }
+   }
+
+   // Prepare index for public key extensions.
+   size_t pk_index = 0;
+
    if ( !signatures.empty() ) {
       const digest_type digest = sig_digest(chain_id, cfd);
 
-      for(const signature_type& sig : signatures) {
-         auto now = fc::time_point::now();
-         SYS_ASSERT( now < deadline, tx_cpu_usage_exceeded, "transaction signature verification executed for too long ${time}us",
-                     ("time", now - start)("now", now)("deadline", deadline)("start", start) );
-         auto[ itr, successful_insertion ] = recovered_pub_keys.emplace( sig, digest );
-         SYS_ASSERT( allow_duplicate_keys || successful_insertion, tx_duplicate_sig,
-                     "transaction includes more than one signature signed using the same key associated with public key: ${key}",
-                     ("key", *itr ) );
+      for ( auto const& sig : signatures ) {
+            auto now = fc::time_point::now();
+            SYS_ASSERT( now < deadline, tx_cpu_usage_exceeded,
+                        "sig verification timed out ${t}us", ("t",now-start) );
+
+            // dynamic dispatch into the correct path
+            sig.visit([&](auto const& shim){
+               using Shim = std::decay_t<decltype(shim)>;
+
+               if constexpr( Shim::is_recoverable ) {
+                  // If public key can be recovered from signature
+                  auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
+                  SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key ${k}", ("k", *itr) );
+               } else {
+                  // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.
+                  SYS_ASSERT( pk_index < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{i}", ("i", pk_index) );
+
+                  const auto& pkvar   = ed_pubkeys[pk_index++];
+                  const auto& pubshim = pkvar.template get<typename Shim::public_key_type>();
+
+                  SYS_ASSERT( shim.verify(digest, pubshim), unsatisfied_authorization, "non-recoverable signature #${i} failed", ("i", pk_index-1) );
+
+                  recovered_pub_keys.emplace(pkvar);
+               }
+            });
       }
    }
+
+   // Ensure no extra ED pubkey extensions were provided
+   SYS_ASSERT( pk_index == ed_pubkeys.size(), unsatisfied_authorization, "got ${g} ED public-key extensions but only ${e} ED signatures", ("g", ed_pubkeys.size()) ("e", pk_index) );
 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW() }

@@ -5,23 +5,14 @@
 
 namespace sysio { namespace chain {
 
-   struct deferred_transaction_generation_context : fc::reflect_init {
-      static constexpr uint16_t extension_id() { return 0; }
-      static constexpr bool     enforce_unique() { return true; }
-
-      deferred_transaction_generation_context() = default;
-
-      deferred_transaction_generation_context( const transaction_id_type& sender_trx_id, uint128_t sender_id, account_name sender )
-      :sender_trx_id( sender_trx_id )
-      ,sender_id( sender_id )
-      ,sender( sender )
-      {}
-
-      void reflector_init();
-
-      transaction_id_type sender_trx_id;
-      uint128_t           sender_id;
-      account_name        sender;
+   /**
+    *  This extension is for including an ED25519 public key in a transaction for signature verification. Generic public_key_type was used to future proof
+    *  in the scenario where another ED25519 curve variant is added. We don't want to add another extension per variant.
+    */
+   struct ed_pubkey_extension {
+      static constexpr uint16_t        extension_id() { return 0x8000; } // 32768 in decimal
+      static constexpr bool            enforce_unique() { return false; }
+      public_key_type                  pubkey; // 32-byte public key
    };
 
    namespace detail {
@@ -33,7 +24,7 @@ namespace sysio { namespace chain {
    }
 
    using transaction_extension_types = detail::transaction_extension_types<
-      deferred_transaction_generation_context
+      ed_pubkey_extension
    >;
 
    using transaction_extension = transaction_extension_types::transaction_extension_t;
@@ -212,7 +203,7 @@ namespace sysio { namespace chain {
 
 } } /// namespace sysio::chain
 
-FC_REFLECT(sysio::chain::deferred_transaction_generation_context, (sender_trx_id)(sender_id)(sender) )
+// FC_REFLECT(sysio::chain::deferred_transaction_generation_context, (sender_trx_id)(sender_id)(sender) )
 FC_REFLECT( sysio::chain::transaction_header, (expiration)(ref_block_num)(ref_block_prefix)
                                               (max_net_usage_words)(max_cpu_usage_ms)(delay_sec) )
 FC_REFLECT_DERIVED( sysio::chain::transaction, (sysio::chain::transaction_header), (context_free_actions)(actions)(transaction_extensions) )
@@ -220,3 +211,4 @@ FC_REFLECT_DERIVED( sysio::chain::signed_transaction, (sysio::chain::transaction
 FC_REFLECT_ENUM( sysio::chain::packed_transaction::compression_type, (none)(zlib))
 // @ignore unpacked_trx
 FC_REFLECT( sysio::chain::packed_transaction, (signatures)(compression)(packed_context_free_data)(packed_trx) )
+FC_REFLECT( sysio::chain::ed_pubkey_extension, (pubkey) )

@@ -40,7 +40,9 @@ struct public_key_shim {
  * ED25519 signature (64 bytes, padded to 65 for fc::signature compatibility)
  */
 struct signature_shim {
-   static constexpr size_t size = crypto_sign_BYTES + 1; // 65
+   static constexpr size_t size = crypto_sign_BYTES + 1; // 65, 64 by default padded to 65 to match fc::signature
+   static constexpr bool is_recoverable = false;
+
    using data_type = fc::array<unsigned char, size>;
    data_type _data;
 
@@ -49,11 +51,11 @@ struct signature_shim {
 
    data_type serialize() const { return _data; }
 
+   using public_key_type = public_key_shim;
    public_key_shim recover(const sha256&, bool) const {
       FC_THROW_EXCEPTION(exception, "ED25519 signature recovery not supported");
    }
 
-   // TODO: Should we just have this throw an exception as well like recover?
    bool verify(const sha256& digest, const public_key_shim& pub) const;
 };
 
@@ -71,7 +73,7 @@ struct private_key_shim {
    using public_key_type = public_key_shim;
 
    public_key_shim get_public_key() const;
-   // TODO: Maybe just make this throw exception as well? Needs caveats of signing for each chain.
+   
    signature_shim  sign(const sha256& digest, bool require_canonical) const;
    sha512          generate_shared_secret(const public_key_shim&) const;
 
@@ -277,7 +279,6 @@ inline mb_peek_datastream<S>& operator>>(mb_peek_datastream<S>& ds, crypto::ed::
     return ds;
 }
 
-// TODO: Optional?
 // mb_peek_datastream<> overloads for ED public key shim (write)
 template<uint32_t S>
 inline mb_peek_datastream<S>& operator<<(mb_peek_datastream<S>& ds, const crypto::ed::public_key_shim& pk) {
