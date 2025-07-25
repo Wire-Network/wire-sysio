@@ -46,4 +46,4 @@ RUN git submodule update --init --recursive
 RUN mkdir build
 WORKDIR /wire/wire-sysio/build
 
-RUN cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 .. && make -j7
+RUN cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 .. && make -j4
