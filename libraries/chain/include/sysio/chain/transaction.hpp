@@ -203,7 +203,6 @@ namespace sysio { namespace chain {
 
 } } /// namespace sysio::chain
 
-// FC_REFLECT(sysio::chain::deferred_transaction_generation_context, (sender_trx_id)(sender_id)(sender) )
 FC_REFLECT( sysio::chain::transaction_header, (expiration)(ref_block_num)(ref_block_prefix)
                                               (max_net_usage_words)(max_cpu_usage_ms)(delay_sec) )
 FC_REFLECT_DERIVED( sysio::chain::transaction, (sysio::chain::transaction_header), (context_free_actions)(actions)(transaction_extensions) )

@@ -642,7 +642,8 @@ namespace impl {
                }
                // future case XXX_extension::extension_id(): …
                default:
-                  // unknown extension: skip or throw
+                  // Should never reach this as validate_and_extract_extensions() should only return known extensions
+                  SYS_ASSERT( false, invalid_transaction_extension, "Transaction extension with id type ${id} is not supported", ("id", id));
                   break;
             }
          }
