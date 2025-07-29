@@ -2,7 +2,7 @@
 
 #include <ios>
 #include <fc/io/cfile.hpp>
-
+#include <fc/crypto/elliptic_ed.hpp>
 namespace sysio::trace_api {
 
    class compressed_file_datastream;
@@ -165,4 +165,23 @@ namespace sysio::trace_api {
       using std::runtime_error::runtime_error;
    };
 
+   inline compressed_file_datastream&
+   operator>>( compressed_file_datastream& ds, fc::crypto::ed::public_key_shim& pk ) {
+      ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+      return ds;
+   }
+
+   inline compressed_file_datastream&
+   operator>>( compressed_file_datastream& ds, fc::crypto::ed::signature_shim& sig ) {
+      ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
+      // zero out the padding byte
+      sig._data.data[crypto_sign_BYTES] = 0;
+      return ds;
+   }
+
+   inline compressed_file_datastream&
+   operator>>( compressed_file_datastream& ds, fc::crypto::ed::private_key_shim& sk ) {
+      ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+      return ds;
+   }
 }

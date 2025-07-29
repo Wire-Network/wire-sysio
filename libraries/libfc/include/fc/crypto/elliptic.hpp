@@ -156,6 +156,7 @@ namespace fc {
       };
 
       struct signature_shim : public crypto::shim<compact_signature> {
+         static constexpr bool is_recoverable = true;
          using public_key_type = public_key_shim;
          using crypto::shim<compact_signature>::shim;
 

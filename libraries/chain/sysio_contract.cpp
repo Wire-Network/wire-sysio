@@ -269,7 +269,7 @@ void apply_sysio_updateauth(apply_context& context) {
    auto update = context.get_action().data_as<updateauth>();
 
    // ** NEW ADDED IF STATEMENT **
-   if( update.permission != name("auth.ext") && update.permission != name("auth.session") ) {
+   if( update.permission.suffix() != name("ext")) {
       context.require_authorization(update.account); // only here to mark the single authority on this action as used
    }
 
@@ -353,8 +353,6 @@ void apply_sysio_deleteauth(apply_context& context) {
 
    auto& authorization = context.control.get_mutable_authorization_manager();
    auto& db = context.db;
-
-
 
    { // Check for links to this permission
       const auto& index = db.get_index<permission_link_index, by_permission_name>();

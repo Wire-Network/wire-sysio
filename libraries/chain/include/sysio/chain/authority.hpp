@@ -7,7 +7,7 @@
 
 namespace sysio { namespace chain {
 
-using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string, fc::em::public_key_shim>;
+using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string, fc::em::public_key_shim, fc::crypto::ed::public_key_shim>;
 
 struct shared_public_key {
    explicit shared_public_key( shared_public_key_data&& p ) :
@@ -49,6 +49,9 @@ struct shared_public_key {
          [&](const fc::crypto::r1::public_key_shim& r1) {
             return r1._data == std::get<fc::crypto::r1::public_key_shim>(rhs.pubkey)._data;
          },
+         [&](const fc::crypto::ed::public_key_shim& edkey) {
+            return edkey._data == std::get<fc::crypto::ed::public_key_shim>(rhs.pubkey)._data;
+         },
          [&](const shared_string& wa) {
             return wa == std::get<shared_string>(rhs.pubkey);
          }
@@ -68,6 +71,9 @@ struct shared_public_key {
          },
          [&](const fc::crypto::r1::public_key_shim& r1) {
             return r1._data == std::get<fc::crypto::r1::public_key_shim>(r._storage)._data;
+         },
+         [&](const fc::crypto::ed::public_key_shim& edkey) {
+            return edkey._data == std::get<fc::crypto::ed::public_key_shim>(r._storage)._data;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());
@@ -124,8 +130,8 @@ struct shared_key_weight {
 
    static shared_key_weight convert(chainbase::allocator<char> allocator, const key_weight& k) {
       return std::visit(overloaded {
-         [&](const auto& k1r1em) {
-            return shared_key_weight(k1r1em, k.weight);
+         [&](const auto& k1r1emed) {
+            return shared_key_weight(k1r1emed, k.weight);
          },
          [&](const fc::crypto::webauthn::public_key& wa) {
             size_t psz = fc::raw::pack_size(wa);

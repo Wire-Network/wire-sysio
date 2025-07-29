@@ -73,6 +73,7 @@ class public_key {
 
 class signature {
    public:
+      static constexpr bool is_recoverable = true;
       //used for base58 de/serialization
       using data_type = signature;
       signature serialize()const { return *this; }

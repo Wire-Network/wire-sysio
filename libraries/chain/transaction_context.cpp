@@ -239,14 +239,8 @@ namespace sysio { namespace chain {
       is_initialized = true;
    }
 
-
    void transaction_context::init_for_implicit_trx( uint64_t initial_net_usage  )
    {
-      const transaction& trx = packed_trx.get_transaction();
-      if( trx.transaction_extensions.size() > 0 ) {
-         disallow_transaction_extensions( "no transaction extensions supported yet for implicit transactions" );
-      }
-
       published = control.pending_block_time();
       init( initial_net_usage);
    }
@@ -255,15 +249,8 @@ namespace sysio { namespace chain {
                                                  uint64_t packed_trx_prunable_size )
    {
       const transaction& trx = packed_trx.get_transaction();
-      // delayed transactions are not allowed after protocol feature
-      // DISABLE_DEFERRED_TRXS_STAGE_1 is activated;
       // read-only and dry-run transactions are not allowed to be delayed at any time
-      if( control.is_builtin_activated(builtin_protocol_feature_t::disable_deferred_trxs_stage_1) || is_transient() ) {
-         SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
-      }
-      if( trx.transaction_extensions.size() > 0 ) {
-         disallow_transaction_extensions( "no transaction extensions supported yet for input transactions" );
-      }
+      SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
 
       const auto& cfg = control.get_global_properties().configuration;
 
@@ -301,7 +288,7 @@ namespace sysio { namespace chain {
          record_transaction( id, trx.expiration );
       }
    }
-
+   
    void transaction_context::init_for_deferred_trx( fc::time_point p )
    {
       const transaction& trx = packed_trx.get_transaction();

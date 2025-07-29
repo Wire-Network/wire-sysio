@@ -201,6 +201,7 @@ namespace fc {
       };
 
       struct signature_shim : public crypto::shim<compact_signature> {
+         static constexpr bool is_recoverable = true;
          using public_key_type = public_key_shim;
          using crypto::shim<compact_signature>::shim;
 
@@ -213,16 +214,11 @@ namespace fc {
                101, 100,  32,  77, 101, 115, 115,
                97, 103, 101,  58,  10,  51,  50
             };
+            
             // Hash (keccak256) the msg string
-
-            // unsigned char msg_digest_result = digest.data();
-
-
-
             unsigned char eth_prefixed_msg_raw[28 + 32];
             std::copy(std::begin(eth_prefix), std::end(eth_prefix), std::begin(eth_prefixed_msg_raw));
             std::copy((unsigned char*) digest.data(), (unsigned char*) digest.data() + 32, std::begin(eth_prefixed_msg_raw) + 28);
-
 
             SHA3_CTX msg_ctx;
             keccak_init(&msg_ctx);

@@ -628,9 +628,24 @@ namespace impl {
 
          // process contents of block.transaction_extensions
          auto exts = trx.validate_and_extract_extensions();
-         if (exts.count(deferred_transaction_generation_context::extension_id()) > 0) {
-            const auto& deferred_transaction_generation = std::get<deferred_transaction_generation_context>(exts.lower_bound(deferred_transaction_generation_context::extension_id())->second);
-            mvo("deferred_transaction_generation", deferred_transaction_generation);
+         // Iterate through every extension entry and serialize known ones:
+         for ( auto const& kv : exts ) {
+            auto id = kv.first;
+            auto const& var = kv.second;
+            switch (id) {
+               case ed_pubkey_extension::extension_id(): {
+                  // Unpack our ED25519 pubkey extension
+                  const auto& edext = std::get<ed_pubkey_extension>(var);
+                  // Emit the 32-byte pubkey (you can change the field name as needed)
+                  mvo("ed_pubkey", edext.pubkey);
+                  break;
+               }
+               // future case XXX_extension::extension_id(): …
+               default:
+                  // Should never reach this as validate_and_extract_extensions() should only return known extensions
+                  SYS_ASSERT( false, invalid_transaction_extension, "Transaction extension with id type ${id} is not supported", ("id", id));
+                  break;
+            }
          }
 
          out(name, std::move(mvo));

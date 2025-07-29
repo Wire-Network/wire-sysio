@@ -2,6 +2,7 @@
 #include <fc/io/cfile.hpp>
 #include <sysio/trace_api/test_common.hpp>
 #include <sysio/trace_api/store_provider.hpp>
+#include <fc/crypto/elliptic_ed.hpp>
 
 using namespace sysio;
 using namespace sysio::trace_api;
@@ -294,6 +295,27 @@ namespace {
 
    inline vslice_datastream vslice::create_datastream() {
       return vslice_datastream(*this);
+   }
+
+   // vslice_datastream support for Ed25519 shim types
+   inline vslice_datastream&
+   operator>>( vslice_datastream& ds, ::fc::crypto::ed::public_key_shim& pk ) {
+      ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+      return ds;
+   }
+
+   inline vslice_datastream&
+   operator>>( vslice_datastream& ds, ::fc::crypto::ed::private_key_shim& sk ) {
+      ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+      return ds;
+   }
+
+   inline vslice_datastream&
+   operator>>( vslice_datastream& ds, ::fc::crypto::ed::signature_shim& sig ) {
+      ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
+      uint8_t pad = 0; // consume padding byte
+      ds.read(reinterpret_cast<char*>(&pad), 1);
+      return ds;
    }
 }
 

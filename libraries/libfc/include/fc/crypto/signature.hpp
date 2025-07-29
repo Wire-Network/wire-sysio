@@ -4,6 +4,7 @@
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/elliptic_em.hpp> 
+#include <fc/crypto/elliptic_ed.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 
@@ -14,14 +15,15 @@ namespace fc { namespace crypto {
          "K1",
          "R1",
          "WA",
-         "EM"
+         "EM",
+         "ED"
       };
    };
 
    class signature
    {
       public:
-         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim>;
+         using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim, ed::signature_shim>;
 
          signature() = default;
          signature( signature&& ) = default;
@@ -35,6 +37,27 @@ namespace fc { namespace crypto {
          size_t which() const;
 
          size_t variable_size() const;
+
+         template<typename T>
+         bool contains() const { return std::holds_alternative<T>(_storage); }
+
+         template<typename T>
+         const T& get() const { return std::get<T>(_storage); }
+
+         /**  
+          *  True if this signature variant should be handled by recover(sig, digest)  
+          *  rather than a verify(sig, pubkey, digest)  
+          */
+         bool is_recoverable() const {
+            return std::visit([](auto const& shim){
+               return std::decay_t<decltype(shim)>::is_recoverable;
+            }, _storage);
+         }
+
+         template<typename Visitor>
+         decltype(auto) visit( Visitor&& v ) const {
+            return std::visit( std::forward<Visitor>(v), _storage );
+         }
 
       private:
          storage_type _storage;
