@@ -4,6 +4,12 @@ on:
   pull_request:
     branches:
       - master
+    paths:
+      - 'libraries/**'
+      - 'programs/**'
+      - 'plugins/**'
+      - 'unittests/**'
+      - 'tests/**'
 
 jobs:
   build-and-test:
