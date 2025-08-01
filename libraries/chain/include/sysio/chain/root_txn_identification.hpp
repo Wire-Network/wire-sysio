@@ -25,7 +25,7 @@ namespace sysio { namespace chain {
        */
       root_txn_identification(contract_action_matches&& matches);
 
-      ~root_txn_identification();
+      virtual ~root_txn_identification();
 
       void signal_applied_transaction( const transaction_trace_ptr& trace, const packed_transaction_ptr& ptrx );
 

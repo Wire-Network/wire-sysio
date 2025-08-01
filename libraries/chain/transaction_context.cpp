@@ -371,8 +371,6 @@ namespace sysio { namespace chain {
       net_limit_due_to_greylist |= greylisted_net;
       cpu_limit_due_to_greylist |= greylisted_cpu;
 
-      uint32_t greylist_limit = (greylisted_net || greylisted_cpu) ? 1 : config::maximum_elastic_resource_multiplier;
-
       // Possibly lower net_limit based on what accounts can pay
       if (static_cast<uint64_t>(account_net_limit) <= net_limit) {
          net_limit = static_cast<uint64_t>(account_net_limit);

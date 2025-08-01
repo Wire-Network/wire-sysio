@@ -128,7 +128,7 @@ inline void unpack( Stream& s, crypto::ed::private_key_shim& sk ) {
 
 }} // namespace fc::raw
 
-namespace fc {
+namespace fc::crypto::ed {
 
 // sha256::encoder overloads
 inline sha256::encoder& operator<<(sha256::encoder& e, const crypto::ed::public_key_shim& pk) {
@@ -299,4 +299,4 @@ inline mb_peek_datastream<S>& operator<<(mb_peek_datastream<S>& ds, const crypto
     ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
     return ds;
 }
-} // namespace fc
+} // namespace fc::crypto::ed
