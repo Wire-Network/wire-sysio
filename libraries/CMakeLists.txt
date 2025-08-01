@@ -22,6 +22,7 @@ ExternalProject_Add( libsodium
   CONFIGURE_COMMAND
     ${CMAKE_CURRENT_SOURCE_DIR}/libsodium/configure
       --prefix=<INSTALL_DIR>                                         # <<< use the INSTALL_DIR internally
+  BUILD_BYPRODUCTS ${CMAKE_BINARY_DIR}/libraries/libsodium-install/libsodium.a
   BUILD_COMMAND   make -C <SOURCE_DIR>
   INSTALL_COMMAND make -C <SOURCE_DIR> install
   BUILD_IN_SOURCE 1
