@@ -990,7 +990,7 @@ struct controller_impl {
          static_cast<block_header_state&>(*head) = head_header_state;
       }
 
-      controller_index_set::walk_indices([this, &snapshot, &header]( auto utils ){
+      controller_index_set::walk_indices([this, &snapshot]( auto utils ){
          using value_t = typename decltype(utils)::index_t::value_type;
 
          // skip the table_id_object as its inlined with contract tables section

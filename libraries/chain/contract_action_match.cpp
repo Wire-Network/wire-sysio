@@ -48,7 +48,7 @@ namespace sysio { namespace chain {
             action_matchers.push_back([action_name](const name& n) { return n.suffix() == action_name; });
             break;
          case match_type::any:
-            action_matchers.push_back([action_name](const name& n) { return true; });
+            action_matchers.push_back([](const name& n) { return true; });
             break;
          default:
             SYS_THROW(chain::producer_exception,
