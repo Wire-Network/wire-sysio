@@ -575,7 +575,7 @@ struct controller_impl {
          } catch(  const database_guard_exception& e ) {
             except_ptr = std::current_exception();
          }
-         ilog( "${n} irreversible blocks replayed", ("n", 1 + head->block_num - start_block_num) );
+         ilog( "${n} irreversible blocks replayed, from ${h}", ("h", 1 + head->block_num)("n", 1 + head->block_num - start_block_num) );
 
          auto pending_head = fork_db.pending_head();
          if( pending_head ) {
