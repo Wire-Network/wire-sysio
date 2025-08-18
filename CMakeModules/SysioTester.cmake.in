@@ -65,6 +65,7 @@ find_library(libbscrypto bscrypto @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libdecrepit decrepit @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libsodium sodium builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 
 #Ubuntu build requires rt library to be specified explicitly
 if(UNIX AND NOT APPLE)
@@ -93,6 +94,7 @@ target_link_libraries(SysioChain INTERFACE
    ${libsecp256k1}
    ${libbn256}
    ${libbls12-381}
+   ${libsodium}
    @GMP_LIBRARY@
 
    Boost::date_time
@@ -126,6 +128,7 @@ target_include_directories(SysioChain INTERFACE
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/leapboringssl
+                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/libsodium-install/include
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat )
 
 #adds -ltr. Ubuntu sysio.contracts build breaks without this
