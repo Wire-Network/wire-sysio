@@ -92,13 +92,7 @@ void apply_context::exec_one()
                (*native)( *this );
             }
 
-            if( ( receiver_account->code_hash != digest_type() ) &&
-                  (  !( act->account == config::system_account_name
-                        && act->name == "setcode"_n
-                        && receiver == config::system_account_name )
-                     || control.is_builtin_activated( builtin_protocol_feature_t::forward_setcode )
-                  )
-            ) {
+            if( receiver_account->code_hash != digest_type() ) {
                if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
                   control.check_contract_list( receiver );
                   control.check_action_list( act->account, act->name );

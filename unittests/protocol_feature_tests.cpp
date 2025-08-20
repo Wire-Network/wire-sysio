@@ -467,51 +467,6 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    {
       action act;
       act.account = tester_account;
-      act.name = "null"_n;
-      act.authorization = vector<permission_level>{
-         {tester_account, config::active_name},
-         {tester_account2, config::active_name}
-      };
-
-      signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
-      chain.set_transaction_headers(trx);
-
-      trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
-      trx.sign(get_private_key(tester_account2, "active"), chain.control->get_chain_id());
-
-
-      auto tester_cpu_limit0  = mgr.get_account_cpu_limit_ex(tester_account).first;
-      auto tester2_cpu_limit0 = mgr.get_account_cpu_limit_ex(tester_account2).first;
-      auto tester_net_limit0  = mgr.get_account_net_limit_ex(tester_account).first;
-      auto tester2_net_limit0 = mgr.get_account_net_limit_ex(tester_account2).first;
-
-      chain.push_transaction(trx);
-
-      auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
-      auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
-      auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
-      auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
-
-      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
-      BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
-      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
-      BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
-
-      BOOST_CHECK_EQUAL(tester_cpu_limit1.used - tester_cpu_limit0.used, tester2_cpu_limit1.used - tester2_cpu_limit0.used);
-      BOOST_CHECK_EQUAL(tester_net_limit1.used - tester_net_limit0.used, tester2_net_limit1.used - tester2_net_limit0.used);
-   }
-
-   const auto& pfm = chain.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::only_bill_first_authorizer );
-   BOOST_REQUIRE( d );
-
-   chain.preactivate_protocol_features( {*d} );
-   chain.produce_blocks();
-
-   {
-      action act;
-      act.account = tester_account;
       act.name = "null2"_n;
       act.authorization = vector<permission_level>{
          {tester_account, config::active_name},
@@ -557,11 +512,6 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    //   * sysio::newaccount is allowed only if it creates the rejectall account.
    c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
-
-   // Activate FORWARD_SETCODE protocol feature and then return contract on sysio back to what it was.
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::forward_setcode );
-   BOOST_REQUIRE( d );
    c.set_before_producer_authority_bios_contract();
 
    // Add minimal protocol feature set to enable ROA.
@@ -570,18 +520,16 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    c.init_roa();
    c.produce_block();
 
-   // Before activation, deploying a contract should work since setcode won't be forwarded to the WASM on sysio.
+   // Before reject_all_wasm code, deploying a contract should work since setcode is forwarded to the WASM on sysio but it doesn't reject it.
    // We do, however, still need to set the ROA policy...
    c.add_roa_policy( c.NODE_DADDY, tester1_account, "0.0001 SYS", "0.0001 SYS", "0.2001 SYS", 0, 0 );
    c.set_code( tester1_account, test_contracts::noop_wasm() );
    c.produce_block();
 
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
    c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
 
-   // After activation, deploying a contract causes setcode to be dispatched to the WASM on sysio,
+   // After reject_all_wasm, deploying a contract causes setcode to be dispatched to the WASM on sysio,
    // and in this case the contract is configured to reject the setcode action.
    BOOST_REQUIRE_EXCEPTION( c.set_code( tester2_account, test_contracts::noop_wasm() ),
                             sysio_assert_message_exception,

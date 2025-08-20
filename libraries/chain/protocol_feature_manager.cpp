@@ -39,28 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::only_bill_first_authorizer, builtin_protocol_feature_spec{
-            "ONLY_BILL_FIRST_AUTHORIZER",
-            fc::variant("2f1f13e291c79da5a2bbad259ed7c1f2d34f697ea460b14b565ac33b063b73e2").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: ONLY_BILL_FIRST_AUTHORIZER
-
-Adds CPU and network bandwidth usage to only the first authorizer of a transaction.
-*/
-            {}
-         } )
-         (  builtin_protocol_feature_t::forward_setcode, builtin_protocol_feature_spec{
-            "FORWARD_SETCODE",
-            fc::variant("d4fd63a6d35bb43157650da695cb1070ac4cbf8d30431aba69ed7464a41c0424").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: FORWARD_SETCODE
-
-Forward sysio::setcode actions to the WebAssembly code deployed on the sysio account.
-*/
-            {}
-         } )
          (  builtin_protocol_feature_t::get_sender, builtin_protocol_feature_spec{
             "GET_SENDER",
             fc::variant("1eab748b95a2e6f4d7cb42065bdee5566af8efddf01a55a0a8d831b823f8828a").as<digest_type>(),

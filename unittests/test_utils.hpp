@@ -137,8 +137,6 @@ void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chai
             chain_plug->chain().preactivate_feature( *preactivate_feature_digest, false );
             std::vector<builtin_protocol_feature_t> pfs{
                builtin_protocol_feature_t::reserved_first_protocol_feature,
-               builtin_protocol_feature_t::only_bill_first_authorizer,
-               builtin_protocol_feature_t::forward_setcode,
                builtin_protocol_feature_t::get_sender,
                builtin_protocol_feature_t::ram_restrictions,
                builtin_protocol_feature_t::webauthn_key,

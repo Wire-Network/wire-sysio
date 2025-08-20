@@ -16,8 +16,6 @@ enum class protocol_feature_t : uint32_t {
 enum class builtin_protocol_feature_t : uint32_t {
    preactivate_feature = 0,
    reserved_first_protocol_feature = 1, // keep an example protocol feature mainly for tests
-   only_bill_first_authorizer = 7,
-   forward_setcode = 8,
    get_sender = 9,
    ram_restrictions = 10,
    webauthn_key = 11,
