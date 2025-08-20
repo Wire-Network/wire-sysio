@@ -874,23 +874,15 @@ bool is_system_account(const account_name& name) {
 }
 
 void apply_context::add_ram_usage( account_name payer, int64_t ram_delta ) {
-   ilog("System account status: Payer ${payer} ${payer_sys}, receiver ${receiver} ${receiver_sys}", ("payer", payer)("payer_sys", is_system_account(payer))("receiver", receiver)("receiver_sys", is_system_account(receiver)));
-
    if (payer != receiver && ram_delta > 0) {
-      ilog("Payer is not receiver (${receiver}) or system account and ram_delta is positive, checking authorization for payer ${payer}", ("receiver", receiver)("payer", payer));
       if (receiver == config::system_account_name) {
-         wlog("Receiver is system account, no need to check authorization for payer ${payer}", ("payer", payer));
       } else if (payer == config::system_account_name && is_privileged()) {
-         wlog("Payer is system account and receiver is privileged, no need to check authorization for payer ${payer}", ("payer", payer));
       } else {
-         wlog("We need authorization to charge RAM to payer ${payer}", ("payer", payer));
          auto payer_found = false;
          // search act->authorization for a payer permission role
          for( const auto& auth : act->authorization ) {
-            wlog("Authorization actor: ${actor}, permission: ${permission}, actor is system: ${sys}", ("actor", auth.actor)("permission", auth.permission)("sys", is_system_account(auth.actor)));
             if( auth.actor == payer && auth.permission == config::sysio_payer_name ) {
                payer_found = true;
-               wlog("We are authorized!");
                break;
             }
             if ( auth.actor == config::system_account_name ) {
@@ -898,7 +890,6 @@ void apply_context::add_ram_usage( account_name payer, int64_t ram_delta ) {
                // This avoids a lot of changes for tests and sysio should not be calling untrusted contracts
                // or spending user's RAM unexpectedly.
                payer_found = true;
-               wlog("System account authorized, no need to provide explicit payer authorization");
                break;
             }
          }
