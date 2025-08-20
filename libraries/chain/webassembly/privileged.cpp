@@ -43,11 +43,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
    int64_t set_proposed_producers_common( apply_context& context, vector<producer_authority> && producers, bool validate_keys ) {
       SYS_ASSERT(producers.size() <= config::max_producers, wasm_execution_error, "Producer schedule exceeds the maximum producer count for this chain");
-      SYS_ASSERT( producers.size() > 0
-                  || !context.control.is_builtin_activated( builtin_protocol_feature_t::disallow_empty_producer_schedule ),
-                  wasm_execution_error,
-                  "Producer schedule cannot be empty"
-      );
+      SYS_ASSERT( producers.size() > 0, wasm_execution_error, "Producer schedule cannot be empty" );
 
       const size_t num_supported_key_types = context.db.get<protocol_state_object>().num_supported_key_types;
 

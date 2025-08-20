@@ -252,12 +252,7 @@ namespace sysio { namespace testing {
             produce_block();
             set_before_producer_authority_bios_contract();
             preactivate_builtin_protocol_features({
-               builtin_protocol_feature_t::only_link_to_existing_permission,
-               builtin_protocol_feature_t::replace_deferred,
-               builtin_protocol_feature_t::no_duplicate_deferred_id,
-               builtin_protocol_feature_t::fix_linkauth_restriction,
-               builtin_protocol_feature_t::disallow_empty_producer_schedule,
-               builtin_protocol_feature_t::restrict_action_to_self,
+               builtin_protocol_feature_t::reserved_first_protocol_feature,
                builtin_protocol_feature_t::only_bill_first_authorizer,
                builtin_protocol_feature_t::forward_setcode,
                builtin_protocol_feature_t::get_sender,

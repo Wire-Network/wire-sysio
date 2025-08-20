@@ -15,12 +15,7 @@ enum class protocol_feature_t : uint32_t {
 // Values are included in protocol digest, so values must remain constant
 enum class builtin_protocol_feature_t : uint32_t {
    preactivate_feature = 0,
-   only_link_to_existing_permission = 1,
-   replace_deferred = 2,
-   no_duplicate_deferred_id = 3,
-   fix_linkauth_restriction = 4,
-   disallow_empty_producer_schedule = 5,
-   restrict_action_to_self = 6,
+   reserved_first_protocol_feature = 1, // keep an example protocol feature mainly for tests
    only_bill_first_authorizer = 7,
    forward_setcode = 8,
    get_sender = 9,

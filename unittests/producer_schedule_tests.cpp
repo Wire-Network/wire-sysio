@@ -282,24 +282,21 @@ BOOST_AUTO_TEST_CASE( empty_producer_schedule_has_no_effect ) try {
    BOOST_CHECK_EQUAL( true, compare_schedules( sch1, c.control->active_producers() ) );
    c.produce_blocks(6);
 
-   res = c.set_producers_legacy( {} );
-   wlog("set producer schedule to []");
-   BOOST_REQUIRE_EQUAL( true, c.control->proposed_producers().has_value() );
-   BOOST_CHECK_EQUAL( c.control->proposed_producers()->producers.size(), 0u );
-   BOOST_CHECK_EQUAL( c.control->proposed_producers()->version, 2u );
+   BOOST_REQUIRE_EXCEPTION( c.set_producers_legacy( {} ), wasm_execution_error, fc_exception_message_is( "Producer schedule cannot be empty" ) );
+   BOOST_REQUIRE_EQUAL( false, c.control->proposed_producers().has_value() );
 
    c.produce_blocks(12);
    BOOST_CHECK_EQUAL( c.control->pending_producers().version, 1u );
 
    // Empty producer schedule does get promoted from proposed to pending
    c.produce_block();
-   BOOST_CHECK_EQUAL( c.control->pending_producers().version, 2u );
+   BOOST_CHECK_EQUAL( c.control->pending_producers().version, 1u );
    BOOST_CHECK_EQUAL( false, c.control->proposed_producers().has_value() );
 
    // However it should not get promoted from pending to active
    c.produce_blocks(24);
    BOOST_CHECK_EQUAL( c.control->active_producers().version, 1u );
-   BOOST_CHECK_EQUAL( c.control->pending_producers().version, 2u );
+   BOOST_CHECK_EQUAL( c.control->pending_producers().version, 1u );
 
    // Setting a new producer schedule should still use version 2
    res = c.set_producers_legacy( {"alice"_n,"bob"_n,"carol"_n} );

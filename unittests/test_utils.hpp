@@ -53,7 +53,7 @@ struct reqactivated {
 // Create a read-only trx that works with bios reqactivated action
 auto make_bios_ro_trx(sysio::chain::controller& control) {
    const auto& pfm = control.get_protocol_feature_manager();
-   static auto feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::replace_deferred);
+   static auto feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::reserved_first_protocol_feature);
 
    signed_transaction trx;
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds(30)};
@@ -136,12 +136,7 @@ void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chai
             BOOST_CHECK( preactivate_feature_digest );
             chain_plug->chain().preactivate_feature( *preactivate_feature_digest, false );
             std::vector<builtin_protocol_feature_t> pfs{
-               builtin_protocol_feature_t::only_link_to_existing_permission,
-               builtin_protocol_feature_t::replace_deferred,
-               builtin_protocol_feature_t::no_duplicate_deferred_id,
-               builtin_protocol_feature_t::fix_linkauth_restriction,
-               builtin_protocol_feature_t::disallow_empty_producer_schedule,
-               builtin_protocol_feature_t::restrict_action_to_self,
+               builtin_protocol_feature_t::reserved_first_protocol_feature,
                builtin_protocol_feature_t::only_bill_first_authorizer,
                builtin_protocol_feature_t::forward_setcode,
                builtin_protocol_feature_t::get_sender,

@@ -350,7 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::replace_deferred>();
       set_activation_handler<builtin_protocol_feature_t::get_sender>();
       set_activation_handler<builtin_protocol_feature_t::webauthn_key>();
       set_activation_handler<builtin_protocol_feature_t::wtmsig_block_signatures>();
@@ -1171,84 +1170,6 @@ struct controller_impl {
       };
 
       return fc::make_scoped_exit( std::move(callback) );
-   }
-
-   transaction_trace_ptr apply_onerror( const generated_transaction& gtrx,
-                                        fc::time_point block_deadline,
-                                        fc::microseconds max_transaction_time,
-                                        fc::time_point start,
-                                        uint32_t& cpu_time_to_bill_us, // only set on failure
-                                        uint32_t billed_cpu_time_us,
-                                        bool explicit_billed_cpu_time = false,
-                                        bool enforce_whiteblacklist = true
-                                      )
-   {
-      signed_transaction etrx;
-      // Deliver onerror action containing the failed deferred transaction directly back to the sender.
-      etrx.actions.emplace_back( vector<permission_level>{{gtrx.sender, config::active_name}},
-                                 onerror( gtrx.sender_id, gtrx.packed_trx.data(), gtrx.packed_trx.size() ) );
-      if( self.is_builtin_activated( builtin_protocol_feature_t::no_duplicate_deferred_id ) ) {
-         etrx.expiration = time_point_sec();
-         etrx.ref_block_num = 0;
-         etrx.ref_block_prefix = 0;
-      } else {
-         etrx.expiration = time_point_sec{self.pending_block_time() + fc::microseconds(999'999)}; // Round up to nearest second to avoid appearing expired
-         etrx.set_reference_block( self.head_block_id() );
-      }
-
-      transaction_checktime_timer trx_timer(timer);
-      const packed_transaction trx( std::move( etrx ) );
-      transaction_context trx_context( self, trx, trx.id(), std::move(trx_timer), start );
-
-      if (auto dm_logger = get_deep_mind_logger(trx_context.is_transient())) {
-         dm_logger->on_onerror(etrx);
-      }
-
-      trx_context.block_deadline = block_deadline;
-      trx_context.max_transaction_time_subjective = max_transaction_time;
-      trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-      trx_context.billed_cpu_time_us = billed_cpu_time_us;
-      trx_context.enforce_whiteblacklist = enforce_whiteblacklist;
-      transaction_trace_ptr trace = trx_context.trace;
-
-      auto handle_exception = [&](const auto& e)
-      {
-         cpu_time_to_bill_us = trx_context.update_billed_cpu_time( fc::time_point::now() );
-         trace->error_code = controller::convert_exception_to_error_code( e );
-         trace->except = e;
-         trace->except_ptr = std::current_exception();
-      };
-
-      try {
-         trx_context.init_for_implicit_trx();
-         trx_context.published = gtrx.published;
-         trx_context.execute_action( trx_context.schedule_action( trx.get_transaction().actions.back(), gtrx.sender, false, 0, 0 ), 0 );
-         trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
-
-         auto restore = make_block_restore_point();
-         trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::soft_fail,
-                                        trx_context.billed_cpu_time_us, trace->net_usage );
-         fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
-                          std::move(trx_context.executed_action_receipt_digests) );
-
-         trx_context.squash();
-         restore.cancel();
-         return trace;
-      } catch( const disallowed_transaction_extensions_bad_block_exception& ) {
-         throw;
-      } catch( const protocol_feature_bad_block_exception& ) {
-         throw;
-      } catch ( const std::bad_alloc& ) {
-         throw;
-      } catch ( const boost::interprocess::bad_alloc& ) {
-         throw;
-      } catch( const fc::exception& e ) {
-         handle_exception(e);
-      } catch ( const std::exception& e ) {
-         auto wrapper = fc::std_exception_wrapper::from_current_exception(e);
-         handle_exception(wrapper);
-      }
-      return trace;
    }
 
    int64_t remove_scheduled_transaction( const generated_transaction_object& gto ) {
@@ -2567,14 +2488,9 @@ struct controller_impl {
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
-      if( self.is_builtin_activated( builtin_protocol_feature_t::no_duplicate_deferred_id ) ) {
-         trx.expiration = time_point_sec();
-         trx.ref_block_num = 0;
-         trx.ref_block_prefix = 0;
-      } else {
-         trx.expiration = time_point_sec{self.pending_block_time() + fc::microseconds(999'999)}; // Round up to nearest second to avoid appearing expired
-         trx.set_reference_block( self.head_block_id() );
-      }
+      trx.expiration = time_point_sec();
+      trx.ref_block_num = 0;
+      trx.ref_block_prefix = 0;
 
       return trx;
    }
@@ -3186,7 +3102,7 @@ int64_t controller::set_proposed_producers( vector<producer_authority> producers
    const auto& gpo = get_global_properties();
    auto cur_block_num = head_block_num() + 1;
 
-   if( producers.size() == 0 && is_builtin_activated( builtin_protocol_feature_t::disallow_empty_producer_schedule ) ) {
+   if( producers.size() == 0 ) {
       return -1;
    }
 
@@ -3709,28 +3625,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::get_sender>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_sender" );
    } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::replace_deferred>() {
-   const auto& indx = db.get_index<account_ram_correction_index, by_id>();
-   for( auto itr = indx.begin(); itr != indx.end(); itr = indx.begin() ) {
-      int64_t current_ram_usage = resource_limits.get_account_ram_usage( itr->name );
-      int64_t ram_delta = -static_cast<int64_t>(itr->ram_correction);
-      if( itr->ram_correction > static_cast<uint64_t>(current_ram_usage) ) {
-         ram_delta = -current_ram_usage;
-         elog( "account ${name} was to be reduced by ${adjust} bytes of RAM despite only using ${current} bytes of RAM",
-               ("name", itr->name)("adjust", itr->ram_correction)("current", current_ram_usage) );
-      }
-
-      // This method is only called for deferred transaction
-      if (auto dm_logger = get_deep_mind_logger(false)) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", itr->id._id)), "deferred_trx", "correction", "deferred_trx_ram_correction");
-      }
-
-      resource_limits.add_pending_ram_usage( itr->name, ram_delta, false ); // false for doing dm logging
-      db.remove( *itr );
-   }
 }
 
 template<>
