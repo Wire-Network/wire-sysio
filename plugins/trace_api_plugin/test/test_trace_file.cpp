@@ -298,13 +298,13 @@ namespace {
    }
 
    // vslice_datastream support for Ed25519 shim types
-   inline vslice_datastream&
+   [[maybe_unused]] inline vslice_datastream&
    operator>>( vslice_datastream& ds, ::fc::crypto::ed::public_key_shim& pk ) {
       ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
       return ds;
    }
 
-   inline vslice_datastream&
+   [[maybe_unused]] inline vslice_datastream&
    operator>>( vslice_datastream& ds, ::fc::crypto::ed::private_key_shim& sk ) {
       ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
       return ds;
