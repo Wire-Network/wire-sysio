@@ -65,7 +65,7 @@ find_library(libbscrypto bscrypto @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libdecrepit decrepit @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-find_library(libsodium sodium builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+find_library(libsodium sodium @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 
 #Ubuntu build requires rt library to be specified explicitly
 if(UNIX AND NOT APPLE)
