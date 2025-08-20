@@ -54,11 +54,20 @@ find_library(libbscrypto bscrypto @CMAKE_BINARY_DIR@/libraries/libfc/libraries/b
 find_library(libdecrepit decrepit @CMAKE_BINARY_DIR@/libraries/libfc/libraries/boringssl/boringssl NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_BINARY_DIR@/libraries/chainbase NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_BINARY_DIR@/libraries/builtins NO_DEFAULT_PATH)
+find_library(libsodium sodium builtins @CMAKE_BINARY_DIR@/libraries/libsodium-install/lib NO_DEFAULT_PATH)
 
 #Ubuntu build requires rt library to be specified explicitly
-if(UNIX AND NOT APPLE)
-  find_library(LIBRT rt)
-endif()
+#Appears on Ubuntu 22.04 (at least for me) librt.a is no longer needed
+IF(UNIX AND NOT APPLE)
+    # Get the Ubuntu codename if available
+    execute_process(COMMAND lsb_release -cs OUTPUT_VARIABLE RELEASE_CODENAME OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    # Check if it's Ubuntu 22 (or a specific codename, e.g., 'jammy')
+    IF(NOT "${RELEASE_CODENAME}" STREQUAL "jammy")
+        find_library(LIBRT rt)
+    ENDIF()
+ENDIF()
+
 
 set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
 if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
@@ -82,6 +91,7 @@ target_link_libraries(SysioChain INTERFACE
    ${libsecp256k1}
    ${libbn256}
    ${libbls12-381}
+   ${libsodium}
    @GMP_LIBRARY@
 
    Boost::date_time
@@ -110,6 +120,7 @@ target_include_directories(SysioChain INTERFACE
                               @CMAKE_BINARY_DIR@/libraries/chain/include
                               @CMAKE_SOURCE_DIR@/libraries/libfc/include
                               @CMAKE_SOURCE_DIR@/libraries/libfc/libraries/boringssl/boringssl/src/include
+                              @CMAKE_SOURCE_DIR@/libraries/libsodium/src/libsodium/include
                               @CMAKE_SOURCE_DIR@/libraries/softfloat/source/include
                               @CMAKE_SOURCE_DIR@/libraries/appbase/include
                               @CMAKE_SOURCE_DIR@/libraries/chainbase/include
@@ -117,9 +128,15 @@ target_include_directories(SysioChain INTERFACE
 
 
 #adds -ltr. Ubuntu sysio.contracts build breaks without this
-if(UNIX AND NOT APPLE)
-   target_link_libraries(SysioChain INTERFACE ${LIBRT})
-endif()
+IF(UNIX AND NOT APPLE)
+    # Get the Ubuntu codename if available
+    execute_process(COMMAND lsb_release -cs OUTPUT_VARIABLE RELEASE_CODENAME OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    # Check if it's Ubuntu 22 (or a specific codename, e.g., 'jammy')
+    IF(NOT "${RELEASE_CODENAME}" STREQUAL "jammy")
+       target_link_libraries(SysioChain INTERFACE ${LIBRT})
+    ENDIF()
+ENDIF()
 
 add_library(SysioTester INTERFACE)
 
