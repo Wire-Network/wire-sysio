@@ -9,7 +9,6 @@ using namespace sysio;
 using namespace sysio::chain;
 
 BOOST_AUTO_TEST_CASE(exact_match) {
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::info);
    using namespace sysio;
    using namespace sysio::chain;
    // Test the suffix matcher
@@ -28,7 +27,6 @@ BOOST_AUTO_TEST_CASE(exact_match) {
 }
 
 BOOST_AUTO_TEST_CASE(suffix_match) {
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::info);
    using namespace sysio;
    using namespace sysio::chain;
    // Test the suffix match matcher
@@ -49,7 +47,6 @@ BOOST_AUTO_TEST_CASE(suffix_match) {
 }
 
 BOOST_AUTO_TEST_CASE(prefix_match) {
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::info);
    // Test the suffix match matcher
    contract_action_match matcher("s"_n, "test"_n, contract_action_match::match_type::prefix);
 
@@ -70,8 +67,6 @@ BOOST_AUTO_TEST_CASE(prefix_match) {
 }
 
 BOOST_AUTO_TEST_CASE(malformed_contract_names) {
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::info);
-
    // Test no empty names
    BOOST_CHECK_EXCEPTION(contract_action_match("s"_n, ""_n, contract_action_match::match_type::prefix), chain::producer_exception,
       [&](const fc::exception &e) {
@@ -100,7 +95,6 @@ BOOST_AUTO_TEST_CASE(malformed_contract_names) {
    }
 
    BOOST_AUTO_TEST_CASE(action_match) {
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::info);
       // Test the suffix match matcher
       contract_action_match matcher("s"_n, "test"_n, contract_action_match::match_type::prefix);
       matcher.add_action("add.match"_n, contract_action_match::match_type::exact);
