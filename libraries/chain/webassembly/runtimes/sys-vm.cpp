@@ -619,10 +619,10 @@ REGISTER_CF_HOST_FUNCTION(__letf2);
 REGISTER_CF_HOST_FUNCTION(__lttf2);
 REGISTER_CF_HOST_FUNCTION(__unordtf2);
 
-// get_block_num protocol feature
+// get_block_num
 REGISTER_CF_HOST_FUNCTION( get_block_num );
 
-// crypto_primitives protocol feature
+// crypto_primitives
 REGISTER_CF_HOST_FUNCTION( alt_bn128_add );
 REGISTER_CF_HOST_FUNCTION( alt_bn128_mul );
 REGISTER_CF_HOST_FUNCTION( alt_bn128_pair );
@@ -632,7 +632,7 @@ REGISTER_CF_HOST_FUNCTION( sha3 );
 REGISTER_CF_HOST_FUNCTION( k1_recover );
 REGISTER_CF_HOST_FUNCTION( blake2b_256 );
 
-// bls_primitives protocol feature
+// bls_primitives
 REGISTER_CF_HOST_FUNCTION( bls_g1_add );
 REGISTER_CF_HOST_FUNCTION( bls_g2_add );
 REGISTER_CF_HOST_FUNCTION( bls_g1_weighted_sum );

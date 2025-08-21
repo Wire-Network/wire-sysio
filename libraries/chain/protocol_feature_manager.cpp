@@ -39,33 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::crypto_primitives, builtin_protocol_feature_spec{
-            "CRYPTO_PRIMITIVES",
-            fc::variant("68d6405cb8df3de95bd834ebb408196578500a9f818ff62ccc68f60b932f7d82").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: CRYPTO_PRIMITIVES
-
-Adds new cryptographic host functions
-- Big integer modular exponentiation (mod_exp)
-- Add, multiply, and pairing check functions for the alt_bn128 elliptic curve. (alt_bn128_add, alt_bn128_mul, alt_bn128_pair)
-- BLAKE2b F compression function (blake2_f)
-- sha3 hash function (with Keccak256 support)
-- k1_recover (safe ECDSA uncompressed pubkey recover for the secp256k1 curve)
-*/
-            {}
-         } )
-         (  builtin_protocol_feature_t::get_block_num, builtin_protocol_feature_spec{
-            "GET_BLOCK_NUM",
-            fc::variant("e5d7992006e628a38c5e6c28dd55ff5e57ea682079bf41fef9b3cced0f46b491").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: GET_BLOCK_NUM
-
-Enables new `get_block_num` intrinsic which returns the current block number.
-*/
-            {}
-         } )
            (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
             "EM_KEY",
             fc::variant("44454e39d7192100f75c2e4895be95c0d56226f8a33e886d537c10126f6b1d60").as<digest_type>(),

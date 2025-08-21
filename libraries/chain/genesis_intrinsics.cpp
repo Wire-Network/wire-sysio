@@ -178,7 +178,16 @@ const std::vector<const char*> genesis_intrinsics = {
    "set_parameters_packed",
    "get_code_hash",
    "set_wasm_parameters_packed",
-   "get_wasm_parameters_packed"
+   "get_wasm_parameters_packed",
+   "alt_bn128_add",
+   "alt_bn128_mul",
+   "alt_bn128_pair",
+   "mod_exp",
+   "blake2_f",
+   "sha3",
+   "k1_recover",
+   "blake2b_256",
+   "get_block_num"
 };
 
 } } // namespace sysio::chain

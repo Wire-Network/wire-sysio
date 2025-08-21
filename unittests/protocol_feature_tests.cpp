@@ -514,8 +514,6 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    c.produce_block();
    c.set_before_producer_authority_bios_contract();
 
-   // Add minimal protocol feature set to enable ROA.
-   c.preactivate_builtin_protocol_features( {builtin_protocol_feature_t::get_block_num} );
    c.produce_block();
    c.init_roa();
    c.produce_block();
