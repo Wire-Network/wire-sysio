@@ -171,7 +171,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "memmove",
    "memcmp",
    "memset",
-   "get_sender"
+   "get_sender",
+   "set_proposed_producers_ex"
 };
 
 } } // namespace sysio::chain

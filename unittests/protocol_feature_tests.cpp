@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE( activate_preactivate_feature ) try {
 
    // Cannot set latest bios contract since it requires intrinsics that have not yet been whitelisted.
    BOOST_CHECK_EXCEPTION( c.set_code( config::system_account_name, contracts::sysio_bios_wasm() ),
-                          wasm_exception, fc_exception_message_is("env.set_proposed_producers_ex unresolveable")
+                          wasm_exception, fc_exception_message_is("env.preactivate_feature unresolveable")
    );
 
    // But the old bios contract can still be set.
@@ -1351,32 +1351,16 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 BOOST_AUTO_TEST_CASE( webauthn_producer ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::webauthn_key );
-   BOOST_REQUIRE( d );
-
    c.create_account("waprod"_n);
    c.produce_block();
 
    vector<legacy::producer_key> waprodsched = {{"waprod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
-
-   BOOST_CHECK_THROW(
-      c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched)),
-      sysio::chain::unactivated_key_type
-   );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
 
    c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::webauthn_key);
-   BOOST_REQUIRE(d);
 
    signed_transaction trx;
    c.set_transaction_headers(trx);
@@ -1392,9 +1376,7 @@ BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
 
    c.set_transaction_headers(trx);
    trx.sign(get_private_key(config::system_account_name, "active"), c.control->get_chain_id());
-   BOOST_CHECK_THROW(c.push_transaction(trx), sysio::chain::unactivated_key_type);
 
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
    c.push_transaction(trx);
 } FC_LOG_AND_RETHROW() }
@@ -1404,18 +1386,7 @@ BOOST_AUTO_TEST_CASE( webauthn_update_account_auth ) { try {
 
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::webauthn_key);
-   BOOST_REQUIRE(d);
-
    c.create_account("billy"_n);
-   c.produce_block();
-
-   BOOST_CHECK_THROW(c.set_authority("billy"_n, config::active_name,
-                        authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s))),
-                     sysio::chain::unactivated_key_type);
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    c.set_authority("billy"_n, config::active_name, authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)));
@@ -1455,10 +1426,6 @@ static const char webauthn_recover_key_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( webauthn_recover_key ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::webauthn_key);
-   BOOST_REQUIRE(d);
-
    c.create_account("bob"_n);
    c.set_code("bob"_n, webauthn_recover_key_wast);
    c.produce_block();
@@ -1472,10 +1439,6 @@ BOOST_AUTO_TEST_CASE( webauthn_recover_key ) { try {
 
    c.set_transaction_headers(trx);
    trx.sign(c.get_private_key( "bob"_n, "active" ), c.control->get_chain_id());
-   BOOST_CHECK_THROW(c.push_transaction(trx), sysio::chain::unactivated_signature_type);
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
    c.push_transaction(trx);
 
 } FC_LOG_AND_RETHROW() }
@@ -1503,10 +1466,6 @@ static const char webauthn_assert_recover_key_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( webauthn_assert_recover_key ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::webauthn_key);
-   BOOST_REQUIRE(d);
-
    c.create_account("bob"_n);
    c.set_code("bob"_n, webauthn_assert_recover_key_wast);
    c.produce_block();
@@ -1520,10 +1479,6 @@ BOOST_AUTO_TEST_CASE( webauthn_assert_recover_key ) { try {
 
    c.set_transaction_headers(trx);
    trx.sign(c.get_private_key( "bob"_n, "active" ), c.control->get_chain_id());
-   BOOST_CHECK_THROW(c.push_transaction(trx), sysio::chain::unactivated_signature_type);
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
    c.push_transaction(trx);
 
 } FC_LOG_AND_RETHROW() }
@@ -1549,22 +1504,11 @@ static const char import_set_proposed_producer_ex_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( set_proposed_producers_ex_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::wtmsig_block_signatures);
-   BOOST_REQUIRE(d);
-
    const auto& alice_account = account_name("alice");
    c.create_accounts( {alice_account} );
    c.produce_block();
 
-   BOOST_CHECK_EXCEPTION(  c.set_code( alice_account, import_set_proposed_producer_ex_wast ),
-                           wasm_exception,
-                           fc_exception_message_is( "env.set_proposed_producers_ex unresolveable" ) );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
-   // ensure it now resolves
+   // ensure set_proposed_producers_ex resolves
    c.set_code( alice_account, import_set_proposed_producer_ex_wast );
 
    // ensure it requires privilege
@@ -1584,69 +1528,15 @@ BOOST_AUTO_TEST_CASE( set_proposed_producers_ex_test ) { try {
 BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::wtmsig_block_signatures);
-   BOOST_REQUIRE(d);
-
    c.produce_blocks(2);
 
    // sync a remote node into this chain
    tester remote( setup_policy::none );
    push_blocks(c, remote);
 
-   // activate the feature
-   // there is a 1 block delay before header-only validation (which is responsible for extension validation) can be
-   // aware of the activation.  So the expectation is that if it is activated in the _state_ at block N, block N + 1
-   // will bear an extension making header-only validators aware of it, and therefore block N + 2 is the first block
-   // where a block may bear a downstream extension.
-   c.preactivate_protocol_features( {*d} );
    remote.push_block(c.produce_block());
 
    auto last_legacy_block = c.produce_block();
-
-
-   { // ensure producer_schedule_change_extension is rejected
-      const auto& hbs = remote.control->head_block_state();
-
-      // create a bad block that has the producer schedule change extension before the feature upgrade
-      auto bad_block = std::make_shared<signed_block>(last_legacy_block->clone());
-      emplace_extension(
-              bad_block->header_extensions,
-              producer_schedule_change_extension::extension_id(),
-              fc::raw::pack(std::make_pair(hbs->active_schedule.version + 1, std::vector<char>{}))
-      );
-
-      // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
-
-      // ensure it is rejected as an unknown extension
-      BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(bad_block), producer_schedule_exception,
-         fc_exception_message_is( "Block header producer_schedule_change_extension before activation of WTMsig Block Signatures" )
-      );
-   }
-
-   { // ensure that non-null new_producers is accepted (and fails later in validation)
-      const auto& hbs = remote.control->head_block_state();
-
-      // create a bad block that has the producer schedule change extension before the feature upgrade
-      auto bad_block = std::make_shared<signed_block>(last_legacy_block->clone());
-      bad_block->new_producers = legacy::producer_schedule_type{hbs->active_schedule.version + 1, {}};
-
-      // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
-
-      // ensure it is accepted (but rejected because it doesn't match expected state)
-      BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(bad_block), wrong_signing_key,
-         fc_exception_message_is( "block signed by unexpected key" )
-      );
-   }
-
    remote.push_block(last_legacy_block);
 
    // propagate header awareness of the activation.
@@ -1675,22 +1565,22 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
       );
    }
 
-   { // ensure that non-null new_producers is rejected
+   { // ensure that non-null not_used is rejected
       const auto& hbs = remote.control->head_block_state();
 
       // create a bad block that has the producer schedule change extension before the feature upgrade
       auto bad_block = std::make_shared<signed_block>(first_new_block->clone());
-      bad_block->new_producers = legacy::producer_schedule_type{hbs->active_schedule.version + 1, {}};
+      bad_block->not_used = legacy::producer_schedule_type{hbs->active_schedule.version + 1, {}};
 
       // re-sign the bad block
       auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state()->blockroot_merkle ) );
       auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state()->pending_schedule.schedule_hash) );
       bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
 
-      // ensure it is rejected because the new_producers field is not null
+      // ensure it is rejected because the not_used field is not null
       BOOST_REQUIRE_EXCEPTION(
          remote.push_block(bad_block), producer_schedule_exception,
-         fc_exception_message_is( "Block header contains legacy producer schedule outdated by activation of WTMsig Block Signatures" )
+         fc_exception_message_is( "Block header contains legacy producer schedule outdated by WTMsig Block Signatures" )
       );
    }
 
@@ -1701,21 +1591,15 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
 BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_legacy_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::wtmsig_block_signatures);
-   BOOST_REQUIRE(d);
-
    c.produce_blocks(2);
 
-   // activate the feature, and start an in-flight producer schedule change with the legacy format
-   c.preactivate_protocol_features( {*d} );
    vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
    c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
    c.produce_block();
 
-   // ensure the last legacy block contains a new_producers
+   // ensure the last block does not contains a not_used
    auto last_legacy_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(last_legacy_block->new_producers.has_value(), true);
+   BOOST_REQUIRE_EQUAL(last_legacy_block->not_used.has_value(), false);
 
    // promote to active schedule
    c.produce_block();
@@ -1732,15 +1616,7 @@ BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_legacy_test ) { try {
 BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_extension_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::wtmsig_block_signatures);
-   BOOST_REQUIRE(d);
-
-   c.produce_blocks(2);
-
-   // activate the feature
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
+   c.produce_blocks(3);
 
    // start an in-flight producer schedule change before the activation is availble to header only validators
    vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
@@ -1749,7 +1625,7 @@ BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_extension_test ) { try {
 
    // ensure the first possible new block contains a producer_schedule_change_extension
    auto first_new_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(first_new_block->new_producers.has_value(), false);
+   BOOST_REQUIRE_EQUAL(first_new_block->not_used.has_value(), false);
    BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.size(), 1u);
    BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.at(0).first, producer_schedule_change_extension::extension_id());
 

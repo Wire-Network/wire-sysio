@@ -39,40 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::webauthn_key, builtin_protocol_feature_spec{
-            "WEBAUTHN_KEY",
-            fc::variant("927fdf78c51e77a899f2db938249fb1f8bb38f4e43d9c1f75b190492080cbc34").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: WEBAUTHN_KEY
-
-Enables usage of WebAuthn keys and signatures.
-*/
-            {}
-         } )
-         (  builtin_protocol_feature_t::wtmsig_block_signatures, builtin_protocol_feature_spec{
-            "WTMSIG_BLOCK_SIGNATURES",
-            fc::variant("ab76031cad7a457f4fd5f5fca97a3f03b8a635278e0416f77dcc91eb99a48e10").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: WTMSIG_BLOCK_SIGNATURES
-
-Allows producers to specify a multisig of weighted keys as the authority for signing blocks.
-
-A valid block header:
-is no longer allowed to have a non-empty `new_producers` field;
-must announce new producer schedules using a block header extension with ID `1`.
-
-A valid signed block:
-must continue to have exactly one signature in its `signatures` field;
-and may have additional signatures in a block extension with ID `2`.
-
-Privileged Contracts:
-may continue to use `set_proposed_producers` as they have;
-may use a new `set_proposed_producers_ex` intrinsic to access extended features.
-*/
-            {}
-         } )
          (  builtin_protocol_feature_t::action_return_value, builtin_protocol_feature_spec{
             "ACTION_RETURN_VALUE",
             fc::variant("69b064c5178e2738e144ed6caa9349a3995370d78db29e494b3126ebd9111966").as<digest_type>(),

@@ -136,11 +136,7 @@ void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chai
             BOOST_CHECK( preactivate_feature_digest );
             chain_plug->chain().preactivate_feature( *preactivate_feature_digest, false );
             std::vector<builtin_protocol_feature_t> pfs{
-               builtin_protocol_feature_t::reserved_first_protocol_feature,
-               builtin_protocol_feature_t::get_sender,
-               builtin_protocol_feature_t::ram_restrictions,
-               builtin_protocol_feature_t::webauthn_key,
-               builtin_protocol_feature_t::wtmsig_block_signatures };
+               builtin_protocol_feature_t::reserved_first_protocol_feature };
             for (const auto t : pfs) {
                auto feature_digest = pfm.get_builtin_digest(t);
                BOOST_CHECK( feature_digest );

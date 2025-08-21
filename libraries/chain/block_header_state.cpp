@@ -198,25 +198,12 @@ namespace sysio { namespace chain {
       }
 
       if (new_producers) {
-         if ( detail::is_builtin_activated(prev_activated_protocol_features, pfs, builtin_protocol_feature_t::wtmsig_block_signatures) ) {
-            // add the header extension to update the block schedule
-            emplace_extension(
-                  h.header_extensions,
-                  producer_schedule_change_extension::extension_id(),
-                  fc::raw::pack( producer_schedule_change_extension( *new_producers ) )
-            );
-         } else {
-            legacy::producer_schedule_type downgraded_producers;
-            downgraded_producers.version = new_producers->version;
-            for (const auto &p : new_producers->producers) {
-               std::visit([&downgraded_producers, &p](const auto& auth)
-               {
-                  SYS_ASSERT(auth.keys.size() == 1 && auth.keys.front().weight == auth.threshold, producer_schedule_exception, "multisig block signing present before enabled!");
-                  downgraded_producers.producers.emplace_back(legacy::producer_key{p.producer_name, auth.keys.front().key});
-               }, p.authority);
-            }
-            h.new_producers = std::move(downgraded_producers);
-         }
+         // add the header extension to update the block schedule
+         emplace_extension(
+               h.header_extensions,
+               producer_schedule_change_extension::extension_id(),
+               fc::raw::pack( producer_schedule_change_extension( *new_producers ) )
+         );
       }
 
       // Add s_root_extensions to header extensions if present & relevant
@@ -250,28 +237,12 @@ namespace sysio { namespace chain {
 
       std::optional<producer_authority_schedule> maybe_new_producer_schedule;
       std::optional<digest_type> maybe_new_producer_schedule_hash;
-      bool wtmsig_enabled = false;
 
-      if (h.new_producers || exts.count(producer_schedule_change_extension::extension_id()) > 0 ) {
-         wtmsig_enabled = detail::is_builtin_activated(prev_activated_protocol_features, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
-      }
-
-      if( h.new_producers ) {
-         SYS_ASSERT(!wtmsig_enabled, producer_schedule_exception, "Block header contains legacy producer schedule outdated by activation of WTMsig Block Signatures" );
-
-         SYS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
-
-         const auto& new_producers = *h.new_producers;
-         SYS_ASSERT( new_producers.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
-         SYS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
-                    "cannot set new pending producers until last pending is confirmed" );
-
-         maybe_new_producer_schedule_hash.emplace(digest_type::hash(new_producers));
-         maybe_new_producer_schedule.emplace(new_producers);
+      if( h.not_used ) {
+         SYS_ASSERT(false, producer_schedule_exception, "Block header contains legacy producer schedule outdated by WTMsig Block Signatures" );
       }
 
       if ( exts.count(producer_schedule_change_extension::extension_id()) > 0 ) {
-         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block header producer_schedule_change_extension before activation of WTMsig Block Signatures" );
          SYS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
 
          const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(exts.lower_bound(producer_schedule_change_extension::extension_id())->second);
@@ -337,12 +308,6 @@ namespace sysio { namespace chain {
                                  bool skip_validate_signee
    )&&
    {
-      if( !additional_signatures.empty() ) {
-         bool wtmsig_enabled = detail::is_builtin_activated(prev_activated_protocol_features, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
-
-         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block contains multiple signatures before WTMsig block signatures are enabled" );
-      }
-
       auto result = std::move(*this)._finish_next( h, pfs, validator );
 
       if( !additional_signatures.empty() ) {
@@ -371,11 +336,6 @@ namespace sysio { namespace chain {
       auto result = std::move(*this)._finish_next( h, pfs, validator );
       result.sign( signer );
       h.producer_signature = result.header.producer_signature;
-
-      if( !result.additional_signatures.empty() ) {
-         bool wtmsig_enabled = detail::is_builtin_activated(pfa, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
-         SYS_ASSERT(wtmsig_enabled, producer_schedule_exception, "Block was signed with multiple signatures before WTMsig block signatures are enabled" );
-      }
 
       return result;
    }

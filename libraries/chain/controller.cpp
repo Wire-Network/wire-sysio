@@ -350,8 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::webauthn_key>();
-      set_activation_handler<builtin_protocol_feature_t::wtmsig_block_signatures>();
       set_activation_handler<builtin_protocol_feature_t::action_return_value>();
       set_activation_handler<builtin_protocol_feature_t::configurable_wasm_limits>();
       set_activation_handler<builtin_protocol_feature_t::blockchain_parameters>();
@@ -1823,7 +1821,7 @@ struct controller_impl {
       SYS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
       SYS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
       SYS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
-      SYS_REPORT( "new_producers", b.new_producers, ab.new_producers )
+      SYS_REPORT( "not_used", b.not_used, ab.not_used )
       SYS_REPORT( "header_extensions", b.header_extensions, ab.header_extensions )
 
 #undef SYS_REPORT
@@ -3620,13 +3618,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feat
 }
 
 template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::webauthn_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 3;
-   } );
-}
-
-template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::em_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 4;
@@ -3637,13 +3628,6 @@ template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 5;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::wtmsig_block_signatures>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_proposed_producers_ex" );
    } );
 }
 
