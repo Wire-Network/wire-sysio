@@ -50,18 +50,6 @@ Enables usage of EM ( Ethereum Message ) keys and signatures.
 */
             {}
          }  )
-         (  builtin_protocol_feature_t::bls_primitives, builtin_protocol_feature_spec{
-            "BLS_PRIMITIVES2",
-            fc::variant("c0cce5bcd8ea19a28d9e12eafda65ebe6d0e0177e280d4f20c7ad66dcd9e011b").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: BLS_PRIMITIVES2
-
-Adds new cryptographic host functions
-- Add, weighted sum, map, and pairing functions for the bls12-381 elliptic curve.
-*/
-            {}
-         } )
          (  builtin_protocol_feature_t::disable_deferred_trxs_stage_1, builtin_protocol_feature_spec{
             "DISABLE_DEFERRED_TRXS_STAGE_1",
             fc::variant("440c3efaaab212c387ce967c574dc813851cf8332d041beb418dfaf55facd5a9").as<digest_type>(),

@@ -350,7 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::bls_primitives>();
       set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
       set_activation_handler<builtin_protocol_feature_t::em_key>();
       set_activation_handler<builtin_protocol_feature_t::ed_key>();
@@ -3622,22 +3621,6 @@ template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 5;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::bls_primitives>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_add" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_add" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_weighted_sum" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_weighted_sum" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_pairing" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_map" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_map" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_mod" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_mul" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_exp" );
    } );
 }
 

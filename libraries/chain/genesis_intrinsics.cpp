@@ -187,7 +187,17 @@ const std::vector<const char*> genesis_intrinsics = {
    "sha3",
    "k1_recover",
    "blake2b_256",
-   "get_block_num"
+   "get_block_num",
+   "bls_g1_add",
+   "bls_g2_add",
+   "bls_g1_weighted_sum",
+   "bls_g2_weighted_sum",
+   "bls_pairing",
+   "bls_g1_map",
+   "bls_g2_map",
+   "bls_fp_mod",
+   "bls_fp_mul",
+   "bls_fp_exp"
 };
 
 } } // namespace sysio::chain
