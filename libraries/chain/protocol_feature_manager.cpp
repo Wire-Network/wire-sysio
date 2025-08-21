@@ -39,30 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::configurable_wasm_limits, builtin_protocol_feature_spec{
-            "CONFIGURABLE_WASM_LIMITS2",
-            fc::variant("8139e99247b87f18ef7eae99f07f00ea3adf39ed53f4d2da3f44e6aa0bfd7c62").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: CONFIGURABLE_WASM_LIMITS2
-
-Allows privileged contracts to set the constraints on WebAssembly code.
-Includes the behavior of GET_WASM_PARAMETERS_PACKED_FIX and
-also removes an inadvertent restriction on custom sections.
-*/
-            {}
-         } )
-         (  builtin_protocol_feature_t::get_code_hash, builtin_protocol_feature_spec{
-            "GET_CODE_HASH",
-            fc::variant("d2596697fed14a0840013647b99045022ae6a885089f35a7e78da7a43ad76ed4").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: GET_CODE_HASH
-
-Enables new `get_code_hash` intrinsic which gets the current code hash of an account.
-*/
-            {}
-         } )
          (  builtin_protocol_feature_t::crypto_primitives, builtin_protocol_feature_spec{
             "CRYPTO_PRIMITIVES",
             fc::variant("68d6405cb8df3de95bd834ebb408196578500a9f818ff62ccc68f60b932f7d82").as<digest_type>(),

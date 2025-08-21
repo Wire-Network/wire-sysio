@@ -175,7 +175,10 @@ const std::vector<const char*> genesis_intrinsics = {
    "set_proposed_producers_ex",
    "set_action_return_value",
    "get_parameters_packed",
-   "set_parameters_packed"
+   "set_parameters_packed",
+   "get_code_hash",
+   "set_wasm_parameters_packed",
+   "get_wasm_parameters_packed"
 };
 
 } } // namespace sysio::chain
