@@ -17,7 +17,6 @@ enum class builtin_protocol_feature_t : uint32_t {
    preactivate_feature = 0,
    reserved_first_protocol_feature = 1, // keep an example protocol feature mainly for tests
    // 2-24+ reserved, used by Spring, new wire protocol features should start at 500001
-   blockchain_parameters = 16, // matches release 2.1 value
    get_code_hash = 17,
    configurable_wasm_limits = 18, // configurable_wasm_limits2,
    crypto_primitives = 19,

@@ -36,11 +36,6 @@ public:
 class params_tester2 : public params_tester{
 public:
    params_tester2() : params_tester(setup_policy::preactivate_feature_and_new_bios){
-      const auto& pfm = control->get_protocol_feature_manager();
-      const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::blockchain_parameters);
-      BOOST_REQUIRE(d);
-      
-      preactivate_protocol_features( {*d} );
       produce_block();
    }
 
@@ -69,8 +64,9 @@ BOOST_FIXTURE_TEST_CASE(throw_test, params_tester){
 }
 
 BOOST_FIXTURE_TEST_CASE(throw_test2, params_tester2){
-   BOOST_CHECK_THROW( [&]{action("throwrvia1"_n, mvo());}(), chain::unsupported_feature);
-   BOOST_CHECK_THROW( [&]{action("throwrvia2"_n, mvo());}(), chain::unsupported_feature);
+   // these are supported at genesis for wire, so verify they don't throw
+   [&]{action("throwrvia1"_n, mvo());}();
+   [&]{action("throwrvia2"_n, mvo());}();
 }
 
 BOOST_AUTO_TEST_SUITE_END()

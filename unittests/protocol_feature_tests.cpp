@@ -1694,21 +1694,12 @@ static const char import_get_parameters_packed_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( get_parameters_packed_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::blockchain_parameters);
-   BOOST_REQUIRE(d);
-
-   BOOST_CHECK_EXCEPTION(  c.set_code( config::system_account_name, import_get_parameters_packed_wast ),
-                           wasm_exception,
-                           fc_exception_message_is( "env.get_parameters_packed unresolveable" ) );
-
-   c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
-   // ensure it now resolves
+   // ensure get_parameters_packed resolves
    c.set_code( config::system_account_name, import_get_parameters_packed_wast );
 
-   // ensure it can be called
+   // ensure get_parameters_packed can be called
    auto action_priv = action( {//vector of permission_level
                                  { config::system_account_name,
                                     permission_name("active") }
@@ -1756,21 +1747,10 @@ static const char import_set_parameters_packed_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( set_parameters_packed_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::blockchain_parameters);
-   BOOST_REQUIRE(d);
-
-   BOOST_CHECK_EXCEPTION(  c.set_code( config::system_account_name, import_set_parameters_packed_wast ),
-                           wasm_exception,
-                           fc_exception_message_is( "env.set_parameters_packed unresolveable" ) );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
-   // ensure it now resolves
+   // ensure set_parameters_packed resolves
    c.set_code( config::system_account_name, import_set_parameters_packed_wast );
 
-   // ensure it can be called
+   // ensure set_parameters_packed can be called
    auto action_priv = action( {//vector of permission_level
                                  { config::system_account_name,
                                     permission_name("active") }
