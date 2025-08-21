@@ -170,7 +170,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "memcpy",
    "memmove",
    "memcmp",
-   "memset"
+   "memset",
+   "get_sender"
 };
 
 } } // namespace sysio::chain

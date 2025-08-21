@@ -39,39 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::get_sender, builtin_protocol_feature_spec{
-            "GET_SENDER",
-            fc::variant("1eab748b95a2e6f4d7cb42065bdee5566af8efddf01a55a0a8d831b823f8828a").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: GET_SENDER
-
-Allows contracts to determine which account is the sender of an inline action.
-*/
-            {}
-         } )
-         (  builtin_protocol_feature_t::ram_restrictions, builtin_protocol_feature_spec{
-            "RAM_RESTRICTIONS",
-            fc::variant("1812fdb5096fd854a4958eb9d53b43219d114de0e858ce00255bd46569ad2c68").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: RAM_RESTRICTIONS
-
-Modifies the restrictions on operations within actions that increase RAM usage of accounts other than the receiver.
-
-An unprivileged contract responding to a notification:
-is not allowed to schedule a deferred transaction in which the RAM costs are paid by an account other than the receiver;
-but is allowed to execute database operations that increase RAM usage of an account other than the receiver as long as
-the action's net effect on RAM usage for the account is to not increase it.
-
-An unprivileged contract executing an action (but not as a response to a notification):
-is not allowed to schedule a deferred transaction in which the RAM costs are paid by an account other than the receiver
-unless that account authorized the action;
-but is allowed to execute database operations that increase RAM usage of an account other than the receiver as long as
-either the account authorized the action or the action's net effect on RAM usage for the account is to not increase it.
-*/
-            {}
-         } )
          (  builtin_protocol_feature_t::webauthn_key, builtin_protocol_feature_spec{
             "WEBAUTHN_KEY",
             fc::variant("927fdf78c51e77a899f2db938249fb1f8bb38f4e43d9c1f75b190492080cbc34").as<digest_type>(),

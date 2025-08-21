@@ -571,17 +571,6 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
    c.create_accounts( {tester1_account, tester2_account} );
    c.produce_block();
 
-   BOOST_CHECK_EXCEPTION(  c.set_code( tester1_account, test_contracts::get_sender_test_wasm() ),
-                           wasm_exception,
-                           fc_exception_message_is( "env.get_sender unresolveable" ) );
-
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::get_sender );
-   BOOST_REQUIRE( d );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
    c.set_code( tester1_account, test_contracts::get_sender_test_wasm() );
    c.set_abi( tester1_account, test_contracts::get_sender_test_abi() );
    c.set_code( tester2_account, test_contracts::get_sender_test_wasm() );
@@ -1254,12 +1243,12 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
       fc_exception_message_is( "Cannot charge RAM to other accounts during notify." )
    );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::ram_restrictions );
-   BOOST_REQUIRE( d );
+   //const auto& pfm = c.control->get_protocol_feature_manager();
+   // now always enforced
+   //const auto& d = pfm.get_builtin_digest( builtin_protocol_feature_t::ram_restrictions );
 
    // Activate RAM_RESTRICTIONS protocol feature (this would also disable the subjective mitigation).
-   c.preactivate_protocol_features( {*d} );
+   //c.preactivate_protocol_features( {*d} );
    c.produce_block();
 
    // Cannot send deferred transaction paid by another account that has not authorized the action.

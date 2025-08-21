@@ -102,7 +102,7 @@ void apply_context::exec_one()
                } catch( const wasm_exit& ) {}
             }
 
-            if( !privileged && control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) {
+            if( !privileged ) {
                const size_t checktime_interval = 10;
                size_t counter = 0;
                bool not_in_notify_context = (receiver == act->account);
@@ -486,15 +486,6 @@ void apply_context::update_db_usage( const account_name& payer, int64_t delta ) 
    // wlog("ApplyContext update_db_usage for payer ${payer} of ${delta} bytes,"
    //      " privileged ${privileged}, receiver ${receiver}, action ${action} of account ${act_account}",
    //      ("payer", payer)("delta", delta)("privileged", privileged)("receiver", receiver)("action", act->name)("act_account", act->account));
-   if( delta > 0 ) {
-      if( !(privileged || payer == account_name(receiver)
-               || control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) )
-      {
-         SYS_ASSERT( control.is_ram_billing_in_notify_allowed() || (receiver == act->account),
-                     subjective_block_production_exception, "Cannot charge RAM to other accounts during notify." );
-         require_authorization( payer );
-      }
-   }
    add_ram_usage(payer, delta);
 }
 
