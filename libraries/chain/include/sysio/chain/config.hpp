@@ -81,7 +81,7 @@ const static uint32_t   default_sig_cpu_bill_pct                     = 50 * perc
 const static uint32_t   default_produce_block_offset_ms              = 450;
 const static uint16_t   default_controller_thread_pool_size          = 2;
 const static uint32_t   default_max_variable_signature_length        = 16384u;
-const static uint32_t   default_max_action_return_value_size         = 256;
+const static uint32_t   default_max_action_return_value_size         = 1024;
 
 const static uint32_t   default_max_transaction_finality_status_success_duration_sec = 180;
 const static uint32_t   default_max_transaction_finality_status_failure_duration_sec = 180;

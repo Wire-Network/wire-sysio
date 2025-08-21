@@ -172,7 +172,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "memcmp",
    "memset",
    "get_sender",
-   "set_proposed_producers_ex"
+   "set_proposed_producers_ex",
+   "set_action_return_value"
 };
 
 } } // namespace sysio::chain

@@ -350,7 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::action_return_value>();
       set_activation_handler<builtin_protocol_feature_t::configurable_wasm_limits>();
       set_activation_handler<builtin_protocol_feature_t::blockchain_parameters>();
       set_activation_handler<builtin_protocol_feature_t::get_code_hash>();
@@ -3628,13 +3627,6 @@ template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       ps.num_supported_key_types = 5;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::action_return_value>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_action_return_value" );
    } );
 }
 

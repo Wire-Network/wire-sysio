@@ -1659,22 +1659,11 @@ static const char import_set_action_return_value_wast[] = R"=====(
 BOOST_AUTO_TEST_CASE( set_action_return_value_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   const auto& pfm = c.control->get_protocol_feature_manager();
-   const auto& d = pfm.get_builtin_digest(builtin_protocol_feature_t::action_return_value);
-   BOOST_REQUIRE(d);
-
    const auto& alice_account = account_name("alice");
    c.create_accounts( {alice_account} );
    c.produce_block();
 
-   BOOST_CHECK_EXCEPTION(  c.set_code( alice_account, import_set_action_return_value_wast ),
-                           wasm_exception,
-                           fc_exception_message_is( "env.set_action_return_value unresolveable" ) );
-
-   c.preactivate_protocol_features( {*d} );
-   c.produce_block();
-
-   // ensure it now resolves
+   // ensure resolves
    c.set_code( alice_account, import_set_action_return_value_wast );
 
    // ensure it can be called
