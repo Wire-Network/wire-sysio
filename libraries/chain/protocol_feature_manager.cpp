@@ -39,17 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-           (  builtin_protocol_feature_t::em_key, builtin_protocol_feature_spec{
-            "EM_KEY",
-            fc::variant("44454e39d7192100f75c2e4895be95c0d56226f8a33e886d537c10126f6b1d60").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: EM_KEY
-
-Enables usage of EM ( Ethereum Message ) keys and signatures.
-*/
-            {}
-         }  )
          (  builtin_protocol_feature_t::disable_deferred_trxs_stage_1, builtin_protocol_feature_spec{
             "DISABLE_DEFERRED_TRXS_STAGE_1",
             fc::variant("440c3efaaab212c387ce967c574dc813851cf8332d041beb418dfaf55facd5a9").as<digest_type>(),
@@ -114,17 +103,6 @@ are acknowledged by all external blockchains.
 */
             {}
          } )
-         (  builtin_protocol_feature_t::ed_key, builtin_protocol_feature_spec{
-            "ED_KEY",
-            fc::variant("f7acb5b3a2fd04c58d9ee8485f52a65847fac35b66f16d4c5aa6d75229d89d37").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: ED_KEY
-
-Enables usage of ED25519 keys and signatures.
-*/
-            {builtin_protocol_feature_t::em_key}
-         }  )
    ;
 
 

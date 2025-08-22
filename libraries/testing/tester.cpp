@@ -249,8 +249,7 @@ namespace sysio { namespace testing {
             produce_block();
             set_before_producer_authority_bios_contract();
             preactivate_builtin_protocol_features({
-               builtin_protocol_feature_t::reserved_first_protocol_feature,
-               builtin_protocol_feature_t::em_key
+               builtin_protocol_feature_t::reserved_first_protocol_feature
             });
             produce_block();
             set_bios_contract();

@@ -351,8 +351,6 @@ struct controller_impl {
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
       set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
-      set_activation_handler<builtin_protocol_feature_t::em_key>();
-      set_activation_handler<builtin_protocol_feature_t::ed_key>();
 
 
       self.irreversible_block.connect([this](const block_state_ptr& bsp) {
@@ -3607,20 +3605,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feat
    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "preactivate_feature" );
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "is_feature_activated" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::em_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 4;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 5;
    } );
 }
 
