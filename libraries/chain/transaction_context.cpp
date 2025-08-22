@@ -4,7 +4,6 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/deep_mind.hpp>

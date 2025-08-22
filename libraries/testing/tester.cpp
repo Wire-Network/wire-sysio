@@ -4,7 +4,6 @@
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/wast_to_wasm.hpp>
 #include <sysio/chain/sysio_contract.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -473,19 +472,6 @@ namespace sysio { namespace testing {
          for( uint32_t i = 0; i < n; ++i )
             produce_block();
       }
-   }
-
-   vector<transaction_id_type> base_tester::get_scheduled_transactions() const {
-      const auto& idx = control->db().get_index<generated_transaction_multi_index,by_delay>();
-
-      vector<transaction_id_type> result;
-
-      auto itr = idx.begin();
-      while( itr != idx.end() && itr->delay_until <= control->pending_block_time() ) {
-         result.emplace_back(itr->trx_id);
-         ++itr;
-      }
-      return result;
    }
 
    void base_tester::produce_blocks_until_end_of_round() {

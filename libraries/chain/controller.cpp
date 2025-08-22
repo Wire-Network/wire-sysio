@@ -12,7 +12,6 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/genesis_intrinsics.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
@@ -55,7 +54,6 @@ using controller_index_set = index_set<
    dynamic_global_property_multi_index,
    block_summary_multi_index,
    transaction_multi_index,
-   generated_transaction_multi_index,
    table_id_multi_index,
    code_index,
    database_header_multi_index

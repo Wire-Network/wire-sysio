@@ -2,7 +2,6 @@
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
 #include <sysio/chain/subjective_billing.hpp>
@@ -2559,7 +2558,6 @@ void producer_plugin_impl::produce_block() {
    if (_update_produced_block_metrics) {
       metrics.unapplied_transactions_total = _unapplied_transactions.size();
       metrics.subjective_bill_account_size_total = chain.get_subjective_billing().get_account_cache_size();
-      metrics.scheduled_trxs_total = chain.db().get_index<generated_transaction_multi_index, by_delay>().size();
       metrics.trxs_produced_total = new_bs->block->transactions.size();
       metrics.cpu_usage_us = br.total_cpu_usage_us;
       metrics.total_elapsed_time_us = br.total_elapsed_time.count();

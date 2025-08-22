@@ -11,7 +11,6 @@
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/controller.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
@@ -1852,85 +1851,6 @@ read_only::get_producer_schedule_result read_only::get_producer_schedule( const 
    auto proposed = db.proposed_producers();
    if(proposed && !proposed->producers.empty())
       to_variant(*proposed, result.proposed);
-   return result;
-}
-
-read_only::get_scheduled_transactions_result
-read_only::get_scheduled_transactions( const read_only::get_scheduled_transactions_params& p, const fc::time_point& deadline ) const {
-
-   fc::time_point params_deadline = p.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline) : deadline;
-
-   const auto& d = db.db();
-
-   const auto& idx_by_delay = d.get_index<generated_transaction_multi_index,by_delay>();
-   auto itr = ([&](){
-      if (!p.lower_bound.empty()) {
-         try {
-            auto when = time_point::from_iso_string( p.lower_bound );
-            return idx_by_delay.lower_bound(boost::make_tuple(when));
-         } catch (...) {
-            try {
-               auto txid = transaction_id_type(p.lower_bound);
-               const auto& by_txid = d.get_index<generated_transaction_multi_index,by_trx_id>();
-               auto itr = by_txid.find( txid );
-               if (itr == by_txid.end()) {
-                  SYS_THROW(transaction_exception, "Unknown Transaction ID: ${txid}", ("txid", txid));
-               }
-
-               return d.get_index<generated_transaction_multi_index>().indices().project<by_delay>(itr);
-
-            } catch (...) {
-               return idx_by_delay.end();
-            }
-         }
-      } else {
-         return idx_by_delay.begin();
-      }
-   })();
-
-   read_only::get_scheduled_transactions_result result;
-
-   auto resolver = make_resolver(db, abi_serializer_max_time, throw_on_yield::no);
-
-   uint32_t remaining = p.limit;
-   if (deadline != fc::time_point::maximum() && remaining > max_return_items)
-      remaining = max_return_items;
-   while (itr != idx_by_delay.end() && remaining > 0) {
-      auto row = fc::mutable_variant_object()
-              ("trx_id", itr->trx_id)
-              ("sender", itr->sender)
-              ("sender_id", itr->sender_id)
-              // ("payer", itr->payer)
-              ("delay_until", itr->delay_until)
-              ("expiration", itr->expiration)
-              ("published", itr->published)
-      ;
-
-      if (p.json) {
-         fc::variant pretty_transaction;
-
-         transaction trx;
-         fc::datastream<const char*> ds( itr->packed_trx.data(), itr->packed_trx.size() );
-         fc::raw::unpack(ds,trx);
-
-         abi_serializer::to_variant(trx, pretty_transaction, resolver, abi_serializer_max_time);
-         row("transaction", pretty_transaction);
-      } else {
-         auto packed_transaction = bytes(itr->packed_trx.begin(), itr->packed_trx.end());
-         row("transaction", packed_transaction);
-      }
-
-      result.transactions.emplace_back(std::move(row));
-      ++itr;
-      remaining--;
-      if (fc::time_point::now() >= params_deadline)
-         break;
-   }
-
-   if (itr != idx_by_delay.end()) {
-      result.more = string(itr->trx_id);
-   }
-
    return result;
 }
 

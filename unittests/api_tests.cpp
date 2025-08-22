@@ -21,7 +21,6 @@
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/block_summary_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/resource_limits.hpp>
 

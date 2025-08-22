@@ -4,7 +4,6 @@
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/permission_link_object.hpp>
 #include <sysio/chain/permission_object.hpp>
@@ -378,16 +377,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
    fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::chain_config>(obj.obj.configuration)));
    fc::raw::pack(ds, as_type<sysio::chain::chain_id_type>(obj.obj.chain_id));
    fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::wasm_config>(obj.obj.wasm_configuration)));
-   return ds;
-}
-
-template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::generated_transaction_object>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.sender.to_uint64_t()));
-   fc::raw::pack(ds, as_type<__uint128_t>(obj.obj.sender_id));
-   fc::raw::pack(ds, as_type<sysio::chain::transaction_id_type>(obj.obj.trx_id));
-   fc::raw::pack(ds, as_type<sysio::chain::shared_string>(obj.obj.packed_trx));
    return ds;
 }
 

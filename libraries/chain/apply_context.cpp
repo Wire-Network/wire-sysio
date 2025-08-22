@@ -3,7 +3,6 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/chain/account_object.hpp>

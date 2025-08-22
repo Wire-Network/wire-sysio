@@ -512,19 +512,6 @@ public:
 
    get_producer_schedule_result get_producer_schedule( const get_producer_schedule_params& params, const fc::time_point& deadline )const;
 
-   struct get_scheduled_transactions_params {
-      bool        json = false;
-      string      lower_bound;  /// timestamp OR transaction ID
-      uint32_t    limit = 50;
-      std::optional<uint32_t> time_limit_ms; // defaults to http-max-response-time-ms
-   };
-
-   struct get_scheduled_transactions_result {
-      fc::variants  transactions;
-      string        more; ///< fill lower_bound with this to fetch next set of transactions
-   };
-
-   get_scheduled_transactions_result get_scheduled_transactions( const get_scheduled_transactions_params& params, const fc::time_point& deadline ) const;
    struct compute_transaction_results {
        chain::transaction_id_type  transaction_id;
        fc::variant                 processed; // "processed" is expected JSON for trxs in clio
@@ -1050,9 +1037,6 @@ FC_REFLECT( sysio::chain_apis::read_only::get_producers_result, (rows)(total_pro
 
 FC_REFLECT_EMPTY( sysio::chain_apis::read_only::get_producer_schedule_params )
 FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)(pending)(proposed) );
-
-FC_REFLECT( sysio::chain_apis::read_only::get_scheduled_transactions_params, (json)(lower_bound)(limit)(time_limit_ms) )
-FC_REFLECT( sysio::chain_apis::read_only::get_scheduled_transactions_result, (transactions)(more) );
 
 FC_REFLECT( sysio::chain_apis::read_only::account_resource_info, (used)(available)(max)(last_usage_update_time)(current_used) )
 FC_REFLECT( sysio::chain_apis::read_only::get_account_results,
