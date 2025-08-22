@@ -506,13 +506,12 @@ namespace sysio { namespace testing {
    }
 
 
-  void base_tester::set_transaction_headers( transaction& trx, uint32_t expiration, uint32_t delay_sec ) const {
+  void base_tester::set_transaction_headers( transaction& trx, uint32_t expiration ) const {
      trx.expiration = fc::time_point_sec{control->head_block_time() + fc::seconds(expiration)};
      trx.set_reference_block( control->head_block_id() );
 
      trx.max_net_usage_words = 0; // No limit
      trx.max_cpu_usage_ms = 0; // No limit
-     trx.delay_sec = delay_sec;
   }
 
 
@@ -762,22 +761,20 @@ namespace sysio { namespace testing {
                                                    const action_name& acttype,
                                                    const account_name& actor,
                                                    const variant_object& data,
-                                                   uint32_t expiration,
-                                                   uint32_t delay_sec
+                                                   uint32_t expiration
                                                  )
 
    {
       vector<permission_level> auths;
       auths.push_back( permission_level{actor, config::active_name} );
-      return push_action( code, acttype, auths, data, expiration, delay_sec );
+      return push_action( code, acttype, auths, data, expiration );
    }
 
    transaction_trace_ptr base_tester::push_action( const account_name& code,
                                                    const action_name& acttype,
                                                    const vector<account_name>& actors,
                                                    const variant_object& data,
-                                                   uint32_t expiration,
-                                                   uint32_t delay_sec
+                                                   uint32_t expiration
                                                  )
 
    {
@@ -785,21 +782,20 @@ namespace sysio { namespace testing {
       for (const auto& actor : actors) {
          auths.push_back( permission_level{actor, config::active_name} );
       }
-      return push_action( code, acttype, auths, data, expiration, delay_sec );
+      return push_action( code, acttype, auths, data, expiration );
    }
 
    transaction_trace_ptr base_tester::push_action( const account_name& code,
                                                    const action_name& acttype,
                                                    const vector<permission_level>& auths,
                                                    const variant_object& data,
-                                                   uint32_t expiration,
-                                                   uint32_t delay_sec
+                                                   uint32_t expiration
                                                  )
 
    { try {
       signed_transaction trx;
       trx.actions.emplace_back( get_action( code, acttype, auths, data ) );
-      set_transaction_headers( trx, expiration, delay_sec );
+      set_transaction_headers( trx, expiration );
       for (const auto& auth : auths) {
          if (auth.permission == config::sysio_payer_name) {
             continue;
@@ -808,7 +804,7 @@ namespace sysio { namespace testing {
       }
 
       return push_transaction( trx );
-   } FC_CAPTURE_AND_RETHROW( (code)(acttype)(auths)(data)(expiration)(delay_sec) ) }
+   } FC_CAPTURE_AND_RETHROW( (code)(acttype)(auths)(data)(expiration) ) }
 
    action base_tester::get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                    const variant_object& data )const { try {

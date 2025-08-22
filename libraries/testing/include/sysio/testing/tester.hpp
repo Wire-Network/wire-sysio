@@ -214,28 +214,24 @@ namespace sysio { namespace testing {
                                                const action_name& acttype,
                                                const account_name& actor,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
                                                const vector<account_name>& actors,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
                                                const vector<permission_level>& auths,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
 
 
          action get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                          const variant_object& data )const;
 
          void  set_transaction_headers( transaction& trx,
-                                        uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                        uint32_t delay_sec = 0 )const;
+                                        uint32_t expiration = DEFAULT_EXPIRATION_DELTA )const;
 
          vector<transaction_trace_ptr>  create_accounts( vector<account_name> names,
                                                          bool multisig = false,

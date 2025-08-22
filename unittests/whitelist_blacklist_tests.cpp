@@ -627,7 +627,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
                                               std::vector<permission_level>{{acnt, perm}},
                                               fc::mutable_variant_object()("from", acnt) ) );
-      c.set_transaction_headers( trx, 6, 0 );
+      c.set_transaction_headers( trx, 6 );
       trx.sign( c.get_private_key( acnt, perm.to_string() ), c.control->get_chain_id() );
       // This transaction is charged 104 bytes of NET.
 
