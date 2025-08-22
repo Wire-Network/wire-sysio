@@ -460,13 +460,7 @@ void apply_sysio_unlinkauth(apply_context& context) {
 }
 
 void apply_sysio_canceldelay(apply_context& context) {
-   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "canceldelay not allowed in read-only transaction" );
-   auto cancel = context.get_action().data_as<canceldelay>();
-   context.require_authorization(cancel.canceling_auth.actor); // only here to mark the single authority on this action as used
-
-   const auto& trx_id = cancel.trx_id;
-
-   context.cancel_deferred_transaction(transaction_id_to_sender_id(trx_id), account_name());
+   SYS_ASSERT( false, unaccessible_api, "canceldelay not supported" );
 }
 
 void apply_roa_reducepolicy(apply_context& context) {

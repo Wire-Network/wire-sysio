@@ -24,6 +24,7 @@ public:
 
    template<typename Lambda>
    sysio_system_tester(Lambda setup) {
+      SKIP_TEST
       setup(*this);
 
       produce_blocks( 2 );

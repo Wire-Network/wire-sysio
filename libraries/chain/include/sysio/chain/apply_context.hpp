@@ -501,9 +501,6 @@ class apply_context {
       void exec();
       void execute_inline( action&& a );
       void execute_context_free_inline( action&& a );
-      void schedule_deferred_transaction( const uint128_t& sender_id, account_name payer, transaction&& trx, bool replace_existing );
-      bool cancel_deferred_transaction( const uint128_t& sender_id, account_name sender );
-      bool cancel_deferred_transaction( const uint128_t& sender_id ) { return cancel_deferred_transaction(sender_id, receiver); }
 
    protected:
       uint32_t schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free );

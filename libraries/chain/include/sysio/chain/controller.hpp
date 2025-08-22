@@ -156,14 +156,6 @@ namespace sysio { namespace chain {
                                                  uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
                                                  int64_t subjective_cpu_bill_us );
 
-         /**
-          * Attempt to execute a specific transaction in our deferred trx database
-          *
-          */
-         transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& scheduled,
-                                                           fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                           uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time );
-
          struct block_report {
             size_t             total_net_usage = 0;
             size_t             total_cpu_usage_us = 0;

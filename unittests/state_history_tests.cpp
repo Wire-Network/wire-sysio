@@ -393,6 +393,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
+   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 

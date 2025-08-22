@@ -391,18 +391,6 @@ namespace sysio { namespace testing {
             }
             itr = unapplied_transactions.erase( itr );
          }
-
-         vector<transaction_id_type> scheduled_trxs;
-         while ((scheduled_trxs = get_scheduled_transactions()).size() > 0 ) {
-            for( const auto& trx : scheduled_trxs ) {
-               auto trace = control->push_scheduled_transaction( trx, fc::time_point::maximum(), fc::microseconds::maximum(), DEFAULT_BILLED_CPU_TIME_US, true );
-               traces.emplace_back( trace );
-               if( !no_throw && trace->except ) {
-                  // this always throws an fc::exception, since the original exception is copied into an fc::exception
-                  trace->except->dynamic_rethrow_exception();
-               }
-            }
-         }
       }
 
       auto head_block = _finish_block();
@@ -1399,9 +1387,6 @@ namespace sysio { namespace testing {
    std::vector<builtin_protocol_feature_t> base_tester::get_all_builtin_protocol_features() {
       std::vector<builtin_protocol_feature_t> builtins;
       for( const auto& f : builtin_protocol_feature_codenames ) {
-         // if ( !shouldAllowBlockProtocolChanges() ) {
-         //    continue;
-         // }
          builtins.push_back( f.first );
       }
 
@@ -1421,14 +1406,7 @@ namespace sysio { namespace testing {
    void base_tester::preactivate_all_but_disable_deferred_trx() {
       std::vector<builtin_protocol_feature_t> builtins;
       for( const auto& f : get_all_builtin_protocol_features() ) {
-         // Before deferred trxs feature is fully disabled, existing tests involving
-         // deferred trxs need to be exercised to make sure existing behaviors are
-         // maintained. Excluding DISABLE_DEFERRED_TRXS_STAGE_1 and DISABLE_DEFERRED_TRXS_STAGE_2
-         // from full protocol feature list such that existing tests can run.
-         if( f ==  builtin_protocol_feature_t::disable_deferred_trxs_stage_1 || f  == builtin_protocol_feature_t::disable_deferred_trxs_stage_2 ) {
-            continue;
-         }
-         else if ( !shouldAllowBlockProtocolChanges() ) {
+         if ( !shouldAllowBlockProtocolChanges() ) {
             continue;
          }
 

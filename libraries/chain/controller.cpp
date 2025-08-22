@@ -350,7 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
 
 
       self.irreversible_block.connect([this](const block_state_ptr& bsp) {
@@ -1160,10 +1159,6 @@ struct controller_impl {
       return fc::make_scoped_exit( std::move(callback) );
    }
 
-   int64_t remove_scheduled_transaction( const generated_transaction_object& gto ) {
-      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-   }
-
    bool failure_is_subjective( const fc::exception& e ) const {
       auto code = e.code();
       return    (code == subjective_block_production_exception::code_value)
@@ -1187,76 +1182,6 @@ struct controller_impl {
       return    (code == tx_cpu_usage_exceeded::code_value)
              || failure_is_subjective(e);
    }
-
-   transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& trxid,
-                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                     uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
-   {
-      const auto& idx = db.get_index<generated_transaction_multi_index,by_trx_id>();
-      auto itr = idx.find( trxid );
-      SYS_ASSERT( itr != idx.end(), unknown_transaction_exception, "unknown transaction" );
-      return push_scheduled_transaction( *itr, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time );
-   }
-
-   transaction_trace_ptr push_scheduled_transaction( const generated_transaction_object& gto,
-                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                     uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
-   { try {
-
-      auto start = fc::time_point::now();
-      const bool validating = !self.is_speculative_block();
-      SYS_ASSERT( !validating || explicit_billed_cpu_time, transaction_exception, "validating requires explicit billing" );
-
-      maybe_session undo_session;
-      if ( !self.skip_db_sessions() )
-         undo_session = maybe_session(db);
-
-      auto gtrx = generated_transaction(gto);
-
-      // remove the generated transaction object after making a copy
-      // this will ensure that anything which affects the GTO multi-index-container will not invalidate
-      // data we need to successfully retire this transaction.
-      //
-      // IF the transaction FAILs in a subjective way, `undo_session` should expire without being squashed
-      // resulting in the GTO being restored and available for a future block to retire.
-      int64_t trx_removal_ram_delta = remove_scheduled_transaction(gto);
-
-      fc::datastream<const char*> ds( gtrx.packed_trx.data(), gtrx.packed_trx.size() );
-
-      signed_transaction dtrx;
-      fc::raw::unpack(ds,static_cast<transaction&>(dtrx) );
-      transaction_metadata_ptr trx =
-            transaction_metadata::create_no_recover_keys( std::make_shared<packed_transaction>( std::move(dtrx)  ),
-                                                          transaction_metadata::trx_type::scheduled );
-      trx->accepted = true;
-
-      // After disable_deferred_trxs_stage_1 is activated, a deferred transaction
-      // can only be retired as expired, and it can be retired as expired
-      // regardless of whether its delay_util or expiration times have been reached.
-      transaction_trace_ptr trace;
-      if( self.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) || gtrx.expiration < self.pending_block_time() ) {
-         trace = std::make_shared<transaction_trace>();
-         trace->id = gtrx.trx_id;
-         trace->block_num = self.head_block_num() + 1;
-         trace->block_time = self.pending_block_time();
-         trace->producer_block_id = self.pending_producer_block_id();
-         trace->scheduled = true;
-         trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::expired, billed_cpu_time_us, 0 ); // expire the transaction
-         trace->account_ram_delta = account_delta( gtrx.sender, trx_removal_ram_delta );
-         trace->elapsed = fc::time_point::now() - start;
-         pending->_block_report.total_cpu_usage_us += billed_cpu_time_us;
-         pending->_block_report.total_elapsed_time += trace->elapsed;
-         pending->_block_report.total_time += trace->elapsed;
-         emit( self.accepted_transaction, trx );
-         dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-         undo_session.squash();
-         return trace;
-      }
-
-      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-   } FC_CAPTURE_AND_RETHROW() } /// push_scheduled_transaction
-
 
    /**
     *  Adds the transaction receipt to the pending block and returns it.
@@ -1874,8 +1799,6 @@ struct controller_impl {
                                                              : std::get<1>( trx_metas.at( packed_idx ) ).get() ) );
                trace = push_transaction( trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true, 0 );
                ++packed_idx;
-            } else if( std::holds_alternative<transaction_id_type>(receipt.trx) ) {
-               trace = push_scheduled_transaction( std::get<transaction_id_type>(receipt.trx), fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true );
             } else {
                SYS_ASSERT( false, block_validate_exception, "encountered unexpected receipt type" );
             }
@@ -2809,15 +2732,6 @@ transaction_trace_ptr controller::push_transaction( const transaction_metadata_p
    return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
 }
 
-transaction_trace_ptr controller::push_scheduled_transaction( const transaction_id_type& trxid,
-                                                              fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                              uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time )
-{
-   SYS_ASSERT( get_read_mode() != db_read_mode::IRREVERSIBLE, transaction_type_exception, "push scheduled transaction not allowed in irreversible mode" );
-   validate_db_available_size();
-   return my->push_scheduled_transaction( trxid, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time );
-}
-
 const flat_set<account_name>& controller::get_actor_whitelist() const {
    return my->conf.actor_whitelist;
 }
@@ -3589,15 +3503,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feat
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "preactivate_feature" );
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "is_feature_activated" );
    } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>() {
-   const auto& idx = db.get_index<generated_transaction_multi_index, by_trx_id>();
-   // remove all deferred trxs and refund their payers
-   for( auto itr = idx.begin(); itr != idx.end(); itr = idx.begin() ) {
-      remove_scheduled_transaction(*itr);
-   }
 }
 
 /// End of protocol feature activation handlers

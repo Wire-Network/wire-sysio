@@ -17,8 +17,6 @@ enum class builtin_protocol_feature_t : uint32_t {
    preactivate_feature = 0,
    reserved_first_protocol_feature = 1, // keep an example protocol feature mainly for tests
    // 2-24+ reserved, used by Spring, new wire protocol features should start at 500001
-   disable_deferred_trxs_stage_1 = 23,
-   disable_deferred_trxs_stage_2 = 24,
    reserved_private_fork_protocol_features = 500000,
 };
 
