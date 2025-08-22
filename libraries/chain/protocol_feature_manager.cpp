@@ -74,35 +74,6 @@ retires a deferred transaction is invalid.
 */
             {builtin_protocol_feature_t::disable_deferred_trxs_stage_1}
          } )
-         (  builtin_protocol_feature_t::disable_compression_in_transaction_merkle, builtin_protocol_feature_spec{
-            "DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE",
-            fc::variant("d73c676578a75fcf8cddf8a6646cb7f9960db50167804809669b19783a96f586").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: DISABLE_COMPRESSION_IN_TRANSACTION_MERKLE
-Depends on: DISABLE_DEFERRED_TRXS_STAGE_2
-
-Once this is turned on, the transaction_mroot will no longer be computed using
-the compressed transaction. It will instead include the transaction via its id,
-which is derived by its own digest.
-*/
-            {builtin_protocol_feature_t::disable_deferred_trxs_stage_2}
-         } )
-         (  builtin_protocol_feature_t::multiple_state_roots_supported, builtin_protocol_feature_spec{
-            "MULTIPLE_STATE_ROOTS_SUPPORTED",
-            fc::variant("6ac2d8207483f9cc03dba857167c6a5e3ee1b5e5ddb23fdb968aff30d9310636").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: MULTIPLE_STATE_ROOTS_SUPPORTED
-
-Initial implementation of s_root just supported one contract. Now there can
-be multiple and the s_header will use the contract_name to distinguish
-between which s_root is being reported and there is also an Operator
-Registration root for facilitating tracking of the list of operators that
-are acknowledged by all external blockchains.
-*/
-            {}
-         } )
    ;
 
 

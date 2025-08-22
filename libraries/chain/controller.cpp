@@ -1274,10 +1274,7 @@ struct controller_impl {
       r.status               = status;
       auto& bb = std::get<building_block>(pending->_block_stage);
       if( std::holds_alternative<digests_t>(bb._trx_mroot_or_receipt_digests) ) {
-         if( self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle ) )
-            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
-         else
-            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.packed_digest() );
+         std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
       }
       return r;
    }
@@ -1983,8 +1980,7 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    block_state_ptr create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_header_state& prev ) {
-      const bool activated = self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle );
-      auto trx_mroot = calculate_trx_merkle( b->transactions, activated );
+      auto trx_mroot = calculate_trx_merkle( b->transactions );
       SYS_ASSERT( b->transaction_mroot == trx_mroot, block_validate_exception,
                   "invalid block transaction merkle root ${b} != ${c}", ("b", b->transaction_mroot)("c", trx_mroot) );
 
@@ -2238,17 +2234,10 @@ struct controller_impl {
       return applied_trxs;
    }
 
-   const checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs, bool disable_compression_in_transaction_merkle )const {
+   const checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs )const {
       deque<digest_type> trx_digests;
-      if (disable_compression_in_transaction_merkle) {
-         for( const auto& a : trxs ) {
-            trx_digests.emplace_back( (a.digest)() );
-         }
-      }
-      else {
-         for( const auto& a : trxs ) {
-            trx_digests.emplace_back( (a.packed_digest)() );
-         }
+      for( const auto& a : trxs ) {
+         trx_digests.emplace_back( (a.digest)() );
       }
 
       return merkle( std::move(trx_digests) );
@@ -2872,7 +2861,7 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
 }
 
 bool controller_impl::are_multiple_state_roots_supported() const {
-   if ( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+   if ( merkle_processor ) {
       return true;
    }
 
@@ -3578,22 +3567,16 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
          std::move(matches)
       );
       applied_transaction.connect(
-         [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
-            }
          } );
       accepted_block.connect(
-         [self=this,root_txn_ident]( const block_state_ptr& blk ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( const block_state_ptr& blk ) {
                root_txn_ident->signal_accepted_block(blk);
-            }
          } ) ;
       block_start.connect(
-         [self=this,root_txn_ident]( uint32_t block_num ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( uint32_t block_num ) {
                root_txn_ident->signal_block_start(block_num);
-            }
          } ) ;
       my->merkle_processor = std::make_shared<block_root_processor>(my->db, std::move(root_txn_ident));
 }

@@ -37,9 +37,8 @@ namespace sysio { namespace chain {
       explicit transaction_receipt( const packed_transaction& ptrx ):transaction_receipt_header(executed),trx(std::in_place_type<packed_transaction>, ptrx){}
 
       std::variant<transaction_id_type, packed_transaction> trx;
-   private:
-      enum trx_digest_type { uncompressed_digest, compressed_digest};
-      digest_type get_digest(trx_digest_type packing)const {
+
+      digest_type digest()const {
          digest_type::encoder enc;
          fc::raw::pack( enc, status );
          fc::raw::pack( enc, cpu_usage_us );
@@ -47,20 +46,10 @@ namespace sysio { namespace chain {
          if( std::holds_alternative<transaction_id_type>(trx) )
             fc::raw::pack( enc, std::get<transaction_id_type>(trx) );
          else {
-            if (packing == trx_digest_type::compressed_digest)
-               fc::raw::pack( enc, std::get<packed_transaction>(trx).packed_digest() );
-            else
-               fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
+            // wire uses digest() instead of packed_digest()
+            fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
          }
          return enc.result();
-      }
-   public:
-      digest_type digest()const {
-         return get_digest(trx_digest_type::uncompressed_digest);
-      }
-
-      digest_type packed_digest()const {
-         return get_digest(trx_digest_type::compressed_digest);
       }
    };
 
