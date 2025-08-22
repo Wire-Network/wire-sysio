@@ -343,7 +343,6 @@ void apply_context::execute_inline( action&& a ) {
              .check_authorization( {a},
                                    {},
                                    {{receiver, config::sysio_code_name}},
-                                   control.pending_block_time() - trx_context.published,
                                    std::bind(&transaction_context::checktime, &this->trx_context),
                                    false,
                                    trx_context.is_dry_run(), // check_but_dont_fail
@@ -378,7 +377,6 @@ void apply_context::execute_context_free_inline( action&& a ) {
       dm_logger->on_send_context_free_inline();
    }
 }
-
 
 uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free )
 {

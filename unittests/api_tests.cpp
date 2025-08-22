@@ -1499,48 +1499,6 @@ BOOST_AUTO_TEST_CASE(inline_action_objective_limit) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE(deferred_inline_action_limit) { try {
-   SKIP_TEST
-   const uint32_t _4k = 4 * 1024;
-   tester chain(setup_policy::full_except_do_not_disable_deferred_trx, db_read_mode::HEAD, {_4k + 100});
-   tester chain2(setup_policy::full_except_do_not_disable_deferred_trx, db_read_mode::HEAD, {_4k + 100});
-   signed_block_ptr block;
-   for (int n=0; n < 2; ++n) {
-      block = chain.produce_block();
-      chain2.push_block(block);
-   }
-   chain.create_accounts( {"testapi"_n, "testapi2"_n, "alice"_n} );
-   chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-   chain.set_code( "testapi2"_n, test_contracts::test_api_wasm() );
-   block = chain.produce_block();
-   chain2.push_block(block);
-
-   transaction_trace_ptr trace;
-   auto c = chain.control->applied_transaction.connect([&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
-      auto& t = std::get<0>(x);
-      if (t->scheduled) { trace = t; }
-   } );
-   block = CALL_TEST_FUNCTION_WITH_BLOCK(chain, "test_transaction", "send_deferred_transaction_4k_action", {} ).second;
-   chain2.push_block(block);
-   BOOST_CHECK(!trace);
-   block = chain.produce_block( fc::seconds(2) );
-   chain2.push_block(block);
-
-   //check that it gets executed afterwards
-   BOOST_REQUIRE(trace);
-
-   //confirm printed message
-   BOOST_TEST(!trace->action_traces.empty());
-   BOOST_TEST(trace->action_traces.back().console == "action size: 4096");
-   c.disconnect();
-
-   for (int n=0; n < 10; ++n) {
-      block = chain.produce_block();
-      chain2.push_block(block);
-   }
-
-} FC_LOG_AND_RETHROW() }
-
 /*************************************************************************************
  * chain_tests test case
  *************************************************************************************/

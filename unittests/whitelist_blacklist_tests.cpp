@@ -485,11 +485,11 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
       if( act.account == "sysio"_n && act.name == "onblock"_n ) return;
 
       if( t->receipt && t->receipt->status == transaction_receipt::executed ) {
-         wlog( "${trx_type} ${id} executed (first action is ${code}::${action})",
-              ("trx_type", t->scheduled ? "scheduled trx" : "trx")("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx ${id} executed (first action is ${code}::${action})",
+              ("id", t->id)("code", act.account)("action", act.name) );
       } else {
-         wlog( "${trx_type} ${id} failed (first action is ${code}::${action})",
-               ("trx_type", t->scheduled ? "scheduled trx" : "trx")("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx ${id} failed (first action is ${code}::${action})",
+               ("id", t->id)("code", act.account)("action", act.name) );
       }
    };
 

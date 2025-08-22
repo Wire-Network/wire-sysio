@@ -52,8 +52,6 @@ namespace sysio { namespace chain {
          void init_for_input_trx( uint64_t packed_trx_unprunable_size,
                                   uint64_t packed_trx_prunable_size );
 
-         void init_for_deferred_trx( fc::time_point published );
-
          void exec();
          void finalize();
          void squash();
@@ -117,7 +115,6 @@ namespace sysio { namespace chain {
 
          void execute_action( uint32_t action_ordinal, uint32_t recurse_depth );
 
-         void schedule_transaction();
          void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
 
          void validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const;
@@ -148,7 +145,6 @@ namespace sysio { namespace chain {
          /// the maximum number of virtual CPU instructions of the transaction that can be safely billed to the billable accounts
          uint64_t                      initial_max_billable_cpu = 0;
 
-         fc::microseconds              delay;
          bool                          is_input           = false;
          bool                          apply_context_free = true;
          bool                          enforce_whiteblacklist = true;

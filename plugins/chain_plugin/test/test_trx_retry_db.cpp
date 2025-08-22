@@ -116,9 +116,7 @@ chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_pt
          chain::transaction_receipt_header{status},
          fc::microseconds(0),
          0,
-         false,
          {}, // actions
-         {},
          {},
          {},
          {},

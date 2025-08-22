@@ -2571,7 +2571,8 @@ read_only::get_required_keys_result read_only::get_required_keys( const get_requ
       abi_serializer::from_variant(params.transaction, pretty_input, resolver, abi_serializer_max_time);
    } SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Invalid transaction")
 
-   auto required_keys_set = db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys, fc::seconds( pretty_input.delay_sec ));
+   SYS_ASSERT( pretty_input.delay_sec.value == 0, chain::transaction_type_exception, "delay_sec must be 0");
+   auto required_keys_set = db.get_authorization_manager().get_required_keys( pretty_input, params.available_keys );
    get_required_keys_result result;
    result.required_keys = required_keys_set;
    return result;

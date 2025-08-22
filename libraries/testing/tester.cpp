@@ -319,13 +319,8 @@ namespace sysio { namespace testing {
       control->accepted_block.connect([this]( const block_state_ptr& block_state ){
         FC_ASSERT( block_state->block );
           for( auto receipt : block_state->block->transactions ) {
-              if( std::holds_alternative<packed_transaction>(receipt.trx) ) {
-                  auto &pt = std::get<packed_transaction>(receipt.trx);
-                  chain_transactions[pt.get_transaction().id()] = std::move(receipt);
-              } else {
-                  auto& id = std::get<transaction_id_type>(receipt.trx);
-                  chain_transactions[id] = std::move(receipt);
-              }
+             auto &pt = std::get<packed_transaction>(receipt.trx);
+             chain_transactions[pt.get_transaction().id()] = std::move(receipt);
           }
       });
    }

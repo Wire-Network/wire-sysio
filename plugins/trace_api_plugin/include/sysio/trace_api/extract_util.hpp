@@ -29,11 +29,7 @@ inline ActionTrace to_action_trace( const chain::action_trace& at ) {
 template<typename TransactionTrace>
 inline TransactionTrace to_transaction_trace( const cache_trace& t ) {
    TransactionTrace r;
-   if( !t.trace->failed_dtrx_trace ) {
-      r.id = t.trace->id;
-   } else {
-      r.id = t.trace->failed_dtrx_trace->id; // report the failed trx id since that is the id known to user
-   }
+   r.id = t.trace->id;
    if constexpr(std::is_same_v<TransactionTrace, transaction_trace_v1>  ||
                 std::is_same_v<TransactionTrace, transaction_trace_v2>  ||
                 std::is_same_v<TransactionTrace, transaction_trace_v3>) {
