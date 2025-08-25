@@ -88,7 +88,6 @@ namespace sysio { namespace chain {
             bool                     contracts_console      =  false;
             bool                     allow_ram_billing_in_notify = false;
             uint32_t                 maximum_variable_signature_length = chain::config::default_max_variable_signature_length;
-            bool                     disable_all_subjective_mitigations = false; //< for developer & testing purposes, can be configured using `disable-all-subjective-mitigations` when `SYSIO_DEVELOPER` build option is provided
             uint32_t                 terminate_at_block     = 0;
             bool                     integrity_hash_on_start= false;
             bool                     integrity_hash_on_stop = false;
@@ -273,8 +272,6 @@ namespace sysio { namespace chain {
          bool is_building_block()const;
          bool is_speculative_block()const;
 
-         bool is_ram_billing_in_notify_allowed()const;
-
          //This is only an accessor to the user configured subjective limit: i.e. it does not do a
          // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently
          // producing a block
@@ -319,7 +316,6 @@ namespace sysio { namespace chain {
          uint32_t get_greylist_limit()const;
 
          void add_to_ram_correction( account_name account, uint64_t ram_bytes );
-         bool all_subjective_mitigations_disabled()const;
 
          deep_mind_handler* get_deep_mind_logger(bool is_trx_transient) const;
          void enable_deep_mind( deep_mind_handler* logger );

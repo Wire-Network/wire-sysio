@@ -340,10 +340,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "In \"light\" mode all incoming blocks headers will be fully validated; transactions in those validated blocks will be trusted \n")
          ("disable-ram-billing-notify-checks", bpo::bool_switch()->default_value(false),
           "Disable the check which subjectively fails a transaction if a contract bills more RAM to another account within the context of a notification handler (i.e. when the receiver is not the code of the action).")
-#ifdef SYSIO_DEVELOPER
-         ("disable-all-subjective-mitigations", bpo::bool_switch()->default_value(false),
-          "Disable all subjective mitigations checks in the entire codebase.")
-#endif
          ("maximum-variable-signature-length", bpo::value<uint32_t>()->default_value(16384u),
           "Subjectively limit the maximum length of variable components in a variable legnth signature to this size in bytes")
          ("trusted-producer", bpo::value<vector<string>>()->composing(), "Indicate a producer whose blocks headers signed by it will be fully validated, but transactions in those validated blocks will be trusted.")
@@ -661,10 +657,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain_config->disable_replay_opts = options.at( "disable-replay-opts" ).as<bool>();
       chain_config->contracts_console = options.at( "contracts-console" ).as<bool>();
       chain_config->allow_ram_billing_in_notify = options.at( "disable-ram-billing-notify-checks" ).as<bool>();
-
-#ifdef SYSIO_DEVELOPER
-      chain_config->disable_all_subjective_mitigations = options.at( "disable-all-subjective-mitigations" ).as<bool>();
-#endif
 
       chain_config->maximum_variable_signature_length = options.at( "maximum-variable-signature-length" ).as<uint32_t>();
 

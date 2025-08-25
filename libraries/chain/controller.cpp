@@ -3190,10 +3190,6 @@ bool controller::is_speculative_block()const {
    return (my->pending->_block_status == block_status::incomplete || my->pending->_block_status == block_status::ephemeral );
 }
 
-bool controller::is_ram_billing_in_notify_allowed()const {
-   return my->conf.disable_all_subjective_mitigations || !is_speculative_block() || my->conf.allow_ram_billing_in_notify;
-}
-
 uint32_t controller::configured_subjective_signature_length_limit()const {
    return my->conf.maximum_variable_signature_length;
 }
@@ -3315,10 +3311,6 @@ void controller::add_to_ram_correction( account_name account, uint64_t ram_bytes
    if (auto dm_logger = get_deep_mind_logger(false)) {
       dm_logger->on_add_ram_correction(*ptr, ram_bytes);
    }
-}
-
-bool controller::all_subjective_mitigations_disabled()const {
-   return my->conf.disable_all_subjective_mitigations;
 }
 
 deep_mind_handler* controller::get_deep_mind_logger(bool is_trx_transient)const {
