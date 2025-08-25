@@ -1,7 +1,6 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/variant_object.hpp>
@@ -1197,7 +1196,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    // Disable the subjective mitigation
    c.close();
    auto cfg = c.get_config();
-   cfg.disable_all_subjective_mitigations = true;
    c.init( cfg );
 
    c.produce_block();
@@ -1222,7 +1220,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
    // Re-enable the subjective mitigation
    c.close();
-   cfg.disable_all_subjective_mitigations = false;
    c.init( cfg );
 
    c.produce_block();

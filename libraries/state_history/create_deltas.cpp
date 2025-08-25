@@ -149,7 +149,7 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
        std::tuple<chain::account_index*, chain::account_metadata_index*, chain::code_index*,
                   chain::table_id_multi_index*, chain::key_value_index*, chain::index64_index*, chain::index128_index*,
                   chain::index256_index*, chain::index_double_index*, chain::index_long_double_index*,
-                  chain::global_property_multi_index*, chain::generated_transaction_multi_index*,
+                  chain::global_property_multi_index*,
                   chain::protocol_state_multi_index*, chain::permission_index*, chain::permission_link_index*,
                   chain::resource_limits::resource_limits_index*, chain::resource_limits::resource_usage_index*,
                   chain::resource_limits::resource_limits_state_index*,
@@ -170,7 +170,6 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
    process_table(ds, "contract_index_long_double", db.get_index<chain::index_long_double_index>(), pack_contract_row);
 
    process_table(ds, "global_property", db.get_index<chain::global_property_multi_index>(), pack_row);
-   process_table(ds, "generated_transaction", db.get_index<chain::generated_transaction_multi_index>(), pack_row);
    process_table(ds, "protocol_state", db.get_index<chain::protocol_state_multi_index>(), pack_row);
 
    process_table(ds, "permission", db.get_index<chain::permission_index>(), pack_row);

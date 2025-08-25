@@ -12,13 +12,10 @@ namespace sysio { namespace chain {
    struct transaction_receipt_header {
       enum status_enum {
          executed  = 0, ///< succeed, no error handler executed
-         soft_fail = 1, ///< objectively failed (not executed), error handler executed
-         hard_fail = 2, ///< objectively failed and error handler objectively failed thus no state change
-         delayed   = 3, ///< transaction delayed/deferred/scheduled for future execution
          expired   = 4  ///< transaction expired and storage space refuned to user
       };
 
-      transaction_receipt_header():status(hard_fail){}
+      transaction_receipt_header():status(expired){}
       explicit transaction_receipt_header( status_enum s ):status(s){}
 
       friend inline bool operator ==( const transaction_receipt_header& lhs, const transaction_receipt_header& rhs ) {
@@ -33,22 +30,17 @@ namespace sysio { namespace chain {
    struct transaction_receipt : public transaction_receipt_header {
 
       transaction_receipt():transaction_receipt_header(){}
-      explicit transaction_receipt( const transaction_id_type& tid ):transaction_receipt_header(executed),trx(tid){}
       explicit transaction_receipt( const packed_transaction& ptrx ):transaction_receipt_header(executed),trx(std::in_place_type<packed_transaction>, ptrx){}
-
-      std::variant<transaction_id_type, packed_transaction> trx;
+      using not_used = transaction_id_type; // keep binary compatibility of transaction_receipt
+      std::variant<not_used, packed_transaction> trx;
 
       digest_type digest()const {
          digest_type::encoder enc;
          fc::raw::pack( enc, status );
          fc::raw::pack( enc, cpu_usage_us );
          fc::raw::pack( enc, net_usage_words );
-         if( std::holds_alternative<transaction_id_type>(trx) )
-            fc::raw::pack( enc, std::get<transaction_id_type>(trx) );
-         else {
-            // wire uses digest() instead of packed_digest()
-            fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
-         }
+         // wire uses digest() instead of packed_digest()
+         fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
          return enc.result();
       }
    };
@@ -116,7 +108,7 @@ namespace sysio { namespace chain {
 } } /// sysio::chain
 
 FC_REFLECT_ENUM( sysio::chain::transaction_receipt::status_enum,
-                 (executed)(soft_fail)(hard_fail)(delayed)(expired) )
+                 (executed)(expired) )
 
 FC_REFLECT(sysio::chain::transaction_receipt_header, (status)(cpu_usage_us)(net_usage_words) )
 FC_REFLECT_DERIVED(sysio::chain::transaction_receipt, (sysio::chain::transaction_receipt_header), (trx) )

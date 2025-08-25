@@ -1,6 +1,5 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/testing/tester.hpp>
 
 #include <fc/variant_object.hpp>

@@ -434,7 +434,7 @@ namespace webassembly {
           * @param permission - the name of the permission to check for authorization.
           * @param pubkeys_data - serialized vector of provided public keys.
           * @param perms_data - serialized vector of provided permissions (empty permission name acts as wildcard).
-          * @param delay_us - the provided delay in microseconds (cannot exceed INT64_MAX)
+          * @param delay_us - must be zero for wire as delayed transactions not supported
           *
           * @retval true if permission is authorized.
           * @retval false otherwise.

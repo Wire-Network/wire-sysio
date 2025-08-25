@@ -55,11 +55,9 @@ namespace sysio { namespace chain {
       std::optional<transaction_receipt_header>  receipt;
       fc::microseconds                           elapsed;
       uint64_t                                   net_usage = 0;
-      bool                                       scheduled = false;
       vector<action_trace>                       action_traces;
       std::optional<account_delta>               account_ram_delta;
 
-      transaction_trace_ptr                      failed_dtrx_trace;
       std::optional<fc::exception>               except;
       std::optional<uint64_t>                    error_code;
       std::exception_ptr                         except_ptr;
@@ -92,5 +90,5 @@ FC_REFLECT( sysio::chain::action_trace,
 
 // @ignore except_ptr
 FC_REFLECT( sysio::chain::transaction_trace, (id)(block_num)(block_time)(producer_block_id)
-                                             (receipt)(elapsed)(net_usage)(scheduled)
-                                             (action_traces)(account_ram_delta)(failed_dtrx_trace)(except)(error_code) )
+                                             (receipt)(elapsed)(net_usage)
+                                             (action_traces)(account_ram_delta)(except)(error_code) )

@@ -5,7 +5,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/chain/abi_serializer.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 
 #include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>

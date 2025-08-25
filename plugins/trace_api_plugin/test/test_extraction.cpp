@@ -29,9 +29,7 @@ namespace {
          chain::transaction_receipt_header{status},
          fc::microseconds(0),
          0,
-         false,
          std::move(actions),
-         {},
          {},
          {},
          {},
@@ -39,26 +37,9 @@ namespace {
       });
    }
 
-   chain::bytes make_onerror_data( const chain::onerror& one ) {
-      fc::datastream<size_t> ps;
-      fc::raw::pack(ps, one);
-      chain::bytes result(ps.tellp());
-
-      if( result.size() ) {
-         fc::datastream<char*>  ds( result.data(), size_t(result.size()) );
-         fc::raw::pack(ds, one);
-      }
-      return result;
-   }
-
    auto make_transfer_action( chain::name from, chain::name to, chain::asset quantity, std::string memo ) {
       return chain::action( std::vector<chain::permission_level> {{from, chain::config::active_name}},
                             "sysio.token"_n, "transfer"_n, make_transfer_data( from, to, quantity, std::move(memo) ) );
-   }
-
-   auto make_onerror_action( chain::name creator, chain::uint128_t sender_id ) {
-      return chain::action( std::vector<chain::permission_level>{{creator, chain::config::active_name}},
-                                chain::onerror{ sender_id, "test ", 4 });
    }
 
    auto make_packed_trx( std::vector<chain::action> actions ) {
@@ -332,72 +313,6 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
                bsp1->block->transactions[2].net_usage_words,
                ptrx3.get_signatures(),
                make_trx_header(ptrx3.get_transaction())
-            }
-         }
-      };
-
-      const block_trace_v2 expected_block_trace {
-         bsp1->id,
-         1,
-         bsp1->prev(),
-         chain::block_timestamp_type(1),
-         "bp.one"_n,
-         bsp1->block->transaction_mroot,
-         bsp1->block->action_mroot,
-         bsp1->block->schedule_version,
-         expected_transaction_traces
-      };
-
-      BOOST_REQUIRE_EQUAL(max_lib, 0u);
-      BOOST_REQUIRE(data_log.size() == 1u);
-      BOOST_REQUIRE(std::holds_alternative<block_trace_v2>(data_log.at(0)));
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(data_log.at(0)), expected_block_trace);
-   }
-
-   BOOST_FIXTURE_TEST_CASE(onerror_transaction_block, extraction_test_fixture)
-   {
-      auto onerror_act = make_onerror_action( "alice"_n, 1 );
-      auto actt1 = make_action_trace( 0, onerror_act, "sysio.token"_n );
-      auto ptrx1 = make_packed_trx( { onerror_act } );
-
-      auto act2 = make_transfer_action( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" );
-      auto actt2 = make_action_trace( 1, act2, "bob"_n );
-      auto transfer_trx = make_packed_trx( { act2 } );
-
-      auto onerror_trace = make_transaction_trace( ptrx1.id(), 1, 1, chain::transaction_receipt_header::executed,
-                              { actt1 } );
-      auto transfer_trace = make_transaction_trace( transfer_trx.id(), 1, 1, chain::transaction_receipt_header::soft_fail,
-                                                   { actt2 } );
-      onerror_trace->failed_dtrx_trace = transfer_trace;
-
-      signal_applied_transaction( onerror_trace, std::make_shared<packed_transaction>( transfer_trx ) );
-
-      auto bsp1 = make_block_state( chain::block_id_type(), 1, 1, "bp.one"_n,
-            { chain::packed_transaction(transfer_trx) } );
-      signal_accepted_block( bsp1 );
-
-      const std::vector<action_trace_v1> expected_action_trace {
-         {
-            {
-               0,
-               "sysio.token"_n, "sysio"_n, "onerror"_n,
-               {{ "alice"_n, "active"_n }},
-               make_onerror_data( chain::onerror{ 1, "test ", 4 } )
-            },
-            {}
-         }
-      };
-
-      const std::vector<transaction_trace_v3> expected_transaction_traces {
-         {
-            {
-               transfer_trx.id(), // transfer_trx.id() because that is the trx id known to the user
-               expected_action_trace,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[0].status},
-               bsp1->block->transactions[0].cpu_usage_us,
-               bsp1->block->transactions[0].net_usage_words,
-               transfer_trx.get_signatures(),
-               make_trx_header(transfer_trx.get_transaction())
             }
          }
       };

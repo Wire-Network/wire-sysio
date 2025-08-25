@@ -201,16 +201,6 @@ namespace sysio { namespace testing {
          void                 produce_min_num_of_blocks_to_spend_time_wo_inactive_prod(const fc::microseconds target_elapsed_time = fc::microseconds());
          void                 push_block(signed_block_ptr b);
 
-         /**
-          * These transaction IDs represent transactions available in the head chain state as scheduled
-          * or otherwise generated transactions.
-          *
-          * calling push_scheduled_transaction with these IDs will remove the associated transaction from
-          * the chain state IFF it succeeds or objectively fails
-          *
-          * @return
-          */
-         vector<transaction_id_type> get_scheduled_transactions() const;
          unapplied_transaction_queue& get_unapplied_transaction_queue() { return unapplied_transactions; }
 
          transaction_trace_ptr    push_transaction( packed_transaction& trx, fc::time_point deadline = fc::time_point::maximum(), uint32_t billed_cpu_time_us = DEFAULT_BILLED_CPU_TIME_US );
@@ -224,28 +214,24 @@ namespace sysio { namespace testing {
                                                const action_name& acttype,
                                                const account_name& actor,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
                                                const vector<account_name>& actors,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
          transaction_trace_ptr    push_action( const account_name& code,
                                                const action_name& acttype,
                                                const vector<permission_level>& auths,
                                                const variant_object& data,
-                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                               uint32_t delay_sec = 0 );
+                                               uint32_t expiration = DEFAULT_EXPIRATION_DELTA );
 
 
          action get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                          const variant_object& data )const;
 
          void  set_transaction_headers( transaction& trx,
-                                        uint32_t expiration = DEFAULT_EXPIRATION_DELTA,
-                                        uint32_t delay_sec = 0 )const;
+                                        uint32_t expiration = DEFAULT_EXPIRATION_DELTA )const;
 
          vector<transaction_trace_ptr>  create_accounts( vector<account_name> names,
                                                          bool multisig = false,

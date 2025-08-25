@@ -1,6 +1,5 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/block_state.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
 #include <sysio/chain/permission_object.hpp>
@@ -34,16 +33,6 @@ namespace sysio::chain {
    void deep_mind_handler::update_logger(const std::string& logger_name)
    {
       fc::logger::update( logger_name, _logger );
-   }
-
-   static const char* prefix(deep_mind_handler::operation_qualifier q) {
-      switch(q)
-      {
-      case deep_mind_handler::operation_qualifier::none: return "";
-      case deep_mind_handler::operation_qualifier::modify: return "MODIFY_";
-      case deep_mind_handler::operation_qualifier::push: return "PUSH_";
-      default: elog("Unknown operation_qualifier"); return "";
-      }
    }
 
    void deep_mind_handler::on_startup(chainbase::database& db, uint32_t head_block_num)
@@ -193,59 +182,6 @@ namespace sysio::chain {
    void deep_mind_handler::on_send_context_free_inline()
    {
       fc_dlog(_logger, "CREATION_OP CFA_INLINE ${action_id}",
-         ("action_id", _action_id)
-      );
-   }
-   void deep_mind_handler::on_cancel_deferred(operation_qualifier qual, const generated_transaction_object& gto)
-   {
-      fc_dlog(_logger, "DTRX_OP ${qual}CANCEL ${action_id} ${sender} ${sender_id} ${payer} ${published} ${delay} ${expiration} ${trx_id} ${trx}",
-         ("qual", prefix(qual))
-         ("action_id", _action_id)
-         ("sender", gto.sender)
-         ("sender_id", gto.sender_id)
-         // ("payer", gto.payer)
-         ("published", gto.published)
-         ("delay", gto.delay_until)
-         ("expiration", gto.expiration)
-         ("trx_id", gto.trx_id)
-         ("trx", fc::to_hex(gto.packed_trx.data(), gto.packed_trx.size()))
-      );
-   }
-   void deep_mind_handler::on_send_deferred(operation_qualifier qual, const generated_transaction_object& gto)
-   {
-      fc_dlog(_logger, "DTRX_OP ${qual}CREATE ${action_id} ${sender} ${sender_id} ${payer} ${published} ${delay} ${expiration} ${trx_id} ${trx}",
-         ("qual", prefix(qual))
-         ("action_id", _action_id)
-         ("sender", gto.sender)
-         ("sender_id", gto.sender_id)
-         // ("payer", gto.payer)
-         ("published", gto.published)
-         ("delay", gto.delay_until)
-         ("expiration", gto.expiration)
-         ("trx_id", gto.trx_id)
-         ("trx", fc::to_hex(gto.packed_trx.data(), gto.packed_trx.size()))
-      );
-   }
-   void deep_mind_handler::on_create_deferred(operation_qualifier qual, const generated_transaction_object& gto, const packed_transaction& packed_trx)
-   {
-      auto packed_signed_trx = fc::raw::pack(packed_trx.get_signed_transaction());
-
-      fc_dlog(_logger, "DTRX_OP ${qual}CREATE ${action_id} ${sender} ${sender_id} ${payer} ${published} ${delay} ${expiration} ${trx_id} ${trx}",
-         ("qual", prefix(qual))
-         ("action_id", _action_id)
-         ("sender", gto.sender)
-         ("sender_id", gto.sender_id)
-         // ("payer", gto.payer)
-         ("published", gto.published)
-         ("delay", gto.delay_until)
-         ("expiration", gto.expiration)
-         ("trx_id", gto.trx_id)
-         ("trx", fc::to_hex(packed_signed_trx.data(), packed_signed_trx.size()))
-      );
-   }
-   void deep_mind_handler::on_fail_deferred()
-   {
-      fc_dlog(_logger, "DTRX_OP FAILED ${action_id}",
          ("action_id", _action_id)
       );
    }

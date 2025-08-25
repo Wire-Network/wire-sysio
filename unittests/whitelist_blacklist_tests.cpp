@@ -1,4 +1,3 @@
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/testing/tester_network.hpp>
@@ -485,11 +484,11 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
       if( act.account == "sysio"_n && act.name == "onblock"_n ) return;
 
       if( t->receipt && t->receipt->status == transaction_receipt::executed ) {
-         wlog( "${trx_type} ${id} executed (first action is ${code}::${action})",
-              ("trx_type", t->scheduled ? "scheduled trx" : "trx")("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx ${id} executed (first action is ${code}::${action})",
+              ("id", t->id)("code", act.account)("action", act.name) );
       } else {
-         wlog( "${trx_type} ${id} failed (first action is ${code}::${action})",
-               ("trx_type", t->scheduled ? "scheduled trx" : "trx")("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx ${id} failed (first action is ${code}::${action})",
+               ("id", t->id)("code", act.account)("action", act.name) );
       }
    };
 
@@ -502,64 +501,6 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
                                                          ( "payload", 10 ) ),
                            fc::exception,
                            fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"bob\"]") );
-
-
-
-   auto num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(0u, num_deferred);
-
-   // Schedule a deferred transaction authorized by charlie@active
-   tester1.chain->push_action( "charlie"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "charlie" )
-      ( "payload", 10 )
-   );
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   // Do not allow that deferred transaction to retire yet
-   tester1.chain->finish_block();
-   tester1.chain->produce_blocks(2, true); // Produce 2 empty blocks (other than onblock of course).
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   c1.disconnect();
-
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
-      tester2.chain->push_block( b );
-   }
-
-   tester1.shutdown();
-
-   tester1.actor_blacklist = {"bob"_n, "charlie"_n};
-   tester1.init(false);
-
-   auto c2 = tester1.chain->control->applied_transaction.connect( log_trxs );
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   // With charlie now in the actor blacklist, retiring the previously scheduled deferred transaction should now not be possible.
-   BOOST_CHECK_EXCEPTION( tester1.chain->produce_blocks(), fc::exception,
-                          fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"charlie\"]")
-                        );
-
-
-   // With charlie now in the actor blacklist, it is now not possible to schedule a deferred transaction authorized by charlie@active
-   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "charlie"_n, "defercall"_n, "alice"_n, mvo()
-                                                         ( "payer", "alice" )
-                                                         ( "sender_id", 1 )
-                                                         ( "contract", "charlie" )
-                                                         ( "payload", 10 ) ),
-                           fc::exception,
-                           fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"charlie\"]")
-   );
-
-   c2.disconnect();
 
 } FC_LOG_AND_RETHROW() }
 
@@ -628,84 +569,6 @@ BOOST_AUTO_TEST_CASE( blacklist_sender_bypass ) { try {
    );
 
 
-   auto num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(0u, num_deferred);
-
-   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "bob"_n, "defercall"_n, "alice"_n, mvo()
-                                                         ( "payer", "alice" )
-                                                         ( "sender_id", 0 )
-                                                         ( "contract", "bob" )
-                                                         ( "payload", 10 ) ),
-                           fc::exception,
-                           fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"bob\"]")
-   );
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(0u, num_deferred);
-
-   // Schedule a deferred transaction authorized by charlie@active
-   tester1.chain->push_action( "charlie"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "charlie" )
-      ( "payload", 10 )
-   );
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   // Retire the deferred transaction successfully despite charlie being on the actor blacklist.
-   // This is allowed due to the fact that the sender of the deferred transaction (also charlie) is in the sender bypass list.
-   tester1.chain->produce_blocks();
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(0u, num_deferred);
-
-   // Schedule another deferred transaction authorized by charlie@active
-   tester1.chain->push_action( "charlie"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 1 )
-      ( "contract", "bob" )
-      ( "payload", 10 )
-   );
-
-   // Do not yet retire the deferred transaction
-   tester1.chain->finish_block();
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   tester1.shutdown();
-
-   tester1.sender_bypass_whiteblacklist = {"charlie"_n};
-   tester1.actor_blacklist = {"bob"_n, "charlie"_n};
-   tester1.contract_blacklist = {"bob"_n}; // Add bob to the contract blacklist as well
-   tester1.init(false);
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   // Now retire the deferred transaction successfully despite charlie being on both the actor blacklist and bob being on the contract blacklist
-   // This is allowed due to the fact that the sender of the deferred transaction (also charlie) is in the sender bypass list.
-   tester1.chain->produce_blocks();
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(0u, num_deferred);
-
-   tester1.chain->push_action( "alice"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "bob" )
-      ( "payload", 10 )
-   );
-
-   num_deferred = tester1.chain->control->db().get_index<generated_transaction_multi_index,by_trx_id>().size();
-   BOOST_REQUIRE_EQUAL(1u, num_deferred);
-
-   // Ensure that if there if the sender is not on the sender bypass list, then the contract blacklist is enforced.
-   BOOST_CHECK_EXCEPTION( tester1.chain->produce_blocks(), fc::exception,
-                          fc_exception_message_is("account 'bob' is on the contract blacklist") );
-
    whitelist_blacklist_tester<tester> tester2;
    tester2.init(false);
 
@@ -764,7 +627,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
                                               std::vector<permission_level>{{acnt, perm}},
                                               fc::mutable_variant_object()("from", acnt) ) );
-      c.set_transaction_headers( trx, 6, 0 );
+      c.set_transaction_headers( trx, 6 );
       trx.sign( c.get_private_key( acnt, perm.to_string() ), c.control->get_chain_id() );
       // This transaction is charged 104 bytes of NET.
 

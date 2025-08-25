@@ -50,14 +50,11 @@ private:
    void on_applied_transaction(const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& t) {
       if( !trace->receipt ) return;
       // include only executed transactions; soft_fail included so that onerror (and any inlines via onerror) are included
-      if((trace->receipt->status != chain::transaction_receipt_header::executed &&
-          trace->receipt->status != chain::transaction_receipt_header::soft_fail)) {
+      if((trace->receipt->status != chain::transaction_receipt_header::executed)) {
          return;
       }
       if( chain::is_onblock( *trace )) {
          onblock_trace.emplace( cache_trace{trace, t} );
-      } else if( trace->failed_dtrx_trace ) {
-         cached_traces[trace->failed_dtrx_trace->id] = {trace, t};
       } else {
          cached_traces[trace->id] = {trace, t};
       }
@@ -92,12 +89,7 @@ private:
          if( onblock_trace )
             traces.emplace_back( to_transaction_trace<transaction_trace_t>( *onblock_trace ));
          for( const auto& r : block_state->block->transactions ) {
-            transaction_id_type id;
-            if( std::holds_alternative<transaction_id_type>(r.trx)) {
-               id = std::get<transaction_id_type>(r.trx);
-            } else {
-               id = std::get<packed_transaction>(r.trx).id();
-            }
+            const transaction_id_type& id = std::get<packed_transaction>(r.trx).id();
             const auto it = cached_traces.find( id );
             if( it != cached_traces.end() ) {
                traces.emplace_back( to_transaction_trace<transaction_trace_t>( it->second ));

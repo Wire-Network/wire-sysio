@@ -276,8 +276,7 @@ namespace sysio { namespace chain {
                                     3040007, "Invalid Reference Block" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_duplicate,                transaction_exception,
                                     3040008, "Duplicate transaction" )
-      FC_DECLARE_DERIVED_EXCEPTION( deferred_tx_duplicate,       transaction_exception,
-                                    3040009, "Duplicate deferred transaction" )
+      // deferred_tx_duplicate 3040009
       FC_DECLARE_DERIVED_EXCEPTION( cfa_inside_generated_tx,     transaction_exception,
                                     3040010, "Context free action is not allowed inside generated transaction" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_not_found,     transaction_exception,
@@ -290,8 +289,7 @@ namespace sysio { namespace chain {
                                     3040014, "Unknown transaction compression" )
       FC_DECLARE_DERIVED_EXCEPTION( invalid_transaction_extension, transaction_exception,
                                     3040015, "Invalid transaction extension" )
-      FC_DECLARE_DERIVED_EXCEPTION( ill_formed_deferred_transaction_generation_context, transaction_exception,
-                                    3040016, "Transaction includes an ill-formed deferred transaction generation context extension" )
+      // ill_formed_deferred_transaction_generation_context 3040016
       FC_DECLARE_DERIVED_EXCEPTION( disallowed_transaction_extensions_bad_block_exception, transaction_exception,
                                     3040017, "Transaction includes disallowed extensions (invalid block)" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_resource_exhaustion, transaction_exception,
@@ -395,13 +393,12 @@ namespace sysio { namespace chain {
       FC_DECLARE_DERIVED_EXCEPTION( tx_irrelevant_sig,            authorization_exception,
                                     3090002, "Irrelevant signature included" )
       FC_DECLARE_DERIVED_EXCEPTION( unsatisfied_authorization,    authorization_exception,
-                                    3090003, "Provided keys, permissions, and delays do not satisfy declared authorizations" )
+                                    3090003, "Provided keys and permissions do not satisfy declared authorizations" )
       FC_DECLARE_DERIVED_EXCEPTION( missing_auth_exception,       authorization_exception,
                                     3090004, "Missing required authority" )
       FC_DECLARE_DERIVED_EXCEPTION( irrelevant_auth_exception,    authorization_exception,
                                     3090005, "Irrelevant authority included" )
-      FC_DECLARE_DERIVED_EXCEPTION( insufficient_delay_exception, authorization_exception,
-                                    3090006, "Insufficient delay" )
+      // insufficient_delay_exception 3090006
       FC_DECLARE_DERIVED_EXCEPTION( invalid_permission,           authorization_exception,
                                     3090007, "Invalid Permission" )
       FC_DECLARE_DERIVED_EXCEPTION( unlinkable_min_permission_action, authorization_exception,

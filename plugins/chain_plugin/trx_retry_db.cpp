@@ -128,8 +128,6 @@ struct trx_retry_db_impl {
       if(trace->receipt->status != chain::transaction_receipt_header::executed) {
          return;
       }
-      // only incoming
-      if( trace->scheduled ) return;
       // Only want transactions in a block, if no producer id then not in a block
       if( !trace->producer_block_id ) return;
       // Don't care about implicit

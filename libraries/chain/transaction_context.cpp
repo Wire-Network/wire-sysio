@@ -4,7 +4,6 @@
 #include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/transaction_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
@@ -249,7 +248,7 @@ namespace sysio { namespace chain {
                                                  uint64_t packed_trx_prunable_size )
    {
       const transaction& trx = packed_trx.get_transaction();
-      // read-only and dry-run transactions are not allowed to be delayed at any time
+      // delayed transactions are not supported by wire
       SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
 
       const auto& cfg = control.get_global_properties().configuration;
@@ -265,13 +264,6 @@ namespace sysio { namespace chain {
 
       uint64_t initial_net_usage = static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
                                     + packed_trx_unprunable_size + discounted_size_for_pruned_data;
-
-      if( trx.delay_sec.value > 0 ) {
-          // If delayed, also charge ahead of time for the additional net usage needed to retire the delayed transaction
-          // whether that be by successfully executing, soft failure, hard failure, or expiration.
-         initial_net_usage += static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
-                               + static_cast<uint64_t>(config::transaction_id_net_usage);
-      }
 
       published = control.pending_block_time();
       is_input = true;
@@ -289,23 +281,6 @@ namespace sysio { namespace chain {
       }
    }
    
-   void transaction_context::init_for_deferred_trx( fc::time_point p )
-   {
-      const transaction& trx = packed_trx.get_transaction();
-      if( (trx.expiration.sec_since_epoch() != 0) && (trx.transaction_extensions.size() > 0) ) {
-         disallow_transaction_extensions( "no transaction extensions supported yet for deferred transactions" );
-      }
-      // If (trx.expiration.sec_since_epoch() == 0) then it was created after NO_DUPLICATE_DEFERRED_ID activation,
-      // and so validation of its extensions was done either in:
-      //   * apply_context::schedule_deferred_transaction for contract-generated transactions;
-      //   * or transaction_context::init_for_input_trx for delayed input transactions.
-
-      published = p;
-      trace->scheduled = true;
-      apply_context_free = false;
-      init( 0 );
-   }
-
    void transaction_context::exec() {
       SYS_ASSERT( is_initialized, transaction_exception, "must first initialize" );
 
@@ -316,20 +291,14 @@ namespace sysio { namespace chain {
          }
       }
 
-      if( delay == fc::microseconds() ) {
-         for( const auto& act : trx.actions ) {
-            schedule_action( act, act.account, false, 0, 0 );
-         }
+      for( const auto& act : trx.actions ) {
+         schedule_action( act, act.account, false, 0, 0 );
       }
 
       auto& action_traces = trace->action_traces;
       uint32_t num_original_actions_to_execute = action_traces.size();
       for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
          execute_action( i, 0 );
-      }
-
-      if( delay != fc::microseconds() ) {
-         schedule_transaction();
       }
    }
 
@@ -676,10 +645,6 @@ namespace sysio { namespace chain {
       }
 
       acontext.exec();
-   }
-
-   void transaction_context::schedule_transaction() {
-      throw std::runtime_error("Scheduled transaction implementation has been removed");
    }
 
    void transaction_context::record_transaction( const transaction_id_type& id, fc::time_point_sec expire ) {

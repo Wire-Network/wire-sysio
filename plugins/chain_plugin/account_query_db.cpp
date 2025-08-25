@@ -286,14 +286,11 @@ namespace sysio::chain_apis {
       void cache_transaction_trace( const chain::transaction_trace_ptr& trace ) {
          if( !trace->receipt ) return;
          // include only executed transactions; soft_fail included so that onerror (and any inlines via onerror) are included
-         if((trace->receipt->status != chain::transaction_receipt_header::executed &&
-             trace->receipt->status != chain::transaction_receipt_header::soft_fail)) {
+         if((trace->receipt->status != chain::transaction_receipt_header::executed)) {
             return;
          }
          if( is_onblock( trace )) {
             onblock_trace.emplace( trace );
-         } else if( trace->failed_dtrx_trace ) {
-            cached_trace_map[trace->failed_dtrx_trace->id] = trace;
          } else {
             cached_trace_map[trace->id] = trace;
          }
@@ -339,13 +336,7 @@ namespace sysio::chain_apis {
             process_trace(*onblock_trace);
 
          for( const auto& r : bsp->block->transactions ) {
-            chain::transaction_id_type id;
-            if( std::holds_alternative<chain::transaction_id_type>(r.trx)) {
-               id = std::get<chain::transaction_id_type>(r.trx);
-            } else {
-               id = std::get<chain::packed_transaction>(r.trx).id();
-            }
-
+            const chain::transaction_id_type& id = std::get<chain::packed_transaction>(r.trx).id();
             const auto it = cached_trace_map.find( id );
             if( it != cached_trace_map.end() ) {
                process_trace( it->second );

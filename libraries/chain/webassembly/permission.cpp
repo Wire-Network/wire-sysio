@@ -36,7 +36,6 @@ namespace sysio { namespace chain { namespace webassembly {
                 .check_authorization( trx.actions,
                                       provided_keys,
                                       provided_permissions,
-                                      fc::seconds(trx.delay_sec),
                                       std::bind(&transaction_context::checktime, &context.trx_context),
                                       false
                                     );
@@ -50,8 +49,7 @@ namespace sysio { namespace chain { namespace webassembly {
                                                    legacy_span<const char> pubkeys_data,
                                                    legacy_span<const char> perms_data,
                                                    uint64_t delay_us ) const {
-      SYS_ASSERT( delay_us <= static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),
-                  action_validate_exception, "provided delay is too large" );
+      SYS_ASSERT( delay_us == 0, action_validate_exception, "delayed transactions not supported" );
 
       flat_set<public_key_type> provided_keys;
       unpack_provided_keys( provided_keys, pubkeys_data.data(), pubkeys_data.size() );
@@ -66,7 +64,6 @@ namespace sysio { namespace chain { namespace webassembly {
                                       permission,
                                       provided_keys,
                                       provided_permissions,
-                                      fc::microseconds(delay_us),
                                       std::bind(&transaction_context::checktime, &context.trx_context),
                                       false
                                     );

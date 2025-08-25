@@ -251,7 +251,6 @@ struct catalog_type {
    void update(const producer_plugin::produced_block_metrics& metrics) {
       unapplied_transactions_total.Increment(metrics.unapplied_transactions_total);
       subjective_bill_account_size_total.Increment(metrics.subjective_bill_account_size_total);
-      scheduled_trxs_total.Increment(metrics.scheduled_trxs_total);
       trxs_produced_total.Increment(metrics.trxs_produced_total);
       cpu_usage_us_produced_block.Increment(metrics.cpu_usage_us);
       total_elapsed_time_us_produced_block.Increment(metrics.total_elapsed_time_us);

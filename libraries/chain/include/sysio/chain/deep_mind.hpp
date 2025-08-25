@@ -71,10 +71,6 @@ public:
    void on_require_recipient();
    void on_send_inline();
    void on_send_context_free_inline();
-   void on_cancel_deferred(operation_qualifier qual, const generated_transaction_object& gto);
-   void on_send_deferred(operation_qualifier qual, const generated_transaction_object& gto);
-   void on_create_deferred(operation_qualifier qual, const generated_transaction_object& gto, const packed_transaction& packed_trx);
-   void on_fail_deferred();
    void on_create_table(const table_id_object& tid);
    void on_remove_table(const table_id_object& tid);
    void on_db_store_i64(const table_id_object& tid, const key_value_object& kvo);
