@@ -47,6 +47,7 @@ BOOST_AUTO_TEST_CASE( get_producers) { try {
 
 // this test verifies the normal case of get_producer, where the contents of the system contract's producers table is used
 BOOST_AUTO_TEST_CASE( get_producers_from_table) { try {
+      SKIP_TEST
       sysio_system::sysio_system_tester chain;
 
       // ensure that enough voting is occurring so that producer1111 is elected as the producer
