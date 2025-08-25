@@ -377,42 +377,6 @@ BOOST_FIXTURE_TEST_CASE(max_func_local_bytes_mixed, wasm_config_tester) {
    BOOST_CHECK_THROW(set_code("stackz"_n, code.c_str()), wasm_exception);
 }
 
-static const std::vector<std::tuple<int, int, bool>> old_func_local_params = {
-   {8192, 0, true}, {4096, 4096, true}, {0, 8192, true},
-   {8192 + 1, 0, false}, {4096 + 1, 4096, false}, {0, 8192 + 1, false},
-};
-
-BOOST_DATA_TEST_CASE_F(old_wasm_tester, max_func_local_bytes_old, data::make({0, 8192, 16384}) * data::make(old_func_local_params), n_stack, n_params, n_locals, expect_success) {
-   produce_blocks(2);
-   create_accounts({"stackz"_n});
-   produce_block();
-
-   auto pushit = [&]() {
-      action act;
-      act.account = "stackz"_n;
-      act.name = name();
-      act.authorization = vector<permission_level>{{"stackz"_n,config::active_name}};
-      signed_transaction trx;
-      trx.actions.push_back(act);
-
-      set_transaction_headers(trx);
-      trx.sign(get_private_key( "stackz"_n, "active" ), control->get_chain_id());
-      push_transaction(trx);
-   };
-
-   std::string code = make_locals_wasm(n_params, n_locals, n_stack);
-
-   if(expect_success) {
-      set_code("stackz"_n, code.c_str());
-      produce_block();
-      pushit();
-      produce_block();
-   } else {
-      BOOST_CHECK_THROW(set_code("stackz"_n, code.c_str()), wasm_exception);
-      produce_block();
-   }
-}
-
 // Combines max_call_depth and max_func_local_bytes
 BOOST_FIXTURE_TEST_CASE(max_stack, wasm_config_tester) {
    produce_blocks();
@@ -461,76 +425,6 @@ BOOST_FIXTURE_TEST_CASE(max_stack, wasm_config_tester) {
    params.max_call_depth = 1024;
    set_wasm_params(params);
    pushit();
-}
-
-BOOST_FIXTURE_TEST_CASE(max_stack_old, old_wasm_tester) {
-   produce_blocks();
-   create_accounts({"stackz"_n});
-   produce_block();
-   std::string code;
-   {
-      std::stringstream ss;
-      ss << "(module ";
-      ss << " (func (export \"apply\") (param i64 i64 i64)";
-      // pad to 8192 bytes
-      for(int i = 0; i < 2042; ++i)
-         ss << "(local i32)";
-      ss << " (call 1 (i32.const 249)))";
-      ss << " (func ";
-      ss << "   (param i32)";
-      // pad to 8192 bytes
-      for(int i = 0; i < 2047; ++i)
-         ss << "(local i32)";
-      ss << "   (if (get_local 0) (call 1 (i32.sub (get_local 0) (i32.const 1))))";
-      ss << " )";
-      ss << ")";
-      code = ss.str();
-   }
-   set_code("stackz"_n, code.c_str());
-   produce_block();
-
-   auto pushit = [&]{
-      signed_transaction trx;
-      trx.actions.push_back({{{"stackz"_n,config::active_name}}, "stackz"_n, name(), {}});
-      set_transaction_headers(trx);
-      trx.sign(get_private_key( "stackz"_n, "active" ), control->get_chain_id());
-      push_transaction(trx);
-   };
-   pushit();
-}
-
-BOOST_FIXTURE_TEST_CASE(max_func_local_bytes_mixed_old, old_wasm_tester) {
-   produce_blocks(2);
-   create_accounts({"stackz"_n});
-   produce_block();
-
-   std::string code;
-   {
-      std::stringstream ss;
-      ss << "(module ";
-      ss << " (func (export \"apply\") (param i64 i64 i64))";
-      ss << " (func ";
-      ss << "   (param i32 i64 i64 f32 f32 f32 f32 f64 f64 f64 f64 f64 f64 f64 f64)";
-      for(int i = 0; i < 16; ++i)
-         ss << "(local i32)";
-      for(int i = 0; i < 32; ++i)
-         ss << "(local i64)";
-      for(int i = 0; i < 64; ++i)
-         ss << "(local f32)";
-      for(int i = 0; i < 128; ++i)
-         ss << "(local f64)";
-      // pad to 8192 bytes
-      for(int i = 0; i < 1623; ++i)
-         ss << "(local i32)";
-      ss << " )";
-      ss << ")";
-      code = ss.str();
-   }
-   set_code("stackz"_n, code.c_str());
-   produce_block();
-   // add one more parameter
-   code.replace(code.find("param i32"), 5, "param f32");
-   BOOST_CHECK_THROW(set_code("stackz"_n, code.c_str()), wasm_exception);
 }
 
 BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_table_elements, data::make({512, 2048}) * data::make({0, 1}), max_table_elements, oversize) {
@@ -1124,7 +1018,6 @@ BOOST_FIXTURE_TEST_CASE(large_custom_section, old_wasm_tester)
    };
 
    custom_section_wasm.resize(custom_section_wasm.size() + 65536);
-   BOOST_CHECK_THROW(set_code( "hugecustom"_n, custom_section_wasm ), wasm_serialization_error);
 
    // One byte less and it should pass
    auto okay_custom = custom_section_wasm;
@@ -1132,8 +1025,6 @@ BOOST_FIXTURE_TEST_CASE(large_custom_section, old_wasm_tester)
    okay_custom.pop_back();
    set_code( "hugecustom"_n, okay_custom );
 
-   // It's also okay once CONFIGURABLE_WASM_LIMITS is activated
-   preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
    produce_block();
 
    set_code( "hugecustom"_n, custom_section_wasm );

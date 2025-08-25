@@ -56,11 +56,6 @@ namespace sysio { namespace chain {
          block_header_state result = std::move(cur).finish_next(b, pfs, std::forward<Extras>(extras)...);
 
          if (!result.additional_signatures.empty()) {
-            bool wtmsig_enabled = detail::is_builtin_activated(pfa, pfs, builtin_protocol_feature_t::wtmsig_block_signatures);
-
-            SYS_ASSERT(wtmsig_enabled, block_validate_exception,
-                       "Block has multiple signatures before activation of WTMsig Block Signatures");
-
             // as an optimization we don't copy this out into the legitimate extension structure as it serializes
             // the same way as the vector of signatures
             static_assert(fc::reflector<additional_block_signatures_extension>::total_member_count == 1);

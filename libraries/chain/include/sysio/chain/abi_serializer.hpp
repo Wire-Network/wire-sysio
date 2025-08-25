@@ -670,7 +670,7 @@ namespace impl {
          mvo("transaction_mroot", block.transaction_mroot);
          mvo("action_mroot", block.action_mroot);
          mvo("schedule_version", block.schedule_version);
-         mvo("new_producers", block.new_producers);
+         // mvo("new_producers", block.new_producers); renamed to not_used. No need to export this as it will always be empty
 
          // process contents of block.header_extensions
          flat_multimap<uint16_t, block_header_extension> header_exts = block.validate_and_extract_header_extensions();

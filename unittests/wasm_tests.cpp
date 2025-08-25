@@ -656,11 +656,8 @@ BOOST_FIXTURE_TEST_CASE( check_global_reset, validating_tester ) try {
 //Make sure we can create a wasm with maximum pages, but not grow it any
 BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
-   if(policy != setup_policy::full)
-      t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
 
    t.produce_blocks(2);
-
 
    t.create_accounts( {"bigmem"_n} );
    t.produce_block();
@@ -693,8 +690,6 @@ BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::old_wasm_parser, se
 
 BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
-   if(policy != setup_policy::full)
-      t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
    t.produce_blocks(2);
 
    t.create_accounts( {"tableinit"_n} );
@@ -889,8 +884,6 @@ BOOST_FIXTURE_TEST_CASE( nested_limit_test, validating_tester ) try {
 
 BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
-   if(policy != setup_policy::full)
-      t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
 
    t.produce_blocks(2);
 
@@ -913,69 +906,6 @@ BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::old_wasm_parser,
    BOOST_CHECK_THROW(t.set_code("globals"_n, (ss.str() + "(global $z (mut i64) (i64.const -12)))").c_str()), sysio::chain::wasm_exception);
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE( offset_check_old ) try {
-   validating_tester t(flat_set<account_name>{}, {}, setup_policy::old_wasm_parser);
-   t.produce_blocks(2);
-
-   t.create_accounts( {"offsets"_n} );
-   t.produce_block();
-
-   vector<string> loadops = {
-      "i32.load", "i64.load", "f32.load", "f64.load", "i32.load8_s", "i32.load8_u",
-      "i32.load16_s", "i32.load16_u", "i64.load8_s", "i64.load8_u", "i64.load16_s",
-      "i64.load16_u", "i64.load32_s", "i64.load32_u"
-   };
-   vector<vector<string>> storeops = {
-      {"i32.store",   "i32"},
-      {"i64.store",   "i64"},
-      {"f32.store",   "f32"},
-      {"f64.store",   "f64"},
-      {"i32.store8",  "i32"},
-      {"i32.store16", "i32"},
-      {"i64.store8",  "i64"},
-      {"i64.store16", "i64"},
-      {"i64.store32", "i64"},
-   };
-
-   for(const string& s : loadops) {
-      std::stringstream ss;
-      ss << "(module (memory $0 " << sysio::chain::wasm_constraints::maximum_linear_memory/(64*1024) << ") (func $apply (param $0 i64) (param $1 i64) (param $2 i64)";
-      ss << "(drop (" << s << " offset=" << sysio::chain::wasm_constraints::maximum_linear_memory-2 << " (i32.const 0)))";
-      ss << ") (export \"apply\" (func $apply)) )";
-
-      t.set_code("offsets"_n, ss.str().c_str());
-      t.produce_block();
-   }
-   for(const vector<string>& o : storeops) {
-      std::stringstream ss;
-      ss << "(module (memory $0 " << sysio::chain::wasm_constraints::maximum_linear_memory/(64*1024) << ") (func $apply (param $0 i64) (param $1 i64) (param $2 i64)";
-      ss << "(" << o[0] << " offset=" << sysio::chain::wasm_constraints::maximum_linear_memory-2 << " (i32.const 0) (" << o[1] << ".const 0))";
-      ss << ") (export \"apply\" (func $apply)) )";
-
-      t.set_code("offsets"_n, ss.str().c_str());
-      t.produce_block();
-   }
-
-   for(const string& s : loadops) {
-      std::stringstream ss;
-      ss << "(module (memory $0 " << sysio::chain::wasm_constraints::maximum_linear_memory/(64*1024) << ") (func $apply (param $0 i64) (param $1 i64) (param $2 i64)";
-      ss << "(drop (" << s << " offset=" << sysio::chain::wasm_constraints::maximum_linear_memory+4 << " (i32.const 0)))";
-      ss << ") (export \"apply\" (func $apply)) )";
-
-      BOOST_CHECK_THROW(t.set_code("offsets"_n, ss.str().c_str()), sysio::chain::wasm_exception);
-      t.produce_block();
-   }
-   for(const vector<string>& o : storeops) {
-      std::stringstream ss;
-      ss << "(module (memory $0 " << sysio::chain::wasm_constraints::maximum_linear_memory/(64*1024) << ") (func $apply (param $0 i64) (param $1 i64) (param $2 i64)";
-      ss << "(" << o[0] << " offset=" << sysio::chain::wasm_constraints::maximum_linear_memory+4 << " (i32.const 0) (" << o[1] << ".const 0))";
-      ss << ") (export \"apply\" (func $apply)) )";
-
-      BOOST_CHECK_THROW(t.set_code("offsets"_n, ss.str().c_str()), sysio::chain::wasm_exception);
-      t.produce_block();
-   }
-
-} FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( offset_check, validating_tester ) try {
    produce_blocks(2);
@@ -1123,82 +1053,6 @@ BOOST_FIXTURE_TEST_CASE(sysio_abi, validating_tester) try {
    BOOST_TEST(fc::json::to_string(pretty_output, fc::time_point::now() + abi_serializer_max_time).find("newaccount") != std::string::npos);
 
    produce_block();
-} FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE( check_big_deserialization ) try {
-   validating_tester t(flat_set<account_name>{}, {}, setup_policy::old_wasm_parser);
-   t.produce_blocks(2);
-   t.create_accounts( {"cbd"_n} );
-   t.produce_block();
-
-   std::stringstream ss;
-   ss << "(module ";
-   ss << "(export \"apply\" (func $apply))";
-   ss << "  (func $apply  (param $0 i64)(param $1 i64)(param $2 i64))";
-   for(unsigned int i = 0; i < wasm_constraints::maximum_section_elements-2; i++)
-      ss << "  (func " << "$AA_" << i << ")";
-   ss << ")";
-
-   t.set_code("cbd"_n, ss.str().c_str());
-   t.produce_blocks(1);
-
-   t.produce_blocks(1);
-
-   ss.str("");
-   ss << "(module ";
-   ss << "(export \"apply\" (func $apply))";
-   ss << "  (func $apply  (param $0 i64)(param $1 i64)(param $2 i64))";
-   for(unsigned int i = 0; i < wasm_constraints::maximum_section_elements; i++)
-      ss << "  (func " << "$AA_" << i << ")";
-   ss << ")";
-
-   BOOST_CHECK_THROW(t.set_code("cbd"_n, ss.str().c_str()), wasm_serialization_error);
-   t.produce_blocks(1);
-
-   ss.str("");
-   ss << "(module ";
-   ss << "(export \"apply\" (func $apply))";
-   ss << "  (func $apply  (param $0 i64)(param $1 i64)(param $2 i64))";
-   ss << "  (func $aa ";
-   for(unsigned int i = 0; i < wasm_constraints::maximum_code_size; i++)
-      ss << "  (drop (i32.const 3))";
-   ss << "))";
-
-   BOOST_CHECK_THROW(t.set_code("cbd"_n, ss.str().c_str()), fc::assert_exception); // this is caught first by MAX_SIZE_OF_ARRAYS check
-   t.produce_blocks(1);
-
-   ss.str("");
-   ss << "(module ";
-   ss << "(memory $0 1)";
-   ss << "(data (i32.const 20) \"";
-   for(unsigned int i = 0; i < wasm_constraints::maximum_func_local_bytes-1; i++)
-      ss << 'a';
-   ss << "\")";
-   ss << "(export \"apply\" (func $apply))";
-   ss << "  (func $apply  (param $0 i64)(param $1 i64)(param $2 i64))";
-   ss << "  (func $aa ";
-      ss << "  (drop (i32.const 3))";
-   ss << "))";
-
-   t.set_code("cbd"_n, ss.str().c_str());
-   t.produce_blocks(1);
-
-   ss.str("");
-   ss << "(module ";
-   ss << "(memory $0 1)";
-   ss << "(data (i32.const 20) \"";
-   for(unsigned int i = 0; i < wasm_constraints::maximum_func_local_bytes; i++)
-      ss << 'a';
-   ss << "\")";
-   ss << "(export \"apply\" (func $apply))";
-   ss << "  (func $apply  (param $0 i64)(param $1 i64)(param $2 i64))";
-   ss << "  (func $aa ";
-      ss << "  (drop (i32.const 3))";
-   ss << "))";
-
-   BOOST_CHECK_THROW(t.set_code("cbd"_n, ss.str().c_str()), wasm_serialization_error);
-   t.produce_blocks(1);
-
 } FC_LOG_AND_RETHROW()
 
 
@@ -1693,8 +1547,6 @@ BOOST_FIXTURE_TEST_CASE( big_maligned_host_ptr, validating_tester ) try {
 
 BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
-   if(policy != setup_policy::full)
-      t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
 
    t.produce_block();
    t.create_accounts( {"depth"_n} );
@@ -1745,50 +1597,6 @@ BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::old_wasm_parser, s
    t.set_code("depth"_n, wasm_float_depth_one_over.c_str());
    BOOST_CHECK_THROW(pushit(), wasm_execution_error);
 
-} FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE( varuint_memory_flags_tests ) try {
-   validating_tester t(flat_set<account_name>{}, {}, setup_policy::preactivate_feature_and_new_bios);
-
-   t.create_accounts( {"memflags"_n} );
-   t.produce_block();
-
-   t.set_code("memflags"_n, varuint_memory_flags);
-   t.produce_block();
-
-   {
-   signed_transaction trx;
-   action act;
-   act.account = "memflags"_n;
-   act.name = ""_n;
-   act.authorization = vector<permission_level>{{"memflags"_n,config::active_name}};
-   trx.actions.push_back(act);
-   t.set_transaction_headers(trx);
-   trx.sign(validating_tester::get_private_key( "memflags"_n, "active" ), t.control->get_chain_id());
-   t.push_transaction(trx);
-   t.produce_block();
-   }
-
-   // Activate new parser
-   t.preactivate_builtin_protocol_features({builtin_protocol_feature_t::configurable_wasm_limits});
-   t.produce_block();
-
-   // We should still be able to execute the old code
-   {
-   signed_transaction trx;
-   action act;
-   act.account = "memflags"_n;
-   act.name = ""_n;
-   act.authorization = vector<permission_level>{{"memflags"_n,config::active_name}};
-   trx.actions.push_back(act);
-   t.set_transaction_headers(trx);
-   trx.sign(validating_tester::get_private_key( "memflags"_n, "active" ), t.control->get_chain_id());
-   t.push_transaction(trx);
-   t.produce_block();
-   }
-
-   t.set_code("memflags"_n, std::vector<uint8_t>{});
-   BOOST_REQUIRE_THROW(t.set_code("memflags"_n, varuint_memory_flags), wasm_exception);
 } FC_LOG_AND_RETHROW()
 
 static char reset_memory_fail1_wast[] = R"======(

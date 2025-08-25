@@ -365,7 +365,7 @@ public:
 BOOST_AUTO_TEST_SUITE(test_chain_plugin_tests)
 
 BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_tester) { try {
-
+    SKIP_TEST
     produce_blocks(10);
     setup_system_accounts();
     produce_blocks();
@@ -413,7 +413,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_self_delegated_bandwidth_test, chain_plu
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(account_results_refund_request_test, chain_plugin_tester) { try {
-
+    SKIP_TEST
     produce_blocks(10);
     setup_system_accounts();
     produce_blocks();

@@ -15,33 +15,8 @@ enum class protocol_feature_t : uint32_t {
 // Values are included in protocol digest, so values must remain constant
 enum class builtin_protocol_feature_t : uint32_t {
    preactivate_feature = 0,
-   only_link_to_existing_permission = 1,
-   replace_deferred = 2,
-   no_duplicate_deferred_id = 3,
-   fix_linkauth_restriction = 4,
-   disallow_empty_producer_schedule = 5,
-   restrict_action_to_self = 6,
-   only_bill_first_authorizer = 7,
-   forward_setcode = 8,
-   get_sender = 9,
-   ram_restrictions = 10,
-   webauthn_key = 11,
-   wtmsig_block_signatures = 12,
-   action_return_value = 13,
-   // 14 reserved
-   // 15 reserved
-   blockchain_parameters = 16, // matches release 2.1 value
-   get_code_hash = 17,
-   configurable_wasm_limits = 18, // configurable_wasm_limits2,
-   crypto_primitives = 19,
-   get_block_num = 20,
-   em_key = 21,
-   bls_primitives = 22,
-   disable_deferred_trxs_stage_1 = 23,
-   disable_deferred_trxs_stage_2 = 24,
-   disable_compression_in_transaction_merkle = 25,
-   multiple_state_roots_supported = 26,
-   ed_key = 27,
+   reserved_first_protocol_feature = 1, // keep an example protocol feature mainly for tests
+   // 2-24+ reserved, used by Spring, new wire protocol features should start at 500001
    reserved_private_fork_protocol_features = 500000,
 };
 

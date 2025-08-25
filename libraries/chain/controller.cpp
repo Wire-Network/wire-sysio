@@ -350,20 +350,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
-      set_activation_handler<builtin_protocol_feature_t::replace_deferred>();
-      set_activation_handler<builtin_protocol_feature_t::get_sender>();
-      set_activation_handler<builtin_protocol_feature_t::webauthn_key>();
-      set_activation_handler<builtin_protocol_feature_t::wtmsig_block_signatures>();
-      set_activation_handler<builtin_protocol_feature_t::action_return_value>();
-      set_activation_handler<builtin_protocol_feature_t::configurable_wasm_limits>();
-      set_activation_handler<builtin_protocol_feature_t::blockchain_parameters>();
-      set_activation_handler<builtin_protocol_feature_t::get_code_hash>();
-      set_activation_handler<builtin_protocol_feature_t::get_block_num>();
-      set_activation_handler<builtin_protocol_feature_t::crypto_primitives>();
-      set_activation_handler<builtin_protocol_feature_t::bls_primitives>();
-      set_activation_handler<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>();
-      set_activation_handler<builtin_protocol_feature_t::em_key>();
-      set_activation_handler<builtin_protocol_feature_t::ed_key>();
 
 
       self.irreversible_block.connect([this](const block_state_ptr& bsp) {
@@ -1173,88 +1159,6 @@ struct controller_impl {
       return fc::make_scoped_exit( std::move(callback) );
    }
 
-   transaction_trace_ptr apply_onerror( const generated_transaction& gtrx,
-                                        fc::time_point block_deadline,
-                                        fc::microseconds max_transaction_time,
-                                        fc::time_point start,
-                                        uint32_t& cpu_time_to_bill_us, // only set on failure
-                                        uint32_t billed_cpu_time_us,
-                                        bool explicit_billed_cpu_time = false,
-                                        bool enforce_whiteblacklist = true
-                                      )
-   {
-      signed_transaction etrx;
-      // Deliver onerror action containing the failed deferred transaction directly back to the sender.
-      etrx.actions.emplace_back( vector<permission_level>{{gtrx.sender, config::active_name}},
-                                 onerror( gtrx.sender_id, gtrx.packed_trx.data(), gtrx.packed_trx.size() ) );
-      if( self.is_builtin_activated( builtin_protocol_feature_t::no_duplicate_deferred_id ) ) {
-         etrx.expiration = time_point_sec();
-         etrx.ref_block_num = 0;
-         etrx.ref_block_prefix = 0;
-      } else {
-         etrx.expiration = time_point_sec{self.pending_block_time() + fc::microseconds(999'999)}; // Round up to nearest second to avoid appearing expired
-         etrx.set_reference_block( self.head_block_id() );
-      }
-
-      transaction_checktime_timer trx_timer(timer);
-      const packed_transaction trx( std::move( etrx ) );
-      transaction_context trx_context( self, trx, trx.id(), std::move(trx_timer), start );
-
-      if (auto dm_logger = get_deep_mind_logger(trx_context.is_transient())) {
-         dm_logger->on_onerror(etrx);
-      }
-
-      trx_context.block_deadline = block_deadline;
-      trx_context.max_transaction_time_subjective = max_transaction_time;
-      trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-      trx_context.billed_cpu_time_us = billed_cpu_time_us;
-      trx_context.enforce_whiteblacklist = enforce_whiteblacklist;
-      transaction_trace_ptr trace = trx_context.trace;
-
-      auto handle_exception = [&](const auto& e)
-      {
-         cpu_time_to_bill_us = trx_context.update_billed_cpu_time( fc::time_point::now() );
-         trace->error_code = controller::convert_exception_to_error_code( e );
-         trace->except = e;
-         trace->except_ptr = std::current_exception();
-      };
-
-      try {
-         trx_context.init_for_implicit_trx();
-         trx_context.published = gtrx.published;
-         trx_context.execute_action( trx_context.schedule_action( trx.get_transaction().actions.back(), gtrx.sender, false, 0, 0 ), 0 );
-         trx_context.finalize(); // Automatically rounds up network and CPU usage in trace and bills payers if successful
-
-         auto restore = make_block_restore_point();
-         trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::soft_fail,
-                                        trx_context.billed_cpu_time_us, trace->net_usage );
-         fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
-                          std::move(trx_context.executed_action_receipt_digests) );
-
-         trx_context.squash();
-         restore.cancel();
-         return trace;
-      } catch( const disallowed_transaction_extensions_bad_block_exception& ) {
-         throw;
-      } catch( const protocol_feature_bad_block_exception& ) {
-         throw;
-      } catch ( const std::bad_alloc& ) {
-         throw;
-      } catch ( const boost::interprocess::bad_alloc& ) {
-         throw;
-      } catch( const fc::exception& e ) {
-         handle_exception(e);
-      } catch ( const std::exception& e ) {
-         auto wrapper = fc::std_exception_wrapper::from_current_exception(e);
-         handle_exception(wrapper);
-      }
-      return trace;
-   }
-
-   int64_t remove_scheduled_transaction( const generated_transaction_object& gto ) {
-      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-   }
-
    bool failure_is_subjective( const fc::exception& e ) const {
       auto code = e.code();
       return    (code == subjective_block_production_exception::code_value)
@@ -1279,76 +1183,6 @@ struct controller_impl {
              || failure_is_subjective(e);
    }
 
-   transaction_trace_ptr push_scheduled_transaction( const transaction_id_type& trxid,
-                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                     uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
-   {
-      const auto& idx = db.get_index<generated_transaction_multi_index,by_trx_id>();
-      auto itr = idx.find( trxid );
-      SYS_ASSERT( itr != idx.end(), unknown_transaction_exception, "unknown transaction" );
-      return push_scheduled_transaction( *itr, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time );
-   }
-
-   transaction_trace_ptr push_scheduled_transaction( const generated_transaction_object& gto,
-                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                     uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time = false )
-   { try {
-
-      auto start = fc::time_point::now();
-      const bool validating = !self.is_speculative_block();
-      SYS_ASSERT( !validating || explicit_billed_cpu_time, transaction_exception, "validating requires explicit billing" );
-
-      maybe_session undo_session;
-      if ( !self.skip_db_sessions() )
-         undo_session = maybe_session(db);
-
-      auto gtrx = generated_transaction(gto);
-
-      // remove the generated transaction object after making a copy
-      // this will ensure that anything which affects the GTO multi-index-container will not invalidate
-      // data we need to successfully retire this transaction.
-      //
-      // IF the transaction FAILs in a subjective way, `undo_session` should expire without being squashed
-      // resulting in the GTO being restored and available for a future block to retire.
-      int64_t trx_removal_ram_delta = remove_scheduled_transaction(gto);
-
-      fc::datastream<const char*> ds( gtrx.packed_trx.data(), gtrx.packed_trx.size() );
-
-      signed_transaction dtrx;
-      fc::raw::unpack(ds,static_cast<transaction&>(dtrx) );
-      transaction_metadata_ptr trx =
-            transaction_metadata::create_no_recover_keys( std::make_shared<packed_transaction>( std::move(dtrx)  ),
-                                                          transaction_metadata::trx_type::scheduled );
-      trx->accepted = true;
-
-      // After disable_deferred_trxs_stage_1 is activated, a deferred transaction
-      // can only be retired as expired, and it can be retired as expired
-      // regardless of whether its delay_util or expiration times have been reached.
-      transaction_trace_ptr trace;
-      if( self.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) || gtrx.expiration < self.pending_block_time() ) {
-         trace = std::make_shared<transaction_trace>();
-         trace->id = gtrx.trx_id;
-         trace->block_num = self.head_block_num() + 1;
-         trace->block_time = self.pending_block_time();
-         trace->producer_block_id = self.pending_producer_block_id();
-         trace->scheduled = true;
-         trace->receipt = push_receipt( gtrx.trx_id, transaction_receipt::expired, billed_cpu_time_us, 0 ); // expire the transaction
-         trace->account_ram_delta = account_delta( gtrx.sender, trx_removal_ram_delta );
-         trace->elapsed = fc::time_point::now() - start;
-         pending->_block_report.total_cpu_usage_us += billed_cpu_time_us;
-         pending->_block_report.total_elapsed_time += trace->elapsed;
-         pending->_block_report.total_time += trace->elapsed;
-         emit( self.accepted_transaction, trx );
-         dmlog_applied_transaction(trace);
-         emit( self.applied_transaction, std::tie(trace, trx->packed_trx()) );
-         undo_session.squash();
-         return trace;
-      }
-
-      throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-   } FC_CAPTURE_AND_RETHROW() } /// push_scheduled_transaction
-
-
    /**
     *  Adds the transaction receipt to the pending block and returns it.
     */
@@ -1365,10 +1199,7 @@ struct controller_impl {
       r.status               = status;
       auto& bb = std::get<building_block>(pending->_block_stage);
       if( std::holds_alternative<digests_t>(bb._trx_mroot_or_receipt_digests) ) {
-         if( self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle ) )
-            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
-         else
-            std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.packed_digest() );
+         std::get<digests_t>(bb._trx_mroot_or_receipt_digests).emplace_back( r.digest() );
       }
       return r;
    }
@@ -1903,7 +1734,7 @@ struct controller_impl {
       SYS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
       SYS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
       SYS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
-      SYS_REPORT( "new_producers", b.new_producers, ab.new_producers )
+      SYS_REPORT( "not_used", b.not_used, ab.not_used )
       SYS_REPORT( "header_extensions", b.header_extensions, ab.header_extensions )
 
 #undef SYS_REPORT
@@ -1968,8 +1799,6 @@ struct controller_impl {
                                                              : std::get<1>( trx_metas.at( packed_idx ) ).get() ) );
                trace = push_transaction( trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true, 0 );
                ++packed_idx;
-            } else if( std::holds_alternative<transaction_id_type>(receipt.trx) ) {
-               trace = push_scheduled_transaction( std::get<transaction_id_type>(receipt.trx), fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true );
             } else {
                SYS_ASSERT( false, block_validate_exception, "encountered unexpected receipt type" );
             }
@@ -2074,8 +1903,7 @@ struct controller_impl {
 
    // thread safe, expected to be called from thread other than the main thread
    block_state_ptr create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_header_state& prev ) {
-      const bool activated = self.is_builtin_activated( builtin_protocol_feature_t::disable_compression_in_transaction_merkle );
-      auto trx_mroot = calculate_trx_merkle( b->transactions, activated );
+      auto trx_mroot = calculate_trx_merkle( b->transactions );
       SYS_ASSERT( b->transaction_mroot == trx_mroot, block_validate_exception,
                   "invalid block transaction merkle root ${b} != ${c}", ("b", b->transaction_mroot)("c", trx_mroot) );
 
@@ -2329,17 +2157,10 @@ struct controller_impl {
       return applied_trxs;
    }
 
-   const checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs, bool disable_compression_in_transaction_merkle )const {
+   const checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs )const {
       deque<digest_type> trx_digests;
-      if (disable_compression_in_transaction_merkle) {
-         for( const auto& a : trxs ) {
-            trx_digests.emplace_back( (a.digest)() );
-         }
-      }
-      else {
-         for( const auto& a : trxs ) {
-            trx_digests.emplace_back( (a.packed_digest)() );
-         }
+      for( const auto& a : trxs ) {
+         trx_digests.emplace_back( (a.digest)() );
       }
 
       return merkle( std::move(trx_digests) );
@@ -2567,14 +2388,9 @@ struct controller_impl {
 
       signed_transaction trx;
       trx.actions.emplace_back(std::move(on_block_act));
-      if( self.is_builtin_activated( builtin_protocol_feature_t::no_duplicate_deferred_id ) ) {
-         trx.expiration = time_point_sec();
-         trx.ref_block_num = 0;
-         trx.ref_block_prefix = 0;
-      } else {
-         trx.expiration = time_point_sec{self.pending_block_time() + fc::microseconds(999'999)}; // Round up to nearest second to avoid appearing expired
-         trx.set_reference_block( self.head_block_id() );
-      }
+      trx.expiration = time_point_sec();
+      trx.ref_block_num = 0;
+      trx.ref_block_prefix = 0;
 
       return trx;
    }
@@ -2916,15 +2732,6 @@ transaction_trace_ptr controller::push_transaction( const transaction_metadata_p
    return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
 }
 
-transaction_trace_ptr controller::push_scheduled_transaction( const transaction_id_type& trxid,
-                                                              fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                              uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time )
-{
-   SYS_ASSERT( get_read_mode() != db_read_mode::IRREVERSIBLE, transaction_type_exception, "push scheduled transaction not allowed in irreversible mode" );
-   validate_db_available_size();
-   return my->push_scheduled_transaction( trxid, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time );
-}
-
 const flat_set<account_name>& controller::get_actor_whitelist() const {
    return my->conf.actor_whitelist;
 }
@@ -2968,7 +2775,7 @@ void controller::set_key_blacklist( const flat_set<public_key_type>& new_key_bla
 }
 
 bool controller_impl::are_multiple_state_roots_supported() const {
-   if ( merkle_processor && self.is_builtin_activated( builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+   if ( merkle_processor ) {
       return true;
    }
 
@@ -3186,7 +2993,7 @@ int64_t controller::set_proposed_producers( vector<producer_authority> producers
    const auto& gpo = get_global_properties();
    auto cur_block_num = head_block_num() + 1;
 
-   if( producers.size() == 0 && is_builtin_activated( builtin_protocol_feature_t::disallow_empty_producer_schedule ) ) {
+   if( producers.size() == 0 ) {
       return -1;
    }
 
@@ -3674,22 +3481,16 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
          std::move(matches)
       );
       applied_transaction.connect(
-         [self=this,root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t ) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
-            }
          } );
       accepted_block.connect(
-         [self=this,root_txn_ident]( const block_state_ptr& blk ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( const block_state_ptr& blk ) {
                root_txn_ident->signal_accepted_block(blk);
-            }
          } ) ;
       block_start.connect(
-         [self=this,root_txn_ident]( uint32_t block_num ) {
-            if( self->is_builtin_activated( chain::builtin_protocol_feature_t::multiple_state_roots_supported ) ) {
+         [root_txn_ident]( uint32_t block_num ) {
                root_txn_ident->signal_block_start(block_num);
-            }
          } ) ;
       my->merkle_processor = std::make_shared<block_root_processor>(my->db, std::move(root_txn_ident));
 }
@@ -3702,139 +3503,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feat
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "preactivate_feature" );
       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "is_feature_activated" );
    } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::get_sender>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_sender" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::replace_deferred>() {
-   const auto& indx = db.get_index<account_ram_correction_index, by_id>();
-   for( auto itr = indx.begin(); itr != indx.end(); itr = indx.begin() ) {
-      int64_t current_ram_usage = resource_limits.get_account_ram_usage( itr->name );
-      int64_t ram_delta = -static_cast<int64_t>(itr->ram_correction);
-      if( itr->ram_correction > static_cast<uint64_t>(current_ram_usage) ) {
-         ram_delta = -current_ram_usage;
-         elog( "account ${name} was to be reduced by ${adjust} bytes of RAM despite only using ${current} bytes of RAM",
-               ("name", itr->name)("adjust", itr->ram_correction)("current", current_ram_usage) );
-      }
-
-      // This method is only called for deferred transaction
-      if (auto dm_logger = get_deep_mind_logger(false)) {
-         dm_logger->on_ram_trace(RAM_EVENT_ID("${id}", ("id", itr->id._id)), "deferred_trx", "correction", "deferred_trx_ram_correction");
-      }
-
-      resource_limits.add_pending_ram_usage( itr->name, ram_delta, false ); // false for doing dm logging
-      db.remove( *itr );
-   }
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::webauthn_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 3;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::em_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 4;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::ed_key>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      ps.num_supported_key_types = 5;
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::wtmsig_block_signatures>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_proposed_producers_ex" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::action_return_value>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_action_return_value" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::configurable_wasm_limits>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_wasm_parameters_packed" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_wasm_parameters_packed" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::blockchain_parameters>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_parameters_packed" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "set_parameters_packed" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::get_code_hash>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_code_hash" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::get_block_num>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_block_num" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::crypto_primitives>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "alt_bn128_add" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "alt_bn128_mul" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "alt_bn128_pair" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "mod_exp" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "blake2_f" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "sha3" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "k1_recover" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "blake2b_256" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::bls_primitives>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_add" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_add" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_weighted_sum" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_weighted_sum" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_pairing" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g1_map" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_g2_map" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_mod" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_mul" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "bls_fp_exp" );
-   } );
-}
-
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::disable_deferred_trxs_stage_2>() {
-   const auto& idx = db.get_index<generated_transaction_multi_index, by_trx_id>();
-   // remove all deferred trxs and refund their payers
-   for( auto itr = idx.begin(); itr != idx.end(); itr = idx.begin() ) {
-      remove_scheduled_transaction(*itr);
-   }
 }
 
 /// End of protocol feature activation handlers

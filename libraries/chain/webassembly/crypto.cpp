@@ -100,8 +100,8 @@ namespace sysio::chain::webassembly {
 
       auto recovered = fc::crypto::public_key(s, *digest, false);
 
-      // the key types newer than the first 2 may be varible in length
-      if (s.which() >= config::genesis_num_supported_key_types ) {
+      // the key types newer than the first 2 may be variable in length
+      if (s.which() >= config::k1_r1_num_supported_key_types ) {
          SYS_ASSERT(pub.size() >= 33, wasm_execution_error,
                     "destination buffer must at least be able to hold an ECC public key");
          auto packed_pubkey = fc::raw::pack(recovered);

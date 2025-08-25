@@ -51,25 +51,8 @@ namespace sysio { namespace chain {
    void wasm_interface::validate(const controller& control, const bytes& code) {
       const auto& pso = control.db().get<protocol_state_object>();
 
-      if (control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
-         const auto& gpo = control.get_global_properties();
-         webassembly::sys_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
-         return;
-      }
-      Module module;
-      try {
-         Serialization::MemoryInputStream stream((U8*)code.data(), code.size());
-         WASM::serialize(stream, module);
-      } catch(const Serialization::FatalSerializationException& e) {
-         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
-      } catch(const IR::ValidationException& e) {
-         SYS_ASSERT(false, wasm_serialization_error, e.message.c_str());
-      }
-
-      wasm_validations::wasm_binary_validation validator(control, module);
-      validator.validate();
-
-      webassembly::sys_vm_runtime::validate( code, pso.whitelisted_intrinsics );
+      const auto& gpo = control.get_global_properties();
+      webassembly::sys_vm_runtime::validate( code, gpo.wasm_configuration, pso.whitelisted_intrinsics );
 
       //there are a couple opportunties for improvement here--
       //Easy: Cache the Module created here so it can be reused for instantiaion

@@ -709,12 +709,6 @@ namespace sysio { namespace testing {
       bool                     skip_validate = false;
    };
 
-   class validating_tester_no_disable_deferred_trx : public validating_tester {
-   public:
-      validating_tester_no_disable_deferred_trx(): validating_tester({}, nullptr, setup_policy::full_except_do_not_disable_deferred_trx) {
-      }
-   };
-
    /**
     * Utility predicate to check whether an fc::exception message is equivalent to a given string
     */
