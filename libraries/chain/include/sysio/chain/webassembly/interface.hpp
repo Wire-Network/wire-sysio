@@ -1619,28 +1619,6 @@ namespace webassembly {
          void send_context_free_inline(legacy_span<const char> data);
 
          /**
-          * Send a deferred transaction.
-          *
-          * @ingroup transaction
-          * @param sender_id - account name of the sender of this deferred transaction.
-          * @param payer - account name responsible for paying the RAM for this deferred transaction.
-          * @param data - the packed transaction to be deferred.
-          * @param replace_existing - if true, it will replace an existing transaction.
-         */
-         void send_deferred(legacy_ptr<const uint128_t> sender_id, account_name payer, legacy_span<const char> data, uint32_t replace_existing);
-
-         /**
-          * Cancels a deferred transaction.
-          *
-          * @ingroup transaction
-          * @param val - The id of the sender.
-          *
-          * @retval false if transaction was not found.
-          * @retval true if transaction was canceled.
-         */
-         bool cancel_deferred(legacy_ptr<const uint128_t> val);
-
-         /**
           * Access a copy of the currently executing transaction.
           *
           * @ingroup context-free-transaction

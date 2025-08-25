@@ -291,78 +291,6 @@ void test_transaction::send_transaction_large( uint64_t receiver, uint64_t, uint
    sysio_assert( false, "send_transaction_large() should've thrown an error" );
 }
 
-/**
- * deferred transaction
- */
-void test_transaction::deferred_print() {
-   sysio::print("deferred executed\n");
-}
-
-void test_transaction::send_deferred_transaction( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_transaction", "deferred_print" )> test_action;
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back( permissions, name{"testapi"}, name{ WASM_TEST_ACTION("test_transaction", "deferred_print" )}, test_action );
-   trx.delay_sec = 2;
-   trx.send( 0xffffffffffffffff, name{receiver} );
-}
-
-void test_transaction::send_deferred_transaction_4k_action( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_transaction", "send_action_4k" )> test_action;
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back( permissions, name{"testapi"}, name{ WASM_TEST_ACTION("test_transaction", "send_action_4k" )}, test_action );
-   trx.delay_sec = 2;
-   trx.send( 0xffffffffffffffff, name{receiver} );
-}
-
-void test_transaction::send_deferred_transaction_replace( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_transaction", "deferred_print" )> test_action;
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back( permissions, name{"testapi"}, name{WASM_TEST_ACTION( "test_transaction", "deferred_print" )}, test_action );
-   trx.delay_sec = 2;
-   trx.send( 0xffffffffffffffff, name{receiver}, true );
-}
-
-void test_transaction::send_deferred_tx_with_dtt_action() {
-   using namespace sysio;
-   dtt_action dtt_act;
-   sysio::read_action_data( &dtt_act, sysio::action_data_size() );
-
-   action deferred_act;
-   deferred_act.account = name{dtt_act.deferred_account};
-   deferred_act.name = name{dtt_act.deferred_action};
-   deferred_act.authorization = std::vector<permission_level>{ {"testapi"_n, name{dtt_act.permission_name}} };
-
-   auto trx = transaction();
-   trx.actions.emplace_back(deferred_act);
-   trx.delay_sec = dtt_act.delay_sec;
-   trx.send( 0xffffffffffffffff, name{dtt_act.payer}, true );
-}
-
-
-void test_transaction::cancel_deferred_transaction_success() {
-   using namespace sysio;
-   auto r = sysio::cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
-   sysio_assert( (bool)r, "transaction was not found" );
-}
-
-void test_transaction::cancel_deferred_transaction_not_found() {
-   using namespace sysio;
-   auto r = sysio::cancel_deferred( 0xffffffffffffffff ); //use the same id (0) as in send_deferred_transaction
-   sysio_assert( !r, "transaction was canceled, whild should not be found" );
-}
-
 void test_transaction::send_cf_action() {
    using namespace sysio;
    action act( std::vector<permission_level>{}, "dummy"_n, "event1"_n, std::vector<char>{} );
@@ -384,26 +312,4 @@ void test_transaction::stateful_api() {
 void test_transaction::context_free_api() {
    char buf[128] = {0};
    sysio::get_context_free_data( 0, buf, sizeof(buf) );
-}
-
-void test_transaction::repeat_deferred_transaction( uint64_t receiver, uint64_t code, uint64_t action ) {
-   using namespace sysio;
-
-   uint128_t sender_id = 0;
-
-   uint32_t payload = unpack_action_data<uint32_t>();
-   print("repeat_deferred_transaction called: payload = ", payload);
-
-   bool res = sysio::cancel_deferred( sender_id );
-
-   print("\nrepeat_deferred_transaction cancelled trx with sender_id = ", sender_id, ", result is ", res);
-
-   if( payload == 0 ) return;
-
-   --payload;
-   transaction trx;
-   std::vector<permission_level> permissions = { {name{receiver}, "active"_n} };
-
-   trx.actions.emplace_back( permissions, name{code}, name{action}, payload );
-   trx.send( sender_id, sysio::name{receiver} );
 }

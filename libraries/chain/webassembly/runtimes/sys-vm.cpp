@@ -563,8 +563,6 @@ REGISTER_LEGACY_CF_HOST_FUNCTION(memset);
 // transaction api
 REGISTER_LEGACY_HOST_FUNCTION(send_inline);
 REGISTER_LEGACY_HOST_FUNCTION(send_context_free_inline);
-REGISTER_LEGACY_HOST_FUNCTION(send_deferred);
-REGISTER_LEGACY_HOST_FUNCTION(cancel_deferred);
 
 // context-free transaction api
 REGISTER_LEGACY_CF_HOST_FUNCTION(read_transaction);

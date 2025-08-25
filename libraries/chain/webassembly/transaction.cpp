@@ -23,11 +23,4 @@ namespace sysio { namespace chain { namespace webassembly {
       context.execute_context_free_inline(std::move(act));
    }
 
-   void interface::send_deferred( legacy_ptr<const uint128_t> sender_id, account_name payer, legacy_span<const char> data, uint32_t replace_existing) {
-      SYS_ASSERT(false, unaccessible_api, "send_deferred is not supported");
-   }
-
-   bool interface::cancel_deferred( legacy_ptr<const uint128_t> val ) {
-      SYS_ASSERT(false, unaccessible_api, "cancel_deferred is not supported");
-   }
 }}} // ns sysio::chain::webassembly
