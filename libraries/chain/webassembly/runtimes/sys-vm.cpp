@@ -142,11 +142,8 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
          // set wasm allocator per apply data
          _runtime->_bkend.set_wasm_allocator(&context.control.get_wasm_allocator());
 
-         apply_options opts;
-         if(context.control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
-            const wasm_config& config = context.control.get_global_properties().wasm_configuration;
-            opts = {config.max_pages, config.max_call_depth};
-         }
+         const wasm_config& config = context.control.get_global_properties().wasm_configuration;
+         apply_options opts = {config.max_pages, config.max_call_depth};
          auto fn = [&]() {
             sysio::chain::webassembly::interface iface(context);
             _runtime->_bkend.initialize(&iface, opts);
@@ -184,11 +181,8 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
 
       void apply(apply_context& context) override {
          _instantiated_module->set_wasm_allocator(&context.control.get_wasm_allocator());
-         apply_options opts;
-         if(context.control.is_builtin_activated(builtin_protocol_feature_t::configurable_wasm_limits)) {
-            const wasm_config& config = context.control.get_global_properties().wasm_configuration;
-            opts = {config.max_pages, config.max_call_depth};
-         }
+         const wasm_config& config = context.control.get_global_properties().wasm_configuration;
+         apply_options opts = {config.max_pages, config.max_call_depth};
          auto fn = [&]() {
             sysio::chain::webassembly::interface iface(context);
             _instantiated_module->initialize(&iface, opts);
@@ -625,10 +619,10 @@ REGISTER_CF_HOST_FUNCTION(__letf2);
 REGISTER_CF_HOST_FUNCTION(__lttf2);
 REGISTER_CF_HOST_FUNCTION(__unordtf2);
 
-// get_block_num protocol feature
+// get_block_num
 REGISTER_CF_HOST_FUNCTION( get_block_num );
 
-// crypto_primitives protocol feature
+// crypto_primitives
 REGISTER_CF_HOST_FUNCTION( alt_bn128_add );
 REGISTER_CF_HOST_FUNCTION( alt_bn128_mul );
 REGISTER_CF_HOST_FUNCTION( alt_bn128_pair );
@@ -638,7 +632,7 @@ REGISTER_CF_HOST_FUNCTION( sha3 );
 REGISTER_CF_HOST_FUNCTION( k1_recover );
 REGISTER_CF_HOST_FUNCTION( blake2b_256 );
 
-// bls_primitives protocol feature
+// bls_primitives
 REGISTER_CF_HOST_FUNCTION( bls_g1_add );
 REGISTER_CF_HOST_FUNCTION( bls_g2_add );
 REGISTER_CF_HOST_FUNCTION( bls_g1_weighted_sum );

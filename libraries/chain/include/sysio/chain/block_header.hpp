@@ -44,21 +44,16 @@ namespace sysio { namespace chain {
 
       checksum256_type                 transaction_mroot; /// mroot of cycles_summary
       checksum256_type                 action_mroot; /// mroot of all delivered action receipts
+      uint32_t                         schedule_version = 0;
 
       /**
        * LEGACY SUPPORT - After enabling the wtmsig-blocks extension this field is deprecated and must be empty
-       *
-       * Prior to that activation this carries:
-       *
-       * The producer schedule version that should validate this block, this is used to
-       * indicate that the prior block which included new_producers->version has been marked
-       * irreversible and that it the new producer schedule takes effect this block.
+       * Wire uses wtmsig-blocks extension from genesis. This member is kept to provide binary compatibility
+       * of block_header with other AntelopeIO chains.
        */
-
       using new_producers_type = std::optional<legacy::producer_schedule_type>;
-
-      uint32_t                          schedule_version = 0;
-      new_producers_type                new_producers;
+      // old `new_producers` which is not used by wire as wtmsig-blocks extension is used from genesis.
+      new_producers_type                not_used;
       extensions_type                   header_extensions;
 
 
@@ -83,6 +78,6 @@ namespace sysio { namespace chain {
 FC_REFLECT(sysio::chain::block_header,
            (timestamp)(producer)(confirmed)(previous)
            (transaction_mroot)(action_mroot)
-           (schedule_version)(new_producers)(header_extensions))
+           (schedule_version)(not_used)(header_extensions))
 
 FC_REFLECT_DERIVED(sysio::chain::signed_block_header, (sysio::chain::block_header), (producer_signature))

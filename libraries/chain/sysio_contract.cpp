@@ -395,13 +395,9 @@ void apply_sysio_linkauth(apply_context& context) {
                  "Failed to retrieve code for account: ${account}", ("account", requirement.code));
       if( requirement.requirement != config::sysio_any_name ) {
          const permission_object* permission = nullptr;
-         if( context.control.is_builtin_activated( builtin_protocol_feature_t::only_link_to_existing_permission ) ) {
-            permission = db.find<permission_object, by_owner>(
-                           boost::make_tuple( requirement.account, requirement.requirement )
-                         );
-         } else {
-            permission = db.find<permission_object, by_name>(requirement.requirement);
-         }
+         permission = db.find<permission_object, by_owner>(
+                        boost::make_tuple( requirement.account, requirement.requirement )
+                      );
 
          SYS_ASSERT(permission != nullptr, permission_query_exception,
                     "Failed to retrieve permission: ${permission}", ("permission", requirement.requirement));
@@ -464,13 +460,7 @@ void apply_sysio_unlinkauth(apply_context& context) {
 }
 
 void apply_sysio_canceldelay(apply_context& context) {
-   SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "canceldelay not allowed in read-only transaction" );
-   auto cancel = context.get_action().data_as<canceldelay>();
-   context.require_authorization(cancel.canceling_auth.actor); // only here to mark the single authority on this action as used
-
-   const auto& trx_id = cancel.trx_id;
-
-   context.cancel_deferred_transaction(transaction_id_to_sender_id(trx_id), account_name());
+   SYS_ASSERT( false, unaccessible_api, "canceldelay not supported" );
 }
 
 void apply_roa_reducepolicy(apply_context& context) {

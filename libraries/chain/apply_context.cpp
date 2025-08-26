@@ -92,13 +92,7 @@ void apply_context::exec_one()
                (*native)( *this );
             }
 
-            if( ( receiver_account->code_hash != digest_type() ) &&
-                  (  !( act->account == config::system_account_name
-                        && act->name == "setcode"_n
-                        && receiver == config::system_account_name )
-                     || control.is_builtin_activated( builtin_protocol_feature_t::forward_setcode )
-                  )
-            ) {
+            if( receiver_account->code_hash != digest_type() ) {
                if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
                   control.check_contract_list( receiver );
                   control.check_action_list( act->account, act->name );
@@ -108,7 +102,7 @@ void apply_context::exec_one()
                } catch( const wasm_exit& ) {}
             }
 
-            if( !privileged && control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) {
+            if( !privileged ) {
                const size_t checktime_interval = 10;
                size_t counter = 0;
                bool not_in_notify_context = (receiver == act->account);
@@ -134,17 +128,13 @@ void apply_context::exec_one()
          }
       } FC_RETHROW_EXCEPTIONS( warn, "${receiver} <= ${account}::${action} pending console output: ${console}", ("console", _pending_console_output)("account", act->account)("action", act->name)("receiver", receiver) )
 
-      if( control.is_builtin_activated( builtin_protocol_feature_t::action_return_value ) ) {
-         act_digest =   generate_action_digest(
-                           [this](const char* data, uint32_t datalen) {
-                              return trx_context.hash_with_checktime<digest_type>(data, datalen);
-                           },
-                           *act,
-                           action_return_value
-                        );
-      } else {
-         act_digest = digest_type::hash(*act);
-      }
+      act_digest =   generate_action_digest(
+                        [this](const char* data, uint32_t datalen) {
+                           return trx_context.hash_with_checktime<digest_type>(data, datalen);
+                        },
+                        *act,
+                        action_return_value
+                     );
    } catch ( const std::bad_alloc& ) {
       throw;
    } catch ( const boost::interprocess::bad_alloc& ) {
@@ -330,15 +320,6 @@ void apply_context::execute_inline( action&& a ) {
    bool enforce_actor_whitelist_blacklist = trx_context.enforce_whiteblacklist && control.is_speculative_block();
    flat_set<account_name> actors;
 
-   bool disallow_send_to_self_bypass = control.is_builtin_activated( builtin_protocol_feature_t::restrict_action_to_self );
-   bool send_to_self = (a.account == receiver);
-   bool inherit_parent_authorizations = (!disallow_send_to_self_bypass && send_to_self && (receiver == act->account) && control.is_speculative_block());
-
-   flat_set<permission_level> inherited_authorizations;
-   if( inherit_parent_authorizations ) {
-      inherited_authorizations.reserve( a.authorization.size() );
-   }
-
    for (const auto &auth: a.authorization) {
       auto *actor = control.db().find<account_object, by_name>(auth.actor);
       SYS_ASSERT(actor != nullptr, action_validate_exception,
@@ -350,11 +331,6 @@ void apply_context::execute_inline( action&& a ) {
       }
       if (enforce_actor_whitelist_blacklist)
          actors.insert(auth.actor);
-
-      if (inherit_parent_authorizations && std::find(act->authorization.begin(), act->authorization.end(), auth) != act
-          ->authorization.end()) {
-         inherited_authorizations.insert(auth);
-      }
    }
 
    if( enforce_actor_whitelist_blacklist ) {
@@ -363,38 +339,16 @@ void apply_context::execute_inline( action&& a ) {
 
    // No need to check authorization if replaying irreversible blocks or contract is privileged
    if( !control.skip_auth_check() && !privileged && !trx_context.is_read_only() ) {
-      try {
-         control.get_authorization_manager()
-                .check_authorization( {a},
-                                      {},
-                                      {{receiver, config::sysio_code_name}},
-                                      control.pending_block_time() - trx_context.published,
-                                      std::bind(&transaction_context::checktime, &this->trx_context),
-                                      false,
-                                      trx_context.is_dry_run(), // check_but_dont_fail
-                                      inherited_authorizations
-                                    );
-
-         //QUESTION: Is it smart to allow a deferred transaction that has been delayed for some time to get away
-         //          with sending an inline action that requires a delay even though the decision to send that inline
-         //          action was made at the moment the deferred transaction was executed with potentially no forewarning?
-      } catch( const fc::exception& e ) {
-         if( disallow_send_to_self_bypass || !send_to_self ) {
-            throw;
-         } else if( control.is_speculative_block() ) {
-            subjective_block_production_exception new_exception(FC_LOG_MESSAGE( error, "Authorization failure with inline action sent to self"));
-            for (const auto& log: e.get_log()) {
-               new_exception.append_log(log);
-            }
-            throw new_exception;
-         }
-      } catch( ... ) {
-         if( disallow_send_to_self_bypass || !send_to_self ) {
-            throw;
-         } else if( control.is_speculative_block() ) {
-            SYS_THROW(subjective_block_production_exception, "Unexpected exception occurred validating inline action sent to self");
-         }
-      }
+      control.get_authorization_manager()
+             .check_authorization( {a},
+                                   {},
+                                   {{receiver, config::sysio_code_name}},
+                                   control.pending_block_time() - trx_context.published,
+                                   std::bind(&transaction_context::checktime, &this->trx_context),
+                                   false,
+                                   trx_context.is_dry_run(), // check_but_dont_fail
+                                   {}
+                                 );
    }
 
    auto inline_receiver = a.account;
@@ -425,22 +379,6 @@ void apply_context::execute_context_free_inline( action&& a ) {
    }
 }
 
-
-void apply_context::schedule_deferred_transaction( const uint128_t& sender_id, account_name payer, transaction&& trx, bool replace_existing ) {
-   // no-op after DISABLE_DEFERRED_TRXS_STAGE_1 is activated
-   if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
-      return;
-   }
-   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-}
-
-bool apply_context::cancel_deferred_transaction( const uint128_t& sender_id, account_name sender ) {
-   // no-op after DISABLE_DEFERRED_TRXS_STAGE_1 is activated
-   if( control.is_builtin_activated( builtin_protocol_feature_t::disable_deferred_trxs_stage_1 ) ) {
-      return false;
-   }
-   throw std::runtime_error("Deferred transaction implementation has been removed.  Please activate disable_deferred_trxs_stage_1!");
-}
 
 uint32_t apply_context::schedule_action( uint32_t ordinal_of_action_to_schedule, account_name receiver, bool context_free )
 {
@@ -528,15 +466,6 @@ void apply_context::update_db_usage( const account_name& payer, int64_t delta ) 
    // wlog("ApplyContext update_db_usage for payer ${payer} of ${delta} bytes,"
    //      " privileged ${privileged}, receiver ${receiver}, action ${action} of account ${act_account}",
    //      ("payer", payer)("delta", delta)("privileged", privileged)("receiver", receiver)("action", act->name)("act_account", act->account));
-   if( delta > 0 ) {
-      if( !(privileged || payer == account_name(receiver)
-               || control.is_builtin_activated( builtin_protocol_feature_t::ram_restrictions ) ) )
-      {
-         SYS_ASSERT( control.is_ram_billing_in_notify_allowed() || (receiver == act->account),
-                     subjective_block_production_exception, "Cannot charge RAM to other accounts during notify." );
-         require_authorization( payer );
-      }
-   }
    add_ram_usage(payer, delta);
 }
 

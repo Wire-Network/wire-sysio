@@ -114,7 +114,7 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(validating_te
    deque<digest_type> trx_digests;
    const auto& trxs = copy_b->transactions;
    for( const auto& a : trxs )
-      trx_digests.emplace_back( a.packed_digest() ); // validating_tester is not allowing the conversion from packed_digest to digest
+      trx_digests.emplace_back( a.digest() );
    copy_b->transaction_mroot = merkle( std::move(trx_digests) );
 
    // Re-sign the block

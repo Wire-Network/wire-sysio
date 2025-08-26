@@ -49,12 +49,6 @@ bool config_entry_validator::operator()(uint32_t id) const {
    bool allowed = true;
    switch(id){
       case chain_config_v1::max_action_return_value_size_id:
-      {
-         allowed = control.is_builtin_activated(builtin_protocol_feature_t::action_return_value);
-         if (!allowed){
-            wlog("action_return_value protocol feature is not active, max_action_return_value_size config is not allowed");
-         }
-      }
       break;
    }
 

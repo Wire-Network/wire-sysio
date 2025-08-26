@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    BOOST_TEST(parms.chain_config.max_authority_depth == t.control->get_global_properties().configuration.max_authority_depth);
    BOOST_TEST(parms.chain_config.max_action_return_value_size == t.control->get_global_properties().configuration.max_action_return_value_size);
 
-   BOOST_TEST(!parms.wasm_config);
+   BOOST_TEST(!!parms.wasm_config); // enabled at genesis for wire
 
    t.preactivate_all_builtin_protocol_features();
    t.produce_block();
