@@ -239,7 +239,7 @@ namespace sysio { namespace chain {
       std::optional<digest_type> maybe_new_producer_schedule_hash;
 
       if( h.not_used ) {
-         SYS_ASSERT(false, producer_schedule_exception, "Block header contains legacy producer schedule outdated by WTMsig Block Signatures" );
+         SYS_ASSERT(false, producer_schedule_exception, "Block header contains legacy producer schedule, required to be empty on wire.network" );
       }
 
       if ( exts.count(producer_schedule_change_extension::extension_id()) > 0 ) {
