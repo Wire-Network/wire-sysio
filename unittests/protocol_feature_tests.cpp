@@ -1578,7 +1578,7 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
       // ensure it is rejected because the not_used field is not null
       BOOST_REQUIRE_EXCEPTION(
          remote.push_block(bad_block), producer_schedule_exception,
-         fc_exception_message_is( "Block header contains legacy producer schedule outdated by WTMsig Block Signatures" )
+         fc_exception_message_is( "Block header contains legacy producer schedule, required to be empty on wire.network" )
       );
    }
 
