@@ -17,19 +17,6 @@ name global_receiver;
 
 extern "C" {
    void apply( uint64_t receiver, uint64_t code, uint64_t action ) {
-      if( code == "sysio"_n.value && action == "onerror"_n.value ) {
-         auto error = sysio::onerror::from_current_action();
-         sysio::print("onerror called\n");
-         auto error_trx = error.unpack_sent_trx();
-         auto error_action = error_trx.actions.at(0).name;
-
-         // Error handlers for deferred transactions in these tests currently only support the first action
-
-         WASM_TEST_ERROR_HANDLER( "test_action", "assert_false", test_transaction, assert_false_error_handler );
-
-
-         return;
-      }
 
       if ( action == name{"cfaction"}.value ) {
          test_action::test_cf_action();
@@ -124,23 +111,10 @@ extern "C" {
       WASM_TEST_HANDLER   ( test_transaction, send_action_recurse                    );
       WASM_TEST_HANDLER   ( test_transaction, test_read_transaction                  );
       WASM_TEST_HANDLER   ( test_transaction, test_transaction_size                  );
-      WASM_TEST_HANDLER_EX( test_transaction, send_transaction                       );
-      WASM_TEST_HANDLER_EX( test_transaction, send_transaction_empty                 );
-      WASM_TEST_HANDLER_EX( test_transaction, send_transaction_trigger_error_handler );
-      WASM_TEST_HANDLER_EX( test_transaction, send_transaction_large                 );
-      WASM_TEST_HANDLER_EX( test_transaction, send_action_sender                     );
-      WASM_TEST_HANDLER   ( test_transaction, deferred_print                         );
-      WASM_TEST_HANDLER_EX( test_transaction, send_deferred_transaction              );
-      WASM_TEST_HANDLER_EX( test_transaction, send_deferred_transaction_4k_action    );
-      WASM_TEST_HANDLER_EX( test_transaction, send_deferred_transaction_replace      );
-      WASM_TEST_HANDLER   ( test_transaction, send_deferred_tx_with_dtt_action       );
-      WASM_TEST_HANDLER   ( test_transaction, cancel_deferred_transaction_success    );
-      WASM_TEST_HANDLER   ( test_transaction, cancel_deferred_transaction_not_found  );
       WASM_TEST_HANDLER   ( test_transaction, send_cf_action                         );
       WASM_TEST_HANDLER   ( test_transaction, send_cf_action_fail                    );
       WASM_TEST_HANDLER   ( test_transaction, stateful_api                           );
       WASM_TEST_HANDLER   ( test_transaction, context_free_api                       );
-      WASM_TEST_HANDLER_EX( test_transaction, repeat_deferred_transaction            );
 
       //test chain
       WASM_TEST_HANDLER( test_chain, test_activeprods );

@@ -593,7 +593,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
    }
 
    BOOST_AUTO_TEST_CASE(test_trace_log_with_transaction_extensions) {
-      SKIP_TEST
+      SKIP_TEST // TODO: update test to use an ed25519 signed transaction which will have a transaction extension
       tester_no_disable_deferred_trx c;
 
       fc::temp_directory state_history_dir;
@@ -605,8 +605,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
             });
 
       c.create_accounts({"alice"_n, "test"_n});
-      c.set_code("test"_n, test_contracts::deferred_test_wasm());
-      c.set_abi("test"_n, test_contracts::deferred_test_abi());
+      // c.set_code("test"_n, test_contracts::deferred_test_wasm());
+      // c.set_abi("test"_n, test_contracts::deferred_test_abi());
       c.produce_block();
 
       c.push_action("test"_n, "defercall"_n, "alice"_n,

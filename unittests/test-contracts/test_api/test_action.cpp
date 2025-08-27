@@ -150,9 +150,6 @@ void test_action::test_cf_action() {
       sysio::internal_use_do_not_use::send_inline( (char*)"hello", 6 );
       sysio_assert( false, "transaction_api should not be allowed" );
    } else if ( cfa.payload == 211 ) {
-      sysio::send_deferred( "testapi"_n.value, "testapi"_n, "hello", 6, 0 );
-      sysio_assert( false, "transaction_api should not be allowed" );
-   } else if ( cfa.payload == 212 ) {
       set_action_return_value("hi", 2);
       sysio_assert( false, "set_action_return_value should not be allowed" );
    }

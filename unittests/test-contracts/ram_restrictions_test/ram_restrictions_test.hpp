@@ -29,13 +29,4 @@ public:
    [[sysio::on_notify("tester2::notifysetdat")]]
    void on_notify_setdata( sysio::name acctonotify, uint32_t len1, uint32_t len2, sysio::name payer );
 
-   [[sysio::action]]
-   void senddefer( uint64_t senderid, sysio::name payer );
-
-   [[sysio::action]]
-   void notifydefer( sysio::name acctonotify, uint64_t senderid, sysio::name payer );
-
-   [[sysio::on_notify("tester2::notifydefer")]]
-   void on_notifydefer( sysio::name acctonotify, uint64_t senderid, sysio::name payer );
-
 };

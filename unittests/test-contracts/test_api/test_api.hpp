@@ -209,25 +209,11 @@ struct test_transaction {
    static void send_action_inline_fail();
    static void test_read_transaction();
    static void test_transaction_size();
-   static void send_transaction(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_transaction_empty(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_transaction_trigger_error_handler(uint64_t receiver, uint64_t code, uint64_t action);
    static void assert_false_error_handler(const sysio::transaction&);
-   static void send_transaction_max();
-   static void send_transaction_large(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_action_sender(uint64_t receiver, uint64_t code, uint64_t action);
-   static void deferred_print();
-   static void send_deferred_transaction(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_deferred_transaction_4k_action(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_deferred_transaction_replace(uint64_t receiver, uint64_t code, uint64_t action);
-   static void send_deferred_tx_with_dtt_action();
-   static void cancel_deferred_transaction_success();
-   static void cancel_deferred_transaction_not_found();
    static void send_cf_action();
    static void send_cf_action_fail();
    static void stateful_api();
    static void context_free_api();
-   static void repeat_deferred_transaction(uint64_t receiver, uint64_t code, uint64_t action);
 };
 
 struct test_chain {

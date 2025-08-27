@@ -52,31 +52,10 @@ static constexpr unsigned int DJBH(const char* cp)
   return hash;
 }
 
-static constexpr unsigned long long WASM_TEST_ACTION(const char* cls, const char* method)
-{
-  return static_cast<unsigned long long>(DJBH(cls)) << 32 | static_cast<unsigned long long>(DJBH(method));
-}
-
 using namespace sysio::chain::literals;
 
 struct u128_action {
   unsigned __int128  values[3]; //16*3
-};
-
-// Deferred Transaction Trigger Action
-struct dtt_action {
-   static uint64_t get_name() {
-      return WASM_TEST_ACTION("test_transaction", "send_deferred_tx_with_dtt_action");
-   }
-   static uint64_t get_account() {
-      return "testapi"_n.to_uint64_t();
-   }
-
-   uint64_t       payer = "testapi"_n.to_uint64_t();
-   uint64_t       deferred_account = "testapi"_n.to_uint64_t();
-   uint64_t       deferred_action = WASM_TEST_ACTION("test_transaction", "deferred_print");
-   uint64_t       permission_name = "active"_n.to_uint64_t();
-   uint32_t       delay_sec = 2;
 };
 
 struct invalid_access_action {
@@ -87,7 +66,6 @@ struct invalid_access_action {
 };
 
 FC_REFLECT( u128_action, (values) )
-FC_REFLECT( dtt_action, (payer)(deferred_account)(deferred_action)(permission_name)(delay_sec) )
 FC_REFLECT( invalid_access_action, (code)(val)(index)(store) )
 
 using namespace sysio;
@@ -674,7 +652,7 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
 
          trx.actions.push_back(act1);
          // attempt to access non context free api
-         for (uint32_t i = 200; i <= 212; ++i) {
+         for (uint32_t i = 200; i <= 211; ++i) {
             trx.context_free_actions.clear();
             trx.context_free_data.clear();
             cfa.payload = i;
