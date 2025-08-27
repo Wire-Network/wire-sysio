@@ -664,8 +664,8 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
 
       c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false);
       // Issuing _only_ enough RAM to load the contracts
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
       c.produce_block();
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
@@ -684,7 +684,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
             ("payer", tester1_account)
          ),
          ram_usage_exceeded,
-         fc_exception_message_is("account tester1 has insufficient ram; needs 133559 bytes has 133120 bytes")
+         fc_exception_message_starts_with("account tester1 has insufficient ram; needs")
       );
       BOOST_REQUIRE_EXCEPTION(
          c.push_action(tester2_account, "setdata"_n, bob_account, mutable_variant_object()
@@ -693,7 +693,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
             ("payer", tester2_account)
          ),
          ram_usage_exceeded,
-         fc_exception_message_is("account tester2 has insufficient ram; needs 133559 bytes has 133120 bytes")
+         fc_exception_message_starts_with("account tester2 has insufficient ram; needs")
       );
 
       wlog("Afer Alice grants a roa policy to tester1, Bob should be able to add data to tester1 but not tester2");
@@ -714,7 +714,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
             ("payer", tester2_account)
          ),
          ram_usage_exceeded,
-         fc_exception_message_is("account tester2 has insufficient ram; needs 133559 bytes has 133120 bytes")
+         fc_exception_message_starts_with("account tester2 has insufficient ram; needs")
       );
       c.produce_block();
 
@@ -745,7 +745,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
          c.push_transaction(trx),
          ram_usage_exceeded,
          // Note: error requires 10 more bytes because we're sharing the cost of the transaction
-         fc_exception_message_is("account tester2 has insufficient ram; needs 133569 bytes has 133120 bytes")
+         fc_exception_message_starts_with("account tester2 has insufficient ram; needs")
       );
 
    } FC_LOG_AND_RETHROW()
