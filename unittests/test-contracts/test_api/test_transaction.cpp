@@ -218,51 +218,6 @@ void test_transaction::test_transaction_size() {
    sysio_assert( trans_size == sysio::transaction_size(), "transaction size does not match" );
 }
 
-void test_transaction::send_transaction(uint64_t receiver, uint64_t, uint64_t) {
-   using namespace sysio;
-   dummy_action payload = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
-
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action_normal" )> test_action;
-   copy_data( (char*)&payload, sizeof(dummy_action), test_action.data );
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back(permissions, name{"testapi"}, name{WASM_TEST_ACTION( "test_action", "read_action_normal" )}, test_action);
-   trx.send( 0, name{receiver} );
-}
-
-void test_transaction::send_action_sender( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   uint64_t cur_send;
-   sysio::read_action_data( &cur_send, sizeof(name) );
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back(permissions, name{"testapi"}, name{WASM_TEST_ACTION( "test_action", "test_current_sender" )}, &cur_send);
-   trx.send( 0, name{receiver} );
-}
-
-void test_transaction::send_transaction_empty( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   auto trx = transaction();
-   trx.send( 0, name{receiver} );
-
-   sysio_assert( false, "send_transaction_empty() should've thrown an error" );
-}
-
-void test_transaction::send_transaction_trigger_error_handler( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "assert_false" )> test_action;
-
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-
-   trx.actions.emplace_back( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "assert_false")}, test_action );
-   trx.send(0, name{receiver});
-}
-
 void test_transaction::assert_false_error_handler( const sysio::transaction& dtrx ) {
    sysio_assert( dtrx.actions.size() == 1, "transaction should only have one action" );
    sysio_assert( dtrx.actions[0].account == "testapi"_n, "transaction has wrong code" );
@@ -270,25 +225,6 @@ void test_transaction::assert_false_error_handler( const sysio::transaction& dtr
    sysio_assert( dtrx.actions[0].authorization.size() == 1, "action should only have one authorization" );
    sysio_assert( dtrx.actions[0].authorization[0].actor == "testapi"_n, "action's authorization has wrong actor" );
    sysio_assert( dtrx.actions[0].authorization[0].permission == "active"_n, "action's authorization has wrong permission" );
-}
-
-/**
- * cause failure due to a large transaction size
- */
-void test_transaction::send_transaction_large( uint64_t receiver, uint64_t, uint64_t ) {
-   using namespace sysio;
-   auto trx = transaction();
-   std::vector<permission_level> permissions = { {"testapi"_n, "active"_n} };
-   for (int i = 0; i < 32; i ++) {
-      char large_message[1024];
-      test_action_action<"testapi"_n.value, WASM_TEST_ACTION( "test_action", "read_action_normal" )> test_action;
-      copy_data( large_message, 1024, test_action.data );
-      trx.actions.emplace_back( permissions, name{"testapi"}, name{WASM_TEST_ACTION("test_action", "read_action_normal")}, test_action );
-   }
-
-   trx.send( 0, name{receiver} );
-
-   sysio_assert( false, "send_transaction_large() should've thrown an error" );
 }
 
 void test_transaction::send_cf_action() {

@@ -37,22 +37,3 @@ void ram_restrictions_test::notifysetdat( name acctonotify, uint32_t len1, uint3
 void ram_restrictions_test::on_notify_setdata( name acctonotify, uint32_t len1, uint32_t len2, name payer) {
    setdata(len1, len2, payer);
 }
-
-void ram_restrictions_test::senddefer( uint64_t senderid, name payer ) {
-   transaction trx;
-   trx.actions.emplace_back(
-      std::vector<sysio::permission_level>{{_self, "active"_n}},
-      get_self(),
-      "noop"_n,
-      std::make_tuple()
-   );
-   trx.send( senderid, payer );
-}
-
-void ram_restrictions_test::notifydefer( name acctonotify, uint64_t senderid, name payer ) {
-   require_recipient(acctonotify);
-}
-
-void ram_restrictions_test::on_notifydefer( name acctonotify, uint64_t senderid, name payer ) {
-   senddefer(senderid, payer);
-}
