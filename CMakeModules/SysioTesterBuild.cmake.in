@@ -54,7 +54,7 @@ find_library(libbscrypto bscrypto @CMAKE_BINARY_DIR@/libraries/libfc/libraries/b
 find_library(libdecrepit decrepit @CMAKE_BINARY_DIR@/libraries/libfc/libraries/boringssl/boringssl NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_BINARY_DIR@/libraries/chainbase NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_BINARY_DIR@/libraries/builtins NO_DEFAULT_PATH)
-find_library(libsodium sodium builtins @CMAKE_BINARY_DIR@/libraries/libsodium-install/lib NO_DEFAULT_PATH)
+find_library(libsodium sodium @CMAKE_BINARY_DIR@/libraries/libsodium-install/lib NO_DEFAULT_PATH)
 
 #Ubuntu build requires rt library to be specified explicitly
 #Appears on Ubuntu 22.04 (at least for me) librt.a is no longer needed
@@ -120,7 +120,7 @@ target_include_directories(SysioChain INTERFACE
                               @CMAKE_BINARY_DIR@/libraries/chain/include
                               @CMAKE_SOURCE_DIR@/libraries/libfc/include
                               @CMAKE_SOURCE_DIR@/libraries/libfc/libraries/boringssl/boringssl/src/include
-                              @CMAKE_SOURCE_DIR@/libraries/libsodium/src/libsodium/include
+                              @CMAKE_BINARY_DIR@/libraries/libsodium-install/include
                               @CMAKE_SOURCE_DIR@/libraries/softfloat/source/include
                               @CMAKE_SOURCE_DIR@/libraries/appbase/include
                               @CMAKE_SOURCE_DIR@/libraries/chainbase/include
