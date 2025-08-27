@@ -9,24 +9,6 @@
             "fields": []
         },
         {
-            "name": "notifydefer",
-            "base": "",
-            "fields": [
-                {
-                    "name": "acctonotify",
-                    "type": "name"
-                },
-                {
-                    "name": "authorizer",
-                    "type": "name"
-                },
-                {
-                    "name": "senderid",
-                    "type": "uint32"
-                }
-            ]
-        },
-        {
             "name": "notifyinline",
             "base": "",
             "fields": [
@@ -37,20 +19,6 @@
                 {
                     "name": "authorizer",
                     "type": "name"
-                }
-            ]
-        },
-        {
-            "name": "senddefer",
-            "base": "",
-            "fields": [
-                {
-                    "name": "authorizer",
-                    "type": "name"
-                },
-                {
-                    "name": "senderid",
-                    "type": "uint32"
                 }
             ]
         },
@@ -72,18 +40,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "notifydefer",
-            "type": "notifydefer",
-            "ricardian_contract": ""
-        },
-        {
             "name": "notifyinline",
             "type": "notifyinline",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "senddefer",
-            "type": "senddefer",
             "ricardian_contract": ""
         },
         {
