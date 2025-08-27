@@ -4,7 +4,6 @@
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/permission_link_object.hpp>
 #include <sysio/chain/permission_object.hpp>
@@ -382,16 +381,6 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysi
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::generated_transaction_object>& obj) {
-   fc::raw::pack(ds, fc::unsigned_int(0));
-   fc::raw::pack(ds, as_type<uint64_t>(obj.obj.sender.to_uint64_t()));
-   fc::raw::pack(ds, as_type<__uint128_t>(obj.obj.sender_id));
-   fc::raw::pack(ds, as_type<sysio::chain::transaction_id_type>(obj.obj.trx_id));
-   fc::raw::pack(ds, as_type<sysio::chain::shared_string>(obj.obj.packed_trx));
-   return ds;
-}
-
-template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::protocol_state_object::activated_protocol_feature>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<sysio::chain::digest_type>(obj.obj.feature_digest));
@@ -640,10 +629,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<sysio::chain::transaction_id_type>(trace.id));
    if (trace.receipt) {
-      if (trace.failed_dtrx_trace && trace.receipt->status.value == sysio::chain::transaction_receipt_header::soft_fail)
-         fc::raw::pack(ds, uint8_t(sysio::chain::transaction_receipt_header::executed));
-      else
-         fc::raw::pack(ds, as_type<uint8_t>(trace.receipt->status.value));
+      fc::raw::pack(ds, as_type<uint8_t>(trace.receipt->status.value));
       fc::raw::pack(ds, as_type<uint32_t>(trace.receipt->cpu_usage_us));
       fc::raw::pack(ds, as_type<fc::unsigned_int>(trace.receipt->net_usage_words));
    } else {
@@ -653,7 +639,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    }
    fc::raw::pack(ds, as_type<int64_t>(debug_mode ? trace.elapsed.count() : 0));
    fc::raw::pack(ds, as_type<uint64_t>(trace.net_usage));
-   fc::raw::pack(ds, as_type<bool>(trace.scheduled));
+   fc::raw::pack(ds, as_type<bool>(false)); // scheduled not allowed for wire, keep SHiP binary compatibility
    history_context_serialize_container(ds, debug_mode, as_type<std::vector<sysio::chain::action_trace>>(trace.action_traces));
 
    fc::raw::pack(ds, bool(trace.account_ram_delta));
@@ -671,16 +657,9 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    fc::raw::pack(ds, as_type<std::optional<std::string>>(e));
    fc::raw::pack(ds, as_type<std::optional<uint64_t>>(debug_mode ? trace.error_code : cap_error_code(trace.error_code)));
 
-   fc::raw::pack(ds, bool(trace.failed_dtrx_trace));
-   if (trace.failed_dtrx_trace) {
-      uint8_t stat = sysio::chain::transaction_receipt_header::hard_fail;
-      if (trace.receipt && trace.receipt->status.value == sysio::chain::transaction_receipt_header::soft_fail)
-         stat = sysio::chain::transaction_receipt_header::soft_fail;
-      std::pair<uint8_t, bool> context = std::make_pair(stat, debug_mode);
-      fc::raw::pack(ds, make_history_context_wrapper(context, sysio::state_history::augmented_transaction_trace{trace.failed_dtrx_trace, obj.obj.partial}));
-   }
+   fc::raw::pack(ds, bool(false)); // failed_dtrx_trace not allowed for wire, keep SHiP binary compatibility
 
-   bool include_partial = obj.obj.partial && !trace.failed_dtrx_trace;
+   bool include_partial = !!obj.obj.partial;
    fc::raw::pack(ds, include_partial);
    if (include_partial) {
       auto& partial = *obj.obj.partial;
@@ -701,7 +680,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<bool, sysio::state_history::augmented_transaction_trace>& obj) {
-   std::pair<uint8_t, bool> context = std::make_pair(sysio::chain::transaction_receipt_header::hard_fail, obj.context);
+   std::pair<uint8_t, bool> context = std::make_pair(sysio::chain::transaction_receipt_header::expired, obj.context);
    ds << make_history_context_wrapper(context, obj.obj);
    return ds;
 }

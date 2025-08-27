@@ -6,7 +6,6 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/contract_types.hpp>
-#include <sysio/chain/generated_transaction_object.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
@@ -423,48 +422,6 @@ namespace sysio { namespace chain {
                   ("auth", auth)("min", permission_level{unlink.account, *unlinked_permission_name}) );
    }
 
-   fc::microseconds authorization_manager::check_canceldelay_authorization( const canceldelay& cancel,
-                                                                            const vector<permission_level>& auths
-                                                                          )const
-   {
-      SYS_ASSERT( auths.size() == 1, irrelevant_auth_exception,
-                  "canceldelay action should only have one declared authorization" );
-      const auto& auth = auths[0];
-
-      SYS_ASSERT( get_permission(auth).satisfies( get_permission(cancel.canceling_auth),
-                                                  _db.get_index<permission_index>().indices() ),
-                  irrelevant_auth_exception,
-                  "canceldelay action declares irrelevant authority '${auth}'; specified authority to satisfy is ${min}",
-                  ("auth", auth)("min", cancel.canceling_auth) );
-
-      const auto& trx_id = cancel.trx_id;
-
-      const auto& generated_transaction_idx = _control.db().get_index<generated_transaction_multi_index>();
-      const auto& generated_index = generated_transaction_idx.indices().get<by_trx_id>();
-      const auto& itr = generated_index.lower_bound(trx_id);
-      SYS_ASSERT( itr != generated_index.end() && itr->sender == account_name() && itr->trx_id == trx_id,
-                  tx_not_found,
-                 "cannot cancel trx_id=${tid}, there is no deferred transaction with that transaction id",
-                 ("tid", trx_id) );
-
-      auto trx = fc::raw::unpack<transaction>(itr->packed_trx.data(), itr->packed_trx.size());
-      bool found = false;
-      for( const auto& act : trx.actions ) {
-         for( const auto& auth : act.authorization ) {
-            if( auth == cancel.canceling_auth ) {
-               found = true;
-               break;
-            }
-         }
-         if( found ) break;
-      }
-
-      SYS_ASSERT( found, action_validate_exception,
-                  "canceling_auth in canceldelay action was not found as authorization in the original delayed transaction" );
-
-      return (itr->delay_until - itr->published);
-   }
-
    void noop_checktime() {}
 
    std::function<void()> authorization_manager::_noop_checktime{&noop_checktime};
@@ -473,7 +430,6 @@ namespace sysio { namespace chain {
    authorization_manager::check_authorization( const vector<action>&                actions,
                                                const flat_set<public_key_type>&     provided_keys,
                                                const flat_set<permission_level>&    provided_permissions,
-                                               fc::microseconds                     provided_delay,
                                                const std::function<void()>&         _checktime,
                                                bool                                 allow_unused_keys,
                                                bool                                 check_but_dont_fail,
@@ -482,23 +438,17 @@ namespace sysio { namespace chain {
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
 
-      auto delay_max_limit = fc::seconds( _control.get_global_properties().configuration.max_transaction_delay );
-
-      auto effective_provided_delay =  (provided_delay >= delay_max_limit) ? fc::microseconds::maximum() : provided_delay;
-
       auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
-                                        effective_provided_delay,
                                         checktime
                                       );
 
-      map<permission_level, fc::microseconds> permissions_to_satisfy;
+      flat_set<permission_level> permissions_to_satisfy;
 
       for( const auto& act : actions ) {
          bool special_case = false;
-         fc::microseconds delay = effective_provided_delay;
 
          if( act.account == config::system_account_name ) {
             special_case = true;
@@ -512,7 +462,7 @@ namespace sysio { namespace chain {
             } else if( act.name == unlinkauth::get_name() ) {
                check_unlinkauth_authorization( act.data_as<unlinkauth>(), act.authorization );
             } else if( act.name ==  canceldelay::get_name() ) {
-               delay = std::max( delay, check_canceldelay_authorization(act.data_as<canceldelay>(), act.authorization) );
+               SYS_ASSERT(false, irrelevant_auth_exception, "canceldelay not supported");
             } else {
                special_case = false;
             }
@@ -543,10 +493,7 @@ namespace sysio { namespace chain {
             }
 
             if( satisfied_authorizations.find( declared_auth ) == satisfied_authorizations.end() ) {
-               auto res = permissions_to_satisfy.emplace( declared_auth, delay );
-               if( !res.second && res.first->second > delay) { // if the declared_auth was already in the map and with a higher delay
-                  res.first->second = delay;
-               }
+               permissions_to_satisfy.emplace( declared_auth );
             }
          }
          if (!payer.empty()) {
@@ -572,16 +519,13 @@ namespace sysio { namespace chain {
       // ascending order of the actor name with ties broken by ascending order of the permission name.
       for( const auto& p : permissions_to_satisfy ) {
          checktime(); // TODO: this should eventually move into authority_checker instead
-         SYS_ASSERT( checker.satisfied( p.first, p.second ) || check_but_dont_fail, unsatisfied_authorization,
+         SYS_ASSERT( checker.satisfied( p ) || check_but_dont_fail, unsatisfied_authorization,
                      "transaction declares authority '${auth}', "
-                     "but does not have signatures for it under a provided delay of ${provided_delay} ms, "
-                     "provided permissions ${provided_permissions}, provided keys ${provided_keys}, "
-                     "and a delay max limit of ${delay_max_limit_ms} ms",
-                     ("auth", p.first)
-                     ("provided_delay", provided_delay.count()/1000)
+                     "but does not have signatures for it, "
+                     "provided permissions ${provided_permissions}, provided keys ${provided_keys}",
+                     ("auth", p)
                      ("provided_permissions", provided_permissions)
                      ("provided_keys", provided_keys)
-                     ("delay_max_limit_ms", delay_max_limit.count()/1000)
                    );
 
       }
@@ -598,32 +542,25 @@ namespace sysio { namespace chain {
                                                permission_name                      permission,
                                                const flat_set<public_key_type>&     provided_keys,
                                                const flat_set<permission_level>&    provided_permissions,
-                                               fc::microseconds                     provided_delay,
                                                const std::function<void()>&         _checktime,
                                                bool                                 allow_unused_keys
                                              )const
    {
       const auto& checktime = ( static_cast<bool>(_checktime) ? _checktime : _noop_checktime );
 
-      auto delay_max_limit = fc::seconds( _control.get_global_properties().configuration.max_transaction_delay );
-
       auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         provided_keys,
                                         provided_permissions,
-                                        ( provided_delay >= delay_max_limit ) ? fc::microseconds::maximum() : provided_delay,
                                         checktime
                                       );
 
       SYS_ASSERT( checker.satisfied({account, permission}), unsatisfied_authorization,
-                  "permission '${auth}' was not satisfied under a provided delay of ${provided_delay} ms, "
-                  "provided permissions ${provided_permissions}, provided keys ${provided_keys}, "
-                  "and a delay max limit of ${delay_max_limit_ms} ms",
+                  "permission '${auth}' was not satisfied, "
+                  "provided permissions ${provided_permissions}, provided keys ${provided_keys}",
                   ("auth", permission_level{account, permission})
-                  ("provided_delay", provided_delay.count()/1000)
                   ("provided_permissions", provided_permissions)
                   ("provided_keys", provided_keys)
-                  ("delay_max_limit_ms", delay_max_limit.count()/1000)
                 );
 
       if( !allow_unused_keys ) {
@@ -634,15 +571,13 @@ namespace sysio { namespace chain {
    }
 
    flat_set<public_key_type> authorization_manager::get_required_keys( const transaction& trx,
-                                                                       const flat_set<public_key_type>& candidate_keys,
-                                                                       fc::microseconds provided_delay
+                                                                       const flat_set<public_key_type>& candidate_keys
                                                                      )const
    {
       auto checker = make_auth_checker( [&](const permission_level& p){ return get_permission(p).auth; },
                                         _control.get_global_properties().configuration.max_authority_depth,
                                         candidate_keys,
                                         {},
-                                        provided_delay,
                                         _noop_checktime
                                       );
 

@@ -47,7 +47,7 @@ namespace sysio { namespace chain {
       uint32_t               ref_block_prefix    = 0UL; ///< specifies the lower 32 bits of the blockid at get_ref_blocknum
       fc::unsigned_int       max_net_usage_words = 0UL; /// upper limit on total network bandwidth (in 8 byte words) billed for this transaction
       uint8_t                max_cpu_usage_ms    = 0; /// upper limit on the total CPU time billed for this transaction
-      fc::unsigned_int       delay_sec           = 0UL; /// number of seconds to delay this transaction for during which it may be canceled.
+      fc::unsigned_int       delay_sec           = 0UL; /// Not used, asserted to be 0
 
       /**
        * @return the absolute block number given the relative ref_block_num

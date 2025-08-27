@@ -184,8 +184,6 @@ int    return_code = 0;
 uint8_t  tx_max_cpu_usage = 0;
 uint32_t tx_max_net_usage = 0;
 
-uint32_t delaysec = 0;
-
 vector<string> tx_permission;
 string tx_payer;
 
@@ -242,7 +240,6 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("--max-cpu-usage-ms", tx_max_cpu_usage, localized("Set an upper limit on the milliseconds of cpu usage budget, for the execution of the transaction (defaults to 0 which means no limit)"));
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("Set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 
-   cmd->add_option("--delay-sec", delaysec, localized("Set the delay_sec seconds, defaults to 0s"));
    cmd->add_option("-t,--return-failure-trace", tx_rtn_failure_trace, localized("Return partial traces on failed transactions"));
    cmd->add_option("--retry-irreversible", tx_retry_lib, localized("Request node to retry transaction until it is irreversible or expires, blocking call"));
    cmd->add_option("--retry-num-blocks", tx_retry_num_blocks, localized("Request node to retry transaction until in a block of given height, blocking call"));
@@ -437,7 +434,6 @@ fc::variant push_transaction( signed_transaction& trx, const std::vector<public_
 
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
-      trx.delay_sec = delaysec;
    }
 
    auto sign_trx = [&] () {
@@ -1880,29 +1876,6 @@ struct unregproxy_subcommand {
                   ("isproxy", false);
          auto accountPermissions = get_account_permissions(tx_permission, {name(proxy), config::active_name});
          send_actions({create_action(accountPermissions, config::system_account_name, "regproxy"_n, act_payload)}, signing_keys_opt.get_keys());
-      });
-   }
-};
-
-struct canceldelay_subcommand {
-   string canceling_account;
-   string canceling_permission;
-   string trx_id;
-
-   canceldelay_subcommand(CLI::App* actionRoot) {
-      auto cancel_delay = actionRoot->add_subcommand("canceldelay", localized("Cancel a delayed transaction"));
-      cancel_delay->add_option("canceling_account", canceling_account, localized("Account from authorization on the original delayed transaction"))->required();
-      cancel_delay->add_option("canceling_permission", canceling_permission, localized("Permission from authorization on the original delayed transaction"))->required();
-      cancel_delay->add_option("trx_id", trx_id, localized("The transaction id of the original delayed transaction"))->required();
-      add_standard_transaction_options_plus_signing(cancel_delay, "canceling_account@canceling_permission");
-
-      cancel_delay->callback([this] {
-         auto canceling_auth = permission_level{name(canceling_account), name(canceling_permission)};
-         fc::variant act_payload = fc::mutable_variant_object()
-                  ("canceling_auth", canceling_auth)
-                  ("trx_id", trx_id);
-         auto accountPermissions = get_account_permissions(tx_permission, canceling_auth);
-         send_actions({create_action(accountPermissions, config::system_account_name, "canceldelay"_n, act_payload)}, signing_keys_opt.get_keys());
       });
    }
 };
@@ -4080,7 +4053,6 @@ int main( int argc, char** argv ) {
       trx.ref_block_prefix = 0;
       trx.max_net_usage_words = 0;
       trx.max_cpu_usage_ms = 0;
-      trx.delay_sec = 0;
       trx.actions = { chain::action(trxperm, name(proposed_contract), name(proposed_action), proposed_trx_serialized) };
 
       fc::to_variant(trx, trx_var);
@@ -4489,7 +4461,6 @@ int main( int argc, char** argv ) {
    auto regProxy = regproxy_subcommand(system);
    auto unregProxy = unregproxy_subcommand(system);
 
-   auto cancelDelay = canceldelay_subcommand(system);
    auto activate = activate_subcommand(system);
 
    auto rex = system->add_subcommand("rex", localized("Actions related to REX (the resource exchange)"));
