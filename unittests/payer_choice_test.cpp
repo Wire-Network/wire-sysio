@@ -29,13 +29,15 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         c.create_accounts({tester1_account, alice_account, bob_account}, false, true, false);
         c.produce_block();
 
-        ilog("Registering bob as node owner and assiging _just_ enough resources to tester1 to load the contract");
+        auto ram_restrictions_wasm = test_contracts::ram_restrictions_test_wasm();
+        ilog("Registering bob as node owner and assigning _just_ enough resources to tester1 to load the contract, wasm size ${w}",
+            ("w", ram_restrictions_wasm.size()));
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1290 SYS", 0, 0);
+        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
         c.produce_block();
 
         ilog("Setting code and ABI for ${a}", ("a", tester1_account));
-        c.set_contract(tester1_account, test_contracts::ram_restrictions_test_wasm(), test_contracts::ram_restrictions_test_abi());
+        c.set_contract(tester1_account, ram_restrictions_wasm, test_contracts::ram_restrictions_test_abi());
         c.produce_block();
 
         auto tester1_ram_usage = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
@@ -46,6 +48,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         ilog("No Resource Testing");
 
         ilog("Attempt by contract to charge itself with no resources should fail with resource_exhausted_exception");
+        // If no exception thrown it could be that the size of the ram_restriction_test contract was reduced
         BOOST_REQUIRE_EXCEPTION(
             c.push_action(tester1_account, "setdata"_n, alice_account, mutable_variant_object()
                 ("len1", 1000)
