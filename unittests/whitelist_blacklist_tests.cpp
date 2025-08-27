@@ -302,7 +302,6 @@ BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
-   SKIP_TEST; // Fails to replicate blocks due to invalid merkle root
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->produce_blocks();
@@ -328,140 +327,13 @@ BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
    }
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE( deferred_blacklist_failure ) { try {
-   SKIP_TEST; // Fails to replicate blocks due to invalid merkle root
-
-   whitelist_blacklist_tester<tester> tester1;
-   tester1.init();
-   tester1.chain->set_code( "bob"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "bob"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "charlie"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "charlie"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->produce_blocks();
-
-   tester1.chain->push_action( "bob"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "charlie" )
-      ( "payload", 10 )
-   );
-
-   tester1.chain->produce_blocks(2);
-
-   tester1.shutdown();
-
-   tester1.contract_blacklist = {"charlie"_n};
-   tester1.init(false);
-
-   whitelist_blacklist_tester<tester> tester2;
-   tester2.init(false);
-
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
-      tester2.chain->push_block( b );
-   }
-
-   tester1.chain->push_action( "bob"_n, "defercall"_n, "alice"_n, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 1 )
-      ( "contract", "charlie" )
-      ( "payload", 10 )
-   );
-
-   BOOST_CHECK_EXCEPTION( tester1.chain->produce_blocks(), fc::exception,
-                          fc_exception_message_is("account 'charlie' is on the contract blacklist")
-                        );
-   tester1.chain->produce_blocks(2, true); // Produce 2 empty blocks (other than onblock of course).
-
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
-      tester2.chain->push_block( b );
-   }
-} FC_LOG_AND_RETHROW() }
-
-
-BOOST_AUTO_TEST_CASE( blacklist_onerror ) { try {
-   SKIP_TEST; // Does not raise error
-   whitelist_blacklist_tester<validating_tester> tester1;
-   tester1.init();
-   tester1.chain->set_code( "bob"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "bob"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "charlie"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "charlie"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->produce_blocks();
-
-   tester1.chain->push_action( "bob"_n, "defercall"_n, {{"alice"_n, config::active_name}, {"alice"_n, config::sysio_payer_name}}, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "charlie" )
-      ( "payload", 13 )
-   );
-
-   tester1.chain->produce_blocks();
-   tester1.shutdown();
-
-   tester1.action_blacklist = {{config::system_account_name, "onerror"_n}};
-   tester1.init(false);
-
-   tester1.chain->push_action( "bob"_n, "defercall"_n, {{"alice"_n, config::active_name}, {"alice"_n, config::sysio_payer_name}
-}, mvo()
-      ( "payer", "alice" )
-      ( "sender_id", 0 )
-      ( "contract", "charlie" )
-      ( "payload", 13 )
-   );
-
-   BOOST_CHECK_EXCEPTION( tester1.chain->produce_blocks(), fc::exception,
-                          fc_exception_message_is("action 'sysio::onerror' is on the action blacklist")
-                        );
-
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
-   SKIP_TEST; // Fails to replicate blocks due to invalid merkle root
+BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->produce_blocks();
-   tester1.chain->set_code( "alice"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "alice"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "bob"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "bob"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "charlie"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "charlie"_n,  test_contracts::deferred_test_abi() );
+   tester1.chain->set_code( "alice"_n, test_contracts::get_sender_test_wasm() );
+   tester1.chain->set_abi( "alice"_n,  test_contracts::get_sender_test_abi() );
    tester1.chain->produce_blocks();
-
-   auto auth = authority(sysio::testing::base_tester::get_public_key(name("alice"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"alice"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "alice"_n, mvo()
-      ( "account", "alice" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   auth = authority(sysio::testing::base_tester::get_public_key(name("bob"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"alice"_n, config::sysio_code_name}, 1} );
-   auth.accounts.push_back( permission_level_weight{{"bob"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "bob"_n, mvo()
-      ( "account", "bob" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   auth = authority(sysio::testing::base_tester::get_public_key(name("charlie"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"charlie"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "charlie"_n, mvo()
-      ( "account", "charlie" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   tester1.chain->produce_blocks(2);
 
    tester1.shutdown();
 
@@ -495,87 +367,11 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline_deferred ) { try {
    auto c1 = tester1.chain->control->applied_transaction.connect( log_trxs );
 
    // Disallow inline actions authorized by actor in blacklist
-   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "alice"_n, "inlinecall"_n, "alice"_n, mvo()
-                                                         ( "contract", "alice" )
-                                                         ( "authorizer", "bob" )
-                                                         ( "payload", 10 ) ),
+   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "alice"_n, "sendinline"_n, "bob"_n, mvo()
+                                                         ( "to", "whatever" )
+                                                         ( "expected_sender", "whatever"_n ) ),
                            fc::exception,
                            fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"bob\"]") );
-
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( blacklist_sender_bypass ) { try {
-   SKIP_TEST; // Does not raise error
-   whitelist_blacklist_tester<tester> tester1;
-   tester1.init();
-   tester1.chain->produce_blocks();
-   tester1.chain->set_code( "alice"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "alice"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "bob"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "bob"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->set_code( "charlie"_n, test_contracts::deferred_test_wasm() );
-   tester1.chain->set_abi( "charlie"_n,  test_contracts::deferred_test_abi() );
-   tester1.chain->produce_blocks();
-
-   auto auth = authority(sysio::testing::base_tester::get_public_key(name("alice"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"alice"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "alice"_n, mvo()
-      ( "account", "alice" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   auth = authority(sysio::testing::base_tester::get_public_key(name("bob"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"bob"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "bob"_n, mvo()
-      ( "account", "bob" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   auth = authority(sysio::testing::base_tester::get_public_key(name("charlie"), "active"));
-   auth.accounts.push_back( permission_level_weight{{"charlie"_n, config::sysio_code_name}, 1} );
-
-   tester1.chain->push_action( "sysio"_n, "updateauth"_n, "charlie"_n, mvo()
-      ( "account", "charlie" )
-      ( "permission", "active" )
-      ( "parent", "owner" )
-      ( "auth", auth )
-   );
-
-   tester1.chain->produce_blocks(2);
-
-   tester1.shutdown();
-
-   tester1.sender_bypass_whiteblacklist = {"charlie"_n};
-   tester1.actor_blacklist = {"bob"_n, "charlie"_n};
-   tester1.init(false);
-
-   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "bob"_n, "deferfunc"_n, "bob"_n, mvo()
-                                                         ( "payload", 10 ) ),
-                           fc::exception,
-                           fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"bob\"]")
-   );
-
-
-   BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "charlie"_n, "deferfunc"_n, "charlie"_n, mvo()
-                                                         ( "payload", 10 ) ),
-                           fc::exception,
-                           fc_exception_message_is("authorizing actor(s) in transaction are on the actor blacklist: [\"charlie\"]")
-   );
-
-
-   whitelist_blacklist_tester<tester> tester2;
-   tester2.init(false);
-
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
-      tester2.chain->push_block( b );
-   }
 
 } FC_LOG_AND_RETHROW() }
 
