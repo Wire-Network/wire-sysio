@@ -108,6 +108,9 @@ ctest -L "nonparallelizable_tests"
 
 The long-running tests are [medium-to-large](https://testing.googleblog.com/2010/12/test-sizes.html) integration tests
 that rely on shared resources and take a very long time to run.
+Follow the instructions [BUILD.md](./BUILD.md) to build Wire Sysio
+from source.
+## Testing
 
 You can invoke them by running `ctest` from a terminal in your `build` directory and specifying the following arguments:
 
@@ -117,7 +120,7 @@ ctest -L "long_running_tests"
 
 ---
 
-<!-- <!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD033 -->
 <table>
   <tr>
     <td><img src="https://bucket.gitgo.app/frontend-assets/icons/favicon.png" alt="Wire Network" width="50"/></td>
