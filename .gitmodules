@@ -44,3 +44,6 @@
 	path = libraries/libsodium
 	url = https://github.com/Wire-Network/libsodium.git
 	branch = stable
+[submodule "vcpkg"]
+	path = vcpkg
+	url = https://github.com/Microsoft/vcpkg.git

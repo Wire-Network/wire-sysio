@@ -20,14 +20,16 @@ set -euo pipefail
 BASE_DIR=${BASE_DIR:-$PWD}
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LLVM_SRC_DIR="${BASE_DIR}/llvm-project"
-BUILD_DIR="${BASE_DIR}/llvm-11-build-gpt"
-PREFIX="${LLVM_11_PREFIX:-/opt/llvm/llvm-11}"
+BUILD_DIR="${BASE_DIR}/llvm-11-build"
+PREFIX="${LLVM_11_PREFIX:-${BASE_DIR}/llvm-11}"
 
 ### ---------- Config (overridable by flags) ----------
 
 if which nproc >/dev/null 2>&1; then
   echo "nproc is installed"
   NPROC=$(nproc)
+else
+  NPROC=0
 fi
 
 if [[ "${NPROC}" -gt 0 ]]; then
@@ -50,7 +52,9 @@ BRANCH="release/11.x"
 PROJECTS="clang;clang-tools-extra;lld;compiler-rt;libcxx;libcxxabi;libunwind"
 
 INSTALL_RUNTIMES_VIA_TOPLEVEL=1
-
+if [[ "$(uname)" == "Darwin" ||  "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
+  TARGETS="AArch64;WebAssembly"
+fi
 ### ---------------------------------------------------
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -77,6 +81,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+
+
 echo "[+] Using:"
 echo "    PREFIX        = ${PREFIX}"
 echo "    JOBS          = ${JOBS}"
@@ -84,15 +90,18 @@ echo "    TARGETS       = ${TARGETS}"
 echo "    SANITIZERS    = ${WANT_SANITIZERS}"
 echo "    BRANCH        = ${BRANCH}"
 
-echo "[+] Checking & installing deps (sudo)…"
-. "${SCRIPT_DIR}/llvm-11-ubuntu-deps.sh"
-
+if [[ $(uname) != "Linux" ]]; then
+  echo "[+] You must install dependencies manually on non-Linux"
+else
+  echo "[+] Checking & installing deps (sudo)…"
+  . "${SCRIPT_DIR}/llvm-11-ubuntu-deps.sh"
+fi
 # Clean env that might force freestanding or odd sysroots
 unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS
 
-# echo "[+] Fetching llvm-project (${BRANCH})…"
+echo "[+] Fetching llvm-project (${BRANCH})…"
 rm -rf "${LLVM_SRC_DIR}" "${BUILD_DIR}"
-# rm -rf "${BUILD_DIR}"
+#rm -rf "${BUILD_DIR}"
 git clone --depth=1 -b "${BRANCH}" https://github.com/llvm/llvm-project.git "${LLVM_SRC_DIR}"
 
 # Base CMake flags
@@ -141,7 +150,7 @@ fi
 
 # Build & Install (top-level)
 echo "[+] Configuring (top-level)…"
-cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" "${CMAKE_FLAGS[@]}"
+cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" -DCMAKE_POLICY_VERSION_MINIMUM=3.5  "${CMAKE_FLAGS[@]}"
 
 echo "[+] Building…"
 ninja -C "${BUILD_DIR}" -j "${JOBS}"
