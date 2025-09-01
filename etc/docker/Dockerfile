@@ -60,18 +60,23 @@ FROM distro-deps AS source-deps
 # Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
 RUN mkdir -p /opt/llvm/scripts
 RUN mkdir -p /opt/llvm/llvm-11
-COPY scripts/llvm-11/* /opt/llvm/scripts/
+#RUN --mount=from=scripts,target=/opt/llvm/scripts \
+#	 ls -ltra /opt/llvm/scripts-mount/ && \
+#    cp -R /opt/llvm/scripts-mount/* /opt/llvm/scripts/ \
+#    ls -ltra /opt/llvm/scripts/
+#COPY --from scripts/llvm-11/* /opt/llvm/scripts/
 
 # Build and install LLVM 11 using the helper script
-RUN BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
+RUN --mount=from=scripts,target=/opt/llvm/scripts \
+    BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
-FROM source-deps AS app-source-local
-
-RUN mkdir -p /wire/wire-sysio
-WORKDIR /wire/wire-sysio
-COPY . /wire/wire-sysio/
+#FROM source-deps AS app-source-local
+#
+#RUN mkdir -p /wire/wire-sysio
+#WORKDIR /wire/wire-sysio
+#COPY . /wire/wire-sysio/
 
 # Stage 3b: app-source-repo
 # Fetch application source from a remote repository (branch configurable via ARGs).
@@ -90,17 +95,17 @@ RUN git submodule update --init --recursive
 # Stage 4a: app-build-local
 # Configure and build the application from local sources.
 ## BUILD WITH LOCAL SOURCE CODE
-FROM app-source-local AS app-build-local
-WORKDIR /wire/wire-sysio
-RUN mkdir build
-WORKDIR /wire/wire-sysio/build
-RUN cmake \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER=gcc-10 \
-    -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 .. \
-    && \
-    make -j$([[ "$(nproc)" -gt 16 ]] && echo 16 || nproc)
+#FROM app-source-local AS app-build-local
+#WORKDIR /wire/wire-sysio
+#RUN mkdir build
+#WORKDIR /wire/wire-sysio/build
+#RUN cmake \
+#    -DCMAKE_BUILD_TYPE=Release \
+#    -DCMAKE_C_COMPILER=gcc-10 \
+#    -DCMAKE_CXX_COMPILER=g++-10 \
+#    -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 .. \
+#    && \
+#    make -j$([[ "$(nproc)" -gt 16 ]] && echo 16 || nproc)
 
 # Stage 4b: app-build-repo
 # Configure and build the application from sources cloned from the repository.

@@ -1,3 +1,4 @@
+tmp
 *.a
 *.sw*
 *.dylib
@@ -98,6 +99,5 @@ package-lock.json
 snapshots
 
 find-eosio-wasm.sh
-
-
 cliff.toml
+
