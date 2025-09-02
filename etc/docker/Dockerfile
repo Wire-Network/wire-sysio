@@ -134,3 +134,20 @@ RUN mkdir -p ${APP_DIR}
 VOLUME ["/wire/wire-sysio"]
 WORKDIR ${APP_DIR}
 ENV PATH="${BUILD_DIR}/bin:${PATH}"
+
+
+FROM app-build-local AS cdt-source-local
+RUN cd /wire && git clone --recursive https://github.com/Wire-Network/wire-cdt.git
+WORKDIR /wire/wire-cdt
+
+# Stage 5: cdt-build-local
+# Build the Wire CDT from source (for local development purposes).
+## BUILD WITH LOCAL SOURCE CODE
+FROM cdt-source-local AS cdt-build-local
+RUN mkdir build && cd build && \
+    cmake -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_C_COMPILER=gcc-10 \
+              -DCMAKE_CXX_COMPILER=g++-10 \
+              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 \
+    					..
+RUN cd build && make -j8
