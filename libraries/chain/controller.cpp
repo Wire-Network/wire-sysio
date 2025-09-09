@@ -377,7 +377,6 @@ struct controller_impl {
    SET_APP_HANDLER( sysio, sysio, vetorecovery );
 */
 
-   SET_APP_HANDLER( sysio, sysio, canceldelay );
    }
 
    /**
