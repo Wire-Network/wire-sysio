@@ -14,9 +14,18 @@
 FROM ubuntu:24.04 AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV APP_DIR=/wire/wire-sysio
-ENV BUILD_DIR="${APP_DIR}/build"
+ENV PLATFORM_DIR=/wire
+ENV APP_DIR="${PLATFORM_DIR}/wire-sysio"
+ENV CDT_DIR="${PLATFORM_DIR}/wire-cdt"
 
+ENV BUILD_TYPE=Release
+ENV APP_BUILD_DIR="${APP_DIR}/build/${BUILD_TYPE}"
+ENV CDT_BUILD_DIR="${CDT_DIR}/build/${BUILD_TYPE}"
+
+ENV APP_DEV_BUILD_DIR="${APP_DIR}/build/debug-docker"
+ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
+
+ENV LLVM_11_DIR=/opt/llvm/llvm-11
 
 # Core package tools and repository helpers
 RUN apt-get update
@@ -62,7 +71,7 @@ FROM distro-deps AS source-deps
 
 # Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
 RUN mkdir -p /opt/llvm/scripts
-RUN mkdir -p /opt/llvm/llvm-11
+RUN mkdir -p LLVM_11_DIR
 
 # Build and install LLVM 11 using the helper script
 RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
@@ -94,60 +103,75 @@ RUN git submodule update --init --recursive
 # Configure and build the application from local sources.
 ## BUILD WITH LOCAL SOURCE CODE
 FROM app-source-local AS app-build-local
-RUN mkdir -p ${BUILD_DIR}
-WORKDIR ${BUILD_DIR}
+RUN mkdir -p ${APP_BUILD_DIR}
+WORKDIR ${APP_BUILD_DIR}
 RUN cmake \
+    -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+    -B . \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 \
-    ..
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+
 
 RUN make -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
-ENV PATH="${BUILD_DIR}/bin:${PATH}"
+ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 
 # Stage 4b: app-build-repo
 # Configure and build the application from sources cloned from the repository.
 ## BUILD WITH REPO SOURCE CODE
 FROM app-source-repo AS app-build-repo
-RUN mkdir -p ${BUILD_DIR}
-WORKDIR ${BUILD_DIR}
+RUN mkdir -p ${APP_BUILD_DIR}
+WORKDIR ${APP_BUILD_DIR}
 RUN cmake \
-    -DCMAKE_BUILD_TYPE=Release \
+    -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+    -B . \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 \
-    ..
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
 
 RUN make -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
-ENV PATH="${BUILD_DIR}/bin:${PATH}"
+ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 
 # Stage 4c: app-dev
 # Configure and build the application from sources cloned from the repository.
 ## BUILD WITH REPO SOURCE CODE
 FROM source-deps AS app-dev
 RUN mkdir -p ${APP_DIR}
-VOLUME ["/wire/wire-sysio"]
+VOLUME ["${APP_DIR}"]
 WORKDIR ${APP_DIR}
-ENV PATH="${BUILD_DIR}/bin:${PATH}"
+ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 
+# Stage 4d: platform-dev
+# Setup development environment with both app and cdt source code volumes.
+## DO NOT BUILD, JUST SETUP VOLUMES
+FROM source-deps AS platform-dev
+RUN mkdir -p ${PLATFORM_DIR}
+VOLUME ["${PLATFORM_DIR}"]
+WORKDIR ${PLATFORM_DIR}
+ENV PATH="${CDT_DEV_BUILD_DIR}/bin:${APP_DEV_BUILD_DIR}/bin:${PATH}"
 
-FROM app-build-local AS cdt-source-local
+# Stage 5: cdt-source-repo
+# Cloning Wire CDT source from the remote repository.
+FROM app-build-repo AS cdt-source-repo
 RUN cd /wire && git clone --recursive https://github.com/Wire-Network/wire-cdt.git
 WORKDIR /wire/wire-cdt
 
-# Stage 5: cdt-build-local
+# Stage 6: cdt-build-repo
 # Build the Wire CDT from source (for local development purposes).
 ## BUILD WITH LOCAL SOURCE CODE
-FROM cdt-source-local AS cdt-build-local
-RUN mkdir build && cd build && \
-    cmake -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_C_COMPILER=gcc-10 \
-              -DCMAKE_CXX_COMPILER=g++-10 \
-              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 \
-    					..
-RUN cd build && make -j8
+FROM cdt-source-repo AS cdt-build-repo
+RUN mkdir -p ${CDT_BUILD_DIR}
+RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+      -B . \
+    	-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+      -DCMAKE_C_COMPILER=gcc-10 \
+      -DCMAKE_CXX_COMPILER=g++-10 \
+      -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+
+RUN cd ${CDT_BUILD_DIR} && make -j8
