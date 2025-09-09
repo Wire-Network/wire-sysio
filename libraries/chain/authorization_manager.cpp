@@ -294,8 +294,7 @@ namespace sysio { namespace chain {
           SYS_ASSERT( act_name != updateauth::get_name() &&
                      act_name != deleteauth::get_name() &&
                      act_name != linkauth::get_name() &&
-                     act_name != unlinkauth::get_name() &&
-                     act_name != canceldelay::get_name(),
+                     act_name != unlinkauth::get_name(),
                      unlinkable_min_permission_action,
                      "cannot call lookup_minimum_permission on native actions that are not allowed to be linked to minimum permissions" );
       }
@@ -381,8 +380,6 @@ namespace sysio { namespace chain {
                      "Cannot link sysio::linkauth to a minimum permission" );
          SYS_ASSERT( link.type != unlinkauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::unlinkauth to a minimum permission" );
-         SYS_ASSERT( link.type != canceldelay::get_name(), action_validate_exception,
-                     "Cannot link sysio::canceldelay to a minimum permission" );
       }
 
       const auto linked_permission_name = lookup_minimum_permission(link.account, link.code, link.type);
@@ -461,8 +458,6 @@ namespace sysio { namespace chain {
                check_linkauth_authorization( act.data_as<linkauth>(), act.authorization );
             } else if( act.name == unlinkauth::get_name() ) {
                check_unlinkauth_authorization( act.data_as<unlinkauth>(), act.authorization );
-            } else if( act.name ==  canceldelay::get_name() ) {
-               SYS_ASSERT(false, irrelevant_auth_exception, "canceldelay not supported");
             } else {
                special_case = false;
             }

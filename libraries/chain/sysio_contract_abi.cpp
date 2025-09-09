@@ -194,20 +194,6 @@ abi_def sysio_contract_abi(const abi_def& sysio_system_abi)
    });
 
    sys_abi.structs.emplace_back( struct_def {
-      "canceldelay", "", {
-         {"canceling_auth", "permission_level"},
-         {"trx_id", "transaction_id_type"},
-      }
-   });
-
-   sys_abi.structs.emplace_back( struct_def {
-         "onerror", "", {
-            {"sender_id", "uint128"},
-            {"sent_trx",  "bytes"}
-      }
-   });
-
-   sys_abi.structs.emplace_back( struct_def {
          "onblock", "", {
             {"header", "block_header"}
       }
@@ -221,8 +207,6 @@ abi_def sysio_contract_abi(const abi_def& sysio_system_abi)
    sys_abi.actions.push_back( action_def{name("deleteauth"), "deleteauth",""} );
    sys_abi.actions.push_back( action_def{name("linkauth"), "linkauth",""} );
    sys_abi.actions.push_back( action_def{name("unlinkauth"), "unlinkauth",""} );
-   sys_abi.actions.push_back( action_def{name("canceldelay"), "canceldelay",""} );
-   sys_abi.actions.push_back( action_def{name("onerror"), "onerror",""} );
    sys_abi.actions.push_back( action_def{name("onblock"), "onblock",""} );
 
    return sys_abi;

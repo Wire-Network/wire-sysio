@@ -79,16 +79,6 @@ namespace sysio::chain {
       );
    }
 
-   void deep_mind_handler::on_onerror(const signed_transaction& etrx)
-   {
-      auto packed_trx = fc::raw::pack(etrx);
-
-      fc_dlog(_logger, "TRX_OP CREATE onerror ${id} ${trx}",
-         ("id", etrx.id())
-         ("trx", fc::to_hex(packed_trx))
-      );
-   }
-
    void deep_mind_handler::on_onblock(const signed_transaction& trx)
    {
       auto packed_trx = fc::raw::pack(trx);

@@ -170,19 +170,6 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, read_only_trx_tester) { try {
    BOOST_CHECK_THROW( send_action(act), transaction_exception );
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(canceldelay_test, read_only_trx_tester) { try {
-   produce_blocks( 1 );
-
-   permission_level canceling_auth { config::system_account_name,config::active_name };
-   transaction_id_type trx_id { "0718886aa8a3895510218b523d3d694280d1dbc1f6d30e173a10b2039fc894f1" };
-   action act = {
-      vector<permission_level>{{config::system_account_name,config::active_name}},
-      canceldelay { canceling_auth, trx_id }
-   };
-
-   BOOST_CHECK_THROW( send_action(act), transaction_exception );
-} FC_LOG_AND_RETHROW() }
-
 BOOST_FIXTURE_TEST_CASE(db_read_only_mode_test, read_only_trx_tester) { try {
    SKIP_TEST
    set_up_test_contract();

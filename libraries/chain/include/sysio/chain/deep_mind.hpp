@@ -58,7 +58,6 @@ public:
    void on_start_block(uint32_t block_num);
    void on_accepted_block(const std::shared_ptr<block_state>& bsp);
    void on_switch_forks(const block_id_type& old_head, const block_id_type& new_head);
-   void on_onerror(const signed_transaction& etrx);
    void on_onblock(const signed_transaction& trx);
    void on_start_transaction();
    void on_end_transaction();

@@ -459,10 +459,6 @@ void apply_sysio_unlinkauth(apply_context& context) {
    db.remove(*link);
 }
 
-void apply_sysio_canceldelay(apply_context& context) {
-   SYS_ASSERT( false, unaccessible_api, "canceldelay not supported" );
-}
-
 void apply_roa_reducepolicy(apply_context& context) {
    // 1. Parse action arguments
    auto args = context.get_action().data_as<reducepolicy>();

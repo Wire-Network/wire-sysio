@@ -28,7 +28,6 @@ namespace sysio { namespace chain {
    void apply_sysio_setcode(apply_context&);
    void apply_sysio_setabi(apply_context&);
 
-   void apply_sysio_canceldelay(apply_context&);
    ///@}  end action handlers
 
 } } /// namespace sysio::chain

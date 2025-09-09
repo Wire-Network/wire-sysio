@@ -14,7 +14,6 @@ namespace sysio { namespace chain {
    struct deleteauth;
    struct linkauth;
    struct unlinkauth;
-   struct canceldelay;
 
    class authorization_manager {
       public:

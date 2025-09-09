@@ -17,10 +17,6 @@ void bios::setabi( name account, const std::vector<char>& abi ) {
    }
 }
 
-void bios::onerror( ignore<uint128_t>, ignore<std::vector<char>> ) {
-   check( false, "the onerror action cannot be called directly" );
-}
-
 void bios::setpriv( name account, uint8_t is_priv ) {
    require_auth( get_self() );
    set_privileged( account, is_priv );

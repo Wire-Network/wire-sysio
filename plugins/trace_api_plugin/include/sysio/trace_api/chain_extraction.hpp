@@ -49,7 +49,6 @@ private:
 
    void on_applied_transaction(const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& t) {
       if( !trace->receipt ) return;
-      // include only executed transactions; soft_fail included so that onerror (and any inlines via onerror) are included
       if((trace->receipt->status != chain::transaction_receipt_header::executed)) {
          return;
       }

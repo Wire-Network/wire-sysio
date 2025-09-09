@@ -196,7 +196,7 @@ namespace sysiobios {
           * Link authorization action.
           *
           * @details Assigns a specific action from a contract to a permission you have created. Five system
-          * actions can not be linked `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, and `canceldelay`.
+          * actions can not be linked `updateauth`, `deleteauth`, `linkauth`, and `unlinkauth`.
           * This is useful because when doing authorization checks, the SYSIO based blockchain starts with the
           * action needed to be authorized (and the contract belonging to), and looks up which permission
           * is needed to pass authorization validation. If a link is set, that permission is used for authoraization
@@ -230,17 +230,6 @@ namespace sysiobios {
                           ignore<name>  type ) {}
 
          /**
-          * Cancel delay action.
-          *
-          * @details Cancels a deferred transaction.
-          *
-          * @param canceling_auth - the permission that authorizes this action,
-          * @param trx_id - the deferred transaction id to be cancelled.
-          */
-         [[sysio::action]]
-         void canceldelay( ignore<permission_level> canceling_auth, ignore<checksum256> trx_id ) {}
-
-         /**
           * Set code action.
           *
           * @details Sets the contract code for an account.
@@ -267,19 +256,6 @@ namespace sysiobios {
           */
          [[sysio::action]]
          void setabi( name account, const std::vector<char>& abi );
-
-         /**
-          * On error action.
-          *
-          * @details Notification of this action is delivered to the sender of a deferred transaction
-          * when an objective error occurs while executing the deferred transaction.
-          * This action is not meant to be called directly.
-          *
-          * @param sender_id - the id for the deferred transaction chosen by the sender,
-          * @param sent_trx - the deferred transaction that failed.
-          */
-         [[sysio::action]]
-         void onerror( ignore<uint128_t> sender_id, ignore<std::vector<char>> sent_trx );
 
          /**
           * Set privilege status for an account.
@@ -381,7 +357,6 @@ namespace sysiobios {
          using deleteauth_action = action_wrapper<"deleteauth"_n, &bios::deleteauth>;
          using linkauth_action = action_wrapper<"linkauth"_n, &bios::linkauth>;
          using unlinkauth_action = action_wrapper<"unlinkauth"_n, &bios::unlinkauth>;
-         using canceldelay_action = action_wrapper<"canceldelay"_n, &bios::canceldelay>;
          using setcode_action = action_wrapper<"setcode"_n, &bios::setcode>;
          using setabi_action = action_wrapper<"setabi"_n, &bios::setabi>;
          using setpriv_action = action_wrapper<"setpriv"_n, &bios::setpriv>;

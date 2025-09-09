@@ -582,7 +582,6 @@ BOOST_AUTO_TEST_CASE( linkauth_special ) { try {
    validate_disallow("unlinkauth");
    validate_disallow("deleteauth");
    validate_disallow("updateauth");
-   validate_disallow("canceldelay");
 
 } FC_LOG_AND_RETHROW() }
 
