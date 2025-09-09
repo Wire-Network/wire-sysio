@@ -2057,7 +2057,7 @@ BOOST_FIXTURE_TEST_CASE( memory_mapping_test, validating_tester ) try {
       push_action(acct, "dothedew"_n, "sysio"_n, {});
 
       // do not put too many transactions in a single block
-      if (i % 20 == 0 ) {
+      if (i % 10 == 0 ) {
          produce_block();
       }
    }
