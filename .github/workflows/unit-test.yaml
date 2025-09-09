@@ -43,4 +43,4 @@ jobs:
       - name: Run CTest suite
         run: |
           sudo docker run --rm wire-sysio-build \
-            bash -c "cd /wire/wire-sysio/build && ctest -j $(nproc) -LE _tests"
+            bash -c "cd /wire/wire-sysio/build && ctest -j $(nproc) -LE _tests --output-on-failure"
