@@ -6,6 +6,21 @@
 using namespace sysio;
 using namespace sysio::chain;
 
+struct testit {
+   uint64_t      id;
+   testit( uint64_t id = 0 )
+         :id(id){}
+
+   static account_name get_account() {
+      return chain::config::system_account_name;
+   }
+   static action_name get_name() {
+      return "testit"_n;
+   }
+};
+FC_REFLECT( testit, (id) )
+
+
 BOOST_AUTO_TEST_SUITE(unapplied_transaction_queue_tests)
 
 auto unique_trx_meta_data( fc::time_point expire = fc::time_point::now() + fc::seconds( 120 ) ) {
@@ -17,7 +32,7 @@ auto unique_trx_meta_data( fc::time_point expire = fc::time_point::now() + fc::s
    account_name creator = config::system_account_name;
    trx.expiration = fc::time_point_sec{expire};
    trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                             onerror{ nextid, "test", 4 });
+                             testit{ nextid });
    return transaction_metadata::create_no_recover_keys( std::make_shared<packed_transaction>( std::move(trx) ),
                                                         transaction_metadata::trx_type::input );
 }

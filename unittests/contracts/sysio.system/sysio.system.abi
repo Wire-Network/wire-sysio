@@ -203,20 +203,6 @@
             ]
         },
         {
-            "name": "canceldelay",
-            "base": "",
-            "fields": [
-                {
-                    "name": "canceling_auth",
-                    "type": "permission_level"
-                },
-                {
-                    "name": "trx_id",
-                    "type": "checksum256"
-                }
-            ]
-        },
-        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -335,20 +321,6 @@
                 {
                     "name": "header",
                     "type": "block_header"
-                }
-            ]
-        },
-        {
-            "name": "onerror",
-            "base": "",
-            "fields": [
-                {
-                    "name": "sender_id",
-                    "type": "uint128"
-                },
-                {
-                    "name": "sent_trx",
-                    "type": "bytes"
                 }
             ]
         },
@@ -806,11 +778,6 @@
             "ricardian_contract": ""
         },
         {
-            "name": "canceldelay",
-            "type": "canceldelay",
-            "ricardian_contract": ""
-        },
-        {
             "name": "deleteauth",
             "type": "deleteauth",
             "ricardian_contract": ""
@@ -838,11 +805,6 @@
         {
             "name": "onblock",
             "type": "onblock",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "onerror",
-            "type": "onerror",
             "ricardian_contract": ""
         },
         {

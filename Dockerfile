@@ -5,8 +5,7 @@ ARG REPO=https://github.com/Wire-Network/wire-sysio
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
         lsb-release \
         wget \
         software-properties-common \
@@ -26,14 +25,22 @@ RUN apt-get install -y \
         libusb-1.0-0-dev \
         pkg-config \
         python3 \
+        python3-pip \
         zlib1g-dev \
         libbz2-dev \
         liblzma-dev \
         libncurses5-dev \
-        libzstd-dev
+        libzstd-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN DEBIAN_FRONTEND=noninteractive apt-get install python3.12 -y
+RUN apt-get update && apt-get install -y python3.12
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+
+RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
+
+RUN python3.12 -m pip install --upgrade pip
+RUN python3.12 -m pip install numpy
 
 RUN mkdir /wire
 WORKDIR /wire

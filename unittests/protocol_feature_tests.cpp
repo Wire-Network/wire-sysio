@@ -384,13 +384,11 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
    validate_disallow("sysio", "unlinkauth");
    validate_disallow("sysio", "deleteauth");
    validate_disallow("sysio", "updateauth");
-   validate_disallow("sysio", "canceldelay");
 
    validate_allowed("currency", "linkauth");
    validate_allowed("currency", "unlinkauth");
    validate_allowed("currency", "deleteauth");
    validate_allowed("currency", "updateauth");
-   validate_allowed("currency", "canceldelay");
 
 } FC_LOG_AND_RETHROW() }
 

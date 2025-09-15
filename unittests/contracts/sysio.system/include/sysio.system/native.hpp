@@ -205,7 +205,7 @@ namespace sysiosystem {
 
          /**
           * Link authorization action assigns a specific action from a contract to a permission you have created. Five system
-          * actions can not be linked `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, and `canceldelay`.
+          * actions can not be linked `updateauth`, `deleteauth`, `linkauth`, and `unlinkauth`.
           * This is useful because when doing authorization checks, the SYSIO based blockchain starts with the
           * action needed to be authorized (and the contract belonging to), and looks up which permission
           * is needed to pass authorization validation. If a link is set, that permission is used for authorization
@@ -267,26 +267,6 @@ namespace sysiosystem {
          }
 
          /**
-          * Cancel delay action cancels a deferred transaction.
-          *
-          * @param canceling_auth - the permission that authorizes this action,
-          * @param trx_id - the deferred transaction id to be cancelled.
-          */
-         [[sysio::action]]
-         void canceldelay( ignore<permission_level> canceling_auth, ignore<checksum256> trx_id ) {}
-
-         /**
-          * On error action, notification of this action is delivered to the sender of a deferred transaction
-          * when an objective error occurs while executing the deferred transaction.
-          * This action is not meant to be called directly.
-          *
-          * @param sender_id - the id for the deferred transaction chosen by the sender,
-          * @param sent_trx - the deferred transaction that failed.
-          */
-         [[sysio::action]]
-         void onerror( ignore<uint128_t> sender_id, ignore<std::vector<char>> sent_trx );
-
-         /**
           * Set abi action sets the contract abi for an account.
           *
           * @param account - the account for which to set the contract abi.
@@ -314,7 +294,6 @@ namespace sysiosystem {
          using deleteauth_action = sysio::action_wrapper<"deleteauth"_n, &native::deleteauth>;
          using linkauth_action = sysio::action_wrapper<"linkauth"_n, &native::linkauth>;
          using unlinkauth_action = sysio::action_wrapper<"unlinkauth"_n, &native::unlinkauth>;
-         using canceldelay_action = sysio::action_wrapper<"canceldelay"_n, &native::canceldelay>;
          using setcode_action = sysio::action_wrapper<"setcode"_n, &native::setcode>;
          using setabi_action = sysio::action_wrapper<"setabi"_n, &native::setabi>;
    };

@@ -124,35 +124,6 @@ struct unlinkauth {
    }
 };
 
-struct canceldelay {
-   permission_level      canceling_auth;
-   transaction_id_type   trx_id;
-
-   static account_name get_account() {
-      return config::system_account_name;
-   }
-
-   static action_name get_name() {
-      return "canceldelay"_n;
-   }
-};
-
-struct onerror {
-   uint128_t      sender_id;
-   bytes          sent_trx;
-
-   onerror( uint128_t sid, const char* data, size_t len )
-   :sender_id(sid),sent_trx(data,data+len){}
-
-   static account_name get_account() {
-      return config::system_account_name;
-   }
-
-   static action_name get_name() {
-      return "onerror"_n;
-   }
-};
-
 // **Roa change** to facilitate native action
 struct reducepolicy {
    account_name owner;
@@ -180,7 +151,5 @@ FC_REFLECT( sysio::chain::updateauth                       , (account)(permissio
 FC_REFLECT( sysio::chain::deleteauth                       , (account)(permission) )
 FC_REFLECT( sysio::chain::linkauth                         , (account)(code)(type)(requirement) )
 FC_REFLECT( sysio::chain::unlinkauth                       , (account)(code)(type) )
-FC_REFLECT( sysio::chain::canceldelay                      , (canceling_auth)(trx_id) )
-FC_REFLECT( sysio::chain::onerror                          , (sender_id)(sent_trx) )
 // **Roa change**
 FC_REFLECT( sysio::chain::reducepolicy                     , (owner)(issuer)(net_weight)(cpu_weight)(ram_weight)(network_gen))
