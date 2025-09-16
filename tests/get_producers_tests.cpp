@@ -47,11 +47,11 @@ BOOST_AUTO_TEST_CASE( get_producers) { try {
 
 // this test verifies the normal case of get_producer, where the contents of the system contract's producers table is used
 BOOST_AUTO_TEST_CASE( get_producers_from_table) { try {
-      SKIP_TEST
+      SKIP_TEST // TODO: this needs to work, should update sysio system contract setprods to update producer table
       sysio_system::sysio_system_tester chain;
 
       // ensure that enough voting is occurring so that producer1111 is elected as the producer
-      chain.cross_15_percent_threshold();
+      //chain.cross_15_percent_threshold();
 
       sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
       sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };

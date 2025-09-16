@@ -299,11 +299,5 @@ namespace sysio {
              */
             asset get_allocation_for_tier(uint8_t tier);
 
-            bool is_sysio_account(const name& account) {
-                std::string acc_str = account.to_string();
-                if (acc_str == "sysio") return true;
-                if (acc_str.size() > 5 && acc_str.rfind("sysio.", 0) == 0) return true;
-                return false;
-            }
     }; // namespace roa
 } // namespace sysio

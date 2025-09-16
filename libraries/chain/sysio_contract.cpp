@@ -71,9 +71,7 @@ void apply_sysio_newaccount(apply_context& context) {
    auto create = context.get_action().data_as<newaccount>();
    try {
       context.require_authorization(create.creator);
-
-   //   context.require_write_lock( config::sysio_auth_scope );
-   auto& authorization = context.control.get_mutable_authorization_manager();
+      auto& authorization = context.control.get_mutable_authorization_manager();
 
       SYS_ASSERT(validate(create.owner), action_validate_exception, "Invalid owner authority");
       SYS_ASSERT(validate(create.active), action_validate_exception, "Invalid active authority");
@@ -87,9 +85,10 @@ void apply_sysio_newaccount(apply_context& context) {
 
       // Ensure only privileged accounts can create new accounts
       const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
-      SYS_ASSERT(creator.is_privileged(),
-                 action_validate_exception,
-                 "Only privileged accounts can create new accounts");
+      if( !creator.is_privileged() ) {
+         SYS_ASSERT( name_str.find( "sysio." ) != 0, action_validate_exception,
+                     "only privileged accounts can have names that start with 'sysio.'" );
+      }
 
       auto existing_account = db.find<account_object, by_name>(create.name);
       SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
@@ -109,34 +108,23 @@ void apply_sysio_newaccount(apply_context& context) {
          validate_authority_precondition(context, auth);
       }
 
-   const auto& owner_permission  = authorization.create_permission( create.name, config::owner_name, 0,
-                                                                    std::move(create.owner), context.trx_context.is_transient() );
-   const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
-                                                                    std::move(create.active), context.trx_context.is_transient() );
+      const auto& owner_permission  = authorization.create_permission( create.name, config::owner_name, 0,
+                                                                       std::move(create.owner), context.trx_context.is_transient() );
+      const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
+                                                                       std::move(create.active), context.trx_context.is_transient() );
 
       context.control.get_mutable_resource_limits_manager().initialize_account(create.name, context.trx_context.is_transient());
-
-      // Determine if this is a system account
-      bool is_system_account = (create.name == config::system_account_name) ||
-                               (name_str.size() > 5 && name_str.find("sysio.") == 0);
-
-      // If it's not a system account, set CPU, NET, RAM to 0
-      if (!is_system_account) {
-         // Non-system accounts start with zero resources
-         context.control.get_mutable_resource_limits_manager().set_account_limits(create.name, 0, 0, 0, context.trx_context.is_transient());
-      }
 
       int64_t ram_delta = config::overhead_per_account_ram_bytes;
       ram_delta += 2 * config::billable_size_v<permission_object>;
       ram_delta += owner_permission.auth.get_billable_size();
       ram_delta += active_permission.auth.get_billable_size();
 
-   if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
-      dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
-   }
+      if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
+         dm_logger->on_ram_trace(RAM_EVENT_ID("${name}", ("name", create.name)), "account", "add", "newaccount");
+      }
 
-      // Charge the RAM usage to sysio (system payer)
-      context.add_ram_usage(config::system_account_name, ram_delta);
+      context.add_ram_usage(create.name, ram_delta);
 
 } FC_CAPTURE_AND_RETHROW( (create) ) }
 
