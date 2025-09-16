@@ -1258,7 +1258,7 @@ class Cluster(object):
 
         Utils.Print("Activate ROA")
         action="activateroa"
-        data="{\"total_sys\":\"75496.0000 SYS\",\"bytes_per_unit\":\"104\"}"
+        data="{\"totalSys\":\"75496.0000 SYS\",\"bytesPerUnit\":\"104\"}"
         opts="--permission %s" % (sysioRoaAccount.name)
         trans=biosNode.pushMessage(sysioRoaAccount.name, action, data, opts)
         transId=Node.getTransId(trans[1])
@@ -1270,7 +1270,7 @@ class Cluster(object):
         # Register carl as a tier 1 node owner
         self.carlAccount = copy.deepcopy(sysioAccount)
         self.carlAccount.name = 'carl'
-        trans=biosNode.pushMessage('sysio.roa', 'regnodeowner', '{"owner": carl, "tier": 1}', '-p sysio.roa')
+        trans=biosNode.pushMessage('sysio.roa', 'forcereg', '{"owner": carl, "tier": 1}', '-p sysio.roa')
         transId=Node.getTransId(trans[1])
         Utils.Print("Wait for carl.")
         if not biosNode.waitForTransactionInBlock(transId):
