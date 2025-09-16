@@ -566,11 +566,11 @@ namespace sysio { namespace testing {
                                              mutable_variant_object()
                                              ("owner", a)
                                              ("issuer", NODE_DADDY)
-                                             ("net_weight", "0.0010 SYS")
-                                             ("cpu_weight", "0.0010 SYS")
-                                             ("ram_weight", "2.0000 SYS")
-                                             ("network_gen", 0)
-                                             ("time_block", 0)
+                                             ("netWeight", "0.0010 SYS")
+                                             ("cpuWeight", "0.0010 SYS")
+                                             ("ramWeight", "2.0000 SYS")
+                                             ("networkGen", 0)
+                                             ("timeBlock", 0)
          ));
       }
 
@@ -588,7 +588,7 @@ namespace sysio { namespace testing {
 
       wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
 
-      trx.actions.emplace_back(get_action(config::roa_account_name, "regnodeowner"_n,
+      trx.actions.emplace_back(get_action(config::roa_account_name, "forcereg"_n,
                                           vector<permission_level>{{config::roa_account_name, config::active_name}},
                                           mutable_variant_object()
                                           ("owner", owner)
@@ -610,11 +610,11 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("net_weight", net_weight)
-                                          ("cpu_weight", cpu_weight)
-                                          ("ram_weight", ram_weight)
-                                          ("network_gen", network_gen)
-                                          ("time_block", time_block)
+                                          ("netWeight", net_weight)
+                                          ("cpuWeight", cpu_weight)
+                                          ("ramWeight", ram_weight)
+                                          ("networkGen", network_gen)
+                                          ("timeBlock", time_block)
       ));
 
       set_transaction_headers(trx);
@@ -632,10 +632,10 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("net_weight", net_weight)
-                                          ("cpu_weight", cpu_weight)
-                                          ("ram_weight", ram_weight)
-                                          ("network_gen", network_gen)
+                                          ("netWeight", net_weight)
+                                          ("cpuWeight", cpu_weight)
+                                          ("ramWeight", ram_weight)
+                                          ("networkGen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -653,10 +653,10 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("net_weight", net_weight)
-                                          ("cpu_weight", cpu_weight)
-                                          ("ram_weight", ram_weight)
-                                          ("network_gen", network_gen)
+                                          ("netWeight", net_weight)
+                                          ("cpuWeight", cpu_weight)
+                                          ("ramWeight", ram_weight)
+                                          ("networkGen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -1245,8 +1245,8 @@ namespace sysio { namespace testing {
       // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
       push_action(config::roa_account_name, "activateroa"_n, config::roa_account_name,
                   fc::mutable_variant_object()
-                  ("total_sys", asset::from_string("75496.0000 SYS"))
-                  ("bytes_per_unit", 104)
+                  ("totalSys", asset::from_string("75496.0000 SYS"))
+                  ("bytesPerUnit", 104)
       );
 
       produce_block();
