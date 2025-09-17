@@ -3,6 +3,10 @@
 
 namespace sysio {
 
+    bool is_sysio_account(const name& account) {
+        return account.prefix() == "sysio"_n;
+    }
+
     void roa::activateroa(const asset& totalSys, const uint64_t& bytesPerUnit) {
         require_auth(get_self());
 
@@ -72,6 +76,18 @@ namespace sysio {
 
         // Set sysio new account limits.
         set_resource_limits(sys_account, sysio_ram_bytes, -1, -1);
+
+        // Add policy for sys_account for tracking RAM provided to accounts for account creation
+        policies_t policies(get_self(), sys_account.value);
+        policies.emplace(get_self(), [&](auto& row) {
+            row.owner = "sysio.acct"_n;
+            row.issuer = sys_account;
+            row.net_weight = asset(0, totalSys.symbol);
+            row.cpu_weight = asset(0, totalSys.symbol);
+            row.ram_weight = asset(0, totalSys.symbol);
+            row.bytes_per_unit = state.bytes_per_unit;
+            row.time_block = 0;
+        });
     };
 
     void roa::setbyteprice(const uint64_t& bytesPerUnit) {
@@ -91,6 +107,28 @@ namespace sysio {
         // Set values to table.
         roastate.set(state, get_self());
     };
+
+    void add_system_resources(const name& owner, int64_t net, int64_t cpu, int64_t ram) {
+        bool sysio_acct = is_sysio_account(owner);
+        // Get current resource limits
+        int64_t current_ram, current_net, current_cpu;
+        get_resource_limits(owner, current_ram, current_net, current_cpu);
+        if (current_ram < 0) current_ram = 0; // if unlimited use the new limit
+
+        // Set the system resource limits
+        auto updated_ram = current_ram + ram;
+        if (sysio_acct) {
+            // Infinite CPU/NET for sysio accounts
+            set_resource_limits(owner, updated_ram, -1, -1);
+        } else {
+            if (current_net < 0) current_net = 0; // if unlimited use the new limit
+            if (current_cpu < 0) current_cpu = 0; // if unlimited use the new limit
+            auto updated_net = current_net + net;
+            auto updated_cpu = current_cpu + cpu;
+            set_resource_limits(owner, updated_ram, updated_net, updated_cpu);
+        }
+
+    }
     
     void roa::addpolicy(const name& owner, const name& issuer, const asset& netWeight, const asset& cpuWeight, const asset& ramWeight, const uint32_t& timeBlock, const uint8_t& networkGen) {
         // Can only issue policies if you are the issuer.
@@ -157,14 +195,8 @@ namespace sysio {
             });
         }
 
-        // After updating resource limits, set the system resource limits
-        auto updated_res_itr = reslimit.find(owner.value);
-        if (sysio_acct) {
-            // Infinite CPU/NET for sysio accounts
-            set_resource_limits(owner, updated_res_itr->ram_bytes, -1, -1);
-        } else {
-            set_resource_limits(owner, updated_res_itr->ram_bytes, updated_res_itr->net_weight.amount, updated_res_itr->cpu_weight.amount);
-        }
+        // Update the system resource limits
+        add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
 
         // Add the new policy
         policies.emplace(get_self(), [&](auto& row) {
@@ -253,13 +285,8 @@ namespace sysio {
             row.ram_bytes += (uint64_t)ram_bytes_to_allocate;
         });
 
-        auto updated_res_itr = reslimit.find(owner.value);
-        if (sysio_acct) {
-            // sysio accounts remain infinite CPU/NET
-            set_resource_limits(owner, updated_res_itr->ram_bytes, -1, -1);
-        } else {
-            set_resource_limits(owner, updated_res_itr->ram_bytes, updated_res_itr->net_weight.amount, updated_res_itr->cpu_weight.amount);
-        }
+        // Update the system resource limits
+        add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
     };
 
     void roa::extendpolicy(const name& owner, const name& issuer, const uint32_t& newTimeBlock) {
@@ -627,6 +654,14 @@ namespace sysio {
                 row.count += 1;
             });
         }
+
+        // Update roa policy for sys_account for tracking RAM provided to accounts for account creation
+        // It is not expected that sysio.acct will use the RAM. Instead sysio.acct is a placeholder for
+        // all RAM provided to individual accounts for the account creation. See sysio.system newaccount.
+        auto sys_symbol = state.total_sys.symbol;
+        int64_t ram_weight_amount = sysiosystem::newaccount_ram * state.bytes_per_unit;
+        asset ram_weight = { ram_weight_amount, sys_symbol };
+        expandpolicy("sysio.acct"_n, "sysio"_n, {0, sys_symbol}, {0, sys_symbol}, ram_weight, 1);
 
         return new_username;
     }
