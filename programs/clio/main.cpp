@@ -305,10 +305,15 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
 }
 
 vector<chain::permission_level> get_account_permissions(const vector<string>& permissions, const chain::permission_level& default_permission) {
-   if (permissions.empty())
-      return vector<chain::permission_level>{default_permission};
-   else
+   if (permissions.empty()) {
+      vector<chain::permission_level> accountPermissions{default_permission};
+      if (!tx_payer.empty()) {
+         accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+      }
+      return accountPermissions;
+   } else {
       return get_account_permissions(tx_permission);
+   }
 }
 
 template<typename T>
