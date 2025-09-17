@@ -242,9 +242,6 @@ namespace sysiosystem {
                             ignore<authority> owner,
                             ignore<authority> active ) {
 
-      if( creator != get_self() ) {
-         check( sysio::get_sender() == "sysio.roa"_n, "Use roa::newuser to create accounts" );
-      }
       check( sysio::is_privileged(creator), "Only privileged accounts can create users");
 
       set_resource_limits( new_account_name, 0, 0, 0 );
