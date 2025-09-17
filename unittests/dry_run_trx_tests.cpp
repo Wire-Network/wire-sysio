@@ -209,6 +209,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, dry_run_trx_tester) { try {
    create_account("sysio.token"_n);
    set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
 
    create_accounts( {"alice"_n} );
 
@@ -239,6 +240,7 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, dry_run_trx_tester) { try {
    create_account("sysio.token"_n);
    set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   set_privileged("sysio.token"_n);
 
    create_accounts( {"alice"_n} );
 

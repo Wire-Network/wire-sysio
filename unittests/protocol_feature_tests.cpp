@@ -1510,7 +1510,7 @@ BOOST_AUTO_TEST_CASE( set_proposed_producers_ex_test ) { try {
            "alice does not have permission to call this API"
    );
 
-   c.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,  fc::mutable_variant_object()("account", alice_account)("is_priv", 1));
+   c.set_privileged(alice_account);
 
    //ensure it can be called w/ privilege
    BOOST_REQUIRE_EQUAL(c.push_action(action({{ alice_account, permission_name("active") }}, alice_account, action_name(), {} ), alice_account.to_uint64_t()), c.success());

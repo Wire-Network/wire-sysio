@@ -28,6 +28,7 @@ public:
 
       set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
       set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+      set_privileged( "sysio.token"_n );
 
       produce_blocks();
 

@@ -75,6 +75,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
 
    set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+   set_privileged("sysio.token"_n);
    produce_blocks(1);
 
    // create currency
@@ -148,6 +149,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
 
    set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+   set_privileged("sysio.token"_n);
    produce_blocks(1);
 
    // create currency
@@ -328,6 +330,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, validating_tester ) try {
 
    set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+   set_privileged("sysio.token"_n);
    produce_blocks(1);
 
    // create currency
