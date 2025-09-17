@@ -22,7 +22,6 @@ elseif( USE_SYSIO_CDT_1_8_X )
 endif()
 
 add_subdirectory(sysio.msig)
-add_subdirectory(sysio.roa)
 add_subdirectory(sysio.system)
 add_subdirectory(sysio.token)
 add_subdirectory(sysio.wrap)

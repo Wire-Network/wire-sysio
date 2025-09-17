@@ -8,11 +8,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "total_sys",
+                    "name": "totalSys",
                     "type": "asset"
                 },
                 {
-                    "name": "bytes_per_unit",
+                    "name": "bytesPerUnit",
                     "type": "uint64"
                 }
             ]
@@ -30,23 +30,23 @@
                     "type": "name"
                 },
                 {
-                    "name": "net_weight",
+                    "name": "netWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpu_weight",
+                    "name": "cpuWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "ram_weight",
+                    "name": "ramWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "time_block",
+                    "name": "timeBlock",
                     "type": "uint32"
                 },
                 {
-                    "name": "network_gen",
+                    "name": "networkGen",
                     "type": "uint8"
                 }
             ]
@@ -64,19 +64,19 @@
                     "type": "name"
                 },
                 {
-                    "name": "net_weight",
+                    "name": "netWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpu_weight",
+                    "name": "cpuWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "ram_weight",
+                    "name": "ramWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "network_gen",
+                    "name": "networkGen",
                     "type": "uint8"
                 }
             ]
@@ -94,8 +94,94 @@
                     "type": "name"
                 },
                 {
-                    "name": "new_time_block",
+                    "name": "newTimeBlock",
                     "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "finalizereg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "forcereg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
+            "name": "initnodereg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "newuser",
+            "base": "",
+            "fields": [
+                {
+                    "name": "creator",
+                    "type": "name"
+                },
+                {
+                    "name": "nonce",
+                    "type": "name"
+                },
+                {
+                    "name": "pubkey",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "nodeownerreg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "status",
+                    "type": "uint8"
+                },
+                {
+                    "name": "trx_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "trx_signature",
+                    "type": "bytes"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint128"
                 }
             ]
         },
@@ -198,20 +284,6 @@
             ]
         },
         {
-            "name": "regnodeowner",
-            "base": "",
-            "fields": [
-                {
-                    "name": "owner",
-                    "type": "name"
-                },
-                {
-                    "name": "tier",
-                    "type": "uint8"
-                }
-            ]
-        },
-        {
             "name": "reslimit",
             "base": "",
             "fields": [
@@ -260,7 +332,61 @@
             "base": "",
             "fields": [
                 {
-                    "name": "bytes_per_unit",
+                    "name": "bytesPerUnit",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "setpending",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                },
+                {
+                    "name": "trxId",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "blockNum",
+                    "type": "uint128"
+                },
+                {
+                    "name": "sig",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "sponsor",
+            "base": "",
+            "fields": [
+                {
+                    "name": "nonce",
+                    "type": "name"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "sponsorcount",
+            "base": "",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "count",
                     "type": "uint64"
                 }
             ]
@@ -270,40 +396,67 @@
         {
             "name": "activateroa",
             "type": "activateroa",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Activate ROA Contract\nsummary: 'Activates ROA setting {{nowrap max_ram_bytes}} and ram price {{nowrap ram_byte_price}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} activates the ROA contract and sets sysio.roa's {{max_ram_bytes}} to the networks capacity of RAM. It also sets the price of 1 byte of RAM {{ram_byte_price}}. Finally it adds system accounts to the reslimit table."
+            "ricardian_contract": ""
         },
         {
             "name": "addpolicy",
             "type": "addpolicy",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Creates A New Policy \nsummary: 'Creates a new policy under {{nowrap issuer}} granting resources to {{nowrap owner}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Creates a new policy scoped to {{issuer}} allocating {{net_weight}}, {{cpu_weight}}, and {{ram_weight}} worth of their unallocated SYS to {{owner}}. This increases {{owner}}'s resource allotment tracked in the reslimit table. This policy can't be reclaimed or reduced until the current block number reaches {{time_block}}"
+            "ricardian_contract": ""
         },
         {
             "name": "expandpolicy",
             "type": "expandpolicy",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Increases An Existing Policies Weights \nsummary: 'Increases {{nowrap issuer}} weights of allocated SYS for {{nowrap owner}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Finds the existing Policy {{issuer}} set for {{owner}}. Adds {{net_weight}}, {{cpu_weight}}, and {{ram_weight}} to the previous weights of the policy. Then it increments {{owner}}'s reslimit values as well as {{issuer}}'s allocated_sys in the Node Owners table."
+            "ricardian_contract": ""
         },
         {
             "name": "extendpolicy",
             "type": "extendpolicy",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Extends a policies time_block period \nsummary: 'Extends {{nowrap issuer}}'s policy for {{nowrap owner}} by setting time_block to {{nowrap new_time_block}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Finds the existing Policy {{issuer}} set for {{owner}} and increases the existing time_block on the policy to {{new_time_block}}"
+            "ricardian_contract": ""
+        },
+        {
+            "name": "finalizereg",
+            "type": "finalizereg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "forcereg",
+            "type": "forcereg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initnodereg",
+            "type": "initnodereg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "newuser",
+            "type": "newuser",
+            "ricardian_contract": ""
         },
         {
             "name": "reducepolicy",
             "type": "reducepolicy",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Decreases An Existing Policies Weights \nsummary: 'Decreases {{nowrap issuer}} weights of allocated SYS for {{nowrap owner}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Finds the existing Policy {{issuer}} set for {{owner}}, ensures the current block number is >= to the policie's time_block. You can not reduce a policy otherwise. Then it reduces the policies weights by {{net_weight}} {{cpu_weight}} {{ram_weight}} respectively, it will check that {{ram_weight}} doesn't lower it beyond what is already used vs allocated."
-        },
-        {
-            "name": "regnodeowner",
-            "type": "regnodeowner",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Registers Node Owners\nsummary: 'Registers {{nowrap owner}} as a {{nowrap tier}} Node Owner'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Reigsters {{owner}} as a {{tier}} Node Owner and creates a default policy for them."
+            "ricardian_contract": ""
         },
         {
             "name": "setbyteprice",
             "type": "setbyteprice",
-            "ricardian_contract": "---\nspec_version: \"0.2.0\"\ntitle: Updates the price of RAM\nsummary: 'Sets our bytes_per_unit to {{nowrap bytes_per_unit}}'\nicon: https://raw.githubusercontent.com/eosnetworkfoundation/eos-system-contracts/main/contracts/icons/admin.png#9bf1cec664863bd6aaac0f814b235f8799fb02c850e9aa5da34e8a004bd6518e\n---\n\n{{$action.account}} Updates the price of ram to {{bytes_per_unit}}"
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setpending",
+            "type": "setpending",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
+        {
+            "name": "nodeownerreg",
+            "type": "nodeownerreg",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
         {
             "name": "nodeowners",
             "type": "nodeowners",
@@ -331,9 +484,28 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
+        },
+        {
+            "name": "sponsorcount",
+            "type": "sponsorcount",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "sponsors",
+            "type": "sponsor",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
         }
     ],
     "ricardian_clauses": [],
     "variants": [],
-    "action_results": []
+    "action_results": [
+        {
+            "name": "newuser",
+            "result_type": "name"
+        }
+    ]
 }
