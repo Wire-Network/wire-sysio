@@ -125,12 +125,6 @@ public:
        return r;
     }
 
-    auto set_privileged( name account ) {
-       auto r = base_tester::push_action(config::system_account_name, "setpriv"_n, config::system_account_name,  mvo()("account", account)("is_priv", 1));
-       produce_block();
-       return r;
-    }
-
     auto register_producer(name producer) {
        auto r = base_tester::push_action(config::system_account_name, "regproducer"_n, producer, mvo()
                        ("producer",  name(producer))

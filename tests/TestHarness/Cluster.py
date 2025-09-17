@@ -1165,6 +1165,11 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to publish contract %s." % (contract))
             return None
 
+        trans=biosNode.setPriv(sysioTokenAccount, sysioAccount, isPriv=True, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to set sysio.token as privileged")
+            return None
+
         # Create currency0000, followed by issue currency0000
         contract=sysioTokenAccount.name
         Utils.Print("push create action to %s contract" % (contract))

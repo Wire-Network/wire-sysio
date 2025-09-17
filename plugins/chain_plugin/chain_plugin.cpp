@@ -2546,26 +2546,26 @@ namespace detail {
 chain::symbol read_only::extract_core_symbol()const {
    symbol core_symbol(0);
 
-   // The following code makes assumptions about the contract deployed on sysio account (i.e. the system contract) and how it stores its data.
+   // The following code makes assumptions about the contract deployed on sysio.token account and how it stores its data.
    const auto& d = db.db();
-   const auto* t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( "sysio"_n, "sysio"_n, "rammarket"_n ));
-   if( t_id != nullptr ) {
+
+   const auto& idx = d.get_index<chain::table_id_multi_index, chain::by_code_scope_table>();
+   auto lower_bound_lookup_tuple = std::make_tuple( "sysio.token"_n, name(std::numeric_limits<uint64_t>::lowest()), "stat"_n );
+   auto upper_bound_lookup_tuple = std::make_tuple( "sysio.token"_n, name(std::numeric_limits<uint64_t>::max()), "stat"_n );
+   auto lower = idx.lower_bound( lower_bound_lookup_tuple );
+   auto upper = idx.upper_bound( upper_bound_lookup_tuple );
+   if (lower != upper) {
       const auto &idx = d.get_index<key_value_index, by_scope_primary>();
-      auto it = idx.find(boost::make_tuple( t_id->id, sysio::chain::string_to_symbol_c(4,"RAMCORE") ));
-      if( it != idx.end() ) {
-         detail::ram_market_exchange_state_t ram_market_exchange_state;
-
-         fc::datastream<const char *> ds( it->value.data(), it->value.size() );
-
-         try {
-            fc::raw::unpack(ds, ram_market_exchange_state);
-         } catch( ... ) {
-            return core_symbol;
-         }
-
-         if( ram_market_exchange_state.core_symbol.get_symbol().valid() ) {
-            core_symbol = ram_market_exchange_state.core_symbol.get_symbol();
-         }
+      auto it = idx.find(boost::make_tuple( lower->id, lower->scope.to_uint64_t() ));
+      if (it != idx.end()) {
+         vector<char> data;
+         copy_inline_row(*it, data);
+         fc::datastream<const char *> ds(data.data(), data.size());
+         read_only::get_currency_stats_result result;
+         fc::raw::unpack(ds, result.supply);
+         fc::raw::unpack(ds, result.max_supply);
+         fc::raw::unpack(ds, result.issuer);
+         return result.max_supply.get_symbol();
       }
    }
 

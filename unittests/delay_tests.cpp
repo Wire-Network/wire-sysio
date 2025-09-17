@@ -20,12 +20,8 @@ static void create_accounts(validating_tester& chain) {
    chain.create_accounts({"sysio.msig"_n, "sysio.token"_n});
    chain.produce_blocks(10);
 
-   chain.push_action(config::system_account_name,
-      "setpriv"_n,
-      config::system_account_name,
-      mvo()
-         ("account", "sysio.msig")
-         ("is_priv", 1) );
+   chain.set_privileged("sysio.msig"_n);
+   chain.set_privileged("sysio.token"_n);
 
    chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
@@ -871,10 +867,16 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
            ("maximum_supply", "9000000.0000 CUR" )
    );
    chain.push_action("sysio.token"_n, name("issue"), "sysio.token"_n, fc::mutable_variant_object()
-           ("to",       "tester")
+           ("to",       "sysio.token")
            ("quantity", "100.0000 CUR")
            ("memo", "for stuff")
    );
+   chain.push_action("sysio.token"_n, name("transfer"), "sysio.token"_n, fc::mutable_variant_object()
+        ("from", "sysio.token")
+        ("to", "tester")
+        ("quantity", "100.0000 CUR")
+        ("memo", "for stuff" )
+    );
 
    //create a permission level with delay 30 days and associate it with token transfer
    auto trace = chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()

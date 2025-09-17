@@ -985,8 +985,7 @@ BOOST_FIXTURE_TEST_CASE(get_wasm_parameters_test, validating_tester) {
 
    BOOST_CHECK_THROW(check_wasm_params(fc::raw::pack(uint32_t{0}, wasm_config(original_params))), unaccessible_api);
 
-   push_action( config::system_account_name, "setpriv"_n, config::system_account_name,
-                fc::mutable_variant_object()("account", "test"_n)("is_priv", true) );
+   set_privileged("test"_n);
 
    check_wasm_params(fc::raw::pack(uint32_t{0}, wasm_config(original_params)));
    // Extra space is left unmodified

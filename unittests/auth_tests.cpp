@@ -365,10 +365,7 @@ try {
    // Note: Only privileged accounts can create accounts enforced by sysio.system contract
 
    // Creating the same new account, this time with privileged account
-   auto r = chain.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
-     mutable_variant_object()
-     ("account", name("joe"))
-     ("is_priv", 1));
+   chain.set_privileged("joe"_n);
    chain.produce_block();
 
    // Creating account with sysio. prefix with privileged account
@@ -428,10 +425,7 @@ try {
    chain.create_account(acc1a);
 
    //  TODO: acc1 needs to be privileged to create accounts, but then it doesn't use CPU or Net....  need to do something else...
-   auto r = chain.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,
-     mutable_variant_object()
-     ("account", acc1)
-     ("is_priv", 1));
+   chain.set_privileged(acc1);
    chain.produce_block();
 
    chain.produce_block();
@@ -594,6 +588,7 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
 
    chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   chain.set_privileged("sysio.token"_n);
 
    chain.produce_blocks();
    chain.create_account("tester"_n);

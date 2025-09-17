@@ -35,6 +35,7 @@ public:
 
       set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
       set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+      set_privileged("sysio.token"_n);
 
       {
          const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
@@ -218,12 +219,7 @@ public:
          create_account( "sysio.msig"_n, config::system_account_name, false, false, false, false );
          produce_block();
 
-         auto trace = base_tester::push_action(config::system_account_name, "setpriv"_n,
-                                               config::system_account_name,  mutable_variant_object()
-                                               ("account", "sysio.msig")
-                                               ("is_priv", 1)
-         );
-
+         set_privileged("sysio.msig"_n);
          set_code( "sysio.msig"_n, test_contracts::sysio_msig_wasm() );
          set_abi( "sysio.msig"_n, test_contracts::sysio_msig_abi() );
 

@@ -145,6 +145,7 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    wdump((fc::json::to_pretty_string(r2)));
    c.set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    c.set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+   c.set_privileged("sysio.token"_n);
    c.produce_blocks(10);
 
 
