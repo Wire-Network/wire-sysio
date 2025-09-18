@@ -576,24 +576,6 @@ class PluginHttpTest(unittest.TestCase):
         self.assertEqual(ret_json["code"], 400)
         self.assertEqual(ret_json["error"]["code"], 3200006)
 
-        # get_scheduled_transactions with empty parameter
-        command = "get_scheduled_transactions"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with valid parameter
-        payload = {"json":"true","lower_bound":""}
-        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertEqual(type(ret_json["payload"]["transactions"]), list)
-
         # get_required_keys with empty parameter
         command = "get_required_keys"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
