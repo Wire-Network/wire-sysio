@@ -131,9 +131,6 @@ try:
         Print(f"Transfer funds {transferAmount} from account {cluster.sysioAccount.name} to {account.name}")
         trans=nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=False)
     nonProdNode.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
-    for account in accounts:
-        trans=nonProdNode.delegatebw(account, 20000000.0000, 20000000.0000, waitForTransBlock=False, exitOnError=True)
-    nonProdNode.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
 
     # ***   vote using accounts   ***
 
