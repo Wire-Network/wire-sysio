@@ -99,7 +99,7 @@ namespace sysiosystem {
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
-                                (last_producer_schedule_update)
+                                (last_producer_schedule_update)(last_pervote_bucket_fill)
                                 (total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
                                 (last_producer_schedule_size) )
    };
