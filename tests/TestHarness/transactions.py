@@ -38,7 +38,7 @@ class Transactions(NodeopQueries):
         if nodeOwner is not None and (stakeNet > 0 or stakeCPU > 0 or buyRAM > 0):
             if not waitForTransBlock:
                 self.waitForTransactionInBlock(transId)
-            trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM)
+            trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM, waitForTransBlock=waitForTransBlock)
             transId=NodeopQueries.getTransId(trans)
 
         return trans
