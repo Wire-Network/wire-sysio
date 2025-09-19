@@ -1,10 +1,15 @@
 #!/bin/bash
 
+set -e
+
 if [ $# -ne 1 ]; then
     echo Usage: $0 my_new_plugin
     echo ... where my_new_plugin is the name of the plugin you want to create
     exit 1
 fi
+
+scriptDir=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
+cd "$scriptDir" || exit
 
 pluginName=$1
 
