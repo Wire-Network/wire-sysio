@@ -57,7 +57,7 @@ wasmFile='nested_container_multi_index.wasm'
 abiFile='nested_container_multi_index.abi'
 
 def create_action(action, data, contract_account, usr):
-    cmdArr= [Utils.SysClientPath, '-v', 'push', 'action', contract_account, action, data, '-p', usr+'@active']
+    cmdArr= [Utils.SysClientPath, '-v', 'push', 'action', contract_account, action, data, '-p', usr+'@active', '--payer', usr]
     clargs = node.sysClientArgs().split()
     for x in clargs[::-1]:
         cmdArr.insert(1, x)
