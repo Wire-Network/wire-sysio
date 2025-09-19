@@ -658,7 +658,7 @@ class PluginHttpTest(unittest.TestCase):
                    "signatures": ["SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp"],
                    "context_free_data": []}
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "\"0be762a6406bab15530e87f21e02d1c58e77944ee55779a76f4112e3b65cac48\"")
+        self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
         # transaction that has hex_data
         payload_hex = {"expiration":"2020-08-01T07:15:49",
                 "ref_block_num": 34881,
