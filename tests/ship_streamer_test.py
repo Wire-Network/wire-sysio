@@ -137,16 +137,6 @@ try:
     cluster.waitOnClusterSync(blockAdvancing=3)
     start_block_num = shipNode.getBlockNum()
 
-    # vote a,b,c (node0)  u (node1)
-    voteProducers=[]
-    voteProducers.append("defproducera")
-    voteProducers.append("defproducerb")
-    voteProducers.append("defproducerc")
-    voteProducers.append("defproduceru")
-    for account in accounts:
-        Print(f"Account {account.name} vote for producers={voteProducers}")
-        trans=prodNode.vote(account, voteProducers, exitOnError=True, waitForTransBlock=False)
-
     #verify nodes are in sync and advancing
     cluster.waitOnClusterSync(blockAdvancing=3)
     Print("Shutdown unneeded bios node")
