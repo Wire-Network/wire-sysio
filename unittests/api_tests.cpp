@@ -2160,7 +2160,6 @@ BOOST_FIXTURE_TEST_CASE(types_tests, validating_tester) { try {
  * permission_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(permission_tests, validating_tester) { try {
-   SKIP_TEST
    produce_blocks(1);
    create_account( "testapi"_n );
 
