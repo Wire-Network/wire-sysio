@@ -920,7 +920,6 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(checktime_pause_max_trx_cpu_extended_test) { try {
-   SKIP_TEST
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
    auto& cfg = conf_genesis.second.initial_configuration;
@@ -938,7 +937,7 @@ BOOST_AUTO_TEST_CASE(checktime_pause_max_trx_cpu_extended_test) { try {
    }
    t.execute_setup_policy( setup_policy::full );
    t.produce_blocks(2);
-   t.create_account( "pause"_n );
+   t.create_account( "pause"_n, config::system_account_name, false, false, false, false );
    t.set_code( "pause"_n, test_contracts::test_api_wasm() );
    t.produce_blocks(1);
 
