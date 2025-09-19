@@ -55,11 +55,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "mp_uint16"
                 }
             ]
@@ -69,11 +69,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "op_uint16"
                 }
             ]
@@ -83,11 +83,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "pr_uint16"
                 }
             ]
@@ -97,11 +97,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "set_uint16"
                 }
             ]
@@ -111,11 +111,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "tup_uint16"
                 }
             ]
@@ -125,11 +125,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "uint16"
                 }
             ]
@@ -153,11 +153,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "first",
+                    "name": "key",
                     "type": "uint16"
                 },
                 {
-                    "name": "second",
+                    "name": "value",
                     "type": "vec_uint16"
                 }
             ]
