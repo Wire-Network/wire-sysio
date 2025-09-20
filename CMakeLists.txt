@@ -1,13 +1,10 @@
 cmake_minimum_required( VERSION 3.16 )
 
-project( wire-sysio )
-include(CTest) # suppresses DartConfiguration.tcl error
-enable_testing()
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
-
-include( GNUInstallDirs )
-include( MASSigning )
+# Set vcpkg toolchain if not already set
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        CACHE STRING "Vcpkg toolchain file")
+endif()
 
 set( CMAKE_CXX_STANDARD 20 )
 set( CMAKE_CXX_EXTENSIONS ON )
@@ -19,10 +16,23 @@ set(VERSION_PATCH 0)
 set(VERSION_SUFFIX rc1)
 
 if(VERSION_SUFFIX)
-    set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
+  set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}-${VERSION_SUFFIX}")
 else()
-    set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
+  set(VERSION_FULL "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}")
 endif()
+
+project( wire-sysio )
+
+include(./CMakeModules/dependencies.cmake)
+
+include(CTest) # suppresses DartConfiguration.tcl error
+enable_testing()
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+
+include( GNUInstallDirs )
+include( MASSigning )
+
 
 
 # Options
@@ -132,8 +142,8 @@ option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for Leap" OFF)
 set(ENABLE_COVERAGE_TESTING FALSE CACHE BOOL "Build Leap for code coverage analysis")
 
 if(ENABLE_COVERAGE_TESTING)
-  SET(CMAKE_C_FLAGS   "--coverage ${CMAKE_C_FLAGS}")
-  SET(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
+  set(CMAKE_C_FLAGS   "--coverage ${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "--coverage ${CMAKE_CXX_FLAGS}")
   find_program( LCOV_PATH lcov )
   find_program( LLVMCOV_PATH  llvm-cov )
   find_program( GENHTML_PATH NAMES genhtml)
@@ -218,13 +228,13 @@ install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_
 install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
 configure_file(LICENSE.md                                                  licenses/sysio/LICENSE.md        COPYONLY)
-configure_file(libraries/softfloat/COPYING.txt                             licenses/sysio/LICENSE.softfloat COPYONLY)
+# Note: softfloat and CLI11 license files are no longer available since moving to vcpkg
+# The licenses would need to be copied separately from vcpkg or original repositories
 configure_file(libraries/wasm-jit/LICENSE                                  licenses/sysio/LICENSE.wavm      COPYONLY)
 configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/sysio/LICENSE.secp256k1 COPYONLY)
 configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/sysio/LICENSE.rapidjson COPYONLY)
 configure_file(libraries/sys-vm/LICENSE                                    licenses/sysio/LICENSE.sys-vm    COPYONLY)
 configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/sysio/LICENSE.prom      COPYONLY)
-configure_file(programs/clio/LICENSE.CLI11                                 licenses/sysio/LICENSE.CLI11     COPYONLY)
 configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/sysio/LICENSE.bls12-381 COPYONLY)
 configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/sysio/LICENSE.boringssl COPYONLY)
 
@@ -258,7 +268,7 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
       COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/leap_testing/bin)
 
    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/python3/dist-packages/TestHarness DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/python3/dist-packages COMPONENT dev EXCLUDE_FROM_ALL)
-   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/leap_testing/bin DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/leap_testing COMPONENT dev EXCLUDE_FROM_ALL)
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/leap_testing/bin/* DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/leap_testing COMPONENT dev EXCLUDE_FROM_ALL)
 else()
    # The following install(SCRIPT ...) steps are necessary for `make dev-install` to work on cmake versions < 3.21.
    install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/scripts/install_testharness_symlinks.cmake COMPONENT dev EXCLUDE_FROM_ALL)
@@ -266,13 +276,8 @@ else()
    # The `make package` installation of symlinks happens via the `postinst` script installed in cmake.package via the line below
 endif()
 
-configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/sys-util
-               ${CMAKE_BINARY_DIR}/programs/sys-util/bash-completion/completions/sys-util COPYONLY)
-configure_file(${CMAKE_SOURCE_DIR}/libraries/cli11/bash-completion/completions/clio
-               ${CMAKE_BINARY_DIR}/programs/clio/bash-completion/completions/clio COPYONLY)
-
-install(FILES libraries/cli11/bash-completion/completions/sys-util DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
-install(FILES libraries/cli11/bash-completion/completions/clio DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/bash-completion/completions COMPONENT base)
+# Note: CLI11 bash completion files are no longer available since moving to vcpkg
+# The completions would need to be created separately or copied from the original CLI11 repository
 
 # Add the boost submodule we used to build to our install package, so headers can be found for libtester
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries/boost/"

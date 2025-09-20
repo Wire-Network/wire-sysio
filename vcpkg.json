@@ -1,0 +1,10 @@
+{
+  "name": "wire-sysio",
+  "version": "5.2.0-rc1",
+  "dependencies": [
+    "softfloat",
+    "libsodium",
+    "cli11",
+    "boost"
+  ]
+}

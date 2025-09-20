@@ -68,16 +68,11 @@ set( fc_sources
      )
 
 file( GLOB_RECURSE fc_headers ${CMAKE_CURRENT_SOURCE_DIR} *.hpp *.h )
-
 add_library(fc ${fc_sources} ${fc_headers})
 
-# Make sure fc is only built after libsodium is installed
-add_dependencies(fc libsodium)
-
-# Tell fc where to find libsodium headers & link it
-target_include_directories(fc PUBLIC ${LIBSODIUM_INCLUDE_DIR})
-target_link_libraries(fc PUBLIC ${LIBSODIUM_LIBRARIES})
-
+# SODIUM(LIBSODIUM) IS NOW INTEGRATED VIA `vcpkg`
+# AND IS CONFIGURED IN THE TOP-LEVEL `CMakeModules/dependencies.cmake`
+target_link_libraries(fc PUBLIC libsodium::libsodium)
 
 find_path(GMP_INCLUDE_DIR NAMES gmp.h)
 find_library(GMP_LIBRARY gmp)
@@ -100,12 +95,6 @@ target_link_libraries(fc PUBLIC GMP::gmp)
 find_package(ZLIB REQUIRED)
 
 target_include_directories(fc PUBLIC include)
-target_include_directories(fc PUBLIC ${LIBSODIUM_INCLUDE_DIR})
-
-target_link_libraries(fc
-  PUBLIC
-    ${LIBSODIUM_LIBRARIES}
-)
 
 # try and make this very clear that this json parser is intended only for webauthn parsing..
 set_source_files_properties(src/crypto/elliptic_webauthn.cpp PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include/fc/crypto/webauthn_json/include")
@@ -121,7 +110,7 @@ endif()
 target_link_libraries( fc PUBLIC Boost::date_time Boost::chrono Boost::iostreams Boost::interprocess Boost::multi_index Boost::dll
                                  Boost::multiprecision Boost::beast Boost::asio Boost::thread Boost::unit_test_framework Threads::Threads
                                  boringssl ZLIB::ZLIB ${PLATFORM_SPECIFIC_LIBS} ${CMAKE_DL_LIBS} secp256k1 bls12-381 
-                                 ${LIBSODIUM_LIBRARIES} ${security_framework} ${corefoundation_framework})
+                                 ${security_framework} ${corefoundation_framework})
 
 add_subdirectory( test )
 
