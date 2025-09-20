@@ -24,7 +24,8 @@ set(ENABLE_TESTS OFF CACHE BOOL "Build tests")
 set(ENABLE_ADDRESS_SANITIZER OFF CACHE BOOL "Use address sanitizer")
 set(ENABLE_UNDEFINED_BEHAVIOR_SANITIZER OFF CACHE BOOL "Use UB sanitizer")
 set(ENABLE_PROFILE OFF CACHE BOOL "Enable for profile builds")
+
 if(sys-vm IN_LIST SYSIO_WASM_RUNTIMES OR sys-vm-jit IN_LIST SYSIO_WASM_RUNTIMES)
   add_subdirectory(sys-vm)
 endif()
-add_subdirectory(prometheus)
+
