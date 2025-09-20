@@ -113,14 +113,12 @@ try:
             prodNodes.append(node)
     nonProdNodeCount = len(nonProdNodes)
 
-    # ***   delegate bandwidth to accounts   ***
-
     node=nonProdNodes[0]
     checkTransIds = []
     startTime = time.perf_counter()
     Print("Create new accounts via %s" % (cluster.sysioAccount.name))
     for account in accounts:
-        trans = node.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0, waitForTransBlock=(account == accounts[-1]), stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
+        trans = node.createInitializeAccount(account, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=(account == accounts[-1]), stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
         checkTransIds.append(Node.getTransId(trans))
 
     nextTime = time.perf_counter()
@@ -137,11 +135,6 @@ try:
     nextTime = time.perf_counter()
     Print("Transfer funds took %s sec" % (nextTime - startTime))
     startTime = nextTime
-
-    Print("Delegate Bandwidth to new accounts")
-    for account in accounts:
-        trans=node.delegatebw(account, 200.0000, 200.0000, waitForTransBlock=(account == accounts[-1]), exitOnError=True, reportStatus=False)
-        checkTransIds.append(Node.getTransId(trans))
 
     nextTime = time.perf_counter()
     Print("Delegate Bandwidth took %s sec" % (nextTime - startTime))

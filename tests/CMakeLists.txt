@@ -32,7 +32,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_forked_chain_test.py ${CMAKE_C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_short_fork_take_over_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_short_fork_take_over_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_run_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_run_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_under_min_avail_ram.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_under_min_avail_ram.py COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_voting_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_voting_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_irreversible_mode_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_irreversible_mode_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_read_terminate_at_block_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_read_terminate_at_block_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_chainbase_allocation_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_chainbase_allocation_test.py COPYONLY)
@@ -209,13 +208,8 @@ set_tests_properties(nodeop_forked_chain_lr_test PROPERTIES LABELS long_running_
 add_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v --wallet-port 9901 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_contrl_c_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
-add_test(NAME nodeop_voting_lr_test COMMAND tests/nodeop_voting_test.py -v --wallet-port 9902 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_voting_lr_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
-# ERROR - "cannot undelegate bandwidth until the chain is activated (at least 15% of all tokens participate in voting)"
-
 add_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
-# ERROR - "Contract cannot pay and no distinct user found to fallback"
 
 add_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_irreversible_mode_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)

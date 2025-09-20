@@ -553,7 +553,6 @@ BOOST_FIXTURE_TEST_CASE(require_notice_tests, validating_tester) { try {
    } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
-   SKIP_TEST
    fc::temp_directory tempdir;
    validating_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -567,10 +566,12 @@ BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
    chain.set_code( "testapi2"_n, test_contracts::test_api_wasm() );
    chain.produce_blocks(1);
 
+   // wire-sysio does not have protocol feature ram_restrictions, ram restrictions are enforced from genesis
+   // notify is restricted fist by ram payer enforcement
    BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify",
                                               fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | "testapi"_n.to_uint64_t() ) ),
-                          subjective_block_production_exception,
-                          fc_exception_message_is("Cannot charge RAM to other accounts during notify.")
+                          unsatisfied_authorization,
+                          fc_exception_message_is("Requested payer testapi did not authorize payment")
    );
 
 

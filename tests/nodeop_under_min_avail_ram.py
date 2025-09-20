@@ -77,21 +77,19 @@ try:
     # create accounts via sysio as otherwise a bid is needed
     for account in accounts:
         Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
-        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
+        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
         transferAmount="70000000.0000 {0}".format(CORE_SYMBOL)
         Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
         nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
-        trans=nonProdNode.delegatebw(account, 1000000.0000, 68000000.0000, waitForTransBlock=True, exitOnError=True)
 
     contractAccount=createAccountKeys(1)[0]
     contractAccount.name="contracttest"
     walletMgr.importKey(contractAccount, testWallet)
     Print("Create new account %s via %s" % (contractAccount.name, cluster.sysioAccount.name))
-    trans=nonProdNode.createInitializeAccount(contractAccount, cluster.sysioAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
+    trans=nonProdNode.createInitializeAccount(contractAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=500000, waitForTransBlock=True, stakeNet=50000, stakeCPU=50000, buyRAM=50000, exitOnError=True)
     transferAmount="90000000.0000 {0}".format(CORE_SYMBOL)
     Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, contractAccount.name))
     nonProdNode.transferFunds(cluster.sysioAccount, contractAccount, transferAmount, "test transfer", waitForTransBlock=True)
-    trans=nonProdNode.delegatebw(contractAccount, 1000000.0000, 88000000.0000, waitForTransBlock=True, exitOnError=True)
 
     contractDir="unittests/test-contracts/integration_test"
     wasmFile="integration_test.wasm"
@@ -119,7 +117,7 @@ try:
             fromAccount=accounts[fromIndex]
             toAccount=accounts[toIndex]
             data="{\"from\":\"%s\",\"to\":\"%s\",\"num\":%d}" % (fromAccount.name, toAccount.name, numAmount)
-            opts="--permission %s@active --permission %s@active --expiration 90" % (contract, fromAccount.name)
+            opts="--permission %s@active --permission %s@active --expiration 90 --payer %s" % (contract, fromAccount.name, fromAccount.name)
             try:
                 trans=nodes[count % numNodes].pushMessage(contract, action, data, opts)
                 if trans is None or not trans[0]:
@@ -216,7 +214,7 @@ try:
             fromAccount=accounts[fromIndex]
             toAccount=accounts[toIndex]
             data="{\"from\":\"%s\",\"to\":\"%s\",\"num\":%d}" % (fromAccount.name, toAccount.name, numAmount)
-            opts="--permission %s@active --permission %s@active --expiration 90" % (contract, fromAccount.name)
+            opts="--permission %s@active --permission %s@active --expiration 90 --payer %s" % (contract, fromAccount.name, fromAccount.name)
             try:
                 trans=nodes[count % numNodes].pushMessage(contract, action, data, opts)
                 if trans is None or not trans[0]:
@@ -275,7 +273,7 @@ try:
         toAccount=accounts[toIndex]
         node=nodes[fromIndexOffset]
         data="{\"from\":\"%s\",\"to\":\"%s\",\"num\":%d}" % (fromAccount.name, toAccount.name, numAmount)
-        opts="--permission %s@active --permission %s@active --expiration 90" % (contract, fromAccount.name)
+        opts="--permission %s@active --permission %s@active --expiration 90 --payer %s" % (contract, fromAccount.name, fromAccount.name)
         try:
             trans=node.pushMessage(contract, action, data, opts)
             if trans is None or not trans[0]:

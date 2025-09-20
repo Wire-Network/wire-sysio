@@ -352,7 +352,6 @@ def chainApiTests():
     runReadOnlyTrxAndRpcInParallel("chain", "get_transaction_id", code=400, payload = {"ref_block_num":"1"})
     runReadOnlyTrxAndRpcInParallel("chain", "push_block", code=202, payload = {"block":"signed_block"})
     runReadOnlyTrxAndRpcInParallel("chain", "get_producer_schedule", "active")
-    runReadOnlyTrxAndRpcInParallel("chain", "get_scheduled_transactions", "transactions", payload = {"json":"true","lower_bound":""})
 
 def netApiTests():
     # NET APIs
