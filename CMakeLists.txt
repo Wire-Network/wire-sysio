@@ -23,12 +23,13 @@ endif()
 
 project( wire-sysio )
 
-include(./CMakeModules/dependencies.cmake)
+include(./cmake/compiler-config.cmake)
+include(./cmake/dependencies.cmake)
 
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include( GNUInstallDirs )
 include( MASSigning )
@@ -206,37 +207,28 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_
 
 set(SYSIO_ROOT_DIR "${CMAKE_BINARY_DIR}/lib")
 # legacy sysio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 # new sysio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
 
 set(SYSIO_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake @ONLY)
 # legacy sysio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 # new sysio CMake files
-configure_file(${CMAKE_SOURCE_DIR}/CMakeModules/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake @ONLY)
 install(FILES ${CMAKE_BINARY_DIR}/modules/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 install(FILES ${CMAKE_BINARY_DIR}/modules/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
-install(FILES ${CMAKE_SOURCE_DIR}/CMakeModules/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
-configure_file(LICENSE.md                                                  licenses/sysio/LICENSE.md        COPYONLY)
-# Note: softfloat and CLI11 license files are no longer available since moving to vcpkg
-# The licenses would need to be copied separately from vcpkg or original repositories
-configure_file(libraries/wasm-jit/LICENSE                                  licenses/sysio/LICENSE.wavm      COPYONLY)
-configure_file(libraries/libfc/secp256k1/secp256k1/COPYING                 licenses/sysio/LICENSE.secp256k1 COPYONLY)
-configure_file(libraries/libfc/include/fc/crypto/webauthn_json/license.txt licenses/sysio/LICENSE.rapidjson COPYONLY)
-configure_file(libraries/sys-vm/LICENSE                                    licenses/sysio/LICENSE.sys-vm    COPYONLY)
-configure_file(libraries/prometheus/prometheus-cpp/LICENSE                 licenses/sysio/LICENSE.prom      COPYONLY)
-configure_file(libraries/libfc/libraries/bls12-381/LICENSE                 licenses/sysio/LICENSE.bls12-381 COPYONLY)
-configure_file(libraries/libfc/libraries/boringssl/boringssl/src/LICENSE   licenses/sysio/LICENSE.boringssl COPYONLY)
+include(cmake/licenses.cmake)
 
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/" COMPONENT base)
 
