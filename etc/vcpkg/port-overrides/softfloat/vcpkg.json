@@ -1,0 +1,14 @@
+{
+  "name": "softfloat",
+  "version": "3.0.0",
+  "description": "Berkeley SoftFloat 3 - Software IEC/IEEE Floating-Point Arithmetic Package",
+  "homepage": "https://github.com/Wire-Network/berkeley-softfloat-3",
+  "supports": "!uwp",
+  "dependencies": [
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    { "name": "vcpkg-cmake-config", "host": true }
+  ]
+}

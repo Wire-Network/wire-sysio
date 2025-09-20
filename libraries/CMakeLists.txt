@@ -27,4 +27,5 @@ if(sys-vm IN_LIST SYSIO_WASM_RUNTIMES OR sys-vm-jit IN_LIST SYSIO_WASM_RUNTIMES)
   find_package(sys-vm REQUIRED)
   # add_library(sys-vm ALIAS sys-vm::sys-vm)
 endif()
+add_subdirectory(prometheus)
 
