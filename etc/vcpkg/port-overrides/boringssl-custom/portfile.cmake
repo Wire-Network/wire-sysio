@@ -50,7 +50,7 @@ vcpkg_execute_required_process(
   LOGNAME boringssl-custom-generate-build-files
 )
 
-file(READ "${CMAKE_CURRENT_LIST_DIR}/boringsslCustomCMakeLists.txt.cmake" BORINGSSL_CUSTOM_CMAKELISTS_TXT)
+file(READ "${CMAKE_CURRENT_LIST_DIR}/boringssl-customCMakeLists.txt.cmake" BORINGSSL_CUSTOM_CMAKELISTS_TXT)
 file(APPEND "${SOURCE_PATH}/CMakeLists.txt" "${BORINGSSL_CUSTOM_CMAKELISTS_TXT}")
 
 # NOW CONFIGURE AND INSTALL USING CMAKE
@@ -82,7 +82,7 @@ vcpkg_copy_pdbs()
 #file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug)
 
 configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/boringsslCustomConfig.cmake.in"
-  "${CURRENT_PACKAGES_DIR}/share/libsodium/libsodiumConfig.cmake"
+  "${CMAKE_CURRENT_LIST_DIR}/boringssl-customConfig.cmake.in"
+  "${CURRENT_PACKAGES_DIR}/share/boringssl-custom/boringssl-customConfig.cmake"
   @ONLY
 )
