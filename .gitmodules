@@ -5,15 +5,15 @@
 	path = libraries/chainbase
 	url = https://github.com/Wire-Network/chainbase
 
-[submodule "libraries/rapidjson"]
-	path = libraries/rapidjson
-	url = https://github.com/Wire-Network/rapidjson
+; [submodule "libraries/rapidjson"]
+; 	path = libraries/rapidjson
+; 	url = https://github.com/Wire-Network/rapidjson
 [submodule "tests/abieos"]
 	path = tests/abieos
 	url = https://github.com/Wire-Network/abieos
-[submodule "libraries/libfc/include/fc/crypto/webauthn_json"]
-	path = libraries/libfc/include/fc/crypto/webauthn_json
-	url = https://github.com/Wire-Network/rapidjson
+; [submodule "libraries/libfc/include/fc/crypto/webauthn_json"]
+; 	path = libraries/libfc/include/fc/crypto/webauthn_json
+; 	url = https://github.com/Wire-Network/rapidjson
 [submodule "libraries/libfc/secp256k1/secp256k1"]
 	path = libraries/libfc/secp256k1/secp256k1
 	url = https://github.com/Wire-Network/secp256k1
@@ -29,6 +29,7 @@
 [submodule "libraries/libfc/libraries/boringssl/boringssl"]
 	path = libraries/libfc/libraries/boringssl/boringssl
 	url = https://github.com/AntelopeIO/boringssl-build
+
 [submodule "libraries/sys-vm"]
 	path = libraries/sys-vm
 	url = https://github.com/Wire-Network/eos-vm.git

@@ -6,56 +6,44 @@ set(BOOST_VERSION 1.83.0)
 set(vcpkgPrefixDir "${CMAKE_BINARY_DIR}/vcpkg_installed/x64-linux")
 message(NOTICE "VCPKG PREFIX Directory: ${vcpkgPrefixDir}")
 list(APPEND CMAKE_PREFIX_PATH "${vcpkgPrefixDir}/lib/cmake" "${vcpkgPrefixDir}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 # LOAD CMAKE TOOLS
 find_package(PkgConfig REQUIRED)
 
 # FIND PACKAGES WITH VCPKG
 # BOOST
-find_package(Boost ${BOOST_VERSION}
-  EXACT
-  CONFIG
-  REQUIRED
-  COMPONENTS
-  assign
-  system
-  multiprecision
-  signals2
-  beast
-  property_tree
-  headers
-  hana
-  bimap
-  multi_index
-  filesystem
-  dll
-  lockfree
-  process
-  program_options
-  iostreams
-  date_time
-  regex
-  thread
-  chrono
-  context
-  coroutine
-  atomic
-  interprocess
-  unit_test_framework
-)
+include(${CMAKE_SOURCE_DIR}/cmake/dependencies.boost.cmake)
 
-add_library(boost_numeric_ublas INTERFACE)
-add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
+# GMP
+pkg_check_modules(gmp REQUIRED IMPORTED_TARGET gmp)
+add_library(GMP::gmp ALIAS PkgConfig::gmp)
 
-find_package(Boost ${BOOST_VERSION}
-  EXACT
-  CONFIG
-  REQUIRED
-  COMPONENTS
-  accumulators
-)
+# Catch2
+pkg_check_modules(catch2 REQUIRED IMPORTED_TARGET catch2)
+add_library(catch2 ALIAS PkgConfig::catch2)
+add_library(catch2::catch2 ALIAS PkgConfig::catch2)
+
+
+#find_path(GMP_INCLUDE_DIR NAMES gmp.h)
+#find_library(GMP_LIBRARY gmp)
+#if(NOT GMP_LIBRARY MATCHES ${CMAKE_SHARED_LIBRARY_SUFFIX})
+#  message( FATAL_ERROR "GMP shared library not found" )
+#endif()
+#set(gmp_library_type SHARED)
+#message(STATUS "GMP: ${GMP_LIBRARY}, ${GMP_INCLUDE_DIR}")
+#add_library(GMP::gmp ${gmp_library_type} IMPORTED)
+#set_target_properties(
+#  GMP::gmp PROPERTIES
+#  IMPORTED_LOCATION ${GMP_LIBRARY}
+#  INTERFACE_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR}
+#)
 
 # OTHER DEPENDENCIES
+find_package(Threads)
+
+find_package(ZLIB REQUIRED)
+find_package(RapidJSON CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(libsodium CONFIG REQUIRED)
 find_package(prometheus-cpp CONFIG REQUIRED)

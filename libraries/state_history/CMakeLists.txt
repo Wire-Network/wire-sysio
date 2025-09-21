@@ -9,7 +9,7 @@ add_library( state_history
            )
 
 target_link_libraries( state_history 
-                       PUBLIC sysio_chain fc chainbase softfloat
+                       PUBLIC sysio_chain fc chainbase softfloat::softfloat
                      )
 
 target_include_directories( state_history

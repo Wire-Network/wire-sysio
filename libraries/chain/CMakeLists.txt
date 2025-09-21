@@ -78,9 +78,6 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/transaction.cpp
 )
 
-add_library(sysio_rapidjson INTERFACE)
-target_include_directories(sysio_rapidjson INTERFACE ../rapidjson/include)
-
 ## SORT .cpp by most likely to change / break compile
 add_library( sysio_chain
              merkle.cpp
@@ -140,11 +137,31 @@ add_library( sysio_chain
              ${HEADERS}
              )
 
-target_link_libraries( sysio_chain PUBLIC bn256 fc chainbase sysio_rapidjson Logging IR WAST WASM
-                       softfloat builtins ${CHAIN_SYSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
-                       Boost::signals2 Boost::hana Boost::property_tree Boost::multi_index Boost::asio Boost::lockfree
-                       Boost::assign Boost::accumulators
-                     )
+target_link_libraries(
+  sysio_chain
+  PUBLIC
+  bn256
+  fc
+  chainbase
+  rapidjson
+  Logging
+  IR
+  WAST
+  WASM
+  softfloat::softfloat
+  builtins
+  ${CHAIN_SYSVM_LIBRARIES}
+  ${LLVM_LIBS}
+  ${CHAIN_RT_LINKAGE}
+  Boost::signals2
+  Boost::hana
+  Boost::property_tree
+  Boost::multi_index
+  Boost::asio
+  Boost::lockfree
+  Boost::assign
+  Boost::accumulators
+)
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
                                    "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"

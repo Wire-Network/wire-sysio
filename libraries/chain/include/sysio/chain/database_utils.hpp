@@ -2,7 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <fc/io/raw.hpp>
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 
 namespace sysio { namespace chain {
 
