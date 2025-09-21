@@ -70,47 +70,44 @@ set( fc_sources
 file( GLOB_RECURSE fc_headers ${CMAKE_CURRENT_SOURCE_DIR} *.hpp *.h )
 add_library(fc ${fc_sources} ${fc_headers})
 
-# SODIUM(LIBSODIUM) IS NOW INTEGRATED VIA `vcpkg`
-# AND IS CONFIGURED IN THE TOP-LEVEL `CMakeModules/dependencies.cmake`
-target_link_libraries(fc PUBLIC libsodium::libsodium)
-
-find_path(GMP_INCLUDE_DIR NAMES gmp.h)
-find_library(GMP_LIBRARY gmp)
-if(NOT GMP_LIBRARY MATCHES ${CMAKE_SHARED_LIBRARY_SUFFIX})
-  message( FATAL_ERROR "GMP shared library not found" )
-endif()
-set(gmp_library_type SHARED)
-message(STATUS "GMP: ${GMP_LIBRARY}, ${GMP_INCLUDE_DIR}")
-add_library(GMP::gmp ${gmp_library_type} IMPORTED)
-set_target_properties(
-  GMP::gmp PROPERTIES
-  IMPORTED_LOCATION ${GMP_LIBRARY}
-  INTERFACE_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR}
-)
-
-target_link_libraries(fc PUBLIC GMP::gmp)
-
-# fc picks up a dependency on zlib via Boost::iostreams, however in some versions of cmake/boost (depending on if CMake config
-#  files are used) the Boost::iostreams target does not have a dependency on zlib itself so add it explicitly
-find_package(ZLIB REQUIRED)
-
 target_include_directories(fc PUBLIC include)
 
 # try and make this very clear that this json parser is intended only for webauthn parsing..
-set_source_files_properties(src/crypto/elliptic_webauthn.cpp PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include/fc/crypto/webauthn_json/include")
+#set_source_files_properties(src/crypto/elliptic_webauthn.cpp PROPERTIES INCLUDE_DIRECTORIES "${CMAKE_CURRENT_SOURCE_DIR}/include/fc/crypto/webauthn_json/include")
 
 if(WIN32)
   target_link_libraries( fc PUBLIC ws2_32 mswsock userenv )
+elseif(APPLE)
+  find_library(security_framework Security REQUIRED)
+  find_library(corefoundation_framework CoreFoundation REQUIRED)
+  target_link_libraries( fc PUBLIC ${security_framework} ${corefoundation_framework})
 endif()
 
-if(APPLE)
-  find_library(security_framework Security)
-  find_library(corefoundation_framework CoreFoundation)
-endif()
-target_link_libraries( fc PUBLIC Boost::date_time Boost::chrono Boost::iostreams Boost::interprocess Boost::multi_index Boost::dll
-                                 Boost::multiprecision Boost::beast Boost::asio Boost::thread Boost::unit_test_framework Threads::Threads
-                                 boringssl ZLIB::ZLIB ${PLATFORM_SPECIFIC_LIBS} ${CMAKE_DL_LIBS} secp256k1 bls12-381 
-                                 ${security_framework} ${corefoundation_framework})
+target_link_libraries(
+  fc
+  PUBLIC
+  Boost::date_time
+  Boost::chrono
+  Boost::iostreams
+  Boost::interprocess
+  Boost::multi_index
+  Boost::dll
+  Boost::multiprecision
+  Boost::beast
+  Boost::asio
+  Boost::thread
+  Boost::unit_test_framework
+  Threads::Threads
+  libsodium::libsodium
+  GMP::gmp
+  ZLIB::ZLIB
+  rapidjson
+  boringssl
+  ${PLATFORM_SPECIFIC_LIBS}
+  ${CMAKE_DL_LIBS}
+  secp256k1
+  bls12-381
+)
 
 add_subdirectory( test )
 

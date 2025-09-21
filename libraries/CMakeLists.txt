@@ -1,7 +1,7 @@
 set(CHAINBASE_INSTALL_COMPONENT "dev")
 set(FC_INSTALL_COMPONENT "dev")
 set(APPBASE_INSTALL_COMPONENT "dev")
-set(SOFTFLOAT_INSTALL_COMPONENT "dev")
+#set(SOFTFLOAT_INSTALL_COMPONENT "dev")
 set(SYSVM_INSTALL_COMPONENT "dev")
 set(BN256_INSTALL_COMPONENT "dev")
 
@@ -18,7 +18,6 @@ add_subdirectory(testing)
 add_subdirectory(version)
 add_subdirectory(state_history)
 
-set(USE_EXISTING_SOFTFLOAT ON CACHE BOOL "use pre-exisiting softfloat lib")
 set(ENABLE_TOOLS OFF CACHE BOOL "Build tools")
 set(ENABLE_TESTS OFF CACHE BOOL "Build tests")
 set(ENABLE_ADDRESS_SANITIZER OFF CACHE BOOL "Use address sanitizer")

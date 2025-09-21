@@ -6,10 +6,23 @@
     "libsodium",
     "cli11",
     "boost",
+    "gmp",
+    "zlib",
+    "catch2",
     {
       "name": "prometheus-cpp",
       "version>=": "1.3.0",
       "features": []
+    },
+    {
+      "name": "rapidjson",
+      "version>=": "2022-06-28#3"
+    }
+  ],
+  "overrides": [
+    {
+      "name": "rapidjson",
+      "version": "2022-06-28#3"
     }
   ]
 }
