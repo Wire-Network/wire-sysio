@@ -1,0 +1,11 @@
+{
+  "name": "boringssl-custom",
+  "version": "1.0.0",
+  "description": "Custom BoringSSL port for wire.network. Derived from the LEAP build process",
+  "homepage": "https://wire.network/",
+  "supports": "!uwp",
+  "dependencies": [
+    { "name": "vcpkg-cmake", "host": true },
+    { "name": "vcpkg-cmake-config", "host": true }
+  ]
+}
