@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
    crtd_it = find_s_root_ext(header_exts);
 
-   BOOST_CHECK(crtd_it != header_exts.end());
+   BOOST_REQUIRE(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext5 = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header5 = crtd_s_ext5.s_header_data;
    BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header5.contract_name);
