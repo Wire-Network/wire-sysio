@@ -2398,14 +2398,13 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.sysio_any_linked_actions = get_linked_actions(chain::config::sysio_any_name);
 
    // Load ROA account code/ABI
-   const auto& code_account = d.get<account_object,by_name>(config::roa_account_name);
+   const auto* code_account = d.find<account_object,by_name>(config::roa_account_name);
    struct http_params_t {
       std::optional<vector<char>> total_resources;
    };
-
    http_params_t http_params;
 
-   if( abi_def abi; abi_serializer::to_abi(code_account.abi, abi) ) {
+   if( abi_def abi; code_account != nullptr && abi_serializer::to_abi(code_account->abi, abi) ) {
 
       const auto token_code = "sysio.token"_n;
 
