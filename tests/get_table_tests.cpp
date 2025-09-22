@@ -319,7 +319,6 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
-   SKIP_TEST
    create_account("test"_n);
 
    // setup contract and abi

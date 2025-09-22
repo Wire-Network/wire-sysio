@@ -2404,14 +2404,6 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
 
    auto res = json.as<sysio::chain_apis::read_only::get_account_results>();
    if (!json_format) {
-      asset staked;
-      asset unstaking;
-
-      if( res.core_liquid_balance ) {
-         unstaking = asset( 0, res.core_liquid_balance->get_symbol() ); // Correct core symbol for unstaking asset.
-         staked = asset( 0, res.core_liquid_balance->get_symbol() );    // Correct core symbol for staked asset.
-      }
-
       std::cout << "created: " << res.created.to_iso_string() << std::endl;
 
       if(res.privileged) std::cout << "privileged: true" << std::endl;
@@ -2532,33 +2524,6 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
                 << indent << "quota: " << std::setw(15) << to_pretty_net(res.ram_quota) << "  used: " << std::setw(15) << to_pretty_net(res.ram_usage) << std::endl << std::endl;
 
       std::cout << "net bandwidth: " << std::endl;
-      if ( res.total_resources.is_object() ) {
-         auto net_total = to_asset(res.total_resources.get_object()["net_weight"].as_string());
-
-         if( net_total.get_symbol() != unstaking.get_symbol() ) {
-            // Core symbol of nodeop responding to the request is different than core symbol built into clio
-            unstaking = asset( 0, net_total.get_symbol() ); // Correct core symbol for unstaking asset.
-            staked = asset( 0, net_total.get_symbol() ); // Correct core symbol for staked asset.
-         }
-
-         if( res.self_delegated_bandwidth.is_object() ) {
-            asset net_own =  asset::from_string( res.self_delegated_bandwidth.get_object()["net_weight"].as_string() );
-            staked = net_own;
-
-            auto net_others = net_total - net_own;
-
-            std::cout << indent << "staked:" << std::setw(20) << net_own
-                      << std::string(11, ' ') << "(total stake delegated from account to self)" << std::endl
-                      << indent << "delegated:" << std::setw(17) << net_others
-                      << std::string(11, ' ') << "(total staked delegated to account from others)" << std::endl;
-         }
-         else {
-            auto net_others = net_total;
-            std::cout << indent << "delegated:" << std::setw(17) << net_others
-                      << std::string(11, ' ') << "(total staked delegated to account from others)" << std::endl;
-         }
-      }
-
 
       auto to_pretty_time = []( int64_t nmicro, uint8_t width_for_units = 5 ) {
          if(nmicro == -1) {
@@ -2606,26 +2571,6 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
 
       std::cout << "cpu bandwidth:" << std::endl;
 
-      if ( res.total_resources.is_object() ) {
-         auto cpu_total = to_asset(res.total_resources.get_object()["cpu_weight"].as_string());
-
-         if( res.self_delegated_bandwidth.is_object() ) {
-            asset cpu_own = asset::from_string( res.self_delegated_bandwidth.get_object()["cpu_weight"].as_string() );
-            staked += cpu_own;
-
-            auto cpu_others = cpu_total - cpu_own;
-
-            std::cout << indent << "staked:" << std::setw(20) << cpu_own
-                      << std::string(11, ' ') << "(total stake delegated from account to self)" << std::endl
-                      << indent << "delegated:" << std::setw(17) << cpu_others
-                      << std::string(11, ' ') << "(total staked delegated to account from others)" << std::endl;
-         } else {
-            auto cpu_others = cpu_total;
-            std::cout << indent << "delegated:" << std::setw(17) << cpu_others
-                      << std::string(11, ' ') << "(total staked delegated to account from others)" << std::endl;
-         }
-      }
-
       std::cout << std::fixed << setprecision(3);
       std::cout << indent << std::left << std::setw(11) << "used:" << std::right << std::setw(18);
       if( res.cpu_limit.current_used ) {
@@ -2643,76 +2588,13 @@ void get_account( const string& accountName, const string& coresym, bool json_fo
          std::cout << std::endl;
       }
 
-      if( res.refund_request.is_object() ) {
-         auto obj = res.refund_request.get_object();
-         auto request_time = fc::time_point_sec::from_iso_string( obj["request_time"].as_string() );
-         fc::time_point refund_time = request_time.to_time_point() + fc::days(3);
-         auto now = res.head_block_time;
-         asset net = asset::from_string( obj["net_amount"].as_string() );
-         asset cpu = asset::from_string( obj["cpu_amount"].as_string() );
-         unstaking = net + cpu;
-
-         if( unstaking > asset( 0, unstaking.get_symbol() ) ) {
-            std::cout << std::fixed << setprecision(3);
-            std::cout << "unstaking tokens:" << std::endl;
-            std::cout << indent << std::left << std::setw(25) << "time of unstake request:" << std::right << std::setw(20) << request_time.to_iso_string();
-            if( now >= refund_time ) {
-               std::cout << " (available to claim now with 'sysio::refund' action)\n";
-            } else {
-               std::cout << " (funds will be available in " << to_pretty_time( (refund_time - now).count(), 0 ) << ")\n";
-            }
-            std::cout << indent << std::left << std::setw(25) << "from net bandwidth:" << std::right << std::setw(18) << net << std::endl;
-            std::cout << indent << std::left << std::setw(25) << "from cpu bandwidth:" << std::right << std::setw(18) << cpu << std::endl;
-            std::cout << indent << std::left << std::setw(25) << "total:" << std::right << std::setw(18) << unstaking << std::endl;
-            std::cout << std::endl;
-         }
-      }
-
       if( res.core_liquid_balance ) {
          std::cout << res.core_liquid_balance->get_symbol().name() << " balances: " << std::endl;
          std::cout << indent << std::left << std::setw(11)
                    << "liquid:" << std::right << std::setw(18) << *res.core_liquid_balance << std::endl;
-         std::cout << indent << std::left << std::setw(11)
-                   << "staked:" << std::right << std::setw(18) << staked << std::endl;
-         std::cout << indent << std::left << std::setw(11)
-                   << "unstaking:" << std::right << std::setw(18) << unstaking << std::endl;
-         std::cout << indent << std::left << std::setw(11) << "total:" << std::right << std::setw(18) << (*res.core_liquid_balance + staked + unstaking) << std::endl;
          std::cout << std::endl;
       }
 
-      if( res.rex_info.is_object() ) {
-         auto& obj = res.rex_info.get_object();
-         asset vote_stake = asset::from_string( obj["vote_stake"].as_string() );
-         asset rex_balance = asset::from_string( obj["rex_balance"].as_string() );
-         std::cout << rex_balance.get_symbol().name() << " balances: " << std::endl;
-         std::cout << indent << std::left << std::setw(11)
-                   << "balance:" << std::right << std::setw(18) << rex_balance << std::endl;
-         std::cout << indent << std::left << std::setw(11)
-                   << "staked:" << std::right << std::setw(18) << vote_stake << std::endl;
-         std::cout << std::endl;
-      }
-
-      if ( res.voter_info.is_object() ) {
-         auto& obj = res.voter_info.get_object();
-         string proxy = obj["proxy"].as_string();
-         if ( proxy.empty() ) {
-            auto& prods = obj["producers"].get_array();
-            std::cout << "producers:";
-            if ( !prods.empty() ) {
-               for ( size_t i = 0; i < prods.size(); ++i ) {
-                  if ( i%3 == 0 ) {
-                     std::cout << std::endl << indent;
-                  }
-                  std::cout << std::setw(16) << std::left << prods[i].as_string();
-               }
-               std::cout << std::endl;
-            } else {
-               std::cout << indent << "<not voted>" << std::endl;
-            }
-         } else {
-            std::cout << "proxy:" << indent << proxy << std::endl;
-         }
-      }
       std::cout << std::endl;
    } else {
       std::cout << fc::json::to_pretty_string(json) << std::endl;
