@@ -7,7 +7,10 @@
 #ifdef __cplusplus
 #include <vector>
 #include <list>
-namespace sysio { namespace chain {class apply_context;}}
+#include <exception>
+namespace sysio::chain {
+   class apply_context;
+}
 #endif
 
 struct sys_vm_oc_control_block {
@@ -38,3 +41,9 @@ struct sys_vm_oc_control_block {
    int64_t max_linear_memory_pages;
    void* globals;
 };
+
+#ifdef __cplusplus
+namespace sysio::chain::sysvmoc {
+   using control_block = sys_vm_oc_control_block;
+}
+#endif

@@ -1,14 +1,15 @@
 #pragma once
 
 #include <sysio/chain/wasm_sysio_constraints.hpp>
-#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/gs_seg_helpers.h>
+#include <fc/exception/exception.hpp>
 
 #include <stdint.h>
 #include <stddef.h>
 
-namespace sysio { namespace chain { namespace sysvmoc {
+namespace sysio::chain::sysvmoc {
 
 class memory {
       static constexpr uint64_t intrinsic_count                   = intrinsic_table_size();
@@ -66,7 +67,7 @@ class memory {
       uint8_t* fullpage_base;
 };
 
-}}}
+}
 
 #define OFFSET_OF_CONTROL_BLOCK_MEMBER(M) (-(int)sysio::chain::sysvmoc::memory::cb_offset + (int)offsetof(sysio::chain::sysvmoc::control_block, M))
 #define OFFSET_OF_FIRST_INTRINSIC ((int)-sysio::chain::sysvmoc::memory::first_intrinsic_offset)
