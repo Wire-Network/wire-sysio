@@ -14,6 +14,7 @@ BOOST_AUTO_TEST_SUITE(test_s_root_extension)
 BOOST_AUTO_TEST_CASE(nothing_there) {
    try {
       tester chain;
+      chain.produce_block();
       chain.create_account("abbie"_n);
       chain.create_account("john"_n);
       chain.create_account("tommy"_n);
@@ -29,6 +30,7 @@ BOOST_AUTO_TEST_CASE(nothing_to_report) {
       matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
       matches[0].add_action("batchw"_n, contract_action_match::match_type::exact);
       tester chain(matches);
+      chain.produce_block();
 
       chain.create_account("abbie"_n);
       chain.create_account("john"_n);
@@ -46,6 +48,9 @@ BOOST_AUTO_TEST_CASE(something_to_report) {
       matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
       matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
       tester chain(matches);
+      chain.produce_block(); // 4
+      chain.create_account("brian"_n);
+      chain.produce_block(); // 5
       auto find_s_root_ext = [](const auto& exts) {
          return std::find_if(exts.begin(), exts.end(),
             [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
