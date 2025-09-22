@@ -10,6 +10,8 @@
     "zlib",
     "catch2",
     "boringssl-custom",
+    "secp256k1-internal",
+    "bn256",
     {
       "name": "prometheus-cpp",
       "version>=": "1.3.0",

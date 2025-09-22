@@ -1,12 +1,5 @@
-add_subdirectory( secp256k1 )
-add_subdirectory( libraries/bn256/src )
+#add_subdirectory( secp256k1 )
 add_subdirectory( libraries/bls12-381 )
-add_subdirectory( libraries/boringssl )
-
-set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
-set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-find_package(Threads)
-
 
 set( fc_sources
      src/uint128.cpp
@@ -102,11 +95,13 @@ target_link_libraries(
   GMP::gmp
   ZLIB::ZLIB
   rapidjson
-  boringssl
+  boringssl::crypto
+  boringssl::decrepit
+
+  secp256k1::secp256k1-internal
+  bls12-381
   ${PLATFORM_SPECIFIC_LIBS}
   ${CMAKE_DL_LIBS}
-  secp256k1
-  bls12-381
 )
 
 add_subdirectory( test )

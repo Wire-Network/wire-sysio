@@ -39,12 +39,18 @@ add_library(catch2::catch2 ALIAS PkgConfig::catch2)
 #  INTERFACE_INCLUDE_DIRECTORIES ${GMP_INCLUDE_DIR}
 #)
 
-# OTHER DEPENDENCIES
-find_package(Threads)
+# THREADS
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
 
+# OTHER DEPENDENCIES
 find_package(ZLIB REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
 find_package(libsodium CONFIG REQUIRED)
 find_package(prometheus-cpp CONFIG REQUIRED)
 find_package(softfloat CONFIG REQUIRED)
+find_package(secp256k1-internal CONFIG REQUIRED)
+find_package(bn256 CONFIG REQUIRED)
+find_package(boringssl-custom CONFIG REQUIRED)
