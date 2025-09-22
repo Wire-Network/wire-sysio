@@ -318,53 +318,6 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( get_table_by_seckey_test, validating_tester ) try {
-   produce_blocks(2);
-
-   create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
-      "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n, "sysio.rex"_n });
-
-   std::vector<account_name> accs{"inita"_n, "initb"_n, "initc"_n, "initd"_n};
-   create_accounts(accs);
-   produce_block();
-
-   set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
-   set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
-   set_privileged("sysio.token"_n);
-   produce_blocks(1);
-
-   // create currency
-   auto act = mutable_variant_object()
-         ("issuer",       "sysio")
-         ("maximum_supply", sysio::chain::asset::from_string("1000000000.0000 SYS"));
-   push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
-
-   // issue
-   for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
-   }
-   produce_blocks(1);
-
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name,  mutable_variant_object()
-                            ("version", 0)
-                            ("core", "4,SYS"));
-
-   // bidname
-   auto bidname = [this]( const account_name& bidder, const account_name& newname, const asset& bid ) {
-      return push_action( "sysio"_n, "bidname"_n, {{bidder, config::active_name}, {bidder, config::sysio_payer_name}}, fc::mutable_variant_object()
-                          ("bidder",  bidder)
-                          ("newname", newname)
-                          ("bid", bid)
-                          );
-   };
-
-} FC_LOG_AND_RETHROW()
-
-
 BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    SKIP_TEST
    create_account("test"_n);
