@@ -575,7 +575,6 @@ BOOST_FIXTURE_TEST_CASE( entry_import, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( entry_db, validating_tester ) try {
-   SKIP_TEST
    create_accounts( {"entrydb"_n} );
    produce_block();
 
