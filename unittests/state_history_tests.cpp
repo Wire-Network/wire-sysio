@@ -505,10 +505,12 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
 
    BOOST_AUTO_TEST_CASE(test_deltas_contract_several_rows){
       SKIP_TEST
-      table_deltas_tester chain(setup_policy::full);
+      // test expects only bios contract to be loaded
+      table_deltas_tester chain(setup_policy::preactivate_feature_only);
+      chain.set_bios_contract();
 
       chain.produce_block();
-      chain.create_account("tester"_n);
+      chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
 
       chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
       chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
@@ -542,15 +544,15 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
 
       std::multiset<std::string> expected_contract_row_table_names {"abihash", "abihash", "hashobjs", "hashobjs", "hashobjs", "numobjs", "numobjs", "numobjs"};
 
-      std::multiset<uint64_t> expected_contract_row_table_primary_keys {6138663577826885632U,14605619288908759040U, 0, 1 ,2, 0, 1, 2};
+      std::multiset<uint64_t> expected_contract_row_table_primary_keys {14389258095169634304U,14605619288908759040U, 0, 1 ,2, 0, 1, 2};
       std::multiset<std::string> result_contract_row_table_names;
       std::multiset<uint64_t> result_contract_row_table_primary_keys;
       for(auto &contract_row : contract_rows) {
          result_contract_row_table_names.insert(contract_row.table.to_string());
          result_contract_row_table_primary_keys.insert(contract_row.primary_key);
       }
-      BOOST_REQUIRE(expected_contract_row_table_names == result_contract_row_table_names);
-      BOOST_REQUIRE(expected_contract_row_table_primary_keys == result_contract_row_table_primary_keys);
+      BOOST_TEST_REQUIRE(expected_contract_row_table_names == result_contract_row_table_names);
+      BOOST_TEST_REQUIRE(expected_contract_row_table_primary_keys == result_contract_row_table_primary_keys);
 
       chain.produce_block();
 
