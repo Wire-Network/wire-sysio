@@ -140,7 +140,7 @@ add_library( sysio_chain
 target_link_libraries(
   sysio_chain
   PUBLIC
-  bn256
+  bn256::bn256
   fc
   chainbase
   rapidjson

@@ -35,17 +35,10 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads)
 
+set( CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
 if ( APPLE )
-   set( CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations" )
-else ( APPLE )
-   set( CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
+   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations" )
 endif ( APPLE )
-
-set( Boost_USE_MULTITHREADED      ON )
-set( Boost_USE_STATIC_LIBS ON CACHE STRING "ON or OFF" )
-set( BOOST_EXCLUDE_LIBRARIES "mysql" )
-
-add_subdirectory( @CMAKE_INSTALL_FULL_DATAROOTDIR@/leap_boost ${PROJECT_BINARY_DIR}/libraries/boost EXCLUDE_FROM_ALL)
 
 find_library(libtester sysio_testing @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchain sysio_chain @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
@@ -60,12 +53,13 @@ find_library(libwast WAST @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libir IR     @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(liblogging Logging @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libruntime Runtime @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-find_library(libsoftfloat softfloat @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-find_library(libbscrypto bscrypto @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-find_library(libdecrepit decrepit @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libchainbase chainbase @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 find_library(libbuiltins builtins @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
-find_library(libsodium sodium @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+
+#find_library(libsoftfloat softfloat @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+#find_library(libbscrypto bscrypto @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+#find_library(libdecrepit decrepit @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
+#find_library(libsodium sodium @CMAKE_INSTALL_FULL_LIBDIR@ NO_DEFAULT_PATH)
 
 #Ubuntu build requires rt library to be specified explicitly
 if(UNIX AND NOT APPLE)
@@ -85,17 +79,23 @@ target_link_libraries(SysioChain INTERFACE
    ${libwast}
    ${libwasm}
    ${libir}
-   ${libsoftfloat}
-   ${libbscrypto}
-   ${libdecrepit}
-   ${liblogging}
+
+  ${liblogging}
    ${libchainbase}
    ${libbuiltins}
    ${libsecp256k1}
    ${libbn256}
    ${libbls12-381}
-   ${libsodium}
-   @GMP_LIBRARY@
+  GMP::gmp
+  softfloat::softfloat
+  boringssl::crypto
+  boringssl::decrepit
+  libsodium::libsodium
+#  ${libsoftfloat}
+#  ${libbscrypto}
+#  ${libdecrepit}
+#  ${libsodium}
+#   @GMP_LIBRARY@
 
    Boost::date_time
    Boost::filesystem
@@ -127,7 +127,7 @@ target_include_directories(SysioChain INTERFACE
                               @CMAKE_INSTALL_PREFIX@
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
-                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/leapboringssl
+#                              @CMAKE_INSTALL_FULL_INCLUDEDIR@/leapboringssl
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/libsodium-install/include
                               @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat )
 

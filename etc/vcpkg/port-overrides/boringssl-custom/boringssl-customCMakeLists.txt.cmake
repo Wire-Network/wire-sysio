@@ -1,5 +1,8 @@
 include(GNUInstallDirs)
 
+add_compile_definitions(BORINGSSL_IMPLEMENTATION=1)
+add_compile_definitions(OPENSSL_EXPORT=1)
+
 target_compile_options(fipsmodule PRIVATE -Wno-error)
 target_compile_options(crypto PRIVATE -Wno-error)
 target_compile_options(decrepit PRIVATE -Wno-error)
@@ -16,7 +19,7 @@ target_include_directories(boringssl INTERFACE src/include)
 # avoid conflict with system lib
 set_target_properties(crypto PROPERTIES PREFIX libbs)
 
-install( TARGETS crypto decrepit
+install(TARGETS crypto decrepit fipsmodule
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )

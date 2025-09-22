@@ -3,7 +3,6 @@ set(FC_INSTALL_COMPONENT "dev")
 set(APPBASE_INSTALL_COMPONENT "dev")
 #set(SOFTFLOAT_INSTALL_COMPONENT "dev")
 set(SYSVM_INSTALL_COMPONENT "dev")
-set(BN256_INSTALL_COMPONENT "dev")
 
 
 add_subdirectory(libfc)

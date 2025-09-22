@@ -59,19 +59,27 @@ vcpkg_cmake_configure(
   OPTIONS
   -DCMAKE_C_COMPILER=/usr/bin/gcc-10
   -DCMAKE_CXX_COMPILER=/usr/bin/g++-10
+  -DOPENSSL_EXPORT=1
+  -DBORINGSSL_IMPLEMENTATION=1
 )
 
 # INSTALL
 vcpkg_cmake_install()
 
-# PERFORM CONFIG FIXUP TO RELOCATE AND ADJUST BOOST CMAKE PACKAGE CONFIGURATION FILES.
-if(EXISTS "${CURRENT_PACKAGES_DIR}/lib/cmake/boringssl")
-  vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/boringssl)
-elseif(EXISTS "${CURRENT_PACKAGES_DIR}/share/boringssl")
-  vcpkg_cmake_config_fixup(CONFIG_PATH share/boringssl)
-else()
-  message(NOTICE "[boringssl] Could not find expected CMake config path for fixup; package config files may be missing.")
-endif()
+configure_file(
+  "${CMAKE_CURRENT_LIST_DIR}/boringssl-customConfig.cmake.in"
+  "${CURRENT_PACKAGES_DIR}/share/boringssl-custom/boringssl-customConfig.cmake"
+  @ONLY
+)
+
+# CMAKE CONFIG FIXUP FOR ``boringssl-custom``
+#if(EXISTS "${CURRENT_PACKAGES_DIR}/lib/cmake/boringssl-custom")
+#  vcpkg_cmake_config_fixup(CONFIG_PATH lib/cmake/boringssl-custom)
+#elseif(EXISTS "${CURRENT_PACKAGES_DIR}/share/boringssl-custom")
+#  vcpkg_cmake_config_fixup(CONFIG_PATH share/boringssl-custom)
+#else()
+#  message(NOTICE "[boringssl] Could not find expected CMake config path for fixup; package config files may be missing.")
+#endif()
 
 ## COPY LICENSE
 #file(INSTALL ${SOURCE_PATH}/LICENSE_1_0.txt DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
@@ -81,8 +89,3 @@ vcpkg_copy_pdbs()
 
 #file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug)
 
-configure_file(
-  "${CMAKE_CURRENT_LIST_DIR}/boringssl-customConfig.cmake.in"
-  "${CURRENT_PACKAGES_DIR}/share/boringssl-custom/boringssl-customConfig.cmake"
-  @ONLY
-)
