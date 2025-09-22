@@ -1525,7 +1525,6 @@ BOOST_FIXTURE_TEST_CASE(chain_tests, validating_tester) { try {
  * db_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
-   SKIP_TEST
    produce_blocks(2);
    create_account( "testapi"_n );
    create_account( "testapi2"_n );
@@ -1633,7 +1632,6 @@ BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
 
 // The multi_index iterator cache is preserved across notifications for the same action.
 BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
-   SKIP_TEST
    create_accounts( {"notifier"_n,"notified"_n } );
    const char notifier[] = R"=====(
 (module
@@ -1688,7 +1686,6 @@ BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
  * multi_index_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(multi_index_tests, validating_tester) { try {
-   SKIP_TEST
    produce_blocks(1);
    create_account( "testapi"_n );
    produce_blocks(1);
