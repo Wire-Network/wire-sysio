@@ -36,7 +36,6 @@ static auto get_table_rows_full = [](chain_apis::read_only& plugin,
 BOOST_AUTO_TEST_SUITE(get_table_seckey_tests)
 
 BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
-   SKIP_TEST
    create_account("test"_n);
 
    // setup contract and abi
