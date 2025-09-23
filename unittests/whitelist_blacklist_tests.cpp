@@ -384,7 +384,6 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
-   SKIP_TEST;
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
 
@@ -425,15 +424,15 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       ("cpu_weight", 249'999'999)
    );
 
-   const int64_t reqauth_net_charge = 104;
+   const int64_t reqauth_net_charge = 120;
    auto push_reqauth = [&]( name acnt, name perm, uint32_t billed_cpu_time_us ) {
       signed_transaction trx;
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
-                                              std::vector<permission_level>{{acnt, perm}},
+                                              std::vector<permission_level>{{acnt, perm},{acnt,config::sysio_payer_name}},
                                               fc::mutable_variant_object()("from", acnt) ) );
       c.set_transaction_headers( trx, 6 );
       trx.sign( c.get_private_key( acnt, perm.to_string() ), c.control->get_chain_id() );
-      // This transaction is charged 104 bytes of NET.
+      // This transaction is charged 120 bytes of NET.
 
       return c.push_transaction( trx, fc::time_point::maximum(), billed_cpu_time_us );
    };
@@ -470,13 +469,13 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    wdump((rm.get_account_net_limit(user_account).first));
 
    // Allow congestion to reduce a little bit.
-   c.produce_blocks(1400);
+   c.produce_blocks(1460);
 
-   BOOST_REQUIRE( rm.get_virtual_block_net_limit() > (3*cfg.max_block_net_usage) );
-   BOOST_REQUIRE( rm.get_virtual_block_net_limit() < (4*cfg.max_block_net_usage) );
+   BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() > (3*cfg.max_block_net_usage) );
+   BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() < (4*cfg.max_block_net_usage) );
    wdump((rm.get_account_net_limit_ex(user_account)));
-   BOOST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max > 3*reqauth_net_charge );
-   BOOST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max < 4*reqauth_net_charge );
+   BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max > 3*reqauth_net_charge );
+   BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max < 4*reqauth_net_charge );
 
 
    // User can only push three reqauths per day even at this relaxed congestion level.
@@ -500,8 +499,8 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    c.produce_block();
    c.produce_block( fc::days(1) );
 
-   // Reducing the greylist limit from 1000 to 4 should not make a difference since it would not be the
-   // bottleneck at this level of congestion. But dropping it to 3 would make a difference.
+   // Reducing the greylist limit from 1000 to 5 should not make a difference since it would not be the
+   // bottleneck at this level of congestion. But dropping it to 4 is not a bottleneck for cpu but is for net.
    {
       auto user_elastic_cpu_limit = rm.get_account_cpu_limit_ex(user_account).first.max;
       auto user_elastic_net_limit = rm.get_account_net_limit_ex(user_account).first.max;
@@ -509,7 +508,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       auto user_cpu_res1 = rm.get_account_cpu_limit_ex(user_account, 4);
       BOOST_REQUIRE_EQUAL( user_cpu_res1.first.max, user_elastic_cpu_limit );
       BOOST_REQUIRE_EQUAL( user_cpu_res1.second, false );
-      auto user_net_res1 = rm.get_account_net_limit_ex(user_account, 4);
+      auto user_net_res1 = rm.get_account_net_limit_ex(user_account, 5);
       BOOST_REQUIRE_EQUAL( user_net_res1.first.max, user_elastic_net_limit );
       BOOST_REQUIRE_EQUAL( user_net_res1.second, false );
 
@@ -523,8 +522,8 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       BOOST_REQUIRE( user_net_res2.first.max < 3*reqauth_net_charge );
    }
 
-   ilog("setting greylist limit to 4");
-   c.control->set_greylist_limit( 4 );
+   ilog("setting greylist limit to 5");
+   c.control->set_greylist_limit( 5 );
    c.produce_block();
 
    push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
