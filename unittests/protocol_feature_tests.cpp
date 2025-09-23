@@ -435,8 +435,9 @@ BOOST_AUTO_TEST_CASE( restrict_action_to_self_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
-   SKIP_TEST
    tester chain( setup_policy::preactivate_feature_and_new_bios );
+
+   // Wire uses an explicit payer (if present) or if no explicit payer then the contract.
 
    const auto& tester_account = "tester"_n;
    const auto& tester_account2 = "tester2"_n;
@@ -484,6 +485,7 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
       chain.push_transaction(trx);
 
+      // no explicit payer so bills only the contract (tester_account)
       auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
       auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
@@ -493,6 +495,45 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
       BOOST_CHECK(tester2_cpu_limit1.used == tester2_cpu_limit0.used);
       BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
       BOOST_CHECK(tester2_net_limit1.used == tester2_net_limit0.used);
+   }
+
+   chain.produce_blocks();
+
+   {
+      action act;
+      act.account = tester_account;
+      act.name = "null2"_n;
+      act.authorization = vector<permission_level>{
+            {tester_account, config::active_name},
+            {tester_account2, config::active_name},
+            {tester_account2, config::sysio_payer_name}
+      };
+
+      signed_transaction trx;
+      trx.actions.emplace_back(std::move(act));
+      chain.set_transaction_headers(trx);
+
+      trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
+      trx.sign(get_private_key(tester_account2, "active"), chain.control->get_chain_id());
+
+      auto tester_cpu_limit0  = mgr.get_account_cpu_limit_ex(tester_account).first;
+      auto tester2_cpu_limit0 = mgr.get_account_cpu_limit_ex(tester_account2).first;
+      auto tester_net_limit0  = mgr.get_account_net_limit_ex(tester_account).first;
+      auto tester2_net_limit0 = mgr.get_account_net_limit_ex(tester_account2).first;
+
+      chain.push_transaction(trx);
+
+      // explicit payer so bills both the explicit payer and the contract
+      // TODO: This should only bill the explicit payer WIRE-173
+      auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
+      auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
+      auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
+      auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
+
+      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
+      BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
+      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
+      BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
    }
 
 } FC_LOG_AND_RETHROW() }
