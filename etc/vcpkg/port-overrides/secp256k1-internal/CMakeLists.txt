@@ -29,47 +29,20 @@ endif()
 # just disable the warning to avoid cluttering compile log
 target_compile_options(secp256k1-internal PRIVATE -Wno-unused-function)
 
-#add_library(secp256k1-internal STATIC
-#  src/secp256k1.c
-#  src/precomputed_ecmult.c
-#  src/prelrecomputed_ecmult_gen.c
-#)
-
-#target_include_directories(secp256k1-internal
-#  PUBLIC
-#  ${CMAKE_CURRENT_LIST_DIR}/include
-#)
-
-#target_link_libraries(secp256k1 PRIVATE secp256k1-internal)
-
-#install( TARGETS secp256k1
-#  RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
-#  LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-#  ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-#)
-
-
 file(GLOB HEADERS include/*.h)
 install(FILES ${HEADERS} DESTINATION include)
 
-#install(TARGETS secp256k1  EXPORT secp256k1-internal-config
-#RUNTIME DESTINATION bin
-#ARCHIVE DESTINATION lib
-#LIBRARY DESTINATION lib
-#)
-
 install(TARGETS secp256k1-internal EXPORT secp256k1-internal-config
-RUNTIME DESTINATION bin
-ARCHIVE DESTINATION lib
-LIBRARY DESTINATION lib
-#INCLUDES DESTINATION include
+  RUNTIME DESTINATION bin
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
 )
 
 install(
-EXPORT secp256k1-internal-config
-FILE secp256k1-internal-config.cmake
-NAMESPACE secp256k1::
-DESTINATION share/secp256k1-internal
+  EXPORT secp256k1-internal-config
+  FILE secp256k1-internal-config.cmake
+  NAMESPACE secp256k1::
+  DESTINATION share/secp256k1-internal
 )
 
 add_executable(secp256k1-bench src/bench.c)
@@ -81,4 +54,4 @@ add_test(secp256k1-tests secp256k1-tests)
 
 add_executable(secp256k1-exhaustive-tests src/tests_exhaustive.c)
 target_link_libraries(secp256k1-exhaustive-tests secp256k1-internal)
-#add_test(secp256k1-exhaustive-tests secp256k1-exhaustive-tests)
+

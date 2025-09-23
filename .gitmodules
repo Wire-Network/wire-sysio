@@ -19,11 +19,7 @@
 	url = https://github.com/Microsoft/vcpkg.git
 
 ; 	TODO: REPLACE WITH VCPKG
-[submodule "libraries/libfc/libraries/bls12-381"]
-	path = libraries/libfc/libraries/bls12-381
-	url = https://github.com/AntelopeIO/bls12-381
-
-; [submodule "libraries/rapidjson"]
+[submodule "libraries/rapidjson"]
 ; 	path = libraries/rapidjson
 ; 	url = https://github.com/Wire-Network/rapidjson
 
@@ -35,4 +31,3 @@
 ; [submodule "libraries/libfc/libraries/boringssl/boringssl"]
 ; 	path = libraries/libfc/libraries/boringssl/boringssl
 ; 	url = https://github.com/AntelopeIO/boringssl-build
-
