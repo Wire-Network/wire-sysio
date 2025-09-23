@@ -1,5 +1,3 @@
-#add_subdirectory( secp256k1 )
-# add_subdirectory( libraries/bls12-381 )
 
 set(fc_sources
   src/uint128.cpp
