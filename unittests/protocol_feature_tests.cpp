@@ -1348,8 +1348,6 @@ BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_update_account_auth ) { try {
-   SKIP_TEST; // TODO: Ram usage delta would underflow UINT64_MAX  (need create_account fix for auth resource allocation)
-
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
    c.create_account("billy"_n);
