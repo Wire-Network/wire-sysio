@@ -24,8 +24,11 @@ else()
   set(build_id_flag "")
 endif()
 
-target_link_libraries(${NODE_EXECUTABLE_NAME}
-  PRIVATE appbase version
+target_link_libraries(
+  ${NODE_EXECUTABLE_NAME}
+  PRIVATE
+  appbase
+  version
   PRIVATE -Wl,${whole_archive_flag} state_history_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} trace_api_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} chain_api_plugin -Wl,${no_whole_archive_flag}
