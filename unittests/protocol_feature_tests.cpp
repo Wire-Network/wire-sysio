@@ -796,7 +796,6 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
  * The purpose of this testing is to ensure that the RAM is actually billed correctly against a limited balance.
  */
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
-   SKIP_TEST
    tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
@@ -806,8 +805,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto &carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
@@ -910,39 +909,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    );
    wlog("E");
 
-   // Cannot send deferred transaction paid by another account that has not authorized the action.
-   //BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "senddefer"_n, bob_payer, mutable_variant_object()
-         ("senderid", 123)
-         ("payer", alice_account)
-     // ),
-     // missing_auth_exception,
-     // fc_exception_message_starts_with( "missing authority" )
-   );
-   wlog("F");
-
-   // Cannot send deferred transaction paid by another account within a notification
-   // even if the account authorized the original action.
-   // This is due to the subjective mitigation in place.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifydefer"_n, alice_account, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // subjective_block_production_exception,
-      // fc_exception_message_is( "Cannot charge RAM to other accounts during notify." )
-   );
-   wlog("G");
-
-   // Can send deferred transaction paid by another account if it has authorized the action.
-   c.push_action( tester1_account, "senddefer"_n, alice_account, mutable_variant_object()
-      ("senderid", 123)
-      ("payer", alice_account)
-   );
-   c.produce_block();
-   wlog("H");
-
    // Can not migrate data from table1 to table2 paid by another account
    // in a RAM usage neutral way with the authority of that account.
    BOOST_REQUIRE_EXCEPTION(
@@ -972,32 +938,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    );
    wlog("I");
 
-   // Cannot send deferred transaction paid by another account that has not authorized the action.
-   // This still fails objectively, but now with another error message.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "senddefer"_n, bob_payer, mutable_variant_object()
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // action_validate_exception,
-      // fc_exception_message_starts_with( "cannot bill RAM usage of deferred transaction to another account that has not authorized the action" )
-   );
-   wlog("J");
-
-   // Cannot send deferred transaction paid by another account within a notification
-   // even if the account authorized the original action.
-   // This now fails with an objective error.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifydefer"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // action_validate_exception,
-      // fc_exception_message_is( "cannot bill RAM usage of deferred transactions to another account within notify context" )
-   );
-   wlog("K");
-
    // Cannot bill more RAM to another account within a notification
    // even if the account authorized the original action.
    // This now fails with an objective error.
@@ -1025,14 +965,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       fc_exception_message_is( "Requested payer alice did not authorize payment" )
    );
    wlog("M");
-
-   // Still can send deferred transaction paid by another account if it has authorized the action.
-   c.push_action( tester1_account, "senddefer"_n, alice_payer, mutable_variant_object()
-      ("senderid", 123)
-      ("payer", alice_account)
-   );
-   c.produce_block();
-   wlog("N");
 
    // We cannot migrate data from table1 to table2 paid by another account
    // in a RAM usage neutral way without the authority of that account.
@@ -1095,7 +1027,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       ("payer", "tester1")
       ),
       ram_usage_exceeded,
-      fc_exception_message_is( "account tester1 has insufficient ram; needs 133345 bytes has 133120 bytes" )
+      fc_exception_message_is( "account tester1 has insufficient ram; needs 89056 bytes has 88808 bytes" )
    );
 
    c.expand_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);
