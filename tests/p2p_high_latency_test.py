@@ -68,7 +68,7 @@ specificExtraNodeopArgs[syncingNodeId]="--p2p-peer-address 0.0.0.0:{}".format(98
 
 try:
     TestHelper.printSystemInfo("BEGIN")
-    traceNodeopArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --producer-threads 1 --plugin sysio::net_plugin --net-threads 1"
+    traceNodeopArgs=" --plugin sysio::producer_plugin --produce-block-offset-ms 0 --plugin sysio::net_plugin --net-threads 1"
     if cluster.launch(pnodes=1, totalNodes=totalNodes, totalProducers=1, specificExtraNodeopArgs=specificExtraNodeopArgs, extraNodeopArgs=traceNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up sys cluster.")
