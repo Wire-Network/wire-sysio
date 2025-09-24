@@ -12,13 +12,7 @@
 #include <vector>
 #include <list>
 
-namespace sysio { namespace chain {
-
-class apply_context;
-
-namespace sysvmoc {
-
-using control_block = sys_vm_oc_control_block;
+namespace sysio::chain::sysvmoc {
 
 struct no_offset{};
 struct code_offset {
@@ -52,7 +46,7 @@ enum sysvmoc_exitcode : int {
 
 static constexpr uint8_t current_codegen_version = 1;
 
-}}}
+}
 
 FC_REFLECT(sysio::chain::sysvmoc::no_offset, );
 FC_REFLECT(sysio::chain::sysvmoc::code_offset, (offset));
