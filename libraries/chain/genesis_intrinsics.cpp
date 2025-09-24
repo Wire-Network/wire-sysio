@@ -195,7 +195,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "bls_g2_map",
    "bls_fp_mod",
    "bls_fp_mul",
-   "bls_fp_exp"
+   "bls_fp_exp",
+   "get_ram_usage"
 };
 
 } } // namespace sysio::chain
