@@ -580,6 +580,14 @@ namespace webassembly {
          */
          name get_sender() const;
 
+        /**
+         * Get the ram usage of an account
+         *
+         * @param account - name of the account whose ram usage to get.
+         * @return number of bytes currently used by the account.
+        */
+        int64_t get_ram_usage(account_name account) const;
+
          /**
           * Aborts processing of this action and unwinds all pending changes.
           *

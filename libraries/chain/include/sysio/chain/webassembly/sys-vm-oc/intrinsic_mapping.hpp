@@ -276,7 +276,8 @@ inline constexpr auto get_intrinsic_table() {
       "env.bls_fp_mod",
       "env.bls_fp_mul",
       "env.bls_fp_exp",
-      "env.blake2b_256"
+      "env.blake2b_256",
+      "env.get_ram_usage"
    );
 }
 inline constexpr std::size_t find_intrinsic_index(std::string_view hf) {

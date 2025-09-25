@@ -118,6 +118,7 @@ extern "C" {
 
       //test chain
       WASM_TEST_HANDLER( test_chain, test_activeprods );
+      WASM_TEST_HANDLER( test_chain, test_get_ram_usage );
 
       // test checktime
       WASM_TEST_HANDLER( test_checktime, checktime_pass                     );

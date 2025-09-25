@@ -1,6 +1,7 @@
 #include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/resource_limits.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
    /* these are both unfortunate that we didn't make the return type an int64_t */
@@ -22,6 +23,10 @@ namespace sysio { namespace chain { namespace webassembly {
 
    uint32_t interface::get_block_num() const {
       return context.control.pending_block_num();
+   }
+
+   int64_t interface::get_ram_usage(account_name account) const {
+      return context.control.get_resource_limits_manager().get_account_ram_usage(account);
    }
 
 }}} // ns sysio::chain::webassembly
