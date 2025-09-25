@@ -28,7 +28,7 @@ void test_permission::check_authorization( uint64_t receiver, uint64_t code, uin
                                                      params.permission,
                                                      packed_pubkeys.data(), packed_pubkeys.size(),
                                                      (const char*)0,        0,
-                                                     microseconds{ std::numeric_limits<int64_t>::max() }
+                                                     microseconds{ 0 }
                                                    );
 
    auto itr = db_lowerbound_i64( self, self, self, 1 );

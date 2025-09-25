@@ -51,7 +51,7 @@ try:
     if localTest and not dontLaunch:
         Print("Stand up cluster")
         if cluster.launch(pnodes=prodCount, totalNodes=prodCount, prodCount=1, onlyBios=onlyBios,
-                         dontBootstrap=dontBootstrap,
+                         dontBootstrap=dontBootstrap, loadSystemContract=False,
                          pfSetupPolicy=PFSetupPolicy.NONE, extraNodeopArgs=" --plugin sysio::producer_api_plugin  --http-max-response-time-ms 990000 ") is False:
             cmdError("launcher")
             errorExit("Failed to stand up sys cluster.")

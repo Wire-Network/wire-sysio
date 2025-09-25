@@ -34,7 +34,7 @@ public:
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
       check(iterator == people.end(), "Record already exists");
-      people.emplace(user, [&]( auto& row ) {
+      people.emplace(get_self(), [&]( auto& row ) {
          row.key = user;
          row.id = id;
          row.age = age;
@@ -46,7 +46,7 @@ public:
       person_index people( get_self(), get_first_receiver().value );
       auto iterator = people.find(user.value);
       check(iterator != people.end(), "Record does not exist");
-      people.modify(iterator, user, [&]( auto& row ) {
+      people.modify(iterator, same_payer, [&]( auto& row ) {
          row.key = user;
          row.age = age;
       });

@@ -131,24 +131,11 @@ try:
         Print(f"Transfer funds {transferAmount} from account {cluster.sysioAccount.name} to {account.name}")
         trans=nonProdNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=False)
     nonProdNode.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
-    for account in accounts:
-        trans=nonProdNode.delegatebw(account, 20000000.0000, 20000000.0000, waitForTransBlock=False, exitOnError=True)
-    nonProdNode.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
 
     # ***   vote using accounts   ***
 
     cluster.waitOnClusterSync(blockAdvancing=3)
     start_block_num = shipNode.getBlockNum()
-
-    # vote a,b,c (node0)  u (node1)
-    voteProducers=[]
-    voteProducers.append("defproducera")
-    voteProducers.append("defproducerb")
-    voteProducers.append("defproducerc")
-    voteProducers.append("defproduceru")
-    for account in accounts:
-        Print(f"Account {account.name} vote for producers={voteProducers}")
-        trans=prodNode.vote(account, voteProducers, exitOnError=True, waitForTransBlock=False)
 
     #verify nodes are in sync and advancing
     cluster.waitOnClusterSync(blockAdvancing=3)

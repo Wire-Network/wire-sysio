@@ -35,19 +35,6 @@
                     "waits": []
                 }
             }
-        },
-        {
-            "actionAuthAcct": "sysio",
-            "actionName": "buyrambytes",
-            "authorization": {
-                "actor": "sysio",
-                "permission": "active"
-            },
-            "actionData": {
-                "payer": "sysio",
-                "receiver": "ACCT_PER_TRX",
-                "bytes": "3000"
-            }
         }
     ]
 }
