@@ -20,9 +20,8 @@ pkg_check_modules(gmp REQUIRED IMPORTED_TARGET gmp)
 add_library(GMP::gmp ALIAS PkgConfig::gmp)
 
 # Catch2
-pkg_check_modules(catch2 REQUIRED IMPORTED_TARGET catch2)
-add_library(catch2 ALIAS PkgConfig::catch2)
-add_library(catch2::catch2 ALIAS PkgConfig::catch2)
+find_package(Catch2 CONFIG REQUIRED)
+list(APPEND CMAKE_MODULE_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/catch2")
 
 
 #find_path(GMP_INCLUDE_DIR NAMES gmp.h)
