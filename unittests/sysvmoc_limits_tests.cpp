@@ -25,25 +25,20 @@ void limit_violated_test(const sysvmoc::config& sysvmoc_config) {
       use_genesis
    );
 
-   chain.create_accounts({"sysio.token"_n});
-   chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
-   chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   chain.create_accounts({"sysio.test"_n});
+   chain.set_code("sysio.test"_n, test_contracts::payloadless_wasm());
+   chain.set_abi("sysio.test"_n, test_contracts::payloadless_abi());
 
    if (chain.control->is_sys_vm_oc_enabled()) {
       BOOST_CHECK_EXCEPTION(
-         chain.push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
-            ( "issuer", "sysio.token" )
-            ( "maximum_supply", "1000000.00 TOK" )),
+         chain.push_action( "sysio.test"_n, "doit"_n, "sysio.test"_n, mvo()),
          sysio::chain::wasm_execution_error,
          [](const sysio::chain::wasm_execution_error& e) {
             return expect_assert_message(e, "failed to compile wasm");
          }
       );
    } else {
-      chain.push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
-         ( "issuer", "sysio.token" )
-         ( "maximum_supply", "1000000.00 TOK" )
-      );
+      chain.push_action( "sysio.test"_n, "doit"_n, "sysio.test"_n, mvo());
    }
 }
 
@@ -61,14 +56,11 @@ void limit_not_violated_test(const sysvmoc::config& sysvmoc_config) {
       use_genesis
    );
 
-   chain.create_accounts({"sysio.token"_n});
-   chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
-   chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
+   chain.create_accounts({"sysio.test"_n});
+   chain.set_code("sysio.test"_n, test_contracts::payloadless_wasm());
+   chain.set_abi("sysio.test"_n, test_contracts::payloadless_abi());
 
-   chain.push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
-      ( "issuer", "sysio.token" )
-      ( "maximum_supply", "1000000.00 TOK" )
-   );
+   chain.push_action( "sysio.test"_n, "doit"_n, "sysio.test"_n, mvo());
 }
 
 static sysvmoc::config make_sysvmoc_config_without_limits() {
@@ -127,7 +119,6 @@ BOOST_AUTO_TEST_CASE( stack_limit ) { try {
 
 // test generated code size limit is checked
 BOOST_AUTO_TEST_CASE( generated_code_size_limit ) { try {
-   SKIP_TEST
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
    // The generated code size of the compiled WASM in the test is 36856.

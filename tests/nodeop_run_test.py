@@ -317,6 +317,10 @@ try:
         cmdError("%s set contract currency1111" % (ClientName))
         errorExit("Failed to publish contract.")
 
+    trans=node.setPriv(currencyAccount, cluster.sysioAccount, isPriv=True, waitForTransBlock=True)
+    if trans is None:
+        errorExit("ERROR: Failed to set currency1111 as privileged")
+
     Print("Get code hash for account %s" % (currencyAccount.name))
     codeHash = node.getAccountCodeHash(currencyAccount.name)
     if codeHash is None:

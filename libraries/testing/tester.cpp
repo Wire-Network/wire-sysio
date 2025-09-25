@@ -1117,6 +1117,10 @@ namespace sysio { namespace testing {
       push_transaction( trx );
    }
 
+   void base_tester::set_privileged( account_name name ) {
+      push_action(config::system_account_name, "setpriv"_n, config::system_account_name,  fc::mutable_variant_object()("account", name)("is_priv", 1));
+   }
+
    bool base_tester::is_code_cached( sysio::chain::account_name name ) const {
       const auto& db  = control->db();
       const account_metadata_object* receiver_account = &db.template get<account_metadata_object,by_name>( name );

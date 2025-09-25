@@ -194,6 +194,7 @@ public:
 
        set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
        set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+       set_privileged("sysio.token"_n);
 
        {
            const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
