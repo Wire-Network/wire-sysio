@@ -9,7 +9,7 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "e5257df0ac9c787e65632615eb164510e1c3a1b8",
+      "baseline": "825f2e86f015171abdd9ace4101d84fc13a4df04",
       "packages": [
         "softfloat",
         "libsodium",
