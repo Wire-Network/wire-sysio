@@ -636,8 +636,9 @@ namespace sysio {
         asset ram_weight = { ram_weight_amount, sys_symbol };
         expandpolicy("sysio.acct"_n, "sysio"_n, {0, sys_symbol}, {0, sys_symbol}, ram_weight, 1);
 
-        // Update reslimit for sysio.acct for the ram
+        // Update reslimit for sysio/sysio.acct for the ram
         update_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, ram_weight_amount);
+        update_reslimit("sysio"_n, {0, sys_symbol}, {0, sys_symbol}, -ram_weight_amount);
 
         return new_username;
     }
