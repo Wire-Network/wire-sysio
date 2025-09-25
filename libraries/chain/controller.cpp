@@ -368,15 +368,6 @@ struct controller_impl {
    SET_APP_HANDLER( sysio, sysio, linkauth );
    SET_APP_HANDLER( sysio, sysio, unlinkauth );
 
-   // **Roa Change** Handler for native action reducepolicy: Had to manually expand due to sysio.roa account name
-   set_apply_handler( account_name("sysio.roa"), account_name("sysio.roa"),
-      action_name("reducepolicy"), &apply_roa_reducepolicy );
-/*
-   SET_APP_HANDLER( sysio, sysio, postrecovery );
-   SET_APP_HANDLER( sysio, sysio, passrecovery );
-   SET_APP_HANDLER( sysio, sysio, vetorecovery );
-*/
-
    }
 
    /**
