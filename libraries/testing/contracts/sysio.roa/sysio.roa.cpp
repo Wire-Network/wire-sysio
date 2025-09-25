@@ -295,8 +295,109 @@ namespace sysio {
         });
     };
     
-    void roa::reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen) { 
-        // ---- Native Action, see chain > sysio_contract.cpp in core ---- 
+    void roa::reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& networkGen) {
+        require_auth(issuer);
+
+        // Ensure issuer is a node owner in the given generation
+        nodeowners_t nodeowners(get_self(), networkGen);
+        auto node_itr = nodeowners.find(issuer.value);
+        check(node_itr != nodeowners.end(), "Only Node Owners can manage policies.");
+
+        // Fetch issuer's policies scoped by issuer
+        policies_t policies(get_self(), issuer.value);
+        auto pol_itr = policies.find(owner.value);
+        check(pol_itr != policies.end(), "You have no policy for this owner.");
+
+        auto pol_row = *pol_itr;
+
+        // Validate time block
+        uint32_t current_block = current_block_number();
+        check(current_block >= pol_row.time_block, "Cannot reduce policy before time_block");
+
+        // Ensure we don't reduce below zero
+        check(net_weight.amount <= pol_row.net_weight.amount, "Cannot reduce NET below zero");
+        check(cpu_weight.amount <= pol_row.cpu_weight.amount, "Cannot reduce CPU below zero");
+        check(ram_weight.amount <= pol_row.ram_weight.amount, "Cannot reduce RAM below zero");
+
+        // Special sysio check
+        bool sysio_acct = is_sysio_account(owner);
+        if (sysio_acct && pol_row.time_block == 1 && pol_row.issuer == issuer) {
+            check(false, "Cannot reduce the sysio policies created at node registration");
+        }
+
+        reslimit_t reslimit(get_self(), owner.value);
+        auto res_itr = reslimit.find(owner.value);
+        check(res_itr != reslimit.end(), "reslimit row does not exist for this owner");
+        auto rl_row = *res_itr;
+
+        // Adjust resource limits
+        int64_t ram_bytes, net_limit, cpu_limit;
+        get_resource_limits(owner, ram_bytes, net_limit, cpu_limit);
+
+        uint64_t bytes_per_unit = pol_row.bytes_per_unit;
+        int64_t divisible_ram_to_reclaim = 0;
+        asset reclaimed_ram_weight(0, ram_weight.symbol);
+
+        if (ram_weight.amount > 0) {
+            int64_t ram_usage = get_ram_usage(owner);
+            int64_t ram_unused = ram_bytes - ram_usage;
+            int64_t requested_ram_bytes = ram_weight.amount * (int64_t) bytes_per_unit;
+            int64_t ram_to_reclaim = std::min(ram_unused, requested_ram_bytes);
+
+            check(ram_to_reclaim >= 0, "Invalid RAM reclaim calculation");
+
+            int64_t remainder = ram_to_reclaim % (int64_t) bytes_per_unit;
+            divisible_ram_to_reclaim = ram_to_reclaim - remainder;
+
+            int64_t reclaimed_units = divisible_ram_to_reclaim / (int64_t) bytes_per_unit;
+            reclaimed_ram_weight = asset(reclaimed_units, ram_weight.symbol);
+
+            check(reclaimed_ram_weight.amount <= ram_weight.amount, "Cannot reclaim more RAM than requested");
+        }
+
+        set_resource_limits(
+            owner,
+            ram_bytes - divisible_ram_to_reclaim,
+            net_limit - net_weight.amount,
+            cpu_limit - cpu_weight.amount
+        );
+
+        // Update reslimit row
+        reslimit.modify(res_itr, get_self(), [&](auto& row) {
+            if (!sysio_acct) {
+                row.net_weight.amount += net_weight.amount;
+                row.cpu_weight.amount += cpu_weight.amount;
+            }
+            row.ram_bytes += static_cast<uint64_t>(rl_row.ram_bytes - divisible_ram_to_reclaim);;
+        });
+
+        // Update / remove the policies row
+        pol_row.net_weight -= net_weight;
+        pol_row.cpu_weight -= cpu_weight;
+        pol_row.ram_weight -= reclaimed_ram_weight;
+
+        bool all_zero = (pol_row.net_weight.amount == 0 &&
+                         pol_row.cpu_weight.amount == 0 &&
+                         pol_row.ram_weight.amount == 0);
+        if (all_zero) {
+            policies.erase(pol_itr);
+        } else {
+            policies.modify(pol_itr, get_self(), [&](auto& row) {
+                if (!sysio_acct) {
+                    row.net_weight.amount = pol_row.net_weight.amount;
+                    row.cpu_weight.amount = pol_row.cpu_weight.amount;
+                }
+                row.ram_weight.amount = pol_row.ram_weight.amount;
+            });
+        }
+
+        // Update nodeowners row
+        int64_t total_reclaimed_sys_amount = net_weight.amount + cpu_weight.amount + reclaimed_ram_weight.amount;
+        nodeowners.modify(node_itr, get_self(), [&](auto &row) {
+            row.allocated_sys.amount -= total_reclaimed_sys_amount;
+            row.allocated_bw.amount -= (net_weight.amount + cpu_weight.amount);
+            row.allocated_ram.amount -= reclaimed_ram_weight.amount;
+        });
     };
 
     void roa::initnodereg(const name& owner) {

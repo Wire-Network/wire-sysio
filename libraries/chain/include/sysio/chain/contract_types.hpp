@@ -124,24 +124,6 @@ struct unlinkauth {
    }
 };
 
-// **Roa change** to facilitate native action
-struct reducepolicy {
-   account_name owner;
-   account_name issuer;
-   asset        net_weight;
-   asset        cpu_weight;
-   asset        ram_weight;
-   uint8_t      network_gen;
-
-   static account_name get_account() {
-      return "sysio.roa"_n; // The account this contract is deployed to.
-   }
-
-   static action_name get_name() {
-      return "reducepolicy"_n; // The action name.
-   }
-};
-
 } } /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::newaccount                       , (creator)(name)(owner)(active) )
@@ -151,5 +133,3 @@ FC_REFLECT( sysio::chain::updateauth                       , (account)(permissio
 FC_REFLECT( sysio::chain::deleteauth                       , (account)(permission) )
 FC_REFLECT( sysio::chain::linkauth                         , (account)(code)(type)(requirement) )
 FC_REFLECT( sysio::chain::unlinkauth                       , (account)(code)(type) )
-// **Roa change**
-FC_REFLECT( sysio::chain::reducepolicy                     , (owner)(issuer)(net_weight)(cpu_weight)(ram_weight)(network_gen))

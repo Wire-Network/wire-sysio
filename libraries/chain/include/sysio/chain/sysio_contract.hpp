@@ -16,14 +16,6 @@ namespace sysio { namespace chain {
    void apply_sysio_deleteauth(apply_context&);
    void apply_sysio_linkauth(apply_context&);
    void apply_sysio_unlinkauth(apply_context&);
-   // **Roa changes**
-   void apply_roa_reducepolicy(apply_context&);
-
-   /*
-   void apply_sysio_postrecovery(apply_context&);
-   void apply_sysio_passrecovery(apply_context&);
-   void apply_sysio_vetorecovery(apply_context&);
-   */
 
    void apply_sysio_setcode(apply_context&);
    void apply_sysio_setabi(apply_context&);
