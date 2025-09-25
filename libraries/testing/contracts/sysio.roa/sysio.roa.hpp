@@ -299,5 +299,15 @@ namespace sysio {
              */
             asset get_allocation_for_tier(uint8_t tier);
 
+            /**
+             * @brief Update reslimit table with values for owner
+             */
+            struct resources_t {
+                asset net;
+                asset cpu;
+                uint64_t ram_bytes;
+            };
+            resources_t update_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+
     }; // namespace roa
 } // namespace sysio

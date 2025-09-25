@@ -573,6 +573,7 @@ class apply_context {
 
       int  db_store_i64( name code, name scope, name table, const account_name& payer, uint64_t id, const char* buffer, size_t buffer_size );
 
+      void validate_account_ram_deltas();
 
    /// Misc methods:
    public:

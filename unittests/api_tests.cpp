@@ -567,11 +567,10 @@ BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
    chain.produce_blocks(1);
 
    // wire-sysio does not have protocol feature ram_restrictions, ram restrictions are enforced from genesis
-   // notify is restricted fist by ram payer enforcement
    BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify",
                                               fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | "testapi"_n.to_uint64_t() ) ),
-                          unsatisfied_authorization,
-                          fc_exception_message_is("Requested payer testapi did not authorize payment")
+                          unauthorized_ram_usage_increase,
+                          fc_exception_message_is("unprivileged contract cannot increase RAM usage of another account within a notify context: testapi")
    );
 
 
