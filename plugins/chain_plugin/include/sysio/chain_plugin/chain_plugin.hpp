@@ -280,10 +280,6 @@ public:
       vector<permission>         permissions;
 
       fc::variant                total_resources;
-      fc::variant                self_delegated_bandwidth;
-      fc::variant                refund_request;
-      fc::variant                voter_info;
-      fc::variant                rex_info;
 
       std::optional<sysio::chain::resource_limits::account_resource_limit> subjective_cpu_bill_limit;
       std::vector<linked_action> sysio_any_linked_actions;
@@ -1042,7 +1038,7 @@ FC_REFLECT( sysio::chain_apis::read_only::account_resource_info, (used)(availabl
 FC_REFLECT( sysio::chain_apis::read_only::get_account_results,
             (account_name)(head_block_num)(head_block_time)(privileged)(last_code_update)(created)
             (core_liquid_balance)(ram_quota)(net_weight)(cpu_weight)(net_limit)(cpu_limit)(ram_usage)(permissions)
-            (total_resources)(self_delegated_bandwidth)(refund_request)(voter_info)(rex_info)
+            (total_resources)
             (subjective_cpu_bill_limit) (sysio_any_linked_actions) )
 // @swap code_hash
 FC_REFLECT( sysio::chain_apis::read_only::get_code_results, (account_name)(code_hash)(wast)(wasm)(abi) )

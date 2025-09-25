@@ -474,7 +474,6 @@ try {
 
 BOOST_AUTO_TEST_CASE(stricter_auth) {
 try {
-   SKIP_TEST
    validating_tester chain;
 
    chain.produce_block();
@@ -484,10 +483,7 @@ try {
    account_name acc3 = "acc3"_n;
    account_name acc4 = "acc4"_n;
 
-
-
    chain.create_account(acc1);
-   chain.create_accounts({acc2, acc3, acc4});
    chain.produce_block();
 
    auto create_acc = [&](account_name a, account_name creator, int threshold) {
@@ -499,22 +495,13 @@ try {
 
       vector<permission_level> pls;
       pls.push_back({creator, name("active")});
-      // force contracts::dancer_wasm() to be of type bytes
-
-      auto wasm = test_contracts::noop_wasm();
       trx.actions.emplace_back( pls,
-         setcode{
-           .account = a,
-           .code = bytes(wasm.begin(), wasm.end()),
-         });
-      // trx.actions.emplace_back( pls, setabi{ .account = a, .abi =  bytes(contracts::noop_abi().begin(), contracts::noop_abi().end()) });
-
-                                // newaccount{
-                                //    .creator  = creator,
-                                //    .name     = a,
-                                //    .owner    = authority( chain.get_public_key( a, "owner" ) ),
-                                //    .active   = invalid_auth//authority( chain.get_public_key( a, "active" ) ),
-                                // });
+                                newaccount{
+                                   .creator  = creator,
+                                   .name     = a,
+                                   .owner    = authority( chain.get_public_key( a, "owner" ) ),
+                                   .active   = invalid_auth//authority( chain.get_public_key( a, "active" ) ),
+                                });
 
       chain.set_transaction_headers(trx);
       trx.sign( chain.get_private_key( creator, "active" ), chain.control->get_chain_id()  );

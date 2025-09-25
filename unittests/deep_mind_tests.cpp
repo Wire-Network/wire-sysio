@@ -86,7 +86,6 @@ BOOST_AUTO_TEST_SUITE(deep_mind_tests)
 
 BOOST_FIXTURE_TEST_CASE(deep_mind, deep_mind_tester)
 {
-   SKIP_TEST
    produce_block();
 
    create_account( "alice"_n );

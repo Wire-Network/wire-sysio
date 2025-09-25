@@ -35,9 +35,14 @@ jobs:
 
       - name: Build Docker image
         run: |
+          BRANCH="${{ github.head_ref || github.ref_name }}"
+          REPO="${{ github.event.pull_request.head.repo.clone_url || format('https://github.com/{0}.git', github.repository) }}"
+          echo "Using BRANCH=$BRANCH"
+          echo "Using REPO=$REPO"
+      
           sudo docker build --no-cache --pull \
-            --build-arg BRANCH=${{ github.head_ref }} \
-            --build-arg REPO=${{ github.event.pull_request.head.repo.clone_url }} \
+            --build-arg BRANCH="$BRANCH" \
+            --build-arg REPO="$REPO" \
             -t wire-sysio-build .
 
       - name: Run CTest suite

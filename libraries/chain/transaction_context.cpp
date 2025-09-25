@@ -381,8 +381,23 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::check_net_usage()const {
-      // This pre-check was checking the wrong resource limits and, if needed, must be updated for ROA policy awareness.
-      // Is needed to support caller-specified per-transaction limits, but old implementation caused too many issues.
+      if (!control.skip_trx_checks()) {
+         if( BOOST_UNLIKELY(net_usage > eager_net_limit) ) {
+            if ( net_limit_due_to_block ) {
+               SYS_THROW( block_net_usage_exceeded,
+                          "not enough space left in block: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            }  else if (net_limit_due_to_greylist) {
+               SYS_THROW( greylist_net_usage_exceeded,
+                          "greylisted transaction net usage is too high: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            } else {
+               SYS_THROW( tx_net_usage_exceeded,
+                          "transaction net usage is too high: ${net_usage} > ${net_limit}",
+                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+            }
+         }
+      }
    }
 
    std::string transaction_context::get_tx_cpu_usage_exceeded_reason_msg(fc::microseconds& limit) const {
@@ -470,11 +485,54 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const {
-      // This pre-check was checking the wrong resource limits and, if needed, must be updated for ROA policy awareness.
+      if (!control.skip_trx_checks()) {
+         if( check_minimum ) {
+            const auto& cfg = control.get_global_properties().configuration;
+            SYS_ASSERT( billed_us >= cfg.min_transaction_cpu_usage, transaction_exception,
+                        "cannot bill CPU time less than the minimum of ${min_billable} us",
+                        ("min_billable", cfg.min_transaction_cpu_usage)("billed_cpu_time_us", billed_us)
+                      );
+         }
+
+         validate_account_cpu_usage( billed_us, account_cpu_limit, subjective_billed_us );
+      }
    }
 
    void transaction_context::validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit, int64_t subjective_billed_us)const {
-      // This pre-check was checking the wrong resource limits and, if needed, must be updated for ROA policy awareness.
+      if( (billed_us > 0) && !control.skip_trx_checks() ) {
+         const bool cpu_limited_by_account = (account_cpu_limit <= objective_duration_limit.count());
+
+         if( !cpu_limited_by_account && (billing_timer_exception_code == block_cpu_usage_exceeded::code_value) ) {
+            SYS_ASSERT( billed_us <= objective_duration_limit.count(),
+                        block_cpu_usage_exceeded,
+                        "billed CPU time (${billed} us) is greater than the billable CPU time left in the block (${billable} us)",
+                        ("billed", billed_us)( "billable", objective_duration_limit.count() )
+            );
+         } else {
+            auto graylisted = cpu_limit_due_to_greylist && cpu_limited_by_account;
+            // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
+            auto account_limit = graylisted ? account_cpu_limit : (cpu_limited_by_account ? account_cpu_limit : objective_duration_limit.count());
+
+            if( billed_us > account_limit ) {
+               fc::microseconds tx_limit;
+               std::string assert_msg;
+               assert_msg.reserve(1024);
+               assert_msg += "billed CPU time (${billed} us) is greater than the maximum";
+               assert_msg += graylisted ? " greylisted" : "";
+               assert_msg += " billable CPU time for the transaction (${billable} us)";
+               assert_msg += subjective_billed_us > 0 ? " with a subjective cpu of (${subjective} us)" : "";
+               assert_msg += get_tx_cpu_usage_exceeded_reason_msg( tx_limit );
+
+               if( graylisted ) {
+                  FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                      ("billed", billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", tx_limit) );
+               } else {
+                  FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                      ("billed", billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", tx_limit) );
+               }
+            }
+         }
+      }
    }
 
    void transaction_context::validate_account_cpu_usage_estimate( int64_t prev_billed_us, int64_t account_cpu_limit, int64_t subjective_billed_us )const {

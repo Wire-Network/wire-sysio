@@ -1273,12 +1273,9 @@ namespace sysio { namespace testing {
                   ("bytesPerUnit", 104)
       );
 
-      produce_block();
-
       // Setup default node daddy for easier resource allocation during testing
       create_account(NODE_DADDY, config::system_account_name, false, true, false);
       register_node_owner(NODE_DADDY, 1);
-      produce_block();
       has_roa = true;
    }
 

@@ -567,11 +567,10 @@ BOOST_AUTO_TEST_CASE(ram_billing_in_notify_tests) { try {
    chain.produce_blocks(1);
 
    // wire-sysio does not have protocol feature ram_restrictions, ram restrictions are enforced from genesis
-   // notify is restricted fist by ram payer enforcement
    BOOST_CHECK_EXCEPTION( CALL_TEST_FUNCTION( chain, "test_action", "test_ram_billing_in_notify",
                                               fc::raw::pack( ((unsigned __int128)"testapi2"_n.to_uint64_t() << 64) | "testapi"_n.to_uint64_t() ) ),
-                          unsatisfied_authorization,
-                          fc_exception_message_is("Requested payer testapi did not authorize payment")
+                          unauthorized_ram_usage_increase,
+                          fc_exception_message_is("unprivileged contract cannot increase RAM usage of another account within a notify context: testapi")
    );
 
 
@@ -1525,7 +1524,6 @@ BOOST_FIXTURE_TEST_CASE(chain_tests, validating_tester) { try {
  * db_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
-   SKIP_TEST
    produce_blocks(2);
    create_account( "testapi"_n );
    create_account( "testapi2"_n );
@@ -1633,7 +1631,6 @@ BOOST_FIXTURE_TEST_CASE(db_tests, validating_tester) { try {
 
 // The multi_index iterator cache is preserved across notifications for the same action.
 BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
-   SKIP_TEST
    create_accounts( {"notifier"_n,"notified"_n } );
    const char notifier[] = R"=====(
 (module
@@ -1688,7 +1685,6 @@ BOOST_FIXTURE_TEST_CASE(db_notify_tests, validating_tester) {
  * multi_index_tests test case
  *************************************************************************************/
 BOOST_FIXTURE_TEST_CASE(multi_index_tests, validating_tester) { try {
-   SKIP_TEST
    produce_blocks(1);
    create_account( "testapi"_n );
    produce_blocks(1);

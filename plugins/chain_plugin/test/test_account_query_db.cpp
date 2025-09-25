@@ -30,9 +30,18 @@ bool find_account_auth(results rst, account_name name, permission_name perm){
     return false;
 }
 
+// Tests assume no permissions are modified before account_query_db is created.
+// Use preactivate_feature_only so that init_roa() is not called
+struct account_query_db_tester : validating_tester {
+    account_query_db_tester()
+        : validating_tester(flat_set<account_name>(), nullptr, setup_policy::preactivate_feature_only)
+    {
+    }
+};
+
 BOOST_AUTO_TEST_SUITE(account_query_db_tests)
 
-BOOST_FIXTURE_TEST_CASE(newaccount_test, validating_tester) { try {
+BOOST_FIXTURE_TEST_CASE(newaccount_test, account_query_db_tester) { try {
 
    // instantiate an account_query_db
    auto aq_db = account_query_db(*control);
@@ -57,7 +66,7 @@ BOOST_FIXTURE_TEST_CASE(newaccount_test, validating_tester) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(updateauth_test, validating_tester) { try {
+BOOST_FIXTURE_TEST_CASE(updateauth_test, account_query_db_tester) { try {
 
     // instantiate an account_query_db
     auto aq_db = account_query_db(*control);
@@ -91,7 +100,7 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test, validating_tester) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, validating_tester) { try {
+BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, account_query_db_tester) { try {
 
    // instantiate an account_query_db
    auto aq_db = account_query_db(*control);
@@ -143,8 +152,8 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, validating_tester) { try
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(future_fork_test) { try {
-   tester node_a(setup_policy::full);
-   tester node_b(setup_policy::full);
+   tester node_a(setup_policy::preactivate_feature_only);
+   tester node_b(setup_policy::preactivate_feature_only);
 
    // instantiate an account_query_db
    auto aq_db = account_query_db(*node_a.control);
@@ -190,8 +199,8 @@ BOOST_AUTO_TEST_CASE(future_fork_test) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE(fork_test) { try {
-      tester node_a(setup_policy::full);
-      tester node_b(setup_policy::full);
+      tester node_a(setup_policy::preactivate_feature_only);
+      tester node_b(setup_policy::preactivate_feature_only);
 
       // instantiate an account_query_db
       auto aq_db = account_query_db(*node_a.control);
