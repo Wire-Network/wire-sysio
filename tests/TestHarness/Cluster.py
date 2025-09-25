@@ -1242,7 +1242,7 @@ class Cluster(object):
         sysioRoaAccount = copy.deepcopy(sysioAccount)
         sysioRoaAccount.name = 'sysio.roa'
         contract="sysio.roa"
-        contractDir=str(self.unittestsContractsPath / contract)
+        contractDir=str(self.libTestingContractsPath / contract)
         wasmFile="%s.wasm" % (contract)
         abiFile="%s.abi" % (contract)
         Utils.Print("Publish %s contract" % (contract))

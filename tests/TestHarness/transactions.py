@@ -322,7 +322,7 @@ class Transactions(NodeopQueries):
         signStr = NodeopQueries.sign_str(sign, [owner.activePublicKey])
         cmdDesc="push action"
         time_block = self.getHeadBlockNum()
-        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "net_weight":"{net} SYS", "cpu_weight":"{cpu} SYS", "ram_weight":"{ram} SYS", "time_block":{time_block}, "network_gen":0' + "}"
+        argsStr = "{" + f'"issuer":"{issuer.name}", "owner":"{owner.name}", "netWeight":"{net} SYS", "cpuWeight":"{cpu} SYS", "ramWeight":"{ram} SYS", "timeBlock":{time_block}, "networkGen":0' + "}"
         cmd = (f"{cmdDesc} -j {signStr} sysio.roa addpolicy  '{argsStr}' -p {issuer.name}@active")
         trans=self.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=exitOnError)
         self.trackCmdTransaction(trans)
