@@ -734,8 +734,12 @@ namespace sysio {
         // all RAM provided to individual accounts for the account creation. See sysio.system newaccount.
         auto sys_symbol = state.total_sys.symbol;
         int64_t ram_weight_amount = sysiosystem::newaccount_ram * state.bytes_per_unit;
-        asset ram_weight = { ram_weight_amount, sys_symbol };
-        expandpolicy("sysio.acct"_n, "sysio"_n, {0, sys_symbol}, {0, sys_symbol}, ram_weight, 1);
+        policies_t policies(get_self(), "sysio"_n.value);
+        auto pol_itr = policies.find("sysio.acct"_n.value);
+        check(pol_itr != policies.end(), "Mission sysio.acct policy");
+        policies.modify(pol_itr, get_self(), [&](auto& row) {
+            row.ram_weight.amount += ram_weight_amount;
+        });
 
         // Update reslimit for sysio.acct for the ram
         update_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, ram_weight_amount);
