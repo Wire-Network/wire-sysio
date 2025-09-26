@@ -568,7 +568,7 @@ namespace sysio { namespace testing {
                                                 vector<permission_level>{{config::system_account_name, config::active_name}},
                                                 fc::mutable_variant_object()
                                                 ("account", a)
-                                                ("ram_bytes", 2800) // matches ram_newaccount of system contract
+                                                ("ram_bytes", 2808) // matches newaccount_ram of system contract
                                                 ("net_weight", -1)
                                                 ("cpu_weight", -1)));
          }
@@ -1258,8 +1258,8 @@ namespace sysio { namespace testing {
 
    void base_tester::init_roa() {
       // Create the ROA account and mark it as privileged
-      create_account(config::roa_account_name, config::system_account_name, false, true, false);
-      create_account("sysio.acct"_n, config::system_account_name, false, false, false); // used for tracking account creation
+      create_account(config::roa_account_name, config::system_account_name, false, true, false, false);
+      create_account("sysio.acct"_n, config::system_account_name, false, false, false, false); // used for tracking account creation
       set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,
@@ -1274,7 +1274,7 @@ namespace sysio { namespace testing {
       );
 
       // Setup default node daddy for easier resource allocation during testing
-      create_account(NODE_DADDY, config::system_account_name, false, true, false);
+      create_account(NODE_DADDY, config::system_account_name, false, false, false, false);
       register_node_owner(NODE_DADDY, 1);
       has_roa = true;
    }
