@@ -70,6 +70,7 @@ RUN apt-get install -y \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
 
+
 # Stage 2: source-deps
 # Install dependencies built from source (LLVM 11) on top of distro-deps.
 FROM distro-deps AS source-deps
@@ -110,6 +111,7 @@ RUN ./vcpkg/bootstrap-vcpkg.sh
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
+RUN ./vcpkg/bootstrap-vcpkg.sh
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
