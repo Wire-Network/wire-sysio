@@ -6,10 +6,6 @@
 	path = libraries/chainbase
 	url = https://github.com/Wire-Network/chainbase
 
-[submodule "libraries/sys-vm"]
-	path = libraries/sys-vm
-	url = https://github.com/Wire-Network/eos-vm.git
-
 [submodule "tests/abieos"]
 	path = tests/abieos
 	url = https://github.com/Wire-Network/abieos
@@ -18,16 +14,3 @@
 	path = vcpkg
 	url = https://github.com/Microsoft/vcpkg.git
 
-; 	TODO: REPLACE WITH VCPKG
-[submodule "libraries/rapidjson"]
-; 	path = libraries/rapidjson
-; 	url = https://github.com/Wire-Network/rapidjson
-
-; [submodule "libraries/libfc/include/fc/crypto/webauthn_json"]
-; 	path = libraries/libfc/include/fc/crypto/webauthn_json
-; 	url = https://github.com/Wire-Network/rapidjson
-
-
-; [submodule "libraries/libfc/libraries/boringssl/boringssl"]
-; 	path = libraries/libfc/libraries/boringssl/boringssl
-; 	url = https://github.com/AntelopeIO/boringssl-build

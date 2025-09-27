@@ -20,7 +20,7 @@
 #include <fc/crypto/sha1.hpp>
 #include <fc/io/raw.hpp>
 
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 #include <compiler_builtins.hpp>
 #include <boost/asio.hpp>
 #include <fstream>

@@ -30,8 +30,10 @@ find_package(Boost ${BOOST_VERSION}
   unit_test_framework
 )
 
-add_library(boost_numeric_ublas INTERFACE)
-add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
+if (NOT TARGET boost_numeric_ublas)
+  add_library(boost_numeric_ublas INTERFACE)
+  add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
+endif()
 
 find_package(Boost ${BOOST_VERSION}
   EXACT

@@ -24,6 +24,7 @@ set(ENABLE_UNDEFINED_BEHAVIOR_SANITIZER OFF CACHE BOOL "Use UB sanitizer")
 set(ENABLE_PROFILE OFF CACHE BOOL "Enable for profile builds")
 
 if(sys-vm IN_LIST SYSIO_WASM_RUNTIMES OR sys-vm-jit IN_LIST SYSIO_WASM_RUNTIMES)
-  add_subdirectory(sys-vm)
+  find_package(sys-vm REQUIRED)
+  # add_library(sys-vm ALIAS sys-vm::sys-vm)
 endif()
 

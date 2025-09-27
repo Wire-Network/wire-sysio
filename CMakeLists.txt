@@ -23,8 +23,10 @@ endif()
 
 project(wire-sysio)
 
-include(./cmake/compiler-config.cmake)
-include(./cmake/dependencies.cmake)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(compiler-config NO_POLICY_SCOPE)
+include(dependencies NO_POLICY_SCOPE)
+
 
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()

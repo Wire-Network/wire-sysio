@@ -1,6 +1,6 @@
 #include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/webassembly/preconditions.hpp>
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
    static constexpr uint32_t inv_float_eps = 0x4B000000;

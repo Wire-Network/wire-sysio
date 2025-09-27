@@ -56,7 +56,7 @@ endif()
 
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
    set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
-   set(CHAIN_SYSVM_LIBRARIES sys-vm)
+   set(CHAIN_SYSVM_LIBRARIES sys-vm::sys-vm)
 endif()
 
 set(CHAIN_WEBASSEMBLY_SOURCES

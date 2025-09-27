@@ -2,17 +2,17 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
-    "gmp",
-    "zlib",
-    "catch2",
-    "softfloat",
-    "libsodium",
-    "cli11",
+    "bls12-381",
+    "bn256",
     "boost",
     "boringssl-custom",
+    "catch2",
+    "cli11",
+    "gmp",
+    "libsodium",
     "secp256k1-internal",
-    "bn256",
-    "bls12-381",
+    "softfloat",
+    "zlib",
     {
       "name": "prometheus-cpp",
       "version>=": "1.3.0",
@@ -21,6 +21,12 @@
     {
       "name": "rapidjson",
       "version>=": "2022-06-28#3"
+    },
+    {
+      "name": "wire-sys-vm",
+      "features": [
+        "softfloat-skip-install"
+      ]
     }
   ],
   "overrides": [

@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 
 extern "C" {
    __int128 ___fixdfti(uint64_t);

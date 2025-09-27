@@ -42,6 +42,8 @@ RUN apt-get update
 RUN apt-get install -y \
         gnupg \
         build-essential \
+        ccache \
+        ninja-build \
         cmake \
         curl \
         git \
@@ -64,6 +66,7 @@ RUN apt-get install -y \
 
 # Make Python 3.12 the default python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
 
 # Stage 2: source-deps
 # Install dependencies built from source (LLVM 11) on top of distro-deps.
@@ -98,6 +101,7 @@ WORKDIR /wire
 RUN git clone --recursive -b ${BRANCH} ${REPO} ${APP_DIR}
 WORKDIR ${APP_DIR}
 RUN git submodule update --init --recursive
+RUN ./vcpkg/bootstrap-vcpkg.sh
 
 # Stage 4a: app-build-local
 # Configure and build the application from local sources.
@@ -105,16 +109,18 @@ RUN git submodule update --init --recursive
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
+RUN ./vcpkg/bootstrap-vcpkg.sh
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
+    -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
+    -DENABLE_CCACHE=ON
 
-
-RUN make -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -128,12 +134,13 @@ WORKDIR ${APP_BUILD_DIR}
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
+    -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
 
-RUN make -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -161,6 +168,7 @@ ENV PATH="${CDT_DEV_BUILD_DIR}/bin:${APP_DEV_BUILD_DIR}/bin:${PATH}"
 FROM app-build-repo AS cdt-source-repo
 RUN cd /wire && git clone --recursive https://github.com/Wire-Network/wire-cdt.git
 WORKDIR /wire/wire-cdt
+RUN ./vcpkg/bootstrap-vcpkg.sh
 
 # Stage 6: cdt-build-repo
 # Build the Wire CDT from source (for local development purposes).
@@ -169,9 +177,10 @@ FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
 RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
       -B . \
+      -G Ninja \
     	-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -DCMAKE_C_COMPILER=gcc-10 \
       -DCMAKE_CXX_COMPILER=g++-10 \
       -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
 
-RUN cd ${CDT_BUILD_DIR} && make -j8
+RUN cd ${CDT_BUILD_DIR} && ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)

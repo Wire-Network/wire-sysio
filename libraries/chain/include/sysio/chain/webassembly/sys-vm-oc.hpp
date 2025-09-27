@@ -4,7 +4,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/webassembly/runtime_interface.hpp>
 #include <sysio/chain/apply_context.hpp>
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 #include "IR/Types.h"
 
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.hpp>
