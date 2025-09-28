@@ -72,7 +72,6 @@ RUN apt-get install -y \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
 
-
 # Stage 2: source-deps
 # Install dependencies built from source (LLVM 11) on top of distro-deps.
 FROM distro-deps AS source-deps
@@ -91,21 +90,21 @@ FROM source-deps AS app-source-local
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 COPY --from=app-root / ${APP_DIR}/
-RUN ./vcpkg/bootstrap-vcpkg.sh
+RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else echo "vcpkg bootstrap script not found, skipping"; fi
 
 # Stage 3b: app-source-repo
 # Fetch application source from a remote repository (branch configurable via ARGs).
 FROM source-deps AS app-source-repo
-ARG BRANCH=master
+ARG SYSIO_BRANCH=master
 ARG REPO=https://github.com/Wire-Network/wire-sysio
 RUN mkdir -p /wire
 WORKDIR /wire
 
 # Clone the selected branch with submodules, then ensure full submodule initialization
-RUN git clone --recursive -b ${BRANCH} ${REPO} ${APP_DIR}
+RUN git clone --recursive -b ${SYSIO_BRANCH} ${REPO} ${APP_DIR}
 WORKDIR ${APP_DIR}
 RUN git submodule update --init --recursive
-RUN ./vcpkg/bootstrap-vcpkg.sh
+RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else echo "vcpkg bootstrap script not found, skipping"; fi
 
 # Stage 4a: app-build-local
 # Configure and build the application from local sources.
@@ -174,9 +173,11 @@ ENV PATH="${CDT_DEV_BUILD_DIR}/bin:${APP_DEV_BUILD_DIR}/bin:${PATH}"
 # Stage 5: cdt-source-repo
 # Cloning Wire CDT source from the remote repository.
 FROM app-build-repo AS cdt-source-repo
-RUN cd /wire && git clone --recursive https://github.com/Wire-Network/wire-cdt.git
+ARG CDT_BRANCH=master
+WORKDIR /wire
+RUN git clone --recursive -b ${CDT_BRANCH} https://github.com/Wire-Network/wire-cdt.git
 WORKDIR /wire/wire-cdt
-RUN ./vcpkg/bootstrap-vcpkg.sh
+RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else echo "vcpkg bootstrap script not found, skipping"; fi
 
 # Stage 6: cdt-build-repo
 # Build the Wire CDT from source (for local development purposes).
@@ -187,8 +188,10 @@ RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
       -B . \
       -G Ninja \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+      -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
       -DCMAKE_C_COMPILER=gcc-10 \
       -DCMAKE_CXX_COMPILER=g++-10 \
-      -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+      -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
+      -DENABLE_CCACHE=ON
 
 RUN cd ${CDT_BUILD_DIR} && ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
