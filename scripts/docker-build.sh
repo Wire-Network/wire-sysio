@@ -10,10 +10,12 @@ DOCKER_DIR="${BASE_DIR}/etc/docker"
 # Default build target and image tag
 TARGET="app-build-local"
 TAG="wire/sysio"
+BRANCH="master"
 
 usage() {
-  echo "Usage: $(basename "$0") [--target=<stage>] [--tag=<tag-name>]" 1>&2
+  echo "Usage: $(basename "$0") [--target=<stage>]  [--branch=<branch-name>] [--tag=<tag-name>]" 1>&2
   echo "  --target=<stage>        Docker build target stage name (default: ${TARGET})" 1>&2
+  echo "  --branch=<branch-or-ref> Git branch or ref (default: ${BRANCH})" 1>&2
   echo "  --tag=<tag-name> Docker image tag to produce (default: ${TAG})" 1>&2
 }
 
@@ -28,6 +30,10 @@ while [[ $# -gt 0 ]]; do
       TAG="${1#--tag=}"
       shift
       ;;
+    --branch=*)
+      BRANCH="${1#--branch=}"
+      shift
+      ;;  
     -h|--help)
       usage
       exit 0
@@ -109,6 +115,7 @@ cd "${DOCKER_DIR}"
 docker build \
   --build-context llvm-11-scripts="${BASE_DIR}/scripts/llvm-11" \
   --build-context app-root="${BASE_DIR}" \
+  --build-arg BRANCH=${BRANCH} \
   --memory 32G \
   --tag "${TAG}" \
   --target "${TARGET}" \

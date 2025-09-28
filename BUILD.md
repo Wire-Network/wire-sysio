@@ -65,27 +65,28 @@ sudo apt update
 
 # Build toolchain and development libraries needed by the application
 sudo apt install -y \
-        gnupg \
-        build-essential \
-        cmake \
-        curl \
-        git \
-        vim \
-        sudo \
-        doxygen \
-        libboost-all-dev \
-        libcurl4-openssl-dev \
-        libgmp-dev \
-        libssl-dev \
-        libusb-1.0-0-dev \
-        pkg-config \
-        python3 \
-        zlib1g-dev \
-        libbz2-dev \
-        liblzma-dev \
-        libncurses5-dev \
-        libzstd-dev \
-    		python3.12
+    	build-essential \
+      cmake \
+      curl \
+      doxygen \
+      git \
+      gnupg \
+      libboost-all-dev \
+      libbz2-dev \
+      libcurl4-openssl-dev \
+      libgmp-dev \
+      liblzma-dev \
+      libncurses5-dev \
+      libssl-dev \
+      libusb-1.0-0-dev \
+      libzstd-dev \
+      ninja-build \
+      pkg-config \
+      python3.12 \
+      tar \
+      unzip \
+      zip \
+      zlib1g-dev
 
 ```
 ### 1b. Ubuntu (20.04, 22.04)
@@ -112,6 +113,19 @@ export BASE_DIR=/opt/llvm
 
 > *IMPORTANT* Remember the path for the purpose of using with CMake.
 > Example `-DCMAKE_PREFIX_PATH=${BASE_DIR}/llvm-11`
+
+### 1d. Bootstrap vcpkg
+
+Wire Sysio, while being a derivative/fork of `leap v5`, it uses a different dependency management system in-line with modern tooling, specifically, `vcpkg`.  
+
+After installing the required system dependencies, you must bootstrap vcpkg from the root of the cloned `wire-sysio`:
+
+```sh
+# From wire-sysio repo root, run
+./vcpkg/bootstrap-vcpkg.sh
+```
+
+You are now ready to build.
 
 ## Step 2 - Build
 

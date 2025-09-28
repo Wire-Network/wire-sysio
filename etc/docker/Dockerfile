@@ -46,6 +46,9 @@ RUN apt-get install -y \
         ninja-build \
         cmake \
         curl \
+        zip \
+        unzip \
+        tar \
         git \
         vim \
         sudo \
@@ -56,13 +59,12 @@ RUN apt-get install -y \
         libssl-dev \
         libusb-1.0-0-dev \
         pkg-config \
-        python3 \
         zlib1g-dev \
         libbz2-dev \
         liblzma-dev \
         libncurses5-dev \
         libzstd-dev \
-    		python3.12
+    	python3.12
 
 # Make Python 3.12 the default python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
@@ -83,17 +85,16 @@ RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
 # Stage 3a: app-source-local
 # Use local build context as the application source.
 FROM source-deps AS app-source-local
-
 RUN mkdir -p ${APP_DIR}
 WORKDIR ${APP_DIR}
 COPY --from=app-root / ${APP_DIR}/
+RUN ./vcpkg/bootstrap-vcpkg.sh
 
 # Stage 3b: app-source-repo
 # Fetch application source from a remote repository (branch configurable via ARGs).
 FROM source-deps AS app-source-repo
 ARG BRANCH=master
 ARG REPO=https://github.com/Wire-Network/wire-sysio
-
 RUN mkdir -p /wire
 WORKDIR /wire
 
@@ -109,12 +110,12 @@ RUN ./vcpkg/bootstrap-vcpkg.sh
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN ./vcpkg/bootstrap-vcpkg.sh
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
@@ -131,14 +132,18 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
+RUN apt install -y golang
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+    -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=gcc-10 \
     -DCMAKE_CXX_COMPILER=g++-10 \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
+    -DENABLE_CCACHE=ON
+
 
 RUN ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
@@ -178,7 +183,7 @@ RUN mkdir -p ${CDT_BUILD_DIR}
 RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
       -B . \
       -G Ninja \
-    	-DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -DCMAKE_C_COMPILER=gcc-10 \
       -DCMAKE_CXX_COMPILER=g++-10 \
       -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
