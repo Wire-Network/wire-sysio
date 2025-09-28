@@ -59,12 +59,14 @@ RUN apt-get install -y \
         libssl-dev \
         libusb-1.0-0-dev \
         pkg-config \
+        python3.12 \
+        python3-pip \
         zlib1g-dev \
         libbz2-dev \
         liblzma-dev \
         libncurses5-dev \
-        libzstd-dev \
-    	python3.12
+        libzstd-dev
+    	
 
 # Make Python 3.12 the default python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
@@ -111,7 +113,6 @@ RUN ./vcpkg/bootstrap-vcpkg.sh
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN ./vcpkg/bootstrap-vcpkg.sh
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
