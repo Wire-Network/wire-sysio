@@ -15,4 +15,4 @@ add_subdirectory(Source/Logging)
 add_subdirectory(Source/WASM)
 add_subdirectory(Source/WAST)
 
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/wasm-jit COMPONENT dev EXCLUDE_FROM_ALL)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Include/ DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/wasm-jit)

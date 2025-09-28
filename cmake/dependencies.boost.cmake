@@ -1,3 +1,4 @@
+set(BOOST_VERSION 1.83.0)
 find_package(Boost ${BOOST_VERSION}
   EXACT
   CONFIG
