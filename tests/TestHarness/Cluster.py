@@ -1142,7 +1142,7 @@ class Cluster(object):
                 return None
             return trans
 
-        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.ram', 'sysio.ramfee', 'sysio.saving', 'sysio.stake', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'carl']
+        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
