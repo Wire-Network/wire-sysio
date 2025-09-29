@@ -644,7 +644,7 @@ BOOST_AUTO_TEST_CASE( get_sender_test ) { try {
 BOOST_AUTO_TEST_CASE(move_my_ram) {
    try {
       tester c(setup_policy::full);
-      wlog("Starting MVOE MY RAM TEST");
+      wlog("Starting MOVE MY RAM TEST");
 
       const auto &tester1_account = account_name("tester1");
       const auto &alice_account = account_name("alice");
@@ -668,6 +668,17 @@ BOOST_AUTO_TEST_CASE(move_my_ram) {
                     ("payer", alice_account)
       );
 
+      // do not allow move if it requires more RAM than available
+      BOOST_REQUIRE_EXCEPTION(
+         c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+                       ("len1", 0)
+                       ("len2", 11)
+                       ("payer", alice_account)
+         ),
+         unauthorized_ram_usage_increase,
+         fc_exception_message_is("unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice")
+      );
+
       wlog("Moving data around with bob's authorization...");
       c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
          ("len1", 0)
@@ -677,6 +688,14 @@ BOOST_AUTO_TEST_CASE(move_my_ram) {
 
       c.produce_block();
 
+      // move some RAM back
+      c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
+         ("len1", 5)
+         ("len2", 1)
+         ("payer", alice_account)
+      );
+
+      c.produce_block();
 
       wlog("Removing data with bob's authorization...");
       c.push_action(tester1_account, "setdata"_n, bob_account, mutable_variant_object()
