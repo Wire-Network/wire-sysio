@@ -747,8 +747,9 @@ namespace sysio {
             row.ram_weight.amount += ram_weight_amount;
         });
 
-        // Update reslimit for sysio.acct for the ram
+        // Update reslimit for sysio/sysio.acct for the ram
         update_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, sysiosystem::newaccount_ram);
+        update_reslimit("sysio"_n, {0, sys_symbol}, {0, sys_symbol}, -sysiosystem::newaccount_ram);
 
         return new_username;
     }
