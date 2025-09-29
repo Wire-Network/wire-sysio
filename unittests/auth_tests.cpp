@@ -362,7 +362,9 @@ try {
    BOOST_CHECK_EXCEPTION(chain.create_account(name("aaaaaaaaaaaaa")), action_validate_exception,
                          fc_exception_message_is("account names can only be 12 chars long"));
 
-   // Note: Only privileged accounts can create accounts enforced by sysio.system contract
+   // Creating a new account with non-privileged account, should fail
+   BOOST_CHECK_EXCEPTION(chain.create_account(name("dandy.joe"), name("joe")), action_validate_exception,
+                         fc_exception_message_is("Only privileged accounts can create new accounts"));
 
    // Creating the same new account, this time with privileged account
    chain.set_privileged("joe"_n);
