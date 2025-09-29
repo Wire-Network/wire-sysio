@@ -200,8 +200,8 @@ namespace sysio {
         auto pol_iter = policies.find(owner.value);
         check(pol_iter == policies.end(), "A policy for this owner already exists from this issuer. Use expandpolicy instead.");
 
-        // Update reslimit for the 'owner'
-        update_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate);
+        // Update reslimit for the 'owner', add newaccount_ram since reslimit is being created for the user
+        update_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate+sysiosystem::newaccount_ram);
         // Update the system resource limits
         add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
 
