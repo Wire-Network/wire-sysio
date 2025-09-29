@@ -338,8 +338,6 @@ BOOST_FIXTURE_TEST_CASE( newuser_nonce_collision, sysio_roa_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
-   static constexpr uint64_t newaccount_ram = 2808; // to cover creation and small amount for variation in authorizations
-
    // load system contract for newaccount functionality
    set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
    set_abi( config::system_account_name, test_contracts::sysio_system_abi() );

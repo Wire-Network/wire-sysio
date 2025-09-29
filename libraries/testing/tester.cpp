@@ -568,7 +568,7 @@ namespace sysio { namespace testing {
                                                 vector<permission_level>{{config::system_account_name, config::active_name}},
                                                 fc::mutable_variant_object()
                                                 ("account", a)
-                                                ("ram_bytes", 2808) // matches newaccount_ram of system contract
+                                                ("ram_bytes", newaccount_ram) // matches newaccount_ram of system contract
                                                 ("net_weight", -1)
                                                 ("cpu_weight", -1)));
          }
