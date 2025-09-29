@@ -190,7 +190,9 @@ void apply_context::validate_account_ram_deltas() {
       auto& ram_delta = itr->delta;
       if (payer != receiver && ram_delta > 0) {
          if (receiver == config::system_account_name) {
+            // sysio allowed
          } else if (payer == config::system_account_name && is_privileged()) {
+            // explicit sysio payer allowed when privileged
          } else {
             auto payer_found = false;
             // search act->authorization for a payer permission role
