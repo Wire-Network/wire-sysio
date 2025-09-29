@@ -29,8 +29,7 @@ BOOST_AUTO_TEST_CASE( bls_testg1add ) { try {
 
    const auto& tester1_account = account_name("tester1");
    c.create_accounts( {tester1_account} );
-   c.register_node_owner( tester1_account, 1 );
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.produce_block();
 
    c.set_contract( tester1_account, test_contracts::bls_primitives_test_wasm(),
@@ -96,8 +95,7 @@ BOOST_AUTO_TEST_CASE( bls_testg2add ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -161,8 +159,7 @@ BOOST_AUTO_TEST_CASE( bls_testg1weightedsum ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -266,8 +263,7 @@ BOOST_AUTO_TEST_CASE( bls_testg2weightedsum ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -371,8 +367,7 @@ BOOST_AUTO_TEST_CASE( bls_testpairing ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -445,8 +440,7 @@ BOOST_AUTO_TEST_CASE( bls_testg1map ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -509,8 +503,7 @@ BOOST_AUTO_TEST_CASE( bls_testg2map ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -572,8 +565,7 @@ BOOST_AUTO_TEST_CASE( bls_empty ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -614,8 +606,7 @@ BOOST_AUTO_TEST_CASE( bls_testfpmul ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -671,8 +662,7 @@ BOOST_AUTO_TEST_CASE( bls_testfpexp ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
@@ -735,8 +725,7 @@ BOOST_AUTO_TEST_CASE( bls_testfpmod ) { try {
    c.create_accounts( {tester1_account} );
    c.produce_block();
 
-   c.register_node_owner(tester1_account, 1);
-   c.expand_roa_policy( tester1_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
+   c.expand_roa_policy( c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "4.0000 SYS", 0);
    c.set_code( tester1_account, test_contracts::bls_primitives_test_wasm() );
    c.set_abi( tester1_account, test_contracts::bls_primitives_test_abi().data() );
    c.produce_block();
