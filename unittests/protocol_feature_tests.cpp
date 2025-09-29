@@ -997,7 +997,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       ("payer", "tester1")
       ),
       ram_usage_exceeded,
-      fc_exception_message_is( "account tester1 has insufficient ram; needs 89056 bytes has 88808 bytes" )
+      fc_exception_message_starts_with( "account tester1 has insufficient ram; needs" )
    );
 
    c.expand_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);

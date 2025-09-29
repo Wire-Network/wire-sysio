@@ -313,7 +313,8 @@ namespace sysio {
             /**
              * @brief Increase values of reslimit entry, assert if not found
              */
-            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes,
+                                          bool require_to_exist);
 
     }; // namespace roa
 } // namespace sysio

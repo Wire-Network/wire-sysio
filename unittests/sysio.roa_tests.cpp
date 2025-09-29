@@ -28,7 +28,7 @@ public:
    sysio_roa_tester() {
       produce_blocks( 2 );
 
-      create_accounts( { "alice"_n, "bob"_n, "carol"_n, "darcy"_n } );
+      create_accounts( { "alice"_n, "bob"_n, "carol"_n, "darcy"_n }, false, false, false, false );
       produce_blocks( 2 );
 
       // set_code( ROA, contracts::sysio_roa_wasm() );

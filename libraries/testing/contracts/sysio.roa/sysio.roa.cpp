@@ -27,25 +27,40 @@ namespace sysio {
         });
     }
 
-    roa::resources_t roa::increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes) {
+    roa::resources_t roa::increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes, bool require_to_exist) {
         bool sysio_acct = is_sysio_account(owner);
 
-        reslimit_t reslimit(get_self(), owner.value);
+        reslimit_t reslimit(get_self(), get_self().value);
         auto res_itr = reslimit.find(owner.value);
-        check(res_itr != reslimit.end(), "No resource limit exists for this account.");
+        check(!require_to_exist || res_itr != reslimit.end(), "No resource limit exists for this account.");
 
-        reslimit.modify(res_itr, get_self(), [&](auto& row) {
-            if (!sysio_acct) {
-                row.net_weight.amount += netWeight.amount;
-                row.cpu_weight.amount += cpuWeight.amount;
-            }
-            row.ram_bytes += (uint64_t)ram_bytes;
-        });
-        return resources_t{
-            .net = res_itr->net_weight,
-            .cpu = res_itr->cpu_weight,
-            .ram_bytes = res_itr->ram_bytes
-        };
+        if (res_itr == reslimit.end()) {
+            resources_t res = {
+                .net = sysio_acct ? asset(0, netWeight.symbol) : netWeight,
+                .cpu = sysio_acct ? asset(0, cpuWeight.symbol) : cpuWeight,
+                .ram_bytes = (uint64_t)ram_bytes
+            };
+            reslimit.emplace(get_self(), [&](auto& row) {
+                row.owner = owner;
+                row.net_weight = res.net;
+                row.cpu_weight = res.cpu;
+                row.ram_bytes = res.ram_bytes;
+            });
+            return res;
+        } else {
+            reslimit.modify(res_itr, get_self(), [&](auto& row) {
+                if (!sysio_acct) {
+                    row.net_weight.amount += netWeight.amount;
+                    row.cpu_weight.amount += cpuWeight.amount;
+                }
+                row.ram_bytes += (uint64_t)ram_bytes;
+            });
+            return resources_t{
+                .net = res_itr->net_weight,
+                .cpu = res_itr->cpu_weight,
+                .ram_bytes = res_itr->ram_bytes
+            };
+        }
     }
 
     void roa::activateroa(const asset& totalSys, const uint64_t& bytesPerUnit) {
@@ -117,7 +132,7 @@ namespace sysio {
             row.time_block = 0;
         });
         // Provide RAM for sysio.acct itself, but provide no CPU/NET
-        update_reslimit("sysio.acct"_n, asset(0, totalSys.symbol), asset(0, totalSys.symbol), sysiosystem::newaccount_ram);
+        set_reslimit("sysio.acct"_n, asset(0, totalSys.symbol), asset(0, totalSys.symbol), sysiosystem::newaccount_ram);
         set_resource_limits("sysio.acct"_n, sysiosystem::newaccount_ram, 0, 0);
     };
 
@@ -207,7 +222,7 @@ namespace sysio {
         check(pol_iter == policies.end(), "A policy for this owner already exists from this issuer. Use expandpolicy instead.");
 
         // Create/set reslimit for the 'owner', add newaccount_ram since reslimit is being created for the user
-        set_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate+sysiosystem::newaccount_ram);
+        increase_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate+sysiosystem::newaccount_ram, false);
 
         // Update the system resource limits
         add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
@@ -287,7 +302,7 @@ namespace sysio {
         });
 
         // Update owner's resource limits
-        increase_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate);
+        increase_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate, true);
         // Update the system resource limits
         add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
     };
@@ -378,8 +393,8 @@ namespace sysio {
         // Update reslimit row
         reslimit.modify(res_itr, get_self(), [&](auto& row) {
             if (!sysio_acct) {
-                row.net_weight.amount += net_weight.amount;
-                row.cpu_weight.amount += cpu_weight.amount;
+                row.net_weight.amount -= net_weight.amount;
+                row.cpu_weight.amount -= cpu_weight.amount;
             }
             row.ram_bytes += static_cast<uint64_t>(rl_row.ram_bytes - divisible_ram_to_reclaim);;
         });
@@ -755,8 +770,8 @@ namespace sysio {
         });
 
         // Update reslimit for sysio/sysio.acct for the ram
-        increase_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, sysiosystem::newaccount_ram);
-        increase_reslimit("sysio"_n, {0, sys_symbol}, {0, sys_symbol}, -sysiosystem::newaccount_ram);
+        increase_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, sysiosystem::newaccount_ram, true);
+        increase_reslimit("sysio"_n, {0, sys_symbol}, {0, sys_symbol}, -sysiosystem::newaccount_ram, true);
 
         return new_username;
     }
