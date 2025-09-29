@@ -32,7 +32,7 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
     int64_t ram_bytes, net_limit, cpu_limit;
     resource_manager.get_account_limits("kevin"_n, ram_bytes, net_limit, cpu_limit);
     // RAM account limit ram_bytes is total RAM usage allowed; not what is left
-    BOOST_TEST( ram_bytes == 2800 ); // RAM usage allowed to account
+    BOOST_TEST( ram_bytes == 2808 ); // RAM usage allowed to account
 
     int64_t ram_usage = resource_manager.get_account_ram_usage("kevin"_n);
     BOOST_TEST( ram_usage == 2724 ); // RAM used by "kevin" during account creation, provided by sysio
