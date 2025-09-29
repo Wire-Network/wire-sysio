@@ -1,13 +1,25 @@
 cmake_minimum_required(VERSION 3.5)
-cmake_policy(SET CMP0116 NEW) #suppress warning about Boost::xxxx targets not being imported
+cmake_policy(SET CMP0116 OLD) #suppress warning about Boost::xxxx targets not being imported
 message(STATUS "Setting up Sysio Tester @VERSION_FULL@ at @SYS_ROOT_DIR@")
 
-SET(CMAKE_INSTALL_RPATH "${HOME}/lib;${HOME}/lib64")
+# VERSION
+set(SYSIO_VERSION "@VERSION_FULL@")
 
+# FORWARD COMPILER SETTINGS
+set(CMAKE_INSTALL_RPATH "${HOME}/lib;${HOME}/lib64")
 set(CMAKE_CXX_COMPILER @CMAKE_CXX_COMPILER@)
 set(CMAKE_C_COMPILER @CMAKE_C_COMPILER@)
 
-set(SYSIO_VERSION "@VERSION_FULL@")
+# CXX CONFIG
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CXX_STANDARD_REQUIRED ON)
+
+# CXX FLAGS
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
+if(APPLE)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+endif(APPLE)
 
 enable_testing()
 
@@ -24,16 +36,8 @@ endif()
 if(NOT "@LLVM_FOUND@" STREQUAL "")
    find_package(LLVM @LLVM_VERSION@ EXACT REQUIRED CONFIG)
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native DebugInfoDWARF orcjit)
-   link_directories(${LLVM_LIBRARY_DIR})
+   # link_directories(AFTER ${LLVM_LIBRARY_DIR})
 endif()
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_EXTENSIONS ON)
-set(CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
-if(APPLE)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-endif(APPLE)
 
 #adds -pthread. Ubuntu sysio.contracts build breaks without this flag specified
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -103,11 +107,6 @@ find_sysio_library(libdecrepit NAMES libdecrepit decrepit)
 find_sysio_library(libsodium NAMES libsodium sodium)
 find_sysio_library(libgmp NAMES libgmp gmp)
 
-#Ubuntu build requires rt library to be specified explicitly
-if(UNIX AND NOT APPLE)
-   find_library(LIBRT rt)
-endif()
-
 set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
 if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    set(WRAP_MAIN "-Wl,-wrap=main")
@@ -121,7 +120,6 @@ target_link_libraries(SysioChain INTERFACE
    ${libwast}
    ${libwasm}
    ${libir}
-
    ${liblogging}
    ${libchainbase}
    ${libbuiltins}
@@ -130,7 +128,6 @@ target_link_libraries(SysioChain INTERFACE
    ${libbls12-381}
    ${libsodium}
    ${libgmp}
-   # ${libborringssl}
    ${libsoftfloat}
    ${libbscrypto}
    ${libdecrepit}
@@ -165,10 +162,6 @@ target_include_directories(SysioChain INTERFACE
    @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
    @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat)
 
-#adds -ltr. Ubuntu sysio.contracts build breaks without this
-if(UNIX AND NOT APPLE)
-   target_link_libraries(SysioChain INTERFACE ${LIBRT})
-endif()
 
 add_library(SysioTester INTERFACE)
 
@@ -182,10 +175,7 @@ macro(add_sysio_test_executable test_name)
    add_executable(${test_name} ${ARGN})
    target_link_libraries(${test_name}
       SysioTester
-   )
-   if(UNIX AND NOT APPLE)
-      target_link_libraries(${test_name} ${LIBRT})
-   endif()
+   )   
 endmacro()
 
 macro(add_sysio_test test_name)

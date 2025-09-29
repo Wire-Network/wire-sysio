@@ -53,6 +53,10 @@ RUN apt-get install -y \
         vim \
         sudo \
         doxygen \
+        golang \
+        llvm-18 \
+        clang-18 \
+        clang-tools-18 \
         libboost-all-dev \
         libcurl4-openssl-dev \
         libgmp-dev \
@@ -118,12 +122,13 @@ RUN cmake \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=gcc-10 \
-    -DCMAKE_CXX_COMPILER=g++-10 \
+    -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+    -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+    -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
     -DENABLE_CCACHE=ON
 
-RUN ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -134,20 +139,20 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN apt install -y golang
 RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=gcc-10 \
-    -DCMAKE_CXX_COMPILER=g++-10 \
+    -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+    -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+    -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \    
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
     -DENABLE_CCACHE=ON
 
 
-RUN ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -189,9 +194,11 @@ RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
       -G Ninja \
       -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-      -DCMAKE_C_COMPILER=gcc-10 \
-      -DCMAKE_CXX_COMPILER=g++-10 \
+      -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+      -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+      -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
       -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
       -DENABLE_CCACHE=ON
 
-RUN cd ${CDT_BUILD_DIR} && ninja -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+WORKDIR ${CDT_BUILD_DIR} 
+RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)

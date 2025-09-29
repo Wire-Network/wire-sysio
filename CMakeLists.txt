@@ -203,13 +203,6 @@ option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.version.in ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/sysio.version.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR})
 
-# set(SYSIO_ROOT_DIR "${CMAKE_BINARY_DIR}/lib")
-
-# new sysio CMake files
-# configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTesterBuild.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
-# configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
-# configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake COPYONLY)
-
 set(SYSIO_ROOT_DIR "${CMAKE_INSTALL_FULL_LIBDIR}")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake @ONLY)
 configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioTester.cmake.in ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake @ONLY)
@@ -218,12 +211,6 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake ${CMAKE_BINARY_
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
 install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio)
-
-# new sysio CMake files
-# configure_file(${CMAKE_SOURCE_DIR}/cmake/sysio-config.cmake.in ${CMAKE_BINARY_DIR}/cmake/sysio-config.cmake @ONLY)
-# install(FILES ${CMAKE_BINARY_DIR}/cmake/sysio-config.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
-# install(FILES ${CMAKE_BINARY_DIR}/cmake/SysioTester.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
-# install(FILES ${CMAKE_SOURCE_DIR}/cmake/SysioCheckVersion.cmake DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/cmake/sysio COMPONENT dev EXCLUDE_FROM_ALL)
 
 include(cmake/licenses.cmake)
 

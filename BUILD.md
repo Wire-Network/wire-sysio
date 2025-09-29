@@ -143,29 +143,26 @@ Select build instructions below based on OS.
 To build, make sure you are in the root of the `wire-sysio` repo, then run the following commands:
 
 ```bash
-mkdir -p build
 
-## on Ubuntu 20 & 22
+## on Ubuntu 20-24.04
 cmake -B build -S . \
-  -DCMAKE_C_COMPILER=gcc-10 \
-  -DCMAKE_CXX_COMPILER=g++-10 \
+  -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+  -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+  -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 \
-  ..
+  -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 
 
 ## on Ubuntu 24, you must set the prefix path 
 ## to the location of your LLVM 11 build completed in step 1c
 cmake -B build -S . \
-  -DCMAKE_C_COMPILER=gcc-10 \
-  -DCMAKE_CXX_COMPILER=g++-10 \
+  -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+  -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+  -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+  -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH=<LLVM_PREFIX_PATH_FROM_STEP_1C> \
-  .. 
+  -DCMAKE_PREFIX_PATH=<LLVM_PREFIX_PATH_FROM_STEP_1C> 
 
-## Build for development
-## If you want to build with debug symbols, and with access to the LLVM tool suite, add this:
-## -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=<LLVM_PREFIX_PATH_FROM_STEP_1C>
-# cmake  -B build -S . --build
 ```
 
 Now you can optionally [test](./README.md#Testing) your build, or [install](#step-3---install) the `*.deb` binary packages,
@@ -180,18 +177,17 @@ command:
 
 ```bash
 # Create a distro package
-cd build
-make -j package
-
-# Install the package
-sudo apt update
-sudo apt install -y ./wire-sysio[-_][0-9]*.deb
+cmake --build build -- -j
 ```
 
-It is also possible to install using `make` instead:
+It is also possible to install using `cmake` instead:
 
 ```bash
-sudo make install
+
+# If installing to a directory you 
+# do not have permissions to 
+# write to, use `sudo`.
+[sudo] cmake --install build
 ```
 
 # Docker Container
