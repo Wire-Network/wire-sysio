@@ -2428,10 +2428,10 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
       }
 
       auto lookup_object = [&](const name& obj_name, const name& account_name) -> std::optional<vector<char>> {
-         auto t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::roa_account_name, account_name, obj_name ));
+         auto t_id = d.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple( config::roa_account_name, config::roa_account_name, obj_name ));
          if (t_id != nullptr) {
             const auto& idx = d.get_index<key_value_index, by_scope_primary>();
-            auto it = idx.find(boost::make_tuple( t_id->id, params.account_name.to_uint64_t() ));
+            auto it = idx.find(boost::make_tuple( t_id->id, account_name.to_uint64_t() ));
             if (it != idx.end()) {
                vector<char> data;
                copy_inline_row(*it, data);
