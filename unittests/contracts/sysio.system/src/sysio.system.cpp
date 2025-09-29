@@ -242,8 +242,6 @@ namespace sysiosystem {
                             ignore<authority> owner,
                             ignore<authority> active ) {
 
-      check( sysio::is_privileged(creator), "Only privileged accounts can create users");
-
       set_resource_limits( new_account_name, 0, 0, 0 );
       transfer_ram( get_self(), new_account_name, sysiosystem::newaccount_ram );
    }
