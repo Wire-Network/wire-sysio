@@ -6,7 +6,6 @@
 
 namespace sysio::chain {
 
-class account_ram_correction_object;
 class generated_transaction_object;
 class table_id_object;
 struct key_value_object;
@@ -62,7 +61,6 @@ public:
    void on_start_transaction();
    void on_end_transaction();
    void on_applied_transaction(uint32_t block_num, const std::shared_ptr<transaction_trace>& trace);
-   void on_add_ram_correction(const account_ram_correction_object& rco, uint64_t delta);
    void on_preactivate_feature(const protocol_feature& feature);
    void on_activate_feature(const protocol_feature& feature);
    void on_input_action();

@@ -118,18 +118,6 @@ namespace sysio::chain {
       );
    }
 
-   void deep_mind_handler::on_add_ram_correction(const account_ram_correction_object& rco, uint64_t delta)
-   {
-      fc_dlog(_logger, "RAM_CORRECTION_OP ${action_id} ${correction_id} ${event_id} ${payer} ${delta}",
-         ("action_id", _action_id)
-         ("correction_id", rco.id._id)
-         ("event_id", _ram_trace.event_id)
-         ("payer", rco.name)
-         ("delta", delta)
-      );
-      _ram_trace = ram_trace();
-   }
-
    void deep_mind_handler::on_preactivate_feature(const protocol_feature& feature)
    {
       fc_dlog(_logger, "FEATURE_OP PRE_ACTIVATE ${action_id} ${feature_digest} ${feature}",

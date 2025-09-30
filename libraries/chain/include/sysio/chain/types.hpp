@@ -178,7 +178,7 @@ namespace sysio::chain {
       action_history_object_type,               ///< Defined by history_plugin
       reversible_block_object_type,
       protocol_state_object_type,
-      account_ram_correction_object_type,
+      UNUSED_account_ram_correction_object_type,
       code_object_type,
       database_header_object_type,
       contract_root_object_type,
