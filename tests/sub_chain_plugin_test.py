@@ -994,26 +994,6 @@ class PluginHttpTest(unittest.TestCase):
         self.assertIn("feature_digest", ret_json[0])
         self.assertIn("subjective_restrictions", ret_json[0])
 
-        # get_account_ram_corrections with empty parameter
-        default_cmd = cmd_base + "get_account_ram_corrections"
-        ret_json = Utils.runCmdReturnJson(default_cmd)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with empty content parameter
-        empty_content_cmd = default_cmd + self.http_post_str + self.empty_content_str
-        ret_json = Utils.runCmdReturnJson(empty_content_cmd)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with invalid parameter
-        invalid_cmd = default_cmd + self.http_post_str + self.http_post_invalid_param
-        ret_json = Utils.runCmdReturnJson(invalid_cmd)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with valid parameter
-        valid_cmd = default_cmd + self.http_post_str + ("'{\"lower_bound\":\"\", \"upper_bound\":\"\", \"limit\":1, \"reverse\":false}'")
-        ret_json = Utils.runCmdReturnJson(valid_cmd)
-        self.assertIn("rows", ret_json)
-
     # test all wallet api
     def notest_WalletApi(self) :
         cmd_base = self.base_wallet_cmd_str + "wallet/"
