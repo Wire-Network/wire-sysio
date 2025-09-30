@@ -85,7 +85,6 @@ target_include_directories(sysio_rapidjson INTERFACE ../rapidjson/include)
 add_library( sysio_chain
              merkle.cpp
              name.cpp
-             action.cpp
              transaction.cpp
              block.cpp
              block_header.cpp

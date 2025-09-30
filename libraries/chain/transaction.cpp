@@ -113,6 +113,17 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW() }
 
+std::optional<account_name> transaction::explicit_payer()const {
+   for( const auto& a : actions ) {
+      for( const auto& auth : a.authorization ) {
+         if ( auth.permission == config::sysio_payer_name ) {
+            return std::optional{auth.actor};
+         }
+      }
+   }
+   return {};
+}
+
 flat_multimap<uint16_t, transaction_extension> transaction::validate_and_extract_extensions()const {
    using decompose_t = transaction_extension_types::decompose_t;
 
