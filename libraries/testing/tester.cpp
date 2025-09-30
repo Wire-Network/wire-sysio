@@ -515,7 +515,8 @@ namespace sysio { namespace testing {
   }
 
 
-   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator, bool multisig, bool include_code, bool include_roa_policy) {
+   transaction_trace_ptr base_tester::create_account( account_name a, account_name creator,
+                                                      bool multisig, bool include_code, bool include_roa_policy, bool include_ram_gift) {
       signed_transaction trx;
       set_transaction_headers(trx);
 
@@ -555,6 +556,23 @@ namespace sysio { namespace testing {
                                    .owner    = owner_auth,
                                    .active   = active_auth,
                                 });
+
+      include_ram_gift &= has_roa;
+      include_ram_gift &= a.prefix() != config::system_account_name;
+      if (include_ram_gift) {
+         // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
+         const auto& acnt = control->get_account(config::system_account_name);
+         auto abi = acnt.get_abi();
+         if (std::ranges::any_of(abi.actions, [](const auto& action) { return action.name == "setalimits"_n; })) {
+            trx.actions.emplace_back(get_action(config::system_account_name, "setalimits"_n,
+                                                vector<permission_level>{{config::system_account_name, config::active_name}},
+                                                fc::mutable_variant_object()
+                                                ("account", a)
+                                                ("ram_bytes", newaccount_ram) // matches newaccount_ram of system contract
+                                                ("net_weight", -1)
+                                                ("cpu_weight", -1)));
+         }
+      }
 
       include_roa_policy &= has_roa;
       include_roa_policy &= a.prefix() != config::system_account_name;
@@ -600,8 +618,8 @@ namespace sysio { namespace testing {
    }
 
    transaction_trace_ptr base_tester::add_roa_policy(account_name issuer, account_name owner, string net_weight,
-                                                     string cpu_weight, string ram_weight, int64_t network_gen,
-                                                     uint32_t time_block) {
+                                                     string cpu_weight, string ram_weight, uint32_t time_block,
+                                                     int64_t network_gen) {
       signed_transaction trx;
       set_transaction_headers(trx);
 
@@ -613,8 +631,8 @@ namespace sysio { namespace testing {
                                           ("netWeight", net_weight)
                                           ("cpuWeight", cpu_weight)
                                           ("ramWeight", ram_weight)
-                                          ("networkGen", network_gen)
                                           ("timeBlock", time_block)
+                                          ("networkGen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -1236,6 +1254,7 @@ namespace sysio { namespace testing {
    void base_tester::init_roa() {
       // Create the ROA account and mark it as privileged
       create_account(config::roa_account_name, config::system_account_name, false, true, false);
+      create_account("sysio.acct"_n, config::system_account_name, false, false, false); // used for tracking account creation
       set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(config::system_account_name, "setpriv"_n,
                   config::system_account_name,

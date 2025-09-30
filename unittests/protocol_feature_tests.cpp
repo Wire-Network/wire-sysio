@@ -660,7 +660,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       const auto &alice_account = account_name("alice");
       const auto &bob_account = account_name("bob");
 
-      c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false);
+      c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false, true);
       // Issuing _only_ enough RAM to load the contracts
       c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
       c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
@@ -670,6 +670,7 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
+      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0);
 
       c.register_node_owner(alice_account, 1);
       c.produce_block();

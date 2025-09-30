@@ -18,7 +18,9 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_test)
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = std::make_shared<signed_block>(std::move(*b));
    auto signed_tx = std::get<packed_transaction>(copy_b->transactions.back().trx).get_signed_transaction();
-   auto& act = signed_tx.actions.back();
+   auto it = std::ranges::find_if(signed_tx.actions, [](const action& a) { return a.name == "newaccount"_n; });
+   BOOST_REQUIRE(it != signed_tx.actions.end());
+   auto& act = *it;
    auto act_data = act.data_as<newaccount>();
    // Make the transaction invalid by having the new account name the same as the creator name
    act_data.name = act_data.creator;

@@ -299,11 +299,21 @@ namespace sysio {
              */
             asset get_allocation_for_tier(uint8_t tier);
 
-            bool is_sysio_account(const name& account) {
-                std::string acc_str = account.to_string();
-                if (acc_str == "sysio") return true;
-                if (acc_str.size() > 5 && acc_str.rfind("sysio.", 0) == 0) return true;
-                return false;
-            }
+            struct resources_t {
+                asset net;
+                asset cpu;
+                uint64_t ram_bytes;
+            };
+
+            /**
+             * @brief Create and set the initial values of reslimit entry
+             */
+            void set_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+
+            /**
+             * @brief Increase values of reslimit entry, assert if not found
+             */
+            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+
     }; // namespace roa
 } // namespace sysio
