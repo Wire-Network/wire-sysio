@@ -1080,24 +1080,6 @@ class PluginHttpTest(unittest.TestCase):
         self.assertIn("feature_digest", ret_json["payload"][0])
         self.assertIn("subjective_restrictions", ret_json["payload"][0])
 
-        # get_account_ram_corrections with empty parameter
-        command = "get_account_ram_corrections"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_account_ram_corrections with valid parameter
-        payload = {"lower_bound":"", "upper_bound":"", "limit":1, "reverse":"false"}
-        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertIn("rows", ret_json["payload"])
-
         # get_unapplied_transactions with empty parameter
         command = "get_unapplied_transactions"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)

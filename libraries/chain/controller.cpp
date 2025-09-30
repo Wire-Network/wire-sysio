@@ -48,7 +48,6 @@ using resource_limits::resource_limits_manager;
 using controller_index_set = index_set<
    account_index,
    account_metadata_index,
-   account_ram_correction_index,
    global_property_multi_index,
    protocol_state_multi_index,
    dynamic_global_property_multi_index,
@@ -3280,27 +3279,6 @@ bool controller::is_resource_greylisted(const account_name &name) const {
 
 const flat_set<account_name> &controller::get_resource_greylist() const {
    return  my->conf.resource_greylist;
-}
-
-
-void controller::add_to_ram_correction( account_name account, uint64_t ram_bytes ) {
-   auto ptr = my->db.find<account_ram_correction_object, by_name>( account );
-   if( ptr ) {
-      my->db.modify<account_ram_correction_object>( *ptr, [&]( auto& rco ) {
-         rco.ram_correction += ram_bytes;
-      } );
-   } else {
-      ptr = &my->db.create<account_ram_correction_object>( [&]( auto& rco ) {
-         rco.name = account;
-         rco.ram_correction = ram_bytes;
-      } );
-   }
-
-   // on_add_ram_correction is only called for deferred transaction
-   // (in apply_context::schedule_deferred_transaction)
-   if (auto dm_logger = get_deep_mind_logger(false)) {
-      dm_logger->on_add_ram_correction(*ptr, ram_bytes);
-   }
 }
 
 deep_mind_handler* controller::get_deep_mind_logger(bool is_trx_transient)const {
