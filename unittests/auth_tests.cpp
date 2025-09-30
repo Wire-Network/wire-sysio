@@ -57,7 +57,6 @@ BOOST_FIXTURE_TEST_CASE( missing_auths, validating_tester ) { try {
  *  of another account by updating the active authority.
  */
 BOOST_FIXTURE_TEST_CASE( delegate_auth, validating_tester ) { try {
-   // TODO: bug in the current create account implementation undeflows ram usage refunding permission delta to account
    create_accounts( {"alice"_n,"bob"_n});
    produce_block();
 
@@ -69,9 +68,20 @@ BOOST_FIXTURE_TEST_CASE( delegate_auth, validating_tester ) { try {
    auto original_auth = control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((original_auth));
 
-   // TODO: need to fix this!
-   elog("BUG HERE: Ram usage delta would underflow UINT64_MAX (crediting Alice for a negative delta)");
+   int64_t ram; int64_t net; int64_t cpu;
+   control->get_resource_limits_manager().get_account_limits( "alice"_n, ram, net, cpu );
+   wdump((cpu)(net)(ram));
+   BOOST_TEST(cpu == 10);
+   BOOST_TEST(net == 10);
+   BOOST_TEST(ram == 40000*104+newaccount_ram); // provided by policy in create_account
+   int64_t ram_usage = control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
+   wdump((ram_usage));
+   BOOST_TEST(ram_usage < newaccount_ram); // ram used to create account
+
    set_authority( "alice"_n, config::active_name,  delegated_auth );
+   int64_t ram_usage_after = control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
+   wdump((ram_usage_after));
+   BOOST_TEST(ram_usage_after < ram_usage); // ram for delegated auth is less than a public key
 
    auto new_auth = control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((new_auth));
@@ -88,7 +98,6 @@ BOOST_FIXTURE_TEST_CASE( delegate_auth, validating_tester ) { try {
    auto trace = push_reqauth("alice"_n, {permission_level{"alice"_n, config::active_name}}, { get_private_key("bob"_n, "active") } );
 
    produce_block();
-   //todoBOOST_REQUIRE_EQUAL(true, chain_has_transaction(trace->id));
 
 } FC_LOG_AND_RETHROW() }
 
