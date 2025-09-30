@@ -35,10 +35,11 @@ namespace sysio {
         check(!require_to_exist || res_itr != reslimit.end(), "No resource limit exists for this account.");
 
         if (res_itr == reslimit.end()) {
+            // add newaccount_ram for reslimit when created to account for gifted ram when created
             resources_t res = {
                 .net = sysio_acct ? asset(0, netWeight.symbol) : netWeight,
                 .cpu = sysio_acct ? asset(0, cpuWeight.symbol) : cpuWeight,
-                .ram_bytes = (uint64_t)ram_bytes
+                .ram_bytes = (uint64_t)ram_bytes + sysiosystem::newaccount_ram
             };
             reslimit.emplace(get_self(), [&](auto& row) {
                 row.owner = owner;
@@ -222,7 +223,7 @@ namespace sysio {
         check(pol_iter == policies.end(), "A policy for this owner already exists from this issuer. Use expandpolicy instead.");
 
         // Create/set reslimit for the 'owner', add newaccount_ram since reslimit is being created for the user
-        increase_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate+sysiosystem::newaccount_ram, false);
+        increase_reslimit(owner, netWeight, cpuWeight, ram_bytes_to_allocate, false);
 
         // Update the system resource limits
         add_system_resources(owner, netWeight.amount, cpuWeight.amount, ram_bytes_to_allocate);
