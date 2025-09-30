@@ -31,14 +31,14 @@ void limit_violated_test(const sysvmoc::config& sysvmoc_config) {
 
    if (chain.control->is_sys_vm_oc_enabled()) {
       BOOST_CHECK_EXCEPTION(
-         chain.push_action( "sysio.test"_n, "doit"_n, "sysio.test"_n, mvo()),
+         chain.push_action( "sysio.test"_n, "doitslow"_n, "sysio.test"_n, mvo()),
          sysio::chain::wasm_execution_error,
          [](const sysio::chain::wasm_execution_error& e) {
             return expect_assert_message(e, "failed to compile wasm");
          }
       );
    } else {
-      chain.push_action( "sysio.test"_n, "doit"_n, "sysio.test"_n, mvo());
+      chain.push_action( "sysio.test"_n, "doitslow"_n, "sysio.test"_n, mvo());
    }
 }
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE( vm_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
    // set vm_limit to a small value such that it is exceeded
-   sysvmoc_config.vm_limit = 64u*1024u*1024u;
+   sysvmoc_config.vm_limit = 32u*1024u*1024u;
    limit_violated_test(sysvmoc_config);
 
    // set vm_limit to a large value such that it is not exceeded
@@ -107,13 +107,13 @@ BOOST_AUTO_TEST_CASE( vm_limit ) { try {
 BOOST_AUTO_TEST_CASE( stack_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
-   // The stack size of the compiled WASM in the test is 104.
+   // The stack size of the compiled WASM in the test is 39.
    // Set stack_size_limit one less than the actual needed stack size
-   sysvmoc_config.stack_size_limit = 103;
+   sysvmoc_config.stack_size_limit = 39;
    limit_violated_test(sysvmoc_config);
 
    // set stack_size_limit to the actual needed stack size
-   sysvmoc_config.stack_size_limit = 104;
+   sysvmoc_config.stack_size_limit = 40;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 
@@ -121,13 +121,13 @@ BOOST_AUTO_TEST_CASE( stack_limit ) { try {
 BOOST_AUTO_TEST_CASE( generated_code_size_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
-   // The generated code size of the compiled WASM in the test is 36856.
+   // The generated code size of the compiled WASM in the test is 3952.
    // Set generated_code_size_limit to the actual generated code size
-   sysvmoc_config.generated_code_size_limit = 36856;
+   sysvmoc_config.generated_code_size_limit = 3952;
    limit_violated_test(sysvmoc_config);
 
    // Set generated_code_size_limit to one above the actual generated code size
-   sysvmoc_config.generated_code_size_limit = 36857;
+   sysvmoc_config.generated_code_size_limit = 3953;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 

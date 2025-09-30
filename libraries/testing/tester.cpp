@@ -577,6 +577,7 @@ namespace sysio { namespace testing {
       include_roa_policy &= has_roa;
       include_roa_policy &= a.prefix() != config::system_account_name;
       if( include_roa_policy ) {
+         // ramWeight of 4 SYS needed to cover wasmtest contract use
          trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
                                              vector<permission_level>{
                                                 {NODE_DADDY, config::active_name},
@@ -586,7 +587,7 @@ namespace sysio { namespace testing {
                                              ("issuer", NODE_DADDY)
                                              ("netWeight", "0.0010 SYS")
                                              ("cpuWeight", "0.0010 SYS")
-                                             ("ramWeight", "2.0000 SYS")
+                                             ("ramWeight", "4.0000 SYS")
                                              ("networkGen", 0)
                                              ("timeBlock", 0)
          ));

@@ -412,7 +412,6 @@ BOOST_AUTO_TEST_CASE( any_auth ) { try {
 
 BOOST_AUTO_TEST_CASE(no_double_billing) {
 try {
-   SKIP_TEST
    fc::temp_directory tempdir;
    validating_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::preactivate_feature_and_new_bios );
@@ -423,13 +422,10 @@ try {
    account_name acc2 = "bill2"_n;
    account_name acc1a = "bill1a"_n;
 
-   chain.create_account(acc1);
-   chain.create_account(acc1a);
-
-   //  TODO: acc1 needs to be privileged to create accounts, but then it doesn't use CPU or Net....  need to do something else...
-   chain.set_privileged(acc1);
-   chain.produce_block();
-
+   chain.create_account(acc1, config::system_account_name, false, false, false, false);
+   chain.create_account(acc1a, config::system_account_name, false, false, false, false);
+   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 50, 50, 50, false);
+   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1a, 50, 50, 50, false);
    chain.produce_block();
 
    const chainbase::database &db = chain.control->db();
@@ -446,6 +442,7 @@ try {
 
       vector<permission_level> pls = {{acc1, name("active")}};
       pls.push_back({acc1, name("owner")}); // same account but different permission names
+      pls.push_back({acc1, config::sysio_payer_name});
       pls.push_back({acc1a, name("owner")});
       trx.actions.emplace_back( pls,
                                 newaccount{
@@ -470,8 +467,9 @@ try {
 
    BOOST_TEST(usage.cpu_usage.average() > 0U);
    BOOST_TEST(usage.net_usage.average() > 0U);
-   BOOST_REQUIRE_EQUAL(usage.cpu_usage.average(), usage2.cpu_usage.average());
-   BOOST_REQUIRE_EQUAL(usage.net_usage.average(), usage2.net_usage.average());
+   // explicit payer only bills the one payer
+   BOOST_TEST(usage2.cpu_usage.average() == 0U);
+   BOOST_TEST(usage2.net_usage.average() == 0U);
    chain.produce_block();
 
 } FC_LOG_AND_RETHROW() }

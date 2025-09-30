@@ -38,7 +38,7 @@ class Transactions(NodeopQueries):
         if nodeOwner is not None and (stakeNet > 0 or stakeCPU > 0 or buyRAM > 0):
             if not waitForTransBlock:
                 self.waitForTransactionInBlock(transId)
-            trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM)
+            trans = self.addRoaPolicy(nodeOwner, account, net=stakeNet, cpu=stakeCPU, ram=buyRAM, waitForTransBlock=waitForTransBlock)
             transId=NodeopQueries.getTransId(trans)
 
         return trans
@@ -329,39 +329,6 @@ class Transactions(NodeopQueries):
 
         return self.waitForTransBlockIfNeeded(trans, waitForTransBlock, exitOnError=exitOnError)
 
-    def delegatebw(self, fromAccount, netQuantity, cpuQuantity, toAccount=None, transferTo=False, waitForTransBlock=False, silentErrors=True, exitOnError=False, reportStatus=True, sign=False, retry_num_blocks=None):
-        if toAccount is None:
-            toAccount=fromAccount
-
-        signStr = NodeopQueries.sign_str(sign, [ fromAccount.activePublicKey ])
-        cmdDesc="system delegatebw"
-        transferStr="--transfer" if transferTo else ""
-        retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
-        retryStr=f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
-        cmd=(f'{cmdDesc} -j {signStr} {fromAccount.name} {toAccount.name} "{netQuantity} {CORE_SYMBOL}" '
-             f'"{cpuQuantity} {CORE_SYMBOL}" {transferStr} {retryStr}')
-        msg="fromAccount=%s, toAccount=%s" % (fromAccount.name, toAccount.name);
-        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
-        self.trackCmdTransaction(trans, reportStatus=reportStatus)
-
-        return trans
-
-    def undelegatebw(self, fromAccount, netQuantity, cpuQuantity, toAccount=None, waitForTransBlock=False, silentErrors=True, exitOnError=False, sign=False, retry_num_blocks=None):
-        if toAccount is None:
-            toAccount=fromAccount
-
-        signStr = NodeopQueries.sign_str(sign, [ fromAccount.activePublicKey ])
-        cmdDesc="system undelegatebw"
-        retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
-        retryStr=f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
-        cmd=(f'{cmdDesc} -j {signStr} {fromAccount.name} {toAccount.name} "{netQuantity} {CORE_SYMBOL}" '
-             f'"{cpuQuantity} {CORE_SYMBOL}" {retryStr}')
-        msg="fromAccount=%s, toAccount=%s" % (fromAccount.name, toAccount.name);
-        trans=self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
-        self.trackCmdTransaction(trans)
-
-        return trans
-
     def regproducer(self, producer, url, location, waitForTransBlock=False, silentErrors=True, exitOnError=False, sign=False, retry_num_blocks=None):
         signStr = NodeopQueries.sign_str(sign, [ producer.activePublicKey ])
         cmdDesc = "system regproducer"
@@ -381,18 +348,6 @@ class Transactions(NodeopQueries):
         retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
         cmd = f'{cmdDesc} -j {signStr} {producer.name} {retryStr}'
         msg = f"producer={producer.name}"
-        trans = self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
-        self.trackCmdTransaction(trans)
-
-        return trans
-
-    def vote(self, account, producers, waitForTransBlock=False, silentErrors=True, exitOnError=False, sign=False, retry_num_blocks=None):
-        signStr = NodeopQueries.sign_str(sign, [ account.activePublicKey ])
-        cmdDesc = "system voteproducer prods"
-        retry_num_blocks = self.retry_num_blocks_default if retry_num_blocks is None else retry_num_blocks
-        retryStr = f"--retry-num-blocks {retry_num_blocks}" if waitForTransBlock else ""
-        cmd = f'{cmdDesc} -j {signStr} {account.name} {" ".join(producers)} {retryStr}'
-        msg = "account=%s, producers=[ %s ]" % (account.name, ", ".join(producers));
         trans = self.processClioCmd(cmd, cmdDesc, silentErrors=silentErrors, exitOnError=exitOnError, exitMsg=msg)
         self.trackCmdTransaction(trans)
 

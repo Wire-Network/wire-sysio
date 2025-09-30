@@ -220,8 +220,6 @@ try:
             producers.extend(node.producers)
 
 
-    # ***   delegate bandwidth to accounts   ***
-
     node=nonProdNode
     # create accounts via sysio as otherwise a bid is needed
     for account in accounts:
@@ -230,19 +228,9 @@ try:
         transferAmount="100000000.0000 {0}".format(CORE_SYMBOL)
         Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
         node.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=True)
-        trans=node.delegatebw(account, 20000000.0000, 20000000.0000, waitForTransBlock=False, exitOnError=True)
-
-
-    # ***   vote using accounts   ***
 
     #verify nodes are in sync and advancing
     cluster.waitOnClusterSync(blockAdvancing=5)
-    index=0
-    for account in accounts:
-        Print("Vote for producers=%s" % (producers))
-        trans=prodNodes[index % len(prodNodes)].vote(account, producers, waitForTransBlock=False)
-        index+=1
-
 
     # ***   Identify a block where production is stable   ***
 

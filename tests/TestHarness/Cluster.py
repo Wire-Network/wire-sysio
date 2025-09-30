@@ -886,9 +886,9 @@ class Cluster(object):
 
         node.validateAccounts(myAccounts)
 
-    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, nodeOwner=Account("defaultNodeOwner"), stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
+    def createAccountAndVerify(self, account, creator, stakedDeposit=1000, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, validationNodeIndex=-1):
         """create account, verify account and return transaction id"""
-        if nodeOwner == Account("defaultNodeOwner"):
+        if nodeOwner is None:
             # If we didn't explicitly specify a node owner (or None), use carl
             nodeOwner = self.carlAccount
         node=self.nodes[validationNodeIndex]
@@ -912,10 +912,10 @@ class Cluster(object):
     #         return transId
     #     return None
 
-    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, nodeOwner=Account("defaultNodeOwner"), stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
+    def createInitializeAccount(self, account, creatorAccount, stakedDeposit=1000, waitForTransBlock=False, nodeOwner=None, stakeNet=100, stakeCPU=100, buyRAM=10000, exitOnError=False):
         assert(len(self.nodes) > 0)
         node=self.nodes[0]
-        if nodeOwner == Account("defaultNodeOwner"):
+        if nodeOwner is None:
             nodeOwner = self.carlAccount
         trans=node.createInitializeAccount(account, creatorAccount, stakedDeposit, waitForTransBlock, nodeOwner=nodeOwner, stakeNet=stakeNet, stakeCPU=stakeCPU, buyRAM=buyRAM)
         return trans

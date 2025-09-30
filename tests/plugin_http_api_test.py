@@ -576,24 +576,6 @@ class PluginHttpTest(unittest.TestCase):
         self.assertEqual(ret_json["code"], 400)
         self.assertEqual(ret_json["error"]["code"], 3200006)
 
-        # get_scheduled_transactions with empty parameter
-        command = "get_scheduled_transactions"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_scheduled_transactions with valid parameter
-        payload = {"json":"true","lower_bound":""}
-        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertEqual(type(ret_json["payload"]["transactions"]), list)
-
         # get_required_keys with empty parameter
         command = "get_required_keys"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
@@ -676,7 +658,7 @@ class PluginHttpTest(unittest.TestCase):
                    "signatures": ["SIG_K1_KeqfqiZu1GwUxQb7jzK9Fdks6HFaVBQ9AJtCZZj56eG9qGgvVMVtx8EerBdnzrhFoX437sgwtojf2gfz6S516Ty7c22oEp"],
                    "context_free_data": []}
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "\"0be762a6406bab15530e87f21e02d1c58e77944ee55779a76f4112e3b65cac48\"")
+        self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
         # transaction that has hex_data
         payload_hex = {"expiration":"2020-08-01T07:15:49",
                 "ref_block_num": 34881,
