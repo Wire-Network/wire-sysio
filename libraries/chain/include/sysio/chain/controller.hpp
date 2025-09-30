@@ -315,8 +315,6 @@ namespace sysio { namespace chain {
          void set_greylist_limit( uint32_t limit );
          uint32_t get_greylist_limit()const;
 
-         void add_to_ram_correction( account_name account, uint64_t ram_bytes );
-
          deep_mind_handler* get_deep_mind_logger(bool is_trx_transient) const;
          void enable_deep_mind( deep_mind_handler* logger );
          uint32_t earliest_available_block_num() const;

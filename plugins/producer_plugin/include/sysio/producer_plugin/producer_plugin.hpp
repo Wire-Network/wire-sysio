@@ -50,18 +50,6 @@ public:
       bool exclude_unactivatable = false;
    };
 
-   struct get_account_ram_corrections_params {
-      std::optional<account_name>  lower_bound;
-      std::optional<account_name>  upper_bound;
-      uint32_t                     limit = 10;
-      bool                         reverse = false;
-   };
-
-   struct get_account_ram_corrections_result {
-      std::vector<fc::variant>     rows;
-      std::optional<account_name>  more;
-   };
-
    template<typename T>
    using next_function = sysio::chain::next_function<T>;
 
@@ -105,8 +93,6 @@ public:
    void schedule_protocol_feature_activations(const scheduled_protocol_feature_activations& schedule);
 
    fc::variants get_supported_protocol_features( const get_supported_protocol_features_params& params ) const;
-
-   get_account_ram_corrections_result  get_account_ram_corrections( const get_account_ram_corrections_params& params ) const;
 
    struct get_unapplied_transactions_params {
       string      lower_bound;  /// transaction id
@@ -202,8 +188,6 @@ FC_REFLECT(sysio::producer_plugin::whitelist_blacklist, (actor_whitelist)(actor_
 FC_REFLECT(sysio::producer_plugin::integrity_hash_information, (head_block_id)(integrity_hash))
 FC_REFLECT(sysio::producer_plugin::scheduled_protocol_feature_activations, (protocol_features_to_activate))
 FC_REFLECT(sysio::producer_plugin::get_supported_protocol_features_params, (exclude_disabled)(exclude_unactivatable))
-FC_REFLECT(sysio::producer_plugin::get_account_ram_corrections_params, (lower_bound)(upper_bound)(limit)(reverse))
-FC_REFLECT(sysio::producer_plugin::get_account_ram_corrections_result, (rows)(more))
 FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_params, (lower_bound)(limit)(time_limit_ms))
 FC_REFLECT(sysio::producer_plugin::unapplied_trx, (trx_id)(expiration)(trx_type)(first_auth)(first_receiver)(first_action)(total_actions)(billed_cpu_time_us)(size))
 FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_result, (size)(incoming_size)(trxs)(more))
