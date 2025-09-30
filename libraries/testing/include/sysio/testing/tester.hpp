@@ -326,6 +326,7 @@ namespace sysio { namespace testing {
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
          void              set_abi( account_name name, const std::string& abi_json, const private_key_type* signer = nullptr );
+         void              set_privileged( account_name name );
 
          bool is_code_cached( account_name name ) const;
 

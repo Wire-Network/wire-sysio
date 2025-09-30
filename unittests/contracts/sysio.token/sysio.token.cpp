@@ -2,6 +2,9 @@
 
 namespace sysio {
 
+// The sysio.token WIRE token RAM is paid for by sysio
+constexpr name ram_payer = "sysio"_n;
+
 void token::create( const name&   issuer,
                     const asset&  maximum_supply )
 {
@@ -15,7 +18,7 @@ void token::create( const name&   issuer,
     auto existing = statstable.find( sym.code().raw() );
     check( existing == statstable.end(), "token with symbol already exists" );
 
-    statstable.emplace( get_self(), [&]( auto& s ) {
+    statstable.emplace( ram_payer, [&]( auto& s ) {
        s.supply.symbol = maximum_supply.symbol;
        s.max_supply    = maximum_supply;
        s.issuer        = issuer;
@@ -46,7 +49,7 @@ void token::issue( const name& to, const asset& quantity, const string& memo )
        s.supply += quantity;
     });
 
-    add_balance( st.issuer, quantity, st.issuer );
+    add_balance( st.issuer, quantity, ram_payer );
 }
 
 void token::retire( const asset& quantity, const string& memo )
@@ -93,10 +96,8 @@ void token::transfer( const name&    from,
     check( quantity.symbol == st.supply.symbol, "symbol precision mismatch" );
     check( memo.size() <= 256, "memo has more than 256 bytes" );
 
-    auto payer = has_auth( to ) ? to : from;
-
     sub_balance( from, quantity );
-    add_balance( to, quantity, payer );
+    add_balance( to, quantity, ram_payer );
 }
 
 void token::sub_balance( const name& owner, const asset& value ) {
@@ -105,7 +106,7 @@ void token::sub_balance( const name& owner, const asset& value ) {
    const auto& from = from_acnts.get( value.symbol.code().raw(), "no balance object found" );
    check( from.balance.amount >= value.amount, "overdrawn balance" );
 
-   from_acnts.modify( from, owner, [&]( auto& a ) {
+   from_acnts.modify( from, same_payer, [&]( auto& a ) {
          a.balance -= value;
       });
 }

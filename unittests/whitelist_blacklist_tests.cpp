@@ -42,6 +42,7 @@ class whitelist_blacklist_tester {
          chain->create_accounts({"sysio.token"_n, "alice"_n, "bob"_n, "charlie"_n});
          chain->set_code("sysio.token"_n, test_contracts::sysio_token_wasm() );
          chain->set_abi("sysio.token"_n, test_contracts::sysio_token_abi() );
+         chain->set_privileged("sysio.token"_n);
          chain->push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mvo()
               ( "issuer", "sysio.token" )
               ( "maximum_supply", "1000000.00 TOK" )
@@ -182,11 +183,13 @@ BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("bob"_n);
 
    test.chain->produce_blocks();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("charlie"_n);
 
    test.chain->produce_blocks();
 
@@ -231,11 +234,13 @@ BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("bob"_n);
 
    test.chain->produce_blocks();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("charlie"_n);
 
    test.chain->produce_blocks();
 
@@ -274,11 +279,13 @@ BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("bob"_n);
 
    test.chain->produce_blocks();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
+   test.chain->set_privileged("charlie"_n);
 
    test.chain->produce_blocks();
 
@@ -333,6 +340,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
    tester1.chain->produce_blocks();
    tester1.chain->set_code( "alice"_n, test_contracts::get_sender_test_wasm() );
    tester1.chain->set_abi( "alice"_n,  test_contracts::get_sender_test_abi() );
+   tester1.chain->set_privileged( "alice"_n );
    tester1.chain->produce_blocks();
 
    tester1.shutdown();

@@ -67,6 +67,7 @@ class currency_tester : public validating_tester {
       {
          create_account( "sysio.token"_n);
          set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+         set_privileged("sysio.token"_n);
 
          auto result = push_action("sysio.token"_n, "create"_n, mutable_variant_object()
                  ("issuer",       sysio_token)
@@ -413,12 +414,13 @@ BOOST_FIXTURE_TEST_CASE( test_input_quantity, currency_tester ) try {
       BOOST_REQUIRE_THROW(transfer("alice"_n, "carl"_n, "20.50 USD"), sysio_assert_message_exception);
    }
 
-   // issue to alice using right precision
+   // issue to sysio.token using right precision
    {
-      auto trace = issue("alice"_n, "25.0256 CUR");
+      auto trace = issue("sysio.token"_n, "25.0256 CUR");
 
       BOOST_CHECK_EQUAL(true, chain_has_transaction(trace->id));
-      BOOST_CHECK_EQUAL(asset::from_string("125.0256 CUR"), get_balance("alice"_n));
+      // 1,000,000 - 100 (transfer above) + 25.0256
+      BOOST_CHECK_EQUAL(asset::from_string("999925.0256 CUR"), get_balance("sysio.token"_n));
    }
 
 

@@ -403,6 +403,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
 
    chain.set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    chain.set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+   chain.set_privileged("sysio.token"_n);
 
    chain.produce_block();
 

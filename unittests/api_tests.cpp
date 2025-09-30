@@ -1464,9 +1464,7 @@ BOOST_AUTO_TEST_CASE(inline_action_objective_limit) { try {
    chain.set_code( "testapi"_n, test_contracts::test_api_wasm() );
    chain.produce_block();
 
-   chain.push_action(config::system_account_name, "setpriv"_n, config::system_account_name,  mutable_variant_object()
-         ("account", "testapi")
-         ("is_priv", 1));
+   chain.set_privileged("testapi"_n);
    chain.produce_block();
 
    BOOST_CHECK_EXCEPTION(CALL_TEST_FUNCTION(chain, "test_transaction", "send_action_4k", {}), inline_action_too_big,
@@ -2323,7 +2321,7 @@ static const char get_resource_limits_null_cpu_wast[] = R"=====(
 BOOST_FIXTURE_TEST_CASE(resource_limits_tests, validating_tester) {
    create_accounts( { "rlimits"_n, "testacnt"_n } );
    set_code("rlimits"_n, resource_limits_wast);
-   push_action( "sysio"_n, "setpriv"_n, "sysio"_n, mutable_variant_object()("account", "rlimits"_n)("is_priv", 1));
+   set_privileged("rlimits"_n);
    produce_block();
 
    auto pushit = [&]{
