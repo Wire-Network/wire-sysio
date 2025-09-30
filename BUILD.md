@@ -33,6 +33,7 @@ You will need to build on a [supported operating system](README.md#supported-ope
 
 - C++20 compiler and standard library
 - CMake 3.16+
+- Clang/LLVM 18
 - LLVM 11 - for Linux only
   - Ubuntu 24.04 requires building from source.
     - [scripts/llvm-11/llvm-11-ubuntu-build-source.sh](scripts/llvm-11/llvm-11-ubuntu-build-source.sh)
@@ -71,6 +72,9 @@ sudo apt install -y \
       doxygen \
       git \
       gnupg \
+      golang \
+      clang-18 \
+      clang-tools-18 \
       libboost-all-dev \
       libbz2-dev \
       libcurl4-openssl-dev \
@@ -144,22 +148,26 @@ To build, make sure you are in the root of the `wire-sysio` repo, then run the f
 
 ```bash
 
+# In order to override the default
+# compiler specified by vcpkh triplet
+# configs compilers, you must 
+# export CC and CXX explicitly
+export CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18
+
 ## on Ubuntu 20-24.04
 cmake -B build -S . \
-  -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-  -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+  -DCMAKE_C_COMPILER=$CC \
+  -DCMAKE_CXX_COMPILER=$CXX \
   -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
-  -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH=/usr/lib/llvm-11 
 
 ## on Ubuntu 24, you must set the prefix path 
 ## to the location of your LLVM 11 build completed in step 1c
 cmake -B build -S . \
-  -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-  -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+  -DCMAKE_C_COMPILER=$CC \
+  -DCMAKE_CXX_COMPILER=$CXX \
   -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
-  -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_PREFIX_PATH=<LLVM_PREFIX_PATH_FROM_STEP_1C> 
 

@@ -116,7 +116,7 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN cmake \
+RUN env CC=clang-18 CXX=clang++-18 cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
@@ -124,7 +124,6 @@ RUN cmake \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
     -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
-    -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
     -DENABLE_CCACHE=ON
 
@@ -139,7 +138,8 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN cmake \
+RUN env CC=clang-18 CXX=clang++-18 \
+    cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
@@ -147,7 +147,6 @@ RUN cmake \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
     -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
-    -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \    
     -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
     -DENABLE_CCACHE=ON
 
@@ -189,16 +188,18 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 ## BUILD WITH LOCAL SOURCE CODE
 FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
-RUN cd ${CDT_BUILD_DIR} && cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
-      -B . \
-      -G Ninja \
-      -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-      -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-      -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-      -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
-      -DVCPKG_TARGET_TRIPLET=x64-linux-clang18 \
-      -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-      -DENABLE_CCACHE=ON
-
 WORKDIR ${CDT_BUILD_DIR} 
+RUN env CC=clang-18 CXX=clang++-18 \
+        cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+        -B . \
+        -G Ninja \
+        -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+        -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+        -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
+        -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+        -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
+        -Dsysio_DIR=${APP_BUILD_DIR} \
+        -DENABLE_CCACHE=ON
+
+
 RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
