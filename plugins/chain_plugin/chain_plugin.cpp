@@ -1305,6 +1305,9 @@ const string read_only::KEYi64 = "i64";
 read_only::get_info_results read_only::get_info(const read_only::get_info_params&, const fc::time_point&) const {
    const auto& rm = db.get_resource_limits_manager();
 
+   auto number_accounts = db.db().get_index<account_index, by_id>().size();
+   auto number_contracts = db.db().get_index<code_index, by_id>().size();
+
    return {
       itoh(static_cast<uint32_t>(app().version())),
       db.get_chain_id(),
@@ -1327,7 +1330,9 @@ read_only::get_info_results read_only::get_info(const read_only::get_info_params
       rm.get_total_cpu_weight(),
       rm.get_total_net_weight(),
       db.earliest_available_block_num(),
-      db.last_irreversible_block_time()
+      db.last_irreversible_block_time(),
+      number_accounts,
+      number_contracts
    };
 }
 
