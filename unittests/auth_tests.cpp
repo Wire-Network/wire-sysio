@@ -104,7 +104,6 @@ BOOST_FIXTURE_TEST_CASE( delegate_auth, validating_tester ) { try {
 
 BOOST_AUTO_TEST_CASE(update_auths) {
 try {
-   // TODO: bug in the current create account implementation undeflows ram usage refunding permission delta to account
    validating_tester chain;
    chain.create_account(name("alice"));
    chain.create_account(name("bob"));
@@ -239,7 +238,6 @@ try {
 
 BOOST_AUTO_TEST_CASE(update_auth_unknown_private_key) {
    try {
-      // TODO: bug in the current create account implementation undeflows ram usage refunding permission delta to account
       validating_tester chain;
       chain.create_account(name("alice"));
 
