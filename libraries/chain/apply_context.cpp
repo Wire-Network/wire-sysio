@@ -100,30 +100,7 @@ void apply_context::exec_one()
                   control.get_wasm_interface().apply( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version, *this );
                } catch( const wasm_exit& ) {}
             }
-
-            if( !privileged ) {
-               const size_t checktime_interval = 10;
-               size_t counter = 0;
-               bool not_in_notify_context = (receiver == act->account);
-               const auto end = _account_ram_deltas.end();
-               for( auto itr = _account_ram_deltas.begin(); itr != end; ++itr, ++counter ) {
-                  // wlog("pending RAM delta: ${account} ${delta}", ("account", itr->account)("delta", itr->delta) );
-                  if( counter == checktime_interval ) {
-                     trx_context.checktime();
-                     counter = 0;
-                  }
-                  if( itr->delta > 0 && itr->account != receiver ) {
-                     SYS_ASSERT( not_in_notify_context, unauthorized_ram_usage_increase,
-                                 "unprivileged contract cannot increase RAM usage of another account within a notify context: ${account}",
-                                 ("account", itr->account)
-                     );
-                     SYS_ASSERT( has_authorization( itr->account ), unauthorized_ram_usage_increase,
-                                 "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: ${account}",
-                                 ("account", itr->account)
-                     );
-                  }
-               }
-            }
+            validate_account_ram_deltas();
          }
       } FC_RETHROW_EXCEPTIONS( warn, "${receiver} <= ${account}::${action} pending console output: ${console}", ("console", _pending_console_output)("account", act->account)("action", act->name)("receiver", receiver) )
 
@@ -185,6 +162,57 @@ void apply_context::exec_one()
    if( auto dm_logger = control.get_deep_mind_logger(trx_context.is_transient()))
    {
       dm_logger->on_end_action();
+   }
+}
+
+void apply_context::validate_account_ram_deltas() {
+   const size_t checktime_interval = 10;
+   size_t counter = 0;
+   bool not_in_notify_context = (receiver == act->account);
+   const auto end = _account_ram_deltas.end();
+   for( auto itr = _account_ram_deltas.begin(); itr != end; ++itr, ++counter ) {
+      // wlog("pending RAM delta: ${account} ${delta}", ("account", itr->account)("delta", itr->delta) );
+      if( counter == checktime_interval ) {
+         trx_context.checktime();
+         counter = 0;
+      }
+      if( !privileged && itr->delta > 0 && itr->account != receiver ) {
+         SYS_ASSERT( not_in_notify_context, unauthorized_ram_usage_increase,
+                     "unprivileged contract cannot increase RAM usage of another account within a notify context: ${account}",
+                     ("account", itr->account)
+         );
+         SYS_ASSERT( has_authorization( itr->account ), unauthorized_ram_usage_increase,
+                     "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: ${account}",
+                     ("account", itr->account)
+         );
+      }
+      auto& payer = itr->account;
+      auto& ram_delta = itr->delta;
+      if (payer != receiver && ram_delta > 0) {
+         if (receiver == config::system_account_name) {
+            // sysio allowed
+         } else if (payer == config::system_account_name && is_privileged()) {
+            // explicit sysio payer allowed when privileged
+         } else {
+            auto payer_found = false;
+            // search act->authorization for a payer permission role
+            for( const auto& auth : act->authorization ) {
+               if( auth.actor == payer && auth.permission == config::sysio_payer_name ) {
+                  payer_found = true;
+                  break;
+               }
+               if ( auth.actor == config::system_account_name ) {
+                  // If the payer is the system account, we don't enforce explicit payer authorization.
+                  // This avoids a lot of changes for tests and sysio should not be calling untrusted contracts
+                  // or spending user's RAM unexpectedly.
+                  payer_found = true;
+                  break;
+               }
+            }
+            SYS_ASSERT(payer_found, unsatisfied_authorization,
+                       "Requested payer ${p} did not authorize payment. Missing ${m}.", ("p", payer)("m", config::sysio_payer_name));
+         }
+      }
    }
 }
 
@@ -800,28 +828,6 @@ bool is_system_account(const account_name& name) {
 }
 
 void apply_context::add_ram_usage( account_name payer, int64_t ram_delta ) {
-   if (payer != receiver && ram_delta > 0) {
-      if (receiver == config::system_account_name) {
-      } else if (payer == config::system_account_name && is_privileged()) {
-      } else {
-         auto payer_found = false;
-         // search act->authorization for a payer permission role
-         for( const auto& auth : act->authorization ) {
-            if( auth.actor == payer && auth.permission == config::sysio_payer_name ) {
-               payer_found = true;
-               break;
-            }
-            if ( auth.actor == config::system_account_name ) {
-               // If the payer is the system account, we don't enforce explicit payer authorization.
-               // This avoids a lot of changes for tests and sysio should not be calling untrusted contracts
-               // or spending user's RAM unexpectedly.
-               payer_found = true;
-               break;
-            }
-         }
-         SYS_ASSERT(payer_found, unsatisfied_authorization, "Requested payer ${payer} did not authorize payment", ("payer", payer));
-      }
-   }
    trx_context.add_ram_usage( payer, ram_delta );
 
    auto p = _account_ram_deltas.emplace( payer, ram_delta );
