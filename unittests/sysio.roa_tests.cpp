@@ -457,7 +457,71 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy(newuser, node_owners[2]);
    BOOST_TEST(p["net_weight"].as_string() == "32.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "32.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "32.0000 SYS"); // not policy does not include the gifted RAM from sysio
+   BOOST_TEST(p["ram_weight"].as_string() == "32.0000 SYS"); // new policy does not include the gifted RAM from sysio
+   r = get_reslimit("sysio"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
+   p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
+   BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS"); // 2*newaccount_ram 2*(2808 / bytesPerUnit 104) == 54 (nothing for policy)
+
+   // Expand policy and verify resources:     net           cpu            ram
+   expand_roa_policy(node_owners[2], newuser, "5.0000 SYS", "10.0000 SYS", "15.0000 SYS", 0);
+   produce_block();
+   control->get_resource_limits_manager().get_account_limits( "sysio.acct"_n, ram, net, cpu );
+   BOOST_TEST(ram == newaccount_ram); // resource_limits of sysio.acct is the same, ram is gifted to new account
+   control->get_resource_limits_manager().get_account_limits( newuser, ram, net, cpu );
+   BOOST_TEST(ram == newaccount_ram+(320000*104)+(150000*104)); // gifted ram plus the policy ram
+   BOOST_TEST(net == 320000+50000);
+   BOOST_TEST(cpu == 320000+100000);
+   r = get_reslimit(newuser);
+   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram+(320000*104)+(150000*104));
+   BOOST_TEST(r["net_weight"].as_string() == "37.0000 SYS");
+   BOOST_TEST(r["cpu_weight"].as_string() == "42.0000 SYS");
+   r = get_reslimit("sysio.acct"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself (nothing for policy)
+   p = get_policy("sysio"_n, "sysio"_n);
+   BOOST_TEST(p.is_null()); // no policy for sysio
+   p = get_policy(newuser, "sysio"_n);
+   BOOST_TEST(p.is_null()); // policy provided by node_owners[2], not sysio
+   p = get_policy(newuser, node_owners[2]);
+   BOOST_TEST(p["net_weight"].as_string() == "37.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "42.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "47.0000 SYS"); // policy does not include the gifted RAM from sysio
+   r = get_reslimit("sysio"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
+   p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
+   BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS"); // 2*newaccount_ram 2*(2808 / bytesPerUnit 104) == 54 (nothing for policy)
+
+   // Add policy from another node owner:     net           cpu            ram
+   add_roa_policy(node_owners[3], newuser, "1.0000 SYS", "2.0000 SYS", "3.0000 SYS", 0, 0);
+   produce_block();
+   control->get_resource_limits_manager().get_account_limits( "sysio.acct"_n, ram, net, cpu );
+   BOOST_TEST(ram == newaccount_ram); // resource_limits of sysio.acct is the same, ram is gifted to new account
+   control->get_resource_limits_manager().get_account_limits( newuser, ram, net, cpu );
+   BOOST_TEST(ram == newaccount_ram+(320000*104)+(150000*104)+(30000*104)); // gifted ram plus the policy ram
+   BOOST_TEST(net == 320000+50000+10000);
+   BOOST_TEST(cpu == 320000+100000+20000);
+   r = get_reslimit(newuser); // reflects both policies from node_owner 2 & 3
+   BOOST_TEST(r["ram_bytes"].as_int64() == newaccount_ram+(320000*104)+(150000*104)+(30000*104));
+   BOOST_TEST(r["net_weight"].as_string() == "38.0000 SYS");
+   BOOST_TEST(r["cpu_weight"].as_string() == "44.0000 SYS");
+   r = get_reslimit("sysio.acct"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == 3*newaccount_ram); // newuser, newuser2, and sysio.acct itself (nothing for policy)
+   p = get_policy("sysio"_n, "sysio"_n);
+   BOOST_TEST(p.is_null()); // no policy for sysio
+   p = get_policy(newuser, "sysio"_n);
+   BOOST_TEST(p.is_null()); // policy provided by node_owners[2], not sysio
+   p = get_policy(newuser, node_owners[2]); // node owner 2
+   BOOST_TEST(p["net_weight"].as_string() == "37.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "42.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "47.0000 SYS");
+   p = get_policy(newuser, node_owners[3]); // node owner 3
+   BOOST_TEST(p["net_weight"].as_string() == "1.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "2.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "3.0000 SYS");
    r = get_reslimit("sysio"_n);
    BOOST_TEST(r["ram_bytes"].as_int64() == roa_sysio_ram-2*newaccount_ram); // sysio ram not changed for a policy, same as before
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
