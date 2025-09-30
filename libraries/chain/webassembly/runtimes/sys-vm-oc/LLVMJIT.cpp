@@ -14,6 +14,8 @@ Redistribution and use in source and binary forms, with or without modification,
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <fc/log/logger_config.hpp> //set_thread_name
+
 #include "LLVMJIT.h"
 #include "LLVMEmitIR.h"
 
@@ -321,9 +323,12 @@ namespace LLVMJIT
 		}
 		if(num_functions_stack_size_found != module.functions.defs.size())
 			_exit(1);
-		if(jitModule->final_pic_code.size() >= generated_code_size_limit)
-			_exit(1);
 
+    auto module_size = jitModule->final_pic_code.size();
+	  if(module_size >= generated_code_size_limit) {
+	    elog("generated_code_size_limit(${limit}) < actualSize(${size})\n", ("limit", generated_code_size_limit)("size",module_size));
+      _exit(1);
+	  }
 		instantiated_code ret;
 		ret.code = jitModule->final_pic_code;
 		ret.function_offsets = jitModule->function_to_offsets;

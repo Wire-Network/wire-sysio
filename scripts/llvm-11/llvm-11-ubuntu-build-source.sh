@@ -44,18 +44,8 @@ fi
 
 echo "Configured to use ${JOBS} jobs for build"
 
-WANT_SANITIZERS=0
-TARGETS="ARM;AArch64;WebAssembly;X86"
 BRANCH="release/11.x"
 
-# Projects: clang toolchain + linker + C++ libs + compiler-rt (host)
-#PROJECTS="clang;clang-tools-extra;lld;lldb;compiler-rt;libcxx;libcxxabi;libunwind;polly"
-PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;polly"
-
-INSTALL_RUNTIMES_VIA_TOPLEVEL=1
-if [[ "$(uname)" == "Darwin" ||  "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
-  TARGETS="AArch64;WebAssembly"
-fi
 ### ---------------------------------------------------
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -67,14 +57,6 @@ while [[ $# -gt 0 ]]; do
     JOBS="${2:?}"
     shift 2
     ;;
-  --with-sanitizers)
-    WANT_SANITIZERS=1
-    shift
-    ;;
-  --targets)
-    TARGETS="${2:?}"
-    shift 2
-    ;;
   *)
     echo "Unknown arg: $1"
     exit 2
@@ -82,13 +64,9 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-
-
 echo "[+] Using:"
 echo "    PREFIX        = ${PREFIX}"
 echo "    JOBS          = ${JOBS}"
-echo "    TARGETS       = ${TARGETS}"
-echo "    SANITIZERS    = ${WANT_SANITIZERS}"
 echo "    BRANCH        = ${BRANCH}"
 
 if [[ $(uname) != "Linux" ]]; then
@@ -112,50 +90,20 @@ declare -a CMAKE_FLAGS=(
   -G Ninja
   -DCMAKE_BUILD_TYPE=Release
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"
-  -DLLVM_ENABLE_PROJECTS="${PROJECTS}"
-  -DLLVM_TARGETS_TO_BUILD="${TARGETS}"
-  -DLLVM_INCLUDE_TESTS=OFF
-  -DLLVM_INCLUDE_EXAMPLES=OFF
-  -DLLVM_ENABLE_RTTI=ON
-  -DLLVM_ENABLE_EH=ON
-  # THIS IS REQUIRED FOR `sys-vm-oc`
-  -DLLVM_ENABLE_ASSERTIONS=OFF
-  -DLLVM_ENABLE_ABI_BREAKING_CHECKS=OFF
 
-  # Prefer gold/ld.lld if present later; keep link portable
-  -DCMAKE_C_COMPILER=gcc-10
-  -DCMAKE_CXX_COMPILER=g++-10
-  -DCMAKE_C_COMPILER_LAUNCHER=ccache
-  -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-
-  # libc++ family for host
-  -DLIBCXX_ENABLE_SHARED=ON
-  -DLIBCXX_ENABLE_STATIC=ON
-  -DLIBCXX_ENABLE_ABI_LINKER_SCRIPT=OFF
-  -DLIBCXXABI_ENABLE_SHARED=ON
-  -DLIBCXXABI_ENABLE_STATIC=ON
-  -DLIBUNWIND_ENABLE_SHARED=ON
-  -DLIBUNWIND_ENABLE_STATIC=ON
-
-  # compiler-rt: build essentials for host; sanitizers optional
-  -DCOMPILER_RT_BUILD_BUILTINS=ON
-  -DCOMPILER_RT_BUILD_CRT=ON
-  -DCOMPILER_RT_BUILD_PROFILE=OFF
-  -DCOMPILER_RT_BUILD_XRAY=OFF
-  -DCOMPILER_RT_BUILD_LIBFUZZER=OFF
-  -DCOMPILER_RT_BUILD_MEMPROF=OFF
-  -DCOMPILER_RT_BUILD_GWP_ASAN=OFF
+  -DLLVM_TARGETS_TO_BUILD=host
+  -DLLVM_BUILD_TOOLS=Off
+  -DLLVM_ENABLE_RTTI=On
+  -DLLVM_ENABLE_TERMINFO=Off
+  -DLLVM_ENABLE_PIC=Off
+  -DCOMPILER_RT_BUILD_SANITIZERS=OFF
+  -DCMAKE_C_COMPILER=gcc-11
+  -DCMAKE_CXX_COMPILER=g++-11
 )
-
-if [[ "${WANT_SANITIZERS}" -eq 1 ]]; then
-  CMAKE_FLAGS+=(-DCOMPILER_RT_BUILD_SANITIZERS=ON)
-else
-  CMAKE_FLAGS+=(-DCOMPILER_RT_BUILD_SANITIZERS=OFF)
-fi
 
 # Build & Install (top-level)
 echo "[+] Configuring (top-level)…"
-cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" -DCMAKE_POLICY_VERSION_MINIMUM=3.5  "${CMAKE_FLAGS[@]}"
+cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "${CMAKE_FLAGS[@]}"
 
 echo "[+] Building…"
 ninja -C "${BUILD_DIR}" -j "${JOBS}"
