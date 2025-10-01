@@ -120,7 +120,6 @@ BOOST_FIXTURE_TEST_CASE( verify_producers, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( producer_schedule_promotion_test, validating_tester ) try {
-   SKIP_TEST
    create_accounts( {"alice"_n,"bob"_n,"carol"_n} );
    while (control->head_block_num() < 3) {
       produce_block();
@@ -186,7 +185,6 @@ BOOST_FIXTURE_TEST_CASE( producer_schedule_promotion_test, validating_tester ) t
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( producer_schedule_reduction, tester ) try {
-   SKIP_TEST
    create_accounts( {"alice"_n,"bob"_n,"carol"_n} );
    while (control->head_block_num() < 3) {
       produce_block();
@@ -586,7 +584,6 @@ BOOST_AUTO_TEST_CASE( large_authority_overflow_test ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( extra_signatures_test ) try {
-   SKIP_TEST
    tester main;
 
    main.create_accounts( {"alice"_n} );

@@ -79,28 +79,6 @@ public:
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
    }
 
-    auto buyram( name payer, name receiver, asset ram ) {
-       auto r = base_tester::push_action(config::system_account_name, "buyram"_n, payer, mvo()
-                    ("payer", payer)
-                    ("receiver", receiver)
-                    ("quant", ram)
-                    );
-       produce_block();
-       return r;
-    }
-
-    auto delegate_bandwidth( name from, name receiver, asset net, asset cpu, uint8_t transfer = 1) {
-       auto r = base_tester::push_action(config::system_account_name, "delegatebw"_n, from, mvo()
-                    ("from", from )
-                    ("receiver", receiver)
-                    ("stake_net_quantity", net)
-                    ("stake_cpu_quantity", cpu)
-                    ("transfer", transfer)
-                    );
-       produce_block();
-       return r;
-    }
-
     void create_currency( name contract, name manager, asset maxsupply, const private_key_type* signer = nullptr ) {
         auto act =  mutable_variant_object()
                 ("issuer",       manager )
@@ -119,30 +97,12 @@ public:
         return r;
     }
 
-    auto claim_rewards( name owner ) {
-       auto r = base_tester::push_action( config::system_account_name, "claimrewards"_n, owner, mvo()("owner",  owner ));
-       produce_block();
-       return r;
-    }
-
     auto register_producer(name producer) {
        auto r = base_tester::push_action(config::system_account_name, "regproducer"_n, producer, mvo()
                        ("producer",  name(producer))
                        ("producer_key", get_public_key( producer, "active" ) )
                        ("url", "" )
                        ("location", 0 )
-                    );
-       produce_block();
-       return r;
-    }
-
-
-    auto undelegate_bandwidth( name from, name receiver, asset net, asset cpu ) {
-       auto r = base_tester::push_action(config::system_account_name, "undelegatebw"_n, from, mvo()
-                    ("from", from )
-                    ("receiver", receiver)
-                    ("unstake_net_quantity", net)
-                    ("unstake_cpu_quantity", cpu)
                     );
        produce_block();
        return r;
@@ -173,23 +133,20 @@ BOOST_AUTO_TEST_SUITE(bootseq_tests)
 
 BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
     try {
-      SKIP_TEST
-
         // Create sysio.msig and sysio.token
-        create_accounts({"sysio.msig"_n, "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.vpay"_n, "sysio.bpay"_n, "sysio.saving"_n, "sysio.rex"_n });
+        create_accounts({"sysio.msig"_n, "sysio.token"_n });
         // Set code for the following accounts:
         //  - sysio (code: sysio.bios) (already set by tester constructor)
         //  - sysio.msig (code: sysio.msig)
         //  - sysio.token (code: sysio.token)
-        // set_code_abi("sysio.msig"_n, contracts::sysio_msig_wasm(), contracts::sysio_msig_abi());//, &sysio_active_pk);
-        // set_code_abi("sysio.token"_n, contracts::sysio_token_wasm(), contracts::sysio_token_abi()); //, &sysio_active_pk);
 
         set_code_abi("sysio.msig"_n,
                      test_contracts::sysio_msig_wasm(),
                      test_contracts::sysio_msig_abi());//, &sysio_active_pk);
-      //   set_code_abi("sysio.roa"_n,
-      //                test_contracts::sysio_roa_wasm(),
-      //                test_contracts::sysio_roa_abi());//, &sysio_active_pk);
+        // deployed as part of tester setup
+        // set_code_abi("sysio.roa"_n,
+        //              contracts::sysio_roa_wasm(),
+        //              contracts::sysio_roa_abi());//, &sysio_active_pk);
         set_code_abi("sysio.token"_n,
                      test_contracts::sysio_token_wasm(),
                      test_contracts::sysio_token_abi()); //, &sysio_active_pk);
@@ -224,20 +181,6 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
 
         deploy_contract();
 
-        // Buy ram and stake cpu and net for each genesis accounts
-        for( const auto& a : test_genesis ) {
-           auto ib = a.initial_balance;
-           auto ram = 1000;
-           auto net = (ib - ram) / 2;
-           auto cpu = ib - net - ram;
-
-           auto r = buyram(config::system_account_name, a.aname, asset(ram));
-           BOOST_REQUIRE( !r->except_ptr );
-
-           r = delegate_bandwidth("sysio.stake"_n, a.aname, asset(net), asset(cpu));
-           BOOST_REQUIRE( !r->except_ptr );
-        }
-
         auto producer_candidates = {
                 "proda"_n, "prodb"_n, "prodc"_n, "prodd"_n, "prode"_n, "prodf"_n, "prodg"_n,
                 "prodh"_n, "prodi"_n, "prodj"_n, "prodk"_n, "prodl"_n, "prodm"_n, "prodn"_n,
@@ -250,47 +193,18 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
            register_producer(pro);
         }
 
-        // Vote for producers
-        auto votepro = [&]( account_name voter, vector<account_name> producers ) {
-          std::sort( producers.begin(), producers.end() );
-          // special case, b1 voting is done by system account
-          auto actor = (voter == "b1"_n) ? config::system_account_name : voter;
-          base_tester::push_action(config::system_account_name, "voteproducer"_n, actor, mvo()
-                                ("voter",  name(voter))
-                                ("proxy", name(0) )
-                                ("producers", producers)
-                     );
-        };
-        votepro( "b1"_n, { "proda"_n, "prodb"_n, "prodc"_n, "prodd"_n, "prode"_n, "prodf"_n, "prodg"_n,
-                           "prodh"_n, "prodi"_n, "prodj"_n, "prodk"_n, "prodl"_n, "prodm"_n, "prodn"_n,
-                           "prodo"_n, "prodp"_n, "prodq"_n, "prodr"_n, "prods"_n, "prodt"_n, "produ"_n} );
-        votepro( "whale2"_n, {"runnerup1"_n, "runnerup2"_n, "runnerup3"_n} );
-        votepro( "whale3"_n, {"proda"_n, "prodb"_n, "prodc"_n, "prodd"_n, "prode"_n} );
+        std::vector<name> producers = producer_candidates;
+        producers.resize(21);
+        set_producers(producers);
 
-        // Total Stakes = b1 + whale2 + whale3 stake = (100,000,000 - 1,000) + (20,000,000 - 1,000) + (30,000,000 - 1,000)
-        vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
-
-        BOOST_TEST(get_global_state()["total_activated_stake"].as<int64_t>() == 1499999997000);
-
-        // No producers will be set, since the total activated stake is less than 150,000,000
-        produce_blocks_for_n_rounds(2); // 2 rounds since new producer schedule is set when the first block of next round is irreversible
+        produce_blocks(2); // sysio is producing by itself
         auto active_schedule = control->head_block_state()->active_schedule;
         BOOST_TEST(active_schedule.producers.size() == 1u);
         BOOST_TEST(active_schedule.producers.front().producer_name == name("sysio"));
+        produce_blocks(1); // switching to the new set
 
-        // Spend some time so the producer pay pool is filled by the inflation rate
-        produce_min_num_of_blocks_to_spend_time_wo_inactive_prod(fc::seconds(30 * 24 * 3600)); // 30 days
-        // Since the total activated stake is less than 150,000,000, it shouldn't be possible to claim rewards
-        BOOST_REQUIRE_THROW(claim_rewards("runnerup1"_n), sysio_assert_message_exception);
-
-        // This will increase the total vote stake by (40,000,000 - 1,000)
-        votepro( "whale4"_n, {"prodq"_n, "prodr"_n, "prods"_n, "prodt"_n, "produ"_n} );
-        BOOST_TEST(get_global_state()["total_activated_stake"].as<int64_t>() == 1899999996000);
-
-        // Since the total vote stake is more than 150,000,000, the new producer set will be set
-        produce_blocks_for_n_rounds(2); // 2 rounds since new producer schedule is set when the first block of next round is irreversible
         active_schedule = control->head_block_state()->active_schedule;
-        BOOST_REQUIRE(active_schedule.producers.size() == 21);
+        BOOST_TEST_REQUIRE(active_schedule.producers.size() == 21);
         BOOST_TEST(active_schedule.producers.at( 0).producer_name == name("proda"));
         BOOST_TEST(active_schedule.producers.at( 1).producer_name == name("prodb"));
         BOOST_TEST(active_schedule.producers.at( 2).producer_name == name("prodc"));
@@ -312,32 +226,6 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         BOOST_TEST(active_schedule.producers.at(18).producer_name == name("prods"));
         BOOST_TEST(active_schedule.producers.at(19).producer_name == name("prodt"));
         BOOST_TEST(active_schedule.producers.at(20).producer_name == name("produ"));
-
-        // Spend some time so the producer pay pool is filled by the inflation rate
-        produce_min_num_of_blocks_to_spend_time_wo_inactive_prod(fc::seconds(30 * 24 * 3600)); // 30 days
-        // Since the total activated stake is larger than 150,000,000, pool should be filled reward should be bigger than zero
-        claim_rewards("runnerup1"_n);
-        BOOST_TEST(get_balance("runnerup1"_n).get_amount() > 0);
-
-        const auto first_june_2028 = fc::seconds(1843430400); // 2028-06-01
-        // Ensure that now is yet 10 years after 2018-06-01 yet
-        BOOST_REQUIRE(control->head_block_time().time_since_epoch() < first_june_2028);
-
-        // This should thrown an error, since block one can only unstake all his stake after 10 years
-
-        BOOST_REQUIRE_THROW(undelegate_bandwidth("b1"_n, "b1"_n, core_from_string("49999500.0000"), core_from_string("49999500.0000")), sysio_assert_message_exception);
-
-        // Skip 10 years
-        produce_block(first_june_2028 - control->head_block_time().time_since_epoch());
-
-        // Block one should be able to unstake all his stake now
-        undelegate_bandwidth("b1"_n, "b1"_n, core_from_string("49999500.0000"), core_from_string("49999500.0000"));
-
-        return;
-        produce_blocks(7000); /// produce blocks until virutal bandwidth can acomadate a small user
-        wlog("minow" );
-        votepro( "minow1"_n, {"p1"_n, "p2"_n} );
-
 
 // TODO: Complete this test
     } FC_LOG_AND_RETHROW()

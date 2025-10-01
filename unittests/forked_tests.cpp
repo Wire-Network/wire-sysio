@@ -35,7 +35,6 @@ struct fork_tracker {
 };
 
 BOOST_AUTO_TEST_CASE( fork_with_bad_block ) try {
-   SKIP_TEST
    tester bios;
    bios.produce_block();
    bios.produce_block();
@@ -127,7 +126,6 @@ BOOST_AUTO_TEST_CASE( fork_with_bad_block ) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE( forking ) try {
-   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 3) {
       c.produce_block();
@@ -140,33 +138,7 @@ BOOST_AUTO_TEST_CASE( forking ) try {
    wdump((fc::json::to_pretty_string(res)));
    wlog("set producer schedule to [dan,sam,pam]");
    c.produce_blocks(30);
-
-   auto r2 = c.create_accounts( {"sysio.token"_n} );
-   wdump((fc::json::to_pretty_string(r2)));
-   c.set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
-   c.set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
-   c.set_privileged("sysio.token"_n);
    c.produce_blocks(10);
-
-
-   auto cr = c.push_action( "sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
-              ("issuer",       "sysio" )
-              ("maximum_supply", core_from_string("10000000.0000"))
-      );
-
-   cr = c.push_action( "sysio.token"_n, "issue"_n, config::system_account_name, mutable_variant_object()
-              ("to",       "sysio" )
-              ("quantity", core_from_string("100.0000"))
-              ("memo", "")
-      );
-
-   cr = c.push_action( "sysio.token"_n, "transfer"_n, config::system_account_name, mutable_variant_object()
-              ("from",     "sysio")
-              ("to",       "dan" )
-              ("quantity", core_from_string("100.0000"))
-              ("memo", "")
-      );
-
 
    tester c2(setup_policy::none);
    wlog( "push c1 blocks to c2" );
@@ -284,7 +256,6 @@ BOOST_AUTO_TEST_CASE( forking ) try {
  *  the highest last irreversible block over one that is longer.
  */
 BOOST_AUTO_TEST_CASE( prune_remove_branch ) try {
-   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 11) {
       c.produce_block();
@@ -380,7 +351,6 @@ BOOST_AUTO_TEST_CASE( validator_accepts_valid_blocks ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( read_modes ) try {
-   SKIP_TEST
    tester c;
    c.produce_block();
    c.produce_block();
@@ -405,7 +375,6 @@ BOOST_AUTO_TEST_CASE( read_modes ) try {
 
 
 BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
-   SKIP_TEST
    auto does_account_exist = []( const tester& t, account_name n ) {
       const auto& db = t.control->db();
       return (db.find<account_object, by_name>( n ) != nullptr);
@@ -515,7 +484,6 @@ BOOST_AUTO_TEST_CASE( irreversible_mode ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( reopen_forkdb ) try {
-   SKIP_TEST
    tester c1;
 
    c1.create_accounts( {"alice"_n,"bob"_n,"carol"_n} );
@@ -570,7 +538,6 @@ BOOST_AUTO_TEST_CASE( reopen_forkdb ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
-   SKIP_TEST
    tester c;
    while (c.control->head_block_num() < 3) {
       c.produce_block();

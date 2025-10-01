@@ -192,7 +192,6 @@ namespace {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
-   SKIP_TEST
    tester chain;
 
    // Create 2 accounts
@@ -259,7 +258,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
-   SKIP_TEST
    tester chain;
    const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 
@@ -381,13 +379,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
    matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
    tester chain(matches);
+   chain.produce_block(); // 4
    const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
    auto find_s_root_ext = [](const auto& exts) {
       return std::find_if(exts.begin(), exts.end(),
          [](const auto& ext) { return ext.first == s_root_extension::extension_id(); });
    };
 
-   const auto block4 = chain.control->fetch_block_by_number(4);
+   const auto block4 = chain.control->fetch_block_by_number(chain.control->head_block_num());
    BOOST_CHECK_EQUAL(4u, block4->block_num());
    BOOST_CHECK_EQUAL(2u, block4->header_extensions.size());
 
@@ -406,11 +405,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    BOOST_CHECK(checksum256_type() != crtd_s_header4.current_s_root);
 
    chain.create_account("snapshot"_n);
-   chain.produce_blocks(1);
+   chain.produce_blocks(1); // 5
    chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
    chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
-   chain.produce_blocks(1);
-   chain.control->abort_block();
+   chain.create_account("brian"_n);
+   chain.produce_blocks(1); // 6
+   chain.control->abort_block(); // aborts pending block
 
    const auto block5 = chain.control->fetch_block_by_number(5);
 
@@ -421,7 +421,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
    crtd_it = find_s_root_ext(header_exts);
 
-   BOOST_CHECK(crtd_it != header_exts.end());
+   BOOST_REQUIRE(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext5 = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header5 = crtd_s_ext5.s_header_data;
    BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header5.contract_name);
@@ -459,45 +459,45 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
    // verify that the snapshot_chain is producing the same s_header results
    chain.create_account("tom"_n);
-   const auto block8 = chain.produce_block();
-   BOOST_CHECK_EQUAL(8u, block8->block_num());
+   const auto block7 = chain.produce_block();
+   BOOST_CHECK_EQUAL(7u, block7->block_num());
 
    snap_chain.create_account("bob"_n);
    
-   snap_chain.push_block(block8);
+   snap_chain.push_block(block7);
 
-   BOOST_CHECK_EQUAL(1u, block8->header_extensions.size());
-   header_exts = block8->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(1u, block7->header_extensions.size());
+   header_exts = block7->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 
    crtd_it = find_s_root_ext(header_exts);
 
    BOOST_CHECK(crtd_it != header_exts.end());
-   s_root_extension crtd_s_ext8 = std::get<s_root_extension>(crtd_it->second);
-   s_header crtd_s_header8 = crtd_s_ext8.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header8.contract_name);
-   BOOST_CHECK_EQUAL(crtd_s_header6.current_s_id, crtd_s_header8.previous_s_id);
-   BOOST_CHECK_EQUAL(6u, crtd_s_header8.previous_block_num);
-   BOOST_CHECK(checksum256_type() != crtd_s_header8.current_s_id);
-   BOOST_CHECK(checksum256_type() != crtd_s_header8.current_s_root);
+   s_root_extension crtd_s_ext7 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header7 = crtd_s_ext7.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header7.contract_name);
+   BOOST_CHECK_EQUAL(crtd_s_header6.current_s_id, crtd_s_header7.previous_s_id);
+   BOOST_CHECK_EQUAL(6u, crtd_s_header7.previous_block_num);
+   BOOST_CHECK(checksum256_type() != crtd_s_header7.current_s_id);
+   BOOST_CHECK(checksum256_type() != crtd_s_header7.current_s_root);
    
-   const auto snap_block8 = snap_chain.control->fetch_block_by_number(8);
+   const auto snap_block7 = snap_chain.control->fetch_block_by_number(7);
   
-   BOOST_CHECK_EQUAL(8u, snap_block8->block_num());
-   BOOST_CHECK_EQUAL(1u, snap_block8->header_extensions.size());
-   header_exts = snap_block8->validate_and_extract_header_extensions();
+   BOOST_CHECK_EQUAL(7u, snap_block7->block_num());
+   BOOST_CHECK_EQUAL(1u, snap_block7->header_extensions.size());
+   header_exts = snap_block7->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 
    crtd_it = find_s_root_ext(header_exts);
 
    BOOST_CHECK(crtd_it != header_exts.end());
-   s_root_extension crtd_s_ext_snap8 = std::get<s_root_extension>(crtd_it->second);
-   s_header crtd_s_header_snap8 = crtd_s_ext_snap8.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_snap8.contract_name);
-   BOOST_CHECK_EQUAL(crtd_s_header6.current_s_id, crtd_s_header_snap8.previous_s_id);
-   BOOST_CHECK_EQUAL(6u, crtd_s_header_snap8.previous_block_num);
-   BOOST_CHECK_EQUAL(crtd_s_header8.current_s_id, crtd_s_header_snap8.current_s_id);
-   BOOST_CHECK_EQUAL(crtd_s_header8.current_s_root, crtd_s_header_snap8.current_s_root);
+   s_root_extension crtd_s_ext_snap7 = std::get<s_root_extension>(crtd_it->second);
+   s_header crtd_s_header_snap7 = crtd_s_ext_snap7.s_header_data;
+   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_snap7.contract_name);
+   BOOST_CHECK_EQUAL(crtd_s_header6.current_s_id, crtd_s_header_snap7.previous_s_id);
+   BOOST_CHECK_EQUAL(6u, crtd_s_header_snap7.previous_block_num);
+   BOOST_CHECK_EQUAL(crtd_s_header7.current_s_id, crtd_s_header_snap7.current_s_id);
+   BOOST_CHECK_EQUAL(crtd_s_header7.current_s_root, crtd_s_header_snap7.current_s_root);
 }
 
 static auto get_extra_args() {
@@ -519,7 +519,6 @@ static auto get_extra_args() {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot_suites)
 {
-   SKIP_TEST
    const uint32_t legacy_default_max_inline_action_size = 4 * 1024;
    bool save_snapshot = false;
    bool generate_log = false;
@@ -593,7 +592,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_block_log, SNAPSHOT_SUITE, snapshot_suites)
 {
-   SKIP_TEST
    tester chain;
    const std::filesystem::path parent_path = chain.get_config().blocks_dir.parent_path();
 

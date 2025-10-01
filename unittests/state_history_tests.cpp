@@ -100,6 +100,7 @@ private:
 
 BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
    table_deltas_tester chain;
+   chain.produce_block();
 
    auto deltas = sysio::state_history::create_deltas(chain.control->db(), false);
 
@@ -109,7 +110,6 @@ BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    BOOST_REQUIRE_EQUAL(chain.find_table_delta("account").first, false);
 
    // Create new account
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Verify that a new record for the new account in the state delta of the block
    auto result = chain.find_table_delta("account");
@@ -131,11 +131,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Spot onto account metadata
    auto result = chain.find_table_delta("account_metadata");
@@ -151,11 +150,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Check that the permissions of this new account are in the delta
    vector<string> expected_permission_names{ "owner", "active" };
@@ -174,11 +172,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    auto& authorization_manager = chain.control->get_authorization_manager();
    const permission_object* ptr = authorization_manager.find_permission( {"newacc"_n, "active"_n} );
@@ -220,11 +217,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
-   SKIP_TEST; // TODO: Ram usage delta would underflow UINT64_MAX  (need create_account fix for auth resource allocation)
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
    chain.produce_block();
    public_key_type keys[] = {
          public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s), // Test for correct serialization of WA key, see issue #9087
@@ -257,11 +253,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_permission_link) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n);
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Spot onto permission_link
    const auto spending_priv_key = chain.get_private_key("newacc"_n, "spending");
@@ -286,6 +281,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_permission_link) {
 BOOST_AUTO_TEST_CASE(test_deltas_global_property_history) {
    // Assuming max transaction delay is 45 days (default in config.hpp)
    table_deltas_tester chain;
+   chain.produce_block();
 
    // Change max_transaction_delay to 60 sec
    auto params = chain.control->get_global_properties().configuration;
@@ -340,11 +336,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
 
 
 BOOST_AUTO_TEST_CASE(test_deltas_contract) {
-   SKIP_TEST
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("tester"_n);
+   chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
 
    chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
    chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
@@ -392,77 +387,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 }
 
 
-BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
-   SKIP_TEST
-   table_deltas_tester chain;
-   chain.produce_block();
-
-   chain.create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n, "sysio.rex"_n});
-
-   chain.produce_blocks( 100 );
-
-   chain.set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
-   chain.set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
-   chain.set_privileged("sysio.token"_n);
-
-   chain.produce_block();
-
-   chain.push_action("sysio.token"_n, "create"_n, "sysio.token"_n, mutable_variant_object()
-      ("issuer", "sysio.token" )
-      ("maximum_supply", core_from_string("1000000000.0000") )
-   );
-
-   chain.push_action("sysio.token"_n, "issue"_n, "sysio.token"_n, fc::mutable_variant_object()
-      ("to",       "sysio")
-      ("quantity", core_from_string("90.0000"))
-      ("memo", "for stuff")
-   );
-
-   chain.produce_blocks(10);
-
-   chain.set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   chain.set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
-
-   chain.push_action(config::system_account_name, "init"_n, config::system_account_name,
-                        mutable_variant_object()
-                        ("version", 0)
-                        ("core", symbol(CORE_SYMBOL).to_string()));
-
-   signed_transaction trx;
-   chain.set_transaction_headers(trx);
-
-   authority owner_auth;
-   owner_auth =  authority( chain.get_public_key( "alice"_n, "owner" ) );
-
-   trx.actions.emplace_back( vector<permission_level>{{config::system_account_name,config::active_name}},
-                                newaccount{
-                                    .creator  = config::system_account_name,
-                                    .name     =  "alice"_n,
-                                    .owner    = owner_auth,
-                                    .active   = authority( chain.get_public_key( "alice"_n, "active" ) )});
-
-   trx.actions.emplace_back( chain.get_action( config::system_account_name, "buyram"_n, vector<permission_level>{{config::system_account_name,config::active_name}},
-                                                  mutable_variant_object()
-                                                      ("payer", config::system_account_name)
-                                                      ("receiver",  "alice"_n)
-                                                      ("quant", core_from_string("1.0000"))));
-
-   trx.actions.emplace_back( chain.get_action( config::system_account_name, "delegatebw"_n, vector<permission_level>{{config::system_account_name,config::active_name}},
-                                                  mutable_variant_object()
-                                                      ("from", config::system_account_name)
-                                                      ("receiver",  "alice"_n)
-                                                      ("stake_net_quantity", core_from_string("10.0000") )
-                                                      ("stake_cpu_quantity", core_from_string("10.0000") )
-                                                      ("transfer", 0 )));
-
-   chain.set_transaction_headers(trx);
-   trx.sign( chain.get_private_key( config::system_account_name, "active" ), chain.control->get_chain_id()  );
-   chain.push_transaction( trx );
-}
 
    BOOST_AUTO_TEST_CASE(test_deltas) {
-      SKIP_TEST
       tester main;
+      main.produce_block();
 
       auto v = sysio::state_history::create_deltas(main.control->db(), false);
 
@@ -478,7 +406,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
       it = std::find_if(v.begin(), v.end(), find_by_name);
       BOOST_REQUIRE(it==v.end());
 
-      main.create_account("newacc"_n);
+      main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
       v = sysio::state_history::create_deltas(main.control->db(), false);
 
@@ -504,11 +432,12 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
    }
 
    BOOST_AUTO_TEST_CASE(test_deltas_contract_several_rows){
-      SKIP_TEST
-      table_deltas_tester chain(setup_policy::full);
+      // test expects only bios contract to be loaded
+      table_deltas_tester chain(setup_policy::preactivate_feature_only);
+      chain.set_bios_contract();
 
       chain.produce_block();
-      chain.create_account("tester"_n);
+      chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
 
       chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
       chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
@@ -542,15 +471,15 @@ BOOST_AUTO_TEST_CASE(test_deltas_resources_history) {
 
       std::multiset<std::string> expected_contract_row_table_names {"abihash", "abihash", "hashobjs", "hashobjs", "hashobjs", "numobjs", "numobjs", "numobjs"};
 
-      std::multiset<uint64_t> expected_contract_row_table_primary_keys {6138663577826885632U,14605619288908759040U, 0, 1 ,2, 0, 1, 2};
+      std::multiset<uint64_t> expected_contract_row_table_primary_keys {14389258095169634304U,14605619288908759040U, 0, 1 ,2, 0, 1, 2};
       std::multiset<std::string> result_contract_row_table_names;
       std::multiset<uint64_t> result_contract_row_table_primary_keys;
       for(auto &contract_row : contract_rows) {
          result_contract_row_table_names.insert(contract_row.table.to_string());
          result_contract_row_table_primary_keys.insert(contract_row.primary_key);
       }
-      BOOST_REQUIRE(expected_contract_row_table_names == result_contract_row_table_names);
-      BOOST_REQUIRE(expected_contract_row_table_primary_keys == result_contract_row_table_primary_keys);
+      BOOST_TEST_REQUIRE(expected_contract_row_table_names == result_contract_row_table_names);
+      BOOST_TEST_REQUIRE(expected_contract_row_table_primary_keys == result_contract_row_table_primary_keys);
 
       chain.produce_block();
 
@@ -691,7 +620,6 @@ static std::vector<sysio::ship_protocol::transaction_trace> get_traces(sysio::st
 }
 
 BOOST_AUTO_TEST_CASE(test_splitted_log) {
-   SKIP_TEST
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{
@@ -816,18 +744,15 @@ bool test_fork(uint32_t stride, uint32_t max_retained_files) {
 }
 
 BOOST_AUTO_TEST_CASE(test_fork_no_stride) {
-   SKIP_TEST
    // In this case, the chain fork would NOT trunk the trace log across the stride boundary.
    BOOST_CHECK(test_fork(UINT32_MAX, 10));
 }
 BOOST_AUTO_TEST_CASE(test_fork_with_stride1) {
-   SKIP_TEST
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, there are still some traces remains after the truncation.
    BOOST_CHECK(test_fork(10, 10));
 }
 BOOST_AUTO_TEST_CASE(test_fork_with_stride2) {
-   SKIP_TEST
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, no existing trace remain after the truncation. Because we only keep a very
    // short history, the create_account_trace is not available to be found. We just need
@@ -836,8 +761,6 @@ BOOST_AUTO_TEST_CASE(test_fork_with_stride2) {
 }
 
 BOOST_AUTO_TEST_CASE(test_corrupted_log_recovery) {
-   SKIP_TEST
-
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{

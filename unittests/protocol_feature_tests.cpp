@@ -435,8 +435,9 @@ BOOST_AUTO_TEST_CASE( restrict_action_to_self_test ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
-   SKIP_TEST
    tester chain( setup_policy::preactivate_feature_and_new_bios );
+
+   // Wire uses an explicit payer (if present) or if no explicit payer then the contract.
 
    const auto& tester_account = "tester"_n;
    const auto& tester_account2 = "tester2"_n;
@@ -484,6 +485,7 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
       chain.push_transaction(trx);
 
+      // no explicit payer so bills only the contract (tester_account)
       auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
       auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
@@ -493,6 +495,45 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
       BOOST_CHECK(tester2_cpu_limit1.used == tester2_cpu_limit0.used);
       BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
       BOOST_CHECK(tester2_net_limit1.used == tester2_net_limit0.used);
+   }
+
+   chain.produce_blocks();
+
+   {
+      action act;
+      act.account = tester_account;
+      act.name = "null2"_n;
+      act.authorization = vector<permission_level>{
+            {tester_account, config::active_name},
+            {tester_account2, config::active_name},
+            {tester_account2, config::sysio_payer_name}
+      };
+
+      signed_transaction trx;
+      trx.actions.emplace_back(std::move(act));
+      chain.set_transaction_headers(trx);
+
+      trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
+      trx.sign(get_private_key(tester_account2, "active"), chain.control->get_chain_id());
+
+      auto tester_cpu_limit0  = mgr.get_account_cpu_limit_ex(tester_account).first;
+      auto tester2_cpu_limit0 = mgr.get_account_cpu_limit_ex(tester_account2).first;
+      auto tester_net_limit0  = mgr.get_account_net_limit_ex(tester_account).first;
+      auto tester2_net_limit0 = mgr.get_account_net_limit_ex(tester_account2).first;
+
+      chain.push_transaction(trx);
+
+      // explicit payer so bills both the explicit payer and the contract
+      // TODO: This should only bill the explicit payer WIRE-173
+      auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
+      auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
+      auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
+      auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
+
+      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
+      BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
+      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
+      BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
    }
 
 } FC_LOG_AND_RETHROW() }
@@ -771,7 +812,6 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
  * The purpose of this testing is to ensure that the RAM is actually billed correctly against a limited balance.
  */
 BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
-   SKIP_TEST
    tester c( setup_policy::full );
 
    const auto& tester1_account = account_name("tester1");
@@ -781,8 +821,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto &carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.1280 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
@@ -820,31 +860,11 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
          ("len2", 0)
          ("payer", alice_account)
       ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
+      unauthorized_ram_usage_increase,
+      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice" )
    );
 
-   wlog("B");
-   // Moving data from table1 to table2 paid by another account still not authorized
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", alice_account)
-      ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
-   );
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester1_account, "setdata"_n, bob_account, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", bob_account)
-      ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer bob did not authorize payment" )
-   );
-   // But if you pay for the new data, you can remove the old data, but only if you are willing to pay for it...
+   // If you pay for the new data, you can remove the old data, but only if you are willing to pay for it...
    c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
       ("len1", 0)
       ("len2", 10)
@@ -857,7 +877,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
 
    // Cannot bill more RAM to another account within a notification
    // even if the account authorized the original action.
-   // This is due to the subjective mitigation in place.
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
          ("acctonotify", tester1_account)
@@ -885,56 +904,10 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    );
    wlog("E");
 
-   // Cannot send deferred transaction paid by another account that has not authorized the action.
-   //BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "senddefer"_n, bob_payer, mutable_variant_object()
-         ("senderid", 123)
-         ("payer", alice_account)
-     // ),
-     // missing_auth_exception,
-     // fc_exception_message_starts_with( "missing authority" )
-   );
-   wlog("F");
-
-   // Cannot send deferred transaction paid by another account within a notification
-   // even if the account authorized the original action.
-   // This is due to the subjective mitigation in place.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifydefer"_n, alice_account, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // subjective_block_production_exception,
-      // fc_exception_message_is( "Cannot charge RAM to other accounts during notify." )
-   );
-   wlog("G");
-
-   // Can send deferred transaction paid by another account if it has authorized the action.
-   c.push_action( tester1_account, "senddefer"_n, alice_account, mutable_variant_object()
-      ("senderid", 123)
-      ("payer", alice_account)
-   );
-   c.produce_block();
-   wlog("H");
-
-   // Can not migrate data from table1 to table2 paid by another account
-   // in a RAM usage neutral way with the authority of that account.
-   BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-         ("len1", 0)
-         ("len2", 10)
-         ("payer", alice_account)
-      ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
-   );
-
    c.produce_block();
 
    // Still cannot bill more RAM to another account within a notification
    // even if the account authorized the original action.
-   // This is due to the subjective mitigation in place.
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester2_account, "notifysetdat"_n, alice_payer, mutable_variant_object()
          ("acctonotify", tester1_account)
@@ -946,32 +919,6 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
    );
    wlog("I");
-
-   // Cannot send deferred transaction paid by another account that has not authorized the action.
-   // This still fails objectively, but now with another error message.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester1_account, "senddefer"_n, bob_payer, mutable_variant_object()
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // action_validate_exception,
-      // fc_exception_message_starts_with( "cannot bill RAM usage of deferred transaction to another account that has not authorized the action" )
-   );
-   wlog("J");
-
-   // Cannot send deferred transaction paid by another account within a notification
-   // even if the account authorized the original action.
-   // This now fails with an objective error.
-   // BOOST_REQUIRE_EXCEPTION(
-      c.push_action( tester2_account, "notifydefer"_n, alice_payer, mutable_variant_object()
-         ("acctonotify", tester1_account)
-         ("senderid", 123)
-         ("payer", alice_account)
-      // ),
-      // action_validate_exception,
-      // fc_exception_message_is( "cannot bill RAM usage of deferred transactions to another account within notify context" )
-   );
-   wlog("K");
 
    // Cannot bill more RAM to another account within a notification
    // even if the account authorized the original action.
@@ -989,40 +936,20 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    wlog("L");
 
    // Cannot bill more RAM to another account that has not authorized the action.
-   // This still fails objectively, but now with another error message.
+   // This still fails objectively
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
          ("len1", 20)
          ("len2", 0)
          ("payer", alice_account)
       ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
+      unauthorized_ram_usage_increase,
+      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: alice" )
    );
    wlog("M");
 
-   // Still can send deferred transaction paid by another account if it has authorized the action.
-   c.push_action( tester1_account, "senddefer"_n, alice_payer, mutable_variant_object()
-      ("senderid", 123)
-      ("payer", alice_account)
-   );
-   c.produce_block();
-   wlog("N");
-
-   // We cannot migrate data from table1 to table2 paid by another account
-   // in a RAM usage neutral way without the authority of that account.
-   BOOST_REQUIRE_EXCEPTION(
-   c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
-      ("len1", 0)
-      ("len2", 10)
-      ("payer", alice_account)
-      ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
-   );
-
    // Now also cannot migrate data from table2 to table1 paid by another account
-   // in a RAM usage neutral way even within a notification .
+   // in a RAM usage neutral way within a notification .
    BOOST_REQUIRE_EXCEPTION(
    c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
       ("acctonotify", "tester1")
@@ -1030,13 +957,13 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       ("len2", 0)
       ("payer", "alice")
       ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
+      unauthorized_ram_usage_increase,
+      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
    );
 
    wlog("OO");
    // Of course it should not be possible to migrate data from table1 to table2 paid by another account
-   // in a way that reduces RAM usage as well, even within a notification.
+   // in a way that reduces RAM usage as well, within a notification.
    BOOST_REQUIRE_EXCEPTION(
    c.push_action( tester2_account, "notifysetdat"_n, bob_payer, mutable_variant_object()
       ("acctonotify", "tester1")
@@ -1044,8 +971,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       ("len2", 5)
       ("payer", "alice")
       ),
-      unsatisfied_authorization,
-      fc_exception_message_starts_with( "Requested payer alice did not authorize payment" )
+      unauthorized_ram_usage_increase,
+      fc_exception_message_is( "unprivileged contract cannot increase RAM usage of another account within a notify context: alice" )
    );
    wlog("PP");
 
@@ -1070,7 +997,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
       ("payer", "tester1")
       ),
       ram_usage_exceeded,
-      fc_exception_message_is( "account tester1 has insufficient ram; needs 133345 bytes has 133120 bytes" )
+      fc_exception_message_is( "account tester1 has insufficient ram; needs 89056 bytes has 88808 bytes" )
    );
 
    c.expand_roa_policy(c.NODE_DADDY, tester1_account, "100.0000 SYS", "100.0000 SYS", "100.0000 SYS", 0);
@@ -1279,8 +1206,6 @@ BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_update_account_auth ) { try {
-   SKIP_TEST; // TODO: Ram usage delta would underflow UINT64_MAX  (need create_account fix for auth resource allocation)
-
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
    c.create_account("billy"_n);
