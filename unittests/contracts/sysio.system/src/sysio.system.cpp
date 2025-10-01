@@ -1,5 +1,4 @@
 #include <sysio.system/sysio.system.hpp>
-#include <sysio.token/sysio.token.hpp>
 
 #include <sysio/crypto.hpp>
 #include <sysio/dispatcher.hpp>
@@ -9,7 +8,6 @@
 namespace sysiosystem {
 
    using sysio::current_time_point;
-   using sysio::token;
 
    system_contract::system_contract( name s, name code, datastream<const char*> ds )
    :native(s,code,ds),
@@ -266,10 +264,7 @@ namespace sysiosystem {
       require_auth( get_self() );
       check( version.value == 0, "unsupported version for init action" );
 
-      auto system_token_supply   = sysio::token::get_supply(token_account, core.code() );
-      check( system_token_supply.symbol == core, "specified core symbol does not exist (precision mismatch)" );
-
-      check( system_token_supply.amount > 0, "system token supply must be greater than 0" );
+      check(core == symbol("SYS", 4), "core symbol must be SYS.");
    }
 
    // ** ON NOTIFY OF AUTH.MSG MODIFICATION **

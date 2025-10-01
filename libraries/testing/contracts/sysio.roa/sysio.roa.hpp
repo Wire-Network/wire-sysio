@@ -89,13 +89,13 @@ namespace sysio {
              * 
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
-             * @param net_weight The amount in SYS to decrease NET by.
-             * @param cpu_weight The amount in SYS to decrease CPU by.
-             * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
-             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust. 
+             * @param netWeight The amount in SYS to decrease NET by.
+             * @param cpuWeight The amount in SYS to decrease CPU by.
+             * @param ramWeight The amount in SYS to attempt decreasing RAM by, returning only
+             * @param networkGen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
              */
             [[sysio::action]]
-            void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
+            void reducepolicy(const name& owner, const name& issuer, const asset& netWeight, const asset& cpuWeight, const asset& ramWeight, const uint8_t& networkGen);
 
 
             /**
@@ -313,7 +313,8 @@ namespace sysio {
             /**
              * @brief Increase values of reslimit entry, assert if not found
              */
-            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes,
+                                          bool require_to_exist);
 
     }; // namespace roa
 } // namespace sysio

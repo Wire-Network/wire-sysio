@@ -363,7 +363,7 @@ try {
                          fc_exception_message_is("account names can only be 12 chars long"));
 
    // Creating a new account with non-privileged account, should fail
-   BOOST_CHECK_EXCEPTION(chain.create_account(name("dandy.joe"), name("joe")), action_validate_exception,
+   BOOST_CHECK_EXCEPTION(chain.create_account(name("dandy.joe"), name("joe"), false, false, false, false), action_validate_exception,
                          fc_exception_message_is("Only privileged accounts can create new accounts"));
 
    // Creating the same new account, this time with privileged account
@@ -426,6 +426,7 @@ try {
    chain.create_account(acc1a, config::system_account_name, false, false, false, false);
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 50, 50, 50, false);
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1a, 50, 50, 50, false);
+   chain.set_privileged(acc1);
    chain.produce_block();
 
    const chainbase::database &db = chain.control->db();
@@ -486,6 +487,7 @@ try {
    account_name acc4 = "acc4"_n;
 
    chain.create_account(acc1);
+   chain.set_privileged(acc1);
    chain.produce_block();
 
    auto create_acc = [&](account_name a, account_name creator, int threshold) {

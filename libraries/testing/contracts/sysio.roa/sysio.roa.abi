@@ -266,19 +266,19 @@
                     "type": "name"
                 },
                 {
-                    "name": "net_weight",
+                    "name": "netWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpu_weight",
+                    "name": "cpuWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "ram_weight",
+                    "name": "ramWeight",
                     "type": "asset"
                 },
                 {
-                    "name": "network_gen",
+                    "name": "networkGen",
                     "type": "uint8"
                 }
             ]
