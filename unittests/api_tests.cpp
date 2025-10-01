@@ -1520,6 +1520,22 @@ BOOST_FIXTURE_TEST_CASE(chain_tests, validating_tester) { try {
    BOOST_REQUIRE_EQUAL( validate(), true );
 } FC_LOG_AND_RETHROW() }
 
+BOOST_FIXTURE_TEST_CASE(test_get_ram_usage, validating_tester) { try {
+   produce_blocks(2);
+
+   create_account( "testapi"_n );
+   set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   produce_block();
+
+   using ram_usage_t = std::tuple<name, int64_t>;
+   int64_t ram_usage = control->get_resource_limits_manager().get_account_ram_usage("testapi"_n);
+
+   ram_usage_t r("testapi"_n, ram_usage);
+   CALL_TEST_FUNCTION( *this, "test_chain", "test_get_ram_usage", fc::raw::pack(r) );
+
+   BOOST_REQUIRE_EQUAL( validate(), true );
+} FC_LOG_AND_RETHROW() }
+
 /*************************************************************************************
  * db_tests test case
  *************************************************************************************/

@@ -218,6 +218,7 @@ struct test_transaction {
 
 struct test_chain {
    static void test_activeprods();
+   static void test_get_ram_usage();
 };
 
 struct test_fixedpoint {
