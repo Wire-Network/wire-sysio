@@ -78,7 +78,8 @@ file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
 add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
 
 # Link and include libsodium from vcpkg
-target_link_libraries( unit_test
+target_link_libraries(
+  unit_test
   sysio_chain_wrap
   state_history
   chainbase

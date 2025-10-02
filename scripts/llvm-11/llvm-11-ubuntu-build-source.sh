@@ -45,11 +45,12 @@ fi
 echo "Configured to use ${JOBS} jobs for build"
 
 WANT_SANITIZERS=0
-TARGETS="X86;WebAssembly"
+TARGETS="ARM;AArch64;WebAssembly;X86"
 BRANCH="release/11.x"
 
 # Projects: clang toolchain + linker + C++ libs + compiler-rt (host)
-PROJECTS="clang;clang-tools-extra;lld;compiler-rt;libcxx;libcxxabi;libunwind"
+#PROJECTS="clang;clang-tools-extra;lld;lldb;compiler-rt;libcxx;libcxxabi;libunwind;polly"
+PROJECTS="clang;clang-tools-extra;compiler-rt;lld;lldb;polly"
 
 INSTALL_RUNTIMES_VIA_TOPLEVEL=1
 if [[ "$(uname)" == "Darwin" ||  "$(uname -m)" == "aarch64" || "$(uname -m)" == "arm64" ]]; then
@@ -100,9 +101,11 @@ fi
 unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS
 
 echo "[+] Fetching llvm-project (${BRANCH})…"
-rm -rf "${LLVM_SRC_DIR}" "${BUILD_DIR}"
-#rm -rf "${BUILD_DIR}"
-git clone --depth=1 -b "${BRANCH}" https://github.com/llvm/llvm-project.git "${LLVM_SRC_DIR}"
+if [[ ! -d "${LLVM_SRC_DIR}" ]]; then
+  git clone --depth=1 -b "${BRANCH}" https://github.com/llvm/llvm-project.git "${LLVM_SRC_DIR}"
+fi
+
+rm -rf "${BUILD_DIR}"
 
 # Base CMake flags
 declare -a CMAKE_FLAGS=(
@@ -113,13 +116,15 @@ declare -a CMAKE_FLAGS=(
   -DLLVM_TARGETS_TO_BUILD="${TARGETS}"
   -DLLVM_INCLUDE_TESTS=OFF
   -DLLVM_INCLUDE_EXAMPLES=OFF
-  -DLLVM_ENABLE_ASSERTIONS=ON
   -DLLVM_ENABLE_RTTI=ON
   -DLLVM_ENABLE_EH=ON
+  # THIS IS REQUIRED FOR `sys-vm-oc`
+  -DLLVM_ENABLE_ASSERTIONS=OFF
+  -DLLVM_ENABLE_ABI_BREAKING_CHECKS=OFF
 
   # Prefer gold/ld.lld if present later; keep link portable
-  -DCMAKE_C_COMPILER=gcc-10
-  -DCMAKE_CXX_COMPILER=g++-10
+  -DCMAKE_C_COMPILER=gcc-12
+  -DCMAKE_CXX_COMPILER=g++-12
   -DCMAKE_C_COMPILER_LAUNCHER=ccache
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
@@ -158,9 +163,3 @@ ninja -C "${BUILD_DIR}" -j "${JOBS}"
 echo "[+] Installing (sudo)…"
 sudo mkdir -p "${PREFIX}"
 sudo ninja -C "${BUILD_DIR}" install
-
-# Convenience -11 symlinks (clang-11, clang++-11, llvm-config-11, etc.)
-# echo "[+] Creating -11 convenience symlinks…"
-# sudo bash -c "cd '${PREFIX}/bin' && \
-#   for b in clang clang++ clang-cl clang-cpp lld llvm-ar llvm-as llvm-config \
-#            llvm-nm llvm-objcopy llvm-objdump llvm-size llvm-strip llvm-symbolizer; do

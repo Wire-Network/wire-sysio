@@ -54,7 +54,11 @@ RUN apt-get install -y \
         sudo \
         doxygen \
         golang \
-        llvm-18 \
+    		gcc-10 \
+        g++-10 \
+    		gcc-12 \
+        g++-12 \
+    		llvm-18 \
         clang-18 \
         clang-tools-18 \
         libboost-all-dev \
