@@ -123,8 +123,8 @@ declare -a CMAKE_FLAGS=(
   -DLLVM_ENABLE_ABI_BREAKING_CHECKS=OFF
 
   # Prefer gold/ld.lld if present later; keep link portable
-  -DCMAKE_C_COMPILER=gcc-12
-  -DCMAKE_CXX_COMPILER=g++-12
+  -DCMAKE_C_COMPILER=gcc-10
+  -DCMAKE_CXX_COMPILER=g++-10
   -DCMAKE_C_COMPILER_LAUNCHER=ccache
   -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
