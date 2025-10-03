@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   Build:
-    name: Build sysio
+    name: Build wire-sysio
     strategy:
       fail-fast: false
       matrix:
@@ -42,7 +42,7 @@ jobs:
             cmake --build build
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
         - name: Upload builddir
-          uses: AntelopeIO/upload-artifact-large-chunks-action@v1
+          uses: actions/upload-artifact@v4
           with:
             name: ${{matrix.platform}}-build
             path: build.tar.zst

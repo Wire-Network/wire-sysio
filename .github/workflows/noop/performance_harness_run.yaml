@@ -60,7 +60,7 @@ jobs:
 
   platform-cache:
     name: Platform Cache
-    uses: AntelopeIO/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
+    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
     permissions:
       packages: write
       contents: read
