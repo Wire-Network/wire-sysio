@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/trace_api/trace.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 
 namespace sysio { namespace trace_api {
 
@@ -59,7 +59,7 @@ inline TransactionTrace to_transaction_trace( const cache_trace& t ) {
    return r;
 }
 
-inline block_trace_v2 create_block_trace( const chain::block_state_ptr& bsp ) {
+inline block_trace_v2 create_block_trace( const chain::block_state_legacy_ptr& bsp ) {
    block_trace_v2 r;
    r.id = bsp->id;
    r.number = bsp->block_num;

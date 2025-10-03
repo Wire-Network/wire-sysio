@@ -1,6 +1,6 @@
 #include <sysio/chain/root_txn_identification.hpp>
 #include <sysio/chain/contract_action_match.hpp>
-#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/merkle.hpp>
 
 #include <sysio/chain/exceptions.hpp>
@@ -18,7 +18,7 @@ namespace sysio { namespace chain {
 
       void signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx );
 
-      void signal_accepted_block( const chain::block_state_ptr& bsp );
+      void signal_accepted_block( const chain::block_state_legacy_ptr& bsp );
 
       void process_action_traces( const std::vector<chain::action_trace>& action_traces );
 
@@ -60,13 +60,13 @@ namespace sysio { namespace chain {
       } FC_LOG_AND_DROP(("Failed to signal applied transaction for finality status"));
    }
 
-   void root_txn_identification::signal_accepted_block( const chain::block_state_ptr& bsp ) {
+   void root_txn_identification::signal_accepted_block( const chain::block_state_legacy_ptr& bsp ) {
       try {
          _my->signal_accepted_block(bsp);
       } FC_LOG_AND_DROP(("Failed to signal accepted block for finality status"));
    }
 
-   void root_txn_identification_impl::signal_accepted_block( const chain::block_state_ptr& bsp ) {
+   void root_txn_identification_impl::signal_accepted_block( const chain::block_state_legacy_ptr& bsp ) {
       try {
          SYS_ASSERT(current_block_num.has_value() && *current_block_num == bsp->block_num, chain::block_validate_exception,
              "Received accepted block for a different block number than we were expecting",
