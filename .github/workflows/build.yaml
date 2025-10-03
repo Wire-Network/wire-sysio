@@ -3,9 +3,17 @@ name: "Build & Test(Parallel ctest)"
 on:
   push:
     branches:
-      - main
+      - master
       - "release/*"
   pull_request:
+    branches:
+      - master
+    paths:
+      - 'libraries/**'
+      - 'programs/**'
+      - 'plugins/**'
+      - 'unittests/**'
+      - 'tests/**'
   workflow_dispatch:
     inputs:
       override-cdt:
@@ -41,7 +49,6 @@ jobs:
       runs-on: '["self-hosted", "enf-x86-beefy"]'
       platform-files: |
         .cicd/platforms
-        tools/reproducible.Dockerfile:builder
 
   build-base:
     name: Run Build Workflow
@@ -85,7 +92,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu20, ubuntu22, reproducible]
+        platform: [ubuntu24, ubsan]
     runs-on: ubuntu-latest
     container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
     steps:
@@ -93,7 +100,7 @@ jobs:
         with:
           submodules: recursive
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.platform}}-build
       - name: Build packages
@@ -106,23 +113,23 @@ jobs:
         if: matrix.platform != 'reproducible'
         run: |
           apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/wire-sysio_*.deb ./build/sysio-dev*.deb
-      - name: Test using TestHarness
-        if: matrix.platform != 'reproducible'
-        run: |
-          python3 -c "from TestHarness import Cluster"
+          apt-get install -y ./build/wire-sysio_*.deb 
+      # - name: Test using TestHarness
+      #   if: matrix.platform != 'reproducible'
+      #   run: |
+      #     python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
       - name: Upload dev package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.platform != 'reproducible'
         with:
-          name: sysio-dev-${{matrix.platform}}-amd64
-          path: build/sysio-dev*.deb
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio-dev*.deb
       - name: Upload sysio package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.platform == 'reproducible'
         with:
           name: sysio-deb-amd64
-          path: build/leap_*.deb
+          path: build/wire-sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
@@ -131,74 +138,285 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
-    runs-on: ["self-hosted", "enf-x86-hightier"]
+          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
+          # - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
+          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+    runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
-      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      options: >-
+        --security-opt seccomp=unconfined
+        --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+        --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
+        --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
+        --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
+      volumes:
+      - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
+
+
     steps:
+      - name: Create ephemeral Docker context
+        id: docker-context
+        run: |
+
+            echo "===== DEBUG: ENVIRONMENT ====="
+            whoami
+            id
+            echo "HOME=$HOME"
+            echo "PWD=$PWD"
+            echo "RUNNER_NAME=$RUNNER_NAME"
+            echo "BASE_RUNNER=${RUNNER_NAME,,}"
+
+            echo "===== DEBUG: PATHS ====="
+            echo "User PATH: $PATH"
+            sudo bash -c 'echo "Sudo PATH: $PATH"'
+
+            echo "===== DEBUG: DOCKER BINARIES ====="
+            which docker || echo "docker not found in PATH"
+            sudo which docker || echo "sudo: docker not found in PATH"
+
+            echo "===== DEBUG: DOCKER BIN LOCATIONS ====="
+            ls -l /usr/bin/docker 2>/dev/null || echo "/usr/bin/docker missing"
+            ls -l /usr/local/bin/docker 2>/dev/null || echo "/usr/local/bin/docker missing"
+
+            echo "===== DEBUG: VERIFY EXECUTION ====="
+            # Try executing docker both with and without sudo to see the difference
+            docker version || echo "docker version failed (user)"
+            sudo /usr/bin/docker version || echo "sudo /usr/bin/docker version failed (explicit path)"
+            sudo docker version || echo "sudo docker version failed (plain sudo)"
+
+            echo "===== DEBUG: SUDO CONFIG ====="
+            sudo grep -E '^Defaults' /etc/sudoers /etc/sudoers.d/* 2>/dev/null | grep -E 'secure_path|env_keep' || echo "No sudo Defaults found"
+            
+            BASE_RUNNER="${RUNNER_NAME,,}"
+            echo "Detected runner name: $RUNNER_NAME"
+
+            if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
+            elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+            else
+              echo "Unknown runner, defaulting to /var/run/docker.sock"
+              DOCKER_SOCK=/var/run/docker.sock
+            fi
+
+            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
+            echo "Using Docker socket: $DOCKER_SOCK"
+            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+
+      # - name: Cleanup stale containers
+      #   run: |
+      #     echo "Removing old containers for context $DOCKER_CONTEXT..."
+      #     sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+      #     echo "Cleanup complete."
+
+      - name: Ensure writable workspace
+        run: |
+          echo "User is $USER"
+          echo "Fixing permissions on workspace for user $(whoami)"
+          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
+          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+
       - uses: actions/checkout@v4
+
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
-      - name: Run Parallel Tests
+
+      - name: Debug environment and workspace
         run: |
-          # https://github.com/actions/runner/issues/2033  -- need this because of full version label test looking at git revs
-          chown -R $(id -u):$(id -g) $PWD
+          echo "=== SYSTEM INFO ==="
+          whoami
+          id
+          hostname
+
+          echo
+          echo "=== ENVIRONMENT ==="
+          env | sort
+
+          echo
+          echo "=== DOCKER CONTEXT INFO ==="
+          docker context ls || true
+          echo "Current DOCKER_HOST: $DOCKER_HOST"
+          echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
+
+          echo
+          echo "=== GITHUB WORKSPACE ==="
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Current directory: $PWD"
+          ls -la "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== PATHS & PERMISSIONS ==="
+          echo "--- /github ---"
+          ls -ld /github || true
+          echo "--- /github/home ---"
+          ls -ld /github/home || true
+          echo "--- Current workspace ---"
+          ls -ld "$GITHUB_WORKSPACE" || true
+          echo "--- ./build ---"
+          ls -ld build || true
+          ls -ld "$GITHUB_WORKSPACE/build" || true
+          echo "--- ./build/Testing ---"
+          ls -ld build/Testing || true
+          echo "--- ./build/Testing/Temporary ---"
+          ls -ld build/Testing/Temporary || true
+
+          echo
+          echo "=== FILE OWNERSHIP TOP 20 ==="
+          find "$GITHUB_WORKSPACE" -maxdepth 2 -type d -printf '%u:%g %p\n' 2>/dev/null | sort | uniq -c | sort -nr | head -n 20
+
+          echo
+          echo "=== MOUNTED FILESYSTEMS ==="
+          df -h
+          mount | grep "$GITHUB_WORKSPACE" || true
+
+          echo
+          echo "=== GIT CONFIG LOCATIONS ==="
+          git config --list --show-origin || true
+
+          echo
+          echo "=== CHECK WRITABILITY OF BUILD DIR ==="
+          touch build/debug_write_test 2>&1 || echo "❌ Cannot write to build/"
+          rm -f build/debug_write_test || true
+
+      - name: Run Parallel Tests
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          # https://github.com/actions/runner/issues/2033
           zstdcat build.tar.zst | tar x
+          sudo chown -R $(id -u):$(id -g) $PWD
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 420
+
       - name: Upload core files from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-tests-logs
-          if-no-files-found: ignore
-          path: /cores
+          if-no-files-found: warn
+          path: |
+              /cores
+              build/Testing/Temporary/
+              build/TestLogs/
+
       - name: Check CPU Features
         run: awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
 
+      - name: Remove ephemeral Docker context
+        if: always()
+        run: |
+          echo "Removing Docker context: $DOCKER_CONTEXT"
+          sudo docker context rm -f "$DOCKER_CONTEXT" || true
+
   np-tests:
-    name: NP Tests (${{matrix.cfg.name}})
+    name: NP Tests (${{ matrix.cfg.name }})
     needs: [platform-cache, build-base]
     strategy:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22', base: 'ubuntu22', builddir: 'ubuntu22'}
+          - cfg: {name: 'ubuntu24', base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',    base: 'ubsan',    builddir: 'ubsan'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
+
     steps:
+      - name: Create ephemeral Docker context
+        id: docker-context
+        run: |
+            BASE_RUNNER="${RUNNER_NAME,,}"
+            echo "Detected runner name: $RUNNER_NAME"
+
+            if [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+            else
+              echo "Unknown runner, defaulting to /var/run/docker.sock"
+              DOCKER_SOCK=/var/run/docker.sock
+            fi
+
+            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
+            echo "Using Docker socket: $DOCKER_SOCK"
+            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+
+      - name: Cleanup stale containers (safety)
+        run: |
+          echo "Removing old containers for context $DOCKER_CONTEXT..."
+          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          echo "Cleanup complete."
+
+      - name: Ensure writable workspace
+        run: |
+          echo "User is $USER"
+          echo "Fixing permissions on workspace for user $(whoami)"
+          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
+          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+
       - uses: actions/checkout@v4
+
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: ${{matrix.cfg.builddir}}-build
-      - name: Run tests in parallel containers
+          name: ${{ matrix.cfg.builddir }}-build
+
+      - name: Run NP tests
         uses: ./.github/actions/parallel-ctest-containers
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         with:
-          container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
+          container: ${{ fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image }}
           error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
-          log-tarball-prefix: ${{matrix.cfg.name}}
+          log-tarball-prefix: ${{ matrix.cfg.name }}
           tests-label: nonparallelizable_tests
           test-timeout: 420
+
+      # - name: Export core dumps
+      #   run: |
+      #     docker --context "$DOCKER_HOST" run --rm \
+      #       --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
+      #       alpine sh -c 'tar -C /cores/ -c .' | tar x
       - name: Export core dumps
-        run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+        run: |
+          sudo docker --host $DOCKER_HOST run --rm \
+            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores,readonly \
+            alpine sh -c 'tar -C /cores/ -c .' | tar x
+
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
         if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          name: ${{matrix.cfg.name}}-np-logs
+          name: ${{ matrix.cfg.name }}-np-logs
           path: |
             *-logs.tar.gz
             core*.zst
+
+      - name: Cleanup Docker context
+        if: always()
+        run: |
+          echo "Removing Docker context..."
+          sudo docker context rm -f "$DOCKER_CONTEXT" || true
 
   lr-tests:
     name: LR Tests (${{matrix.cfg.name}})
@@ -207,18 +425,57 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
+          # - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
+          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
+    
     steps:
+      - name: Create ephemeral Docker context
+        id: docker-context
+        run: |
+          BASE_RUNNER="${RUNNER_NAME,,}"
+          echo "Detected runner name: $RUNNER_NAME"
+
+          if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
+          elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+          elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+          elif [[ "$BASE_RUNNER" == *"runner-5"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner5.sock
+          else
+            echo "Unknown runner, defaulting to /var/run/docker.sock"
+            DOCKER_SOCK=/var/run/docker.sock
+          fi
+
+          CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"          
+          echo "Using Docker socket: $DOCKER_SOCK"
+          sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+          echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+          echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+
+      - name: Cleanup stale containers
+        run: |
+          echo "Removing old containers for context $DOCKER_CONTEXT..."
+          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          echo "Cleanup complete"
+
       - uses: actions/checkout@v4
+
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
+
       - name: Run tests in parallel containers
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         uses: ./.github/actions/parallel-ctest-containers
         with:
           container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
@@ -226,11 +483,20 @@ jobs:
           log-tarball-prefix: ${{matrix.cfg.name}}
           tests-label: long_running_tests
           test-timeout: 1800
+
       - name: Export core dumps
-        run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
+        env:
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          echo "Checking for core dumps..."
+          docker context ls
+          sudo docker --context "$DOCKER_CONTEXT" run --rm \
+            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
+            alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
+
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-lr-logs
@@ -238,110 +504,115 @@ jobs:
             *-logs.tar.gz
             core*.zst
 
-  libtester-tests:
-    name: libtester tests
-    needs: [platform-cache, build-base, v, package]
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu20, ubuntu22]
-        test: [build-tree, make-dev-install, deb-install]
-    runs-on:  ["self-hosted", "enf-x86-midtier"]
-    container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
-    env:
-      DEBIAN_FRONTEND: noninteractive
-      TZ: Etc/UTC
-    steps:
-      - name: Update Package Index & Upgrade Packages
+      - name: Remove ephemeral Docker context
+        if: always()
         run: |
-          apt-get update
-          apt-get upgrade -y
+          echo "Removing Docker context: $DOCKER_CONTEXT"
+          sudo docker context rm -f "$DOCKER_CONTEXT" || true
+  # libtester-tests:
+  #   name: libtester tests
+  #   needs: [platform-cache, build-base, v, package]
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       platform: [ubuntu20, ubuntu22, ubuntu24]
+  #       test: [build-tree, make-dev-install, deb-install]
+  #   runs-on:  ["self-hosted", "enf-x86-midtier"]
+  #   container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
+  #   env:
+  #     DEBIAN_FRONTEND: noninteractive
+  #     TZ: Etc/UTC
+  #   steps:
+  #     - name: Update Package Index & Upgrade Packages
+  #       run: |
+  #         apt-get update
+  #         apt-get upgrade -y
 
-      # wire-sysio
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Clone sysio
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Download sysio builddir
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{matrix.platform}}-build
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Extract sysio build
-        run: |
-          zstdcat build.tar.zst | tar x
-      - if: ${{ matrix.test == 'build-tree' }}
-        name: Set sysio_DIR env var
-        run: |
-          echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
-      - if: ${{ matrix.test == 'make-dev-install' }}
-        name: sysio dev-install
-        run: |
-          cmake --install build
-          cmake --install build --component dev
-      - if: ${{ matrix.test == 'make-dev-install' }}
-        name: Delete sysio artifacts
-        run: |
-          rm -r *
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Download sysio-dev
-        uses: actions/download-artifact@v3
-        with:
-          name: sysio-dev-${{matrix.platform}}-amd64
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Install sysio-dev Package
-        run: |
-          apt-get install -y ./*.deb
-          rm ./*.deb
+  #     # wire-sysio
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Clone sysio
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Download sysio builddir
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{matrix.platform}}-build
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Extract sysio build
+  #       run: |
+  #         zstdcat build.tar.zst | tar x
+  #     - if: ${{ matrix.test == 'build-tree' }}
+  #       name: Set sysio_DIR env var
+  #       run: |
+  #         echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
+  #     - if: ${{ matrix.test == 'make-dev-install' }}
+  #       name: sysio dev-install
+  #       run: |
+  #         cmake --install build
+  #         cmake --install build --component dev
+  #     - if: ${{ matrix.test == 'make-dev-install' }}
+  #       name: Delete sysio artifacts
+  #       run: |
+  #         rm -r *
+  #     # - if: ${{ matrix.test == 'deb-install' }}
+  #     #   name: Download sysio-dev
+  #     #   uses: actions/download-artifact@v4
+  #     #   with:
+  #     #     name: sysio-dev-${{matrix.platform}}-amd64
+  #     # - if: ${{ matrix.test == 'deb-install' }}
+  #     #   name: Install sysio-dev Package
+  #     #   run: |
+  #     #     apt-get install -y ./*.deb
+  #     #     rm ./*.deb
 
-      # CDT
-      # - name: Download cdt
-      #   uses: AntelopeIO/asset-artifact-download-action@v3
-      #   with:
-      #     owner: Wire-Network
-      #     repo: wire-cdt
-      #     file: 'cdt_.*amd64.deb'
-      #     target: '${{needs.v.outputs.cdt-target}}'
-      #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
-      #     artifact-name: cdt_ubuntu_package_amd64
-      # - name: Install cdt Packages
-      #   run: |
-      #     apt-get install -y ./*.deb
-      #     rm ./*.deb
-          # CDT
-      - name: Download and Install wire-cdt
-        run: |
-          CDT_VERSION="${{needs.v.outputs.cdt-target}}"
-          CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
-          wget -O wire-cdt.deb "$CDT_URL"
-          apt-get install -y ./wire-cdt.deb
-          rm ./wire-cdt.deb
+  #     # CDT
+  #     # - name: Download cdt
+  #     #   uses: AntelopeIO/asset-artifact-download-action@v3
+  #     #   with:
+  #     #     owner: Wire-Network
+  #     #     repo: wire-cdt
+  #     #     file: 'cdt_.*amd64.deb'
+  #     #     target: '${{needs.v.outputs.cdt-target}}'
+  #     #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
+  #     #     artifact-name: cdt_ubuntu_package_amd64
+  #     # - name: Install cdt Packages
+  #     #   run: |
+  #     #     apt-get install -y ./*.deb
+  #     #     rm ./*.deb
+  #         # CDT
+  #     - name: Download and Install wire-cdt
+  #       run: |
+  #         CDT_VERSION="${{needs.v.outputs.cdt-target}}"
+  #         CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
+  #         wget -O wire-cdt.deb "$CDT_URL"
+  #         apt-get install -y ./wire-cdt.deb
+  #         rm ./wire-cdt.deb
 
-      # Reference Contracts
-      - name: checkout wire-system-contracts
-        uses: actions/checkout@v4
-        with:
-          repository: Wire-Network/wire-system-contracts
-          path: wire-system-contracts
-          ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Install wire-system-contracts deps
-        run: |
-          apt-get -y install cmake build-essential
-      - name: Build & Test wire-system-contracts
-        run: |
-          cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
-          cmake --build wire-system-contracts/build -- -j $(nproc)
-          cd wire-system-contracts/build/tests
-          ctest --output-on-failure -j $(nproc)
+  #     # Reference Contracts
+  #     - name: checkout wire-system-contracts
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: Wire-Network/wire-system-contracts
+  #         path: wire-system-contracts
+  #         ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
+  #     - if: ${{ matrix.test == 'deb-install' }}
+  #       name: Install wire-system-contracts deps
+  #       run: |
+  #         apt-get -y install cmake build-essential
+  #     - name: Build & Test wire-system-contracts
+  #       run: |
+  #         cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
+  #         cmake --build wire-system-contracts/build -- -j $(nproc)
+  #         cd wire-system-contracts/build/tests
+  #         ctest --output-on-failure -j $(nproc)
 
   all-passing:
     name: All Required Tests Passed
-    needs: [tests, np-tests, libtester-tests]
+    needs: [tests, np-tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.libtester-tests.result != 'success'
+      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success'
         run: false

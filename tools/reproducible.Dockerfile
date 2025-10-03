@@ -18,16 +18,18 @@ ENV SOURCE_DATE_EPOCH=1695620708
 ##EOS
 ##EOF
 
-RUN apt-get update && apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get -y install build-essential \
-                                                                                              file \
-                                                                                              git \
-                                                                                              libcurl4-openssl-dev \
-                                                                                              libgmp-dev \
-                                                                                              ninja-build \
-                                                                                              python3 \
-                                                                                              zlib1g-dev \
-                                                                                              zstd \
-                                                                                              ;
+RUN apt-get update && apt-get -y upgrade && DEBIAN_FRONTEND=noninteractive apt-get -y install \
+    build-essential \
+    file \
+    git \
+    libcurl4-openssl-dev \
+    libgmp-dev \
+    ninja-build \
+    python3 \
+    zlib1g-dev \
+    zstd \
+    pkg-config \
+    ;
 
 ARG _SYSIO_CLANG_VERSION=17.0.2
 ARG _SYSIO_LLVM_VERSION=11.1.0
