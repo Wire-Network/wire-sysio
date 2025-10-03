@@ -43,9 +43,9 @@ try:
 
     cluster.setWalletMgr(walletMgr)
     Print("Stand up cluster")
-    specificExtraNodeosArgs={}
+    specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeosArgs[totalProducerNodes]="--plugin eosio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
 
     # ***   setup topogrophy   ***
 
@@ -53,9 +53,9 @@ try:
     # and the only connection between those 2 groups is through the bridge (node4)
     if cluster.launch(topo="./tests/bridge_for_fork_test_shape.json", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducerNodes, loadSystemContract=False,
-                      specificExtraNodeosArgs=specificExtraNodeosArgs) is False:
+                      specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
-        Utils.errorExit("Failed to stand up eos cluster.")
+        Utils.errorExit("Failed to stand up sysio cluster.")
     Print("Validating system accounts after bootstrap")
     cluster.validateAccounts(None)
 
@@ -104,7 +104,7 @@ try:
 
     transferAmount = 10
     # Does not use transaction retry (not needed)
-    transfer = prodD.transferFunds(cluster.eosioAccount, cluster.defproduceraAccount, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
+    transfer = prodD.transferFunds(cluster.sysioAccount, cluster.defproduceraAccount, f"{transferAmount}.0000 {CORE_SYMBOL}", "fund account")
     transBlockNum = transfer['processed']['block_num']
     transId = prodD.getLastTrackedTransactionId()
 
