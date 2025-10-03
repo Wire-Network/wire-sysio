@@ -123,13 +123,8 @@ struct mock_state_history_plugin {
 
    fc::logger& get_logger() { return logger; }
 
-<<<<<<< HEAD
-   void get_block(uint32_t block_num, const sysio::chain::block_state_ptr& block_state,
+   void get_block(uint32_t block_num, const sysio::chain::block_state_legacy_ptr& block_state,
                   std::optional<sysio::chain::bytes>& result) const {
-=======
-   void get_block(uint32_t block_num, const eosio::chain::block_state_legacy_ptr& block_state,
-                  std::optional<eosio::chain::bytes>& result) const {
->>>>>>> 14287b0ca1 (rename block_state to block_state_legacy and block_header_state to block_header_state_legacy)
       result.emplace().resize(16);
    }
 

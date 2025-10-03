@@ -1891,7 +1891,7 @@ namespace sysio { namespace chain {
    }
 
    // Force instantiation of the two supported block_log implementations
-   template class block_log<block_header_state>;
+   template class block_log<block_header_state_legacy>;
    template class block_log<signed_block>;
 
 }} // namespace sysio::chain

@@ -1976,7 +1976,7 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
 }
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
-   block_header_state_ptr b;
+   block_header_state_legacy_ptr b;
    std::optional<uint64_t> block_num;
    std::exception_ptr e;
    try {

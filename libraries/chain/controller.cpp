@@ -233,7 +233,7 @@ struct controller_impl {
    std::function<void()>           shutdown;
    chainbase::database             db;
    block_log<signed_block>         blog;
-   using state_log = block_log<block_header_state>;
+   using state_log = block_log<block_header_state_legacy>;
    std::optional<state_log>        slog;
    std::optional<pending_state>    pending;
    block_state_legacy_ptr          head;
@@ -447,7 +447,7 @@ struct controller_impl {
             v.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)->block]() { return fc::raw::pack(*b); } ) );
             if (slog.has_value()) {
                sv.emplace_back( post_async_task( thread_pool.get_executor(), [b=(*bitr)]() {
-                  return fc::raw::pack(static_cast<const block_header_state&>(*b));
+                  return fc::raw::pack(static_cast<const block_header_state_legacy&>(*b));
                } ) );
             }
          }
@@ -666,7 +666,7 @@ struct controller_impl {
       } else {
          blog.reset( genesis, head->block );
          if( slog.has_value() ) {
-            slog->reset( genesis, std::dynamic_pointer_cast<block_header_state>(head) );
+            slog->reset( genesis, std::dynamic_pointer_cast<block_header_state_legacy>(head) );
          }
       }
       init(std::move(check_shutdown));
@@ -943,7 +943,7 @@ struct controller_impl {
       });
 
       { /// load and upgrade the block header state
-         block_header_state_legcy head_header_state;
+         block_header_state_legacy head_header_state;
 
          snapshot->read_section<block_state_legacy>([this,&head_header_state]( auto &section ){
             section.read_row(head_header_state, db);
@@ -1904,7 +1904,7 @@ struct controller_impl {
       return bsp;
    }
 
-   std::future<block_state_ptr> create_block_state_future( const block_id_type& id, const signed_block_ptr& b ) {
+   std::future<block_state_legacy_ptr> create_block_state_future( const block_id_type& id, const signed_block_ptr& b ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       return post_async_task( thread_pool.get_executor(), [b, id, control=this]() {
@@ -1921,7 +1921,7 @@ struct controller_impl {
    }
 
    // thread safe, expected to be called from thread other than the main thread
-   block_state_ptr create_block_state( const block_id_type& id, const signed_block_ptr& b ) {
+   block_state_legacy_ptr create_block_state( const block_id_type& id, const signed_block_ptr& b ) {
       SYS_ASSERT( b, block_validate_exception, "null block" );
 
       // no reason for a block_state if fork_db already knows about block
@@ -2929,7 +2929,7 @@ block_state_legacy_ptr controller::fetch_block_state_by_number( uint32_t block_n
    return my->fork_db.search_on_branch( fork_db_head_block_id(), block_num );
 } FC_CAPTURE_AND_RETHROW( (block_num) ) }
 
-block_header_state_ptr controller::fetch_irr_block_header_state_by_number( uint32_t block_num )const  { try {
+block_header_state_legacy_ptr controller::fetch_irr_block_header_state_by_number( uint32_t block_num )const  { try {
    SYS_ASSERT(my->slog, block_log_exception, "Block State log is not configured.");
    return my->slog->read_block_by_num(block_num);
 } FC_CAPTURE_AND_RETHROW( (block_num) ) }
@@ -3436,7 +3436,7 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
          } );
       accepted_block.connect(
-         [root_txn_ident]( const block_state_ptr& blk ) {
+         [root_txn_ident]( const block_state_legacy_ptr& blk ) {
                root_txn_ident->signal_accepted_block(blk);
          } ) ;
       block_start.connect(
