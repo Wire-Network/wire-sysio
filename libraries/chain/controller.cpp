@@ -902,7 +902,7 @@ struct controller_impl {
          section.add_row(chain_snapshot_header(), db);
       });
 
-      snapshot->write_section("eosio::chain::block_state", [this]( auto &section ){
+      snapshot->write_section("sysio::chain::block_state_legacy", [this]( auto &section ){
          section.template add_row<block_header_state_legacy>(*head, db);
       });
 
