@@ -7,7 +7,7 @@
 
 #include <vector>
 
-namespace sysio { namespace chain { namespace eosvmoc {
+namespace sysio { namespace chain { namespace sysvmoc {
 
 class wrapped_fd {
    public:
