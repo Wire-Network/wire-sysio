@@ -876,41 +876,6 @@ namespace sysio { namespace testing {
     }
 
 
-   transaction_trace_ptr base_tester::push_dummy(account_name from, const string& v, uint32_t billed_cpu_time_us) {
-      // use reqauth for a normal action, this could be anything
-      fc::variant pretty_trx = fc::mutable_variant_object()
-         ("actions", fc::variants({
-            fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
-               ("name", "reqauth")
-               ("authorization", fc::variants({
-                  fc::mutable_variant_object()
-                     ("actor", from)
-                     ("permission", name(config::active_name))
-               }))
-               ("data", fc::mutable_variant_object()
-                  ("from", from)
-               )
-            })
-        )
-        // lets also push a context free action, the multi chain test will then also include a context free action
-        ("context_free_actions", fc::variants({
-            fc::mutable_variant_object()
-               ("account", name(config::null_account_name))
-               ("name", "nonce")
-               ("data", fc::raw::pack(v))
-            })
-         );
-
-      signed_transaction trx;
-      abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
-      set_transaction_headers(trx);
-
-      trx.sign( get_private_key( from, "active" ), control->get_chain_id() );
-      return push_transaction( trx, fc::time_point::maximum(), billed_cpu_time_us );
-   }
-
-
    transaction_trace_ptr base_tester::transfer( account_name from, account_name to, string amount, string memo, account_name currency ) {
       return transfer( from, to, asset::from_string(amount), memo, currency );
    }
