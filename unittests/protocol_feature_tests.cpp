@@ -445,10 +445,11 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    chain.produce_blocks();
    chain.create_account(tester_account);
    chain.create_account(tester_account2);
+   chain.set_contract(tester_account, test_contracts::noop_wasm(), test_contracts::noop_abi());
 
    chain.push_action(config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
       ("account", name(tester_account).to_string())
-      ("ram_bytes", 10000)
+      ("ram_bytes", 20000)
       ("net_weight", 1000)
       ("cpu_weight", 1000));
 
@@ -463,16 +464,14 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    chain.produce_blocks();
 
    {
-      action act;
-      act.account = tester_account;
-      act.name = "null2"_n;
-      act.authorization = vector<permission_level>{
+      auto auths = vector<permission_level>{
          {tester_account, config::active_name},
          {tester_account2, config::active_name}
       };
 
       signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
+      trx.actions.emplace_back( chain.get_action( tester_account, "anyaction"_n, auths,
+         fc::mutable_variant_object()("from", tester_account)("type", "")("data", "") ) );
       chain.set_transaction_headers(trx);
 
       trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
@@ -500,17 +499,15 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    chain.produce_blocks();
 
    {
-      action act;
-      act.account = tester_account;
-      act.name = "null2"_n;
-      act.authorization = vector<permission_level>{
+      auto auths = vector<permission_level>{
             {tester_account, config::active_name},
             {tester_account2, config::active_name},
             {tester_account2, config::sysio_payer_name}
       };
 
       signed_transaction trx;
-      trx.actions.emplace_back(std::move(act));
+      trx.actions.emplace_back( chain.get_action( tester_account, "anyaction"_n, auths,
+         fc::mutable_variant_object()("from", tester_account)("type", "")("data", "") ) );
       chain.set_transaction_headers(trx);
 
       trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
