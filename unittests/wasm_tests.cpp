@@ -1685,6 +1685,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    account_name acc = "asserter"_n;
    account_name user = "user"_n;
    chain.create_accounts( {acc, user} );
+   chain.set_contract(acc, test_contracts::asserter_wasm(), test_contracts::asserter_abi());
    chain.produce_block();
 
    auto create_trx = [&](auto trx_max_ms) {
