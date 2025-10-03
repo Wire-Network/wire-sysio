@@ -750,6 +750,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(jumbo_row, SNAPSHOT_SUITE, snapshot_suites)
    chain.create_accounts({"jumbo"_n});
    chain.set_code("jumbo"_n, set_jumbo_row_wast);
    chain.produce_blocks(1);
+   chain.expand_roa_policy(chain.NODE_DADDY, "jumbo"_n, "32.0000 SYS", "32.0000 SYS", "40.0000 SYS", 0);
 
    signed_transaction trx;
    action act;
