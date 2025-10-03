@@ -1,0 +1,7 @@
+/.github
+/.vscode
+/.idea
+/build
+/etc/docker
+/scripts/llvm-11
+/scripts/docker-build.sh

@@ -1,3 +1,6 @@
+.idea
+.vscode-ctags
+tmp
 *.a
 *.sw*
 *.dylib
@@ -17,8 +20,8 @@ Makefile
 compile_commands.json
 moc_*
 *.moc
-
 .cache
+/vcpkg
 
 genesis.json
 hardfork.hpp
@@ -98,6 +101,5 @@ package-lock.json
 snapshots
 
 find-eosio-wasm.sh
-
-
 cliff.toml
+

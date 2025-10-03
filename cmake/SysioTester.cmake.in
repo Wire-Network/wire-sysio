@@ -1,0 +1,187 @@
+cmake_minimum_required(VERSION 3.5)
+cmake_policy(SET CMP0116 OLD) #suppress warning about Boost::xxxx targets not being imported
+message(STATUS "Setting up Sysio Tester @VERSION_FULL@ at @SYS_ROOT_DIR@")
+
+# VERSION
+set(SYSIO_VERSION "@VERSION_FULL@")
+
+# FORWARD COMPILER SETTINGS
+set(CMAKE_INSTALL_RPATH "${HOME}/lib;${HOME}/lib64")
+set(CMAKE_CXX_COMPILER @CMAKE_CXX_COMPILER@)
+set(CMAKE_C_COMPILER @CMAKE_C_COMPILER@)
+
+# CXX CONFIG
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CXX_STANDARD_REQUIRED ON)
+
+# CXX FLAGS
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
+if(APPLE)
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+endif(APPLE)
+
+enable_testing()
+
+if(LLVM_DIR STREQUAL "" OR NOT LLVM_DIR)
+   set(LLVM_DIR @LLVM_DIR@)
+endif()
+
+find_package(Gperftools QUIET)
+if(GPERFTOOLS_FOUND)
+   message(STATUS "Found gperftools; compiling tests with TCMalloc")
+   list(APPEND PLATFORM_SPECIFIC_LIBS tcmalloc)
+endif()
+
+if(NOT "@LLVM_FOUND@" STREQUAL "")
+   find_package(LLVM @LLVM_VERSION@ EXACT REQUIRED CONFIG)
+   llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native DebugInfoDWARF orcjit)
+   # link_directories(AFTER ${LLVM_LIBRARY_DIR})
+endif()
+
+#adds -pthread. Ubuntu sysio.contracts build breaks without this flag specified
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+
+# CALCULATE PATHS
+get_filename_component(sysioPrefixDir ${CMAKE_CURRENT_LIST_DIR}/../../.. ABSOLUTE)
+set(sysioLibDir ${sysioPrefixDir}/lib)
+set(sysioLibCmakeDir ${sysioLibDir}/cmake)
+set(sysioIncludeDir ${sysioPrefixDir}/include)
+
+# SET PREFIX PATHS FOR CMAKE PACKAGES
+list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}" "${sysioLibDir}" "${sysioLibCmakeDir}")
+
+# Helper macro to find sysio-provided libraries from ${sysioLibDir}
+macro(find_sysio_library VAR)
+  cmake_parse_arguments(_FSL "" "" "NAMES" ${ARGN})
+  if(NOT _FSL_NAMES)
+    message(FATAL_ERROR "find_sysio_library(<var> NAMES <names...>) requires NAMES.")
+  endif()
+  find_library(${VAR} NAMES ${_FSL_NAMES} PATHS ${sysioLibDir} NO_DEFAULT_PATH REQUIRED)
+endmacro()
+
+# FIND BOOST & OTHERS
+set(BOOST_VERSION 1.83.0)
+find_package(Boost ${BOOST_VERSION}
+   EXACT
+   CONFIG
+   REQUIRED
+   PATHS
+   ${sysioLibDir}
+   ${sysioLibCmakeDir}
+   NO_DEFAULT_PATH
+   COMPONENTS
+   date_time
+   filesystem
+   system
+   chrono
+   multi_index
+   multiprecision
+   interprocess
+   asio
+   signals2
+   iostreams
+   algorithm
+   unit_test_framework
+)
+
+find_package(Threads REQUIRED)
+
+# Sysio libraries (deduplicated via macro)
+find_sysio_library(libtester NAMES libsysio_testing sysio_testing)
+find_sysio_library(libchain NAMES libsysio_chain sysio_chain)
+find_sysio_library(libfc NAMES libfc fc)
+find_sysio_library(libwasm NAMES libwasm libWASM WASM)
+find_sysio_library(libwast NAMES libwast libWAST WAST)
+find_sysio_library(libir NAMES libir libIR IR)
+find_sysio_library(liblogging NAMES liblogging libLogging Logging)
+find_sysio_library(libchainbase NAMES libchainbase chainbase)
+find_sysio_library(libbuiltins NAMES libbuiltins builtins)
+find_sysio_library(libsecp256k1 NAMES libsecp256k1 libsecp256k1-internal secp256k1 secp256k1-internal)
+find_sysio_library(libbn256 NAMES libbn256 bn256)
+find_sysio_library(libbls12-381 NAMES libbls12-381 bls12-381)
+find_sysio_library(libsoftfloat NAMES libsoftfloat softfloat)
+find_sysio_library(libbscrypto NAMES libbscrypto bscrypto)
+find_sysio_library(libdecrepit NAMES libdecrepit decrepit)
+find_sysio_library(libsodium NAMES libsodium sodium)
+find_sysio_library(libgmp NAMES libgmp gmp)
+
+set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
+if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
+   set(WRAP_MAIN "-Wl,-wrap=main")
+endif()
+
+add_library(SysioChain INTERFACE)
+
+target_link_libraries(SysioChain INTERFACE
+   ${libchain}
+   ${libfc}
+   ${libwast}
+   ${libwasm}
+   ${libir}
+   ${liblogging}
+   ${libchainbase}
+   ${libbuiltins}
+   ${libsecp256k1}
+   ${libbn256}
+   ${libbls12-381}
+   ${libsodium}
+   ${libgmp}
+   ${libsoftfloat}
+   ${libbscrypto}
+   ${libdecrepit}
+
+   Boost::date_time
+   Boost::filesystem
+   Boost::system
+   Boost::chrono
+   Boost::multi_index
+   Boost::multiprecision
+   Boost::interprocess
+   Boost::asio
+   Boost::signals2
+   Boost::iostreams
+   "-lz" # Needed by Boost iostreams
+
+   ${LLVM_LIBS}
+
+   ${PLATFORM_SPECIFIC_LIBS}
+
+   ${WRAP_MAIN}
+   Threads::Threads
+)
+
+
+
+target_include_directories(SysioChain INTERFACE
+   ${sysioIncludeDir}
+   @OPENSSL_INCLUDE_DIR@
+   @CMAKE_INSTALL_PREFIX@
+   @CMAKE_INSTALL_FULL_INCLUDEDIR@
+   @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
+   @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat)
+
+
+add_library(SysioTester INTERFACE)
+
+target_link_libraries(SysioTester INTERFACE
+   ${libtester}
+   Boost::unit_test_framework
+   SysioChain
+)
+
+macro(add_sysio_test_executable test_name)
+   add_executable(${test_name} ${ARGN})
+   target_link_libraries(${test_name}
+      SysioTester
+   )   
+endmacro()
+
+macro(add_sysio_test test_name)
+   add_sysio_test_executable(${test_name} ${ARGN})
+   #This will generate a test with the default runtime
+   add_test(NAME ${test_name} COMMAND ${test_name} --report_level=detailed --color_output)
+   #Manually run unit_test for all supported runtimes
+   #To run unit_test with all log from blockchain displayed, put --verbose after --, i.e. unit_test -- --verbose
+endmacro()

@@ -70,28 +70,16 @@ add_custom_command(
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py
 )
 
-# === Use bundled libsodium built via ExternalProject in libraries/ ===
-# These should be defined as CACHE variables by libraries/CMakeLists.txt
-if (NOT LIBSODIUM_INCLUDE_DIR OR NOT LIBSODIUM_LIBRARIES)
-  message(FATAL_ERROR
-    "Bundled libsodium paths are not set. "
-    "Ensure ExternalProject_Add(libsodium ...) in libraries/CMakeLists.txt "
-    "defines LIBSODIUM_INCLUDE_DIR and LIBSODIUM_LIBRARIES as CACHE variables.")
-endif()
-
-message(STATUS "Using bundled libsodium from submodule")
-set(SODIUM_INCLUDE_DIRS "${LIBSODIUM_INCLUDE_DIR}")
-set(SODIUM_LIBS         "${LIBSODIUM_LIBRARIES}")
+# === Use vcpkg libsodium ===
+message(STATUS "Using libsodium from vcpkg")
 
 ### BUILD UNIT TEST EXECUTABLE ###
 file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
 add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
 
-# Ensure bundled libsodium is built (ExternalProject target) before linking unit tests
-add_dependencies(unit_test libsodium)
-
-# Link and include libsodium from the bundled build
-target_link_libraries( unit_test
+# Link and include libsodium from vcpkg
+target_link_libraries(
+  unit_test
   sysio_chain_wrap
   state_history
   chainbase
@@ -99,11 +87,9 @@ target_link_libraries( unit_test
   fc
   custom_appbase
   abieos
-  ${SODIUM_LIBS}
+  libsodium::libsodium
   ${PLATFORM_SPECIFIC_LIBS}
 )
-
-target_include_directories(unit_test PUBLIC ${SODIUM_INCLUDE_DIRS})
 
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)

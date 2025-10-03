@@ -1,0 +1,27 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg-configuration.schema.json",
+  "default-registry": {
+    "kind": "git",
+    "baseline": "29ff5b8131d0c6c8fcb8fbaef35992f0d507cd7c",
+    "repository": "https://github.com/Microsoft/vcpkg"
+  },
+  "registries": [
+    {
+      "kind": "git",
+      "repository": "https://github.com/wire-network/wire-vcpkg-registry",
+      "baseline": "315947a8cb23b89eea290f52d52cdd6b34eb6242",
+      "packages": [
+        "softfloat",
+        "libsodium",
+        "catch2",
+        "cli11",
+        "boost",
+        "boringssl-custom",
+        "secp256k1-internal",
+        "bn256",
+        "bls12-381",
+        "wire-sys-vm"
+      ]
+    }
+  ]
+}

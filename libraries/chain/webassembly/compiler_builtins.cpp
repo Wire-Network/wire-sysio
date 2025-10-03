@@ -1,7 +1,7 @@
 #include <sysio/chain/webassembly/interface.hpp>
 
 #include <compiler_builtins.hpp>
-#include <softfloat.hpp>
+#include <softfloat/softfloat.hpp>
 
 #include <fc/uint128.hpp>
 

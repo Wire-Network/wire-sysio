@@ -56,7 +56,7 @@ endif()
 
 if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTIMES)
    set(CHAIN_SYSVM_SOURCES "webassembly/runtimes/sys-vm.cpp")
-   set(CHAIN_SYSVM_LIBRARIES sys-vm)
+   set(CHAIN_SYSVM_LIBRARIES sys-vm::sys-vm)
 endif()
 
 set(CHAIN_WEBASSEMBLY_SOURCES
@@ -77,9 +77,6 @@ set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/system.cpp
    webassembly/transaction.cpp
 )
-
-add_library(sysio_rapidjson INTERFACE)
-target_include_directories(sysio_rapidjson INTERFACE ../rapidjson/include)
 
 ## SORT .cpp by most likely to change / break compile
 add_library( sysio_chain
@@ -140,18 +137,31 @@ add_library( sysio_chain
              ${HEADERS}
              )
 
-## Boost::accumulators depends on Boost::numeric_ublas, which is still missing cmake support (see
-## https://github.com/boostorg/cmake/issues/39). Until this is fixed, manually add Boost::numeric_ublas
-## as an interface library
-## ----------------------------------------------------------------------------------------------------
-add_library(boost_numeric_ublas INTERFACE)
-add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
-
-target_link_libraries( sysio_chain PUBLIC bn256 fc chainbase sysio_rapidjson Logging IR WAST WASM
-                       softfloat builtins ${CHAIN_SYSVM_LIBRARIES} ${LLVM_LIBS} ${CHAIN_RT_LINKAGE}
-                       Boost::signals2 Boost::hana Boost::property_tree Boost::multi_index Boost::asio Boost::lockfree
-                       Boost::assign Boost::accumulators
-                     )
+target_link_libraries(
+  sysio_chain
+  PUBLIC
+  bn256::bn256
+  fc
+  chainbase
+  rapidjson
+  Logging
+  IR
+  WAST
+  WASM
+  softfloat::softfloat
+  builtins
+  ${CHAIN_SYSVM_LIBRARIES}
+  ${LLVM_LIBS}
+  ${CHAIN_RT_LINKAGE}
+  Boost::signals2
+  Boost::hana
+  Boost::property_tree
+  Boost::multi_index
+  Boost::asio
+  Boost::lockfree
+  Boost::assign
+  Boost::accumulators
+)
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
                                    "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
@@ -176,13 +186,12 @@ if(SYSVMOC_ENABLE_DEVELOPER_OPTIONS)
 endif()
 
 install( TARGETS sysio_chain
-   RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR} COMPONENT dev EXCLUDE_FROM_ALL
-   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} COMPONENT dev EXCLUDE_FROM_ALL
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR} COMPONENT dev EXCLUDE_FROM_ALL
+   RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
 )
 install( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/sysio/chain/
       DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/chain
-      COMPONENT dev EXCLUDE_FROM_ALL
       FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" EXCLUDE
 )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/sysio/chain/core_symbol.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/chain COMPONENT dev EXCLUDE_FROM_ALL)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/include/sysio/chain/core_symbol.hpp DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/chain)

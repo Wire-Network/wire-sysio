@@ -6,7 +6,7 @@
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/wasm_config.hpp>
 #include <sysio/chain/whitelisted_intrinsics.hpp>
-#include <softfloat_types.h>
+#include <softfloat/softfloat_types.h>
 
 //sys-vm includes
 #include <sysio/vm/backend.hpp>

@@ -40,12 +40,12 @@ jobs:
           echo "Using BRANCH=$BRANCH"
           echo "Using REPO=$REPO"
       
-          sudo docker build --no-cache --pull \
-            --build-arg BRANCH="$BRANCH" \
-            --build-arg REPO="$REPO" \
-            -t wire-sysio-build .
+          sudo  ./scripts/docker-build.sh \
+            --target=app-build-repo \
+            --tag=wire-sysio-build \
+            --sysio-branch=$BRANCH
 
       - name: Run CTest suite
         run: |
           sudo docker run --rm wire-sysio-build \
-            bash -c "cd /wire/wire-sysio/build && ctest -j $(nproc) -LE _tests --output-on-failure"
+            bash -c 'cd /wire/wire-sysio/build/Release && ctest -j $(nproc) -LE _tests --output-on-failure'
