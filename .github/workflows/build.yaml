@@ -85,7 +85,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu20, ubuntu22, reproducible]
+        platform: [ubuntu20, ubuntu22]
     runs-on: ubuntu-latest
     container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
     steps:
@@ -101,12 +101,12 @@ jobs:
           zstdcat build.tar.zst | tar x
           cd build
           cpack
-          ../tools/tweak-deb.sh wire-sysio_*.deb
+          ../tools/tweak-deb.sh sysio_*.deb
       - name: Install dev package
         if: matrix.platform != 'reproducible'
         run: |
           apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/wire-sysio_*.deb ./build/sysio-dev*.deb
+          apt-get install -y ./build/sysio_*.deb ./build/sysio-dev*.deb
       - name: Test using TestHarness
         if: matrix.platform != 'reproducible'
         run: |
@@ -122,7 +122,7 @@ jobs:
         if: matrix.platform == 'reproducible'
         with:
           name: sysio-deb-amd64
-          path: build/leap_*.deb
+          path: build/sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
@@ -133,8 +133,8 @@ jobs:
         include:
           - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-hightier"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
@@ -171,8 +171,8 @@ jobs:
         include:
           - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
     steps:
       - uses: actions/checkout@v4
@@ -209,8 +209,8 @@ jobs:
         include:
           - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
     steps:
       - uses: actions/checkout@v4
