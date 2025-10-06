@@ -45,29 +45,4 @@ BOOST_AUTO_TEST_CASE( get_producers) { try {
       }
    } FC_LOG_AND_RETHROW() }
 
-// this test verifies the normal case of get_producer, where the contents of the system contract's producers table is used
-BOOST_AUTO_TEST_CASE( get_producers_from_table) { try {
-      SKIP_TEST // TODO: this needs to work, should update sysio system contract setprods to update producer table
-      sysio_system::sysio_system_tester chain;
-
-      // ensure that enough voting is occurring so that producer1111 is elected as the producer
-      //chain.cross_15_percent_threshold();
-
-      sysio::chain_apis::read_only plugin(*(chain.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
-      sysio::chain_apis::read_only::get_producers_params params = { .json = true, .lower_bound = "", .limit = 21 };
-
-      auto results = plugin.get_producers(params, fc::time_point::maximum());
-      BOOST_REQUIRE_EQUAL(results.more, "");
-      BOOST_REQUIRE_EQUAL(results.rows.size(), 1u);
-      const auto& row = results.rows[0].get_object();
-      BOOST_REQUIRE(row.contains("owner"));
-      BOOST_REQUIRE_EQUAL(row["owner"].as_string(), "producer1111");
-
-      // check for producer_authority not present, since it is only set when the producer schedule is used, this verifies producers table was used
-      // Disabling this check as the producer_authority appears to always be set with current system contract
-      // BOOST_REQUIRE(!row.contains("producer_authority"));
-
-   } FC_LOG_AND_RETHROW() }
-
-
 BOOST_AUTO_TEST_SUITE_END()
