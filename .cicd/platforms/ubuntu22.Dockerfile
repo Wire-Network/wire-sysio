@@ -30,4 +30,7 @@ RUN apt-get update && apt-get upgrade -y && \
                        gcc-10               \
                        g++-10               \
                        clang-11             \
-                       clang++-11
+                       clang++-11           \
+                       sudo
+
+RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
