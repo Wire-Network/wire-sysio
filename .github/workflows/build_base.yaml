@@ -38,7 +38,7 @@ jobs:
           run: |
             # https://github.com/actions/runner/issues/2033
             echo $PWD
-            la -la
+            ls -la
             ./vcpkg/bootstrap-vcpkg.sh
             env BASE_DIR=/opt/llvm ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
             chown -R $(id -u):$(id -g) $PWD
