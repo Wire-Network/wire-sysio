@@ -37,9 +37,19 @@ jobs:
           id: build
           run: |
             # https://github.com/actions/runner/issues/2033
+            echo $PWD
+            la -la
+            ./vcpkg/bootstrap-vcpkg.sh
+            env BASE_DIR=/opt/llvm ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
             chown -R $(id -u):$(id -g) $PWD
-            cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DENABLE_LEAP_DEV_DEB=On -GNinja
-            cmake --build build
+            env CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 \
+            cmake -B build -S . -G Ninja \
+              -DCMAKE_C_COMPILER=$CC \
+              -DCMAKE_CXX_COMPILER=$CXX \
+              -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 
+            cmake --build build -- -j 6
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
         - name: Upload builddir
           uses: actions/upload-artifact@v4

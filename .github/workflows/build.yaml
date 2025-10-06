@@ -41,7 +41,6 @@ jobs:
       runs-on: '["self-hosted", "enf-x86-beefy"]'
       platform-files: |
         .cicd/platforms
-        tools/reproducible.Dockerfile:builder
 
   build-base:
     name: Run Build Workflow
