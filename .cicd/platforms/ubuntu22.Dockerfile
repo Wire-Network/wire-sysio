@@ -13,4 +13,21 @@ RUN apt-get update && apt-get upgrade -y && \
                        python3-numpy        \
                        file                 \
                        zlib1g-dev           \
-                       zstd
+                       zstd                 \
+                       curl                 \
+                       zip                  \
+                       unzip                \
+                       tar                  \
+                       python3-dev          \
+                       libffi-dev           \
+                       libedit-dev          \
+                       libxml2-dev          \
+                       libncurses-dev       \
+                       libtinfo-dev         \
+                       libzstd-dev          \
+                       libssl-dev           \
+                       ccache               \
+                       gcc-10               \
+                       g++-10               \
+                       clang-11             \
+                       clang++-11

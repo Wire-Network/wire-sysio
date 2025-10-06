@@ -14,9 +14,24 @@ RUN apt-get update && apt-get upgrade -y && \
                        python3-numpy        \
                        file                 \
                        zlib1g-dev           \
-                       zstd &&              \
+                       zstd                 \
+                       curl                 \
+                       zip                  \
+                       unzip                \
+                       tar                  \
+                       python3-dev          \
+                       libffi-dev           \
+                       libedit-dev          \
+                       libxml2-dev          \
+                       libncurses-dev       \
+                       libtinfo-dev         \
+                       libzstd-dev          \
+                       libssl-dev           \
+                       ccache               \
+                       gcc-10               \
+                       g++-10               \
+                       clang-11             \
+                       clang++-11 &&        \
      update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
                                    /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
-                                   /usr/bin/gcov gcov /usr/bin/gcov-10 
-
-         
+                                   /usr/bin/gcov gcov /usr/bin/gcov-10
