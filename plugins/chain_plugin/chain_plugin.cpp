@@ -1761,70 +1761,14 @@ fc::variant get_global_row( const database& db, const abi_def& abi, const abi_se
 }
 
 read_only::get_producers_result
-read_only::get_producers( const read_only::get_producers_params& params, const fc::time_point& deadline ) const try {
-   abi_def abi = sysio::chain_apis::get_abi(db, config::system_account_name);
-   const auto table_type = get_table_type(abi, "producers"_n);
-   const abi_serializer abis{ abi_def(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) };
-   SYS_ASSERT(table_type == KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table producers", ("type",table_type));
-
-   const auto& d = db.db();
-   const auto lower = name{params.lower_bound};
-
-   static const uint8_t secondary_index_num = 0;
-   const auto* const table_id = d.find<chain::table_id_object, chain::by_code_scope_table>(
-           boost::make_tuple(config::system_account_name, config::system_account_name, "producers"_n));
-   const auto* const secondary_table_id = d.find<chain::table_id_object, chain::by_code_scope_table>(
-           boost::make_tuple(config::system_account_name, config::system_account_name, name("producers"_n.to_uint64_t() | secondary_index_num)));
-   SYS_ASSERT(table_id && secondary_table_id, chain::contract_table_query_exception, "Missing producers table");
-
-   const auto& kv_index = d.get_index<key_value_index, by_scope_primary>();
-   const auto& secondary_index = d.get_index<index_double_index>().indices();
-   const auto& secondary_index_by_primary = secondary_index.get<by_primary>();
-   const auto& secondary_index_by_secondary = secondary_index.get<by_secondary>();
-
-   read_only::get_producers_result result;
-   vector<char> data;
-
-   auto it = [&]{
-      if(lower.to_uint64_t() == 0)
-         return secondary_index_by_secondary.lower_bound(
-            boost::make_tuple(secondary_table_id->id, to_softfloat64(std::numeric_limits<double>::lowest()), 0));
-      else
-         return secondary_index.project<by_secondary>(
-            secondary_index_by_primary.lower_bound(
-               boost::make_tuple(secondary_table_id->id, lower.to_uint64_t())));
-   }();
-
-   fc::time_point params_deadline = params.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*params.time_limit_ms)), deadline) : deadline;
-   uint32_t limit = params.limit;
-   if (deadline != fc::time_point::maximum() && limit > max_return_items)
-      limit = max_return_items;
-
-   for( unsigned int count = 0; count < limit && it != secondary_index_by_secondary.end() && it->t_id == secondary_table_id->id; ++it, ++count ) {
-      copy_inline_row(*kv_index.find(boost::make_tuple(table_id->id, it->primary_key)), data);
-      if (params.json)
-         result.rows.emplace_back( abis.binary_to_variant( abis.get_table_type("producers"_n), data, abi_serializer::create_yield_function( abi_serializer_max_time ), shorten_abi_errors ) );
-      else
-         result.rows.emplace_back(data);
-      if (fc::time_point::now() >= params_deadline)
-         break;
-   }
-   if( it != secondary_index_by_secondary.end() && it->t_id == secondary_table_id->id ) {
-      result.more = name{it->primary_key}.to_string();
-   }
-
-   result.total_producer_vote_weight = get_global_row(d, abi, abis, abi_serializer_max_time, shorten_abi_errors)["total_producer_vote_weight"].as_double();
-   return result;
-} catch (...) {
+read_only::get_producers( const read_only::get_producers_params& params, const fc::time_point& deadline ) const {
    read_only::get_producers_result result;
    result.rows.reserve(db.active_producers().producers.size());
 
    for (const auto& p : db.active_producers().producers) {
       auto row = fc::mutable_variant_object()
          ("owner", p.producer_name)
-         ("producer_authority", p.authority)
-         ("url", "")
-         ("total_votes", 0.0f);
+         ("producer_authority", p.authority);
 
       // detect a legacy key and maintain API compatibility for those entries
       if (std::holds_alternative<block_signing_authority_v0>(p.authority)) {
