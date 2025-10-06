@@ -123,6 +123,7 @@ class Cluster(object):
 
         self.libTestingContractsPath = Path(__file__).resolve().parents[2] / "libraries" / "testing" / "contracts"
         self.unittestsContractsPath = Path(__file__).resolve().parents[2] / "unittests" / "contracts"
+        self.unittestsTestContractsPath = Path(__file__).resolve().parents[2] / "unittests" / "test-contracts"
 
         if unshared:
             unshare(CLONE_NEWNET)
@@ -1142,7 +1143,8 @@ class Cluster(object):
                 return None
             return trans
 
-        systemAccounts = ['sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
+        # sysio.noop used by trx_generator for noop action
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:
@@ -1616,8 +1618,20 @@ class Cluster(object):
                             nodeId: int=0, tpsPerGenerator: int=10, numGenerators: int=1, durationSec: int=60,
                             waitToComplete:bool=False, abiFile=None, actionsData=None, actionsAuths=None,
                             trxGenerator=Path("./tests/trx_generator/trx_generator")):
-        Utils.Print("Configure txn generators")
         node=self.getNode(nodeId)
+        noopAccount = copy.deepcopy(self.sysioAccount)
+        noopAccount.name = 'sysio.noop'
+        contract="noop"
+        contractDir=str(self.unittestsTestContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=node.publishContract(noopAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
+        Utils.Print("Configure txn generators")
         info = node.getInfo()
         chainId = info['chain_id']
         lib_id = info['last_irreversible_block_id']

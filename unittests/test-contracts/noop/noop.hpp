@@ -10,4 +10,7 @@ public:
    void anyaction( sysio::name                       from,
                    const sysio::ignore<std::string>& type,
                    const sysio::ignore<std::string>& data );
+
+   [[sysio::action]]
+   void nonce( const sysio::ignore<std::string>& data ) {}
 };

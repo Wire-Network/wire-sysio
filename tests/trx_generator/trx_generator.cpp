@@ -13,6 +13,8 @@ namespace sysio::testing {
    using namespace chain::literals;
    namespace chain = sysio::chain;
 
+   constexpr chain::name noop_account_name = "sysio.noop"_n;
+
    void trx_generator_base::set_transaction_headers(chain::transaction& trx, const chain::block_id_type& last_irr_block_id, const fc::microseconds& expiration, uint32_t delay_sec) {
       trx.expiration = fc::time_point_sec{fc::time_point::now() + expiration};
       trx.set_reference_block(last_irr_block_id);
@@ -28,7 +30,7 @@ namespace sysio::testing {
       chain::signed_transaction trx;
       set_transaction_headers(trx, last_irr_block_id, trx_expiration);
       trx.actions = std::move(acts);
-      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), chain::config::null_account_name, chain::name("nonce"),
+      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), noop_account_name, chain::name("nonce"),
          fc::raw::pack(std::to_string(_config._generator_id) + ":" + std::to_string(nonce_prefix) + ":" + std::to_string(++nonce) + ":" + std::to_string(fc::time_point::now().time_since_epoch().count())));
 
       trx.sign(priv_key, chain_id);
@@ -50,7 +52,7 @@ namespace sysio::testing {
    void trx_generator_base::update_resign_transaction(chain::signed_transaction& trx, const fc::crypto::private_key& priv_key, uint64_t& nonce_prefix, uint64_t& nonce,
                                                       const fc::microseconds& trx_expiration, const chain::chain_id_type& chain_id, const chain::block_id_type& last_irr_block_id) {
       trx.context_free_actions.clear();
-      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), chain::config::null_account_name, chain::name("nonce"),
+      trx.context_free_actions.emplace_back(std::vector<chain::permission_level>(), noop_account_name, chain::name("nonce"),
          fc::raw::pack(std::to_string(_config._generator_id) + ":" + std::to_string(nonce_prefix) + ":" + std::to_string(++nonce) + ":" + std::to_string(fc::time_point::now().time_since_epoch().count())));
       set_transaction_headers(trx, last_irr_block_id, trx_expiration);
       trx.signatures.clear();
