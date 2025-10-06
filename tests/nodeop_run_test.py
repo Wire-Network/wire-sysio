@@ -238,9 +238,9 @@ try:
         errorExit("Transfer verification failed. Excepted %s, actual: %s" % (expectedAmount, actualAmount))
 
     transferAmount="0.0100 {0}".format(CORE_SYMBOL)
-    Print("Force transfer funds %s from account %s to %s" % (
+    Print("Transfer funds %s from account %s to %s" % (
         transferAmount, defproduceraAccount.name, testeraAccount.name))
-    node.transferFunds(defproduceraAccount, testeraAccount, transferAmount, "test transfer", force=True, waitForTransBlock=True)
+    node.transferFunds(defproduceraAccount, testeraAccount, transferAmount, "test transfer", waitForTransBlock=True)
 
     expectedAmount="97.5421 {0}".format(CORE_SYMBOL)
     Print("Verify transfer, Expected: %s" % (expectedAmount))
@@ -644,7 +644,7 @@ try:
     currencyAccountAmountBeforeTrx=node.getAccountSysBalanceStr(currencyAccount.name)
 
     xferAmount="1.2345 {0}".format(CORE_SYMBOL)
-    unsignedTrxRet = node.transferFunds(currencyAccount, testeraAccount, xferAmount, "unsigned trx", force=False, waitForTransBlock=False, exitOnError=True, reportStatus=False, sign=False, dontSend=True, expiration=None, skipSign=True)
+    unsignedTrxRet = node.transferFunds(currencyAccount, testeraAccount, xferAmount, "unsigned trx", waitForTransBlock=False, exitOnError=True, reportStatus=False, sign=False, dontSend=True, expiration=None, skipSign=True)
     unsignedTrxJsonFile = "unsigned_trx_file"
     with open(unsignedTrxJsonFile, 'w') as outfile:
         json.dump(unsignedTrxRet, outfile)

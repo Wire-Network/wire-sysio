@@ -66,7 +66,7 @@ class Transactions(NodeopQueries):
 
         return trans
 
-    def transferFundsCmdArr(self, source, destination, amountStr, memo, force, retry, sign, dontSend, expiration, skipSign):
+    def transferFundsCmdArr(self, source, destination, amountStr, memo, retry, sign, dontSend, expiration, skipSign):
         assert isinstance(amountStr, str)
         assert(source)
         assert(isinstance(source, Account))
@@ -100,15 +100,13 @@ class Transactions(NodeopQueries):
         cmdArr.append(destination.name)
         cmdArr.append(amountStr)
         cmdArr.append(memo)
-        if force:
-            cmdArr.append("-f")
         s=" ".join(cmdArr)
         if Utils.Debug: Utils.Print("cmd: %s" % (s))
         return cmdArr
 
     # Trasfer funds. Returns "transfer" json return object
-    def transferFunds(self, source, destination, amountStr, memo="memo", force=False, waitForTransBlock=False, exitOnError=True, reportStatus=True, retry=None, sign=False, dontSend=False, expiration=90, skipSign=False):
-        cmdArr = self.transferFundsCmdArr(source, destination, amountStr, memo, force, retry, sign, dontSend, expiration, skipSign)
+    def transferFunds(self, source, destination, amountStr, memo="memo", waitForTransBlock=False, exitOnError=True, reportStatus=True, retry=None, sign=False, dontSend=False, expiration=90, skipSign=False):
+        cmdArr = self.transferFundsCmdArr(source, destination, amountStr, memo, retry, sign, dontSend, expiration, skipSign)
         if waitForTransBlock:
             cmdArr.append('--retry-num-blocks')
             cmdArr.append('1')
@@ -137,8 +135,8 @@ class Transactions(NodeopQueries):
         return trans
 
     # Trasfer funds. Returns (popen, cmdArr) for checkDelayedOutput
-    def transferFundsAsync(self, source, destination, amountStr, memo="memo", force=False, exitOnError=True, retry=None, sign=False, dontSend=False, expiration=90, skipSign=False):
-        cmdArr = self.transferFundsCmdArr(source, destination, amountStr, memo, force, retry, sign, dontSend, expiration, skipSign)
+    def transferFundsAsync(self, source, destination, amountStr, memo="memo", exitOnError=True, retry=None, sign=False, dontSend=False, expiration=90, skipSign=False):
+        cmdArr = self.transferFundsCmdArr(source, destination, amountStr, memo, retry, sign, dontSend, expiration, skipSign)
         start=time.perf_counter()
         try:
             popen=Utils.delayedCheckOutput(cmdArr)
@@ -160,7 +158,7 @@ class Transactions(NodeopQueries):
     def publishContract(self, account, contractDir, wasmFile, abiFile, waitForTransBlock=True, shouldFail=False, sign=False, retryNum:int=5):
         assert(isinstance(retryNum, int))
         signStr = NodeopQueries.sign_str(sign, [ account.activePublicKey ])
-        cmd=f"{Utils.SysClientPath} {self.sysClientArgs()} -v set contract -j -f {signStr} {account.name} {contractDir}"
+        cmd=f"{Utils.SysClientPath} {self.sysClientArgs()} -v set contract -j {signStr} {account.name} {contractDir}"
         cmd += "" if wasmFile is None else (" "+ wasmFile)
         cmd += "" if abiFile is None else (" " + abiFile)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
@@ -263,15 +261,13 @@ class Transactions(NodeopQueries):
             return (False, msg)
 
     # returns tuple with transaction execution status and transaction
-    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True, force=False):
+    def pushMessage(self, account, action, data, opts, silentErrors=False, signatures=None, expectTrxTrace=True):
         cmd="%s %s push action -j %s %s" % (Utils.SysClientPath, self.sysClientArgs(), account, action)
         cmdArr=cmd.split()
         # not using sign_str, since cmdArr messes up the string
         if signatures is not None:
             cmdArr.append("--sign-with")
             cmdArr.append("[ \"%s\" ]" % ("\", \"".join(signatures)))
-        if force:
-            cmdArr.append("-f")
         if data is not None:
             cmdArr.append(data)
         if opts is not None:
