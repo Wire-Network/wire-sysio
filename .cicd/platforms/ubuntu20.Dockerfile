@@ -32,6 +32,8 @@ RUN apt-get update && apt-get upgrade -y && \
                        g++-10               \
                        clang-11             \
                        clang++-11           \
+                       clang-18             \
+                       clang++-18           \
                        sudo &&              \
      update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
                                    /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
