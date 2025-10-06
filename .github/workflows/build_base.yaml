@@ -39,8 +39,9 @@ jobs:
             # https://github.com/actions/runner/issues/2033
             echo $PWD
             ls -la
+            sudo apt-get install curl zip unzip tar
             ./vcpkg/bootstrap-vcpkg.sh
-            env BASE_DIR=/opt/llvm ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+            env BASE_DIR=/opt/llvm sudo ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
             chown -R $(id -u):$(id -g) $PWD
             env CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 \
             cmake -B build -S . -G Ninja \
