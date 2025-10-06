@@ -31,7 +31,10 @@ RUN apt-get update && apt-get upgrade -y && \
                        gcc-10               \
                        g++-10               \
                        clang-11             \
-                       clang++-11 &&        \
+                       clang++-11           \
+                       sudo &&              \
      update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
                                    /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
                                    /usr/bin/gcov gcov /usr/bin/gcov-10
+
+RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
