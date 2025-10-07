@@ -30,6 +30,8 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container: ${{fromJSON(inputs.platforms)[matrix.platform].image}}
     steps:
+        - name: Allow safe directories
+          run: git config --global --add safe.directory '*'
         - uses: actions/checkout@v4
           with:
             submodules: recursive
