@@ -50,6 +50,29 @@ add_library( sysio_testing
              ${HEADERS}
         )
 
+# Could not figure out how to make this work correctly.
+# As it is now, it takes two builds when anything in sysio.roa or sysio.bios is modified. The first build
+# builds the wasm file and then the next build includes the wasm file in the library. Before the only
+# way to get it to work was to remove the contracts.o file. This is better than a clean everytime.
+if( SYSIO_COMPILE_TEST_CONTRACTS )
+    set(CONTRACT_WASM_FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"
+            "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"
+    )
+    set(CONTRACT_WASM_FILE "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm")
+
+    # Make the main testing library wait for the contracts to be built.
+    add_dependencies(sysio_testing sysio_testing_contracts)
+
+    # Set the explicit dependency. This is the magic link.
+    #    It tells CMake: "If ${CONTRACT_WASM_FILE} is newer than contracts.cpp.o, recompile contracts.cpp".
+    #    Note: The source file is specified relative to the current CMakeLists.txt.
+    set_source_files_properties(
+            "contracts.cpp"
+            PROPERTIES OBJECT_DEPENDS "${CONTRACT_WASM_FILES}"
+    )
+endif()
+
 target_link_libraries( sysio_testing sysio_testing_contracts sysio_chain fc chainbase Logging IR WAST WASM)
 target_include_directories( sysio_testing
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
