@@ -44,6 +44,7 @@ RUN apt-get update && apt-get upgrade -y && \
                        g++-10               \
                        clang-18             \
                        clang++-18           \
+                       autoconf automake libtool \
                        sudo                 
 
 RUN  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
