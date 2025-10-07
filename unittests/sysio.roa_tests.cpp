@@ -578,6 +578,10 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
     result = extend_policy("sysio"_n, "alice"_n, 42);
     BOOST_REQUIRE_EQUAL(error("assertion failure with message: Cannot reduce a policies existing time_block"), result);
 
+    BOOST_CHECK_EXCEPTION(reduce_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0),
+                          sysio_assert_message_exception,
+                          sysio_assert_message_is("Cannot reduce policy before time_block"));
+
     expand_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0);
 
     p = get_policy("sysio"_n, "alice"_n);
