@@ -1,20 +1,19 @@
 #include <sysio/chain/webassembly/sys-vm-oc/memory.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
+#include <sysio/chain/webassembly/sys-vm-oc/memfd_helpers.hpp>
 
 #include <fc/scoped_exit.hpp>
 
 #include <unistd.h>
-#include <sys/syscall.h>
 #include <sys/mman.h>
-#include <linux/memfd.h>
 
 namespace sysio { namespace chain { namespace sysvmoc {
 
 memory::memory(uint64_t sliced_pages) {
    uint64_t number_slices = sliced_pages + 1;
    uint64_t wasm_memory_size = sliced_pages * wasm_constraints::wasm_page_size;
-   int fd = syscall(SYS_memfd_create, "sysvmoc_mem", MFD_CLOEXEC);
+   int fd = exec_sealed_memfd_create("sysvmoc_mem");
    FC_ASSERT(fd >= 0, "Failed to create memory memfd");
    auto cleanup_fd = fc::make_scoped_exit([&fd](){close(fd);});
    int ret = ftruncate(fd, wasm_memory_size+memory_prologue_size);
