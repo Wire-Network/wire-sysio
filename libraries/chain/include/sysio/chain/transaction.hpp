@@ -149,7 +149,7 @@ namespace sysio { namespace chain {
       packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd, compression_type _compression );
       packed_transaction( transaction&& t, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
 
-      // no-op if already decomrpessed
+      // no-op if already decompressed
       void decompress();
 
       friend bool operator==(const packed_transaction& lhs, const packed_transaction& rhs) {
