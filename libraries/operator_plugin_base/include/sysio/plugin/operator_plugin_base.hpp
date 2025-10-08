@@ -2,7 +2,7 @@
 
 #include <appbase/application.hpp>
 
-namespace sysio {
+namespace sysio::plugin {
 
 // operator_plugin_base: abstract base class that extends appbase::plugin
 // This is a CRTP-style base to be used as: class my_plugin : public sysio::operator_plugin_base<my_plugin> { ... };
