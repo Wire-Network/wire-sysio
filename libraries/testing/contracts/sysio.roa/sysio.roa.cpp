@@ -350,9 +350,6 @@ namespace sysio {
 
         // Special sysio check
         bool sysio_acct = is_sysio_account(owner);
-        if (sysio_acct && pol_row.time_block == 1 && pol_row.issuer == issuer) {
-            check(false, "Cannot reduce the sysio policies created at node registration");
-        }
 
         reslimit_t reslimit(get_self(), get_self().value);
         auto res_itr = reslimit.find(owner.value);
@@ -608,7 +605,7 @@ namespace sysio {
                 row.cpu_weight = zero_asset;
                 row.ram_weight = sysio_allocation; 
                 row.bytes_per_unit = state.bytes_per_unit;
-                row.time_block = 1;
+                row.time_block = UINT32_MAX; // do not allow to be extended
             });
         }
 

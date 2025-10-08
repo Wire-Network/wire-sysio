@@ -163,6 +163,14 @@ public:
       );
    }
 
+   action_result extend_policy( account_name owner, account_name issuer, uint32_t new_time_block ) {
+       return push_action(issuer, "extendpolicy"_n, mvo()
+            ("owner", owner)
+            ("issuer", issuer)
+            ("newTimeBlock", new_time_block)
+       );
+   }
+
    abi_serializer abi_ser;
 };
 
@@ -532,5 +540,56 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    produce_block();
 
 } FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
+    auto result = regnodeowner("alice"_n, 1);
+    BOOST_REQUIRE_EQUAL(success(), result);
+    produce_blocks(1);
+
+    result = regnodeowner("bob"_n, 1);
+    BOOST_REQUIRE_EQUAL(success(), result);
+    produce_blocks(1);
+
+    auto p = get_policy("alice"_n, "alice"_n);
+    BOOST_TEST(p["owner"].as_string() == "alice");
+    BOOST_TEST(p["issuer"].as_string() == "alice");
+    BOOST_TEST(p["bytes_per_unit"].as_string() == "104");
+    BOOST_TEST(p["time_block"].as_string() == "1");
+    p = get_policy("sysio"_n, "alice"_n);
+    BOOST_TEST(p["owner"].as_string() == "sysio");
+    BOOST_TEST(p["issuer"].as_string() == "alice");
+    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
+    BOOST_TEST(p["time_block"].as_string() == "4294967295");
+    BOOST_TEST(p["ram_weight"].as_string() == "301.9840 SYS");
+
+    // extend policy
+    extend_policy("alice"_n, "alice"_n, 42);
+
+    p = get_policy("alice"_n, "alice"_n);
+    BOOST_TEST(p["owner"].as_string() == "alice");
+    BOOST_TEST(p["issuer"].as_string() == "alice");
+    BOOST_TEST(p["time_block"].as_string() == "42");
+    p = get_policy("sysio"_n, "alice"_n);
+    BOOST_TEST(p["owner"].as_string() == "sysio");
+    BOOST_TEST(p["issuer"].as_string() == "alice");
+    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
+    BOOST_TEST(p["time_block"].as_string() == "4294967295");
+
+    result = extend_policy("sysio"_n, "alice"_n, 42);
+    BOOST_REQUIRE_EQUAL(error("assertion failure with message: Cannot reduce a policies existing time_block"), result);
+
+    BOOST_CHECK_EXCEPTION(reduce_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0),
+                          sysio_assert_message_exception,
+                          sysio_assert_message_is("Cannot reduce policy before time_block"));
+
+    expand_roa_policy("alice"_n, "sysio"_n, "0.0000 SYS", "0.0000 SYS", "500.0000 SYS", 0);
+
+    p = get_policy("sysio"_n, "alice"_n);
+    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
+    BOOST_TEST(p["ram_weight"].as_string() == "801.9840 SYS");
+
+} FC_LOG_AND_RETHROW()
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
