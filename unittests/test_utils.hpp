@@ -74,6 +74,7 @@ auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& control,
       trx.sign(testing::tester::get_private_key(account, "active"), control.get_chain_id());
    }
    auto ptrx = std::make_shared<packed_transaction>( trx, packed_transaction::compression_type::zlib );
+   ptrx->decompress();
 
    auto trx_promise = std::make_shared<std::promise<transaction_trace_ptr>>();
    std::future<transaction_trace_ptr> trx_future = trx_promise->get_future();
