@@ -528,11 +528,11 @@ namespace sysio {
       uint32_t get_chain_lib_num() const;
       uint32_t get_chain_head_num() const;
 
-      void on_accepted_block_header( const block_state_ptr& bs );
-      void on_accepted_block( const block_state_ptr& bs );
+      void on_accepted_block_header( const block_state_legacy_ptr& bs );
+      void on_accepted_block( const block_state_legacy_ptr& bs );
 
       void transaction_ack(const std::pair<fc::exception_ptr, packed_transaction_ptr>&);
-      void on_irreversible_block( const block_state_ptr& block );
+      void on_irreversible_block( const block_state_legacy_ptr& block );
 
       void start_expire_timer();
       void start_monitors();
@@ -1098,7 +1098,7 @@ namespace sysio {
       // returns calculated number of blocks combined latency
       uint32_t calc_block_latency();
 
-      void process_signed_block( const block_id_type& id, signed_block_ptr block, block_state_ptr bsp );
+      void process_signed_block( const block_id_type& id, signed_block_ptr block, block_state_legacy_ptr bsp );
 
       fc::variant_object get_logger_variant() const {
          fc::mutable_variant_object mvo;
@@ -3706,7 +3706,7 @@ namespace sysio {
             return;
          }
 
-         block_state_ptr bsp;
+         block_state_legacy_ptr bsp;
          bool exception = false;
          try {
             // this may return null if block is not immediately ready to be processed
@@ -3750,7 +3750,7 @@ namespace sysio {
    }
 
    // called from application thread
-   void connection::process_signed_block( const block_id_type& blk_id, signed_block_ptr block, block_state_ptr bsp ) {
+   void connection::process_signed_block( const block_id_type& blk_id, signed_block_ptr block, block_state_legacy_ptr bsp ) {
       controller& cc = my_impl->chain_plug->chain();
       uint32_t blk_num = block_header::num_from_id(blk_id);
       // use c in this method instead of this to highlight that all methods called on c-> must be thread safe
@@ -3900,7 +3900,7 @@ namespace sysio {
    }
 
    // called from application thread
-   void net_plugin_impl::on_accepted_block_header(const block_state_ptr& bs) {
+   void net_plugin_impl::on_accepted_block_header(const block_state_legacy_ptr& bs) {
       update_chain_info();
 
       dispatcher->strand.post([bs]() {
@@ -3909,13 +3909,13 @@ namespace sysio {
       });
    }
 
-   void net_plugin_impl::on_accepted_block(const block_state_ptr& ) {
+   void net_plugin_impl::on_accepted_block(const block_state_legacy_ptr& ) {
       on_pending_schedule(chain_plug->chain().pending_producers());
       on_active_schedule(chain_plug->chain().active_producers());
    }
 
    // called from application thread
-   void net_plugin_impl::on_irreversible_block( const block_state_ptr& block) {
+   void net_plugin_impl::on_irreversible_block( const block_state_legacy_ptr& block) {
       fc_dlog( logger, "on_irreversible_block, blk num = ${num}, id = ${id}", ("num", block->block_num)("id", block->id) );
       update_chain_info();
    }
@@ -4302,14 +4302,14 @@ namespace sysio {
 
       {
          chain::controller& cc = chain_plug->chain();
-         cc.accepted_block_header.connect( [my = shared_from_this()]( const block_state_ptr& s ) {
+         cc.accepted_block_header.connect( [my = shared_from_this()]( const block_state_legacy_ptr& s ) {
             my->on_accepted_block_header( s );
          } );
 
-         cc.accepted_block.connect( [my = shared_from_this()]( const block_state_ptr& s ) {
+         cc.accepted_block.connect( [my = shared_from_this()]( const block_state_legacy_ptr& s ) {
             my->on_accepted_block( s );
          } );
-         cc.irreversible_block.connect( [my = shared_from_this()]( const block_state_ptr& s ) {
+         cc.irreversible_block.connect( [my = shared_from_this()]( const block_state_legacy_ptr& s ) {
             my->on_irreversible_block( s );
          } );
       }

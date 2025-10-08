@@ -150,7 +150,7 @@ auto make_block_state( uint32_t block_num, std::vector<chain::packed_transaction
    auto priv_key = get_private_key( block->producer, "active" );
    auto pub_key = get_public_key( block->producer, "active" );
 
-   auto prev = std::make_shared<chain::block_state>();
+   auto prev = std::make_shared<chain::block_state_legacy>();
    auto header_bmroot = chain::digest_type::hash( std::make_pair( block->digest(), prev->blockroot_merkle.get_root()));
    auto sig_digest = chain::digest_type::hash( std::make_pair( header_bmroot, prev->pending_schedule.schedule_hash ));
    block->producer_signature = priv_key.sign( sig_digest );
@@ -164,7 +164,7 @@ auto make_block_state( uint32_t block_num, std::vector<chain::packed_transaction
          result.emplace_back( k.sign( d ));
       return result;
    };
-   chain::pending_block_header_state pbhs;
+   chain::pending_block_header_state_legacy pbhs;
    pbhs.producer = block->producer;
    pbhs.timestamp = block->timestamp;
    pbhs.previous = block->previous;
@@ -173,7 +173,7 @@ auto make_block_state( uint32_t block_num, std::vector<chain::packed_transaction
                                         chain::block_signing_authority_v0{1, {{pub_key, 1}}}}}};
    pbhs.active_schedule = schedule;
    pbhs.valid_block_signing_authority = chain::block_signing_authority_v0{1, {{pub_key, 1}}};
-   auto bsp = std::make_shared<chain::block_state>(
+   auto bsp = std::make_shared<chain::block_state_legacy>(
          std::move( pbhs ),
          std::move( block ),
          deque<chain::transaction_metadata_ptr>(),
