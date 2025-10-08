@@ -12,7 +12,7 @@
 
 #include <sysio/chain/thread_utils.hpp>
 
-namespace sysio {
+namespace sysio::plugin::common::services {
 
   // Represents a cron-like schedule. Empty set for any field means wildcard (match all values).
   struct cron_schedule {
@@ -41,8 +41,8 @@ namespace sysio {
       using job_fn = std::function<void()>;
 
       struct options {
-        std::size_t num_threads{4};
         std::string name{"cron_service"};
+        std::size_t num_threads{4};
       };
 
       struct job_options {

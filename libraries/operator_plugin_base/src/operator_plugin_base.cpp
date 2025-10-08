@@ -1,8 +1,8 @@
 #include <fc/log/logger.hpp>
 
-#include <sysio/operator_plugin_base/operator_plugin_base.hpp>
+#include <sysio/plugin/operator_plugin_base.hpp>
 
-namespace sysio {
+namespace sysio::plugin {
 
   namespace {
     inline fc::logger& logger() {
