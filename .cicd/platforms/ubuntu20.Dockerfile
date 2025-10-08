@@ -8,8 +8,11 @@ RUN apt-get install -y \
         wget \
         software-properties-common \
         gnupg
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
+
+# add golang backports PPA for Go >= 1.19
+RUN add-apt-repository ppa:deadsnakes/ppa -y && \
+    add-apt-repository ppa:longsleep/golang-backports -y && \
+    apt-get update
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y build-essential      \
@@ -21,7 +24,7 @@ RUN apt-get update && apt-get upgrade -y && \
                        libgmp-dev           \
                        llvm-11-dev          \
                        ninja-build          \
-                       golang               \
+                       golang-go            \
                        python3-numpy        \
                        file                 \
                        zlib1g-dev           \
@@ -45,10 +48,13 @@ RUN apt-get update && apt-get upgrade -y && \
                        clang-18             \
                        clang++-18           \
                        autoconf automake libtool \
-                       sudo                 
+                       sudo
 
-RUN  update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
-                                   /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
-                                   /usr/bin/gcov gcov /usr/bin/gcov-10
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
+                         /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
+                         /usr/bin/gcov gcov /usr/bin/gcov-10
 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
+
+# verify Go version (should be >= 1.19)
+RUN go version
