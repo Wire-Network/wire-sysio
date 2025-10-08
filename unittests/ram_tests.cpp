@@ -32,7 +32,7 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
     int64_t ram_bytes, net_limit, cpu_limit;
     resource_manager.get_account_limits("kevin"_n, ram_bytes, net_limit, cpu_limit);
     // RAM account limit ram_bytes is total RAM usage allowed; not what is left
-    BOOST_TEST( ram_bytes == 2808 ); // RAM usage allowed to account
+    BOOST_TEST( ram_bytes == newaccount_ram ); // RAM usage allowed to account
 
     int64_t ram_usage = resource_manager.get_account_ram_usage("kevin"_n);
     BOOST_TEST( ram_usage == 2724 ); // RAM used by "kevin" during account creation, provided by sysio
@@ -73,6 +73,80 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
                                      { permission_level{name("kevin"), name("active")} }, { new_active_priv_key }),
                        ram_usage_exceeded);
 
+} FC_LOG_AND_RETHROW() }
+
+// Verify ram paid by contract when contract uses get_self() for payer even when explicit payer is used
+BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
+    using mvo = fc::mutable_variant_object;
+    produce_block();
+
+    create_accounts( {"noauthtable"_n, "alice"_n} );
+    // insert uses `emplace(get_self()`, noauthtable always pays for RAM
+    set_code( "noauthtable"_n, test_contracts::no_auth_table_wasm() );
+    set_abi( "noauthtable"_n, test_contracts::no_auth_table_abi() );
+    produce_block();
+
+    const resource_limits_manager& mgr = control->get_resource_limits_manager();
+    auto noauthtable_cpu_limit0 = mgr.get_account_cpu_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_cpu_limit0 = mgr.get_account_cpu_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_net_limit0 = mgr.get_account_net_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_net_limit0 = mgr.get_account_net_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_ram_usage0 = mgr.get_account_ram_usage("noauthtable"_n);
+    auto alice_ram_usage0 = mgr.get_account_ram_usage("alice"_n);
+
+    vector<permission_level> noauthtable_auth {{"noauthtable"_n, config::active_name} };
+    // noauthtable pays for CPU,NET
+    push_action( "noauthtable"_n, "insert"_n, noauthtable_auth, mvo()("user", "a") ("id", 1) ("age", 10));
+
+    auto noauthtable_cpu_limit1 = mgr.get_account_cpu_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_cpu_limit1 = mgr.get_account_cpu_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_net_limit1 = mgr.get_account_net_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_net_limit1 = mgr.get_account_net_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_ram_usage1 = mgr.get_account_ram_usage("noauthtable"_n);
+    auto alice_ram_usage1 = mgr.get_account_ram_usage("alice"_n);
+
+    BOOST_TEST(noauthtable_cpu_limit0 < noauthtable_cpu_limit1);
+    BOOST_TEST(alice_cpu_limit0 == alice_cpu_limit1);
+    BOOST_TEST(noauthtable_net_limit0 < noauthtable_net_limit1);
+    BOOST_TEST(alice_net_limit0 == alice_net_limit1);
+    BOOST_TEST(noauthtable_ram_usage0 < noauthtable_ram_usage1);
+    BOOST_TEST(alice_ram_usage0 == alice_ram_usage1);
+
+    vector<permission_level> alice_auth {{"alice"_n, config::active_name} };
+    // noauthtable still pays for CPU,NET
+    push_action( "noauthtable"_n, "insert"_n, alice_auth, mvo()("user", "b") ("id", 1) ("age", 10));
+
+    auto noauthtable_cpu_limit2 = mgr.get_account_cpu_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_cpu_limit2 = mgr.get_account_cpu_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_net_limit2 = mgr.get_account_net_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_net_limit2 = mgr.get_account_net_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_ram_usage2 = mgr.get_account_ram_usage("noauthtable"_n);
+    auto alice_ram_usage2 = mgr.get_account_ram_usage("alice"_n);
+
+    BOOST_TEST(noauthtable_cpu_limit1 < noauthtable_cpu_limit2);
+    BOOST_TEST(alice_cpu_limit1 == alice_cpu_limit2);
+    BOOST_TEST(noauthtable_net_limit1 < noauthtable_net_limit2);
+    BOOST_TEST(alice_net_limit1 == alice_net_limit2);
+    BOOST_TEST(noauthtable_ram_usage1 < noauthtable_ram_usage2);
+    BOOST_TEST(alice_ram_usage1 == alice_ram_usage2);
+
+    vector<permission_level> alice_explicit {{"alice"_n, config::active_name}, {"alice"_n, config::sysio_payer_name} };
+    // alice pays for CPU,NET
+    push_action( "noauthtable"_n, "insert"_n, alice_explicit, mvo()("user", "c") ("id", 1) ("age", 10));
+
+    auto noauthtable_cpu_limit3 = mgr.get_account_cpu_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_cpu_limit3 = mgr.get_account_cpu_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_net_limit3 = mgr.get_account_net_limit_ex("noauthtable"_n).first.current_used;
+    auto alice_net_limit3 = mgr.get_account_net_limit_ex("alice"_n).first.current_used;
+    auto noauthtable_ram_usage3 = mgr.get_account_ram_usage("noauthtable"_n);
+    auto alice_ram_usage3 = mgr.get_account_ram_usage("alice"_n);
+
+    BOOST_TEST(noauthtable_cpu_limit2 == noauthtable_cpu_limit3);
+    BOOST_TEST(alice_cpu_limit2 < alice_cpu_limit3);
+    BOOST_TEST(noauthtable_net_limit2 == noauthtable_net_limit3);
+    BOOST_TEST(alice_net_limit2 < alice_net_limit3);
+    BOOST_TEST(noauthtable_ram_usage2 < noauthtable_ram_usage3);
+    BOOST_TEST(alice_ram_usage2 == alice_ram_usage3);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

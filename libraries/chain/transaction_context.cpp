@@ -140,17 +140,12 @@ namespace sysio { namespace chain {
             validate_cpu_usage_to_bill( billed_cpu_time_us, std::numeric_limits<int64_t>::max(), false, subjective_cpu_bill_us); // Fail early if the amount to be billed is too high
 
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
-         for ( const auto &act : trx.actions ) {
-            bill_to_accounts.insert(act.explicit_payer());
-         }
-
-         // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
-         // Identify the contract account from the first action if possible
-         account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
-
-         // Only add contract_account if it's a valid (non-empty) name
-         if (contract_account.good()) {
-            bill_to_accounts.insert(contract_account);
+         if (std::optional<account_name> explicit_payer = trx.explicit_payer()) {
+            bill_to_accounts.insert(*explicit_payer);
+         } else {
+            for ( const auto &act : trx.actions ) {
+               bill_to_accounts.insert(act.account);
+            }
          }
 
          validate_ram_usage.reserve(bill_to_accounts.size());
