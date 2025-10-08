@@ -1,10 +1,10 @@
-#include <sysio/operator_plugin_base/cron_service.hpp>
+#include <sysio/plugin/common/services/cron_service.hpp>
 
 #include <boost/asio/post.hpp>
 
 #include <ctime>
 
-namespace sysio {
+namespace sysio::plugin::common::services {
 
   namespace {
 
