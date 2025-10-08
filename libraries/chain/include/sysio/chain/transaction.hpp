@@ -121,7 +121,7 @@ namespace sysio { namespace chain {
    struct packed_transaction : fc::reflect_init {
       enum class compression_type {
          none = 0,
-         zlib = 1,
+         zlib = 1, // not allowed in consensus, can be used by clients or on p2p network
       };
 
       packed_transaction() = default;
@@ -149,6 +149,9 @@ namespace sysio { namespace chain {
       packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd, compression_type _compression );
       packed_transaction( transaction&& t, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression );
 
+      // no-op if already decomrpessed
+      void decompress();
+
       friend bool operator==(const packed_transaction& lhs, const packed_transaction& rhs) {
          return std::tie(lhs.signatures, lhs.compression, lhs.packed_context_free_data, lhs.packed_trx) ==
                 std::tie(rhs.signatures, rhs.compression, rhs.packed_context_free_data, rhs.packed_trx);
@@ -159,11 +162,9 @@ namespace sysio { namespace chain {
       uint32_t get_prunable_size()const;
       size_t get_estimated_size()const;
 
-      digest_type packed_digest()const;
       digest_type digest()const;
 
       const transaction_id_type& id()const { return trx_id; }
-      bytes               get_raw_transaction()const;
 
       time_point_sec                expiration()const { return unpacked_trx.expiration; }
       const vector<bytes>&          get_context_free_data()const { return unpacked_trx.context_free_data; }

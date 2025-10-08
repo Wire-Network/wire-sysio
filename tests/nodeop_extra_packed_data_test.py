@@ -8,9 +8,9 @@ from TestHarness.Cluster import PFSetupPolicy
 from TestHarness.TestHelper import AppArgs
 
 ###############################################################
-# nodeop_run_test
+# nodeop_extra_packed_data_test
 #
-# General test that tests a wide range of general use actions around nodeop and kiod
+# Tests nodeop rejects a transaction with extra packed data
 #
 ###############################################################
 
@@ -131,8 +131,7 @@ try:
     accounts=[testeraAccount, testerbAccount]
     cluster.validateAccounts(accounts)
 
-    trxNumber = 2
-    postedTrxs = []
+    trxNumber = 2 # one with extra data will fail
     for i in range(trxNumber):
         if i == 1:
             node = cluster.getNode(pnodes - 1)
@@ -152,31 +151,19 @@ try:
             errorExit("Can't find packed_trx in packed json")
         
         #adding random trailing data
-        packedTrx["packed_trx"] = packed_trx_param + "00000000"
+        if i == 0:
+            packedTrx["packed_trx"] = packed_trx_param + "00000000"
 
-        exitMsg = "failed to send packed transaction: %s" % (packedTrx)
-        sentTrx = node.processUrllibRequest("chain", "send_transaction", packedTrx, silentErrors=False, exitOnError=True, exitMsg=exitMsg)
+        sentTrx = node.processUrllibRequest("chain", "send_transaction2", {"transaction": packedTrx}, silentErrors=True, exitOnError=False)
         Print("sent transaction json: %s" % (sentTrx))
+        if i == 0:
+            assert sentTrx is None, "Should have failed to send transaction with extra data"
+            assert node.findInLog("packed_transaction contains extra data"), "Should have found failed log message"
+            continue
+
         trx_id = sentTrx["payload"]["transaction_id"]
-        postedTrxs.append(trx_id)
+        assert node.waitForTransactionInBlock(trx_id), "Transaction %s didn't get into a block" % (trx_id)
 
-    assert len(postedTrxs) == trxNumber, Print("posted transactions number %d doesn't match %d" % (len(postedTrxs), trxNumber))
-    
-    for trxId in postedTrxs:        
-        attemptCnt = 10
-        trxBlock = None
-        while trxBlock is None and attemptCnt > 0:
-            trxBlock = node.getBlockNumByTransId(trx_id)
-            attemptCnt = attemptCnt - 1
-        
-        assert trxBlock, Print("Transaction %s wasn't posted" % (trx_id))
-
-        for cur_node in cluster.getNodes():
-
-            timeout = (12 * pnodes) * 1.3
-            passed = cur_node.waitForBlock(trxBlock + 12 * pnodes, timeout)
-            assert passed, Print("Node %d not advanced head block within timeout")
-    
     testSuccessful=True
 finally:
     TestHelper.shutdown(cluster, walletMgr, testSuccessful, dumpErrorDetails)

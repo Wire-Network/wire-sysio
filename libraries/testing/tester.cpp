@@ -713,7 +713,7 @@ namespace sysio { namespace testing {
          _start_block(control->head_block_time() + fc::microseconds(config::block_interval_us));
       auto c = packed_transaction::compression_type::none;
 
-      if( fc::raw::pack_size(trx) > 1000 ) {
+      if( fc::raw::pack_size(trx) > 1000 ) { // needed for cfa test
          c = packed_transaction::compression_type::zlib;
       }
 
@@ -721,6 +721,8 @@ namespace sysio { namespace testing {
             fc::microseconds::maximum() :
             fc::microseconds( deadline - fc::time_point::now() );
       auto ptrx = std::make_shared<packed_transaction>( trx, c );
+      if (c == packed_transaction::compression_type::zlib)
+         ptrx->decompress();
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
       auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
       if (no_throw) return r;

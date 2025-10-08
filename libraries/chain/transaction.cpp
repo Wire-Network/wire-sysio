@@ -193,24 +193,11 @@ size_t packed_transaction::get_estimated_size()const {
 }
 
 
-digest_type packed_transaction::packed_digest()const {
-   digest_type::encoder prunable;
-   fc::raw::pack( prunable, signatures );
-   fc::raw::pack( prunable, packed_context_free_data );
-
-   digest_type::encoder enc;
-   fc::raw::pack( enc, compression );
-   fc::raw::pack( enc, packed_trx  );
-   fc::raw::pack( enc, prunable.result() );
-
-   return enc.result();
-}
-
 digest_type packed_transaction::digest()const {
    digest_type::encoder enc;
    fc::raw::pack( enc, signatures );
    fc::raw::pack( enc, packed_context_free_data );
-   // compression is set by the node, so not actually necessary
+   // compression is `none` in consensus, so not necessary
    fc::raw::pack( enc, trx_id  );   // all of transaction is represented by trx id/digest
 
    return enc.result();
@@ -242,7 +229,11 @@ static vector<bytes> unpack_context_free_data(const bytes& data) {
 }
 
 static transaction unpack_transaction(const bytes& data) {
-   return fc::raw::unpack<transaction>(data);
+   transaction trx;
+   fc::datastream<const char*> ds(data.data(), data.size());
+   fc::raw::unpack(ds, trx);
+   SYS_ASSERT( !ds.remaining(), tx_extra_data, "packed_transaction contains extra data beyond transaction struct" );
+   return trx;
 }
 
 static bytes zlib_decompress(const bytes& data) {
@@ -250,7 +241,7 @@ static bytes zlib_decompress(const bytes& data) {
       bytes out;
       bio::filtering_ostream decomp;
       decomp.push(bio::zlib_decompressor());
-      decomp.push(read_limiter<1*1024*1024>()); // limit to 1 meg decompressed for zip bomb protections
+      decomp.push(read_limiter<10*1024*1024>()); // limit to 10 meg decompressed for zip bomb protections
       decomp.push(bio::back_inserter(out));
       bio::write(decomp, data.data(), data.size());
       bio::close(decomp);
@@ -312,20 +303,6 @@ static bytes zlib_compress_transaction(const transaction& t) {
    return out;
 }
 
-bytes packed_transaction::get_raw_transaction() const
-{
-   try {
-      switch(compression) {
-         case compression_type::none:
-            return packed_trx;
-         case compression_type::zlib:
-            return zlib_decompress(packed_trx);
-         default:
-            SYS_THROW(unknown_transaction_compression, "Unknown transaction compression algorithm");
-      }
-   } FC_CAPTURE_AND_RETHROW((compression)(packed_trx))
-}
-
 packed_transaction::packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression )
 :signatures(std::move(sigs))
 ,compression(_compression)
@@ -362,6 +339,22 @@ packed_transaction::packed_transaction( transaction&& t, vector<signature_type>&
    }
 }
 
+void packed_transaction::decompress() {
+   switch (compression) {
+      case compression_type::none:
+         return;
+      case compression_type::zlib:
+         break;
+      default:
+         SYS_THROW(unknown_transaction_compression, "Unknown compression type");
+   }
+   packed_trx = zlib_decompress(packed_trx);
+   if (!packed_context_free_data.empty()) {
+      packed_context_free_data = zlib_decompress(packed_context_free_data);
+   }
+   compression = compression_type::none;
+}
+
 void packed_transaction::reflector_init()
 {
    // called after construction, but always on the same thread and before packed_transaction passed to any other threads
@@ -370,6 +363,7 @@ void packed_transaction::reflector_init()
    SYS_ASSERT( unpacked_trx.expiration == time_point_sec(), tx_decompression_error, "packed_transaction already unpacked" );
    local_unpack_transaction({});
    local_unpack_context_free_data();
+   decompress();
 }
 
 void packed_transaction::local_unpack_transaction(vector<bytes>&& context_free_data)
