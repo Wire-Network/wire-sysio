@@ -95,7 +95,7 @@ namespace sysio { namespace chain {
    }
 
    root_txn_identification::root_storage root_txn_identification::retrieve_root_transactions(uint32_t block_num) {
-      ilog("Processing accepted block: ${block_num}", ("block_num", block_num));
+      dlog("Processing accepted block: ${block_num}", ("block_num", block_num));
       auto released_storage = std::move(_my->storage);
       _my->storage = root_txn_identification_impl::contract_storage{};
       return released_storage;
