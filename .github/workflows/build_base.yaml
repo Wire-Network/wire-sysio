@@ -63,6 +63,18 @@ jobs:
             
             cmake --build build -- -j 6
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
+
+        - name: Show vcpkg logs if failure
+          if: failure()            # this runs only when something failed above
+          run: |
+            echo "$PWD"
+            echo "=== vcpkg-manifest-install.log ==="
+            cat build/vcpkg-manifest-install.log || true
+            echo "=== Other vcpkg logs ==="
+            find build -type f -name '*.log' | while read f; do
+              echo "----- $f -----"
+              tail -n 40 "$f"
+            done
         - name: Upload builddir
           uses: actions/upload-artifact@v4
           with:
