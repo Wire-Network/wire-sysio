@@ -53,6 +53,12 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave \
                          /usr/bin/g++ g++ /usr/bin/g++-10 --slave \
                          /usr/bin/gcov gcov /usr/bin/gcov-10
+RUN apt-get remove -y pkg-config && \
+    wget http://archive.ubuntu.com/ubuntu/pool/main/p/pkg-config/pkg-config_0.29.2-1ubuntu3_amd64.deb && \
+    apt-get install -y ./pkg-config_0.29.2-1ubuntu3_amd64.deb && \
+    rm pkg-config_0.29.2-1ubuntu3_amd64.deb
+
+RUN pkg-config --version
 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
 
