@@ -92,7 +92,7 @@ jobs:
         with:
           submodules: recursive
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.platform}}-build
       - name: Build packages
@@ -111,13 +111,13 @@ jobs:
         run: |
           python3 -c "from TestHarness import Cluster"
       - name: Upload dev package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.platform != 'reproducible'
         with:
           name: wire-sysio-dev-${{matrix.platform}}-amd64
           path: build/wire-sysio-dev*.deb
       - name: Upload sysio package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.platform == 'reproducible'
         with:
           name: sysio-deb-amd64
@@ -143,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run Parallel Tests
@@ -154,7 +154,7 @@ jobs:
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 420
       - name: Upload core files from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-tests-logs
@@ -179,7 +179,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run tests in parallel containers
@@ -194,7 +194,7 @@ jobs:
         run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-np-logs
@@ -218,7 +218,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run tests in parallel containers
@@ -233,7 +233,7 @@ jobs:
         run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-lr-logs
@@ -268,7 +268,7 @@ jobs:
           submodules: recursive
       - if: ${{ matrix.test != 'deb-install' }}
         name: Download sysio builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.platform}}-build
       - if: ${{ matrix.test != 'deb-install' }}
@@ -290,7 +290,7 @@ jobs:
           rm -r *
       - if: ${{ matrix.test == 'deb-install' }}
         name: Download sysio-dev
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: sysio-dev-${{matrix.platform}}-amd64
       - if: ${{ matrix.test == 'deb-install' }}
