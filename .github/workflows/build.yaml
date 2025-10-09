@@ -109,7 +109,7 @@ jobs:
       - name: Test using TestHarness
         if: matrix.platform != 'reproducible'
         run: |
-          python3 -c "from TestHarness import Cluster"
+          python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
       # - name: Upload dev package
       #   uses: actions/upload-artifact@v4
       #   if: matrix.platform != 'reproducible'
