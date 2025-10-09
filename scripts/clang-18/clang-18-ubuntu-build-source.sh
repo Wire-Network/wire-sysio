@@ -13,7 +13,6 @@
 #
 # Notes:
 #   * Mirrors style of llvm-11-ubuntu-build-source.sh (variables, Ninja, comments).
-#   * No sudo is assumed (caller/Dockerfile can ensure permissions).
 set -euo pipefail
 
 BASE_DIR=${BASE_DIR:-$PWD}
@@ -62,7 +61,14 @@ declare -a CMAKE_FLAGS=(
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"
 
   -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld"
-  -DLLVM_ENABLE_RUNTIMES="libcxx;libcxxabi;compiler-rt"
+  -DLLVM_ENABLE_RUNTIMES="libunwind;libcxx;libcxxabi;compiler-rt"
+
+  # Make the linkage explicit and consistent
+  -DLIBCXXABI_USE_LLVM_UNWINDER=ON
+  -DLIBCXX_USE_COMPILER_RT=ON
+  -DLIBCXXABI_USE_COMPILER_RT=ON
+  -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON
+
   -DLLVM_TARGETS_TO_BUILD="X86"
   -DLLVM_INCLUDE_TESTS=OFF
   -DLLVM_INCLUDE_EXAMPLES=OFF

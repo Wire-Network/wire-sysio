@@ -78,17 +78,27 @@ RUN apt-get install -y \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
 
-# Stage 2: source-deps
-# Install dependencies built from source (LLVM 11) on top of distro-deps.
-FROM distro-deps AS source-deps
+# Stage 2a: clang18-build
+FROM distro-deps AS clang18-build
+# Prepare build context for Clang 18 scripts
+RUN mkdir -p /opt/clang/scripts
+
+# Build clang-18 once; this layer will cache unless scripts or args change
+RUN --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
+    BASE_DIR=/opt/clang /opt/clang/scripts/clang-18-ubuntu-build-source.sh
+
+ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
+
+# Stage 2b: source-deps
+# Install dependencies built from source (LLVM 11) on top of clang-18-build.
+FROM clang18-build AS source-deps
 
 # Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
-RUN mkdir -p /opt/llvm/scripts /opt/clang/scripts
+RUN mkdir -p /opt/llvm/scripts 
 # RUN mkdir -p LLVM_11_DIR
 
 # Build and install LLVM 11 using the helper script
 RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
-    --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
     BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
 
 # Stage 3a: app-source-local

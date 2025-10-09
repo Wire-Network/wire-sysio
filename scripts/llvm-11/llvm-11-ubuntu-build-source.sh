@@ -100,11 +100,22 @@ declare -a CMAKE_FLAGS=(
   -DCMAKE_BUILD_TYPE=Release
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"
 
+  -DLLVM_ENABLE_WERROR=OFF
+
+  # Use lld explicitly so feature tests that try --color-diagnostics don’t hit GNU ld
+  -DLLVM_USE_LINKER=lld
+  -DCMAKE_LINKER="${CLANG_18_DIR}/bin/ld.lld"
+
+  # Tests/benchmarks/utilities from 11.x can choke under newer Clang; keep tree lean
+  -DLLVM_INCLUDE_BENCHMARKS=OFF
+  -DLLVM_ENABLE_BINDINGS=OFF
+
+
   -DLLVM_TARGETS_TO_BUILD=host
   -DLLVM_BUILD_TOOLS=Off
   -DLLVM_ENABLE_RTTI=On
   -DLLVM_ENABLE_TERMINFO=Off
-  -DLLVM_ENABLE_PIC=Off
+  -DLLVM_ENABLE_PIC=On
   -DCOMPILER_RT_BUILD_SANITIZERS=OFF
   -DCMAKE_C_COMPILER="${CLANG_18_DIR}/bin/clang"
   -DCMAKE_CXX_COMPILER="${CLANG_18_DIR}/bin/clang++"
@@ -116,6 +127,34 @@ cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" -DCMAKE_POLICY_VERSION_MINIMUM
 
 echo "[+] Building…"
 ninja -C "${BUILD_DIR}" -j "${JOBS}"
+# Build with full verbosity, capture to a log, and print the failing commands
+# LOG="${BUILD_DIR}/ninja.log"
+# ninja -C "${BUILD_DIR}" -j "${JOBS}" -v -k 0 2>&1 | tee "${LOG}" || {
+#   echo "---- FIRST FAILED COMMAND(S) ----"
+#   # Show the first failing command(s)
+#   awk '/FAILED:/{print; f=1; next} f && NF{print; if(++c==30) exit}' "${LOG}" || true
+#   echo "---- GREP FAILED LINES ----"
+#   grep -n "FAILED:" -n "${LOG}" | head -n 20 || true
+#   echo "---- CMakeError tail ----"
+#   tail -n 200 "${BUILD_DIR}/CMakeFiles/CMakeError.log" || true
+#   exit 1
+# }
+
+# --- Focused test sweep (run as non-root so permission checks behave) ---
+# TEST_LOG_DIR="${BUILD_DIR}/test-logs"
+# mkdir -p "${TEST_LOG_DIR}"
+
+# # Create a non-root user (idempotent)
+# if ! id -u builder >/dev/null 2>&1; then
+#   useradd -m -u 1000 -s /bin/bash builder
+# fi
+# chown -R builder:builder "${BUILD_DIR}"
+
+# echo "[+] Running check-llvm (focused) as non-root"
+# if ! sudo -u builder bash -lc "ninja -C '${BUILD_DIR}' check-llvm -k 0 -v 2>&1 | tee '${TEST_LOG_DIR}/check-llvm.log'"; then
+#   echo "[!] check-llvm had failures. Logs saved to ${TEST_LOG_DIR}"
+#   # keep going; we still install the SDK
+# fi
 
 echo "[+] Installing (sudo)…"
 sudo mkdir -p "${PREFIX}"
