@@ -10,7 +10,6 @@ class test_control_plugin_impl {
 public:
    explicit test_control_plugin_impl(chain::controller& c) : _chain(c) {}
    void connect();
-   void disconnect();
    void kill_on_lib(account_name prod, uint32_t where_in_seq);
    void kill_on_head(account_name prod, uint32_t where_in_seq);
 
@@ -39,11 +38,6 @@ void test_control_plugin_impl::connect() {
          _chain.accepted_block.connect( [&]( const chain::block_state_legacy_ptr& bs ) {
             accepted_block( bs );
          } );
-}
-
-void test_control_plugin_impl::disconnect() {
-   _accepted_block_connection.reset();
-   _irreversible_block_connection.reset();
 }
 
 void test_control_plugin_impl::applied_irreversible_block(const chain::block_state_legacy_ptr& bsp) {
@@ -113,14 +107,13 @@ void test_control_plugin::plugin_initialize(const variables_map& options) {
 }
 
 void test_control_plugin::plugin_startup() {
-   ilog("test_control_plugin starting up");
+   dlog("test_control_plugin starting up");
    my.reset(new test_control_plugin_impl(app().get_plugin<chain_plugin>().chain()));
    my->connect();
 }
 
 void test_control_plugin::plugin_shutdown() {
-   my->disconnect();
-   ilog("test_control_plugin shutting down");
+   dlog("test_control_plugin shutting down");
 }
 
 namespace test_control_apis {

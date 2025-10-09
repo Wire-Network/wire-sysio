@@ -135,16 +135,15 @@ namespace sysio {
           * @param priority - priority to post to the app thread at
           * @param to_queue - execution queue to post to
           * @param next - the next handler for responses
-          * @param my - the http_plugin_impl
           * @param content_type - json or plain txt
           * @return the constructed internal_url_handler
           */
-         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry, appbase::exec_queue to_queue, int priority, http_plugin_impl_ptr my, http_content_type content_type ) {
+         static detail::internal_url_handler make_app_thread_url_handler(api_entry&& entry, appbase::exec_queue to_queue, int priority, http_content_type content_type ) {
             detail::internal_url_handler handler;
             handler.content_type = content_type;
             handler.category = entry.category;
             auto next_ptr = std::make_shared<url_handler>(std::move(entry.handler));
-            handler.fn = [my=std::move(my), priority, to_queue, next_ptr=std::move(next_ptr)]
+            handler.fn = [priority, to_queue, next_ptr=std::move(next_ptr)]
                        ( detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&& then ) {
                if (auto error_str = conn->verify_max_bytes_in_flight(b.size()); !error_str.empty()) {
                   conn->send_busy_response(std::move(error_str));
@@ -509,9 +508,6 @@ namespace sysio {
    void http_plugin::plugin_shutdown() {
       my->plugin_state->thread_pool.stop();
 
-      // release http_plugin_impl_ptr shared_ptrs captured in url handlers
-      my->plugin_state->url_handlers.clear();
-
       fc_ilog( logger(), "exit shutdown");
    }
 
@@ -528,7 +524,7 @@ namespace sysio {
    void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
-      auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, my, content_type));
+      auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
    }
 
