@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     );
     BOOST_CHECK(ok_a && ok_b);
 
-    service->cancel(id_a);Oscar-2021-health-card
+    service->cancel(id_a);
     int a_snap = a.load();
     std::this_thread::sleep_for(std::chrono::milliseconds(250));
     BOOST_CHECK_LE(std::abs(a_snap - a.load()), 1);

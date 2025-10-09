@@ -1,6 +1,6 @@
 #include <fc/log/logger.hpp>
 
-#include <sysio/plugin/operator_plugin_base.hpp>
+#include <sysio/plugin/common/abstract_operator_plugin.hpp>
 
 namespace sysio::plugin {
 

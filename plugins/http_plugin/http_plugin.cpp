@@ -95,7 +95,7 @@ namespace sysio {
          return "sysio::producer_api_plugin";
       // It's a programming error when the control flow reaches this point, 
       // please make sure all the plugin names are returned from above statements.
-      assert(false && "No correspding plugin for the category value");
+      assert(false && "No corresponding plugin for the category value");
       return {};
    }
 
