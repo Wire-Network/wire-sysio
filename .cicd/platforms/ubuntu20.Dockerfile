@@ -1,9 +1,12 @@
 FROM ubuntu:focal
+
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
+ENV LC_ALL=C.UTF-8
+ENV LANG=C.UTF-8
 
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
         lsb-release \
         wget \
         software-properties-common \
