@@ -15,7 +15,6 @@ add_subdirectory(chain)
 add_subdirectory(testing)
 add_subdirectory(version)
 add_subdirectory(state_history)
-add_subdirectory(operator_plugin_base)
 add_subdirectory(plugin_common)
 
 set(ENABLE_TOOLS OFF CACHE BOOL "Build tools")
