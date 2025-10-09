@@ -105,17 +105,17 @@ jobs:
         if: matrix.platform != 'reproducible'
         run: |
           apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/wire-sysio_*.deb ./build/wire-sysio-dev*.deb
+          apt-get install -y ./build/wire-sysio_*.deb 
       - name: Test using TestHarness
         if: matrix.platform != 'reproducible'
         run: |
           python3 -c "from TestHarness import Cluster"
-      - name: Upload dev package
-        uses: actions/upload-artifact@v4
-        if: matrix.platform != 'reproducible'
-        with:
-          name: wire-sysio-dev-${{matrix.platform}}-amd64
-          path: build/wire-sysio-dev*.deb
+      # - name: Upload dev package
+      #   uses: actions/upload-artifact@v4
+      #   if: matrix.platform != 'reproducible'
+      #   with:
+      #     name: wire-sysio-dev-${{matrix.platform}}-amd64
+      #     path: build/wire-sysio-dev*.deb
       - name: Upload sysio package
         uses: actions/upload-artifact@v4
         if: matrix.platform == 'reproducible'
@@ -288,16 +288,16 @@ jobs:
         name: Delete sysio artifacts
         run: |
           rm -r *
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Download sysio-dev
-        uses: actions/download-artifact@v4
-        with:
-          name: sysio-dev-${{matrix.platform}}-amd64
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Install sysio-dev Package
-        run: |
-          apt-get install -y ./*.deb
-          rm ./*.deb
+      # - if: ${{ matrix.test == 'deb-install' }}
+      #   name: Download sysio-dev
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: sysio-dev-${{matrix.platform}}-amd64
+      # - if: ${{ matrix.test == 'deb-install' }}
+      #   name: Install sysio-dev Package
+      #   run: |
+      #     apt-get install -y ./*.deb
+      #     rm ./*.deb
 
       # CDT
       # - name: Download cdt
