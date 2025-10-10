@@ -30,6 +30,34 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container: ${{fromJSON(inputs.platforms)[matrix.platform].image}}
     steps:
+        - name: Debug runner environment and permissions
+          run: |
+            echo "=== SYSTEM INFO ==="
+            whoami
+            id
+            echo
+            echo "=== ENVIRONMENT ==="
+            echo "HOME=$HOME"
+            echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+            echo "PWD=$PWD"
+            echo "USER=$(whoami)"
+            echo "SHELL=$SHELL"
+            echo
+            echo "=== PATHS & PERMISSIONS ==="
+            for dir in /github /github/home /__w "$GITHUB_WORKSPACE"; do
+              echo "--- $dir ---"
+              ls -ld $dir || true
+              stat -c "%U:%G %a %n" $dir || true
+              echo
+            done
+            echo "=== MOUNTED FILESYSTEMS ==="
+            df -h | grep -E 'github|__w|overlay' || true
+            echo
+            echo "=== TOP OWNERS OF WORKSPACE ==="
+            sudo find "$GITHUB_WORKSPACE" -maxdepth 2 -printf "%u:%g %p\n" 2>/dev/null | head -n 20 || true
+            echo
+            echo "=== GIT CONFIG LOCATIONS ==="
+            git config --list --show-origin || echo "Git not configured yet"
         - name: Allow safe directories
           run: git config --global --add safe.directory '*'
         - uses: actions/checkout@v4
