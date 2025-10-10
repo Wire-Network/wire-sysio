@@ -4,7 +4,7 @@
 
 > NOTE: The files in the `<target-root>` directory are overwritten AND you must have `fish` installed.
 
-The script file being used is [../scripts/](../scripts/dev-chain-run-nodeop.fish)
+The script file being used is [dev-chain-run-nodeop.fish](../scripts/dev-chain-run-nodeop.fish)
 
 ```shell
 # USAGE 
@@ -16,7 +16,6 @@ The script file being used is [../scripts/](../scripts/dev-chain-run-nodeop.fish
   /opt/wire-network/chain-001
 ```
 
-
 ## Detailed breakdown
 
 Below is a script that does the following
@@ -26,9 +25,6 @@ Below is a script that does the following
 
 > NOTE: This script is for local development only. 
 > The script runs in FISH shell only.
-
- 
-
 
 ```shell
 # FISH SHELL
@@ -48,7 +44,7 @@ export CONFIG_TEMPLATE=aio
 
 # GENERATE KEYS & CONFIG
 # NOTE: This will overwrite any existing files in $TARGET_ROOT
-clio chain-configure \
+sys-util chain-configure \
   --target=$TARGET_ROOT \
   --template=$CONFIG_TEMPLATE \
   --overwrite
