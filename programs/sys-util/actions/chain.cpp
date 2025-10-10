@@ -436,7 +436,7 @@ int chain_actions::run_subcommand_configure() {
         }
         auto now = std::chrono::system_clock::now();
         auto epoch_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
-        auto timestamp = std::format("{:%FT%T}.000", epoch_ms);
+        auto timestamp = std::format("{:%FT%T}", epoch_ms);
         auto chain_id_data = std::format("wire-{}", timestamp);
         auto chain_id = fc::sha256::hash(chain_id_data).str();
         std::println(std::cout, "chain_id_data: {}, chain_id: {}", chain_id_data, chain_id);
