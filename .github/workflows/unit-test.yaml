@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: [self-hosted, '${{ github.repository }}']
+    runs-on: [self-hosted, 'runner-0@github-actions-server']
     timeout-minutes: 60
 
     steps:
