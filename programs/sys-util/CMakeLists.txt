@@ -10,13 +10,18 @@ target_include_directories(${SYS_UTIL_EXECUTABLE_NAME} PUBLIC ${CMAKE_CURRENT_BI
 target_link_libraries(${SYS_UTIL_EXECUTABLE_NAME}
   PRIVATE
   appbase
-  version
+  fc
   plugin_common
+  version
+
   sysio_chain
   chain_plugin
-  fc
-  CLI11::CLI11
+  wallet_plugin
+  wallet_api_plugin
   producer_plugin
+
+  CLI11::CLI11
+
   ${CMAKE_DL_LIBS}
   ${PLATFORM_SPECIFIC_LIBS}
 )

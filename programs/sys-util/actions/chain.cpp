@@ -33,11 +33,13 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/contract_types.hpp>
 #include <sysio/version/version.hpp>
+#include <sysio/wallet_plugin/wallet_manager.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;
 
 namespace {
+  namespace fs = std::filesystem;
   FC_DECLARE_EXCEPTION(connection_exception, 1100000, "Connection Exception");
 
   std::filesystem::path determine_home_directory() {
@@ -281,6 +283,7 @@ int chain_actions::run_subcommand_configure() {
 
     std::filesystem::path config_dir = target_dir / "config";
     std::filesystem::path secrets_dir = target_dir / "secrets";
+    std::filesystem::path wallet_dir = target_dir / "wallet";
     std::filesystem::path data_dir = target_dir / "data";
     auto skip_genesis = opt->configure_skip_genesis;
     auto skip_ini = opt->configure_skip_ini;
@@ -289,10 +292,12 @@ int chain_actions::run_subcommand_configure() {
     std::filesystem::path genesis_override_file = opt->configure_genesis_override_file;
 
     auto template_name = opt->configure_template;
-    if (skip_genesis && skip_ini)
-      throw CLI::RequiredError("Both --skip-genesis & --skip-ini can not be used at the sametime (nothing to do)");
-    if (!std::ranges::contains(chain_configure_template_names, template_name))
-      throw CLI::RequiredError("Invalid template name: " + template_name);
+    if (skip_genesis && skip_ini) throw CLI::RequiredError(
+      "Both --skip-genesis & --skip-ini can not be used at the sametime (nothing to do)"
+    );
+    if (!std::ranges::contains(chain_configure_template_names, template_name)) throw CLI::RequiredError(
+      "Invalid template name: " + template_name
+    );
     if (target_dir.empty()) throw CLI::RequiredError("No config path specified");
 
 
@@ -312,7 +317,7 @@ int chain_actions::run_subcommand_configure() {
     }
 
     // CREATE PATHS
-    for (auto& p : {config_dir, secrets_dir, data_dir}) {
+    for (auto& p : {config_dir, wallet_dir, secrets_dir, data_dir}) {
       if (std::filesystem::exists(p)) continue;
       std::error_code ec;
       std::filesystem::create_directories(p, ec);
@@ -348,23 +353,62 @@ int chain_actions::run_subcommand_configure() {
           target_genesis_file.generic_string()
         );
       } else {
-        // SECRETS KEY FILE
+        // CREATE NEW WALLET
+        auto wallet_file = wallet_dir / "default.wallet";
+        if (fs::exists(wallet_file)) {
+          std::println(std::cout, "overwriting wallet ({})", wallet_file.generic_string());
+          fs::remove(wallet_file);
+        }
+
+        std::println(std::cout, "creating wallet ({})", wallet_file.generic_string());
+        auto wallet_manager = std::make_unique<sysio::wallet::wallet_manager>();
+        wallet_manager->set_dir(wallet_dir);
+        auto wallet_pw = wallet_manager->create(wallet_default_name);
+
+        // WALLET & KEY PATHS
+        auto wallet_pw_file = secrets_dir / "sysio_wallet_pw.txt";
         auto key_file = secrets_dir / "sysio_key.txt";
+
+        // SAVE WALLET PW
+        std::println(std::cout, "saving wallet password to {}", wallet_pw_file.generic_string());
+        {
+          std::ofstream out(wallet_pw_file.c_str(), std::ofstream::trunc);
+          out << wallet_pw;
+          out.close();
+        }
+
+        // OPEN & UNLOCK WALLET
+        std::println(
+          std::cout,
+          "opening & unlocking wallet {} with password in file {}",
+          wallet_file.generic_string(),
+          wallet_pw_file.generic_string()
+        );
+        wallet_manager->open(wallet_default_name);
+        wallet_manager->unlock(wallet_default_name, wallet_pw);
 
         // CREATE KEY
         auto pk = private_key_type::generate();
         auto privs = pk.to_string({});
         auto pubs = pk.get_public_key().to_string({});
 
-        std::println(std::cerr, "saving keys to {}", key_file.generic_string());
-        std::ofstream out(key_file.c_str());
-        out << std::format("Private key: {}\nPublic key: {}\n", privs, pubs);
-        out.close();
+        std::println(std::cout, "saving keys to {}", key_file.generic_string());
+        {
+          std::ofstream out(key_file.c_str());
+          out << std::format("Private key: {}\nPublic key: {}\n", privs, pubs);
+          out.close();
+        }
 
+        // IMPORTING KEY INTO WALLET
+        std::println(
+          std::cout,
+          "importing key into wallet {}",
+          wallet_file.generic_string()
+        );
+        wallet_manager->import_key(wallet_default_name, privs);
+        wallet_manager->lock(wallet_default_name);
 
-        // Locate default genesis template based on selected template
-
-
+        // LOCATE DEFAULT GENESIS TEMPLATE BASED ON SELECTED TEMPLATE
         if (!std::filesystem::exists(default_genesis_file)) {
           std::println(
             std::cerr,
@@ -432,8 +476,11 @@ int chain_actions::run_subcommand_configure() {
           default_ini_file.generic_string(),
           target_ini_file.generic_string()
         );
-        if (std::filesystem::exists(ini_override_file))
-          std::println(std::cerr, "INI OVERRIDE IS NOT IMPLEMENTED YET: {}", ini_override_file.generic_string());
+        if (std::filesystem::exists(ini_override_file)) std::println(
+          std::cerr,
+          "INI OVERRIDE IS NOT IMPLEMENTED YET: {}",
+          ini_override_file.generic_string()
+        );
         std::filesystem::copy_file(
           default_ini_file,
           target_ini_file,
