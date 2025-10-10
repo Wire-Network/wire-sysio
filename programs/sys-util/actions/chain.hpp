@@ -1,7 +1,8 @@
+#pragma once
 #include "subcommand.hpp"
 
 constexpr std::array<std::string,1> chain_configure_template_names = {"aio"};
-
+constexpr std::string wallet_default_name = "default";
 
 struct chain_options {
   bool build_just_print = false;

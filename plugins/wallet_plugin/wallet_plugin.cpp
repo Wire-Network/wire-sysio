@@ -33,7 +33,7 @@ void wallet_plugin::plugin_initialize(const variables_map& options) {
    try {
       wallet_manager_ptr = std::make_unique<wallet_manager>();
 
-      if (options.count("wallet-dir")) {
+      if (options.contains("wallet-dir")) {
          auto dir = options.at("wallet-dir").as<std::filesystem::path>();
          if (dir.is_relative())
             dir = app().data_dir() / dir;
@@ -41,7 +41,7 @@ void wallet_plugin::plugin_initialize(const variables_map& options) {
             std::filesystem::create_directories(dir);
          wallet_manager_ptr->set_dir(dir);
       }
-      if (options.count("unlock-timeout")) {
+      if (options.contains("unlock-timeout")) {
          auto timeout = options.at("unlock-timeout").as<int64_t>();
          SYS_ASSERT(timeout > 0, chain::invalid_lock_timeout_exception, "Please specify a positive timeout ${t}", ("t", timeout));
          std::chrono::seconds t(timeout);
