@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -21,7 +21,6 @@ RUN apt-get update && apt-get upgrade -y && \
     jq                   \
     libcurl4-openssl-dev \
     libgmp-dev           \
-    llvm-11-dev          \
     ninja-build          \
     python3-numpy        \
     file                 \

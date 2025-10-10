@@ -1,4 +1,4 @@
-name: "Build & Test"
+name: "Build & Test(Parallel ctest)"
 
 on:
   push:
@@ -33,7 +33,7 @@ defaults:
 jobs:
   platform-cache:
     name: Platform Cache
-    uses: AntelopeIO/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
+    uses: Wire-Network/platform-cache-workflow/.github/workflows/platformcache.yaml@v1
     permissions:
       packages: write
       contents: read
@@ -41,7 +41,6 @@ jobs:
       runs-on: '["self-hosted", "enf-x86-beefy"]'
       platform-files: |
         .cicd/platforms
-        tools/reproducible.Dockerfile:builder
 
   build-base:
     name: Run Build Workflow
@@ -57,17 +56,17 @@ jobs:
     outputs:
       cdt-target: ${{steps.versions.outputs.cdt-target}}
       cdt-prerelease: ${{steps.versions.outputs.cdt-prerelease}}
-      sys-system-contracts-ref: ${{steps.versions.outputs.sys-system-contracts-ref}}
+      wire-system-contracts-ref: ${{steps.versions.outputs.wire-system-contracts-ref}}
     steps:
-      - name: Setup cdt and sys-system-contracts versions
+      - name: Setup wire-cdt and wire-system-contracts versions
         id: versions
         env:
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_TOKEN: ${{secrets.GH_TOKEN}}
         run: |
           DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
-          echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.cdt.target') >> $GITHUB_OUTPUT
-          echo cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.cdt.prerelease') >> $GITHUB_OUTPUT
-          echo sys-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.eossystemcontracts.ref') >> $GITHUB_OUTPUT
+          echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
+          echo cdt-prerelease=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.prerelease') >> $GITHUB_OUTPUT
+          echo wire-system-contracts-ref=$(echo "$DEFAULTS_JSON" | jq -r '.wiresystemcontracts.ref') >> $GITHUB_OUTPUT
 
           if [[ "${{inputs.override-cdt}}" != "" ]]; then
             echo cdt-target=${{inputs.override-cdt}} >> $GITHUB_OUTPUT
@@ -75,8 +74,8 @@ jobs:
           if [[ "${{inputs.override-cdt-prerelease}}" == +(true|false) ]]; then
             echo cdt-prerelease=${{inputs.override-cdt-prerelease}} >> $GITHUB_OUTPUT
           fi
-          if [[ "${{inputs.override-sys-system-contracts}}" != "" ]]; then
-            echo sys-system-contracts-ref=${{inputs.override-sys-system-contracts}} >> $GITHUB_OUTPUT
+          if [[ "${{inputs.override-wire-system-contracts}}" != "" ]]; then
+            echo wire-system-contracts-ref=${{inputs.override-wire-system-contracts}} >> $GITHUB_OUTPUT
           fi
 
   package:
@@ -85,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu20, ubuntu22, reproducible]
+        platform: [ubuntu22, ubuntu24]
     runs-on: ubuntu-latest
     container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
     steps:
@@ -93,7 +92,7 @@ jobs:
         with:
           submodules: recursive
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.platform}}-build
       - name: Build packages
@@ -101,28 +100,28 @@ jobs:
           zstdcat build.tar.zst | tar x
           cd build
           cpack
-          ../tools/tweak-deb.sh leap_*.deb
+          ../tools/tweak-deb.sh wire-sysio_*.deb
       - name: Install dev package
         if: matrix.platform != 'reproducible'
         run: |
           apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/leap_*.deb ./build/sysio-dev*.deb
+          apt-get install -y ./build/wire-sysio_*.deb 
       - name: Test using TestHarness
         if: matrix.platform != 'reproducible'
         run: |
-          python3 -c "from TestHarness import Cluster"
-      - name: Upload dev package
-        uses: actions/upload-artifact@v3
-        if: matrix.platform != 'reproducible'
-        with:
-          name: sysio-dev-${{matrix.platform}}-amd64
-          path: build/sysio-dev*.deb
+          python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
+      # - name: Upload dev package
+      #   uses: actions/upload-artifact@v4
+      #   if: matrix.platform != 'reproducible'
+      #   with:
+      #     name: wire-sysio-dev-${{matrix.platform}}-amd64
+      #     path: build/wire-sysio-dev*.deb
       - name: Upload sysio package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: matrix.platform == 'reproducible'
         with:
           name: sysio-deb-amd64
-          path: build/leap_*.deb
+          path: build/wire-sysio_*.deb
 
   tests:
     name: Tests (${{matrix.cfg.name}})
@@ -131,10 +130,12 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
+          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-hightier"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
@@ -142,7 +143,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run Parallel Tests
@@ -153,7 +154,7 @@ jobs:
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 420
       - name: Upload core files from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-tests-logs
@@ -169,15 +170,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
+          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run tests in parallel containers
@@ -192,7 +194,7 @@ jobs:
         run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-np-logs
@@ -207,15 +209,16 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
+          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
+          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
     steps:
       - uses: actions/checkout@v4
       - name: Download builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
       - name: Run tests in parallel containers
@@ -230,7 +233,7 @@ jobs:
         run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
       - name: Upload logs from failed tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-lr-logs
@@ -244,7 +247,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu20, ubuntu22]
+        platform: [ubuntu20, ubuntu22, ubuntu24]
         test: [build-tree, make-dev-install, deb-install]
     runs-on:  ["self-hosted", "enf-x86-midtier"]
     container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
@@ -257,7 +260,7 @@ jobs:
           apt-get update
           apt-get upgrade -y
 
-      # LEAP
+      # wire-sysio
       - if: ${{ matrix.test != 'deb-install' }}
         name: Clone sysio
         uses: actions/checkout@v4
@@ -265,7 +268,7 @@ jobs:
           submodules: recursive
       - if: ${{ matrix.test != 'deb-install' }}
         name: Download sysio builddir
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{matrix.platform}}-build
       - if: ${{ matrix.test != 'deb-install' }}
@@ -273,9 +276,9 @@ jobs:
         run: |
           zstdcat build.tar.zst | tar x
       - if: ${{ matrix.test == 'build-tree' }}
-        name: Set leap_DIR env var
+        name: Set sysio_DIR env var
         run: |
-          echo "leap_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
+          echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
       - if: ${{ matrix.test == 'make-dev-install' }}
         name: sysio dev-install
         run: |
@@ -285,48 +288,56 @@ jobs:
         name: Delete sysio artifacts
         run: |
           rm -r *
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Download sysio-dev
-        uses: actions/download-artifact@v3
-        with:
-          name: sysio-dev-${{matrix.platform}}-amd64
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Install sysio-dev Package
-        run: |
-          apt-get install -y ./*.deb
-          rm ./*.deb
+      # - if: ${{ matrix.test == 'deb-install' }}
+      #   name: Download sysio-dev
+      #   uses: actions/download-artifact@v4
+      #   with:
+      #     name: sysio-dev-${{matrix.platform}}-amd64
+      # - if: ${{ matrix.test == 'deb-install' }}
+      #   name: Install sysio-dev Package
+      #   run: |
+      #     apt-get install -y ./*.deb
+      #     rm ./*.deb
 
       # CDT
-      - name: Download cdt
-        uses: AntelopeIO/asset-artifact-download-action@v3
-        with:
-          owner: AntelopeIO
-          repo: cdt
-          file: 'cdt_.*amd64.deb'
-          target: '${{needs.v.outputs.cdt-target}}'
-          prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
-          artifact-name: cdt_ubuntu_package_amd64
-      - name: Install cdt Packages
+      # - name: Download cdt
+      #   uses: AntelopeIO/asset-artifact-download-action@v3
+      #   with:
+      #     owner: Wire-Network
+      #     repo: wire-cdt
+      #     file: 'cdt_.*amd64.deb'
+      #     target: '${{needs.v.outputs.cdt-target}}'
+      #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
+      #     artifact-name: cdt_ubuntu_package_amd64
+      # - name: Install cdt Packages
+      #   run: |
+      #     apt-get install -y ./*.deb
+      #     rm ./*.deb
+          # CDT
+      - name: Download and Install wire-cdt
         run: |
-          apt-get install -y ./*.deb
-          rm ./*.deb
+          CDT_VERSION="${{needs.v.outputs.cdt-target}}"
+          CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
+          wget -O wire-cdt.deb "$CDT_URL"
+          apt-get install -y ./wire-cdt.deb
+          rm ./wire-cdt.deb
 
       # Reference Contracts
-      - name: checkout sys-system-contracts
+      - name: checkout wire-system-contracts
         uses: actions/checkout@v4
         with:
-          repository: eosnetworkfoundation/sys-system-contracts
-          path: sys-system-contracts
-          ref: '${{needs.v.outputs.sys-system-contracts-ref}}'
+          repository: Wire-Network/wire-system-contracts
+          path: wire-system-contracts
+          ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
       - if: ${{ matrix.test == 'deb-install' }}
-        name: Install sys-system-contracts deps
+        name: Install wire-system-contracts deps
         run: |
           apt-get -y install cmake build-essential
-      - name: Build & Test sys-system-contracts
+      - name: Build & Test wire-system-contracts
         run: |
-          cmake -S sys-system-contracts -B sys-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_LEAP_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
-          cmake --build sys-system-contracts/build -- -j $(nproc)
-          cd sys-system-contracts/build/tests
+          cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
+          cmake --build wire-system-contracts/build -- -j $(nproc)
+          cd wire-system-contracts/build/tests
           ctest --output-on-failure -j $(nproc)
 
   all-passing:
