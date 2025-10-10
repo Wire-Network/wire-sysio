@@ -877,15 +877,52 @@ void call_test(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cp
    test.produce_block();
 }
 
+// requires asserter_wasm
+transaction_trace_ptr push_dummy(base_tester& t, account_name from, const string& v, uint32_t billed_cpu_time_us) {
+   // use reqauth for a normal action, this could be anything
+   fc::variant pretty_trx = fc::mutable_variant_object()
+      ("actions", fc::variants({
+         fc::mutable_variant_object()
+            ("account", name(config::system_account_name))
+            ("name", "reqauth")
+            ("authorization", fc::variants({
+               fc::mutable_variant_object()
+                  ("actor", from)
+                  ("permission", name(config::active_name))
+            }))
+            ("data", fc::mutable_variant_object()
+               ("from", from)
+            )
+         })
+     )
+     // lets also push a context free action
+     ("context_free_actions", fc::variants({
+         fc::mutable_variant_object()
+            ("account", name("asserter"))
+            ("name", "procassert")
+            ("data", fc::mutable_variant_object()
+                ("condition", 1)
+                ("message", "noop failed: " + v )
+            )
+         })
+      );
+
+   signed_transaction trx;
+   abi_serializer::from_variant(pretty_trx, trx, t.get_resolver(), abi_serializer::create_yield_function( base_tester::abi_serializer_max_time ));
+   t.set_transaction_headers(trx);
+
+   trx.sign( t.get_private_key( from, "active" ), t.control->get_chain_id() );
+   return t.push_transaction( trx, fc::time_point::maximum(), billed_cpu_time_us );
+}
+
 BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
    validating_tester t;
    t.produce_blocks(2);
 
-   ilog( "create account" );
+   t.create_account( "asserter"_n );
    t.create_account( "testapi"_n );
-   ilog( "set code" );
    t.set_code( "testapi"_n, test_contracts::test_api_wasm() );
-   ilog( "produce block" );
+   t.set_contract( "asserter"_n, test_contracts::asserter_wasm(), test_contracts::asserter_abi() );
    t.produce_blocks(1);
 
    int64_t x; int64_t net; int64_t cpu;
@@ -908,7 +945,7 @@ BOOST_AUTO_TEST_CASE(checktime_fail_tests) { try {
    std::string dummy_string = "nonce";
    uint32_t increment = config::default_max_transaction_cpu_usage / 3;
    for( auto i = 0; time_left_in_block_us > 2*increment; ++i ) {
-      t.push_dummy( "testapi"_n, dummy_string + std::to_string(i), increment );
+      push_dummy( t, "testapi"_n, dummy_string + std::to_string(i), increment );
       time_left_in_block_us -= increment;
    }
    BOOST_CHECK_EXCEPTION( call_test( t, test_api_action<TEST_METHOD("test_checktime", "checktime_failure")>{},

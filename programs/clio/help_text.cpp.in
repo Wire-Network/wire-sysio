@@ -14,9 +14,7 @@ is an intentionally repeated transaction there are a few ways to resolve the
 issue:
   - wait for the next block
   - combine duplicate transactions into a single transaction
-  - adjust the expiration time using the `--expiration <milliseconds>` option
-  - use the `--force-unique` option to add additional nonce data
-    Please note, this will consume more bandwidth than the base transaction )text");
+  - adjust the expiration time using the `--expiration <milliseconds>` option )text");
 
 const char* missing_perms_help_text = _(R"text(The transaction requires permissions that were not granted by the transaction.
 Missing permission from:

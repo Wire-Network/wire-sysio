@@ -20,12 +20,27 @@
                     "type": "string"
                 }
             ]
+        },
+        {
+            "name": "nonce",
+            "base": "",
+            "fields": [
+                {
+                    "name": "data",
+                    "type": "string"
+                }
+            ]
         }
     ],
     "actions": [
         {
             "name": "anyaction",
             "type": "anyaction",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "nonce",
+            "type": "nonce",
             "ricardian_contract": ""
         }
     ],

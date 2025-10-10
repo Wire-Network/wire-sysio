@@ -57,7 +57,6 @@ Positionals:
 
 Options:
   -x,--expiration             set the time in seconds before a transaction expires, defaults to 30s
-  -f,--force-unique           force the transaction to be unique. this will consume extra bandwidth and remove any protections against accidently issuing the same transaction multiple times
   -s,--skip-sign              Specify if unlocked wallet keys should be used to sign transaction
   -d,--dont-broadcast         don't broadcast transaction to the network (just print to stdout)
   -p,--permission TEXT ...    An account and permission level to authorize, as in 'account@permission' (defaults to 'creator@active')
@@ -162,7 +161,6 @@ std::map<name, std::string>  abi_files_override;
 auto   tx_expiration = fc::seconds(30);
 const fc::microseconds abi_serializer_max_time = fc::seconds(10); // No risk to client side serialization taking a long time
 string tx_ref_block_num_or_id;
-bool   tx_force_unique = false;
 bool   tx_dont_broadcast = false;
 bool   tx_unpack_data = false;
 bool   tx_return_packed = false;
@@ -218,7 +216,6 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    };
 
    cmd->add_option("-x,--expiration", parse_expiration, localized("Set the time in seconds before a transaction expires, defaults to 30s"));
-   cmd->add_flag("-f,--force-unique", tx_force_unique, localized("Force the transaction to be unique. this will consume extra bandwidth and remove any protections against accidently issuing the same transaction multiple times"));
    cmd->add_flag("-s,--skip-sign", tx_skip_sign, localized("Specify if unlocked wallet keys should be used to sign transaction"));
    cmd->add_flag("-j,--json", tx_print_json, localized("Print result as JSON"));
    cmd->add_option("--json-file", tx_json_save_file, localized("Save result in JSON format into a file"));
@@ -357,10 +354,6 @@ string generate_nonce_string() {
    return std::to_string(fc::time_point::now().time_since_epoch().count());
 }
 
-chain::action generate_nonce_action() {
-   return chain::action( {}, config::null_account_name, name("nonce"), fc::raw::pack(fc::time_point::now().time_since_epoch().count()));
-}
-
 //resolver for ABI serializer to decode actions in proposed transaction in multisig contract
 auto abi_serializer_resolver = [](const name& account) -> std::optional<abi_serializer> {
    static unordered_map<account_name, std::optional<abi_serializer> > abi_cache;
@@ -432,10 +425,6 @@ fc::variant push_transaction( signed_transaction& trx, const std::vector<public_
          }
       } SYS_RETHROW_EXCEPTIONS(invalid_ref_block_exception, "Invalid reference block num or id: ${block_num_or_id}", ("block_num_or_id", tx_ref_block_num_or_id));
       trx.set_reference_block(ref_block_id);
-
-      if (tx_force_unique) {
-         trx.context_free_actions.emplace_back( generate_nonce_action() );
-      }
 
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
       trx.max_net_usage_words = (tx_max_net_usage + 7)/8;
@@ -2491,12 +2480,6 @@ int main( int argc, char** argv ) {
 
    add_standard_transaction_options_plus_signing(transfer, "sender@active");
    transfer->callback([&] {
-      if (tx_force_unique && memo.size() == 0) {
-         // use the memo to add a nonce
-         memo = generate_nonce_string();
-         tx_force_unique = false;
-      }
-
       auto transfer_amount = to_asset(name(con), amount);
       auto transfer = create_transfer(con, name(sender), name(recipient), transfer_amount, memo);
       if (!pay_ram) {

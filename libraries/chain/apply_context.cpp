@@ -99,6 +99,13 @@ void apply_context::exec_one()
                try {
                   control.get_wasm_interface().apply( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version, *this );
                } catch( const wasm_exit& ) {}
+            } else {
+               // allow inline and notify to non-existing contracts
+               // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
+               if (receiver != config::system_account_name && act->account == receiver && get_sender().empty()) {
+                  SYS_ASSERT(false, action_validate_exception,
+                             "No contract for action ${a} on account ${r}", ("a", act->name)("r", receiver));
+               }
             }
             validate_account_ram_deltas();
          }
