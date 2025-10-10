@@ -1,6 +1,7 @@
 
 # Option to enable/disable ccache usage
 option(ENABLE_CCACHE "Enable ccache if available" ON)
+option(ENABLE_DISTCC "Enable distcc if available" ON)
 
 if(ENABLE_CCACHE)
   find_program(CCACHE_PROGRAM ccache)

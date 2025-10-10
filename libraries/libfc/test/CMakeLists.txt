@@ -1,3 +1,4 @@
+
 add_executable( test_fc
         crypto/test_blake2.cpp
         crypto/test_bls.cpp

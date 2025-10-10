@@ -1,7 +1,6 @@
 set(CHAINBASE_INSTALL_COMPONENT "dev")
 set(FC_INSTALL_COMPONENT "dev")
 set(APPBASE_INSTALL_COMPONENT "dev")
-#set(SOFTFLOAT_INSTALL_COMPONENT "dev")
 set(SYSVM_INSTALL_COMPONENT "dev")
 
 
@@ -16,6 +15,7 @@ add_subdirectory(chain)
 add_subdirectory(testing)
 add_subdirectory(version)
 add_subdirectory(state_history)
+add_subdirectory(plugin_common)
 
 set(ENABLE_TOOLS OFF CACHE BOOL "Build tools")
 set(ENABLE_TESTS OFF CACHE BOOL "Build tests")
