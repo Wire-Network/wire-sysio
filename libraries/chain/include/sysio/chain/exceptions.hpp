@@ -294,6 +294,10 @@ namespace sysio { namespace chain {
                                     3040017, "Transaction includes disallowed extensions (invalid block)" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_resource_exhaustion, transaction_exception,
                                     3040018, "Transaction exceeded transient resource limit" )
+      FC_DECLARE_DERIVED_EXCEPTION( tx_extra_data, transaction_exception,
+                                    3040019, "Packed transaction contains extra unexpected data" )
+      FC_DECLARE_DERIVED_EXCEPTION( tx_compression_not_allowed, transaction_exception,
+                                    3040020, "Packed transaction compression not allowed in consensus" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( action_validate_exception, chain_exception,

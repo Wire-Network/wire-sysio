@@ -84,10 +84,10 @@ BOOST_AUTO_TEST_CASE( decompressed_size_over_limit ) try {
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
    trx.context_free_actions.push_back(act);
-   // this is a over limit size (4+4)*129*1024 = 1032*1024 > 1M
+   // this is a over limit size 4*20*129*1024 = 1032*1024 > 10M
    for(int i = 0; i < 129*1024; ++i){
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
+      vector<uint32_t> v(20, 1);
+      trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};

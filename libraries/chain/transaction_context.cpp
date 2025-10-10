@@ -248,8 +248,10 @@ namespace sysio { namespace chain {
                                                  uint64_t packed_trx_prunable_size )
    {
       const transaction& trx = packed_trx.get_transaction();
-      // delayed transactions are not supported by wire
+      // delayed and compressed transactions are not supported by wire
       SYS_ASSERT( trx.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
+      SYS_ASSERT( packed_trx.get_compression() == packed_transaction::compression_type::none,
+                  tx_compression_not_allowed, "packed transaction cannot be compressed");
 
       const auto& cfg = control.get_global_properties().configuration;
 

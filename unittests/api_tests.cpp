@@ -624,7 +624,17 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
       // run normal passing case
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
       auto res = push_transaction(trx);
+      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
 
+      produce_block();
+
+      // add a large trx so that it is compressed
+      trx.signatures.clear();
+      set_transaction_headers(trx);
+      trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(vector<uint32_t>(251, 1))); // 251*4 > 1000
+      BOOST_TEST( fc::raw::pack_size(trx) > 1000); // so that it is compressed
+      sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      res = push_transaction(trx);
       BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
 
       // attempt to access context free api in non context free action
@@ -1431,9 +1441,9 @@ void transaction_tests(T& chain) {
       auto time_limit = fc::microseconds::maximum();
       auto ptrx = std::make_shared<packed_transaction>( signed_transaction(trx), packed_transaction::compression_type::none );
 
+      // verify packed_transaction constructor
       string sha_expect = ptrx->id();
       auto packed = fc::raw::pack( static_cast<const transaction&>(ptrx->get_transaction()) );
-      packed.push_back('7'); packed.push_back('7'); // extra ignored
       auto packed_copy = packed;
       vector<signature_type> psigs = ptrx->get_signatures();
       vector<bytes> pcfd = ptrx->get_context_free_data();
@@ -1448,6 +1458,30 @@ void transaction_tests(T& chain) {
       tx_trace = r;
       chain.produce_block();
       BOOST_CHECK(tx_trace->action_traces.front().console == sha_expect);
+   }
+
+   // extra data not allowed in packed_transaction
+   {
+      signed_transaction trx;
+
+      auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
+      action act( pl, test_api_action<TEST_METHOD( "test_transaction", "test_read_transaction" )>{} );
+      act.data = {};
+      act.authorization = {{"testapi"_n, config::active_name}};
+      trx.actions.push_back( act );
+
+      chain.set_transaction_headers( trx, chain.DEFAULT_EXPIRATION_DELTA );
+      auto sigs = trx.sign( chain.get_private_key( "testapi"_n, "active" ), chain.control->get_chain_id() );
+
+      auto ptrx = std::make_shared<packed_transaction>( signed_transaction(trx), packed_transaction::compression_type::none );
+
+      string sha_expect = ptrx->id();
+      auto packed = fc::raw::pack( static_cast<const transaction&>(ptrx->get_transaction()) );
+      packed.push_back('7'); packed.push_back('7'); // extra ignored
+      vector<signature_type> psigs = ptrx->get_signatures();
+      vector<bytes> pcfd = ptrx->get_context_free_data();
+      BOOST_CHECK_EXCEPTION(packed_transaction( std::move(packed), std::move(psigs), std::move(pcfd), packed_transaction::compression_type::none ),
+                            tx_extra_data, fc_exception_message_is("packed_transaction contains extra data beyond transaction struct"));
    }
 }
 

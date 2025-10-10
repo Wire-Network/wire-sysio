@@ -770,11 +770,6 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    BOOST_CHECK_EQUAL(trx.id(), pkt.id());
    BOOST_CHECK_EQUAL(trx.id(), pkt2.id());
 
-   bytes raw = pkt.get_raw_transaction();
-   bytes raw2 = pkt2.get_raw_transaction();
-   BOOST_CHECK_EQUAL(raw.size(), raw2.size());
-   BOOST_CHECK_EQUAL(true, std::equal(raw.begin(), raw.end(), raw2.begin()));
-
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt2.get_signed_transaction().id());
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt2.id());
 
@@ -813,12 +808,6 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    packed_transaction pkt5;
    fc::from_variant(pkt_v, pkt5);
 
-   bytes raw3 = pkt3.get_raw_transaction();
-   bytes raw4 = pkt4.get_raw_transaction();
-   BOOST_CHECK_EQUAL(raw.size(), raw3.size());
-   BOOST_CHECK_EQUAL(raw3.size(), raw4.size());
-   BOOST_CHECK_EQUAL(true, std::equal(raw.begin(), raw.end(), raw3.begin()));
-   BOOST_CHECK_EQUAL(true, std::equal(raw.begin(), raw.end(), raw4.begin()));
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt3.get_signed_transaction().id());
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt4.get_signed_transaction().id());
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt5.get_signed_transaction().id()); // failure indicates reflector_init not working
@@ -838,16 +827,14 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
       packed_transaction pkt7( std::move(packed), std::move(psigs), std::move(pcfd), packed_transaction::compression_type::none );
       BOOST_CHECK_EQUAL(pkt5.get_transaction().id(), pkt7.get_transaction().id());
    }
-   {
+   { // verify extra data not allowed
       auto packed = fc::raw::pack( static_cast<const transaction&>(pkt5.get_transaction()) );
       vector<signature_type> psigs = pkt5.get_signatures();
       vector<bytes> pcfd = pkt5.get_context_free_data();
-      packed.push_back( '8' ); packed.push_back( '8' ); // extra ignored
+      packed.push_back( '8' ); packed.push_back( '8' ); // extra not allowed
       auto packed_copy = packed;
-      packed_transaction pkt8( std::move(packed), std::move(psigs), std::move(pcfd), packed_transaction::compression_type::none );
-      BOOST_CHECK_EQUAL( pkt5.get_transaction().id(), pkt8.get_transaction().id() );
-      BOOST_CHECK( packed_copy != fc::raw::pack( static_cast<const transaction&>(pkt8.get_transaction()) ) );
-      BOOST_CHECK( packed_copy == pkt8.get_packed_transaction() ); // extra maintained
+      BOOST_CHECK_EXCEPTION(packed_transaction pkt8( std::move(packed), std::move(psigs), std::move(pcfd), packed_transaction::compression_type::none ),
+                            chain::tx_extra_data, fc_exception_message_is("packed_transaction contains extra data beyond transaction struct"));
    }
 
 } FC_LOG_AND_RETHROW() }
