@@ -284,7 +284,44 @@ namespace config {
 
 } // namespace config
 
-} }  // namespace sysio::chain
+namespace detail {
+   template<>
+   struct snapshot_row_traits<key_value_object> {
+      using value_type = key_value_object;
+      using snapshot_type = snapshot_key_value_object;
+
+      static snapshot_key_value_object to_snapshot_row(const key_value_object& value, const chainbase::database&) {
+         snapshot_key_value_object ret;
+
+         ret.primary_key = value.primary_key;
+         ret.payer = value.payer;
+         if(value.value.size()) {
+            ret.value.resize(value.value.size());
+            memcpy(ret.value.data(), value.value.data(), value.value.size());
+         }
+         return ret;
+      };
+
+      static void from_snapshot_row(snapshot_key_value_object&& row, key_value_object& value, chainbase::database&) {
+         value.primary_key = row.primary_key;
+         value.payer = row.payer;
+         if(row.value.size())
+            value.value.resize_and_fill(row.value.size(), [&](char* data, std::size_t size) {
+               memcpy(data, row.value.data(), size);
+            });
+      }
+   };
+
+   //the typenames for these can be different across stdlibs due to the template parameters
+#define SNAPSHOT_SECONDARY_SECTION_NAME(N) template<> struct snapshot_section_traits<N> { static std::string section_name() {return #N ;} };
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index64_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index128_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index256_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index_double_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index_long_double_object)
+}
+
+} }  // namespace eosio::chain
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::table_id_object, sysio::chain::table_id_multi_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::key_value_object, sysio::chain::key_value_index)
