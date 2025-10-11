@@ -633,7 +633,10 @@ struct controller_impl {
 
          init(std::move(check_shutdown));
          auto snapshot_load_time = (fc::time_point::now() - snapshot_load_start_time).to_seconds();
-         ilog( "Finished initialization from snapshot (snapshot load time was ${t}s)", ("t", snapshot_load_time) );
+         auto db_size = db.get_segment_manager()->get_size();
+         auto db_free_size = db.get_segment_manager()->get_free_memory();
+         ilog( "Finished initialization from snapshot (snapshot load time was ${t}s), db total size ${dbs}, db free size ${dfs}, db used size ${dus}",
+             ("t", snapshot_load_time)("dbs", db_size)("dfs", db_free_size)("dus", db_size - db_free_size) );
       } catch (boost::interprocess::bad_alloc& e) {
          elog( "Failed initialization from snapshot - db storage not configured to have enough storage for the provided snapshot, please increase and retry snapshot" );
          shutdown();

@@ -20,7 +20,7 @@ namespace sysio { namespace chain {
       template<typename Constructor>
       protocol_state_object(Constructor&& c, chainbase::constructor_tag) :
          id(0),
-         whitelisted_intrinsics(*activated_protocol_features.get_allocator(this)) {
+         whitelisted_intrinsics(*chainbase::pinnable_mapped_file::get_allocator<whitelisted_intrinsics_type::value_type>(this)) {
          c(*this);
       }
 
