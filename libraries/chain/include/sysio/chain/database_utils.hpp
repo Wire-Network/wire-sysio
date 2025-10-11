@@ -4,7 +4,7 @@
 #include <fc/io/raw.hpp>
 #include <softfloat/softfloat.hpp>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
    template<typename ...Indices>
    class index_set;
@@ -50,6 +50,10 @@ namespace sysio { namespace chain {
          static void create( chainbase::database& db, F cons ) {
             db.create<typename index_t::value_type>(cons);
          }
+
+         static void preallocate( chainbase::database& db, size_t num_objects ) {
+            db.preallocate<typename index_t::value_type>(num_objects);
+         }
    };
 
    template<typename Index>
@@ -79,18 +83,6 @@ namespace sysio { namespace chain {
          index_set<RemainingIndices...>::walk_indices(function);
       }
    };
-
-   template<typename DataStream>
-   DataStream& operator << ( DataStream& ds, const shared_blob& b ) {
-      fc::raw::pack(ds, static_cast<const shared_string&>(b));
-      return ds;
-   }
-
-   template<typename DataStream>
-   DataStream& operator >> ( DataStream& ds, shared_blob& b ) {
-      fc::raw::unpack(ds, static_cast<shared_string &>(b));
-      return ds;
-   }
 
 namespace detail {
    struct snapshot_key_value_object {
@@ -127,7 +119,7 @@ namespace detail {
    };
 }
 
-} }
+}
 
 namespace fc {
 
@@ -208,7 +200,7 @@ namespace fc {
    void from_variant( const variant& v, sysio::chain::shared_string& s ) {
       std::string _s;
       from_variant(v, _s);
-      s = sysio::chain::shared_string(_s.begin(), _s.end(), s.get_allocator());
+      s = _s;
    }
 
    inline
@@ -219,7 +211,7 @@ namespace fc {
    inline
    void from_variant( const variant& v, sysio::chain::shared_blob& b ) {
       std::vector<char> b64 = base64_decode(v.as_string());
-      b = sysio::chain::shared_blob(b64.begin(), b64.end(), b.get_allocator());
+      b = std::string_view(b64.data(), b64.size());
    }
 
    template<typename T>
@@ -231,7 +223,7 @@ namespace fc {
    void from_variant( const variant& v, sysio::chain::shared_vector<T>& sv ) {
       std::vector<T> _v;
       from_variant(v, _v);
-      sv = sysio::chain::shared_vector<T>(_v.begin(), _v.end(), sv.get_allocator());
+      sv = v;
    }
 
    inline
@@ -261,6 +253,65 @@ namespace chainbase {
    DataStream& operator >> ( DataStream& ds, oid<OidType>& oid ) {
       fc::raw::unpack(ds, oid._id);
       return ds;
+   }
+
+   // chainbase::shared_cow_string
+   // ----------------------------
+   template<typename Stream>
+   inline Stream& operator<<(Stream& s, const chainbase::shared_cow_string& v)  {
+      FC_ASSERT(v.size() <= MAX_NUM_ARRAY_ELEMENTS);
+      fc::raw::pack(s, fc::unsigned_int((uint32_t)v.size()));
+      if( v.size() )
+         s.write((const char*)v.data(), v.size());
+      return s;
+   }
+
+   template<typename Stream>
+   inline Stream& operator>>(Stream& s, chainbase::shared_cow_string& v)  {
+      fc::unsigned_int sz;
+      fc::raw::unpack(s, sz);
+      FC_ASSERT(sz.value <= MAX_SIZE_OF_BYTE_ARRAYS);
+      if (sz) {
+         v.resize_and_fill(sz, [&](char* buf, std::size_t sz) {
+            s.read(buf, sz);
+         });
+      }
+      return s;
+   }
+
+   // chainbase::shared_cow_vector
+   // ----------------------------
+   template<typename Stream, typename T>
+   inline Stream& operator<<(Stream& s, const chainbase::shared_cow_vector<T>& v)  {
+      FC_ASSERT(v.size() <= MAX_NUM_ARRAY_ELEMENTS);
+      fc::raw::pack( s, fc::unsigned_int((uint32_t)v.size()));
+      for (const auto& el : v)
+         fc::raw::pack(s, el);
+      return s;
+   }
+
+   template<typename Stream, typename T>
+   inline Stream& operator>>(Stream& s, chainbase::shared_cow_vector<T>& v)  {
+      fc::unsigned_int size;
+      fc::raw::unpack( s, size );
+      FC_ASSERT(size.value  <= MAX_NUM_ARRAY_ELEMENTS);
+      FC_ASSERT(v.size() == 0);
+      v.clear_and_construct(size.value, 0, [&](auto* dest, std::size_t i) {
+         new (dest) T(); // unpack expects a constructed variable
+         fc::raw::unpack(s, *dest);
+      });
+      return s;
+   }
+
+   // chainbase::shared_cow_vector<char>
+   // ----------------------------------
+   template<typename Stream, typename T>
+   inline Stream& operator<<(Stream& s, const chainbase::shared_cow_vector<char>& v)  {
+      FC_ASSERT(v.size() <= MAX_NUM_ARRAY_ELEMENTS);
+      fc::raw::pack( s, fc::unsigned_int((uint32_t)v.size()));
+      if( v.size() )
+         s.write((const char*)v.data(), v.size());
+      return s;
    }
 }
 
