@@ -22,6 +22,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LLVM_SRC_DIR="${BASE_DIR}/llvm-project"
 BUILD_DIR="${BASE_DIR}/llvm-11-build"
 PREFIX="${LLVM_11_PREFIX:-${BASE_DIR}/llvm-11}"
+: "${CLANG_18_DIR:=/opt/clang/clang-18}"
+
+### ---------- Bootstrap Clang 18 if needed ----------
+if [[ ! -x "${CLANG_18_DIR}/bin/clang" ]]; then
+  echo "[+] Bootstrapping Clang 18 at ${CLANG_18_DIR}"
+  BASE_DIR="/opt/clang" CLANG_18_PREFIX="${CLANG_18_DIR}" \
+    /opt/clang/scripts/clang-18-ubuntu-build-source.sh
+else
+  echo "[+] Found existing Clang 18 at ${CLANG_18_DIR}"
+fi
 
 ### ---------- Config (overridable by flags) ----------
 
@@ -91,14 +101,20 @@ declare -a CMAKE_FLAGS=(
   -DCMAKE_BUILD_TYPE=Release
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"
 
+  -DLLVM_USE_LINKER=lld
+  -DCMAKE_LINKER="${CLANG_18_DIR}/bin/ld.lld"
+  -DLLVM_INCLUDE_BENCHMARKS=OFF
+  -DLLVM_ENABLE_BINDINGS=OFF
+  -DLLVM_ENABLE_WERROR=OFF
+
   -DLLVM_TARGETS_TO_BUILD=host
   -DLLVM_BUILD_TOOLS=Off
   -DLLVM_ENABLE_RTTI=On
   -DLLVM_ENABLE_TERMINFO=Off
-  -DLLVM_ENABLE_PIC=Off
+  -DLLVM_ENABLE_PIC=On
   -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-  -DCMAKE_C_COMPILER=gcc-10
-  -DCMAKE_CXX_COMPILER=g++-10
+  -DCMAKE_C_COMPILER="${CLANG_18_DIR}/bin/clang"
+  -DCMAKE_CXX_COMPILER="${CLANG_18_DIR}/bin/clang++"
 )
 
 # Build & Install (top-level)

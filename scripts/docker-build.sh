@@ -120,6 +120,7 @@ fi
 cd "${DOCKER_DIR}"
 docker build \
   --build-context llvm-11-scripts="${BASE_DIR}/scripts/llvm-11" \
+  --build-context clang-18-scripts="${BASE_DIR}/scripts/clang-18" \
   --build-context app-root="${BASE_DIR}" \
   --build-arg SYSIO_BRANCH=${SYSIO_BRANCH} \
   --build-arg CDT_BRANCH=${CDT_BRANCH} \

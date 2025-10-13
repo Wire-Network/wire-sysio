@@ -11,7 +11,7 @@
 
 # Stage 1: distro-deps
 # Base image with system packages required for building (compilers, cmake, Python, etc.)
-FROM ubuntu:24.04 AS distro-deps
+FROM ubuntu:22.04 AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -25,6 +25,7 @@ ENV CDT_BUILD_DIR="${CDT_DIR}/build/${BUILD_TYPE}"
 ENV APP_DEV_BUILD_DIR="${APP_DIR}/build/debug-docker"
 ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
 
+ENV CLANG_18_DIR=/opt/clang/clang-18
 ENV LLVM_11_DIR=/opt/llvm/llvm-11
 
 # Core package tools and repository helpers
@@ -82,13 +83,24 @@ RUN apt-get install -y \
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
 
-# Stage 2: source-deps
-# Install dependencies built from source (LLVM 11) on top of distro-deps.
-FROM distro-deps AS source-deps
+# Stage 2a: clang18-build
+FROM distro-deps AS clang18-build
+# Prepare build context for Clang 18 scripts
+RUN mkdir -p /opt/clang/scripts
+
+# Build clang-18 once; this layer will cache unless scripts or args change
+RUN --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
+    BASE_DIR=/opt/clang /opt/clang/scripts/clang-18-ubuntu-build-source.sh
+
+ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
+
+# Stage 2b: source-deps
+# Install dependencies built from source (LLVM 11) on top of clang-18-build.
+FROM clang18-build AS source-deps
 
 # Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
-RUN mkdir -p /opt/llvm/scripts
-RUN mkdir -p LLVM_11_DIR
+RUN mkdir -p /opt/llvm/scripts 
+# RUN mkdir -p LLVM_11_DIR
 
 # Build and install LLVM 11 using the helper script
 RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
@@ -126,15 +138,16 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN env CC=clang-18 CXX=clang++-18 cmake \
+RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_CC_COMPILER=${CC} \
-    -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+    -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
+    -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+    -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+    -DENABLE_CCACHE=ON
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
@@ -147,15 +160,17 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN cmake \
+RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ \
+    cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=${CC} \
-    -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+    -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
+    -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+    -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+    -DENABLE_CCACHE=ON
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
@@ -195,14 +210,16 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
 WORKDIR ${CDT_BUILD_DIR} 
-RUN cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ \
+        cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
         -B . \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-        -DCMAKE_CC_COMPILER=${CC} \
-        -DCMAKE_CXX_COMPILER=${CXX} \
-        -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-        -Dsysio_DIR=${APP_BUILD_DIR} 
+        -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
+        -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+        -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+        -Dsysio_DIR=${APP_BUILD_DIR} \
+        -DENABLE_CCACHE=ON
 
 RUN  cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
