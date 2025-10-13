@@ -88,6 +88,7 @@ jobs:
               -DCMAKE_CXX_COMPILER=$CXX \
               -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
               -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+              -DCMAKE_FIND_DEBUG_MODE=ON \
               -DCMAKE_BUILD_TYPE=Release \
               -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 
             
