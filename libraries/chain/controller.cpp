@@ -633,7 +633,10 @@ struct controller_impl {
 
          init(std::move(check_shutdown));
          auto snapshot_load_time = (fc::time_point::now() - snapshot_load_start_time).to_seconds();
-         ilog( "Finished initialization from snapshot (snapshot load time was ${t}s)", ("t", snapshot_load_time) );
+         auto db_size = db.get_segment_manager()->get_size();
+         auto db_free_size = db.get_segment_manager()->get_free_memory();
+         ilog( "Finished initialization from snapshot (snapshot load time was ${t}s), db total size ${dbs}, db free size ${dfs}, db used size ${dus}",
+             ("t", snapshot_load_time)("dbs", db_size)("dfs", db_free_size)("dus", db_size - db_free_size) );
       } catch (boost::interprocess::bad_alloc& e) {
          elog( "Failed initialization from snapshot - db storage not configured to have enough storage for the provided snapshot, please increase and retry snapshot" );
          shutdown();
@@ -1450,11 +1453,8 @@ struct controller_impl {
             db.modify( pso, [&]( auto& ps ) {
                ps.preactivated_protocol_features.clear();
 
-               ps.activated_protocol_features.reserve( ps.activated_protocol_features.size()
-                                                         + new_protocol_feature_activations.size() );
-               for( const auto& feature_digest : new_protocol_feature_activations ) {
-                  ps.activated_protocol_features.emplace_back( feature_digest, pbhs.block_num );
-               }
+               for (const auto& digest : new_protocol_feature_activations)
+                  ps.activated_protocol_features.emplace_back(digest, pbhs.block_num);
             });
          }
 
@@ -2609,7 +2609,7 @@ void controller::preactivate_feature( const digest_type& feature_digest, bool is
    }
 
    my->db.modify( pso, [&]( auto& ps ) {
-      ps.preactivated_protocol_features.push_back( feature_digest );
+      ps.preactivated_protocol_features.emplace_back(feature_digest);
    } );
 }
 
@@ -3020,7 +3020,7 @@ int64_t controller::set_proposed_producers( vector<producer_authority> producers
 
    my->db.modify( gpo, [&]( auto& gp ) {
       gp.proposed_schedule_block_num = cur_block_num;
-      gp.proposed_schedule = sch.to_shared(gp.proposed_schedule.producers.get_allocator());
+      gp.proposed_schedule = sch;
    });
    return version;
 }

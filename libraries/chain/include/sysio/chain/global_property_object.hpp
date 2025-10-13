@@ -65,7 +65,7 @@ namespace sysio { namespace chain {
 
          static void from_snapshot_row( snapshot_global_property_object&& row, global_property_object& value, chainbase::database& ) {
             value.proposed_schedule_block_num = row.proposed_schedule_block_num;
-            value.proposed_schedule = row.proposed_schedule.to_shared(value.proposed_schedule.producers.get_allocator());
+            value.proposed_schedule = row.proposed_schedule;
             value.configuration = row.configuration;
             value.chain_id = row.chain_id;
             value.wasm_configuration = row.wasm_configuration;

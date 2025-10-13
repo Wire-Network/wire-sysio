@@ -311,9 +311,17 @@ namespace detail {
             });
       }
    };
+
+   //the typenames for these can be different across stdlibs due to the template parameters
+#define SNAPSHOT_SECONDARY_SECTION_NAME(N) template<> struct snapshot_section_traits<N> { static std::string section_name() {return #N ;} };
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index64_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index128_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index256_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index_double_object)
+   SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index_long_double_object)
 }
 
-} }  // namespace sysio::chain
+} }  // namespace eosio::chain
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::table_id_object, sysio::chain::table_id_multi_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::key_value_object, sysio::chain::key_value_index)
