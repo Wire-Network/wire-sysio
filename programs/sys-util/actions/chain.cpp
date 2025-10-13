@@ -23,6 +23,8 @@
 #include <boost/process.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <gsl-lite/gsl-lite.hpp>
+#include <fc/log/logger_config.hpp>
 
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/chainbase_environment.hpp>
@@ -32,8 +34,26 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/contract_types.hpp>
+#include <sysio/http_plugin/http_plugin.hpp>
+#include <sysio/net_plugin/net_plugin.hpp>
+#include <sysio/producer_api_plugin/producer_api_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #include <sysio/version/version.hpp>
 #include <sysio/wallet_plugin/wallet_manager.hpp>
+
+
+#define ELOG_EXIT(exit_code, fmt, ...) \
+do { \
+  std::println(std::cerr, fmt, __VA_ARGS__); \
+  return exit_code; \
+} while(0)
+
+#define ASSERT_ELOG_EXIT(test, fmt, ...) \
+if (!test) { \
+ELOG_EXIT(-1, fmt, ...) \
+} while(0)
+
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -133,7 +153,103 @@ namespace {
     }
   }
 
-}
+  void log_non_default_options(const std::vector<bpo::basic_option<char>>& options) {
+    using namespace std::string_literals;
+    string result;
+    for (const auto& op : options) {
+      bool mask = false;
+      if (op.string_key == "signature-provider"s || op.string_key == "peer-private-key"s || op.string_key ==
+        "p2p-auto-bp-peer"s) {
+        mask = true;
+      }
+      std::string v;
+      for (auto i = op.value.cbegin(), b = op.value.cbegin(), e = op.value.cend(); i != e; ++i) {
+        if (i != b) v += ", ";
+        if (mask) v += "***";
+        else v += *i;
+      }
+
+      if (!result.empty()) result += ", ";
+
+      if (v.empty()) {
+        result += op.string_key;
+      } else {
+        result += op.string_key;
+        result += " = ";
+        result += v;
+      }
+    }
+    ilog("Non-default options: ${v}", ("v", result));
+  }
+
+
+  fc::logging_config& add_deep_mind_logger(fc::logging_config& config) {
+    config.appenders.push_back(fc::appender_config("deep-mind", "dmlog"));
+
+    fc::logger_config dmlc;
+    dmlc.name = "deep-mind";
+    dmlc.level = fc::log_level::debug;
+    dmlc.enabled = true;
+    dmlc.appenders.push_back("deep-mind");
+
+    config.loggers.push_back(dmlc);
+
+    return config;
+  }
+
+  void configure_logging(const std::filesystem::path& config_path) {
+    try {
+      try {
+        if (std::filesystem::exists(config_path)) {
+          fc::configure_logging(config_path);
+        } else {
+          auto cfg = fc::logging_config::default_config();
+
+          fc::configure_logging(add_deep_mind_logger(cfg));
+        }
+      } catch (...) {
+        elog("Error reloading logging.json");
+        throw;
+      }
+    } catch (const fc::exception& e) {
+      elog("${e}", ("e",e.to_detail_string()));
+    } catch (const boost::exception& e) {
+      elog("${e}", ("e",boost::diagnostic_information(e)));
+    } catch (const std::exception& e) {
+      elog("${e}", ("e",e.what()));
+    } catch (...) {
+      // empty
+    }
+  }
+
+  void logging_conf_handler() {
+    auto config_path = app().get_logging_conf();
+    if (std::filesystem::exists(config_path)) {
+      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+    } else {
+      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+    }
+    configure_logging(config_path);
+    fc::log_config::initialize_appenders();
+  }
+
+  void initialize_logging() {
+    auto config_path = app().get_logging_conf();
+    if (std::filesystem::exists(config_path)) fc::configure_logging(config_path);
+    // intentionally allowing exceptions to escape
+    else {
+      auto cfg = fc::logging_config::default_config();
+
+      fc::configure_logging(add_deep_mind_logger(cfg));
+    }
+
+    fc::log_config::initialize_appenders();
+
+    app().set_sighup_callback(logging_conf_handler);
+
+  }
+
+} // namespace detail
 
 void chain_actions::setup(CLI::App& app) {
   auto* sub = app.add_subcommand("chain-state", "chain utility");
@@ -300,6 +416,10 @@ int chain_actions::run_subcommand_configure() {
     );
     if (target_dir.empty()) throw CLI::RequiredError("No config path specified");
 
+    if (fs::is_directory(data_dir) && overwrite) {
+      std::println(std::cout, "Removing existing data directory: {}", data_dir.generic_string());
+      fs::remove_all(data_dir);
+    }
 
     // RESOLVE ROOT DIR
     std::filesystem::path root_dir{std::filesystem::current_path()};
@@ -400,13 +520,9 @@ int chain_actions::run_subcommand_configure() {
         }
 
         // IMPORTING KEY INTO WALLET
-        std::println(
-          std::cout,
-          "importing key into wallet {}",
-          wallet_file.generic_string()
-        );
+        std::println(std::cout, "importing key into wallet {}", wallet_file.generic_string());
         wallet_manager->import_key(wallet_default_name, privs);
-        wallet_manager->lock(wallet_default_name);
+
 
         // LOCATE DEFAULT GENESIS TEMPLATE BASED ON SELECTED TEMPLATE
         if (!std::filesystem::exists(default_genesis_file)) {
@@ -448,6 +564,9 @@ int chain_actions::run_subcommand_configure() {
         std::println(std::cout, "Writing genesis JSON to '{}'", target_genesis_file.generic_string());
         fc::json::save_to_file(result_v, target_genesis_file, true);
         std::println(std::cout, "Saved genesis JSON to '{}'", target_genesis_file.generic_string());
+
+
+        wallet_manager->lock(wallet_default_name);
       }
     }
 
@@ -489,9 +608,126 @@ int chain_actions::run_subcommand_configure() {
         std::println(std::cout, "Saved config.ini to '{}'", target_ini_file.generic_string());
       }
     }
+
+    // CONFIG IS COMPLETE, NOW POPULATE THE CHAIN
+    std::println(std::cout, "Starting the chain and importing contracts");
+    std::atomic_int app_thread_status{-1};
+    std::mutex app_thread_mutex;
+    std::condition_variable app_thread_cond;
+    if (!application::null_app_singleton()) {
+      application::instance().shutdown();
+      application::reset_app_singleton();
+    }
+    appbase::scoped_app app;
+
+    auto on_app_init = [&](std::int32_t code) {
+      std::scoped_lock lock(app_thread_mutex);
+      app_thread_status = code;
+      app_thread_cond.notify_all();
+    };
+
+    std::thread app_thread(
+      [&] {
+
+        auto exe_name = boost::dll::program_location().filename().generic_string();
+
+        fc::scoped_exit<std::function<void()>> on_exit = [&]() {
+          ilog(
+            "${name} version ${ver} ${fv}",
+            ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string()
+              ? "" : app->full_version_string())
+          );
+          log_non_default_options(app->get_parsed_options());
+        };
+
+        auto app_cleanup = gsl_lite::finally(
+          [&] {
+            on_exit.cancel();
+            app->shutdown();
+          }
+        );
+
+
+        uint32_t short_hash = 0;
+        fc::from_hex(sysio::version::version_hash(), reinterpret_cast<char*>(&short_hash), sizeof(short_hash));
+
+        app->set_version(htonl(short_hash));
+        app->set_version_string(sysio::version::version_client());
+        app->set_full_version_string(sysio::version::version_full());
+
+        auto root = fc::app_path();
+        app->set_default_data_dir(data_dir);
+        app->set_default_config_dir(config_dir);
+        http_plugin::set_defaults(
+          {
+            .default_unix_socket_path = "",
+            .default_http_port = 8888,
+            .server_header = exe_name + "/" + app->version_string()
+          }
+        );
+
+        // int argc = 0;
+        // char** argv = nullptr;
+        char* argvv[] = {const_cast<char*>(exe_name.c_str()), nullptr};
+        if (!app->initialize<chain_plugin, net_plugin, producer_plugin, producer_api_plugin, resource_monitor_plugin>(
+          1,
+          argvv,
+          initialize_logging
+        )) {
+          on_app_init(1);
+          return 1;
+        }
+        if (auto resmon_plugin = app->find_plugin<resource_monitor_plugin>()) {
+          resmon_plugin->monitor_directory(app->data_dir());
+        } else {
+          elog("resource_monitor_plugin failed to initialize");
+          on_app_init(1);
+          return 1;
+        }
+        ilog(
+          "${name} version ${ver} ${fv}",
+          ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string() ?
+            "" : app->full_version_string())
+        );
+        ilog("${name} using configuration file ${c}", ("name", exe_name)("c", app->full_config_file_path().string()));
+        ilog("${name} data directory is ${d}", ("name", exe_name)("d", app->data_dir().string()));
+        log_non_default_options(app->get_parsed_options());
+        app->startup();
+        app->set_thread_priority_max();
+
+        on_app_init(0);
+        app->exec();
+
+        return 0;
+      }
+    );
+
+    //app_thread.join();
+    {
+      std::unique_lock<std::mutex> lock(app_thread_mutex);
+      if (app_thread_status == -1)
+        app_thread_cond.wait(lock, [&] { return app_thread_status != -1; });
+    }
+    if (app_thread_status != 0) {
+      std::println(std::cerr, "Error initializing app: {}", app_thread_status.load());
+      return -1;
+    }
+
+    std::println(std::cout, "Chain initialized, sleep 1s");
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    std::println(std::cout, "Populating contracts");
+    // auto& app = application::instance();
+    auto chain = app->find_plugin<chain_plugin>();
+    ilog("Got chain with id: ${chainId}", ("chainId",chain->get_chain_id()));
+
+    // TODO: Create accounts & load contracts
+    app->shutdown();
+    app->quit();
+    app_thread.join();
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << "Error generating genesis.json: " << e.what() << std::endl;
+    std::println(std::cerr, "Error generating configs: {}", e.what());
     return -1;
   }
 }

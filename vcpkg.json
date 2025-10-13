@@ -1,25 +1,48 @@
 {
-  "name" : "wire-sysio",
-  "version" : "5.2.0-rc1",
-  "dependencies" : [ "bls12-381", "bn256", "boost", "boringssl-custom", "cli11", "gmp", "libsodium", "secp256k1-internal", "softfloat", "zlib", {
-    "name" : "catch2",
-    "features" : [ "no-posix-signals" ]
-  }, {
-    "name" : "prometheus-cpp",
-    "version>=" : "1.3.0",
-    "features" : [ ]
-  }, {
-    "name" : "rapidjson",
-    "version>=" : "2022-06-28#3"
-  }, {
-    "name" : "wire-sys-vm",
-    "features" : [ "softfloat-skip-install" ]
-  }, {
-    "name" : "nlohmann-json",
-    "version>=" : "3.12.0#1"
-  } ],
-  "overrides" : [ {
-    "name" : "rapidjson",
-    "version" : "2022-06-28#3"
-  } ]
+  "name": "wire-sysio",
+  "version": "5.2.0-rc1",
+  "dependencies": [
+    "gsl-lite",
+    "bls12-381",
+    "bn256",
+    "boost",
+    "boringssl-custom",
+    "cli11",
+    "gmp",
+    "libsodium",
+    "secp256k1-internal",
+    "softfloat",
+    "zlib",
+    {
+      "name": "catch2",
+      "features": [
+        "no-posix-signals"
+      ]
+    },
+    {
+      "name": "prometheus-cpp",
+      "version>=": "1.3.0",
+      "features": []
+    },
+    {
+      "name": "rapidjson",
+      "version>=": "2022-06-28#3"
+    },
+    {
+      "name": "wire-sys-vm",
+      "features": [
+        "softfloat-skip-install"
+      ]
+    },
+    {
+      "name": "nlohmann-json",
+      "version>=": "3.12.0#1"
+    }
+  ],
+  "overrides": [
+    {
+      "name": "rapidjson",
+      "version": "2022-06-28#3"
+    }
+  ]
 }

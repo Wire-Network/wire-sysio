@@ -488,11 +488,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       chain_config = controller::config();
 
-      if( options.at( "print-build-info" ).as<bool>() || options.count( "extract-build-info") ) {
+      if( options.at( "print-build-info" ).as<bool>() || options.contains( "extract-build-info") ) {
          if( options.at( "print-build-info" ).as<bool>() ) {
             ilog( "Build environment JSON:\n${e}", ("e", json::to_pretty_string( chainbase::environment() )) );
          }
-         if( options.count( "extract-build-info") ) {
+         if( options.contains( "extract-build-info") ) {
             auto p = options.at( "extract-build-info" ).as<std::filesystem::path>();
 
             if( p.is_relative()) {
@@ -518,7 +518,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       LOAD_VALUE_SET( options, "trusted-producer", chain_config->trusted_producers );
 
-      if( options.count( "action-blacklist" )) {
+      if( options.contains( "action-blacklist" )) {
          const std::vector<std::string>& acts = options["action-blacklist"].as<std::vector<std::string>>();
          auto& list = chain_config->action_blacklist;
          for( const auto& a : acts ) {
@@ -530,7 +530,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.count( "key-blacklist" )) {
+      if( options.contains( "key-blacklist" )) {
          const std::vector<std::string>& keys = options["key-blacklist"].as<std::vector<std::string>>();
          auto& list = chain_config->key_blacklist;
          for( const auto& key_str : keys ) {
@@ -538,7 +538,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.count( "blocks-dir" )) {
+      if( options.contains( "blocks-dir" )) {
          auto bld = options.at( "blocks-dir" ).as<std::filesystem::path>();
          if( bld.is_relative())
             blocks_dir = app().data_dir() / bld;
@@ -546,7 +546,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             blocks_dir = bld;
       }
 
-      if( options.count( "state-dir" )) {
+      if( options.contains( "state-dir" )) {
          auto sd = options.at( "state-dir" ).as<std::filesystem::path>();
          if( sd.is_relative())
             state_dir = app().data_dir() / sd;
@@ -570,7 +570,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          pfs = initialize_protocol_features( protocol_features_dir );
       }
 
-      if( options.count("checkpoint") ) {
+      if( options.contains("checkpoint") ) {
          auto cps = options.at("checkpoint").as<vector<string>>();
          loaded_checkpoints.reserve(cps.size());
          for( const auto& cp : cps ) {
@@ -588,7 +588,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.count( "wasm-runtime" ))
+      if( options.contains( "wasm-runtime" ))
          wasm_runtime = options.at( "wasm-runtime" ).as<vm_type>();
 
       LOAD_VALUE_SET( options, "profile-account", chain_config->profile_accounts );
@@ -605,16 +605,16 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
         resmon_plugin->monitor_directory(chain_config->state_dir);
       }
 
-      if( options.count( "chain-state-db-size-mb" )) {
+      if( options.contains( "chain-state-db-size-mb" )) {
          chain_config->state_size = options.at( "chain-state-db-size-mb" ).as<uint64_t>() * 1024 * 1024;
          SYS_ASSERT( chain_config->state_size <= 8ull * 1024 * 1024 * 1024 * 1024, plugin_config_exception,
                      "The maximum supported size for the chain state db (chain-state-db-size-mb) is 8TiB" );
       }
 
-      if( options.count( "chain-state-db-guard-size-mb" ))
+      if( options.contains( "chain-state-db-guard-size-mb" ))
          chain_config->state_guard_size = options.at( "chain-state-db-guard-size-mb" ).as<uint64_t>() * 1024 * 1024;
 
-      if( options.count( "transaction-finality-status-max-storage-size-gb" )) {
+      if( options.contains( "transaction-finality-status-max-storage-size-gb" )) {
          const uint64_t max_storage_size = options.at( "transaction-finality-status-max-storage-size-gb" ).as<uint64_t>() * 1024 * 1024 * 1024;
          if (max_storage_size > 0) {
             const fc::microseconds success_duration = fc::seconds(options.at( "transaction-finality-status-success-duration-sec" ).as<uint64_t>());
@@ -624,7 +624,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.count( "chain-threads" )) {
+      if( options.contains( "chain-threads" )) {
          chain_config->thread_pool_size = options.at( "chain-threads" ).as<uint16_t>();
          SYS_ASSERT( chain_config->thread_pool_size > 0, plugin_config_exception,
                      "chain-threads ${num} must be greater than 0", ("num", chain_config->thread_pool_size) );
@@ -645,33 +645,33 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       chain_config->maximum_variable_signature_length = options.at( "maximum-variable-signature-length" ).as<uint32_t>();
 
-      if( options.count( "terminate-at-block" ))
+      if( options.contains( "terminate-at-block" ))
          chain_config->terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
 
       // move fork_db to new location
       upgrade_from_reversible_to_fork_db( this );
 
-      bool has_partitioned_block_log_options = options.count("blocks-retained-dir") ||  options.count("blocks-archive-dir")
-         || options.count("blocks-log-stride") || options.count("max-retained-block-files");
-      bool has_retain_blocks_option = options.count("block-log-retain-blocks");
+      bool has_partitioned_block_log_options = options.contains("blocks-retained-dir") ||  options.contains("blocks-archive-dir")
+         || options.contains("blocks-log-stride") || options.contains("max-retained-block-files");
+      bool has_retain_blocks_option = options.contains("block-log-retain-blocks");
 
       SYS_ASSERT(!has_partitioned_block_log_options || !has_retain_blocks_option, plugin_config_exception,
          "block-log-retain-blocks cannot be specified together with blocks-retained-dir, blocks-archive-dir or blocks-log-stride or max-retained-block-files.");
 
       std::filesystem::path retained_dir;
       if (has_partitioned_block_log_options) {
-         retained_dir = options.count("blocks-retained-dir") ? options.at("blocks-retained-dir").as<std::filesystem::path>()
+         retained_dir = options.contains("blocks-retained-dir") ? options.at("blocks-retained-dir").as<std::filesystem::path>()
                                                                  : std::filesystem::path("");
          if (retained_dir.is_relative())
             retained_dir = std::filesystem::path{blocks_dir}/retained_dir;
 
          chain_config->blog = sysio::chain::partitioned_blocklog_config{
             .retained_dir = retained_dir,
-            .archive_dir  = options.count("blocks-archive-dir") ? options.at("blocks-archive-dir").as<std::filesystem::path>()
+            .archive_dir  = options.contains("blocks-archive-dir") ? options.at("blocks-archive-dir").as<std::filesystem::path>()
                                                                : std::filesystem::path("archive"),
-            .stride       = options.count("blocks-log-stride") ? options.at("blocks-log-stride").as<uint32_t>()
+            .stride       = options.contains("blocks-log-stride") ? options.at("blocks-log-stride").as<uint32_t>()
                                                                : UINT32_MAX,
-            .max_retained_files = options.count("max-retained-block-files")
+            .max_retained_files = options.contains("max-retained-block-files")
                                        ? options.at("max-retained-block-files").as<uint32_t>()
                                        : UINT32_MAX,
          };
@@ -691,7 +691,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
 
 
-      if( options.count( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
+      if( options.contains( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
          
          gs = block_log<signed_block>::extract_genesis_state( blocks_dir, retained_dir );
@@ -706,7 +706,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             ilog( "Genesis JSON:\n${genesis}", ("genesis", json::to_pretty_string( *gs )));
          }
 
-         if( options.count( "extract-genesis-json" )) {
+         if( options.contains( "extract-genesis-json" )) {
             auto p = options.at( "extract-genesis-json" ).as<std::filesystem::path>();
 
             if( p.is_relative()) {
@@ -743,7 +743,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       }
 
       std::optional<chain_id_type> chain_id;
-      if (options.count( "snapshot" )) {
+      if (options.contains( "snapshot" )) {
          snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
          SYS_ASSERT( std::filesystem::exists(*snapshot_path), plugin_config_exception,
                      "Cannot load snapshot, ${name} does not exist", ("name", snapshot_path->generic_string()) );
@@ -756,10 +756,12 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          chain_id = controller::extract_chain_id(reader);
          infile.close();
 
-         SYS_ASSERT( options.count( "genesis-timestamp" ) == 0,
+         SYS_ASSERT(
+           !options.contains( "genesis-timestamp" ),
                  plugin_config_exception,
                  "--snapshot is incompatible with --genesis-timestamp as the snapshot contains genesis information");
-         SYS_ASSERT( options.count( "genesis-json" ) == 0,
+         SYS_ASSERT(
+           !options.contains( "genesis-json" ),
                      plugin_config_exception,
                      "--snapshot is incompatible with --genesis-json as the snapshot contains genesis information");
 
@@ -813,7 +815,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             }
          }
 
-         if( options.count( "genesis-json" ) ) {
+         if( options.contains( "genesis-json" ) ) {
             std::filesystem::path genesis_file = options.at( "genesis-json" ).as<std::filesystem::path>();
             if( genesis_file.is_relative()) {
                genesis_file = std::filesystem::current_path() / genesis_file;
@@ -826,7 +828,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
             genesis_state provided_genesis = fc::json::from_file( genesis_file ).as<genesis_state>();
 
-            if( options.count( "genesis-timestamp" ) ) {
+            if( options.contains( "genesis-timestamp" ) ) {
                provided_genesis.initial_timestamp = calculate_genesis_timestamp( options.at( "genesis-timestamp" ).as<string>() );
 
                ilog( "Using genesis state provided in '${genesis}' but with adjusted genesis timestamp",
@@ -868,7 +870,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                }
             }
          } else {
-            SYS_ASSERT( options.count( "genesis-timestamp" ) == 0,
+            SYS_ASSERT(
+              !options.contains( "genesis-timestamp" ),
                         plugin_config_exception,
                         "--genesis-timestamp is only valid if also passed in with --genesis-json");
          }
@@ -893,7 +896,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if ( options.count("read-mode") ) {
+      if ( options.contains("read-mode") ) {
          chain_config->read_mode = options.at("read-mode").as<db_read_mode>();
       }
       api_accept_transactions = options.at( "api-accept-transactions" ).as<bool>();
@@ -908,16 +911,16 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          enable_accept_transactions();
       }
 
-      if ( options.count("validation-mode") ) {
+      if ( options.contains("validation-mode") ) {
          chain_config->block_validation_mode = options.at("validation-mode").as<validation_mode>();
       }
 
       chain_config->db_map_mode = options.at("database-map-mode").as<pinnable_mapped_file::map_mode>();
 
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-      if( options.count("sys-vm-oc-cache-size-mb") )
+      if( options.contains("sys-vm-oc-cache-size-mb") )
          chain_config->sysvmoc_config.cache_size = options.at( "sys-vm-oc-cache-size-mb" ).as<uint64_t>() * 1024u * 1024u;
-      if( options.count("sys-vm-oc-compile-threads") )
+      if( options.contains("sys-vm-oc-compile-threads") )
          chain_config->sysvmoc_config.threads = options.at("sys-vm-oc-compile-threads").as<uint64_t>();
       chain_config->sysvmoc_tierup = options["sys-vm-oc-enable"].as<chain::wasm_interface::vm_oc_enable>();
 #endif
@@ -929,8 +932,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       chain.emplace( *chain_config, std::move(pfs), *chain_id );
 
-      if( options.count( "transaction-retry-max-storage-size-gb" )) {
-         SYS_ASSERT( !options.count( "producer-name"), plugin_config_exception,
+      if( options.contains( "transaction-retry-max-storage-size-gb" )) {
+         SYS_ASSERT( !options.contains( "producer-name"), plugin_config_exception,
                      "Transaction retry not allowed on producer nodes." );
          const uint64_t max_storage_size = options.at( "transaction-retry-max-storage-size-gb" ).as<uint64_t>() * 1024 * 1024 * 1024;
          if( max_storage_size > 0 ) {
