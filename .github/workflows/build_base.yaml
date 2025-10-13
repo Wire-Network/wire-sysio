@@ -63,25 +63,32 @@ jobs:
         - uses: actions/checkout@v4
           with:
             submodules: recursive
+        - name: Verify system zstd presence
+          run: |
+            dpkg -L libzstd-dev | grep -E "libzstd\.so|zstd\.h" || true
+            ls -l /usr/lib/x86_64-linux-gnu/libzstd.so*
+            ls -l /usr/include/zstd.h
         - name: Build
           id: build
           run: |
-            # https://github.com/actions/runner/issues/2033
-            echo $PWD
-            ls -la
-
+            echo "Building for ${{ matrix.platform }}"
             rm -rf vcpkg/downloads vcpkg/packages vcpkg/buildtrees
-            
+
             export CC=/usr/bin/clang-18
             export CXX=/usr/bin/clang++-18
             export CMAKE_MAKE_PROGRAM=/usr/bin/ninja
-            
+
             ./vcpkg/bootstrap-vcpkg.sh
-            
             env BASE_DIR=/opt/llvm ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-            
             chown -R $(id -u):$(id -g) $PWD
-            
+
+            if [[ "${{ matrix.platform }}" == "ubuntu22" ]]; then
+              echo "Applying zstd system fix for ubuntu22"
+              EXTRA_FLAGS="-Dzstd_LIBRARY=/usr/lib/x86_64-linux-gnu/libzstd.so -Dzstd_INCLUDE_DIR=/usr/include"
+            else
+              EXTRA_FLAGS=""
+            fi
+
             env CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 \
             cmake -B build -S . -G Ninja \
               -DCMAKE_C_COMPILER=$CC \
@@ -90,9 +97,9 @@ jobs:
               -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
               -DCMAKE_FIND_DEBUG_MODE=ON \
               -DCMAKE_BUILD_TYPE=Release \
-              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 
-            
-            cmake --build build -- -j 6
+              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 $EXTRA_FLAGS 
+
+            cmake --build build -- -j 11
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
 
         - name: Show vcpkg logs if failure
