@@ -37,6 +37,19 @@ Builtin protocol feature: RESERVED_FIRST_PROTOCOL_FEATURE
 
 Example protocol feature. No functionality is triggered by this protocol feature.
 */
+            {},
+            {time_point{}, false, true} // enabled without preactivation and ready to go at any time
+         } )
+         (  builtin_protocol_feature_t::reserved_second_protocol_feature, builtin_protocol_feature_spec{
+            "RESERVED_SECOND_PROTOCOL_FEATURE",
+            fc::variant("0c27fcedb5c663edaf95ade037820deb8d04a1a0b828edba1de58c06f380b3d5").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+            // SHA256 begins with "Builtin ..." after return and includes trailing return.
+/*
+Builtin protocol feature: RESERVED_SECOND_PROTOCOL_FEATURE
+
+Example protocol feature. No functionality is triggered by this protocol feature.
+*/
             {}
          } )
    ;

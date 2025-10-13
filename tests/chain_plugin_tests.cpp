@@ -131,7 +131,7 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 } FC_LOG_AND_RETHROW() /// get_block_with_invalid_abi
 
 BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
-   tester t{setup_policy::old_wasm_parser};
+   tester t{setup_policy::preactivate_feature_and_new_bios};
    t.produce_blocks(1);
 
    chain_apis::read_only plugin(*(t.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);

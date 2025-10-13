@@ -1120,7 +1120,15 @@ struct controller_impl {
                                                                              active_producers_authority,
                                                                              false,
                                                                              genesis.initial_timestamp );
-
+      // bootstrap protocol features
+      const auto& pfm = protocol_features;
+      auto preactivate_feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::preactivate_feature);
+      assert(preactivate_feature_digest);
+      const auto& pso = db.get<protocol_state_object>();
+      db.modify( pso, [&]( auto& ps ) {
+         ps.activated_protocol_features.emplace_back(*preactivate_feature_digest, head->block_num);
+      } );
+      head->activated_protocol_features->protocol_features.insert(*preactivate_feature_digest);
    }
 
    // The returned scoped_exit should not exceed the lifetime of the pending which existed when make_block_restore_point was called.
@@ -3455,11 +3463,16 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
 
 template<>
 void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feature>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "preactivate_feature" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "is_feature_activated" );
-   } );
+   // setup in initialize_database()
 }
+
+// example
+// template<>
+// void controller_impl::on_activation<builtin_protocol_feature_t::get_block_num>() {
+//    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
+//       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_block_num" );
+//    } );
+// }
 
 /// End of protocol feature activation handlers
 

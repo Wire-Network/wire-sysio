@@ -619,6 +619,16 @@
             ]
         },
         {
+            "name": "setprodkeys",
+            "base": "",
+            "fields": [
+                {
+                    "name": "schedule",
+                    "type": "producer_key[]"
+                }
+            ]
+        },
+        {
             "name": "setprods",
             "base": "",
             "fields": [
@@ -860,6 +870,11 @@
         {
             "name": "setpriv",
             "type": "setpriv",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setprodkeys",
+            "type": "setprodkeys",
             "ricardian_contract": ""
         },
         {

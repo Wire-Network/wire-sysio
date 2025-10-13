@@ -183,6 +183,11 @@ namespace sysiosystem {
       set_proposed_producers( schedule );
    }
 
+   void system_contract::setprodkeys( const std::vector<sysio::producer_key>& schedule ) {
+      require_auth( get_self() );
+      set_proposed_producers( schedule );
+   }
+
    void system_contract::setacctnet( const name& account, const std::optional<int64_t>& net_weight ) {
       require_auth( get_self() );
 

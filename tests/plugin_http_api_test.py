@@ -106,7 +106,7 @@ class PluginHttpTest(unittest.TestCase):
         self.nodeop.activatePreactivateFeature()
 
         contract = "sysio.bios"
-        contractDir = "libraries/testing/contracts/old_versions/v1.7.0-develop-preactivate_feature/%s" % (contract)
+        contractDir = "libraries/testing/contracts/%s" % (contract)
         wasmFile = "%s.wasm" % (contract)
         abiFile = "%s.abi" % (contract)
 

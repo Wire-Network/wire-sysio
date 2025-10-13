@@ -70,11 +70,8 @@ namespace boost { namespace test_tools { namespace tt_detail {
 namespace sysio { namespace testing {
    enum class setup_policy {
       none,
-      old_bios_only,
       preactivate_feature_only,
       preactivate_feature_and_new_bios,
-      old_wasm_parser,
-      full_except_do_not_disable_deferred_trx,
       full
    };
 
@@ -247,8 +244,6 @@ namespace sysio { namespace testing {
             return traces;
          }
 
-         void                  set_before_preactivate_bios_contract();
-         void                  set_before_producer_authority_bios_contract();
          void                  set_bios_contract();
          void                  init_roa();
 
@@ -545,12 +540,6 @@ namespace sysio { namespace testing {
       }
 
       bool validate() { return true; }
-   };
-
-   class tester_no_disable_deferred_trx : public tester {
-   public:
-      tester_no_disable_deferred_trx(): tester(setup_policy::full_except_do_not_disable_deferred_trx) {
-      }
    };
 
    class validating_tester : public base_tester {

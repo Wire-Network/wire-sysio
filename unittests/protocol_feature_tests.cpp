@@ -22,41 +22,13 @@ BOOST_AUTO_TEST_CASE( activate_preactivate_feature ) try {
    tester c( setup_policy::none );
    const auto& pfm = c.control->get_protocol_feature_manager();
 
-   c.produce_block();
-
-   // Cannot set latest bios contract since it requires intrinsics that have not yet been whitelisted.
-   BOOST_CHECK_EXCEPTION( c.set_code( config::system_account_name, contracts::sysio_bios_wasm() ),
-                          wasm_exception, fc_exception_message_is("env.preactivate_feature unresolveable")
-   );
-
-   // But the old bios contract can still be set.
-   c.set_code( config::system_account_name, contracts::before_preactivate_sysio_bios_wasm() );
-   c.set_abi( config::system_account_name, contracts::before_preactivate_sysio_bios_abi() );
-
-   auto t = c.control->pending_block_time();
-   c.control->abort_block();
-   BOOST_REQUIRE_EXCEPTION( c.control->start_block( t, 0, {digest_type()}, controller::block_status::incomplete ), protocol_feature_exception,
-                            fc_exception_message_is( "protocol feature with digest '0000000000000000000000000000000000000000000000000000000000000000' is unrecognized" )
-   );
-
    auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::preactivate_feature );
-
    BOOST_REQUIRE( d );
 
-   // Activate PREACTIVATE_FEATURE.
-   c.schedule_protocol_features_wo_preactivation({ *d });
    c.produce_block();
 
-   // Now the latest bios contract can be set.
-   c.set_before_producer_authority_bios_contract();
-
-   c.produce_block();
-
-   BOOST_CHECK_EXCEPTION( c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name,
-                                          mutable_variant_object()("feature_digest",  digest_type()) ),
-                           sysio_assert_message_exception,
-                           sysio_assert_message_is( "protocol feature is not activated" )
-   );
+   // The latest bios contract can be set in WIRE without any preactivation steps
+   c.set_bios_contract();
 
    c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name, mutable_variant_object()
       ("feature_digest",  *d )
@@ -80,10 +52,9 @@ BOOST_AUTO_TEST_CASE( activate_and_restart ) try {
    auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::preactivate_feature );
    BOOST_REQUIRE( d );
 
-   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
+   // activated in initialization of database
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
 
-   // Activate PREACTIVATE_FEATURE.
-   c.schedule_protocol_features_wo_preactivation({ *d });
    c.produce_blocks(2);
 
    auto head_block_num = c.control->head_block_num();
@@ -163,10 +134,10 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
    const auto& pfm = c.control->get_protocol_feature_manager();
 
-   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
+   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_second_protocol_feature );
    BOOST_REQUIRE( d );
 
-   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
    c.schedule_protocol_features_wo_preactivation( {*d} );
    BOOST_CHECK_EXCEPTION( c.produce_block(),
@@ -176,12 +147,12 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
 
    c.protocol_features_to_be_activated_wo_preactivation.clear();
 
-   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
    c.preactivate_protocol_features( {*d} );
    c.finish_block();
 
-   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
    BOOST_CHECK_EXCEPTION( c.control->start_block(
                               c.control->head_block_time() + fc::milliseconds(config::block_interval_ms),
@@ -193,20 +164,16 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
                           fc_exception_message_is( "There are pre-activated protocol features that were not activated at the start of this block" )
    );
 
-   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
    c.produce_block();
 
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( only_link_to_existing_permission_test ) try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
-   const auto& pfm = c.control->get_protocol_feature_manager();
-
-   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
-   BOOST_REQUIRE( d );
 
    c.create_accounts( {"alice"_n, "bob"_n, "charlie"_n} );
 
@@ -246,19 +213,19 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
       return *res;
    };
 
-   auto preactivate_feature_digest = get_builtin_digest( builtin_protocol_feature_t::preactivate_feature );
-   auto only_link_to_existing_permission_digest = get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
+   auto reversed_first_protocol_feature_digest = get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
+   auto reversed_second_protocol_feature_digest = get_builtin_digest( builtin_protocol_feature_t::reserved_second_protocol_feature );
 
    auto invalid_act_time = fc::time_point::from_iso_string( "2200-01-01T00:00:00" );
    auto valid_act_time = fc::time_point{};
 
    // First, test subjective_restrictions on feature that can be activated WITHOUT preactivation (PREACTIVATE_FEATURE)
 
-   c.schedule_protocol_features_wo_preactivation({ preactivate_feature_digest });
+   c.schedule_protocol_features_wo_preactivation({ reversed_first_protocol_feature_digest });
    // schedule PREACTIVATE_FEATURE activation (persists until next successful start_block)
 
    subjective_restriction_map custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::preactivate_feature, {invalid_act_time, false, true} }
+      { builtin_protocol_feature_t::reserved_first_protocol_feature, {invalid_act_time, false, true} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // When a block is produced, the protocol feature activation should fail and throw an error
@@ -273,7 +240,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
 
    // Revert to the valid earliest allowed activation time, however with enabled == false
    custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::preactivate_feature, {valid_act_time, false, false} }
+      { builtin_protocol_feature_t::reserved_first_protocol_feature, {valid_act_time, false, false} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // This should also fail, but with different exception
@@ -281,7 +248,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            protocol_feature_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(preactivate_feature_digest) +
+                              std::string(reversed_first_protocol_feature_digest) +
                               "' is disabled"
                            )
    );
@@ -289,25 +256,25 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
 
    // Revert to the valid earliest allowed activation time, however with subjective_restrictions enabled == true
    custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::preactivate_feature, {valid_act_time, false, true} }
+      { builtin_protocol_feature_t::reserved_first_protocol_feature, {valid_act_time, false, true} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // Now it should be fine, the feature should be activated after the block is produced
    BOOST_CHECK_NO_THROW( c.produce_block() );
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
    BOOST_CHECK_EQUAL( c.protocol_features_to_be_activated_wo_preactivation.size(), 0u );
 
-   // Second, test subjective_restrictions on feature that need to be activated WITH preactivation (ONLY_LINK_TO_EXISTING_PERMISSION)
+   // Second, test subjective_restrictions on feature that need to be activated WITH preactivation (RESERVED_SECOND_PROTOCOL_FEATURE)
 
-   c.set_before_producer_authority_bios_contract();
+   c.set_bios_contract();
    c.produce_block();
 
    custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::reserved_first_protocol_feature, {invalid_act_time, true, true} }
+      { builtin_protocol_feature_t::reserved_second_protocol_feature, {invalid_act_time, true, true} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // It should fail
-   BOOST_CHECK_EXCEPTION(  c.preactivate_protocol_features({only_link_to_existing_permission_digest}),
+   BOOST_CHECK_EXCEPTION(  c.preactivate_protocol_features({reversed_second_protocol_feature_digest}),
                            subjective_block_production_exception,
                            fc_exception_message_starts_with(
                               (c.control->head_block_time() + fc::milliseconds(config::block_interval_ms)).to_iso_string() +
@@ -317,28 +284,28 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
 
    // Revert with valid time and subjective_restrictions enabled == false
    custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::reserved_first_protocol_feature, {valid_act_time, true, false} }
+      { builtin_protocol_feature_t::reserved_second_protocol_feature, {valid_act_time, true, false} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // It should fail but with different exception
-   BOOST_CHECK_EXCEPTION(  c.preactivate_protocol_features({only_link_to_existing_permission_digest}),
+   BOOST_CHECK_EXCEPTION(  c.preactivate_protocol_features({reversed_second_protocol_feature_digest}),
                            subjective_block_production_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(only_link_to_existing_permission_digest)+
+                              std::string(reversed_second_protocol_feature_digest)+
                               "' is disabled"
                            )
    );
 
    // Revert with valid time and subjective_restrictions enabled == true
    custom_subjective_restrictions = {
-      { builtin_protocol_feature_t::reserved_first_protocol_feature, {valid_act_time, true, true} }
+      { builtin_protocol_feature_t::reserved_second_protocol_feature, {valid_act_time, true, true} }
    };
    restart_with_new_pfs( make_protocol_feature_set(custom_subjective_restrictions) );
    // Should be fine now, and activated in the next block
-   BOOST_CHECK_NO_THROW( c.preactivate_protocol_features({only_link_to_existing_permission_digest}) );
+   BOOST_CHECK_NO_THROW( c.preactivate_protocol_features({reversed_second_protocol_feature_digest}) );
    c.produce_block();
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
@@ -547,7 +514,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    //   * sysio::newaccount is allowed only if it creates the rejectall account.
    c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
-   c.set_before_producer_authority_bios_contract();
+   c.set_bios_contract();
 
    c.produce_block();
    c.init_roa();
@@ -572,7 +539,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    tester c2(setup_policy::none);
    push_blocks( c, c2 ); // make a backup of the chain to enable testing further conditions.
 
-   c.set_before_producer_authority_bios_contract(); // To allow pushing further actions for setting up the other part of the test.
+   c.set_bios_contract(); // To allow pushing further actions for setting up the other part of the test.
    c.create_account( "rejectall"_n );
    c.produce_block();
    // The existence of the rejectall account will make the reject_all contract reject all actions with no exception.
@@ -592,7 +559,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
 
    // However, it should still be possible to set the bios contract because the WASM on sysio is called after the
    // native setcode function completes.
-   c2.set_before_producer_authority_bios_contract();
+   c2.set_bios_contract();
    c2.produce_block();
 } FC_LOG_AND_RETHROW() }
 
@@ -1177,7 +1144,7 @@ BOOST_AUTO_TEST_CASE( webauthn_producer ) { try {
 
    vector<legacy::producer_key> waprodsched = {{"waprod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
 
-   c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
+   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
@@ -1413,7 +1380,7 @@ BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_legacy_test ) { try {
    c.produce_blocks(2);
 
    vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
+   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
    c.produce_block();
 
    // ensure the last block does not contains a not_used
@@ -1439,7 +1406,7 @@ BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_extension_test ) { try {
 
    // start an in-flight producer schedule change before the activation is availble to header only validators
    vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprods"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
+   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
    c.produce_block();
 
    // ensure the first possible new block contains a producer_schedule_change_extension

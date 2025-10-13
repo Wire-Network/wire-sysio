@@ -1038,24 +1038,16 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to import %s account keys into ignition wallet." % (sysioName))
             return None
 
-        contract="sysio.bios"
-        contractDir= str(self.libTestingContractsPath / contract)
-        if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
-            contractDir=str(self.libTestingContractsPath / "old_versions" / "v1.7.0-develop-preactivate_feature" / contract)
-        else:
-            contractDir=str(self.libTestingContractsPath / "old_versions" / "v1.6.0-rc3" / contract)
-        wasmFile="%s.wasm" % (contract)
-        abiFile="%s.abi" % (contract)
-        Utils.Print("Publish %s contract" % (contract))
-        trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
-        if trans is None:
-            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
-            return None
-
-        if pfSetupPolicy == PFSetupPolicy.FULL:
-            biosNode.preactivateAllBuiltinProtocolFeature()
-
-        Node.validateTransaction(trans)
+        if onlyBios:
+            contract="sysio.bios"
+            contractDir=str(self.unittestsContractsPath / contract)
+            wasmFile="%s.wasm" % (contract)
+            abiFile="%s.abi" % (contract)
+            Utils.Print("Publish %s contract" % (contract))
+            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+            if trans is None:
+                Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+                return None
 
         Utils.Print("Creating accounts: %s " % ", ".join(producerKeys.keys()))
         producerKeys.pop(sysioName)
@@ -1080,6 +1072,43 @@ class Cluster(object):
 
         Utils.Print("Validating system accounts within bootstrap")
         biosNode.validateAccounts(accounts)
+
+        def createSystemAccount(accountName):
+            newAccount = copy.deepcopy(sysioAccount)
+            newAccount.name = accountName
+            trans=biosNode.createAccount(newAccount, sysioAccount, 0)
+            if trans is None:
+                Utils.Print(f'ERROR: Failed to create account {newAccount.name}')
+                return None
+            return trans
+
+        # sysio.noop used by trx_generator for noop action
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
+        acctTrans = list(map(createSystemAccount, systemAccounts))
+
+        for trans in acctTrans:
+            Node.validateTransaction(trans)
+
+        transIds = list(map(Node.getTransId, acctTrans))
+        if not biosNode.waitForTransactionsInBlock(transIds):
+            Utils.Print('ERROR: Failed to validate creation of system accounts')
+            return None
+
+        if loadSystemContract:
+            contract="sysio.system"
+            contractDir=str(self.unittestsContractsPath / contract)
+            wasmFile="%s.wasm" % (contract)
+            abiFile="%s.abi" % (contract)
+            Utils.Print("Publish %s contract" % (contract))
+            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+            if trans is None:
+                Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+                return None
+
+            Node.validateTransaction(trans)
+
+        if pfSetupPolicy == PFSetupPolicy.FULL:
+            biosNode.preactivateAllBuiltinProtocolFeature()
 
         if not onlyBios:
             if prodCount == -1:
@@ -1112,7 +1141,7 @@ class Cluster(object):
                 Utils.Print("Setting producers: %s." % (", ".join(prodNames)))
                 opts="--permission sysio@active"
                 # pylint: disable=redefined-variable-type
-                trans=biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
+                trans=biosNode.pushMessage("sysio", "setprodkeys", setProdsStr, opts)
                 if trans is None or not trans[0]:
                     Utils.Print("ERROR: Failed to set producer %s." % (keys["name"]))
                     return None
@@ -1131,27 +1160,6 @@ class Cluster(object):
                 return None
 
         if onlySetProds: return biosNode
-
-        def createSystemAccount(accountName):
-            newAccount = copy.deepcopy(sysioAccount)
-            newAccount.name = accountName
-            trans=biosNode.createAccount(newAccount, sysioAccount, 0)
-            if trans is None:
-                Utils.Print(f'ERROR: Failed to create account {newAccount.name}')
-                return None
-            return trans
-
-        # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
-        acctTrans = list(map(createSystemAccount, systemAccounts))
-
-        for trans in acctTrans:
-            Node.validateTransaction(trans)
-
-        transIds = list(map(Node.getTransId, acctTrans))
-        if not biosNode.waitForTransactionsInBlock(transIds):
-            Utils.Print('ERROR: Failed to validate creation of system accounts')
-            return None
 
         sysioTokenAccount = copy.deepcopy(sysioAccount)
         sysioTokenAccount.name = 'sysio.token'
@@ -1209,19 +1217,6 @@ class Cluster(object):
             Utils.Print("ERROR: Issue verification failed. Excepted %s, actual: %s" %
                         (expectedAmount, actualAmount))
             return None
-
-        if loadSystemContract:
-            contract="sysio.system"
-            contractDir=str(self.unittestsContractsPath / contract)
-            wasmFile="%s.wasm" % (contract)
-            abiFile="%s.abi" % (contract)
-            Utils.Print("Publish %s contract" % (contract))
-            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
-            if trans is None:
-                Utils.Print("ERROR: Failed to publish contract %s." % (contract))
-                return None
-
-            Node.validateTransaction(trans)
 
         initialFunds="1000000.0000 {0}".format(CORE_SYMBOL)
         Utils.Print("Transfer initial fund %s to individual accounts." % (initialFunds))

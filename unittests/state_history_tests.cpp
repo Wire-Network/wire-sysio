@@ -307,16 +307,15 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
 
    chain.produce_block();
 
-   auto d = pfm.get_builtin_digest(builtin_protocol_feature_t::preactivate_feature);
+   auto d = pfm.get_builtin_digest(builtin_protocol_feature_t::reserved_first_protocol_feature);
    BOOST_REQUIRE(d);
 
-   // Activate PREACTIVATE_FEATURE.
+   // Activate protocol feature.
    chain.schedule_protocol_features_wo_preactivation({*d});
 
    chain.produce_block();
 
-   // Now the latest bios contract can be set.
-   chain.set_before_producer_authority_bios_contract();
+   chain.set_bios_contract();
 
    // Spot onto some data of the protocol state table delta
    auto result = chain.find_table_delta("protocol_state");
@@ -324,7 +323,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
    auto &it_protocol_state = result.second;
    BOOST_REQUIRE_EQUAL(it_protocol_state->rows.obj.size(), 1u);
    auto protocol_states = chain.deserialize_data<sysio::ship_protocol::protocol_state_v0, sysio::ship_protocol::protocol_state>(it_protocol_state);
-   auto protocol_feature = std::get<sysio::ship_protocol::activated_protocol_feature_v0>(protocol_states[0].activated_protocol_features[0]);
+   BOOST_REQUIRE_EQUAL(protocol_states.size(), 1u);
+   BOOST_REQUIRE_EQUAL(protocol_states[0].activated_protocol_features.size(), 2u);
+   // activated_protocol_features[0] is preactivate_feature
+   auto protocol_feature = std::get<sysio::ship_protocol::activated_protocol_feature_v0>(protocol_states[0].activated_protocol_features[1]);
 
    auto digest_byte_array = protocol_feature.feature_digest.extract_as_byte_array();
    char digest_array[digest_byte_array.size()];
@@ -524,7 +526,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
    BOOST_AUTO_TEST_CASE(test_trace_log_with_transaction_extensions) {
       SKIP_TEST // TODO: update test to use an ed25519 signed transaction which will have a transaction extension
-      tester_no_disable_deferred_trx c;
+      validating_tester c;
 
       fc::temp_directory state_history_dir;
       sysio::state_history::trace_converter log;
