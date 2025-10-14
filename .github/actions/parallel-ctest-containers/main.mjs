@@ -15,11 +15,16 @@ const test_timeout = core.getInput('test-timeout', {required: true});
 const repo_name = process.env.GITHUB_REPOSITORY.split('/')[1];
 
 try {
-   if(child_process.spawnSync("docker", ["run", "--name", "base", "-v", `${process.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], {stdio:"inherit"}).status)
+      const suffix = process.env.CONTAINER_SUFFIX || `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_JOB}-${Math.floor(Math.random() * 10000)}`;
+   const baseContainer = `base-${suffix}`;
+   const baseImage = `baseimage-${suffix}`;
+
+   child_process.spawnSync("docker", ["rm", "-f", baseContainer], {stdio:"ignore"});
+   if(child_process.spawnSync("docker", ["run", "--name", baseContainer, "-v", `${process.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], {stdio:"inherit"}).status)
       throw new Error("Failed to create base container");
-   if(child_process.spawnSync("docker", ["commit", "base", "baseimage"], {stdio:"inherit"}).status)
+   if(child_process.spawnSync("docker", ["commit", baseContainer, baseImage], {stdio:"inherit"}).status)
       throw new Error("Failed to create base image");
-   if(child_process.spawnSync("docker", ["rm", "base"], {stdio:"inherit"}).status)
+   if(child_process.spawnSync("docker", ["rm", baseContainer], {stdio:"inherit"}).status)
       throw new Error("Failed to remove base container");
 
    const test_query_result = child_process.spawnSync("docker", ["run", "--rm", "baseimage", "bash", "-e", "-o", "pipefail", "-c", `cd build; ctest -L '${tests_label}' --show-only=json-v1`]);
