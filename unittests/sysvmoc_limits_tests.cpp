@@ -107,9 +107,9 @@ BOOST_AUTO_TEST_CASE( vm_limit ) { try {
 
 //make sure vm_limit is populated for a default constructed config (what nodeos will use)
 BOOST_AUTO_TEST_CASE( check_config_default_vm_limit ) { try {
-   sysvmoc::config eosvmoc_config;
+   sysvmoc::config sysvmoc_config;
 
-   BOOST_REQUIRE(eosvmoc_config.vm_limit);
+   BOOST_REQUIRE(sysvmoc_config.vm_limit);
 } FC_LOG_AND_RETHROW() }
 #endif // !__has_feature(undefined_behavior_sanitizer) && !__has_feature(address_sanitizer)
 
