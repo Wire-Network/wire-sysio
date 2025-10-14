@@ -14,9 +14,6 @@
     "softfloat",
     "zlib",
     {
-      "name": "zstd"
-    },
-    {
       "name": "catch2",
       "features": [
         "no-posix-signals"
