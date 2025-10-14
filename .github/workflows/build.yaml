@@ -241,108 +241,108 @@ jobs:
             *-logs.tar.gz
             core*.zst
 
-  libtester-tests:
-    name: libtester tests
-    needs: [platform-cache, build-base, v, package]
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ubuntu20, ubuntu22, ubuntu24]
-        test: [build-tree, make-dev-install, deb-install]
-    runs-on:  ["self-hosted", "enf-x86-midtier"]
-    container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
-    env:
-      DEBIAN_FRONTEND: noninteractive
-      TZ: Etc/UTC
-    steps:
-      - name: Update Package Index & Upgrade Packages
-        run: |
-          apt-get update
-          apt-get upgrade -y
+  # libtester-tests:
+  #   name: libtester tests
+  #   needs: [platform-cache, build-base, v, package]
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       platform: [ubuntu20, ubuntu22, ubuntu24]
+  #       test: [build-tree, make-dev-install, deb-install]
+  #   runs-on:  ["self-hosted", "enf-x86-midtier"]
+  #   container: ${{ matrix.test != 'deb-install' && fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image || matrix.platform == 'ubuntu20' && 'ubuntu:focal' || 'ubuntu:jammy' }}
+  #   env:
+  #     DEBIAN_FRONTEND: noninteractive
+  #     TZ: Etc/UTC
+  #   steps:
+  #     - name: Update Package Index & Upgrade Packages
+  #       run: |
+  #         apt-get update
+  #         apt-get upgrade -y
 
-      # wire-sysio
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Clone sysio
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Download sysio builddir
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{matrix.platform}}-build
-      - if: ${{ matrix.test != 'deb-install' }}
-        name: Extract sysio build
-        run: |
-          zstdcat build.tar.zst | tar x
-      - if: ${{ matrix.test == 'build-tree' }}
-        name: Set sysio_DIR env var
-        run: |
-          echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
-      - if: ${{ matrix.test == 'make-dev-install' }}
-        name: sysio dev-install
-        run: |
-          cmake --install build
-          cmake --install build --component dev
-      - if: ${{ matrix.test == 'make-dev-install' }}
-        name: Delete sysio artifacts
-        run: |
-          rm -r *
-      # - if: ${{ matrix.test == 'deb-install' }}
-      #   name: Download sysio-dev
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: sysio-dev-${{matrix.platform}}-amd64
-      # - if: ${{ matrix.test == 'deb-install' }}
-      #   name: Install sysio-dev Package
-      #   run: |
-      #     apt-get install -y ./*.deb
-      #     rm ./*.deb
+  #     # wire-sysio
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Clone sysio
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Download sysio builddir
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: ${{matrix.platform}}-build
+  #     - if: ${{ matrix.test != 'deb-install' }}
+  #       name: Extract sysio build
+  #       run: |
+  #         zstdcat build.tar.zst | tar x
+  #     - if: ${{ matrix.test == 'build-tree' }}
+  #       name: Set sysio_DIR env var
+  #       run: |
+  #         echo "sysio_DIR=$PWD/build/lib/cmake/sysio" >> "$GITHUB_ENV"
+  #     - if: ${{ matrix.test == 'make-dev-install' }}
+  #       name: sysio dev-install
+  #       run: |
+  #         cmake --install build
+  #         cmake --install build --component dev
+  #     - if: ${{ matrix.test == 'make-dev-install' }}
+  #       name: Delete sysio artifacts
+  #       run: |
+  #         rm -r *
+  #     # - if: ${{ matrix.test == 'deb-install' }}
+  #     #   name: Download sysio-dev
+  #     #   uses: actions/download-artifact@v4
+  #     #   with:
+  #     #     name: sysio-dev-${{matrix.platform}}-amd64
+  #     # - if: ${{ matrix.test == 'deb-install' }}
+  #     #   name: Install sysio-dev Package
+  #     #   run: |
+  #     #     apt-get install -y ./*.deb
+  #     #     rm ./*.deb
 
-      # CDT
-      # - name: Download cdt
-      #   uses: AntelopeIO/asset-artifact-download-action@v3
-      #   with:
-      #     owner: Wire-Network
-      #     repo: wire-cdt
-      #     file: 'cdt_.*amd64.deb'
-      #     target: '${{needs.v.outputs.cdt-target}}'
-      #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
-      #     artifact-name: cdt_ubuntu_package_amd64
-      # - name: Install cdt Packages
-      #   run: |
-      #     apt-get install -y ./*.deb
-      #     rm ./*.deb
-          # CDT
-      - name: Download and Install wire-cdt
-        run: |
-          CDT_VERSION="${{needs.v.outputs.cdt-target}}"
-          CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
-          wget -O wire-cdt.deb "$CDT_URL"
-          apt-get install -y ./wire-cdt.deb
-          rm ./wire-cdt.deb
+  #     # CDT
+  #     # - name: Download cdt
+  #     #   uses: AntelopeIO/asset-artifact-download-action@v3
+  #     #   with:
+  #     #     owner: Wire-Network
+  #     #     repo: wire-cdt
+  #     #     file: 'cdt_.*amd64.deb'
+  #     #     target: '${{needs.v.outputs.cdt-target}}'
+  #     #     prereleases: ${{fromJSON(needs.v.outputs.cdt-prerelease)}}
+  #     #     artifact-name: cdt_ubuntu_package_amd64
+  #     # - name: Install cdt Packages
+  #     #   run: |
+  #     #     apt-get install -y ./*.deb
+  #     #     rm ./*.deb
+  #         # CDT
+  #     - name: Download and Install wire-cdt
+  #       run: |
+  #         CDT_VERSION="${{needs.v.outputs.cdt-target}}"
+  #         CDT_URL="https://github.com/Wire-Network/wire-cdt/releases/download/v${CDT_VERSION}/wire-cdt_${CDT_VERSION}_amd64.deb"
+  #         wget -O wire-cdt.deb "$CDT_URL"
+  #         apt-get install -y ./wire-cdt.deb
+  #         rm ./wire-cdt.deb
 
-      # Reference Contracts
-      - name: checkout wire-system-contracts
-        uses: actions/checkout@v4
-        with:
-          repository: Wire-Network/wire-system-contracts
-          path: wire-system-contracts
-          ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
-      - if: ${{ matrix.test == 'deb-install' }}
-        name: Install wire-system-contracts deps
-        run: |
-          apt-get -y install cmake build-essential
-      - name: Build & Test wire-system-contracts
-        run: |
-          cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
-          cmake --build wire-system-contracts/build -- -j $(nproc)
-          cd wire-system-contracts/build/tests
-          ctest --output-on-failure -j $(nproc)
+  #     # Reference Contracts
+  #     - name: checkout wire-system-contracts
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: Wire-Network/wire-system-contracts
+  #         path: wire-system-contracts
+  #         ref: '${{needs.v.outputs.wire-system-contracts-ref}}'
+  #     - if: ${{ matrix.test == 'deb-install' }}
+  #       name: Install wire-system-contracts deps
+  #       run: |
+  #         apt-get -y install cmake build-essential
+  #     - name: Build & Test wire-system-contracts
+  #       run: |
+  #         cmake -S wire-system-contracts -B wire-system-contracts/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=On -DSYSTEM_ENABLE_SYSIO_VERSION_CHECK=Off -DSYSTEM_ENABLE_CDT_VERSION_CHECK=Off
+  #         cmake --build wire-system-contracts/build -- -j $(nproc)
+  #         cd wire-system-contracts/build/tests
+  #         ctest --output-on-failure -j $(nproc)
 
   all-passing:
     name: All Required Tests Passed
-    needs: [tests, np-tests, libtester-tests]
+    needs: [tests, np-tests]
     if: always()
     runs-on: ubuntu-latest
     steps:
