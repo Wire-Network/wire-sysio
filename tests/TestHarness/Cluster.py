@@ -1041,6 +1041,7 @@ class Cluster(object):
             if trans is None:
                 Utils.Print("ERROR: Failed to publish contract %s." % (contract))
                 return None
+            Node.validateTransaction(trans)
 
         Utils.Print("Creating accounts: %s " % ", ".join(producerKeys.keys()))
         producerKeys.pop(sysioName)
