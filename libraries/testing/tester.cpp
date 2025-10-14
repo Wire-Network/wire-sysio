@@ -227,11 +227,7 @@ namespace sysio { namespace testing {
          case setup_policy::full: {
             produce_block();
             set_bios_contract();
-            if( policy == setup_policy::full ) {
-               preactivate_all_builtin_protocol_features();
-            } else {
-               preactivate_all_but_disable_deferred_trx();
-            }
+            preactivate_all_builtin_protocol_features();
             produce_block();
             init_roa();
             break;
@@ -1322,19 +1318,6 @@ namespace sysio { namespace testing {
 
    void base_tester::preactivate_all_builtin_protocol_features() {
       preactivate_builtin_protocol_features( get_all_builtin_protocol_features() );
-   }
-
-   void base_tester::preactivate_all_but_disable_deferred_trx() {
-      std::vector<builtin_protocol_feature_t> builtins;
-      for( const auto& f : get_all_builtin_protocol_features() ) {
-         if ( !shouldAllowBlockProtocolChanges() ) {
-            continue;
-         }
-
-         builtins.push_back( f );
-      }
-
-      preactivate_builtin_protocol_features( builtins );
    }
 
    tester::tester(const std::function<void(controller&)>& control_setup, setup_policy policy, db_read_mode read_mode) {
