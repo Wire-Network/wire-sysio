@@ -72,7 +72,7 @@ jobs:
           id: build
           run: |
             echo "Building for ${{ matrix.platform }}"
-            rm -rf vcpkg/downloads vcpkg/packages vcpkg/buildtrees
+            rm -rf vcpkg/{buildtrees,packages,downloads,vcpkg_installed} build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg 
 
             export CC=/usr/bin/clang-18
             export CXX=/usr/bin/clang++-18
