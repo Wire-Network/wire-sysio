@@ -3437,8 +3437,9 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
                root_txn_ident->signal_applied_transaction(std::get<0>(t), std::get<1>(t));
          } );
       accepted_block.connect(
-         [root_txn_ident]( const block_state_legacy_ptr& blk ) {
-               root_txn_ident->signal_accepted_block(blk);
+         [root_txn_ident]( const block_signal_params& t ) {
+               const auto& [ block, id ] = t;
+               root_txn_ident->signal_accepted_block(block, id);
          } ) ;
       block_start.connect(
          [root_txn_ident]( uint32_t block_num ) {
