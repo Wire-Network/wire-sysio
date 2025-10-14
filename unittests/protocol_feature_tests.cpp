@@ -18,17 +18,31 @@ using namespace std::literals;
 
 BOOST_AUTO_TEST_SUITE(protocol_feature_tests)
 
-BOOST_AUTO_TEST_CASE( activate_preactivate_feature ) try {
+BOOST_AUTO_TEST_CASE( activate_protocol_feature ) try {
    tester c( setup_policy::none );
    const auto& pfm = c.control->get_protocol_feature_manager();
 
-   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::preactivate_feature );
+   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
    BOOST_REQUIRE( d );
 
    c.produce_block();
 
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
+
    // The latest bios contract can be set in WIRE without any preactivation steps
    c.set_bios_contract();
+   c.produce_block();
+
+   BOOST_CHECK_EXCEPTION( c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name,
+                                          mutable_variant_object()("feature_digest",  *d) ),
+                           sysio_assert_message_exception,
+                           sysio_assert_message_is( "protocol feature is not activated" )
+   );
+
+   c.preactivate_protocol_features( {*d} );
+   c.produce_blocks(2);
+
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
    c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name, mutable_variant_object()
       ("feature_digest",  *d )
@@ -49,24 +63,25 @@ BOOST_AUTO_TEST_CASE( activate_and_restart ) try {
 
    auto pfs = pfm.get_protocol_feature_set(); // make copy of protocol feature set
 
-   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::preactivate_feature );
+   auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
    BOOST_REQUIRE( d );
 
-   // activated in initialization of database
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
+   BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
+   // Activate
+   c.schedule_protocol_features_wo_preactivation({ *d });
    c.produce_blocks(2);
 
    auto head_block_num = c.control->head_block_num();
 
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
    c.close();
    c.open( std::move( pfs ) );
 
    BOOST_CHECK_EQUAL( head_block_num, c.control->head_block_num() );
 
-   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::preactivate_feature ) );
+   BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
 } FC_LOG_AND_RETHROW()
 

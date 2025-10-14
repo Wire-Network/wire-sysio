@@ -213,7 +213,8 @@ namespace sysio { namespace testing {
    void base_tester::execute_setup_policy(const setup_policy policy) {
       switch (policy) {
          case setup_policy::preactivate_feature_only: {
-            produce_block(); // block production is required to activate protocol feature
+            // preactivate is available at genesis
+            produce_block();
             break;
          }
          case setup_policy::preactivate_feature_and_new_bios: {
