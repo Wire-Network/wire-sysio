@@ -438,9 +438,7 @@ void state_history_plugin::plugin_startup() {
 }
 
 void state_history_plugin_impl::plugin_shutdown() {
-   applied_transaction_connection.reset();
-   accepted_block_connection.reset();
-   block_start_connection.reset();
+   fc_ilog(_log, "shutdown");
    thread_pool.stop();
 }
 

@@ -23,6 +23,3 @@ endif()
 add_subdirectory(sysio.bios)
 add_subdirectory(sysio.roa)
 add_subdirectory(dancer)
-
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/old_versions/v1.6.0-rc3/sysio.bios/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/old_versions/v1.6.0-rc3/sysio.bios/)
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/old_versions/v1.7.0-develop-preactivate_feature/sysio.bios/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/old_versions/v1.7.0-develop-preactivate_feature/sysio.bios/)

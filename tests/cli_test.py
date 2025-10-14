@@ -370,7 +370,6 @@ def abi_file_with_nodeop_test():
             accounts.append(account)
         walletMgr.create('sysio', [accounts[0]])
         node.createAccount(accounts[1], accounts[0], stakedDeposit=0)
-        node.activatePreactivateFeature()
         node.publishContract(accounts[0], biosDir, 'sysio.bios.wasm', 'sysio.bios.abi')
         node.publishContract(accounts[1], contractDir, 'sysio.token.wasm', 'sysio.token.abi')
         node.setPriv(accounts[1], accounts[0], waitForTransBlock=True)

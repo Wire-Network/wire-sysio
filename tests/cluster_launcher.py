@@ -33,7 +33,7 @@ Utils.Debug=debug
 testSuccessful=False
 
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
-walletMgr=WalletMgr(True)
+walletMgr=WalletMgr(True, keepRunning=args.leave_running)
 
 try:
     TestHelper.printSystemInfo("BEGIN")

@@ -469,7 +469,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    wdump((rm.get_account_net_limit(user_account).first));
 
    // Allow congestion to reduce a little bit.
-   c.produce_blocks(1485);
+   c.produce_blocks(1480);
 
    BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() > (3*cfg.max_block_net_usage) );
    BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() < (4*cfg.max_block_net_usage) );

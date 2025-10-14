@@ -14,19 +14,6 @@ namespace sysio { namespace chain {
    const std::unordered_map<builtin_protocol_feature_t, builtin_protocol_feature_spec, enum_hash<builtin_protocol_feature_t>>
    builtin_protocol_feature_codenames =
       boost::assign::map_list_of<builtin_protocol_feature_t, builtin_protocol_feature_spec>
-         (  builtin_protocol_feature_t::preactivate_feature, builtin_protocol_feature_spec{
-            "PREACTIVATE_FEATURE",
-            fc::variant("64fe7df32e9b86be2b296b3f81dfd527f84e82b98e363bc97e40bc7a83733310").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
-/*
-Builtin protocol feature: PREACTIVATE_FEATURE
-
-Adds privileged intrinsic to enable a contract to pre-activate a protocol feature specified by its digest.
-Pre-activated protocol features must be activated in the next block.
-*/
-            {},
-            {time_point{}, false, true} // enabled without preactivation and ready to go at any time
-         } )
          (  builtin_protocol_feature_t::reserved_first_protocol_feature, builtin_protocol_feature_spec{
             "RESERVED_FIRST_PROTOCOL_FEATURE",
             fc::variant("7fed1e357f6973b66ea0e582ca0c1a69b3ce08e7e5780af010935007ac89e4e3").as<digest_type>(),
@@ -34,6 +21,19 @@ Pre-activated protocol features must be activated in the next block.
             // SHA256 begins with "Builtin ..." after return and includes trailing return.
 /*
 Builtin protocol feature: RESERVED_FIRST_PROTOCOL_FEATURE
+
+Example protocol feature. No functionality is triggered by this protocol feature.
+*/
+            {},
+            {time_point{}, false, true} // enabled without preactivation and ready to go at any time
+         } )
+         (  builtin_protocol_feature_t::reserved_second_protocol_feature, builtin_protocol_feature_spec{
+            "RESERVED_SECOND_PROTOCOL_FEATURE",
+            fc::variant("0c27fcedb5c663edaf95ade037820deb8d04a1a0b828edba1de58c06f380b3d5").as<digest_type>(),
+            // SHA256 hash of the raw message below within the comment delimiters (do not modify message below).
+            // SHA256 begins with "Builtin ..." after return and includes trailing return.
+/*
+Builtin protocol feature: RESERVED_SECOND_PROTOCOL_FEATURE
 
 Example protocol feature. No functionality is triggered by this protocol feature.
 */

@@ -26,17 +26,11 @@ namespace sysio { namespace testing {
          case setup_policy::none:
             os << "none";
             break;
-         case setup_policy::old_bios_only:
-            os << "old_bios_only";
-            break;
          case setup_policy::preactivate_feature_only:
             os << "preactivate_feature_only";
             break;
          case setup_policy::preactivate_feature_and_new_bios:
             os << "preactivate_feature_and_new_bios";
-            break;
-         case setup_policy::old_wasm_parser:
-            os << "old_wasm_parser";
             break;
          case setup_policy::full:
             os << "full";
@@ -217,56 +211,24 @@ namespace sysio { namespace testing {
    }
 
    void base_tester::execute_setup_policy(const setup_policy policy) {
-      const auto& pfm = control->get_protocol_feature_manager();
-
-      auto schedule_preactivate_protocol_feature = [&]() {
-         auto preactivate_feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::preactivate_feature);
-         FC_ASSERT( preactivate_feature_digest, "PREACTIVATE_FEATURE not found" );
-         schedule_protocol_features_wo_preactivation( { *preactivate_feature_digest } );
-      };
-
       switch (policy) {
-         case setup_policy::old_bios_only: {
-            set_before_preactivate_bios_contract();
-            break;
-         }
          case setup_policy::preactivate_feature_only: {
-            schedule_preactivate_protocol_feature();
-            produce_block(); // block production is required to activate protocol feature
+            // preactivate is available at genesis
+            produce_block();
             break;
          }
          case setup_policy::preactivate_feature_and_new_bios: {
-            schedule_preactivate_protocol_feature();
             produce_block();
-            set_before_producer_authority_bios_contract();
+            set_bios_contract();
             produce_block();
             init_roa();
             break;
          }
-         case setup_policy::old_wasm_parser: {
-            schedule_preactivate_protocol_feature();
-            produce_block();
-            set_before_producer_authority_bios_contract();
-            preactivate_builtin_protocol_features({
-               builtin_protocol_feature_t::reserved_first_protocol_feature
-            });
+         case setup_policy::full: {
             produce_block();
             set_bios_contract();
-            init_roa();
-            break;
-         }
-         case setup_policy::full:
-         case setup_policy::full_except_do_not_disable_deferred_trx: {
-            schedule_preactivate_protocol_feature();
+            preactivate_all_builtin_protocol_features();
             produce_block();
-            set_before_producer_authority_bios_contract();
-            if( policy == setup_policy::full ) {
-               preactivate_all_builtin_protocol_features();
-            } else {
-               preactivate_all_but_disable_deferred_trx();
-            }
-            produce_block();
-            set_bios_contract();
             init_roa();
             break;
          }
@@ -1208,16 +1170,6 @@ namespace sysio { namespace testing {
       sync_dbs(other, *this);
    }
 
-   void base_tester::set_before_preactivate_bios_contract() {
-      set_code(config::system_account_name, contracts::before_preactivate_sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::before_preactivate_sysio_bios_abi());
-   }
-
-   void base_tester::set_before_producer_authority_bios_contract() {
-      set_code(config::system_account_name, contracts::before_producer_authority_sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::before_producer_authority_sysio_bios_abi());
-   }
-
    void base_tester::set_bios_contract() {
       set_code(config::system_account_name, contracts::sysio_bios_wasm());
       set_abi(config::system_account_name, contracts::sysio_bios_abi());
@@ -1286,7 +1238,7 @@ namespace sysio { namespace testing {
          }, p.authority);
       }
 
-      return push_action( config::system_account_name, "setprods"_n, config::system_account_name,
+      return push_action( config::system_account_name, "setprodkeys"_n, config::system_account_name,
                           fc::mutable_variant_object()("schedule", legacy_keys));
 
    }
@@ -1366,19 +1318,6 @@ namespace sysio { namespace testing {
 
    void base_tester::preactivate_all_builtin_protocol_features() {
       preactivate_builtin_protocol_features( get_all_builtin_protocol_features() );
-   }
-
-   void base_tester::preactivate_all_but_disable_deferred_trx() {
-      std::vector<builtin_protocol_feature_t> builtins;
-      for( const auto& f : get_all_builtin_protocol_features() ) {
-         if ( !shouldAllowBlockProtocolChanges() ) {
-            continue;
-         }
-
-         builtins.push_back( f );
-      }
-
-      preactivate_builtin_protocol_features( builtins );
    }
 
    tester::tester(const std::function<void(controller&)>& control_setup, setup_policy policy, db_read_mode read_mode) {

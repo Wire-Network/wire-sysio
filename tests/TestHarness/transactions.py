@@ -350,16 +350,6 @@ class Transactions(NodeopQueries):
         return trans
 
     # Require producer_api_plugin
-    def activatePreactivateFeature(self):
-        protocolFeatureDigestDict = self.getSupportedProtocolFeatureDict()
-        preactivateFeatureDigest = protocolFeatureDigestDict["PREACTIVATE_FEATURE"]["feature_digest"]
-        assert preactivateFeatureDigest
-
-        self.scheduleProtocolFeatureActivations([preactivateFeatureDigest])
-
-        # Wait for the next block to be produced so the scheduled protocol feature is activated
-        assert self.waitForHeadToAdvance(blocksToAdvance=2), "ERROR: TIMEOUT WAITING FOR PREACTIVATE"
-
     # Return an array of feature digests to be preactivated in a correct order respecting dependencies
     # Require producer_api_plugin
     def getAllBuiltinFeatureDigestsToPreactivate(self):

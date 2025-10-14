@@ -1050,9 +1050,9 @@ struct set_action_permission_subcommand {
 bool local_port_used() {
     using namespace boost::asio;
 
-    io_service ios;
+    io_context io_ctx;
     local::stream_protocol::endpoint endpoint(wallet_url.substr(strlen("unix://")));
-    local::stream_protocol::socket socket(ios);
+    local::stream_protocol::socket socket(io_ctx);
     boost::system::error_code ec;
     socket.connect(endpoint, ec);
 
@@ -1459,13 +1459,6 @@ protocol_features_t get_supported_protocol_features() {
          return {};
       }
       auto name = spec_vo["value"].as_string();
-
-      if ( spec_vo["value"].as_string() == "PREACTIVATE_FEATURE" )
-      {
-         // PREACTIVATE_FEATURE must be activated by schedule_protocol_feature_activations RPC,
-         // not by activate action
-         continue;
-      }
 
       results.names += name;
       results.names += "\n";
