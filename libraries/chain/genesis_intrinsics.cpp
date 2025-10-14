@@ -196,7 +196,9 @@ const std::vector<const char*> genesis_intrinsics = {
    "bls_fp_mod",
    "bls_fp_mul",
    "bls_fp_exp",
-   "get_ram_usage"
+   "get_ram_usage",
+   "preactivate_feature",
+   "is_feature_activated"
 };
 
 } } // namespace sysio::chain

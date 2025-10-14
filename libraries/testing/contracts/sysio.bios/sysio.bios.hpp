@@ -294,6 +294,19 @@ namespace sysiobios {
          void setprods( const std::vector<sysio::producer_authority>& schedule );
 
          /**
+          * Set a new list of active producers, that is, a new producers' schedule.
+          *
+          * @details Set a new list of active producers, by proposing a schedule change, once the block that
+          * contains the proposal becomes irreversible, the schedule is promoted to "pending"
+          * automatically. Once the block that promotes the schedule is irreversible, the schedule will
+          * become "active".
+          *
+          * @param schedule - New list of active producers to set
+          */
+         [[sysio::action]]
+         void setprodkeys( const std::vector<sysio::producer_key>& schedule );
+
+         /**
           * Set the blockchain parameters
           *
           * @details Set the blockchain parameters. By tuning these parameters, various degrees of customization can be achieved.

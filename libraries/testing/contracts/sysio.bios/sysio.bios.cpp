@@ -32,6 +32,11 @@ void bios::setprods( const std::vector<sysio::producer_authority>& schedule ) {
    set_proposed_producers( schedule );
 }
 
+void bios::setprodkeys( const std::vector<sysio::producer_key>& schedule ) {
+   require_auth( get_self() );
+   set_proposed_producers( schedule );
+}
+
 void bios::setparams( const sysio::blockchain_parameters& params ) {
    require_auth( get_self() );
    set_blockchain_parameters( params );

@@ -72,10 +72,6 @@ std::string make_locals_wasm(int n_params, int n_locals, int n_stack)
 
 BOOST_AUTO_TEST_SUITE(wasm_config_tests)
 
-struct old_wasm_tester : tester {
-   old_wasm_tester() : tester{setup_policy::old_wasm_parser} {}
-};
-
 BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_mutable_global_bytes, data::make({ 4096, 8192 , 16384 }) * data::make({0, 1}), n_globals, oversize) {
    produce_block();
    create_accounts({"globals"_n});
@@ -997,7 +993,7 @@ BOOST_FIXTURE_TEST_CASE(get_wasm_parameters_test, validating_tester) {
 }
 
 // Uses a custom section with large size
-BOOST_FIXTURE_TEST_CASE(large_custom_section, old_wasm_tester)
+BOOST_FIXTURE_TEST_CASE(large_custom_section, validating_tester)
 {
    create_account( "hugecustom"_n );
 

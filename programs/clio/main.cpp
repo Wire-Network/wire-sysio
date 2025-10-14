@@ -1460,13 +1460,6 @@ protocol_features_t get_supported_protocol_features() {
       }
       auto name = spec_vo["value"].as_string();
 
-      if ( spec_vo["value"].as_string() == "PREACTIVATE_FEATURE" )
-      {
-         // PREACTIVATE_FEATURE must be activated by schedule_protocol_feature_activations RPC,
-         // not by activate action
-         continue;
-      }
-
       results.names += name;
       results.names += "\n";
       results.digests.emplace(name, digest);

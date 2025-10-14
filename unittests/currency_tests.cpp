@@ -91,11 +91,6 @@ class currency_tester : public validating_tester {
       static const name sysio_token;
 };
 
-class pre_disable_deferred_trx_currency_tester : public currency_tester {
-   public:
-      pre_disable_deferred_trx_currency_tester() : currency_tester(setup_policy::full_except_do_not_disable_deferred_trx) {}
-};
-
 const name currency_tester::sysio_token = "sysio.token"_n;
 
 BOOST_AUTO_TEST_SUITE(currency_tests)

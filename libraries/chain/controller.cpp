@@ -351,7 +351,7 @@ struct controller_impl {
          if( shutdown ) shutdown();
       } );
 
-      set_activation_handler<builtin_protocol_feature_t::preactivate_feature>();
+      set_activation_handler<builtin_protocol_feature_t::reserved_first_protocol_feature>();
 
       self.irreversible_block.connect([this](const block_state_legacy_ptr& bsp) {
          wasmif.current_lib(bsp->block_num);
@@ -1120,7 +1120,6 @@ struct controller_impl {
                                                                              active_producers_authority,
                                                                              false,
                                                                              genesis.initial_timestamp );
-
    }
 
    // The returned scoped_exit should not exceed the lifetime of the pending which existed when make_block_restore_point was called.
@@ -3454,12 +3453,17 @@ void controller::initialize_root_extensions(contract_action_matches&& matches) {
 /// Protocol feature activation handlers:
 
 template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::preactivate_feature>() {
-   db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "preactivate_feature" );
-      add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "is_feature_activated" );
-   } );
+void controller_impl::on_activation<builtin_protocol_feature_t::reserved_first_protocol_feature>() {
+   // any initialization needed for protocol feature
 }
+
+// example:
+// template<>
+// void controller_impl::on_activation<builtin_protocol_feature_t::get_block_num>() {
+//    db.modify( db.get<protocol_state_object>(), [&]( auto& ps ) {
+//       add_intrinsic_to_whitelist( ps.whitelisted_intrinsics, "get_block_num" );
+//    } );
+// }
 
 /// End of protocol feature activation handlers
 

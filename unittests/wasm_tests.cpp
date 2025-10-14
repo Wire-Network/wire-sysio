@@ -653,7 +653,7 @@ BOOST_FIXTURE_TEST_CASE( check_global_reset, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 //Make sure we can create a wasm with maximum pages, but not grow it any
-BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
 
    t.produce_blocks(2);
@@ -687,7 +687,7 @@ BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::old_wasm_parser, se
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
    t.produce_blocks(2);
 
@@ -881,7 +881,7 @@ BOOST_FIXTURE_TEST_CASE( nested_limit_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 
-BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
 
    t.produce_blocks(2);
@@ -1544,7 +1544,7 @@ BOOST_FIXTURE_TEST_CASE( big_maligned_host_ptr, validating_tester ) try {
    produce_blocks(1);
 } FC_LOG_AND_RETHROW()
 
-BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::old_wasm_parser, setup_policy::full}), policy ) try {
+BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
    validating_tester t(flat_set<account_name>{}, {}, policy);
 
    t.produce_block();
