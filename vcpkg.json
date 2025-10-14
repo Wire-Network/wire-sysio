@@ -14,8 +14,7 @@
     "softfloat",
     "zlib",
     {
-      "name": "zstd",
-      "features": ["zstd-shared"]
+      "name": "zstd"
     },
     {
       "name": "catch2",
