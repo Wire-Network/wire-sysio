@@ -133,9 +133,6 @@ void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chai
             if (!chain_plug->chain().is_building_block() || *feature_set)
                return;
             const auto& pfm = chain_plug->chain().get_protocol_feature_manager();
-            auto preactivate_feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::preactivate_feature);
-            BOOST_CHECK( preactivate_feature_digest );
-            chain_plug->chain().preactivate_feature( *preactivate_feature_digest, false );
             std::vector<builtin_protocol_feature_t> pfs{
                builtin_protocol_feature_t::reserved_first_protocol_feature };
             for (const auto t : pfs) {

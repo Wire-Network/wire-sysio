@@ -46,7 +46,7 @@ def setProds(sharedProdKey):
     Utils.Print("setprods: %s" % (setProdsStr))
     opts="--permission sysio@active"
     # pylint: disable=redefined-variable-type
-    trans=cluster.biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
+    trans=cluster.biosNode.pushMessage("sysio", "setprodkeys", setProdsStr, opts)
     if trans is None or not trans[0]:
         Utils.Print("ERROR: Failed to set producer with cmd %s" % (setProdsStr))
 

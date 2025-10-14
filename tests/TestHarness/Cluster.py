@@ -507,18 +507,11 @@ class Cluster(object):
             Utils.Print("ERROR: Bios node doesn't appear to be running...")
             return False
 
-        if onlyBios:
-            self.nodes=[self.biosNode]
-
         # ensure cluster node are inter-connected by ensuring everyone has block 1
         Utils.Print("Cluster viability smoke test. Validate every cluster node has block 1. ")
         if not self.waitOnClusterBlockNumSync(1):
             Utils.Print("ERROR: Cluster doesn't seem to be in sync. Some nodes missing block 1")
             return False
-
-        if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
-            Utils.Print("Activate Preactivate Feature.")
-            self.biosNode.activatePreactivateFeature()
 
         if dontBootstrap:
             Utils.Print("Skipping bootstrap.")
@@ -1038,9 +1031,9 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to import %s account keys into ignition wallet." % (sysioName))
             return None
 
-        if onlyBios:
+        if onlyBios or (not loadSystemContract and pfSetupPolicy == PFSetupPolicy.FULL):
             contract="sysio.bios"
-            contractDir=str(self.unittestsContractsPath / contract)
+            contractDir=str(self.libTestingContractsPath / contract)
             wasmFile="%s.wasm" % (contract)
             abiFile="%s.abi" % (contract)
             Utils.Print("Publish %s contract" % (contract))
@@ -1110,54 +1103,56 @@ class Cluster(object):
         if pfSetupPolicy == PFSetupPolicy.FULL:
             biosNode.preactivateAllBuiltinProtocolFeature()
 
-        if not onlyBios:
-            if prodCount == -1:
-                setProdsFile="setprods.json"
-                if Utils.Debug: Utils.Print("Reading in setprods file %s." % (setProdsFile))
-                with open(setProdsFile, "r") as f:
-                    setProdsStr=f.read()
+        if prodCount == -1:
+            setProdsFile="setprods.json"
+            if Utils.Debug: Utils.Print("Reading in setprods file %s." % (setProdsFile))
+            with open(setProdsFile, "r") as f:
+                setProdsStr=f.read()
 
-                    Utils.Print("Setting producers.")
-                    opts="--permission sysio@active"
-                    myTrans=biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
-                    if myTrans is None or not myTrans[0]:
-                        Utils.Print("ERROR: Failed to set producers.")
-                        return None
-            else:
-                counts=dict.fromkeys(range(totalNodes), 0) #initialize node prods count to 0
-                setProdsStr='{"schedule": '
-                prodStanzas=[]
-                prodNames=[]
-                for name, keys in list(producerKeys.items())[:21]:
-                    if counts[keys["node"]] >= prodCount:
-                        Utils.Print(f'Count for this node exceeded: {counts[keys["node"]]}')
-                        continue
-                    prodStanzas.append({ 'producer_name': keys['name'], 'block_signing_key': keys['public'] })
-                    prodNames.append(keys["name"])
-                    counts[keys["node"]] += 1
-                setProdsStr += json.dumps(prodStanzas)
-                setProdsStr += ' }'
-                if Utils.Debug: Utils.Print("setprods: %s" % (setProdsStr))
-                Utils.Print("Setting producers: %s." % (", ".join(prodNames)))
+                Utils.Print("Setting producers.")
                 opts="--permission sysio@active"
-                # pylint: disable=redefined-variable-type
-                trans=biosNode.pushMessage("sysio", "setprodkeys", setProdsStr, opts)
-                if trans is None or not trans[0]:
-                    Utils.Print("ERROR: Failed to set producer %s." % (keys["name"]))
+                myTrans=biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
+                if myTrans is None or not myTrans[0]:
+                    Utils.Print("ERROR: Failed to set producers.")
                     return None
-
-            trans=trans[1]
-            transId=Node.getTransId(trans)
-            if not biosNode.waitForTransactionInBlock(transId):
-                Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
+        else:
+            counts=dict.fromkeys(range(totalNodes), 0) #initialize node prods count to 0
+            setProdsStr='{"schedule": '
+            prodStanzas=[]
+            prodNames=[]
+            for name, keys in list(producerKeys.items())[:21]:
+                if counts[keys["node"]] >= prodCount:
+                    Utils.Print(f'Count for this node exceeded: {counts[keys["node"]]}')
+                    continue
+                prodStanzas.append({ 'producer_name': keys['name'], 'block_signing_key': keys['public'] })
+                prodNames.append(keys["name"])
+                counts[keys["node"]] += 1
+            setProdsStr += json.dumps(prodStanzas)
+            setProdsStr += ' }'
+            if Utils.Debug: Utils.Print("setprods: %s" % (setProdsStr))
+            Utils.Print("Setting producers: %s." % (", ".join(prodNames)))
+            opts="--permission sysio@active"
+            # pylint: disable=redefined-variable-type
+            trans=biosNode.pushMessage("sysio", "setprodkeys", setProdsStr, opts)
+            if trans is None or not trans[0]:
+                Utils.Print("ERROR: Failed to set producer %s." % (keys["name"]))
                 return None
 
-            # wait for block production handover (essentially a block produced by anyone but sysio).
-            lam = lambda: biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio"
-            ret=Utils.waitForBool(lam)
-            if not ret:
-                Utils.Print("ERROR: Block production handover failed.")
-                return None
+        if onlyBios:
+            return biosNode
+
+        trans=trans[1]
+        transId=Node.getTransId(trans)
+        if not biosNode.waitForTransactionInBlock(transId):
+            Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, biosNode.port))
+            return None
+
+        # wait for block production handover (essentially a block produced by anyone but sysio).
+        lam = lambda: biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio"
+        ret=Utils.waitForBool(lam)
+        if not ret:
+            Utils.Print("ERROR: Block production handover failed.")
+            return None
 
         if onlySetProds: return biosNode
 

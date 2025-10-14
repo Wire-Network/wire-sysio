@@ -42,7 +42,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_extra_packed_data_test.py ${CM
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/validate-dirty-db.py ${CMAKE_CURRENT_BINARY_DIR}/validate-dirty-db.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kiod_auto_launch_test.py ${CMAKE_CURRENT_BINARY_DIR}/kiod_auto_launch_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/db_modes_test.sh ${CMAKE_CURRENT_BINARY_DIR}/db_modes_test.sh COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/prod_preactivation_test.py ${CMAKE_CURRENT_BINARY_DIR}/prod_preactivation_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/release-build.sh ${CMAKE_CURRENT_BINARY_DIR}/release-build.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version-label.sh ${CMAKE_CURRENT_BINARY_DIR}/version-label.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/full-version-label.sh ${CMAKE_CURRENT_BINARY_DIR}/full-version-label.sh COPYONLY)
@@ -130,7 +129,6 @@ set_tests_properties(ship_streamer_test PROPERTIES LABELS long_running_failing_t
 add_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(p2p_dawn515_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
-add_test(NAME producer-preactivate-feature-test COMMAND tests/prod_preactivation_test.py ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_property(TEST producer-preactivate-feature-test PROPERTY LABELS nonparallelizable_failing_tests)
 add_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feature_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_protocol_feature_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
