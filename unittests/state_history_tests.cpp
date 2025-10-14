@@ -324,9 +324,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
    BOOST_REQUIRE_EQUAL(it_protocol_state->rows.obj.size(), 1u);
    auto protocol_states = chain.deserialize_data<sysio::ship_protocol::protocol_state_v0, sysio::ship_protocol::protocol_state>(it_protocol_state);
    BOOST_REQUIRE_EQUAL(protocol_states.size(), 1u);
-   BOOST_REQUIRE_EQUAL(protocol_states[0].activated_protocol_features.size(), 2u);
+   BOOST_REQUIRE_EQUAL(protocol_states[0].activated_protocol_features.size(), 1u);
    // activated_protocol_features[0] is preactivate_feature
-   auto protocol_feature = std::get<sysio::ship_protocol::activated_protocol_feature_v0>(protocol_states[0].activated_protocol_features[1]);
+   auto protocol_feature = std::get<sysio::ship_protocol::activated_protocol_feature_v0>(protocol_states[0].activated_protocol_features[0]);
 
    auto digest_byte_array = protocol_feature.feature_digest.extract_as_byte_array();
    char digest_array[digest_byte_array.size()];
