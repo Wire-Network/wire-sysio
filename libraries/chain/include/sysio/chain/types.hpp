@@ -69,7 +69,7 @@ namespace sysio::chain {
    using                               fc::flat_map;
    using                               fc::flat_multimap;
    using                               fc::flat_set;
-   using                               std::variant;
+   // using                               std::variant;
 
    using public_key_type  = fc::crypto::public_key;
    using private_key_type = fc::crypto::private_key;

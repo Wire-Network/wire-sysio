@@ -11,6 +11,7 @@ struct chain_options {
 
   // Configure options
   std::string configure_target_root = ""; // directory to write resulting data
+  std::string configure_contracts_path = "";
   bool configure_overwrite = false; // force overwrite existing files
   bool configure_skip_genesis = false; // skip writing genesis.json and/or creating key pairs
   bool configure_skip_ini = false; // skip writing config.ini

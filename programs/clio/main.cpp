@@ -234,6 +234,7 @@ void add_standard_transaction_options(CLI::App* cmd, string default_permission =
    cmd->add_option("-p,--permission", tx_permission, localized(msg.c_str()));
    cmd->add_option("-P,--payer", tx_payer, localized("Pass in explicit payer permission"));
 
+
    cmd->add_option("--max-cpu-usage-ms", tx_max_cpu_usage, localized("Set an upper limit on the milliseconds of cpu usage budget, for the execution of the transaction (defaults to 0 which means no limit)"));
    cmd->add_option("--max-net-usage", tx_max_net_usage, localized("Set an upper limit on the net usage budget, in bytes, for the transaction (defaults to 0 which means no limit)"));
 

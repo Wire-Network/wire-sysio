@@ -63,6 +63,7 @@ target_link_libraries(${SYS_UTIL_EXECUTABLE_NAME}
   ${CMAKE_DL_LIBS}
   ${PLATFORM_SPECIFIC_LIBS}
 
+  Boost::process
   Boost::dll
 )
 
