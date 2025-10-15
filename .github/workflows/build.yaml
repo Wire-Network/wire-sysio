@@ -141,6 +141,11 @@ jobs:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
     steps:
+      - name: Cleanup stale containers
+        run: |
+          echo "Removing old containers..."
+          sudo docker ps -aq | xargs -r sudo docker rm -f || true
+          echo "Cleanup complete"
       - uses: actions/checkout@v4
       - name: Download builddir
         uses: actions/download-artifact@v4
@@ -177,6 +182,11 @@ jobs:
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
     steps:
+      - name: Cleanup stale containers
+        run: |
+          echo "Removing old containers..."
+          sudo docker ps -aq | xargs -r sudo docker rm -f || true
+          echo "Cleanup complete"
       - uses: actions/checkout@v4
       - name: Download builddir
         uses: actions/download-artifact@v4
@@ -216,6 +226,11 @@ jobs:
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
     steps:
+      - name: Cleanup stale containers
+        run: |
+          echo "Removing old containers..."
+          sudo docker ps -aq | xargs -r sudo docker rm -f || true
+          echo "Cleanup complete"
       - uses: actions/checkout@v4
       - name: Download builddir
         uses: actions/download-artifact@v4
