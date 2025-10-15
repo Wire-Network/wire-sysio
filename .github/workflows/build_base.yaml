@@ -72,11 +72,9 @@ jobs:
           id: build
           run: |
             echo "Building for ${{ matrix.platform }}"
-
-            if [[ "${{ matrix.platform }}" == "ubuntu22" || "${{ matrix.platform }}" == "ubsan" ]]; then              
-                rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
+             
+            rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
                     build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
-            fi
 
             export CC=/usr/bin/clang-18
             export CXX=/usr/bin/clang++-18
