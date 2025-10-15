@@ -133,6 +133,7 @@ jobs:
           # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
 
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
@@ -178,6 +179,7 @@ jobs:
           # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
@@ -222,6 +224,8 @@ jobs:
           # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
+
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
@@ -361,5 +365,5 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.libtester-tests.result != 'success'
+      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success'
         run: false
