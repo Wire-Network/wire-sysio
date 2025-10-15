@@ -20,6 +20,4 @@ elseif( USE_SYSIO_CDT_1_8_X )
     add_definitions(-DUSE_SYSIO_CDT_1_8_X=true)
 endif()
 
-add_subdirectory(sysio.bios)
-add_subdirectory(sysio.roa)
 add_subdirectory(dancer)

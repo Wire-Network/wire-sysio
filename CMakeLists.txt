@@ -171,7 +171,7 @@ message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if(ENABLE_TCMALLOC)
   find_package(Gperftools REQUIRED)
-  message(STATUS "Compiling Leap with TCMalloc")
+  message(STATUS "Compiling Wire with TCMalloc")
   #if doing this by the book, simply link_libraries( ${GPERFTOOLS_TCMALLOC} ) here. That will
   #give the performance benefits of tcmalloc but since it won't be linked last
   #the heap profiler & checker may not be accurate. This here is rather undocumented behavior
@@ -189,6 +189,7 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
 
 add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
+add_subdirectory(contracts)
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
