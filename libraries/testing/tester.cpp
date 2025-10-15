@@ -277,12 +277,13 @@ namespace sysio { namespace testing {
       control->add_indices();
       if (lambda) lambda();
       chain_transactions.clear();
-      control->accepted_block.connect([this]( const block_state_legacy_ptr& block_state ){
-        FC_ASSERT( block_state->block );
-          for( auto receipt : block_state->block->transactions ) {
-             auto &pt = std::get<packed_transaction>(receipt.trx);
-             chain_transactions[pt.get_transaction().id()] = std::move(receipt);
-          }
+      control->accepted_block.connect([this]( block_signal_params t ){
+         const auto& [ block, id ] = t;
+         FC_ASSERT( block );
+         for( auto receipt : block->transactions ) {
+            auto& pt = std::get<packed_transaction>(receipt.trx);
+            chain_transactions[pt.get_transaction().id()] = std::move(receipt);
+         }
       });
    }
 

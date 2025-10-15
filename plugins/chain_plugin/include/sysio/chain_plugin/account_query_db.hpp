@@ -1,6 +1,5 @@
 #pragma once
 #include <sysio/chain/types.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/trace.hpp>
 
 namespace sysio::chain_apis {
@@ -40,7 +39,7 @@ namespace sysio::chain_apis {
        * uncommitted traces.
        * @param block
        */
-      void commit_block(const chain::block_state_legacy_ptr& block );
+      void commit_block( const chain::signed_block_ptr& block );
 
       /**
        * parameters for the get_accounts_by_authorizers RPC

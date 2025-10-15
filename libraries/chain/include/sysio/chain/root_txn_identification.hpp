@@ -8,8 +8,8 @@ namespace sysio { namespace chain {
    using transaction_trace_ptr = std::shared_ptr<transaction_trace>;
    struct packed_transaction;
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;
-   struct block_state_legacy;
-   using block_state_legacy_ptr = std::shared_ptr<block_state_legacy>;
+   struct signed_block;;
+   using signed_block_ptr = std::shared_ptr<signed_block>;
 
    struct root_txn_identification_impl; 
    using root_txn_identification_impl_ptr = std::unique_ptr<root_txn_identification_impl>;
@@ -29,7 +29,7 @@ namespace sysio { namespace chain {
 
       void signal_applied_transaction( const transaction_trace_ptr& trace, const packed_transaction_ptr& ptrx );
 
-      void signal_accepted_block( const block_state_legacy_ptr& bsp );
+      void signal_accepted_block( const signed_block_ptr& block, const block_id_type& id );
 
       void signal_block_start( uint32_t block_num );
 
