@@ -15,7 +15,9 @@ const test_timeout = core.getInput('test-timeout', {required: true});
 const repo_name = process.env.GITHUB_REPOSITORY.split('/')[1];
 
 try {
-      const suffix = process.env.CONTAINER_SUFFIX || `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_JOB}-${Math.floor(Math.random() * 10000)}`;
+   const platform = log_tarball_prefix;
+
+   const suffix = `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_JOB}-${platform}-${Math.floor(Math.random() * 10000)}`;
    const baseContainer = `base-${suffix}`;
    const baseImage = `baseimage-${suffix}`;
 
