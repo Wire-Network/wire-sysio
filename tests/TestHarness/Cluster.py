@@ -1088,6 +1088,18 @@ class Cluster(object):
             Utils.Print('ERROR: Failed to validate creation of system accounts')
             return None
 
+        noopAccount = copy.deepcopy(self.sysioAccount)
+        noopAccount.name = 'sysio.noop'
+        contract="noop"
+        contractDir=str(self.unittestsTestContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(noopAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+
         if loadSystemContract:
             contract="sysio.system"
             contractDir=str(self.unittestsContractsPath / contract)
@@ -1608,18 +1620,6 @@ class Cluster(object):
                             waitToComplete:bool=False, abiFile=None, actionsData=None, actionsAuths=None,
                             trxGenerator=Path("./tests/trx_generator/trx_generator")):
         node=self.getNode(nodeId)
-        noopAccount = copy.deepcopy(self.sysioAccount)
-        noopAccount.name = 'sysio.noop'
-        contract="noop"
-        contractDir=str(self.unittestsTestContractsPath / contract)
-        wasmFile="%s.wasm" % (contract)
-        abiFile="%s.abi" % (contract)
-        Utils.Print("Publish %s contract" % (contract))
-        trans=node.publishContract(noopAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
-        if trans is None:
-            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
-            return None
-
         Utils.Print("Configure txn generators")
         info = node.getInfo()
         chainId = info['chain_id']
