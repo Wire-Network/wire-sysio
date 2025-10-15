@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu22, ubuntu24]
+        platform: [ubuntu22, ubuntu24, ubsan]
     runs-on: ubuntu-latest
     container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
     steps:
