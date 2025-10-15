@@ -178,6 +178,10 @@ int main(int argc, char** argv)
          }
          return INITIALIZE_FAIL;
       }
+      app->set_stop_executor_cb([&app]() {
+         ilog("Stopping main thread");
+         app->get_io_context().stop();
+      });
       if (auto resmon_plugin = app->find_plugin<resource_monitor_plugin>()) {
          resmon_plugin->monitor_directory(app->data_dir());
       } else {
