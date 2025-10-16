@@ -34,7 +34,7 @@ fish_add_path <cmake-build-root>/bin
 
 # Make sure to stop any running kiod processes 
 # before `chain-configure` is run.
-pkill -9 kiod || true
+pkill kiod || true
 
 # Any directory works here
 export TARGET_ROOT=<target-root>
@@ -55,7 +55,7 @@ export SYS_PUBLIC_KEY=(cat $TARGET_ROOT/secrets/sysio_key.txt | grep Public | gr
 export SYS_PRIVATE_KEY=(cat $TARGET_ROOT/secrets/sysio_key.txt | grep Private | grep -oP 'Private\\skey:\\s\K([a-zA-Z0-9]+)$')
 
 # START KIOD TO ENSURE THE CORRECT WALLET IS USED
-pkill -9 kiod || true
+pkill kiod || true
 sleep 1
 echo "Starting kiod with wallet dir $TARGET_ROOT/wallet. Logs at $LOGS_ROOT/kiod.log"
 kiod --wallet-dir $TARGET_ROOT/wallet &> $LOGS_ROOT/kiod.log &
