@@ -127,11 +127,6 @@ namespace sysio {
           try {
             try {
               tn = _thread_pool_prefix_label + "-" + std::to_string(i);
-              // tn = boost::core::demangle(typeid(this).name());
-              // auto offset = tn.rfind("::");
-              // if (offset != std::string::npos)
-              //    tn.erase(0, offset+2);
-              // tn = tn.substr(0, tn.find('>')) + "-" + std::to_string( i );
               fc::set_thread_name(tn);
               if (init) init();
             } FC_LOG_AND_RETHROW()
