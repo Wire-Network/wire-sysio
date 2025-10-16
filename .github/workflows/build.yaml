@@ -110,12 +110,12 @@ jobs:
       #   if: matrix.platform != 'reproducible'
       #   run: |
       #     python3 -c "import sys; sys.path.append('tests'); from TestHarness import Cluster; print('OK')"
-      # - name: Upload dev package
-      #   uses: actions/upload-artifact@v4
-      #   if: matrix.platform != 'reproducible'
-      #   with:
-      #     name: wire-sysio-dev-${{matrix.platform}}-amd64
-      #     path: build/wire-sysio-dev*.deb
+      - name: Upload dev package
+        uses: actions/upload-artifact@v4
+        if: matrix.platform != 'reproducible'
+        with:
+          name: wire-sysio-dev-${{matrix.platform}}-amd64
+          path: build/wire-sysio-dev*.deb
       - name: Upload sysio package
         uses: actions/upload-artifact@v4
         if: matrix.platform == 'reproducible'
@@ -170,6 +170,13 @@ jobs:
           sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
           echo "Cleanup complete."
 
+      - name: Ensure writable workspace
+        run: |
+          echo "User is $USER"
+          echo "Fixing permissions on workspace for user $(whoami)"
+          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
+          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+
       - uses: actions/checkout@v4
 
       - name: Download builddir
@@ -178,6 +185,9 @@ jobs:
           name: ${{matrix.cfg.builddir}}-build
 
       - name: Run Parallel Tests
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           # https://github.com/actions/runner/issues/2033
           chown -R $(id -u):$(id -g) $PWD
@@ -244,6 +254,13 @@ jobs:
           sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
           echo "Cleanup complete."
 
+      - name: Ensure writable workspace
+        run: |
+          echo "User is $USER"
+          echo "Fixing permissions on workspace for user $(whoami)"
+          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
+          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+
       - uses: actions/checkout@v4
 
       - name: Download builddir
@@ -251,15 +268,10 @@ jobs:
         with:
           name: ${{ matrix.cfg.builddir }}-build
 
-      - name: Ensure writable workspace
-        run: |
-          echo "Fixing permissions on workspace for user $(whoami)"
-          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
-          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
-
       - name: Run NP tests
         uses: ./.github/actions/parallel-ctest-containers
         env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         with:
           container: ${{ fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image }}
@@ -268,28 +280,68 @@ jobs:
           tests-label: nonparallelizable_tests
           test-timeout: 420
 
+      # - name: Export core dumps
+      #   run: |
+      #     docker --context "$DOCKER_HOST" run --rm \
+      #       --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
+      #       alpine sh -c 'tar -C /cores/ -c .' | tar x
       - name: Export core dumps
         if: failure()
+        env:
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
         run: |
-          docker --context "$DOCKER_CONTEXT" run --rm \
-            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
-            alpine sh -c 'tar -C /cores/ -c .' | tar x
+          echo "=== Checking Docker context and host before exporting core dumps ==="
+          echo "DOCKER_CONTEXT=${DOCKER_CONTEXT:-<unset>}"
+          echo "DOCKER_HOST=${DOCKER_HOST:-<unset>}"
 
-      - name: Upload logs from failed tests
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.cfg.name }}-np-logs
-          path: |
-            *-logs.tar.gz
-            core*.zst
+          echo "Available Docker contexts:"
+          docker context ls || echo "(Failed to list contexts)"
 
-      - name: Cleanup Docker context
-        if: always()
-        run: |
-          echo "Removing Docker context $DOCKER_CONTEXT..."
-          sudo docker context rm -f "$DOCKER_CONTEXT" || true
-          echo "Docker context cleanup complete."
+          # Determine which connection to use
+          if docker context inspect "$DOCKER_CONTEXT" >/dev/null 2>&1; then
+            echo "Context '$DOCKER_CONTEXT' is valid. Using it for export."
+            DOCKER_CONN="--context $DOCKER_CONTEXT"
+          elif [ -n "${DOCKER_HOST:-}" ]; then
+            echo "Context not found. Falling back to DOCKER_HOST=${DOCKER_HOST}"
+            DOCKER_CONN="--host $DOCKER_HOST"
+          else
+            echo "No valid Docker context or host found. Skipping core dump export."
+            exit 0
+          fi
+
+          echo "Using Docker connection: $DOCKER_CONN"
+
+          # Try to export core dumps safely
+          docker $DOCKER_CONN run --rm \
+            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores,readonly \
+            alpine sh -c '
+              set -e
+              if [ -z "$(ls -A /cores 2>/dev/null)" ]; then
+                echo "No core dumps found in /var/lib/systemd/coredump"
+                exit 0
+              fi
+              echo "Archiving core dumps..."
+              tar -C /cores -cvf - . || true
+            ' | tar -xv || true
+
+          echo "=== Core dump export complete ==="
+
+            - name: Upload logs from failed tests
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                name: ${{ matrix.cfg.name }}-np-logs
+                path: |
+                  *-logs.tar.gz
+                  core*.zst
+
+            - name: Cleanup Docker context
+              if: always()
+              run: |
+                echo "Removing Docker context $DOCKER_CONTEXT..."
+                sudo docker context rm -f "$DOCKER_CONTEXT" || true
+                echo "Docker context cleanup complete."
 
   lr-tests:
     name: LR Tests (${{matrix.cfg.name}})
