@@ -50,3 +50,6 @@ RUN apt-get update && apt-get upgrade -y && \
     autoconf automake libtool \
     htop 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
+
+RUN python3 -m pip install --upgrade pip setuptools wheel \
+ && python3 -m pip install --no-cache-dir numpy==1.26.4
