@@ -14,7 +14,6 @@ RUN apt-get update && apt-get upgrade -y && \
                        llvm-11-dev          \
                        lsb-release          \
                        ninja-build          \
-                       python3-numpy        \
                        software-properties-common \
                        file                 \
                        wget                 \
@@ -53,8 +52,12 @@ RUN yes | bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh 18
 RUN rm -rf /usr/lib/llvm-18/lib/cmake
 
 RUN add-apt-repository ppa:deadsnakes/ppa -y && apt-get update && \
-    apt-get install -y python3.12 python3-pip && \
+    apt-get install -y python3.12 python3.12-dev python3-pip python3-numpy && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+
+# Upgrade pip and install NumPy 1.26.4 (compatible with Python 3.12)
+RUN python3 -m pip install --upgrade pip setuptools wheel && \
+    python3 -m pip install --no-cache-dir numpy==1.26.4
 
 COPY <<-EOF /ubsan.supp
   vptr:wasm_sysio_validation.hpp
