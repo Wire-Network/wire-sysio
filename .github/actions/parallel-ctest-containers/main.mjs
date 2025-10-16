@@ -1,4 +1,8 @@
-// .github/actions/parallel-ctest-containers/main.mjs
+// Build command:
+// npx esbuild .github/actions/parallel-ctest-containers/main.mjs \
+//   --bundle --platform=node --target=node20 --format=cjs \
+//   --outfile=.github/actions/parallel-ctest-containers/dist/index.js
+
 import child_process from 'node:child_process'
 import process from 'node:process'
 import stream from 'node:stream'
@@ -68,24 +72,56 @@ async function main() {
       if (code === 0) continue
       core.setFailed('Some tests failed')
 
-      const extractor = tar.extract()
-      const packer = tar.pack()
+      const containerName = `${name}-${suffix}`
+      
+      const checkResult = child_process.spawnSync('docker', 
+        [...dockerArgs, 'ps', '-a', '-q', '-f', `name=${containerName}`],
+        { encoding: 'utf-8' })
+      
+      if (!checkResult.stdout.trim()) {
+        console.log(`Container ${containerName} not found, skipping log extraction`)
+        continue
+      }
 
-      extractor.on('entry', (header, s, next) => {
-        if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
-          s.on('end', next); s.resume(); return
-        }
-        header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length)
-        if (header.name !== 'build/' && !error_log_paths.some(p => header.name.startsWith(p))) {
-          s.on('end', next); s.resume(); return
-        }
-        s.pipe(packer.entry(header, next))
-      }).on('finish', () => packer.finalize())
+      console.log(`Extracting logs from ${containerName}`)
 
-      const exp = child_process.spawn('docker', [...dockerArgs, 'export', `${name}-${suffix}`])
-      exp.stdout.pipe(extractor)
-      stream.promises.pipeline(packer, zlib.createGzip(),
-        fs.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`))
+      try {
+        const extractor = tar.extract()
+        const packer = tar.pack()
+
+        extractor.on('entry', (header, s, next) => {
+          if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
+            s.on('end', next); s.resume(); return
+          }
+          header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length)
+          if (header.name !== 'build/' && !error_log_paths.some(p => header.name.startsWith(p))) {
+            s.on('end', next); s.resume(); return
+          }
+          s.pipe(packer.entry(header, next))
+        }).on('finish', () => packer.finalize())
+
+        const exp = child_process.spawn('docker', [...dockerArgs, 'export', containerName])
+        
+        exp.on('error', (err) => {
+          console.error(`Failed to export container ${containerName}: ${err.message}`)
+        })
+        
+        exp.stderr.on('data', (data) => {
+          console.error(`Docker export stderr: ${data}`)
+        })
+
+        exp.stdout.pipe(extractor)
+        
+        await stream.promises.pipeline(
+          packer, 
+          zlib.createGzip(),
+          fs.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`)
+        )
+        
+        console.log(`Logs saved to ${log_tarball_prefix}-${name}-logs.tar.gz`)
+      } catch (err) {
+        console.error(`Error extracting logs for ${name}: ${err.message}`)
+      }
     }
   } catch (e) {
     core.setFailed(`Uncaught exception ${e.message}`)

@@ -137,6 +137,9 @@ jobs:
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-beefy"]
+    container:
+      image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
+      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
 
     steps:
       - name: Create ephemeral Docker context
@@ -411,22 +414,53 @@ jobs:
           - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
-
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
           # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
+    
     steps:
+      - name: Create ephemeral Docker context
+        id: docker-context
+        run: |
+          BASE_RUNNER="${RUNNER_NAME,,}"
+          echo "Detected runner name: $RUNNER_NAME"
+
+          if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
+          elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+          elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+          elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+          else
+            echo "Unknown runner, defaulting to /var/run/docker.sock"
+            DOCKER_SOCK=/var/run/docker.sock
+          fi
+
+          CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+          echo "Using Docker socket: $DOCKER_SOCK"
+          sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+          echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+          echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+
       - name: Cleanup stale containers
         run: |
-          echo "Removing old containers..."
-          sudo docker ps -aq | xargs -r sudo docker rm -f || true
+          echo "Removing old containers for context $DOCKER_CONTEXT..."
+          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
           echo "Cleanup complete"
+
       - uses: actions/checkout@v4
+
       - name: Download builddir
         uses: actions/download-artifact@v4
         with:
           name: ${{matrix.cfg.builddir}}-build
+
       - name: Run tests in parallel containers
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         uses: ./.github/actions/parallel-ctest-containers
         with:
           container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
@@ -434,9 +468,18 @@ jobs:
           log-tarball-prefix: ${{matrix.cfg.name}}
           tests-label: long_running_tests
           test-timeout: 1800
+
       - name: Export core dumps
-        run: docker run --mount type=bind,source=/var/lib/systemd/coredump,target=/cores alpine sh -c 'tar -C /cores/ -c .' | tar x
         if: failure()
+        env:
+          DOCKER_HOST: ${{ env.DOCKER_HOST }}
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          echo "Checking for core dumps..."
+          sudo docker --context "$DOCKER_CONTEXT" run --rm \
+            --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
+            alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
+
       - name: Upload logs from failed tests
         uses: actions/upload-artifact@v4
         if: failure()
@@ -446,6 +489,11 @@ jobs:
             *-logs.tar.gz
             core*.zst
 
+      - name: Remove ephemeral Docker context
+        if: always()
+        run: |
+          echo "Removing Docker context: $DOCKER_CONTEXT"
+          sudo docker context rm -f "$DOCKER_CONTEXT" || true
   # libtester-tests:
   #   name: libtester tests
   #   needs: [platform-cache, build-base, v, package]
