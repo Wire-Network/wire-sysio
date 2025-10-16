@@ -11,8 +11,6 @@ from TestHarness.Cluster import PFSetupPolicy
 ###############################################################
 # nodeop_protocol_feature_test
 #
-# Many smaller tests centered around irreversible mode
-#
 ###############################################################
 
 # Parse command line arguments
@@ -46,15 +44,15 @@ try:
         "preactivation_required": True,
         "enabled": False
     }
-    biosNode.modifyBuiltinPFSubjRestrictions("PREACTIVATE_FEATURE", newSubjectiveRestrictions)
+    biosNode.modifyBuiltinPFSubjRestrictions("RESERVED_FIRST_PROTOCOL_FEATURE", newSubjectiveRestrictions)
     restartNode(biosNode)
 
     supportedProtocolFeatureDict = biosNode.getSupportedProtocolFeatureDict()
-    preactivateFeatureSubjectiveRestrictions = supportedProtocolFeatureDict["PREACTIVATE_FEATURE"]["subjective_restrictions"]
+    preactivateFeatureSubjectiveRestrictions = supportedProtocolFeatureDict["RESERVED_FIRST_PROTOCOL_FEATURE"]["subjective_restrictions"]
 
-    # Ensure that the PREACTIVATE_FEATURE subjective restrictions match the value written in the JSON
+    # Ensure that the RESERVED_FIRST_PROTOCOL_FEATURE subjective restrictions match the value written in the JSON
     assert preactivateFeatureSubjectiveRestrictions == newSubjectiveRestrictions,\
-        "PREACTIVATE_FEATURE subjective restrictions are not updated according to the JSON"
+        "RESERVED_FIRST_PROTOCOL_FEATURE subjective restrictions are not updated according to the JSON"
 
     testSuccessful = True
 finally:
