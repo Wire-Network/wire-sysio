@@ -142,24 +142,27 @@ jobs:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
-          # Detect which runner we’re on and map to proper socket
-          if hostname | grep -q runner-2; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
-          elif hostname | grep -q runner-3; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-          elif hostname | grep -q runner-4; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
-          else
-            DOCKER_SOCK=/var/run/docker.sock
-          fi
+            BASE_RUNNER="${RUNNER_NAME,,}"
+            echo "Detected runner name: $RUNNER_NAME"
 
-          CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
-          echo "Using Docker socket: $DOCKER_SOCK"
-          sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
-          sudo docker context use "$CTX_NAME"
+            if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
+            elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+            else
+              echo "Unknown runner, defaulting to /var/run/docker.sock"
+              DOCKER_SOCK=/var/run/docker.sock
+            fi
 
-          echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
-          echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+            CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+            echo "Using Docker socket: $DOCKER_SOCK"
+            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
 
       - name: Cleanup stale containers
         run: |
@@ -206,36 +209,36 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
-          - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
-          - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
-          # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
-          # - cfg: {name: 'ubuntu22repro', base: 'ubuntu22', builddir: 'reproducible'}
+          - cfg: {name: 'ubuntu22', base: 'ubuntu22', builddir: 'ubuntu22'}
+          - cfg: {name: 'ubuntu24', base: 'ubuntu24', builddir: 'ubuntu24'}
+          - cfg: {name: 'ubsan',    base: 'ubsan',    builddir: 'ubsan'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
 
     steps:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
-          # Detect which runner we’re on and map to proper socket
-          if hostname | grep -q runner-3; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-          elif hostname | grep -q runner-4; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
-          else
-            DOCKER_SOCK=/var/run/docker.sock
-          fi
+            BASE_RUNNER="${RUNNER_NAME,,}"
+            echo "Detected runner name: $RUNNER_NAME"
 
-          CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
-          echo "Using Docker socket: $DOCKER_SOCK"
-          sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
-          sudo docker context use "$CTX_NAME"
+            if [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
+            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
+            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
+              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+            else
+              echo "Unknown runner, defaulting to /var/run/docker.sock"
+              DOCKER_SOCK=/var/run/docker.sock
+            fi
 
-          echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
-          echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+            CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+            echo "Using Docker socket: $DOCKER_SOCK"
+            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
+            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
+            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
 
-      - name: Cleanup stale containers
+      - name: Cleanup stale containers (safety)
         run: |
           echo "Removing old containers for context $DOCKER_CONTEXT..."
           sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
@@ -248,7 +251,13 @@ jobs:
         with:
           name: ${{ matrix.cfg.builddir }}-build
 
-      - name: Run tests in parallel containers
+      - name: Ensure writable workspace
+        run: |
+          echo "Fixing permissions on workspace for user $(whoami)"
+          sudo chown -R $USER:$USER "$GITHUB_WORKSPACE"
+          sudo chmod -R u+rwX "$GITHUB_WORKSPACE"
+
+      - name: Run NP tests
         uses: ./.github/actions/parallel-ctest-containers
         env:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
