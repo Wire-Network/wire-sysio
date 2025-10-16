@@ -12,7 +12,7 @@
 
 #include <sysio/chain/thread_utils.hpp>
 
-namespace sysio::plugin::common::services {
+namespace sysio::operator_plugin::services {
 
   // Represents a cron-like schedule. Empty set for any field means wildcard (match all values).
   struct cron_schedule {

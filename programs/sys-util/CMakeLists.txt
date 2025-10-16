@@ -28,7 +28,8 @@ target_link_libraries(${SYS_UTIL_EXECUTABLE_NAME}
   PRIVATE
   appbase
   fc
-  plugin_common
+
+
   version
   PRIVATE -Wl,${whole_archive_flag} state_history_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} trace_api_plugin -Wl,${no_whole_archive_flag}
@@ -41,6 +42,7 @@ target_link_libraries(${SYS_UTIL_EXECUTABLE_NAME}
   PRIVATE -Wl,${whole_archive_flag} test_control_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} test_control_api_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} prometheus_plugin -Wl,${no_whole_archive_flag}
+  PRIVATE -Wl,${whole_archive_flag} operator_plugin batch_operator_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${build_id_flag}
 
   sysio_chain

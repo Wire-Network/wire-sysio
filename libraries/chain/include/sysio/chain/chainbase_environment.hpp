@@ -10,7 +10,7 @@ FC_REFLECT_ENUM(chainbase::environment::arch_t,
 
 namespace fc {
 
-void to_variant(const chainbase::environment& bi, variant& v) {
+inline void to_variant(const chainbase::environment& bi, variant& v) {
    // the variant conversion ultimately binds a reference to each member, but chainbase::environment is packed making
    // a reference to an unaligned variable UB. The boost_version is the only offender
    unsigned aligned_boost_version = bi.boost_version;
