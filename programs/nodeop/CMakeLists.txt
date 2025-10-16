@@ -29,6 +29,8 @@ target_link_libraries(
   PRIVATE
   appbase
   version
+  operator_plugin
+
   PRIVATE -Wl,${whole_archive_flag} state_history_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} trace_api_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} chain_api_plugin -Wl,${no_whole_archive_flag}
@@ -40,19 +42,24 @@ target_link_libraries(
   PRIVATE -Wl,${whole_archive_flag} test_control_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} test_control_api_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${whole_archive_flag} prometheus_plugin -Wl,${no_whole_archive_flag}
+  PRIVATE -Wl,${whole_archive_flag} batch_operator_plugin -Wl,${no_whole_archive_flag}
   PRIVATE -Wl,${build_id_flag}
   PRIVATE
-  boringssl::crypto
-  boringssl::decrepit
   fc
   chain_plugin
-  http_plugin
   producer_plugin
+
+  http_plugin
   http_client_plugin
   sysio_chain_wrap
+
   ${CMAKE_DL_LIBS}
   ${PLATFORM_SPECIFIC_LIBS}
   Boost::dll
+  Boost::process
+  boringssl::crypto
+  boringssl::decrepit
+  gsl-lite::gsl-lite
 )
 
 include(additionalPlugins)

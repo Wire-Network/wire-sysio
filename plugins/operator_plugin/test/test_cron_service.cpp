@@ -6,10 +6,10 @@
 #include <optional>
 #include <set>
 
-#include <sysio/plugin/common/services/cron_service.hpp>
+#include <sysio/operator_plugin/services/cron_service.hpp>
 
 using namespace std::literals;
-using namespace sysio::plugin::common::services;
+using namespace sysio::operator_plugin::services;
 
 namespace {
   auto cron_service_factory(
