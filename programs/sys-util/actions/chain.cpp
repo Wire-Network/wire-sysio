@@ -387,6 +387,7 @@ int chain_actions::run_subcommand_configure() {
 
   try {
     std::array<std::string, 3> contract_names = {"sysio.token", "sysio.msig", "sysio.roa"};
+    std::array<std::string, 1> other_account_names = {"sysio.acct" };
     std::vector<chain_contract_detail> contract_details{};
 
     std::map<std::string, chain_account_detail> accounts{};
@@ -570,7 +571,7 @@ int chain_actions::run_subcommand_configure() {
         .public_key = pk.get_public_key(),
         .private_key_str = privs,
         .public_key_str = pubs,
-        .key_file = key_file,
+        .key_file = key_file
       };
       std::println(std::cout, "ACCOUNT[{}]: key imported", name);
       return accounts[name];
@@ -578,6 +579,13 @@ int chain_actions::run_subcommand_configure() {
 
     // CREATE CHAIN KEY
     auto sysio_account_detail = create_chain_account_detail("sysio");
+
+    // CREATE MISC ACCOUNTS
+    for (auto& other_account_name: other_account_names) {
+      std::println(std::cout, "ACCOUNT[{}]: Create", other_account_name);
+      create_chain_account_detail(other_account_name);
+      std::println(std::cout, "ACCOUNT[{}]: Successfully created", other_account_name);
+    }
 
     // CREATE CONTRACT ACCOUNTS
     for (auto& contract_detail : contract_details) {
@@ -819,23 +827,44 @@ int chain_actions::run_subcommand_configure() {
       return 0;
     };
 
+    auto create_account = [&](const std::string& account_name, const std::string& public_key_str) {
+      auto rc = run_clio(
+        "create",
+        "account",
+        "sysio",
+        account_name,
+        public_key_str);
+      if (rc != 0) {
+        std::println(
+          std::cerr,
+          "create account failed (account={},pubkey={})",
+          account_name,
+          public_key_str
+        );
+        return 1;
+      }
+      return 0;
+    };
+
+    for (auto& other_account_name: other_account_names) {
+      auto& account_detail = accounts[other_account_name];
+      if (auto rc = create_account(other_account_name, account_detail.public_key_str); rc != 0) return rc;
+      std::println(
+        std::cout,
+        "create account succeeded (account={},pubkey={})",
+        other_account_name,
+        account_detail.public_key_str
+      );
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
     for (auto& contract_detail : contract_details) {
       auto contract_name = contract_detail.name;
       auto contract_path = contract_detail.path;
       auto contract_path_str = contract_path.generic_string();
       auto contract_account_detail = accounts[contract_name];
       {
-        auto rc = run_clio("create", "account", "sysio", contract_name, contract_account_detail.public_key_str);
-        if (rc != 0) {
-          std::println(
-            std::cerr,
-            "create account failed (account={},pubkey={})",
-            contract_name,
-            contract_account_detail.public_key_str
-          );
-          return 1;
-        }
-
+        if (auto rc = create_account(contract_name, contract_account_detail.public_key_str); rc != 0) return rc;
         std::println(
           std::cout,
           "create account succeeded (account={},pubkey={})",
@@ -847,50 +876,10 @@ int chain_actions::run_subcommand_configure() {
       if (auto rc = set_contract(contract_name, contract_path_str); rc != 0) {
         return rc;
       }
-
-
     }
 
     ilog("Accounts & contracts are ready. ");
-    {
-      auto rc = run_clio(
-        "push",
-        "action",
-        "sysio.token",
-        "create",
-        "[ \"sysio\", \"75496.0000 SYS\" ]",
-        "-p",
-        "sysio.token@active"
-      );
 
-      if (rc != 0) {
-        std::println(std::cerr, "sysio.token::create failed");
-        return 1;
-      }
-
-      std::println(std::cout, "sysio.token::create succeeded");
-    }
-    {
-      auto rc = run_clio(
-        "push",
-        "action",
-        "sysio.token",
-        "issue",
-        "[ \"sysio\", \"75496.0000 SYS\", \"initial issuance\" ]",
-        "-p",
-        "sysio@active"
-      );
-
-      if (rc != 0) {
-        std::println(std::cerr, "sysio.token::issue failed");
-        return 1;
-      }
-
-      std::println(std::cout, "sysio.token::issue succeeded");
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     {
       // app_thread.join(); // TEMP TO KEEP SERVER ACTIVE
       std::println(std::cout, "setting system contract: {}", system_contract_path.generic_string());
@@ -946,6 +935,45 @@ int chain_actions::run_subcommand_configure() {
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
+    {
+      auto rc = run_clio(
+        "push",
+        "action",
+        "sysio.token",
+        "create",
+        "[ \"sysio\", \"75496.0000 SYS\" ]",
+        "-p",
+        "sysio.token@active"
+      );
+
+      if (rc != 0) {
+        std::println(std::cerr, "sysio.token::create failed");
+        return 1;
+      }
+
+      std::println(std::cout, "sysio.token::create succeeded");
+    }
+    {
+      auto rc = run_clio(
+        "push",
+        "action",
+        "sysio.token",
+        "issue",
+        "[ \"sysio\", \"75496.0000 SYS\", \"initial issuance\" ]",
+        "-p",
+        "sysio@active"
+      );
+
+      if (rc != 0) {
+        std::println(std::cerr, "sysio.token::issue failed");
+        return 1;
+      }
+
+      std::println(std::cout, "sysio.token::issue succeeded");
+      std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     // SYMBOL=SYS
     // SUPPLY=75496.0000
     // BYTE_PER_UNIT=104
