@@ -6165,29 +6165,51 @@ async function main() {
     for (const { name, code } of results) {
       if (code === 0) continue;
       import_core.default.setFailed("Some tests failed");
-      const extractor = import_tar_stream.default.extract();
-      const packer = import_tar_stream.default.pack();
-      extractor.on("entry", (header, s, next) => {
-        if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
-          s.on("end", next);
-          s.resume();
-          return;
-        }
-        header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length);
-        if (header.name !== "build/" && !error_log_paths.some((p) => header.name.startsWith(p))) {
-          s.on("end", next);
-          s.resume();
-          return;
-        }
-        s.pipe(packer.entry(header, next));
-      }).on("finish", () => packer.finalize());
-      const exp = import_node_child_process.default.spawn("docker", [...dockerArgs, "export", `${name}-${suffix}`]);
-      exp.stdout.pipe(extractor);
-      import_node_stream.default.promises.pipeline(
-        packer,
-        import_node_zlib.default.createGzip(),
-        import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`)
+      const containerName = `${name}-${suffix}`;
+      const checkResult = import_node_child_process.default.spawnSync(
+        "docker",
+        [...dockerArgs, "ps", "-a", "-q", "-f", `name=${containerName}`],
+        { encoding: "utf-8" }
       );
+      if (!checkResult.stdout.trim()) {
+        console.log(`Container ${containerName} not found, skipping log extraction`);
+        continue;
+      }
+      console.log(`Extracting logs from ${containerName}`);
+      try {
+        const extractor = import_tar_stream.default.extract();
+        const packer = import_tar_stream.default.pack();
+        extractor.on("entry", (header, s, next) => {
+          if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
+            s.on("end", next);
+            s.resume();
+            return;
+          }
+          header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length);
+          if (header.name !== "build/" && !error_log_paths.some((p) => header.name.startsWith(p))) {
+            s.on("end", next);
+            s.resume();
+            return;
+          }
+          s.pipe(packer.entry(header, next));
+        }).on("finish", () => packer.finalize());
+        const exp = import_node_child_process.default.spawn("docker", [...dockerArgs, "export", containerName]);
+        exp.on("error", (err) => {
+          console.error(`Failed to export container ${containerName}: ${err.message}`);
+        });
+        exp.stderr.on("data", (data) => {
+          console.error(`Docker export stderr: ${data}`);
+        });
+        exp.stdout.pipe(extractor);
+        await import_node_stream.default.promises.pipeline(
+          packer,
+          import_node_zlib.default.createGzip(),
+          import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`)
+        );
+        console.log(`Logs saved to ${log_tarball_prefix}-${name}-logs.tar.gz`);
+      } catch (err) {
+        console.error(`Error extracting logs for ${name}: ${err.message}`);
+      }
     }
   } catch (e) {
     import_core.default.setFailed(`Uncaught exception ${e.message}`);
