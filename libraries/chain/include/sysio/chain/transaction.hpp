@@ -89,6 +89,8 @@ namespace sysio { namespace chain {
          return account_name();
       }
 
+      std::optional<account_name> explicit_payer()const;
+
       flat_multimap<uint16_t, transaction_extension> validate_and_extract_extensions()const;
    };
 
