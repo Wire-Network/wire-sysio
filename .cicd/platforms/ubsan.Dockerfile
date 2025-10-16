@@ -4,6 +4,19 @@ FROM ubuntu:jammy
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get update
+RUN apt-get install -y \
+    lsb-release \
+    wget \
+    software-properties-common \
+    gnupg
+
+RUN add-apt-repository ppa:deadsnakes/ppa -y
+RUN apt-get update
+
+RUN yes | bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh 18
+RUN rm -rf /usr/lib/llvm-18/lib/cmake
+
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y build-essential      \
                        cmake                \
@@ -12,14 +25,14 @@ RUN apt-get update && apt-get upgrade -y && \
                        libcurl4-openssl-dev \
                        libgmp-dev           \
                        llvm-11-dev          \
-                       lsb-release          \
                        ninja-build          \
-                       software-properties-common \
+                       python3              \
+                       python3-dev          \
+                       python3-pip          \
+                       python3-numpy        \
                        file                 \
-                       wget                 \
                        zlib1g-dev           \
                        zstd                 \
-                       gnupg                \
                        ccache               \
                        curl                 \
                        zip                  \
@@ -37,7 +50,6 @@ RUN apt-get update && apt-get upgrade -y && \
                        libssl-dev           \
                        libusb-1.0-0-dev     \
                        pkg-config           \
-                       python3-dev          \
                        libffi-dev           \
                        libedit-dev          \
                        libxml2-dev          \
@@ -46,17 +58,8 @@ RUN apt-get update && apt-get upgrade -y && \
                        libzstd-dev          \
                        libbz2-dev           \
                        liblzma-dev          \
-                       libncurses5-dev
-
-RUN yes | bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh 18
-RUN rm -rf /usr/lib/llvm-18/lib/cmake
-
-RUN add-apt-repository ppa:deadsnakes/ppa -y && apt-get update && \
-    apt-get install -y python3.12 python3.12-dev python3-pip python3-numpy && \
-    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
-
-# Upgrade pip and install NumPy 1.26.4 (compatible with Python 3.12)
-RUN python3 -m pip install --upgrade pip setuptools wheel && \
+                       libncurses5-dev && \
+    python3 -m pip install --upgrade pip setuptools wheel && \
     python3 -m pip install --no-cache-dir numpy==1.26.4
 
 COPY <<-EOF /ubsan.supp
