@@ -5,42 +5,29 @@
 #include <filesystem>
 #include <pwd.h>
 
+#include <boost/exception/diagnostic_information.hpp>
+#include <boost/dll.hpp>
+#include <boost/process.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/asio.hpp>
+#include <boost/format.hpp>
+#include <boost/process/spawn.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
+#include <gsl-lite/gsl-lite.hpp>
+
+#include "config.hpp"
+
 #include <fc/bitutil.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/io/json.hpp>
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
-
-
-#include "config.hpp"
-//#include <chainbase/environment.hpp>
-
-
-
-
-#include <boost/exception/diagnostic_information.hpp>
-#include <boost/dll.hpp>
-#include <boost/process.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/asio.hpp>
-#include <boost/format.hpp>
-#include <boost/process/spawn.hpp>
-#include <boost/range/adaptor/transformed.hpp>
-
-#include <boost/range/algorithm/copy.hpp>
-#include <gsl-lite/gsl-lite.hpp>
 #include <fc/log/logger_config.hpp>
-
-#include <sysio/chain/block_log.hpp>
 #include <sysio/chain/chainbase_environment.hpp>
-#include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/name.hpp>
 #include <sysio/chain/config.hpp>
-#include <sysio/chain/trace.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/chain/contract_types.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_api_plugin/producer_api_plugin.hpp>
@@ -69,8 +56,8 @@ namespace {
   namespace fs = std::filesystem;
   FC_DECLARE_EXCEPTION(connection_exception, 1100000, "Connection Exception");
 
-  std::filesystem::path determine_home_directory() {
-    std::filesystem::path home;
+  fs::path determine_home_directory() {
+    fs::path home;
     passwd* pwd = getpwuid(getuid());
     if (pwd) {
       home = pwd->pw_dir;
@@ -87,36 +74,6 @@ namespace {
   ) + ".sock")).string();
   string wallet_url = default_wallet_url; //to be set to default_wallet_url in main
 
-
-  bool local_port_used() {
-    using namespace boost::asio;
-
-    io_service ios;
-    local::stream_protocol::endpoint endpoint(wallet_url.substr(strlen("unix://")));
-    local::stream_protocol::socket socket(ios);
-    boost::system::error_code ec;
-    socket.connect(endpoint, ec);
-
-    return !ec;
-  }
-
-  void try_local_port(uint32_t duration) {
-    using namespace std::chrono;
-    auto start_time = duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch()).count();
-    while (!local_port_used()) {
-      if (duration_cast<std::chrono::milliseconds>(system_clock::now().time_since_epoch()).count() - start_time >
-        duration) {
-        std::cerr << "Unable to connect to " << client::config::key_store_executable_name << ", if " <<
-          client::config::key_store_executable_name << " is running please kill the process and try again.\n";
-        throw connection_exception(
-          fc::log_messages{
-            FC_LOG_MESSAGE(error, "Unable to connect to ${k}", ("k", client::config::key_store_executable_name))
-          }
-        );
-      }
-    }
-  }
-
   namespace bp = boost::process;
 
   bool kill_process_by_name(const std::string& name) {
@@ -125,10 +82,13 @@ namespace {
     bp::child find_proc(bp::search_path("pgrep"), name, bp::std_out > is);
 
     std::vector<int> pids;
-    int pid;
-    while (is >> pid) {
-      pids.push_back(pid);
+    {
+      int pid;
+      while (is >> pid) {
+        pids.push_back(pid);
+      }
     }
+
     find_proc.wait();
 
     if (pids.empty()) {
@@ -239,29 +199,12 @@ namespace {
   }
 
 
-  fc::logging_config& add_deep_mind_logger(fc::logging_config& config) {
-    config.appenders.push_back(fc::appender_config("deep-mind", "dmlog"));
 
-    fc::logger_config dmlc;
-    dmlc.name = "deep-mind";
-    dmlc.level = fc::log_level::debug;
-    dmlc.enabled = true;
-    dmlc.appenders.push_back("deep-mind");
-
-    config.loggers.push_back(dmlc);
-
-    return config;
-  }
-
-  void configure_logging(const std::filesystem::path& config_path) {
+  void configure_logging(const fs::path& config_path) {
     try {
       try {
         if (std::filesystem::exists(config_path)) {
           fc::configure_logging(config_path);
-        } else {
-          auto cfg = fc::logging_config::default_config();
-
-          fc::configure_logging(add_deep_mind_logger(cfg));
         }
       } catch (...) {
         elog("Error reloading logging.json");
@@ -280,59 +223,19 @@ namespace {
 
   void logging_conf_handler() {
     auto config_path = app().get_logging_conf();
-    if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
-    } else {
-      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
-    }
     configure_logging(config_path);
     fc::log_config::initialize_appenders();
   }
 
   void initialize_logging() {
     auto config_path = app().get_logging_conf();
-    if (std::filesystem::exists(config_path)) fc::configure_logging(config_path);
-    // intentionally allowing exceptions to escape
-    else {
-      auto cfg = fc::logging_config::default_config();
-
-      fc::configure_logging(add_deep_mind_logger(cfg));
-    }
+    if (std::filesystem::exists(config_path))
+      fc::configure_logging(config_path);
 
     fc::log_config::initialize_appenders();
-
     app().set_sighup_callback(logging_conf_handler);
-
   }
 
-
-  vector<chain::permission_level> get_account_permissions(const string& tx_payer, const vector<string>& permissions) {
-    auto fixedPermissions = permissions | boost::adaptors::transformed(
-      [](const string& p) {
-        vector<string> pieces;
-        split(pieces, p, boost::algorithm::is_any_of("@"));
-        if (pieces.size() == 1) pieces.push_back("active");
-        return chain::permission_level{.actor = name(pieces[0]), .permission = name(pieces[1])};
-      }
-    );
-    vector<chain::permission_level> accountPermissions;
-    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
-
-    accountPermissions.push_back(chain::permission_level{.actor = name(tx_payer), .permission = name("sysio.payer")});
-    return accountPermissions;
-  }
-
-  vector<chain::permission_level> get_account_permissions(
-    const string& tx_payer,
-    const chain::permission_level& default_permission
-  ) {
-    vector<chain::permission_level> accountPermissions{default_permission};
-    if (!tx_payer.empty()) {
-      accountPermissions.push_back(chain::permission_level{.actor = name(tx_payer), .permission = name("sysio.payer")});
-    }
-    return accountPermissions;
-
-  }
 } // namespace detail
 
 void chain_actions::setup(CLI::App& app) {
@@ -353,9 +256,8 @@ void chain_actions::setup(CLI::App& app) {
 
   build_info->callback(
     [&] {
-      int rc = run_subcommand_build_info();
       // properly return err code in main
-      if (rc) throw(CLI::RuntimeError(rc));
+      if (int rc = run_subcommand_build_info();rc) throw(CLI::RuntimeError(rc));
     }
   );
 
@@ -405,7 +307,7 @@ void chain_actions::setup(CLI::App& app) {
 
 int chain_actions::run_subcommand_build_info() {
   if (!opt->build_output_file.empty()) {
-    std::filesystem::path p = opt->build_output_file;
+    fs::path p = opt->build_output_file;
     if (p.is_relative()) {
       p = std::filesystem::current_path() / p;
     }
@@ -420,7 +322,7 @@ int chain_actions::run_subcommand_build_info() {
 }
 
 int chain_actions::run_subcommand_sstate() {
-  std::filesystem::path state_dir = "";
+  fs::path state_dir = "";
 
   // default state dir, if none specified
   if (opt->sstate_state_dir.empty()) {
@@ -450,7 +352,7 @@ int chain_actions::run_subcommand_sstate() {
     return -1;
   }
 
-  chainbase::db_header* dbheader = reinterpret_cast<chainbase::db_header*>(header);
+  auto dbheader = reinterpret_cast<chainbase::db_header*>(header);
   if (dbheader->id != chainbase::header_id) {
     std::string what_str(
       "\"" + state_dir.generic_string() + "\" database format not compatible with this version of chainbase."
@@ -489,16 +391,16 @@ int chain_actions::run_subcommand_configure() {
 
     std::map<std::string, chain_account_detail> accounts{};
 
-    std::filesystem::path target_dir = std::filesystem::absolute(opt->configure_target_root);
+    fs::path target_dir = std::filesystem::absolute(opt->configure_target_root);
 
-    std::filesystem::path config_dir = target_dir / "config";
-    std::filesystem::path secrets_dir = target_dir / "secrets";
-    std::filesystem::path wallet_dir = target_dir / "wallet";
-    std::filesystem::path data_dir = target_dir / "data";
+    fs::path config_dir = target_dir / "config";
+    fs::path secrets_dir = target_dir / "secrets";
+    fs::path wallet_dir = target_dir / "wallet";
+    fs::path data_dir = target_dir / "data";
 
     auto overwrite = opt->configure_overwrite;
-    std::filesystem::path ini_override_file = opt->configure_ini_override_file;
-    std::filesystem::path genesis_override_file = opt->configure_genesis_override_file;
+    fs::path ini_override_file = opt->configure_ini_override_file;
+    fs::path genesis_override_file = opt->configure_genesis_override_file;
 
     auto template_name = opt->configure_template;
     if (!std::ranges::contains(chain_configure_template_names, template_name)) throw CLI::RequiredError(
@@ -512,7 +414,7 @@ int chain_actions::run_subcommand_configure() {
     }
 
     // RESOLVE ROOT DIR
-    std::filesystem::path root_dir{std::filesystem::current_path()};
+    fs::path root_dir{std::filesystem::current_path()};
     const char* root_path_env = std::getenv("WIRE_ROOT");
     if (root_path_env && std::strlen(root_path_env)) root_dir = root_path_env;
 
@@ -585,7 +487,7 @@ int chain_actions::run_subcommand_configure() {
 
     std::println(std::cout, "root_dir: {}", root_dir.generic_string());
 
-    std::filesystem::path template_dir = root_dir / "etc" / "config" / "nodeop" / template_name;
+    fs::path template_dir = root_dir / "etc" / "config" / "nodeop" / template_name;
     auto default_genesis_file = template_dir / "genesis.template.json";
 
     std::println(std::cout, "template_dir: {}", root_dir.generic_string());
@@ -594,8 +496,8 @@ int chain_actions::run_subcommand_configure() {
     std::println(std::cout, "config_dir: {}", config_dir.generic_string());
 
     // Target genesis.json path
-    std::filesystem::path target_genesis_file = config_dir / "genesis.json";
-    std::filesystem::path target_ini_file = config_dir / "config.ini";
+    fs::path target_genesis_file = config_dir / "genesis.json";
+    fs::path target_ini_file = config_dir / "config.ini";
     auto target_genesis_file_exists = std::filesystem::exists(target_genesis_file);
     auto target_ini_file_exists = std::filesystem::exists(target_ini_file);
     auto can_write_genesis = !target_genesis_file_exists || overwrite;
@@ -900,10 +802,8 @@ int chain_actions::run_subcommand_configure() {
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     std::println(std::cout, "Populating contracts");
-    // auto& app = application::instance();
-    fc::microseconds max_response_time{30 * 1000};
     auto chain = app->find_plugin<chain_plugin>();
-    auto chain_api = chain->get_read_write_api(max_response_time);
+
 
     ilog("Got chain with id: ${chainId}", ("chainId",chain->get_chain_id()));
 
