@@ -202,19 +202,22 @@ jobs:
           echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
 
           echo
+          echo "=== GITHUB WORKSPACE ==="
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Current directory: $PWD"
+          ls -la "$GITHUB_WORKSPACE" || true
+
+          echo
           echo "=== PATHS & PERMISSIONS ==="
           echo "--- /github ---"
           ls -ld /github || true
           echo "--- /github/home ---"
           ls -ld /github/home || true
-          echo "--- /__w ---"
-          ls -ld /__w || true
-          echo "--- /__w/wire-sysio ---"
-          ls -ld /__w/wire-sysio || true
-          echo "--- /__w/wire-sysio/wire-sysio ---"
-          ls -ld /__w/wire-sysio/wire-sysio || true
+          echo "--- Current workspace ---"
+          ls -ld "$GITHUB_WORKSPACE" || true
           echo "--- ./build ---"
           ls -ld build || true
+          ls -ld "$GITHUB_WORKSPACE/build" || true
           echo "--- ./build/Testing ---"
           ls -ld build/Testing || true
           echo "--- ./build/Testing/Temporary ---"
@@ -222,12 +225,12 @@ jobs:
 
           echo
           echo "=== FILE OWNERSHIP TOP 20 ==="
-          find /__w/wire-sysio/wire-sysio -maxdepth 2 -type d -printf '%u:%g %p\n' | sort | uniq -c | sort -nr | head -n 20
+          find "$GITHUB_WORKSPACE" -maxdepth 2 -type d -printf '%u:%g %p\n' 2>/dev/null | sort | uniq -c | sort -nr | head -n 20
 
           echo
           echo "=== MOUNTED FILESYSTEMS ==="
           df -h
-          mount | grep /__w || true
+          mount | grep "$GITHUB_WORKSPACE" || true
 
           echo
           echo "=== GIT CONFIG LOCATIONS ==="
@@ -235,7 +238,7 @@ jobs:
 
           echo
           echo "=== CHECK WRITABILITY OF BUILD DIR ==="
-          touch build/debug_write_test || echo "❌ Cannot write to build/"
+          touch build/debug_write_test 2>&1 || echo "❌ Cannot write to build/"
           rm -f build/debug_write_test || true
 
       - name: Run Parallel Tests
@@ -244,8 +247,8 @@ jobs:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           # https://github.com/actions/runner/issues/2033
-          chown -R $(id -u):$(id -g) $PWD
           zstdcat build.tar.zst | tar x
+          sudo chown -R $(id -u):$(id -g) $PWD
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 420
 
