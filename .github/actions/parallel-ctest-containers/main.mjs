@@ -50,8 +50,9 @@ try {
       ],
       { stdio: 'inherit' }
     ).status
-  )
+  ) {
     throw new Error('Failed to create base container')
+  }
 
   if (child_process.spawnSync('docker', [...dockerArgs, 'commit', baseContainer, baseImage], { stdio: 'inherit' }).status)
     throw new Error('Failed to create base image')
@@ -60,14 +61,28 @@ try {
     throw new Error('Failed to remove base container')
 
   // Discover tests
-  const test_query_result = child_process.spawnSync('docker', [...dockerArgs, 'run', '--rm', baseImage, 'bash', '-e', '-o', 'pipefail', '-c', `cd build; ctest -L '${tests_label}' --show-only=json-v1`])
+  const test_query_result = child_process.spawnSync(
+    'docker',
+    [
+      ...dockerArgs,
+      'run',
+      '--rm',
+      baseImage,
+      'bash',
+      '-e',
+      '-o',
+      'pipefail',
+      '-c',
+      `cd build; ctest -L '${tests_label}' --show-only=json-v1`
+    ]
+  )
+
   if (test_query_result.status) throw new Error('Failed to discover tests with label')
   const tests = JSON.parse(test_query_result.stdout).tests
 
   // Run tests concurrently
-  let subprocesses = []
-  tests.forEach((t) => {
-    subprocesses.push(
+  const subprocesses = tests.map(
+    (t) =>
       new Promise((resolve) => {
         const cname = `${t.name}-${suffix}`
         const args = [
@@ -87,43 +102,71 @@ try {
         ]
         child_process.spawn('docker', args, { stdio: 'inherit' }).on('close', (code) => resolve(code))
       })
-    )
-  })
+  )
 
   const results = await Promise.all(subprocesses)
 
+  // Log full results for diagnostics
+  console.log('==== Parallel test results ====')
+  results.forEach((code, idx) => {
+    console.log(`Test #${idx + 1}: ${tests[idx]?.name || 'unknown'} exited with code ${code}`)
+  })
+  console.log('================================')
+
+  // Count non-zero codes for summary
+  const failedCount = results.filter((code) => code !== 0).length
+  console.log(`Total failed tests: ${failedCount} / ${results.length}`)
+
+  // Export logs for failed tests
   for (let i = 0; i < results.length; ++i) {
     if (results[i] === 0) continue
 
-    // A test failed
-    core.setFailed('Some tests failed')
+    console.log(`⚠️  Test failed: ${tests[i].name} (exit code ${results[i]})`)
 
-    let extractor = tar.extract()
-    let packer = tar.pack()
+    // Mark the action failed (but only once)
+    if (i === 0) core.setFailed('Some tests failed')
 
-    extractor.on('entry', (header, stream, next) => {
-      if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
-        stream.on('end', () => next())
-        stream.resume()
-        return
-      }
+    const extractor = tar.extract()
+    const packer = tar.pack()
 
-      header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length)
-      if (header.name !== 'build/' && error_log_paths.filter((p) => header.name.startsWith(p)).length === 0) {
-        stream.on('end', () => next())
-        stream.resume()
-        return
-      }
+    extractor
+      .on('entry', (header, stream, next) => {
+        if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
+          stream.on('end', next)
+          stream.resume()
+          return
+        }
 
-      stream.pipe(packer.entry(header, next))
-    }).on('finish', () => {
-      packer.finalize()
-    })
+        header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length)
+        if (
+          header.name !== 'build/' &&
+          !error_log_paths.some((p) => header.name.startsWith(p))
+        ) {
+          stream.on('end', next)
+          stream.resume()
+          return
+        }
 
-    // 👇 Use the correct docker host for export
-    const exportProc = child_process.spawn('docker', [...dockerArgs, 'export', `${tests[i].name}-${suffix}`])
+        stream.pipe(packer.entry(header, next))
+      })
+      .on('finish', () => packer.finalize())
+
+    const exportProc = child_process.spawn(
+      'docker',
+      [...dockerArgs, 'export', `${tests[i].name}-${suffix}`]
+    )
+
     exportProc.stdout.pipe(extractor)
-    stream.promises.pipeline(packer, zlib.createGzip(), fs.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`))
+
+    stream.promises
+      .pipeline(
+        packer,
+        zlib.createGzip(),
+        fs.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`)
+      )
+      .catch((err) => {
+        console.error(`Pipeline error for ${tests[i].name}:`, err)
+      })
   }
 } catch (e) {
   core.setFailed(`Uncaught exception ${e.message}`)

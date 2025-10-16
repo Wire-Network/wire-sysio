@@ -184,6 +184,60 @@ jobs:
         with:
           name: ${{matrix.cfg.builddir}}-build
 
+      - name: Debug environment and workspace
+        run: |
+          echo "=== SYSTEM INFO ==="
+          whoami
+          id
+          hostname
+
+          echo
+          echo "=== ENVIRONMENT ==="
+          env | sort
+
+          echo
+          echo "=== DOCKER CONTEXT INFO ==="
+          docker context ls || true
+          echo "Current DOCKER_HOST: $DOCKER_HOST"
+          echo "Current DOCKER_CONTEXT: $DOCKER_CONTEXT"
+
+          echo
+          echo "=== PATHS & PERMISSIONS ==="
+          echo "--- /github ---"
+          ls -ld /github || true
+          echo "--- /github/home ---"
+          ls -ld /github/home || true
+          echo "--- /__w ---"
+          ls -ld /__w || true
+          echo "--- /__w/wire-sysio ---"
+          ls -ld /__w/wire-sysio || true
+          echo "--- /__w/wire-sysio/wire-sysio ---"
+          ls -ld /__w/wire-sysio/wire-sysio || true
+          echo "--- ./build ---"
+          ls -ld build || true
+          echo "--- ./build/Testing ---"
+          ls -ld build/Testing || true
+          echo "--- ./build/Testing/Temporary ---"
+          ls -ld build/Testing/Temporary || true
+
+          echo
+          echo "=== FILE OWNERSHIP TOP 20 ==="
+          find /__w/wire-sysio/wire-sysio -maxdepth 2 -type d -printf '%u:%g %p\n' | sort | uniq -c | sort -nr | head -n 20
+
+          echo
+          echo "=== MOUNTED FILESYSTEMS ==="
+          df -h
+          mount | grep /__w || true
+
+          echo
+          echo "=== GIT CONFIG LOCATIONS ==="
+          git config --list --show-origin || true
+
+          echo
+          echo "=== CHECK WRITABILITY OF BUILD DIR ==="
+          touch build/debug_write_test || echo "❌ Cannot write to build/"
+          rm -f build/debug_write_test || true
+
       - name: Run Parallel Tests
         env:
           DOCKER_HOST: ${{ env.DOCKER_HOST }}
