@@ -78,6 +78,8 @@ echo "[+] Using:"
 echo "    PREFIX        = ${PREFIX}"
 echo "    JOBS          = ${JOBS}"
 echo "    BRANCH        = ${BRANCH}"
+echo "    BASE_DIR      = ${BASE_DIR}"
+echo "    BUILD_DIR     = ${BUILD_DIR}"
 
 if [[ $(uname) != "Linux" ]]; then
   echo "[+] You must install dependencies manually on non-Linux"
@@ -93,6 +95,22 @@ if [[ ! -d "${LLVM_SRC_DIR}" ]]; then
   git clone --depth=1 -b "${BRANCH}" https://github.com/llvm/llvm-project.git "${LLVM_SRC_DIR}"
 fi
 
+# Resolves Ubuntu 24 issue.
+# ---- Patch: ensure uintptr_t is visible in Signals.h for newer libc/clang toolchains ----
+SIG_H="${LLVM_SRC_DIR}/llvm/include/llvm/Support/Signals.h"
+if [[ -f "${SIG_H}" ]]; then
+  if ! grep -qE '^\s*#\s*include\s*<cstdint>' "${SIG_H}"; then
+    # Insert <cstdint> once, just after the first existing #include for tidy order
+    sed -i '0,/#include/s//#include <cstdint>\n&/' "${SIG_H}"
+    echo "[+] Injected <cstdint> into llvm/Support/Signals.h"
+  else
+    echo "[+] <cstdint> already present in llvm/Support/Signals.h"
+  fi
+else
+  echo "[!] WARNING: ${SIG_H} not found; skipping uintptr_t include patch"
+fi
+# ----------------------------------------------------------------------------------------
+
 rm -rf "${BUILD_DIR}"
 
 # Base CMake flags
@@ -106,6 +124,11 @@ declare -a CMAKE_FLAGS=(
   -DLLVM_INCLUDE_BENCHMARKS=OFF
   -DLLVM_ENABLE_BINDINGS=OFF
   -DLLVM_ENABLE_WERROR=OFF
+  
+  # Silence noisy warnings that occasionally trip -Werror in subtools
+  -DCMAKE_C_FLAGS="-Wno-unused-but-set-variable -Wno-bitwise-instead-of-logical"
+  -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable -Wno-bitwise-instead-of-logical"
+
 
   -DLLVM_TARGETS_TO_BUILD=host
   -DLLVM_BUILD_TOOLS=Off
@@ -122,7 +145,18 @@ echo "[+] Configuring (top-level)…"
 cmake -S "${LLVM_SRC_DIR}/llvm" -B "${BUILD_DIR}" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 "${CMAKE_FLAGS[@]}"
 
 echo "[+] Building…"
-ninja -C "${BUILD_DIR}" -j "${JOBS}"
+# ninja -C "${BUILD_DIR}" -j "${JOBS}"
+
+# - - - - FOR DEBUGGING FAILED BUILDS - - - -
+echo "[+] Building…"
+LOG="${BUILD_DIR}/ninja.log"
+ninja -C "${BUILD_DIR}" -j "${JOBS}" -v -k 0 2>&1 | tee "${LOG}" || {
+  echo "---- FIRST FAILED COMMAND(S) ----"
+  awk '/FAILED:/{print; f=1; next} f && NF{print; if(++c==30) exit}' "${LOG}" || true
+  echo "---- CMakeError.log tail ----"
+  tail -n 200 "${BUILD_DIR}/CMakeFiles/CMakeError.log" || true
+  exit 1
+}
 
 echo "[+] Installing (sudo)…"
 sudo mkdir -p "${PREFIX}"

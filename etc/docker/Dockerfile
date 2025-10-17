@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile
 # Stages:
 #   1) distro-deps   - Install OS-level toolchain and libraries (base for all other stages)
-#   2) source-deps   - Install source-built dependencies (LLVM 11) on top of distro-deps
+#   2) source-deps   - Install source-built dependencies (CLANG 18 + LLVM 11) on top of distro-deps
 #   3) app-source-*  - Prepare application sources (from local context or remote repo)
 #   4) app-build-*   - Build the application from the chosen app-source-* stage
 #
@@ -11,7 +11,9 @@
 
 # Stage 1: distro-deps
 # Base image with system packages required for building (compilers, cmake, Python, etc.)
-FROM ubuntu:22.04 AS distro-deps
+ARG UBUNTU_TAG=22.04
+FROM ubuntu:${UBUNTU_TAG} AS distro-deps
+# FROM ubuntu:22.04 AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -28,6 +30,11 @@ ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
 ENV CLANG_18_DIR=/opt/clang/clang-18
 ENV LLVM_11_DIR=/opt/llvm/llvm-11
 
+# vcpkg deterministic behavior (manifests/registries/versions + compiler tracking)
+ENV VCPKG_FEATURE_FLAGS=manifests,registries,versions,compilertracking
+ENV VCPKG_DEFAULT_TRIPLET=x64-linux
+ENV VCPKG_OVERLAY_TRIPLETS=/wire/wire-sysio/vcpkg/triplets
+
 # Core package tools and repository helpers
 RUN apt-get update
 RUN apt-get install -y \
@@ -35,12 +42,34 @@ RUN apt-get install -y \
         wget \
         software-properties-common
 
-# Enable Python 3.12 PPA and refresh indexes
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
+# ----- Consistent Python setup across 22/24/25 -----
+# jammy (22.04): get Python 3.12 from deadsnakes, set python3 -> 3.12
+# noble/plucky: use distro python3; don't force version symlink
+RUN set -eux; \
+    . /etc/os-release; \
+    if [ "${VERSION_CODENAME}" = "jammy" ]; then \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+            software-properties-common \
+            ca-certificates \
+            gnupg && \
+        add-apt-repository -y ppa:deadsnakes/ppa && \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+            python3.12 \
+            python3.12-venv \
+            python3-pip && \
+        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1; \
+    else \
+        apt-get update && \
+        apt-get install -y --no-install-recommends \
+            python3 \
+            python3-pip; \
+    fi
 
 # Build toolchain and development libraries needed by the application
 RUN apt-get install -y \
+<<<<<<< HEAD
 				build-essential \
 				ccache \
 				clang-18 \
@@ -78,10 +107,54 @@ RUN apt-get install -y \
 				vim \
 				zip \
 				zlib1g-dev
+=======
+        gnupg \
+        build-essential \
+        ccache \
+        ninja-build \
+        cmake \
+        curl \
+        zip \
+        unzip \
+        tar \
+        git \
+        vim \
+        sudo \
+        doxygen \
+        golang \
+        libboost-all-dev \
+        libcurl4-openssl-dev \
+        libgmp-dev \
+        libssl-dev \
+        libusb-1.0-0-dev \
+        pkg-config \
+        zlib1g-dev \
+        libbz2-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libzstd-dev
+>>>>>>> 0612c1389a (WIP: Ubuntu 22/24 building with clang-18 and llvm-11 compiled - debs need testing)
 
-# Make Python 3.12 the default python3
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
-RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
+# Make sure GNU C++ headers/libs are visible to clang (pick correct libstdc++-*-dev)
+RUN set -eux; \
+    . /etc/os-release; \
+    case "${VERSION_CODENAME}" in \
+      jammy)  PKG=libstdc++-11-dev ;; \
+      noble)  PKG=libstdc++-13-dev ;; \
+      *)      echo "Unsupported Ubuntu ${VERSION_CODENAME} for this Dockerfile"; exit 1 ;; \
+    esac; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends g++ "$PKG" python3; \
+    rm -rf /var/lib/apt/lists/*
+
+# Satisfy vcpkg/boost find_program(gcc-10) on 22/24:
+RUN set -eux; \
+    . /etc/os-release; \
+    if [ "${VERSION_CODENAME}" = "jammy" ]; then \
+        apt-get update && apt-get install -y --no-install-recommends gcc-10 g++-10 && rm -rf /var/lib/apt/lists/*; \
+    fi
+
+RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
 # Stage 2a: clang18-build
 FROM distro-deps AS clang18-build
@@ -93,6 +166,37 @@ RUN --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
     BASE_DIR=/opt/clang /opt/clang/scripts/clang-18-ubuntu-build-source.sh
 
 ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
+
+# A tiny chainloaded toolchain so vcpkg sub-builds always use clang-18
+RUN cat > /opt/clang/clang18-vcpkg-toolchain.cmake <<'EOF'
+set(CMAKE_C_COMPILER   /opt/clang/clang-18/bin/clang)
+set(CMAKE_CXX_COMPILER /opt/clang/clang-18/bin/clang++)
+set(CMAKE_AR           /opt/clang/clang-18/bin/llvm-ar)
+set(CMAKE_RANLIB       /opt/clang/clang-18/bin/llvm-ranlib)
+# Be explicit; some ports gate on language level
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+EOF
+
+# Make sure vcpkg keeps (and uses) the chainloaded toolchain in all sub-configures
+ENV B2_TOOLSET=clang \
+    VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake \
+    VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
+
+# On noble (24.04), if anything probes gcc-10/g++-10, route it to clang-18
+RUN . /etc/os-release; if [ "$VERSION_CODENAME" = "noble" ]; then \
+      ln -sf ${CLANG_18_DIR}/bin/clang   /usr/bin/gcc-10  && \
+      ln -sf ${CLANG_18_DIR}/bin/clang++ /usr/bin/g++-10; \
+    fi
+
+
+# Ensure vcpkg sub-builds keep using clang-18 + LLVM binutils
+# ENV CC=${CLANG_18_DIR}/bin/clang \
+#     CXX=${CLANG_18_DIR}/bin/clang++ \
+#     AR=${CLANG_18_DIR}/bin/llvm-ar \
+#     RANLIB=${CLANG_18_DIR}/bin/llvm-ranlib \
+#     VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET" \
+#     B2_TOOLSET=clang
 
 # Stage 2b: source-deps
 # Install dependencies built from source (LLVM 11) on top of clang-18-build.
@@ -138,16 +242,65 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ cmake \
-    -S $(realpath --relative-to=$PWD ${APP_DIR}) \
-    -B . \
-    -G Ninja \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-    -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
-    -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
-    -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
-    -DENABLE_CCACHE=ON
+# RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ cmake \
+#     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+#     -B . \
+#     -G Ninja \
+#     -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
+#     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
+#     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
+#     -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
+#     -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+#     -DCMAKE_AR=${CLANG_18_DIR}/bin/llvm-ar \
+#     -DCMAKE_RANLIB=${CLANG_18_DIR}/bin/llvm-ranlib \
+#     -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+#     -DENABLE_CCACHE=ON
+RUN set -eux; \
+  unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS || true; \
+  rc=0; \
+  env \
+    VCPKG_MAX_CONCURRENCY=8 \
+    CMAKE_BUILD_PARALLEL_LEVEL=8 \
+    CC=${CLANG_18_DIR}/bin/clang \
+    CXX=${CLANG_18_DIR}/bin/clang++ \
+    cmake \
+      -S "$(realpath --relative-to=$PWD ${APP_DIR})" \
+      -B . \
+      -G Ninja \
+      -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
+      -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+      -DCMAKE_TOOLCHAIN_FILE="${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+      -DCMAKE_C_COMPILER="${CLANG_18_DIR}/bin/clang" \
+      -DCMAKE_CXX_COMPILER="${CLANG_18_DIR}/bin/clang++" \
+      -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
+      -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
+      -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+      -DENABLE_CCACHE=ON \
+  || rc=$?; \
+  if [ "$rc" -ne 0 ]; then \
+    echo '=== vcpkg-manifest-install.log (tail) ===' || true; \
+    test -f "${APP_BUILD_DIR}/vcpkg-manifest-install.log" && tail -n 200 "${APP_BUILD_DIR}/vcpkg-manifest-install.log" || true; \
+    for f in \
+      "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-dbg-out.log" \
+      "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-rel-out.log" \
+      "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-dbg-out.log" \
+      "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-rel-out.log" \
+    ; do \
+      if [ -f "$f" ]; then \
+        echo "=== $f (first failure context) ==="; \
+        line=$(grep -nE "FAILED:|subcommand failed| error: | error\\]|ninja: build stopped" "$f" | head -n1 | cut -d: -f1 || true); \
+        if [ -n "$line" ]; then \
+          start=$((line>160?line-160:1)); end=$((line+320)); sed -n "${start},${end}p" "$f" || true; \
+        else \
+          echo "(no match)"; tail -n 400 "$f" || true; \
+        fi; \
+        echo "--- compiler lines (first few) ---"; \
+        grep -E "/clang\\+\\+|/g\\+\\+-10|/g\\+\\+| -std=gnu\\+\\+| -std=c\\+\\+" "$f" | head -n 10 || true; \
+      fi; \
+    done; \
+    exit $rc; \
+  fi
+
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
