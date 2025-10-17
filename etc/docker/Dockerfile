@@ -40,41 +40,43 @@ RUN apt-get update
 
 # Build toolchain and development libraries needed by the application
 RUN apt-get install -y \
-        gnupg \
-        build-essential \
-        ccache \
-        ninja-build \
-        cmake \
-        curl \
-        zip \
-        unzip \
-        tar \
-        git \
-        vim \
-        sudo \
-        doxygen \
-        golang \
-    		gcc-10 \
-        g++-10 \
-    		gcc-12 \
-        g++-12 \
-    		llvm-18 \
-        clang-18 \
-        clang-tools-18 \
-        libboost-all-dev \
-        libcurl4-openssl-dev \
-        libgmp-dev \
-        libssl-dev \
-        libusb-1.0-0-dev \
-        pkg-config \
-        python3.12 \
-        python3-pip \
-        zlib1g-dev \
-        libbz2-dev \
-        liblzma-dev \
-        libncurses5-dev \
-        libzstd-dev
-    	
+				build-essential \
+				ccache \
+				clang-18 \
+				clang-tools-18 \
+				cmake \
+				curl \
+				doxygen \
+				g++-10 \
+				g++-12 \
+				gcc-10 \
+				gcc-12 \
+				git \
+				gnupg \
+				golang \
+				libc++-18-dev \
+				libc++-dev \
+				libbz2-dev \
+				libboost-all-dev \
+				libcurl4-openssl-dev \
+				libgmp-dev \
+				liblzma-dev \
+				libncurses5-dev \
+				libssl-dev \
+				libstdc++-14-dev \
+				libusb-1.0-0-dev \
+				libzstd-dev \
+				llvm-18 \
+				ninja-build \
+				pkg-config \
+				python3-pip \
+				python3.12 \
+				sudo \
+				tar \
+				unzip \
+				vim \
+				zip \
+				zlib1g-dev
 
 # Make Python 3.12 the default python3
 RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
@@ -91,6 +93,10 @@ RUN mkdir -p LLVM_11_DIR
 # Build and install LLVM 11 using the helper script
 RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
     BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
+
+ENV MAX_JOBS=16
+ENV CC=/usr/bin/clang-18
+ENV CXX=/usr/bin/clang++-18
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
@@ -126,12 +132,11 @@ RUN env CC=clang-18 CXX=clang++-18 cmake \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-    -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-    -DENABLE_CCACHE=ON
+    -DCMAKE_CC_COMPILER=${CC} \
+    -DCMAKE_CXX_COMPILER=${CXX} \
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
 
-RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -142,20 +147,17 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN env CC=clang-18 CXX=clang++-18 \
-    cmake \
+RUN cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-    -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-    -DENABLE_CCACHE=ON
+    -DCMAKE_C_COMPILER=${CC} \
+    -DCMAKE_CXX_COMPILER=${CXX} \
+    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
 
-
-RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
 # Ensure application binaries are in PATH
 ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
@@ -193,17 +195,14 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
 WORKDIR ${CDT_BUILD_DIR} 
-RUN env CC=clang-18 CXX=clang++-18 \
-        cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+RUN cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
         -B . \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-        -DCMAKE_C_COMPILER=/usr/bin/clang-18 \
-        -DCMAKE_CXX_COMPILER=/usr/bin/clang++-18 \
+        -DCMAKE_CC_COMPILER=${CC} \
+        -DCMAKE_CXX_COMPILER=${CXX} \
         -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-        -Dsysio_DIR=${APP_BUILD_DIR} \
-        -DENABLE_CCACHE=ON
+        -Dsysio_DIR=${APP_BUILD_DIR} 
 
-
-RUN cmake --build . -- -j$([[ "$(nproc)" -gt 8 ]] && echo 8 || nproc)
+RUN  cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
