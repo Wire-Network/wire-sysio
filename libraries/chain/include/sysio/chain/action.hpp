@@ -95,6 +95,7 @@ namespace sysio { namespace chain {
       }
 
       account_name explicit_payer() const;
+      uint32_t get_billable_size()const { return fc::raw::pack_size(static_cast<const action_base&>(*this)) + data.size(); }
    };
 
    template <typename Hasher>

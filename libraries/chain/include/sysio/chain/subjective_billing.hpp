@@ -83,10 +83,7 @@ private:
    void remove_subjective_billing( const chain::signed_block_ptr& block, uint32_t time_ordinal ) {
       if( !_trx_cache_index.empty() ) {
          for( const auto& receipt : block->transactions ) {
-            if( std::holds_alternative<chain::packed_transaction>(receipt.trx) ) {
-               const auto& pt = std::get<chain::packed_transaction>(receipt.trx);
-               remove_subjective_billing( pt.id(), time_ordinal );
-            }
+            remove_subjective_billing( receipt.trx.id(), time_ordinal );
          }
       }
    }

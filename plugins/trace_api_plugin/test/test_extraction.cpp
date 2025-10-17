@@ -26,7 +26,7 @@ namespace {
          block_number,
          chain::block_timestamp_type(slot),
          {},
-         chain::transaction_receipt_header{status},
+         chain::transaction_receipt_header{},
          fc::microseconds(0),
          0,
          std::move(actions),
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             ptrx1.id(),
             expected_action_traces,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[0].status},
+            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{0},
             bsp1->block->transactions[0].cpu_usage_us,
             bsp1->block->transactions[0].net_usage_words,
             ptrx1.get_signatures(),

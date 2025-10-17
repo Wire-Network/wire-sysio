@@ -276,9 +276,8 @@ namespace sysio { namespace chain {
                                     3040007, "Invalid Reference Block" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_duplicate,                transaction_exception,
                                     3040008, "Duplicate transaction" )
-      // deferred_tx_duplicate 3040009
-      FC_DECLARE_DERIVED_EXCEPTION( cfa_inside_generated_tx,     transaction_exception,
-                                    3040010, "Context free action is not allowed inside generated transaction" )
+      // deferred_tx_duplicate   3040009
+      // cfa_inside_generated_tx 3040010
       FC_DECLARE_DERIVED_EXCEPTION( tx_not_found,     transaction_exception,
                                     3040011, "The transaction can not be found" )
       FC_DECLARE_DERIVED_EXCEPTION( too_many_tx_at_once,          transaction_exception,

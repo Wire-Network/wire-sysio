@@ -169,18 +169,26 @@ signed_transaction::get_signature_keys( const chain_id_type& chain_id, fc::time_
    return transaction::get_signature_keys(signatures, chain_id, deadline, context_free_data, recovered_pub_keys, allow_duplicate_keys);
 }
 
-uint32_t packed_transaction::get_unprunable_size()const {
+uint32_t packed_transaction::get_billable_size()const {
    uint64_t size = config::fixed_net_overhead_of_packed_trx;
    size += packed_trx.size();
+   size += fc::raw::pack_size(signatures);
+   size += packed_context_free_data.size();
    SYS_ASSERT( size <= std::numeric_limits<uint32_t>::max(), tx_too_big, "packed_transaction is too big" );
    return static_cast<uint32_t>(size);
 }
 
-uint32_t packed_transaction::get_prunable_size()const {
-   uint64_t size = fc::raw::pack_size(signatures);
-   size += packed_context_free_data.size();
-   SYS_ASSERT( size <= std::numeric_limits<uint32_t>::max(), tx_too_big, "packed_transaction is too big" );
-   return static_cast<uint32_t>(size);
+uint32_t packed_transaction::get_billable_size(size_t action_index)const {
+   assert(action_index < unpacked_trx.total_actions());
+   uint32_t size = 0;
+   if (action_index < unpacked_trx.context_free_actions.size()) {
+      // asserted to be the same size in local_unpack_context_free_data
+      size += unpacked_trx.context_free_data[action_index].size();
+      size += unpacked_trx.context_free_actions[action_index].get_billable_size();
+   } else {
+      size += unpacked_trx.actions[action_index].get_billable_size();
+   }
+   return size;
 }
 
 size_t packed_transaction::get_estimated_size()const {
@@ -385,6 +393,7 @@ void packed_transaction::local_unpack_transaction(vector<bytes>&& context_free_d
 
 void packed_transaction::local_unpack_context_free_data()
 {
+   assert(!trx_id.empty()); // must call after local_unpack_transaction
    try {
       SYS_ASSERT(unpacked_trx.context_free_data.empty(), tx_decompression_error, "packed_transaction.context_free_data not empty");
       switch( compression ) {
@@ -397,6 +406,9 @@ void packed_transaction::local_unpack_context_free_data()
          default:
             SYS_THROW( unknown_transaction_compression, "Unknown transaction compression algorithm" );
       }
+      SYS_ASSERT(unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
+                 "Context free data size ${cfd} not equal to context free actions size ${cfa}",
+                 ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
    } FC_CAPTURE_AND_RETHROW( (compression) )
 }
 

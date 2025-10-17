@@ -47,17 +47,16 @@ namespace sysio { namespace chain {
                               transaction_metadata::trx_type type = transaction_metadata::trx_type::input);
          ~transaction_context();
 
-         void init_for_implicit_trx( uint64_t initial_net_usage = 0 );
+         void init_for_implicit_trx();
 
-         void init_for_input_trx( uint64_t packed_trx_unprunable_size,
-                                  uint64_t packed_trx_prunable_size );
+         void init_for_input_trx();
 
          void exec();
          void finalize();
          void squash();
          void undo();
 
-         inline void add_net_usage( uint64_t u ) { net_usage += u; check_net_usage(); }
+         inline void add_net_usage( uint64_t u ) { trace->net_usage += u; check_net_usage(); }
 
          void check_net_usage()const;
 
@@ -82,8 +81,6 @@ namespace sysio { namespace chain {
 
          uint32_t update_billed_cpu_time( fc::time_point now );
 
-         std::tuple<int64_t, int64_t, bool, bool> max_bandwidth_billed_accounts_can_pay( bool force_elastic_limits = false )const;
-
          void validate_referenced_accounts( const transaction& trx, bool enforce_actor_whitelist_blacklist )const;
 
          bool is_dry_run()const { return trx_type == transaction_metadata::trx_type::dry_run; };
@@ -95,6 +92,10 @@ namespace sysio { namespace chain {
          friend struct controller_impl;
          friend class apply_context;
          friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
+
+         std::tuple<int64_t, int64_t, bool, bool> max_bandwidth_billed_accounts_can_pay()const;
+
+         std::tuple<int64_t, int64_t, bool, bool> max_bandwidth_billed_account_can_pay(account_name a)const;
 
          void add_ram_usage( account_name account, int64_t ram_delta );
 
@@ -138,15 +139,22 @@ namespace sysio { namespace chain {
          fc::time_point                published;
 
 
-         deque<digest_type>           executed_action_receipt_digests;
-         flat_set<account_name>        bill_to_accounts;
+         deque<digest_type>            executed_action_receipt_digests;
+
+         struct account_billing {
+            account_name account;
+            int64_t      cpu_usage_us = 0;
+            uint32_t     net_usage = 0;
+            bool         cpu_greylisted = false;
+            bool         net_greylisted = false;
+         };
+         vector<account_billing>       bill_to_accounts;
          flat_set<account_name>        validate_ram_usage;
 
          /// the maximum number of virtual CPU instructions of the transaction that can be safely billed to the billable accounts
          uint64_t                      initial_max_billable_cpu = 0;
 
          bool                          is_input           = false;
-         bool                          apply_context_free = true;
          bool                          enforce_whiteblacklist = true;
 
          fc::time_point                block_deadline = fc::time_point::maximum();
@@ -158,6 +166,7 @@ namespace sysio { namespace chain {
          transaction_checktime_timer   transaction_timer;
 
    private:
+         bool                          enforce_deadline = true;
          bool                          is_initialized = false;
          transaction_metadata::trx_type trx_type;
 
@@ -165,7 +174,6 @@ namespace sysio { namespace chain {
          bool                          net_limit_due_to_block = true;
          bool                          net_limit_due_to_greylist = false;
          uint64_t                      eager_net_limit = 0;
-         uint64_t&                     net_usage; /// reference to trace->net_usage
 
          bool                          cpu_limit_due_to_greylist = false;
 

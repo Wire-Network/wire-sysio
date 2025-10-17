@@ -281,8 +281,7 @@ namespace sysio { namespace testing {
          const auto& [ block, id ] = t;
          FC_ASSERT( block );
          for( auto receipt : block->transactions ) {
-            auto& pt = std::get<packed_transaction>(receipt.trx);
-            chain_transactions[pt.get_transaction().id()] = std::move(receipt);
+            chain_transactions.insert_or_assign(receipt.trx.id(), std::move(receipt));
          }
       });
    }
