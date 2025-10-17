@@ -1,71 +1,131 @@
-import child_process from 'node:child_process';
-import process from 'node:process';
-import stream from 'node:stream';
-import fs from 'node:fs';
-import zlib from 'node:zlib';
-import tar from 'tar-stream';
+// Build command:
+// npx esbuild .github/actions/parallel-ctest-containers/main.mjs \
+//   --bundle --platform=node --target=node20 --format=cjs \
+//   --outfile=.github/actions/parallel-ctest-containers/dist/index.js
+
+import child_process from 'node:child_process'
+import process from 'node:process'
+import stream from 'node:stream'
+import fs from 'node:fs'
+import zlib from 'node:zlib'
+import tar from 'tar-stream'
 import core from '@actions/core'
 
-const container = core.getInput('container', {required: true});
-const error_log_paths = JSON.parse(core.getInput('error-log-paths', {required: true}));
-const log_tarball_prefix = core.getInput('log-tarball-prefix', {required: true});
-const tests_label = core.getInput('tests-label', {required: true});
-const test_timeout = core.getInput('test-timeout', {required: true});
+async function main() {
+  const container = core.getInput('container', { required: true })
+  const error_log_paths = JSON.parse(core.getInput('error-log-paths', { required: true }))
+  const log_tarball_prefix = core.getInput('log-tarball-prefix', { required: true })
+  const tests_label = core.getInput('tests-label', { required: true })
+  const test_timeout = core.getInput('test-timeout', { required: true })
 
-const repo_name = process.env.GITHUB_REPOSITORY.split('/')[1];
+  const repo_name = process.env.GITHUB_REPOSITORY.split('/')[1]
+  const dockerHost = process.env.DOCKER_HOST || ''
+  const dockerArgs = dockerHost ? ['--host', dockerHost] : []
+  core.info(`Using Docker host: ${dockerHost || 'default /var/run/docker.sock'}`)
 
-try {
-   if(child_process.spawnSync("docker", ["run", "--name", "base", "-v", `${process.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], {stdio:"inherit"}).status)
-      throw new Error("Failed to create base container");
-   if(child_process.spawnSync("docker", ["commit", "base", "baseimage"], {stdio:"inherit"}).status)
-      throw new Error("Failed to create base image");
-   if(child_process.spawnSync("docker", ["rm", "base"], {stdio:"inherit"}).status)
-      throw new Error("Failed to remove base container");
+  try {
+    const platform = log_tarball_prefix
+    const suffix = `${process.env.GITHUB_RUN_ID}-${process.env.GITHUB_JOB}-${platform}-${Math.floor(Math.random() * 10000)}`
+    const baseContainer = `base-${suffix}`
+    const baseImage = `baseimage-${suffix}`
 
-   const test_query_result = child_process.spawnSync("docker", ["run", "--rm", "baseimage", "bash", "-e", "-o", "pipefail", "-c", `cd build; ctest -L '${tests_label}' --show-only=json-v1`]);
-   if(test_query_result.status)
-      throw new Error("Failed to discover tests with label")
-   const tests = JSON.parse(test_query_result.stdout).tests;
+    child_process.spawnSync('docker', [...dockerArgs, 'rm', '-f', baseContainer], { stdio: 'ignore' })
 
-   let subprocesses = [];
-   tests.forEach(t => {
-      subprocesses.push(new Promise(resolve => {
-         child_process.spawn("docker", ["run", "--security-opt", "seccomp=unconfined", "-e", "GITHUB_ACTIONS=True", "--name", t.name, "--init", "baseimage", "bash", "-c", `cd build; ctest --output-on-failure -R '^${t.name}$' --timeout ${test_timeout}`], {stdio:"inherit"}).on('close', code => resolve(code));
-      }));
-   });
+    if (
+      child_process.spawnSync(
+        'docker',
+        [...dockerArgs, 'run', '--name', baseContainer,
+         '-v', `${process.cwd()}/build.tar.zst:/build.tar.zst`,
+         '--workdir', `/__w/${repo_name}/${repo_name}`,
+         container, 'sh', '-c', 'zstdcat /build.tar.zst | tar x'],
+        { stdio: 'inherit' }
+      ).status
+    ) throw new Error('Failed to create base container')
 
-   const results = await Promise.all(subprocesses);
+    if (child_process.spawnSync('docker', [...dockerArgs, 'commit', baseContainer, baseImage], { stdio: 'inherit' }).status)
+      throw new Error('Failed to create base image')
+    if (child_process.spawnSync('docker', [...dockerArgs, 'rm', baseContainer], { stdio: 'inherit' }).status)
+      throw new Error('Failed to remove base container')
 
-   for(let i = 0; i < results.length; ++i) {
-      if(results[i] === 0)
-         continue;
+    const test_query_result = child_process.spawnSync('docker',
+      [...dockerArgs, 'run', '--rm', baseImage,
+       'bash', '-e', '-o', 'pipefail', '-c', `cd build; ctest -L '${tests_label}' --show-only=json-v1`])
+    if (test_query_result.status) throw new Error('Failed to discover tests with label')
+    const tests = JSON.parse(test_query_result.stdout).tests
 
-      //failing test
-      core.setFailed("Some tests failed");
+    const subprocesses = tests.map(t => new Promise(resolve => {
+      const cname = `${t.name}-${suffix}`
+      const args = [...dockerArgs, 'run', '--security-opt', 'seccomp=unconfined',
+        '-e', 'GITHUB_ACTIONS=True', '--name', cname, '--init', baseImage,
+        'bash', '-c', `cd build; ctest --output-on-failure -R '^${t.name}$' --timeout ${test_timeout}`]
+      child_process.spawn('docker', args, { stdio: 'inherit' })
+        .on('close', code => resolve({ name: t.name, code }))
+    }))
 
-      let extractor = tar.extract();
-      let packer = tar.pack();
+    const results = await Promise.all(subprocesses)
 
-      extractor.on('entry', (header, stream, next) => {
-         if(!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
-            stream.on('end', () => next());
-            stream.resume();
-            return;
-         }
+    console.log('==== Parallel test results ====')
+    results.forEach(r => console.log(`Test ${r.name} → exit ${r.code}`))
+    console.log('================================')
 
-         header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length);
-         if(header.name !== "build/" && error_log_paths.filter(p => header.name.startsWith(p)).length === 0) {
-            stream.on('end', () => next());
-            stream.resume();
-            return;
-         }
+    for (const { name, code } of results) {
+      if (code === 0) continue
+      core.setFailed('Some tests failed')
 
-         stream.pipe(packer.entry(header, next));
-      }).on('finish', () => {packer.finalize()});
+      const containerName = `${name}-${suffix}`
+      
+      const checkResult = child_process.spawnSync('docker', 
+        [...dockerArgs, 'ps', '-a', '-q', '-f', `name=${containerName}`],
+        { encoding: 'utf-8' })
+      
+      if (!checkResult.stdout.trim()) {
+        console.log(`Container ${containerName} not found, skipping log extraction`)
+        continue
+      }
 
-      child_process.spawn("docker", ["export", tests[i].name]).stdout.pipe(extractor);
-      stream.promises.pipeline(packer, zlib.createGzip(), fs.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`));
-   }
-} catch(e) {
-   core.setFailed(`Uncaught exception ${e.message}`);
+      console.log(`Extracting logs from ${containerName}`)
+
+      try {
+        const extractor = tar.extract()
+        const packer = tar.pack()
+
+        extractor.on('entry', (header, s, next) => {
+          if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
+            s.on('end', next); s.resume(); return
+          }
+          header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length)
+          if (header.name !== 'build/' && !error_log_paths.some(p => header.name.startsWith(p))) {
+            s.on('end', next); s.resume(); return
+          }
+          s.pipe(packer.entry(header, next))
+        }).on('finish', () => packer.finalize())
+
+        const exp = child_process.spawn('docker', [...dockerArgs, 'export', containerName])
+        
+        exp.on('error', (err) => {
+          console.error(`Failed to export container ${containerName}: ${err.message}`)
+        })
+        
+        exp.stderr.on('data', (data) => {
+          console.error(`Docker export stderr: ${data}`)
+        })
+
+        exp.stdout.pipe(extractor)
+        
+        await stream.promises.pipeline(
+          packer, 
+          zlib.createGzip(),
+          fs.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`)
+        )
+        
+        console.log(`Logs saved to ${log_tarball_prefix}-${name}-logs.tar.gz`)
+      } catch (err) {
+        console.error(`Error extracting logs for ${name}: ${err.message}`)
+      }
+    }
+  } catch (e) {
+    core.setFailed(`Uncaught exception ${e.message}`)
+  }
 }
+
+main()

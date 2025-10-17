@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -21,11 +21,7 @@ RUN apt-get update && apt-get upgrade -y && \
     jq                   \
     libcurl4-openssl-dev \
     libgmp-dev           \
-    llvm-11-dev          \
     ninja-build          \
-    python3              \
-    python3-dev          \
-    python3-pip          \
     python3-numpy        \
     file                 \
     zlib1g-dev           \
@@ -34,8 +30,9 @@ RUN apt-get update && apt-get upgrade -y && \
     zip                  \
     unzip                \
     tar                  \
-    sudo                 \
+    sudo                 \ 
     golang               \
+    python3-dev          \
     libffi-dev           \
     libedit-dev          \
     libxml2-dev          \
@@ -48,8 +45,6 @@ RUN apt-get update && apt-get upgrade -y && \
     g++-10               \
     clang-18             \
     clang++-18           \
-    clang-tools-18       \
-    autoconf automake libtool \
-    htop && \
-    python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install --no-cache-dir numpy==1.26.4
+    clang-tools-18       \ 
+    autoconf automake libtool 
+RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
