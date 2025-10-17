@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS )
    add_contract( sysmechanics sysmechanics sysmechanics.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysmechanics.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysmechanics.wasm COPYONLY )

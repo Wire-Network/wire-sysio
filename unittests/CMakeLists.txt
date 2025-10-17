@@ -1,60 +1,35 @@
 ### Build contracts with cdt if available ###
 include(ExternalProject)
 
-if( DONT_SKIP_TESTS )
-   add_compile_definitions(RUN_FAILING_TESTS=TRUE)
+if(DONT_SKIP_TESTS)
+  add_compile_definitions(RUN_FAILING_TESTS=TRUE)
 endif()
 
-if( SYSIO_COMPILE_TEST_CONTRACTS )
-   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
-   if( USE_SYSIO_CDT_1_7_X OR USE_SYSIO_CDT_1_8_X )
-      find_package( sysio.cdt REQUIRED )
-      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${SYSIO_CDT_ROOT}/lib/cmake/sysio.cdt/SysioWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
-   else()
-      find_package( cdt REQUIRED )
-      set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
-   endif()
+if(BUILD_TEST_CONTRACTS)
+  set(SYSIO_WASM_OLD_BEHAVIOR "Off")
 
-   if( USE_SYSIO_CDT_1_7_X )
-      list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_7_X=${USE_SYSIO_CDT_1_7_X})
-   elseif( USE_SYSIO_CDT_1_8_X )
-      list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_8_X=${USE_SYSIO_CDT_1_8_X})
-   endif()
+  message(STATUS "Building contracts in directory `./unittests/system-test-contracts/`")
+  contracts_target(
+    system_test_contracts_project
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/system-test-contracts
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/system-test-contracts
+  )
 
-   message( STATUS "Building contracts in directory `./unittests/contracts/`" )
-   ExternalProject_Add(
-           contracts_project
-           SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contracts
-           BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/contracts
-           CMAKE_ARGS ${CMAKE_ARGS_VAL}
-           UPDATE_COMMAND ""
-           PATCH_COMMAND ""
-           TEST_COMMAND ""
-           INSTALL_COMMAND ""
-           BUILD_ALWAYS 1
-   )
-
-   message( STATUS "Building contracts in directory `./unittests/test-contracts/`" )
-   ExternalProject_Add(
-      test_contracts_project
-      SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test-contracts
-      BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/test-contracts
-      CMAKE_ARGS ${CMAKE_ARGS_VAL}
-      UPDATE_COMMAND ""
-      PATCH_COMMAND ""
-      TEST_COMMAND ""
-      INSTALL_COMMAND ""
-      BUILD_ALWAYS 1
-   )
+  message(STATUS "Building contracts in directory `./unittests/test-contracts/`")
+  contracts_target(
+    test_contracts_project
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test-contracts
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/test-contracts
+  )
 else()
-  message( STATUS "Not building contracts in directory `./unittests/contracts/`" )
-  add_subdirectory(contracts)
-  message( STATUS "Not building contracts in directory `./unittests/test-contracts/`" )
+  message(STATUS "Not building contracts in directory `./unittests/system-test-contracts/`")
+  add_subdirectory(system-test-contracts)
+  message(STATUS "Not building contracts in directory `./unittests/test-contracts/`")
   add_subdirectory(test-contracts)
 endif()
 
-if (NOT DISABLE_WASM_SPEC_TESTS)
-  add_subdirectory( wasm-spec-tests/generated-tests )
+if(NOT DISABLE_WASM_SPEC_TESTS)
+  add_subdirectory(wasm-spec-tests/generated-tests)
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_contracts.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/include/test_contracts.hpp ESCAPE_QUOTES)
@@ -65,9 +40,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/snapshots.hpp.in ${CMAKE_CURRENT_BINA
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/deep-mind/deep-mind.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/include/deep-mind.hpp ESCAPE_QUOTES)
 
 add_custom_command(
-   OUTPUT protocol_feature_digest_tests.cpp
-   COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp > protocol_feature_digest_tests.cpp
-   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py
+  OUTPUT protocol_feature_digest_tests.cpp
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp > protocol_feature_digest_tests.cpp
+  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/../libraries/chain/protocol_feature_manager.cpp ${CMAKE_CURRENT_SOURCE_DIR}/gen_protocol_feature_digest_tests.py
 )
 
 # === Use vcpkg libsodium ===
@@ -75,7 +50,7 @@ message(STATUS "Using libsodium from vcpkg")
 
 ### BUILD UNIT TEST EXECUTABLE ###
 file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
-add_executable( unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
+add_executable(unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
 
 # Link and include libsodium from vcpkg
 target_link_libraries(
@@ -94,29 +69,30 @@ target_link_libraries(
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 
-target_include_directories( unit_test PUBLIC
-                            ${CMAKE_SOURCE_DIR}/libraries/testing/include
-                            ${CMAKE_SOURCE_DIR}/test-contracts
-                            ${CMAKE_BINARY_DIR}/contracts
-                            ${CMAKE_CURRENT_SOURCE_DIR}/contracts
-                            ${CMAKE_CURRENT_BINARY_DIR}/contracts
-                            ${CMAKE_CURRENT_BINARY_DIR}/include
-                            ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include
-                            ${CMAKE_SOURCE_DIR}/plugins/chain_interface/include)
+target_include_directories(unit_test PUBLIC
+  ${CMAKE_SOURCE_DIR}/libraries/testing/include
+  ${CMAKE_SOURCE_DIR}/test-contracts
+  ${CMAKE_BINARY_DIR}/contracts
+  ${CMAKE_SOURCE_DIR}/contracts
+  ${CMAKE_CURRENT_SOURCE_DIR}/system-test-contracts
+  ${CMAKE_CURRENT_BINARY_DIR}/system-test-contracts
+  ${CMAKE_CURRENT_BINARY_DIR}/include
+  ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include
+  ${CMAKE_SOURCE_DIR}/plugins/chain_interface/include)
 
 ### MARK TEST SUITES FOR EXECUTION ###
 add_test(NAME protocol_feature_digest_unit_test COMMAND unit_test --run_test=protocol_feature_digest_tests --report_level=detailed --color_output)
 set(ctest_tests "protocol_feature_digest_tests")
 foreach(TEST_SUITE ${UNIT_TESTS}) # create an independent target for each test suite
   execute_process(COMMAND sh -c "grep -E 'BOOST_AUTO_TEST_SUITE\\s*[(]' '${TEST_SUITE}' | grep -vE '//.*BOOST_AUTO_TEST_SUITE\\s*[(]' | cut -d ')' -f 1 | cut -d '(' -f 2" OUTPUT_VARIABLE SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # get the test suite name from the *.cpp file
-  if (NOT "" STREQUAL "${SUITE_NAME}") # ignore empty lines
+  if(NOT "" STREQUAL "${SUITE_NAME}") # ignore empty lines
     execute_process(COMMAND sh -c "echo ${SUITE_NAME} | sed -e 's/s$//' | sed -e 's/_test$//'" OUTPUT_VARIABLE TRIMMED_SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # trim "_test" or "_tests" from the end of ${SUITE_NAME}
     # to run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
     foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
       add_test(NAME ${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME} COMMAND unit_test --run_test=${SUITE_NAME} --report_level=detailed --color_output -- --${RUNTIME})
       # build list of tests to run during coverage testing
       if(ctest_tests)
-         string(APPEND ctest_tests "|")
+        string(APPEND ctest_tests "|")
       endif()
       string(APPEND ctest_tests ${TRIMMED_SUITE_NAME}_unit_test_$RUNTIME)
     endforeach()
@@ -127,9 +103,9 @@ set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostroph
 # The following tests are known to take the longest, bump up their cost (priority) so that they'll run first
 # even on fresh first time test runs before ctest auto-detects costs
 foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-   set_tests_properties(api_unit_test_${RUNTIME} PROPERTIES COST 5000)
-   set_tests_properties(wasm_unit_test_${RUNTIME} PROPERTIES COST 4000)
-   set_tests_properties(delay_unit_test_${RUNTIME} PROPERTIES COST 3000)
+  set_tests_properties(api_unit_test_${RUNTIME} PROPERTIES COST 5000)
+  set_tests_properties(wasm_unit_test_${RUNTIME} PROPERTIES COST 4000)
+  set_tests_properties(delay_unit_test_${RUNTIME} PROPERTIES COST 3000)
 endforeach()
 
 ### COVERAGE TESTING ###

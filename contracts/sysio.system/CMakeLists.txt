@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_SYSTEM_CONTRACTS AND CDT_BUILD)
    add_contract(
            sysio.system
            sysio.system

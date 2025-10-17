@@ -3,6 +3,10 @@
 option(ENABLE_CCACHE "Enable ccache if available" ON)
 option(ENABLE_DISTCC "Enable distcc if available" ON)
 
+if ("${CMAKE_GENERATOR}" STREQUAL "Ninja")
+  add_compile_options(-fcolor-diagnostics)
+endif()
+
 if(ENABLE_CCACHE)
   find_program(CCACHE_PROGRAM ccache)
 

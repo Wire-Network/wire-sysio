@@ -1,8 +1,8 @@
 cmake_minimum_required( VERSION 3.8 )
-project(unittest_contracts)
+project(system_test_contracts)
 
 
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS )
     set(SYSIO_WASM_OLD_BEHAVIOR "Off")
     find_package( cdt REQUIRED )
 endif()

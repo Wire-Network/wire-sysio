@@ -15,7 +15,7 @@
 
 #define TEST_INCLUDE
 
-#include "../contracts/test_contracts/blockinfo_tester/include/blockinfo_tester/blockinfo_tester.hpp"
+#include "./test_contracts/blockinfo_tester/include/blockinfo_tester/blockinfo_tester.hpp"
 
 namespace {
 

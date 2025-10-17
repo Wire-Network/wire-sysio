@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_SYSTEM_CONTRACTS AND CDT_BUILD)
    add_contract( sysio.msig sysio.msig sysio.msig.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.wasm COPYONLY )

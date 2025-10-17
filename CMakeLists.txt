@@ -26,6 +26,8 @@ project(wire-sysio)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
+include(contract-tools NO_POLICY_SCOPE)
+
 
 
 include(CTest) # suppresses DartConfiguration.tcl error
@@ -189,15 +191,26 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
 
 add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
-add_subdirectory(contracts)
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
 add_subdirectory(scripts)
+
 add_subdirectory(unittests)
+
 add_subdirectory(tests)
+
 add_subdirectory(tools)
 add_subdirectory(benchmark)
+
+if(BUILD_SYSTEM_CONTRACTS)
+  contracts_target(
+    contracts_project
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
+    BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
+  )
+endif()
+add_subdirectory(contracts)
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 

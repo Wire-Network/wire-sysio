@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS )
    add_contract( crypto_primitives_test crypto_primitives_test crypto_primitives_test.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/crypto_primitives_test.wasm ${CMAKE_CURRENT_BINARY_DIR}/crypto_primitives_test.wasm COPYONLY )
