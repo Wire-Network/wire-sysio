@@ -11,7 +11,7 @@
 #include <chrono>
 #include <bit>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
    transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
          : expired(timer.expired), _timer(timer) {
@@ -49,7 +49,6 @@ namespace sysio { namespace chain {
    ,start(s)
    ,transaction_timer(std::move(tmr))
    ,trx_type(type)
-   ,net_usage(trace->net_usage)
    ,pseudo_start(s)
    {
       if (!c.skip_db_sessions() && !is_read_only()) {
@@ -230,23 +229,19 @@ namespace sysio { namespace chain {
          add_net_usage( initial_net_usage );  // Fail early if current net usage exceeds limit
 
       if(control.skip_trx_checks()) {
-         transaction_timer.start( fc::time_point::maximum() );
-      } else {
-         transaction_timer.start( _deadline );
-         checktime(); // Fail early if deadline already exceeded
+         enforce_deadline = false;
       }
 
       is_initialized = true;
    }
 
-   void transaction_context::init_for_implicit_trx( uint64_t initial_net_usage  )
+   void transaction_context::init_for_implicit_trx()
    {
       published = control.pending_block_time();
-      init( initial_net_usage);
+      init( 0 );
    }
 
-   void transaction_context::init_for_input_trx( uint64_t packed_trx_unprunable_size,
-                                                 uint64_t packed_trx_prunable_size )
+   void transaction_context::init_for_input_trx()
    {
       const transaction& trx = packed_trx.get_transaction();
       // delayed and compressed transactions are not supported by wire
@@ -256,17 +251,9 @@ namespace sysio { namespace chain {
 
       const auto& cfg = control.get_global_properties().configuration;
 
-      uint64_t discounted_size_for_pruned_data = packed_trx_prunable_size;
-      if( cfg.context_free_discount_net_usage_den > 0
-          && cfg.context_free_discount_net_usage_num < cfg.context_free_discount_net_usage_den )
-      {
-         discounted_size_for_pruned_data *= cfg.context_free_discount_net_usage_num;
-         discounted_size_for_pruned_data =  ( discounted_size_for_pruned_data + cfg.context_free_discount_net_usage_den - 1)
-                                                                                    / cfg.context_free_discount_net_usage_den; // rounds up
-      }
-
+      uint64_t discounted_size_for_pruned_data = packed_trx.get_prunable_size();
       uint64_t initial_net_usage = static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
-                                    + packed_trx_unprunable_size + discounted_size_for_pruned_data;
+                                    + packed_trx.get_unprunable_size() + discounted_size_for_pruned_data;
 
       published = control.pending_block_time();
       is_input = true;
@@ -285,24 +272,49 @@ namespace sysio { namespace chain {
    }
    
    void transaction_context::exec() {
-      SYS_ASSERT( is_initialized, transaction_exception, "must first initialize" );
-
       const transaction& trx = packed_trx.get_transaction();
-      if( apply_context_free ) {
-         for( const auto& act : trx.context_free_actions ) {
-            schedule_action( act, act.account, true, 0, 0 );
-         }
+
+      assert( is_initialized );
+      assert( bill_to_accounts.size() == trx.total_actions() );
+
+      uint32_t action_billable_size = 0;
+      size_t idx = 0;
+      for( const auto& act : trx.context_free_actions ) {
+         schedule_action( act, act.account, true, 0, 0 );
+         action_billable_size += bill_to_accounts[idx].net_usage = act.get_billable_size();
+         ++idx;
       }
 
       for( const auto& act : trx.actions ) {
          schedule_action( act, act.account, false, 0, 0 );
+         action_billable_size += bill_to_accounts[idx].net_usage = act.get_billable_size();
+         ++idx;
       }
 
       auto& action_traces = trace->action_traces;
-      uint32_t num_original_actions_to_execute = action_traces.size();
+      const uint32_t num_original_actions_to_execute = action_traces.size();
+      assert( num_original_actions_to_execute == idx );
+      const uint32_t trx_billable_size = packed_trx.get_billable_size();
+      assert( trx_billable_size > action_billable_size );
+      const uint32_t trx_net_per_action = (trx_billable_size - action_billable_size) / num_original_actions_to_execute;
       for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
+         wlog("=>starting action ${i}", ("i", action_traces.at(i-1).act.name));
+         fc::time_point start = fc::time_point::now();
+         if(enforce_deadline) {
+            transaction_timer.start( _deadline );
+            checktime(); // Fail early if deadline already exceeded
+         } else {
+            transaction_timer.start( fc::time_point::maximum() );
+         }
+
          execute_action( i, 0 );
+         trace->action_traces[i-1].net_usage = bill_to_accounts[i-1].net_usage += trx_net_per_action;
+         transaction_timer.stop();
+         auto elapsed = fc::time_point::now() - start;
+         trace->action_traces[i-1].cpu_usage_us = bill_to_accounts[i-1].cpu_usage_us += elapsed.count();
+         wlog("<=elapsed  action ${i}: ${e}", ("i", action_traces.at(i-1).act.name)("e", elapsed));
       }
+      trace->net_usage = trx_billable_size;
    }
 
    void transaction_context::finalize() {
@@ -310,7 +322,7 @@ namespace sysio { namespace chain {
 
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
-         net_usage = ((net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
+         trace->net_usage = ((trace->net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
          trace->elapsed = fc::time_point::now() - start;
          return;
       }
@@ -357,7 +369,7 @@ namespace sysio { namespace chain {
       }
 
       // Round up net_usage to the nearest multiple of 8 bytes and verify
-      net_usage = ((net_usage + 7)/8)*8;
+      trace->net_usage = ((trace->net_usage + 7)/8)*8;
       eager_net_limit = net_limit;
       check_net_usage();
 
@@ -369,7 +381,7 @@ namespace sysio { namespace chain {
 
       validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true, subjective_cpu_bill_us );
 
-      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
+      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), trace->net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
    }
 
@@ -385,19 +397,19 @@ namespace sysio { namespace chain {
 
    void transaction_context::check_net_usage()const {
       if (!control.skip_trx_checks()) {
-         if( BOOST_UNLIKELY(net_usage > eager_net_limit) ) {
+         if( BOOST_UNLIKELY(trace->net_usage > eager_net_limit) ) {
             if ( net_limit_due_to_block ) {
                SYS_THROW( block_net_usage_exceeded,
                           "not enough space left in block: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             }  else if (net_limit_due_to_greylist) {
                SYS_THROW( greylist_net_usage_exceeded,
                           "greylisted transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             } else {
                SYS_THROW( tx_net_usage_exceeded,
                           "transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             }
          }
       }
@@ -594,7 +606,7 @@ namespace sysio { namespace chain {
       return static_cast<uint32_t>(billed_cpu_time_us);
    }
 
-   std::tuple<int64_t, int64_t, bool, bool> transaction_context::max_bandwidth_billed_accounts_can_pay( bool force_elastic_limits ) const{
+   std::tuple<int64_t, int64_t, bool, bool> transaction_context::max_bandwidth_billed_accounts_can_pay() const{
       // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
 
       // Calculate the new highest network usage and CPU time that all of the billed accounts can afford to be billed
@@ -608,7 +620,7 @@ namespace sysio { namespace chain {
       uint32_t specified_greylist_limit = control.get_greylist_limit();
       for( const auto& a : bill_to_accounts ) {
          uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
-         if( !force_elastic_limits && control.is_speculative_block() ) {
+         if( control.is_speculative_block() ) {
             if( control.is_resource_greylisted(a) ) {
                greylist_limit = 1;
             } else {
@@ -627,7 +639,44 @@ namespace sysio { namespace chain {
          }
       }
 
-      SYS_ASSERT( (!force_elastic_limits && control.is_speculative_block()) || (!greylisted_cpu && !greylisted_net),
+      SYS_ASSERT( control.is_speculative_block() || (!greylisted_cpu && !greylisted_net),
+                  transaction_exception, "greylisted when not producing block" );
+
+      return std::make_tuple(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu);
+   }
+
+   std::tuple<int64_t, int64_t, bool, bool>  transaction_context::max_bandwidth_billed_account_can_pay(account_name a)const {
+      // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
+
+      // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
+      auto& rl = control.get_mutable_resource_limits_manager();
+      static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
+      int64_t account_net_limit = large_number_no_overflow;
+      int64_t account_cpu_limit = large_number_no_overflow;
+      bool greylisted_net = false;
+      bool greylisted_cpu = false;
+
+      uint32_t specified_greylist_limit = control.get_greylist_limit();
+      uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
+      if( control.is_speculative_block() ) {
+         if( control.is_resource_greylisted(a) ) {
+            greylist_limit = 1;
+         } else {
+            greylist_limit = specified_greylist_limit;
+         }
+      }
+      auto [net_limit, net_was_greylisted] = rl.get_account_net_limit(a, greylist_limit);
+      if( net_limit >= 0 ) {
+         account_net_limit = net_limit;
+         greylisted_net = net_was_greylisted;
+      }
+      auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
+      if( cpu_limit >= 0 ) {
+         account_cpu_limit = cpu_limit;
+         greylisted_cpu = cpu_was_greylisted;
+      }
+
+      SYS_ASSERT( control.is_speculative_block() || (!greylisted_cpu && !greylisted_net),
                   transaction_exception, "greylisted when not producing block" );
 
       return std::make_tuple(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu);
@@ -792,5 +841,4 @@ namespace sysio { namespace chain {
       }
    }
 
-
-} } /// sysio::chain
+} /// sysio::chain

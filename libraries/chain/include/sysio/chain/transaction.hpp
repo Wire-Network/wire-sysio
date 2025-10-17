@@ -47,7 +47,7 @@ namespace sysio { namespace chain {
       uint32_t               ref_block_prefix    = 0UL; ///< specifies the lower 32 bits of the blockid at get_ref_blocknum
       fc::unsigned_int       max_net_usage_words = 0UL; /// upper limit on total network bandwidth (in 8 byte words) billed for this transaction
       uint8_t                max_cpu_usage_ms    = 0; /// upper limit on the total CPU time billed for this transaction
-      fc::unsigned_int       delay_sec           = 0UL; /// Not used, asserted to be 0
+      fc::unsigned_int       delay_sec           = 0UL; /// Not used for input trx, asserted to be 0 for input trx
 
       /**
        * @return the absolute block number given the relative ref_block_num
@@ -158,8 +158,8 @@ namespace sysio { namespace chain {
       }
       friend bool operator!=(const packed_transaction& lhs, const packed_transaction& rhs) { return !(lhs == rhs); }
 
-      uint32_t get_unprunable_size()const;
-      uint32_t get_prunable_size()const;
+      uint32_t get_billable_size()const;
+      uint32_t get_billable_size(size_t action_index)const;
       size_t get_estimated_size()const;
 
       digest_type digest()const;

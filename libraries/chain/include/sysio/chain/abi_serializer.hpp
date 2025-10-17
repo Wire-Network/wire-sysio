@@ -1048,14 +1048,11 @@ public:
 
    abi_serializer_cache_builder&& add_serializers(const chain::signed_block_ptr& block) && {
       for( const auto& receipt: block->transactions ) {
-         if( std::holds_alternative<chain::packed_transaction>( receipt.trx ) ) {
-            const auto& pt = std::get<chain::packed_transaction>( receipt.trx );
-            const auto& t = pt.get_transaction();
-            for( const auto& a: t.actions )
-               add_to_cache( a );
-            for( const auto& a: t.context_free_actions )
-               add_to_cache( a );
-         }
+         const auto& t = receipt.trx.get_transaction();
+         for( const auto& a: t.actions )
+            add_to_cache( a );
+         for( const auto& a: t.context_free_actions )
+            add_to_cache( a );
       }
       return std::move(*this);
    }

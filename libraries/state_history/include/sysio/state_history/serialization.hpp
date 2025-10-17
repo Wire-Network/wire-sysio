@@ -629,9 +629,9 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<sysio::chain::transaction_id_type>(trace.id));
    if (trace.receipt) {
-      fc::raw::pack(ds, as_type<uint8_t>(trace.receipt->status.value));
-      fc::raw::pack(ds, as_type<uint32_t>(trace.receipt->cpu_usage_us));
-      fc::raw::pack(ds, as_type<fc::unsigned_int>(trace.receipt->net_usage_words));
+      fc::raw::pack(ds, as_type<uint8_t>(sysio::chain::transaction_receipt_header::status_enum::executed)); // executed is 0
+      fc::raw::pack(ds, as_type<uint32_t>(trace.receipt->total_cpu_usage_us()));
+      fc::raw::pack(ds, as_type<fc::unsigned_int>(trace.net_usage / 8)); // net_usage_words
    } else {
       fc::raw::pack(ds, uint8_t(obj.context.first));
       fc::raw::pack(ds, uint32_t(0));
@@ -680,7 +680,7 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_stateless<bool, sysio::state_history::augmented_transaction_trace>& obj) {
-   std::pair<uint8_t, bool> context = std::make_pair(sysio::chain::transaction_receipt_header::expired, obj.context);
+   std::pair<uint8_t, bool> context = std::make_pair(sysio::chain::transaction_receipt_header::executed, obj.context);
    ds << make_history_context_wrapper(context, obj.obj);
    return ds;
 }

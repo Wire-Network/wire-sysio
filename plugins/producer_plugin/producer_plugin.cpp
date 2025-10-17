@@ -1995,7 +1995,7 @@ inline std::string get_detailed_contract_except_info(const packed_transaction_pt
 
 void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx,
                                            const transaction_trace_ptr&    trace) {
-   uint32_t billed_cpu_time_us = (trace && trace->receipt) ? trace->receipt->cpu_usage_us : 0;
+   uint32_t billed_cpu_time_us = (trace && trace->receipt) ? trace->receipt->total_cpu_usage_us() : 0;
    log_trx_results(trx->packed_trx(), trace, nullptr, billed_cpu_time_us, trx->is_transient());
 }
 

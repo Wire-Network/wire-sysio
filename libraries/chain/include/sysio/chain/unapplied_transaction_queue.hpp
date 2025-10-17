@@ -118,17 +118,14 @@ public:
       if( empty() ) return;
       auto& idx = queue.get<by_trx_id>();
       for( const auto& receipt : block->transactions ) {
-         if( std::holds_alternative<packed_transaction>(receipt.trx) ) {
-            const auto& pt = std::get<packed_transaction>(receipt.trx);
-            auto itr = idx.find( pt.id() );
-            if( itr != idx.end() ) {
-               if( itr->next ) {
-                  itr->next( std::static_pointer_cast<fc::exception>( std::make_shared<tx_duplicate>(
-                                FC_LOG_MESSAGE( info, "duplicate transaction ${id}", ("id", itr->trx_meta->id())))));
-               }
-               removed( itr );
-               idx.erase( itr );
+         auto itr = idx.find( receipt.trx.id() );
+         if( itr != idx.end() ) {
+            if( itr->next ) {
+               itr->next( std::static_pointer_cast<fc::exception>( std::make_shared<tx_duplicate>(
+                             FC_LOG_MESSAGE( info, "duplicate transaction ${id}", ("id", itr->trx_meta->id())))));
             }
+            removed( itr );
+            idx.erase( itr );
          }
       }
    }

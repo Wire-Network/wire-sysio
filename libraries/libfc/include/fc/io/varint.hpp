@@ -12,7 +12,7 @@ struct unsigned_int {
     operator uint32_t()const { return value; }
     //operator uint64_t()const { return value; }
 
-    unsigned_int& operator=( int32_t v ) { value = v; return *this; }
+    unsigned_int& operator=( uint32_t v ) { value = v; return *this; }
     
     uint32_t value;
 
