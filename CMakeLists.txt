@@ -2,9 +2,14 @@ cmake_minimum_required(VERSION 3.16)
 
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
+  set(CMAKE_TOOLCHAIN_FILE
+      "${CMAKE_CURRENT_SOURCE_DIR}/cmake/toolchains/wire-vcpkg.cmake"
+      CACHE STRING "Toolchain: Wire vcpkg shim")
 endif()
+# if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+#   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+#     CACHE STRING "Vcpkg toolchain file")
+# endif()
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
