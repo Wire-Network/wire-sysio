@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS )
    add_contract( wasm_config_bios wasm_config_bios wasm_config_bios.cpp )
 else()
    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/wasm_config_bios.wasm ${CMAKE_CURRENT_BINARY_DIR}/wasm_config_bios.wasm COPYONLY )

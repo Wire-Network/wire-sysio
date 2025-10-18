@@ -24,8 +24,12 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
+include(test-tools NO_POLICY_SCOPE)
+include(contract-tools NO_POLICY_SCOPE)
+
 
 
 include(CTest) # suppresses DartConfiguration.tcl error
@@ -171,7 +175,7 @@ message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if(ENABLE_TCMALLOC)
   find_package(Gperftools REQUIRED)
-  message(STATUS "Compiling Leap with TCMalloc")
+  message(STATUS "Compiling Wire with TCMalloc")
   #if doing this by the book, simply link_libraries( ${GPERFTOOLS_TCMALLOC} ) here. That will
   #give the performance benefits of tcmalloc but since it won't be linked last
   #the heap profiler & checker may not be accurate. This here is rather undocumented behavior
@@ -193,10 +197,22 @@ add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
 add_subdirectory(scripts)
+
 add_subdirectory(unittests)
+
 add_subdirectory(tests)
+
 add_subdirectory(tools)
 add_subdirectory(benchmark)
+
+if(BUILD_SYSTEM_CONTRACTS)
+  contracts_target(
+    contracts_project
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
+    BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
+  )
+endif()
+add_subdirectory(contracts)
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
