@@ -1,4 +1,4 @@
-if( BUILD_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS AND CDT_BUILD )
     add_contract( dancer dancer dancer.cpp )
 else()
     configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/dancer.wasm ${CMAKE_CURRENT_BINARY_DIR}/dancer.wasm COPYONLY )
