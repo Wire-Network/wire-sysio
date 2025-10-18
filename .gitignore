@@ -10,6 +10,9 @@ tmp
 *.wast.hpp
 *.dot
 *.abi.hpp
+!unittests/system-test-contracts/*/*.wast*
+!unittests/system-test-contracts/*.wast*
+!unittests/system-test-contracts/*/*.abi.hpp
 !unittests/system-test-contracts/*.abi.hpp
 *.ninja
 \#*
