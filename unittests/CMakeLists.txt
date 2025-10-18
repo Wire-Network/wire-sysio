@@ -50,35 +50,17 @@ message(STATUS "Using libsodium from vcpkg")
 
 ### BUILD UNIT TEST EXECUTABLE ###
 file(GLOB UNIT_TESTS "*.cpp") # find all unit test suites
-add_executable(unit_test ${UNIT_TESTS} protocol_feature_digest_tests.cpp) # build unit tests as one executable
-
-# Link and include libsodium from vcpkg
-target_link_libraries(
+unittest_target(
   unit_test
-  sysio_chain_wrap
-  state_history
-  chainbase
-  sysio_testing
-  fc
-  custom_appbase
-  abieos
-  libsodium::libsodium
-  ${PLATFORM_SPECIFIC_LIBS}
-)
+  SOURCE_FILES
+  ${UNIT_TESTS}
+  protocol_feature_digest_tests.cpp
+) # build unit tests as one executable
 
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 
-target_include_directories(unit_test PUBLIC
-  ${CMAKE_SOURCE_DIR}/libraries/testing/include
-  ${CMAKE_SOURCE_DIR}/test-contracts
-  ${CMAKE_BINARY_DIR}/contracts
-  ${CMAKE_SOURCE_DIR}/contracts
-  ${CMAKE_CURRENT_SOURCE_DIR}/system-test-contracts
-  ${CMAKE_CURRENT_BINARY_DIR}/system-test-contracts
-  ${CMAKE_CURRENT_BINARY_DIR}/include
-  ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include
-  ${CMAKE_SOURCE_DIR}/plugins/chain_interface/include)
+# Link and include libsodium from vcpkg
 
 ### MARK TEST SUITES FOR EXECUTION ###
 add_test(NAME protocol_feature_digest_unit_test COMMAND unit_test --run_test=protocol_feature_digest_tests --report_level=detailed --color_output)

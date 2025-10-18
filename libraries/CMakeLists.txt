@@ -16,12 +16,6 @@ add_subdirectory(testing)
 add_subdirectory(version)
 add_subdirectory(state_history)
 
-set(ENABLE_TOOLS OFF CACHE BOOL "Build tools")
-set(ENABLE_TESTS OFF CACHE BOOL "Build tests")
-set(ENABLE_ADDRESS_SANITIZER OFF CACHE BOOL "Use address sanitizer")
-set(ENABLE_UNDEFINED_BEHAVIOR_SANITIZER OFF CACHE BOOL "Use UB sanitizer")
-set(ENABLE_PROFILE OFF CACHE BOOL "Enable for profile builds")
-
 if(sys-vm IN_LIST SYSIO_WASM_RUNTIMES OR sys-vm-jit IN_LIST SYSIO_WASM_RUNTIMES)
   find_package(sys-vm REQUIRED)
   # add_library(sys-vm ALIAS sys-vm::sys-vm)

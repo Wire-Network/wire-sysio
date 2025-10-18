@@ -9,7 +9,7 @@
 #include <fc/log/logger.hpp>
 #include <sysio/chain/exceptions.hpp>
 
-#include "sysio.system_tester.hpp"
+#include <sysio_system_tester.hpp>
 
 using namespace sysio_system;
 #define BOOST_TEST_STATIC_LINK

@@ -106,4 +106,4 @@ snapshots
 
 find-eosio-wasm.sh
 cliff.toml
-
+!cmake/build-options.cmake
