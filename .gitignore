@@ -1,6 +1,7 @@
 .idea
 .vscode-ctags
 tmp
+.run/
 *.a
 *.sw*
 *.dylib
