@@ -9,6 +9,7 @@
 #include <sysio/chain/deep_mind.hpp>
 
 #include <chrono>
+#include <bit>
 
 namespace sysio { namespace chain {
 
@@ -682,11 +683,12 @@ namespace sysio { namespace chain {
    {
       uint32_t new_action_ordinal = trace->action_traces.size() + 1;
 
-      trace->action_traces.reserve( new_action_ordinal );
+      trace->action_traces.reserve( std::bit_ceil(new_action_ordinal) ); // bit_ceil to avoid vector copy on every reserve call.
 
       const action& provided_action = get_action_trace( action_ordinal ).act;
 
-      // The reserve above is required so that the emplace_back below does not invalidate the provided_action reference.
+      // The reserve above is required so that the emplace_back below does not invalidate the provided_action reference,
+      // which references an action within the `trace->action_traces` vector we are appending to.
 
       trace->action_traces.emplace_back( *trace, provided_action, receiver, context_free,
                                          new_action_ordinal, creator_action_ordinal,
