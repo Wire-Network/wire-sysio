@@ -6097,17 +6097,52 @@ async function main() {
     const suffix = `${import_node_process.default.env.GITHUB_RUN_ID}-${import_node_process.default.env.GITHUB_JOB}-${Math.floor(Math.random() * 1e4)}`;
     const baseContainer = `base-${suffix}`;
     const baseImage = `baseimage-${suffix}`;
+    console.log(`=== Setup Info ===`);
+    console.log(`Docker Host: ${dockerHost || "default"}`);
+    console.log(`Docker Args: ${dockerArgs.join(" ") || "none"}`);
+    console.log(`Base Container: ${baseContainer}`);
+    console.log(`Base Image: ${baseImage}`);
+    console.log(`Working Directory: ${import_node_process.default.cwd()}`);
+    console.log(`Repository: ${repo_name}`);
+    console.log(`==================
+`);
     import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", "-f", baseContainer], { stdio: "ignore" });
+    console.log("Creating base container...");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${import_node_process.default.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], { stdio: "inherit" }).status)
       throw new Error("Failed to create base container");
+    console.log("Committing base image...");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "commit", baseContainer, baseImage], { stdio: "inherit" }).status)
       throw new Error("Failed to create base image");
+    console.log("Removing temporary base container...");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", baseContainer], { stdio: "inherit" }).status)
       throw new Error("Failed to remove base container");
+    console.log("\nDiscovering tests...");
     const test_query_result = import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--rm", baseImage, "bash", "-e", "-o", "pipefail", "-c", `cd build; ctest -L '${tests_label}' --show-only=json-v1`]);
-    if (test_query_result.status)
+    if (test_query_result.status) {
+      console.error("STDOUT:", test_query_result.stdout.toString());
+      console.error("STDERR:", test_query_result.stderr.toString());
       throw new Error("Failed to discover tests with label");
+    }
     const tests = JSON.parse(test_query_result.stdout).tests;
+    console.log(`Found ${tests.length} tests with label '${tests_label}'`);
+    tests.forEach((t, i) => console.log(`  ${i + 1}. ${t.name}`));
+    console.log();
+    if (tests.length > 0) {
+      console.log(`
+=== Sanity check: Testing environment for ${tests[0].name} ===`);
+      const sanityCheck = import_node_child_process.default.spawnSync("docker", [
+        ...dockerArgs,
+        "run",
+        "--rm",
+        baseImage,
+        "bash",
+        "-c",
+        `cd build &&              echo "PWD: $(pwd)" &&              echo "Build dir exists: $(test -d . && echo yes || echo no)" &&              echo "Testing dir exists: $(test -d Testing && echo yes || echo no)" &&              echo "Can create Temporary: $(mkdir -p Testing/Temporary && echo yes || echo no)" &&              echo "CTest available: $(which ctest)" &&              ls -la Testing/ 2>/dev/null || echo "No Testing directory"`
+      ], { stdio: "inherit" });
+      console.log(`=== Sanity check complete ===
+`);
+    }
+    console.log("Starting parallel test execution...\n");
     const subprocesses = tests.map((t) => new Promise((resolve) => {
       const cname = `${t.name}-${suffix}`;
       const args = [
@@ -6125,18 +6160,65 @@ async function main() {
         "-c",
         `cd build; ctest --output-on-failure -R '^${t.name}$' --timeout ${test_timeout}`
       ];
-      import_node_child_process.default.spawn("docker", args, { stdio: "inherit" }).on("close", (code) => resolve({ name: t.name, code }));
+      console.log(`[${t.name}] Starting container ${cname}`);
+      const proc = import_node_child_process.default.spawn("docker", args, { stdio: "pipe" });
+      let stdout = "";
+      let stderr = "";
+      proc.stdout.on("data", (data) => {
+        const output = data.toString();
+        stdout += output;
+        output.split("\n").forEach((line) => {
+          if (line) console.log(`[${t.name}] ${line}`);
+        });
+      });
+      proc.stderr.on("data", (data) => {
+        const output = data.toString();
+        stderr += output;
+        output.split("\n").forEach((line) => {
+          if (line) console.error(`[${t.name}] ERR: ${line}`);
+        });
+      });
+      proc.on("close", (code) => {
+        if (code !== 0) {
+          console.error(`
+=== Test ${t.name} FAILED with exit code ${code} ===`);
+          if (stderr) {
+            console.error("STDERR:");
+            console.error(stderr);
+          }
+          console.error("================================\n");
+        } else {
+          console.log(`[${t.name}] \u2713 PASSED`);
+        }
+        resolve({ name: t.name, code, stdout, stderr });
+      });
+      proc.on("error", (err) => {
+        console.error(`[${t.name}] Process error:`, err);
+        resolve({ name: t.name, code: -1, stdout, stderr, error: err.message });
+      });
     }));
     const results = await Promise.all(subprocesses);
-    console.log("==== Parallel test results ====");
-    results.forEach((r) => console.log(`Test ${r.name} \u2192 exit ${r.code}`));
-    console.log("================================");
+    console.log("\n==== Parallel test results ====");
+    const passed = results.filter((r) => r.code === 0).length;
+    const failed = results.filter((r) => r.code !== 0).length;
+    console.log(`Total: ${results.length} tests, ${passed} passed, ${failed} failed
+`);
+    results.forEach((r) => {
+      const status = r.code === 0 ? "\u2713 PASS" : "\u2717 FAIL";
+      console.log(`${status} Test ${r.name} \u2192 exit ${r.code}`);
+      if (r.error) {
+        console.log(`      Error: ${r.error}`);
+      }
+    });
+    console.log("================================\n");
     let hasFailures = false;
+    console.log("Extracting logs from failed tests...");
     for (let i = 0; i < results.length; ++i) {
-      if (results[i] === 0)
+      if (results[i].code === 0)
         continue;
       hasFailures = true;
       const containerName = `${tests[i].name}-${suffix}`;
+      console.log(`Extracting logs from ${containerName}...`);
       let extractor = import_tar_stream.default.extract();
       let packer = import_tar_stream.default.pack();
       extractor.on("entry", (header, stream2, next) => {
@@ -6151,16 +6233,26 @@ async function main() {
           stream2.resume();
           return;
         }
+        console.log(`  Including: ${header.name}`);
         stream2.pipe(packer.entry(header, next));
       }).on("finish", () => {
         packer.finalize();
       });
       import_node_child_process.default.spawn("docker", [...dockerArgs, "export", containerName]).stdout.pipe(extractor);
-      import_node_stream.default.promises.pipeline(packer, import_node_zlib.default.createGzip(), import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`));
+      await import_node_stream.default.promises.pipeline(packer, import_node_zlib.default.createGzip(), import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`));
+      console.log(`  Created: ${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`);
     }
-    if (hasFailures)
+    if (hasFailures) {
+      console.error("\n\u274C Some tests failed - check logs above for details");
       import_core.default.setFailed("Some tests failed");
+    } else {
+      console.log("\n\u2713 All tests passed!");
+    }
   } catch (e) {
+    console.error("\n=== UNCAUGHT EXCEPTION ===");
+    console.error("Message:", e.message);
+    console.error("Stack:", e.stack);
+    console.error("==========================\n");
     import_core.default.setFailed(`Uncaught exception ${e.message}`);
   }
 }

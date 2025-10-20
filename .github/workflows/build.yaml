@@ -139,7 +139,13 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
-      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      options: >-
+        --security-opt seccomp=unconfined
+        --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+        --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
+        --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
+        --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
+        --volume ${{ github.workspace }}:${{ github.workspace }}
 
     steps:
       - name: Create ephemeral Docker context
@@ -461,8 +467,8 @@ jobs:
             DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
           elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
             DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-          elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
+          elif [[ "$BASE_RUNNER" == *"runner-5"* ]]; then
+            DOCKER_SOCK=/run/docker-runners/docker-runner5.sock
           else
             echo "Unknown runner, defaulting to /var/run/docker.sock"
             DOCKER_SOCK=/var/run/docker.sock
