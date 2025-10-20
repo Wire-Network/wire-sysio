@@ -1,0 +1,53 @@
+#pragma once
+#include <sysio/testing/tester.hpp>
+
+namespace sysio::testing {
+
+struct contracts {
+   static std::vector<uint8_t> system_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.wasm"); }
+   static std::vector<char>    system_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.abi"); }
+   static std::vector<uint8_t> roa_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"); }
+   static std::vector<char>    roa_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi"); }
+   static std::vector<uint8_t> token_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.token/sysio.token.wasm"); }
+   static std::vector<char>    token_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.token/sysio.token.abi"); }
+   static std::vector<uint8_t> msig_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.msig/sysio.msig.wasm"); }
+   static std::vector<char>    msig_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.msig/sysio.msig.abi"); }
+   static std::vector<uint8_t> wrap_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.wrap/sysio.wrap.wasm"); }
+   static std::vector<char>    wrap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.wrap/sysio.wrap.abi"); }
+   static std::vector<uint8_t> bios_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"); }
+   static std::vector<char>    bios_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi"); }
+
+   struct util {
+      static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/reject_all.wasm"); }
+      static std::vector<uint8_t> exchange_wasm() { return read_wasm("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/exchange.wasm"); }
+      static std::vector<uint8_t> system_wasm_v1_8() { return read_wasm("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.8.3/sysio.system/sysio.system.wasm"); }
+      static std::vector<char>    system_abi_v1_8() { return read_abi("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.8.3/sysio.system/sysio.system.abi"); }
+      static std::vector<uint8_t> system_wasm_old() { return read_wasm("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.2.1/sysio.system/sysio.system.wasm"); }
+      static std::vector<char>    system_abi_old() { return read_abi("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.2.1/sysio.system/sysio.system.abi"); }
+      static std::vector<uint8_t> msig_wasm_old() { return read_wasm("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.2.1/sysio.msig/sysio.msig.wasm"); }
+      static std::vector<char>    msig_abi_old() { return read_abi("${CMAKE_CURRENT_SOURCE_DIR}/test_contracts/old_versions/v1.2.1/sysio.msig/sysio.msig.abi"); }
+   };
+};
+
+} // namespace sysio::testing
+
+namespace system_contracts::testing::test_contracts {
+
+static std::vector<uint8_t> blockinfo_tester_wasm()
+{
+   return sysio::testing::read_wasm(
+      "${CMAKE_BINARY_DIR}/contracts/test_contracts/blockinfo_tester/blockinfo_tester.wasm");
+}
+static std::vector<uint8_t> sendinline_wasm() 
+{
+   return sysio::testing::read_wasm(
+      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.wasm"); 
+}
+static std::vector<char>    sendinline_abi() 
+{
+   return sysio::testing::read_abi(
+      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.abi"); 
+}
+
+
+} // namespace system_contracts::testing::test_contracts

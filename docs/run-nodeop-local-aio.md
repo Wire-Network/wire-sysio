@@ -15,6 +15,20 @@ The script file being used is [dev-chain-run-nodeop.fish](../scripts/dev-chain-r
   $PWD/build/debug \
   /opt/wire-network/chain-001
 ```
+### CLion
+
+If you want to generate CLion run configurations, you can add a 3rd argument to the script.
+
+```shell
+# MUST BE RUN FROM THE ROOT OF THE REPO/PROJECT
+./scripts/dev-chain-run-nodeop.fish \
+  $PWD/build/debug \
+  /opt/wire-network/chain-001 \
+  chain-001
+```
+Using this example `chain-001-clio-unlock-wallet` & `chain-001-nodeop-producer`.
+
+> NOTE: The `nodeop` run configuration is configured to run clio unlock configuration first
 
 ## Detailed breakdown
 
@@ -45,6 +59,7 @@ export CONFIG_TEMPLATE=aio
 # GENERATE KEYS & CONFIG
 # NOTE: This will overwrite any existing files in $TARGET_ROOT
 sys-util chain-configure \
+  --contracts=<build-root>/contracts \
   --target=$TARGET_ROOT \
   --template=$CONFIG_TEMPLATE \
   --overwrite

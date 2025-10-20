@@ -1,4 +1,4 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
+if( BUILD_TEST_CONTRACTS )
    # add_contract( test_ram_limit test_ram_limit test_ram_limit.cpp )
    # target_compile_options(test_ram_limit PUBLIC -Os)
    message(STATUS "Not building test_ram_limit, read README.txt in sys/unittests/test-contracts/test_ram_limit")

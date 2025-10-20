@@ -5,10 +5,10 @@
 
 #include <CLI/CLI.hpp>
 
-#include "actions/blocklog.hpp"
-#include "actions/chain.hpp"
-#include "actions/generic.hpp"
-#include "actions/snapshot.hpp"
+#include "actions/blocklog_actions.hpp"
+#include "actions/chain_actions.hpp"
+#include "actions/generic_actions.hpp"
+#include "actions/snapshot_actions.hpp"
 
 #include <memory>
 

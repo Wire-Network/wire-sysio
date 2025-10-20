@@ -1,6 +1,0 @@
-if( SYSIO_COMPILE_TEST_CONTRACTS )
-   add_contract( sysio.bios sysio.bios sysio.bios.cpp )
-else()
-   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.wasm COPYONLY )
-   configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.abi  COPYONLY )
-endif()

@@ -1,39 +1,19 @@
 ### Build contracts with cdt if available ###
 include(ExternalProject)
 
-if( SYSIO_COMPILE_TEST_CONTRACTS )
-    set(SYSIO_WASM_OLD_BEHAVIOR "Off")
-    if( USE_SYSIO_CDT_1_7_X OR USE_SYSIO_CDT_1_8_X )
-        find_package( sysio.cdt REQUIRED )
-        set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${SYSIO_CDT_ROOT}/lib/cmake/sysio.cdt/SysioWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
-    else()
-        find_package( cdt REQUIRED )
-        set(CMAKE_ARGS_VAL -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DSYSIO_COMPILE_TEST_CONTRACTS=${SYSIO_COMPILE_TEST_CONTRACTS} )
-    endif()
+if(BUILD_TEST_CONTRACTS)
+  set(SYSIO_WASM_OLD_BEHAVIOR "Off")
 
-    if( USE_SYSIO_CDT_1_7_X )
-        list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_7_X=${USE_SYSIO_CDT_1_7_X})
-    elseif( USE_SYSIO_CDT_1_8_X )
-        list(APPEND CMAKE_ARGS_VAL -DUSE_SYSIO_CDT_1_8_X=${USE_SYSIO_CDT_1_8_X})
-    endif()
-
-    message( STATUS "Building contracts in directory `./libraries/contracts/`" )
-    ExternalProject_Add(
-            testing_contracts_project
-            SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contracts
-            BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/contracts
-            CMAKE_ARGS ${CMAKE_ARGS_VAL}
-            UPDATE_COMMAND ""
-            PATCH_COMMAND ""
-            TEST_COMMAND ""
-            INSTALL_COMMAND ""
-            BUILD_ALWAYS 1
-    )
-else()
-    message( STATUS "Not building contracts in directory `./libraries/contracts/`" )
-    add_subdirectory(contracts)
+  message(STATUS "Building contracts in directory `./libraries/contracts/`")
+  contracts_target(
+    testing_contracts_project
+    SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contracts
+    BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/contracts
+  )
 endif()
 
+# TODO: @heifner Realign the dependencies declared in contracts.hpp.in
+add_subdirectory(contracts)
 file(GLOB HEADERS "include/sysio/testing/*.hpp")
 
 configure_file(contracts.hpp.in include/testing_contracts/contracts.hpp ESCAPE_QUOTES)
@@ -43,48 +23,51 @@ target_include_directories(sysio_testing_contracts INTERFACE ${CMAKE_CURRENT_BIN
 configure_file(contracts.cpp.in contracts.cpp ESCAPE_QUOTES)
 
 ## SORT .cpp by most likely to change / break compile
-add_library( sysio_testing
-             tester.cpp
-             tester_network.cpp
-             ${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp
-             ${HEADERS}
-        )
+add_library(sysio_testing
+  tester.cpp
+  tester_network.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp
+  ${HEADERS}
+)
 
 # Could not figure out how to make this work correctly.
-# As it is now, it takes two builds when anything in sysio.roa or sysio.bios is modified. The first build
 # builds the wasm file and then the next build includes the wasm file in the library. Before the only
 # way to get it to work was to remove the contracts.o file. This is better than a clean everytime.
-if( SYSIO_COMPILE_TEST_CONTRACTS )
-    set(CONTRACT_WASM_FILES
-            "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"
-            "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"
-    )
-    set(CONTRACT_WASM_FILE "${CMAKE_CURRENT_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm")
+if(BUILD_TEST_CONTRACTS)
+  set(CONTRACT_WASM_FILES
+    "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"
+    "${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"
+  )
+  set(CONTRACT_WASM_FILE "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm")
 
-    # Make the main testing library wait for the contracts to be built.
-    add_dependencies(sysio_testing sysio_testing_contracts)
+  # Make the main testing library wait for the contracts to be built.
+  add_dependencies(sysio_testing sysio_testing_contracts)
 
-    # Set the explicit dependency. This is the magic link.
-    #    It tells CMake: "If ${CONTRACT_WASM_FILE} is newer than contracts.cpp.o, recompile contracts.cpp".
-    #    Note: The source file is specified relative to the current CMakeLists.txt.
-    set_source_files_properties(
-            "contracts.cpp"
-            PROPERTIES OBJECT_DEPENDS "${CONTRACT_WASM_FILES}"
-    )
+  # Set the explicit dependency. This is the magic link.
+  #    It tells CMake: "If ${CONTRACT_WASM_FILE} is newer than contracts.cpp.o, recompile contracts.cpp".
+  #    Note: The source file is specified relative to the current CMakeLists.txt.
+  set_source_files_properties(
+    "contracts.cpp"
+    PROPERTIES OBJECT_DEPENDS "${CONTRACT_WASM_FILES}"
+  )
 endif()
 
-target_link_libraries( sysio_testing sysio_testing_contracts sysio_chain fc chainbase Logging IR WAST WASM)
-target_include_directories( sysio_testing
-                            PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
-                                   "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
-                                   "${CMAKE_CURRENT_SOURCE_DIR}/contracts"
-                                   "${CMAKE_CURRENT_BINARY_DIR}/contracts"
-                          )
+target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc chainbase Logging IR WAST WASM)
+target_include_directories(sysio_testing
+  PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+  "${CMAKE_CURRENT_BINARY_DIR}/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/contracts"
+  "${CMAKE_CURRENT_BINARY_DIR}/contracts"
+  "${CMAKE_SOURCE_DIR}/contracts"
+  "${CMAKE_BINARY_DIR}/contracts"
+)
 
-set_target_properties( sysio_testing PROPERTIES PUBLIC_HEADER "${HEADERS}" )
-install( TARGETS sysio_testing
-   RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
-   LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-   ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
-   PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/testing
+set_target_properties(sysio_testing PROPERTIES PUBLIC_HEADER "${HEADERS}")
+install(TARGETS sysio_testing
+  RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/sysio/testing
 )
