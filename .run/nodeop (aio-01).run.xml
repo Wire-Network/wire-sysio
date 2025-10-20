@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="nodeop (aio-01)" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--config-dir $ProjectFileDir$/etc/config/nodeop/aio --contracts-console --data-dir /tmp/wire-chain-aio-01 --genesis-json $ProjectFileDir$/etc/config/nodeop/aio/genesis.json --signature-provider &quot;SYS8FwtmL4r1z27ZR2jM8Wc4PAsLTjXk5rWz9939Ds7mJrrK8bUGo=KEY:5JtGeD8XhZkXXYcpi1KQtf1ZQY2SdkYuVS4QidDg4d6cC9qMfjy&quot;" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" WORKING_DIR="file://$ProjectFileDir$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="wire-sysio" TARGET_NAME="nodeop" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="wire-sysio" RUN_TARGET_NAME="nodeop">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>
