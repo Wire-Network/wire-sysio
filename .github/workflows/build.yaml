@@ -145,7 +145,9 @@ jobs:
         --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
         --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
         --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
-        --volume ${{ github.workspace }}:${{ github.workspace }}
+      volumes:
+      - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
+
 
     steps:
       - name: Create ephemeral Docker context
@@ -384,60 +386,26 @@ jobs:
       - name: Export core dumps
         if: failure()
         env:
-          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
           DOCKER_HOST: ${{ env.DOCKER_HOST }}
         run: |
-          echo "=== Checking Docker context and host before exporting core dumps ==="
-          echo "DOCKER_CONTEXT=${DOCKER_CONTEXT:-<unset>}"
-          echo "DOCKER_HOST=${DOCKER_HOST:-<unset>}"
-
-          echo "Available Docker contexts:"
-          docker context ls || echo "(Failed to list contexts)"
-
-          # Determine which connection to use
-          if docker context inspect "$DOCKER_CONTEXT" >/dev/null 2>&1; then
-            echo "Context '$DOCKER_CONTEXT' is valid. Using it for export."
-            DOCKER_CONN="--context $DOCKER_CONTEXT"
-          elif [ -n "${DOCKER_HOST:-}" ]; then
-            echo "Context not found. Falling back to DOCKER_HOST=${DOCKER_HOST}"
-            DOCKER_CONN="--host $DOCKER_HOST"
-          else
-            echo "No valid Docker context or host found. Skipping core dump export."
-            exit 0
-          fi
-
-          echo "Using Docker connection: $DOCKER_CONN"
-
-          # Try to export core dumps safely
-          docker $DOCKER_CONN run --rm \
+          sudo docker --host $DOCKER_HOST run --rm \
             --mount type=bind,source=/var/lib/systemd/coredump,target=/cores,readonly \
-            alpine sh -c '
-              set -e
-              if [ -z "$(ls -A /cores 2>/dev/null)" ]; then
-                echo "No core dumps found in /var/lib/systemd/coredump"
-                exit 0
-              fi
-              echo "Archiving core dumps..."
-              tar -C /cores -cvf - . || true
-            ' | tar -xv || true
+            alpine sh -c 'tar -C /cores/ -c .' | tar x
 
-          echo "=== Core dump export complete ==="
+      - name: Upload logs from failed tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.cfg.name }}-np-logs
+          path: |
+            *-logs.tar.gz
+            core*.zst
 
-            - name: Upload logs from failed tests
-              if: failure()
-              uses: actions/upload-artifact@v4
-              with:
-                name: ${{ matrix.cfg.name }}-np-logs
-                path: |
-                  *-logs.tar.gz
-                  core*.zst
-
-            - name: Cleanup Docker context
-              if: always()
-              run: |
-                echo "Removing Docker context $DOCKER_CONTEXT..."
-                sudo docker context rm -f "$DOCKER_CONTEXT" || true
-                echo "Docker context cleanup complete."
+      - name: Cleanup Docker context
+        if: always()
+        run: |
+          echo "Removing Docker context..."
+          sudo docker context rm -f "$DOCKER_CONTEXT" || true
 
   lr-tests:
     name: LR Tests (${{matrix.cfg.name}})
@@ -508,10 +476,10 @@ jobs:
       - name: Export core dumps
         if: failure()
         env:
-          DOCKER_HOST: ${{ env.DOCKER_HOST }}
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           echo "Checking for core dumps..."
+          docker context ls
           sudo docker --context "$DOCKER_CONTEXT" run --rm \
             --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
             alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
