@@ -27,10 +27,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
+include(chain-tools NO_POLICY_SCOPE)
 include(test-tools NO_POLICY_SCOPE)
 include(contract-tools NO_POLICY_SCOPE)
-
-
 
 include(CTest) # suppresses DartConfiguration.tcl error
 enable_testing()
@@ -80,7 +79,7 @@ if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
     # can be created with the exact version found
     find_package(LLVM REQUIRED CONFIG)
     if(LLVM_VERSION_MAJOR VERSION_LESS 7)# OR LLVM_VERSION_MAJOR VERSION_GREATER_EQUAL 12)
-      message(FATAL_ERROR "Leap requires an LLVM version 7 through 11")
+      message(FATAL_ERROR "WIRE requires an LLVM version 7 through 11")
     endif()
   endif()
 endif()
@@ -108,12 +107,12 @@ endif()
 
 if(APPLE AND UNIX)
   # Apple Specific Options Here
-  message(STATUS "Configuring Leap on macOS")
+  message(STATUS "Configuring WIRE on macOS")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall -Wno-deprecated-declarations")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-deprecated-declarations")
 else()
   # Linux Specific Options Here
-  message(STATUS "Configuring Leap on Linux")
+  message(STATUS "Configuring WIRE on Linux")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
   if(FULL_STATIC_BUILD)
@@ -136,13 +135,13 @@ if(ENABLE_WEXTRA)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 endif()
 
-option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for Leap" OFF)
+option(SYSIO_ENABLE_DEVELOPER_OPTIONS "enable developer options for WIRE" OFF)
 
 # based on http://www.delorie.com/gnu/docs/gdb/gdb_70.html
 # uncomment this line to tell GDB about macros (slows compile times)
 # set( CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -gdwarf-2 -g3" )
 
-set(ENABLE_COVERAGE_TESTING FALSE CACHE BOOL "Build Leap for code coverage analysis")
+set(ENABLE_COVERAGE_TESTING FALSE CACHE BOOL "Build WIRE for code coverage analysis")
 
 if(ENABLE_COVERAGE_TESTING)
   set(CMAKE_C_FLAGS "--coverage ${CMAKE_C_FLAGS}")
@@ -197,11 +196,8 @@ add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
 add_subdirectory(scripts)
-
 add_subdirectory(unittests)
-
 add_subdirectory(tests)
-
 add_subdirectory(tools)
 add_subdirectory(benchmark)
 

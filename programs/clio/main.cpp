@@ -3331,6 +3331,11 @@ int main( int argc, char** argv ) {
       elog("bad alloc");
       return 1;
    } catch (const fc::exception& e) {
+     // IF THE WALLET IS ALREADY UNLOCKED, IGNORE THE ERROR AS THE USER'S
+     // DESIRED RESULT IS THE RESULT
+     if (std::string(e.name()).contains("wallet_unlocked_exception"))
+        return 0;
+
       return handle_error(e);
    } catch (const std::exception& e) {
       return handle_error(fc::std_exception_wrapper::from_current_exception(e));

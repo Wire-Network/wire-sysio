@@ -31,7 +31,6 @@ add_library(sysio_testing
 )
 
 # Could not figure out how to make this work correctly.
-# As it is now, it takes two builds when anything in sysio.roa or sysio.bios is modified. The first build
 # builds the wasm file and then the next build includes the wasm file in the library. Before the only
 # way to get it to work was to remove the contracts.o file. This is better than a clean everytime.
 if(BUILD_TEST_CONTRACTS)

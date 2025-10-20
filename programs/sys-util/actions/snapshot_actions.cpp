@@ -1,4 +1,4 @@
-#include "snapshot.hpp"
+#include "snapshot_actions.hpp"
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/config.hpp>

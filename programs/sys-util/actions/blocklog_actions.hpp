@@ -1,4 +1,4 @@
-#include "subcommand.hpp"
+#include "base_actions.hpp"
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/config.hpp>
 
@@ -19,9 +19,9 @@ struct blocklog_options {
    block_log_config blog_conf;
 };
 
-class blocklog_actions : public sub_command<blocklog_options> {
+class blocklog_actions : public base_actions<blocklog_options> {
 public:
-   blocklog_actions() : sub_command() {}
+   blocklog_actions() : base_actions() {}
    void setup(CLI::App& app);
 
 protected:

@@ -1,5 +1,5 @@
 #pragma once
-#include "subcommand.hpp"
+#include "base_actions.hpp"
 
 constexpr std::array<std::string,1> chain_configure_template_names = {"aio"};
 constexpr std::string wallet_default_name = "default";
@@ -20,10 +20,10 @@ struct chain_options {
   std::string configure_ini_override_file = ""; // optional override JSON file path
 };
 
-class chain_actions : public sub_command<chain_options> {
+class chain_actions : public base_actions<chain_options> {
   public:
 
-    chain_actions() : sub_command() {
+    chain_actions() : base_actions() {
     }
 
     void setup(CLI::App& app);

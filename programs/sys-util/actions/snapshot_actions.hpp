@@ -1,4 +1,4 @@
-#include "subcommand.hpp"
+#include "base_actions.hpp"
 
 struct snapshot_options {
    std::string input_file = "";
@@ -8,9 +8,9 @@ struct snapshot_options {
    std::string chain_id = "";
 };
 
-class snapshot_actions : public sub_command<snapshot_options> {
+class snapshot_actions : public base_actions<snapshot_options> {
 public:
-   snapshot_actions() : sub_command() {}
+   snapshot_actions() : base_actions() {}
    void setup(CLI::App& app);
 
    // callbacks
