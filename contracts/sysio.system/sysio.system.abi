@@ -759,6 +759,16 @@
             ]
         },
         {
+            "name": "wasmcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "settings",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "limit_auth_change",
             "base": "",
             "fields": [
@@ -900,6 +910,11 @@
         {
             "name": "updateauth",
             "type": "updateauth",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "wasmcfg",
+            "type": "wasmcfg",
             "ricardian_contract": ""
         }
     ],

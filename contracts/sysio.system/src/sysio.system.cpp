@@ -83,8 +83,6 @@ namespace sysiosystem {
 #endif
    }
 
-#ifdef SYSTEM_CONFIGURABLE_WASM_LIMITS
-
    // The limits on contract WebAssembly modules
    struct wasm_parameters
    {
@@ -154,8 +152,6 @@ namespace sysiosystem {
          check(false, "Unknown configuration");
       }
    }
-
-#endif
 
    void system_contract::setpriv( const name& account, uint8_t ispriv ) {
       require_auth( get_self() );

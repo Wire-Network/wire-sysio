@@ -311,7 +311,6 @@ namespace sysiosystem {
          [[sysio::action]]
          void setparams( const blockchain_parameters_t& params );
 
-#ifdef SYSTEM_CONFIGURABLE_WASM_LIMITS
          /**
           * Sets the WebAssembly limits.  Valid parameters are "low",
           * "default" (equivalent to low), and "high".  A value of "high"
@@ -319,7 +318,6 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          void wasmcfg( const name& settings );
-#endif
 
          /**
           * Set privilege status for an account. Allows to set privilege status for an account (turn it on/off).

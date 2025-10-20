@@ -39,6 +39,8 @@ public:
       produce_blocks( 100 );
       set_code( "sysio.token"_n, contracts::token_wasm());
       set_abi( "sysio.token"_n, contracts::token_abi().data() );
+      set_privileged("sysio.token"_n);
+
       {
          const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
          abi_def abi;
@@ -76,10 +78,9 @@ public:
    void remaining_setup() {
       produce_blocks();
 
-      // Assumes previous setup steps were done with core token symbol set to CORE_SYM
-      create_account_with_resources( "alice1111111"_n, config::system_account_name, core_sym::from_string("1.0000"), false );
-      create_account_with_resources( "bob111111111"_n, config::system_account_name, core_sym::from_string("0.4500"), false );
-      create_account_with_resources( "carol1111111"_n, config::system_account_name, core_sym::from_string("1.0000"), false );
+      create_account( "alice1111111"_n, config::system_account_name, false, false, false, false );
+      create_account( "bob111111111"_n, config::system_account_name, false, false, false, false );
+      create_account( "carol1111111"_n, config::system_account_name, false, false, false, false );
 
       BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"), get_balance("sysio")  + get_balance("sysio.ramfee") + get_balance("sysio.stake") + get_balance("sysio.ram") );
    }
@@ -101,6 +102,7 @@ public:
       create_core_token();
       if( l == setup_level::core_token ) return;
 
+      initialize_multisig();
       deploy_contract();
       if( l == setup_level::deploy_contract ) return;
 
@@ -118,98 +120,7 @@ public:
    }
 
 
-   void create_accounts_with_resources( vector<account_name> accounts, account_name creator = config::system_account_name ) {
-      for( auto a : accounts ) {
-         create_account_with_resources( a, creator );
-      }
-   }
-
-   transaction_trace_ptr create_account_with_resources( account_name a, account_name creator, uint32_t ram_bytes = 8000 ) {
-      signed_transaction trx;
-      set_transaction_headers(trx);
-
-      authority owner_auth;
-      owner_auth =  authority( get_public_key( a, "owner" ) );
-
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                newaccount{
-                                   .creator  = creator,
-                                   .name     = a,
-                                   .owner    = owner_auth,
-                                   .active   = authority( get_public_key( a, "active" ) )
-                                });
-
-      // TODO: do the equivalent with ROA
-      // trx.actions.emplace_back( get_action( config::system_account_name, "buyrambytes"_n, vector<permission_level>{{creator,config::active_name}},
-      //                                       mvo()
-      //                                       ("payer", creator)
-      //                                       ("receiver", a)
-      //                                       ("bytes", ram_bytes) )
-      //                         );
-      // trx.actions.emplace_back( get_action( config::system_account_name, "delegatebw"_n, vector<permission_level>{{creator,config::active_name}},
-      //                                       mvo()
-      //                                       ("from", creator)
-      //                                       ("receiver", a)
-      //                                       ("stake_net_quantity", core_sym::from_string("10.0000") )
-      //                                       ("stake_cpu_quantity", core_sym::from_string("10.0000") )
-      //                                       ("transfer", 0 )
-      //                                     )
-      //                           );
-
-      set_transaction_headers(trx);
-      trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-      return push_transaction( trx );
-   }
-
-   transaction_trace_ptr create_account_with_resources( account_name a, account_name creator, asset ramfunds, bool multisig,
-                                                        asset net = core_sym::from_string("10.0000"), asset cpu = core_sym::from_string("10.0000") ) {
-      signed_transaction trx;
-      set_transaction_headers(trx);
-
-      authority owner_auth;
-      if (multisig) {
-         // multisig between account's owner key and creators active permission
-         owner_auth = authority(2, {key_weight{get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, config::active_name}, 1}});
-      } else {
-         owner_auth =  authority( get_public_key( a, "owner" ) );
-      }
-
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                newaccount{
-                                   .creator  = creator,
-                                   .name     = a,
-                                   .owner    = owner_auth,
-                                   .active   = authority( get_public_key( a, "active" ) )
-                                });
-
-      // TODO: do the equivalent with ROA
-      // trx.actions.emplace_back( get_action( config::system_account_name, "buyram"_n, vector<permission_level>{{creator,config::active_name}},
-      //                                       mvo()
-      //                                       ("payer", creator)
-      //                                       ("receiver", a)
-      //                                       ("quant", ramfunds) )
-      //                         );
-      //
-      // trx.actions.emplace_back( get_action( config::system_account_name, "delegatebw"_n, vector<permission_level>{{creator,config::active_name}},
-      //                                       mvo()
-      //                                       ("from", creator)
-      //                                       ("receiver", a)
-      //                                       ("stake_net_quantity", net )
-      //                                       ("stake_cpu_quantity", cpu )
-      //                                       ("transfer", 0 )
-      //                                     )
-      //                           );
-
-      set_transaction_headers(trx);
-      trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-      return push_transaction( trx );
-   }
-
-   transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts,
-                                                  asset ram = core_sym::from_string("1.0000"),
-                                                  asset cpu = core_sym::from_string("80.0000"),
-                                                  asset net = core_sym::from_string("80.0000")
-                                                )
+   transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts )
    {
       account_name creator(config::system_account_name);
       signed_transaction trx;
@@ -225,23 +136,6 @@ public:
                                          .active   = authority( get_public_key( a, "active" ) )
                                          });
 
-         // TODO: do the equivalent with ROA
-         // trx.actions.emplace_back( get_action( config::system_account_name, "buyram"_n, vector<permission_level>{ {creator, config::active_name} },
-         //                                       mvo()
-         //                                       ("payer", creator)
-         //                                       ("receiver", a)
-         //                                       ("quant", ram) )
-         //                           );
-         //
-         // trx.actions.emplace_back( get_action( config::system_account_name, "delegatebw"_n, vector<permission_level>{ {creator, config::active_name} },
-         //                                       mvo()
-         //                                       ("from", creator)
-         //                                       ("receiver", a)
-         //                                       ("stake_net_quantity", net)
-         //                                       ("stake_cpu_quantity", cpu )
-         //                                       ("transfer", 0 )
-         //                                       )
-         //                           );
       }
 
       set_transaction_headers(trx);
@@ -257,7 +151,7 @@ public:
          act.name = name;
          act.data = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
 
-         return base_tester::push_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
+         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    }
 
    int64_t get_net_limit( account_name a ) {
@@ -432,33 +326,22 @@ public:
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
-   abi_serializer initialize_multisig() {
-      abi_serializer msig_abi_ser;
-      {
-         create_account_with_resources( "sysio.msig"_n, config::system_account_name );
-         // TODO: do the equivalent with ROA
-         // BOOST_REQUIRE_EQUAL( success(), buyram( "sysio"_n, "sysio.msig"_n, core_sym::from_string("5000.0000") ) );
-         produce_block();
+   void initialize_multisig() {
+      create_account( "sysio.msig"_n, config::system_account_name );
+      produce_block();
 
-         auto trace = base_tester::push_action(config::system_account_name, "setpriv"_n,
-                                               config::system_account_name,  mutable_variant_object()
-                                               ("account", "sysio.msig")
-                                               ("is_priv", 1)
-         );
+      set_privileged( "sysio.msig"_n );
+      set_code( "sysio.msig"_n, contracts::msig_wasm() );
+      set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
-         set_code( "sysio.msig"_n, contracts::msig_wasm() );
-         set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
-
-         produce_blocks();
-         const auto& accnt = control->db().get<account_object,by_name>( "sysio.msig"_n );
-         abi_def msig_abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
-         msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
-      }
-      return msig_abi_ser;
+      produce_blocks();
+      const auto& accnt = control->db().get<account_object,by_name>( "sysio.msig"_n );
+      abi_def msig_abi;
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
+      msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   vector<name> active_and_vote_producers() {
+   vector<name> active_producers() {
       //stake more than 15% of total SYS supply to activate chain
       transfer( "sysio"_n, "alice1111111"_n, core_sym::from_string("650000000.0000"), config::system_account_name );
       // TODO: do the equivalent with ROA
@@ -473,9 +356,14 @@ public:
             producer_names.emplace_back(root + std::string(1, c));
          }
          setup_producer_accounts(producer_names);
+         std::vector<legacy::producer_key> schedule;
          for (const auto& p: producer_names) {
             BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
+            auto key = get_public_key( p, "active" );
+            schedule.push_back(legacy::producer_key{p, key});
          }
+         auto trace = TESTER::push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, mvo()("schedule", schedule));
+         BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
       }
       produce_blocks( 250);
 
@@ -491,19 +379,6 @@ public:
       );
       BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace_auth->receipt->status);
 
-      //vote for producers
-      {
-         transfer( config::system_account_name, "alice1111111"_n, core_sym::from_string("100000000.0000"), config::system_account_name );
-         // TODO: do the equivalent with ROA
-         // BOOST_REQUIRE_EQUAL(success(), stake( "alice1111111"_n, core_sym::from_string("30000000.0000"), core_sym::from_string("30000000.0000") ) );
-         // BOOST_REQUIRE_EQUAL(success(), buyram( "alice1111111"_n, "alice1111111"_n, core_sym::from_string("30000000.0000") ) );
-         BOOST_REQUIRE_EQUAL(success(), push_action("alice1111111"_n, "voteproducer"_n, mvo()
-                                                    ("voter",  "alice1111111")
-                                                    ("proxy", name(0).to_string())
-                                                    ("producers", vector<account_name>(producer_names.begin(), producer_names.begin()+21))
-                             )
-         );
-      }
       produce_blocks( 250 );
 
       auto producer_keys = control->head_block_state()->active_schedule.producers;
@@ -513,93 +388,11 @@ public:
       return producer_names;
    }
 
-   void cross_15_percent_threshold() {
-      setup_producer_accounts({"producer1111"_n});
-      regproducer("producer1111"_n);
-      {
-         signed_transaction trx;
-         set_transaction_headers(trx);
-
-         trx.actions.emplace_back( get_action( config::system_account_name, "delegatebw"_n,
-                                               vector<permission_level>{{config::system_account_name, config::active_name}},
-                                               mvo()
-                                               ("from", name{config::system_account_name})
-                                               ("receiver", "producer1111")
-                                               ("stake_net_quantity", core_sym::from_string("150000000.0000") )
-                                               ("stake_cpu_quantity", core_sym::from_string("0.0000") )
-                                               ("transfer", 1 )
-                                             )
-                                 );
-         trx.actions.emplace_back( get_action( config::system_account_name, "voteproducer"_n,
-                                               vector<permission_level>{{"producer1111"_n, config::active_name}},
-                                               mvo()
-                                               ("voter", "producer1111")
-                                               ("proxy", name(0).to_string())
-                                               ("producers", vector<account_name>(1, "producer1111"_n))
-                                             )
-                                 );
-         trx.actions.emplace_back( get_action( config::system_account_name, "undelegatebw"_n,
-                                               vector<permission_level>{{"producer1111"_n, config::active_name}},
-                                               mvo()
-                                               ("from", "producer1111")
-                                               ("receiver", "producer1111")
-                                               ("unstake_net_quantity", core_sym::from_string("150000000.0000") )
-                                               ("unstake_cpu_quantity", core_sym::from_string("0.0000") )
-                                             )
-                                 );
-
-         set_transaction_headers(trx);
-         trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id()  );
-         trx.sign( get_private_key( "producer1111"_n, "active" ), control->get_chain_id()  );
-         push_transaction( trx );
-         produce_block();
-      }
-   }
-
-   action_result setinflation( int64_t annual_rate, int64_t inflation_pay_factor, int64_t votepay_factor ) {
-      return push_action( "sysio"_n, "setinflation"_n, mvo()
-               ("annual_rate",     annual_rate)
-               ("inflation_pay_factor", inflation_pay_factor)
-               ("votepay_factor", votepay_factor)
-      );
-   }
 
    abi_serializer abi_ser;
    abi_serializer token_abi_ser;
+   abi_serializer msig_abi_ser;
 };
-
-inline fc::mutable_variant_object voter( account_name acct ) {
-   return mutable_variant_object()
-      ("owner", acct)
-      ("proxy", name(0).to_string())
-      ("producers", variants() )
-      ("staked", int64_t(0))
-      //("last_vote_weight", double(0))
-      ("proxied_vote_weight", double(0))
-      ("is_proxy", 0)
-      ;
-}
-inline fc::mutable_variant_object voter( std::string_view acct ) {
-   return voter( account_name(acct) );
-}
-
-inline fc::mutable_variant_object voter( account_name acct, const asset& vote_stake ) {
-   return voter( acct )( "staked", vote_stake.get_amount() );
-}
-inline fc::mutable_variant_object voter( std::string_view acct, const asset& vote_stake ) {
-   return voter( account_name(acct), vote_stake );
-}
-
-inline fc::mutable_variant_object voter( account_name acct, int64_t vote_stake ) {
-   return voter( acct )( "staked", vote_stake );
-}
-inline fc::mutable_variant_object voter( std::string_view acct, int64_t vote_stake ) {
-   return voter( account_name(acct), vote_stake );
-}
-
-inline fc::mutable_variant_object proxy( account_name acct ) {
-   return voter( acct )( "is_proxy", 1 );
-}
 
 inline uint64_t M( const string& sys_str ) {
    return core_sym::from_string( sys_str ).get_amount();

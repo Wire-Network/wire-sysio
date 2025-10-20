@@ -113,6 +113,8 @@ BOOST_AUTO_TEST_SUITE(sysio_system_limitauth_tests)
 
 // alice hasn't opted in; she can still use the native abi (no authorized_by)
 BOOST_FIXTURE_TEST_CASE(native_tests, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL(
       "",
       updateauth({alice, active}, alice, freebie, active, get_public_key(alice, "freebie")));
@@ -149,6 +151,8 @@ FC_LOG_AND_RETHROW()
 
 // alice hasn't opted in; she can use the extended abi, but set authorized_by to empty
 BOOST_FIXTURE_TEST_CASE(extended_empty_tests, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL(
       "",
       updateauth({alice, active}, alice, freebie, active, get_public_key(alice, "freebie"), ""_n));
@@ -185,6 +189,8 @@ FC_LOG_AND_RETHROW()
 
 // alice hasn't opted in; she can use the extended abi, but set authorized_by to matching values
 BOOST_FIXTURE_TEST_CASE(extended_matching_tests, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL(
       "missing authority of alice1111111/owner",
       updateauth({alice, active}, alice, freebie, active, get_public_key(alice, "freebie"), owner));
@@ -234,6 +240,8 @@ FC_LOG_AND_RETHROW()
 
 // alice protects her account using allow_perms
 BOOST_FIXTURE_TEST_CASE(allow_perms_tests, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL(
       "missing authority of alice1111111",
       limitauthchg({bob, active}, alice, {owner, active, admin}, {}));
@@ -369,6 +377,8 @@ FC_LOG_AND_RETHROW()
 
 // alice protects her account using disallow_perms
 BOOST_FIXTURE_TEST_CASE(disallow_perms_tests, limitauth_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL(
       "missing authority of alice1111111",
       limitauthchg({bob, active}, alice, {}, {freebie, freebie2}));

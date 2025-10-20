@@ -25,6 +25,7 @@ public:
 
       set_code( "sysio.token"_n, contracts::token_wasm() );
       set_abi( "sysio.token"_n, contracts::token_abi().data() );
+      set_privileged( "sysio.token"_n );
 
       produce_blocks();
 

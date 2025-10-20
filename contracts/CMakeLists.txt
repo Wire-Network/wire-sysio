@@ -11,6 +11,7 @@ if(BUILD_SYSTEM_CONTRACTS)
 
   add_subdirectory(sysio.token)
   add_subdirectory(sysio.wrap)
+  add_subdirectory(test_contracts)
   if(NOT CDT_BUILD AND BUILD_TEST_CONTRACTS)
     add_subdirectory(tests)
   endif()
