@@ -10,11 +10,10 @@ if(BUILD_TEST_CONTRACTS)
     SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contracts
     BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/contracts
   )
-else()
-  message(STATUS "Not building contracts in directory `./libraries/contracts/`")
-  add_subdirectory(contracts)
 endif()
 
+# TODO: @heifner Realign the dependencies declared in contracts.hpp.in
+add_subdirectory(contracts)
 file(GLOB HEADERS "include/sysio/testing/*.hpp")
 
 configure_file(contracts.hpp.in include/testing_contracts/contracts.hpp ESCAPE_QUOTES)
