@@ -292,6 +292,7 @@ try {
         cur_block_height <= end_block_height;                                     //
         advance_cur_block())                                                      //
    {
+      (void)cur_block_height; // avoid unused warning
       add_to_expected_table(cur_block_height, cur_block_timestamp);
    }
 
