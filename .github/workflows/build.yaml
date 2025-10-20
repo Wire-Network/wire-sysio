@@ -84,7 +84,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu22, ubuntu24, ubsan]
+        platform: [ubuntu24, ubsan]
     runs-on: ubuntu-latest
     container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.platform].image}}
     steps:
@@ -131,7 +131,7 @@ jobs:
       matrix:
         include:
           # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
+          # - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}
@@ -279,7 +279,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cfg: {name: 'ubuntu22', base: 'ubuntu22', builddir: 'ubuntu22'}
+          # - cfg: {name: 'ubuntu22', base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24', base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',    base: 'ubsan',    builddir: 'ubsan'}
     runs-on: ["self-hosted", "enf-x86-midtier"]
@@ -411,7 +411,7 @@ jobs:
       matrix:
         include:
           # - cfg: {name: 'ubuntu20',      base: 'ubuntu20', builddir: 'ubuntu20'}
-          - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
+          # - cfg: {name: 'ubuntu22',      base: 'ubuntu22', builddir: 'ubuntu22'}
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
           # - cfg: {name: 'ubuntu20repro', base: 'ubuntu20', builddir: 'reproducible'}

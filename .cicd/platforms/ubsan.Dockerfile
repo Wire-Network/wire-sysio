@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM ubuntu:jammy
-
+FROM ubuntu:noble
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -14,9 +13,6 @@ RUN apt-get install -y \
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 RUN apt-get update
 
-RUN yes | bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)" llvm.sh 18
-RUN rm -rf /usr/lib/llvm-18/lib/cmake
-
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y build-essential      \
                        cmake                \
@@ -24,7 +20,6 @@ RUN apt-get update && apt-get upgrade -y && \
                        jq                   \
                        libcurl4-openssl-dev \
                        libgmp-dev           \
-                       llvm-11-dev          \
                        ninja-build          \
                        python3              \
                        python3-dev          \
@@ -42,10 +37,9 @@ RUN apt-get update && apt-get upgrade -y && \
                        sudo                 \
                        doxygen              \
                        golang               \
-                       gcc-10               \
-                       g++-10               \
-                       gcc-12               \
-                       g++-12               \
+                       gcc-14               \
+                       g++-14               \
+                       libstdc++-14-dev     \
                        libboost-all-dev     \
                        libssl-dev           \
                        libusb-1.0-0-dev     \
@@ -58,9 +52,17 @@ RUN apt-get update && apt-get upgrade -y && \
                        libzstd-dev          \
                        libbz2-dev           \
                        liblzma-dev          \
-                       libncurses5-dev && \
-    python3 -m pip install --upgrade pip setuptools wheel && \
-    python3 -m pip install --no-cache-dir numpy==1.26.4
+                       clang-18             \
+                       clang-tools-18       \
+                       autoconf             \
+                       automake             \
+                       libtool              \
+                       htop
+
+RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
+
+RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
 
 COPY <<-EOF /ubsan.supp
   vptr:wasm_sysio_validation.hpp

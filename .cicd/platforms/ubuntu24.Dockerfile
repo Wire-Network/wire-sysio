@@ -11,9 +11,6 @@ RUN apt-get install -y \
 RUN add-apt-repository ppa:deadsnakes/ppa -y
 RUN apt-get update
 
-RUN wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc && \
-    add-apt-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main"
-
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y build-essential      \
     cmake                \
@@ -30,7 +27,7 @@ RUN apt-get update && apt-get upgrade -y && \
     zip                  \
     unzip                \
     tar                  \
-    sudo                 \ 
+    sudo                 \
     golang               \
     python3-dev          \
     libffi-dev           \
@@ -41,10 +38,15 @@ RUN apt-get update && apt-get upgrade -y && \
     libzstd-dev          \
     libssl-dev           \
     ccache               \
-    gcc-10               \
-    g++-10               \
     clang-18             \
-    clang++-18           \
-    clang-tools-18       \ 
-    autoconf automake libtool 
+    clang-tools-18       \
+    libc++-18-dev        \
+    libc++-dev           \
+    libbz2-dev           \
+    libstdc++-14-dev     \
+    g++-10               \
+    g++-12               \
+    gcc-10               \
+    gcc-12               \
+    autoconf automake libtool libltdl-dev 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
