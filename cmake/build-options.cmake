@@ -1,5 +1,5 @@
 option(ENABLE_CCACHE "Enable ccache if available" ON)
-option(ENABLE_DISTCC "Enable distcc if available" ON)
+option(ENABLE_DISTCC "Enable distcc if available" OFF)
 
 option(ENABLE_TOOLS "Build tools" OFF)
 option(ENABLE_TESTS "Build tests" OFF)
