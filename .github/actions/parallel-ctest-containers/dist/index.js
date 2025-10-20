@@ -6084,60 +6084,29 @@ var import_node_fs = __toESM(require("node:fs"), 1);
 var import_node_zlib = __toESM(require("node:zlib"), 1);
 var import_tar_stream = __toESM(require_tar_stream(), 1);
 var import_core = __toESM(require_core(), 1);
+var container = import_core.default.getInput("container", { required: true });
+var error_log_paths = JSON.parse(import_core.default.getInput("error-log-paths", { required: true }));
+var log_tarball_prefix = import_core.default.getInput("log-tarball-prefix", { required: true });
+var tests_label = import_core.default.getInput("tests-label", { required: true });
+var test_timeout = import_core.default.getInput("test-timeout", { required: true });
+var repo_name = import_node_process.default.env.GITHUB_REPOSITORY.split("/")[1];
+var dockerHost = import_node_process.default.env.DOCKER_HOST || "";
+var dockerArgs = dockerHost ? ["--host", dockerHost] : [];
 async function main() {
-  const container = import_core.default.getInput("container", { required: true });
-  const error_log_paths = JSON.parse(import_core.default.getInput("error-log-paths", { required: true }));
-  const log_tarball_prefix = import_core.default.getInput("log-tarball-prefix", { required: true });
-  const tests_label = import_core.default.getInput("tests-label", { required: true });
-  const test_timeout = import_core.default.getInput("test-timeout", { required: true });
-  const repo_name = import_node_process.default.env.GITHUB_REPOSITORY.split("/")[1];
-  const dockerHost = import_node_process.default.env.DOCKER_HOST || "";
-  const dockerArgs = dockerHost ? ["--host", dockerHost] : [];
-  import_core.default.info(`Using Docker host: ${dockerHost || "default /var/run/docker.sock"}`);
   try {
-    const platform = log_tarball_prefix;
-    const suffix = `${import_node_process.default.env.GITHUB_RUN_ID}-${import_node_process.default.env.GITHUB_JOB}-${platform}-${Math.floor(Math.random() * 1e4)}`;
+    const suffix = `${import_node_process.default.env.GITHUB_RUN_ID}-${import_node_process.default.env.GITHUB_JOB}-${Math.floor(Math.random() * 1e4)}`;
     const baseContainer = `base-${suffix}`;
     const baseImage = `baseimage-${suffix}`;
     import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", "-f", baseContainer], { stdio: "ignore" });
-    if (import_node_child_process.default.spawnSync(
-      "docker",
-      [
-        ...dockerArgs,
-        "run",
-        "--name",
-        baseContainer,
-        "-v",
-        `${import_node_process.default.cwd()}/build.tar.zst:/build.tar.zst`,
-        "--workdir",
-        `/__w/${repo_name}/${repo_name}`,
-        container,
-        "sh",
-        "-c",
-        "zstdcat /build.tar.zst | tar x"
-      ],
-      { stdio: "inherit" }
-    ).status) throw new Error("Failed to create base container");
+    if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${import_node_process.default.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], { stdio: "inherit" }).status)
+      throw new Error("Failed to create base container");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "commit", baseContainer, baseImage], { stdio: "inherit" }).status)
       throw new Error("Failed to create base image");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", baseContainer], { stdio: "inherit" }).status)
       throw new Error("Failed to remove base container");
-    const test_query_result = import_node_child_process.default.spawnSync(
-      "docker",
-      [
-        ...dockerArgs,
-        "run",
-        "--rm",
-        baseImage,
-        "bash",
-        "-e",
-        "-o",
-        "pipefail",
-        "-c",
-        `cd build; ctest -L '${tests_label}' --show-only=json-v1`
-      ]
-    );
-    if (test_query_result.status) throw new Error("Failed to discover tests with label");
+    const test_query_result = import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--rm", baseImage, "bash", "-e", "-o", "pipefail", "-c", `cd build; ctest -L '${tests_label}' --show-only=json-v1`]);
+    if (test_query_result.status)
+      throw new Error("Failed to discover tests with label");
     const tests = JSON.parse(test_query_result.stdout).tests;
     const subprocesses = tests.map((t) => new Promise((resolve) => {
       const cname = `${t.name}-${suffix}`;
@@ -6162,55 +6131,35 @@ async function main() {
     console.log("==== Parallel test results ====");
     results.forEach((r) => console.log(`Test ${r.name} \u2192 exit ${r.code}`));
     console.log("================================");
-    for (const { name, code } of results) {
-      if (code === 0) continue;
-      import_core.default.setFailed("Some tests failed");
-      const containerName = `${name}-${suffix}`;
-      const checkResult = import_node_child_process.default.spawnSync(
-        "docker",
-        [...dockerArgs, "ps", "-a", "-q", "-f", `name=${containerName}`],
-        { encoding: "utf-8" }
-      );
-      if (!checkResult.stdout.trim()) {
-        console.log(`Container ${containerName} not found, skipping log extraction`);
+    let hasFailures = false;
+    for (let i = 0; i < results.length; ++i) {
+      if (results[i] === 0)
         continue;
-      }
-      console.log(`Extracting logs from ${containerName}`);
-      try {
-        const extractor = import_tar_stream.default.extract();
-        const packer = import_tar_stream.default.pack();
-        extractor.on("entry", (header, s, next) => {
-          if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
-            s.on("end", next);
-            s.resume();
-            return;
-          }
-          header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length);
-          if (header.name !== "build/" && !error_log_paths.some((p) => header.name.startsWith(p))) {
-            s.on("end", next);
-            s.resume();
-            return;
-          }
-          s.pipe(packer.entry(header, next));
-        }).on("finish", () => packer.finalize());
-        const exp = import_node_child_process.default.spawn("docker", [...dockerArgs, "export", containerName]);
-        exp.on("error", (err) => {
-          console.error(`Failed to export container ${containerName}: ${err.message}`);
-        });
-        exp.stderr.on("data", (data) => {
-          console.error(`Docker export stderr: ${data}`);
-        });
-        exp.stdout.pipe(extractor);
-        await import_node_stream.default.promises.pipeline(
-          packer,
-          import_node_zlib.default.createGzip(),
-          import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${name}-logs.tar.gz`)
-        );
-        console.log(`Logs saved to ${log_tarball_prefix}-${name}-logs.tar.gz`);
-      } catch (err) {
-        console.error(`Error extracting logs for ${name}: ${err.message}`);
-      }
+      hasFailures = true;
+      const containerName = `${tests[i].name}-${suffix}`;
+      let extractor = import_tar_stream.default.extract();
+      let packer = import_tar_stream.default.pack();
+      extractor.on("entry", (header, stream2, next) => {
+        if (!header.name.startsWith(`__w/${repo_name}/${repo_name}/build`)) {
+          stream2.on("end", () => next());
+          stream2.resume();
+          return;
+        }
+        header.name = header.name.substring(`__w/${repo_name}/${repo_name}/`.length);
+        if (header.name !== "build/" && error_log_paths.filter((p) => header.name.startsWith(p)).length === 0) {
+          stream2.on("end", () => next());
+          stream2.resume();
+          return;
+        }
+        stream2.pipe(packer.entry(header, next));
+      }).on("finish", () => {
+        packer.finalize();
+      });
+      import_node_child_process.default.spawn("docker", [...dockerArgs, "export", containerName]).stdout.pipe(extractor);
+      import_node_stream.default.promises.pipeline(packer, import_node_zlib.default.createGzip(), import_node_fs.default.createWriteStream(`${log_tarball_prefix}-${tests[i].name}-logs.tar.gz`));
     }
+    if (hasFailures)
+      import_core.default.setFailed("Some tests failed");
   } catch (e) {
     import_core.default.setFailed(`Uncaught exception ${e.message}`);
   }

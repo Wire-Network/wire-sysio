@@ -145,6 +145,36 @@ jobs:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
+
+            echo "===== DEBUG: ENVIRONMENT ====="
+            whoami
+            id
+            echo "HOME=$HOME"
+            echo "PWD=$PWD"
+            echo "RUNNER_NAME=$RUNNER_NAME"
+            echo "BASE_RUNNER=${RUNNER_NAME,,}"
+
+            echo "===== DEBUG: PATHS ====="
+            echo "User PATH: $PATH"
+            sudo bash -c 'echo "Sudo PATH: $PATH"'
+
+            echo "===== DEBUG: DOCKER BINARIES ====="
+            which docker || echo "docker not found in PATH"
+            sudo which docker || echo "sudo: docker not found in PATH"
+
+            echo "===== DEBUG: DOCKER BIN LOCATIONS ====="
+            ls -l /usr/bin/docker 2>/dev/null || echo "/usr/bin/docker missing"
+            ls -l /usr/local/bin/docker 2>/dev/null || echo "/usr/local/bin/docker missing"
+
+            echo "===== DEBUG: VERIFY EXECUTION ====="
+            # Try executing docker both with and without sudo to see the difference
+            docker version || echo "docker version failed (user)"
+            sudo /usr/bin/docker version || echo "sudo /usr/bin/docker version failed (explicit path)"
+            sudo docker version || echo "sudo docker version failed (plain sudo)"
+
+            echo "===== DEBUG: SUDO CONFIG ====="
+            sudo grep -E '^Defaults' /etc/sudoers /etc/sudoers.d/* 2>/dev/null | grep -E 'secure_path|env_keep' || echo "No sudo Defaults found"
+            
             BASE_RUNNER="${RUNNER_NAME,,}"
             echo "Detected runner name: $RUNNER_NAME"
 
@@ -161,7 +191,7 @@ jobs:
               DOCKER_SOCK=/var/run/docker.sock
             fi
 
-            CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
             echo "Using Docker socket: $DOCKER_SOCK"
             sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
             echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
@@ -302,7 +332,7 @@ jobs:
               DOCKER_SOCK=/var/run/docker.sock
             fi
 
-            CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
             echo "Using Docker socket: $DOCKER_SOCK"
             sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
             echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
@@ -438,7 +468,7 @@ jobs:
             DOCKER_SOCK=/var/run/docker.sock
           fi
 
-          CTX_NAME="job-${{ github.run_id }}-${{ matrix.cfg.name }}"
+          CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"          
           echo "Using Docker socket: $DOCKER_SOCK"
           sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
           echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
