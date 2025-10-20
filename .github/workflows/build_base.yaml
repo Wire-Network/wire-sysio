@@ -89,6 +89,7 @@ jobs:
             cmake -B build -S . -G Ninja \
               -DCMAKE_C_COMPILER=$CC \
               -DCMAKE_CXX_COMPILER=$CXX \
+              -DBUILD_SYSTEM_CONTRACTS=OFF
               -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
               -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
               -DCMAKE_BUILD_TYPE=Release \
