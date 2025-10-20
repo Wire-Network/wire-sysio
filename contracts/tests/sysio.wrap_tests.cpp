@@ -87,7 +87,7 @@ public:
    }
 
    void approve( name proposer, name proposal_name, name approver ) {
-      push_action( "sysio.msig"_n, "approve"_n,  {{approver, config::active_name},{approver, config::sysio_payer_name}}, mvo()
+      push_action( "sysio.msig"_n, "approve"_n,  vector<permission_level>{{approver, config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
                      ("level",         permission_level{approver, config::active_name} )
@@ -95,7 +95,7 @@ public:
    }
 
    void unapprove( name proposer, name proposal_name, name unapprover ) {
-      push_action( "sysio.msig"_n, "unapprove"_n, {{unapprover, config::active_name},{unapprover, config::sysio_payer_name}}, mvo()
+      push_action( "sysio.msig"_n, "unapprove"_n, vector<permission_level>{{unapprover, config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
                      ("level",         permission_level{unapprover, config::active_name})

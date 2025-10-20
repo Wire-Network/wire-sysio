@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="sys-util (chain-configure) /opt/wire-network/chain-001" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="chain-configure --target=/opt/wire-network/chain-001 --template=aio --overwrite" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" WORKING_DIR="file://$ProjectFileDir$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="wire-sysio" TARGET_NAME="sys-util" CONFIG_NAME="Debug-clang-18-no-cache" RUN_TARGET_PROJECT_NAME="wire-sysio" RUN_TARGET_NAME="sys-util">
+  <configuration default="false" name="sys-util (chain-configure) /opt/wire-network/chain-001" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="chain-configure --target=/opt/wire-network/chain-001 --template=aio --overwrite" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" WORKING_DIR="file://$ProjectFileDir$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="wire-sysio" TARGET_NAME="sys-util" CONFIG_NAME="RelWithDebInfo" RUN_TARGET_PROJECT_NAME="wire-sysio" RUN_TARGET_NAME="sys-util">
     <method v="2">
       <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
     </method>

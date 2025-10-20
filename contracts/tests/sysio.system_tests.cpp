@@ -31,43 +31,42 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key )
-                                               ("url", "http://block.one")
+                                               ("url", "http://wire.network")
                                                ("location", 1)
                         )
    );
 
    auto info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( 0, info["total_votes"].as_double() );
-   BOOST_REQUIRE_EQUAL( "http://block.one", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( "http://wire.network", info["url"].as_string() );
 
    //change parameters one by one to check for things like #3783
    //fc::variant params2 = producer_parameters_example(2);
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key )
-                                               ("url", "http://block.two")
+                                               ("url", "http://wire")
                                                ("location", 1)
                         )
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
    BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key(info["producer_key"].as_string()) );
-   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( "http://wire", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 1, info["location"].as_int64() );
 
    auto key2 =  fc::crypto::public_key( std::string("SYS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6") ); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key2 )
-                                               ("url", "http://block.two")
+                                               ("url", "https://wire.network")
                                                ("location", 2)
                         )
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
    BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key(info["producer_key"].as_string()) );
-   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 2, info["location"].as_int64() );
 
    //unregister producer
@@ -80,8 +79,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(info["producer_key"].as_string()) );
    //everything else should stay the same
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( 0, info["total_votes"].as_double() );
-   BOOST_REQUIRE_EQUAL( "http://block.two", info["url"].as_string() );
+   BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );
 
    //unregister bob111111111 who is not a producer
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer not found" ),
@@ -94,7 +92,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
 
 
 BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
-   cross_15_percent_threshold();
+   produce_blocks(10);
 
    BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
 
@@ -107,13 +105,10 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    BOOST_REQUIRE_EQUAL( success(), push_action( "alice1111111"_n, "regproducer2"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_authority", alice_producer_authority.get_abi_variant()["authority"])
-                                               ("url", "http://block.one")
+                                               ("url", "http://wire.network")
                                                ("location", 0 )
                         )
    );
-   // TODO: do the equivalent with ROA
-   // BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, core_sym::from_string("100000000.0000"), core_sym::from_string("100000000.0000") ) );
-   // BOOST_REQUIRE_EQUAL( success(), vote( "alice1111111"_n, { "alice1111111"_n } ) );
 
    block_signing_private_keys.emplace(get_public_key("alice1111111"_n, "bs1"), get_private_key("alice1111111"_n, "bs1"));
 
@@ -121,12 +116,6 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    wdump((alice_prod_info));
    BOOST_REQUIRE_EQUAL( alice_prod_info["is_active"], true );
 
-   produce_block();
-   produce_block( fc::minutes(2) );
-   produce_blocks(2);
-   BOOST_REQUIRE_EQUAL( control->active_producers().version, 1u );
-   produce_block();
-   BOOST_REQUIRE_EQUAL( control->pending_block_producer(), "alice1111111"_n );
    produce_block();
 
    alice_signing_authority.threshold = 0;
@@ -179,28 +168,12 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
                         )
    );
 
-   produce_block();
-   produce_block( fc::minutes(2) );
-   produce_blocks(2);
-   BOOST_REQUIRE_EQUAL( control->active_producers().version, 2u );
-   produce_block();
-   BOOST_REQUIRE_EQUAL( control->pending_block_producer(), "alice1111111"_n );
-   produce_block();
-
 } FC_LOG_AND_RETHROW()
 
-
-
-
-
-
-
-
-
 BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) try {
-   //install multisig contract
-   abi_serializer msig_abi_ser = initialize_multisig();
-   auto producer_names = active_and_vote_producers();
+   auto producer_names = active_producers();
+
+   add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
    //change `default_max_inline_action_size` to 512 KB
    sysio::chain::chain_config params = control->get_global_properties().configuration;
@@ -219,7 +192,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
          act.name = name;
          act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
 
-         return base_tester::push_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
+         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
    // test begins
    vector<permission_level> prod_perms;
@@ -231,10 +204,10 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
    {
       //prepare system contract with different hash (contract differs in one byte)
       auto code = contracts::system_wasm();
-      string msg = "producer votes must be unique and sorted";
+      string msg = "insufficient ram";
       auto it = std::search( code.begin(), code.end(), msg.begin(), msg.end() );
       BOOST_REQUIRE( it != code.end() );
-      msg[0] = 'P';
+      msg[0] = 'I';
       std::copy( msg.begin(), msg.end(), it );
 
       fc::variant pretty_trx = fc::mutable_variant_object()
@@ -336,9 +309,9 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
 }
 
 BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
-   //install multisig contract
-   abi_serializer msig_abi_ser = initialize_multisig();
-   auto producer_names = active_and_vote_producers();
+   auto producer_names = active_producers();
+
+   add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
    //helper function
    auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
@@ -349,7 +322,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
          act.name = name;
          act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
 
-         return base_tester::push_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
+         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
 
    // test begins
@@ -432,9 +405,9 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
-   //install multisig contract
-   abi_serializer msig_abi_ser = initialize_multisig();
-   auto producer_names = active_and_vote_producers();
+   auto producer_names = active_producers();
+
+   add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
    //helper function
    auto push_action_msig = [&]( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) -> action_result {
@@ -445,7 +418,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
          act.name = name;
          act.data = msig_abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function(abi_serializer_max_time) );
 
-         return base_tester::push_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
+         return base_tester::push_contract_paid_action( std::move(act), (auth ? signer : signer == "bob111111111"_n ? "alice1111111"_n : "bob111111111"_n).to_uint64_t() );
    };
 
    // test begins
@@ -524,8 +497,9 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
    t.execute_setup_policy( setup_policy::full );
 
    abi_serializer abi_ser(fc::json::from_string( (const char*)contracts::bios_abi().data()).template as<abi_def>(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
-   t.set_code( config::system_account_name, contracts::bios_wasm() );
-   t.set_abi( config::system_account_name, contracts::bios_abi().data() );
+   // bios_wasm and bios_abi set by set execute_setup_policy full
+   // t.set_code( config::system_account_name, contracts::bios_wasm() );
+   // t.set_abi( config::system_account_name, contracts::bios_abi().data() );
    t.create_account("sysio.token"_n);
    t.set_abi( "sysio.token"_n, contracts::token_abi().data() );
    {

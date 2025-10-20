@@ -19,7 +19,7 @@
 namespace sysio {
    namespace testing {
       struct test_contracts {
-         // Contracts in `unittests/contracts' directory
+         // Contracts in `contracts' directory
          MAKE_READ_WASM_ABI(sysio_msig,   sysio.msig,   contracts)
          MAKE_READ_WASM_ABI(sysio_system, sysio.system, contracts)
          MAKE_READ_WASM_ABI(sysio_token,  sysio.token,  contracts)
