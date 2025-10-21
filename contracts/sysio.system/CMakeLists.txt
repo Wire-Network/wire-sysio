@@ -13,9 +13,9 @@ if(BUILD_SYSTEM_CONTRACTS)
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../)
+endif()
 
-  if(NOT CDT_BUILD)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm COPYONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi COPYONLY)
-  endif()
+if(NOT BUILD_SYSTEM_CONTRACTS OR NOT CDT_BUILD)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi COPYONLY)
 endif()
