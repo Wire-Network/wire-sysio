@@ -1,10 +1,9 @@
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.wasm COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.abi COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi COPYONLY)
+
 if(BUILD_SYSTEM_CONTRACTS)
   add_contract(sysio.roa sysio.roa sysio.roa.cpp)
 endif()
 
-if(NOT BUILD_SYSTEM_CONTRACTS OR NOT CDT_BUILD)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.wasm COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.roa.abi COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm COPYONLY)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi COPYONLY)
-endif()

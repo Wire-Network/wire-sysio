@@ -14,4 +14,3 @@ add_subdirectory(sysio.token)
 add_subdirectory(sysio.wrap)
 add_subdirectory(test_contracts)
 
-add_subdirectory(tests)

@@ -35,9 +35,14 @@ add_library(sysio_testing
 if(BUILD_TEST_CONTRACTS)
   set(CONTRACT_WASM_FILES
     "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"
+    "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi"
     "${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"
+    "${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi"
+    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm"
+    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi"
+    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm"
+    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi"
   )
-  set(CONTRACT_WASM_FILE "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm")
 
   # Make the main testing library wait for the contracts to be built.
   add_dependencies(sysio_testing sysio_testing_contracts)
