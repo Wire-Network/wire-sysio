@@ -69,7 +69,6 @@ RUN set -eux; \
 
 # Build toolchain and development libraries needed by the application
 RUN apt-get install -y \
-<<<<<<< HEAD
 				build-essential \
 				ccache \
 				clang-18 \
@@ -107,33 +106,6 @@ RUN apt-get install -y \
 				vim \
 				zip \
 				zlib1g-dev
-=======
-        gnupg \
-        build-essential \
-        ccache \
-        ninja-build \
-        cmake \
-        curl \
-        zip \
-        unzip \
-        tar \
-        git \
-        vim \
-        sudo \
-        doxygen \
-        golang \
-        libboost-all-dev \
-        libcurl4-openssl-dev \
-        libgmp-dev \
-        libssl-dev \
-        libusb-1.0-0-dev \
-        pkg-config \
-        zlib1g-dev \
-        libbz2-dev \
-        liblzma-dev \
-        libncurses5-dev \
-        libzstd-dev
->>>>>>> 0612c1389a (WIP: Ubuntu 22/24 building with clang-18 and llvm-11 compiled - debs need testing)
 
 # Make sure GNU C++ headers/libs are visible to clang (pick correct libstdc++-*-dev)
 RUN set -eux; \
@@ -188,15 +160,6 @@ RUN . /etc/os-release; if [ "$VERSION_CODENAME" = "noble" ]; then \
       ln -sf ${CLANG_18_DIR}/bin/clang   /usr/bin/gcc-10  && \
       ln -sf ${CLANG_18_DIR}/bin/clang++ /usr/bin/g++-10; \
     fi
-
-
-# Ensure vcpkg sub-builds keep using clang-18 + LLVM binutils
-# ENV CC=${CLANG_18_DIR}/bin/clang \
-#     CXX=${CLANG_18_DIR}/bin/clang++ \
-#     AR=${CLANG_18_DIR}/bin/llvm-ar \
-#     RANLIB=${CLANG_18_DIR}/bin/llvm-ranlib \
-#     VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET" \
-#     B2_TOOLSET=clang
 
 # Stage 2b: source-deps
 # Install dependencies built from source (LLVM 11) on top of clang-18-build.
