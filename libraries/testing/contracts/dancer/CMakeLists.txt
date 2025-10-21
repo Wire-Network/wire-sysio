@@ -1,7 +1,0 @@
-if( BUILD_TEST_CONTRACTS )
-    add_contract( dancer dancer dancer.cpp )
-  if (NOT CDT_BUILD)
-    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/dancer.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/dancer/dancer.wasm COPYONLY )
-    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/dancer.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/dancer/dancer.abi COPYONLY )
-  endif()
-endif()

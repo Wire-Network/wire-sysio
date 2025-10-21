@@ -16,10 +16,6 @@ namespace sysio {
          // Contracts in `libraries/testing/contracts' directory
          MAKE_EMBD_WASM_ABI(sysio_bios)
          MAKE_EMBD_WASM_ABI(sysio_roa)
-         MAKE_EMBD_WASM_ABI(dancer)
-
-         MAKE_EMBD_WASM_ABI(before_producer_authority_sysio_bios)
-         MAKE_EMBD_WASM_ABI(before_preactivate_sysio_bios)
       };
    } /// sysio::testing
 }  /// sysio

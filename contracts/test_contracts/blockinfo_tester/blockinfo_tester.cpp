@@ -1,4 +1,4 @@
-#include <blockinfo_tester/blockinfo_tester.hpp>
+#include <blockinfo_tester.hpp>
 
 #include <type_traits>
 #include <vector>

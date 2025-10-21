@@ -21,4 +21,3 @@ namespace sysio::testing {                                                      
 
 MAKE_EMBEDDED_WASM_ABI(sysio_bios,                             sysio.bios, contracts)
 MAKE_EMBEDDED_WASM_ABI(sysio_roa,                              sysio.roa,  contracts)
-MAKE_EMBEDDED_WASM_ABI(dancer,                                 dancer,     contracts)

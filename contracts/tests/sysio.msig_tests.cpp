@@ -19,15 +19,10 @@ using mvo = fc::mutable_variant_object;
 class sysio_msig_tester : public tester {
 public:
    sysio_msig_tester() {
-      create_accounts( { "sysio.msig"_n, "sysio.stake"_n, "sysio.ram"_n, "sysio.ramfee"_n, "alice"_n, "bob"_n, "carol"_n } );
+      create_accounts( { "sysio.msig"_n, "alice"_n, "bob"_n, "carol"_n } );
       produce_block();
 
-      auto trace = base_tester::push_action(config::system_account_name, "setpriv"_n,
-                                            config::system_account_name,  mutable_variant_object()
-                                            ("account", "sysio.msig")
-                                            ("is_priv", 1)
-      );
-
+      set_privileged("sysio.msig"_n);
       set_code( "sysio.msig"_n, contracts::msig_wasm() );
       set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
@@ -38,48 +33,6 @@ public:
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   transaction_trace_ptr create_account_with_resources( account_name a, account_name creator, asset ramfunds, bool multisig,
-                                                        asset net = core_sym::from_string("10.0000"), asset cpu = core_sym::from_string("10.0000") ) {
-      signed_transaction trx;
-      set_transaction_headers(trx);
-
-      authority owner_auth;
-      if (multisig) {
-         // multisig between account's owner key and creators active permission
-         owner_auth = authority(2, {key_weight{get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, config::active_name}, 1}});
-      } else {
-         owner_auth =  authority( get_public_key( a, "owner" ) );
-      }
-
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                newaccount{
-                                   .creator  = creator,
-                                   .name     = a,
-                                   .owner    = owner_auth,
-                                   .active   = authority( get_public_key( a, "active" ) )
-                                });
-
-      trx.actions.emplace_back( get_action( "sysio"_n, "buyram"_n, vector<permission_level>{{creator,config::active_name}},
-                                            mvo()
-                                            ("payer", creator)
-                                            ("receiver", a)
-                                            ("quant", ramfunds) )
-                              );
-
-      trx.actions.emplace_back( get_action( "sysio"_n, "delegatebw"_n, vector<permission_level>{{creator,config::active_name}},
-                                            mvo()
-                                            ("from", creator)
-                                            ("receiver", a)
-                                            ("stake_net_quantity", net )
-                                            ("stake_cpu_quantity", cpu )
-                                            ("transfer", 0 )
-                                          )
-                                );
-
-      set_transaction_headers(trx);
-      trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-      return push_transaction( trx );
-   }
    void create_currency( name contract, name manager, asset maxsupply ) {
       auto act =  mutable_variant_object()
          ("issuer",       manager )
@@ -426,7 +379,8 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    set_producers( {"alice"_n,"bob"_n,"carol"_n} );
    produce_blocks(50);
 
-   create_accounts( { "sysio.token"_n, "sysio.rex"_n } );
+   create_accounts( { "sysio.token"_n } );
+   set_privileged("sysio.token"_n);
    set_code( "sysio.token"_n, contracts::token_wasm() );
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
 
@@ -443,9 +397,9 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
                               ("core", CORE_SYM_STR)
    );
    produce_blocks();
-   create_account_with_resources( "alice1111111"_n, "sysio"_n, core_sym::from_string("1.0000"), false );
-   create_account_with_resources( "bob111111111"_n, "sysio"_n, core_sym::from_string("0.4500"), false );
-   create_account_with_resources( "carol1111111"_n, "sysio"_n, core_sym::from_string("1.0000"), false );
+   create_account( "alice1111111"_n, "sysio"_n );
+   create_account( "bob111111111"_n, "sysio"_n );
+   create_account( "carol1111111"_n, "sysio"_n );
 
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"),
                         get_balance(config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
@@ -521,7 +475,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
                         } );
 
    // can't create account because system contract was replaced by the reject_all contract
-   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "alice1111112"_n, "sysio"_n, core_sym::from_string("1.0000"), false ),
+   BOOST_REQUIRE_EXCEPTION( create_account( "alice1111112"_n, "sysio"_n ),
                             sysio_assert_message_exception, sysio_assert_message_is("rejecting all actions")
 
    );
@@ -546,7 +500,8 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    set_producers( {"alice"_n,"bob"_n,"carol"_n, "apple"_n} );
    produce_blocks(50);
 
-   create_accounts( { "sysio.token"_n, "sysio.rex"_n } );
+   create_accounts( { "sysio.token"_n } );
+   set_privileged("sysio.token"_n);
    set_code( "sysio.token"_n, contracts::token_wasm() );
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
 
@@ -563,9 +518,9 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    );
    produce_blocks();
 
-   create_account_with_resources( "alice1111111"_n, "sysio"_n, core_sym::from_string("1.0000"), false );
-   create_account_with_resources( "bob111111111"_n, "sysio"_n, core_sym::from_string("0.4500"), false );
-   create_account_with_resources( "carol1111111"_n, "sysio"_n, core_sym::from_string("1.0000"), false );
+   create_account( "alice1111111"_n, "sysio"_n );
+   create_account( "bob111111111"_n, "sysio"_n );
+   create_account( "carol1111111"_n, "sysio"_n );
 
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"),
                         get_balance(config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
@@ -651,7 +606,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
                         } );
 
    // can't create account because system contract was replaced by the reject_all contract
-   BOOST_REQUIRE_EXCEPTION( create_account_with_resources( "alice1111112"_n, "sysio"_n, core_sym::from_string("1.0000"), false ),
+   BOOST_REQUIRE_EXCEPTION( create_account( "alice1111112"_n, "sysio"_n ),
                             sysio_assert_message_exception, sysio_assert_message_is("rejecting all actions")
 
    );
@@ -742,139 +697,6 @@ BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
                         {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( approve_execute_old, sysio_msig_tester ) try {
-   set_code( "sysio.msig"_n, contracts::util::msig_wasm_old() );
-   set_abi( "sysio.msig"_n, contracts::util::msig_abi_old().data() );
-   produce_blocks();
-
-   //propose with old version of sysio.msig
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
-   push_action( "alice"_n, "propose"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
-   );
-
-   set_code( "sysio.msig"_n, contracts::msig_wasm() );
-   set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
-   produce_blocks();
-
-   //approve and execute with new version
-   push_action( "alice"_n, "approve"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
-   );
-
-   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
-                                            ("proposer",      "alice")
-                                            ("proposal_name", "first")
-                                            ("executer",      "alice")
-   );
-   check_traces( trace, {
-                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
-                        } );
-} FC_LOG_AND_RETHROW()
-
-
-BOOST_FIXTURE_TEST_CASE( approve_unapprove_old, sysio_msig_tester ) try {
-   set_code( "sysio.msig"_n, contracts::util::msig_wasm_old() );
-   set_abi( "sysio.msig"_n, contracts::util::msig_abi_old().data() );
-   produce_blocks();
-
-   //propose with old version of sysio.msig
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
-   push_action( "alice"_n, "propose"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
-   );
-
-   //approve with old version
-   push_action( "alice"_n, "approve"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
-   );
-
-   set_code( "sysio.msig"_n, contracts::msig_wasm() );
-   set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
-   produce_blocks();
-
-   //unapprove with old version
-   push_action( "alice"_n, "unapprove"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
-   );
-
-   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
-                                          ("proposer",      "alice")
-                                          ("proposal_name", "first")
-                                          ("executer",      "alice")
-                            ),
-                            sysio_assert_message_exception,
-                            sysio_assert_message_is("transaction authorization failed")
-   );
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE( approve_by_two_old, sysio_msig_tester ) try {
-   set_code( "sysio.msig"_n, contracts::util::msig_wasm_old() );
-   set_abi( "sysio.msig"_n, contracts::util::msig_abi_old().data() );
-   produce_blocks();
-
-   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } }, abi_serializer_max_time );
-   push_action( "alice"_n, "propose"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("trx",           trx)
-                  ("requested", vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } })
-   );
-
-   //approve by alice
-   push_action( "alice"_n, "approve"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
-   );
-
-   set_code( "sysio.msig"_n, contracts::msig_wasm() );
-   set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
-   produce_blocks();
-
-   //fail because approval by bob is missing
-   BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
-                                          ("proposer",      "alice")
-                                          ("proposal_name", "first")
-                                          ("executer",      "alice")
-                            ),
-                            sysio_assert_message_exception,
-                            sysio_assert_message_is("transaction authorization failed")
-   );
-
-   //approve and execute with new version
-   push_action( "bob"_n, "approve"_n, mvo()
-                  ("proposer",      "alice")
-                  ("proposal_name", "first")
-                  ("level",         permission_level{ "bob"_n, config::active_name })
-   );
-
-   transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
-                                            ("proposer",      "alice")
-                                            ("proposal_name", "first")
-                                            ("executer",      "alice")
-   );
-   check_traces( trace, {
-                        {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
-                        } );
-
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {

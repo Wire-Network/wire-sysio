@@ -12,7 +12,6 @@ if(BUILD_TEST_CONTRACTS)
   )
 endif()
 
-# TODO: @heifner Realign the dependencies declared in contracts.hpp.in
 add_subdirectory(contracts)
 file(GLOB HEADERS "include/sysio/testing/*.hpp")
 
