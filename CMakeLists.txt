@@ -201,14 +201,13 @@ add_subdirectory(tests)
 add_subdirectory(tools)
 add_subdirectory(benchmark)
 
-if(BUILD_SYSTEM_CONTRACTS)
-  contracts_target(
-    contracts_project
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
-    BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
-  )
-endif()
 add_subdirectory(contracts)
+add_subdirectory(contracts/tests)
+contracts_target(
+  contracts_project
+  SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
+  BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
+)
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 
