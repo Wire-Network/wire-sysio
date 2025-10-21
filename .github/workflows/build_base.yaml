@@ -72,7 +72,7 @@ jobs:
           id: build
           run: |
             echo "Building for ${{ matrix.platform }}"
-             
+
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
                     build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
 
@@ -89,7 +89,6 @@ jobs:
             cmake -B build -S . -G Ninja \
               -DCMAKE_C_COMPILER=$CC \
               -DCMAKE_CXX_COMPILER=$CXX \
-              -DBUILD_SYSTEM_CONTRACTS=OFF -DBUILD_TEST_CONTRACTS=OFF -DCDT_BUILD=OFF \
               -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
               -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
               -DCMAKE_BUILD_TYPE=Release \
