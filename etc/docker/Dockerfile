@@ -11,9 +11,9 @@
 
 # Stage 1: distro-deps
 # Base image with system packages required for building (compilers, cmake, Python, etc.)
-ARG UBUNTU_TAG=22.04
+ARG UBUNTU_TAG=24.04
 FROM ubuntu:${UBUNTU_TAG} AS distro-deps
-# FROM ubuntu:22.04 AS distro-deps
+# FROM ubuntu:24.04 AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -42,51 +42,23 @@ RUN apt-get install -y \
         wget \
         software-properties-common
 
-# ----- Consistent Python setup across 22/24/25 -----
-# jammy (22.04): get Python 3.12 from deadsnakes, set python3 -> 3.12
-# noble/plucky: use distro python3; don't force version symlink
-RUN set -eux; \
-    . /etc/os-release; \
-    if [ "${VERSION_CODENAME}" = "jammy" ]; then \
-        apt-get update && \
-        apt-get install -y --no-install-recommends \
-            software-properties-common \
-            ca-certificates \
-            gnupg && \
-        add-apt-repository -y ppa:deadsnakes/ppa && \
-        apt-get update && \
-        apt-get install -y --no-install-recommends \
-            python3.12 \
-            python3.12-venv \
-            python3-pip && \
-        update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1; \
-    else \
-        apt-get update && \
-        apt-get install -y --no-install-recommends \
-            python3 \
-            python3-pip; \
-    fi
-
 # Build toolchain and development libraries needed by the application
 RUN apt-get install -y \
 				build-essential \
 				ccache \
-				clang-18 \
-				clang-tools-18 \
 				cmake \
 				curl \
 				doxygen \
-				g++-10 \
+        g++-10 \
+        gcc-10 \
 				g++-12 \
-				gcc-10 \
 				gcc-12 \
 				git \
 				gnupg \
 				golang \
-				libc++-18-dev \
-				libc++-dev \
+				# libc++-18-dev \
+				# libc++-dev \
 				libbz2-dev \
-				libboost-all-dev \
 				libcurl4-openssl-dev \
 				libgmp-dev \
 				liblzma-dev \
@@ -95,11 +67,17 @@ RUN apt-get install -y \
 				libstdc++-14-dev \
 				libusb-1.0-0-dev \
 				libzstd-dev \
-				llvm-18 \
 				ninja-build \
 				pkg-config \
+        python3 \
 				python3-pip \
-				python3.12 \
+				python3-venv \
+        python3-dev \
+        autoconf \
+        automake \
+        libtool \
+        libltdl-dev \
+        m4 \
 				sudo \
 				tar \
 				unzip \
@@ -107,25 +85,7 @@ RUN apt-get install -y \
 				zip \
 				zlib1g-dev
 
-# Make sure GNU C++ headers/libs are visible to clang (pick correct libstdc++-*-dev)
-RUN set -eux; \
-    . /etc/os-release; \
-    case "${VERSION_CODENAME}" in \
-      jammy)  PKG=libstdc++-11-dev ;; \
-      noble)  PKG=libstdc++-13-dev ;; \
-      *)      echo "Unsupported Ubuntu ${VERSION_CODENAME} for this Dockerfile"; exit 1 ;; \
-    esac; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends g++ "$PKG" python3; \
-    rm -rf /var/lib/apt/lists/*
-
-# Satisfy vcpkg/boost find_program(gcc-10) on 22/24:
-RUN set -eux; \
-    . /etc/os-release; \
-    if [ "${VERSION_CODENAME}" = "jammy" ]; then \
-        apt-get update && apt-get install -y --no-install-recommends gcc-10 g++-10 && rm -rf /var/lib/apt/lists/*; \
-    fi
-
+        
 RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
 # Stage 2a: clang18-build
@@ -152,14 +112,10 @@ EOF
 
 # Make sure vcpkg keeps (and uses) the chainloaded toolchain in all sub-configures
 ENV B2_TOOLSET=clang \
+    CC=${CLANG_18_DIR}/bin/clang \
+    CXX=${CLANG_18_DIR}/bin/clang++ \
     VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake \
     VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
-
-# On noble (24.04), if anything probes gcc-10/g++-10, route it to clang-18
-RUN . /etc/os-release; if [ "$VERSION_CODENAME" = "noble" ]; then \
-      ln -sf ${CLANG_18_DIR}/bin/clang   /usr/bin/gcc-10  && \
-      ln -sf ${CLANG_18_DIR}/bin/clang++ /usr/bin/g++-10; \
-    fi
 
 # Stage 2b: source-deps
 # Install dependencies built from source (LLVM 11) on top of clang-18-build.
@@ -174,8 +130,8 @@ RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
     BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
 
 ENV MAX_JOBS=16
-ENV CC=/usr/bin/clang-18
-ENV CXX=/usr/bin/clang++-18
+# ENV CC=${CLANG_18_DIR}/bin/clang
+# ENV CXX=${CLANG_18_DIR}/bin/clang++
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
@@ -205,15 +161,15 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-# RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ cmake \
+# RUN env CC=${CC} CXX=${CXX} cmake \
 #     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
 #     -B . \
 #     -G Ninja \
 #     -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
 #     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
 #     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-#     -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
-#     -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+#     -DCMAKE_C_COMPILER=${CC} \
+#     -DCMAKE_CXX_COMPILER=${CXX} \
 #     -DCMAKE_AR=${CLANG_18_DIR}/bin/llvm-ar \
 #     -DCMAKE_RANLIB=${CLANG_18_DIR}/bin/llvm-ranlib \
 #     -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
@@ -224,8 +180,8 @@ RUN set -eux; \
   env \
     VCPKG_MAX_CONCURRENCY=8 \
     CMAKE_BUILD_PARALLEL_LEVEL=8 \
-    CC=${CLANG_18_DIR}/bin/clang \
-    CXX=${CLANG_18_DIR}/bin/clang++ \
+    CC=${CC} \
+    CXX=${CXX} \
     cmake \
       -S "$(realpath --relative-to=$PWD ${APP_DIR})" \
       -B . \
@@ -233,8 +189,8 @@ RUN set -eux; \
       -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
       -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
       -DCMAKE_TOOLCHAIN_FILE="${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-      -DCMAKE_C_COMPILER="${CLANG_18_DIR}/bin/clang" \
-      -DCMAKE_CXX_COMPILER="${CLANG_18_DIR}/bin/clang++" \
+      -DCMAKE_C_COMPILER="${CC}" \
+      -DCMAKE_CXX_COMPILER="${CXX}" \
       -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
       -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
       -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
@@ -244,23 +200,26 @@ RUN set -eux; \
     echo '=== vcpkg-manifest-install.log (tail) ===' || true; \
     test -f "${APP_BUILD_DIR}/vcpkg-manifest-install.log" && tail -n 200 "${APP_BUILD_DIR}/vcpkg-manifest-install.log" || true; \
     for f in \
-      "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-dbg-out.log" \
-      "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-rel-out.log" \
-      "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-dbg-out.log" \
-      "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-rel-out.log" \
-    ; do \
-      if [ -f "$f" ]; then \
-        echo "=== $f (first failure context) ==="; \
-        line=$(grep -nE "FAILED:|subcommand failed| error: | error\\]|ninja: build stopped" "$f" | head -n1 | cut -d: -f1 || true); \
-        if [ -n "$line" ]; then \
-          start=$((line>160?line-160:1)); end=$((line+320)); sed -n "${start},${end}p" "$f" || true; \
-        else \
-          echo "(no match)"; tail -n 400 "$f" || true; \
-        fi; \
-        echo "--- compiler lines (first few) ---"; \
-        grep -E "/clang\\+\\+|/g\\+\\+-10|/g\\+\\+| -std=gnu\\+\\+| -std=c\\+\\+" "$f" | head -n 10 || true; \
-      fi; \
-    done; \
+  "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-dbg-out.log" \
+  "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-rel-out.log" \
+  "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-dbg-out.log" \
+  "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-rel-out.log" \
+  "${APP_DIR}/vcpkg/buildtrees/gmp/config-${VCPKG_DEFAULT_TRIPLET}-out.log" \
+  "${APP_DIR}/vcpkg/buildtrees/gmp/install-${VCPKG_DEFAULT_TRIPLET}-out.log" \
+  "${APP_BUILD_DIR}/vcpkg-manifest-install.log" \
+; do \
+  if [ -f "$f" ]; then \
+    echo "=== $f (first failure context) ==="; \
+    line=$(grep -nE "FAILED:|subcommand failed| error: | error\\]|ninja: build stopped" "$f" | head -n1 | cut -d: -f1 || true); \
+    if [ -n "$line" ]; then \
+      start=$((line>120?line-120:1)); end=$((line+240)); sed -n "${start},${end}p" "$f" || true; \
+    else \
+      tail -n 200 "$f" || true; \
+    fi; \
+    echo "--- compiler lines (first few) ---"; \
+    grep -E "/clang\\+\\+|/g\\+\\+| -std=gnu\\+\\+| -std=c\\+\\+" "$f" | head -n 10 || true; \
+  fi; \
+done; \
     exit $rc; \
   fi
 
@@ -276,15 +235,15 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ \
+RUN env CC=${CC} CXX=${CXX} \
     cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
-    -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+    -DCMAKE_C_COMPILER=${CC} \
+    -DCMAKE_CXX_COMPILER=${CXX} \
     -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
     -DENABLE_CCACHE=ON
 
@@ -326,14 +285,14 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
 WORKDIR ${CDT_BUILD_DIR} 
-RUN env CC=${CLANG_18_DIR}/bin/clang CXX=${CLANG_18_DIR}/bin/clang++ \
+RUN env CC=${CC} CXX=${CXX} \
         cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
         -B . \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-        -DCMAKE_C_COMPILER=${CLANG_18_DIR}/bin/clang \
-        -DCMAKE_CXX_COMPILER=${CLANG_18_DIR}/bin/clang++ \
+        -DCMAKE_C_COMPILER=${CC} \
+        -DCMAKE_CXX_COMPILER=${CXX} \
         -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
         -Dsysio_DIR=${APP_BUILD_DIR} \
         -DENABLE_CCACHE=ON
