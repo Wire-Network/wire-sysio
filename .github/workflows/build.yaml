@@ -205,11 +205,11 @@ jobs:
             echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
             echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
 
-      - name: Cleanup stale containers
-        run: |
-          echo "Removing old containers for context $DOCKER_CONTEXT..."
-          sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
-          echo "Cleanup complete."
+      # - name: Cleanup stale containers
+      #   run: |
+      #     echo "Removing old containers for context $DOCKER_CONTEXT..."
+      #     sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+      #     echo "Cleanup complete."
 
       - name: Ensure writable workspace
         run: |
