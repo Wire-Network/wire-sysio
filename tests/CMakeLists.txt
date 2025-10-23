@@ -124,7 +124,7 @@ add_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --nu
 set_tests_properties(ship_test_unix PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME ship_streamer_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(ship_streamer_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(ship_streamer_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(p2p_dawn515_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
@@ -206,7 +206,7 @@ add_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v --wa
 set_tests_properties(nodeop_contrl_c_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_failing_tests RUN_SERIAL TRUE)
+set_tests_properties(nodeop_under_min_avail_ram_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
 add_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(nodeop_irreversible_mode_lr_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
