@@ -742,7 +742,7 @@ Performance Test Basic Base:
   --account-name ACCOUNT_NAME
                         Name of the account to create and assign a contract to (default: sysio)
   --contract-dir CONTRACT_DIR
-                        Path to contract dir (default: unittests/contracts/sysio.system)
+                        Path to contract dir (default: contracts/sysio.system)
   --wasm-file WASM_FILE
                         WASM file name for contract (default: sysio.system.wasm)
   --abi-file ABI_FILE   ABI file name for contract (default: sysio.system.abi)
@@ -1701,7 +1701,7 @@ Finally, the full detail test report for each of the determined max TPS throughp
       }
     },
     "specifiedContract": {
-      "contractDir": "unittests/contracts/sysio.system",
+      "contractDir": "contracts/sysio.system",
       "wasmFile": "sysio.system.wasm",
       "abiFile": "sysio.system.abi",
       "account": "Name: sysio"
@@ -2357,7 +2357,7 @@ The Performance Test Basic generates, by default, a report that details results 
       }
     },
     "specifiedContract": {
-      "contractDir": "unittests/contracts/sysio.system",
+      "contractDir": "contracts/sysio.system",
       "wasmFile": "sysio.system.wasm",
       "abiFile": "sysio.system.abi",
       "account": "Name: sysio"

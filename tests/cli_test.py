@@ -155,8 +155,8 @@ def processClioCommand(cmd):
 
 def clio_abi_file_test():
     """Test option --abi-file """
-    token_abi_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
-    system_abi_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.system/sysio.system.abi')
+    token_abi_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
+    system_abi_path = os.path.abspath(os.getcwd() + '/contracts/sysio.system/sysio.system.abi')
     token_abi_file_arg = 'sysio.token' + ':' + token_abi_path
     system_abi_file_arg = 'sysio' + ':' + system_abi_path
 
@@ -330,11 +330,11 @@ def abi_file_with_nodeop_test():
     global testSuccessful
     try:
         biosDir = os.path.abspath(os.getcwd() + "/libraries/testing/contracts/sysio.bios")
-        contractDir = os.path.abspath(os.getcwd() + "/unittests/contracts/sysio.token")
+        contractDir = os.path.abspath(os.getcwd() + "/contracts/sysio.token")
         # make a malicious abi file by switching 'from' and 'to' in sysio.token.abi
-        token_abi_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
+        token_abi_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
         token_abi_file_arg = 'sysio.token' + ':' + token_abi_path
-        malicious_token_abi_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/malicious.sysio.token.abi')
+        malicious_token_abi_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/malicious.sysio.token.abi')
         shutil.copyfile(token_abi_path, malicious_token_abi_path)
         replaces = [["from", "malicious"], ["to", "from"], ["malicious", "to"]]
         for replace in replaces:

@@ -120,7 +120,7 @@ class Cluster(object):
         self.nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}')
 
         self.libTestingContractsPath = Path(__file__).resolve().parents[2] / "libraries" / "testing" / "contracts"
-        self.unittestsContractsPath = Path(__file__).resolve().parents[2] / "unittests" / "contracts"
+        self.contractsPath = Path(__file__).resolve().parents[2] / "contracts"
         self.unittestsTestContractsPath = Path(__file__).resolve().parents[2] / "unittests" / "test-contracts"
 
         if unshared:
@@ -1102,7 +1102,7 @@ class Cluster(object):
 
         if loadSystemContract:
             contract="sysio.system"
-            contractDir=str(self.unittestsContractsPath / contract)
+            contractDir=str(self.contractsPath / contract)
             wasmFile="%s.wasm" % (contract)
             abiFile="%s.abi" % (contract)
             Utils.Print("Publish %s contract" % (contract))
@@ -1172,7 +1172,7 @@ class Cluster(object):
         sysioTokenAccount = copy.deepcopy(sysioAccount)
         sysioTokenAccount.name = 'sysio.token'
         contract="sysio.token"
-        contractDir=str(self.unittestsContractsPath / contract)
+        contractDir=str(self.contractsPath / contract)
         wasmFile="%s.wasm" % (contract)
         abiFile="%s.abi" % (contract)
         Utils.Print("Publish %s contract" % (contract))

@@ -1,6 +1,6 @@
 {
     "initAccounts": [],
-    "abiFile": "unittests/contracts/sysio.system/sysio.system.abi",
+    "abiFile": "contracts/sysio.system/sysio.system.abi",
     "actions": [
         {
             "actionAuthAcct": "sysio",

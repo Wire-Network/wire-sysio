@@ -3,7 +3,7 @@
         "testacct1",
         "testacct2"
     ],
-    "abiFile": "unittests/contracts/sysio.token/sysio.token.abi",
+    "abiFile": "contracts/sysio.token/sysio.token.abi",
     "actions": [
         {
             "actionAuthAcct": "testacct1",

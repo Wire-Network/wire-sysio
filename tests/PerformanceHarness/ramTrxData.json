@@ -1,6 +1,6 @@
 {
     "initAccounts": ["r"],
-    "abiFile": "unittests/contracts/sysio.mechanics/sysmechanics.abi",
+    "abiFile": "unittests/system-test-contracts/sysio.mechanics/sysmechanics.abi",
     "actions": [
         {
             "actionName": "ram",

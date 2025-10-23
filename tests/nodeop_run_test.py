@@ -60,7 +60,7 @@ try:
     if localTest and not dontLaunch:
         Print("Stand up cluster")
 
-        abs_path = os.path.abspath(os.getcwd() + '/unittests/contracts/sysio.token/sysio.token.abi')
+        abs_path = os.path.abspath(os.getcwd() + '/contracts/sysio.token/sysio.token.abi')
         traceNodeopArgs=" --http-max-response-time-ms 990000 --trace-rpc-abi sysio.token=" + abs_path
         extraNodeopArgs=traceNodeopArgs + " --plugin sysio::prometheus_plugin --database-map-mode mapped_private "
         specificNodeopInstances={0: "bin/nodeop"}
@@ -308,7 +308,7 @@ try:
     if hashNum != 0:
         errorExit("FAILURE - get code currency1111 failed", raw=True)
 
-    contractDir="unittests/contracts/sysio.token"
+    contractDir="contracts/sysio.token"
     wasmFile="sysio.token.wasm"
     abiFile="sysio.token.abi"
     Print("Publish contract")
@@ -758,7 +758,7 @@ try:
 
     # run a get_table_rows API call for a table which has an incorrect abi (missing type), to make sure that
     # the resulting exception in http-plugin is caught and doesn't cause nodeop to crash (leap issue #1372).
-    contractDir="unittests/contracts/sysio.token"
+    contractDir="contracts/sysio.token"
     wasmFile="sysio.token.wasm"
     abiFile="sysio.token.bad.abi"
     Print("Publish contract")
