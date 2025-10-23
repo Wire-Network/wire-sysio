@@ -36,7 +36,7 @@ class transaction_metadata {
 
    public:
       bool                                                       accepted = false;       // not thread safe
-      uint32_t                                                   billed_cpu_time_us = 0; // not thread safe
+      uint32_t                                                   prev_cpu_time_us = 0;   // not thread safe
 
    private:
       struct private_type{};

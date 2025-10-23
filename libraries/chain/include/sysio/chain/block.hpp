@@ -4,8 +4,6 @@
 
 namespace sysio { namespace chain {
 
-   using cpu_usage_t = std::vector<fc::unsigned_int>;
-
    struct transaction_receipt_header {
       enum status_enum : uint8_t { // Used for backward compatibility of SHiP and TraceAPI
          executed  = 0 ///< succeed

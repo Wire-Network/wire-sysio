@@ -1181,7 +1181,7 @@ struct controller_impl {
     *  Adds the transaction receipt to the pending block and returns it.
     */
    template<typename T>
-   const transaction_receipt& push_receipt( const T& trx, uint64_t cpu_usage_us, uint64_t net_usage ) {
+   const transaction_receipt& push_receipt( const T& trx, const cpu_usage_t& cpu_usage_us, uint64_t net_usage ) {
       uint64_t net_usage_words = net_usage / 8;
       SYS_ASSERT( net_usage_words*8 == net_usage, transaction_exception, "net_usage is not divisible by 8" );
       auto& receipts = std::get<building_block>(pending->_block_stage)._pending_trx_receipts;
@@ -1203,7 +1203,7 @@ struct controller_impl {
    transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                            fc::time_point block_deadline,
                                            fc::microseconds max_transaction_time,
-                                           uint32_t billed_cpu_time_us,
+                                           const cpu_usage_t& billed_cpu_us,
                                            bool explicit_billed_cpu_time,
                                            int64_t subjective_cpu_bill_us )
    {
@@ -1234,7 +1234,8 @@ struct controller_impl {
          trx_context.block_deadline = block_deadline;
          trx_context.max_transaction_time_subjective = max_transaction_time;
          trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-         trx_context.billed_cpu_time_us = billed_cpu_time_us;
+         trx_context.billed_cpu_us = billed_cpu_us;
+         trx_context.prev_cpu_time_us = trx->prev_cpu_time_us;
          trx_context.subjective_cpu_bill_us = subjective_cpu_bill_us;
          trace = trx_context.trace;
 
@@ -1269,13 +1270,13 @@ struct controller_impl {
 
             auto restore = make_block_restore_point( trx->is_read_only() );
 
-            trx->billed_cpu_time_us = trx_context.billed_cpu_time_us;
+            trx->prev_cpu_time_us = trx_context.trx_billed_cpu_us;
             if (!trx->implicit() && !trx->is_read_only()) {
-               trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_time_us, trace->net_usage);
+               trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us, trace->net_usage);
                std::get<building_block>(pending->_block_stage)._pending_trx_metas.emplace_back(trx);
             } else {
                transaction_receipt_header r;
-               r.cpu_usage_us = trx_context.billed_cpu_time_us;
+               r.cpu_usage_us = trx_context.billed_cpu_us;
                trace->receipt = r;
             }
 
@@ -1484,7 +1485,7 @@ struct controller_impl {
                });
             in_trx_requiring_checks = true;
             auto trace = push_transaction( onbtrx, fc::time_point::maximum(), fc::microseconds::maximum(),
-                                           gpo.configuration.min_transaction_cpu_usage, true, 0 );
+                                           cpu_usage_t{{gpo.configuration.min_transaction_cpu_usage}}, true, 0 );
             if( trace->except ) {
                wlog("onblock ${block_num} is REJECTING: ${entire_trace}",("block_num", head->block_num + 1)("entire_trace", trace));
             }
@@ -2691,12 +2692,13 @@ void controller::push_block( controller::block_report& br,
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,
                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                    uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
+                                                    uint32_t prev_cpu_time_us, bool explicit_billed_cpu_time,
                                                     int64_t subjective_cpu_bill_us ) {
    validate_db_available_size();
    SYS_ASSERT( get_read_mode() != db_read_mode::IRREVERSIBLE, transaction_type_exception, "push transaction not allowed in irreversible mode" );
    SYS_ASSERT( trx && !trx->implicit() && !trx->scheduled(), transaction_type_exception, "Implicit/Scheduled transaction not allowed" );
-   return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
+   // todo: fix
+   return my->push_transaction(trx, block_deadline, max_transaction_time, cpu_usage_t{{prev_cpu_time_us}}, explicit_billed_cpu_time, subjective_cpu_bill_us );
 }
 
 const flat_set<account_name>& controller::get_actor_whitelist() const {

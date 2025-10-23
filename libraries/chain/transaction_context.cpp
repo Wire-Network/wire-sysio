@@ -10,12 +10,13 @@
 
 #include <chrono>
 #include <bit>
+#include <ranges>
 
 namespace sysio::chain {
 
    transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
          : expired(timer.expired), _timer(timer) {
-      expired = 0;
+      expired = false;
    }
 
    void transaction_checktime_timer::start(fc::time_point tp) {
@@ -81,25 +82,35 @@ namespace sysio::chain {
       }
    }
 
-   void transaction_context::init(uint64_t initial_net_usage)
+   void transaction_context::init()
    {
       SYS_ASSERT( !is_initialized, transaction_exception, "cannot initialize twice" );
 
+      published = control.pending_block_time();
+
       // set maximum to a semi-valid deadline to allow for pause math and conversion to dates for logging
       if( block_deadline == fc::time_point::maximum() )
-         block_deadline = start + fc::hours(24*7*52);
+         block_deadline = start + fc::hours(24*7*52); // half-year
 
       const auto& cfg = control.get_global_properties().configuration;
       auto& rl = control.get_mutable_resource_limits_manager();
 
-      net_limit = rl.get_block_net_limit();
+      //
+      // net (which is always objective) and objective cpu
+      //
+      trx_net_limit = rl.get_block_net_limit();
 
-      objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
-      _deadline = start + objective_duration_limit;
+      if (is_read_only() && !control.is_write_window()) {
+         // read_only trx do not have objective limits, however, objective_duration_limit used to limit run time
+         objective_duration_limit = block_deadline - start;
+      } else {
+         objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
+      }
+      _trx_deadline = start + objective_duration_limit;
 
       // Possibly lower net_limit to the maximum net usage a transaction is allowed to be billed
-      if( cfg.max_transaction_net_usage <= net_limit && !is_read_only() ) {
-         net_limit = cfg.max_transaction_net_usage;
+      if( cfg.max_transaction_net_usage <= trx_net_limit && !is_read_only() ) {
+         trx_net_limit = cfg.max_transaction_net_usage;
          net_limit_due_to_block = false;
       }
 
@@ -108,15 +119,14 @@ namespace sysio::chain {
          objective_duration_limit = fc::microseconds(cfg.max_transaction_cpu_usage);
          billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
          tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::on_chain_consensus_max_transaction_cpu_usage;
-         _deadline = start + objective_duration_limit;
+         _trx_deadline = start + objective_duration_limit;
       }
 
       const transaction& trx = packed_trx.get_transaction();
-
       // Possibly lower net_limit to optional limit set in the transaction header
       uint64_t trx_specified_net_usage_limit = static_cast<uint64_t>(trx.max_net_usage_words.value) * 8;
-      if( trx_specified_net_usage_limit > 0 && trx_specified_net_usage_limit <= net_limit ) {
-         net_limit = trx_specified_net_usage_limit;
+      if( trx_specified_net_usage_limit > 0 && trx_specified_net_usage_limit <= trx_net_limit ) {
+         trx_net_limit = trx_specified_net_usage_limit;
          net_limit_due_to_block = false;
       }
 
@@ -127,106 +137,86 @@ namespace sysio::chain {
             objective_duration_limit = trx_specified_cpu_usage_limit;
             billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
             tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::user_specified_trx_max_cpu_usage_ms;
-            _deadline = start + objective_duration_limit;
+            _trx_deadline = start + objective_duration_limit;
          }
       }
 
-      initial_objective_duration_limit = objective_duration_limit;
-      int64_t account_net_limit = 0;
-      int64_t account_cpu_limit = 0;
+      leeway_trx_net_limit = trx_net_limit; // no leeway for block, cfg.max_transaction_net_usage, or trx.max_net_usage_words
 
       if ( !is_read_only() ) {
-         if( explicit_billed_cpu_time )
-            validate_cpu_usage_to_bill( billed_cpu_time_us, std::numeric_limits<int64_t>::max(), false, subjective_cpu_bill_us); // Fail early if the amount to be billed is too high
-
-         // For each action, add either the explicit payer (if present) or the contract (if no payer)
-         for ( const auto &act : trx.actions ) {
-            bill_to_accounts.insert(act.explicit_payer());
+         if (explicit_billed_cpu_time) {
+            SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), tx_no_action, "No transaction receipt cpu usage");
+            trx_billed_cpu_us = std::ranges::fold_left(billed_cpu_us, 0, std::plus());
+            SYS_ASSERT(trx_billed_cpu_us > 0, tx_no_action, "Invalid transaction receipt cpu usage");
+            validate_trx_billed_cpu();
+         } else {
+            billed_cpu_us.resize(trx.total_actions());
          }
+      }
 
-         // ---------------------- NEW ADDITION FOR SYSIO.ROA BILLING ----------------------
-         // Identify the contract account from the first action if possible
-         account_name contract_account = trx.actions.empty() ? name() : trx.actions.front().account;
+      std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
+      assert(all_actions.size() == trx.total_actions());
+      uint32_t trx_billable_size = 0;
+      for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
+         // For each action, add either the explicit payer (if present) or the contract (if no payer)
+         account_name a = act.explicit_payer();
+         auto& b = bill_to_accounts[a];
+         b.net_usage += packed_trx.get_action_billable_size(i);
+         if (explicit_billed_cpu_time)
+            b.cpu_usage_us += billed_cpu_us[i];
+         trx_billable_size += b.net_usage;
+      }
+      trace->net_usage = trx_billable_size;
+      check_trx_net_usage(); // Fail early if current net usage exceeds limit
 
-         // Only add contract_account if it's a valid (non-empty) name
-         if (contract_account.good()) {
-            bill_to_accounts.insert(contract_account);
+      if ( !is_read_only() ) {
+         // validate account net with objective net_usage_leeway
+         for (auto& [account, bill] : bill_to_accounts) {
+            max_bandwidth_billed_account_can_pay(account, bill, cfg.net_usage_leeway);
          }
 
          validate_ram_usage.reserve(bill_to_accounts.size());
-         // -------------------------------------------------------------------------
-
          // Update usage windows for all candidate accounts (user + contract)
          rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot );
-
-         // Calculate the highest network usage and CPU time that all of the billed accounts can afford to be billed
-         bool greylisted_net = false, greylisted_cpu = false;
-         std::tie( account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
-         net_limit_due_to_greylist |= greylisted_net;
-         cpu_limit_due_to_greylist |= greylisted_cpu;
       }
 
-      eager_net_limit = net_limit;
+      //
+      // cpu
+      //
 
-      if ( !is_read_only() ) {
-         // Possibly lower eager_net_limit to what the billed accounts can pay plus some (objective) leeway
-         auto new_eager_net_limit = std::min( eager_net_limit, static_cast<uint64_t>(account_net_limit + cfg.net_usage_leeway) );
-         if( new_eager_net_limit < eager_net_limit ) {
-            eager_net_limit = new_eager_net_limit;
-            net_limit_due_to_block = false;
+      if (!explicit_billed_cpu_time) {
+         // Possibly limit deadline to subjective max_transaction_time
+         if( max_transaction_time_subjective != fc::microseconds::maximum() && (start + max_transaction_time_subjective) <= _trx_deadline ) {
+            _trx_deadline = start + max_transaction_time_subjective;
+            tx_cpu_usage_reason = prev_cpu_time_us > 0
+                                     ? tx_cpu_usage_exceeded_reason::speculative_executed_adjusted_max_transaction_time
+                                     : tx_cpu_usage_exceeded_reason::node_configured_max_transaction_time;
+            billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
          }
-
-         // Possibly limit deadline if the duration accounts can be billed for (+ a subjective leeway) does not exceed current delta
-         if( (fc::microseconds(account_cpu_limit) + leeway) <= (_deadline - start) ) {
-            _deadline = start + fc::microseconds(account_cpu_limit) + leeway;
-            billing_timer_exception_code = leeway_deadline_exception::code_value;
-         }
-      }
-
-      // Possibly limit deadline to subjective max_transaction_time
-      if( max_transaction_time_subjective != fc::microseconds::maximum() && (start + max_transaction_time_subjective) <= _deadline ) {
-         _deadline = start + max_transaction_time_subjective;
-         tx_cpu_usage_reason = billed_cpu_time_us > 0 ?
-            tx_cpu_usage_exceeded_reason::speculative_executed_adjusted_max_transaction_time : tx_cpu_usage_exceeded_reason::node_configured_max_transaction_time;
-         billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
       }
 
       // Possibly limit deadline to caller provided wall clock block deadline
-      if( block_deadline < _deadline ) {
-         _deadline = block_deadline;
+      if( block_deadline < _trx_deadline ) {
+         _trx_deadline = block_deadline;
          billing_timer_exception_code = deadline_exception::code_value;
       }
 
       if ( !is_read_only() ) {
          if( !explicit_billed_cpu_time ) {
-            int64_t validate_account_cpu_limit = account_cpu_limit - subjective_cpu_bill_us + leeway.count(); // Add leeway to allow powerup
-            // Possibly limit deadline to account subjective cpu left
-            if( subjective_cpu_bill_us > 0 && (start + fc::microseconds(validate_account_cpu_limit) < _deadline) ) {
-               _deadline = start + fc::microseconds(validate_account_cpu_limit);
-               billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
-               tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+            // fail early for subjectively billed accounts
+            for (const auto& [account, b] : bill_to_accounts) {
+               validate_available_account_cpu( account, b.cpu_limit_us, b.cpu_greylisted, leeway.count(), subjective_cpu_bill_us );
             }
-
-            // Fail early if amount of the previous speculative execution is within 10% of remaining account cpu available
-            if( validate_account_cpu_limit > 0 )
-               validate_account_cpu_limit -= SYS_PERCENT( validate_account_cpu_limit, 10 * config::percent_1 );
-            if( validate_account_cpu_limit < 0 ) validate_account_cpu_limit = 0;
-            validate_account_cpu_usage_estimate( billed_cpu_time_us, validate_account_cpu_limit, subjective_cpu_bill_us );
          }
       }
 
       // Explicit billed_cpu_time_us used
       if( explicit_billed_cpu_time ) {
-         _deadline = block_deadline;
+         _trx_deadline = block_deadline;
          deadline_exception_code = deadline_exception::code_value;
       } else {
          deadline_exception_code = billing_timer_exception_code;
       }
-
-      eager_net_limit = (eager_net_limit/8)*8; // Round down to nearest multiple of word size (8 bytes) so check_net_usage can be efficient
-
-      if( initial_net_usage > 0 )
-         add_net_usage( initial_net_usage );  // Fail early if current net usage exceeds limit
 
       if(control.skip_trx_checks()) {
          enforce_deadline = false;
@@ -237,8 +227,11 @@ namespace sysio::chain {
 
    void transaction_context::init_for_implicit_trx()
    {
-      published = control.pending_block_time();
-      init( 0 );
+      assert( packed_trx.get_transaction().delay_sec.value == 0 );
+      assert( packed_trx.get_compression() == packed_transaction::compression_type::none );
+      assert( !is_read_only() );
+
+      init();
    }
 
    void transaction_context::init_for_input_trx()
@@ -249,13 +242,6 @@ namespace sysio::chain {
       SYS_ASSERT( packed_trx.get_compression() == packed_transaction::compression_type::none,
                   tx_compression_not_allowed, "packed transaction cannot be compressed");
 
-      const auto& cfg = control.get_global_properties().configuration;
-
-      uint64_t discounted_size_for_pruned_data = packed_trx.get_prunable_size();
-      uint64_t initial_net_usage = static_cast<uint64_t>(cfg.base_per_transaction_net_usage)
-                                    + packed_trx.get_unprunable_size() + discounted_size_for_pruned_data;
-
-      published = control.pending_block_time();
       is_input = true;
       if (!control.skip_trx_checks()) {
          if ( !is_read_only() ) {
@@ -265,7 +251,7 @@ namespace sysio::chain {
          validate_referenced_accounts( trx, enforce_whiteblacklist && control.is_speculative_block() );
       }
 
-      init( initial_net_usage );
+      init();
       if ( !is_read_only() ) {
          record_transaction( id, trx.expiration );
       }
@@ -277,44 +263,61 @@ namespace sysio::chain {
       assert( is_initialized );
       assert( bill_to_accounts.size() == trx.total_actions() );
 
-      uint32_t action_billable_size = 0;
+      auto add_trace_net = [&]( size_t idx ) {
+         if (!is_input) return;
+         assert(trace->action_traces.size() == idx + 1);
+         trace->action_traces[idx].net_usage = packed_trx.get_action_billable_size(idx);
+      };
+
       size_t idx = 0;
       for( const auto& act : trx.context_free_actions ) {
          schedule_action( act, act.account, true, 0, 0 );
-         action_billable_size += bill_to_accounts[idx].net_usage = act.get_billable_size();
+         add_trace_net(idx);
          ++idx;
       }
 
       for( const auto& act : trx.actions ) {
          schedule_action( act, act.account, false, 0, 0 );
-         action_billable_size += bill_to_accounts[idx].net_usage = act.get_billable_size();
+         add_trace_net(idx);
          ++idx;
       }
 
       auto& action_traces = trace->action_traces;
       const uint32_t num_original_actions_to_execute = action_traces.size();
       assert( num_original_actions_to_execute == idx );
-      const uint32_t trx_billable_size = packed_trx.get_billable_size();
-      assert( trx_billable_size > action_billable_size );
-      const uint32_t trx_net_per_action = (trx_billable_size - action_billable_size) / num_original_actions_to_execute;
       for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
-         wlog("=>starting action ${i}", ("i", action_traces.at(i-1).act.name));
-         fc::time_point start = fc::time_point::now();
-         if(enforce_deadline) {
-            transaction_timer.start( _deadline );
-            checktime(); // Fail early if deadline already exceeded
-         } else {
-            transaction_timer.start( fc::time_point::maximum() );
+         fc::time_point action_start = fc::time_point::now();
+         const auto& act = action_traces.at(i-1).act;
+         wlog("=>starting action ${i}", ("i", act.name));
+         auto _ = fc::make_scoped_exit([this, org_code=billing_timer_exception_code, org_reason=tx_cpu_usage_reason](){
+            billing_timer_exception_code = org_code;
+            tx_cpu_usage_reason = org_reason;
+         });
+         account_name a = act.explicit_payer();
+         auto& b = bill_to_accounts[a];
+         auto action_deadline = _trx_deadline;
+         if (!explicit_billed_cpu_time) {
+            int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill_us + leeway.count(); // Add leeway to allow powerup
+            // Possibly limit deadline to account subjective cpu left
+            if( action_start + fc::microseconds(account_cpu_limit) < _trx_deadline ) {
+               action_deadline = action_start + fc::microseconds(account_cpu_limit);
+               billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
+               tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+            }
          }
-
+         if (enforce_deadline) {
+            transaction_timer.start( action_deadline );
+            checktime(); // Fail early if deadline already exceeded
+         }
          execute_action( i, 0 );
-         trace->action_traces[i-1].net_usage = bill_to_accounts[i-1].net_usage += trx_net_per_action;
-         transaction_timer.stop();
-         auto elapsed = fc::time_point::now() - start;
-         trace->action_traces[i-1].cpu_usage_us = bill_to_accounts[i-1].cpu_usage_us += elapsed.count();
-         wlog("<=elapsed  action ${i}: ${e}", ("i", action_traces.at(i-1).act.name)("e", elapsed));
+         if (enforce_deadline)
+            transaction_timer.stop();
+         auto elapsed = fc::time_point::now() - action_start;
+         trace->action_traces[i-1].cpu_usage_us = elapsed.count();
+         if (!explicit_billed_cpu_time)
+            billed_cpu_us[i-1] = elapsed.count();
+         wlog("<=elapsed  action ${i}: ${e}", ("i", act.name)("e", elapsed));
       }
-      trace->net_usage = trx_billable_size;
    }
 
    void transaction_context::finalize() {
@@ -322,7 +325,6 @@ namespace sysio::chain {
 
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
-         trace->net_usage = ((trace->net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
          trace->elapsed = fc::time_point::now() - start;
          return;
       }
@@ -346,32 +348,11 @@ namespace sysio::chain {
          rl.verify_account_ram_usage(a);
       }
 
-      // Calculate limits based on what billed accounts can afford
-      int64_t account_net_limit = 0;
-      int64_t account_cpu_limit = 0;
-      bool greylisted_net = false, greylisted_cpu = false;
-      std::tie(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu) = max_bandwidth_billed_accounts_can_pay();
-
-      net_limit_due_to_greylist |= greylisted_net;
-      cpu_limit_due_to_greylist |= greylisted_cpu;
-
-      // Possibly lower net_limit based on what accounts can pay
-      if (static_cast<uint64_t>(account_net_limit) <= net_limit) {
-         net_limit = static_cast<uint64_t>(account_net_limit);
-         net_limit_due_to_block = false;
+      leeway_trx_net_limit = trx_net_limit; // reset with no leeway==0
+      constexpr uint32_t net_leeway = 0;
+      for (auto& [account, bill]: bill_to_accounts) {
+         max_bandwidth_billed_account_can_pay(account, bill, net_leeway);
       }
-
-      // Possibly lower objective_duration_limit based on what accounts can pay
-      if (account_cpu_limit <= objective_duration_limit.count()) {
-         objective_duration_limit = fc::microseconds(account_cpu_limit);
-         billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
-         tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
-      }
-
-      // Round up net_usage to the nearest multiple of 8 bytes and verify
-      trace->net_usage = ((trace->net_usage + 7)/8)*8;
-      eager_net_limit = net_limit;
-      check_net_usage();
 
       auto now = fc::time_point::now();
       trace->elapsed = now - start;
@@ -379,9 +360,17 @@ namespace sysio::chain {
       // Update CPU time and validate CPU usage
       update_billed_cpu_time( now );
 
-      validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true, subjective_cpu_bill_us );
+      validate_cpu_minimum();
+      if (!explicit_billed_cpu_time) {
+         // validated in init() when explicit_billed_cpu_time (validating trx in block)
+         validate_trx_billed_cpu();
 
-      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), trace->net_usage,
+         for (const auto& [account, b] : bill_to_accounts) {
+            validate_available_account_cpu( account, b.cpu_limit_us, b.cpu_greylisted, 0, 0 );
+         }
+      }
+
+      rl.add_transaction_usage( bill_to_accounts, trace->net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
    }
 
@@ -395,21 +384,17 @@ namespace sysio::chain {
       if (undo_session) undo_session->undo();
    }
 
-   void transaction_context::check_net_usage()const {
-      if (!control.skip_trx_checks()) {
-         if( BOOST_UNLIKELY(trace->net_usage > eager_net_limit) ) {
+   void transaction_context::check_trx_net_usage()const {
+      if (is_input && !control.skip_trx_checks()) {
+         if( BOOST_UNLIKELY(trace->net_usage > trx_net_limit) ) {
             if ( net_limit_due_to_block ) {
                SYS_THROW( block_net_usage_exceeded,
                           "not enough space left in block: ${net_usage} > ${net_limit}",
-                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
-            }  else if (net_limit_due_to_greylist) {
-               SYS_THROW( greylist_net_usage_exceeded,
-                          "greylisted transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", trx_net_limit) );
             } else {
                SYS_THROW( tx_net_usage_exceeded,
                           "transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", trx_net_limit) );
             }
          }
       }
@@ -443,11 +428,11 @@ namespace sysio::chain {
       auto now = fc::time_point::now();
       if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
          SYS_THROW( deadline_exception, "deadline exceeded ${billing_timer}us",
-                     ("billing_timer", now - pseudo_start)("now", now)("deadline", _deadline)("start", start) );
+                     ("billing_timer", now - pseudo_start)("now", now)("deadline", _trx_deadline)("start", start) );
       } else if( deadline_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_THROW( block_cpu_usage_exceeded,
                      "not enough time left in block to complete executing transaction ${billing_timer}us",
-                     ("now", now)("deadline", _deadline)("start", start)("billing_timer", now - pseudo_start) );
+                     ("now", now)("deadline", _trx_deadline)("start", start)("billing_timer", now - pseudo_start) );
       } else if( deadline_exception_code == tx_cpu_usage_exceeded::code_value ) {
          std::string assert_msg = "transaction ${id} was executing for too long ${billing_timer}us";
          if (subjective_cpu_bill_us > 0) {
@@ -467,7 +452,7 @@ namespace sysio::chain {
          SYS_THROW( leeway_deadline_exception,
                      "the transaction was unable to complete by deadline, "
                      "but it is possible it could have succeeded if it were allowed to run to completion ${billing_timer}",
-                     ("now", now)("deadline", _deadline)("start", start)("billing_timer", now - pseudo_start) );
+                     ("now", now)("deadline", _trx_deadline)("start", start)("billing_timer", now - pseudo_start) );
       }
       SYS_ASSERT( false,  transaction_exception, "unexpected deadline exception code ${code}", ("code", deadline_exception_code) );
    }
@@ -488,27 +473,29 @@ namespace sysio::chain {
       auto paused = now - paused_time;
 
       pseudo_start = now - billed_time;
-      _deadline += paused;
+      _trx_deadline += paused;
 
       // do not allow to go past block wall clock deadline
-      if( block_deadline < _deadline ) {
+      if( block_deadline < _trx_deadline ) {
          deadline_exception_code = deadline_exception::code_value;
-         _deadline = block_deadline;
+         _trx_deadline = block_deadline;
       }
 
-      transaction_timer.start(_deadline);
+      transaction_timer.start(_trx_deadline);
+   }
+
+   void transaction_context::validate_cpu_minimum()const {
+      // validate minimum must be done at the end of the trx because the trx might have modified the cfg.min_transaction_cpu_usage
+      if (!explicit_billed_cpu_time || control.skip_trx_checks())
+         return;
+      const auto& cfg = control.get_global_properties().configuration;
+      SYS_ASSERT( trx_billed_cpu_us >= cfg.min_transaction_cpu_usage, transaction_exception,
+                  "cannot bill CPU time ${b} less than the minimum of ${m} us",
+                  ("b", trx_billed_cpu_us)("m", cfg.min_transaction_cpu_usage) );
    }
 
    void transaction_context::validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const {
       if (!control.skip_trx_checks()) {
-         if( check_minimum ) {
-            const auto& cfg = control.get_global_properties().configuration;
-            SYS_ASSERT( billed_us >= cfg.min_transaction_cpu_usage, transaction_exception,
-                        "cannot bill CPU time less than the minimum of ${min_billable} us",
-                        ("min_billable", cfg.min_transaction_cpu_usage)("billed_cpu_time_us", billed_us)
-                      );
-         }
-
          validate_account_cpu_usage( billed_us, account_cpu_limit, subjective_billed_us );
       }
    }
@@ -550,39 +537,60 @@ namespace sysio::chain {
       }
    }
 
-   void transaction_context::validate_account_cpu_usage_estimate( int64_t prev_billed_us, int64_t account_cpu_limit, int64_t subjective_billed_us )const {
-      // prev_billed_us can be 0, but so can account_cpu_limit
-      if( (prev_billed_us >= 0) && !control.skip_trx_checks() ) {
-         const bool cpu_limited_by_account = (account_cpu_limit <= objective_duration_limit.count());
+   void transaction_context::validate_trx_billed_cpu() const {
+      assert(trx_billed_cpu_us > 0);
+      if (control.skip_trx_checks())
+         return;
 
-         if( !cpu_limited_by_account && (billing_timer_exception_code == block_cpu_usage_exceeded::code_value) ) {
-            SYS_ASSERT( prev_billed_us < objective_duration_limit.count(),
-                        block_cpu_usage_exceeded,
-                        "estimated CPU time (${billed} us) is not less than the billable CPU time left in the block (${billable} us)",
-                        ("billed", prev_billed_us)( "billable", objective_duration_limit.count() )
-            );
+      // validate objective cpu limits
+      if( billing_timer_exception_code == block_cpu_usage_exceeded::code_value ) {
+         SYS_ASSERT( trx_billed_cpu_us <= objective_duration_limit.count(),
+                     block_cpu_usage_exceeded,
+                     "billed CPU time (${billed} us) is greater than the billable CPU time left in the block (${billable} us)",
+                     ("billed", trx_billed_cpu_us)( "billable", objective_duration_limit.count() )
+         );
+      } else {
+         // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
+         auto limit = objective_duration_limit.count();
+
+         if( trx_billed_cpu_us > limit ) {
+            fc::microseconds tx_limit;
+            std::string assert_msg;
+            assert_msg.reserve(1024);
+            assert_msg += "billed CPU time (${billed} us) is greater than the maximum";
+            assert_msg += " billable CPU time for the transaction (${billable} us)";
+            assert_msg += get_tx_cpu_usage_exceeded_reason_msg( tx_limit );
+
+            FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                ("billed", trx_billed_cpu_us)("billable", limit)("limit", tx_limit) );
+         }
+      }
+   }
+
+   void transaction_context::validate_available_account_cpu( account_name account, int64_t account_limit, bool greylisted, int64_t leeway_us, int64_t subjective_billed_us )const {
+      // verify account has cpu available with leeway and subjective billing
+      if (control.skip_trx_checks())
+         return;
+
+      int64_t validate_account_cpu_limit = account_limit - subjective_cpu_bill_us + leeway.count(); // Add leeway to allow powerup
+      // Fail early if amount of the previous speculative execution is within 10% of remaining account cpu available
+      if( subjective_billed_us > 0 && validate_account_cpu_limit > 0 )
+         validate_account_cpu_limit -= SYS_PERCENT( validate_account_cpu_limit, 10 * config::percent_1 );
+
+      if( validate_account_cpu_limit <= 0 ) { // if none available
+         std::string assert_msg;
+         assert_msg.reserve(1024);
+         assert_msg += greylisted ? "greylisted " : "";
+         assert_msg += "account ${a} has no CPU time";
+         assert_msg += subjective_billed_us > 0 ? " with a subjective cpu of (${s} us)" : "";
+         assert_msg += " exceeded account cpu limit by ${over}";
+
+         if( greylisted ) {
+            FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                ("a", account)("s", subjective_billed_us)("over", std::abs(validate_account_cpu_limit)) );
          } else {
-            auto graylisted = cpu_limit_due_to_greylist && cpu_limited_by_account;
-            // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
-            auto account_limit = graylisted ? account_cpu_limit : (cpu_limited_by_account ? account_cpu_limit : objective_duration_limit.count());
-
-            if( prev_billed_us >= account_limit ) {
-               std::string assert_msg;
-               assert_msg.reserve(1024);
-               assert_msg += "estimated CPU time (${billed} us) is not less than the maximum";
-               assert_msg += graylisted ? " greylisted" : "";
-               assert_msg += " billable CPU time for the transaction (${billable} us)";
-               assert_msg += subjective_billed_us > 0 ? " with a subjective cpu of (${subjective} us)" : "";
-               assert_msg += " reached account cpu limit ${limit}us";
-
-               if( graylisted ) {
-                  FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                      ("billed", prev_billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", account_limit) );
-               } else {
-                  FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                      ("billed", prev_billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", account_limit) );
-               }
-            }
+            FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                ("a", account)("s", subjective_billed_us)("over", std::abs(validate_account_cpu_limit)) );
          }
       }
    }
@@ -597,59 +605,26 @@ namespace sysio::chain {
       }
    }
 
-   uint32_t transaction_context::update_billed_cpu_time( fc::time_point now ) {
-      if( explicit_billed_cpu_time ) return static_cast<uint32_t>(billed_cpu_time_us);
+   void transaction_context::update_billed_cpu_time( fc::time_point now ) {
+      if( explicit_billed_cpu_time ) return;
 
+      trx_billed_cpu_us = std::ranges::fold_left(billed_cpu_us, 0, std::plus());
       const auto& cfg = control.get_global_properties().configuration;
-      billed_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
-
-      return static_cast<uint32_t>(billed_cpu_time_us);
-   }
-
-   std::tuple<int64_t, int64_t, bool, bool> transaction_context::max_bandwidth_billed_accounts_can_pay() const{
-      // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
-
-      // Calculate the new highest network usage and CPU time that all of the billed accounts can afford to be billed
-      auto& rl = control.get_mutable_resource_limits_manager();
-      const static int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
-      int64_t account_net_limit = large_number_no_overflow;
-      int64_t account_cpu_limit = large_number_no_overflow;
-      bool greylisted_net = false;
-      bool greylisted_cpu = false;
-
-      uint32_t specified_greylist_limit = control.get_greylist_limit();
-      for( const auto& a : bill_to_accounts ) {
-         uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
-         if( control.is_speculative_block() ) {
-            if( control.is_resource_greylisted(a) ) {
-               greylist_limit = 1;
-            } else {
-               greylist_limit = specified_greylist_limit;
-            }
-         }
-         auto [net_limit, net_was_greylisted] = rl.get_account_net_limit(a, greylist_limit);
-         if( net_limit >= 0 ) {
-            account_net_limit = std::min( account_net_limit, net_limit );
-            greylisted_net |= net_was_greylisted;
-         }
-         auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
-         if( cpu_limit >= 0 ) {
-            account_cpu_limit = std::min( account_cpu_limit, cpu_limit );
-            greylisted_cpu |= cpu_was_greylisted;
-         }
+      int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
+      SYS_ASSERT(total_cpu_time_us - trx_billed_cpu_us >= 0, tx_cpu_usage_exceeded, "Invalid CPU usage calcuation");
+      // +1 so total is above min_transaction_cpu_usage
+      int64_t delta_per_account = ( total_cpu_time_us - trx_billed_cpu_us ) / bill_to_accounts.size() + 1;
+      for (auto& bill: bill_to_accounts | std::views::values) {
+         bill.cpu_usage_us += delta_per_account;
       }
-
-      SYS_ASSERT( control.is_speculative_block() || (!greylisted_cpu && !greylisted_net),
-                  transaction_exception, "greylisted when not producing block" );
-
-      return std::make_tuple(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu);
+      trx_billed_cpu_us = total_cpu_time_us;
    }
 
-   std::tuple<int64_t, int64_t, bool, bool>  transaction_context::max_bandwidth_billed_account_can_pay(account_name a)const {
+   void transaction_context::max_bandwidth_billed_account_can_pay(account_name a, account_billing& b, uint32_t net_usage_leeway) {
       // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
 
       // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
-      auto& rl = control.get_mutable_resource_limits_manager();
+      const auto& rl = control.get_mutable_resource_limits_manager();
       static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
       int64_t account_net_limit = large_number_no_overflow;
       int64_t account_cpu_limit = large_number_no_overflow;
@@ -679,7 +654,19 @@ namespace sysio::chain {
       SYS_ASSERT( control.is_speculative_block() || (!greylisted_cpu && !greylisted_net),
                   transaction_exception, "greylisted when not producing block" );
 
-      return std::make_tuple(account_net_limit, account_cpu_limit, greylisted_net, greylisted_cpu);
+      const auto leeway_net_limit = account_net_limit + net_usage_leeway;
+      if (b.net_usage > leeway_net_limit) {
+         if (greylisted_net) {
+            SYS_THROW( greylist_net_usage_exceeded, "greylisted account ${a} net usage is too high: ${nu} > ${nl}",
+                       ("a", a)("nu", trace->net_usage)("nl", leeway_net_limit) );
+         } else {
+            SYS_THROW( tx_net_usage_exceeded, "account ${a} net usage is too high: ${nu} > ${nl}",
+                       ("a", a)("nu", trace->net_usage)("nl", leeway_net_limit) );
+         }
+      }
+
+      b.cpu_limit_us = account_cpu_limit;
+      b.cpu_greylisted |= greylisted_cpu;
    }
 
    action_trace& transaction_context::get_action_trace( uint32_t action_ordinal ) {

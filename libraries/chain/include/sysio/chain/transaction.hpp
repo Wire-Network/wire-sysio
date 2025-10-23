@@ -5,6 +5,8 @@
 
 namespace sysio { namespace chain {
 
+   using cpu_usage_t = std::vector<fc::unsigned_int>;
+
    /**
     *  This extension is for including an ED25519 public key in a transaction for signature verification. Generic public_key_type was used to future proof
     *  in the scenario where another ED25519 curve variant is added. We don't want to add another extension per variant.
@@ -135,6 +137,7 @@ namespace sysio { namespace chain {
       {
          local_pack_transaction();
          local_pack_context_free_data();
+         init();
       }
 
       explicit packed_transaction(signed_transaction&& t, compression_type _compression = compression_type::none)
@@ -142,6 +145,7 @@ namespace sysio { namespace chain {
       {
          local_pack_transaction();
          local_pack_context_free_data();
+         init();
       }
 
       // used by abi_serializer
@@ -158,8 +162,7 @@ namespace sysio { namespace chain {
       }
       friend bool operator!=(const packed_transaction& lhs, const packed_transaction& rhs) { return !(lhs == rhs); }
 
-      uint32_t get_billable_size()const;
-      uint32_t get_billable_size(size_t action_index)const;
+      uint32_t get_action_billable_size(size_t action_index)const;
       size_t get_estimated_size()const;
 
       digest_type digest()const;
@@ -176,6 +179,7 @@ namespace sysio { namespace chain {
       const bytes&                  get_packed_transaction()const { return packed_trx; }
 
    private:
+      void init();
       void local_unpack_transaction(vector<bytes>&& context_free_data);
       void local_unpack_context_free_data();
       void local_pack_transaction();
@@ -196,6 +200,7 @@ namespace sysio { namespace chain {
       // cache unpacked trx, for thread safety do not modify after construction
       signed_transaction                      unpacked_trx;
       transaction_id_type                     trx_id;
+      uint32_t                                billable_net_per_action_overhead = 0;
    };
 
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;

@@ -35,7 +35,8 @@ inline TransactionTrace to_transaction_trace( const cache_trace& t ) {
       if (t.trace->receipt) {
          r.status = chain::transaction_receipt_header::status_enum::executed; // executed is 0
          r.cpu_usage_us = t.trace->receipt->total_cpu_usage_us();
-         r.net_usage_words = t.trace->net_usage / 8; // net_usage_words
+         // Round up net_usage to the nearest multiple of 8 bytes
+         r.net_usage_words = ((t.trace->net_usage + 7)/8)*8;
       }
       r.signatures = t.trx->get_signatures();
       r.trx_header = static_cast<const chain::transaction_header&>( t.trx->get_transaction() );

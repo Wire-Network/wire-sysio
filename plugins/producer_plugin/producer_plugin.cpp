@@ -1678,7 +1678,7 @@ producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplie
          r.first_action   = actions[0].name;
       }
       r.total_actions      = pt->get_transaction().total_actions();
-      r.billed_cpu_time_us = itr->trx_meta->billed_cpu_time_us;
+      r.billed_cpu_time_us = itr->trx_meta->prev_cpu_time_us;
       r.size               = pt->get_estimated_size();
 
       ++itr;
@@ -2000,7 +2000,7 @@ void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx,
 }
 
 void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx, const fc::exception_ptr& except_ptr) {
-   uint32_t billed_cpu_time_us = trx ? trx->billed_cpu_time_us : 0;
+   uint32_t billed_cpu_time_us = trx ? trx->prev_cpu_time_us : 0;
    log_trx_results(trx->packed_trx(), nullptr, except_ptr, billed_cpu_time_us, trx->is_transient());
 }
 
@@ -2118,19 +2118,19 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    if (!disable_subjective_enforcement)
       sub_bill = subjective_bill.get_subjective_bill(first_auth, fc::time_point::now());
 
-   auto prev_billed_cpu_time_us = trx->billed_cpu_time_us;
-   if (in_producing_mode() && prev_billed_cpu_time_us > 0) {
+   auto prev_cpu_time_us = trx->prev_cpu_time_us;
+   if (in_producing_mode() && trx->prev_cpu_time_us > 0) {
       const auto& rl = chain.get_resource_limits_manager();
       if (!subjective_bill.is_account_disabled(first_auth) && !rl.is_unlimited_cpu(first_auth)) {
-         int64_t prev_billed_plus100_us = prev_billed_cpu_time_us + SYS_PERCENT(prev_billed_cpu_time_us, 100 * config::percent_1);
+         int64_t prev_billed_plus100_us = prev_cpu_time_us + SYS_PERCENT(prev_cpu_time_us, 100 * config::percent_1);
          if (prev_billed_plus100_us < max_trx_time.count())
             max_trx_time = fc::microseconds(prev_billed_plus100_us);
       }
    }
 
-   auto trace = chain.push_transaction(trx, block_deadline, max_trx_time, prev_billed_cpu_time_us, false, sub_bill);
+   auto trace = chain.push_transaction(trx, block_deadline, max_trx_time, prev_cpu_time_us, false, sub_bill);
 
-   auto pr = handle_push_result(trx, next, start, chain, trace, return_failure_trace, disable_subjective_enforcement, first_auth, sub_bill, prev_billed_cpu_time_us);
+   auto pr = handle_push_result(trx, next, start, chain, trace, return_failure_trace, disable_subjective_enforcement, first_auth, sub_bill, prev_cpu_time_us);
 
    if (!pr.failed) {
       trx_tracker.trx_success();

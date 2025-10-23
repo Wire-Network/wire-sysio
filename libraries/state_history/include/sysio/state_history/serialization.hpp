@@ -631,7 +631,8 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
    if (trace.receipt) {
       fc::raw::pack(ds, as_type<uint8_t>(sysio::chain::transaction_receipt_header::status_enum::executed)); // executed is 0
       fc::raw::pack(ds, as_type<uint32_t>(trace.receipt->total_cpu_usage_us()));
-      fc::raw::pack(ds, as_type<fc::unsigned_int>(trace.net_usage / 8)); // net_usage_words
+      // Round up net_usage to the nearest multiple of 8 bytes
+      fc::raw::pack(ds, as_type<fc::unsigned_int>(((trace.net_usage + 7)/8)*8));
    } else {
       fc::raw::pack(ds, uint8_t(obj.context.first));
       fc::raw::pack(ds, uint32_t(0));
