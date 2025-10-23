@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SYSIO Contract ABI",
+  "type": "object",
+  "required": ["version", "structs", "actions"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^sysio::abi/[0-9]+\\.[0-9]+$"
+    },
+    "types": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["new_type_name", "type"],
+        "properties": {
+          "new_type_name": {"type": "string"},
+          "type": {"type": "string"}
+        }
+      }
+    },
+    "structs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "base", "fields"],
+        "properties": {
+          "name": {"type": "string"},
+          "base": {"type": "string"},
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["name", "type"],
+              "properties": {
+                "name": {"type": "string"},
+                "type": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "ricardian_contract"],
+        "properties": {
+          "name": {"type": "string"},
+          "type": {"type": "string"},
+          "ricardian_contract": {"type": "string"}
+        }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "index_type", "key_names", "key_types"],
+        "properties": {
+          "name": {"type": "string"},
+          "type": {"type": "string"},
+          "index_type": {"type": "string"},
+          "key_names": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "key_types": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "ricardian_clauses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "body"],
+        "properties": {
+          "id": {"type": "string"},
+          "body": {"type": "string"}
+        }
+      }
+    },
+    "variants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "types"],
+        "properties": {
+          "name": {"type": "string"},
+          "types": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "action_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "result_type"],
+        "properties": {
+          "name": {"type": "string"},
+          "result_type": {"type": "string"}
+        }
+      }
+    },
+    "abi_extensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["tag", "value"],
+        "properties": {
+          "tag": {"type": "integer"},
+          "value": {"type": "string"}
+        }
+      }
+    },
+    "error_messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["error_code", "error_msg"],
+        "properties": {
+          "error_code": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "error_msg": {"type": "string"}
+        }
+      }
+    },
+    "kv_tables": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type", "primary_index"],
+        "properties": {
+          "type": {"type": "string"},
+          "primary_index": {
+            "type": "object",
+            "required": ["name", "type"],
+            "properties": {
+              "name": {"type": "string"},
+              "type": {"type": "string"}
+            }
+          },
+          "secondary_indices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": {"type": "string"}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
