@@ -1162,7 +1162,7 @@ class Cluster(object):
 
         # wait for block production handover (essentially a block produced by anyone but sysio).
         lam = lambda: biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio"
-        ret=Utils.waitForBool(lam)
+        ret=Utils.waitForBool(lam, timeout=90)
         if not ret:
             Utils.Print("ERROR: Block production handover failed.")
             return None
