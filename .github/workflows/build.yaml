@@ -298,8 +298,11 @@ jobs:
         if: failure()
         with:
           name: ${{matrix.cfg.name}}-tests-logs
-          if-no-files-found: ignore
-          path: /cores
+          if-no-files-found: warn
+          path: |
+              /cores
+              build/Testing/Temporary/
+              build/TestLogs/
 
       - name: Check CPU Features
         run: awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
