@@ -1,0 +1,9 @@
+{
+  "version": "sysio::abi/1.1",
+  "types": [],
+  "structs": [],
+  "actions": [],
+  "tables": [],
+  "ricardian_clauses": [],
+  "variants": []
+}

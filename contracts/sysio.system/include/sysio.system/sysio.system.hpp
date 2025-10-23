@@ -7,7 +7,7 @@
 #include <sysio/singleton.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
-
+#include <sysio.system/non_wasm_types.hpp>
 #include <sysio.system/native.hpp>
 
 #include <deque>

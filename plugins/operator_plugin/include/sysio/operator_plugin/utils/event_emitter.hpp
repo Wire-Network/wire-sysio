@@ -10,7 +10,7 @@
 #include <mutex>
 #include <vector>
 
-namespace sysio::operator_plugin::utils {
+namespace sysio::utils {
 
   template <typename... Args>
   class event_emitter {
