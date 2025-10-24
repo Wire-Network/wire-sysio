@@ -89,8 +89,9 @@ namespace sysio::chain {
       published = control.pending_block_time();
 
       // set maximum to a semi-valid deadline to allow for pause math and conversion to dates for logging
+      const fc::time_point six_months = start + fc::hours(24*7*52);
       if( block_deadline == fc::time_point::maximum() )
-         block_deadline = start + fc::hours(24*7*52); // half-year
+         block_deadline = six_months; // half-year
 
       const auto& cfg = control.get_global_properties().configuration;
       auto& rl = control.get_mutable_resource_limits_manager();
@@ -145,17 +146,18 @@ namespace sysio::chain {
 
       if ( !is_read_only() ) {
          if (explicit_billed_cpu_time) {
-            SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), tx_no_action, "No transaction receipt cpu usage");
+            SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception, "No transaction receipt cpu usage");
             trx_billed_cpu_us = std::ranges::fold_left(billed_cpu_us, 0, std::plus());
-            SYS_ASSERT(trx_billed_cpu_us > 0, tx_no_action, "Invalid transaction receipt cpu usage");
+            SYS_ASSERT(trx_billed_cpu_us > 0, transaction_exception, "Invalid transaction receipt cpu usage");
             validate_trx_billed_cpu();
+            trace->total_cpu_usage_us = trx_billed_cpu_us;
          } else {
             billed_cpu_us.resize(trx.total_actions());
          }
       }
 
       std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
-      assert(all_actions.size() == trx.total_actions());
+      assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
       uint32_t trx_billable_size = 0;
       for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
@@ -219,7 +221,11 @@ namespace sysio::chain {
       }
 
       if(control.skip_trx_checks()) {
+         _trx_deadline = block_deadline;
+      }
+      if (_trx_deadline >= six_months) {
          enforce_deadline = false;
+         transaction_timer.start( fc::time_point::maximum() );
       }
 
       is_initialized = true;
@@ -261,7 +267,6 @@ namespace sysio::chain {
       const transaction& trx = packed_trx.get_transaction();
 
       assert( is_initialized );
-      assert( bill_to_accounts.size() == trx.total_actions() );
 
       auto add_trace_net = [&]( size_t idx ) {
          if (!is_input) return;
@@ -326,6 +331,7 @@ namespace sysio::chain {
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
          trace->elapsed = fc::time_point::now() - start;
+         trace->total_cpu_usage_us = trace->elapsed.count();
          return;
       }
 
@@ -370,7 +376,7 @@ namespace sysio::chain {
          }
       }
 
-      rl.add_transaction_usage( bill_to_accounts, trace->net_usage,
+      rl.add_transaction_usage( bill_to_accounts, trace->total_cpu_usage_us, trace->net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
    }
 
@@ -448,11 +454,6 @@ namespace sysio::chain {
             SYS_THROW( tx_cpu_usage_exceeded, assert_msg, ("id", packed_trx.id())
                      ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill_us)("limit", limit) );
          }
-      } else if( deadline_exception_code == leeway_deadline_exception::code_value ) {
-         SYS_THROW( leeway_deadline_exception,
-                     "the transaction was unable to complete by deadline, "
-                     "but it is possible it could have succeeded if it were allowed to run to completion ${billing_timer}",
-                     ("now", now)("deadline", _trx_deadline)("start", start)("billing_timer", now - pseudo_start) );
       }
       SYS_ASSERT( false,  transaction_exception, "unexpected deadline exception code ${code}", ("code", deadline_exception_code) );
    }
@@ -461,7 +462,7 @@ namespace sysio::chain {
       if( explicit_billed_cpu_time || pseudo_start == fc::time_point() ) return; // either irrelevant or already paused
 
       paused_time = fc::time_point::now();
-      billed_time = paused_time - pseudo_start;
+      pause_billed_time = paused_time - pseudo_start;
       pseudo_start = fc::time_point();
       transaction_timer.stop();
    }
@@ -472,7 +473,7 @@ namespace sysio::chain {
       auto now = fc::time_point::now();
       auto paused = now - paused_time;
 
-      pseudo_start = now - billed_time;
+      pseudo_start = now - pause_billed_time;
       _trx_deadline += paused;
 
       // do not allow to go past block wall clock deadline
@@ -618,6 +619,7 @@ namespace sysio::chain {
          bill.cpu_usage_us += delta_per_account;
       }
       trx_billed_cpu_us = total_cpu_time_us;
+      trace->total_cpu_usage_us = trx_billed_cpu_us;
    }
 
    void transaction_context::max_bandwidth_billed_account_can_pay(account_name a, account_billing& b, uint32_t net_usage_leeway) {

@@ -86,7 +86,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, validating_tester ) try {
       set_transaction_headers(trx);
       trx.sign( get_private_key( "asserter"_n, "active" ), control->get_chain_id() );
       auto result = push_transaction( trx );
-      BOOST_CHECK_EQUAL(result->receipt->status, transaction_receipt::executed);
+      BOOST_CHECK(!!result->receipt);
       BOOST_CHECK_EQUAL(result->action_traces.size(), 1u);
       BOOST_CHECK_EQUAL(result->action_traces.at(0).receiver.to_string(),  name("asserter"_n).to_string() );
       BOOST_CHECK_EQUAL(result->action_traces.at(0).act.account.to_string(), name("asserter"_n).to_string() );
@@ -101,7 +101,7 @@ BOOST_FIXTURE_TEST_CASE( basic_test, validating_tester ) try {
 
    BOOST_REQUIRE_EQUAL(true, chain_has_transaction(no_assert_id));
    const auto& receipt = get_transaction_receipt(no_assert_id);
-   BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+   BOOST_CHECK(!receipt.cpu_usage_us.empty());
 
    transaction_id_type yes_assert_id;
    {
@@ -148,7 +148,7 @@ BOOST_FIXTURE_TEST_CASE( prove_mem_reset, validating_tester ) try {
       produce_blocks(1);
       BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
       const auto& receipt = get_transaction_receipt(trx.id());
-      BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+      BOOST_CHECK(!receipt.cpu_usage_us.empty());
    }
 
 } FC_LOG_AND_RETHROW() /// prove_mem_reset
@@ -201,7 +201,7 @@ BOOST_FIXTURE_TEST_CASE( abi_from_variant, validating_tester ) try {
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
    const auto& receipt = get_transaction_receipt(trx.id());
-   BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+   BOOST_CHECK(!receipt.cpu_usage_us.empty());
 
 } FC_LOG_AND_RETHROW() /// prove_mem_reset
 
@@ -529,7 +529,7 @@ BOOST_FIXTURE_TEST_CASE( check_entry_behavior, validating_tester ) try {
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
    const auto& receipt = get_transaction_receipt(trx.id());
-   BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+   BOOST_CHECK(!receipt.cpu_usage_us.empty());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( check_entry_behavior_2, validating_tester ) try {
@@ -553,7 +553,7 @@ BOOST_FIXTURE_TEST_CASE( check_entry_behavior_2, validating_tester ) try {
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
    const auto& receipt = get_transaction_receipt(trx.id());
-   BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+   BOOST_CHECK(!receipt.cpu_usage_us.empty());
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( entry_import, validating_tester ) try {
@@ -649,7 +649,7 @@ BOOST_FIXTURE_TEST_CASE( check_global_reset, validating_tester ) try {
    produce_blocks(1);
    BOOST_REQUIRE_EQUAL(true, chain_has_transaction(trx.id()));
    const auto& receipt = get_transaction_receipt(trx.id());
-   BOOST_CHECK_EQUAL(transaction_receipt::executed, receipt.status);
+   BOOST_CHECK(!receipt.cpu_usage_us.empty());
 } FC_LOG_AND_RETHROW()
 
 //Make sure we can create a wasm with maximum pages, but not grow it any
@@ -1703,7 +1703,10 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    auto push_trx = [&]( const transaction_metadata_ptr& trx, fc::time_point deadline,
                      uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time, uint32_t subjective_cpu_bill_us ) {
-      auto r = chain.control->push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_time_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx->packed_trx()->get_transaction().total_actions(), billed_cpu_time_us);
+      auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except ) throw *r->except;
       return r;
@@ -1779,7 +1782,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    ptrx = create_trx(0);
    // indicate explicit billing at minimum-1, objective failure even with explicit billing for under min
    BOOST_CHECK_EXCEPTION( push_trx( ptrx, fc::time_point::maximum(), min_cpu_time_us - 1, true, 0 ), transaction_exception,
-                          fc_exception_message_starts_with("cannot bill CPU time less than the minimum") );
+                          fc_exception_message_is("cannot bill CPU time 99 less than the minimum of 100 us") );
 
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
          ("account", acc)
@@ -1798,7 +1801,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    BOOST_CHECK_LT( cpu_limit, max_cpu_time_us );
    // indicate non-explicit billing at one less than our account cpu limit, will allow this trx to run, but only bills for actual use
    auto r = push_trx( ptrx, fc::time_point::maximum(), cpu_limit-1, false, 0 );
-   BOOST_CHECK_LT( r->receipt->cpu_usage_us, cpu_limit-1 ); // verify not billed at provided bill amount when explicit_billed_cpu_time=false
+   BOOST_TEST( r->receipt->cpu_usage_us.size() == 1 );
+   BOOST_CHECK_LT( r->receipt->cpu_usage_us.at(0).value, cpu_limit-1 ); // verify not billed at provided bill amount when explicit_billed_cpu_time=false
 
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu
@@ -1839,6 +1843,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu
    ptrx = create_trx(0);
+   // TODO: doesn't seem like this is correct
    cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max;
    combined_cpu_limit = cpu_limit + leeway.count();
    subjective_cpu_bill_us = cpu_limit;

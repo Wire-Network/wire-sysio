@@ -113,6 +113,7 @@ chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_pt
          chain::block_timestamp_type(fc::time_point::now()),
          trx->id(), // block_id, doesn't matter what it is for this test as long as it is set
          chain::transaction_receipt_header{},
+         0,
          fc::microseconds(0),
          0,
          {}, // actions

@@ -192,7 +192,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    chain.produce_block();
 
    BOOST_REQUIRE(trace->receipt);
-   BOOST_CHECK_EQUAL(trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK_EQUAL(2u, trace->action_traces.size());
 
    BOOST_CHECK(trace->action_traces.at(0).context_free); // cfa
@@ -222,7 +221,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
 
    BOOST_REQUIRE(other_trace);
    BOOST_REQUIRE(other_trace->receipt);
-   BOOST_CHECK_EQUAL(other_trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK(*trace->receipt == *other_trace->receipt);
    BOOST_CHECK_EQUAL(2u, other_trace->action_traces.size());
 

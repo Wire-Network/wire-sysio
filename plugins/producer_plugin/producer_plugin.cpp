@@ -1995,7 +1995,7 @@ inline std::string get_detailed_contract_except_info(const packed_transaction_pt
 
 void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx,
                                            const transaction_trace_ptr&    trace) {
-   uint32_t billed_cpu_time_us = (trace && trace->receipt) ? trace->receipt->total_cpu_usage_us() : 0;
+   uint32_t billed_cpu_time_us = trace ? trace->total_cpu_usage_us : 0;
    log_trx_results(trx->packed_trx(), trace, nullptr, billed_cpu_time_us, trx->is_transient());
 }
 
@@ -2128,7 +2128,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
       }
    }
 
-   auto trace = chain.push_transaction(trx, block_deadline, max_trx_time, prev_cpu_time_us, false, sub_bill);
+   auto trace = chain.push_transaction(trx, block_deadline, max_trx_time, sub_bill);
 
    auto pr = handle_push_result(trx, next, start, chain, trace, return_failure_trace, disable_subjective_enforcement, first_auth, sub_bill, prev_cpu_time_us);
 
@@ -2697,7 +2697,8 @@ bool producer_plugin_impl::push_read_only_transaction(transaction_metadata_ptr t
       auto window_deadline = _ro_window_deadline;
 
       // Ensure the trx to finish by the end of read-window or write-window or block_deadline depending on
-      auto trace = chain.push_transaction(trx, window_deadline, _ro_max_trx_time_us, 0, false, 0);
+      constexpr int64_t subjective_cpu_bill_us = 0;
+      auto trace = chain.push_transaction(trx, window_deadline, _ro_max_trx_time_us, subjective_cpu_bill_us);
       _ro_all_threads_exec_time_us += (fc::time_point::now() - start).count();
       auto pr = handle_push_result(trx, next, start, chain, trace,
                                    true, // return_failure_trace

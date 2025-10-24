@@ -640,7 +640,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -657,8 +656,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "1.0000 CUR")
        ("memo", "hi" )
    );
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "sysio.token"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("999900.0000 CUR"), liquid_balance);
@@ -683,14 +680,11 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
            ("account", "tester")
            ("code", "sysio.token")
            ("type", "transfer"));
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    // delete auth
    trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first"));
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks(1);;
 
@@ -700,7 +694,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "3.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 

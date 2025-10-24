@@ -363,7 +363,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
       const auto& act = t->action_traces[0].act;
       if( act.account == "sysio"_n && act.name == "onblock"_n ) return;
 
-      if( t->receipt && t->receipt->status == transaction_receipt::executed ) {
+      if( t->receipt ) {
          wlog( "trx ${id} executed (first action is ${code}::${action})",
               ("id", t->id)("code", act.account)("action", act.name) );
       } else {

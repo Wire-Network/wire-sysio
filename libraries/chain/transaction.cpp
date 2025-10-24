@@ -179,7 +179,7 @@ uint32_t packed_transaction::get_action_billable_size(size_t action_index)const 
       size += unpacked_trx.context_free_data[action_index].size();
       size += unpacked_trx.context_free_actions[action_index].get_billable_size();
    } else {
-      size += unpacked_trx.actions[action_index].get_billable_size();
+      size += unpacked_trx.actions[action_index - unpacked_trx.context_free_actions.size()].get_billable_size();
    }
    return size;
 }
@@ -361,9 +361,10 @@ void packed_transaction::decompress() {
 
 void packed_transaction::init()
 {
-   decompress();
-
    SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
+   SYS_ASSERT( unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
+              "Context free data size ${cfd} not equal to context free actions size ${cfa}",
+              ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
 
    int64_t size = config::fixed_net_overhead_of_packed_trx;
    size += fc::raw::pack_size(signatures);
@@ -382,6 +383,7 @@ void packed_transaction::reflector_init()
    SYS_ASSERT( unpacked_trx.expiration == time_point_sec(), tx_decompression_error, "packed_transaction already unpacked" );
    local_unpack_transaction({});
    local_unpack_context_free_data();
+   decompress();
    init();
 }
 
@@ -417,9 +419,6 @@ void packed_transaction::local_unpack_context_free_data()
          default:
             SYS_THROW( unknown_transaction_compression, "Unknown transaction compression algorithm" );
       }
-      SYS_ASSERT(unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
-                 "Context free data size ${cfd} not equal to context free actions size ${cfa}",
-                 ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
    } FC_CAPTURE_AND_RETHROW( (compression) )
 }
 

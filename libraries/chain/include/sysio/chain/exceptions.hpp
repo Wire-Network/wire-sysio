@@ -385,9 +385,7 @@ namespace sysio { namespace chain {
                                     3080009, "Read-only transaction sys-vm-oc compile temporary failure" )
       FC_DECLARE_DERIVED_EXCEPTION( ro_trx_vm_oc_compile_permanent_failure, resource_exhausted_exception,
                                     3080010, "Read-only transaction sys-vm-oc compile permanent failure" )
-
-      FC_DECLARE_DERIVED_EXCEPTION( leeway_deadline_exception, deadline_exception,
-                                    3081001, "Transaction reached the deadline set due to leeway on account CPU limits" )
+      // leeway_deadline_exception 3081001
 
    FC_DECLARE_DERIVED_EXCEPTION( authorization_exception, chain_exception,
                                  3090000, "Authorization exception" )

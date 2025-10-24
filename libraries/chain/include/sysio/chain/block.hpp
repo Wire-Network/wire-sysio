@@ -9,7 +9,6 @@ namespace sysio { namespace chain {
          executed  = 0 ///< succeed
       };
       bool operator==(const transaction_receipt_header&) const = default;
-      uint32_t total_cpu_usage_us() const { return std::accumulate(cpu_usage_us.begin(), cpu_usage_us.end(), 0u); }
 
       cpu_usage_t    cpu_usage_us; ///< billed CPU for nth input action
    };

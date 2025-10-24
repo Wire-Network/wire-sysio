@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       // relax from the starting state (congested) to the idle state as fast as possible
       uint32_t iterations = 0;
       while( get_virtual_block_cpu_limit() < desired_virtual_limit && iterations <= expected_relax_iterations ) {
-         add_transaction_usage({account},0,0,iterations);
+         add_transaction_usage({{account,{}}},0,0,iterations);
          process_block_usage(iterations++);
       }
 
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       // push maximum resources to go from idle back to congested as fast as possible
       while( get_virtual_block_cpu_limit() > config::default_max_block_cpu_usage
               && iterations <= expected_relax_iterations + expected_contract_iterations ) {
-         add_transaction_usage({account}, config::default_max_block_cpu_usage, 0, iterations);
+         add_transaction_usage({{account,{.cpu_usage_us = config::default_max_block_cpu_usage}}}, config::default_max_block_cpu_usage, 0, iterations);
          process_block_usage(iterations++);
       }
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       // relax from the starting state (congested) to the idle state as fast as possible
       uint32_t iterations = 0;
       while( get_virtual_block_net_limit() < desired_virtual_limit && iterations <= expected_relax_iterations ) {
-         add_transaction_usage({account},0,0,iterations);
+         add_transaction_usage({{account,{}}},0,0,iterations);
          process_block_usage(iterations++);
       }
 
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       // push maximum resources to go from idle back to congested as fast as possible
       while( get_virtual_block_net_limit() > config::default_max_block_net_usage
               && iterations <= expected_relax_iterations + expected_contract_iterations ) {
-         add_transaction_usage({account},0, config::default_max_block_net_usage, iterations);
+         add_transaction_usage({{account,{.net_usage = config::default_max_block_net_usage}}},0, config::default_max_block_net_usage, iterations);
          process_block_usage(iterations++);
       }
 
@@ -163,15 +163,15 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
          {  // use the expected limit, should succeed ... roll it back
             auto s = start_session();
             if (expected_limits.at(idx) <= config::default_max_block_cpu_usage) {
-               add_transaction_usage({account}, expected_limits.at(idx), 0, 0);
+               add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0);
             } else {
-               BOOST_REQUIRE_THROW(add_transaction_usage({account}, expected_limits.at(idx), 0, 0), block_resource_exhausted);
+               BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0), block_resource_exhausted);
             }
             s.undo();
          }
 
          // use too much, and expect failure;
-         BOOST_REQUIRE_THROW(add_transaction_usage({account}, expected_limits.at(idx) + 1, 0, 0), tx_cpu_usage_exceeded);
+         BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx) + 1}}}, expected_limits.at(idx) + 1, 0, 0), tx_cpu_usage_exceeded);
       }
    } FC_LOG_AND_RETHROW();
 
@@ -203,15 +203,15 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
          {  // use the expected limit, should succeed ... roll it back
             auto s = start_session();
             if (expected_limits.at(idx) <= config::default_max_block_net_usage) {
-               add_transaction_usage({account}, 0, expected_limits.at(idx), 0);
+               add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0);
             } else {
-               BOOST_REQUIRE_THROW(add_transaction_usage({account}, 0, expected_limits.at(idx), 0), block_resource_exhausted);
+               BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0), block_resource_exhausted);
             }
             s.undo();
          }
 
          // use too much, and expect failure;
-         BOOST_REQUIRE_THROW(add_transaction_usage({account}, 0, expected_limits.at(idx) + 1, 0), tx_net_usage_exceeded);
+         BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx) + 1}}}, 0, expected_limits.at(idx) + 1, 0), tx_net_usage_exceeded);
       }
    } FC_LOG_AND_RETHROW();
 
@@ -225,10 +225,10 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       const uint64_t expected_iterations = config::default_max_block_cpu_usage / increment;
 
       for (uint64_t idx = 0; idx < expected_iterations; idx++) {
-         add_transaction_usage({account}, increment, 0, 0);
+         add_transaction_usage({{account, {.cpu_usage_us = increment}}}, increment, 0, 0);
       }
 
-      BOOST_REQUIRE_THROW(add_transaction_usage({account}, increment, 0, 0), block_resource_exhausted);
+      BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = increment}}}, increment, 0, 0), block_resource_exhausted);
 
    } FC_LOG_AND_RETHROW();
 
@@ -242,10 +242,10 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       const uint64_t expected_iterations = config::default_max_block_net_usage / increment;
 
       for (uint64_t idx = 0; idx < expected_iterations; idx++) {
-         add_transaction_usage({account}, 0, increment, 0);
+         add_transaction_usage({{account, {.net_usage = increment}}}, 0, increment, 0);
       }
 
-      BOOST_REQUIRE_THROW(add_transaction_usage({account}, 0, increment, 0), block_resource_exhausted);
+      BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.net_usage = increment}}}, 0, increment, 0), block_resource_exhausted);
 
    } FC_LOG_AND_RETHROW();
 
@@ -337,13 +337,13 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
       process_account_limit_updates();
 
       // dan cannot consume more than 34 us per day
-      BOOST_REQUIRE_THROW( add_transaction_usage( {"dan"_n}, 35, 0, 1 ), tx_cpu_usage_exceeded );
+      BOOST_REQUIRE_THROW( add_transaction_usage( {{"dan"_n, {.cpu_usage_us = 35}}}, 35, 0, 1 ), tx_cpu_usage_exceeded );
 
       // Ensure CPU usage is 0 by "waiting" for one day's worth of blocks to pass.
-      add_transaction_usage( {"dan"_n}, 0, 0, 1 + blocks_per_day );
+      add_transaction_usage( {{"dan"_n,{.cpu_usage_us = 0}}}, 0, 0, 1 + blocks_per_day );
 
       // But dan should be able to consume up to 34 us per day.
-      add_transaction_usage( {"dan"_n}, 34, 0, 2 + blocks_per_day );
+      add_transaction_usage( {{"dan"_n,{.cpu_usage_us = 34}}}, 34, 0, 2 + blocks_per_day );
    } FC_LOG_AND_RETHROW()
 
    /**
@@ -400,7 +400,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
          const uint32_t update_slot = time_stamp_now.slot - delta_slot;
          const int64_t cpu_usage = 100;
          const int64_t net_usage = 200;
-         add_transaction_usage({test_account}, cpu_usage, net_usage, update_slot );
+         add_transaction_usage({{test_account,{.cpu_usage_us = cpu_usage, .net_usage = net_usage}}}, cpu_usage, net_usage, update_slot );
          // limited, with some usages, current time stamp
          {
             const auto ret_limited_1st_usg_wo_time_stamp =  get_account_limit_ex(this, test_account, greylist_limit, {});

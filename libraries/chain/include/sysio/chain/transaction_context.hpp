@@ -34,7 +34,7 @@ namespace sysio { namespace chain {
    };
 
    struct account_billing {
-      int64_t      cpu_usage_us = 0;
+      uint32_t     cpu_usage_us = 0;
       int64_t      cpu_limit_us = 0;
       uint32_t     net_usage = 0;
       bool         cpu_greylisted = false;
@@ -184,12 +184,7 @@ namespace sysio { namespace chain {
          int64_t                       deadline_exception_code = block_cpu_usage_exceeded::code_value;
          int64_t                       billing_timer_exception_code = block_cpu_usage_exceeded::code_value;
          fc::time_point                pseudo_start;
-         fc::microseconds              billed_time;
-
-         // Roa Change
-         // Store total RAM usage accumulated during actions here.
-         // transaction_context::finalize() will use to finalize charges.
-         int64_t                       total_ram_usage = 0;
+         fc::microseconds              pause_billed_time;
 
          enum class tx_cpu_usage_exceeded_reason {
             account_cpu_limit, // includes subjective billing

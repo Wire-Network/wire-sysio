@@ -55,6 +55,7 @@ namespace sysio { namespace chain {
       block_timestamp_type                       block_time;
       std::optional<block_id_type>               producer_block_id;
       std::optional<transaction_receipt_header>  receipt;
+      uint32_t                                   total_cpu_usage_us = 0;
       fc::microseconds                           elapsed;
       uint64_t                                   net_usage = 0;
       vector<action_trace>                       action_traces;

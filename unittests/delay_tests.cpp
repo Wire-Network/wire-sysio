@@ -186,7 +186,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -203,8 +202,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
        ("memo", "hi" )
    );
 
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
-
    chain.produce_blocks();
 
    liquid_balance = get_currency_balance(chain, "sysio.token"_n);
@@ -220,7 +217,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
            ("parent", "active")
            ("auth",  authority(chain.get_public_key(tester_account, "first"), 10))
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -309,7 +305,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -326,8 +321,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
        ("memo", "hi" )
    );
 
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
-
    chain.produce_blocks();
 
    liquid_balance = get_currency_balance(chain, "sysio.token"_n);
@@ -343,7 +336,6 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
            ("parent", "active")
            ("auth",  authority(chain.get_public_key(tester_account, "first"), 20))
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -431,7 +423,6 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -514,7 +505,6 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_test ) { try {
        ("quantity", "10.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -585,7 +575,6 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -668,8 +657,6 @@ BOOST_AUTO_TEST_CASE( link_delay_permission_change_with_delay_heirarchy_test ) {
        ("quantity", "10.0000 CUR")
        ("memo", "hi" )
    );
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -752,7 +739,6 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -830,7 +816,6 @@ BOOST_AUTO_TEST_CASE( link_delay_link_change_heirarchy_test ) { try {
        ("quantity", "10.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    liquid_balance = get_currency_balance(chain, "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("89.0000 CUR"), liquid_balance);
@@ -885,14 +870,12 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
                      ("parent", "active")
                      ("auth",  authority(chain.get_public_key(tester_account, "first"), 30*86400)) // 30 days delay
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    trace = chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
                      ("account", "tester")
                      ("code", "sysio.token")
                      ("type", "transfer")
                      ("requirement", "first"));
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 

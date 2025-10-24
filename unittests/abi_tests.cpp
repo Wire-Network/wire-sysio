@@ -1529,9 +1529,11 @@ BOOST_AUTO_TEST_CASE(packed_transaction)
                .owner    = authority( get_public_key( a, "owner" )),
                .active   = authority( get_public_key( a, "active" ) )
          });
+   txn.context_free_data.emplace_back(fc::raw::pack(42));
    txn.context_free_actions.emplace_back(
          vector<permission_level>{{"testapi2"_n, config::active_name}},
          action1{ 15, 23, (uint8_t)3});
+   txn.context_free_data.emplace_back();
    txn.actions.emplace_back(
          vector<permission_level>{{"testapi3"_n, config::active_name}},
          action2{ 42, 67, (uint8_t)1});

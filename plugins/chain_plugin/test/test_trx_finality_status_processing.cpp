@@ -85,6 +85,7 @@ chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_pt
          chain::block_timestamp_type(fc::time_point::now()),
          bs_ptr ? bs_ptr->id : std::optional<block_id_type> {},
          chain::transaction_receipt_header{},
+         0,
          fc::microseconds(0),
          0,
          {}, // actions

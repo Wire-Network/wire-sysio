@@ -79,7 +79,7 @@ namespace sysio { namespace chain {
          void set_block_parameters( const elastic_limit_parameters& cpu_limit_parameters, const elastic_limit_parameters& net_limit_parameters );
 
          void update_account_usage( const accounts_billing_t& accounts, uint32_t ordinal );
-         void add_transaction_usage( const accounts_billing_t& accounts, uint64_t total_net_usage, uint32_t ordinal, bool is_trx_transient = false );
+         void add_transaction_usage( const accounts_billing_t& accounts, uint64_t total_cpu_usage, uint64_t total_net_usage, uint32_t ordinal, bool is_trx_transient = false );
 
          void add_pending_ram_usage( const account_name account, int64_t ram_delta, bool is_trx_transient = false );
          void verify_account_ram_usage( const account_name accunt )const;

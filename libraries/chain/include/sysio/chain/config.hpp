@@ -49,20 +49,15 @@ namespace sysio::chain::config {
   static constexpr uint32_t block_size_average_window_ms         = 60*1000l;
   static constexpr uint32_t maximum_elastic_resource_multiplier  = 1000;
 
-  //const static uint64_t   default_max_storage_size       = 10 * 1024;
-  //const static uint32_t   default_max_trx_runtime        = 10*1000;
-  //const static uint32_t   default_max_gen_trx_size       = 64 * 1024;
-
   static constexpr uint32_t   rate_limiting_precision        = 1000*1000;
-
 
   static constexpr uint32_t   default_max_block_net_usage                  = 1024 * 1024; /// at 500ms blocks and 200byte trx, this enables ~10,000 TPS burst
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
   static constexpr uint32_t   default_base_per_transaction_net_usage       = 12;  // 12 bytes (11 bytes for worst case of transaction_receipt_header + 1 byte for static_variant tag)
-  static constexpr uint32_t   default_net_usage_leeway                     = 500; // TODO: is this reasonable?
+  static constexpr uint32_t   default_net_usage_leeway                     = 500; // is this reasonable?
   static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
-  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 0; // Wire does not support discount of context free data
+  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
   static constexpr uint32_t   transaction_id_net_usage                     = 32; // 32 bytes for the size of a transaction id
 
   static constexpr uint32_t   default_max_block_cpu_usage                  = 200'000; /// max block cpu usage in microseconds
@@ -104,7 +99,7 @@ namespace sysio::chain::config {
   // Should be large enough to allow recovery from badly set blockchain parameters without a hard fork
   // (unless net_usage_leeway is set to 0 and so are the net limits of all accounts that can help with resetting blockchain parameters).
 
-  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // TODO: is this reasonable?
+  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // is this reasonable?
 
   static constexpr uint32_t   fixed_overhead_shared_vector_ram_bytes = 16; ///< overhead accounts for fixed portion of size of shared_vector field
   static constexpr uint32_t   overhead_per_row_per_index_ram_bytes = 32;    ///< overhead accounts for basic tracking structures in a row per index

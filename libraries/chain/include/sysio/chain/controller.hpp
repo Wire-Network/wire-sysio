@@ -149,13 +149,13 @@ namespace sysio { namespace chain {
           */
          deque<transaction_metadata_ptr> abort_block();
 
-       /**
-        *
-        */
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                                  fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                 uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
                                                  int64_t subjective_cpu_bill_us );
+         transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
+                                                      fc::time_point deadline, fc::microseconds max_transaction_time,
+                                                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time,
+                                                      int64_t subjective_cpu_bill_us );
 
          struct block_report {
             size_t             total_net_usage = 0;

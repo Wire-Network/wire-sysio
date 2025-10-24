@@ -363,7 +363,7 @@ public:
             schedule.push_back(legacy::producer_key{p, key});
          }
          auto trace = TESTER::push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, mvo()("schedule", schedule));
-         BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
+         BOOST_REQUIRE(!!trace->receipt);
       }
       produce_blocks( 250);
 
@@ -377,7 +377,7 @@ public:
                                                }
                                             ))
       );
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace_auth->receipt->status);
+      BOOST_REQUIRE(!!trace_auth->receipt);
 
       produce_blocks( 250 );
 

@@ -23,7 +23,6 @@ class transaction_metadata {
       enum class trx_type {
          input,
          implicit,
-         scheduled,
          dry_run,
          read_only
       };
@@ -72,7 +71,6 @@ class transaction_metadata {
       size_t get_estimated_size() const;
       trx_type get_trx_type() const { return _trx_type; };
       bool implicit() const { return _trx_type == trx_type::implicit; };
-      bool scheduled() const { return _trx_type == trx_type::scheduled; };
       bool is_dry_run() const { return _trx_type == trx_type::dry_run; };
       bool is_read_only() const { return _trx_type == trx_type::read_only; };
       bool is_transient() const { return _trx_type == trx_type::read_only || _trx_type == trx_type::dry_run; };

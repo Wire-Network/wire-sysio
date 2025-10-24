@@ -137,19 +137,17 @@ void resource_limits_manager::update_account_usage(const accounts_billing_t& acc
    }
 }
 
-void resource_limits_manager::add_transaction_usage(const accounts_billing_t& accounts, uint64_t total_net_usage, uint32_t time_slot, bool is_trx_transient ) {
+void resource_limits_manager::add_transaction_usage(const accounts_billing_t& accounts, uint64_t total_cpu_usage, uint64_t total_net_usage, uint32_t time_slot, bool is_trx_transient ) {
    const auto& state = _db.get<resource_limits_state_object>();
    const auto& config = _db.get<resource_limits_config_object>();
 
-   uint64_t total_cpu_usage = 0;
-   for( const auto& a : accounts ) {
-      const auto& account = a.first;
-      const auto& billing = a.second;
-      const auto& usage = _db.get<resource_usage_object,by_owner>( account );
+   for( const auto& [a, billing] : accounts ) {
+
+      const auto& usage = _db.get<resource_usage_object,by_owner>( a );
       int64_t unused;
       int64_t net_weight;
       int64_t cpu_weight;
-      get_account_limits( account, unused, net_weight, cpu_weight );
+      get_account_limits( a, unused, net_weight, cpu_weight );
 
       _db.modify( usage, [&]( auto& bu ){
           bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );
@@ -174,11 +172,10 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
                      tx_cpu_usage_exceeded,
                      "authorizing account '${n}' has insufficient objective cpu resources for this transaction,"
                      " used in window ${cpu_used_in_window}us, allowed in window ${max_user_use_in_window}us",
-                     ("n", account)
+                     ("n", a)
                      ("cpu_used_in_window",cpu_used_in_window)
                      ("max_user_use_in_window",max_user_use_in_window) );
       }
-      total_cpu_usage += billing.cpu_usage_us;
 
       if( net_weight >= 0 && state.total_net_weight > 0) {
 
@@ -195,7 +192,7 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
                      tx_net_usage_exceeded,
                      "authorizing account '${n}' has insufficient net resources for this transaction,"
                      " used in window ${net_used_in_window}, allowed in window ${max_user_use_in_window}",
-                     ("n", account)
+                     ("n", a)
                      ("net_used_in_window",net_used_in_window)
                      ("max_user_use_in_window",max_user_use_in_window) );
 
