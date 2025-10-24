@@ -1,9 +1,9 @@
 {
-    "cdt":{
-       "target":"4",
-       "prerelease":false
+    "wirecdt":{
+       "target":"4.1.0",
+       "prerelease":true
     },
-    "eossystemcontracts":{
-       "ref":"release/3.2"
+    "wiresystemcontracts":{
+       "ref":"release/4.0"
     }
  }

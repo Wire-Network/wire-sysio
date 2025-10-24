@@ -1,0 +1,120 @@
+name: "Build sysio"
+
+on:
+  workflow_call:
+    inputs:
+      platforms:
+        description: "Platforms definitions"
+        type: string
+        required: true
+      platform-list:
+        description: "Array of platforms"
+        type: string
+        required: true
+
+permissions:
+  packages: read
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  Build:
+    name: Build wire-sysio
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{fromJSON(inputs.platform-list)}}
+    runs-on: ["self-hosted", "enf-x86-beefy"]
+    container: ${{fromJSON(inputs.platforms)[matrix.platform].image}}
+    steps:
+        - name: Debug runner environment and permissions
+          run: |
+            echo "=== SYSTEM INFO ==="
+            whoami
+            id
+            echo
+            echo "=== ENVIRONMENT ==="
+            echo "HOME=$HOME"
+            echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+            echo "PWD=$PWD"
+            echo "USER=$(whoami)"
+            echo "SHELL=$SHELL"
+            echo
+            echo "=== PATHS & PERMISSIONS ==="
+            for dir in /github /github/home /__w "$GITHUB_WORKSPACE"; do
+              echo "--- $dir ---"
+              ls -ld $dir || true
+              stat -c "%U:%G %a %n" $dir || true
+              echo
+            done
+            echo "=== MOUNTED FILESYSTEMS ==="
+            df -h | grep -E 'github|__w|overlay' || true
+            echo
+            echo "=== TOP OWNERS OF WORKSPACE ==="
+            sudo find "$GITHUB_WORKSPACE" -maxdepth 2 -printf "%u:%g %p\n" 2>/dev/null | head -n 20 || true
+            echo
+            echo "=== GIT CONFIG LOCATIONS ==="
+            git config --list --show-origin || echo "Git not configured yet"
+        - name: Allow safe directories
+          run: git config --global --add safe.directory '*'
+        - uses: actions/checkout@v4
+          with:
+            submodules: recursive
+        - name: Verify system zstd presence
+          run: |
+            dpkg -L libzstd-dev | grep -E "libzstd\.so|zstd\.h" || true
+            ls -l /usr/lib/x86_64-linux-gnu/libzstd.so*
+            ls -l /usr/include/zstd.h
+        - name: Build
+          id: build
+          run: |
+            echo "Building for ${{ matrix.platform }}"
+
+            rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
+                    build/vcpkg_installed ~/.cache/vcpkg ~/.vcpkg
+
+            export CC=/usr/bin/clang-18
+            export CXX=/usr/bin/clang++-18
+            export CMAKE_MAKE_PROGRAM=/usr/bin/ninja
+
+            ./vcpkg/bootstrap-vcpkg.sh
+            env BASE_DIR=/opt/llvm ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+            chown -R $(id -u):$(id -g) $PWD
+
+
+            env CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 \
+            cmake -B build -S . -G Ninja \
+              -DCMAKE_C_COMPILER=$CC \
+              -DCMAKE_CXX_COMPILER=$CXX \
+              -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
+              -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11 
+
+
+            if [[ "${{ matrix.platform }}" == "ubuntu22" ]]; then
+              echo "=== Confirming zstd flags were picked up ==="
+              grep -i zstd build/CMakeCache.txt || true
+            fi
+
+            cmake --build build -- -j 11
+            tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
+        - name: Show vcpkg logs if failure
+          if: failure()            # this runs only when something failed above
+          run: |
+            echo "$PWD"
+            echo "=== vcpkg-manifest-install.log ==="
+            cat build/vcpkg-manifest-install.log || true
+            echo "=== Other vcpkg logs ==="
+            find build -type f -name '*.log' | while read f; do
+              echo "----- $f -----"
+              tail -n 40 "$f"
+            done
+        - name: Upload builddir
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{matrix.platform}}-build
+            path: build.tar.zst
