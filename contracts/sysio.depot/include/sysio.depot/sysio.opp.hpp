@@ -1,6 +1,10 @@
 #pragma once
 
+#include <fc/traits.hpp>
 #include <sysio/asset.hpp>
+#include <tuple>
+#include <type_traits>
+#include <variant>
 
 #include <sysio.system/non_wasm_types.hpp>
 
@@ -30,6 +34,82 @@ enum message_type : uint8_t {
   message_type_challenge_reject,        ///< Challenge rejection
   message_type_no_challenge             ///< No challenge present
 };
+
+/**
+ * @brief Message structures for each message type
+ */
+struct message_unknown {
+  // Placeholder for unknown message data
+};
+
+struct message_purchase {
+  // Placeholder for purchase transaction data
+};
+
+struct message_stake {
+  // Placeholder for staking operation data
+};
+
+struct message_unstake {
+  // Placeholder for unstaking operation data
+};
+
+struct message_balance_sheet {
+  // Placeholder for balance sheet update data
+};
+
+struct message_swap {
+  // Placeholder for token swap operation data
+};
+
+struct message_operator_registration {
+  // Placeholder for operator registration data
+};
+
+struct message_operator_deregistration {
+  // Placeholder for operator deregistration data
+};
+
+struct message_challenge_agree {
+  // Placeholder for challenge agreement data
+};
+
+struct message_challenge_reject {
+  // Placeholder for challenge rejection data
+};
+
+struct message_no_challenge {
+  // Placeholder for no challenge data
+};
+
+/**
+ * @brief Mapping of message types to their corresponding structures
+ */
+constexpr auto message_type_mapping = std::tuple{
+    std::pair{message_type_unknown, fc::type_tag<message_unknown>{}},
+    std::pair{message_type_purchase, fc::type_tag<message_purchase>{}},
+    std::pair{message_type_stake, fc::type_tag<message_stake>{}},
+    std::pair{message_type_unstake, fc::type_tag<message_unstake>{}},
+    std::pair{message_type_balance_sheet, fc::type_tag<message_balance_sheet>{}},
+    std::pair{message_type_swap, fc::type_tag<message_swap>{}},
+    std::pair{message_type_operator_registration, fc::type_tag<message_operator_registration>{}},
+    std::pair{message_type_operator_deregistration, fc::type_tag<message_operator_deregistration>{}},
+    std::pair{message_type_challenge_agree, fc::type_tag<message_challenge_agree>{}},
+    std::pair{message_type_challenge_reject, fc::type_tag<message_challenge_reject>{}},
+    std::pair{message_type_no_challenge, fc::type_tag<message_no_challenge>{}}
+};
+
+using message_variant_type =
+    fc::tuple_pairs_to_variant_t<decltype(message_type_mapping)>;
+
+
+template <message_type Type>
+using mapped_t = typename decltype(fc::get_type_tag_by_key<message_type_mapping,Type>(Type))::type;
+
+// template <message_type Type>
+// constexpr mapped_t<Type> make_value() {
+//     return fc::get_value_by_key<message_type_mapping>(Type);
+// }
 
 /**
  * @brief Header for a chain of operator protocol messages
