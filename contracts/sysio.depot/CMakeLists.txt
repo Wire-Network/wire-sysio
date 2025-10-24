@@ -9,6 +9,9 @@ if(BUILD_SYSTEM_CONTRACTS)
   )
 
   target_include_directories(sysio.depot
+    PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc/include
+
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>

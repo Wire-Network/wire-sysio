@@ -93,7 +93,7 @@ target_link_libraries(
   rapidjson
   boringssl::crypto
   boringssl::decrepit
-
+  gsl-lite::gsl-lite
   secp256k1::secp256k1-internal
   bls12-381::bls12-381
   bn256::bn256

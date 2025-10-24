@@ -1,9 +1,11 @@
 #include <boost/test/unit_test.hpp>
-#include <sysio.depot/sysio.opp.hpp>
+
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/resource_limits.hpp>
 #include <sysio/testing/tester.hpp>
+
+#include <sysio.depot/sysio.opp.hpp>
 
 using namespace sysio;
 using namespace sysio::chain;

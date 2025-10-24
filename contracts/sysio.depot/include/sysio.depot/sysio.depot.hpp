@@ -12,16 +12,6 @@ class system_contract;
 
 namespace sysio {
 
-enum chain_kind : uint8_t {
-  chain_wire = 0,
-  chain_ethereum = 1,
-  chain_solana = 2,
-  chain_sui = 3,
-};
-
-enum swap_status_type : uint8_t {
-
-};
 
 // A completely stubbed contract for sysio.depot.
 class [[sysio::contract("sysio.depot")]] depot : public contract {

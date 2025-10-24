@@ -16,6 +16,7 @@ add_executable( test_fc
         variant/test_variant.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
+        test_traits.cpp
         test_escape_str.cpp
         main.cpp
         )
