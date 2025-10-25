@@ -180,7 +180,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    action             act({}, cfa);
    trx.context_free_actions.push_back(act);
    trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
    // add a normal action along with cfa
    dummy_action da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    action       act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);

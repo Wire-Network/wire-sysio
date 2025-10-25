@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
    BOOST_FIXTURE_TEST_CASE(weighted_capacity_cpu, resource_limits_fixture) try {
       const vector<int64_t> weights = { 1, 3, 9, 234, 511, 672, 800, 1213, 4242, 77777, 888888, 999999 };
       const uint128_t total = std::accumulate(std::begin(weights), std::end(weights), 0LL);
-      vector<int64_t> expected_limits;
+      vector<uint64_t> expected_limits;
       std::transform(std::begin(weights), std::end(weights), std::back_inserter(expected_limits), [total](const auto& v){
          uint128_t value = v;
          uint128_t account_cpu_usage_window = config::account_cpu_usage_average_window_ms / config::block_interval_ms;
@@ -163,15 +163,15 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
          {  // use the expected limit, should succeed ... roll it back
             auto s = start_session();
             if (expected_limits.at(idx) <= config::default_max_block_cpu_usage) {
-               add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0);
+               add_transaction_usage({{account, {.cpu_usage_us = expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0);
             } else {
-               BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0), block_resource_exhausted);
+               BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = expected_limits.at(idx)}}}, expected_limits.at(idx), 0, 0), block_resource_exhausted);
             }
             s.undo();
          }
 
          // use too much, and expect failure;
-         BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = (uint32_t)expected_limits.at(idx) + 1}}}, expected_limits.at(idx) + 1, 0, 0), tx_cpu_usage_exceeded);
+         BOOST_REQUIRE_THROW(add_transaction_usage({{account, {.cpu_usage_us = expected_limits.at(idx) + 1}}}, expected_limits.at(idx) + 1, 0, 0), tx_cpu_usage_exceeded);
       }
    } FC_LOG_AND_RETHROW();
 
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
    BOOST_FIXTURE_TEST_CASE(weighted_capacity_net, resource_limits_fixture) try {
       const vector<int64_t> weights = { 1, 3, 9, 234, 511, 672, 800, 1213, 4242, 77777, 888888, 999999 };
       const uint128_t total = std::accumulate(std::begin(weights), std::end(weights), 0LL);
-      vector<int64_t> expected_limits;
+      vector<uint64_t> expected_limits;
       std::transform(std::begin(weights), std::end(weights), std::back_inserter(expected_limits), [total](const auto& v){
          uint128_t value = v;
          uint128_t account_net_usage_average_window = config::account_net_usage_average_window_ms / config::block_interval_ms;
@@ -203,15 +203,15 @@ BOOST_AUTO_TEST_SUITE(resource_limits_test)
          {  // use the expected limit, should succeed ... roll it back
             auto s = start_session();
             if (expected_limits.at(idx) <= config::default_max_block_net_usage) {
-               add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0);
+               add_transaction_usage({{account,{.net_usage = expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0);
             } else {
-               BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0), block_resource_exhausted);
+               BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = expected_limits.at(idx)}}}, 0, expected_limits.at(idx), 0), block_resource_exhausted);
             }
             s.undo();
          }
 
          // use too much, and expect failure;
-         BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = (uint32_t)expected_limits.at(idx) + 1}}}, 0, expected_limits.at(idx) + 1, 0), tx_net_usage_exceeded);
+         BOOST_REQUIRE_THROW(add_transaction_usage({{account,{.net_usage = expected_limits.at(idx) + 1}}}, 0, expected_limits.at(idx) + 1, 0), tx_net_usage_exceeded);
       }
    } FC_LOG_AND_RETHROW();
 

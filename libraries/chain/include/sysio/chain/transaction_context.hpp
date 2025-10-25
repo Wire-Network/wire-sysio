@@ -34,9 +34,9 @@ namespace sysio { namespace chain {
    };
 
    struct account_billing {
-      uint32_t     cpu_usage_us = 0;
+      uint64_t     cpu_usage_us = 0;
       int64_t      cpu_limit_us = 0;
-      uint32_t     net_usage = 0;
+      uint64_t     net_usage = 0;
       bool         cpu_greylisted = false;
    };
    using accounts_billing_t = flat_map<account_name, account_billing>;
@@ -180,11 +180,13 @@ namespace sysio { namespace chain {
          fc::microseconds              max_transaction_time_subjective;
          fc::time_point                paused_time;
          fc::microseconds              objective_duration_limit;
-         fc::time_point                _trx_deadline = fc::time_point::maximum(); // calculated deadline
+         fc::time_point                trx_deadline = fc::time_point::maximum(); // calculated deadline
+         fc::time_point                active_deadline; // either action or transaction deadline to use for timer
          int64_t                       deadline_exception_code = block_cpu_usage_exceeded::code_value;
          int64_t                       billing_timer_exception_code = block_cpu_usage_exceeded::code_value;
          fc::time_point                pseudo_start;
-         fc::microseconds              pause_billed_time;
+         fc::time_point                action_start; // adjusted for paused timer
+         bool                          paused_timer = false;
 
          enum class tx_cpu_usage_exceeded_reason {
             account_cpu_limit, // includes subjective billing

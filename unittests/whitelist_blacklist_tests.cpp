@@ -1,4 +1,5 @@
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/testing/tester_network.hpp>
 
@@ -8,6 +9,7 @@
 
 #include <contracts.hpp>
 #include <test_contracts.hpp>
+
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -387,6 +389,15 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
 
+   tester c;
+
+   const resource_limits_manager& rm = c.control->get_resource_limits_manager();
+
+   const auto& user_account  = "user"_n;
+   const auto& other_account = "other"_n;
+
+   c.create_accounts( {user_account, other_account} );
+
    auto& cfg = conf_genesis.second.initial_configuration;
 
    cfg.max_block_net_usage        = 128 * 1024; // 64 KiB max block size
@@ -400,15 +411,8 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    cfg.min_transaction_cpu_usage  = 100; // Empty blocks (consisting of only onblock) would be below the target.
    // But all it takes is one transaction in the block to be above the target.
 
-   tester c( conf_genesis.first, conf_genesis.second );
-   c.execute_setup_policy( setup_policy::full );
-
-   const resource_limits_manager& rm = c.control->get_resource_limits_manager();
-
-   const auto& user_account  = "user"_n;
-   const auto& other_account = "other"_n;
-
-   c.create_accounts( {user_account, other_account} );
+   c.push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+                              ("params", cfg) );
 
    c.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
       ("account", user_account)
@@ -463,7 +467,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EXCEPTION(
       push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
       tx_net_usage_exceeded,
-      fc_exception_message_starts_with("transaction net usage is too high")
+      fc_exception_message_starts_with("account user net usage is too high")
    );
 
    wdump((rm.get_account_net_limit(user_account).first));
