@@ -14,6 +14,15 @@ class transaction_metadata;
 using transaction_metadata_ptr = std::shared_ptr<transaction_metadata>;
 using recover_keys_future = std::future<transaction_metadata_ptr>;
 
+struct account_billing {
+   int64_t      subjective_cpu_usage_us = 0;
+   int64_t      cpu_limit_us = 0;
+   uint64_t     cpu_usage_us = 0;
+   uint64_t     net_usage = 0;
+   bool         cpu_greylisted = false;
+};
+using accounts_billing_t = flat_map<account_name, account_billing>;
+
 /**
  *  This data structure should store context-free cached data about a transaction such as
  *  packed/unpacked/compressed and recovered keys
@@ -35,7 +44,7 @@ class transaction_metadata {
 
    public:
       bool                                                       accepted = false;       // not thread safe
-      uint32_t                                                   prev_cpu_time_us = 0;   // not thread safe
+      accounts_billing_t                                         prev_accounts_billing;  // not thread safe
 
    private:
       struct private_type{};
@@ -98,3 +107,5 @@ class transaction_metadata {
 };
 
 } } // sysio::chain
+
+FC_REFLECT( sysio::chain::account_billing, (subjective_cpu_usage_us)(cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted) )

@@ -874,7 +874,8 @@ void push_trx(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cpu
                                                         test.control->get_chain_id(), fc::microseconds::maximum(),
                                                         trx_type );
    auto trx_meta = fut.get();
-   trx_meta->prev_cpu_time_us = billed_cpu_time_us;
+   if (billed_cpu_time_us > 0)
+      trx_meta->prev_accounts_billing = {{act.account, {.cpu_usage_us = billed_cpu_time_us}}};
    cpu_usage_t billed_cpu_us;
    if (explicit_bill)
       billed_cpu_us.insert(billed_cpu_us.end(), total_actions, billed_cpu_time_us);

@@ -393,8 +393,7 @@ public:
                                   bool                                        return_failure_trace,
                                   bool                                        disable_subjective_enforcement,
                                   account_name                                first_auth,
-                                  int64_t                                     sub_bill,
-                                  uint32_t                                    prev_billed_cpu_time_us);
+                                  int64_t                                     sub_bill);
 
    void        log_trx_results(const transaction_metadata_ptr& trx, const transaction_trace_ptr& trace);
    void        log_trx_results(const transaction_metadata_ptr& trx, const fc::exception_ptr& except_ptr);
@@ -1678,7 +1677,7 @@ producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplie
          r.first_action   = actions[0].name;
       }
       r.total_actions      = pt->get_transaction().total_actions();
-      r.billed_cpu_time_us = itr->trx_meta->prev_cpu_time_us;
+      r.accounts_billing   = itr->trx_meta->prev_accounts_billing;
       r.size               = pt->get_estimated_size();
 
       ++itr;
@@ -2000,7 +1999,7 @@ void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx,
 }
 
 void producer_plugin_impl::log_trx_results(const transaction_metadata_ptr& trx, const fc::exception_ptr& except_ptr) {
-   uint32_t billed_cpu_time_us = trx ? trx->prev_cpu_time_us : 0;
+   const uint32_t billed_cpu_time_us = 0;
    log_trx_results(trx->packed_trx(), nullptr, except_ptr, billed_cpu_time_us, trx->is_transient());
 }
 
@@ -2091,6 +2090,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    chain::controller&         chain           = chain_plug->chain();
    chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
 
+   // TODO: WIRE- fix subjective cpu billing
    auto first_auth = trx->packed_trx()->get_transaction().first_authorizer();
 
    bool disable_subjective_enforcement = (api_trx && _disable_subjective_api_billing) ||
@@ -2118,19 +2118,9 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    if (!disable_subjective_enforcement)
       sub_bill = subjective_bill.get_subjective_bill(first_auth, fc::time_point::now());
 
-   auto prev_cpu_time_us = trx->prev_cpu_time_us;
-   if (in_producing_mode() && trx->prev_cpu_time_us > 0) {
-      const auto& rl = chain.get_resource_limits_manager();
-      if (!subjective_bill.is_account_disabled(first_auth) && !rl.is_unlimited_cpu(first_auth)) {
-         int64_t prev_billed_plus100_us = prev_cpu_time_us + SYS_PERCENT(prev_cpu_time_us, 100 * config::percent_1);
-         if (prev_billed_plus100_us < max_trx_time.count())
-            max_trx_time = fc::microseconds(prev_billed_plus100_us);
-      }
-   }
-
    auto trace = chain.push_transaction(trx, block_deadline, max_trx_time, sub_bill);
 
-   auto pr = handle_push_result(trx, next, start, chain, trace, return_failure_trace, disable_subjective_enforcement, first_auth, sub_bill, prev_cpu_time_us);
+   auto pr = handle_push_result(trx, next, start, chain, trace, return_failure_trace, disable_subjective_enforcement, first_auth, sub_bill);
 
    if (!pr.failed) {
       trx_tracker.trx_success();
@@ -2147,8 +2137,8 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
                                          bool                                        return_failure_trace,
                                          bool         disable_subjective_enforcement,
                                          account_name first_auth,
-                                         int64_t      sub_bill,
-                                         uint32_t     prev_billed_cpu_time_us) {
+                                         int64_t      sub_bill)
+{
    auto                       end             = fc::time_point::now();
    chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
 
@@ -2178,7 +2168,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
             log_trx_results(trx, trace);
             // this failed our configured maximum transaction time, we don't want to replay it
             fc_tlog(_log, "Failed ${c} trx, auth: ${a}, prev billed: ${p}us, ran: ${r}us, id: ${id}, except: ${e}",
-                    ("c", e.code())("a", first_auth)("p", prev_billed_cpu_time_us)("r", end - start)("id", trx->id())("e", e));
+                    ("c", e.code())("a", first_auth)("p", trace->total_cpu_usage_us)("r", end - start)("id", trx->id())("e", e));
             if (!disable_subjective_enforcement)
                _account_fails.add(first_auth, e);
          }
@@ -2704,8 +2694,7 @@ bool producer_plugin_impl::push_read_only_transaction(transaction_metadata_ptr t
                                    true, // return_failure_trace
                                    true, // disable_subjective_enforcement
                                    {},   // first_auth
-                                   0,    // sub_bill
-                                   0);   // prev_billed_cpu_time_us
+                                   0);   // sub_bill
       // If a transaction was exhausted, that indicates we are close to
       // the end of read window. Retry in next round.
       retry = pr.trx_exhausted;

@@ -33,14 +33,6 @@ namespace sysio { namespace chain {
          friend controller_impl;
    };
 
-   struct account_billing {
-      uint64_t     cpu_usage_us = 0;
-      int64_t      cpu_limit_us = 0;
-      uint64_t     net_usage = 0;
-      bool         cpu_greylisted = false;
-   };
-   using accounts_billing_t = flat_map<account_name, account_billing>;
-
    class transaction_context {
       private:
          void init();
@@ -124,7 +116,8 @@ namespace sysio { namespace chain {
 
          void validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const;
          void validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit,  int64_t subjective_billed_us )const;
-         void validate_available_account_cpu( account_name account, int64_t account_limit, bool greylisted, int64_t leeway_us, int64_t subjective_billed_us )const;
+         void validate_available_account_cpu( account_name account, int64_t billed_us, int64_t account_limit, bool greylisted )const;
+         void validate_account_cpu_usage_estimate()const;
          void validate_cpu_minimum()const;
          void validate_trx_billed_cpu()const;
 
@@ -147,7 +140,7 @@ namespace sysio { namespace chain {
 
          deque<digest_type>            executed_action_receipt_digests;
 
-         accounts_billing_t            bill_to_accounts;
+         accounts_billing_t            accounts_billing;
          flat_set<account_name>        validate_ram_usage;
 
          /// the maximum number of virtual CPU instructions of the transaction that can be safely billed to the billable accounts
@@ -160,7 +153,7 @@ namespace sysio { namespace chain {
          fc::microseconds              leeway = fc::microseconds( config::default_subjective_cpu_leeway_us );
          cpu_usage_t                   billed_cpu_us;
          int64_t                       trx_billed_cpu_us = 0;
-         int64_t                       prev_cpu_time_us = 0;
+         accounts_billing_t            prev_accounts_billing;
          int64_t                       subjective_cpu_bill_us = 0;
          bool                          explicit_billed_cpu_time = false;
 

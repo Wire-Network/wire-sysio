@@ -502,16 +502,15 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
       chain.push_transaction(trx);
 
-      // explicit payer so bills both the explicit payer and the contract
-      // TODO: This should only bill the explicit payer WIRE-173
+      // explicit payer so only bill the explicit payer
       auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
       auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
       auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
 
-      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
+      BOOST_CHECK(tester_cpu_limit1.used == tester_cpu_limit0.used);
       BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
-      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
+      BOOST_CHECK(tester_net_limit1.used == tester_net_limit0.used);
       BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
    }
 

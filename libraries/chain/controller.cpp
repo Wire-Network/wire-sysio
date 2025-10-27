@@ -1232,7 +1232,7 @@ struct controller_impl {
          trx_context.max_transaction_time_subjective = max_transaction_time;
          trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
          trx_context.billed_cpu_us = billed_cpu_us;
-         trx_context.prev_cpu_time_us = trx->prev_cpu_time_us;
+         trx_context.prev_accounts_billing = trx->prev_accounts_billing;
          trx_context.subjective_cpu_bill_us = subjective_cpu_bill_us;
          trace = trx_context.trace;
 
@@ -1267,7 +1267,7 @@ struct controller_impl {
 
             auto restore = make_block_restore_point( trx->is_read_only() );
 
-            trx->prev_cpu_time_us = trx_context.trx_billed_cpu_us;
+            trx->prev_accounts_billing = trx_context.accounts_billing;
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                std::get<building_block>(pending->_block_stage)._pending_trx_metas.emplace_back(trx);

@@ -1812,9 +1812,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    // indicate explicit billing at over our account cpu limit, not allowed
    cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max;
    BOOST_CHECK_EXCEPTION( push_trx( ptrx, fc::time_point::maximum(), cpu_limit+1, true, 0 ), tx_cpu_usage_exceeded,
-                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("billed");
-                                                              fc_exception_message_contains contains("reached account cpu limit");
-                                                              return starts(e) && contains(e); } );
+                          fc_exception_message_starts_with("authorizing account 'asserter' has insufficient objective cpu resources for this transaction") );
 
    // leeway and subjective billing interaction tests
    auto leeway = fc::microseconds(config::default_subjective_cpu_leeway_us);
@@ -1843,11 +1841,11 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu
    ptrx = create_trx(0);
-   // TODO: doesn't seem like this is correct
    cpu_limit = mgr.get_account_cpu_limit_ex(acc).first.max;
    combined_cpu_limit = cpu_limit + leeway.count();
    subjective_cpu_bill_us = cpu_limit;
    billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 90 * config::percent_1 );
+   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.subjective_cpu_usage_us = subjective_cpu_bill_us, .cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -1857,6 +1855,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    // Disallow transaction with billed cpu greater 90% of (account cpu limit + leeway - subjective bill)
    subjective_cpu_bill_us = 0;
    billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 91 * config::percent_1 );
+   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -1874,13 +1873,15 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu
 
-   // Allow transaction with billed cpu less than 90% of leeway subjective bill being 0 to run but fail it if no cpu is staked afterwards
+   // Allow transaction with billed cpu less than 90% of leeway subjective bill being 0 to run but fail it if no cpu is
+   // provided by the transaction itself. Allowed to run by leeway but fail in the end.
    ptrx = create_trx(0);
    subjective_cpu_bill_us = 0;
    billed_cpu_time_us = SYS_PERCENT( leeway.count(), 89 *config::percent_1 );
+   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("billed");
-                                                             fc_exception_message_contains contains("reached account cpu limit");
+                                                             fc_exception_message_contains contains("exceeded the maximum");
                                                              return starts(e) && contains(e); } );
 
 } FC_LOG_AND_RETHROW()
