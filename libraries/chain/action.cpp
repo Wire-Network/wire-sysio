@@ -4,7 +4,7 @@
 namespace sysio {
     namespace chain {
 
-        account_name action::explicit_payer() const {
+        account_name action::payer() const {
         for ( auto &auth : authorization ) {
             if ( auth.permission == sysio::chain::config::sysio_payer_name ) {
                 return auth.actor;

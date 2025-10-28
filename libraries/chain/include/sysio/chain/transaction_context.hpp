@@ -153,7 +153,7 @@ namespace sysio { namespace chain {
          fc::microseconds              leeway = fc::microseconds( config::default_subjective_cpu_leeway_us );
          cpu_usage_t                   billed_cpu_us;
          accounts_billing_t            prev_accounts_billing;
-         int64_t                       subjective_cpu_bill_us = 0;
+         account_subjective_cpu_bill_t subjective_cpu_bill;
          bool                          explicit_billed_cpu_time = false;
 
          transaction_checktime_timer   transaction_timer;

@@ -343,7 +343,7 @@ namespace sysio { namespace testing {
          for( auto itr = unapplied_transactions.begin(); itr != unapplied_transactions.end();  ) {
             const auto& trx = itr->trx_meta->packed_trx()->get_transaction();
             cpu_usage_t billed_cpu_us(trx.total_actions(), DEFAULT_BILLED_CPU_TIME_US);
-            auto trace = control->test_push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true, 0 );
+            auto trace = control->test_push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true, {} );
             traces.emplace_back( trace );
             if(!no_throw && trace->except) {
                // this always throws an fc::exception, since the original exception is copied into an fc::exception
@@ -666,7 +666,7 @@ namespace sysio { namespace testing {
       cpu_usage_t billed_cpu_us;
       if (explicit_billed_cpu_time)
          billed_cpu_us.insert(billed_cpu_us.end(), trx.get_transaction().total_actions(), billed_cpu_time_us/trx.get_transaction().total_actions());
-      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, 0 );
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, {} );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except ) throw *r->except;
       return r;
@@ -694,11 +694,13 @@ namespace sysio { namespace testing {
       if (c == packed_transaction::compression_type::zlib)
          ptrx->decompress();
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
-      const bool explicit_billed_cpu_time = billed_cpu_time_us > 0;
+      bool explicit_billed_cpu_time = billed_cpu_time_us > 0 && trx_type == transaction_metadata::trx_type::input;
+      if (trx_type == transaction_metadata::trx_type::implicit)
+         explicit_billed_cpu_time = true;
       cpu_usage_t billed_cpu_us;
       if (explicit_billed_cpu_time)
          billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), billed_cpu_time_us/trx.total_actions());
-      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, 0 );
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, {} );
       if (no_throw) return r;
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except)  throw *r->except;

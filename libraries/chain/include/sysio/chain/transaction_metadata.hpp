@@ -15,7 +15,6 @@ using transaction_metadata_ptr = std::shared_ptr<transaction_metadata>;
 using recover_keys_future = std::future<transaction_metadata_ptr>;
 
 struct account_billing {
-   int64_t      subjective_cpu_usage_us = 0;
    int64_t      cpu_limit_us = 0;
    uint64_t     cpu_usage_us = 0;
    uint64_t     net_usage = 0;
@@ -108,4 +107,4 @@ class transaction_metadata {
 
 } } // sysio::chain
 
-FC_REFLECT( sysio::chain::account_billing, (subjective_cpu_usage_us)(cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted) )
+FC_REFLECT( sysio::chain::account_billing, (cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted) )

@@ -94,7 +94,7 @@ namespace sysio { namespace chain {
          return fc::raw::unpack<T>(data);
       }
 
-      account_name explicit_payer() const;
+      account_name payer() const;
 
    private:
       friend struct packed_transaction;

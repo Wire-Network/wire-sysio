@@ -6,6 +6,8 @@
 namespace sysio { namespace chain {
 
    using cpu_usage_t = std::vector<fc::unsigned_int>;
+   using account_subjective_cpu_bill_t = flat_map<account_name, fc::microseconds>;
+   using action_payers_t = flat_set<account_name>;
 
    /**
     *  This extension is for including an ED25519 public key in a transaction for signature verification. Generic public_key_type was used to future proof
@@ -83,13 +85,8 @@ namespace sysio { namespace chain {
 
       uint32_t total_actions()const { return context_free_actions.size() + actions.size(); }
 
-      account_name first_authorizer()const {
-         for( const auto& a : actions ) {
-            for( const auto& u : a.authorization )
-               return u.actor;
-         }
-         return account_name();
-      }
+      account_name first_authorizer()const;
+      action_payers_t payers()const;
 
       flat_multimap<uint16_t, transaction_extension> validate_and_extract_extensions()const;
    };

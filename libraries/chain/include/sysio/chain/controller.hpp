@@ -151,11 +151,11 @@ namespace sysio { namespace chain {
 
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                                  fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                 int64_t subjective_cpu_bill_us );
+                                                 const account_subjective_cpu_bill_t& subjective_cpu_bill );
          transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
                                                       fc::time_point deadline, fc::microseconds max_transaction_time,
                                                       const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time,
-                                                      int64_t subjective_cpu_bill_us );
+                                                      const account_subjective_cpu_bill_t& subjective_cpu_bill );
 
          struct block_report {
             size_t             total_net_usage = 0;

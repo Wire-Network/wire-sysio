@@ -1202,7 +1202,7 @@ struct controller_impl {
                                            fc::microseconds max_transaction_time,
                                            const cpu_usage_t& billed_cpu_us,
                                            bool explicit_billed_cpu_time,
-                                           int64_t subjective_cpu_bill_us )
+                                           const account_subjective_cpu_bill_t& subjective_cpu_bill )
    {
       SYS_ASSERT(block_deadline != fc::time_point(), transaction_exception, "deadline cannot be uninitialized");
 
@@ -1233,15 +1233,18 @@ struct controller_impl {
          trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
          trx_context.billed_cpu_us = billed_cpu_us;
          trx_context.prev_accounts_billing = trx->prev_accounts_billing;
-         trx_context.subjective_cpu_bill_us = subjective_cpu_bill_us;
+         trx_context.subjective_cpu_bill = subjective_cpu_bill;
          trace = trx_context.trace;
 
          auto handle_exception =[&](const auto& e)
          {
+            auto now = fc::time_point::now();
+            trx_context.update_billed_cpu_time(now);
+            trx->prev_accounts_billing = trx_context.accounts_billing; // for subjective billing
             trace->error_code = controller::convert_exception_to_error_code( e );
             trace->except = e;
             trace->except_ptr = std::current_exception();
-            trace->elapsed = fc::time_point::now() - trx_context.start;
+            trace->elapsed = now - trx_context.start;
          };
 
          try {
@@ -1482,7 +1485,7 @@ struct controller_impl {
                });
             in_trx_requiring_checks = true;
             auto trace = push_transaction( onbtrx, fc::time_point::maximum(), fc::microseconds::maximum(),
-                                           cpu_usage_t{{gpo.configuration.min_transaction_cpu_usage}}, true, 0 );
+                                           cpu_usage_t{{gpo.configuration.min_transaction_cpu_usage}}, true, {} );
             if( trace->except ) {
                wlog("onblock ${block_num} is REJECTING: ${entire_trace}",("block_num", head->block_num + 1)("entire_trace", trace));
             }
@@ -1769,7 +1772,7 @@ struct controller_impl {
                                                     : ( !!std::get<0>( trx_metas.at( packed_idx ) ) ?
                                                           std::get<0>( trx_metas.at( packed_idx ) )
                                                           : std::get<1>( trx_metas.at( packed_idx ) ).get() ) );
-            trace = push_transaction( trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true, 0 );
+            trace = push_transaction( trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), receipt.cpu_usage_us, true, {} );
             ++packed_idx;
 
             const bool transaction_failed = trace && trace->except;
@@ -2689,22 +2692,22 @@ void controller::push_block( controller::block_report& br,
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,
                                                     fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                    int64_t subjective_cpu_bill_us ) {
+                                                    const account_subjective_cpu_bill_t& subjective_cpu_bill ) {
    validate_db_available_size();
    SYS_ASSERT( get_read_mode() != db_read_mode::IRREVERSIBLE, transaction_type_exception, "push transaction not allowed in irreversible mode" );
    SYS_ASSERT( trx && !trx->implicit(), transaction_type_exception, "Implicit transaction not allowed" );
    constexpr bool explicit_billed_cpu_time = false;
-   return my->push_transaction(trx, block_deadline, max_transaction_time, cpu_usage_t{}, explicit_billed_cpu_time, subjective_cpu_bill_us );
+   return my->push_transaction(trx, block_deadline, max_transaction_time, cpu_usage_t{}, explicit_billed_cpu_time, subjective_cpu_bill );
 }
 
 transaction_trace_ptr controller::test_push_transaction( const transaction_metadata_ptr& trx,
                                                          fc::time_point block_deadline, fc::microseconds max_transaction_time,
                                                          const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time,
-                                                         int64_t subjective_cpu_bill_us ) {
+                                                         const account_subjective_cpu_bill_t& subjective_cpu_bill ) {
    validate_db_available_size();
    SYS_ASSERT( get_read_mode() != db_read_mode::IRREVERSIBLE, transaction_type_exception, "push transaction not allowed in irreversible mode" );
    SYS_ASSERT( trx && !trx->implicit(), transaction_type_exception, "Implicit transaction not allowed" );
-   return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
+   return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_us, explicit_billed_cpu_time, subjective_cpu_bill );
 }
 
 const flat_set<account_name>& controller::get_actor_whitelist() const {

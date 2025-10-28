@@ -153,7 +153,7 @@ namespace sysio::chain {
             SYS_ASSERT(trace->total_cpu_usage_us > 0, transaction_exception, "Invalid transaction receipt cpu usage");
             validate_trx_billed_cpu();
          } else {
-            billed_cpu_us.resize(trx.total_actions());
+            billed_cpu_us.reserve(trx.total_actions());
          }
       }
 
@@ -161,15 +161,18 @@ namespace sysio::chain {
       assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
       for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
-         account_name a = act.explicit_payer();
+         account_name a = act.payer();
          auto& b = accounts_billing[a];
          if (is_input) {
             uint64_t billable_size = packed_trx.get_action_billable_size(i);
             b.net_usage += billable_size;
             trace->net_usage += billable_size;
          }
-         if (explicit_billed_cpu_time)
+         if (explicit_billed_cpu_time) {
+            assert(!is_read_only());
+            assert(billed_cpu_us.size() > i);
             b.cpu_usage_us += billed_cpu_us[i];
+         }
       }
       check_trx_net_usage(); // Fail early if current net usage exceeds limit
 
@@ -298,11 +301,11 @@ namespace sysio::chain {
             billing_timer_exception_code = org_code;
             tx_cpu_usage_reason = org_reason;
          });
-         account_name a = act.explicit_payer();
+         account_name a = act.payer();
          auto& b = accounts_billing[a];
          active_deadline = trx_deadline;
          if (!explicit_billed_cpu_time) {
-            int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill_us + leeway.count(); // Add leeway to allow powerup
+            int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill[a].count() + leeway.count(); // Add leeway to allow powerup
             // Possibly limit deadline to account subjective cpu left
             if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
                active_deadline = action_start + fc::microseconds(account_cpu_limit);
@@ -314,14 +317,24 @@ namespace sysio::chain {
             transaction_timer.start( active_deadline );
             checktime(); // Fail early if deadline already exceeded
          }
-         execute_action( i, 0 );
+         try {
+            execute_action( i, 0 );
+         } catch ( ... ) {
+            if (!explicit_billed_cpu_time) {
+               auto billed_time = fc::time_point::now() - action_start;
+               assert(billed_cpu_us.size() == i-1);
+               billed_cpu_us.emplace_back( billed_time.count() );
+            }
+            throw;
+         }
          if (enforce_deadline)
             transaction_timer.stop();
          auto billed_time = fc::time_point::now() - action_start;
          if (explicit_billed_cpu_time) {
             action_traces[i-1].cpu_usage_us = billed_cpu_us[i-1];
          } else {
-            billed_cpu_us[i-1] = billed_time.count(); // will be updated to include trx time in finalize
+            assert(billed_cpu_us.size() == i-1);
+            billed_cpu_us.emplace_back( billed_time.count() ); // will be updated to include trx time in finalize
          }
       }
    }
@@ -366,6 +379,8 @@ namespace sysio::chain {
       trace->elapsed = now - start;
 
       // Update CPU time and validate CPU usage
+      assert(billed_cpu_us.size() == packed_trx.get_transaction().total_actions());
+      assert(trace->action_traces.size() >= billed_cpu_us.size());
       update_billed_cpu_time( now );
 
       validate_cpu_minimum();
@@ -443,7 +458,7 @@ namespace sysio::chain {
                      ("now", now)("deadline", trx_deadline)("start", start)("billing_timer", now - pseudo_start) );
       } else if( deadline_exception_code == tx_cpu_usage_exceeded::code_value ) {
          std::string assert_msg = "transaction ${id} was executing for too long ${billing_timer}us";
-         if (subjective_cpu_bill_us > 0) {
+         if (!subjective_cpu_bill.empty()) {
             assert_msg += " with a subjective cpu of (${subjective} us)";
          }
          fc::microseconds limit;
@@ -451,10 +466,10 @@ namespace sysio::chain {
          if (cpu_limit_due_to_greylist) {
             assert_msg = "greylisted " + assert_msg;
             SYS_THROW( greylist_cpu_usage_exceeded, assert_msg, ("id", packed_trx.id())
-                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill_us)("limit", limit) );
+                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill)("limit", limit) );
          } else {
             SYS_THROW( tx_cpu_usage_exceeded, assert_msg, ("id", packed_trx.id())
-                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill_us)("limit", limit) );
+                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill)("limit", limit) );
          }
       }
       SYS_ASSERT( false,  transaction_exception, "unexpected deadline exception code ${code}", ("code", deadline_exception_code) );
@@ -541,20 +556,27 @@ namespace sysio::chain {
          return;
 
       if (!prev_accounts_billing.empty() && billing_timer_exception_code == block_cpu_usage_exceeded::code_value) {
-         int64_t total_cpu_us = std::ranges::fold_left(prev_accounts_billing, 0l,
-            [](long v, const accounts_billing_t::value_type& b) { return v + b.second.subjective_cpu_usage_us + b.second.cpu_usage_us; });
+         int64_t total_cpu_us = [&]() {
+            int64_t result = 0;
+            for (const auto& [a, b] : prev_accounts_billing) {
+               result += b.cpu_usage_us;
+               if (auto i = subjective_cpu_bill.find(a); i != subjective_cpu_bill.end()) {
+                  result += i->second.count();
+               }
+            }
+            return result;
+         }();
          SYS_ASSERT( total_cpu_us < objective_duration_limit.count(), block_cpu_usage_exceeded,
                      "estimated CPU time (${ec} us) is not less than the billable CPU time left in the block (${bb} us)",
                      ("ec", total_cpu_us)("bb", objective_duration_limit.count()) );
       }
 
       for (const auto& [a, b] : accounts_billing) {
-         auto [prev_cpu_usage_us, subjective_cpu_usage_us] = [&]() {
-            if (auto i = prev_accounts_billing.find(a); i != prev_accounts_billing.end()) {
-               return std::pair{ i->second.cpu_usage_us, i->second.subjective_cpu_usage_us };
-            }
-            return std::pair<uint64_t, int64_t>{0, 0};
-         }();
+         int64_t prev_cpu_usage_us = 0, subjective_cpu_usage_us = 0;
+         if (auto i = prev_accounts_billing.find(a); i != prev_accounts_billing.end())
+            prev_cpu_usage_us = i->second.cpu_usage_us;
+         if (auto i = subjective_cpu_bill.find(a); i != subjective_cpu_bill.end())
+            subjective_cpu_usage_us = i->second.count();
          int64_t validate_account_cpu_limit = b.cpu_limit_us - subjective_cpu_usage_us + leeway.count(); // Add leeway to allow powerup
          // Fail early if amount of the previous speculative execution is within 10% of remaining account cpu available
          if( validate_account_cpu_limit > 0 )
@@ -621,21 +643,22 @@ namespace sysio::chain {
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
       if( explicit_billed_cpu_time ) return; // updated in init() for explicit_billed_cpu
 
-      assert(billed_cpu_us.size() == packed_trx.get_transaction().total_actions());
-      assert(trace->action_traces.size() >= billed_cpu_us.size());
       trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
       const auto& cfg = control.get_global_properties().configuration;
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded, "Invalid CPU usage calculation");
-      // +1 so total is above min_transaction_cpu_usage
-      int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
-      total_cpu_time_us = 0;
-      for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
-         auto& act_trace = trace->action_traces[i];
-         accounts_billing[act_trace.act.explicit_payer()].cpu_usage_us += delta_per_action;
-         b.value += delta_per_action;
-         total_cpu_time_us += b.value;
-         act_trace.cpu_usage_us = b.value;
+      if (!billed_cpu_us.empty()) {
+         // +1 so total is above min_transaction_cpu_usage
+         int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
+         total_cpu_time_us = 0;
+         for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
+            // if exception thrown, action_traces may not be the same size as billed_cpu_us
+            auto& act_trace = trace->action_traces[i];
+            accounts_billing[act_trace.act.payer()].cpu_usage_us += delta_per_action;
+            b.value += delta_per_action;
+            total_cpu_time_us += b.value;
+            act_trace.cpu_usage_us = b.value;
+         }
       }
       trace->total_cpu_usage_us = total_cpu_time_us;
    }

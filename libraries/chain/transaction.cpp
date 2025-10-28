@@ -113,6 +113,25 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW() }
 
+account_name transaction::first_authorizer()const {
+   for( const auto& a : actions ) {
+      for( const auto& u : a.authorization )
+         return u.actor;
+   }
+   return account_name();
+}
+
+action_payers_t transaction::payers()const {
+   action_payers_t result;
+   for (const auto& a : context_free_actions) {
+      result.insert(a.payer());
+   }
+   for (const auto& a : actions) {
+      result.insert(a.payer());
+   }
+   return result;
+}
+
 flat_multimap<uint16_t, transaction_extension> transaction::validate_and_extract_extensions()const {
    using decompose_t = transaction_extension_types::decompose_t;
 
