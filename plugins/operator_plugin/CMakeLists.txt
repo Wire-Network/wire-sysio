@@ -45,8 +45,8 @@ if(ENABLE_TESTS)
     sysio_chain_wrap
   )
   add_test(
-    NAME test_plugin_common
-    COMMAND libraries/plugin_common/test/test_plugin_common
+    NAME test_operator_plugin
+    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test/test_plugin_common
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
   )
 endif()

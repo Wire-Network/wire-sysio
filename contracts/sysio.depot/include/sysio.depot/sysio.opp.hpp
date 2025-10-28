@@ -153,9 +153,9 @@ struct message_unknown : message_base, std::enable_shared_from_this<message_unkn
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
    message_unknown() : message_base(message_type_unknown) {};
    virtual ~message_unknown() = default;
-// #ifdef WASM
-//    META_REFLECT( sysio::opp::message_unknown, (type) );
-// #endif
+#ifdef WASM
+//TODO: Fix META_REFLECT_DERIVED( sysio::opp::message_unknown, sysio::opp::message_base,  );
+#endif
 };
 
 /**
@@ -406,7 +406,7 @@ FC_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_pu
 
 META_REFLECT( sysio::opp::message_base, (type) );
 
-// META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), );
+META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), BOOST_PP_SEQ_NIL );
 META_REFLECT_DERIVED( sysio::opp::message_purchase, (sysio::opp::message_base), (amount) );
 META_REFLECT_DERIVED( sysio::opp::message_stake, (sysio::opp::message_base), (amount) );
 META_REFLECT_DERIVED( sysio::opp::message_unstake, (sysio::opp::message_base), (amount) );
