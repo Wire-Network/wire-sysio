@@ -91,6 +91,8 @@ namespace sysio { namespace chain {
          friend class apply_context;
          friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
 
+         void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
+         void load_cpu_limit(account_name account, account_billing& b);
          void max_bandwidth_billed_account_can_pay(account_name account, account_billing& b, uint32_t net_usage_leeway);
 
          void add_ram_usage( account_name account, int64_t ram_delta );
@@ -114,8 +116,6 @@ namespace sysio { namespace chain {
 
          void record_transaction( const transaction_id_type& id, fc::time_point_sec expire );
 
-         void validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const;
-         void validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit,  int64_t subjective_billed_us )const;
          void validate_available_account_cpu( account_name account, int64_t billed_us, int64_t account_limit, bool greylisted )const;
          void validate_account_cpu_usage_estimate()const;
          void validate_cpu_minimum()const;
@@ -152,7 +152,6 @@ namespace sysio { namespace chain {
          fc::time_point                block_deadline = fc::time_point::maximum();
          fc::microseconds              leeway = fc::microseconds( config::default_subjective_cpu_leeway_us );
          cpu_usage_t                   billed_cpu_us;
-         int64_t                       trx_billed_cpu_us = 0;
          accounts_billing_t            prev_accounts_billing;
          int64_t                       subjective_cpu_bill_us = 0;
          bool                          explicit_billed_cpu_time = false;

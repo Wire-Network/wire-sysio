@@ -36,8 +36,8 @@ namespace sysio { namespace chain {
       action                          act;
       bool                            context_free = false;
       fc::microseconds                elapsed;
-      fc::unsigned_int                cpu_usage_us = 0;
-      fc::unsigned_int                net_usage = 0;
+      fc::unsigned_int                cpu_usage_us = 0; // only populated for input action
+      fc::unsigned_int                net_usage = 0;    // only populated for input action
       string                          console;
       transaction_id_type             trx_id; ///< the transaction that generated this action
       uint32_t                        block_num = 0;

@@ -14,6 +14,8 @@
 
 namespace sysio::chain {
 
+   static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
+
    transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
          : expired(timer.expired), _timer(timer) {
       expired = false;
@@ -84,7 +86,7 @@ namespace sysio::chain {
 
    void transaction_context::init()
    {
-      SYS_ASSERT( !is_initialized, transaction_exception, "cannot initialize twice" );
+      assert(!is_initialized);
 
       published = control.pending_block_time();
 
@@ -147,10 +149,9 @@ namespace sysio::chain {
       if ( !is_read_only() ) {
          if (explicit_billed_cpu_time) {
             SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception, "No transaction receipt cpu usage");
-            trx_billed_cpu_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
-            SYS_ASSERT(trx_billed_cpu_us > 0, transaction_exception, "Invalid transaction receipt cpu usage");
+            trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
+            SYS_ASSERT(trace->total_cpu_usage_us > 0, transaction_exception, "Invalid transaction receipt cpu usage");
             validate_trx_billed_cpu();
-            trace->total_cpu_usage_us = trx_billed_cpu_us;
          } else {
             billed_cpu_us.resize(trx.total_actions());
          }
@@ -158,30 +159,30 @@ namespace sysio::chain {
 
       std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
       assert(std::ranges::distance(std::views::join(all_actions)) == trx.total_actions());
-      uint32_t trx_billable_size = 0;
       for (const auto& [i, act] : std::views::enumerate(std::views::join(all_actions))) {
          // For each action, add either the explicit payer (if present) or the contract (if no payer)
          account_name a = act.explicit_payer();
          auto& b = accounts_billing[a];
-         if (is_input)
-            b.net_usage += packed_trx.get_action_billable_size(i);
+         if (is_input) {
+            uint64_t billable_size = packed_trx.get_action_billable_size(i);
+            b.net_usage += billable_size;
+            trace->net_usage += billable_size;
+         }
          if (explicit_billed_cpu_time)
             b.cpu_usage_us += billed_cpu_us[i];
-         trx_billable_size += b.net_usage;
       }
-      if (is_input)
-         trace->net_usage = trx_billable_size;
       check_trx_net_usage(); // Fail early if current net usage exceeds limit
 
       if ( !is_read_only() ) {
-         // validate account net with objective net_usage_leeway
-         for (auto& [account, bill] : accounts_billing) {
-            max_bandwidth_billed_account_can_pay(account, bill, cfg.net_usage_leeway);
-         }
-
          validate_ram_usage.reserve(accounts_billing.size());
          // Update usage windows for all candidate accounts (user + contract)
          rl.update_account_usage( accounts_billing, block_timestamp_type(control.pending_block_time()).slot );
+
+         // validate account net with objective net_usage_leeway
+         for (auto& [account, bill] : accounts_billing) {
+            verify_net_usage(account, bill.net_usage, cfg.net_usage_leeway);
+            load_cpu_limit(account, bill);
+         }
       }
 
       //
@@ -265,9 +266,8 @@ namespace sysio::chain {
    }
    
    void transaction_context::exec() {
-      const transaction& trx = packed_trx.get_transaction();
-
       assert( is_initialized );
+      const transaction& trx = packed_trx.get_transaction();
 
       auto add_trace_net = [&]( size_t idx ) {
          if (!is_input) return;
@@ -293,8 +293,7 @@ namespace sysio::chain {
       assert( num_original_actions_to_execute == idx );
       for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
          action_start = fc::time_point::now();
-         const auto& act = action_traces.at(i-1).act;
-         wlog("=>starting action ${i}", ("i", act.name));
+         const auto& act = action_traces[i-1].act;
          auto _ = fc::make_scoped_exit([this, org_code=billing_timer_exception_code, org_reason=tx_cpu_usage_reason](){
             billing_timer_exception_code = org_code;
             tx_cpu_usage_reason = org_reason;
@@ -319,15 +318,16 @@ namespace sysio::chain {
          if (enforce_deadline)
             transaction_timer.stop();
          auto billed_time = fc::time_point::now() - action_start;
-         trace->action_traces[i-1].cpu_usage_us = billed_time.count();
-         if (!explicit_billed_cpu_time)
-            billed_cpu_us[i-1] = billed_time.count();
-         wlog("<=elapsed  action ${i}: ${e}", ("i", act.name)("e", billed_time));
+         if (explicit_billed_cpu_time) {
+            action_traces[i-1].cpu_usage_us = billed_cpu_us[i-1];
+         } else {
+            billed_cpu_us[i-1] = billed_time.count(); // will be updated to include trx time in finalize
+         }
       }
    }
 
    void transaction_context::finalize() {
-      SYS_ASSERT(is_initialized, transaction_exception, "must first initialize");
+      assert(is_initialized);
 
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
@@ -358,7 +358,8 @@ namespace sysio::chain {
       leeway_trx_net_limit = trx_net_limit; // reset with no leeway==0
       constexpr uint32_t net_leeway = 0;
       for (auto& [account, bill]: accounts_billing) {
-         max_bandwidth_billed_account_can_pay(account, bill, net_leeway);
+         verify_net_usage(account, bill.net_usage, net_leeway);
+         load_cpu_limit(account, bill);
       }
 
       auto now = fc::time_point::now();
@@ -496,74 +497,31 @@ namespace sysio::chain {
 
    void transaction_context::validate_cpu_minimum()const {
       // validate minimum must be done at the end of the trx because the trx might have modified the cfg.min_transaction_cpu_usage
-      if (!explicit_billed_cpu_time || control.skip_trx_checks())
+      if (control.skip_trx_checks())
          return;
       const auto& cfg = control.get_global_properties().configuration;
-      SYS_ASSERT( trx_billed_cpu_us >= cfg.min_transaction_cpu_usage, transaction_exception,
+      SYS_ASSERT( trace->total_cpu_usage_us >= cfg.min_transaction_cpu_usage, transaction_exception,
                   "cannot bill CPU time ${b} less than the minimum of ${m} us",
-                  ("b", trx_billed_cpu_us)("m", cfg.min_transaction_cpu_usage) );
-   }
-
-   void transaction_context::validate_cpu_usage_to_bill( int64_t billed_us, int64_t account_cpu_limit, bool check_minimum, int64_t subjective_billed_us )const {
-      if (!control.skip_trx_checks()) {
-         validate_account_cpu_usage( billed_us, account_cpu_limit, subjective_billed_us );
-      }
-   }
-
-   void transaction_context::validate_account_cpu_usage( int64_t billed_us, int64_t account_cpu_limit, int64_t subjective_billed_us)const {
-      if( (billed_us > 0) && !control.skip_trx_checks() ) {
-         const bool cpu_limited_by_account = (account_cpu_limit <= objective_duration_limit.count());
-
-         if( !cpu_limited_by_account && (billing_timer_exception_code == block_cpu_usage_exceeded::code_value) ) {
-            SYS_ASSERT( billed_us <= objective_duration_limit.count(),
-                        block_cpu_usage_exceeded,
-                        "billed CPU time (${billed} us) is greater than the billable CPU time left in the block (${billable} us)",
-                        ("billed", billed_us)( "billable", objective_duration_limit.count() )
-            );
-         } else {
-            auto graylisted = cpu_limit_due_to_greylist && cpu_limited_by_account;
-            // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
-            auto account_limit = graylisted ? account_cpu_limit : (cpu_limited_by_account ? account_cpu_limit : objective_duration_limit.count());
-
-            if( billed_us > account_limit ) {
-               fc::microseconds tx_limit;
-               std::string assert_msg;
-               assert_msg.reserve(1024);
-               assert_msg += "billed CPU time (${billed} us) is greater than the maximum";
-               assert_msg += graylisted ? " greylisted" : "";
-               assert_msg += " billable CPU time for the transaction (${billable} us)";
-               assert_msg += subjective_billed_us > 0 ? " with a subjective cpu of (${subjective} us)" : "";
-               assert_msg += get_tx_cpu_usage_exceeded_reason_msg( tx_limit );
-
-               if( graylisted ) {
-                  FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                      ("billed", billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", tx_limit) );
-               } else {
-                  FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                      ("billed", billed_us)("billable", account_limit)("subjective", subjective_billed_us)("limit", tx_limit) );
-               }
-            }
-         }
-      }
+                  ("b", trace->total_cpu_usage_us)("m", cfg.min_transaction_cpu_usage) );
    }
 
    void transaction_context::validate_trx_billed_cpu() const {
-      assert(trx_billed_cpu_us > 0);
+      assert(trace->total_cpu_usage_us > 0);
       if (control.skip_trx_checks())
          return;
 
       // validate objective cpu limits
       if( billing_timer_exception_code == block_cpu_usage_exceeded::code_value ) {
-         SYS_ASSERT( trx_billed_cpu_us <= objective_duration_limit.count(),
+         SYS_ASSERT( trace->total_cpu_usage_us <= objective_duration_limit.count(),
                      block_cpu_usage_exceeded,
                      "billed CPU time (${billed} us) is greater than the billable CPU time left in the block (${billable} us)",
-                     ("billed", trx_billed_cpu_us)( "billable", objective_duration_limit.count() )
+                     ("billed", trace->total_cpu_usage_us)( "billable", objective_duration_limit.count() )
          );
       } else {
          // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
          auto limit = objective_duration_limit.count();
 
-         if( trx_billed_cpu_us > limit ) {
+         if( trace->total_cpu_usage_us > limit ) {
             fc::microseconds tx_limit;
             std::string assert_msg;
             assert_msg.reserve(1024);
@@ -572,7 +530,7 @@ namespace sysio::chain {
             assert_msg += get_tx_cpu_usage_exceeded_reason_msg( tx_limit );
 
             FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                ("billed", trx_billed_cpu_us)("billable", limit)("limit", tx_limit) );
+                                ("billed", trace->total_cpu_usage_us)("billable", limit)("limit", tx_limit) );
          }
       }
    }
@@ -661,31 +619,34 @@ namespace sysio::chain {
    }
 
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
-      if( explicit_billed_cpu_time ) return;
+      if( explicit_billed_cpu_time ) return; // updated in init() for explicit_billed_cpu
 
-      trx_billed_cpu_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
+      assert(billed_cpu_us.size() == packed_trx.get_transaction().total_actions());
+      assert(trace->action_traces.size() >= billed_cpu_us.size());
+      trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
       const auto& cfg = control.get_global_properties().configuration;
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
-      SYS_ASSERT(total_cpu_time_us - trx_billed_cpu_us >= 0, tx_cpu_usage_exceeded, "Invalid CPU usage calcuation");
+      SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded, "Invalid CPU usage calculation");
       // +1 so total is above min_transaction_cpu_usage
-      int64_t delta_per_account = ( total_cpu_time_us - trx_billed_cpu_us ) / accounts_billing.size() + 1;
-      for (auto& bill: accounts_billing | std::views::values) {
-         bill.cpu_usage_us += delta_per_account;
+      int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
+      total_cpu_time_us = 0;
+      for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
+         auto& act_trace = trace->action_traces[i];
+         accounts_billing[act_trace.act.explicit_payer()].cpu_usage_us += delta_per_action;
+         b.value += delta_per_action;
+         total_cpu_time_us += b.value;
+         act_trace.cpu_usage_us = b.value;
       }
-      trx_billed_cpu_us = total_cpu_time_us;
-      trace->total_cpu_usage_us = trx_billed_cpu_us;
+      trace->total_cpu_usage_us = total_cpu_time_us;
    }
 
-   void transaction_context::max_bandwidth_billed_account_can_pay(account_name a, account_billing& b, uint32_t net_usage_leeway) {
-      // Assumes rl.update_account_usage( bill_to_accounts, block_timestamp_type(control.pending_block_time()).slot ) was already called prior
+   void transaction_context::verify_net_usage(account_name a, int64_t net_usage, uint32_t net_usage_leeway) {
+      // Assumes rl.update_account_usage() was already called prior
 
       // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
       const auto& rl = control.get_mutable_resource_limits_manager();
-      static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
       int64_t account_net_limit = large_number_no_overflow;
-      int64_t account_cpu_limit = large_number_no_overflow;
       bool greylisted_net = false;
-      bool greylisted_cpu = false;
 
       uint32_t specified_greylist_limit = control.get_greylist_limit();
       uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
@@ -701,25 +662,47 @@ namespace sysio::chain {
          account_net_limit = net_limit;
          greylisted_net = net_was_greylisted;
       }
+
+      SYS_ASSERT( control.is_speculative_block() || !greylisted_net,
+                  transaction_exception, "greylisted when not producing block" );
+
+      const auto leeway_net_limit = account_net_limit + net_usage_leeway;
+      if (net_usage > leeway_net_limit) {
+         if (greylisted_net) {
+            SYS_THROW( greylist_net_usage_exceeded, "greylisted account ${a} net usage is too high: ${nu} > ${nl}",
+                       ("a", a)("nu", net_usage)("nl", leeway_net_limit) );
+         } else {
+            SYS_THROW( tx_net_usage_exceeded, "account ${a} net usage is too high: ${nu} > ${nl}",
+                       ("a", a)("nu", net_usage)("nl", leeway_net_limit) );
+         }
+      }
+   }
+
+   void transaction_context::load_cpu_limit(account_name a, account_billing& b) {
+      // Assumes rl.update_account_usage() was already called prior
+
+      // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
+      const auto& rl = control.get_mutable_resource_limits_manager();
+      int64_t account_cpu_limit = large_number_no_overflow;
+      bool greylisted_cpu = false;
+
+      uint32_t specified_greylist_limit = control.get_greylist_limit();
+      uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
+      if( control.is_speculative_block() ) {
+         if( control.is_resource_greylisted(a) ) {
+            greylist_limit = 1;
+         } else {
+            greylist_limit = specified_greylist_limit;
+         }
+      }
       auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
       if( cpu_limit >= 0 ) {
          account_cpu_limit = cpu_limit;
          greylisted_cpu = cpu_was_greylisted;
       }
 
-      SYS_ASSERT( control.is_speculative_block() || (!greylisted_cpu && !greylisted_net),
+      SYS_ASSERT( control.is_speculative_block() || !greylisted_cpu,
                   transaction_exception, "greylisted when not producing block" );
-
-      const auto leeway_net_limit = account_net_limit + net_usage_leeway;
-      if (b.net_usage > leeway_net_limit) {
-         if (greylisted_net) {
-            SYS_THROW( greylist_net_usage_exceeded, "greylisted account ${a} net usage is too high: ${nu} > ${nl}",
-                       ("a", a)("nu", trace->net_usage)("nl", leeway_net_limit) );
-         } else {
-            SYS_THROW( tx_net_usage_exceeded, "account ${a} net usage is too high: ${nu} > ${nl}",
-                       ("a", a)("nu", trace->net_usage)("nl", leeway_net_limit) );
-         }
-      }
 
       b.cpu_limit_us = account_cpu_limit;
       b.cpu_greylisted |= greylisted_cpu;

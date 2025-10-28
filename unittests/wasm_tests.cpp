@@ -1845,7 +1845,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    combined_cpu_limit = cpu_limit + leeway.count();
    subjective_cpu_bill_us = cpu_limit;
    billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 90 * config::percent_1 );
-   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.subjective_cpu_usage_us = subjective_cpu_bill_us, .cpu_usage_us = billed_cpu_time_us}}};
+   ptrx->prev_accounts_billing = accounts_billing_t{{acc, {.subjective_cpu_usage_us = subjective_cpu_bill_us, .cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -1855,7 +1855,7 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    // Disallow transaction with billed cpu greater 90% of (account cpu limit + leeway - subjective bill)
    subjective_cpu_bill_us = 0;
    billed_cpu_time_us = SYS_PERCENT( combined_cpu_limit - subjective_cpu_bill_us, 91 * config::percent_1 );
-   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.cpu_usage_us = billed_cpu_time_us}}};
+   ptrx->prev_accounts_billing = accounts_billing_t{{acc, {.cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
@@ -1878,11 +1878,149 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    ptrx = create_trx(0);
    subjective_cpu_bill_us = 0;
    billed_cpu_time_us = SYS_PERCENT( leeway.count(), 89 *config::percent_1 );
-   ptrx->prev_accounts_billing = accounts_billing_t{{"asserter"_n, {.cpu_usage_us = billed_cpu_time_us}}};
+   ptrx->prev_accounts_billing = accounts_billing_t{{acc, {.cpu_usage_us = billed_cpu_time_us}}};
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false, subjective_cpu_bill_us ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("billed");
                                                              fc_exception_message_contains contains("exceeded the maximum");
                                                              return starts(e) && contains(e); } );
+
+} FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
+   tester chain( setup_policy::full, db_read_mode::SPECULATIVE );
+
+   const resource_limits_manager& mgr = chain.control->get_resource_limits_manager();
+
+   account_name acc = "asserter"_n;
+   account_name user = "user"_n;
+   chain.create_accounts( {acc, user} );
+   chain.set_contract(acc, test_contracts::asserter_wasm(), test_contracts::asserter_abi());
+   chain.produce_block();
+
+   auto create_trx = [&](auto trx_max_ms) {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{acc, config::active_name}}, // paid by contract
+                                assertdef {1, "Should Not Assert!"} );
+      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}}, // also paid by contract
+                                assertdef {1, "Should Not Assert!"} );
+      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name},{user, config::sysio_payer_name}}, // paid by user
+                                assertdef {1, "Should Not Assert!"} );
+      static int num_secs = 1;
+      chain.set_transaction_headers( trx, ++num_secs ); // num_secs provides nonce
+      trx.max_cpu_usage_ms = trx_max_ms;
+      trx.sign( chain.get_private_key( acc, "active" ), chain.control->get_chain_id() );
+      trx.sign( chain.get_private_key( user, "active" ), chain.control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>(trx);
+      auto fut = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(), chain.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      return fut.get();
+   };
+
+   auto push_trx = [&]( const transaction_metadata_ptr& trx, fc::time_point deadline,
+                     const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time, uint32_t subjective_cpu_bill_us ) {
+      auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
+      if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
+      if( r->except ) throw *r->except;
+      return r;
+   };
+
+   // first call will load wasm, pausing timer
+   auto ptrx = create_trx(0);
+   // no limits, verify trace values
+   auto trace = push_trx( ptrx, fc::time_point::maximum(), {}, false, 0 ); // non-explicit billing
+   BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
+   // timer is paused while loading the contract, so elapsed is larger than billed
+   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us.value <= trace->action_traces.at(0).elapsed.count());
+
+   chain.produce_block();
+   chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
+
+   auto acc_cpu_limit0  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   auto user_cpu_limit0 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   auto acc_net_limit0  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   auto user_net_limit0 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+
+   ptrx = create_trx(0);
+   // no limits, verify trace values
+   trace = push_trx( ptrx, fc::time_point::maximum(), {}, false, 0 ); // non-explicit billing
+   BOOST_TEST(trace->elapsed.count() > 1);
+   BOOST_TEST(trace->net_usage == 340u);
+   BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
+   BOOST_TEST(trace->action_traces.at(0).elapsed.count() > 1);
+   BOOST_TEST(trace->action_traces.at(1).elapsed.count() > 1);
+   BOOST_TEST(trace->action_traces.at(2).elapsed.count() > 1);
+   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.net_usage; }));
+   BOOST_TEST(trace->action_traces.at(0).net_usage == 108u);
+   BOOST_TEST(trace->action_traces.at(1).net_usage == 108u);
+   BOOST_TEST(trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(trace->total_cpu_usage_us == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.cpu_usage_us; }));
+   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us > 1u);
+   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us > 1u);
+   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us > 1u);
+   // billed larger than elapsed because billed includes trx time distributed over the cpu_usage_us
+   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us.value >= trace->action_traces.at(0).elapsed.count());
+   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us.value >= trace->action_traces.at(1).elapsed.count());
+   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us.value >= trace->action_traces.at(2).elapsed.count());
+   auto acc_cpu_limit1  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   auto user_cpu_limit1 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   auto acc_net_limit1  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   auto user_net_limit1 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us.value - trace->action_traces.at(1).cpu_usage_us.value);
+   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us.value);
+   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - trace->action_traces.at(0).net_usage - trace->action_traces.at(1).net_usage);
+   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - trace->action_traces.at(2).net_usage);
+
+   chain.produce_block();
+   chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
+
+   acc_cpu_limit0  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   user_cpu_limit0 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   acc_net_limit0  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   user_net_limit0 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+
+   ptrx = create_trx(0);
+   // indicate explicit billing
+   cpu_usage_t cpu_usage{321, 4242, 123};
+   auto total_cpu = std::ranges::fold_left(cpu_usage, 0ul, std::plus());
+   trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true, 0 );
+   BOOST_TEST(trace->elapsed.count() > 1);
+   BOOST_TEST(trace->net_usage == 340u);
+   BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
+   BOOST_TEST(trace->action_traces.at(0).elapsed.count() > 1);
+   BOOST_TEST(trace->action_traces.at(1).elapsed.count() > 1);
+   BOOST_TEST(trace->action_traces.at(2).elapsed.count() > 1);
+   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.net_usage; }));
+   BOOST_TEST(trace->action_traces.at(0).net_usage == 108u);
+   BOOST_TEST(trace->action_traces.at(1).net_usage == 108u);
+   BOOST_TEST(trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(trace->total_cpu_usage_us == total_cpu);
+   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us == cpu_usage[0]);
+   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us == cpu_usage[1]);
+   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us == cpu_usage[2]);
+   acc_cpu_limit1  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   user_cpu_limit1 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   acc_net_limit1  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
+   user_net_limit1 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
+   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us.value - trace->action_traces.at(1).cpu_usage_us.value);
+   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us.value);
+   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - trace->action_traces.at(0).net_usage - trace->action_traces.at(1).net_usage);
+   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - trace->action_traces.at(2).net_usage);
+
+   // bill at minimum
+   auto min_cpu_time_us = chain.control->get_global_properties().configuration.min_transaction_cpu_usage;
+   BOOST_TEST_REQUIRE(min_cpu_time_us == 100u);
+
+   ptrx = create_trx(0);
+   // indicate explicit billing at transaction minimum
+   cpu_usage = {25, 25, 50};
+   push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true, 0 );
+   chain.produce_block();
+
+   // do not allow to bill less than minimum
+   ptrx = create_trx(0);
+   cpu_usage = {25, 25, 49};
+   // indicate explicit billing at minimum-1, objective failure even with explicit billing for under min
+   BOOST_CHECK_EXCEPTION( push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true, 0 ), transaction_exception,
+                          fc_exception_message_is("cannot bill CPU time 99 less than the minimum of 100 us") );
 
 } FC_LOG_AND_RETHROW()
 
