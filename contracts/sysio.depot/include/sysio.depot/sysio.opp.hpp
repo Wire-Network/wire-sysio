@@ -3,7 +3,7 @@
 #include <fc-lite/lut.hpp>
 #include <fc-lite/tuples.hpp>
 #include <sysio.system/non_wasm_types.hpp>
-#include <sysio/asset.hpp>
+
 #include <tuple>
 #include <variant>
 
@@ -12,6 +12,7 @@
 #include <fc/io/datastream.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <sysio/chain/asset.hpp>
 #define META_REFLECT(...) FC_REFLECT(__VA_ARGS__)
 // #define META_REFLECT_ENUM(...) FC_REFLECT_ENUM(__VA_ARGS__)
 #define META_REFLECT_TEMPLATE(...) FC_REFLECT_TEMPLATE(__VA_ARGS__)
@@ -19,7 +20,10 @@
 #define META_REFLECT_DERIVED_TEMPLATE(...) FC_REFLECT_DERIVED_TEMPLATE(__VA_ARGS__)
 #define META_DATASTREAM fc::datastream<char*>
 #define PUBLIC_KEY_TYPE fc::crypto::public_key
+#define NAME_TYPE sysio::chain::name
+#define ASSET_TYPE sysio::chain::asset
 #else
+#include <sysio/asset.hpp>
 #include <sysio/crypto.hpp>
 #include <sysio/fixed_bytes.hpp>
 #include <sysio/serialize.hpp>
@@ -31,6 +35,8 @@
 
 #define META_DATASTREAM sysio::datastream<char*>
 #define PUBLIC_KEY_TYPE sysio::public_key
+#define NAME_TYPE sysio::name
+#define ASSET_TYPE sysio::asset
 #endif
 
 
@@ -142,7 +148,7 @@ struct message_base {
 /**
  * @brief Message structures for each message type
  */
-struct message_unknown : message_base {
+struct message_unknown : message_base, std::enable_shared_from_this<message_unknown> {
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
    message_unknown() : message_base(message_type_unknown) {};
@@ -155,8 +161,8 @@ struct message_unknown : message_base {
 /**
  * TOKEN PURCHASE
  */
-struct message_purchase : message_base {
-   asset amount{};
+struct message_purchase : message_base, std::enable_shared_from_this<message_purchase> {
+   ASSET_TYPE amount{};
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
    message_purchase() : message_base(message_type_purchase) {};
@@ -169,8 +175,8 @@ struct message_purchase : message_base {
 /**
  * STAKE
  */
-struct message_stake : message_base {
-   asset amount{};
+struct message_stake : message_base, std::enable_shared_from_this<message_stake> {
+   ASSET_TYPE amount{};
 
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
@@ -181,8 +187,8 @@ struct message_stake : message_base {
 #endif
 };
 
-struct message_unstake : message_base {
-   asset amount{};
+struct message_unstake : message_base, std::enable_shared_from_this<message_unstake> {
+   ASSET_TYPE amount{};
 
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
@@ -193,12 +199,12 @@ struct message_unstake : message_base {
 #endif
 };
 
-struct message_balance_sheet : message_base {
-   constexpr static auto asset_size = sizeof(asset);
+struct message_balance_sheet : message_base, std::enable_shared_from_this<message_balance_sheet> {
+   constexpr static auto asset_size = sizeof(ASSET_TYPE);
    static_assert(asset_size == sizeof(uint128_t), "Asset size is not 16 bytes");
 
    chain_kind         chain{chain_unknown};
-   std::vector<asset> assets{};
+   std::vector<ASSET_TYPE> assets{};
 
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
@@ -209,14 +215,14 @@ struct message_balance_sheet : message_base {
 #endif
 };
 
-struct message_swap : message_base {
+struct message_swap : message_base, std::enable_shared_from_this<message_swap> {
    chain_kind source_chain{chain_unknown};
-   asset source_amount{};
+   ASSET_TYPE source_amount{};
 
    uint64_t divisor{};
 
    chain_kind target_chain{chain_unknown};
-   asset target_amount{};
+   ASSET_TYPE target_amount{};
 
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
@@ -227,8 +233,8 @@ struct message_swap : message_base {
 #endif
 };
 
-struct message_operator_registration : message_base {
-   name operator_account{};
+struct message_operator_registration : message_base, std::enable_shared_from_this<message_operator_registration> {
+   NAME_TYPE operator_account{};
    PUBLIC_KEY_TYPE operator_key{};
    bool unpack(META_DATASTREAM* ds) override;
    META_DATASTREAM* pack(META_DATASTREAM* ds) override;
@@ -240,8 +246,8 @@ struct message_operator_registration : message_base {
 #endif
 };
 
-struct message_operator_deregistration : message_base {
-   name operator_account{};
+struct message_operator_deregistration : message_base, std::enable_shared_from_this<message_operator_deregistration> {
+   NAME_TYPE operator_account{};
    PUBLIC_KEY_TYPE operator_key{};
 
    bool                  unpack(META_DATASTREAM* ds) override;
@@ -396,11 +402,14 @@ public:
 } // namespace sysio
 
 #ifdef NO_WASM
+FC_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_purchase)(message_type_stake)(message_type_unstake)(message_type_balance_sheet)(message_type_swap)(message_type_operator_registration)(message_type_operator_deregistration) )
+
 META_REFLECT( sysio::opp::message_base, (type) );
-META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), );
+
+// META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), );
 META_REFLECT_DERIVED( sysio::opp::message_purchase, (sysio::opp::message_base), (amount) );
-META_REFLECT_DERIVED( sysio::opp::message_stake, (sysio::opp::message_base), );
-META_REFLECT_DERIVED( sysio::opp::message_unstake, (sysio::opp::message_base), );
+META_REFLECT_DERIVED( sysio::opp::message_stake, (sysio::opp::message_base), (amount) );
+META_REFLECT_DERIVED( sysio::opp::message_unstake, (sysio::opp::message_base), (amount) );
 META_REFLECT_DERIVED( sysio::opp::message_balance_sheet, (sysio::opp::message_base), (chain)(assets) );
 META_REFLECT_DERIVED( sysio::opp::message_swap, (sysio::opp::message_base), (source_chain)(source_amount)(divisor)(target_chain)(target_amount) );
 META_REFLECT_DERIVED( sysio::opp::message_operator_registration, (sysio::opp::message_base), (operator_account)(operator_key) );
