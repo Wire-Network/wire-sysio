@@ -26,6 +26,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/multi_index/key.hpp>
+#include <boost/asio/post.hpp>
 
 #include <atomic>
 #include <cmath>
@@ -1422,7 +1423,7 @@ namespace sysio {
 
    void connection::close( bool reconnect, bool shutdown ) {
       set_state(connection_state::closing);
-      strand.post( [self = shared_from_this(), reconnect, shutdown]() {
+      boost::asio::post(strand, [self = shared_from_this(), reconnect, shutdown]() {
          self->_close( reconnect, shutdown );
       });
    }
@@ -1565,7 +1566,7 @@ namespace sysio {
    void connection::send_handshake() {
       if (closed())
          return;
-      strand.post( [c = shared_from_this()]() {
+      boost::asio::post(strand, [c = shared_from_this()]() {
          fc::unique_lock g_conn( c->conn_mtx );
          if( c->populate_handshake( c->last_handshake_sent ) ) {
             static_assert( std::is_same_v<decltype( c->sent_handshake_count ), int16_t>, "INT16_MAX based on int16_t" );
@@ -1658,7 +1659,7 @@ namespace sysio {
       std::vector<boost::asio::const_buffer> bufs;
       buffer_queue.fill_out_buffer( bufs );
 
-      strand.post( [c{std::move(c)}, bufs{std::move(bufs)}]() {
+      boost::asio::post(strand, [c{std::move(c)}, bufs{std::move(bufs)}]() {
          boost::asio::async_write( *c->socket, bufs,
             boost::asio::bind_executor( c->strand, [c, socket=c->socket]( boost::system::error_code ec, std::size_t w ) {
             try {
@@ -1931,7 +1932,7 @@ namespace sysio {
    void connection::sync_wait() {
       connection_ptr c(shared_from_this());
       fc::lock_guard g( response_expected_timer_mtx );
-      response_expected_timer.expires_from_now( my_impl->resp_expected_period );
+      response_expected_timer.expires_after( my_impl->resp_expected_period );
       response_expected_timer.async_wait(
             boost::asio::bind_executor( c->strand, [c]( boost::system::error_code ec ) {
                c->sync_timeout( ec );
@@ -1942,7 +1943,7 @@ namespace sysio {
    void connection::fetch_wait() {
       connection_ptr c( shared_from_this() );
       fc::lock_guard g( response_expected_timer_mtx );
-      response_expected_timer.expires_from_now( my_impl->resp_expected_period );
+      response_expected_timer.expires_after( my_impl->resp_expected_period );
       response_expected_timer.async_wait(
             boost::asio::bind_executor( c->strand, [c]( boost::system::error_code ec ) {
                c->fetch_timeout(ec);
@@ -2165,7 +2166,7 @@ namespace sysio {
             sync_last_requested_num = end;
             sync_source = new_sync_source;
             request_sent = true;
-            new_sync_source->strand.post( [new_sync_source, start, end, head_num=chain_info.head_num, lib=chain_info.lib_num]() {
+            boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, head_num=chain_info.head_num, lib=chain_info.lib_num]() {
                peer_ilog( new_sync_source, "requesting range ${s} to ${e}, head ${h}, lib ${lib}", ("s", start)("e", end)("h", head_num)("lib", lib) );
                new_sync_source->request_sync_blocks( start, end );
             } );
@@ -2625,7 +2626,7 @@ namespace sysio {
 
          send_buffer_type sb = buff_factory.get_send_buffer( b );
 
-         cp->strand.post( [cp, bnum, sb{std::move(sb)}]() {
+         boost::asio::post(cp->strand, [cp, bnum, sb{std::move(sb)}]() {
             cp->latest_blk_time = std::chrono::system_clock::now();
             bool has_block = cp->peer_lib_num >= bnum;
             if( !has_block ) {
@@ -2671,7 +2672,7 @@ namespace sysio {
 
          send_buffer_type sb = buff_factory.get_send_buffer( trx );
          fc_dlog( logger, "sending trx: ${id}, to connection ${cid}", ("id", trx->id())("cid", cp->connection_id) );
-         cp->strand.post( [cp, sb{std::move(sb)}]() {
+         boost::asio::post(cp->strand, [cp, sb{std::move(sb)}]() {
             cp->enqueue_buffer( sb, no_reason );
          } );
       } );
@@ -2731,7 +2732,7 @@ namespace sysio {
 
          bool sendit = peer_has_block( bid, conn->connection_id );
          if( sendit ) {
-            conn->strand.post( [conn, last_req{std::move(last_req)}]() {
+            boost::asio::post(conn->strand, [conn, last_req{std::move(last_req)}]() {
                conn->enqueue( last_req );
                conn->fetch_wait();
                fc::lock_guard g_conn_conn( conn->conn_mtx );
@@ -2773,7 +2774,7 @@ namespace sysio {
          }
       }
       connection_ptr c = shared_from_this();
-      strand.post([c]() {
+      boost::asio::post(strand, [c]() {
          my_impl->connections.connect(c);
       });
       return true;
@@ -2848,7 +2849,7 @@ namespace sysio {
             });
 
             connection_ptr new_connection = std::make_shared<connection>(std::move(socket), listen_address, limit);
-            new_connection->strand.post([new_connection, this]() {
+            boost::asio::post(new_connection->strand, [new_connection, this]() {
                if (new_connection->start_session()) {
                   connections.add(new_connection);
                }
@@ -3675,13 +3676,13 @@ namespace sysio {
    // called from connection strand
    void connection::handle_message( const block_id_type& id, signed_block_ptr ptr ) {
       // post to dispatcher strand so that we don't have multiple threads validating the block header
-      my_impl->dispatcher.strand.post([id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id]() mutable {
+      boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id]() mutable {
          controller& cc = my_impl->chain_plug->chain();
 
          // may have come in on a different connection and posted into dispatcher strand before this one
          if( my_impl->dispatcher.have_block( id ) || cc.fetch_block_state_by_id( id ) ) { // thread-safe
             my_impl->dispatcher.add_peer_block( id, c->connection_id );
-            c->strand.post( [c, id]() {
+            boost::asio::post(c->strand, [c, id]() {
                my_impl->sync_master->sync_recv_block( c, id, block_header::num_from_id(id), false );
             });
             return;
@@ -3702,7 +3703,7 @@ namespace sysio {
                      ("cid", cid)("n", ptr->block_num())("id", id.str().substr(8,16)));
          }
          if( exception ) {
-            c->strand.post( [c, id, blk_num=ptr->block_num()]() {
+            boost::asio::post(c->strand, [c, id, blk_num=ptr->block_num()]() {
                my_impl->sync_master->rejected_block( c, blk_num );
                my_impl->dispatcher.rejected_block( id );
             });
@@ -3740,7 +3741,7 @@ namespace sysio {
       uint32_t lib = cc.last_irreversible_block_num();
       try {
          if( blk_num <= lib || cc.fetch_block_by_id(blk_id) ) {
-            c->strand.post( [sync_master = my_impl->sync_master.get(),
+            boost::asio::post(c->strand, [sync_master = my_impl->sync_master.get(),
                              &dispatcher = my_impl->dispatcher, c, blk_id, blk_num]() {
                dispatcher.add_peer_block( blk_id, c->connection_id );
                sync_master->sync_recv_block( c, blk_id, blk_num, true );
@@ -3803,12 +3804,12 @@ namespace sysio {
                });
             }
          });
-         c->strand.post( [sync_master = my_impl->sync_master.get(), &dispatcher = my_impl->dispatcher, c, blk_id, blk_num]() {
+         boost::asio::post(c->strand, [sync_master = my_impl->sync_master.get(), &dispatcher = my_impl->dispatcher, c, blk_id, blk_num]() {
             dispatcher.recv_block( c, blk_id, blk_num );
             sync_master->sync_recv_block( c, blk_id, blk_num, true );
          });
       } else {
-         c->strand.post( [sync_master = my_impl->sync_master.get(), &dispatcher = my_impl->dispatcher, c,
+         boost::asio::post(c->strand, [sync_master = my_impl->sync_master.get(), &dispatcher = my_impl->dispatcher, c,
                           block{std::move(block)}, blk_id, blk_num, reason]() mutable {
             if( reason == unlinkable || reason == no_reason ) {
                dispatcher.add_unlinkable_block( std::move(block), blk_id );
@@ -3825,7 +3826,7 @@ namespace sysio {
    // thread safe
    void net_plugin_impl::start_expire_timer() {
       fc::lock_guard g( expire_timer_mtx );
-      expire_timer.expires_from_now( txn_exp_period);
+      expire_timer.expires_after( txn_exp_period);
       expire_timer.async_wait( [my = shared_from_this()]( boost::system::error_code ec ) {
          if( !ec ) {
             my->expire();
@@ -3836,7 +3837,7 @@ namespace sysio {
    // thread safe
    void net_plugin_impl::ticker() {
       fc::lock_guard g( keepalive_timer_mtx );
-      keepalive_timer.expires_from_now(keepalive_interval);
+      keepalive_timer.expires_after(keepalive_interval);
       keepalive_timer.async_wait( [my = shared_from_this()]( boost::system::error_code ec ) {
             my->ticker();
             if( ec ) {
@@ -3847,7 +3848,7 @@ namespace sysio {
             auto current_time = std::chrono::system_clock::now();
             my->connections.for_each_connection( [current_time]( const connection_ptr& c ) {
                if( c->socket_is_open() ) {
-                  c->strand.post([c, current_time]() {
+                  boost::asio::post(c->strand, [c, current_time]() {
                      c->check_heartbeat(current_time);
                   } );
                }
@@ -3874,7 +3875,7 @@ namespace sysio {
    void net_plugin_impl::on_accepted_block_header(const signed_block_ptr& block, const block_id_type& id) {
       update_chain_info();
 
-      dispatcher.strand.post([block, id]() {
+      boost::asio::post(dispatcher.strand, [block, id]() {
          fc_dlog(logger, "signaled accepted_block_header, blk num = ${num}, id = ${id}", ("num", block->block_num())("id", id));
          my_impl->dispatcher.bcast_block(block, id);
       });
@@ -4582,7 +4583,7 @@ namespace sysio {
       if (!timer) {
          timer = std::make_unique<boost::asio::steady_timer>( my_impl->thread_pool.get_executor() );
       }
-      timer->expires_from_now( du );
+      timer->expires_after( du );
       timer->async_wait( [this, from_connection{std::move(from_connection)}, f = func](boost::system::error_code ec) mutable {
          if( !ec ) {
             (this->*f)(from_connection);

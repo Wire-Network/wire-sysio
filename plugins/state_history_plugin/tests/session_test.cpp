@@ -267,8 +267,9 @@ struct state_history_test_fixture {
       beast::flat_buffer buffer;
       ws.read(buffer);
 
-      auto                        d = boost::asio::buffer_cast<char const*>(boost::beast::buffers_front(buffer.data()));
-      auto                        s = boost::asio::buffer_size(buffer.data());
+      auto first_buf = boost::beast::buffers_front(buffer.data());
+      auto d         = static_cast<char const*>(first_buf.data());
+      auto s         = boost::asio::buffer_size(buffer.data());
       fc::datastream<const char*> ds(d, s);
       fc::raw::unpack(ds, result);
    }

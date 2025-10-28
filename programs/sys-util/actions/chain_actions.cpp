@@ -7,12 +7,11 @@
 
 #include <boost/exception/diagnostic_information.hpp>
 #include <boost/dll.hpp>
-#include <boost/process.hpp>
+#include <boost/process/v1.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
-#include <boost/process/spawn.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
 #include <gsl-lite/gsl-lite.hpp>
@@ -74,7 +73,7 @@ namespace {
   ) + ".sock")).string();
   string wallet_url = default_wallet_url; //to be set to default_wallet_url in main
 
-  namespace bp = boost::process;
+  namespace bp = boost::process::v1;
 
   bool kill_process_by_name(const std::string& name) {
     // Use pgrep to find PIDs by process name
