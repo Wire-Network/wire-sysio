@@ -6,7 +6,7 @@ namespace sysio::opp {
 
 namespace {
 template <typename T>
-META_DATASTREAM* pack_to_stream(META_DATASTREAM* ds, std::shared_ptr<T> storage_ptr) {
+META_DATASTREAM* pack_to_stream(META_DATASTREAM* ds, const std::shared_ptr<T>& storage_ptr) {
 #ifdef NO_WASM
    fc::raw::pack(*ds, storage_ptr);
 #else
@@ -16,7 +16,7 @@ META_DATASTREAM* pack_to_stream(META_DATASTREAM* ds, std::shared_ptr<T> storage_
 }
 
 template <typename T>
-bool unpack_from_stream(META_DATASTREAM* ds, std::shared_ptr<T> storage_ptr) {
+bool unpack_from_stream(META_DATASTREAM* ds, const std::shared_ptr<T>& storage_ptr) {
 #ifdef NO_WASM
    fc::raw::unpack(*ds, storage_ptr);
 #else
