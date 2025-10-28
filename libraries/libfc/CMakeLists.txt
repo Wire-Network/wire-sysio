@@ -77,6 +77,7 @@ endif()
 target_link_libraries(
   fc
   PUBLIC
+  fc-lite
   Boost::date_time
   Boost::chrono
   Boost::iostreams
@@ -103,6 +104,8 @@ target_link_libraries(
   ${CMAKE_DL_LIBS}
 )
 
+target_compile_definitions(fc PUBLIC -DFC_AVAILABLE=1)
+
 add_subdirectory(test)
 
 install(
@@ -116,10 +119,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR} 
 )
 
-# install(
-#   TARGETS bls12-381::bls12-381
-#   ARCHIVE
-#   DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}" 
-#   EXCLUDE_FROM_ALL
-#   PUBLIC_HEADER 
-#   DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}/bls12-381" COMPONENT dev EXCLUDE_FROM_ALL)
+
