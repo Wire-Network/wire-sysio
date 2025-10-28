@@ -45,12 +45,13 @@ RUN apt-get install -y \
 # Build toolchain and development libraries needed by the application
 RUN apt-get install -y \
 				build-essential \
+        binutils \
 				ccache \
 				cmake \
 				curl \
 				doxygen \
-        g++-10 \
-        gcc-10 \
+        # g++ \
+        # gcc \
 				g++-12 \
 				gcc-12 \
 				git \
@@ -74,10 +75,15 @@ RUN apt-get install -y \
 				python3-venv \
         python3-dev \
         autoconf \
+        autoconf-archive \
         automake \
         libtool \
         libltdl-dev \
         m4 \
+        gettext \
+        gawk \
+        texinfo \
+        perl \
 				sudo \
 				tar \
 				unzip \
@@ -85,7 +91,26 @@ RUN apt-get install -y \
 				zip \
 				zlib1g-dev
 
-        
+
+# --- OS-specific fixups for package names / probes ---
+# --- OS-specific fixups for package names / probes ---
+# RUN set -eux; . /etc/os-release; \
+#   if [ "$VERSION_ID" = "25.04" ]; then \
+#     apt-get update; \
+#     # ncurses name differences
+#     (apt-get install -y libncurses-dev || true); \
+#     # ensure real gcc/g++ exist (25.04 typically ships gcc-14)
+#     apt-get install -y gcc g++; \
+#     # Provide gcc-10/g++-10 shims that delegate to the real gcc/g++
+#     install -d /usr/local/bin; \
+#     printf '#!/bin/sh\nexec gcc "$@"\n'  >/usr/local/bin/gcc-10;  chmod +x /usr/local/bin/gcc-10; \
+#     printf '#!/bin/sh\nexec g++ "$@"\n'  >/usr/local/bin/g++-10;  chmod +x /usr/local/bin/g++-10; \
+#     # sanity
+#     which gcc-10 && ls -l $(which gcc-10) || true; \
+#     which g++-10 && ls -l $(which g++-10) || true; \
+#   fi
+
+
 RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
 # Stage 2a: clang18-build
@@ -130,8 +155,8 @@ RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
     BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
 
 ENV MAX_JOBS=16
-# ENV CC=${CLANG_18_DIR}/bin/clang
-# ENV CXX=${CLANG_18_DIR}/bin/clang++
+ENV CC=${CLANG_18_DIR}/bin/clang
+ENV CXX=${CLANG_18_DIR}/bin/clang++
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
@@ -161,19 +186,6 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-# RUN env CC=${CC} CXX=${CXX} cmake \
-#     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
-#     -B . \
-#     -G Ninja \
-#     -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
-#     -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-#     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-#     -DCMAKE_C_COMPILER=${CC} \
-#     -DCMAKE_CXX_COMPILER=${CXX} \
-#     -DCMAKE_AR=${CLANG_18_DIR}/bin/llvm-ar \
-#     -DCMAKE_RANLIB=${CLANG_18_DIR}/bin/llvm-ranlib \
-#     -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
-#     -DENABLE_CCACHE=ON
 RUN set -eux; \
   unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS || true; \
   rc=0; \
@@ -194,35 +206,7 @@ RUN set -eux; \
       -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
       -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
       -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
-      -DENABLE_CCACHE=ON \
-  || rc=$?; \
-  if [ "$rc" -ne 0 ]; then \
-    echo '=== vcpkg-manifest-install.log (tail) ===' || true; \
-    test -f "${APP_BUILD_DIR}/vcpkg-manifest-install.log" && tail -n 200 "${APP_BUILD_DIR}/vcpkg-manifest-install.log" || true; \
-    for f in \
-  "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-dbg-out.log" \
-  "${APP_DIR}/vcpkg/buildtrees/boost/install-x64-linux-rel-out.log" \
-  "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-dbg-out.log" \
-  "${APP_DIR}/vcpkg/buildtrees/boost/config-x64-linux-rel-out.log" \
-  "${APP_DIR}/vcpkg/buildtrees/gmp/config-${VCPKG_DEFAULT_TRIPLET}-out.log" \
-  "${APP_DIR}/vcpkg/buildtrees/gmp/install-${VCPKG_DEFAULT_TRIPLET}-out.log" \
-  "${APP_BUILD_DIR}/vcpkg-manifest-install.log" \
-; do \
-  if [ -f "$f" ]; then \
-    echo "=== $f (first failure context) ==="; \
-    line=$(grep -nE "FAILED:|subcommand failed| error: | error\\]|ninja: build stopped" "$f" | head -n1 | cut -d: -f1 || true); \
-    if [ -n "$line" ]; then \
-      start=$((line>120?line-120:1)); end=$((line+240)); sed -n "${start},${end}p" "$f" || true; \
-    else \
-      tail -n 200 "$f" || true; \
-    fi; \
-    echo "--- compiler lines (first few) ---"; \
-    grep -E "/clang\\+\\+|/g\\+\\+| -std=gnu\\+\\+| -std=c\\+\\+" "$f" | head -n 10 || true; \
-  fi; \
-done; \
-    exit $rc; \
-  fi
-
+      -DENABLE_CCACHE=ON 
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 

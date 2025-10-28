@@ -354,7 +354,9 @@ private:
       socket_stream->async_read(
           *in_buffer, [self = this->shared_from_this(), in_buffer](boost::system::error_code ec, size_t) {
              self->callback(ec, false, "async_read", [self, in_buffer] {
-                auto d = boost::asio::buffer_cast<char const*>(boost::beast::buffers_front(in_buffer->data()));
+               //  auto d = boost::asio::buffer_cast<char const*>(boost::beast::buffers_front(in_buffer->data()));
+                auto first_buf = boost::beast::buffers_front(in_buffer->data());
+                auto d        = static_cast<char const*>(first_buf.data());
                 auto s = boost::asio::buffer_size(in_buffer->data());
                 fc::datastream<const char*> ds(d, s);
                 state_history::state_request req;

@@ -96,8 +96,14 @@ namespace sysio::operator_plugin::services {
     if (j) {
       j->cancelled = true;
       if (j->timer) {
-        boost::system::error_code ec;
-        j->timer->cancel(ec);
+        try {
+          j->timer->cancel();
+        } catch (const std::exception& e) {
+          logger().log(FC_LOG_MESSAGE(warn,
+            "cron_service::cancel() timer->cancel() threw: ${what}",
+            ("what", e.what())
+          ));
+        }
       }
     }
   }
@@ -112,8 +118,14 @@ namespace sysio::operator_plugin::services {
     for (auto& j : to_cancel) {
       j->cancelled = true;
       if (j->timer) {
-        boost::system::error_code ec;
-        j->timer->cancel(ec);
+        try {
+          j->timer->cancel();
+        } catch (const std::exception& e) {
+          logger().log(FC_LOG_MESSAGE(warn,
+            "cron_service::cancel() timer->cancel() threw: ${what}",
+            ("what", e.what())
+          ));
+        }
       }
     }
   }
