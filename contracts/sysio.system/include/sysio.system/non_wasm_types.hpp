@@ -1,6 +1,12 @@
 #pragma once
 
 #if !defined(__EMSCRIPTEN__) && !defined(__wasm__)  && !defined(__wasm32__)  && !defined(__wasm64__)
+#define NO_WASM
+#else
+#define WASM
+#endif
+
+#ifdef NO_WASM
 typedef __int128 int_128;
 typedef __int128 int_128;
 typedef __int128 int128;

@@ -2,7 +2,7 @@
 #include <boost/optional/optional.hpp>
 #include <boost/test/results_collector.hpp>
 #include <boost/test/unit_test.hpp>
-#include <fc/tuples.hpp>
+#include <../../libfc-lite/include/fc-lite/tuples.hpp>
 
 #include <fc/exception/exception.hpp>
 

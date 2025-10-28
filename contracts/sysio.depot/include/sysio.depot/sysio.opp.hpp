@@ -1,12 +1,38 @@
 #pragma once
 
+#include <fc-lite/lut.hpp>
+#include <fc-lite/tuples.hpp>
+#include <sysio.system/non_wasm_types.hpp>
+#include <sysio/asset.hpp>
 #include <tuple>
 #include <variant>
 
-#include <fc/tuples.hpp>
-#include <fc/lut.hpp>
-#include <sysio/asset.hpp>
-#include <sysio.system/non_wasm_types.hpp>
+#ifdef NO_WASM
+#include <fc/utility.hpp>
+#include <fc/io/datastream.hpp>
+#include <fc/reflect/reflect.hpp>
+#include <fc/crypto/public_key.hpp>
+#define META_REFLECT(...) FC_REFLECT(__VA_ARGS__)
+// #define META_REFLECT_ENUM(...) FC_REFLECT_ENUM(__VA_ARGS__)
+#define META_REFLECT_TEMPLATE(...) FC_REFLECT_TEMPLATE(__VA_ARGS__)
+#define META_REFLECT_DERIVED(...) FC_REFLECT_DERIVED(__VA_ARGS__)
+#define META_REFLECT_DERIVED_TEMPLATE(...) FC_REFLECT_DERIVED_TEMPLATE(__VA_ARGS__)
+#define META_DATASTREAM fc::datastream<char*>
+#define PUBLIC_KEY_TYPE fc::crypto::public_key
+#else
+#include <sysio/crypto.hpp>
+#include <sysio/fixed_bytes.hpp>
+#include <sysio/serialize.hpp>
+#include <sysio/sysio.hpp>
+#define META_REFLECT(...) SYSLIB_SERIALIZE(__VA_ARGS__)
+#define META_REFLECT_TEMPLATE(...) SYSLIB_SERIALIZE_TEMPLATE(__VA_ARGS__)
+#define META_REFLECT_DERIVED(...) SYSLIB_SERIALIZE_DERIVED(__VA_ARGS__)
+#define META_REFLECT_DERIVED_TEMPLATE(...) SYSLIB_SERIALIZE_DERIVED_TEMPLATE(__VA_ARGS__)
+
+#define META_DATASTREAM sysio::datastream<char*>
+#define PUBLIC_KEY_TYPE sysio::public_key
+#endif
+
 
 namespace sysiosystem {
 class system_contract;
@@ -82,24 +108,13 @@ enum message_type : uint8_t {
    message_type_unknown = 0,            ///< Unknown message type
    message_type_purchase,               ///< Purchase transaction
    message_type_stake,                  ///< Staking operation
-   message_type_unstake,                ///< Unstaking operation
+   message_type_unstake,                ///< Un-staking operation
    message_type_balance_sheet,          ///< Balance sheet update
    message_type_swap,                   ///< Token swap operation
    message_type_operator_registration,  ///< New operator registration
    message_type_operator_deregistration ///< Operator deregistration
-                                        // message_type_challenge_agree,         ///< Challenge agreement
-                                        // message_type_challenge_reject,        ///< Challenge rejection
-                                        // message_type_no_challenge             ///< No challenge present
 };
 
-
-struct message_metadata {
-   const message_type type;
-   explicit message_metadata(message_type type)
-      : type(type) {};
-
-   virtual ~message_metadata() = default;
-};
 
 /**
  * Abstract message class defining pack & unpack
@@ -107,96 +122,137 @@ struct message_metadata {
  * @tparam Type The message type
  * @brief Base structure for all message types
  */
-template <message_type Type>
-struct message_base : message_metadata {
-   explicit message_base()
-      : message_metadata(Type) {};
+
+struct message_base {
+   message_type type;
+   message_base() : type(message_type_unknown) {};
+   explicit message_base(message_type type)
+      : type(type) {}
    virtual ~message_base() = default;
 
-   virtual void                  unpack(const uint8_t* data, std::size_t size) = 0;
-   virtual std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes)             = 0;
+   virtual bool unpack(META_DATASTREAM* ds);
+   virtual META_DATASTREAM* pack(META_DATASTREAM* ds);
+#ifdef WASM
+   META_REFLECT( sysio::opp::message_base, (type) );
+#endif
 };
+
+// META_REFLECT( sysio::opp::message_base, (type) );
 
 /**
  * @brief Message structures for each message type
  */
-struct message_unknown : message_base<message_type_unknown> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_unknown : message_base {
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+   message_unknown() : message_base(message_type_unknown) {};
    virtual ~message_unknown() = default;
+// #ifdef WASM
+//    META_REFLECT( sysio::opp::message_unknown, (type) );
+// #endif
 };
 
 /**
  * TOKEN PURCHASE
  */
-struct message_purchase : message_base<message_type_purchase> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_purchase : message_base {
+   asset amount{};
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+   message_purchase() : message_base(message_type_purchase) {};
    virtual ~message_purchase() = default;
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_purchase, sysio::opp::message_base , (amount) );
+#endif
 };
 
 /**
  * STAKE
  */
-struct message_stake : message_base<message_type_stake> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_stake : message_base {
+   asset amount{};
+
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+   message_stake() : message_base(message_type_stake) {};
    virtual ~message_stake() = default;
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_stake, sysio::opp::message_base, (amount) );
+#endif
 };
 
-struct message_unstake : message_base<message_type_unstake> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_unstake : message_base {
+   asset amount{};
+
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
    virtual ~message_unstake() = default;
+   message_unstake() : message_base(message_type_unstake) {};
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_unstake, sysio::opp::message_base, (amount) );
+#endif
 };
 
-struct message_balance_sheet : message_base<message_type_balance_sheet> {
+struct message_balance_sheet : message_base {
    constexpr static auto asset_size = sizeof(asset);
    static_assert(asset_size == sizeof(uint128_t), "Asset size is not 16 bytes");
 
    chain_kind         chain{chain_unknown};
    std::vector<asset> assets{};
 
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+   message_balance_sheet() : message_base(message_type_balance_sheet) {};
    virtual ~message_balance_sheet() = default;
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_balance_sheet, sysio::opp::message_base, (chain)(assets) );
+#endif
 };
 
-struct message_swap : message_base<message_type_swap> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_swap : message_base {
+   chain_kind source_chain{chain_unknown};
+   asset source_amount{};
+
+   uint64_t divisor{};
+
+   chain_kind target_chain{chain_unknown};
+   asset target_amount{};
+
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
    virtual ~message_swap() = default;
+   message_swap() : message_base(message_type_swap) {};
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_swap, sysio::opp::message_base, (source_chain)(source_amount)(divisor)(target_chain)(target_amount));
+#endif
 };
 
-struct message_operator_registration : message_base<message_type_operator_registration> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_operator_registration : message_base {
+   name operator_account{};
+   PUBLIC_KEY_TYPE operator_key{};
+   bool unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+
+   message_operator_registration() : message_base(message_type_operator_registration) {};
    virtual ~message_operator_registration() = default;
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_operator_registration, sysio::opp::message_base, (operator_account)(operator_key) );
+#endif
 };
 
-struct message_operator_deregistration : message_base<message_type_operator_deregistration> {
-   void                  unpack(const uint8_t* data, std::size_t size) override;
-   std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
+struct message_operator_deregistration : message_base {
+   name operator_account{};
+   PUBLIC_KEY_TYPE operator_key{};
+
+   bool                  unpack(META_DATASTREAM* ds) override;
+   META_DATASTREAM* pack(META_DATASTREAM* ds) override;
+   message_operator_deregistration() : message_base(message_type_operator_deregistration) {};
    virtual ~message_operator_deregistration() = default;
+#ifdef WASM
+   META_REFLECT_DERIVED( sysio::opp::message_operator_deregistration, sysio::opp::message_base, (operator_account)(operator_key) );
+#endif
 };
 
-// struct message_challenge_agree : message_base<message_type_challenge_agree> {
-//    void                  unpack(const uint8_t* data, std::size_t size) override;
-//    std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
-//    virtual ~message_challenge_agree() = default;
-// };
-//
-// struct message_challenge_reject : message_base<message_type_challenge_reject> {
-//    void                  unpack(const uint8_t* data, std::size_t size) override;
-//    std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
-//    virtual ~message_challenge_reject() = default;
-// };
-//
-// struct message_no_challenge : message_base<message_type_no_challenge> {
-//    void                  unpack(const uint8_t* data, std::size_t size) override;
-//    std::vector<uint8_t>& pack(std::vector<uint8_t>& bytes) override;
-//    virtual ~message_no_challenge() = default;
-// };
 /**
  * @brief Mapping of message types to their corresponding structures
  */
@@ -338,3 +394,15 @@ public:
 } // namespace opp
 
 } // namespace sysio
+
+#ifdef NO_WASM
+META_REFLECT( sysio::opp::message_base, (type) );
+META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), );
+META_REFLECT_DERIVED( sysio::opp::message_purchase, (sysio::opp::message_base), (amount) );
+META_REFLECT_DERIVED( sysio::opp::message_stake, (sysio::opp::message_base), );
+META_REFLECT_DERIVED( sysio::opp::message_unstake, (sysio::opp::message_base), );
+META_REFLECT_DERIVED( sysio::opp::message_balance_sheet, (sysio::opp::message_base), (chain)(assets) );
+META_REFLECT_DERIVED( sysio::opp::message_swap, (sysio::opp::message_base), (source_chain)(source_amount)(divisor)(target_chain)(target_amount) );
+META_REFLECT_DERIVED( sysio::opp::message_operator_registration, (sysio::opp::message_base), (operator_account)(operator_key) );
+META_REFLECT_DERIVED( sysio::opp::message_operator_deregistration, (sysio::opp::message_base), (operator_account)(operator_key) );
+#endif

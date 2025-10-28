@@ -1,5 +1,6 @@
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.depot.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.depot.wasm COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.depot.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.depot.abi COPYONLY)
+
 if(BUILD_SYSTEM_CONTRACTS)
   file(GLOB_RECURSE SRCS src/*.cpp)
   add_contract(
@@ -8,10 +9,9 @@ if(BUILD_SYSTEM_CONTRACTS)
     ${SRCS}
   )
 
-  target_include_directories(sysio.depot
-    PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../libraries/libfc/include
+  target_link_libraries(sysio.depot INTERFACE fc-lite)
 
+  target_include_directories(sysio.depot
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include>
