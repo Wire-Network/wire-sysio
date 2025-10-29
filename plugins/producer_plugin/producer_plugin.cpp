@@ -2113,8 +2113,8 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
             log_trx_results(trx, except_ptr);
             next(except_ptr);
          }
+         return push_result{.failed = true};
       }
-      return push_result{.failed = true};
    }
 
    fc::microseconds max_trx_time = fc::milliseconds(_max_transaction_time_ms.load());

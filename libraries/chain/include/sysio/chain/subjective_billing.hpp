@@ -144,10 +144,10 @@ public:
 
    fc::microseconds get_subjective_bill( const account_name& a, const fc::time_point& now ) const {
       if( _disabled || _disabled_accounts.contains( a ) ) return fc::microseconds{0};
-      const auto time_ordinal = time_ordinal_for(now);
       auto aitr = _account_subjective_bill_cache.find( a );
       if( aitr != _account_subjective_bill_cache.end() ) {
          const subjective_billing_info& sub_bill_info = aitr->second;
+         const auto time_ordinal = time_ordinal_for(now);
          int64_t sub_bill = sub_bill_info.pending_cpu_us + sub_bill_info.expired_accumulator.value_at(time_ordinal, _expired_accumulator_average_window );
          return fc::microseconds{sub_bill};
       }
