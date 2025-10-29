@@ -150,7 +150,6 @@ namespace sysio::chain {
          if (explicit_billed_cpu_time) {
             SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception, "No transaction receipt cpu usage");
             trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
-            SYS_ASSERT(trace->total_cpu_usage_us > 0, transaction_exception, "Invalid transaction receipt cpu usage");
             validate_trx_billed_cpu();
          } else {
             billed_cpu_us.reserve(trx.total_actions());
@@ -525,7 +524,6 @@ namespace sysio::chain {
    }
 
    void transaction_context::validate_trx_billed_cpu() const {
-      assert(trace->total_cpu_usage_us > 0);
       if (control.skip_trx_checks())
          return;
 
