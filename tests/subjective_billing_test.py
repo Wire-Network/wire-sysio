@@ -88,7 +88,7 @@ try:
     # api node configured with whitelist
     wlnode = cluster.nodes[2]
 
-    # api node configured with decay of 30 min
+    # api node configured with decay of 1 min
     fdnode = cluster.nodes[3]
 
     preBalances = node.getSysBalances([account1, account2])
@@ -99,9 +99,8 @@ try:
     for x in range(5):
         memo = 'tx-{}'.format(x)
         txn = {
-
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account1","permission": "active"}],
+                         "authorization": [{"actor": "account1","permission": "active"},{"actor": "account1","permission": "sysio.payer"}],
                          "data": {"from": "account1","to": "account2","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }
@@ -122,9 +121,8 @@ try:
     for x in range(5):
         memo = 'tx-{}'.format(x)
         txn = {
-
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account2","permission": "active"}],
+                         "authorization": [{"actor": "account2","permission": "active"},{"actor": "account2","permission": "sysio.payer"}],
                          "data": {"from": "account2","to": "account1","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }
@@ -145,9 +143,8 @@ try:
     for x in range(5):
         memo = 'tx-{}'.format(x)
         txn = {
-
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account1","permission": "active"}],
+                         "authorization": [{"actor": "account1","permission": "active"},{"actor": "account1","permission": "sysio.payer"}],
                          "data": {"from": "account1","to": "account2","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }
