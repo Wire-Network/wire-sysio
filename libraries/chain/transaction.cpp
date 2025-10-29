@@ -194,8 +194,10 @@ uint32_t packed_transaction::get_action_billable_size(size_t action_index)const 
 
    uint32_t size = billable_net_per_action_overhead;
    if (action_index < unpacked_trx.context_free_actions.size()) {
-      // asserted to be the same size in local_unpack_context_free_data
-      size += unpacked_trx.context_free_data[action_index].size();
+      // asserted to be less than or equal to context_free_actions.size()
+      if (unpacked_trx.context_free_data.size() > action_index) {
+         size += unpacked_trx.context_free_data[action_index].size();
+      }
       size += unpacked_trx.context_free_actions[action_index].get_billable_size();
    } else {
       size += unpacked_trx.actions[action_index - unpacked_trx.context_free_actions.size()].get_billable_size();
@@ -381,8 +383,8 @@ void packed_transaction::decompress() {
 void packed_transaction::init()
 {
    SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
-   SYS_ASSERT( unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
-              "Context free data size ${cfd} not equal to context free actions size ${cfa}",
+   SYS_ASSERT( unpacked_trx.context_free_data.size() <= unpacked_trx.context_free_actions.size(), transaction_exception,
+              "Context free data size ${cfd} greater than context free actions size ${cfa}",
               ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
 
    int64_t size = config::fixed_net_overhead_of_packed_trx;

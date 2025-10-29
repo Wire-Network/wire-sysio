@@ -612,7 +612,8 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
       set_transaction_headers(trx);
 
       auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
-      BOOST_CHECK_EXCEPTION(push_transaction(trx), transaction_exception, fc_exception_message_is("Context free data size 2 not equal to context free actions size 1"));
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), transaction_exception,
+                            fc_exception_message_is("Context free data size 2 greater than context free actions size 1"));
 
       trx.signatures.clear();
 
