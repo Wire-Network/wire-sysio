@@ -1,6 +1,6 @@
 #pragma once
 
-#if !defined(__EMSCRIPTEN__) && !defined(__wasm__)  && !defined(__wasm32__)  && !defined(__wasm64__)
+#if defined(WASMTIME) || (!defined(__EMSCRIPTEN__) && !defined(__wasm__)  && !defined(__wasm32__)  && !defined(__wasm64__))
 #define NO_WASM
 #else
 #define WASM

@@ -32,6 +32,9 @@ if(NOT DISABLE_WASM_SPEC_TESTS)
   add_subdirectory(wasm-spec-tests/generated-tests)
 endif()
 
+# WASI unit tests harness
+add_subdirectory(wasm-unittests-harness)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_contracts.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/include/test_contracts.hpp ESCAPE_QUOTES)
 
 add_subdirectory(snapshots)
