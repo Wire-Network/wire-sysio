@@ -1952,27 +1952,33 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    BOOST_TEST(trace->action_traces.at(0).elapsed.count() > 0);
    BOOST_TEST(trace->action_traces.at(1).elapsed.count() > 0);
    BOOST_TEST(trace->action_traces.at(2).elapsed.count() > 0);
-   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.net_usage; }));
-   BOOST_TEST(trace->action_traces.at(0).net_usage == 108u);
-   BOOST_TEST(trace->action_traces.at(1).net_usage == 108u);
-   BOOST_TEST(trace->action_traces.at(2).net_usage == 124u); // has two auths
-   BOOST_TEST(trace->total_cpu_usage_us == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.cpu_usage_us; }));
-   BOOST_TEST(trace->total_cpu_usage_us >= 100);
-   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us > 1u); // min billed trx time is 100
-   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us > 1u);
-   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us > 1u);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(0).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(0).cpu_usage_us);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).cpu_usage_us);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).cpu_usage_us);
+   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.net_usage; }));
+   BOOST_TEST(*trace->action_traces.at(0).net_usage == 108u);
+   BOOST_TEST(*trace->action_traces.at(1).net_usage == 108u);
+   BOOST_TEST(*trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(trace->total_cpu_usage_us.value == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.cpu_usage_us; }));
+   BOOST_TEST(trace->total_cpu_usage_us.value >= 100u);
+   BOOST_TEST(*trace->action_traces.at(0).cpu_usage_us > 1u); // min billed trx time is 100
+   BOOST_TEST(*trace->action_traces.at(1).cpu_usage_us > 1u);
+   BOOST_TEST(*trace->action_traces.at(2).cpu_usage_us > 1u);
    // billed larger than elapsed because billed includes trx time distributed over the cpu_usage_us
-   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us.value >= trace->action_traces.at(0).elapsed.count());
-   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us.value >= trace->action_traces.at(1).elapsed.count());
-   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us.value >= trace->action_traces.at(2).elapsed.count());
+   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us->value >= trace->action_traces.at(0).elapsed.count());
+   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us->value >= trace->action_traces.at(1).elapsed.count());
+   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us->value >= trace->action_traces.at(2).elapsed.count());
    auto acc_cpu_limit1  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
    auto user_cpu_limit1 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
    auto acc_net_limit1  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
    auto user_net_limit1 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
-   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us.value - trace->action_traces.at(1).cpu_usage_us.value);
-   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us.value);
-   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - trace->action_traces.at(0).net_usage - trace->action_traces.at(1).net_usage);
-   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - trace->action_traces.at(2).net_usage);
+   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us->value - trace->action_traces.at(1).cpu_usage_us->value);
+   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us->value);
+   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - *trace->action_traces.at(0).net_usage - *trace->action_traces.at(1).net_usage);
+   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - *trace->action_traces.at(2).net_usage);
 
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
@@ -1993,22 +1999,28 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    BOOST_TEST(trace->action_traces.at(0).elapsed.count() > 0);
    BOOST_TEST(trace->action_traces.at(1).elapsed.count() > 0);
    BOOST_TEST(trace->action_traces.at(2).elapsed.count() > 0);
-   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + t.net_usage; }));
-   BOOST_TEST(trace->action_traces.at(0).net_usage == 108u);
-   BOOST_TEST(trace->action_traces.at(1).net_usage == 108u);
-   BOOST_TEST(trace->action_traces.at(2).net_usage == 124u); // has two auths
-   BOOST_TEST(trace->total_cpu_usage_us == total_cpu);
-   BOOST_TEST(trace->action_traces.at(0).cpu_usage_us == cpu_usage[0]);
-   BOOST_TEST(trace->action_traces.at(1).cpu_usage_us == cpu_usage[1]);
-   BOOST_TEST(trace->action_traces.at(2).cpu_usage_us == cpu_usage[2]);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(0).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).net_usage);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(0).cpu_usage_us);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(1).cpu_usage_us);
+   BOOST_TEST_REQUIRE(!!trace->action_traces.at(2).cpu_usage_us);
+   BOOST_TEST(trace->net_usage == std::ranges::fold_left(trace->action_traces, 0ul, [](uint64_t v, const action_trace& t) { return v + *t.net_usage; }));
+   BOOST_TEST(*trace->action_traces.at(0).net_usage == 108u);
+   BOOST_TEST(*trace->action_traces.at(1).net_usage == 108u);
+   BOOST_TEST(*trace->action_traces.at(2).net_usage == 124u); // has two auths
+   BOOST_TEST(trace->total_cpu_usage_us.value == total_cpu);
+   BOOST_TEST(*trace->action_traces.at(0).cpu_usage_us == cpu_usage[0]);
+   BOOST_TEST(*trace->action_traces.at(1).cpu_usage_us == cpu_usage[1]);
+   BOOST_TEST(*trace->action_traces.at(2).cpu_usage_us == cpu_usage[2]);
    acc_cpu_limit1  = mgr.get_account_cpu_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
    user_cpu_limit1 = mgr.get_account_cpu_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
    acc_net_limit1  = mgr.get_account_net_limit_ex(acc, config::maximum_elastic_resource_multiplier).first;
    user_net_limit1 = mgr.get_account_net_limit_ex(user, config::maximum_elastic_resource_multiplier).first;
-   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us.value - trace->action_traces.at(1).cpu_usage_us.value);
-   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us.value);
-   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - trace->action_traces.at(0).net_usage - trace->action_traces.at(1).net_usage);
-   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - trace->action_traces.at(2).net_usage);
+   BOOST_TEST(acc_cpu_limit1.available >= acc_cpu_limit0.available - trace->action_traces.at(0).cpu_usage_us->value - trace->action_traces.at(1).cpu_usage_us->value);
+   BOOST_TEST(user_cpu_limit1.available >= user_cpu_limit0.available - trace->action_traces.at(2).cpu_usage_us->value);
+   BOOST_TEST(acc_net_limit1.available >= acc_net_limit0.available - *trace->action_traces.at(0).net_usage - *trace->action_traces.at(1).net_usage);
+   BOOST_TEST(user_net_limit1.available >= user_net_limit0.available - *trace->action_traces.at(2).net_usage);
 
    // bill at minimum
    auto min_cpu_time_us = chain.control->get_global_properties().configuration.min_transaction_cpu_usage;

@@ -3158,6 +3158,8 @@ inline std::pair<action_trace, std::string> generate_action_trace(const std::opt
       action_name{"acttest"},
       bytes{fc::raw::pack(std::string{"test_data"})});
    at.elapsed = fc::microseconds{3};
+   at.cpu_usage_us = 3;
+   at.net_usage = 5;
    at.console = "console line";
    at.trx_id = transaction_id_type{"5d039021cf3262c5036a6ad40a809ae1440ae6c6792a48e6e95abf083b108d5f"};
    at.block_num = 4;
@@ -3187,6 +3189,8 @@ inline std::pair<action_trace, std::string> generate_action_trace(const std::opt
       <<         "},"
       <<         "\"context_free\":false,"
       <<         "\"elapsed\":3,"
+      <<         "\"cpu_usage_us\":3,"
+      <<         "\"net_usage\":5,"
       <<         "\"console\":\"console line\","
       <<         "\"trx_id\":\"5d039021cf3262c5036a6ad40a809ae1440ae6c6792a48e6e95abf083b108d5f\","
       <<         "\"block_num\":4,"

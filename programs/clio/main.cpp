@@ -668,9 +668,9 @@ void print_result( const fc::variant& result ) { try {
          if( processed.get_object().contains( "receipt" )) {
             const auto& receipt = processed["receipt"];
             if( receipt.is_object()) {
-               status = receipt["status"].as_string();
-               net = receipt["net_usage_words"].as_int64() * 8;
-               cpu = receipt["cpu_usage_us"].as_int64();
+               status = "executed";
+               net = processed["net_usage"].as_int64();
+               cpu = processed["total_cpu_usage_us"].as_int64();
             }
          }
 
