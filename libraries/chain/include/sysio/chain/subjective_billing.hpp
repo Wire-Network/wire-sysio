@@ -181,13 +181,13 @@ public:
    }
 
    template <typename Yield>
-   bool remove_expired( fc::logger& log, const fc::time_point& pending_block_time, const fc::time_point& now, Yield&& yield ) {
+   std::pair<bool,uint32_t> remove_expired( fc::logger& log, const fc::time_point& pending_block_time, const fc::time_point& now, Yield&& yield ) {
       bool exhausted = false;
+      uint32_t num_expired = 0;
       auto& idx = _trx_cache_index.get<by_expiry>();
       if( !idx.empty() ) {
          const auto time_ordinal = time_ordinal_for(now);
          const auto orig_count = _trx_cache_index.size();
-         uint32_t num_expired = 0;
 
          while( !idx.empty() ) {
             if( yield() ) {
@@ -204,7 +204,7 @@ public:
          fc_dlog( log, "Processed ${n} subjective billed transactions, Expired ${expired}",
                   ("n", orig_count)( "expired", num_expired ) );
       }
-      return !exhausted;
+      return std::make_pair(!exhausted, num_expired);
    }
 
    uint32_t get_expired_accumulator_average_window() const {

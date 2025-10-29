@@ -1908,7 +1908,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
             return start_block_result::exhausted;
          if (!subjective_bill.remove_expired(_log, chain.pending_block_time(), fc::time_point::now(), [&]() {
                 return should_interrupt_start_block(preprocess_deadline, pending_block_num);
-             })) {
+             }).first) {
             return start_block_result::exhausted;
          }
 
