@@ -301,10 +301,11 @@ namespace sysio::chain {
             billing_timer_exception_code = org_code;
             tx_cpu_usage_reason = org_reason;
          });
-         account_name a = act.payer();
-         auto& b = accounts_billing[a];
          active_deadline = trx_deadline;
          if (!explicit_billed_cpu_time) {
+            account_name a = act.payer();
+            auto& b = accounts_billing[a];
+            cpu_limit_due_to_greylist = b.cpu_greylisted;
             int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill[a].count() + leeway.count(); // Add leeway to allow powerup
             // Possibly limit deadline to account subjective cpu left
             if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
@@ -344,8 +345,9 @@ namespace sysio::chain {
 
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
-         trace->elapsed = fc::time_point::now() - start;
-         trace->total_cpu_usage_us = trace->elapsed.count();
+         auto now = fc::time_point::now();
+         trace->elapsed = now - start;
+         update_billed_cpu_time(now);
          return;
       }
 
@@ -641,12 +643,13 @@ namespace sysio::chain {
    }
 
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
-      if( explicit_billed_cpu_time ) return; // updated in init() for explicit_billed_cpu
+      if( explicit_billed_cpu_time || is_cpu_updated ) return; // updated in init() for explicit_billed_cpu
 
       trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
       const auto& cfg = control.get_global_properties().configuration;
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
-      SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded, "Invalid CPU usage calculation");
+      SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
+                 "Invalid CPU usage calculation ${tt} - ${tu}", ("tt", total_cpu_time_us)("tu", trace->total_cpu_usage_us));
       if (!billed_cpu_us.empty()) {
          // +1 so total is above min_transaction_cpu_usage
          int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
@@ -661,6 +664,7 @@ namespace sysio::chain {
          }
       }
       trace->total_cpu_usage_us = total_cpu_time_us;
+      is_cpu_updated = true;
    }
 
    void transaction_context::verify_net_usage(account_name a, int64_t net_usage, uint32_t net_usage_leeway) {

@@ -161,6 +161,7 @@ namespace sysio { namespace chain {
    private:
          bool                          enforce_deadline = true;
          bool                          is_initialized = false;
+         bool                          is_cpu_updated = false;
          transaction_metadata::trx_type trx_type;
 
          uint64_t                      trx_net_limit = 0;
