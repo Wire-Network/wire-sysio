@@ -306,12 +306,14 @@ namespace sysio::chain {
             account_name a = act.payer();
             auto& b = accounts_billing[a];
             cpu_limit_due_to_greylist = b.cpu_greylisted;
-            int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill[a].count() + leeway.count(); // Add leeway to allow powerup
-            // Possibly limit deadline to account subjective cpu left
-            if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
-               active_deadline = action_start + fc::microseconds(account_cpu_limit);
-               billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
-               tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+            if (!is_read_only()) {
+               int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill[a].count() + leeway.count(); // Add leeway to allow powerup
+               // Possibly limit deadline to account subjective cpu left
+               if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
+                  active_deadline = action_start + fc::microseconds(account_cpu_limit);
+                  billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
+                  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+               }
             }
          }
          if (enforce_deadline) {
@@ -453,11 +455,11 @@ namespace sysio::chain {
       auto now = fc::time_point::now();
       if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
          SYS_THROW( deadline_exception, "deadline exceeded ${billing_timer}us",
-                     ("billing_timer", now - pseudo_start)("now", now)("deadline", trx_deadline)("start", start) );
+                     ("billing_timer", now - pseudo_start)("now", now)("deadline", active_deadline)("start", start) );
       } else if( deadline_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_THROW( block_cpu_usage_exceeded,
                      "not enough time left in block to complete executing transaction ${billing_timer}us",
-                     ("now", now)("deadline", trx_deadline)("start", start)("billing_timer", now - pseudo_start) );
+                     ("now", now)("deadline", active_deadline)("start", start)("billing_timer", now - pseudo_start) );
       } else if( deadline_exception_code == tx_cpu_usage_exceeded::code_value ) {
          std::string assert_msg = "transaction ${id} was executing for too long ${billing_timer}us";
          if (!subjective_cpu_bill.empty()) {
