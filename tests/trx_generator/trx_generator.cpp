@@ -311,7 +311,10 @@ namespace sysio::testing {
             elog("no transactions available to send");
             return false;
          }
-      } catch (const std::exception &e) {
+      } catch (const fc::exception& e) {
+         elog("${e}", ("e", e.to_detail_string()));
+         return false;
+      } catch (const std::exception& e) {
          elog("${e}", ("e", e.what()));
          return false;
       } catch (...) {
