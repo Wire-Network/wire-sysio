@@ -56,6 +56,8 @@ try:
     abiFile="payloadless.abi"
     Utils.Print("Publish payloadless contract")
     trans = producerNode.publishContract(payloadlessAcc, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (wasmFile))
 
     trx = {
         "actions": [{"account": "payloadless", "name": "doit", "authorization": [{
