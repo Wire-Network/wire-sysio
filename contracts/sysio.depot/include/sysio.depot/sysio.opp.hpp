@@ -14,9 +14,10 @@
 #include <fc/crypto/public_key.hpp>
 #include <sysio/chain/asset.hpp>
 #define META_REFLECT(...) FC_REFLECT(__VA_ARGS__)
-// #define META_REFLECT_ENUM(...) FC_REFLECT_ENUM(__VA_ARGS__)
+#define META_REFLECT_ENUM(...) FC_REFLECT_ENUM(__VA_ARGS__)
 #define META_REFLECT_TEMPLATE(...) FC_REFLECT_TEMPLATE(__VA_ARGS__)
 #define META_REFLECT_DERIVED(...) FC_REFLECT_DERIVED(__VA_ARGS__)
+#define META_REFLECT_DERIVED_EMPTY(...) FC_REFLECT_DERIVED_EMPTY(__VA_ARGS__)
 #define META_REFLECT_DERIVED_TEMPLATE(...) FC_REFLECT_DERIVED_TEMPLATE(__VA_ARGS__)
 #define META_DATASTREAM fc::datastream<char*>
 #define PUBLIC_KEY_TYPE fc::crypto::public_key
@@ -29,8 +30,10 @@
 #include <sysio/serialize.hpp>
 #include <sysio/sysio.hpp>
 #define META_REFLECT(...) SYSLIB_SERIALIZE(__VA_ARGS__)
+#define META_REFLECT_ENUM(...) SYSLIB_REFLECT_ENUM(__VA_ARGS__)
 #define META_REFLECT_TEMPLATE(...) SYSLIB_SERIALIZE_TEMPLATE(__VA_ARGS__)
 #define META_REFLECT_DERIVED(...) SYSLIB_SERIALIZE_DERIVED(__VA_ARGS__)
+#define META_REFLECT_DERIVED_EMPTY(...) SYSLIB_SERIALIZE_DERIVED_EMPTY(__VA_ARGS__)
 #define META_REFLECT_DERIVED_TEMPLATE(...) SYSLIB_SERIALIZE_DERIVED_TEMPLATE(__VA_ARGS__)
 
 #define META_DATASTREAM sysio::datastream<char*>
@@ -39,6 +42,7 @@
 #define ASSET_TYPE sysio::asset
 #endif
 
+#define META_REFLECT_NIL(x)  (x)
 
 namespace sysiosystem {
 class system_contract;
@@ -119,7 +123,12 @@ enum message_type : uint8_t {
    message_type_swap,                   ///< Token swap operation
    message_type_operator_registration,  ///< New operator registration
    message_type_operator_deregistration ///< Operator deregistration
+#ifdef WASM
+   // , META_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_purchase)(message_type_stake)(message_type_unstake)(message_type_balance_sheet)(message_type_swap)(message_type_operator_registration)(message_type_operator_deregistration) );
+#endif
+
 };
+
 
 
 /**
@@ -154,7 +163,7 @@ struct message_unknown : message_base, std::enable_shared_from_this<message_unkn
    message_unknown() : message_base(message_type_unknown) {};
    virtual ~message_unknown() = default;
 #ifdef WASM
-//TODO: Fix META_REFLECT_DERIVED( sysio::opp::message_unknown, sysio::opp::message_base,  );
+META_REFLECT_DERIVED_EMPTY( sysio::opp::message_unknown, sysio::opp::message_base );
 #endif
 };
 
@@ -402,11 +411,11 @@ public:
 } // namespace sysio
 
 #ifdef NO_WASM
-FC_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_purchase)(message_type_stake)(message_type_unstake)(message_type_balance_sheet)(message_type_swap)(message_type_operator_registration)(message_type_operator_deregistration) )
+META_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_purchase)(message_type_stake)(message_type_unstake)(message_type_balance_sheet)(message_type_swap)(message_type_operator_registration)(message_type_operator_deregistration) )
 
 META_REFLECT( sysio::opp::message_base, (type) );
 
-META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), BOOST_PP_SEQ_NIL );
+META_REFLECT_DERIVED( sysio::opp::message_unknown, (sysio::opp::message_base), META_REFLECT_NIL );
 META_REFLECT_DERIVED( sysio::opp::message_purchase, (sysio::opp::message_base), (amount) );
 META_REFLECT_DERIVED( sysio::opp::message_stake, (sysio::opp::message_base), (amount) );
 META_REFLECT_DERIVED( sysio::opp::message_unstake, (sysio::opp::message_base), (amount) );
