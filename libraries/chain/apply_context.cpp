@@ -170,7 +170,6 @@ void apply_context::exec_one()
    {
       dm_logger->on_end_action();
    }
-   wlog("executed action: ${a} ${r}, elapsed: ${e}", ("a", act->name)("r", receiver)("e", fc::time_point::now()-start));
 }
 
 void apply_context::validate_account_ram_deltas() {
