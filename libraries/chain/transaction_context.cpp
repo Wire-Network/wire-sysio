@@ -834,8 +834,29 @@ namespace sysio::chain {
             auto* code = db.find<account_object, by_name>( a.account );
             SYS_ASSERT( code != nullptr, transaction_exception,
                         "action's code account '${account}' does not exist", ("account", a.account) );
-            SYS_ASSERT( a.authorization.size() == 0, transaction_exception,
-                        "context-free actions cannot have authorizations" );
+            auto verify_auth = [&]() -> bool {
+               if (a.authorization.size() == 0)
+                  return true;
+               // context_free_action authorization only allowed to be sysio_payer_name for an authorized explicit payer
+               // of a regular action.
+               if (a.authorization.size() == 1) {
+                  if (a.authorization[0].permission == config::sysio_payer_name) {
+                     bool found = std::ranges::any_of(trx.actions,
+                                                      [&](const auto& act) {
+                                                         return std::ranges::any_of(act.authorization,
+                                                            [&](const auto& auth) {
+                                                               return auth.permission == config::sysio_payer_name &&
+                                                                      auth.actor == a.authorization[0].actor;
+                                                            });
+                                                      });
+                     if (found)
+                        return true;
+                  }
+               }
+               return false;
+            };
+            SYS_ASSERT( verify_auth(), transaction_exception,
+                        "context-free actions can only have a valid explicit payer authorization" );
          }
       }
 

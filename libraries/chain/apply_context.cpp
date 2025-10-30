@@ -400,7 +400,7 @@ void apply_context::execute_context_free_inline( action&& a ) {
                "inline action's code account ${account} does not exist", ("account", a.account) );
 
    SYS_ASSERT( a.authorization.size() == 0, action_validate_exception,
-               "context-free actions cannot have authorizations" );
+               "inline context-free actions cannot have authorizations" );
 
    auto inline_receiver = a.account;
    _cfa_inline_actions.emplace_back(

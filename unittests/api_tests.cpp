@@ -629,6 +629,58 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
 
       produce_block();
 
+      // verify context_free_actions can't have a normal authorizations
+      {
+         signed_transaction trx;
+         action act({pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         trx.actions.push_back(act1);
+         set_transaction_headers(trx);
+         sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+         BOOST_CHECK_EXCEPTION(push_transaction(trx), transaction_exception,
+                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
+      }
+
+      // verify context_free_actions can have an explicit payer
+      {
+         signed_transaction trx;
+         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}};
+         action act({cfa_pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
+         action act1(pl, tm);
+         trx.actions.push_back(act1);
+         set_transaction_headers(trx);
+         sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+         push_transaction(trx);
+      }
+
+      produce_block();
+
+      // verify context_free_actions can have an explicit payer, but not more than one
+      {
+         signed_transaction trx;
+         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}, {"testapi"_n, config::sysio_payer_name}};
+         action act({cfa_pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
+         action act1(pl, tm);
+         trx.actions.push_back(act1);
+         set_transaction_headers(trx);
+         sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+         BOOST_CHECK_EXCEPTION(push_transaction(trx), transaction_exception,
+                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
+      }
+
+
       // add a large trx so that it is compressed
       trx.signatures.clear();
       set_transaction_headers(trx);
