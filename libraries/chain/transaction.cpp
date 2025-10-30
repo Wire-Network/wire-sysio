@@ -383,8 +383,8 @@ void packed_transaction::decompress() {
 void packed_transaction::init()
 {
    SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
-   SYS_ASSERT( unpacked_trx.context_free_data.size() <= unpacked_trx.context_free_actions.size(), transaction_exception,
-              "Context free data size ${cfd} greater than context free actions size ${cfa}",
+   SYS_ASSERT( unpacked_trx.context_free_data.empty() || unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
+              "Context free data size ${cfd} not equal to context free actions size ${cfa}",
               ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
 
    int64_t size = config::fixed_net_overhead_of_packed_trx;
