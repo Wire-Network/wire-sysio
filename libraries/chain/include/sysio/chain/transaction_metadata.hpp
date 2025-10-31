@@ -42,8 +42,9 @@ class transaction_metadata {
       const trx_type                                             _trx_type;
 
    public:
-      bool                                                       accepted = false;       // not thread safe
+      fc::microseconds                                           elapsed;                // not thread safe
       accounts_billing_t                                         prev_accounts_billing;  // not thread safe
+      account_subjective_cpu_bill_t                              authorizers_cpu;        // not thread safe
 
    private:
       struct private_type{};

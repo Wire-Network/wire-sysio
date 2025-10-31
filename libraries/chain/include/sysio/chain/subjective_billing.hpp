@@ -107,7 +107,7 @@ public:
    void disable() { _disabled = true; }
    void disable_account( chain::account_name a ) { _disabled_accounts.emplace( a ); }
    bool is_account_disabled(const account_name& a ) const { return _disabled || _disabled_accounts.contains( a ); }
-   bool is_account_disabled(const action_payers_t& accounts ) const {
+   bool is_any_account_disabled(const action_payers_t& accounts ) const {
       if ( _disabled ) return true;
       return std::ranges::any_of(accounts, [&](const account_name& a) { return _disabled_accounts.contains( a ); });
    }

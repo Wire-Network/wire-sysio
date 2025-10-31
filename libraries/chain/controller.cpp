@@ -1240,11 +1240,13 @@ struct controller_impl {
          {
             auto now = fc::time_point::now();
             trx_context.update_billed_cpu_time(now);
-            trx->prev_accounts_billing = trx_context.accounts_billing; // for subjective billing
+            trx->prev_accounts_billing = trx_context.accounts_billing;
+            trx->authorizers_cpu = trx_context.authorizers_cpu; // for subjective billing
             trace->error_code = controller::convert_exception_to_error_code( e );
             trace->except = e;
             trace->except_ptr = std::current_exception();
             trace->elapsed = now - trx_context.start;
+            trx->elapsed = std::max(trx->elapsed, trace->elapsed);
          };
 
          try {
@@ -1271,6 +1273,8 @@ struct controller_impl {
             auto restore = make_block_restore_point( trx->is_read_only() );
 
             trx->prev_accounts_billing = trx_context.accounts_billing;
+            trx->authorizers_cpu = trx_context.authorizers_cpu;
+            trx->elapsed = std::max(trx->elapsed, trace->elapsed);
             if (!trx->implicit() && !trx->is_read_only()) {
                trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                std::get<building_block>(pending->_block_stage)._pending_trx_metas.emplace_back(trx);
@@ -1284,11 +1288,6 @@ struct controller_impl {
                fc::move_append( std::get<building_block>(pending->_block_stage)._action_receipt_digests,
                                 std::move(trx_context.executed_action_receipt_digests) );
                 if ( !trx->is_dry_run() ) {
-                  // call the accept signal but only once for this transaction
-                   if (!trx->accepted) {
-                       trx->accepted = true;
-                   }
-
                    dmlog_applied_transaction(trace, &trn);
                    emit(self.applied_transaction, std::tie(trace, trx->packed_trx()));
                 }
@@ -2445,6 +2444,33 @@ subjective_billing& controller::get_mutable_subjective_billing() {
    return my->subjective_bill;
 }
 
+std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) {
+   static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
+   // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
+   const auto& rl = get_resource_limits_manager();
+   int64_t account_cpu_limit = large_number_no_overflow;
+   bool greylisted_cpu = false;
+
+   uint32_t specified_greylist_limit = get_greylist_limit();
+   uint32_t greylist_limit = chain::config::maximum_elastic_resource_multiplier;
+   if( is_speculative_block() ) {
+      if( is_resource_greylisted(a) ) {
+         greylist_limit = 1;
+      } else {
+         greylist_limit = specified_greylist_limit;
+      }
+   }
+   auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
+   if( cpu_limit >= 0 ) {
+      account_cpu_limit = cpu_limit;
+      greylisted_cpu = cpu_was_greylisted;
+   }
+
+   SYS_ASSERT( is_speculative_block() || !greylisted_cpu,
+               transaction_exception, "greylisted when not producing block" );
+
+   return {account_cpu_limit, greylisted_cpu, cpu_limit == -1};
+}
 
 controller::controller( const controller::config& cfg, const chain_id_type& chain_id )
 :my( new controller_impl( cfg, *this, protocol_feature_set{}, chain_id ) )

@@ -201,6 +201,9 @@ namespace sysio { namespace chain {
          const subjective_billing&             get_subjective_billing()const;
          subjective_billing&                   get_mutable_subjective_billing();
 
+         //        limit,greylisted,unlimited
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a);
+
          const flat_set<account_name>&   get_actor_whitelist() const;
          const flat_set<account_name>&   get_actor_blacklist() const;
          const flat_set<account_name>&   get_contract_whitelist() const;

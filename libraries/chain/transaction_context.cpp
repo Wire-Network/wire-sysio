@@ -183,7 +183,7 @@ namespace sysio::chain {
          // validate account net with objective net_usage_leeway
          for (auto& [account, bill] : accounts_billing) {
             verify_net_usage(account, bill.net_usage, cfg.net_usage_leeway);
-            load_cpu_limit(account, bill);
+            std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = control.get_cpu_limit(account);
          }
       }
 
@@ -375,7 +375,7 @@ namespace sysio::chain {
       constexpr uint32_t net_leeway = 0;
       for (auto& [account, bill]: accounts_billing) {
          verify_net_usage(account, bill.net_usage, net_leeway);
-         load_cpu_limit(account, bill);
+         std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = control.get_cpu_limit(account);
       }
 
       auto now = fc::time_point::now();
@@ -651,9 +651,11 @@ namespace sysio::chain {
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
                  "Invalid CPU usage calculation ${tt} - ${tu}", ("tt", total_cpu_time_us)("tu", trace->total_cpu_usage_us));
       if (!billed_cpu_us.empty()) {
+         assert(trace->action_traces.size() >= billed_cpu_us.size());
          // +1 so total is above min_transaction_cpu_usage
          int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
          total_cpu_time_us = 0;
+         auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // use if no authorizer
          for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
@@ -661,6 +663,10 @@ namespace sysio::chain {
             b.value += delta_per_action;
             total_cpu_time_us += b.value;
             act_trace.cpu_usage_us = b.value;
+            auto first_auth = act_trace.act.first_authorizer();
+            if (first_auth.empty())
+               first_auth = trx_first_authorizer;
+            authorizers_cpu[first_auth] += fc::microseconds{b.value};
          }
       }
       trace->total_cpu_usage_us = total_cpu_time_us;
@@ -671,7 +677,7 @@ namespace sysio::chain {
       // Assumes rl.update_account_usage() was already called prior
 
       // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
-      const auto& rl = control.get_mutable_resource_limits_manager();
+      const auto& rl = control.get_resource_limits_manager();
       int64_t account_net_limit = large_number_no_overflow;
       bool greylisted_net = false;
 
@@ -703,36 +709,6 @@ namespace sysio::chain {
                        ("a", a)("nu", net_usage)("nl", leeway_net_limit) );
          }
       }
-   }
-
-   void transaction_context::load_cpu_limit(account_name a, account_billing& b) {
-      // Assumes rl.update_account_usage() was already called prior
-
-      // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
-      const auto& rl = control.get_mutable_resource_limits_manager();
-      int64_t account_cpu_limit = large_number_no_overflow;
-      bool greylisted_cpu = false;
-
-      uint32_t specified_greylist_limit = control.get_greylist_limit();
-      uint32_t greylist_limit = config::maximum_elastic_resource_multiplier;
-      if( control.is_speculative_block() ) {
-         if( control.is_resource_greylisted(a) ) {
-            greylist_limit = 1;
-         } else {
-            greylist_limit = specified_greylist_limit;
-         }
-      }
-      auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
-      if( cpu_limit >= 0 ) {
-         account_cpu_limit = cpu_limit;
-         greylisted_cpu = cpu_was_greylisted;
-      }
-
-      SYS_ASSERT( control.is_speculative_block() || !greylisted_cpu,
-                  transaction_exception, "greylisted when not producing block" );
-
-      b.cpu_limit_us = account_cpu_limit;
-      b.cpu_greylisted |= greylisted_cpu;
    }
 
    action_trace& transaction_context::get_action_trace( uint32_t action_ordinal ) {

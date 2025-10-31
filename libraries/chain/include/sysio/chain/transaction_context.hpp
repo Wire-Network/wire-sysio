@@ -92,7 +92,6 @@ namespace sysio { namespace chain {
          friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
 
          void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
-         void load_cpu_limit(account_name account, account_billing& b);
          void max_bandwidth_billed_account_can_pay(account_name account, account_billing& b, uint32_t net_usage_leeway);
 
          void add_ram_usage( account_name account, int64_t ram_delta );
@@ -154,6 +153,7 @@ namespace sysio { namespace chain {
          cpu_usage_t                   billed_cpu_us;
          accounts_billing_t            prev_accounts_billing;
          account_subjective_cpu_bill_t subjective_cpu_bill;
+         account_subjective_cpu_bill_t authorizers_cpu;
          bool                          explicit_billed_cpu_time = false;
 
          transaction_checktime_timer   transaction_timer;
