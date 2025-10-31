@@ -50,15 +50,11 @@ RUN apt-get install -y \
 				cmake \
 				curl \
 				doxygen \
-        # g++ \
-        # gcc \
 				g++-12 \
 				gcc-12 \
 				git \
 				gnupg \
 				golang \
-				# libc++-18-dev \
-				# libc++-dev \
 				libbz2-dev \
 				libcurl4-openssl-dev \
 				libgmp-dev \
@@ -90,26 +86,6 @@ RUN apt-get install -y \
 				vim \
 				zip \
 				zlib1g-dev
-
-
-# --- OS-specific fixups for package names / probes ---
-# --- OS-specific fixups for package names / probes ---
-# RUN set -eux; . /etc/os-release; \
-#   if [ "$VERSION_ID" = "25.04" ]; then \
-#     apt-get update; \
-#     # ncurses name differences
-#     (apt-get install -y libncurses-dev || true); \
-#     # ensure real gcc/g++ exist (25.04 typically ships gcc-14)
-#     apt-get install -y gcc g++; \
-#     # Provide gcc-10/g++-10 shims that delegate to the real gcc/g++
-#     install -d /usr/local/bin; \
-#     printf '#!/bin/sh\nexec gcc "$@"\n'  >/usr/local/bin/gcc-10;  chmod +x /usr/local/bin/gcc-10; \
-#     printf '#!/bin/sh\nexec g++ "$@"\n'  >/usr/local/bin/g++-10;  chmod +x /usr/local/bin/g++-10; \
-#     # sanity
-#     which gcc-10 && ls -l $(which gcc-10) || true; \
-#     which g++-10 && ls -l $(which g++-10) || true; \
-#   fi
-
 
 RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
