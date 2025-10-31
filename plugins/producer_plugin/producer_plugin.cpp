@@ -379,6 +379,9 @@ public:
    bool     process_unapplied_trxs(const fc::time_point& deadline);
    bool     process_incoming_trxs(const fc::time_point& deadline, unapplied_transaction_queue::iterator& itr);
 
+   account_subjective_cpu_bill_t init_subjective_billing(const transaction_metadata_ptr& trx,
+                                                         const action_payers_t& auths,
+                                                         bool disabled);
    struct push_result {
       bool block_exhausted = false;
       bool trx_exhausted   = false;
@@ -507,6 +510,7 @@ public:
    uint32_t                                          _max_block_net_usage_threshold_bytes         = 0;
    bool                                              _disable_subjective_p2p_billing              = true;
    bool                                              _disable_subjective_api_billing              = true;
+   fc::microseconds                                  _subjective_account_cpu_allowed{300000};
    fc::time_point                                    _irreversible_block_time;
 
    std::vector<chain::digest_type> _protocol_features_to_activate;
@@ -1075,6 +1079,8 @@ void producer_plugin::set_program_options(
           "Sets the window size in number of blocks for subjective-account-max-failures.")
          ("subjective-account-decay-time-minutes", bpo::value<uint32_t>()->default_value( config::account_cpu_usage_average_window_ms / 1000 / 60 ),
           "Sets the time to return full subjective cpu for accounts")
+         ("subjective-account-cpu-allowed-us", bpo::value<int64_t>()->default_value( my->_subjective_account_cpu_allowed.count() ),
+          "Sets the maximum allowed CPU, above account CPU, that can be used by an authorizing account within subjective-account-decay-time-minutes")
          ("incoming-transaction-queue-size-mb", bpo::value<uint16_t>()->default_value( 1024 ),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
@@ -1173,6 +1179,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
               ("dt", subjective_account_decay_time.to_seconds() / 60));
    chain.get_mutable_subjective_billing().set_expired_accumulator_average_window(subjective_account_decay_time);
 
+   _subjective_account_cpu_allowed = fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>());
    _max_transaction_time_ms = options.at("max-transaction-time").as<int32_t>();
 
    _max_irreversible_block_age_us = fc::seconds(options.at("max-irreversible-block-age").as<int32_t>());
@@ -2082,16 +2089,15 @@ void producer_plugin_impl::log_trx_results(const packed_transaction_ptr& trx,
    }
 }
 
-account_subjective_cpu_bill_t init_verify_subjective_billing(chain::controller& chain,
-                                                             chain::subjective_billing& subjective_bill,
-                                                             const transaction_metadata_ptr& trx,
-                                                             const action_payers_t& auths,
-                                                             bool disabled)
+account_subjective_cpu_bill_t producer_plugin_impl::init_subjective_billing(const transaction_metadata_ptr& trx,
+                                                                            const action_payers_t& auths,
+                                                                            bool disabled)
 {
    account_subjective_cpu_bill_t result;
    if (!disabled) {
-      constexpr fc::microseconds subjective_limit{300000}; // TODO: make configurable
       auto now = fc::time_point::now();
+      chain::controller& chain = chain_plug->chain();
+      chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
       auto payers = trx->packed_trx()->get_transaction().payers();
       action_payers_t auths_not_payers;
       // payers subjective billing will be handled by transaction_context
@@ -2102,7 +2108,7 @@ account_subjective_cpu_bill_t init_verify_subjective_billing(chain::controller& 
             const auto&[cpu_limit, greylisted, unlimited] = chain.get_cpu_limit(a);
             if (!unlimited) { // else is unlimited
                const auto sub_bill = subjective_bill.get_subjective_bill(a, now);
-               const int64_t available = subjective_limit.count() + cpu_limit - sub_bill.count();
+               const int64_t available = _subjective_account_cpu_allowed.count() + cpu_limit - sub_bill.count();
                if (available <= 0) {
                   std::string assert_msg;
                   assert_msg.reserve(256);
@@ -2113,10 +2119,10 @@ account_subjective_cpu_bill_t init_verify_subjective_billing(chain::controller& 
                                 " with an objective cpu limit of ${ol}us.";
                   if( greylisted ) {
                      FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                         ("id", trx->id())("a", a)("sl", subjective_limit)("d", -available)("ol", cpu_limit) );
+                                         ("id", trx->id())("a", a)("sl", _subjective_account_cpu_allowed)("d", -available)("ol", cpu_limit) );
                   } else {
                      FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                         ("id", trx->id())("a", a)("sl", subjective_limit)("d", -available)("ol", cpu_limit) );
+                                         ("id", trx->id())("a", a)("sl", _subjective_account_cpu_allowed)("d", -available)("ol", cpu_limit) );
                   }
 
                }
@@ -2169,7 +2175,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    if (max_trx_time.count() < 0)
       max_trx_time = fc::microseconds::maximum();
 
-   account_subjective_cpu_bill_t subjective_cpu_bill = init_verify_subjective_billing(chain, subjective_bill, trx, auths, disable_subjective_enforcement);
+   account_subjective_cpu_bill_t subjective_cpu_bill = init_subjective_billing(trx, auths, disable_subjective_enforcement);
 
    auto prev_elapsed = trx->elapsed;
    if (in_producing_mode() && prev_elapsed.count() > 0) {
