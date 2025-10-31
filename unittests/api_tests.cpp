@@ -377,6 +377,64 @@ BOOST_FIXTURE_TEST_CASE(action_receipt_tests, validating_tester) { try {
 /*************************************************************************************
  * action_tests test case
  *************************************************************************************/
+BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
+   produce_blocks(2);
+   create_account( "testapi"_n );
+   create_account( "acc1"_n );
+   create_account( "acc2"_n );
+   create_account( "acc3"_n );
+   create_account( "acc4"_n );
+   produce_block();
+   set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   produce_block();
+
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      auto res = push_transaction(trx); // throws if invalid
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action, with explicit payer
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      auto res = push_transaction(trx);
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action, with 2 explicit payers
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},
+                                         {"testapi"_n, config::active_name},
+                                         {"testapi"_n, config::sysio_payer_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
+         fc_exception_message_is("action cannot have multiple payers"));
+   }
+
+
+   BOOST_REQUIRE_EQUAL( validate(), true );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(action_tests, validating_tester) { try {
 	produce_blocks(2);
 	create_account( "testapi"_n );
@@ -665,7 +723,7 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
       // verify context_free_actions can have an explicit payer, but not more than one
       {
          signed_transaction trx;
-         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}, {"testapi"_n, config::sysio_payer_name}};
+         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}, {"testapi"_n, config::active_name}};
          action act({cfa_pl}, cfa);
          trx.context_free_actions.push_back(act);
          set_transaction_headers(trx);
