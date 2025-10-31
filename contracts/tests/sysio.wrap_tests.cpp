@@ -78,7 +78,7 @@ public:
    }
 
    void propose( name proposer, name proposal_name, vector<permission_level> requested_permissions, const transaction& trx ) {
-      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::active_name},{proposer, config::sysio_payer_name}}, mvo()
+      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::sysio_payer_name},{proposer, config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
                      ("requested",     requested_permissions)
@@ -113,11 +113,11 @@ transaction sysio_wrap_tester::wrap_exec( account_name executer, const transacti
    fc::variants v;
    v.push_back( fc::mutable_variant_object()
                   ("actor", executer)
-                  ("permission", name{config::active_name})
+                  ("permission", name{config::sysio_payer_name} )
               );
    v.push_back( fc::mutable_variant_object()
                   ("actor", executer)
-                  ("permission", name{config::sysio_payer_name} )
+                  ("permission", name{config::active_name})
               );
   v.push_back( fc::mutable_variant_object()
                  ("actor", "sysio.wrap")

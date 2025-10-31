@@ -1904,7 +1904,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
                                 assertdef {1, "Should Not Assert!"} );
       trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}}, // also paid by contract
                                 assertdef {1, "Should Not Assert!"} );
-      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name},{user, config::sysio_payer_name}}, // paid by user
+      trx.actions.emplace_back( vector<permission_level>{{user, config::sysio_payer_name},{user, config::active_name}}, // paid by user
                                 assertdef {1, "Should Not Assert!"} );
       static int num_secs = 1;
       chain.set_transaction_headers( trx, ++num_secs ); // num_secs provides nonce
@@ -2306,7 +2306,7 @@ BOOST_FIXTURE_TEST_CASE(weighted_net_usage_tests, tester ) try {
       produce_blocks(1);
       signed_transaction trx;
       auto wasm = ::sysio::chain::wast_to_wasm(code);
-      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name},{account,config::sysio_payer_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account,config::sysio_payer_name},{account,config::active_name}},
                               setcode{
                                  .account    = account,
                                  .vmtype     = 0,

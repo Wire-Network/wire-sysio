@@ -86,6 +86,7 @@ namespace sysio { namespace chain {
       uint32_t total_actions()const { return context_free_actions.size() + actions.size(); }
 
       account_name first_authorizer()const;
+      action_payers_t first_authorizers()const;
       action_payers_t payers()const;
 
       flat_multimap<uint16_t, transaction_extension> validate_and_extract_extensions()const;

@@ -66,7 +66,7 @@ class whitelist_blacklist_tester {
       }
 
       transaction_trace_ptr transfer( account_name from, account_name to, string quantity = "1.00 TOK" ) {
-         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::active_name},{from, config::sysio_payer_name}}, mvo()
+         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::sysio_payer_name},{from, config::active_name}}, mvo()
             ( "from", from )
             ( "to", to )
             ( "quantity", quantity )
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    auto push_reqauth = [&]( name acnt, name perm, uint32_t billed_cpu_time_us ) {
       signed_transaction trx;
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
-                                              std::vector<permission_level>{{acnt, perm},{acnt,config::sysio_payer_name}},
+                                              std::vector<permission_level>{{acnt,config::sysio_payer_name}, {acnt, perm}},
                                               fc::mutable_variant_object()("from", acnt) ) );
       c.set_transaction_headers( trx, 6 );
       trx.sign( c.get_private_key( acnt, perm.to_string() ), c.control->get_chain_id() );

@@ -37,7 +37,7 @@ static void create_accounts(validating_tester& chain) {
 static void propose_approve_msig_trx(validating_tester& chain, const name& proposal_name, const name& auth, const fc::variant& pretty_trx) {
    permission_level perm = { auth, config::active_name };
    vector<permission_level> requested_perm = { perm };
-   vector<permission_level> perm_with_payer = { perm, {auth, config::sysio_payer_name} };
+   vector<permission_level> perm_with_payer = { {auth, config::sysio_payer_name}, perm };
    transaction trx;
    abi_serializer::from_variant(pretty_trx, trx, chain.get_resolver(), abi_serializer::create_yield_function(chain.abi_serializer_max_time));
 
@@ -69,8 +69,8 @@ static void propose_approve_msig_token_transfer_trx(validating_tester& chain, co
             ("account", name("sysio.token"_n))
             ("name", "transfer")
             ("authorization", vector<permission_level>{
-                {auth, config::active_name},
-                {auth, config::sysio_payer_name}
+                {auth, config::sysio_payer_name},
+                {auth, config::active_name}
             })
             ("data", fc::mutable_variant_object()
                ("from", name("tester"_n))
@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
    liquid_balance = get_currency_balance(chain, "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
-   auto auth = vector<permission_level>{{"tester"_n, config::active_name},{"tester"_n, config::sysio_payer_name}};
+   auto auth = vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, config::active_name}};
    trace = chain.push_action("sysio.token"_n, name("transfer"), auth, fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
@@ -249,8 +249,9 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_test ) { try {
 
    // executue after delay of 10 seconds
    exec_msig_trx(chain, proposal_name, {
-       { "tester"_n, config::active_name },
-       { "tester"_n, config::sysio_payer_name }});
+       { "tester"_n, config::sysio_payer_name },
+       { "tester"_n, config::active_name }
+   });
 
    chain.produce_blocks();
 
@@ -313,7 +314,7 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
    liquid_balance = get_currency_balance(chain, "tester"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
-   auto auth = vector<permission_level>{{tester_account, config::active_name},{tester_account, config::sysio_payer_name}};
+   auto auth = vector<permission_level>{{tester_account, config::sysio_payer_name},{tester_account, config::active_name}};
    trace = chain.push_action("sysio.token"_n, name("transfer"), auth, fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
@@ -373,8 +374,9 @@ BOOST_AUTO_TEST_CASE( link_delay_direct_walk_parent_permissions_test ) { try {
 
    // executue after delay
    exec_msig_trx(chain, proposal_name, {
-       { "tester"_n, config::active_name },
-       { "tester"_n, config::sysio_payer_name }});
+      { "tester"_n, config::sysio_payer_name },
+      { "tester"_n, config::active_name }
+   });
 
    chain.produce_blocks();
 
@@ -892,7 +894,7 @@ BOOST_AUTO_TEST_CASE( max_transaction_delay_execute ) { try {
 
    //check that the delayed msig transaction can be executed after after 60 sec
    chain.produce_blocks(120);
-   exec_msig_trx(chain, proposal_name, {{ "tester"_n, config::active_name },{"tester"_n, config::sysio_payer_name }});
+   exec_msig_trx(chain, proposal_name, {{"tester"_n, config::sysio_payer_name }, { "tester"_n, config::active_name }});
 
    //check that the transfer really happened
    auto liquid_balance = get_currency_balance(chain, "tester"_n);

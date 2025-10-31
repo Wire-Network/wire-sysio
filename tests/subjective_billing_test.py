@@ -100,7 +100,7 @@ try:
         memo = 'tx-{}'.format(x)
         txn = {
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account1","permission": "active"},{"actor": "account1","permission": "sysio.payer"}],
+                         "authorization": [{"actor": "account1","permission": "sysio.payer"},{"actor": "account1","permission": "active"}],
                          "data": {"from": "account1","to": "account2","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }
@@ -122,7 +122,7 @@ try:
         memo = 'tx-{}'.format(x)
         txn = {
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account2","permission": "active"},{"actor": "account2","permission": "sysio.payer"}],
+                         "authorization": [{"actor": "account2","permission": "sysio.payer"},{"actor": "account2","permission": "active"}],
                          "data": {"from": "account2","to": "account1","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }
@@ -144,7 +144,7 @@ try:
         memo = 'tx-{}'.format(x)
         txn = {
             "actions": [{"account": "sysio.token","name": "transfer",
-                         "authorization": [{"actor": "account1","permission": "active"},{"actor": "account1","permission": "sysio.payer"}],
+                         "authorization": [{"actor": "account1","permission": "sysio.payer"},{"actor": "account1","permission": "active"}],
                          "data": {"from": "account1","to": "account2","quantity": "100000.0001 SYS","memo": memo},
                          "compression": "none"}]
         }

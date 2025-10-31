@@ -121,6 +121,21 @@ account_name transaction::first_authorizer()const {
    return account_name();
 }
 
+action_payers_t transaction::first_authorizers()const {
+   action_payers_t result;
+   for (const auto& a : context_free_actions) {
+      auto auth = a.first_authorizer();
+      if (!auth.empty())
+         result.insert(auth);
+   }
+   for (const auto& a : actions) {
+      auto auth = a.first_authorizer();
+      if (!auth.empty())
+         result.insert(auth);
+   }
+   return result;
+}
+
 action_payers_t transaction::payers()const {
    action_payers_t result;
    for (const auto& a : context_free_actions) {

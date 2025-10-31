@@ -448,9 +448,10 @@ try {
 
       authority owner_auth =  authority( chain.get_public_key( a, "owner" ) );
 
-      vector<permission_level> pls = {{acc1, name("active")}};
-      pls.push_back({acc1, name("owner")}); // same account but different permission names
+      vector<permission_level> pls = {};
       pls.push_back({acc1, config::sysio_payer_name});
+      pls.push_back({acc1, name("active")});
+      pls.push_back({acc1, name("owner")}); // same account but different permission names
       pls.push_back({acc1a, name("owner")});
       trx.actions.emplace_back( pls,
                                 newaccount{
@@ -649,7 +650,7 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
    trace = chain.push_action("sysio.token"_n, name("transfer"),
-      vector<permission_level>{{"tester"_n, config::active_name},{"tester"_n, config::sysio_payer_name}},
+      vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, config::active_name}},
       fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")

@@ -713,8 +713,9 @@ namespace sysio { namespace testing {
       signed_transaction trx;
       if (authorizer) {
          act.authorization = vector<permission_level>{
-            {account_name(authorizer), config::active_name},
-            {account_name(authorizer), config::sysio_payer_name}};
+               {account_name(authorizer), config::sysio_payer_name},
+               {account_name(authorizer), config::active_name}
+      };
       }
       trx.actions.emplace_back(std::move(act));
       set_transaction_headers(trx);

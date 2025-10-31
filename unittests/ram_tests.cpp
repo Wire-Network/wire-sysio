@@ -130,7 +130,7 @@ BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
     BOOST_TEST(noauthtable_ram_usage1 < noauthtable_ram_usage2);
     BOOST_TEST(alice_ram_usage1 == alice_ram_usage2);
 
-    vector<permission_level> alice_explicit {{"alice"_n, config::active_name}, {"alice"_n, config::sysio_payer_name} };
+    vector<permission_level> alice_explicit {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name} };
     // alice pays for CPU,NET
     push_action( "noauthtable"_n, "insert"_n, alice_explicit, mvo()("user", "c") ("id", 1) ("age", 10));
 

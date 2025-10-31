@@ -418,6 +418,20 @@ BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
       signed_transaction trx;
       set_transaction_headers(trx);
 
+      // add a normal action, with explicit payer (but not in correct possition)
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+                            fc_exception_message_is("Explicit payer must be the first declared authorization"));
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
       // add a normal action, with 2 explicit payers
       dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
       auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},
@@ -709,7 +723,7 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
          trx.context_free_actions.push_back(act);
          set_transaction_headers(trx);
          trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
          auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
          action act1(pl, tm);
          trx.actions.push_back(act1);
@@ -728,7 +742,7 @@ BOOST_FIXTURE_TEST_CASE(cf_action_tests, validating_tester) { try {
          trx.context_free_actions.push_back(act);
          set_transaction_headers(trx);
          trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
          auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
          action act1(pl, tm);
          trx.actions.push_back(act1);
