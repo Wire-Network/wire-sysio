@@ -94,7 +94,10 @@ namespace sysio { namespace chain {
          return fc::raw::unpack<T>(data);
       }
 
+      // sysio_payer_name actor or contract
       account_name payer() const;
+      // first authorization actor (which will be sysio_payer_name actor if exists) or empty() if no authorizer
+      account_name first_authorizer()const;
 
    private:
       friend struct packed_transaction;
