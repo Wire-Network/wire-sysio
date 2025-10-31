@@ -169,7 +169,7 @@ namespace sysio::chain {
          }
          if (explicit_billed_cpu_time) {
             assert(!is_read_only());
-            assert(billed_cpu_us.size() > i);
+            assert(billed_cpu_us.size() > static_cast<size_t>(i));
             b.cpu_usage_us += billed_cpu_us[i];
          }
       }
