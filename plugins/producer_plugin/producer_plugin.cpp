@@ -2174,7 +2174,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
    auto prev_elapsed = trx->elapsed;
    if (in_producing_mode() && prev_elapsed.count() > 0) {
       const auto& rl = chain.get_resource_limits_manager();
-      const uint64_t block_cpu_limit = rl.get_block_cpu_limit();
+      const int64_t block_cpu_limit = rl.get_block_cpu_limit();
       const auto& gpo = chain.get_global_properties();
       const fc::microseconds max_trx_cpu_usage{gpo.configuration.max_transaction_cpu_usage};
       if (prev_elapsed > max_trx_cpu_usage) { // clamp to max_transaction_cpu_usage
