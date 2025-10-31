@@ -2,7 +2,9 @@ cmake_minimum_required( VERSION 3.8 )
 project(testing_contracts)
 
 if ("${CMAKE_GENERATOR}" STREQUAL "Ninja")
-    add_compile_options(-fcolor-diagnostics)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-fcolor-diagnostics)
+    endif()
 endif()
 
 if( BUILD_TEST_CONTRACTS )
