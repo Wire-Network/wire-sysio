@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
          app->initialize<chain_plugin, producer_plugin>(argv.size(), (char**) &argv[0]);
          app->startup();
 
-         app->get_plugin<chain_plugin>().chain().block_start.connect([&](uint32_t bn) {
+         app->get_plugin<chain_plugin>().chain().block_start().connect([&](uint32_t bn) {
             if(bn == 16u)
                at_block_16.set_value();
          });
