@@ -68,6 +68,7 @@ try:
     if nodeArg != "":
         if chainSyncStrategyStr == "hardReplay":
             nodeArg += " --truncate-at-block %d" % terminate
+    nodeArg += " --enable-stale-production "
     if cluster.relaunchSysInstances(nodeArgs=nodeArg, waitForTerm=(terminate > 0)) is False:
         errorExit("Failed to relaunch Sys instance")
     Print("nodeop instance relaunched.")
