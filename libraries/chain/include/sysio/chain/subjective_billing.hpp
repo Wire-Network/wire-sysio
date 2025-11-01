@@ -113,7 +113,7 @@ public:
    }
 
    void subjective_bill( const chain::transaction_id_type& id, fc::time_point_sec expire,
-                         const accounts_billing_t& accounts_billing)
+                         const accounts_billing_t& accounts_billing, const account_subjective_cpu_bill_t& auth_cpu)
    {
       if (_disabled) return;
       if (_trx_cache_index.contains(id)) return;
@@ -124,6 +124,12 @@ public:
             _account_subjective_bill_cache[a].pending_cpu_us += b.cpu_usage_us;
          }
       }
+      for (const auto& [a, b] : auth_cpu) {
+         if (!_disabled_accounts.contains(a)) {
+            account_subjective_cpu_bill[a] = b;
+            _account_subjective_bill_cache[a].pending_cpu_us += b.count();
+         }
+      }
       if (!account_subjective_cpu_bill.empty()) {
          _trx_cache_index.emplace(
             trx_cache_entry{id,
@@ -132,12 +138,17 @@ public:
       }
    }
 
-   void subjective_bill_failure( const accounts_billing_t& accounts_billing, const fc::time_point& now ) {
+   void subjective_bill_failure( const accounts_billing_t& accounts_billing, const account_subjective_cpu_bill_t& auth_cpu, const fc::time_point& now ) {
       if (_disabled) return;
       const auto time_ordinal = time_ordinal_for(now);
       for (const auto& [a, b] : accounts_billing) {
          if (!_disabled_accounts.contains(a)) {
             _account_subjective_bill_cache[a].expired_accumulator.add(b.cpu_usage_us, time_ordinal, _expired_accumulator_average_window);
+         }
+      }
+      for (const auto& [a, b] : auth_cpu) {
+         if (!_disabled_accounts.contains(a)) {
+            _account_subjective_bill_cache[a].expired_accumulator.add(b.count(), time_ordinal, _expired_accumulator_average_window);
          }
       }
    }

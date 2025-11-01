@@ -2248,8 +2248,9 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
          if (e.code() != tx_duplicate::code_value) {
             fc_tlog(_log, "Subjective bill for failed ${a}: ${b} elapsed ${t}us, time ${r}us",
                     ("a", auths)("b", subjective_cpu_bill)("t", trace->elapsed)("r", end - start));
-            if (!disable_subjective_enforcement) // subjectively bill failure when producing since not in objective cpu account billing
-               subjective_bill.subjective_bill_failure(trx->prev_accounts_billing, fc::time_point::now());
+            if (!disable_subjective_enforcement) { // subjectively bill failure when producing since not in objective cpu account billing
+               subjective_bill.subjective_bill_failure(trx->prev_accounts_billing, trx->authorizers_cpu, fc::time_point::now());
+            }
 
             log_trx_results(trx, trace);
             // this failed our configured maximum transaction time, we don't want to replay it
@@ -2273,7 +2274,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
       log_trx_results(trx, trace);
       // if producing then trx is in objective cpu account billing
       if (!disable_subjective_enforcement && !in_producing_mode()) {
-         subjective_bill.subjective_bill(trx->id(), trx->packed_trx()->expiration(), trx->prev_accounts_billing);
+         subjective_bill.subjective_bill(trx->id(), trx->packed_trx()->expiration(), trx->prev_accounts_billing, trx->authorizers_cpu);
       }
       if (next)
          next(trace);

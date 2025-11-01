@@ -660,13 +660,15 @@ namespace sysio::chain {
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
             b.value += delta_per_action;
-            accounts_billing[act_trace.act.payer()].cpu_usage_us += b.value;
+            auto payer = act_trace.act.payer();
+            accounts_billing[payer].cpu_usage_us += b.value;
             total_cpu_time_us += b.value;
             act_trace.cpu_usage_us = b.value;
             auto first_auth = act_trace.act.first_authorizer();
             if (first_auth.empty())
                first_auth = trx_first_authorizer;
-            authorizers_cpu[first_auth] += fc::microseconds{b.value};
+            if (first_auth != payer) // don't subjectively bill payer twice
+               authorizers_cpu[first_auth] += fc::microseconds{b.value};
          }
       }
       trace->total_cpu_usage_us = total_cpu_time_us;

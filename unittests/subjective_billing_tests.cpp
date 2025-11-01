@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
    {  // Failed transactions remain until expired in subjective billing.
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}}} );
-      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}}}, {} );
+      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}}}, {} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}}, {} );
 
       BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
    {  // db_read_mode HEAD mode, so transactions are immediately reverted
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 23}}} );
-      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 19}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 23}}}, {} );
+      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 19}}}, {} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}}}, {} );
 
       BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
@@ -81,16 +81,16 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
    { // failed handling logic, decay with repeated failures should be exponential, single failures should be linear
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, now);
-      sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}}}, now);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, now);
+      sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}}}, {}, now);
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, halftime);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, halftime);
       BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
       BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, endtime);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}}}, {}, endtime);
       BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).count() );
       BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
    }
@@ -98,9 +98,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_test ) {
    { // expired handling logic, full billing until expiration then failed/decay logic
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}}} );
-      sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}}}, {} );
+      sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}}}, {} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}}}, {} );
       BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
 
@@ -148,9 +148,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
    {  // Failed transactions remain until expired in subjective billing.
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}},{c, {.cpu_usage_us = 42}}} );
-      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}},{c, {.cpu_usage_us = 23}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}},{c, {.cpu_usage_us = 7}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 13}},{c, {.cpu_usage_us = 42}}}, {} );
+      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 11}},{c, {.cpu_usage_us = 23}}}, {} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 9}}}, {{c, {fc::microseconds(7)}}} );
 
       BOOST_CHECK_EQUAL( 13+11, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 9, sub_bill.get_subjective_bill(b, now).count() );
@@ -178,9 +178,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
    {  // db_read_mode HEAD mode, so transactions are immediately reverted
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 23}},{c, {.cpu_usage_us = 11}}} );
-      sub_bill.subjective_bill( id2, now_sec, {{a, {.cpu_usage_us = 19}},{c, {.cpu_usage_us = 3}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}},{c, {.cpu_usage_us = 1}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 23}},{c, {.cpu_usage_us = 11}}}, {} );
+      sub_bill.subjective_bill( id2, now_sec, {{c, {.cpu_usage_us = 3}}}, {{a, {fc::microseconds(19)}}} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 7}},{c, {.cpu_usage_us = 1}}}, {} );
 
       BOOST_CHECK_EQUAL( 23+19, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 7, sub_bill.get_subjective_bill(b, now).count() );
@@ -202,18 +202,18 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
    { // failed handling logic, decay with repeated failures should be exponential, single failures should be linear
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 2048}}}, now);
-      sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 512}}}, now);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 2048}}}, {}, now);
+      sub_bill.subjective_bill_failure({{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 512}}}, {}, now);
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
       BOOST_CHECK_EQUAL( 2048+512, sub_bill.get_subjective_bill(c, now).count() );
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}}, halftime);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}}, {}, halftime);
       BOOST_CHECK_EQUAL( 512 + 1024, sub_bill.get_subjective_bill(a, halftime).count() );
       BOOST_CHECK_EQUAL( 512, sub_bill.get_subjective_bill(b, halftime).count() );
       BOOST_CHECK_EQUAL( (2048+512)/2+256, sub_bill.get_subjective_bill(c, halftime).count() );
 
-      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 24}}}, endtime);
+      sub_bill.subjective_bill_failure({{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 24}}}, {}, endtime);
       BOOST_CHECK_EQUAL( 256 + 512 + 1024, sub_bill.get_subjective_bill(a, endtime).count() );
       BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
       BOOST_CHECK_EQUAL( (2048+512)/2/2+256/2+24, sub_bill.get_subjective_bill(c, endtime).count() );
@@ -222,9 +222,9 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
    { // expired handling logic, full billing until expiration then failed/decay logic
       subjective_billing sub_bill;
 
-      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}} );
-      sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 128}}} );
-      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 64}}} );
+      sub_bill.subjective_bill( id1, now_sec, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 256}}}, {} );
+      sub_bill.subjective_bill( id2, fc::time_point_sec{now + fc::seconds(1)}, {{a, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 128}}}, {} );
+      sub_bill.subjective_bill( id3, now_sec, {{b, {.cpu_usage_us = 1024}},{c, {.cpu_usage_us = 64}}}, {} );
       BOOST_CHECK_EQUAL( 1024 + 1024, sub_bill.get_subjective_bill(a, now).count() );
       BOOST_CHECK_EQUAL( 1024, sub_bill.get_subjective_bill(b, now).count() );
       BOOST_CHECK_EQUAL( 256+128+64, sub_bill.get_subjective_bill(c, now).count() );
