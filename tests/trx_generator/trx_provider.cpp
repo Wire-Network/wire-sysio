@@ -184,8 +184,8 @@ namespace sysio::testing {
                          const auto& receipt = processed["receipt"];
                          if (receipt.is_object()) {
                             executed = true;
-                            net    = receipt["net_usage"].as_int64();
-                            cpu    = receipt["total_cpu_usage_us"].as_int64();
+                            net    = processed["net_usage"].as_int64();
+                            cpu    = processed["total_cpu_usage_us"].as_int64();
                          }
                          if (executed) {
                             record_trx_info(trx_id, block_num, this->is_read_only_transaction() ? elapsed_time : cpu, net, block_time);
