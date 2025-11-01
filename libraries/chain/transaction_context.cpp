@@ -659,8 +659,8 @@ namespace sysio::chain {
          for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
             auto& act_trace = trace->action_traces[i];
-            accounts_billing[act_trace.act.payer()].cpu_usage_us += delta_per_action;
             b.value += delta_per_action;
+            accounts_billing[act_trace.act.payer()].cpu_usage_us += b.value;
             total_cpu_time_us += b.value;
             act_trace.cpu_usage_us = b.value;
             auto first_auth = act_trace.act.first_authorizer();
