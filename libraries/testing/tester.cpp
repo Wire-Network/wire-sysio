@@ -548,11 +548,11 @@ namespace sysio { namespace testing {
                                              mutable_variant_object()
                                              ("owner", a)
                                              ("issuer", NODE_DADDY)
-                                             ("netWeight", "0.0010 SYS")
-                                             ("cpuWeight", "0.0010 SYS")
-                                             ("ramWeight", "4.0000 SYS")
-                                             ("networkGen", 0)
-                                             ("timeBlock", 0)
+                                             ("net_weight", "0.0010 SYS")
+                                             ("cpu_weight", "0.0010 SYS")
+                                             ("ram_weight", "4.0000 SYS")
+                                             ("network_gen", 0)
+                                             ("time_block", 0)
          ));
       }
 
@@ -592,11 +592,11 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("netWeight", net_weight)
-                                          ("cpuWeight", cpu_weight)
-                                          ("ramWeight", ram_weight)
-                                          ("timeBlock", time_block)
-                                          ("networkGen", network_gen)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("time_block", time_block)
+                                          ("network_gen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -614,10 +614,10 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("netWeight", net_weight)
-                                          ("cpuWeight", cpu_weight)
-                                          ("ramWeight", ram_weight)
-                                          ("networkGen", network_gen)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -635,10 +635,10 @@ namespace sysio { namespace testing {
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
-                                          ("netWeight", net_weight)
-                                          ("cpuWeight", cpu_weight)
-                                          ("ramWeight", ram_weight)
-                                          ("networkGen", network_gen)
+                                          ("net_weight", net_weight)
+                                          ("cpu_weight", cpu_weight)
+                                          ("ram_weight", ram_weight)
+                                          ("network_gen", network_gen)
       ));
 
       set_transaction_headers(trx);
@@ -1191,8 +1191,8 @@ namespace sysio { namespace testing {
       // Call sysio.roa activateroa with total_sys of 75496.0000 SYS and bytes_per_unit of 104
       push_action(config::roa_account_name, "activateroa"_n, config::roa_account_name,
                   fc::mutable_variant_object()
-                  ("totalSys", asset::from_string("75496.0000 SYS"))
-                  ("bytesPerUnit", 104)
+                  ("total_sys", asset::from_string("75496.0000 SYS"))
+                  ("bytes_per_unit", 104)
       );
 
       // Setup default node daddy for easier resource allocation during testing
