@@ -2444,7 +2444,7 @@ subjective_billing& controller::get_mutable_subjective_billing() {
    return my->subjective_bill;
 }
 
-std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) {
+std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) const {
    static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
    // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
    const auto& rl = get_resource_limits_manager();

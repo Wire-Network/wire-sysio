@@ -381,7 +381,7 @@ public:
 
    account_subjective_cpu_bill_t init_subjective_billing(const transaction_metadata_ptr& trx,
                                                          const action_payers_t& auths,
-                                                         bool disabled);
+                                                         bool disabled) const;
    struct push_result {
       bool block_exhausted = false;
       bool trx_exhausted   = false;
@@ -2091,13 +2091,13 @@ void producer_plugin_impl::log_trx_results(const packed_transaction_ptr& trx,
 
 account_subjective_cpu_bill_t producer_plugin_impl::init_subjective_billing(const transaction_metadata_ptr& trx,
                                                                             const action_payers_t& auths,
-                                                                            bool disabled)
+                                                                            bool disabled) const
 {
    account_subjective_cpu_bill_t result;
    if (!disabled) {
       auto now = fc::time_point::now();
       chain::controller& chain = chain_plug->chain();
-      chain::subjective_billing& subjective_bill = chain.get_mutable_subjective_billing();
+      const chain::subjective_billing& subjective_bill = chain.get_subjective_billing();
       auto payers = trx->packed_trx()->get_transaction().payers();
       action_payers_t auths_not_payers;
       // payers subjective billing will be handled by transaction_context
@@ -2272,7 +2272,7 @@ producer_plugin_impl::handle_push_result(const transaction_metadata_ptr&        
       fc_tlog(_log, "Subjective bill for success ${a}: ${b} elapsed ${t}us, time ${r}us",
               ("a", auths)("b", subjective_cpu_bill)("t", trace->elapsed)("r", end - start));
       log_trx_results(trx, trace);
-      // if producing then trx is in objective cpu account billing
+      // if producing then trx is in objective cpu account billing. Also no block will be received to remove the billing.
       if (!disable_subjective_enforcement && !in_producing_mode()) {
          subjective_bill.subjective_bill(trx->id(), trx->packed_trx()->expiration(), trx->prev_accounts_billing, trx->authorizers_cpu);
       }
