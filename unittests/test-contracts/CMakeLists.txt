@@ -11,7 +11,9 @@ if( BUILD_TEST_CONTRACTS )
 endif()
 
 if ("${CMAKE_GENERATOR}" STREQUAL "Ninja")
-   add_compile_options(-fcolor-diagnostics)
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-fcolor-diagnostics)
+    endif()
 endif()
 
 if( USE_SYSIO_CDT_1_7_X )

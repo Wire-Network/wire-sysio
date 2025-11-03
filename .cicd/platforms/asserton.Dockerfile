@@ -63,28 +63,21 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
 
-COPY <<-EOF /ubsan.supp
-  vptr:wasm_sysio_validation.hpp
-  vptr:wasm_sysio_injection.hpp
-EOF
-
 ENV CC=/usr/bin/clang-18
 ENV CXX=/usr/bin/clang++-18
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
 ENV CMAKE_PREFIX_PATH=/opt/llvm/llvm-11
 
 COPY <<-EOF /extras.cmake
-  set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING "" FORCE)
-  set(CMAKE_C_COMPILER "clang-18" CACHE STRING "")
-  set(CMAKE_CXX_COMPILER "clang++-18" CACHE STRING "")
-  set(CMAKE_C_FLAGS "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING "")
-  set(CMAKE_CXX_FLAGS "-fsanitize=undefined -fno-sanitize-recover=all -fno-omit-frame-pointer" CACHE STRING "")
+  # reset the build type to empty to disable any cmake default flags
+  set(CMAKE_BUILD_TYPE "" CACHE STRING "" FORCE)
+  set(CMAKE_C_FLAGS "-O3" CACHE STRING "")
+  set(CMAKE_CXX_FLAGS "-O3" CACHE STRING "")
+  set(SYSIO_ENABLE_RELEASE_BUILD_TEST "Off" CACHE BOOL "")
 EOF
 
 ENV SYSIO_PLATFORM_HAS_EXTRAS_CMAKE=1
-ENV UBSAN_OPTIONS=print_stacktrace=1,suppressions=/ubsan.supp
 
-# Copy scripts directory and run LLVM build script
 COPY scripts /scripts
 RUN chmod +x /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
 RUN BASE_DIR=/opt/llvm /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
