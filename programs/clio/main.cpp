@@ -1927,6 +1927,33 @@ int main( int argc, char** argv ) {
       std::cout << fc::json::to_pretty_string(unpacked_action_data_json) << std::endl;
    });
 
+   string abi_file_name;
+   auto abi_to_hash = convert->add_subcommand("abi_to_hash", localized("From abi file to hash"));
+   abi_to_hash->add_option("abi-file", abi_file_name, localized("The ABI file name"))->required();
+   abi_to_hash->callback([&] {
+      SYS_ASSERT( std::filesystem::exists( abi_file_name ), abi_file_not_found, "ABI file not found: ${f}", ("f", abi_file_name)  );
+      auto abi_bytes = fc::raw::pack(fc::json::from_file(abi_file_name).as<abi_def>());
+      auto abi_hash = fc::sha256::hash( abi_bytes.data(), abi_bytes.size() );
+      std::cout << "ABI hash: " << abi_hash.str() << std::endl;
+   });
+
+   string wasm_file_name;
+   auto wasm_to_hash = convert->add_subcommand("wasm_to_hash", localized("From WASM file to hash"));
+   wasm_to_hash->add_option("wasm-file", wasm_file_name, localized("The WASM file name"))->required();
+   wasm_to_hash->callback([&] {
+      SYS_ASSERT( std::filesystem::exists( wasm_file_name ), wasm_file_not_found, "WASM file not found: ${f}", ("f", wasm_file_name)  );
+      std::string wasm_str;
+      fc::read_file_contents(wasm_file_name, wasm_str);
+      SYS_ASSERT( !wasm_str.empty(), wasm_file_not_found, "Empty WASM file: ${f}", ("f", wasm_file_name) );
+      const string binary_wasm_header("\x00\x61\x73\x6d\x01\x00\x00\x00", 8);
+      if(wasm_str.compare(0, 8, binary_wasm_header)) {
+         std::cerr << localized("WARNING: ") << wasm_file_name << localized(" doesn't look like a binary WASM file. Is it something else, like WAST?") << std::endl;
+         return;
+      }
+      auto wasm_hash = fc::sha256::hash(wasm_str.data(), wasm_str.size());
+      std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
+   });
+
    // validate subcommand
    auto validate = app.add_subcommand("validate", localized("Validate transactions"));
    validate->require_subcommand();
