@@ -59,7 +59,7 @@ class TestHelper(object):
         if "-n" in includeArgs:
             thGrp.add_argument("-n", type=int, help=argparse.SUPPRESS if suppressHelp else "total nodes", default=0)
         if "-d" in includeArgs:
-            thGrp.add_argument("-d", type=int, help=argparse.SUPPRESS if suppressHelp else "delay between nodes startup", default=1)
+            thGrp.add_argument("-d", type=int, help=argparse.SUPPRESS if suppressHelp else "delay between nodes startup", default=2)
         if "--nodes-file" in includeArgs:
             thGrp.add_argument("--nodes-file", type=str, help=argparse.SUPPRESS if suppressHelp else "File containing nodes info in JSON format.")
         if "-s" in includeArgs:
