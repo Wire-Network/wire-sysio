@@ -279,7 +279,7 @@ namespace sysio { namespace testing {
       control->add_indices();
       if (lambda) lambda();
       chain_transactions.clear();
-      control->accepted_block.connect([this]( block_signal_params t ){
+      control->accepted_block().connect([this]( block_signal_params t ){
          const auto& [ block, id ] = t;
          FC_ASSERT( block );
          for( auto receipt : block->transactions ) {

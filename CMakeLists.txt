@@ -291,7 +291,7 @@ endif()
 
 include(doxygen)
 
-option(ENABLE_LEAP_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
+option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
 
 include(package.cmake)
 include(CPack)

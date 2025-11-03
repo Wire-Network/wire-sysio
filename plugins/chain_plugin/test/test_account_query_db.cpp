@@ -46,7 +46,7 @@ BOOST_FIXTURE_TEST_CASE(newaccount_test, account_query_db_tester) { try {
    auto aq_db = account_query_db(*control);
 
     //link aq_db to the `accepted_block` signal on the controller
-   auto c2 = control->accepted_block.connect([&](const block_signal_params& t) {
+   auto c2 = control->accepted_block().connect([&](const block_signal_params& t) {
         const auto& [ block, id ] = t;
         aq_db.commit_block( block );
    });
@@ -72,7 +72,7 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test, account_query_db_tester) { try {
     auto aq_db = account_query_db(*control);
 
     //link aq_db to the `accepted_block` signal on the controller
-    auto c = control->accepted_block.connect([&](const block_signal_params& t) {
+    auto c = control->accepted_block().connect([&](const block_signal_params& t) {
         const auto& [ block, id ] = t;
         aq_db.commit_block( block );
     });
@@ -107,7 +107,7 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test_multi_threaded, account_query_db_tester)
    auto aq_db = account_query_db(*control);
 
    //link aq_db to the `accepted_block` signal on the controller
-   auto c = control->accepted_block.connect([&](const block_signal_params& t) {
+   auto c = control->accepted_block().connect([&](const block_signal_params& t) {
       const auto& [ block, id ] = t;
       aq_db.commit_block( block );
    });
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(future_fork_test) { try {
    auto aq_db = account_query_db(*node_a.control);
 
    //link aq_db to the `accepted_block` signal on the controller
-   auto c = node_a.control->accepted_block.connect([&](const block_signal_params& t) {
+   auto c = node_a.control->accepted_block().connect([&](const block_signal_params& t) {
       const auto& [ block, id ] = t;
       aq_db.commit_block( block );
    });
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(fork_test) { try {
       auto aq_db = account_query_db(*node_a.control);
 
       //link aq_db to the `accepted_block` signal on the controller
-      auto c = node_a.control->accepted_block.connect([&](const block_signal_params& t) {
+      auto c = node_a.control->accepted_block().connect([&](const block_signal_params& t) {
          const auto& [ block, id ] = t;
          aq_db.commit_block( block );
       });

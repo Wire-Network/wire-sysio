@@ -26,7 +26,7 @@ namespace sysio::operator_plugin {
       if (!_irreversible_block_connection) {
         ilog("Subscribing to irreversible block events");
         _irreversible_block_connection.emplace(
-         controller.irreversible_block.connect([this](const auto& bsp) {
+         controller.irreversible_block().connect([this](const auto& bsp) {
           events.irreversible_block.publish(bsp);
          }));
       }

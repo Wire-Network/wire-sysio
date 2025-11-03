@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
       }
    };
 
-   auto c1 = tester1.chain->control->applied_transaction.connect( log_trxs );
+   auto c1 = tester1.chain->control->applied_transaction().connect( log_trxs );
 
    // Disallow inline actions authorized by actor in blacklist
    BOOST_CHECK_EXCEPTION( tester1.chain->push_action( "alice"_n, "sendinline"_n, "bob"_n, mvo()

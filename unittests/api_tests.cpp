@@ -923,7 +923,7 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
    other.execute_setup_policy( setup_policy::full );
 
    transaction_trace_ptr other_trace;
-   auto cc = other.control->applied_transaction.connect( [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
+   auto cc = other.control->applied_transaction().connect( [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
       auto& t = std::get<0>(x);
       if( t && t->id == trace->id ) {
          other_trace = t;
