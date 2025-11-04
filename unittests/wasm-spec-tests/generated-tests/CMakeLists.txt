@@ -37,3 +37,9 @@ foreach(TEST_SUITE ${WASM_TESTS}) # create an independent target for each test s
   endif()
 endforeach(TEST_SUITE)
 set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostrophies
+
+# Set the priority of long running tests
+foreach(RUNTIME ${EOSIO_WASM_RUNTIMES})
+    set_tests_properties(memory_trap_1_check_throw_1_unit_test_${RUNTIME} PROPERTIES COST 4000)
+    set_tests_properties(memory_trap_1_check_throw_2_unit_test_${RUNTIME} PROPERTIES COST 4000)
+endforeach()
