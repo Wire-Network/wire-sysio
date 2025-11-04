@@ -391,11 +391,6 @@ jobs:
           tests-label: nonparallelizable_tests
           test-timeout: 420
 
-      # - name: Export core dumps
-      #   run: |
-      #     docker --context "$DOCKER_HOST" run --rm \
-      #       --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
-      #       alpine sh -c 'tar -C /cores/ -c .' | tar x
       - name: Export core dumps
         if: failure()
         env:
@@ -413,6 +408,22 @@ jobs:
           path: |
             *-logs.tar.gz
             core*.zst
+
+      - name: Cleanup Docker resources
+        if: always() 
+        env:
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          echo "=== Cleaning up Docker resources ==="
+          JOB_PREFIX="base-${{ github.run_id }}-${{ github.job }}"
+          echo "Removing containers matching: $JOB_PREFIX*"
+          sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
+            xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          
+          echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
+          sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
+            grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
+            xargs -r sudo docker --context "$DOCKER_CONTEXT" rmi -f || true
 
       - name: Cleanup Docker context
         if: always()
@@ -496,6 +507,7 @@ jobs:
             --mount type=bind,source=/var/lib/systemd/coredump,target=/cores \
             alpine sh -c 'tar -C /cores/ -c .' | tar x || echo "No core dumps found"
 
+
       - name: Upload logs from failed tests
         uses: actions/upload-artifact@v4
         if: failure()
@@ -505,7 +517,25 @@ jobs:
             *-logs.tar.gz
             core*.zst
 
-      - name: Remove ephemeral Docker context
+
+      - name: Cleanup Docker resources
+        if: always() 
+        env:
+          DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
+        run: |
+          echo "=== Cleaning up Docker resources ==="
+          echo $DOCKER_CONTEXT
+          JOB_PREFIX="base-${{ github.run_id }}-${{ github.job }}"
+          echo "Removing containers matching: $JOB_PREFIX*"
+          sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
+            xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
+          
+          echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
+          sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
+            grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
+            xargs -r sudo docker --context "$DOCKER_CONTEXT" rmi -f || true
+
+      - name: Cleanup Docker context
         if: always()
         run: |
           echo "Removing Docker context: $DOCKER_CONTEXT"
