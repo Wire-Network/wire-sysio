@@ -1266,7 +1266,7 @@ class Cluster(object):
 
         Utils.Print("Activate ROA")
         action="activateroa"
-        data="{\"totalSys\":\"75496.0000 SYS\",\"bytesPerUnit\":\"104\"}"
+        data="{\"total_sys\":\"75496.0000 SYS\",\"bytes_per_unit\":\"104\"}"
         opts="--permission %s" % (sysioRoaAccount.name)
         trans=biosNode.pushMessage(sysioRoaAccount.name, action, data, opts)
         transId=Node.getTransId(trans[1])

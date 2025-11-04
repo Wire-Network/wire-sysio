@@ -23,21 +23,21 @@ namespace sysio {
             /** 
              * @brief Initializes sysio.roa, should be called as last step in Bios Boot Sequence, activating the ROA resource management system.
              * 
-             * @param totalSys The total starting SYS of the network.
-             * @param bytesPerUnit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
+             * @param total_sys The total starting SYS of the network.
+             * @param bytes_per_unit The amount of bytes .0001 SYS is worth, set in roastate table. If SYS precision is different, same concept applies, the single smallest unit of the core token.
              */
             [[sysio::action]]
-            void activateroa(const asset& totalSys, const uint64_t& bytesPerUnit);
+            void activateroa(const asset& total_sys, const uint64_t& bytes_per_unit);
 
             /**
              * TODO: Ideally make this on-notify or some automated system on network expansion. Will address this down the line.
              * 
              * @brief Updates the amount of bytes .0001 SYS allocates. Requires Node Owner multisig approval, should only be used on network expansion.
              * 
-             * @param bytesPerUnit The NEW amount of bytes .0001 SYS is worth.
+             * @param bytes_per_unit The NEW amount of bytes .0001 SYS is worth.
              */
             [[sysio::action]]
-            void setbyteprice(const uint64_t& bytesPerUnit);
+            void setbyteprice(const uint64_t& bytes_per_unit);
 
 
 
@@ -48,14 +48,14 @@ namespace sysio {
              * 
              * @param owner The account to issue this policy for.
              * @param issuer The Node Owner issuing the policy.
-             * @param netWeight The amount of SYS allocated for NET
-             * @param cpuWeight The amount of SYS allocated for CPU
-             * @param ramWeight The amount of SYS allocated for RAM.
-             * @param timeBlock A block number, the policy can't be reclaimed or reduced before this block.
-             * @param networkGen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param net_weight The amount of SYS allocated for NET
+             * @param cpu_weight The amount of SYS allocated for CPU
+             * @param ram_weight The amount of SYS allocated for RAM.
+             * @param time_block A block number, the policy can't be reclaimed or reduced before this block.
+             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
-            void addpolicy(const name& owner, const name& issuer, const asset& netWeight, const asset& cpuWeight, const asset& ramWeight, const uint32_t& timeBlock, const uint8_t& networkGen);
+            void addpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint32_t& time_block, const uint8_t& network_gen);
 
             /** 
              * @brief Increase the resource limits on an existing policy. Adds new weights, to existing policy values.
@@ -64,23 +64,23 @@ namespace sysio {
              * 
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
-             * @param netWeight The amount in SYS to increase NET by.
-             * @param cpuWeight The amount in SYS to increase CPU by.
-             * @param ramWeight The amount in SYS to increase RAM by.
-             * @param networkGen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
+             * @param net_weight The amount in SYS to increase NET by.
+             * @param cpu_weight The amount in SYS to increase CPU by.
+             * @param ram_weight The amount in SYS to increase RAM by.
+             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to pull from.
              */
             [[sysio::action]]
-            void expandpolicy(const name& owner, const name& issuer, const asset& netWeight, const asset& cpuWeight, const asset& ramWeight, const uint8_t& networkGen);
+            void expandpolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
             
             /**
              * @brief Increases the policie's time_block extending the policies term.
              * 
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
-             * @param newTimeBlock The new block number this policy can't be reduced or reclaimed till.
+             * @param new_time_block The new block number this policy can't be reduced or reclaimed till.
              */
             [[sysio::action]]
-            void extendpolicy(const name& owner, const name& issuer, const uint32_t& newTimeBlock);
+            void extendpolicy(const name& owner, const name& issuer, const uint32_t& new_time_block);
 
             /**
              * @brief Decrease the resource limits on an existing policy. Subtracts new weights from existing values. Only callable after policie's time_block.
@@ -89,13 +89,13 @@ namespace sysio {
              * 
              * @param owner The account this policy is issued to.
              * @param issuer The Node Owner who issued this policy.
-             * @param netWeight The amount in SYS to decrease NET by.
-             * @param cpuWeight The amount in SYS to decrease CPU by.
-             * @param ramWeight The amount in SYS to attempt decreasing RAM by, returning only
-             * @param networkGen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
+             * @param net_weight The amount in SYS to decrease NET by.
+             * @param cpu_weight The amount in SYS to decrease CPU by.
+             * @param ram_weight The amount in SYS to attempt decreasing RAM by, returning only
+             * @param network_gen Generation of issuer, in cases were you are a Node Owner in multiple, specifies which allocation of SYS to adjust.
              */
             [[sysio::action]]
-            void reducepolicy(const name& owner, const name& issuer, const asset& netWeight, const asset& cpuWeight, const asset& ramWeight, const uint8_t& networkGen);
+            void reducepolicy(const name& owner, const name& issuer, const asset& net_weight, const asset& cpu_weight, const asset& ram_weight, const uint8_t& network_gen);
 
 
             /**
@@ -113,12 +113,12 @@ namespace sysio {
              * 
              * @param owner The account name of the node owner.
              * @param tier The tier level of the node owner.
-             * @param trxId The transaction ID of the transaction on Ethereum. 
-             * @param blockNum The block number on ETH that the deposit was in.
+             * @param trx_id The transaction ID of the transaction on Ethereum.
+             * @param block_num The block number on ETH that the deposit was in.
              * @param sig The signature of the Ethereum deposit
              */
             [[sysio::action]]
-            void setpending(const name& owner, const uint8_t& tier ,const checksum256& trxId, const uint128_t& blockNum, const bytes& sig);
+            void setpending(const name& owner, const uint8_t& tier ,const checksum256& trx_id, const uint128_t& block_num, const bytes& sig);
 
             /**
              * @brief Finalizes registration process.
@@ -308,12 +308,12 @@ namespace sysio {
             /**
              * @brief Create and set the initial values of reslimit entry
              */
-            void set_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes);
+            void set_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes);
 
             /**
              * @brief Increase values of reslimit entry, assert if not found
              */
-            resources_t increase_reslimit(const name& owner, const asset& netWeight, const asset& cpuWeight, int64_t ram_bytes,
+            resources_t increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes,
                                           bool require_to_exist);
 
     }; // namespace roa

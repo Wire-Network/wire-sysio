@@ -8,11 +8,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "totalSys",
+                    "name": "total_sys",
                     "type": "asset"
                 },
                 {
-                    "name": "bytesPerUnit",
+                    "name": "bytes_per_unit",
                     "type": "uint64"
                 }
             ]
@@ -30,23 +30,23 @@
                     "type": "name"
                 },
                 {
-                    "name": "netWeight",
+                    "name": "net_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpuWeight",
+                    "name": "cpu_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "ramWeight",
+                    "name": "ram_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "timeBlock",
+                    "name": "time_block",
                     "type": "uint32"
                 },
                 {
-                    "name": "networkGen",
+                    "name": "network_gen",
                     "type": "uint8"
                 }
             ]
@@ -64,19 +64,19 @@
                     "type": "name"
                 },
                 {
-                    "name": "netWeight",
+                    "name": "net_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpuWeight",
+                    "name": "cpu_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "ramWeight",
+                    "name": "ram_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "networkGen",
+                    "name": "network_gen",
                     "type": "uint8"
                 }
             ]
@@ -94,7 +94,7 @@
                     "type": "name"
                 },
                 {
-                    "name": "newTimeBlock",
+                    "name": "new_time_block",
                     "type": "uint32"
                 }
             ]
@@ -266,19 +266,19 @@
                     "type": "name"
                 },
                 {
-                    "name": "netWeight",
+                    "name": "net_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "cpuWeight",
+                    "name": "cpu_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "ramWeight",
+                    "name": "ram_weight",
                     "type": "asset"
                 },
                 {
-                    "name": "networkGen",
+                    "name": "network_gen",
                     "type": "uint8"
                 }
             ]
@@ -332,7 +332,7 @@
             "base": "",
             "fields": [
                 {
-                    "name": "bytesPerUnit",
+                    "name": "bytes_per_unit",
                     "type": "uint64"
                 }
             ]
@@ -350,11 +350,11 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "trxId",
+                    "name": "trx_id",
                     "type": "checksum256"
                 },
                 {
-                    "name": "blockNum",
+                    "name": "block_num",
                     "type": "uint128"
                 },
                 {

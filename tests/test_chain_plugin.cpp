@@ -122,9 +122,9 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     setup_system_accounts();
     produce_blocks();
     // creates account with ROA policy values
-    //   ("netWeight", "0.0010 SYS")
-    //   ("cpuWeight", "0.0010 SYS")
-    //   ("ramWeight", "4.0000 SYS")
+    //   ("net_weight", "0.0010 SYS")
+    //   ("cpu_weight", "0.0010 SYS")
+    //   ("ram_weight", "4.0000 SYS")
     create_account("alice1111111"_n, config::system_account_name);
     transfer(name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
 
