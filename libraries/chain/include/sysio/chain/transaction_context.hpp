@@ -91,8 +91,11 @@ namespace sysio { namespace chain {
          friend class apply_context;
          friend struct benchmark::interface_in_benchmark; // defined in benchmark/bls.cpp
 
+         //        limit,greylisted,unlimited
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
+
+         void verify_init_subjective_billing() const;
          void verify_net_usage(account_name account, int64_t net_usage, uint32_t net_usage_leeway);
-         void max_bandwidth_billed_account_can_pay(account_name account, account_billing& b, uint32_t net_usage_leeway);
 
          void add_ram_usage( account_name account, int64_t ram_delta );
 
@@ -152,7 +155,6 @@ namespace sysio { namespace chain {
          fc::microseconds              leeway = fc::microseconds( config::default_subjective_cpu_leeway_us );
          cpu_usage_t                   billed_cpu_us;
          accounts_billing_t            prev_accounts_billing;
-         account_subjective_cpu_bill_t subjective_cpu_bill;
          account_subjective_cpu_bill_t authorizers_cpu;
          bool                          explicit_billed_cpu_time = false;
 
@@ -169,6 +171,7 @@ namespace sysio { namespace chain {
          uint64_t                      leeway_trx_net_limit = 0;
 
          bool                          cpu_limit_due_to_greylist = false;
+         fc::microseconds              subjective_cpu_bill;
 
          fc::microseconds              max_transaction_time_subjective;
          fc::time_point                paused_time;

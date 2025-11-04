@@ -665,4 +665,15 @@ namespace sysio { namespace chain {
                                     3250002, "Protocol feature exception (invalid block)" )
       FC_DECLARE_DERIVED_EXCEPTION( protocol_feature_iterator_exception, protocol_feature_exception,
                                     3250003, "Protocol feature iterator exception" )
+
+
+   /// @return true if exception requires transaction to be retried in the next block
+   inline bool exception_is_exhausted(const fc::exception& e) {
+      const auto code = e.code();
+      return (code == block_cpu_usage_exceeded::code_value) ||
+             (code == block_net_usage_exceeded::code_value) ||
+             (code == deadline_exception::code_value) ||
+             (code == ro_trx_vm_oc_compile_temporary_failure::code_value);
+   }
+
 } } // sysio::chain

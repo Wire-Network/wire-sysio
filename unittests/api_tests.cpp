@@ -1005,7 +1005,7 @@ void push_trx(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cpu
    if (explicit_bill)
       billed_cpu_us.insert(billed_cpu_us.end(), total_actions, billed_cpu_time_us);
    auto res = test.control->test_push_transaction( trx_meta, fc::time_point::now() + fc::milliseconds(max_block_cpu_ms),
-                                              fc::milliseconds(max_cpu_usage_ms), billed_cpu_us, explicit_bill, {} );
+                                              fc::milliseconds(max_cpu_usage_ms), billed_cpu_us, explicit_bill );
    if( res->except_ptr ) std::rethrow_exception( res->except_ptr );
    if( res->except ) throw *res->except;
 };
@@ -1589,7 +1589,7 @@ void transaction_tests(T& chain) {
       cpu_usage_t billed_cpu_us;
       if (explicit_billed_cpu_time)
          billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), T::DEFAULT_BILLED_CPU_TIME_US);
-      auto r = chain.control->test_push_transaction( fut.get(), fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true, {} );
+      auto r = chain.control->test_push_transaction( fut.get(), fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except) throw *r->except;
       tx_trace = r;

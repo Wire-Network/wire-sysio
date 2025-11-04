@@ -150,12 +150,10 @@ namespace sysio { namespace chain {
          deque<transaction_metadata_ptr> abort_block();
 
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
-                                                 fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                 const account_subjective_cpu_bill_t& subjective_cpu_bill );
+                                                 fc::time_point deadline, fc::microseconds max_transaction_time );
          transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
                                                       fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time,
-                                                      const account_subjective_cpu_bill_t& subjective_cpu_bill );
+                                                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time );
 
          struct block_report {
             size_t             total_net_usage = 0;
@@ -275,7 +273,11 @@ namespace sysio { namespace chain {
          void check_action_list( account_name code, action_name action )const;
          void check_key_list( const public_key_type& key )const;
          bool is_building_block()const;
+         // returns true for both is_producing_block() and ephemeral blocks
+         // blocks being produced are considered speculative blocks
          bool is_speculative_block()const;
+         // returns true for block_status::incomplete block
+         bool is_producing_block()const;
 
          //This is only an accessor to the user configured subjective limit: i.e. it does not do a
          // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently

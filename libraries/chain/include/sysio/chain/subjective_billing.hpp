@@ -49,12 +49,22 @@ private:
    using account_subjective_bill_cache = std::unordered_map<chain::account_name, subjective_billing_info>;
 
    bool                                      _disabled = false;
+   fc::microseconds                          _subjective_account_cpu_allowed{300000};
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
    std::set<chain::account_name>             _disabled_accounts;
    uint32_t                                  _expired_accumulator_average_window = chain::config::account_cpu_usage_average_window_ms / subjective_time_interval_ms;
 
 private:
+   void _reset() { // for testing
+      _disabled = false;
+      _subjective_account_cpu_allowed = fc::microseconds{300000};
+      _trx_cache_index.clear();
+      _account_subjective_bill_cache.clear();
+      _disabled_accounts.clear();
+      _expired_accumulator_average_window = chain::config::account_cpu_usage_average_window_ms / subjective_time_interval_ms;
+   }
+
    static uint32_t time_ordinal_for( const fc::time_point& t ) {
       auto ordinal = t.time_since_epoch().count() / (1000U * (uint64_t)subjective_time_interval_ms);
       SYS_ASSERT(ordinal <= std::numeric_limits<uint32_t>::max(), chain::tx_resource_exhaustion, "overflow of quantized time in subjective billing");
@@ -104,7 +114,10 @@ public: // public for tests
    }
 
 public:
-   void disable() { _disabled = true; }
+   void set_subjective_account_cpu_allowed( fc::microseconds v ) { _subjective_account_cpu_allowed = v; }
+   fc::microseconds get_subjective_account_cpu_allowed() const { return _subjective_account_cpu_allowed; }
+   void set_disabled(bool disable) { _disabled = disable; }
+   bool is_disabled() const { return _disabled; }
    void disable_account( chain::account_name a ) { _disabled_accounts.emplace( a ); }
    bool is_account_disabled(const account_name& a ) const { return _disabled || _disabled_accounts.contains( a ); }
    bool is_any_account_disabled(const action_payers_t& accounts ) const {
@@ -225,6 +238,10 @@ public:
    void set_expired_accumulator_average_window( fc::microseconds subjective_account_decay_time ) {
       _expired_accumulator_average_window =
         subjective_account_decay_time.count() / 1000 / subjective_time_interval_ms;
+   }
+
+   void reset() { // for testing
+      _reset();
    }
 };
 
