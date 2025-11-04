@@ -373,6 +373,17 @@ def abi_file_with_nodeop_test():
         node.publishContract(accounts[0], biosDir, 'sysio.bios.wasm', 'sysio.bios.abi')
         node.publishContract(accounts[1], contractDir, 'sysio.token.wasm', 'sysio.token.abi')
         node.setPriv(accounts[1], accounts[0], waitForTransBlock=True)
+        raw_abi_result = node.processUrllibRequest("chain", "get_raw_abi", payload = {"account_name":"sysio.token"})
+        Utils.Print("raw abi result: %s" % raw_abi_result)
+        raw_abi_hash = raw_abi_result['payload']['abi_hash']
+        raw_code_hash = raw_abi_result['payload']['code_hash']
+        Utils.Print("raw abi hash: %s" % raw_abi_hash)
+        clio_abi_hash = node.processClioCmd('convert abi_to_hash ' + contractDir + '/sysio.token.abi', 'convert abi to hash', silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
+        Utils.Print("clio abi hash: %s" % clio_abi_hash)
+        assert(raw_abi_hash in clio_abi_hash);
+        clio_wasm_hash = node.processClioCmd('convert wasm_to_hash ' + contractDir + '/sysio.token.wasm', 'convert wasm to hash', silentErrors=False, exitOnError=True, returnType=ReturnType.raw)
+        Utils.Print("clio wasm hash: %s" % clio_wasm_hash)
+        assert(raw_code_hash in clio_wasm_hash);
         account = 'sysio.token'
         action = 'create'
         data = '{"issuer":"sysio.token","maximum_supply":"100000.0000 SYS","can_freeze":"0","can_recall":"0","can_whitelist":"0"}'
