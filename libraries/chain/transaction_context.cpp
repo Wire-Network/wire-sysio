@@ -273,6 +273,7 @@ namespace sysio::chain {
       assert( is_initialized );
       const transaction& trx = packed_trx.get_transaction();
       auto& sub_bill = control.get_subjective_billing();
+      const auto pending_block_time = control.pending_block_time();
 
       auto add_trace_net = [&]( size_t idx ) {
          if (!is_input) return;
@@ -309,7 +310,7 @@ namespace sysio::chain {
             auto& b = accounts_billing[a];
             cpu_limit_due_to_greylist = b.cpu_greylisted;
             if (!is_read_only()) {
-               subjective_cpu_bill = sub_bill.get_subjective_bill(a, action_start);
+               subjective_cpu_bill = sub_bill.get_subjective_bill(a, pending_block_time);
                int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill.count() + leeway.count(); // Add leeway to allow powerup
                // Possibly limit deadline to account subjective cpu left
                if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
@@ -682,7 +683,7 @@ namespace sysio::chain {
          if( trace->except ) {
             const fc::exception& e = *trace->except;
             if( !exception_is_exhausted( e ) && e.code() != tx_duplicate::code_value) {
-               subjective_bill.subjective_bill_failure(accounts_billing, authorizers_cpu, now);
+               subjective_bill.subjective_bill_failure(accounts_billing, authorizers_cpu, control.pending_block_time());
             }
          } else {
             // if producing then trx is in objective cpu account billing. Also no block will be received to remove the billing.
@@ -701,7 +702,6 @@ namespace sysio::chain {
          return;
 
       const fc::microseconds subjective_cpu_allowed = subjective_bill.get_subjective_account_cpu_allowed();
-      auto now = fc::time_point::now();
       const auto& trx = packed_trx.get_transaction();
       const action_payers_t auths = trx.first_authorizers();
       const action_payers_t payers = trx.payers();
@@ -713,7 +713,7 @@ namespace sysio::chain {
          if (!subjective_bill.is_account_disabled(a)) {
             const auto&[cpu_limit, greylisted, unlimited] = get_cpu_limit(a);
             if (!unlimited) { // else is unlimited
-               const auto sub_bill = subjective_bill.get_subjective_bill(a, now);
+               const auto sub_bill = subjective_bill.get_subjective_bill(a, control.pending_block_time());
                const int64_t available = subjective_cpu_allowed.count() + cpu_limit - sub_bill.count();
                if (available <= 0) {
                   std::string assert_msg;
