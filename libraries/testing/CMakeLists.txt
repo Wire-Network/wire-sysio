@@ -32,11 +32,20 @@ add_library(sysio_testing
 )
 
 add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm
+        OUTPUT ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm
+               ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi
+               ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm
+               ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi
+        COMMAND mkdir -p ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios
         COMMAND mkdir -p ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa
+        COMMAND cp ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm
+        COMMAND cp ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi
         COMMAND cp ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm
         COMMAND cp ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi
-        DEPENDS ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm
+        DEPENDS ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm
+                ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi
+                ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm
+                ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi
 )
 
 # Could not figure out how to make this work correctly.
@@ -51,6 +60,7 @@ if(BUILD_TEST_CONTRACTS)
     "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm"
     "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi"
     "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm"
+    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi"
   )
 
   # Make the main testing library wait for the contracts to be built.
