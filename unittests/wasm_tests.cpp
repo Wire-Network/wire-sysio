@@ -24,6 +24,7 @@
 #include <fc/io/json.hpp>
 #include <fc/variant_object.hpp>
 
+#include <test_common.hpp>
 #include "test_wasts.hpp"
 #include "test_softfloat_wasts.hpp"
 
@@ -34,34 +35,6 @@ using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace fc;
 namespace bdata = boost::unit_test::data;
-
-
-struct assertdef {
-   int8_t      condition;
-   string      message;
-
-   static account_name get_account() {
-      return "asserter"_n;
-   }
-
-   static action_name get_name() {
-      return "procassert"_n;
-   }
-};
-
-FC_REFLECT(assertdef, (condition)(message));
-
-struct provereset {
-   static account_name get_account() {
-      return "asserter"_n;
-   }
-
-   static action_name get_name() {
-      return "provereset"_n;
-   }
-};
-
-FC_REFLECT_EMPTY(provereset);
 
 BOOST_AUTO_TEST_SUITE(wasm_tests)
 

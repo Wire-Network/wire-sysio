@@ -1,13 +1,16 @@
 #include <boost/test/unit_test.hpp>
 
-#include "sysio/chain/subjective_billing.hpp"
+#include <sysio/chain/subjective_billing.hpp>
 #include <sysio/testing/tester.hpp>
+#include <test_common.hpp>
+#include <test_contracts.hpp>
 #include <fc/time.hpp>
 
 namespace {
 
 using namespace sysio;
 using namespace sysio::chain;
+using namespace sysio::testing;
 
 BOOST_AUTO_TEST_SUITE(subjective_billing_test)
 
@@ -258,6 +261,125 @@ BOOST_AUTO_TEST_CASE( subjective_bill_multiple_accounts_test ) {
       BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(b, endtime).count() );
       BOOST_CHECK_EQUAL( 0, sub_bill.get_subjective_bill(c, endtime).count() );
    }
+}
+
+BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
+   tester chain( setup_policy::full, db_read_mode::SPECULATIVE );
+
+   fc::logger log;
+   account_name acc = "asserter"_n;
+   account_name user = "user"_n;
+   account_name other = "other"_n;
+   chain.create_accounts( {acc, user} );
+   chain.create_account( other, config::system_account_name, false, false, false, true );
+   chain.set_contract(acc, test_contracts::asserter_wasm(), test_contracts::asserter_abi());
+   auto b = chain.produce_block();
+
+   chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
+         ("account", other)
+         ("ram_bytes", base_tester::newaccount_ram)
+         ("net_weight", 0) // no NET
+         ("cpu_weight", 0) // no CPU
+   );
+
+   // assertdef_v values of 1 indicate it does not assert, 0 means it asserts
+   auto create_trx = [&](auto trx_max_ms, std::array<signed char, 4> assertdef_v) {
+      signed_transaction trx;
+      trx.actions.emplace_back( vector<permission_level>{{acc, config::active_name}}, // paid by contract
+                                assertdef {assertdef_v[0], std::to_string(assertdef_v[0])} );
+      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}}, // also paid by contract
+                                assertdef {assertdef_v[1], std::to_string(assertdef_v[1])} );
+      trx.actions.emplace_back( vector<permission_level>{{user, config::sysio_payer_name},{user, config::active_name}}, // paid by user
+                                assertdef {assertdef_v[2], std::to_string(assertdef_v[2])} );
+      trx.actions.emplace_back( vector<permission_level>{{other, config::active_name}}, // paid by contract
+                                assertdef {assertdef_v[3], std::to_string(assertdef_v[3])} );
+      static int num_secs = 1;
+      chain.set_transaction_headers( trx, ++num_secs ); // num_secs provides nonce
+      trx.max_cpu_usage_ms = trx_max_ms;
+      trx.sign( tester::get_private_key( acc, "active" ), chain.control->get_chain_id() );
+      trx.sign( tester::get_private_key( user, "active" ), chain.control->get_chain_id() );
+      trx.sign( tester::get_private_key( other, "active" ), chain.control->get_chain_id() );
+      auto ptrx = std::make_shared<packed_transaction>(trx);
+      auto fut = transaction_metadata::start_recover_keys( ptrx, chain.control->get_thread_pool(), chain.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      return fut.get();
+   };
+
+   auto push_trx = [&]( const transaction_metadata_ptr& trx, fc::time_point deadline,
+                     const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time ) {
+      auto r = chain.control->test_push_transaction( trx, deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
+      if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
+      if( r->except ) throw *r->except;
+      return r;
+   };
+
+   auto& sub_bill = chain.control->get_mutable_subjective_billing();
+   sub_bill.set_disabled(false);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+
+   auto ptrx = create_trx(0, {0,1,1,1});
+   BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
+
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+
+   chain.produce_block();
+   b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
+   sub_bill.on_block(log, b, b->timestamp);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+
+   ptrx = create_trx(0, {1,0,1,1});
+   BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
+
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0); // didn't make it to the final action
+
+   chain.produce_block();
+   b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
+   sub_bill.on_block(log, b, b->timestamp);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+
+   ptrx = create_trx(0, {1,1,0,1});
+   BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
+
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0); // didn't make it to the final action
+
+   chain.produce_block();
+   b = chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
+   sub_bill.on_block(log, b, b->timestamp);
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() == 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() == 0);
+
+   ptrx = create_trx(0, {1,1,1,0});
+   BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
+
+   BOOST_TEST(sub_bill.get_subjective_bill(acc, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(user, b->timestamp).count() > 0);
+   BOOST_TEST(sub_bill.get_subjective_bill(other, b->timestamp).count() > 0);
+
+   sub_bill.set_subjective_account_cpu_allowed(fc::microseconds{1000});
+   const size_t num_itrs = 1000;
+   size_t i = 0;
+   for (; i < num_itrs; ++i) {
+      ptrx = create_trx(0, {1,1,1,0});
+      BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
+      if (sub_bill.get_subjective_bill(other, b->timestamp) > sub_bill.get_subjective_account_cpu_allowed())
+         break;
+   }
+   BOOST_REQUIRE(i < num_itrs); // failed to accumulate subjective billing
+   ptrx = create_trx(0, {1,1,1,1});
+   BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), {}, false ), tx_cpu_usage_exceeded,
+                         fc_exception_message_contains("Authorized account other exceeded subjective CPU limit"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
