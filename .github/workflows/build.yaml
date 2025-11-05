@@ -160,7 +160,7 @@ jobs:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
-
+            set -euo pipefail
             echo "===== DEBUG: ENVIRONMENT ====="
             whoami
             id
@@ -190,27 +190,21 @@ jobs:
             echo "===== DEBUG: SUDO CONFIG ====="
             sudo grep -E '^Defaults' /etc/sudoers /etc/sudoers.d/* 2>/dev/null | grep -E 'secure_path|env_keep' || echo "No sudo Defaults found"
             
-            BASE_RUNNER="${RUNNER_NAME,,}"
             echo "Detected runner name: $RUNNER_NAME"
+            name="${RUNNER_NAME,,}"
 
-            if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
-            elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
-            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
-            else
-              echo "Unknown runner, defaulting to /var/run/docker.sock"
-              DOCKER_SOCK=/var/run/docker.sock
-            fi
+            [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
+            num="${BASH_REMATCH[1]}"
+            sock="/run/docker-runners/docker-runner${num}.sock"
+            [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
 
-            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
-            echo "Using Docker socket: $DOCKER_SOCK"
-            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
-            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
-            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+            echo "Using Docker socket: $sock"
+            echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
+
+            ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
+            sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
+              sudo docker context create "$ctx" --docker "host=unix://$sock"
+            echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
 
       # - name: Cleanup stale containers
       #   run: |
@@ -339,25 +333,23 @@ jobs:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
-            BASE_RUNNER="${RUNNER_NAME,,}"
+            set -euo pipefail
+
             echo "Detected runner name: $RUNNER_NAME"
+            name="${RUNNER_NAME,,}"
 
-            if [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
-            elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-            elif [[ "$BASE_RUNNER" == *"runner-4"* ]]; then
-              DOCKER_SOCK=/run/docker-runners/docker-runner4.sock
-            else
-              echo "Unknown runner, defaulting to /var/run/docker.sock"
-              DOCKER_SOCK=/var/run/docker.sock
-            fi
+            [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
+            num="${BASH_REMATCH[1]}"
+            sock="/run/docker-runners/docker-runner${num}.sock"
+            [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
 
-            CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}" 
-            echo "Using Docker socket: $DOCKER_SOCK"
-            sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
-            echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
-            echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+            echo "Using Docker socket: $sock"
+            echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
+
+            ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
+            sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
+              sudo docker context create "$ctx" --docker "host=unix://$sock"
+            echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
 
       - name: Cleanup stale containers (safety)
         run: |
@@ -449,27 +441,23 @@ jobs:
       - name: Create ephemeral Docker context
         id: docker-context
         run: |
-          BASE_RUNNER="${RUNNER_NAME,,}"
+          set -euo pipefail
+
           echo "Detected runner name: $RUNNER_NAME"
+          name="${RUNNER_NAME,,}"
 
-          if [[ "$BASE_RUNNER" == *"runner-0"* ]]; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner0.sock
-          elif [[ "$BASE_RUNNER" == *"runner-2"* ]]; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner2.sock
-          elif [[ "$BASE_RUNNER" == *"runner-3"* ]]; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner3.sock
-          elif [[ "$BASE_RUNNER" == *"runner-5"* ]]; then
-            DOCKER_SOCK=/run/docker-runners/docker-runner5.sock
-          else
-            echo "Unknown runner, defaulting to /var/run/docker.sock"
-            DOCKER_SOCK=/var/run/docker.sock
-          fi
+          [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
+          num="${BASH_REMATCH[1]}"
+          sock="/run/docker-runners/docker-runner${num}.sock"
+          [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
 
-          CTX_NAME="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"          
-          echo "Using Docker socket: $DOCKER_SOCK"
-          sudo docker context create "$CTX_NAME" --docker "host=unix://$DOCKER_SOCK"
-          echo "DOCKER_CONTEXT=$CTX_NAME" >> "$GITHUB_ENV"
-          echo "DOCKER_HOST=unix://$DOCKER_SOCK" >> "$GITHUB_ENV"
+          echo "Using Docker socket: $sock"
+          echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
+
+          ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
+          sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
+            sudo docker context create "$ctx" --docker "host=unix://$sock"
+          echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
 
       - name: Cleanup stale containers
         run: |
