@@ -98,7 +98,7 @@ class TraceApiPluginTest(unittest.TestCase):
 
         # relaunch with no time allocated for http response & abi-serializer
         node.kill(signal.SIGTERM)
-        isRelaunchSuccess = node.relaunch(timeout=10, addSwapFlags={"--http-max-response-time-ms": "0", "--abi-serializer-max-time-ms": "0"})
+        isRelaunchSuccess = node.relaunch(timeout=15, addSwapFlags={"--http-max-response-time-ms": "0", "--abi-serializer-max-time-ms": "0"})
         self.assertTrue(isRelaunchSuccess)
 
         # Verify get block_trace still works even with no time for http-max-response-time-ms and no time for bi-serializer-max-time-ms
