@@ -569,6 +569,9 @@ class Node(Transactions):
                     if re.match(r".*unlinkable_block_exception", line):
                         lastRestartBlockNum = blockNumber
                         continue
+                    if re.match(r".*Block not applied to head", line):
+                        lastRestartBlockNum = blockNumber
+                        continue
                     match = re.match(r".*Starting block #(\d+)", line)
                     if match:
                         blockNumber = match.group(1)
