@@ -85,7 +85,7 @@ public:
    }
 
    template <typename A, typename B>
-   vector<A> deserialize_data(deltas_vector::iterator &it) {
+   static vector<A> deserialize_data(deltas_vector::iterator &it) {
       vector<A> result;
       for(size_t i=0; i < it->rows.obj.size(); i++) {
          sysio::input_stream stream{it->rows.obj[i].second.data(), it->rows.obj[i].second.size()};
@@ -410,7 +410,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
-      BOOST_REQUIRE(it==v.end());
+      BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
+      BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 1u);
+      auto resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
+      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
 
       main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
@@ -423,6 +426,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
       BOOST_REQUIRE(it!=v.end());
+      BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 2u);
+      resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
+      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
+      BOOST_REQUIRE_EQUAL(resources[1].owner.to_string(), "newacc");
 
       main.produce_block();
 
@@ -434,7 +441,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
-      BOOST_REQUIRE(it==v.end());
+      BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
    }
 
    BOOST_AUTO_TEST_CASE(test_deltas_contract_several_rows){
