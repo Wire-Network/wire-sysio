@@ -183,11 +183,16 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
 }
 
 template <typename ST>
-datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stateless<sysio::chain::account_object>& obj) {
+datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::account_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(0));
    fc::raw::pack(ds, as_type<uint64_t>(obj.obj.name.to_uint64_t()));
    fc::raw::pack(ds, as_type<sysio::chain::block_timestamp_type>(obj.obj.creation_date));
-   fc::raw::pack(ds, as_type<sysio::chain::shared_string>(obj.obj.abi));
+   const auto* account_metadata = obj.db.find<sysio::chain::account_metadata_object, sysio::chain::by_name>(obj.obj.name);
+   if (account_metadata != nullptr) {
+      fc::raw::pack(ds, as_type<sysio::chain::shared_string>(account_metadata->abi));
+   } else {
+      fc::raw::pack(ds, as_type<sysio::chain::shared_string>({}));
+   }
    return ds;
 }
 

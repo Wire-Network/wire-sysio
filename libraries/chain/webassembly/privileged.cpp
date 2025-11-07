@@ -209,13 +209,17 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    bool interface::is_privileged( account_name n ) const {
-      return context.db.get<account_metadata_object, by_name>( n ).is_privileged();
+      const auto* account_metadata = context.db.find<account_metadata_object, by_name>( n );
+      return account_metadata != nullptr && account_metadata->is_privileged();
    }
 
    void interface::set_privileged( account_name n, bool is_priv ) {
       SYS_ASSERT(!context.trx_context.is_read_only(), wasm_execution_error, "set_privileged not allowed in a readonly transaction");
-      const auto& a = context.db.get<account_metadata_object, by_name>( n );
-      context.db.modify( a, [&]( auto& ma ){
+      const auto* account_metadata = context.db.find<account_metadata_object, by_name>( n );
+      if (account_metadata == nullptr && !is_priv)
+         return; // already not priv
+      SYS_ASSERT(account_metadata != nullptr, wasm_execution_error, "setcode must be called before setpriv for account ${a}", ("a", n));
+      context.db.modify( *account_metadata, [&]( auto& ma ){
          ma.set_privileged( is_priv );
       });
    }

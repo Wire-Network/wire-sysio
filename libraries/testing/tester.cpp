@@ -527,8 +527,9 @@ namespace sysio { namespace testing {
       include_ram_gift &= a.prefix() != config::system_account_name;
       if (include_ram_gift) {
          // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
-         const auto& acnt = control->get_account(config::system_account_name);
-         auto abi = acnt.get_abi();
+         const auto* acnt = control->find_account_metadata(config::system_account_name);
+         FC_ASSERT(acnt != nullptr, "system account metadata not found");
+         auto abi = acnt->get_abi();
          if (std::ranges::any_of(abi.actions, [](const auto& action) { return action.name == "setalimits"_n; })) {
             trx.actions.emplace_back(get_action(config::system_account_name, "setalimits"_n,
                                                 vector<permission_level>{{config::system_account_name, config::active_name}},
@@ -808,8 +809,9 @@ namespace sysio { namespace testing {
 
    action base_tester::get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                    const variant_object& data )const { try {
-      const auto& acnt = control->get_account(code);
-      auto abi = acnt.get_abi();
+      const auto* acnt = control->find_account_metadata(code);
+      FC_ASSERT(acnt != nullptr, "account metadata not found");
+      auto abi = acnt->get_abi();
       chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
       string action_type_name = abis.get_action_type(acttype);
@@ -1069,9 +1071,8 @@ namespace sysio { namespace testing {
    }
 
    bool base_tester::is_code_cached( sysio::chain::account_name name ) const {
-      const auto& db  = control->db();
-      const account_metadata_object* receiver_account = &db.template get<account_metadata_object,by_name>( name );
-      if ( receiver_account->code_hash == digest_type() ) return false;
+      const account_metadata_object* receiver_account = control->find_account_metadata( name );
+      if ( receiver_account == nullptr || receiver_account->code_hash == digest_type() ) return false;
       return control->get_wasm_interface().is_code_cached( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version );
    }
 

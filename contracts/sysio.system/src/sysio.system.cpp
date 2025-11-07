@@ -31,7 +31,7 @@ namespace sysiosystem {
       require_auth( get_self() );
 
       check( _gstate.max_ram_size < max_ram_size, "ram may only be increased" ); /// decreasing ram might result market maker issues
-      check( max_ram_size < 1024ll*1024*1024*1024*1024, "ram size is unrealistic" );
+      check( max_ram_size < 1024ll*1024*1024*1024*1024, "ram size is unrealistic large" );
       check( max_ram_size > _gstate.total_ram_bytes_reserved, "attempt to set max below reserved" );
 
       _gstate.max_ram_size = max_ram_size;
