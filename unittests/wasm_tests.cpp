@@ -142,9 +142,10 @@ BOOST_FIXTURE_TEST_CASE( abi_from_variant, validating_tester ) try {
 
    auto resolver = [&,this]( const account_name& name ) -> std::optional<abi_serializer> {
       try {
-         const auto& accnt  = this->control->db().get<account_object,by_name>( name );
-         if (abi_def abi; abi_serializer::to_abi(accnt.abi, abi)) {
-            return abi_serializer(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
+         if (const auto* accnt  = this->control->find_account_metadata( name ); accnt != nullptr) {
+            if (abi_def abi; abi_serializer::to_abi(accnt->abi, abi)) {
+               return abi_serializer(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
+            }
          }
          return std::optional<abi_serializer>();
       } FC_RETHROW_EXCEPTIONS(error, "Failed to find or parse ABI for ${name}", ("name", name))
@@ -933,9 +934,10 @@ BOOST_FIXTURE_TEST_CASE(noop, validating_tester) try {
    set_code("noop"_n, test_contracts::noop_wasm());
 
    set_abi("noop"_n, test_contracts::noop_abi());
-   const auto& accnt  = control->db().get<account_object,by_name>("noop"_n);
+   const auto* accnt  = control->find_account_metadata("noop"_n);
+   BOOST_REQUIRE(accnt != nullptr);
    abi_def abi;
-   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
    abi_serializer abi_ser(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
    {
@@ -996,9 +998,10 @@ BOOST_FIXTURE_TEST_CASE(noop, validating_tester) try {
 BOOST_FIXTURE_TEST_CASE(sysio_abi, validating_tester) try {
    produce_blocks(2);
 
-   const auto& accnt  = control->db().get<account_object,by_name>(config::system_account_name);
+   const auto* accnt  = control->find_account_metadata(config::system_account_name);
+   BOOST_REQUIRE(accnt != nullptr);
    abi_def abi;
-   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+   BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
    abi_serializer abi_ser(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
    signed_transaction trx;

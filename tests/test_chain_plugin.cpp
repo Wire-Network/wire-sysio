@@ -75,9 +75,10 @@ public:
        set_privileged("sysio.token"_n);
 
        {
-           const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
+           const auto& accnt = control->find_account_metadata( "sysio.token"_n );
+           FC_ASSERT(accnt != nullptr, "sysio.token account metadata not found");
            abi_def abi;
-           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
            token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
        }
 
@@ -94,9 +95,10 @@ public:
                                         ("core", symbol(CORE_SYMBOL).to_string()));
 
        {
-           const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+           const auto& accnt = control->find_account_metadata( config::system_account_name );
+           FC_ASSERT(accnt != nullptr, "sysio account metadata not found");
            abi_def abi;
-           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
            abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
        }
 

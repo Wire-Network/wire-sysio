@@ -162,7 +162,7 @@ namespace sysio { namespace testing {
          static const uint32_t DEFAULT_BILLED_CPU_TIME_US = 2000;
          static const fc::microseconds abi_serializer_max_time;
 
-         static constexpr uint64_t newaccount_ram = 2808; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t newaccount_ram = 1784; // Should match sysio.system native newaccount_ram
          static constexpr auto NODE_DADDY = "nodedaddy"_n;
          bool has_roa = false;
 
@@ -354,9 +354,10 @@ namespace sysio { namespace testing {
          auto get_resolver() {
             return [this]( const account_name& name ) -> std::optional<abi_serializer> {
                try {
-                  const auto& accnt = control->db().get<account_object, by_name>( name );
-                  if( abi_def abi; abi_serializer::to_abi( accnt.abi, abi )) {
-                     return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                  if (const auto* accnt = control->find_account_metadata( name ); accnt != nullptr) {
+                     if( abi_def abi; abi_serializer::to_abi( accnt->abi, abi )) {
+                        return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                     }
                   }
                   return std::optional<abi_serializer>();
                } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for ${name}", ("name", name))

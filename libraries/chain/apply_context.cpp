@@ -65,7 +65,8 @@ void apply_context::exec_one()
 
    digest_type act_digest;
 
-   const account_metadata_object* receiver_account = nullptr;
+   const account_object* receiver_account = nullptr;
+   const account_metadata_object* receiver_account_metadata = nullptr;
 
    auto handle_exception = [&](const auto& e)
    {
@@ -79,9 +80,10 @@ void apply_context::exec_one()
    try {
       try {
          action_return_value.clear();
-         receiver_account = &db.get<account_metadata_object,by_name>( receiver );
+         receiver_account = &db.get<account_object,by_name>( receiver );
+         receiver_account_metadata = db.find<account_metadata_object,by_name>( receiver );
          if( !(context_free && control.skip_trx_checks()) ) {
-            privileged = receiver_account->is_privileged();
+            privileged = receiver_account_metadata != nullptr && receiver_account_metadata->is_privileged();
             auto native = control.find_apply_handler( receiver, act->account, act->name );
             if( native ) {
                if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
@@ -91,13 +93,16 @@ void apply_context::exec_one()
                (*native)( *this );
             }
 
-            if( receiver_account->code_hash != digest_type() ) {
+            if( receiver_account_metadata != nullptr && receiver_account_metadata->code_hash != digest_type() ) {
                if( trx_context.enforce_whiteblacklist && control.is_speculative_block() ) {
                   control.check_contract_list( receiver );
                   control.check_action_list( act->account, act->name );
                }
                try {
-                  control.get_wasm_interface().apply( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version, *this );
+                  control.get_wasm_interface().apply( receiver_account_metadata->code_hash,
+                                                      receiver_account_metadata->vm_type,
+                                                      receiver_account_metadata->vm_version,
+                                                      *this );
                } catch( const wasm_exit& ) {}
             } else {
                // allow inline and notify to non-existing contracts
@@ -144,15 +149,15 @@ void apply_context::exec_one()
    r.global_sequence  = next_global_sequence();
    r.recv_sequence    = next_recv_sequence( *receiver_account );
 
-   const account_metadata_object* first_receiver_account = nullptr;
+   const account_metadata_object* first_receiver_account_metadata = nullptr;
    if( act->account == receiver ) {
-      first_receiver_account = receiver_account;
+      first_receiver_account_metadata = receiver_account_metadata;
    } else {
-      first_receiver_account = &db.get<account_metadata_object, by_name>(act->account);
+      first_receiver_account_metadata = db.find<account_metadata_object, by_name>(act->account);
    }
 
-   r.code_sequence    = first_receiver_account->code_sequence; // could be modified by action execution above
-   r.abi_sequence     = first_receiver_account->abi_sequence;  // could be modified by action execution above
+   r.code_sequence    = first_receiver_account_metadata != nullptr ? first_receiver_account_metadata->code_sequence : 0; // could be modified by action execution above
+   r.abi_sequence     = first_receiver_account_metadata != nullptr ? first_receiver_account_metadata->abi_sequence: 0;  // could be modified by action execution above
 
    for( const auto& auth : act->authorization ) {
       r.auth_sequence[auth.actor] = next_auth_sequence( auth.actor );
@@ -810,7 +815,7 @@ uint64_t apply_context::next_global_sequence() {
    }
 }
 
-uint64_t apply_context::next_recv_sequence( const account_metadata_object& receiver_account ) {
+uint64_t apply_context::next_recv_sequence( const account_object& receiver_account ) {
    if ( trx_context.is_read_only() ) {
       // To avoid confusion of duplicated receive sequence number, hard code to be 0.
       return 0;
@@ -822,7 +827,7 @@ uint64_t apply_context::next_recv_sequence( const account_metadata_object& recei
    }
 }
 uint64_t apply_context::next_auth_sequence( account_name actor ) {
-   const auto& amo = db.get<account_metadata_object,by_name>( actor );
+   const auto& amo = db.get<account_object,by_name>( actor );
    db.modify( amo, [&](auto& am ){
       ++am.auth_sequence;
    });

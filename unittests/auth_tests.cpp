@@ -374,6 +374,7 @@ try {
                          fc_exception_message_is("Only privileged accounts can create new accounts"));
 
    // Creating the same new account, this time with privileged account
+   chain.set_code("joe"_n, vector<uint8_t>{});
    chain.set_privileged("joe"_n);
    chain.produce_block();
 
@@ -431,8 +432,9 @@ try {
 
    chain.create_account(acc1, config::system_account_name, false, false, false, false);
    chain.create_account(acc1a, config::system_account_name, false, false, false, false);
-   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 50, 50, 50, false);
+   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 1844, 50, 50, false); // just enough ram
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1a, 50, 50, 50, false);
+   chain.set_code(acc1, vector<uint8_t>{});
    chain.set_privileged(acc1);
    chain.produce_block();
 
@@ -495,6 +497,7 @@ try {
    account_name acc4 = "acc4"_n;
 
    chain.create_account(acc1);
+   chain.set_code(acc1, vector<uint8_t>{});
    chain.set_privileged(acc1);
    chain.produce_block();
 

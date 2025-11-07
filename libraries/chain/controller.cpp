@@ -1028,16 +1028,14 @@ struct controller_impl {
       db.create<account_object>([&](auto& a) {
          a.name = name;
          a.creation_date = initial_timestamp;
-
-         if( name == config::system_account_name ) {
-            // The initial sysio ABI value affects consensus; see  https://github.com/SYSIO/sys/issues/7794
-            // TODO: This doesn't charge RAM; a fix requires a consensus upgrade.
-            a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
-         }
       });
       db.create<account_metadata_object>([&](auto & a) {
          a.name = name;
          a.set_privileged( is_privileged );
+
+         if( name == config::system_account_name ) {
+            a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
+         }
       });
 
       const auto& owner_permission  = authorization.create_permission(name, config::owner_name, 0,
@@ -1051,6 +1049,8 @@ struct controller_impl {
       ram_delta += 2*config::billable_size_v<permission_object>;
       ram_delta += owner_permission.auth.get_billable_size();
       ram_delta += active_permission.auth.get_billable_size();
+      if( name == config::system_account_name ) // see above
+         ram_delta += sizeof(sysio_abi_bin);
 
       // This is only called at startup, no transaction specific logging is possible
       if (auto dm_logger = get_deep_mind_logger(false)) {
@@ -3245,6 +3245,16 @@ wasm_interface& controller::get_wasm_interface() {
 const account_object& controller::get_account( account_name name )const
 { try {
    return my->db.get<account_object, by_name>(name);
+} FC_CAPTURE_AND_RETHROW( (name) ) }
+
+const account_object* controller::find_account( account_name name )const
+{ try {
+   return my->db.find<account_object, by_name>(name);
+} FC_CAPTURE_AND_RETHROW( (name) ) }
+
+const account_metadata_object* controller::find_account_metadata( account_name name )const
+{ try {
+   return my->db.find<account_metadata_object, by_name>(name);
 } FC_CAPTURE_AND_RETHROW( (name) ) }
 
 bool controller::sender_avoids_whitelist_blacklist_enforcement( account_name sender )const {

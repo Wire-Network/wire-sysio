@@ -44,7 +44,7 @@ namespace sysio::chain {
          ("block_num", head_block_num)
          ("global_sequence_num", db.get<dynamic_global_property_object>().global_action_sequence)
       );
-      const auto& idx = db.get_index<account_index>();
+      const auto& idx = db.get_index<account_metadata_index>();
       for (auto& row : idx.indices()) {
          if (row.abi.size() != 0) {
             fc_dlog(_logger, "ABIDUMP ABI ${contract} ${abi}",

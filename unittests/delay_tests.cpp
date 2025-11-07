@@ -20,13 +20,13 @@ static void create_accounts(validating_tester& chain) {
    chain.create_accounts({"sysio.msig"_n, "sysio.token"_n});
    chain.produce_blocks(10);
 
-   chain.set_privileged("sysio.msig"_n);
-   chain.set_privileged("sysio.token"_n);
-
    chain.set_code("sysio.token"_n, test_contracts::sysio_token_wasm());
    chain.set_abi("sysio.token"_n, test_contracts::sysio_token_abi());
    chain.set_code("sysio.msig"_n, test_contracts::sysio_msig_wasm());
    chain.set_abi("sysio.msig"_n, test_contracts::sysio_msig_abi());
+
+   chain.set_privileged("sysio.msig"_n);
+   chain.set_privileged("sysio.token"_n);
 
    chain.produce_blocks();
    chain.create_account("tester"_n);
