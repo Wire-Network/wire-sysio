@@ -442,17 +442,6 @@ namespace webassembly {
          bool check_permission_authorization(account_name account, permission_name permission, legacy_span<const char> pubkeys_data, legacy_span<const char> perms_data, uint64_t delay_us) const;
 
          /**
-          * Returns the last used time of a permission.
-          *
-          * @ingroup permission
-          * @param account - the account owner of the permission.
-          * @param permission - the name of the permission.
-          *
-          * @return the last used time (in microseconds since Unix epoch) of the permission.
-         */
-         int64_t get_permission_last_used(account_name account, permission_name permission) const;
-
-         /**
           * Returns the creation time of an account.
           *
           * @ingroup permission

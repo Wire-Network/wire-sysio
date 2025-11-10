@@ -357,18 +357,6 @@ namespace sysio::chain {
          return;
       }
 
-      if( is_input ) {
-         const transaction& trx = packed_trx.get_transaction();
-         auto& am = control.get_mutable_authorization_manager();
-         for (const auto& act : trx.actions) {
-            for (const auto& auth : act.authorization) {
-               if (auth.permission != config::sysio_payer_name) {
-                  am.update_permission_usage(am.get_permission(auth));
-               }
-            }
-         }
-      }
-
       auto& rl = control.get_mutable_resource_limits_manager();
 
       // Verify that all accounts that incurred RAM usage in this transaction have valid RAM usage
