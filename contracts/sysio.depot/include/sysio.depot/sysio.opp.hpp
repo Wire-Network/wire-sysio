@@ -51,7 +51,7 @@ class system_contract;
 namespace sysio {
 
 enum chain_kind : uint8_t {
-   chain_unknown       = 0,
+   chain_kind_unknown  = 0,
    chain_kind_wire     = 1,
    chain_kind_ethereum = 2,
    chain_kind_solana   = 3,
@@ -81,7 +81,7 @@ constexpr std::size_t chain_address_size_wire     = key_size_sec256k1;
 
 // fc::lut<chain_kind, std::pair<chain_key_type, std::size_t>, chain_kind_count>
 constexpr auto chain_public_key_types = std::tuple{
-   std::pair{chain_unknown,       std::pair{chain_key_type_unknown, std::size_t{0}}    },
+   std::pair{chain_kind_unknown,       std::pair{chain_key_type_unknown, std::size_t{0}}    },
    std::pair{chain_kind_wire,     std::pair{chain_key_type_wire, key_size_sec256k1}    },
    std::pair{chain_kind_ethereum, std::pair{chain_key_type_ethereum, key_size_sec256k1}},
    std::pair{chain_kind_solana,   std::pair{chain_key_type_solana, key_size_ed25519}   },
@@ -90,7 +90,7 @@ constexpr auto chain_public_key_types = std::tuple{
 
 // fc::lut<chain_kind, std::pair<chain_key_type, std::size_t>, chain_kind_count>
 constexpr auto chain_address_sizes = std::tuple{
-   std::pair{chain_unknown,       std::pair{chain_key_type_unknown, chain_key_type_unknown}  },
+   std::pair{chain_kind_unknown,       std::pair{chain_key_type_unknown, chain_key_type_unknown}  },
    std::pair{chain_kind_wire,     std::pair{chain_key_type_wire, chain_key_type_wire}        },
    std::pair{chain_kind_ethereum, std::pair{chain_key_type_ethereum, chain_key_type_ethereum}},
    std::pair{chain_kind_solana,   std::pair{chain_key_type_solana, chain_key_type_solana}    },
@@ -123,10 +123,6 @@ enum message_type : uint8_t {
    message_type_swap,                   ///< Token swap operation
    message_type_operator_registration,  ///< New operator registration
    message_type_operator_deregistration ///< Operator deregistration
-#ifdef WASM
-   // , META_REFLECT_ENUM(sysio::opp::message_type, (message_type_unknown)(message_type_purchase)(message_type_stake)(message_type_unstake)(message_type_balance_sheet)(message_type_swap)(message_type_operator_registration)(message_type_operator_deregistration) );
-#endif
-
 };
 
 
@@ -140,7 +136,8 @@ enum message_type : uint8_t {
 
 struct message_base {
    message_type type;
-   message_base() : type(message_type_unknown) {};
+   message_base();
+   ;
    explicit message_base(message_type type)
       : type(type) {}
    virtual ~message_base() = default;
@@ -151,8 +148,6 @@ struct message_base {
    META_REFLECT( sysio::opp::message_base, (type) );
 #endif
 };
-
-// META_REFLECT( sysio::opp::message_base, (type) );
 
 /**
  * @brief Message structures for each message type
@@ -212,7 +207,7 @@ struct message_balance_sheet : message_base, std::enable_shared_from_this<messag
    constexpr static auto asset_size = sizeof(ASSET_TYPE);
    static_assert(asset_size == sizeof(uint128_t), "Asset size is not 16 bytes");
 
-   chain_kind         chain{chain_unknown};
+   chain_kind         chain{chain_kind_unknown};
    std::vector<ASSET_TYPE> assets{};
 
    bool unpack(META_DATASTREAM* ds) override;
@@ -225,12 +220,12 @@ struct message_balance_sheet : message_base, std::enable_shared_from_this<messag
 };
 
 struct message_swap : message_base, std::enable_shared_from_this<message_swap> {
-   chain_kind source_chain{chain_unknown};
+   chain_kind source_chain{chain_kind_unknown};
    ASSET_TYPE source_amount{};
 
    uint64_t divisor{};
 
-   chain_kind target_chain{chain_unknown};
+   chain_kind target_chain{chain_kind_unknown};
    ASSET_TYPE target_amount{};
 
    bool unpack(META_DATASTREAM* ds) override;

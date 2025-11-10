@@ -1,8 +1,3 @@
-#list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/libraries/testing")
-#list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}/lib/cmake")
-
-# find_package(sysio REQUIRED)
-
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/contracts.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/contracts.hpp)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -20,4 +15,4 @@ unittest_target(
 ) # build unit tests as one executable
 
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable
-add_test(NAME contracts_unit_test COMMAND contracts_unit_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME ${CONTRACT_UNIT_TEST_EXE} COMMAND ${CONTRACT_UNIT_TEST_EXE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

@@ -84,6 +84,8 @@ META_DATASTREAM* message_unstake::pack(META_DATASTREAM* ds) {
    return pack_to_stream(ds, shared_from_this());
 }
 
+message_base::message_base()
+   : type(message_type_unknown) {}
 bool message_base::unpack(META_DATASTREAM* ds) {
    return !!ds;
 }

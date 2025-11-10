@@ -18,10 +18,11 @@ class [[sysio::contract("sysio.depot")]] depot : public contract {
 public:
   using contract::contract;
 
+  ACTION echotest(const chain_kind &kind);
   ACTION reservedelta(const chain_kind &kind, const asset &delta);
 
-  ACTION swapquote(const chain_kind &source_chain, const asset &source_amount,
-                   const chain_kind &target_chain_kind);
+  ACTION swapquote(const uint8_t &source_chain, const asset &source_amount,
+                   const uint8_t &target_chain);
 
 private:
   // TABLES
@@ -32,14 +33,14 @@ private:
      *
      * @see chain_kind
      */
-    chain_kind chain;
+    uint8_t chain;
 
     /**
      * Reserve/Pool balance
      */
     asset balance;
 
-    chain_kind by_chain() const { return chain; }
+    uint8_t by_chain() const { return chain; }
 
     /**
      * Symbol index
@@ -68,7 +69,7 @@ private:
   using reserve_t = multi_index<
       "reserve"_n, reserve_s,
       indexed_by<"bychain"_n,
-                 const_mem_fun<reserve_s, chain_kind, &reserve_s::by_chain>>,
+                 const_mem_fun<reserve_s, uint8_t, &reserve_s::by_chain>>,
       indexed_by<"bysymbol"_n,
                  const_mem_fun<reserve_s, uint64_t, &reserve_s::by_symbol>>
       // indexed_by<"bychainsym"_n, const_mem_fun<reserve_s, uint128_t,
@@ -85,14 +86,14 @@ private:
     /**
      * Swap status
      */
-    swap_status_type status;
+    uint8_t status;
 
     /**
      * Source External Chain
      *
      * @see chain_kind
      */
-    chain_kind source_chain;
+    uint8_t source_chain;
 
     /**
      * Source asset
@@ -104,16 +105,16 @@ private:
      *
      * @see chain_kind
      */
-    chain_kind target_chain;
+    uint8_t target_chain;
 
     /**
      * Source asset
      */
     asset target_amount;
 
-    chain_kind by_source_chain() const { return source_chain; }
+    uint8_t by_source_chain() const { return source_chain; }
 
-    chain_kind by_target_chain() const { return target_chain; }
+    uint8_t by_target_chain() const { return target_chain; }
 
     /**
      * Source status value combining chain and status bytes
@@ -187,19 +188,68 @@ private:
   using swap_t = multi_index<
       "swap"_n, swap_s,
       indexed_by<"byschain"_n,
-                 const_mem_fun<swap_s, chain_kind, &swap_s::by_source_chain>>,
+                 const_mem_fun<swap_s, uint8_t, &swap_s::by_source_chain>>,
       indexed_by<"byschst"_n, const_mem_fun<swap_s, uint16_t,
                                             &swap_s::by_source_chain_status>>,
       indexed_by<"byschstsym"_n,
                  const_mem_fun<swap_s, uint128_t,
                                &swap_s::by_source_chain_status_symbol>>,
       indexed_by<"bytchain"_n,
-                 const_mem_fun<swap_s, chain_kind, &swap_s::by_target_chain>>,
+                 const_mem_fun<swap_s, uint8_t, &swap_s::by_target_chain>>,
       indexed_by<"bytchst"_n, const_mem_fun<swap_s, uint16_t,
                                             &swap_s::by_target_chain_status>>,
       indexed_by<"bytchstsym"_n,
                  const_mem_fun<swap_s, uint128_t,
                                &swap_s::by_target_chain_status_symbol>>>;
+   TABLE msgchain_s {
+
+      /**
+       * External chain kind
+       *
+       * @see chain_kind
+       */
+      uint8_t chain;
+
+      /**
+       * Reserve/Pool balance
+       */
+      asset balance;
+
+      uint8_t by_chain() const { return chain; }
+
+      /**
+       * Symbol index
+       *
+       * @return symbol index
+       */
+      uint64_t by_symbol() const { return balance.symbol.raw(); }
+
+      /**
+       * Same as `primary_key()`
+       * Chain << 64 | Symbol
+       */
+      uint128_t by_chain_symbol() const {
+         uint128_t chain_symbol = chain;
+         chain_symbol <<= 64;
+
+         return chain_symbol | balance.symbol.raw();
+      }
+
+      /**
+       * Chain << 64 | Symbol
+       */
+      uint128_t primary_key() const { return by_chain_symbol(); }
+   };
+
+   using msgchain_t = multi_index<
+       "msgchain"_n, msgchain_s,
+       indexed_by<"bychain"_n,
+                  const_mem_fun<msgchain_s, uint8_t, &msgchain_s::by_chain>>,
+       indexed_by<"bysymbol"_n,
+                  const_mem_fun<msgchain_s, uint64_t, &msgchain_s::by_symbol>>
+       // indexed_by<"bychainsym"_n, const_mem_fun<msgchain_s, uint128_t,
+       // &msgchain_s::by_chain_symbol>>
+       >;
 };
 
 } // namespace sysio
