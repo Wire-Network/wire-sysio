@@ -27,6 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
+      max-parallel: 2
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container: ${{fromJSON(inputs.platforms)[matrix.platform].image}}
     steps:
