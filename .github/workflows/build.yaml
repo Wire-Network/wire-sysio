@@ -143,6 +143,7 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
+      max-parallel: 3
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
