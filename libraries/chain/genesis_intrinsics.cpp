@@ -128,7 +128,6 @@ const std::vector<const char*> genesis_intrinsics = {
    "ripemd160",
    "check_transaction_authorization",
    "check_permission_authorization",
-   "get_permission_last_used",
    "get_account_creation_time",
    "current_time",
    "publication_time",

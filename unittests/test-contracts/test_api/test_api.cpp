@@ -138,7 +138,6 @@ extern "C" {
 
       // test permission
       WASM_TEST_HANDLER_EX( test_permission, check_authorization        );
-      WASM_TEST_HANDLER_EX( test_permission, test_permission_last_used  );
       WASM_TEST_HANDLER_EX( test_permission, test_account_creation_time );
 
       //unhandled test call

@@ -151,7 +151,6 @@ inline constexpr auto get_intrinsic_table() {
       "env.ripemd160",
       "env.check_transaction_authorization",
       "env.check_permission_authorization",
-      "env.get_permission_last_used",
       "env.get_account_creation_time",
       "env.current_time",
       "env.publication_time",

@@ -73,11 +73,6 @@ namespace sysio { namespace chain { namespace webassembly {
       return false;
    }
 
-   int64_t interface::get_permission_last_used( account_name account, permission_name permission ) const {
-      const auto& am = context.control.get_authorization_manager();
-      return am.get_permission_last_used( am.get_permission({account, permission}) ).time_since_epoch().count();
-   };
-
    int64_t interface::get_account_creation_time( account_name account ) const {
       const auto* acct = context.db.find<account_object, by_name>(account);
       SYS_ASSERT( acct != nullptr, action_validate_exception,

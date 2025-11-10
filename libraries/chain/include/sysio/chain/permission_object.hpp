@@ -6,27 +6,10 @@
 
 namespace sysio { namespace chain {
 
-   class permission_usage_object : public chainbase::object<permission_usage_object_type, permission_usage_object> {
-      OBJECT_CTOR(permission_usage_object)
-
-      id_type           id;
-      time_point        last_used;   ///< when this permission was last used
-   };
-
-   struct by_account_permission;
-   using permission_usage_index = chainbase::shared_multi_index_container<
-      permission_usage_object,
-      indexed_by<
-         ordered_unique<tag<by_id>, member<permission_usage_object, permission_usage_object::id_type, &permission_usage_object::id>>
-      >
-   >;
-
-
    class permission_object : public chainbase::object<permission_object_type, permission_object> {
       OBJECT_CTOR(permission_object, (auth))
 
       id_type                           id;
-      permission_usage_object::id_type  usage_id;
       id_type                           parent; ///< parent permission
       account_name                      owner; ///< the account this permission belongs to (should not be changed within a chainbase modifier lambda)
       permission_name                   name; ///< human-readable name for the permission (should not be changed within a chainbase modifier lambda)
@@ -75,7 +58,6 @@ namespace sysio { namespace chain {
       account_name      owner; ///< the account this permission belongs to
       permission_name   name; ///< human-readable name for the permission
       time_point        last_updated; ///< the last time this authority was updated
-      time_point        last_used; ///< when this permission was last used
       authority         auth; ///< authority required to execute this permission
    };
 
@@ -118,9 +100,6 @@ namespace sysio { namespace chain {
 } } // sysio::chain
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::permission_object, sysio::chain::permission_index)
-CHAINBASE_SET_INDEX_TYPE(sysio::chain::permission_usage_object, sysio::chain::permission_usage_index)
 
-FC_REFLECT(sysio::chain::permission_object, (usage_id)(parent)(owner)(name)(last_updated)(auth))
-FC_REFLECT(sysio::chain::snapshot_permission_object, (parent)(owner)(name)(last_updated)(last_used)(auth))
-
-FC_REFLECT(sysio::chain::permission_usage_object, (last_used))
+FC_REFLECT(sysio::chain::permission_object, (parent)(owner)(name)(last_updated)(auth))
+FC_REFLECT(sysio::chain::snapshot_permission_object, (parent)(owner)(name)(last_updated)(auth))
