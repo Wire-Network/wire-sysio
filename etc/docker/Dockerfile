@@ -9,11 +9,21 @@
 #   docker build --target=app-build-local -t wire-sysio:local .
 #   docker build --target=app-build-repo  -t wire-sysio:repo  .
 
-# Stage 1: distro-deps
-# Base image with system packages required for building (compilers, cmake, Python, etc.)
+# --- Stage 0: vendor-binutils-noble (Ubuntu 24.04) ---------------------------
 ARG UBUNTU_TAG=24.04
-FROM ubuntu:${UBUNTU_TAG} AS distro-deps
-# FROM ubuntu:24.04 AS distro-deps
+FROM ubuntu:${UBUNTU_TAG} AS vendor-binutils-noble
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y --download-only \
+        binutils \
+        binutils-x86-64-linux-gnu \
+        binutils-common && \
+    mkdir -p /opt/vendor/binutils && \
+    cp -v /var/cache/apt/archives/*.deb /opt/vendor/binutils/
+
+# --- Stage 1: distro-deps ----------------------------------------------------
+# Base image with system packages required for building (compilers, cmake, Python, etc.)
+FROM vendor-binutils-noble AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -36,39 +46,46 @@ ENV VCPKG_DEFAULT_TRIPLET=x64-linux
 ENV VCPKG_OVERLAY_TRIPLETS=/wire/wire-sysio/vcpkg/triplets
 
 # Core package tools and repository helpers
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
         lsb-release \
         wget \
         software-properties-common
 
-# Build toolchain and development libraries needed by the application
+# Install identical Ubuntu-24 binutils on any base (24/25)
+COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
+RUN apt-get update && \
+    apt-get install -y /opt/vendor/binutils/*.deb && \
+    update-alternatives --set ld /usr/bin/ld.bfd || true && \
+    apt-mark hold binutils binutils-x86-64-linux-gnu binutils-common && \
+    ld --version | head -1 && ld.bfd -v
+
+# Build toolchain and development libraries (binutils intentionally omitted)
 RUN apt-get install -y \
-				build-essential \
-        binutils \
-				ccache \
-				cmake \
-				curl \
-				doxygen \
-				g++-12 \
-				gcc-12 \
-				git \
-				gnupg \
-				golang \
-				libbz2-dev \
-				libcurl4-openssl-dev \
-				libgmp-dev \
-				liblzma-dev \
-				libncurses5-dev \
-				libssl-dev \
-				libstdc++-14-dev \
-				libusb-1.0-0-dev \
-				libzstd-dev \
-				ninja-build \
-				pkg-config \
+        build-essential \
+        ccache \
+        cmake \
+        curl \
+        doxygen \
+        g++-12 \
+        gcc-12 \
+        git \
+        gnupg \
+        golang \
+        libbz2-dev \
+        libcurl4-openssl-dev \
+        libgmp-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libssl-dev \
+        libstdc++-14-dev \
+        libusb-1.0-0-dev \
+        libzstd-dev \
+        ninja-build \
+        pkg-config \
         python3 \
-				python3-pip \
-				python3-venv \
+        python3-pip \
+        python3-venv \
         python3-dev \
         autoconf \
         autoconf-archive \
@@ -80,12 +97,12 @@ RUN apt-get install -y \
         gawk \
         texinfo \
         perl \
-				sudo \
-				tar \
-				unzip \
-				vim \
-				zip \
-				zlib1g-dev
+        sudo \
+        tar \
+        unzip \
+        vim \
+        zip \
+        zlib1g-dev
 
 RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
