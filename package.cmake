@@ -44,7 +44,12 @@ set(CPACK_COMPONENT_BASE_DESCRIPTION "daemon and CLI tools including ${NODE_EXEC
 set(CPACK_COMPONENT_DEV_DESCRIPTION "headers and libraries for native contract unit testing")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/Wire-Network/wire-sysio")
 
-set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+  "libatomic1 (>= 4.8), libc6 (>= 2.38), libgcc-s1 (>= 3.3), libstdc++6 (>= 13.1), zlib1g (>= 1:1.2.0)"
+)
+
+
 set(CPACK_DEBIAN_BASE_PACKAGE_SECTION "utils")
 
 set(CPACK_DEBIAN_PACKAGE_CONFLICTS "sysio, mandel")
