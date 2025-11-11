@@ -209,6 +209,8 @@ bool public_key::is_canonical(const compact_signature& c) {
       0xDF, 0xE9, 0x2F, 0x46, 0x68, 0x1B, 0x20, 0xA0
    };
 
+   static_assert(sizeof(c.data) >= 65, "compact_signature must be 65 bytes");
+
    // The S value is the 32 bytes starting at index 33.
    // We check if S <= half_order.
    // memcmp returns <= 0 if S is less than or equal to half_order.

@@ -108,4 +108,19 @@ BOOST_AUTO_TEST_CASE(test_em_recovery) try {
    BOOST_TEST(sig_str.starts_with("SIG_EM_"));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
+   fc::sha256 msg = fc::sha256::hash(std::string("hello canonical world"));
+
+   // Generate a private key
+   auto priv = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto sig = priv.sign(msg);
+
+   // Force S > n/2 to simulate a non-canonical signature
+   signature non_canonical = sig;
+   const_cast<em::compact_signature*>(&non_canonical.get<em::signature_shim>()._data)->at(33) ^= 0x80;  // flip highest bit of S to make it > n/2 artificially
+
+   BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
+   BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
