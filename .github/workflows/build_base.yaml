@@ -32,7 +32,6 @@ jobs:
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       options: >-
-        --network host
         --security-opt seccomp=unconfined
         --mount type=bind,source=/etc/resolv.conf,target=/etc/resolv.conf,readonly
 
