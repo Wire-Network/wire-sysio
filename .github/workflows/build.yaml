@@ -149,6 +149,7 @@ jobs:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       options: >-
         --security-opt seccomp=unconfined
+        --dns 8.8.8.8 --dns 1.1.1.1
         --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
         --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
         --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
