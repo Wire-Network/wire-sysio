@@ -32,8 +32,7 @@ jobs:
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       options: >-
-        --dns 8.8.8.8
-        --dns 1.1.1.1
+        --network host
         --security-opt seccomp=unconfined
 
     steps:
