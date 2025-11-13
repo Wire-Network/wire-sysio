@@ -108,7 +108,12 @@ jobs:
             ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
 
 
-            cmake --build build -- -j 11
+            if [[ "${{ matrix.platform }}" == "gcc" ]]; then
+              echo "Using reduced parallelism for gcc platform"
+              cmake --build build -- -j 8
+            else
+              cmake --build build -- -j 11
+            fi
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
         - name: Show vcpkg logs if failure
           if: failure()            # this runs only when something failed above
