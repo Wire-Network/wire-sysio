@@ -29,18 +29,17 @@ jobs:
         platform: ${{fromJSON(inputs.platform-list)}}
       # max-parallel: 2
     runs-on: ["self-hosted", "enf-x86-beefy"]
-    container:
-      image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
+    container: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
     steps:
-        - name: Fix DNS (force public resolvers)
-          run: |
-            echo " Init === /etc/resolv.conf ==="
-            cat /etc/resolv.conf
-            echo "nameserver 8.8.8.8" > /etc/resolv.conf
-            echo "nameserver 1.1.1.1" >> /etc/resolv.conf
-            echo "options timeout:1 attempts:3" >> /etc/resolv.conf
-            echo "=== Fixed /etc/resolv.conf ==="
-            cat /etc/resolv.conf
+        # - name: Fix DNS (force public resolvers)
+        #   run: |
+        #     echo " Init === /etc/resolv.conf ==="
+        #     cat /etc/resolv.conf
+        #     echo "nameserver 8.8.8.8" > /etc/resolv.conf
+        #     echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+        #     echo "options timeout:1 attempts:3" >> /etc/resolv.conf
+        #     echo "=== Fixed /etc/resolv.conf ==="
+        #     cat /etc/resolv.conf
         - name: Force & debug DNS in job container
           run: |
             echo "=== /etc/resolv.conf ==="
@@ -48,9 +47,6 @@ jobs:
 
             echo "=== Try DNS: curl github.com ==="
             curl -I --max-time 10 https://github.com && echo "DNS WORKS" || echo "DNS FAILED"
-
-            echo "=== Try IP only: curl 8.8.8.8 ==="
-            curl -I --max-time 10 http://8.8.8.8 && echo "NETWORK OK" || echo "NETWORK DOWN"
         - name: Debug runner environment and permissions
           run: |
             echo "=== SYSTEM INFO ==="
@@ -92,6 +88,8 @@ jobs:
         - name: Build
           id: build
           run: |
+            echo "=== Try DNS: curl github.com ==="
+            curl -I --max-time 10 https://github.com && echo "DNS WORKS" || echo "DNS FAILED"
             echo "Building for ${{ matrix.platform }}"
 
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
