@@ -31,12 +31,16 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
-      options: >-
-        --dns 8.8.8.8
-        --dns 1.1.1.1
-        --cap-add=NET_ADMIN
-        --sysctl net.ipv4.ping_group_range="0 2147483647"
     steps:
+        - name: Fix DNS (force public resolvers)
+          run: |
+            echo " Init === /etc/resolv.conf ==="
+            cat /etc/resolv.conf
+            echo "nameserver 8.8.8.8" > /etc/resolv.conf
+            echo "nameserver 1.1.1.1" >> /etc/resolv.conf
+            echo "options timeout:1 attempts:3" >> /etc/resolv.conf
+            echo "=== Fixed /etc/resolv.conf ==="
+            cat /etc/resolv.conf
         - name: Force & debug DNS in job container
           run: |
             echo "=== /etc/resolv.conf ==="
