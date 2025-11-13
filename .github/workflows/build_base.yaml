@@ -110,7 +110,7 @@ jobs:
 
             if [[ "${{ matrix.platform }}" == "gcc" ]]; then
               echo "Using reduced parallelism for gcc platform"
-              cmake --build build -- -j 8
+              cmake --build build -- -j 6
             else
               cmake --build build -- -j 11
             fi
