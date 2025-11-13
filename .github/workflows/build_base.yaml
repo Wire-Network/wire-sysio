@@ -33,29 +33,56 @@ jobs:
       image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
       options: >-
         --security-opt seccomp=unconfined
-        --mount type=bind,source=/etc/resolv.conf,target=/etc/resolv.conf,readonly
+        --mount type=bind,source=/run/systemd/resolve/resolv.conf,target=/etc/resolv.conf,readonly
 
     steps:
         - name: Force & debug DNS in job container
           run: |
-            echo "=== /etc/resolv.conf ==="
-            cat /etc/resolv.conf || echo "no resolv.conf"
+            apt-get update && apt-get install -y iputils-ping dnsutils
+            echo "=== Hostname & Time ==="
+            hostname
+            date
             echo
 
-            echo "=== ping 8.8.8.8 (raw IP) ==="
-            ping -c1 -W1 8.8.8.8 || echo "ping 8.8.8.8 failed"
+            echo "=== /etc/resolv.conf (container) ==="
+            cat /etc/resolv.conf 2>/dev/null || echo "[FAILED TO READ]"
             echo
 
-            echo "=== ping google.com (DNS + ICMP) ==="
-            ping -c1 -W1 google.com || echo "ping google.com failed"
+            echo "=== /run/systemd/resolve/resolv.conf (host real DNS) ==="
+            cat /run/systemd/resolve/resolv.conf 2>/dev/null || echo "[NOT AVAILABLE]"
             echo
 
-            echo "=== ping github.com (DNS + ICMP) ==="
-            ping -c1 -W1 github.com || echo "ping github.com failed"
+            echo "=== Check if ping exists ==="
+            which ping || echo "ping: command not found"
             echo
 
-            echo "=== curl https://github.com (HEAD, 5s timeout) ==="
-            curl -I --max-time 5 https://github.com || echo "curl failed"
+            echo "=== Raw IP connectivity (8.8.8.8) ==="
+            if ping -c1 -W2 8.8.8.8 > /dev/null 2>&1; then
+              echo "ping 8.8.8.8: OK"
+            else
+              echo "ping 8.8.8.8: FAILED"
+            fi
+            echo
+
+            echo "=== DNS resolution test (nslookup) ==="
+            if command -v nslookup > /dev/null; then
+              nslookup github.com 2>/dev/null | grep -A1 "Name:" || echo "nslookup failed"
+            else
+              echo "nslookup not available"
+            fi
+            echo
+
+            echo "=== DNS resolution via getent (bypass libc) ==="
+            getent hosts github.com || echo "getent hosts failed"
+            echo
+
+            echo "=== Curl to IP (bypass DNS) ==="
+            curl -I --max-time 5 http://192.30.255.116 2>/dev/null | head -n1 || echo "curl to github IP failed"
+            echo
+
+            echo "=== Curl to github.com (full DNS) ==="
+            curl -I --max-time 5 https://github.com 2>/dev/null | head -n1 || echo "curl https://github.com failed"
+            echo
         - name: Debug runner environment and permissions
           run: |
             echo "=== SYSTEM INFO ==="
