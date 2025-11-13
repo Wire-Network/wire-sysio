@@ -147,12 +147,14 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
-      options: >-
-        --security-opt seccomp=unconfined
-        --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
-        --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
-        --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
-        --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
+      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+
+      # options: >-
+      #   --security-opt seccomp=unconfined
+      #   --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
+      #   --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
+      #   --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
+      #   --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
 
