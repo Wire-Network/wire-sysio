@@ -77,5 +77,50 @@ BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
    BOOST_CHECK_EQUAL(pub.to_string({}), recycled_pub.to_string({}));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_em) try {
+   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto pub = key.get_public_key();
+   auto priv_str = key.to_string({});
+   auto pub_str = pub.to_string({});
+
+   auto recycled_priv = fc::crypto::private_key(priv_str);
+   auto recycled_pub = recycled_priv.get_public_key();
+
+   BOOST_CHECK_EQUAL(priv_str, recycled_priv.to_string({}));
+   BOOST_CHECK_EQUAL(pub_str, recycled_pub.to_string({}));
+   BOOST_TEST(pub.to_string({}).starts_with("PUB_EM_"));
+   BOOST_TEST(key.to_string({}).starts_with("PVT_EM_"));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_em_recovery) try {
+   auto payload = "Test Cases";
+   auto digest = sha256::hash(payload, const_strlen(payload));
+   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto pub = key.get_public_key();
+   auto sig = key.sign(digest);
+   std::string sig_str = sig.to_string({});
+   BOOST_TEST(fc::em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
+
+   auto recovered_pub = fc::crypto::public_key(sig, digest);
+
+   BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
+   BOOST_CHECK_EQUAL(sig_str, fc::crypto::signature(sig_str).to_string({}));
+   BOOST_TEST(sig_str.starts_with("SIG_EM_"));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
+   fc::sha256 msg = fc::sha256::hash(std::string("hello canonical world"));
+
+   // Generate a private key
+   auto priv = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto sig = priv.sign(msg);
+
+   // Force S > n/2 to simulate a non-canonical signature
+   signature non_canonical = sig;
+   const_cast<em::compact_signature*>(&non_canonical.get<em::signature_shim>()._data)->at(33) ^= 0x80;  // flip highest bit of S to make it > n/2 artificially
+
+   BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
+   BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
+} FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

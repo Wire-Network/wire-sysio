@@ -2,6 +2,8 @@
 #include <fc/crypto/base58.hpp>      // fc::from_base58
 #include <fc/crypto/elliptic_ed.hpp> // public_key_shim, signature_shim, private_key_shim
 #include <fc/crypto/sha256.hpp>      // fc::sha256::hash
+#include <fc/crypto/private_key.hpp>
+#include <fc/crypto/public_key.hpp>
 #include <fc/io/raw.hpp>             // fc::raw::pack / unpack
 #include <fc/crypto/hex.hpp>         // fc::to_hex
 #include <sodium.h>                  // libsodium
@@ -155,6 +157,16 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
                 sk1.generate_shared_secret(pk2),
                 fc::exception
             );
+
+       // verify to/from string
+       fc::crypto::public_key pubkey1(pk1);
+       std::string pk1_str = pubkey1.to_string({});
+       dlog("pk1_str = ${k}", ("k", pk1_str));
+       fc::crypto::public_key pubkey2(pk1_str);
+       std::string pk2_str = pubkey2.to_string({});
+       BOOST_TEST(pk1_str == pk2_str);
+       BOOST_TEST(pk1_str.starts_with("PUB_ED_"));
+
     } FC_LOG_AND_RETHROW()
 }
 
