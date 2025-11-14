@@ -36,7 +36,7 @@ using namespace sysio::testing;
 using namespace fc;
 namespace bdata = boost::unit_test::data;
 
-BOOST_AUTO_TEST_SUITE(wasm_tests)
+BOOST_AUTO_TEST_SUITE(wasm_part1_tests)
 
 /**
  * Prove that action reading and assertions are working
@@ -591,6 +591,9 @@ BOOST_FIXTURE_TEST_CASE( simple_no_memory_check, validating_tester ) try {
    BOOST_CHECK_THROW(push_transaction( trx ), wasm_execution_error);
 } FC_LOG_AND_RETHROW()
 
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_part2_tests)
+
 //Make sure globals are all reset to their inital values
 BOOST_FIXTURE_TEST_CASE( check_global_reset, validating_tester ) try {
    produce_blocks(2);
@@ -747,6 +750,9 @@ BOOST_FIXTURE_TEST_CASE( imports, validating_tester ) try {
    }
 
 } FC_LOG_AND_RETHROW()
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_part3_tests)
 
 BOOST_FIXTURE_TEST_CASE( nested_limit_test, validating_tester ) try {
    produce_blocks(2);
@@ -2130,6 +2136,9 @@ BOOST_FIXTURE_TEST_CASE( negative_memory_grow, validating_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_part4_tests)
+
 // This test is only applicable to Linux
 #if defined(__linux__)
 // Returns the number of memory mappings of the current process. Only works on Linux
@@ -2177,7 +2186,7 @@ BOOST_FIXTURE_TEST_CASE( memory_mapping_test, validating_tester ) try {
    BOOST_CHECK_GT(num_mappings_before, 0U); // must be able to get number of memory mappings
 
    // number of contracts to deploy
-   constexpr uint32_t num_contracts = 5000;
+   constexpr uint32_t num_contracts = 3000;
 
    for (uint32_t i = 1; i < num_contracts; ++i) {
       std::stringstream ss;

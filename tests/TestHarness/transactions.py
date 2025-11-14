@@ -273,21 +273,27 @@ class Transactions(NodeopQueries):
         if opts is not None:
             cmdArr += opts.split()
         if Utils.Debug: Utils.Print("cmd: %s" % (cmdArr))
+        retries = 5
         start=time.perf_counter()
-        try:
-            trans=Utils.runCmdArrReturnJson(cmdArr)
-            self.trackCmdTransaction(trans, ignoreNonTrans=True)
-            if Utils.Debug:
-                end=time.perf_counter()
-                Utils.Print("cmd Duration: %.3f sec" % (end-start))
-            return (NodeopQueries.getTransStatus(trans) == 'executed' if expectTrxTrace else True, trans)
-        except subprocess.CalledProcessError as ex:
-            msg=ex.stderr.decode("utf-8")
-            output=ex.output.decode("utf-8")
-            if not silentErrors:
-                end=time.perf_counter()
-                Utils.Print("ERROR: Exception during push message. stderr: %s. stdout: %s.  cmd Duration=%.3f sec." % (msg, output, end - start))
-            return (False, msg)
+        while retries > 0:
+            retries -= 1
+            try:
+                trans=Utils.runCmdArrReturnJson(cmdArr)
+                self.trackCmdTransaction(trans, ignoreNonTrans=True)
+                if Utils.Debug:
+                    end=time.perf_counter()
+                    Utils.Print("cmd Duration: %.3f sec" % (end-start))
+                return (NodeopQueries.getTransStatus(trans) == 'executed' if expectTrxTrace else True, trans)
+            except subprocess.CalledProcessError as ex:
+                msg=ex.stderr.decode("utf-8")
+                output=ex.output.decode("utf-8")
+                if not silentErrors:
+                    end=time.perf_counter()
+                    Utils.Print("ERROR: Exception during push message. retry %s. stderr: %s. stdout: %s.  cmd Duration=%.3f sec." % (retries, msg, output, end - start))
+                if retries > 0 and "tx_cpu_usage_exceeded" in output:
+                    Utils.Print(f"Retrying {cmd} due to: tx_cpu_usage_exceeded")
+                    continue # try again
+                return (False, msg)
 
     def setPermission(self, account, code, pType, requirement, waitForTransBlock=False, exitOnError=False, sign=False):
         assert(isinstance(account, Account))

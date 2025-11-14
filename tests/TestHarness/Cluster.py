@@ -1116,6 +1116,10 @@ class Cluster(object):
         if pfSetupPolicy == PFSetupPolicy.FULL:
             biosNode.preactivateAllBuiltinProtocolFeature()
 
+        # verify node is synced before setting prods
+        headBlockNum=biosNode.getHeadBlockNum()
+        assert self.getNode().waitForBlock(headBlockNum, timeout=Utils.systemWaitTimeout)
+
         if prodCount == -1:
             setProdsFile="setprods.json"
             if Utils.Debug: Utils.Print("Reading in setprods file %s." % (setProdsFile))
