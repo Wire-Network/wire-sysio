@@ -318,6 +318,9 @@ template<BOOST_PP_SEQ_ENUM(TEMPLATE_ARGS)> struct reflector<TYPE> {\
 #define FC_REFLECT_EMPTY( TYPE ) \
     FC_REFLECT_DERIVED( TYPE, BOOST_PP_SEQ_NIL, BOOST_PP_SEQ_NIL )
 
+#define FC_REFLECT_DERIVED_EMPTY( TYPE, INHERITS ) \
+    FC_REFLECT_DERIVED( TYPE, INHERITS, BOOST_PP_SEQ_NIL )
+
 #define FC_REFLECT_TYPENAME( TYPE ) \
 namespace fc { \
   template<> struct get_typename<TYPE>  { static const char* name()  { return BOOST_PP_STRINGIZE(TYPE);  } }; \

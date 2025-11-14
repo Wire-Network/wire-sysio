@@ -176,7 +176,7 @@ namespace sysio {
             /**
              * Scoped to network_gen
              * 
-             * Basic table tracking who T1-3 Node Owners are and their availble vs allocated SYS.
+             * Basic table tracking who T1-3 Node Owners are and their available vs allocated SYS.
              */
             struct [[sysio::table]] nodeowners {
                 name owner;          // Node Owners account name.

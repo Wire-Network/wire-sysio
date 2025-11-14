@@ -156,6 +156,7 @@ std::string clean_output( std::string str ) {
 string default_url = "http://127.0.0.1:8888";
 string default_wallet_url = "unix://" + (determine_home_directory() / "sysio-wallet" / (string(key_store_executable_name) + ".sock")).string();
 string wallet_url; //to be set to default_wallet_url in main
+string wallet_dir{""};
 std::map<name, std::string>  abi_files_override;
 
 auto   tx_expiration = fc::seconds(30);
@@ -1075,6 +1076,7 @@ void ensure_kiod_running(CLI::App* app) {
     if (no_auto_kiod)
         return;
     // get, version, net, convert do not require kiod
+
     if (tx_skip_sign || app->got_subcommand("get") || app->got_subcommand("version") || app->got_subcommand("net") || app->got_subcommand("convert"))
         return;
     if (app->get_subcommand("create")->got_subcommand("key")) // create key does not require wallet
@@ -1102,6 +1104,11 @@ void ensure_kiod_running(CLI::App* app) {
         binPath = std::filesystem::canonical(binPath);
 
         vector<std::string> pargs;
+        if (!wallet_dir.empty()) {
+          pargs.push_back("--wallet-dir");
+          pargs.push_back(std::filesystem::absolute(wallet_dir));
+        }
+
         pargs.push_back("--http-server-address");
         pargs.push_back("");
         pargs.push_back("--unix-socket-path");
@@ -1763,7 +1770,20 @@ int main( int argc, char** argv ) {
 
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
 
-   wallet_url = default_wallet_url;
+  // GET ENV OVERRIDE VARS
+  if (auto env_nodeop_url = getenv("NODEOP_URL"); env_nodeop_url) {
+    default_url = env_nodeop_url;
+  }
+
+  if (auto env_wallet_url = getenv("WALLET_URL"); env_wallet_url) {
+    default_wallet_url = env_wallet_url;
+  }
+
+  wallet_url = default_wallet_url;
+
+  if (auto env_wallet_dir = getenv("WALLET_DIR"); env_wallet_dir) {
+    wallet_dir = env_wallet_dir;
+  }
 
    CLI::App app{"Command Line Interface to SYSIO Client"};
 
@@ -1779,6 +1799,7 @@ int main( int argc, char** argv ) {
    // Hide obsolete options by putting them into a group with an empty name.
    app.add_option( "-H,--host", obsoleted_option_host_port, localized("The host where ${n} is running", ("n", node_executable_name)) )->group("");
    app.add_option( "-p,--port", obsoleted_option_host_port, localized("The port where ${n} is running", ("n", node_executable_name)) )->group("");
+   app.add_option( "--wallet-dir", wallet_dir, localized("Override the default wallet directory") )->default_str("")->group("");
    app.add_option( "--wallet-host", obsoleted_option_host_port, localized("The host where ${k} is running", ("k", key_store_executable_name)) )->group("");
    app.add_option( "--wallet-port", obsoleted_option_host_port, localized("The port where ${k} is running", ("k", key_store_executable_name)) )->group("");
 
