@@ -28,8 +28,15 @@ jobs:
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
     runs-on: ["self-hosted", "enf-x86-beefy"]
-    container: ${{fromJSON(inputs.platforms)[matrix.platform].image}}
+    container: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
     steps:
+        - name: Force & debug DNS in job container
+          run: |
+            echo "=== /etc/resolv.conf ==="
+            cat /etc/resolv.conf
+
+            echo "=== Try DNS: curl github.com ==="
+            curl -I --max-time 10 https://github.com && echo "DNS WORKS" || echo "DNS FAILED"
         - name: Debug runner environment and permissions
           run: |
             echo "=== SYSTEM INFO ==="
@@ -71,6 +78,8 @@ jobs:
         - name: Build
           id: build
           run: |
+            echo "=== Try DNS: curl github.com ==="
+            curl -I --max-time 10 https://github.com && echo "DNS WORKS" || echo "DNS FAILED"
             echo "Building for ${{ matrix.platform }}"
 
             rm -rf vcpkg/buildtrees vcpkg/packages vcpkg/downloads vcpkg/vcpkg_installed \
@@ -89,7 +98,12 @@ jobs:
             ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
 
 
-            cmake --build build -- -j 11
+            if [[ "${{ matrix.platform }}" == "gcc" ]]; then
+              echo "Using reduced parallelism for gcc platform"
+              cmake --build build -- -j 4
+            else
+              cmake --build build -- -j 11
+            fi
             tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
         - name: Show vcpkg logs if failure
           if: failure()            # this runs only when something failed above
