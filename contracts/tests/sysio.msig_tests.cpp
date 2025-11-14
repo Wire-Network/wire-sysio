@@ -135,7 +135,7 @@ transaction sysio_msig_tester::reqauth( account_name from, const vector<permissi
 void sysio_msig_tester::check_traces(transaction_trace_ptr trace, std::vector<std::map<std::string, name>> res) {
 
    BOOST_REQUIRE( bool(trace) );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+   BOOST_REQUIRE( !!trace->receipt );
    BOOST_REQUIRE_EQUAL( res.size(), trace->action_traces.size() );
 
    for (size_t i = 0; i < res.size(); i++) {

@@ -6,10 +6,10 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/contract_types.hpp>
-#include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <ranges>
 
 
 namespace sysio { namespace chain {
@@ -469,13 +469,14 @@ namespace sysio { namespace chain {
          }
 
          account_name payer;
-         for( const auto& declared_auth : act.authorization ) {
+         for( const auto& [i, declared_auth] : std::views::enumerate(act.authorization) ) {
 
             checktime();
 
             // Special case for explicit payer
             if ( declared_auth.permission == config::sysio_payer_name ) {
                SYS_ASSERT(payer.empty(), irrelevant_auth_exception, "Multiple payers specified for action");
+               SYS_ASSERT(i == 0, irrelevant_auth_exception, "Explicit payer must be the first declared authorization");
                payer = declared_auth.actor;
                continue;
             }

@@ -14,6 +14,14 @@ class transaction_metadata;
 using transaction_metadata_ptr = std::shared_ptr<transaction_metadata>;
 using recover_keys_future = std::future<transaction_metadata_ptr>;
 
+struct account_billing {
+   int64_t      cpu_limit_us = 0;
+   uint64_t     cpu_usage_us = 0;
+   uint64_t     net_usage = 0;
+   bool         cpu_greylisted = false;
+};
+using accounts_billing_t = flat_map<account_name, account_billing>;
+
 /**
  *  This data structure should store context-free cached data about a transaction such as
  *  packed/unpacked/compressed and recovered keys
@@ -23,7 +31,6 @@ class transaction_metadata {
       enum class trx_type {
          input,
          implicit,
-         scheduled,
          dry_run,
          read_only
       };
@@ -35,8 +42,8 @@ class transaction_metadata {
       const trx_type                                             _trx_type;
 
    public:
-      bool                                                       accepted = false;       // not thread safe
-      uint32_t                                                   billed_cpu_time_us = 0; // not thread safe
+      fc::microseconds                                           elapsed;                // not thread safe
+      accounts_billing_t                                         prev_accounts_billing;  // not thread safe
 
    private:
       struct private_type{};
@@ -72,7 +79,6 @@ class transaction_metadata {
       size_t get_estimated_size() const;
       trx_type get_trx_type() const { return _trx_type; };
       bool implicit() const { return _trx_type == trx_type::implicit; };
-      bool scheduled() const { return _trx_type == trx_type::scheduled; };
       bool is_dry_run() const { return _trx_type == trx_type::dry_run; };
       bool is_read_only() const { return _trx_type == trx_type::read_only; };
       bool is_transient() const { return _trx_type == trx_type::read_only || _trx_type == trx_type::dry_run; };
@@ -100,3 +106,5 @@ class transaction_metadata {
 };
 
 } } // sysio::chain
+
+FC_REFLECT( sysio::chain::account_billing, (cpu_limit_us)(cpu_usage_us)(net_usage)(cpu_greylisted) )

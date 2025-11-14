@@ -56,12 +56,14 @@ try:
     abiFile="payloadless.abi"
     Utils.Print("Publish payloadless contract")
     trans = producerNode.publishContract(payloadlessAcc, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (wasmFile))
 
     trx = {
         "actions": [{"account": "payloadless", "name": "doit", "authorization": [{
           "actor": "payloadless", "permission": "active"}], "data": ""}],
         "context_free_actions": [{"account": "payloadless", "name": "doit", "data": ""}],
-        "context_free_data": ["a1b2c3", "1a2b3c"],
+        "context_free_data": ["a1b2c3"],
     } 
 
     cmd = "push transaction '{}' -p payloadless".format(json.dumps(trx))

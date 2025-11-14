@@ -482,9 +482,9 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
    {
       auto auths = vector<permission_level>{
+            {tester_account2, config::sysio_payer_name},
             {tester_account, config::active_name},
-            {tester_account2, config::active_name},
-            {tester_account2, config::sysio_payer_name}
+            {tester_account2, config::active_name}
       };
 
       signed_transaction trx;
@@ -502,16 +502,15 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
       chain.push_transaction(trx);
 
-      // explicit payer so bills both the explicit payer and the contract
-      // TODO: This should only bill the explicit payer WIRE-173
+      // explicit payer so only bill the explicit payer
       auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
       auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
       auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
 
-      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
+      BOOST_CHECK(tester_cpu_limit1.used == tester_cpu_limit0.used);
       BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
-      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
+      BOOST_CHECK(tester_net_limit1.used == tester_net_limit0.used);
       BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
    }
 
@@ -640,7 +639,7 @@ BOOST_AUTO_TEST_CASE(move_my_ram) {
       c.produce_block();
 
       wlog("Adding data using alice");
-      vector<permission_level> levels = vector<permission_level>{{alice_account, config::active_name}, {alice_account, config::sysio_payer_name}};
+      vector<permission_level> levels = vector<permission_level>{{alice_account, config::sysio_payer_name},{alice_account, config::active_name}};
       c.push_action(tester1_account, "setdata"_n, levels, mutable_variant_object()
                     ("len1", 10)
                     ("len2", 0)
@@ -823,7 +822,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.produce_block();
 
    // Basic setup
-   auto alice_payer = vector<permission_level>{{alice_account, config::active_name}, {alice_account, config::sysio_payer_name}};
+   auto alice_payer = vector<permission_level>{{alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
    c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -832,7 +831,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    wlog("A");
 
    // Cannot bill more RAM to another account that has not authorized the action.
-   auto bob_payer = vector<permission_level>{{bob_account, config::active_name}, {bob_account, config::sysio_payer_name}};
+   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, config::active_name}};
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
          ("len1", 20)
@@ -1016,8 +1015,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
    // Basic setup
    vector<permission_level> alice_auths;
-   alice_auths.push_back( permission_level{alice_account, config::active_name} );
    alice_auths.push_back( permission_level{alice_account, config::sysio_payer_name} );
+   alice_auths.push_back( permission_level{alice_account, config::active_name} );
    c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -1026,8 +1025,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
    // Cannot bill more RAM to another account that has not authorized the action.
    vector<permission_level> bob_auths;
-   bob_auths.push_back( permission_level{bob_account, config::active_name} );
    bob_auths.push_back( permission_level{bob_account, config::sysio_payer_name} );
+   bob_auths.push_back( permission_level{bob_account, config::active_name} );
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
          ("len1", 20)

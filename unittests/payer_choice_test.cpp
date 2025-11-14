@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
 
         ilog("Attempt to charge node owner with sysio.payer permission should succeed");
         c.push_action(tester1_account, "setdata"_n, {
-                          permission_level(alice_account, "active"_n),
-                          permission_level(alice_account, config::sysio_payer_name)
+                          permission_level(alice_account, config::sysio_payer_name),
+                          permission_level(alice_account, "active"_n)
                       }, mutable_variant_object()
                       ("len1", 1000)
                       ("len2", 0)

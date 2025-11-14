@@ -276,9 +276,8 @@ namespace sysio { namespace chain {
                                     3040007, "Invalid Reference Block" )
       FC_DECLARE_DERIVED_EXCEPTION( tx_duplicate,                transaction_exception,
                                     3040008, "Duplicate transaction" )
-      // deferred_tx_duplicate 3040009
-      FC_DECLARE_DERIVED_EXCEPTION( cfa_inside_generated_tx,     transaction_exception,
-                                    3040010, "Context free action is not allowed inside generated transaction" )
+      // deferred_tx_duplicate   3040009
+      // cfa_inside_generated_tx 3040010
       FC_DECLARE_DERIVED_EXCEPTION( tx_not_found,     transaction_exception,
                                     3040011, "The transaction can not be found" )
       FC_DECLARE_DERIVED_EXCEPTION( too_many_tx_at_once,          transaction_exception,
@@ -386,9 +385,7 @@ namespace sysio { namespace chain {
                                     3080009, "Read-only transaction sys-vm-oc compile temporary failure" )
       FC_DECLARE_DERIVED_EXCEPTION( ro_trx_vm_oc_compile_permanent_failure, resource_exhausted_exception,
                                     3080010, "Read-only transaction sys-vm-oc compile permanent failure" )
-
-      FC_DECLARE_DERIVED_EXCEPTION( leeway_deadline_exception, deadline_exception,
-                                    3081001, "Transaction reached the deadline set due to leeway on account CPU limits" )
+      // leeway_deadline_exception 3081001
 
    FC_DECLARE_DERIVED_EXCEPTION( authorization_exception, chain_exception,
                                  3090000, "Authorization exception" )
@@ -668,4 +665,15 @@ namespace sysio { namespace chain {
                                     3250002, "Protocol feature exception (invalid block)" )
       FC_DECLARE_DERIVED_EXCEPTION( protocol_feature_iterator_exception, protocol_feature_exception,
                                     3250003, "Protocol feature iterator exception" )
+
+
+   /// @return true if exception requires transaction to be retried in the next block
+   inline bool exception_is_exhausted(const fc::exception& e) {
+      const auto code = e.code();
+      return (code == block_cpu_usage_exceeded::code_value) ||
+             (code == block_net_usage_exceeded::code_value) ||
+             (code == deadline_exception::code_value) ||
+             (code == ro_trx_vm_oc_compile_temporary_failure::code_value);
+   }
+
 } } // sysio::chain

@@ -18,7 +18,7 @@ void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool tr
    if (onblock_trace)
       traces.push_back(*onblock_trace);
    for (auto& r : block->transactions) {
-      const transaction_id_type& id = std::get<chain::packed_transaction>(r.trx).id();
+      const transaction_id_type& id = r.trx.id();
       auto it = cached_traces.find(id);
       SYS_ASSERT(it != cached_traces.end() && it->second.trace->receipt, chain::plugin_exception,
                  "missing trace for transaction ${id}", ("id", id));

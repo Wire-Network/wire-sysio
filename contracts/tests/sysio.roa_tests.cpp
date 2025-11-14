@@ -49,7 +49,7 @@ public:
 
    transaction_trace_ptr push_paid_action( const account_name& signer, const action_name &name, const variant_object &data ) {
       return base_tester::push_action( ROA, name,
-         vector<permission_level>{{signer, "active"_n},{signer, "sysio.payer"_n}},
+         vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
    }
 

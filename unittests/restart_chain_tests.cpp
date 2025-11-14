@@ -180,7 +180,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    action             act({}, cfa);
    trx.context_free_actions.push_back(act);
    trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
    // add a normal action along with cfa
    dummy_action da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    action       act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
@@ -192,7 +191,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    chain.produce_block();
 
    BOOST_REQUIRE(trace->receipt);
-   BOOST_CHECK_EQUAL(trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK_EQUAL(2u, trace->action_traces.size());
 
    BOOST_CHECK(trace->action_traces.at(0).context_free); // cfa
@@ -222,7 +220,6 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
 
    BOOST_REQUIRE(other_trace);
    BOOST_REQUIRE(other_trace->receipt);
-   BOOST_CHECK_EQUAL(other_trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK(*trace->receipt == *other_trace->receipt);
    BOOST_CHECK_EQUAL(2u, other_trace->action_traces.size());
 

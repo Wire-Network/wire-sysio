@@ -106,14 +106,14 @@ auto make_unique_trx( const chain_id_type& chain_id, const fc::microseconds& exp
    return std::make_shared<packed_transaction>( std::move(trx), packed_transaction::compression_type::none);
 }
 
-chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number,
-                                                     chain::transaction_receipt_header::status_enum status = sysio::chain::transaction_receipt_header::executed ) {
+chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number ) {
    return std::make_shared<chain::transaction_trace>(chain::transaction_trace{
          trx->id(),
          block_number,
          chain::block_timestamp_type(fc::time_point::now()),
          trx->id(), // block_id, doesn't matter what it is for this test as long as it is set
-         chain::transaction_receipt_header{status},
+         chain::transaction_receipt_header{},
+         0,
          fc::microseconds(0),
          0,
          {}, // actions

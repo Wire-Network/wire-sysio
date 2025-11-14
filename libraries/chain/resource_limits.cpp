@@ -7,6 +7,7 @@
 #include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
 #include <algorithm>
+#include <ranges>
 
 namespace sysio { namespace chain { namespace resource_limits {
 
@@ -125,9 +126,9 @@ void resource_limits_manager::set_block_parameters(const elastic_limit_parameter
    });
 }
 
-void resource_limits_manager::update_account_usage(const flat_set<account_name>& accounts, uint32_t time_slot ) {
+void resource_limits_manager::update_account_usage(const accounts_billing_t& accounts, uint32_t time_slot ) {
    const auto& config = _db.get<resource_limits_config_object>();
-   for( const auto& a : accounts ) {
+   for(const auto& a: accounts | std::views::keys) {
       const auto& usage = _db.get<resource_usage_object,by_owner>( a );
       _db.modify( usage, [&]( auto& bu ){
           bu.net_usage.add( 0, time_slot, config.account_net_usage_average_window );
@@ -136,11 +137,11 @@ void resource_limits_manager::update_account_usage(const flat_set<account_name>&
    }
 }
 
-void resource_limits_manager::add_transaction_usage(const flat_set<account_name>& accounts, uint64_t cpu_usage, uint64_t net_usage, uint32_t time_slot, bool is_trx_transient ) {
+void resource_limits_manager::add_transaction_usage(const accounts_billing_t& accounts, uint64_t total_cpu_usage, uint64_t total_net_usage, uint32_t time_slot, bool is_trx_transient ) {
    const auto& state = _db.get<resource_limits_state_object>();
    const auto& config = _db.get<resource_limits_config_object>();
 
-   for( const auto& a : accounts ) {
+   for( const auto& [a, billing] : accounts ) {
 
       const auto& usage = _db.get<resource_usage_object,by_owner>( a );
       int64_t unused;
@@ -149,8 +150,8 @@ void resource_limits_manager::add_transaction_usage(const flat_set<account_name>
       get_account_limits( a, unused, net_weight, cpu_weight );
 
       _db.modify( usage, [&]( auto& bu ){
-          bu.net_usage.add( net_usage, time_slot, config.account_net_usage_average_window );
-          bu.cpu_usage.add( cpu_usage, time_slot, config.account_cpu_usage_average_window );
+          bu.net_usage.add( billing.net_usage, time_slot, config.account_net_usage_average_window );
+          bu.cpu_usage.add( billing.cpu_usage_us, time_slot, config.account_cpu_usage_average_window );
 
          if (auto dm_logger = _get_deep_mind_logger(is_trx_transient)) {
             dm_logger->on_update_account_usage(bu);
@@ -200,8 +201,8 @@ void resource_limits_manager::add_transaction_usage(const flat_set<account_name>
 
    // account for this transaction in the block and do not exceed those limits either
    _db.modify(state, [&](resource_limits_state_object& rls){
-      rls.pending_cpu_usage += cpu_usage;
-      rls.pending_net_usage += net_usage;
+      rls.pending_cpu_usage += total_cpu_usage;
+      rls.pending_net_usage += total_net_usage;
    });
 
    SYS_ASSERT( state.pending_cpu_usage <= config.cpu_limit_parameters.max, block_resource_exhausted, "Block has insufficient cpu resources" );

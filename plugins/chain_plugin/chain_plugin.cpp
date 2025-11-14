@@ -2261,7 +2261,7 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.ram_usage = rm.get_account_ram_usage( result.account_name );
 
    sysio::chain::resource_limits::account_resource_limit subjective_cpu_bill_limit;
-   subjective_cpu_bill_limit.used = db.get_subjective_billing().get_subjective_bill( result.account_name, fc::time_point::now() );
+   subjective_cpu_bill_limit.used = db.get_subjective_billing().get_subjective_bill( result.account_name, fc::time_point::now() ).count();
    result.subjective_cpu_bill_limit = subjective_cpu_bill_limit;
 
    // Gather permission and linked actions info as before

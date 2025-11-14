@@ -177,17 +177,17 @@ namespace sysio::testing {
                       const auto& block_num      = processed["block_num"].as_uint64();
                       const auto& block_time     = processed["block_time"].as_string();
                       const auto& elapsed_time     = processed["elapsed"].as_uint64();
-                      std::string status         = "failed";
+                      bool executed = false;
                       uint32_t    net            = 0;
                       uint32_t    cpu            = 0;
                       if (processed.get_object().contains("receipt")) {
                          const auto& receipt = processed["receipt"];
                          if (receipt.is_object()) {
-                            status = receipt["status"].as_string();
-                            net    = receipt["net_usage_words"].as_uint64() * 8;
-                            cpu    = receipt["cpu_usage_us"].as_uint64();
+                            executed = true;
+                            net    = processed["net_usage"].as_int64();
+                            cpu    = processed["total_cpu_usage_us"].as_int64();
                          }
-                         if (status == "executed") {
+                         if (executed) {
                             record_trx_info(trx_id, block_num, this->is_read_only_transaction() ? elapsed_time : cpu, net, block_time);
                          } else {
                             elog("async_http_request Transaction receipt status not executed: ${string}",
