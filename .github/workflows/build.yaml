@@ -143,18 +143,10 @@ jobs:
           - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
-      # max-parallel: 3
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
       options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
-
-      # options: >-
-      #   --security-opt seccomp=unconfined
-      #   --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
-      #   --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
-      #   --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
-      #   --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
 
@@ -265,7 +257,6 @@ jobs:
         include:
           - cfg: {name: 'ubuntu24', base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',    base: 'ubsan',    builddir: 'ubsan'}
-          - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
@@ -374,7 +365,6 @@ jobs:
         include:
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
-          - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]

@@ -27,19 +27,9 @@ jobs:
       fail-fast: false
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
-      # max-parallel: 2
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
     steps:
-        # - name: Fix DNS (force public resolvers)
-        #   run: |
-        #     echo " Init === /etc/resolv.conf ==="
-        #     cat /etc/resolv.conf
-        #     echo "nameserver 8.8.8.8" > /etc/resolv.conf
-        #     echo "nameserver 1.1.1.1" >> /etc/resolv.conf
-        #     echo "options timeout:1 attempts:3" >> /etc/resolv.conf
-        #     echo "=== Fixed /etc/resolv.conf ==="
-        #     cat /etc/resolv.conf
         - name: Force & debug DNS in job container
           run: |
             echo "=== /etc/resolv.conf ==="
