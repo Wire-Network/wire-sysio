@@ -339,6 +339,63 @@ BOOST_FIXTURE_TEST_CASE( newuser_nonce_collision, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
+
+   create_accounts( { "alice.com"_n, "bob.m"_n, "a.longonexxx"_n }, false, false, false, false );
+   produce_blocks(1);
+   auto result = regnodeowner("alice.com"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   result = regnodeowner("bob.m"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   result = regnodeowner("a.longonexxx"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   produce_blocks(1);
+
+   auto alice_owner = get_nodeowner("alice.com"_n);
+   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
+   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
+
+   auto empty = get_sponsorship("alice.com"_n, "nonce1"_n);
+   BOOST_REQUIRE_EQUAL(empty.is_null(), true);
+   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("alice.com"_n));
+
+   auto newuser_result = newuser("alice.com"_n, "nonce1"_n, get_public_key("alice.com"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   auto newuser_action_trace = newuser_result->action_traces[0];
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.name, "newuser"_n);
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.receiver, ROA);
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.account, ROA);
+   auto new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_REQUIRE_NE(""_n, new_name);
+   BOOST_TEST(new_name.suffix() == "alice.com"_n.suffix());
+   BOOST_TEST(new_name.suffix() == "com"_n);
+
+   auto newaccount_action_trace = newuser_result->action_traces[1];
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.name, "newaccount"_n);
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.receiver, "sysio"_n);
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.account, "sysio"_n);
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice.com"_n));
+   auto sponsorship = get_sponsorship("alice.com"_n, "nonce1"_n);
+   BOOST_REQUIRE_EQUAL(sponsorship.is_null(), false);
+   BOOST_REQUIRE_EQUAL(sponsorship["username"].as<name>(), new_name);
+
+   newuser_result = newuser("bob.m"_n, "nonce1"_n, get_public_key("bob.m"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   newuser_action_trace = newuser_result->action_traces[0];
+   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_TEST(new_name.suffix() == "m"_n);
+
+   newuser_result = newuser("a.longonexxx"_n, "nonce1"_n, get_public_key("a.longonexxx"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   newuser_action_trace = newuser_result->action_traces[0];
+   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_TEST(new_name.suffix() == "longonexxx"_n);
+
+} FC_LOG_AND_RETHROW()
+
+
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    // load system contract for newaccount functionality
    set_code( config::system_account_name, test_contracts::sysio_system_wasm() );

@@ -682,7 +682,7 @@ namespace sysio {
     };
 
     name roa::newuser(const name& creator, const name& nonce, const public_key& pubkey) {
-        require_auth(creator);
+       require_auth(creator);
 
        roastate_t roastate(get_self(), get_self().value);
        auto state = roastate.get();
@@ -698,15 +698,36 @@ namespace sysio {
         auto sponsor_itr = sponsors.find(nonce.value);
         check(sponsor_itr == sponsors.end(), "Sponsor entry for this nonce already exists");
 
+        // Get the creator's suffix (e.g., "com" from "node.com", or "myname" from "myname")
+        name creator_suffix = creator.suffix();
+        if (creator_suffix == creator)
+           creator_suffix = name();
+        std::string suffix_str = creator_suffix.to_string();
+        size_t suffix_len = suffix_str.size();
+
+        // Create a name like "[generated].[suffix]"
+        const size_t NAME_LENGTH = 12;
+        const size_t dot_len = suffix_len > 0 ? 1 : 0;
+
+        // Calculate length of the randomly generated prefix
+        // e.g., suffix="com" (3), gen_len = 12 - 3 - 1 = 8. name: "abcdefgh.com"
+        check(suffix_len < (NAME_LENGTH - 1), "Creator suffix is too long to generate a new username under it");
+        size_t gen_len = NAME_LENGTH - suffix_len - dot_len;
+
         // Try up to 3 times to generate a unique username
         name new_username;
         bool created = false;
         uint32_t block_num = current_block_number();
 
         // Create the username string buffer once, so we don't reallocate
-        const size_t NAME_LENGTH = 12; // sysio name constraints
         char uname_str[NAME_LENGTH + 1];
         uname_str[NAME_LENGTH] = 0; // ensure null-termination
+
+        // Pre-fill the buffer with ".suffix"
+        if (suffix_len > 0) {
+           uname_str[gen_len] = '.';
+           std::memcpy(uname_str + gen_len + 1, suffix_str.c_str(), suffix_len);
+        }
 
         for (uint8_t attempt = 0; attempt < 3; ++attempt) {
             // Hash nonce + attempt + block_num to generate username
@@ -718,12 +739,13 @@ namespace sysio {
                'p','q','r','s','t','u','v','w','x','y','z'};
             constexpr size_t charmap_len = sizeof(charmap) / sizeof(charmap[0]);
 
-            // Use first 12 chars of hash as account name (sysio name constraints)
-            for (size_t i = 0; i < 12; ++i) {
+            // Use hash to fill the generated part (prefix) of the account name
+            for (size_t i = 0; i < gen_len; ++i) {
                 auto offset = hash.extract_as_byte_array()[i] % charmap_len;
                 uname_str[i] = charmap[offset];
             }
 
+            // `uname_str` now holds "[generated].[suffix]"
             new_username = name(uname_str);
 
             if (!is_account(new_username)) {
