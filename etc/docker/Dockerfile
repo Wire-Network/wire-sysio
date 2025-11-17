@@ -10,20 +10,20 @@
 #   docker build --target=app-build-repo  -t wire-sysio:repo  .
 
 # --- Stage 0: vendor-binutils-noble (Ubuntu 24.04) ---------------------------
+    # RUN apt-get update && \
+    #     apt-get install -y --download-only \
+    #         binutils \
+    #         binutils-x86-64-linux-gnu \
+    #         binutils-common && \
+    #     mkdir -p /opt/vendor/binutils && \
+    #     cp -v /var/cache/apt/archives/*.deb /opt/vendor/binutils/
+
 ARG UBUNTU_TAG=24.04
-FROM ubuntu:${UBUNTU_TAG} AS vendor-binutils-noble
+FROM ubuntu:${UBUNTU_TAG} AS distro-deps
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && \
-    apt-get install -y --download-only \
-        binutils \
-        binutils-x86-64-linux-gnu \
-        binutils-common && \
-    mkdir -p /opt/vendor/binutils && \
-    cp -v /var/cache/apt/archives/*.deb /opt/vendor/binutils/
 
 # --- Stage 1: distro-deps ----------------------------------------------------
 # Base image with system packages required for building (compilers, cmake, Python, etc.)
-FROM vendor-binutils-noble AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -53,22 +53,21 @@ RUN apt-get update && \
         software-properties-common
 
 # Install identical Ubuntu-24 binutils on any base (24/25)
-COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
-RUN apt-get update && \
-    apt-get install -y /opt/vendor/binutils/*.deb && \
-    update-alternatives --set ld /usr/bin/ld.bfd || true && \
-    apt-mark hold binutils binutils-x86-64-linux-gnu binutils-common && \
-    ld --version | head -1 && ld.bfd -v
+# COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
+# RUN apt-get update && \
+#     apt-get install -y /opt/vendor/binutils/*.deb && \
+#     update-alternatives --set ld /usr/bin/ld.bfd || true && \
+#     apt-mark hold binutils binutils-x86-64-linux-gnu binutils-common && \
+#     ld --version | head -1 && ld.bfd -v
 
 # Build toolchain and development libraries (binutils intentionally omitted)
 RUN apt-get install -y \
         build-essential \
+        binutils \
         ccache \
         cmake \
         curl \
         doxygen \
-        g++-12 \
-        gcc-12 \
         git \
         gnupg \
         golang \
@@ -77,7 +76,6 @@ RUN apt-get install -y \
         libgmp-dev \
         liblzma-dev \
         libncurses5-dev \
-        libssl-dev \
         libstdc++-14-dev \
         libusb-1.0-0-dev \
         libzstd-dev \
@@ -91,12 +89,6 @@ RUN apt-get install -y \
         autoconf-archive \
         automake \
         libtool \
-        libltdl-dev \
-        m4 \
-        gettext \
-        gawk \
-        texinfo \
-        perl \
         sudo \
         tar \
         unzip \

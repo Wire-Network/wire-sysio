@@ -12,12 +12,10 @@ find_package(Boost 1.89.0 EXACT CONFIG REQUIRED
     filesystem
     iostreams
     date_time
-    regex
     thread
     chrono
     context
     coroutine
-    atomic
     program_options
     interprocess
     process
