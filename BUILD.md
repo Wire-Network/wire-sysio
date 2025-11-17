@@ -98,7 +98,13 @@ sudo apt-get install -y \
   export BASE_DIR=/opt/clang    # you can choose a different prefix if desired
 
   # Build and install Clang 18 from source (this will download LLVM/Clang source and take some time)
+
+  # Option A (recommended): precreate and chown once, then run as your user
+  sudo mkdir -p "$BASE_DIR"; sudo chown "$USER":"$USER" "$BASE_DIR"
   ./scripts/clang-18/clang-18-ubuntu-build-source.sh
+
+  # Option B: keep /opt/clang root-owned, but preserve the env for sudo
+  sudo --preserve-env=BASE_DIR ./scripts/clang-18/clang-18-ubuntu-build-source.sh
   ```
   
   This script will compile Clang 18 and install it under `$BASE_DIR/clang-18`. (Using `/opt/clang/clang-18` as an example location.) 
@@ -119,23 +125,6 @@ export CC=$(command -v clang-18)
 export CXX=$(command -v clang++-18)
 ```
 
-> **Optional (mirrors Docker’s vcpkg sub-build behavior):**
-> Create a tiny chainloaded toolchain so **vcpkg ports** also use Clang/LLVM binutils.
-> ```bash
-> sudo mkdir -p /opt/clang
-> sudo tee /opt/clang/clang18-vcpkg-toolchain.cmake >/dev/null <<'EOF'
-> set(CMAKE_C_COMPILER   /opt/clang/clang-18/bin/clang)
-> set(CMAKE_CXX_COMPILER /opt/clang/clang-18/bin/clang++)
-> set(CMAKE_AR           /opt/clang/clang-18/bin/llvm-ar)
-> set(CMAKE_RANLIB       /opt/clang/clang-18/bin/llvm-ranlib)
-> set(CMAKE_CXX_STANDARD 20)
-> set(CMAKE_CXX_STANDARD_REQUIRED ON)
-> EOF
-> export VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake
-> export VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
-> export B2_TOOLSET=clang
-> ```
-
 ### 1c. Install LLVM 11
 
 Wire Sysio depends on **LLVM 11**. On modern systems (Ubuntu 24.04+), you will need to build LLVM 11 from source, since it’s not available in the apt repositories.
@@ -147,7 +136,11 @@ Use our helper script to build and install LLVM 11:
 export BASE_DIR=/opt/llvm    # (you can choose a different directory if desired)
 
 # Build and install LLVM 11 from source
+sudo mkdir -p "$BASE_DIR"; sudo chown "$USER":"$USER" "$BASE_DIR"
 ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+
+# or:
+sudo --preserve-env=BASE_DIR ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
 ```
 
 This will download the LLVM 11 source code, compile it, and install the libraries and tools to `$BASE_DIR/llvm-11`. (By default, the script places the final installation in `/opt/llvm/llvm-11` if `BASE_DIR=/opt/llvm`.) 
@@ -183,18 +176,6 @@ First, ensure the environment is set to use **Clang 18** as the compiler:
 export CC=/opt/clang/clang-18/bin/clang
 export CXX=/opt/clang/clang-18/bin/clang++
 ```
-
-> **Environment parity with Docker (recommended):**
-> ```bash
-> # Deterministic vcpkg behavior & correct compiler tracking
-> export VCPKG_FEATURE_FLAGS=manifests,registries,versions,compilertracking
-> export VCPKG_DEFAULT_TRIPLET=x64-linux
-> export VCPKG_OVERLAY_TRIPLETS=$PWD/vcpkg/triplets
-> 
-> # If you created the chainload file in 1b:
-> export VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake
-> export VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
-> ```
 
 Now run CMake to configure the build and generate build files. We recommend using **Ninja** as the build generator for faster builds (we installed `ninja-build` earlier):
 
