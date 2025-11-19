@@ -1,6 +1,6 @@
 {
     "initAccounts": ["n"],
-    "abiFile": "unittests/contracts/eosio.mechanics/eosmechanics.abi",
+    "abiFile": "unittests/system-test-contracts/sysio.mechanics/sysmechanics.abi",
     "actions": [
         {
             "actionName": "net",

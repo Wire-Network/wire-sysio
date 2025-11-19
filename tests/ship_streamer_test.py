@@ -104,7 +104,7 @@ try:
     nonProdNode.createAccount(jumboAcc, cluster.sysioAccount)
 
     contract = "jumborow"
-    contractDir = "unittests/contracts/%s" % (contract)
+    contractDir = "unittests/system-test-contracts/%s" % (contract)
     wasmFile = "%s.wasm" % (contract)
     abiFile = "%s.abi" % (contract)
 
