@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE( forking ) try {
 
    wdump((fc::json::to_pretty_string(res)));
    wlog("set producer schedule to [dan,sam,pam]");
-   c.produce_blocks(30); // legacy: 0..2 by eosio, 3..7 by dan, 8..19 by sam, 20..29 by pam, pam still has 2 to produce
+   c.produce_blocks(30); // legacy: 0..2 by sysio, 3..7 by dan, 8..19 by sam, 20..29 by pam, pam still has 2 to produce
    c.produce_blocks(10); // 0..1 by pam, 2..9 by dan, dan still has 4 to produce
 
    legacy_tester c2(setup_policy::none);

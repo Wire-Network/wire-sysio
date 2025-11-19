@@ -131,7 +131,7 @@ try:
     Print("Stand up cluster")
     specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
-    specificExtraNodeopArgs[totalProducerNodes]="--plugin eosio::test_control_api_plugin"
+    specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
     # test expects split network to advance with single producer
     extraNodeopArgs=" --production-pause-vote-timeout-ms 0 "
 

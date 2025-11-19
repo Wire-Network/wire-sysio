@@ -58,7 +58,7 @@ void payloadless::doitforever() {
       for (size_t p = 2; p <= max_cpu_prime; p += 1) {
          if (is_prime(p) && is_mersenne_prime(p)) {
             // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
-            //eosio::print_f(" %u", p);
+            //sysio::print_f(" %u", p);
          }
       }
    }

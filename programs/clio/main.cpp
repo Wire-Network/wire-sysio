@@ -2613,7 +2613,7 @@ int main( int argc, char** argv ) {
    transfer->add_option("recipient", recipient, localized("The account receiving tokens"))->required();
    transfer->add_option("amount", amount, localized("The amount of tokens to send"))->required();
    transfer->add_option("memo", memo, localized("The memo for the transfer"));
-   transfer->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to core.vaulta for A and eosio.token for all other asset amounts"));
+   transfer->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to sysio.token for asset amounts"));
    transfer->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
    add_standard_transaction_options_plus_signing(transfer, "sender@active");

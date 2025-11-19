@@ -38,7 +38,7 @@ try:
         totalNodes=3,
         loadSystemContract=False,
         activateIF=True,
-        extraNodeopArgs="--plugin eosio::test_control_api_plugin")
+        extraNodeopArgs="--plugin sysio::test_control_api_plugin")
 
     prodNode = cluster.getNode(0)
     prodNode2 = cluster.getNode(1)
@@ -49,7 +49,7 @@ try:
     payloadlessAcc = Account("payloadless")
     payloadlessAcc.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
     payloadlessAcc.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
-    prodNode.createAccount(payloadlessAcc, cluster.eosioAccount)
+    prodNode.createAccount(payloadlessAcc, cluster.sysioAccount)
 
     contractDir="unittests/test-contracts/payloadless"
     wasmFile="payloadless.wasm"
