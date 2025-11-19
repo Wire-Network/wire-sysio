@@ -115,8 +115,8 @@ else()
   set(UNSHARE "")
 endif()
 
-option(SPRING_ENABLE_RELEASE_BUILD_TEST "Enables a test that verifies nodeop was compiled with compiler options typical for a release build" On)
-if(SPRING_ENABLE_RELEASE_BUILD_TEST)
+option(SYSIO_ENABLE_RELEASE_BUILD_TEST "Enables a test that verifies nodeop was compiled with compiler options typical for a release build" On)
+if(SYSIO_ENABLE_RELEASE_BUILD_TEST)
   add_p_test(NAME release-build-test COMMAND tests/release-build.sh)
 endif()
 
@@ -283,8 +283,8 @@ add_np_test(NAME cli_test COMMAND tests/cli_test.py)
 add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v ${UNSHARE})
 add_np_test(NAME lib_advance_if_test COMMAND tests/lib_advance_test.py --activate-if -v ${UNSHARE})
 
-add_p_test(NAME spring_util_bls_test COMMAND tests/spring_util_bls_test.py)
-add_p_test(NAME spring_util_snapshot_info_test COMMAND tests/spring_util_snapshot_info_test.py)
+add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
+add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
 add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} TIMEOUT 100)
 
