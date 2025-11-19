@@ -7,12 +7,12 @@ from http.client import RemoteDisconnected
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 
 ###############################################################
-# nodeos_signal_throw_test
+# nodeop_signal_throw_test
 #
-# Verify throwing in signal handlers is handled correctly by nodeos.
+# Verify throwing in signal handlers is handled correctly by nodeop.
 #
-# A controller_emit_signal_exception should cause nodeos to gracefully shutdown.
-# Any other exception type should be ignored and nodeos continue running.
+# A controller_emit_signal_exception should cause nodeop to gracefully shutdown.
+# Any other exception type should be ignored and nodeop continue running.
 #
 ###############################################################
 
@@ -61,13 +61,13 @@ try:
     Print(f'producing nodes: {pnodes}, delay between nodes launch: {delay} second{"s" if delay != 1 else ""}')
 
     Print("Stand up cluster")
-    extraNodeopArgs="--plugin eosio::test_control_api_plugin"
+    extraNodeopArgs="--plugin sysio::test_control_api_plugin"
     specificExtraNodeopArgs= {"0": "--enable-stale-production"}
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay,
                       activateIF=True, extraNodeopArgs=extraNodeopArgs, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
-    assert cluster.biosNode.getInfo(exitOnError=True)["head_block_producer"] != "eosio", "launch should have waited for production to change"
+    assert cluster.biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio", "launch should have waited for production to change"
     cluster.waitOnClusterSync(blockAdvancing=2)
 
     node0 = cluster.getNode(0) # producer A
@@ -77,8 +77,8 @@ try:
     Print("Configure and launch txn generators")
     targetTpsPerGenerator = 5
     testTrxGenDurationSec=60*60
-    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.eosioAccount.name, acctNamesList=[cluster.defproduceraAccount.name, cluster.eosioAccount.name],
-                                acctPrivKeysList=[cluster.defproduceraAccount.activePrivateKey,cluster.eosioAccount.activePrivateKey], nodeId=node2.nodeId,
+    cluster.launchTrxGenerators(contractOwnerAcctName=cluster.sysioAccount.name, acctNamesList=[cluster.defproduceraAccount.name, cluster.sysioAccount.name],
+                                acctPrivKeysList=[cluster.defproduceraAccount.activePrivateKey,cluster.sysioAccount.activePrivateKey], nodeId=node2.nodeId,
                                 tpsPerGenerator=targetTpsPerGenerator, numGenerators=1, durationSec=testTrxGenDurationSec,
                                 waitToComplete=False)
 

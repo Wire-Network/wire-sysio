@@ -49,9 +49,9 @@ try:
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, extraNodeopArgs=extraNodeopArgs,
                       topo="./tests/nodeop_late_block_test_shape.json", delay=delay, loadSystemContract=False,
                       activateIF=True, signatureProviderForNonProducer=True) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
-    assert cluster.biosNode.getInfo(exitOnError=True)["head_block_producer"] != "eosio", "launch should have waited for production to change"
+    assert cluster.biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio", "launch should have waited for production to change"
     cluster.biosNode.kill(signal.SIGTERM)
     cluster.waitOnClusterSync(blockAdvancing=5)
 

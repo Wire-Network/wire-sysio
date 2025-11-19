@@ -68,7 +68,7 @@ try:
     if cluster.launch(pnodes=pnodes, unstartedNodes=2, totalNodes=total_nodes, prodCount=prod_count,
                       extraNodeopArgs="--connection-cleanup-period 3", specificExtraNodeopArgs=specificExtraNodeopArgs,
                       topo='./tests/p2p_no_blocks_test_shape.json', delay=delay, activateIF=activateIF, biosFinalizer=False) is False:
-        errorExit("Failed to stand up eos cluster.")
+        errorExit("Failed to stand up sys cluster.")
 
     prodNode00 = cluster.getNode(0)
     nonProdNode01 = cluster.getNode(1)
@@ -89,10 +89,10 @@ try:
     assert noBlocks03.waitForBlock(headBlockNum), "node03 did not sync from bios"
 
     # create transfer transaction now so it has a valid TAPOS
-    eosioBalanceBefore = nonProdNode01.getAccountEosBalance("eosio")
-    defprodueraBalanceBefore = nonProdNode01.getAccountEosBalance("defproducera")
+    sysioBalanceBefore = nonProdNode01.getAccountSysBalance("sysio")
+    defprodueraBalanceBefore = nonProdNode01.getAccountSysBalance("defproducera")
     transferAmount="50.0000 {0}".format(CORE_SYMBOL)
-    trx=nonProdNode01.transferFunds(cluster.eosioAccount, cluster.defproduceraAccount, transferAmount, dontSend=True)
+    trx=nonProdNode01.transferFunds(cluster.sysioAccount, cluster.defproduceraAccount, transferAmount, dontSend=True)
 
     Print("Sync past transfer reference block")
     # Make sure node2 and node3 have trx reference block before killing bios node otherwise the trx will fail
@@ -114,20 +114,20 @@ try:
     Print("Send transfer trx")
     cmdDesc = "push transaction --skip-sign"
     cmd     = "%s '%s'" % (cmdDesc, json.dumps(trx))
-    trans = nonProdNode01.processCleosCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True)
+    trans = nonProdNode01.processClioCmd(cmd, cmdDesc, silentErrors=False, exitOnError=True)
 
     # can't wait for transaction in block, so just sleep
     time.sleep(0.5)
 
-    eosioBalanceNode02 = noBlocks02.getAccountEosBalance("eosio")
-    defprodueraBalanceNode02 = noBlocks02.getAccountEosBalance("defproducera")
-    eosioBalanceNode03 = noBlocks03.getAccountEosBalance("eosio")
-    defprodueraBalanceNode03 = noBlocks03.getAccountEosBalance("defproducera")
+    sysioBalanceNode02 = noBlocks02.getAccountSysBalance("sysio")
+    defprodueraBalanceNode02 = noBlocks02.getAccountSysBalance("defproducera")
+    sysioBalanceNode03 = noBlocks03.getAccountSysBalance("sysio")
+    defprodueraBalanceNode03 = noBlocks03.getAccountSysBalance("defproducera")
 
-    assert eosioBalanceBefore - 500000 == eosioBalanceNode02, f"{eosioBalanceBefore - 500000} != {eosioBalanceNode02}"
+    assert sysioBalanceBefore - 500000 == sysioBalanceNode02, f"{sysioBalanceBefore - 500000} != {sysioBalanceNode02}"
     assert defprodueraBalanceBefore + 500000 == defprodueraBalanceNode02, f"{defprodueraBalanceBefore + 500000} != {defprodueraBalanceNode02}"
 
-    assert eosioBalanceBefore == eosioBalanceNode03, f"{eosioBalanceBefore} != {eosioBalanceNode03}"
+    assert sysioBalanceBefore == sysioBalanceNode03, f"{sysioBalanceBefore} != {sysioBalanceNode03}"
     assert defprodueraBalanceBefore == defprodueraBalanceNode03, f"{defprodueraBalanceBefore} != {defprodueraBalanceNode03}"
 
     cluster.biosNode.relaunch()

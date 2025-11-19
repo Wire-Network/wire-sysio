@@ -1,55 +1,55 @@
 #pragma once
 
-#include <eosio/chain/abi_serializer.hpp>
-#include <eosio/testing/tester.hpp>
+#include <sysio/chain/abi_serializer.hpp>
+#include <sysio/testing/tester.hpp>
 
 #include <fc/variant_object.hpp>
 
 #include <contracts.hpp>
 #include <test_contracts.hpp>
 
-using namespace eosio::chain;
-using namespace eosio::testing;
+using namespace sysio::chain;
+using namespace sysio::testing;
 using namespace fc;
 
 using mvo = fc::mutable_variant_object;
 
-namespace eosio_system {
+namespace sysio_system {
 
 template<typename T>
-class eosio_system_tester : public T {
+class sysio_system_tester : public T {
 public:
 
-   eosio_system_tester()
-   : eosio_system_tester([](validating_tester& ) {}){}
+   sysio_system_tester()
+   : sysio_system_tester([](validating_tester& ) {}){}
 
    template<typename Lambda>
-   eosio_system_tester(Lambda setup) {
+   sysio_system_tester(Lambda setup) {
       setup(*this);
 
       T::produce_block();
 
-      T::create_accounts({ "eosio.token"_n, "eosio.ram"_n, "eosio.ramfee"_n, "eosio.stake"_n,
-               "eosio.bpay"_n, "eosio.vpay"_n, "eosio.saving"_n, "eosio.names"_n, "eosio.rex"_n });
+      T::create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
+               "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n, "sysio.rex"_n });
 
       T::produce_block();
 
-      T::set_code( "eosio.token"_n, test_contracts::eosio_token_wasm() );
-      T::set_abi( "eosio.token"_n, test_contracts::eosio_token_abi() );
+      T::set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+      T::set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
 
       {
-         const auto& accnt = T::control->db().template get<account_object,by_name>( "eosio.token"_n );
+         const auto& accnt = T::control->db().template get<account_object,by_name>( "sysio.token"_n );
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
          token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( T::abi_serializer_max_time ));
       }
 
-      create_currency( "eosio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
+      create_currency( "sysio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
       issue(config::system_account_name,      core_from_string("1000000000.0000"));
-      BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( name("eosio") ) );
+      BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( name("sysio") ) );
 
-      T::set_code( config::system_account_name, test_contracts::eosio_system_wasm() );
-      T::set_abi( config::system_account_name, test_contracts::eosio_system_abi() );
+      T::set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      T::set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
 
       base_tester::push_action(config::system_account_name, "init"_n,
                             config::system_account_name,  mutable_variant_object()
@@ -70,7 +70,7 @@ public:
       create_account_with_resources( "carol1111111"_n, config::system_account_name, core_from_string("1.0000"), false );
 
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"),
-            get_balance(name("eosio")) + get_balance(name("eosio.ramfee")) + get_balance(name("eosio.stake")) + get_balance(name("eosio.ram")) );
+            get_balance(name("sysio")) + get_balance(name("sysio.ramfee")) + get_balance(name("sysio.stake")) + get_balance(name("sysio.ram")) );
    }
 
    T::action_result open( account_name  owner,
@@ -374,7 +374,7 @@ public:
    }
 
    asset get_balance( const account_name& act ) {
-      vector<char> data = T::get_row_by_account( "eosio.token"_n, act, "accounts"_n, name(symbol(CORE_SYMBOL).to_symbol_code().value) );
+      vector<char> data = T::get_row_by_account( "sysio.token"_n, act, "accounts"_n, name(symbol(CORE_SYMBOL).to_symbol_code().value) );
       return data.empty() ? asset(0, symbol(CORE_SYMBOL)) : token_abi_ser.binary_to_variant("account", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ))["balance"].template as<asset>();
    }
 
@@ -407,14 +407,14 @@ public:
    }
 
    void issue( name to, const asset& amount, name manager = config::system_account_name ) {
-      base_tester::push_action( "eosio.token"_n, "issue"_n, manager, mutable_variant_object()
+      base_tester::push_action( "sysio.token"_n, "issue"_n, manager, mutable_variant_object()
                                 ("to",      to )
                                 ("quantity", amount )
                                 ("memo", "")
                                 );
    }
    void transfer( name from, name to, const asset& amount, name manager = config::system_account_name ) {
-      base_tester::push_action( "eosio.token"_n, "transfer"_n, manager, mutable_variant_object()
+      base_tester::push_action( "sysio.token"_n, "transfer"_n, manager, mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
                                 ("quantity", amount)
@@ -424,7 +424,7 @@ public:
 
    void issue_and_transfer( const name& to, const asset& amount, const name& manager = config::system_account_name ) {
       signed_transaction trx;
-      trx.actions.emplace_back( T::get_action( "eosio.token"_n, "issue"_n,
+      trx.actions.emplace_back( T::get_action( "sysio.token"_n, "issue"_n,
                                             vector<permission_level>{{manager, config::active_name}},
                                             mutable_variant_object()
                                             ("to",       manager )
@@ -433,7 +433,7 @@ public:
                                             )
                                 );
       if ( to != manager ) {
-         trx.actions.emplace_back( T::get_action( "eosio.token"_n, "transfer"_n,
+         trx.actions.emplace_back( T::get_action( "sysio.token"_n, "transfer"_n,
                                                vector<permission_level>{{manager, config::active_name}},
                                                mutable_variant_object()
                                                ("from",     manager)
@@ -458,9 +458,9 @@ public:
    }
 
    fc::variant get_stats( const string& symbolname ) {
-      auto symb = eosio::chain::symbol::from_string(symbolname);
+      auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
-      vector<char> data = T::get_row_by_account( "eosio.token"_n, name(symbol_code), "stat"_n, name(symbol_code) );
+      vector<char> data = T::get_row_by_account( "sysio.token"_n, name(symbol_code), "stat"_n, name(symbol_code) );
       return data.empty() ? fc::variant() : token_abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
    }
 
@@ -475,17 +475,17 @@ public:
    fc::variant get_global_state() {
       vector<char> data = T::get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
       if (data.empty()) std::cout << "\nData is empty\n" << std::endl;
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "eosio_global_state", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
    }
 
    fc::variant get_global_state2() {
       vector<char> data = T::get_row_by_account( config::system_account_name, config::system_account_name, "global2"_n, "global2"_n );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "eosio_global_state2", data, abi_serializer::create_yield_function(T::abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state2", data, abi_serializer::create_yield_function(T::abi_serializer_max_time) );
    }
 
    fc::variant get_global_state3() {
       vector<char> data = T::get_row_by_account( config::system_account_name, config::system_account_name, "global3"_n, "global3"_n );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "eosio_global_state3", data, abi_serializer::create_yield_function(T::abi_serializer_max_time) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state3", data, abi_serializer::create_yield_function(T::abi_serializer_max_time) );
    }
 
    fc::variant get_refund_request( name account ) {
@@ -496,21 +496,21 @@ public:
    abi_serializer initialize_multisig() {
       abi_serializer msig_abi_ser;
       {
-         create_account_with_resources( "eosio.msig"_n, config::system_account_name );
-         BOOST_REQUIRE_EQUAL( T::success(), buyram( name("eosio"), name("eosio.msig"), core_from_string("5000.0000") ) );
+         create_account_with_resources( "sysio.msig"_n, config::system_account_name );
+         BOOST_REQUIRE_EQUAL( T::success(), buyram( name("sysio"), name("sysio.msig"), core_from_string("5000.0000") ) );
          T::produce_block();
 
          auto trace = base_tester::push_action(config::system_account_name, "setpriv"_n,
                                                config::system_account_name,  mutable_variant_object()
-                                               ("account", "eosio.msig")
+                                               ("account", "sysio.msig")
                                                ("is_priv", 1)
          );
 
-         T::set_code( "eosio.msig"_n, test_contracts::eosio_msig_wasm() );
-         T::set_abi( "eosio.msig"_n, test_contracts::eosio_msig_abi() );
+         T::set_code( "sysio.msig"_n, test_contracts::sysio_msig_wasm() );
+         T::set_abi( "sysio.msig"_n, test_contracts::sysio_msig_abi() );
 
          T::produce_block();
-         const auto& accnt = T::control->db().template get<account_object,by_name>( "eosio.msig"_n );
+         const auto& accnt = T::control->db().template get<account_object,by_name>( "sysio.msig"_n );
          abi_def msig_abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
          msig_abi_ser.set_abi(std::move(msig_abi), abi_serializer::create_yield_function( T::abi_serializer_max_time ));
@@ -520,7 +520,7 @@ public:
 
    vector<name> active_and_vote_producers() {
       //stake more than 15% of total EOS supply to activate chain
-      transfer( name("eosio"), name("alice1111111"), core_from_string("650000000.0000"), name("eosio") );
+      transfer( name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
       BOOST_REQUIRE_EQUAL( T::success(), stake( name("alice1111111"), name("alice1111111"), core_from_string("300000000.0000"), core_from_string("300000000.0000") ) );
 
       // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
@@ -545,7 +545,7 @@ public:
                                             ("permission", name(config::active_name).to_string())
                                             ("parent", name(config::owner_name).to_string())
                                             ("auth",  authority(1, {key_weight{T::get_public_key( config::system_account_name, "active" ), 1}}, {
-                                                  permission_level_weight{{config::system_account_name, config::eosio_code_name}, 1},
+                                                  permission_level_weight{{config::system_account_name, config::sysio_code_name}, 1},
                                                      permission_level_weight{{config::producers_account_name,  config::active_name}, 1}
                                                }
                                             ))
@@ -647,7 +647,7 @@ inline uint64_t M( const string& eos_str ) {
    return core_from_string( eos_str ).get_amount();
 }
 
-using eosio_system_testers = boost::mpl::list<eosio_system_tester<legacy_validating_tester>,
-                                              eosio_system_tester<savanna_validating_tester>>;
+using sysio_system_testers = boost::mpl::list<sysio_system_tester<legacy_validating_tester>,
+                                              sysio_system_tester<savanna_validating_tester>>;
 
 }

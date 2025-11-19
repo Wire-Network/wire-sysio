@@ -14,7 +14,7 @@
           "testnet_02"
         ],
         "producers": [
-          "eosio"
+          "sysio"
         ],
         "dont_start": false
       },

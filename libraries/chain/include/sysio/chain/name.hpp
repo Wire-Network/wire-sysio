@@ -114,8 +114,8 @@ namespace sysio::chain {
       /**
        *  Returns the suffix.
        *  for example:
-       *    "eosio.any" -> "any"
-       *    "eosio" -> "eosio"
+       *    "sysio.any" -> "any"
+       *    "sysio" -> "sysio"
        */
       constexpr name suffix() const {
          uint32_t remaining_bits_after_last_actual_dot = 0;
