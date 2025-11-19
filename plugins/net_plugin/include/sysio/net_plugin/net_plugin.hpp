@@ -3,6 +3,7 @@
 #include <sysio/chain/application.hpp>
 #include <sysio/net_plugin/protocol.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/producer_plugin/producer_plugin.hpp>
 
 namespace sysio {
    using namespace appbase;
@@ -14,10 +15,19 @@ namespace sysio {
       bool              connecting           = false;
       bool              syncing              = false;
       bool              is_bp_peer           = false;
+      bool              is_bp_gossip_peer    = false;
       bool              is_socket_open       = false;
       bool              is_blocks_only       = false;
       bool              is_transactions_only = false;
+      time_point        last_vote_received;
       handshake_message last_handshake;
+   };
+
+   struct gossip_peer {
+      sysio::name               producer_name;
+      std::string               server_endpoint;      // externally available address to connect to
+      std::string               outbound_ip_address;  // outbound ip address for firewall
+      block_timestamp_type      expiration;           // head block to remove bp_peer
    };
 
    class net_plugin : public appbase::plugin<net_plugin>
@@ -26,7 +36,7 @@ namespace sysio {
         net_plugin();
         virtual ~net_plugin();
 
-        APPBASE_PLUGIN_REQUIRES((chain_plugin))
+        APPBASE_PLUGIN_REQUIRES((chain_plugin)(producer_plugin))
         virtual void set_program_options(options_description& cli, options_description& cfg) override;
         void handle_sighup() override;
 
@@ -36,8 +46,9 @@ namespace sysio {
 
         string                            connect( const string& endpoint );
         string                            disconnect( const string& endpoint );
-        std::optional<connection_status>  status( const string& endpoint )const;
+        fc::variant                       status( const string& endpoint )const;
         vector<connection_status>         connections()const;
+        vector<gossip_peer>               bp_gossip_peers()const;
 
         struct p2p_per_connection_metrics {
             struct connection_metric {
@@ -92,10 +103,16 @@ namespace sysio {
         void register_increment_failed_p2p_connections(std::function<void()>&&);
         void register_increment_dropped_trxs(std::function<void()>&&);
 
+        // for testing
+        void broadcast_block(const signed_block_ptr& b, const block_id_type& id);
+
       private:
         std::shared_ptr<class net_plugin_impl> my;
    };
 
 }
 
-FC_REFLECT( sysio::connection_status, (peer)(remote_ip)(remote_port)(connecting)(syncing)(is_bp_peer)(is_socket_open)(is_blocks_only)(is_transactions_only)(last_handshake) )
+FC_REFLECT( sysio::connection_status, (peer)(remote_ip)(remote_port)(connecting)(syncing)
+                                      (is_bp_peer)(is_bp_gossip_peer)(is_socket_open)(is_blocks_only)(is_transactions_only)
+                                      (last_vote_received)(last_handshake) )
+FC_REFLECT( sysio::gossip_peer, (producer_name)(server_endpoint)(outbound_ip_address)(expiration) )

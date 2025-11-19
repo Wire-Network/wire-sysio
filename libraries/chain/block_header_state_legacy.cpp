@@ -1,25 +1,10 @@
 #include <sysio/chain/block_header_state_legacy.hpp>
+#include <sysio/chain/block_header_state_utils.hpp>
+#include <sysio/chain/snapshot_detail.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <limits>
 
-namespace sysio { namespace chain {
-
-   namespace detail {
-      bool is_builtin_activated( const protocol_feature_activation_set_ptr& pfa,
-                                 const protocol_feature_set& pfs,
-                                 builtin_protocol_feature_t feature_codename )
-      {
-         auto digest = pfs.get_builtin_digest(feature_codename);
-         const auto& protocol_features = pfa->protocol_features;
-         return digest && protocol_features.find(*digest) != protocol_features.end();
-      }
-   }
-
-   producer_authority block_header_state_legacy::get_scheduled_producer( block_timestamp_type t )const {
-      auto index = t.slot % (active_schedule.producers.size() * config::producer_repetitions);
-      index /= config::producer_repetitions;
-      return active_schedule.producers[index];
-   }
+namespace sysio::chain {
 
    uint32_t block_header_state_legacy::calc_dpos_last_irreversible( account_name producer_of_next_block )const {
       vector<uint32_t> blocknums; blocknums.reserve( producer_to_last_implied_irb.size() );
@@ -35,8 +20,12 @@ namespace sysio { namespace chain {
       return blocknums[ index ];
    }
 
+   const producer_authority& block_header_state_legacy::get_scheduled_producer( block_timestamp_type t ) const {
+      return detail::get_scheduled_producer(active_schedule.producers, t);
+   }
+
    pending_block_header_state_legacy  block_header_state_legacy::next( block_timestamp_type when,
-                                                                uint16_t num_prev_blocks_to_confirm )const
+                                                                       uint16_t num_prev_blocks_to_confirm )const
    {
       pending_block_header_state_legacy result;
 
@@ -46,7 +35,7 @@ namespace sysio { namespace chain {
         (when = header.timestamp).slot++;
       }
 
-      auto proauth = get_scheduled_producer(when);
+      const auto& proauth = get_scheduled_producer(when);
 
       auto itr = producer_to_last_produced.find( proauth.producer_name );
       if( itr != producer_to_last_produced.end() ) {
@@ -167,13 +156,27 @@ namespace sysio { namespace chain {
          result.producer_to_last_implied_irb[proauth.producer_name] = dpos_proposed_irreversible_blocknum;
       }
 
+      if (auto it = header_exts.find(finality_extension::extension_id()); it != header_exts.end()) { // transition to savanna has started
+         const auto& f_ext = std::get<finality_extension>(it->second);
+         // copy over qc_claim from IF Genesis Block
+         result.qc_claim = f_ext.qc_claim;
+      }
+
       return result;
+   }
+
+   std::optional<block_num_type> pending_block_header_state_legacy::savanna_genesis_block_num() const {
+      if (qc_claim) {
+         return std::optional<block_num_type>{qc_claim->block_num};
+      }
+      return {};
    }
 
    signed_block_header pending_block_header_state_legacy::make_block_header(
                                                       const checksum256_type& transaction_mroot,
                                                       const checksum256_type& action_mroot,
                                                       const std::optional<producer_authority_schedule>& new_producers,
+                                                      std::optional<finalizer_policy>&& new_finalizer_policy,
                                                       vector<digest_type>&& new_protocol_feature_activations,
                                                       const protocol_feature_set& pfs,
                                                       const chain::deque<s_header>& s_header
@@ -193,7 +196,7 @@ namespace sysio { namespace chain {
          emplace_extension(
                h.header_extensions,
                protocol_feature_activation::extension_id(),
-               fc::raw::pack( protocol_feature_activation{ std::move(new_protocol_feature_activations) } )
+               fc::raw::pack( protocol_feature_activation{ .protocol_features=std::move(new_protocol_feature_activations) } )
          );
       }
 
@@ -215,20 +218,32 @@ namespace sysio { namespace chain {
          );
       }
 
+      if (new_finalizer_policy) {
+         assert(new_finalizer_policy->generation == 1); // only allowed to be set once
+         // set current block_num as qc_claim.last_qc_block_num in the IF extension
+         qc_claim_t initial_if_claim { .block_num = block_num,
+                                       .is_strong_qc = false };
+         finalizer_policy no_policy;
+         auto new_fin_policy_diff = no_policy.create_diff(*new_finalizer_policy);
+         emplace_extension(h.header_extensions, finality_extension::extension_id(),
+                           fc::raw::pack(finality_extension{ initial_if_claim, std::move(new_fin_policy_diff), {} }));
+      } else if (qc_claim) {
+         emplace_extension(h.header_extensions, finality_extension::extension_id(),
+                           fc::raw::pack(finality_extension{ *qc_claim, {}, {} }));
+      }
+
       return h;
    }
 
    block_header_state_legacy pending_block_header_state_legacy::_finish_next(
                                  const signed_block_header& h,
                                  const protocol_feature_set& pfs,
-                                 const std::function<void( block_timestamp_type,
-                                                           const flat_set<digest_type>&,
-                                                           const vector<digest_type>& )>& validator
+                                 validator_t& validator
 
    )&&
    {
       SYS_ASSERT( h.timestamp == timestamp, block_validate_exception, "timestamp mismatch" );
-      SYS_ASSERT( h.previous == previous, unlinkable_block_exception, "previous mismatch" );
+      SYS_ASSERT( h.previous == previous, unlinkable_block_exception, "previous mismatch ${p} != ${id}", ("p", h.previous)("id", previous) );
       SYS_ASSERT( h.confirmed == confirmed, block_validate_exception, "confirmed mismatch" );
       SYS_ASSERT( h.producer == producer, wrong_producer, "wrong producer specified" );
       SYS_ASSERT( h.schedule_version == active_schedule_version, producer_schedule_exception, "schedule_version in signed block is corrupted" );
@@ -242,10 +257,10 @@ namespace sysio { namespace chain {
          SYS_ASSERT(false, producer_schedule_exception, "Block header contains legacy producer schedule, required to be empty on wire.network" );
       }
 
-      if ( exts.count(producer_schedule_change_extension::extension_id()) > 0 ) {
+      if (auto it = exts.find(producer_schedule_change_extension::extension_id()); it != exts.end()) {
          SYS_ASSERT( !was_pending_promoted, producer_schedule_exception, "cannot set pending producer schedule in the same block in which pending was promoted to active" );
 
-         const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(exts.lower_bound(producer_schedule_change_extension::extension_id())->second);
+         const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(it->second);
 
          SYS_ASSERT( new_producer_schedule.version == active_schedule.version + 1, producer_schedule_exception, "wrong producer schedule version specified" );
          SYS_ASSERT( prev_pending_schedule.schedule.producers.empty(), producer_schedule_exception,
@@ -256,9 +271,9 @@ namespace sysio { namespace chain {
       }
 
       protocol_feature_activation_set_ptr new_activated_protocol_features;
-      { // handle protocol_feature_activation
-         if( exts.count(protocol_feature_activation::extension_id() > 0) ) {
-            const auto& new_protocol_features = std::get<protocol_feature_activation>(exts.lower_bound(protocol_feature_activation::extension_id())->second).protocol_features;
+      {  // handle protocol_feature_activation
+         if (auto it = exts.find(protocol_feature_activation::extension_id()); it != exts.end()) {
+            const auto& new_protocol_features = std::get<protocol_feature_activation>(it->second).protocol_features;
             validator( timestamp, prev_activated_protocol_features->protocol_features, new_protocol_features );
 
             new_activated_protocol_features =   std::make_shared<protocol_feature_activation_set>(
@@ -274,14 +289,14 @@ namespace sysio { namespace chain {
 
       block_header_state_legacy result( std::move( *static_cast<detail::block_header_state_legacy_common*>(this) ) );
 
-      result.id      = h.calculate_id();
-      result.header  = h;
+      result.id       = h.calculate_id();
+      result.header   = h;
 
       result.header_exts = std::move(exts);
 
       if( maybe_new_producer_schedule ) {
          result.pending_schedule.schedule = std::move(*maybe_new_producer_schedule);
-         result.pending_schedule.schedule_hash = std::move(*maybe_new_producer_schedule_hash);
+         result.pending_schedule.schedule_hash = *maybe_new_producer_schedule_hash;
          result.pending_schedule.schedule_lib_num    = block_number;
       } else {
          if( was_pending_promoted ) {
@@ -289,7 +304,7 @@ namespace sysio { namespace chain {
          } else {
             result.pending_schedule.schedule         = std::move( prev_pending_schedule.schedule );
          }
-         result.pending_schedule.schedule_hash       = std::move( prev_pending_schedule.schedule_hash );
+         result.pending_schedule.schedule_hash       = prev_pending_schedule.schedule_hash ;
          result.pending_schedule.schedule_lib_num    = prev_pending_schedule.schedule_lib_num;
       }
 
@@ -302,9 +317,7 @@ namespace sysio { namespace chain {
                                  const signed_block_header& h,
                                  vector<signature_type>&& additional_signatures,
                                  const protocol_feature_set& pfs,
-                                 const std::function<void( block_timestamp_type,
-                                                           const flat_set<digest_type>&,
-                                                           const vector<digest_type>& )>& validator,
+                                 validator_t& validator,
                                  bool skip_validate_signee
    )&&
    {
@@ -325,9 +338,7 @@ namespace sysio { namespace chain {
    block_header_state_legacy pending_block_header_state_legacy::finish_next(
                                  signed_block_header& h,
                                  const protocol_feature_set& pfs,
-                                 const std::function<void( block_timestamp_type,
-                                                           const flat_set<digest_type>&,
-                                                           const vector<digest_type>& )>& validator,
+                                 validator_t& validator,
                                  const signer_callback_type& signer
    )&&
    {
@@ -350,14 +361,12 @@ namespace sysio { namespace chain {
     */
    block_header_state_legacy block_header_state_legacy::next(
                         const signed_block_header& h,
-                        vector<signature_type>&& _additional_signatures,
+                        vector<signature_type>&& additional_signatures,
                         const protocol_feature_set& pfs,
-                        const std::function<void( block_timestamp_type,
-                                                  const flat_set<digest_type>&,
-                                                  const vector<digest_type>& )>& validator,
+                        validator_t& validator,
                         bool skip_validate_signee )const
    {
-      return next( h.timestamp, h.confirmed ).finish_next( h, std::move(_additional_signatures), pfs, validator, skip_validate_signee );
+      return next( h.timestamp, h.confirmed ).finish_next( h, std::move(additional_signatures), pfs, validator, skip_validate_signee );
    }
 
    digest_type   block_header_state_legacy::sig_digest()const {
@@ -403,8 +412,8 @@ namespace sysio { namespace chain {
       std::tie(is_satisfied, relevant_sig_count) = producer_authority::keys_satisfy_and_relevant(keys, valid_block_signing_authority);
 
       SYS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
-                 "block signed by unexpected key",
-                 ("signing_keys", keys)("authority", valid_block_signing_authority));
+                 "block signed by unexpected key: ${signing_keys}, expected: ${authority}. ${c} != ${s}",
+                 ("signing_keys", keys)("authority", valid_block_signing_authority)("c", relevant_sig_count)("s", keys.size()));
 
       SYS_ASSERT(is_satisfied, wrong_signing_key,
                  "block signatures do not satisfy the block signing authority",
@@ -412,15 +421,30 @@ namespace sysio { namespace chain {
    }
 
    /**
-    *  Reference cannot outlive *this. Assumes header_exts is not mutated after instatiation.
+    *  Reference cannot outlive *this. Assumes header_exts is not mutated after instantiation.
     */
    const vector<digest_type>& block_header_state_legacy::get_new_protocol_feature_activations()const {
-      static const vector<digest_type> no_activations{};
-
-      if( header_exts.count(protocol_feature_activation::extension_id()) == 0 )
-         return no_activations;
-
-      return std::get<protocol_feature_activation>(header_exts.lower_bound(protocol_feature_activation::extension_id())->second).protocol_features;
+      return detail::get_new_protocol_feature_activations(header_exts);
    }
 
-} } /// namespace sysio::chain
+block_header_state_legacy::block_header_state_legacy( snapshot_detail::snapshot_block_header_state_legacy_v3&& bhs_v3 )
+   {
+      block_num                             = bhs_v3.block_num;
+      dpos_proposed_irreversible_blocknum   = bhs_v3.dpos_proposed_irreversible_blocknum;
+      dpos_irreversible_blocknum            = bhs_v3.dpos_irreversible_blocknum;
+      active_schedule                       = std::move(bhs_v3.active_schedule);
+      blockroot_merkle                      = std::move(bhs_v3.blockroot_merkle);
+      producer_to_last_produced             = std::move(bhs_v3.producer_to_last_produced);
+      producer_to_last_implied_irb          = std::move(bhs_v3.producer_to_last_implied_irb);
+      valid_block_signing_authority         = std::move(bhs_v3.valid_block_signing_authority);
+      confirm_count                         = std::move(bhs_v3.confirm_count);
+      id                                    = bhs_v3.id;
+      header                                = std::move(bhs_v3.header);
+      pending_schedule                      = std::move(bhs_v3.pending_schedule);
+      activated_protocol_features           = std::move(bhs_v3.activated_protocol_features);
+      additional_signatures                 = std::move(bhs_v3.additional_signatures);
+
+      header_exts = header.validate_and_extract_header_extensions();
+   }
+
+} /// namespace sysio::chain

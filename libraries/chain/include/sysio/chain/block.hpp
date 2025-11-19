@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/chain/block_header.hpp>
 #include <sysio/chain/transaction.hpp>
+#include <sysio/chain/qc.hpp>
 
 namespace sysio { namespace chain {
 
@@ -49,19 +50,18 @@ namespace sysio { namespace chain {
       static constexpr uint16_t extension_id() { return 2; }
       static constexpr bool     enforce_unique() { return true; }
 
-      additional_block_signatures_extension() = default;
-
-      additional_block_signatures_extension( const vector<signature_type>& signatures )
-      :signatures( signatures )
-      {}
-
-      additional_block_signatures_extension( vector<signature_type>&& signatures )
-      :signatures( std::move(signatures) )
-      {}
-
       void reflector_init();
 
       vector<signature_type> signatures;
+   };
+
+   struct quorum_certificate_extension : fc::reflect_init {
+      static constexpr uint16_t extension_id() { return 3; }
+      static constexpr bool     enforce_unique() { return true; }
+
+      void reflector_init();
+
+      qc_t qc;
    };
 
    namespace detail {
@@ -73,30 +73,53 @@ namespace sysio { namespace chain {
    }
 
    using block_extension_types = detail::block_extension_types<
-         additional_block_signatures_extension
+         additional_block_signatures_extension,
+         quorum_certificate_extension
    >;
 
    using block_extension = block_extension_types::block_extension_t;
+
+   using signed_block_ptr = std::shared_ptr<const signed_block>;
+   // mutable_block_ptr is built up until it is signed and converted to signed_block_ptr
+   // mutable_block_ptr is not thread safe and should be moved into signed_block_ptr when complete
+   using mutable_block_ptr = std::unique_ptr<signed_block>;
 
    /**
     */
    struct signed_block : public signed_block_header{
    private:
       signed_block( const signed_block& ) = default;
+      explicit signed_block( const signed_block_header& h ):signed_block_header(h){}
    public:
       signed_block() = default;
-      explicit signed_block( const signed_block_header& h ):signed_block_header(h){}
       signed_block( signed_block&& ) = default;
       signed_block& operator=(const signed_block&) = delete;
       signed_block& operator=(signed_block&&) = default;
-      signed_block clone() const { return *this; }
+      mutable_block_ptr clone() const { return std::unique_ptr<signed_block>(new signed_block(*this)); }
+      static mutable_block_ptr create_mutable_block(const signed_block_header& h) { return std::unique_ptr<signed_block>(new signed_block(h)); }
+      static signed_block_ptr  create_signed_block(mutable_block_ptr&& b) { b->pack(); return signed_block_ptr{std::move(b)}; }
 
       deque<transaction_receipt>   transactions; /// new or generated transactions
-      extensions_type               block_extensions;
+      extensions_type              block_extensions;
 
       flat_multimap<uint16_t, block_extension> validate_and_extract_extensions()const;
+      std::optional<block_extension> extract_extension(uint16_t extension_id)const;
+      template<typename Ext> Ext extract_extension()const {
+         assert(contains_extension(Ext::extension_id()));
+         return std::get<Ext>(*extract_extension(Ext::extension_id()));
+      }
+      bool contains_extension(uint16_t extension_id)const;
+
+      const bytes& packed_signed_block() const { assert(!packed_block.empty()); return packed_block; }
+
+   private:
+      friend struct block_state;
+      friend struct block_state_legacy;
+      template<typename Stream> friend void fc::raw::unpack(Stream& s, sysio::chain::signed_block& v);
+      void pack() { packed_block = fc::raw::pack( *this ); }
+
+      bytes packed_block; // packed this
    };
-   using signed_block_ptr = std::shared_ptr<signed_block>;
 
    struct producer_confirmation {
       block_id_type   block_id;
@@ -113,4 +136,21 @@ FC_REFLECT_ENUM( sysio::chain::transaction_receipt::status_enum,
 FC_REFLECT(sysio::chain::transaction_receipt_header, (status)(cpu_usage_us)(net_usage_words) )
 FC_REFLECT_DERIVED(sysio::chain::transaction_receipt, (sysio::chain::transaction_receipt_header), (trx) )
 FC_REFLECT(sysio::chain::additional_block_signatures_extension, (signatures));
+FC_REFLECT(sysio::chain::quorum_certificate_extension, (qc));
 FC_REFLECT_DERIVED(sysio::chain::signed_block, (sysio::chain::signed_block_header), (transactions)(block_extensions) )
+
+namespace fc::raw {
+   template <typename Stream>
+   void unpack(Stream& s, sysio::chain::signed_block& v) {
+      try {
+         if constexpr (requires { s.extract_mirror(); }) {
+            fc::reflector<sysio::chain::signed_block>::visit( fc::raw::detail::unpack_object_visitor<Stream, sysio::chain::signed_block>( v, s ) );
+            v.packed_block = s.extract_mirror();
+         } else {
+            fc::datastream_mirror<Stream> ds(s, sizeof(sysio::chain::signed_block) + 4096);
+            fc::reflector<sysio::chain::signed_block>::visit( fc::raw::detail::unpack_object_visitor<fc::datastream_mirror<Stream>, sysio::chain::signed_block>( v, ds ) );
+            v.packed_block = ds.extract_mirror();
+         }
+      } FC_RETHROW_EXCEPTIONS(warn, "error unpacking signed_block")
+   }
+}

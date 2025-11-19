@@ -51,7 +51,7 @@ namespace fc
          {
             auto itr = vo.find(name);
             if( itr != vo.end() )
-               from_variant( itr->value(), this->obj.*member );
+               from_variant( itr->value(), const_cast<std::remove_const_t<Member>&>(this->obj.*member) );
          }
 
          const variant_object& vo;
@@ -65,13 +65,13 @@ namespace fc
      { 
          mutable_variant_object mvo;
          fc::reflector<T>::visit( to_variant_visitor<T>( mvo, v ) );
-         vo = fc::move(mvo);
+         vo = std::move(mvo);
      }
      template<typename T>
      static inline void from_variant( const fc::variant& v, T& o ) 
      { 
          const variant_object& vo = v.get_object();
-         fc::reflector<T>::visit( from_variant_visitor<T>( vo, o ) );
+         fc::reflector<std::remove_const_t<T>>::visit( from_variant_visitor<T>( vo, o ) );
      }
    };
 

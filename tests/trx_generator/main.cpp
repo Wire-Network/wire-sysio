@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
          ("contract-owner-account", bpo::value<std::string>(&contract_owner_account_in), "Account name of the contract account for the transaction actions")
          ("accounts", bpo::value<std::string>(&accts), "comma-separated list of accounts that will be used for transfers. Minimum required accounts: 2.")
          ("priv-keys", bpo::value<std::string>(&p_keys), "comma-separated list of private keys in same order of accounts list that will be used to sign transactions. Minimum required: 2.")
-         ("trx-expiration", bpo::value<int64_t>(&trx_expr)->default_value(trx_expiration_max), "transaction expiration time in seconds. Defaults to 3,599. Maximum allowed: 3,599")
+         ("trx-expiration", bpo::value<int64_t>(&trx_expr)->default_value(1800), "transaction expiration time in seconds. Defaults to 1,800. Maximum allowed: 3,599")
          ("trx-gen-duration", bpo::value<uint32_t>(&tester_config._gen_duration_seconds)->default_value(60), "Transaction generation duration (seconds). Defaults to 60 seconds.")
          ("target-tps", bpo::value<uint32_t>(&tester_config._target_tps)->default_value(1), "Target transactions per second to generate/send. Defaults to 1 transaction per second.")
          ("last-irreversible-block-id", bpo::value<std::string>(&lib_id_str), "Current last-irreversible-block-id (LIB ID) to use for transactions.")
@@ -203,6 +203,7 @@ int main(int argc, char** argv) {
       et::trx_tps_tester<et::trx_generator, et::tps_performance_monitor> tester{generator, monitor, tester_config};
 
       if (!tester.run()) {
+         wlog("Exiting main with OTHER_FAIL");
          return OTHER_FAIL;
       }
    } else {
@@ -212,14 +213,16 @@ int main(int argc, char** argv) {
       et::trx_tps_tester<et::transfer_trx_generator, et::tps_performance_monitor> tester{generator, monitor, tester_config};
 
       if (!tester.run()) {
+         wlog("Exiting main with OTHER_FAIL");
          return OTHER_FAIL;
       }
    }
 
    if (monitor->terminated_early()) {
+      wlog("Exiting main with TERMINATED_EARLY");
       return TERMINATED_EARLY;
    }
-   
-   return SUCCESS;
 
+   ilog("Exiting main SUCCESS");
+   return SUCCESS;
 }

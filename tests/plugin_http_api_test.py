@@ -118,7 +118,7 @@ class PluginHttpTest(unittest.TestCase):
 
         retMap = self.nodeop.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
 
-        self.nodeop.preactivateAllBuiltinProtocolFeature()
+        self.nodeop.activateAllBuiltinProtocolFeature()
 
     # test all chain api
     def test_ChainApi(self) :
@@ -126,8 +126,12 @@ class PluginHttpTest(unittest.TestCase):
         command = "get_info"
         endpoint=self.endpoint("chain_ro")
 
-        # get_info without parameter
+        # get_info without parameter with default chain_ro endpoint
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertIn("server_version", ret_json["payload"])
+        # get_info without parameter with an endpoint (catelog) other than chain_ro
+        # get_info should work on any end point
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=self.endpoint("producer_ro"))
         self.assertIn("server_version", ret_json["payload"])
         # get_info with empty content parameter
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
@@ -166,6 +170,17 @@ class PluginHttpTest(unittest.TestCase):
         command = "get_activated_protocol_features"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
         self.assertEqual(type(ret_json["payload"]["activated_protocol_features"]), list)
+
+        # some extra debugging info
+        activated_features = ret_json["payload"]["activated_protocol_features"]
+        activated_names = [feature['specification'][0]['value'] for feature in activated_features]
+        expected_names = allFeatureCodenames
+        Utils.Print("activated_features={}".format(activated_features))
+        Utils.Print("expected_names={}".format(expected_names))
+        for n in expected_names:
+            if n not in activated_names:
+                Utils.Print("Missing feature: {}".format(n))
+
         self.assertEqual(len(ret_json["payload"]["activated_protocol_features"]), ACT_FEATURE_CURRENT_EXPECTED_TOTAL)
         for dict_feature in ret_json["payload"]["activated_protocol_features"]:
             self.assertTrue(dict_feature['feature_digest'] in allFeatureDigests)
@@ -347,11 +362,37 @@ class PluginHttpTest(unittest.TestCase):
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
         self.assertEqual(ret_json["error"]["code"], 3200006)
-        # get_block_header_state with valid parameter, the irreversible is not available, unknown block number
-        payload = {"block_num_or_id":1}
+        self.nodeop.waitForNextBlock()
+        # get_block_header_state with reversible block
+        head_block_num = self.nodeop.getHeadBlockNum()
+        payload = {"block_num_or_id":head_block_num}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["block_num"], head_block_num)
+        self.assertEqual(ret_json["payload"]["header"]["producer"], "sysio")
+        # and by id
+        ret_json = self.nodeop.processUrllibRequest(resource, command, {"block_num_or_id":ret_json["payload"]["id"]}, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["block_num"], head_block_num)
+        self.assertEqual(ret_json["payload"]["header"]["producer"], "sysio")
+        # get_block_header_state with irreversible block
+        lib_block_num = self.nodeop.getIrreversibleBlockNum()
+        payload = {"block_num_or_id":lib_block_num}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["block_num"], lib_block_num)
+        self.assertEqual(ret_json["payload"]["header"]["producer"], "sysio")
+        # and by id
+        ret_json = self.nodeop.processUrllibRequest(resource, command, {"block_num_or_id":ret_json["payload"]["id"]}, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["block_num"], lib_block_num)
+        self.assertEqual(ret_json["payload"]["header"]["producer"], "sysio")
+        # get_block_header_state with block far in future
+        payload = {"block_num_or_id":head_block_num+2000000}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
         self.assertEqual(ret_json["error"]["code"], 3100002)
+        #invalid num and invalid sha256
+        payload = {"block_num_or_id":"spoon was here"}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 500)
+        self.assertEqual(ret_json["error"]["code"], 3010008)
 
         # get_account with empty parameter
         command = "get_account"
@@ -543,6 +584,22 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"code":"sysio.token","symbol":"SYS"}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
+
+        # Make sure calling get_finalizer_info in Legacy does not do any harm and
+        # returns empty JSON.
+        # Tests in Savanna are in plugin_http_api_test_savanna.py.
+        #
+        # get_finalizer_info with empty parameter
+        command = "get_finalizer_info"
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["active_finalizer_policy"], None)
+        # get_finalizer_info with empty content parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["active_finalizer_policy"], None)
+        # get_finalizer_info with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
 
         # get_producers with empty parameter
         command = "get_producers"
@@ -807,7 +864,7 @@ class PluginHttpTest(unittest.TestCase):
         # status with valid parameter
         payload = "localhost"
         ret_str = self.nodeop.processUrllibRequest(resource, command, payload, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "null")
+        self.assertEqual(ret_str, "\"connection not found: localhost\"")
 
         # connections with empty parameter
         command = "connections"
@@ -824,43 +881,7 @@ class PluginHttpTest(unittest.TestCase):
     # test all producer api
     def test_ProducerApi(self) :
         resource = "producer"
-        endpoint=self.endpoint("producer_rw")
-        # pause with empty parameter
-        command = "pause"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # pause with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # pause with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-
-        # resume with empty parameter
-        command = "resume"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # resume with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # resume with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-
         endpoint=self.endpoint("producer_ro")
-        # paused with empty parameter
-        command = "paused"
-        ret_str = self.nodeop.processUrllibRequest(resource, command, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "false")
-        # paused with empty content parameter
-        ret_str = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "false")
-        # paused with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
 
         # get_runtime_options with empty parameter
         command = "get_runtime_options"
@@ -892,10 +913,18 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"max_transaction_time":30,
                    "max_irreversible_block_age":1,
                    "cpu_effort_us":400000,
-                   "max_scheduled_transaction_time_per_block_ms":10000,
                    "subjective_cpu_leeway_us":0,
-                   "incoming_defer_ratio":1.0,
                    "greylist_limit":100}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertIn(ret_json["payload"]["result"], "ok")
+        # restore runtime options to default values such that future tests are not impacted
+        # by the modified values of last test (max_irreversible_block_age: 1 can make producer
+        # plugin stuck in speculative mode)
+        payload = {"max_transaction_time":499,
+                   "max_irreversible_block_age":-1,
+                   "cpu_effort_us":400000,
+                   "subjective_cpu_leeway_us":31000,
+                   "greylist_limit":1000}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn(ret_json["payload"]["result"], "ok")
 
@@ -1095,6 +1124,47 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"lower_bound":"", "limit":1, "time_limit_ms":500}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn("trxs", ret_json["payload"])
+
+        # place pause and resume tests at the end such that they are not impacted
+        # by update_runtime_options
+
+        endpoint=self.endpoint("producer_rw") # pause and resume are in producer_rw category
+        # pause with empty parameter
+        command = "pause"
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # pause with empty content parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # pause with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
+
+        # resume with empty parameter
+        command = "resume"
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # resume with empty content parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # resume with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
+
+        endpoint=self.endpoint("producer_ro")
+        # paused with empty parameter
+        command = "paused"
+        ret_str = self.nodeop.processUrllibRequest(resource, command, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
+        self.assertEqual(ret_str, "false")
+        # paused with empty content parameter
+        ret_str = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
+        self.assertEqual(ret_str, "false")
+        # paused with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
 
     # test all wallet api
     def test_WalletApi(self) :
@@ -1526,10 +1596,7 @@ class PluginHttpTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        global keepLogs
         self.killNodes(self)
-        if unittest.TestResult().wasSuccessful() and not keepLogs:
-            self.cleanEnv(self)
 
 
 if __name__ == "__main__":
@@ -1541,9 +1608,18 @@ if __name__ == "__main__":
     parser.add_argument('unittest_args', nargs=argparse.REMAINDER)
 
     args = parser.parse_args()
-    global keepLogs
-    keepLogs = args.keep_logs;
+    keepLogs = args.keep_logs
 
     # Now set the sys.argv to the unittest_args (leaving sys.argv[0] alone)
     sys.argv[1:] = args.unittest_args
-    unittest.main()
+    suite = unittest.TestLoader().loadTestsFromTestCase(PluginHttpTest)
+    results = unittest.TextTestRunner().run(suite)
+    testSuccessful = True
+    if not results.wasSuccessful():
+        keepLogs = True
+        testSuccessful = False
+    if not keepLogs:
+        PluginHttpTest().cleanEnv()
+
+    exitCode = 0 if testSuccessful else 1
+    exit(exitCode)

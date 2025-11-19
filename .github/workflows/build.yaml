@@ -113,7 +113,7 @@ jobs:
         if: matrix.platform != 'reproducible'
         run: |
           apt-get update && apt-get upgrade -y
-          apt-get install -y ./build/wire-sysio_*.deb 
+          apt-get install -y ./build/wire-sysio_*.deb
       # - name: Test using TestHarness
       #   if: matrix.platform != 'reproducible'
       #   run: |
@@ -306,7 +306,9 @@ jobs:
               build/TestLogs/
 
       - name: Check CPU Features
-        run: awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
+        run: |
+          awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
+          build/tools/fsgsbase-enabled
 
       - name: Remove ephemeral Docker context
         if: always()
@@ -400,6 +402,7 @@ jobs:
           path: |
             *-logs.tar.gz
             core*.zst
+          compression-level: 0
 
       - name: Cleanup Docker resources
         if: always() 
@@ -479,10 +482,10 @@ jobs:
         uses: ./.github/actions/parallel-ctest-containers
         with:
           container: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
-          error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
+          error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs", "build/PerformanceHarnessScenarioRunnerLogs"]'
           log-tarball-prefix: ${{matrix.cfg.name}}
           tests-label: long_running_tests
-          test-timeout: 1800
+          test-timeout: 2700
 
       - name: Export core dumps
         if: failure()
@@ -504,6 +507,7 @@ jobs:
           path: |
             *-logs.tar.gz
             core*.zst
+          compression-level: 0
 
 
       - name: Cleanup Docker resources

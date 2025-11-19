@@ -152,7 +152,7 @@ public:
    }
 
    uint32_t last_block_time() const {
-      return time_point_sec( control->head_block_time() ).sec_since_epoch();
+      return time_point_sec( control->head().block_time() ).sec_since_epoch();
    }
 
    asset get_balance( const account_name& act ) {

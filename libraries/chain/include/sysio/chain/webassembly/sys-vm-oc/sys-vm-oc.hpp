@@ -44,7 +44,7 @@ enum sysvmoc_exitcode : int {
    SYSVMOC_EXIT_EXCEPTION
 };
 
-static constexpr uint8_t current_codegen_version = 1;
+static constexpr uint8_t current_codegen_version = 2;
 
 }
 

@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
         std::fill_n(orig._data.data, crypto_sign_BYTES, 0x5A);
         orig._data.data[crypto_sign_BYTES] = 0;
 
-        // 2) Pack: only the 64 signature bytes are emitted
+        // 2) Pack: Use fc standard packing/unpacking
         auto blob = fc::raw::pack(orig);
         BOOST_CHECK_MESSAGE(
             blob.size() == crypto_sign_BYTES,

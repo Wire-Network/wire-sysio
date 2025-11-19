@@ -2,7 +2,6 @@ file(GLOB HEADERS "include/sysio/state-history/*.hpp")
 
 add_library( state_history
              abi.cpp
-             compression.cpp
              create_deltas.cpp
              trace_converter.cpp
              ${HEADERS}

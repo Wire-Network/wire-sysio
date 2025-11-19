@@ -131,12 +131,9 @@ class PerformanceTestBasic:
             def configureValidationNodes():
                 validationNodeSpecificNodeopStr = ""
                 validationNodeSpecificNodeopStr += '--p2p-accept-transactions false '
-                if "v2" in self.nodeopVers:
-                    validationNodeSpecificNodeopStr += '--plugin sysio::history_api_plugin --filter-on "*" '
-                else:
-                    #If prodsEnableTraceApi, then Cluster configures all nodes with trace_api_plugin so no need to duplicate here
-                    if not self.prodsEnableTraceApi:
-                        validationNodeSpecificNodeopStr += "--plugin sysio::trace_api_plugin "
+                #If prodsEnableTraceApi, then Cluster configures all nodes with trace_api_plugin so no need to duplicate here
+                if not self.prodsEnableTraceApi:
+                    validationNodeSpecificNodeopStr += "--plugin sysio::trace_api_plugin "
                 if self.nonProdsSysVmOcEnable:
                     validationNodeSpecificNodeopStr += "--sys-vm-oc-enable all "
                 if validationNodeSpecificNodeopStr:
@@ -147,8 +144,7 @@ class PerformanceTestBasic:
                 apiNodeSpecificNodeopStr += "--p2p-accept-transactions false "
                 apiNodeSpecificNodeopStr += "--plugin sysio::chain_api_plugin "
                 apiNodeSpecificNodeopStr += "--plugin sysio::net_api_plugin "
-                if "v4" in self.nodeopVers:
-                    apiNodeSpecificNodeopStr += f"--read-only-threads {self.apiNodesReadOnlyThreadCount} "
+                apiNodeSpecificNodeopStr += f"--read-only-threads {self.apiNodesReadOnlyThreadCount} "
                 if apiNodeSpecificNodeopStr:
                     self.specificExtraNodeopArgs.update({f"{nodeId}" : apiNodeSpecificNodeopStr for nodeId in self._apiNodeIds})
 
@@ -157,15 +153,6 @@ class PerformanceTestBasic:
             if self.apiNodeCount > 0:
                 configureApiNodes()
 
-            assert "v1" not in self.nodeopVers and "v0" not in self.nodeopVers, f"nodeop version {Utils.getNodeopVersion()} is unsupported by performance test"
-            if "v2" in self.nodeopVers:
-                self.writeTrx = lambda trxDataFile, blockNum, trx: [trxDataFile.write(f"{trx['trx']['id']},{blockNum},{trx['cpu_usage_us']},{trx['net_usage_words']}\n")]
-                self.createBlockData = lambda block, blockTransactionTotal, blockNetTotal, blockCpuTotal: blockData(blockId=block["payload"]["id"], blockNum=block['payload']['block_num'], transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal, producer=block["payload"]["producer"], status=block["payload"]["confirmed"], _timestamp=block["payload"]["timestamp"])
-                self.updateTrxDict = lambda blockNum, transaction, trxDict: trxDict.update(dict([(transaction['trx']['id'], trxData(blockNum, transaction['cpu_usage_us'], transaction['net_usage_words']))]))
-            else:
-                self.writeTrx = lambda trxDataFile, blockNum, trx:[ trxDataFile.write(f"{trx['id']},{trx['block_num']},{trx['block_time']},{trx['cpu_usage_us']},{trx['net_usage_words']},{trx['actions']}\n") ]
-                self.createBlockData = lambda block, blockTransactionTotal, blockNetTotal, blockCpuTotal: blockData(blockId=block["payload"]["id"], blockNum=block['payload']['number'], transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal, producer=block["payload"]["producer"], status=block["payload"]["status"], _timestamp=block["payload"]["timestamp"])
-                self.updateTrxDict = lambda blockNum, transaction, trxDict: trxDict.update(dict([(transaction["id"], trxData(blockNum=transaction["block_num"], cpuUsageUs=transaction["cpu_usage_us"], netUsageUs=transaction["net_usage_words"], blockTime=transaction["block_time"]))]))
     @dataclass
     class PtbConfig:
         targetTps: int=8000
@@ -212,7 +199,7 @@ class PerformanceTestBasic:
 
         Utils.Debug = self.testHelperConfig.verbose
         self.errorExit = Utils.errorExit
-        self.emptyBlockGoal = 1
+        self.emptyBlockGoal = 7
 
         self.testStart = datetime.now(UTC)
         self.testEnd = self.testStart
@@ -239,7 +226,7 @@ class PerformanceTestBasic:
         self.nodeopLogPath = self.nodeopLogDir/f"node_{str(self.validationNodeId).zfill(2)}"/"stderr.txt"
 
         # Setup cluster and its wallet manager
-        self.walletMgr=WalletMgr(True)
+        self.walletMgr=WalletMgr(True, port=7899)
         self.cluster=Cluster(loggingLevel=self.clusterConfig.loggingLevel, loggingLevelDict=self.clusterConfig.loggingDict,
                              nodeopVers=self.clusterConfig.nodeopVers,unshared=self.testHelperConfig.unshared,
                              keepRunning=self.clusterConfig.dontKill, keepLogs=self.clusterConfig.keepLogs)
@@ -313,40 +300,40 @@ class PerformanceTestBasic:
         return append_write
 
     def isOnBlockTransaction(self, transaction):
-        # v2 history does not include onblock
-        if "v2" in self.clusterConfig.nodeopVers:
+        if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['action'] != 'onblock':
             return False
-        else:
-            if transaction['actions'][0]['account'] != 'sysio' or transaction['actions'][0]['action'] != 'onblock':
-                return False
         return True
 
     def queryBlockTrxData(self, node, blockDataPath, blockTrxDataPath, startBlockNum, endBlockNum):
         for blockNum in range(startBlockNum, endBlockNum + 1):
             blockCpuTotal, blockNetTotal, blockTransactionTotal = 0, 0, 0
-            block = node.fetchBlock(blockNum)
+            block = node.processUrllibRequest("trace_api", "get_block", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
             btdf_append_write = self.fileOpenMode(blockTrxDataPath)
             with open(blockTrxDataPath, btdf_append_write) as trxDataFile:
-                for transaction in block['payload']['transactions']:
-                    if not self.isOnBlockTransaction(transaction):
-                        self.clusterConfig.updateTrxDict(blockNum, transaction, self.data.trxDict)
-                        self.clusterConfig.writeTrx(trxDataFile, blockNum, transaction)
-                        blockCpuTotal += transaction["cpu_usage_us"]
-                        blockNetTotal += transaction["net_usage_words"]
+                for trx in block['payload']['transactions']:
+                    if not self.isOnBlockTransaction(trx):
+                        trx_data = trxData(blockNum=trx["block_num"], cpuUsageUs=trx["cpu_usage_us"],
+                                           netUsageUs=trx["net_usage_words"], blockTime=trx["block_time"])
+                        self.data.trxDict.update(dict([(trx["id"], trx_data)]))
+                        [ trxDataFile.write(f"{trx['id']},{trx['block_num']},{trx['block_time']},{trx['cpu_usage_us']},{trx['net_usage_words']},{trx['actions']}\n") ]
+                        blockCpuTotal += trx["cpu_usage_us"]
+                        blockNetTotal += trx["net_usage_words"]
                         blockTransactionTotal += 1
-            blockData = self.clusterConfig.createBlockData(block=block, blockTransactionTotal=blockTransactionTotal,
-                                                           blockNetTotal=blockNetTotal, blockCpuTotal=blockCpuTotal)
-            self.data.blockList.append(blockData)
-            self.data.blockDict[str(blockNum)] = blockData
+            block_data = blockData(blockId=block["payload"]["id"], blockNum=block['payload']['number'],
+                                   transactions=blockTransactionTotal, net=blockNetTotal, cpu=blockCpuTotal,
+                                   producer=block["payload"]["producer"], status=block["payload"]["status"],
+                                   _timestamp=block["payload"]["timestamp"])
+            self.data.blockList.append(block_data)
+            self.data.blockDict[str(blockNum)] = block_data
             bdf_append_write = self.fileOpenMode(blockDataPath)
             with open(blockDataPath, bdf_append_write) as blockDataFile:
-                blockDataFile.write(f"{blockData.blockNum},{blockData.blockId},{blockData.producer},{blockData.status},{blockData._timestamp}\n")
+                blockDataFile.write(f"{block_data.blockNum},{block_data.blockId},{block_data.producer},{block_data.status},{block_data._timestamp}\n")
 
     def waitForEmptyBlocks(self, node, numEmptyToWaitOn):
         emptyBlocks = 0
         while emptyBlocks < numEmptyToWaitOn:
             headBlock = node.getHeadBlockNum()
-            block = node.fetchHeadBlock(node, headBlock)
+            block = node.processUrllibRequest("chain", "get_block_info", {"block_num":headBlock}, silentErrors=False, exitOnError=True)
             node.waitForHeadToAdvance()
             if block['payload']['transaction_mroot'] == "0000000000000000000000000000000000000000000000000000000000000000":
                 emptyBlocks += 1
@@ -358,6 +345,7 @@ class PerformanceTestBasic:
         return self.cluster.launch(
             pnodes=self.clusterConfig._pNodes,
             totalNodes=self.clusterConfig._totalNodes,
+            totalProducers=self.clusterConfig._pNodes if self.clusterConfig._totalNodes > 21 else None,
             genesisPath=self.clusterConfig.genesisPath,
             maximumP2pPerHost=self.clusterConfig.maximumP2pPerHost,
             maximumClients=self.clusterConfig.maximumClients,
@@ -676,8 +664,8 @@ class PerformanceTestBasic:
         httpPluginArgs = HttpPluginArgs(httpMaxBytesInFlightMb=args.http_max_bytes_in_flight_mb, httpMaxInFlightRequests=args.http_max_in_flight_requests,
                                         httpMaxResponseTimeMs=args.http_max_response_time_ms, httpThreads=args.http_threads)
         netPluginArgs = NetPluginArgs(netThreads=args.net_threads, maxClients=0)
-        nodeopVers=Utils.getNodeopVersion()
-        resourceMonitorPluginArgs = ResourceMonitorPluginArgs(resourceMonitorNotShutdownOnThresholdExceeded=not "v2" in nodeopVers)
+        nodeopVers=Utils.getnodeopVersion()
+        resourceMonitorPluginArgs = ResourceMonitorPluginArgs(resourceMonitorNotShutdownOnThresholdExceeded=True)
         ENA = PerformanceTestBasic.ClusterConfig.ExtraNodeopArgs
         extraNodeopArgs = ENA(chainPluginArgs=chainPluginArgs, httpPluginArgs=httpPluginArgs, producerPluginArgs=producerPluginArgs, netPluginArgs=netPluginArgs,
                             resourceMonitorPluginArgs=resourceMonitorPluginArgs)

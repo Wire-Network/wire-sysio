@@ -8,8 +8,10 @@ import json
 import shlex
 import signal
 import sys
+import shutil
 from pathlib import Path
 from typing import List
+from dataclasses import InitVar, dataclass, field, is_dataclass, asdict
 
 from datetime import datetime
 from datetime import timedelta
@@ -20,6 +22,14 @@ from .accounts import Account
 from .testUtils import Utils
 from .testUtils import unhandledEnumType
 from .testUtils import ReturnType
+
+@dataclass
+class KeyStrings(object):
+    pubkey: str
+    privkey: str
+    blspubkey: str = None
+    blsprivkey: str = None
+    blspop: str = None
 
 # pylint: disable=too-many-public-methods
 class Node(Transactions):
@@ -66,29 +76,9 @@ class Node(Transactions):
         self.config_dir=config_dir
         self.launch_time=launch_time
         self.isProducer=False
-        self.configureVersion()
-
-    def configureVersion(self):
-        if 'v2' in self.nodeopVers:
-            self.fetchTransactionCommand = lambda: "get transaction"
-            self.fetchTransactionFromTrace = lambda trx: trx['trx']['id']
-            self.fetchBlock = lambda blockNum: self.processUrllibRequest("chain", "get_block", {"block_num_or_id":blockNum}, silentErrors=False, exitOnError=True)
-            self.fetchKeyCommand = lambda: "[trx][trx][ref_block_num]"
-            self.fetchRefBlock = lambda trans: trans["trx"]["trx"]["ref_block_num"]
-            self.fetchHeadBlock = lambda node, headBlock: node.processUrllibRequest("chain", "get_block", {"block_num_or_id":headBlock}, silentErrors=False, exitOnError=True)
-            self.clioLimit = ""
-
-        else:
-            self.fetchTransactionCommand = lambda: "get transaction_trace"
-            self.fetchTransactionFromTrace = lambda trx: trx['id']
-            self.fetchBlock = lambda blockNum: self.processUrllibRequest("trace_api", "get_block", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
-            self.fetchKeyCommand = lambda: "[transaction][transaction_header][ref_block_num]"
-            self.fetchRefBlock = lambda trans: trans["block_num"]
-            self.fetchHeadBlock = lambda node, headBlock: node.processUrllibRequest("chain", "get_block_info", {"block_num":headBlock}, silentErrors=False, exitOnError=True)
-            if 'v3.1' in self.nodeopVers:
-                self.clioLimit = ""
-            else:
-                self.clioLimit = "--time-limit 999"
+        # if multiple producers configured for a Node, this is the first one
+        self.producerName=None
+        self.keys: List[KeyStrings] = field(default_factory=list)
 
     def __str__(self):
         return "Host: %s, Port:%d, NodeNum:%s, Pid:%s" % (self.host, self.port, self.nodeId, self.pid)
@@ -146,7 +136,7 @@ class Node(Transactions):
                 Utils.Print("account validation failed. account: %s" % (account.name))
                 raise
 
-    def waitForTransactionInBlock(self, transId, timeout=None, exitOnError=True):
+    def waitForTransactionInBlock(self, transId, timeout=None, exitOnError=False):
         """Wait for trans id to appear in a block."""
         assert(isinstance(transId, str))
         lam = lambda: self.isTransInAnyBlock(transId, exitOnError=exitOnError)
@@ -154,11 +144,11 @@ class Node(Transactions):
         return ret
 
     def checkBlockForTransactions(self, transIds, blockNum):
-        block = self.fetchBlock(blockNum)
+        block = self.processUrllibRequest("trace_api", "get_block", {"block_num":blockNum}, silentErrors=False, exitOnError=True)
         if block['payload']['transactions']:
             for trx in block['payload']['transactions']:
-                if self.fetchTransactionFromTrace(trx) in transIds:
-                    transIds.pop(self.fetchTransactionFromTrace(trx))
+                if trx['id'] in transIds:
+                    transIds.pop(trx['id'])
         return transIds
 
     def waitForTransactionsInBlockRange(self, transIds, startBlock, endBlock):
@@ -198,7 +188,7 @@ class Node(Transactions):
         return ret
 
     def waitForBlock(self, blockNum, timeout=None, blockType=BlockType.head, reportInterval=None):
-        lam = lambda: self.getBlockNum(blockType=blockType) > blockNum
+        lam = lambda: self.getBlockNum(blockType=blockType) >= blockNum
         blockDesc = "head" if blockType == BlockType.head else "LIB"
         count = 0
 
@@ -246,19 +236,81 @@ class Node(Transactions):
             return self.getIrreversibleBlockNum() > currentLib
         return Utils.waitForBool(isLibAdvancing, timeout)
 
-    def waitForProducer(self, producer, timeout=None, exitOnError=False):
+    def waitForLibNotToAdvance(self, timeout=30):
+        endTime=time.time()+timeout
+        while self.waitForLibToAdvance(timeout=timeout):
+            if time.time() > endTime:
+                return False
+        return True
+
+    def waitForAnyProducer(self, producers, timeout=None, exitOnError=False):
         if timeout is None:
             # default to the typical configuration of 21 producers, each producing 12 blocks in a row (every 1/2 second)
-            timeout = 21 * 6;
+            timeout = 21 * 6
         start=time.perf_counter()
         Utils.Print(self.getInfo())
         initialProducer=self.getInfo()["head_block_producer"]
-        def isProducer():
-            return self.getInfo()["head_block_producer"] == producer;
-        found = Utils.waitForBool(isProducer, timeout)
+        def isProducerInList():
+            return self.getInfo()["head_block_producer"] in producers
+        found = Utils.waitForBool(isProducerInList, timeout)
         assert not exitOnError or found, \
-            f"Waited for {time.perf_counter()-start} sec but never found producer: {producer}. Started with {initialProducer} and ended with {self.getInfo()['head_block_producer']}"
+            f"Waited for {time.perf_counter()-start} sec but never found a producer in: {producers}. Started with {initialProducer} and ended with {self.getInfo()['head_block_producer']}"
         return found
+
+    def waitForProducer(self, producer, timeout=None, exitOnError=False):
+        return self.waitForAnyProducer([producer], timeout, exitOnError)
+
+    # returns True if the node has missed next scheduled production round.
+    def missedNextProductionRound(self):
+        # Cannot use producer_plugin's paused() endpoint as it does not
+        # include paused due to max-reversible-blocks exceeded.
+        # The idea is to find the scheduled start block of node's producer's
+        # next round. If that block is not produced, it means block production
+        # on the node is paused.
+
+        assert self.isProducer, 'missedNextProductionRound can be only called on a producer'
+
+        blocksPerProducer = 12
+
+        scheduled_producers = []
+        schedule = self.processUrllibRequest("chain", "get_producer_schedule")
+        for prod in schedule["payload"]["active"]["producers"]:
+            scheduled_producers.append(prod["producer_name"])
+        if Utils.Debug: Utils.Print(f'scheduled_producers {scheduled_producers}')
+
+        self.getInfo()
+        currBlockNum=self.lastRetrievedHeadBlockNum
+        currProducer=self.lastRetrievedHeadBlockProducer
+        blocksRemainedInCurrRound = blocksPerProducer - currBlockNum % blocksPerProducer - 1
+        if Utils.Debug: Utils.Print(f'currBlockNum {currBlockNum}, currProducer {currProducer}, blocksRemainedInCurrRound {blocksRemainedInCurrRound}')
+
+        # find the positions of currProducerPos and nodeProducer in the schedule
+        currProducerPos=0
+        nodeProducerPos=0
+        for i in range(0, len(scheduled_producers)):
+            if scheduled_producers[i] == currProducer:
+                currProducerPos=i
+            if scheduled_producers[i] == self.producerName:
+                nodeProducerPos=i
+
+        # find the number of the blocks to node producer's next scheduled round
+        blocksToNextScheduledRound = 0
+        if currProducerPos < nodeProducerPos:
+            # nodeProducerPos - currProducerPos - 1 is the number of producers
+            # from current producer to the node producer in the schedule
+            blocksToNextScheduledRound = (nodeProducerPos - currProducerPos - 1) * blocksPerProducer + blocksRemainedInCurrRound + 1
+        else:
+            # nodeProducerPos is the number of producers before node producer in the schedule
+            # len(scheduled_producers) - currProducerPos - 1 is the number
+            # of producers after node producer in the schedule
+            blocksToNextScheduledRound = (nodeProducerPos + (len(scheduled_producers)  - currProducerPos - 1)) * blocksPerProducer + blocksRemainedInCurrRound + 1
+
+        # find the block number of the node producer's next scheduled round
+        nextScheduledRoundBlockNum=currBlockNum + blocksToNextScheduledRound
+        timeout=blocksToNextScheduledRound/2 + 2 # leave 2 seconds for avoid flakiness
+        if Utils.Debug: Utils.Print(f'blocksToNextScheduledRound {blocksToNextScheduledRound}, nextScheduledRoundBlockNum {nextScheduledRoundBlockNum}, timeout {timeout}')
+
+        return not self.waitForBlock(nextScheduledRoundBlockNum, timeout=timeout)
 
     def killNodeOnProducer(self, producer, whereInSequence, blockType=BlockType.head, silentErrors=True, exitOnError=False, exitMsg=None, returnType=ReturnType.json):
         assert(isinstance(producer, str))
@@ -332,24 +384,44 @@ class Node(Transactions):
             if logStatus: Utils.Print(f'Determined node id {self.nodeId} (pid={pid}) is alive')
             return True
 
-    def rmFromCmd(self, matchValue: str):
-        '''Removes all instances of matchValue from cmd array and succeeding value if it's an option value string.'''
+    def rmFromCmd(self, matchValue: str) -> str:
+        '''Removes all instances of matchValue from cmd array and succeeding value if it's an option value string.
+           Returns the removed strings as a space-delimited string.'''
         if not self.cmd:
-            return
+            return ''
+
+        removed_items = []
 
         while True:
             try:
                 i = self.cmd.index(matchValue)
-                self.cmd.pop(i)
+                removed_items.append(self.cmd.pop(i))  # Store the matchValue
                 if len(self.cmd) > i:
-                    if self.cmd[i][0] != '-':
-                        self.cmd.pop(i)
+                    if self.cmd[i][0] != '-':  # Check if the next value isn't an option (doesn't start with '-')
+                        removed_items.append(self.cmd.pop(i))  # Store the succeeding value
             except ValueError:
                 break
 
+        return ' '.join(removed_items)  # Return the removed strings as a space-delimited string
+
+    def waitForNodeToExit(self, timeout):
+        def didNodeExitGracefully(popen, timeout):
+            try:
+                popen.communicate(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                return False
+            with open(popen.errfile.name, 'r') as f:
+                if "successfully exiting" in f.read():
+                    return True
+                else:
+                    return False
+
+        return Utils.waitForBoolWithArg(didNodeExitGracefully, self.popenProc, timeout, sleepTime=1)
+
     # pylint: disable=too-many-locals
     # If nodeopPath is equal to None, it will use the existing nodeop path
-    def relaunch(self, chainArg=None, newChain=False, skipGenesis=True, timeout=Utils.systemWaitTimeout, addSwapFlags=None, nodeopPath=None, waitForTerm=False):
+    def relaunch(self, chainArg=None, newChain=False, skipGenesis=True, timeout=Utils.systemWaitTimeout,
+                 addSwapFlags=None, rmArgs=None, nodeopPath=None, waitForTerm=False):
 
         assert(self.pid is None)
         assert(self.killed)
@@ -359,6 +431,10 @@ class Node(Transactions):
         cmdArr=self.cmd[:]
         if nodeopPath: cmdArr[0] = nodeopPath
         toAddOrSwap=copy.deepcopy(addSwapFlags) if addSwapFlags is not None else {}
+        if rmArgs is not None:
+            for v in shlex.split(rmArgs):
+                i = cmdArr.index(v)
+                cmdArr.pop(i)
         if not newChain:
             if skipGenesis:
                 try:
@@ -392,19 +468,8 @@ class Node(Transactions):
                 pass
             return False
 
-        def didNodeExitGracefully(popen, timeout):
-            try:
-                popen.communicate(timeout=timeout)
-            except subprocess.TimeoutExpired:
-                return False
-            with open(popen.errfile.name, 'r') as f:
-                if "successfully exiting" in f.read():
-                    return True
-                else:
-                    return False
-
         if waitForTerm:
-            isAlive=Utils.waitForBoolWithArg(didNodeExitGracefully, self.popenProc, timeout, sleepTime=1)
+            isAlive=self.waitForNodeToExit(timeout)
         else:
             isAlive=Utils.waitForBool(isNodeAlive, timeout, sleepTime=1)
 
@@ -431,9 +496,32 @@ class Node(Transactions):
             Utils.errorExit("Cannot find unstarted node since %s file does not exist" % startFile)
         return startFile
 
-    def launchUnstarted(self):
+    def launchUnstarted(self, waitForAlive=True):
         Utils.Print("launchUnstarted cmd: %s" % (self.cmd))
         self.popenProc = self.launchCmd(self.cmd, self.data_dir, self.launch_time)
+
+        if not waitForAlive:
+            return
+
+        def isNodeAlive():
+            """wait for node to be responsive."""
+            try:
+                return True if self.checkPulse() else False
+            except (TypeError) as _:
+                pass
+            return False
+
+        isAlive=Utils.waitForBool(isNodeAlive)
+
+        if isAlive:
+            if Utils.Debug: Utils.Print("Node launch was successful.")
+        else:
+            Utils.Print("ERROR: Node launch Failed.")
+            # Ensure the node process is really killed
+            if self.popenProc:
+                self.popenProc.send_signal(signal.SIGTERM)
+                self.popenProc.wait()
+            self.pid=None
 
     def launchCmd(self, cmd: List[str], data_dir: Path, launch_time: str):
         dd = data_dir
@@ -441,6 +529,12 @@ class Node(Transactions):
         err_sl = dd / 'stderr.txt'
         err = dd / Path(f'stderr.{launch_time}.txt')
         pidf = dd / Path(f'{Utils.SysServerName}.pid')
+
+        # make sure unique file name to avoid overwrite of existing log file
+        i = 0
+        while err.is_file():
+            i = i + 1
+            err = dd / Path(f'stderr.{launch_time}-{i}.txt')
 
         Utils.Print(f'spawning child: {" ".join(cmd)}')
         dd.mkdir(parents=True, exist_ok=True)
@@ -451,6 +545,8 @@ class Node(Transactions):
             self.pid = popen.pid
             self.cmd = cmd
             self.isProducer = '--producer-name' in self.cmd
+            # first configured producer or None
+            self.producerName = re.search(r'--producer-name (\w+)', " ".join(cmd))[1] if re.search(r'--producer-name (\w+)', " ".join(cmd)) is not None else None
         with pidf.open('w') as pidout:
             pidout.write(str(popen.pid))
         try:
@@ -516,6 +612,9 @@ class Node(Transactions):
         with open(jsonPath, "w") as f:
             json.dump(protocolFeatureJson, f, indent=2)
 
+    def getFinalizerInfo(self):
+       return self.processUrllibRequest("chain", "get_finalizer_info",silentErrors=False, exitOnError=True)
+
     # Require producer_api_plugin
     def createSnapshot(self):
         return self.processUrllibRequest("producer", "create_snapshot")
@@ -527,13 +626,53 @@ class Node(Transactions):
         param = { "start_block_num": sbn, "end_block_num": sbn }
         return self.processUrllibRequest("producer", "schedule_snapshot", param)
 
+    def getLatestSnapshot(self):
+       snapshotDir = os.path.join(Utils.getNodeDataDir(self.nodeId), "snapshots")
+       snapshotDirContents = os.listdir(snapshotDir)
+       assert len(snapshotDirContents) > 0
+       # disregard snapshot schedule config in same folder
+       snapshotScheduleDB = "snapshot-schedule.json"
+       if snapshotScheduleDB in snapshotDirContents: snapshotDirContents.remove(snapshotScheduleDB)
+       snapshotDirContents.sort()
+       return os.path.join(snapshotDir, snapshotDirContents[-1])
+
+    def removeDataDir(self, rmState=True, rmBlocks=True, rmStateHist=True, rmFinalizersSafetyDir=True):
+        if rmState:
+            shutil.rmtree(Utils.getNodeDataDir(self.nodeId, "state"))
+        if rmBlocks:
+            shutil.rmtree(Utils.getNodeDataDir(self.nodeId, "blocks"))
+        if rmStateHist:
+            shutil.rmtree(Utils.getNodeDataDir(self.nodeId, "state-history"), ignore_errors=True)
+        if rmFinalizersSafetyDir:
+            shutil.rmtree(Utils.getNodeDataDir(self.nodeId, "finalizers"), ignore_errors=True)
+
+    def removeState(self):
+       dataDir = Utils.getNodeDataDir(self.nodeId)
+       state = os.path.join(dataDir, "state")
+       shutil.rmtree(state, ignore_errors=True)
+
+    def removeReversibleBlks(self):
+        dataDir = Utils.getNodeDataDir(self.nodeId)
+        reversibleBlks = os.path.join(dataDir, "blocks", "reversible")
+        shutil.rmtree(reversibleBlks, ignore_errors=True)
+
+    def removeFinalizersSafetyDir(self):
+        dataDir = Utils.getNodeDataDir(self.nodeId)
+        finalizersDir = os.path.join(dataDir, "finalizers")
+        shutil.rmtree(finalizersDir, ignore_errors=True)
+
+    def removeTracesDir(self):
+        dataDir = Utils.getNodeDataDir(self.nodeId)
+        tracesDir = os.path.join(dataDir, "traces")
+        shutil.rmtree(tracesDir, ignore_errors=True)
+
     @staticmethod
     def findStderrFiles(path):
         files=[]
         it=os.scandir(path)
         for entry in it:
             if entry.is_file(follow_symlinks=False):
-                match=re.match("stderr\..+\.txt", entry.name)
+                match=re.match(r"stderr\..+\.txt", entry.name)
                 if match:
                     files.append(os.path.join(path, entry.name))
         files.sort()
@@ -542,44 +681,123 @@ class Node(Transactions):
     def findInLog(self, searchStr):
         dataDir=Utils.getNodeDataDir(self.nodeId)
         files=Node.findStderrFiles(dataDir)
+        pattern = re.compile(searchStr)
         for file in files:
             with open(file, 'r') as f:
                 for line in f:
-                    if searchStr in line:
+                    if pattern.search(line):
                         return True
         return False
 
-    # verify only one or two 'Starting block' per block number unless block is restarted
+    def linesInLog(self, searchStr):
+        dataDir=Utils.getNodeDataDir(self.nodeId)
+        files=Node.findStderrFiles(dataDir)
+        pattern = re.compile(searchStr)
+        lines=[]
+        for file in files:
+            with open(file, 'r') as f:
+                for line in f:
+                    if pattern.search(line):
+                        lines.append(line)
+        return lines
+
+    # Verfify that in during synching, unlinkable blocks are expected if
+    # the number of each group of consecutive unlinkable blocks is less than sync fetch span
+    def verifyUnlinkableBlocksExpected(self, syncFetchSpan) -> bool:
+        dataDir=Utils.getNodeDataDir(self.nodeId)
+        files=Node.findStderrFiles(dataDir)
+
+        # A sample of unique line of unlinkable_block in logging file looks like:
+        # debug 2024-11-06T16:28:21.216 net-0 net_plugin.cpp:3744 operator() unlinkable_block 144 : 0000009063379d966646fede5662c76c970dd53ea3a3a38d4311625b72971b07, previous 143 : 0000008f172a24dd573825702ff7bdeec92ea6c2c3b22a5303a27cc367ee5a52
+        pattern = re.compile(r"unlinkable_block\s(\d+)")
+
+        for file in files:
+            blocks = []
+            with open(file, 'r') as f:
+                for line in f:
+                    match = pattern.search(line)
+                    if match:
+                        try:
+                            blockNum = int(match.group(1))
+                            blocks.append(blockNum)
+                        except ValueError:
+                            Utils.Print(f"unlinkable block number cannot be converted into integer: in {line.strip()} of {f}")
+                            return False
+                blocks.sort() # blocks from multiple connections might be out of order
+                Utils.Print(f"Unlinkable blocks: {blocks}")
+                numConsecutiveUnlinkableBlocks = 0 if len(blocks) == 0 else 1 # numConsecutiveUnlinkableBlocks is at least 1 if len(blocks) > 0
+                for i in range(1, len(blocks)):
+                    if blocks[i] == blocks[i - 1] or blocks[i] == blocks[i - 1] + 1: # look for consecutive blocks, including duplicate
+                        if blocks[i] == blocks[i - 1] + 1: # excluding duplicate
+                            ++numConsecutiveUnlinkableBlocks
+                    else: # start a new group of consecutive blocks
+                        if numConsecutiveUnlinkableBlocks > syncFetchSpan:
+                            Utils.Print(f"the number of a group of unlinkable blocks {numConsecutiveUnlinkableBlocks} greater than syncFetchSpan {syncFetchSpan} in {f}")
+                            return False
+                        numConsecutiveUnlinkableBlocks = 1
+        if numConsecutiveUnlinkableBlocks > syncFetchSpan:
+            Utils.Print(f"the number of a group of unlinkable blocks {numConsecutiveUnlinkableBlocks} greater than syncFetchSpan {syncFetchSpan} in {f}")
+            return False
+        else:
+            return True
+
+    # Returns the number of unique unlinkable blocks in stderr.txt.
+    def numUniqueUnlinkableBlocks(self) -> int:
+        dataDir = Utils.getNodeDataDir(self.nodeId)
+        logFile = dataDir + "/stderr.txt"
+
+        pattern = re.compile(r"unlinkable_block\s(\d+)")
+
+        # Use set for uniqueness, as the same block can be unlinkable multiple
+        # times due to multiple connections.
+        uniqueBlocks = set()
+        with open(logFile, 'r') as f:
+            for line in f:
+                match = pattern.search(line)
+                if match:
+                    try:
+                        blockNum = int(match.group(1))
+                        uniqueBlocks.add(blockNum)
+                    except ValueError:
+                        Utils.Print(f"unlinkable block number cannot be converted into integer: in {line.strip()} of {f}")
+                        assert(False)  # Cannot happen. Fail the test.
+        numUnlinkableBlocks = len(uniqueBlocks)
+        Utils.Print(f"Number of unique unlinkable blocks: {numUnlinkableBlocks}")
+        return numUnlinkableBlocks
+
+    # Verify that we have only one "Starting block" in the log for any block number unless:
+    # - the block was restarted because it was exhausted,
+    # - or the second "Starting block" is for a different block time than the first.
+    # -------------------------------------------------------------------------------------
     def verifyStartingBlockMessages(self):
         dataDir=Utils.getNodeDataDir(self.nodeId)
         files=Node.findStderrFiles(dataDir)
+        restarting_exhausted_regexp = re.compile(r"Restarting exhausted speculative block #(\d+)")
+        starting_block_regexp       = re.compile(r"Starting block #(\d+) .*(\d\d:\d\d\.\d\d\d) producer")
+
         for f in files:
-            blockNumbers = set()
-            duplicateBlockNumbers = set()
-            threeStartsFound = False
-            lastRestartBlockNum = 0
-            blockNumber = 0
+            notRestartedBlockNumbersAndTimes = {}
+            duplicateStartFound = False
 
             with open(f, 'r') as file:
                 for line in file:
-                    match = re.match(r".*Restarting exhausted speculative block #(\d+)", line)
+                    match = restarting_exhausted_regexp.match(line)
                     if match:
-                        lastRestartBlockNum = match.group(1)
+                        # remove restarted block
+                        notRestartedBlockNumbersAndTimes.pop(match.group(1), None)
                         continue
-                    if re.match(r".*unlinkable_block_exception", line):
-                        lastRestartBlockNum = blockNumber
-                        continue
-                    match = re.match(r".*Starting block #(\d+)", line)
+                    match = starting_block_regexp.match(line)
                     if match:
-                        blockNumber = match.group(1)
-                        if blockNumber != lastRestartBlockNum and blockNumber in duplicateBlockNumbers:
-                            print(f"Duplicate Staring block found: {blockNumber} in {f}")
-                            threeStartsFound = True
-                        if blockNumber != lastRestartBlockNum and blockNumber in blockNumbers:
-                            duplicateBlockNumbers.add(blockNumber)
-                        blockNumbers.add(blockNumber)
+                        blockNumber, time = match.group(1), match.group(2)
+                        if blockNumber in notRestartedBlockNumbersAndTimes and notRestartedBlockNumbersAndTimes[blockNumber] == time:
+                            print(f"Duplicate Starting block found: {blockNumber} in {f}")
+                            duplicateStartFound = True
+                            break
+                        notRestartedBlockNumbersAndTimes[blockNumber] = time
+            if duplicateStartFound:
+                break
 
-        return not threeStartsFound
+        return not duplicateStartFound
 
     def analyzeProduction(self, specificBlockNum=None, thresholdMs=500):
         dataDir=Utils.getNodeDataDir(self.nodeId)
@@ -591,7 +809,7 @@ class Node(Transactions):
         producedBlockPostStr=r')\s@\s([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3})'
         anyBlockPtrn=re.compile(initialTimestamp + producedBlockPreStr + anyBlockStr + producedBlockPostStr)
         producedBlockPtrn=re.compile(initialTimestamp + producedBlockPreStr + str(specificBlockNum) + producedBlockPostStr) if specificBlockNum is not None else anyBlockPtrn
-        producedBlockDonePtrn=re.compile(initialTimestamp + r'.+Producing\sBlock\s+#' + anyBlockStr + '\sreturned:\strue')
+        producedBlockDonePtrn=re.compile(initialTimestamp + r'.+Producing\sBlock\s+#' + anyBlockStr + r'\sreturned:\strue')
         for file in files:
             with open(file, 'r') as f:
                 line = f.readline()

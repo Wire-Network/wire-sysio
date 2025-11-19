@@ -2,7 +2,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
 struct chain_snapshot_header {
    /**
@@ -23,10 +23,19 @@ struct chain_snapshot_header {
     *   5: Updated for v3.0.0 sys features:
     *         - chain_config update
     *   6: Updated for v3.1.0 release
+    *   7: Updated for Spring v1.0.0 release:
+    *         - Savanna consensus support
+    *         - Each chainbase contract table placed in individual snapshot section instead of commingled "contract_tables" section
+    *   8: Updated for Spring v1.0.1 release:
+    *         - new member `latest_qc_claim_block_active_finalizer_policy` in `block_header_state`
+    *         - 2 new members (`pending` and `active` policy generations in every `block_ref` of the `finality_core`)
+    *         - Spring v1.0.1 is incompatible with v7 format, but can read previous formats
     */
 
    static constexpr uint32_t minimum_compatible_version = 6;
-   static constexpr uint32_t current_version = 6;
+   static constexpr uint32_t current_version = 8;
+
+   static constexpr uint32_t first_version_with_split_table_sections = 7;
 
    uint32_t version = current_version;
 
@@ -40,6 +49,6 @@ struct chain_snapshot_header {
    }
 };
 
-} }
+} // namespace sysio::chain
 
 FC_REFLECT(sysio::chain::chain_snapshot_header,(version))

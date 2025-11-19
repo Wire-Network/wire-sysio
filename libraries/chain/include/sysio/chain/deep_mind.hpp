@@ -3,6 +3,7 @@
 #include <fc/log/logger.hpp>
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/block.hpp>
 
 namespace sysio::chain {
 
@@ -16,6 +17,7 @@ struct signed_transaction;
 struct packed_transaction;
 struct transaction_trace;
 struct ram_trace;
+struct finality_data_t;
 namespace resource_limits {
    class resource_limits_config_object;
    class resource_limits_state_object;
@@ -56,6 +58,11 @@ public:
    void on_startup(chainbase::database& db, uint32_t head_block_num);
    void on_start_block(uint32_t block_num);
    void on_accepted_block(const std::shared_ptr<block_state_legacy>& bsp);
+   void on_accepted_block_v2(const block_id_type& id, block_num_type lib,
+                             const signed_block_ptr& b,
+                             const finality_data_t& fd,
+                             const proposer_policy_ptr& active_proposer_policy,
+                             const finalizer_policy_with_string_key& active_finalizer_policy);
    void on_switch_forks(const block_id_type& old_head, const block_id_type& new_head);
    void on_onblock(const signed_transaction& trx);
    void on_start_transaction();

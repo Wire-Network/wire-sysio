@@ -1002,3 +1002,119 @@ static const char set_jumbo_row_wast[] = R"=====(
    )
 )
 )=====";
+
+static const char divmod_host_function_overflow_wast[] = R"=====(
+(module
+   (import "env" "__divti3" (func $__divti3 (param $ret_ptr i32) (param $la i64) (param $ha i64) (param $lb i64) (param $hb i64)))
+   (import "env" "__modti3" (func $__modti3 (param $ret_ptr i32) (param $la i64) (param $ha i64) (param $lb i64) (param $hb i64)))
+
+   (memory $0 1)
+   (export "apply" (func $apply))
+
+   (func $apply (param $receiver i64) (param $account i64) (param $action_name i64)
+      (call $__divti3 (i32.const 8)
+         (i64.const 0)                  (i64.const 0x8000000000000000)   ;; bytes: 0x00000000000000000000000000000080 (INT128_MIN)
+         (i64.const 0xffffffffffffffff) (i64.const 0xffffffffffffffff)   ;; -1
+      )
+      ;;should still be bytes 00000000000000000000000000000080
+      (if (i64.ne (i64.load (i32.const 8)) (i64.const 0)) (then
+         (unreachable)
+      ))
+      (if (i64.ne (i64.load (i32.const 16)) (i64.const 0x8000000000000000)) (then
+         (unreachable)
+      ))
+
+      (call $__modti3 (i32.const 8)
+         (i64.const 0)                  (i64.const 0x8000000000000000)   ;; bytes: 0x00000000000000000000000000000080 (INT128_MIN)
+         (i64.const 0xffffffffffffffff) (i64.const 0xffffffffffffffff)   ;; -1
+      )
+      ;;should still be all 00s
+      (if (i64.ne (i64.load (i32.const 8)) (i64.const 0)) (then
+         (unreachable)
+      ))
+      (if (i64.ne (i64.load (i32.const 16)) (i64.const 0)) (then
+         (unreachable)
+      ))
+   )
+)
+)=====";
+
+static const char small_memcpy_const_dstsrc_wastfmt[] = R"=====(
+(module
+   (import "env" "memcpy" (func $$memcpy (param i32 i32 i32) (result i32)))
+   (import "env" "memcmp" (func $$memcmp (param i32 i32 i32) (result i32)))
+   (export "apply" (func $$apply))
+   (memory 1)
+   (func $$apply (param i64) (param i64) (param i64)
+      ;; do copy and check that return value is dst
+      (if (i32.ne (call $$memcpy (i32.const 256) (i32.const 64) (i32.const ${COPY_SIZE})) (i32.const 256)) (then unreachable))
+
+      ;; validate copied region
+      (if (i32.ne (call $$memcmp (i32.const 256) (i32.const 64) (i32.const ${COPY_SIZE})) (i32.const 0)) (then unreachable))
+
+      ;; check the 4 bytes before and and after the copied region and expect them to still be 0x0
+      (if (i32.ne (i32.load (i32.const 252)) (i32.const 0)) (then unreachable))
+      (if (i32.ne (i32.load (i32.add (i32.const 256) (i32.const ${COPY_SIZE}))) (i32.const 0)) (then unreachable))
+   )
+   (data (i32.const 64) "1234567890-abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+)
+)=====";
+
+static const char small_memcpy_var_dstsrc_wastfmt[] = R"=====(
+(module
+   (import "env" "memcpy" (func $$memcpy (param i32 i32 i32) (result i32)))
+   (import "env" "memcmp" (func $$memcmp (param i32 i32 i32) (result i32)))
+   (export "apply" (func $$apply))
+   (memory 1)
+   (func $$doit (param $$dst i32) (param $$src i32)
+      ;; do copy and check that return value is dst
+      (if (i32.ne (call $$memcpy (get_local $$dst) (get_local $$src) (i32.const ${COPY_SIZE})) (get_local $$dst)) (then unreachable))
+
+      ;; validate copied region
+      (if (i32.ne (call $$memcmp (get_local $$dst) (get_local $$src) (i32.const ${COPY_SIZE})) (i32.const 0)) (then unreachable))
+
+      ;; check the 4 bytes before and and after the copied region and expect them to still be 0x0
+      (if (i32.ne (i32.load (i32.sub (get_local $$dst) (i32.const 4))) (i32.const 0)) (then unreachable))
+      (if (i32.ne (i32.load (i32.add (get_local $$dst) (i32.const ${COPY_SIZE}))) (i32.const 0)) (then unreachable))
+   )
+   (func $$apply (param i64) (param i64) (param i64)
+      (call $$doit (i32.const 256) (i32.const 64))
+   )
+   (data (i32.const 64) "1234567890-abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+)
+)=====";
+
+static const char small_memcpy_overlapenddst_wast[] = R"=====(
+(module
+   (import "env" "memcpy" (func $memcpy (param i32 i32 i32) (result i32)))
+   (export "apply" (func $apply))
+   (memory 1)
+   (func $apply (param i64) (param i64) (param i64)
+      (drop (call $memcpy (i32.const 65532) (i32.const 64) (i32.const 8)))
+   )
+
+   (data (i32.const 64) "1234567890-abcdefghijklmnopqrstuvwxyz_ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+)
+)=====";
+
+static const char small_memcpy_overlapendsrc_wast[] = R"=====(
+(module
+   (import "env" "memcpy" (func $memcpy (param i32 i32 i32) (result i32)))
+   (export "apply" (func $apply))
+   (memory 1)
+   (func $apply (param i64) (param i64) (param i64)
+      (drop (call $memcpy (i32.const 4) (i32.const 65532) (i32.const 8)))
+   )
+)
+)=====";
+
+static const char small_memcpy_high_wast[] = R"=====(
+(module
+   (import "env" "memcpy" (func $memcpy (param i32 i32 i32) (result i32)))
+   (export "apply" (func $apply))
+   (memory 1)
+   (func $apply (param i64) (param i64) (param i64)
+      (drop (call $memcpy (i32.const 4294967295) (i32.const 4294967200) (i32.const 8)))
+   )
+)
+)=====";

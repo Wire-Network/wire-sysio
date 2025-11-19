@@ -68,16 +68,16 @@ def main():
 
     pluginOptsDict = {}
     for section, options in pairwise(pluginSections[1:]):
-        myOpts = re.sub(r"\s+", " ", options)
+        myOpts = re.sub("\\s+", " ", options)
         myOpts = re.sub("\n", " ", myOpts)
         myOpts = re.sub(" --", "\n--",string = myOpts)
         splitOpts=re.split("\n", myOpts)
 
         argDescDict = {}
         for opt in splitOpts[1:]:
-            secondSplit = re.split(r"(--[\w\-]+)", opt)[1:]
+            secondSplit = re.split("(--[\\w\\-]+)", opt)[1:]
             argument=secondSplit[0]
-            argDefaultDesc=secondSplit[1].lstrip(r"\s")
+            argDefaultDesc=secondSplit[1].lstrip("\\s")
             argDescDict[argument] = argDefaultDesc
         section=re.sub("@@@", "", section)
         section=re.sub("\n", "", section)
@@ -122,7 +122,7 @@ def main():
                 newKey="".join([x.capitalize() for x in key.split('-')]).replace('--','')
                 newKey="".join([newKey[0].lower(), newKey[1:]])
                 value = chainPluginArgs[newKey]
-                match = re.search(r"\(=.*?\)", value)
+                match = re.search("\\(=.*?\\)", value)
                 if match is not None:
                     value = match.group(0)[2:-1]
                     try:

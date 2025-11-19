@@ -17,34 +17,35 @@ using namespace std;
 
 using mvo = fc::mutable_variant_object;
 
-class sysio_token_tester : public tester {
+template<typename T>
+class sysio_token_tester : public T {
 public:
 
    sysio_token_tester() {
-      produce_blocks( 2 );
+      T::produce_block();
 
-      create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n } );
-      produce_blocks( 2 );
+      T::create_accounts( { "alice"_n, "bob"_n, "carol"_n, "sysio.token"_n } );
+      T::produce_block();
 
-      set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
-      set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
-      set_privileged( "sysio.token"_n );
+      T::set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
+      T::set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
+      T::set_privileged( "sysio.token"_n );
 
-      produce_blocks();
+      T::produce_block();
 
-      const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
+      const auto& accnt = T::control->db().template get<account_object,by_name>( "sysio.token"_n );
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
-      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
+      abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( T::abi_serializer_max_time ));
    }
 
-   action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
+   T::action_result push_action( const account_name& signer, const action_name &name, const variant_object &data ) {
       string action_type_name = abi_ser.get_action_type(name);
 
       action act;
       act.account = "sysio.token"_n;
       act.name    = name;
-      act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+      act.data    = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
 
       return base_tester::push_contract_paid_action( std::move(act), signer.to_uint64_t() );
    }
@@ -53,19 +54,19 @@ public:
    {
       auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
-      vector<char> data = get_row_by_account( "sysio.token"_n, name(symbol_code), "stat"_n, name(symbol_code) );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+      vector<char> data = T::get_row_by_account( "sysio.token"_n, name(symbol_code), "stat"_n, name(symbol_code) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "currency_stats", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
    }
 
    fc::variant get_account( account_name acc, const string& symbolname)
    {
       auto symb = sysio::chain::symbol::from_string(symbolname);
       auto symbol_code = symb.to_symbol_code().value;
-      vector<char> data = get_row_by_account( "sysio.token"_n, acc, "accounts"_n, name(symbol_code) );
-      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "account", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
+      vector<char> data = T::get_row_by_account( "sysio.token"_n, acc, "accounts"_n, name(symbol_code) );
+      return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "account", data, abi_serializer::create_yield_function( T::abi_serializer_max_time ) );
    }
 
-   action_result create( account_name issuer,
+   T::action_result create( account_name issuer,
                 asset        maximum_supply ) {
 
       return push_action( "sysio.token"_n, "create"_n, mvo()
@@ -74,7 +75,7 @@ public:
       );
    }
 
-   action_result issue( account_name issuer, account_name to, asset quantity, string memo ) {
+   T::action_result issue( account_name issuer, account_name to, asset quantity, string memo ) {
       return push_action( issuer, "issue"_n, mvo()
            ( "to", to)
            ( "quantity", quantity)
@@ -82,7 +83,7 @@ public:
       );
    }
 
-   action_result transfer( account_name from,
+   T::action_result transfer( account_name from,
                   account_name to,
                   asset        quantity,
                   string       memo ) {
@@ -97,56 +98,63 @@ public:
    abi_serializer abi_ser;
 };
 
+using sysio_token_testers = boost::mpl::list<sysio_token_tester<legacy_tester>,
+                                             sysio_token_tester<savanna_tester>>;
+
 BOOST_AUTO_TEST_SUITE(sysio_token_tests)
 
-BOOST_FIXTURE_TEST_CASE( create_tests, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( create_tests, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
-   auto stats = get_stats("3,TKN");
+   auto token = chain.create( "alice"_n, asset::from_string("1000.000 TKN"));
+   auto stats = chain.get_stats("3,TKN");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "0.000 TKN")
       ("max_supply", "1000.000 TKN")
       ("issuer", "alice")
    );
-   produce_blocks(1);
+   chain.produce_block();
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( create_negative_max_supply, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( create_negative_max_supply, T, sysio_token_testers ) try {
+   T chain;
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "max-supply must be positive" ),
-      create( "alice"_n, asset::from_string("-1000.000 TKN"))
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "max-supply must be positive" ),
+      chain.create( "alice"_n, asset::from_string("-1000.000 TKN"))
    );
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( symbol_already_exists, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( symbol_already_exists, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("100 TKN"));
-   auto stats = get_stats("0,TKN");
+   auto token = chain.create( "alice"_n, asset::from_string("100 TKN"));
+   auto stats = chain.get_stats("0,TKN");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "0 TKN")
       ("max_supply", "100 TKN")
       ("issuer", "alice")
    );
-   produce_blocks(1);
+   chain.produce_block();
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "token with symbol already exists" ),
-                        create( "alice"_n, asset::from_string("100 TKN"))
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "token with symbol already exists" ),
+                        chain.create( "alice"_n, asset::from_string("100 TKN"))
    );
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( create_max_supply, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( create_max_supply, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("4611686018427387903 TKN"));
-   auto stats = get_stats("0,TKN");
+   auto token = chain.create( "alice"_n, asset::from_string("4611686018427387903 TKN"));
+   auto stats = chain.get_stats("0,TKN");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "0 TKN")
       ("max_supply", "4611686018427387903 TKN")
       ("issuer", "alice")
    );
-   produce_blocks(1);
+   chain.produce_block();
 
    asset max(10, symbol(SY(0, NKT)));
    share_type amount = 4611686018427387904;
@@ -155,23 +163,24 @@ BOOST_FIXTURE_TEST_CASE( create_max_supply, sysio_token_tester ) try {
    // OK to cast as this is a test and it is a hack to construct an invalid amount
    memcpy((char*)&max, (char*)&amount, sizeof(share_type)); // hack in an invalid amount.
 
-   BOOST_CHECK_EXCEPTION( create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
+   BOOST_CHECK_EXCEPTION( chain.create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
       return expect_assert_message(e, "magnitude of asset amount must be less than 2^62");
    });
 
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( create_max_decimals, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( create_max_decimals, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("1.000000000000000000 TKN"));
-   auto stats = get_stats("18,TKN");
+   auto token = chain.create( "alice"_n, asset::from_string("1.000000000000000000 TKN"));
+   auto stats = chain.get_stats("18,TKN");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "0.000000000000000000 TKN")
       ("max_supply", "1.000000000000000000 TKN")
       ("issuer", "alice")
    );
-   produce_blocks(1);
+   chain.produce_block();
 
    asset max(10, symbol(SY(0, NKT)));
    //1.0000000000000000000 => 0x8ac7230489e80000L
@@ -181,87 +190,89 @@ BOOST_FIXTURE_TEST_CASE( create_max_decimals, sysio_token_tester ) try {
    // OK to cast as this is a test and it is a hack to construct an invalid amount
    memcpy((char*)&max, (char*)&amount, sizeof(share_type)); // hack in an invalid amount
 
-   BOOST_CHECK_EXCEPTION( create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
+   BOOST_CHECK_EXCEPTION( chain.create( "alice"_n, max) , asset_type_exception, [](const asset_type_exception& e) {
       return expect_assert_message(e, "magnitude of asset amount must be less than 2^62");
    });
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( issue_tests, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( issue_tests, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("1000.000 TKN"));
-   produce_blocks(1);
+   auto token = chain.create( "alice"_n, asset::from_string("1000.000 TKN"));
+   chain.produce_block();
 
-   issue( "alice"_n, "alice"_n, asset::from_string("500.000 TKN"), "hola" );
+   chain.issue( "alice"_n, "alice"_n, asset::from_string("500.000 TKN"), "hola" );
 
-   auto stats = get_stats("3,TKN");
+   auto stats = chain.get_stats("3,TKN");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "500.000 TKN")
       ("max_supply", "1000.000 TKN")
       ("issuer", "alice")
    );
 
-   auto alice_balance = get_account("alice"_n, "3,TKN");
+   auto alice_balance = chain.get_account("alice"_n, "3,TKN");
    REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
       ("balance", "500.000 TKN")
    );
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "quantity exceeds available supply" ),
-      issue( "alice"_n, "alice"_n, asset::from_string("500.001 TKN"), "hola" )
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "quantity exceeds available supply" ),
+      chain.issue( "alice"_n, "alice"_n, asset::from_string("500.001 TKN"), "hola" )
    );
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "must issue positive quantity" ),
-      issue( "alice"_n, "alice"_n, asset::from_string("-1.000 TKN"), "hola" )
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "must issue positive quantity" ),
+      chain.issue( "alice"_n, "alice"_n, asset::from_string("-1.000 TKN"), "hola" )
    );
 
-   BOOST_REQUIRE_EQUAL( success(),
-      issue( "alice"_n, "alice"_n, asset::from_string("1.000 TKN"), "hola" )
+   BOOST_REQUIRE_EQUAL( chain.success(),
+      chain.issue( "alice"_n, "alice"_n, asset::from_string("1.000 TKN"), "hola" )
    );
 
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( transfer_tests, sysio_token_tester ) try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( transfer_tests, T, sysio_token_testers ) try {
+   T chain;
 
-   auto token = create( "alice"_n, asset::from_string("1000 CERO"));
-   produce_blocks(1);
+   auto token = chain.create( "alice"_n, asset::from_string("1000 CERO"));
+   chain.produce_block();
 
-   issue( "alice"_n, "alice"_n, asset::from_string("1000 CERO"), "hola" );
+   chain.issue( "alice"_n, "alice"_n, asset::from_string("1000 CERO"), "hola" );
 
-   auto stats = get_stats("0,CERO");
+   auto stats = chain.get_stats("0,CERO");
    REQUIRE_MATCHING_OBJECT( stats, mvo()
       ("supply", "1000 CERO")
       ("max_supply", "1000 CERO")
       ("issuer", "alice")
    );
 
-   auto alice_balance = get_account("alice"_n, "0,CERO");
+   auto alice_balance = chain.get_account("alice"_n, "0,CERO");
    REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
       ("balance", "1000 CERO")
    );
 
-   transfer( "alice"_n, "bob"_n, asset::from_string("300 CERO"), "hola" );
+   chain.transfer( "alice"_n, "bob"_n, asset::from_string("300 CERO"), "hola" );
 
-   alice_balance = get_account("alice"_n, "0,CERO");
+   alice_balance = chain.get_account("alice"_n, "0,CERO");
    REQUIRE_MATCHING_OBJECT( alice_balance, mvo()
       ("balance", "700 CERO")
       ("frozen", 0)
       ("whitelist", 1)
    );
 
-   auto bob_balance = get_account("bob"_n, "0,CERO");
+   auto bob_balance = chain.get_account("bob"_n, "0,CERO");
    REQUIRE_MATCHING_OBJECT( bob_balance, mvo()
       ("balance", "300 CERO")
       ("frozen", 0)
       ("whitelist", 1)
    );
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "overdrawn balance" ),
-      transfer( "alice"_n, "bob"_n, asset::from_string("701 CERO"), "hola" )
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "overdrawn balance" ),
+      chain.transfer( "alice"_n, "bob"_n, asset::from_string("701 CERO"), "hola" )
    );
 
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "must transfer positive quantity" ),
-      transfer( "alice"_n, "bob"_n, asset::from_string("-1000 CERO"), "hola" )
+   BOOST_REQUIRE_EQUAL( chain.wasm_assert_msg( "must transfer positive quantity" ),
+      chain.transfer( "alice"_n, "bob"_n, asset::from_string("-1000 CERO"), "hola" )
    );
 
 

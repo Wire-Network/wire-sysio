@@ -201,7 +201,7 @@ public:
    }
 
    uint32_t last_block_time() const {
-      return time_point_sec( control->head_block_time() ).sec_since_epoch();
+      return time_point_sec( control->head().block_time() ).sec_since_epoch();
    }
 
    asset get_balance( const account_name& act, symbol balance_symbol = symbol{CORE_SYM} ) {
@@ -341,7 +341,7 @@ public:
       msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   vector<name> active_producers() {
+   vector<name> activate_producers() {
       //stake more than 15% of total SYS supply to activate chain
       transfer( "sysio"_n, "alice1111111"_n, core_sym::from_string("650000000.0000"), config::system_account_name );
       // TODO: do the equivalent with ROA
@@ -381,7 +381,7 @@ public:
 
       produce_blocks( 250 );
 
-      auto producer_keys = control->head_block_state()->active_schedule.producers;
+      auto producer_keys = control->active_producers().producers;
       BOOST_REQUIRE_EQUAL( 21, producer_keys.size() );
       BOOST_REQUIRE_EQUAL( name("defproducera"), producer_keys[0].producer_name );
 

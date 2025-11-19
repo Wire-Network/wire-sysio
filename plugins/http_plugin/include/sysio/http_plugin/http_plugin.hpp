@@ -87,6 +87,7 @@ namespace sysio {
         static std::string get_server_header();
 
         APPBASE_PLUGIN_REQUIRES()
+
         void set_program_options(options_description&, options_description& cfg) override;
 
         void plugin_initialize(const variables_map& options);
@@ -113,6 +114,9 @@ namespace sysio {
 
         bool is_on_loopback(api_category category) const;
 
+        // returns true if `category` is enabled in http_plugin
+        bool is_enabled(api_category category) const;
+
         static bool verbose_errors();
 
         struct get_supported_apis_result {
@@ -129,6 +133,10 @@ namespace sysio {
         };
 
         void register_update_metrics(std::function<void(metrics)>&& fun);
+
+        size_t requests_in_flight() const;
+
+        size_t bytes_in_flight() const;
 
         std::atomic<bool>& listening();
    private:

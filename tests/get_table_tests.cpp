@@ -64,7 +64,7 @@ issue_tokens( validating_tester& t, account_name issuer, account_name to, const 
 }
 
 BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
-   produce_blocks(2);
+   produce_block();
 
    create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
       "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
@@ -76,7 +76,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    set_privileged("sysio.token"_n);
-   produce_blocks(1);
+   produce_block();
 
    // create currency
    auto act = mutable_variant_object()
@@ -88,10 +88,11 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
    for (account_name a: accs) {
       issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("999.0000 SYS") );
    }
-   produce_blocks(1);
+   produce_block();
 
    // iterate over scope
-   sysio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   sysio::chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
    sysio::chain_apis::read_only::get_table_by_scope_params param{"sysio.token"_n, "accounts"_n, "inita", "", 10};
    sysio::chain_apis::read_only::get_table_by_scope_result result = plugin.read_only::get_table_by_scope(param, fc::time_point::maximum());
 
@@ -138,7 +139,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
 } FC_LOG_AND_RETHROW() /// get_scope_test
 
 BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
-   produce_blocks(2);
+   produce_block();
 
    create_accounts({ "sysio.token"_n, "sysio.ram"_n, "sysio.ramfee"_n, "sysio.stake"_n,
       "sysio.bpay"_n, "sysio.vpay"_n, "sysio.saving"_n, "sysio.names"_n });
@@ -150,7 +151,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    set_code( "sysio.token"_n, test_contracts::sysio_token_wasm() );
    set_abi( "sysio.token"_n, test_contracts::sysio_token_abi() );
    set_privileged("sysio.token"_n);
-   produce_blocks(1);
+   produce_block();
 
    // create currency
    auto act = mutable_variant_object()
@@ -162,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    for (account_name a: accs) {
       issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
    }
-   produce_blocks(1);
+   produce_block();
 
    // create currency 2
    act = mutable_variant_object()
@@ -173,7 +174,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    for (account_name a: accs) {
       issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("9999.0000 AAA") );
    }
-   produce_blocks(1);
+   produce_block();
 
    // create currency 3
    act = mutable_variant_object()
@@ -184,7 +185,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    for (account_name a: accs) {
       issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("7777.0000 CCC") );
    }
-   produce_blocks(1);
+   produce_block();
 
    // create currency 3
    act = mutable_variant_object()
@@ -195,10 +196,11 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    for (account_name a: accs) {
       issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("8888.0000 BBB") );
    }
-   produce_blocks(1);
+   produce_block();
 
    // get table: normal case
-   sysio::chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   sysio::chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
    sysio::chain_apis::read_only::get_table_rows_params p;
    p.code = "sysio.token"_n;
    p.scope = "inita";
@@ -384,7 +386,8 @@ BOOST_FIXTURE_TEST_CASE( get_table_next_key_test, validating_tester ) try {
    // }
 
 
-   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
    chain_apis::read_only::get_table_rows_params params = []{
       chain_apis::read_only::get_table_rows_params params{};
       params.json=true;

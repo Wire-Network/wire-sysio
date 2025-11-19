@@ -150,6 +150,14 @@ public:
       }
    }
 
+   void truncate() {
+      const int fd = fileno();
+      if( -1 == ftruncate(fd, 0) ) {
+         throw std::ios_base::failure( "cfile: " + _file_path.generic_string() +
+                                       " unable to truncate file, error: " + std::to_string( errno ) );
+      }
+   }
+
    void flush() {
       if( 0 != fflush( _file.get() ) ) {
          int err = ferror( _file.get() );
@@ -318,6 +326,16 @@ class datastream<fc::cfile, void> : public fc::cfile {
 
    bool get(char& c) {
       c = this->getc();
+      return true;
+   }
+
+   bool read( char* d, size_t s ) {
+      cfile::read( d, s );
+      return true;
+   }
+
+   bool write(const char* d, size_t s) {
+      cfile::write(d, s);
       return true;
    }
 

@@ -49,11 +49,11 @@ template<typename T>
 std::string to_log_string(const T& req, size_t max_size = 1024) {
    assert( max_size > 4 );
    std::string buffer( max_size, '\0' );
-   {
+   try {
       boost::iostreams::array_sink sink( buffer.data(), buffer.size() );
       boost::iostreams::stream stream( sink );
       stream << req;
-   }
+   } catch (...) {}
    buffer.resize( std::strlen( buffer.data() ) );
    if( buffer.size() == max_size ) {
       buffer[max_size - 3] = '.';

@@ -38,6 +38,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
 include(MASSigning)
+include(AddTestHelpers)
 
 # Options
 option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
@@ -292,6 +293,7 @@ endif()
 include(doxygen)
 
 option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
+option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
 include(package.cmake)
 include(CPack)

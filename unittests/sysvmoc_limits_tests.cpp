@@ -65,10 +65,10 @@ void limit_not_violated_test(const sysvmoc::config& sysvmoc_config) {
 
 static sysvmoc::config make_sysvmoc_config_without_limits() {
    sysvmoc::config cfg;
-   cfg.cpu_limit.reset();
-   cfg.vm_limit.reset();
-   cfg.stack_size_limit.reset();
-   cfg.generated_code_size_limit.reset();
+   cfg.non_whitelisted_limits.cpu_limit.reset();
+   cfg.non_whitelisted_limits.vm_limit.reset();
+   cfg.non_whitelisted_limits.stack_size_limit.reset();
+   cfg.non_whitelisted_limits.generated_code_size_limit.reset();
    return cfg;
 }
 
@@ -77,10 +77,10 @@ BOOST_AUTO_TEST_CASE( limits_not_set ) { try {
    validating_tester chain;
    auto& cfg = chain.get_config();
 
-   BOOST_REQUIRE(cfg.sysvmoc_config.cpu_limit == std::nullopt);
-   BOOST_REQUIRE(cfg.sysvmoc_config.vm_limit == std::nullopt);
-   BOOST_REQUIRE(cfg.sysvmoc_config.stack_size_limit == std::nullopt);
-   BOOST_REQUIRE(cfg.sysvmoc_config.generated_code_size_limit == std::nullopt);
+   BOOST_REQUIRE(cfg.sysvmoc_config.non_whitelisted_limits.cpu_limit == std::nullopt);
+   BOOST_REQUIRE(cfg.sysvmoc_config.non_whitelisted_limits.vm_limit == std::nullopt);
+   BOOST_REQUIRE(cfg.sysvmoc_config.non_whitelisted_limits.stack_size_limit == std::nullopt);
+   BOOST_REQUIRE(cfg.sysvmoc_config.non_whitelisted_limits.generated_code_size_limit == std::nullopt);
 } FC_LOG_AND_RETHROW() }
 
 // test limits are not enforced unless limits in sysvmoc_config
@@ -97,11 +97,11 @@ BOOST_AUTO_TEST_CASE( vm_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
    // set vm_limit to a small value such that it is exceeded
-   sysvmoc_config.vm_limit = 32u*1024u*1024u;
+   sysvmoc_config.non_whitelisted_limits.vm_limit = 64u*1024u*1024u;
    limit_violated_test(sysvmoc_config);
 
    // set vm_limit to a large value such that it is not exceeded
-   sysvmoc_config.vm_limit = 128u*1024u*1024u;
+   sysvmoc_config.non_whitelisted_limits.vm_limit = 128u*1024u*1024u;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE( vm_limit ) { try {
 BOOST_AUTO_TEST_CASE( check_config_default_vm_limit ) { try {
    sysvmoc::config sysvmoc_config;
 
-   BOOST_REQUIRE(sysvmoc_config.vm_limit);
+   BOOST_REQUIRE(sysvmoc_config.non_whitelisted_limits.vm_limit);
 } FC_LOG_AND_RETHROW() }
 #endif // !__has_feature(undefined_behavior_sanitizer) && !__has_feature(address_sanitizer)
 
@@ -119,11 +119,11 @@ BOOST_AUTO_TEST_CASE( stack_limit ) { try {
 
    // The stack size of the compiled WASM in the test is 39.
    // Set stack_size_limit one less than the actual needed stack size
-   sysvmoc_config.stack_size_limit = 39;
+   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 39;
    limit_violated_test(sysvmoc_config);
 
    // set stack_size_limit to the actual needed stack size
-   sysvmoc_config.stack_size_limit = 40;
+   sysvmoc_config.non_whitelisted_limits.stack_size_limit = 40;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 
@@ -131,13 +131,14 @@ BOOST_AUTO_TEST_CASE( stack_limit ) { try {
 BOOST_AUTO_TEST_CASE( generated_code_size_limit ) { try {
    sysvmoc::config sysvmoc_config = make_sysvmoc_config_without_limits();
 
-   // The generated code size of the compiled WASM in the test is 4016(used to be 3952).
-   // Set generated_code_size_limit to the actual generated code size
-   sysvmoc_config.generated_code_size_limit = 3952;
+   // Generated code size can vary based on the version of LLVM in use. Since this test
+   // isn't intended to detect minute differences or regressions, give the range a wide
+   // berth to work on. As a single data point, LLVM11 used in reproducible builds during
+   // Spring 1.0 timeframe was 36856
+   sysvmoc_config.non_whitelisted_limits.generated_code_size_limit = 20*1024;
    limit_violated_test(sysvmoc_config);
 
-   // Set generated_code_size_limit to one above the actual generated code size
-   sysvmoc_config.generated_code_size_limit = 4017;
+   sysvmoc_config.non_whitelisted_limits.generated_code_size_limit = 40*1024;
    limit_not_violated_test(sysvmoc_config);
 } FC_LOG_AND_RETHROW() }
 

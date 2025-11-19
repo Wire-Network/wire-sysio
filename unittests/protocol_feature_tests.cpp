@@ -70,16 +70,16 @@ BOOST_AUTO_TEST_CASE( activate_and_restart ) try {
 
    // Activate
    c.schedule_protocol_features_wo_preactivation({ *d });
-   c.produce_blocks(2);
+   c.produce_block();
 
-   auto head_block_num = c.control->head_block_num();
+   auto head_block_num = c.head().block_num();
 
    BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
    c.close();
    c.open( std::move( pfs ) );
 
-   BOOST_CHECK_EQUAL( head_block_num, c.control->head_block_num() );
+   BOOST_CHECK_EQUAL( head_block_num, c.head().block_num() );
 
    BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
    BOOST_CHECK( !c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_second_protocol_feature ) );
 
    BOOST_CHECK_EXCEPTION( c.control->start_block(
-                              c.control->head_block_time() + fc::milliseconds(config::block_interval_ms),
+                              c.head().block_time() + fc::milliseconds(config::block_interval_ms),
                               0,
                               {},
                               controller::block_status::incomplete
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
    BOOST_CHECK_EXCEPTION(  c.produce_block(),
                            protocol_feature_exception,
                            fc_exception_message_starts_with(
-                              c.control->head_block_time().to_iso_string() +
+                              c.head().block_time().to_iso_string() +
                               " is too early for the earliest allowed activation time of the protocol feature"
                            )
    );
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
    BOOST_CHECK_EXCEPTION(  c.preactivate_protocol_features({reversed_second_protocol_feature_digest}),
                            subjective_block_production_exception,
                            fc_exception_message_starts_with(
-                              (c.control->head_block_time() + fc::milliseconds(config::block_interval_ms)).to_iso_string() +
+                              (c.head().block_time() + fc::milliseconds(config::block_interval_ms)).to_iso_string() +
                               " is too early for the earliest allowed activation time of the protocol feature"
                            )
    );
@@ -328,10 +328,10 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
 
    const auto& tester_account = "tester"_n;
 
-   chain.produce_blocks();
+   chain.produce_block();
    chain.create_account("currency"_n);
    chain.create_account(tester_account);
-   chain.produce_blocks();
+   chain.produce_block();
 
    chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", name(tester_account).to_string())
@@ -424,7 +424,7 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    const auto& tester_account = "tester"_n;
    const auto& tester_account2 = "tester2"_n;
 
-   chain.produce_blocks();
+   chain.produce_block();
    chain.create_account(tester_account);
    chain.create_account(tester_account2);
    chain.set_contract(tester_account, test_contracts::noop_wasm(), test_contracts::noop_abi());
@@ -443,7 +443,7 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
    const resource_limits_manager& mgr = chain.control->get_resource_limits_manager();
 
-   chain.produce_blocks();
+   chain.produce_block();
 
    {
       auto auths = vector<permission_level>{
@@ -456,8 +456,8 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
          fc::mutable_variant_object()("from", tester_account)("type", "")("data", "") ) );
       chain.set_transaction_headers(trx);
 
-      trx.sign(get_private_key(tester_account, "active"), chain.control->get_chain_id());
-      trx.sign(get_private_key(tester_account2, "active"), chain.control->get_chain_id());
+      trx.sign(get_private_key(tester_account, "active"), chain.get_chain_id());
+      trx.sign(get_private_key(tester_account2, "active"), chain.get_chain_id());
 
       auto tester_cpu_limit0  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit0 = mgr.get_account_cpu_limit_ex(tester_account2).first;
@@ -1239,7 +1239,7 @@ BOOST_AUTO_TEST_CASE( webauthn_recover_key ) { try {
    trx.actions.push_back(act);
 
    c.set_transaction_headers(trx);
-   trx.sign(c.get_private_key( "bob"_n, "active" ), c.control->get_chain_id());
+   trx.sign(c.get_private_key( "bob"_n, "active" ), c.get_chain_id());
    c.push_transaction(trx);
 
 } FC_LOG_AND_RETHROW() }
@@ -1279,7 +1279,7 @@ BOOST_AUTO_TEST_CASE( webauthn_assert_recover_key ) { try {
    trx.actions.push_back(act);
 
    c.set_transaction_headers(trx);
-   trx.sign(c.get_private_key( "bob"_n, "active" ), c.control->get_chain_id());
+   trx.sign(c.get_private_key( "bob"_n, "active" ), c.get_chain_id());
    c.push_transaction(trx);
 
 } FC_LOG_AND_RETHROW() }
@@ -1344,43 +1344,39 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
    auto first_new_block = c.produce_block();
 
    {
-      const auto& hbs = remote.control->head_block_state();
-
       // create a bad block that has the producer schedule change extension that is valid but not warranted by actions in the block
-      auto bad_block = std::make_shared<signed_block>(first_new_block->clone());
+      auto bad_block = first_new_block->clone();
       emplace_extension(
               bad_block->header_extensions,
               producer_schedule_change_extension::extension_id(),
-              fc::raw::pack(std::make_pair(hbs->active_schedule.version + 1, std::vector<char>{}))
+              fc::raw::pack(std::make_pair(remote.control->active_producers().version + 1, std::vector<char>{}))
       );
 
       // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
+      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
+      bad_block->producer_signature = remote.get_private_key("eosio"_n, "active").sign(sig_digest);
 
       // ensure it is rejected because it doesn't match expected state (but the extention was accepted)
       BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(bad_block), wrong_signing_key,
-         fc_exception_message_is( "block signed by unexpected key" )
+         remote.push_block(signed_block::create_signed_block(std::move(bad_block))), wrong_signing_key,
+         fc_exception_message_starts_with( "block signed by unexpected key" )
       );
    }
 
-   { // ensure that non-null not_used is rejected
-      const auto& hbs = remote.control->head_block_state();
-
+   { // ensure that non-null new_producers is rejected
       // create a bad block that has the producer schedule change extension before the feature upgrade
-      auto bad_block = std::make_shared<signed_block>(first_new_block->clone());
-      bad_block->not_used = legacy::producer_schedule_type{hbs->active_schedule.version + 1, {}};
+      auto bad_block = first_new_block->clone();
+      bad_block->not_used = legacy::producer_schedule_type{remote.control->active_producers().version + 1, {}};
 
       // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
+      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
+      bad_block->producer_signature = remote.get_private_key("eosio"_n, "active").sign(sig_digest);
 
       // ensure it is rejected because the not_used field is not null
       BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(bad_block), producer_schedule_exception,
+         remote.push_block(signed_block::create_signed_block(std::move(bad_block))), producer_schedule_exception,
          fc_exception_message_is( "Block header contains legacy producer schedule, required to be empty on wire.network" )
       );
    }
@@ -1576,6 +1572,52 @@ BOOST_AUTO_TEST_CASE( set_parameters_packed_test ) { try {
                                   action_name(),
                                   {} );
    //ensure priviledged intrinsic cannot be called by regular account
+   BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_non_priv), alice_account.to_uint64_t()),
+                       c.error("alice does not have permission to call this API"));
+} FC_LOG_AND_RETHROW() }
+
+
+static const char import_set_finalizers_wast[] = R"=====(
+(module
+ (import "env" "set_finalizers" (func $set_finalizers (param i64 i32 i32)))
+ (memory $0 1)
+ (export "apply" (func $apply))
+ (func $apply (param $0 i64) (param $1 i64) (param $2 i64)
+   (call $set_finalizers
+         (i64.const 0)
+         (i32.const 0)
+         (i32.const 4)
+   )
+ )
+ (data (i32.const 0) "\00\00\00\00")
+)
+)=====";
+
+BOOST_AUTO_TEST_CASE(set_finalizers_test) { try {
+   tester c( setup_policy::preactivate_feature_and_new_bios );
+
+   const auto alice_account = account_name("alice");
+   c.create_accounts( {alice_account} );
+   c.produce_block();
+
+   // ensure set_finalizers resolves, forward setcode enabled so will call automatically
+   // if able to call then will get error on unpacking field `threshold`, top message of: 'read datastream of length 4 over by -3'
+   BOOST_CHECK_EXCEPTION( c.set_code( config::system_account_name, import_set_finalizers_wast ),
+                          fc::out_of_range_exception,
+                          fc_exception_message_contains( "read datastream of length 4 over by -3" ) );
+
+   c.produce_block();
+
+
+   c.set_code( alice_account, import_set_finalizers_wast );
+   auto action_non_priv = action( {//vector of permission_level
+                                    { alice_account,
+                                      permission_name("active") }
+                                  },
+                                  alice_account,
+                                  action_name(),
+                                  {} );
+   //ensure privileged host function cannot be called by regular account
    BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_non_priv), alice_account.to_uint64_t()),
                        c.error("alice does not have permission to call this API"));
 } FC_LOG_AND_RETHROW() }

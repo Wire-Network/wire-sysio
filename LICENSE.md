@@ -1,6 +1,11 @@
 Wire Network<br />
 Copyright (c) 2024 WIRE NETWORK, INC. and its contributors. All Rights Reserved.<br />
-This software is owned and created by Wire Network, but it builds upon AntelopeIO/leap and EOSIO/eos.
+This software is owned and created by Wire Network, but it builds upon AntelopeIO/Spring and AntelopeIO/leap and EOSIO/eos.
+
+AntelopeIO/spring<br />
+Copyright (c) 2025-2025 Vaulta Foundation (VF) and its contributors.  All rights reserved.
+Copyright (c) 2021-2025 EOS Network Foundation (ENF) and its contributors.  All rights reserved.
+This Vaulta software is based upon:
 
 AntelopeIO/leap<br />
 Copyright (c) 2021-2022 EOS Network Foundation (ENF) and its contributors.  All rights reserved. <br />

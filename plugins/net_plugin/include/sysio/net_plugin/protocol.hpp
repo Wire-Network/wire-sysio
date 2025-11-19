@@ -1,11 +1,13 @@
 #pragma once
 #include <sysio/chain/block.hpp>
+#include <sysio/chain/vote_message.hpp>
 #include <sysio/chain/types.hpp>
-#include <chrono>
 
 namespace sysio {
    using namespace chain;
    using namespace fc;
+
+   constexpr auto message_header_size = sizeof(uint32_t);
 
    struct chain_size_message {
       uint32_t                   last_irreversible_block_num = 0;
@@ -13,15 +15,6 @@ namespace sysio {
       uint32_t                   head_num = 0;
       block_id_type              head_id;
    };
-
-   // Longest domain name is 253 characters according to wikipedia.
-   // Addresses include ":port" where max port is 65535, which adds 6 chars.
-   // Addresses may also include ":bitrate" with suffix and separators, which adds 30 chars,
-   // for the maximum comma-separated value that fits in a size_t expressed in decimal plus a suffix.
-   // We also add our own extentions of "[:trx|:blk] - xxxxxxx", which adds 14 chars, total= 273.
-   // Allow for future extentions as well, hence 384.
-   constexpr size_t max_p2p_address_length = 253 + 6 + 30;
-   constexpr size_t max_handshake_str_length = 384;
 
    struct handshake_message {
       uint16_t                   network_version = 0; ///< incremental value above a computed base
@@ -32,17 +25,17 @@ namespace sysio {
       fc::sha256                 token; ///< digest of time to prove we own the private key of the key above
       chain::signature_type      sig; ///< signature for the digest
       string                     p2p_address;
-      uint32_t                   last_irreversible_block_num = 0;
-      block_id_type              last_irreversible_block_id;
-      uint32_t                   head_num = 0;
-      block_id_type              head_id;
+      uint32_t                   fork_db_root_num = 0;
+      block_id_type              fork_db_root_id;
+      uint32_t                   fork_db_head_num = 0;
+      block_id_type              fork_db_head_id;
       string                     os;
       string                     agent;
       int16_t                    generation = 0;
    };
 
 
-  enum go_away_reason {
+  enum class go_away_reason {
     no_reason, ///< no reason to go away
     self, ///< the connection is to itself
     duplicate, ///< the connection is redundant
@@ -59,25 +52,24 @@ namespace sysio {
 
   constexpr auto reason_str( go_away_reason rsn ) {
     switch (rsn ) {
-    case no_reason : return "no reason";
-    case self : return "self connect";
-    case duplicate : return "duplicate";
-    case wrong_chain : return "wrong chain";
-    case wrong_version : return "wrong version";
-    case forked : return "chain is forked";
-    case unlinkable : return "unlinkable block received";
-    case bad_transaction : return "bad transaction";
-    case validation : return "invalid block";
-    case authentication : return "authentication failure";
-    case fatal_other : return "some other failure";
-    case benign_other : return "some other non-fatal condition, possibly unknown block";
+    case go_away_reason::no_reason : return "no reason";
+    case go_away_reason::self : return "self connect";
+    case go_away_reason::duplicate : return "duplicate";
+    case go_away_reason::wrong_chain : return "wrong chain";
+    case go_away_reason::wrong_version : return "wrong version";
+    case go_away_reason::forked : return "chain is forked";
+    case go_away_reason::unlinkable : return "unlinkable block received";
+    case go_away_reason::bad_transaction : return "bad transaction";
+    case go_away_reason::validation : return "invalid block";
+    case go_away_reason::authentication : return "authentication failure";
+    case go_away_reason::fatal_other : return "some other failure";
+    case go_away_reason::benign_other : return "some other non-fatal condition, possibly unknown block";
     default : return "some crazy reason";
     }
   }
 
   struct go_away_message {
-    go_away_message(go_away_reason r = no_reason) : reason(r), node_id() {}
-    go_away_reason reason{no_reason};
+    go_away_reason reason{go_away_reason::no_reason};
     fc::sha256 node_id; ///< for duplicate notification
   };
 
@@ -112,6 +104,7 @@ namespace sysio {
     uint32_t       pending{0};
     vector<T>      ids;
     bool           empty () const { return (mode == none || ids.empty()); }
+    bool operator==(const select_ids&) const noexcept = default;
   };
 
   using ordered_txn_ids = select_ids<transaction_id_type>;
@@ -134,6 +127,46 @@ namespace sysio {
       uint32_t end_block{0};
    };
 
+   struct block_nack_message {
+      block_id_type id;
+   };
+
+   struct block_notice_message {
+      block_id_type previous;
+      block_id_type id;
+   };
+
+   struct transaction_notice_message {
+      transaction_id_type id;
+   };
+
+   struct gossip_bp_peers_message {
+      struct bp_peer_info_v1 {
+         std::string               server_endpoint;      // externally available address to connect to
+         std::string               outbound_ip_address;  // outbound ip address for firewall
+         block_timestamp_type      expiration;           // head block to remove bp_peer
+      };
+      // bp_peer_info_v2 can derive from bp_peer_info_v1, so old peers can still unpack bp_peer_info_v1 from bp_peer::bp_peer_info
+      struct bp_peer {
+         unsigned_int              version = 1;
+         sysio::name               producer_name;
+         std::vector<char>         bp_peer_info;         // serialized bp_peer_info
+
+         digest_type digest(const chain_id_type& chain_id) const;
+      };
+      struct signed_bp_peer : bp_peer {
+         signature_type  sig; // signature over bp_peer
+
+         std::optional<bp_peer_info_v1> cached_bp_peer_info; // not serialized
+
+         const std::string& server_endpoint() const     { assert(cached_bp_peer_info); return cached_bp_peer_info->server_endpoint; }
+         const std::string& outbound_ip_address() const { assert(cached_bp_peer_info); return cached_bp_peer_info->outbound_ip_address; }
+         block_timestamp_type expiration() const        { assert(cached_bp_peer_info); return cached_bp_peer_info->expiration; }
+      };
+
+      std::vector<signed_bp_peer> peers;
+   };
+
    using net_message = std::variant<handshake_message,
                                     chain_size_message,
                                     go_away_message,
@@ -141,8 +174,43 @@ namespace sysio {
                                     notice_message,
                                     request_message,
                                     sync_request_message,
-                                    signed_block,         // which = 7
-                                    packed_transaction>;  // which = 8
+                                    signed_block,
+                                    packed_transaction,
+                                    vote_message,
+                                    block_nack_message,
+                                    block_notice_message,
+                                    gossip_bp_peers_message,
+                                    transaction_notice_message>;
+
+   // see protocol net_message
+   enum class msg_type_t {
+      handshake_message      = fc::get_index<net_message, handshake_message>(),
+      chain_size_message     = fc::get_index<net_message, chain_size_message>(),
+      go_away_message        = fc::get_index<net_message, go_away_message>(),
+      time_message           = fc::get_index<net_message, time_message>(),
+      notice_message         = fc::get_index<net_message, notice_message>(),
+      request_message        = fc::get_index<net_message, request_message>(),
+      sync_request_message   = fc::get_index<net_message, sync_request_message>(),
+      signed_block           = fc::get_index<net_message, signed_block>(),
+      packed_transaction     = fc::get_index<net_message, packed_transaction>(),
+      vote_message           = fc::get_index<net_message, vote_message>(),
+      block_nack_message     = fc::get_index<net_message, block_nack_message>(),
+      block_notice_message   = fc::get_index<net_message, block_notice_message>(),
+      gossip_bp_peers_message    = fc::get_index<net_message, gossip_bp_peers_message>(),
+      transaction_notice_message = fc::get_index<net_message, transaction_notice_message>(),
+      unknown
+   };
+
+   constexpr uint32_t to_index(msg_type_t net_msg) {
+      static_assert( std::variant_size_v<net_message> == static_cast<uint32_t>(msg_type_t::unknown));
+      return static_cast<uint32_t>(net_msg);
+   }
+
+   constexpr msg_type_t to_msg_type_t(size_t v) {
+      static_assert( std::variant_size_v<net_message> == static_cast<size_t>(msg_type_t::unknown));
+      SYS_ASSERT(v < to_index(msg_type_t::unknown), plugin_exception, "Invalid net_message index: ${v}", ("v", v));
+      return static_cast<msg_type_t>(v);
+   }
 
 } // namespace sysio
 
@@ -153,14 +221,21 @@ FC_REFLECT( sysio::chain_size_message,
 FC_REFLECT( sysio::handshake_message,
             (network_version)(chain_id)(node_id)(key)
             (time)(token)(sig)(p2p_address)
-            (last_irreversible_block_num)(last_irreversible_block_id)
-            (head_num)(head_id)
+            (fork_db_root_num)(fork_db_root_id)
+            (fork_db_head_num)(fork_db_head_id)
             (os)(agent)(generation) )
 FC_REFLECT( sysio::go_away_message, (reason)(node_id) )
 FC_REFLECT( sysio::time_message, (org)(rec)(xmt)(dst) )
 FC_REFLECT( sysio::notice_message, (known_trx)(known_blocks) )
 FC_REFLECT( sysio::request_message, (req_trx)(req_blocks) )
 FC_REFLECT( sysio::sync_request_message, (start_block)(end_block) )
+FC_REFLECT( sysio::block_nack_message, (id) )
+FC_REFLECT( sysio::block_notice_message, (previous)(id) )
+FC_REFLECT( sysio::transaction_notice_message, (id) )
+FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer_info_v1, (server_endpoint)(outbound_ip_address)(expiration) )
+FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer, (version)(producer_name)(bp_peer_info) )
+FC_REFLECT_DERIVED(sysio::gossip_bp_peers_message::signed_bp_peer, (sysio::gossip_bp_peers_message::bp_peer), (sig) )
+FC_REFLECT( sysio::gossip_bp_peers_message, (peers) )
 
 /**
  *

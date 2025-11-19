@@ -1,7 +1,6 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/producer_plugin/producer_plugin.hpp>
-#include <sysio/chain/fork_database.hpp>
+#include <sysio/chain_plugin/tracked_votes.hpp>
 #include <sysio/chain/block_log.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/authorization_manager.hpp>
@@ -9,17 +8,17 @@
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/resource_limits.hpp>
-#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/controller.hpp>
+#include <sysio/chain/contract_action_match.hpp>
 #include <sysio/chain/snapshot.hpp>
+#include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain_plugin/trx_finality_status_processing.hpp>
 #include <sysio/chain/permission_link_object.hpp>
-#include <sysio/chain/subjective_billing.hpp>
 #include <sysio/chain/global_property_object.hpp>
-#include <sysio/chain/chainbase_environment.hpp>
-
+#include <sysio/chain/block_header_state_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <chainbase/environment.hpp>
 
 #include <boost/signals2/connection.hpp>
 #include <boost/algorithm/string.hpp>
@@ -29,8 +28,25 @@
 #include <fc/variant.hpp>
 #include <cstdlib>
 
+
 const std::string deep_mind_logger_name("deep-mind");
 sysio::chain::deep_mind_handler _deep_mind_log;
+
+namespace std {
+   // declare operator<< for boost program options of vector<string>
+   std::ostream& operator<<(std::ostream& osm, const std::vector<std::string>& v) {
+      auto size = v.size();
+      osm << "{";
+      for (size_t i = 0; i < size; ++i) {
+         osm << v[i];
+         if (i < size - 1) {
+            osm << ", ";
+         }
+      }
+      osm << "}";
+      return osm;
+   }
+}
 
 namespace sysio {
 
@@ -151,18 +167,18 @@ public:
    ,accepted_block_channel(app().get_channel<channels::accepted_block>())
    ,irreversible_block_channel(app().get_channel<channels::irreversible_block>())
    ,applied_transaction_channel(app().get_channel<channels::applied_transaction>())
-   ,incoming_block_sync_method(app().get_method<incoming::methods::block_sync>())
    ,incoming_transaction_async_method(app().get_method<incoming::methods::transaction_async>())
    {}
 
+   std::filesystem::path             finalizers_dir;
    std::filesystem::path             blocks_dir;
    std::filesystem::path             state_dir;
    bool                              readonly = false;
    flat_map<uint32_t, block_id_type> loaded_checkpoints;
+   bool                              accept_votes = false;
    bool                              accept_transactions     = false;
    bool                              api_accept_transactions = true;
    bool                              account_queries_enabled = false;
-   bool                              state_log = false;
 
    std::optional<controller::config> chain_config;
    std::optional<controller>         chain;
@@ -179,14 +195,11 @@ public:
    channels::applied_transaction::channel_type&    applied_transaction_channel;
 
    // retained references to methods for easy calling
-   incoming::methods::block_sync::method_type&        incoming_block_sync_method;
    incoming::methods::transaction_async::method_type& incoming_transaction_async_method;
 
    // method provider handles
-   methods::get_block_by_number::method_type::handle                 get_block_by_number_provider;
    methods::get_block_by_id::method_type::handle                     get_block_by_id_provider;
    methods::get_head_block_id::method_type::handle                   get_head_block_id_provider;
-   methods::get_last_irreversible_block_number::method_type::handle  get_last_irreversible_block_number_provider;
 
    // scoped connections for chain controller
    std::optional<scoped_connection>                                   accepted_block_header_connection;
@@ -195,10 +208,11 @@ public:
    std::optional<scoped_connection>                                   applied_transaction_connection;
    std::optional<scoped_connection>                                   block_start_connection;
 
-
+   std::optional<chain_apis::get_info_db>                             _get_info_db;
    std::optional<chain_apis::account_query_db>                        _account_query_db;
    std::optional<chain_apis::trx_retry_db>                            _trx_retry_db;
    chain_apis::trx_finality_status_processing_ptr                     _trx_finality_status_processing;
+   std::optional<chain_apis::tracked_votes>                           _last_tracked_votes;
 
    static void handle_guard_exception(const chain::guard_exception& e);
    void do_hard_replay(const variables_map& options);
@@ -239,10 +253,6 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
    delim = ", ";
 #endif
 
-#ifdef SYSIO_SYS_VM_OC_DEVELOPER
-   wasm_runtime_opt += delim + "\"sys-vm-oc\"";
-   wasm_runtime_desc += "\"sys-vm-oc\" : Unsupported. Instead, use one of the other runtimes along with the option sys-vm-oc-enable.\n";
-#endif
    wasm_runtime_opt += ")\n" + wasm_runtime_desc;
 
    std::string default_wasm_runtime_str= sysio::chain::wasm_interface::vm_type_string(sysio::chain::config::default_wasm_runtime);
@@ -268,18 +278,14 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "All files in the archive directory are completely under user's control, i.e. they won't be accessed by nodeop anymore.")
          ("state-dir", bpo::value<std::filesystem::path>()->default_value(config::default_state_dir_name),
           "the location of the state directory (absolute path or relative to application data dir)")
-         ("state-log", bpo::value<bool>()->default_value(false), "Maintain a block state log, using the same configuration as the block log.")
+         ("finalizers-dir", bpo::value<std::filesystem::path>()->default_value(config::default_finalizers_dir_name),
+          "the location of the finalizers safety data directory (absolute path or relative to application data dir)")
          ("protocol-features-dir", bpo::value<std::filesystem::path>()->default_value("protocol_features"),
           "the location of the protocol_features directory (absolute path or relative to application config dir)")
          ("checkpoint", bpo::value<vector<string>>()->composing(), "Pairs of [BLOCK_NUM,BLOCK_ID] that should be enforced as checkpoints.")
          ("wasm-runtime", bpo::value<sysio::chain::wasm_interface::vm_type>()->value_name("runtime")->notifier([](const auto& vm){
-#ifndef SYSIO_SYS_VM_OC_DEVELOPER
-            //throwing an exception here (like SYS_ASSERT) is just gobbled up with a "Failed to initialize" error :(
-            if(vm == wasm_interface::vm_type::sys_vm_oc) {
-               elog("SYS VM OC is a tier-up compiler and works in conjunction with the configured base WASM runtime. Enable SYS VM OC via 'sys-vm-oc-enable' option");
-               SYS_ASSERT(false, plugin_exception, "");
-            }
-#endif
+            if(vm == wasm_interface::vm_type::sys_vm_oc)
+               wlog("sys-vm-oc-forced mode is not supported. It is for development purposes only");
          })->default_value(sysio::chain::config::default_wasm_runtime, default_wasm_runtime_str), wasm_runtime_opt.c_str()
          )
          ("profile-account", boost::program_options::value<vector<string>>()->composing(),
@@ -292,6 +298,8 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "Percentage of actual signature recovery cpu to bill. Whole number percentages, e.g. 50 for 50%")
          ("chain-threads", bpo::value<uint16_t>()->default_value(config::default_controller_thread_pool_size),
           "Number of worker threads in controller thread pool")
+         ("vote-threads", bpo::value<uint16_t>(),
+          "Number of worker threads in vote processor thread pool. If set to 0, voting disabled, votes are not propagatged on P2P network. Defaults to 4 on producer nodes.")
          ("contracts-console", bpo::bool_switch()->default_value(false),
           "print contract's output to console")
          ("deep-mind", bpo::bool_switch()->default_value(false),
@@ -351,6 +359,8 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "'auto' - SYS VM OC tier-up is enabled for sysio.* accounts, read-only trxs, and except on producers applying blocks.\n"
           "'all'  - SYS VM OC tier-up is enabled for all contract execution.\n"
           "'none' - SYS VM OC tier-up is completely disabled.\n")
+         ("sys-vm-oc-whitelist", bpo::value<vector<string>>()->composing()->multitoken()->default_value(std::vector<string>{"wire"}),
+          "SYS VM OC tier-up whitelist account suffixes for tier-up runtime 'auto'.")
 #endif
          ("enable-account-queries", bpo::value<bool>()->default_value(false), "enable queries to find accounts by various metadata.")
          ("transaction-retry-max-storage-size-gb", bpo::value<uint64_t>(),
@@ -396,9 +406,12 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
          ("delete-all-blocks", bpo::bool_switch()->default_value(false),
           "clear chain state database and block log")
          ("truncate-at-block", bpo::value<uint32_t>()->default_value(0),
-          "stop hard replay / block log recovery at this block number (if set to non-zero number)")
+          "Stop hard replay / block log recovery at this block number (if non-zero). "
+          "Can also be used with terminate-at-block to prune any received blocks from fork database on exit.")
          ("terminate-at-block", bpo::value<uint32_t>()->default_value(0),
-          "terminate after reaching this block number (if set to a non-zero number)")
+          "Stops the node after reaching the specified block number (if non-zero). "
+          "Use RPC endpoint /v1/producer/pause_at_block to pause at a specific block instead. "
+          "Combine with truncate-at-block to prune blocks beyond the specified number from the fork database on exit.")
          ("snapshot", bpo::value<std::filesystem::path>(), "File to read Snapshot State from")
          ;
 
@@ -446,8 +459,8 @@ void clear_directory_contents( const std::filesystem::path& p ) {
 namespace {
   // This can be removed when versions of sysio that support reversible chainbase state file no longer supported.
   void upgrade_from_reversible_to_fork_db(chain_plugin_impl* my) {
-          std::filesystem::path old_fork_db = my->chain_config->state_dir / config::forkdb_filename;
-     std::filesystem::path new_fork_db = my->blocks_dir / config::reversible_blocks_dir_name / config::forkdb_filename;
+     std::filesystem::path old_fork_db = my->chain_config->state_dir / config::fork_db_filename;
+     std::filesystem::path new_fork_db = my->blocks_dir / config::reversible_blocks_dir_name / config::fork_db_filename;
      if( std::filesystem::exists( old_fork_db ) && std::filesystem::is_regular_file( old_fork_db ) ) {
         bool copy_file = false;
         if( std::filesystem::exists( new_fork_db ) && std::filesystem::is_regular_file( new_fork_db ) ) {
@@ -469,9 +482,9 @@ namespace {
 
 void
 chain_plugin_impl::do_hard_replay(const variables_map& options) {
-         ilog( "Hard replay requested: deleting state database" );
-         clear_directory_contents( chain_config->state_dir );
-         auto backup_dir = block_log<signed_block>::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
+   ilog( "Hard replay requested: deleting state database" );
+   clear_directory_contents( chain_config->state_dir );
+   auto backup_dir = block_log::repair_log( blocks_dir, options.at( "truncate-at-block" ).as<uint32_t>(), config::reversible_blocks_dir_name);
 }
 
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
@@ -515,10 +528,20 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       LOAD_VALUE_SET( options, "actor-blacklist", chain_config->actor_blacklist );
       LOAD_VALUE_SET( options, "contract-whitelist", chain_config->contract_whitelist );
       LOAD_VALUE_SET( options, "contract-blacklist", chain_config->contract_blacklist );
+      LOAD_VALUE_SET( options, "sys-vm-oc-whitelist", chain_config->sys_vm_oc_whitelist_suffixes);
 
       LOAD_VALUE_SET( options, "trusted-producer", chain_config->trusted_producers );
 
-      if( options.contains( "action-blacklist" )) {
+      if (!chain_config->sys_vm_oc_whitelist_suffixes.empty()) {
+         const auto& wl = chain_config->sys_vm_oc_whitelist_suffixes;
+         std::string s = std::accumulate(std::next(wl.begin()), wl.end(),
+                                         wl.begin()->to_string(),
+                                         [](std::string a, account_name b) -> std::string {
+                                            return std::move(a) + ", " + b.to_string();
+                                         });
+         ilog("sys-vm-oc-whitelist accounts: ${a}", ("a", s));
+      }
+      if( options.count( "action-blacklist" )) {
          const std::vector<std::string>& acts = options["action-blacklist"].as<std::vector<std::string>>();
          auto& list = chain_config->action_blacklist;
          for( const auto& a : acts ) {
@@ -538,7 +561,15 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.contains( "blocks-dir" )) {
+      if( options.count( "finalizers-dir" )) {
+         auto fd = options.at( "finalizers-dir" ).as<std::filesystem::path>();
+         if( fd.is_relative())
+            finalizers_dir = app().data_dir() / fd;
+         else
+            finalizers_dir = fd;
+      }
+
+      if( options.count( "blocks-dir" )) {
          auto bld = options.at( "blocks-dir" ).as<std::filesystem::path>();
          if( bld.is_relative())
             blocks_dir = app().data_dir() / bld;
@@ -552,10 +583,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             state_dir = app().data_dir() / sd;
          else
             state_dir = sd;
-      }
-
-      if( options.at( "state-log" ).as<bool>()) {
-         state_log = true;
       }
 
       protocol_feature_set pfs;
@@ -595,10 +622,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       abi_serializer_max_time_us = fc::microseconds(options.at("abi-serializer-max-time-ms").as<uint32_t>() * 1000);
 
+      chain_config->finalizers_dir = finalizers_dir;
       chain_config->blocks_dir = blocks_dir;
       chain_config->state_dir = state_dir;
       chain_config->read_only = readonly;
-      chain_config->keep_state_log = state_log;
 
       if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>()) {
         resmon_plugin->monitor_directory(chain_config->blocks_dir);
@@ -624,10 +651,19 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
-      if( options.contains( "chain-threads" )) {
-         chain_config->thread_pool_size = options.at( "chain-threads" ).as<uint16_t>();
-         SYS_ASSERT( chain_config->thread_pool_size > 0, plugin_config_exception,
-                     "chain-threads ${num} must be greater than 0", ("num", chain_config->thread_pool_size) );
+      if( options.count( "chain-threads" )) {
+         chain_config->chain_thread_pool_size = options.at( "chain-threads" ).as<uint16_t>();
+         SYS_ASSERT( chain_config->chain_thread_pool_size > 0, plugin_config_exception,
+                     "chain-threads ${num} must be greater than 0", ("num", chain_config->chain_thread_pool_size) );
+      }
+
+      if (options.count("producer-name") || options.count("vote-threads")) {
+         chain_config->vote_thread_pool_size = options.count("vote-threads") ? options.at("vote-threads").as<uint16_t>() : 0;
+         if (chain_config->vote_thread_pool_size == 0 && options.count("producer-name")) {
+            chain_config->vote_thread_pool_size = config::default_vote_thread_pool_size;
+            ilog("Setting vote-threads to ${n} on producing node", ("n", chain_config->vote_thread_pool_size));
+         }
+         accept_votes = chain_config->vote_thread_pool_size > 0;
       }
 
       chain_config->sig_cpu_bill_pct = options.at("signature-cpu-billable-pct").as<uint32_t>();
@@ -645,8 +681,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       chain_config->maximum_variable_signature_length = options.at( "maximum-variable-signature-length" ).as<uint32_t>();
 
-      if( options.contains( "terminate-at-block" ))
-         chain_config->terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
+      chain_config->terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
+      chain_config->truncate_at_block = options.at( "truncate-at-block" ).as<uint32_t>();
+
+      chain_config->num_configured_p2p_peers = options.count( "p2p-peer-address" );
 
       // move fork_db to new location
       upgrade_from_reversible_to_fork_db( this );
@@ -679,9 +717,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          uint32_t block_log_retain_blocks = options.at("block-log-retain-blocks").as<uint32_t>();
          if (block_log_retain_blocks == 0) {
             chain_config->blog = sysio::chain::empty_blocklog_config{};
-            chain_config->keep_state_log = false; // an empty blocklog only is needed for the signed block log
-         }
-         else {
+         } else {
             SYS_ASSERT(cfile::supports_hole_punching(), plugin_config_exception,
                        "block-log-retain-blocks cannot be greater than 0 because the file system does not support hole "
                        "punching");
@@ -694,7 +730,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if( options.contains( "extract-genesis-json" ) || options.at( "print-genesis-json" ).as<bool>()) {
          std::optional<genesis_state> gs;
          
-         gs = block_log<signed_block>::extract_genesis_state( blocks_dir, retained_dir );
+         gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
          SYS_ASSERT( gs,
                      plugin_config_exception,
                      "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
@@ -725,21 +761,30 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          SYS_THROW( extract_genesis_state_exception, "extracted genesis state from blocks.log" );
       }
 
+      uint32_t truncate_at_block = options.at( "truncate-at-block" ).as<uint32_t>();
+      uint32_t terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
+      if (truncate_at_block > 0 && terminate_at_block > 0) {
+         SYS_ASSERT(truncate_at_block == terminate_at_block, plugin_config_exception,
+                    "truncate-at-block ${a} must match terminate-at-block ${b}",
+                    ("a", truncate_at_block)("b", terminate_at_block));
+      } else if (truncate_at_block > 0 && !options.at( "hard-replay-blockchain" ).as<bool>()) {
+         wlog("truncate-at-block only applicable to --hard-replay-blockchain unless specified with --terminate-at-block");
+      }
+
       if( options.at( "delete-all-blocks" ).as<bool>()) {
          ilog( "Deleting state database and blocks" );
-         if( options.at( "truncate-at-block" ).as<uint32_t>() > 0 )
-            wlog( "The --truncate-at-block option does not make sense when deleting all blocks." );
          clear_directory_contents( chain_config->state_dir );
          clear_directory_contents( blocks_dir );
       } else if( options.at( "hard-replay-blockchain" ).as<bool>()) {
          do_hard_replay(options);
       } else if( options.at( "replay-blockchain" ).as<bool>()) {
          ilog( "Replay requested: deleting state database" );
-         if( options.at( "truncate-at-block" ).as<uint32_t>() > 0 )
-            wlog( "The --truncate-at-block option does not work for a regular replay of the blockchain." );
+         if (!options.count( "snapshot" )) {
+            auto first_block = block_log::extract_first_block_num(blocks_dir, retained_dir);
+            SYS_ASSERT(first_block == 1, plugin_config_exception,
+                       "replay-blockchain without snapshot requested without a full block log, first block: ${n}", ("n", first_block));
+         }
          clear_directory_contents( chain_config->state_dir );
-      } else if( options.at( "truncate-at-block" ).as<uint32_t>() > 0 ) {
-         wlog( "The --truncate-at-block option can only be used with --hard-replay-blockchain." );
       }
 
       std::optional<chain_id_type> chain_id;
@@ -766,11 +811,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                      "--snapshot is incompatible with --genesis-json as the snapshot contains genesis information");
 
          auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
-         SYS_ASSERT( !std::filesystem::is_regular_file(shared_mem_path),
-                 plugin_config_exception,
-                 "Snapshot can only be used to initialize an empty database." );
+         auto chain_head_path = chain_config->state_dir / chain_head_filename;
+         SYS_ASSERT(!std::filesystem::is_regular_file(shared_mem_path) &&
+                    !std::filesystem::is_regular_file(chain_head_path),
+                    plugin_config_exception,
+                    "Snapshot can only be used to initialize an empty database, remove directory: ${d}",
+                    ("d", chain_config->state_dir.generic_string()));
 
-         auto block_log_chain_id = block_log<signed_block>::extract_chain_id(blocks_dir, retained_dir);
+         auto block_log_chain_id = block_log::extract_chain_id(blocks_dir, retained_dir);
 
          if (block_log_chain_id) {
             SYS_ASSERT( *chain_id == *block_log_chain_id,
@@ -785,7 +833,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          chain_id = controller::extract_chain_id_from_db( chain_config->state_dir );
 
-         auto chain_context = block_log<signed_block>::extract_chain_context( blocks_dir, retained_dir );
+         auto chain_context = block_log::extract_chain_context( blocks_dir, retained_dir );
          std::optional<genesis_state> block_log_genesis;
          std::optional<chain_id_type> block_log_chain_id;
 
@@ -901,12 +949,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       }
       api_accept_transactions = options.at( "api-accept-transactions" ).as<bool>();
 
-      if( chain_config->read_mode == db_read_mode::IRREVERSIBLE ) {
-         if( api_accept_transactions ) {
-            api_accept_transactions = false;
-            wlog( "api-accept-transactions set to false due to read-mode: irreversible" );
-         }
-      }
       if( api_accept_transactions ) {
          enable_accept_transactions();
       }
@@ -952,6 +994,17 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          }
       }
 
+      _last_tracked_votes.emplace(*chain);
+
+      bool chain_api_plugin_configured = false;
+      if (options.count("plugin")) {
+         const auto& v = options.at("plugin").as<std::vector<std::string>>();
+         chain_api_plugin_configured = std::ranges::any_of(v, [](const std::string& p) { return p.find("sysio::chain_api_plugin") != std::string::npos; });
+      }
+
+      // only enable _get_info_db if chain_api_plugin enabled.
+      _get_info_db.emplace(*chain, chain_api_plugin_configured);
+
       // initialize deep mind logging
       if ( options.at( "deep-mind" ).as<bool>() ) {
          // The actual `fc::dmlog_appender` implementation that is currently used by deep mind
@@ -988,25 +1041,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          chain->enable_deep_mind( &_deep_mind_log );
       }
 
-      // set up method providers
-      get_block_by_number_provider = app().get_method<methods::get_block_by_number>().register_provider(
-            [this]( uint32_t block_num ) -> signed_block_ptr {
-               return chain->fetch_block_by_number( block_num );
-            } );
-
       get_block_by_id_provider = app().get_method<methods::get_block_by_id>().register_provider(
             [this]( block_id_type id ) -> signed_block_ptr {
                return chain->fetch_block_by_id( id );
             } );
 
       get_head_block_id_provider = app().get_method<methods::get_head_block_id>().register_provider( [this]() {
-         return chain->head_block_id();
+         return chain->head().id();
       } );
-
-      get_last_irreversible_block_number_provider = app().get_method<methods::get_last_irreversible_block_number>().register_provider(
-            [this]() {
-               return chain->last_irreversible_block_num();
-            } );
 
       // relay signals to channels
       accepted_block_header_connection = chain->accepted_block_header().connect(
@@ -1028,6 +1070,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _trx_finality_status_processing->signal_accepted_block(block, id);
          }
 
+         if (_last_tracked_votes) {
+            _last_tracked_votes->on_accepted_block(block, id);
+         }
+
+         if (_get_info_db) {
+            _get_info_db->on_accepted_block();
+         }
+
          accepted_block_channel.publish( priority::high, t );
       } );
 
@@ -1040,6 +1090,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          if (_trx_finality_status_processing) {
             _trx_finality_status_processing->signal_irreversible_block(block, id);
+         }
+
+         if (_get_info_db) {
+            _get_info_db->on_irreversible_block(block, id);
          }
 
          irreversible_block_channel.publish( priority::low, t );
@@ -1088,7 +1142,6 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain->add_indices();
 
    } FC_LOG_AND_RETHROW()
-
 }
 
 void chain_plugin::plugin_initialize(const variables_map& options) {
@@ -1098,21 +1151,18 @@ void chain_plugin::plugin_initialize(const variables_map& options) {
 
 void chain_plugin_impl::plugin_startup()
 { try {
-   SYS_ASSERT( chain_config->read_mode != db_read_mode::IRREVERSIBLE || !accept_transactions, plugin_config_exception,
-               "read-mode = irreversible. transactions should not be enabled by enable_accept_transactions" );
    try {
-      auto shutdown = [](){ return app().quit(); };
+      auto shutdown = []() {
+         dlog("controller shutdown, quitting...");
+         return app().quit();
+      };
       auto check_shutdown = [](){ return app().is_quiting(); };
-      if (snapshot_path) {
-         auto infile = std::ifstream(snapshot_path->generic_string(), (std::ios::in | std::ios::binary));
-         auto reader = std::make_shared<istream_snapshot_reader>(infile);
-         chain->startup(shutdown, check_shutdown, reader);
-         infile.close();
-      } else if( genesis ) {
+      if (snapshot_path)
+         chain->startup(shutdown, check_shutdown, std::make_shared<threaded_snapshot_reader>(*snapshot_path));
+      else if( genesis )
          chain->startup(shutdown, check_shutdown, *genesis);
-      } else {
+      else
          chain->startup(shutdown, check_shutdown);
-      }
    } catch (const database_guard_exception& e) {
       log_guard_exception(e);
       // make sure to properly close the db
@@ -1126,10 +1176,10 @@ void chain_plugin_impl::plugin_startup()
 
    if (genesis) {
       ilog("Blockchain started; head block is #${num}, genesis timestamp is ${ts}",
-           ("num", chain->head_block_num())("ts", genesis->initial_timestamp));
+           ("num", chain->head().block_num())("ts", genesis->initial_timestamp));
    }
    else {
-      ilog("Blockchain started; head block is #${num}", ("num", chain->head_block_num()));
+      ilog("Blockchain started; head block is #${num}", ("num", chain->head().block_num()));
    }
 
    chain_config.reset();
@@ -1141,7 +1191,6 @@ void chain_plugin_impl::plugin_startup()
          account_queries_enabled = true;
       } FC_LOG_AND_DROP(("Unable to enable account queries"));
    }
-
 
 } FC_CAPTURE_AND_RETHROW() }
 
@@ -1155,6 +1204,7 @@ void chain_plugin::plugin_shutdown() {
 
 void chain_plugin::handle_sighup() {
    _deep_mind_log.update_logger( deep_mind_logger_name );
+   fc::logger::update(vote_logger.get_name(), vote_logger);
 }
 
 chain_apis::read_write::read_write(controller& db,
@@ -1180,12 +1230,7 @@ chain_apis::read_write chain_plugin::get_read_write_api(const fc::microseconds& 
 }
 
 chain_apis::read_only chain_plugin::get_read_only_api(const fc::microseconds& http_max_response_time) const {
-   return chain_apis::read_only(chain(), my->_account_query_db, get_abi_serializer_max_time(), http_max_response_time, my->_trx_finality_status_processing.get());
-}
-
-
-bool chain_plugin::accept_block(const signed_block_ptr& block, const block_id_type& id, const block_state_legacy_ptr& bsp ) {
-   return my->incoming_block_sync_method(block, id, bsp);
+   return chain_apis::read_only(chain(), my->_get_info_db, my->_account_query_db, my->_last_tracked_votes, get_abi_serializer_max_time(), http_max_response_time, my->_trx_finality_status_processing.get());
 }
 
 void chain_plugin::accept_transaction(const chain::packed_transaction_ptr& trx, next_function<chain::transaction_trace_ptr> next) {
@@ -1217,6 +1262,10 @@ void chain_plugin_impl::enable_accept_transactions() {
 
 void chain_plugin::enable_accept_transactions() {
    my->enable_accept_transactions();
+}
+
+bool chain_plugin::accept_votes() const {
+   return my->accept_votes;
 }
 
 
@@ -1265,38 +1314,12 @@ namespace chain_apis {
 
 const string read_only::KEYi64 = "i64";
 
-read_only::get_info_results read_only::get_info(const read_only::get_info_params&, const fc::time_point&) const {
-   const auto& rm = db.get_resource_limits_manager();
+get_info_db::get_info_results read_only::get_info(const read_only::get_info_params&, const fc::time_point&) const {
+   SYS_ASSERT(gidb, plugin_config_exception, "get_info being accessed when not enabled");
 
-   auto number_accounts = db.db().get_index<account_index, by_id>().size();
-   auto number_contracts = db.db().get_index<code_index, by_id>().size();
-
-   return {
-      itoh(static_cast<uint32_t>(app().version())),
-      db.get_chain_id(),
-      db.head_block_num(),
-      db.last_irreversible_block_num(),
-      db.last_irreversible_block_id(),
-      db.head_block_id(),
-      db.head_block_time(),
-      db.head_block_producer(),
-      rm.get_virtual_block_cpu_limit(),
-      rm.get_virtual_block_net_limit(),
-      rm.get_block_cpu_limit(),
-      rm.get_block_net_limit(),
-      //std::bitset<64>(db.get_dynamic_global_properties().recent_slots_filled).to_string(),
-      //__builtin_popcountll(db.get_dynamic_global_properties().recent_slots_filled) / 64.0,
-      app().version_string(),
-      db.fork_db_head_block_num(),
-      db.fork_db_head_block_id(),
-      app().full_version_string(),
-      rm.get_total_cpu_weight(),
-      rm.get_total_net_weight(),
-      db.earliest_available_block_num(),
-      db.last_irreversible_block_time(),
-      number_accounts,
-      number_contracts
-   };
+   // To be able to run get_info on an http thread, get_info results are stored
+   // in get_info_db and updated whenever accepted_block signal is received.
+   return gidb->get_info();
 }
 
 read_only::get_transaction_status_results
@@ -1388,7 +1411,6 @@ read_only::get_activated_protocol_features( const read_only::get_activated_proto
 }
 
 uint64_t read_only::get_table_index_name(const read_only::get_table_rows_params& p, bool& primary) {
-   using boost::algorithm::starts_with;
    // see multi_index packing of index name
    const uint64_t table = p.table.to_uint64_t();
    uint64_t index = table & 0xFFFFFFFFFFFFFFF0ULL;
@@ -1398,22 +1420,22 @@ uint64_t read_only::get_table_index_name(const read_only::get_table_rows_params&
    uint64_t pos = 0;
    if (p.index_position.empty() || p.index_position == "first" || p.index_position == "primary" || p.index_position == "one") {
       primary = true;
-   } else if (starts_with(p.index_position, "sec") || p.index_position == "two") { // second, secondary
-   } else if (starts_with(p.index_position , "ter") || starts_with(p.index_position, "th")) { // tertiary, ternary, third, three
+   } else if (p.index_position.starts_with("sec") || p.index_position == "two") { // second, secondary
+   } else if (p.index_position .starts_with("ter") || p.index_position.starts_with("th")) { // tertiary, ternary, third, three
       pos = 1;
-   } else if (starts_with(p.index_position, "fou")) { // four, fourth
+   } else if (p.index_position.starts_with("fou")) { // four, fourth
       pos = 2;
-   } else if (starts_with(p.index_position, "fi")) { // five, fifth
+   } else if (p.index_position.starts_with("fi")) { // five, fifth
       pos = 3;
-   } else if (starts_with(p.index_position, "six")) { // six, sixth
+   } else if (p.index_position.starts_with("six")) { // six, sixth
       pos = 4;
-   } else if (starts_with(p.index_position, "sev")) { // seven, seventh
+   } else if (p.index_position.starts_with("sev")) { // seven, seventh
       pos = 5;
-   } else if (starts_with(p.index_position, "eig")) { // eight, eighth
+   } else if (p.index_position.starts_with("eig")) { // eight, eighth
       pos = 6;
-   } else if (starts_with(p.index_position, "nin")) { // nine, ninth
+   } else if (p.index_position.starts_with("nin")) { // nine, ninth
       pos = 7;
-   } else if (starts_with(p.index_position, "ten")) { // ten, tenth
+   } else if (p.index_position.starts_with("ten")) { // ten, tenth
       pos = 8;
    } else {
       try {
@@ -1723,6 +1745,46 @@ fc::variant get_global_row( const database& db, const abi_def& abi, const abi_se
    return abis.binary_to_variant(abis.get_table_type("global"_n), data, abi_serializer::create_yield_function( abi_serializer_max_time_us ), shorten_abi_errors );
 }
 
+read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_only::get_finalizer_info_params& p, const fc::time_point& ) const {
+   read_only::get_finalizer_info_result result;
+
+   // Finalizer keys present in active_finalizer_policy and pending_finalizer_policy.
+   // Use std::set for eliminating duplications.
+   std::set<fc::crypto::blslib::bls_public_key> finalizer_keys;
+
+   // Populate a particular finalizer policy
+   auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy, fc::variant& to_policy) {
+      if (from_policy) {
+         // Use string format of public key for easy uses
+         to_variant(*from_policy, to_policy);
+
+         for (const auto& f: from_policy->finalizers) {
+            finalizer_keys.insert(f.public_key);
+         }
+      }
+   };
+
+   // Populate active_finalizer_policy and pending_finalizer_policy
+   add_policy_to_result(db.head_active_finalizer_policy(), result.active_finalizer_policy);
+   add_policy_to_result(db.head_pending_finalizer_policy(), result.pending_finalizer_policy);
+
+   // Populate last_tracked_votes
+   if (last_tracked_votes) {
+      for (const auto& k: finalizer_keys) {
+         if (const auto& v = last_tracked_votes->get_last_vote_info(k)) {
+            result.last_tracked_votes.emplace_back(*v);
+         }
+      }
+   }
+
+   // Sort last_tracked_votes by description
+   std::sort( result.last_tracked_votes.begin(), result.last_tracked_votes.end(), []( const tracked_votes::vote_info& lhs, const tracked_votes::vote_info& rhs ) {
+      return lhs.description < rhs.description;
+   });
+
+   return result;
+}
+
 read_only::get_producers_result
 read_only::get_producers( const read_only::get_producers_params& params, const fc::time_point& deadline ) const {
    read_only::get_producers_result result;
@@ -1750,9 +1812,9 @@ read_only::get_producers( const read_only::get_producers_params& params, const f
 read_only::get_producer_schedule_result read_only::get_producer_schedule( const read_only::get_producer_schedule_params& p, const fc::time_point& ) const {
    read_only::get_producer_schedule_result result;
    to_variant(db.active_producers(), result.active);
-   if(!db.pending_producers().producers.empty())
-      to_variant(db.pending_producers(), result.pending);
-   auto proposed = db.proposed_producers();
+   if (const auto* pending = db.pending_producers())
+      to_variant(*pending, result.pending);
+   auto proposed = db.proposed_producers_legacy(); // empty for savanna
    if(proposed && !proposed->producers.empty())
       to_variant(*proposed, result.proposed);
    return result;
@@ -1855,9 +1917,9 @@ fc::variant read_only::convert_block( const chain::signed_block_ptr& block, abi_
 
 fc::variant read_only::get_block_info(const read_only::get_block_info_params& params, const fc::time_point&) const {
 
-   signed_block_ptr block;
+   std::optional<signed_block_header> block;
    try {
-         block = db.fetch_block_by_number( params.block_num );
+         block = db.fetch_block_header_by_number( params.block_num );
    } catch (...)   {
       // assert below will handle the invalid block num
    }
@@ -1883,34 +1945,41 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
 }
 
 fc::variant read_only::get_block_header_state(const get_block_header_state_params& params, const fc::time_point&) const {
-   block_header_state_legacy_ptr b;
+   signed_block_ptr sbp;
    std::optional<uint64_t> block_num;
-   std::exception_ptr e;
+
    try {
       block_num = fc::to_uint64(params.block_num_or_id);
    } catch( ... ) {}
 
    if( block_num ) {
-      b = db.fetch_block_state_by_number(*block_num);
+      sbp = db.fetch_block_by_number(*block_num);
    } else {
       try {
-         b = db.fetch_block_state_by_id(fc::variant(params.block_num_or_id).as<block_id_type>());
+         sbp = db.fetch_block_by_id(block_id_type(params.block_num_or_id));
       } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
    }
 
-   if( !b && db.is_irreversible_state_available() ) {
-      b = db.fetch_irr_block_header_state_by_number(*block_num);
-   }
-   SYS_ASSERT( b, unknown_block_exception, "Could not find reversible block: ${block}", ("block", params.block_num_or_id));
+   SYS_ASSERT( sbp, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num_or_id));
+
+   block_header_state_legacy ret;
+   ret.block_num = sbp->block_num();
+   ret.id = sbp->calculate_id();
+   ret.header = *sbp;
+   ret.additional_signatures = detail::extract_additional_signatures(sbp);
 
    fc::variant vo;
-   fc::to_variant( *b, vo );
+   fc::to_variant( ret, vo );
    return vo;
 }
 
 void read_write::push_block(read_write::push_block_params&& params, next_function<read_write::push_block_results> next) {
    try {
-      app().get_method<incoming::methods::block_sync>()(std::make_shared<signed_block>( std::move(params) ), std::optional<block_id_type>{}, block_state_legacy_ptr{});
+      auto b = std::make_shared<signed_block>( std::move(params) );
+      block_id_type id = b->calculate_id();
+      auto [best_head, obh] = db.accept_block( id, b );
+      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", id));
+      app().get_method<incoming::methods::block_sync>()(b, id, *obh);
    } catch ( boost::interprocess::bad_alloc& ) {
       handle_db_exhaustion();
    } catch ( const std::bad_alloc& ) {
@@ -1955,9 +2024,9 @@ void read_write::push_transaction(const read_write::push_transaction_params& par
                                              act_trace.get_object() );
                   }
 
-                  std::function<vector<fc::variant>(uint32_t)> convert_act_trace_to_tree_struct =
+                  std::function<fc::variants(uint32_t)> convert_act_trace_to_tree_struct =
                   [&](uint32_t closest_unnotified_ancestor_action_ordinal) {
-                     vector<fc::variant> restructured_act_traces;
+                     fc::variants restructured_act_traces;
                      auto it = act_traces_map.lower_bound(
                                  std::make_pair( closest_unnotified_ancestor_action_ordinal, 0)
                      );
@@ -2235,8 +2304,8 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    const auto& d = db.db();
    const auto& rm = db.get_resource_limits_manager();
 
-   result.head_block_num  = db.head_block_num();
-   result.head_block_time = db.head_block_time();
+   result.head_block_num  = db.head().block_num();
+   result.head_block_time = db.head().block_time();
 
    // Get baseline resource limits from the resource manager
    rm.get_account_limits(result.account_name, result.ram_quota, result.net_weight, result.cpu_weight);
@@ -2249,7 +2318,7 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.created          = accnt_obj.creation_date;
 
    uint32_t greylist_limit = db.is_resource_greylisted(result.account_name) ? 1 : config::maximum_elastic_resource_multiplier;
-   const block_timestamp_type current_usage_time (db.head_block_time());
+   const block_timestamp_type current_usage_time (db.head().block_time());
    result.net_limit.set( rm.get_account_net_limit_ex( result.account_name, greylist_limit, current_usage_time).first );
    if ( result.net_limit.last_usage_update_time && (result.net_limit.last_usage_update_time->slot == 0) ) {   // account has no action yet
       result.net_limit.last_usage_update_time = accnt_obj.creation_date;
@@ -2473,7 +2542,7 @@ read_only::get_consensus_parameters_results
 read_only::get_consensus_parameters(const get_consensus_parameters_params&, const fc::time_point& ) const {
    get_consensus_parameters_results results;
 
-   results.chain_config = db.get_global_properties().configuration;
+   to_variant(db.get_global_properties().configuration, results.chain_config); //chain_config_v1
    results.wasm_config = db.get_global_properties().wasm_configuration;
 
    return results;

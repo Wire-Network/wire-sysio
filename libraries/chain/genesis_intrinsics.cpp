@@ -198,7 +198,8 @@ const std::vector<const char*> genesis_intrinsics = {
    "bls_fp_exp",
    "get_ram_usage",
    "preactivate_feature",
-   "is_feature_activated"
+   "is_feature_activated",
+   "set_finalizers"
 };
 
 } } // namespace sysio::chain

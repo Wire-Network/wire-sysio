@@ -28,7 +28,10 @@ class sysvmoc_instantiated_module : public wasm_instantiated_module_interface {
       bool is_main_thread() { return _main_thread_id == std::this_thread::get_id(); };
 
       void apply(apply_context& context) override {
-         const code_descriptor* const cd = _sysvmoc_runtime.cc.get_descriptor_for_code_sync(_code_hash, _vm_version, context.control.is_write_window());
+         sysio::chain::sysvmoc::code_cache_sync::mode m;
+         m.whitelisted = context.is_sys_vm_oc_whitelisted();
+         m.write_window = context.control.is_write_window();
+         const code_descriptor* const cd = _sysvmoc_runtime.cc.get_descriptor_for_code_sync(m, context.get_receiver(), _code_hash, _vm_version);
          SYS_ASSERT(cd, wasm_execution_error, "SYS VM OC instantiation failed");
 
          if ( is_main_thread() )

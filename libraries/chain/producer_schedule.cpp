@@ -56,4 +56,4 @@ shared_producer_authority_schedule& shared_producer_authority_schedule::operator
    return *this;
 }
 
-} /// eosio::chain
+} /// sysio::chain

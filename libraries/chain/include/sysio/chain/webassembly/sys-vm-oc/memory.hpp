@@ -1,10 +1,10 @@
 #pragma once
+#include <fc/exception/exception.hpp>
 
 #include <sysio/chain/wasm_sysio_constraints.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/sys-vm-oc.h>
 #include <sysio/chain/webassembly/sys-vm-oc/intrinsic_mapping.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/gs_seg_helpers.h>
-#include <fc/exception/exception.hpp>
 
 #include <stdint.h>
 #include <stddef.h>

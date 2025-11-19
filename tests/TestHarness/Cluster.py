@@ -173,14 +173,18 @@ class Cluster(object):
     # pylint: disable=too-many-statements
     def launch(self, pnodes=1, unstartedNodes=0, totalNodes=1, prodCount=21, topo="mesh", delay=2, onlyBios=False, dontBootstrap=False,
                totalProducers=None, sharedProducers=0, extraNodeopArgs="", specificExtraNodeopArgs=None, specificNodeopInstances=None, onlySetProds=False,
-               pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True, nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
+               pfSetupPolicy=PFSetupPolicy.FULL, alternateVersionLabelsFile=None, associatedNodeLabels=None, loadSystemContract=True,
+               activateIF=False, biosFinalizer=True,
+               signatureProviderForNonProducer=False,
+               nodeopLogPath=Path(Utils.TestLogRoot) / Path(f'{Path(sys.argv[0]).stem}{os.getpid()}'), genesisPath=None,
                maximumP2pPerHost=0, maximumClients=25, prodsEnableTraceApi=True):
         """Launch cluster.
         pnodes: producer nodes count
         unstartedNodes: non-producer nodes that are configured into the launch, but not started.  Should be included in totalNodes.
         totalNodes: producer + non-producer nodes + unstarted non-producer nodes count
         prodCount: producers per producer node count
-        topo: cluster topology (as defined by launcher, and "bridge" shape that is specific to this launch method)
+        topo: cluster topology (as defined by launcher, and "bridge" shape that is specific to this launch method).
+              bridge configures producers non-consecutive in nodes.
         delay: delay between individual nodes launch (as defined by launcher)
           delay 0 exposes a bootstrap bug where producer handover may have a large gap confusing nodes and bringing system to a halt.
         onlyBios: When true, only loads the bios contract (and not more full bootstrapping).
@@ -194,7 +198,10 @@ class Cluster(object):
         pfSetupPolicy: determine the protocol feature setup policy (none, preactivate_feature_only, or full)
         alternateVersionLabelsFile: Supply an alternate version labels file to use with associatedNodeLabels.
         associatedNodeLabels: Supply a dictionary of node numbers to use an alternate label for a specific node.
-        loadSystemContract: indicate whether the sysio.system contract should be loaded
+        loadSystemContract: indicate whether the sysio system contract should be loaded
+        activateIF: Activate/enable instant-finality by setting finalizers
+        biosFinalizer: True if the biosNode should act as a finalizer
+        signatureProviderForNonProducer: Add signature provider for non-producer
         genesisPath: set the path to a specific genesis.json to use
         maximumP2pPerHost:  Maximum number of client nodes from any single IP address. Defaults to totalNodes if not set.
         maximumClients: Maximum number of clients from which connections are accepted, use 0 for no limit. Defaults to 25.
@@ -260,6 +267,8 @@ class Cluster(object):
         if self.staging:
             argsArr.append("--nogen")
         nodeopArgs=""
+        if "--vote-threads" not in extraNodeopArgs:
+            nodeopArgs += " --vote-threads 4"
         if "--max-transaction-time" not in extraNodeopArgs:
             nodeopArgs += " --max-transaction-time -1"
         if "--abi-serializer-max-time-ms" not in extraNodeopArgs:
@@ -268,6 +277,9 @@ class Cluster(object):
             nodeopArgs += f" --p2p-max-nodes-per-host {maximumP2pPerHost}"
         if "--max-clients" not in extraNodeopArgs:
             nodeopArgs += f" --max-clients {maximumClients}"
+        if "--connection-cleanup-period" not in extraNodeopArgs:
+            # Quicker retry, default is 30s, since many tests launch multiple nodes at the same time
+            nodeopArgs += f" --connection-cleanup-period 15"
         if Utils.Debug and "--contracts-console" not in extraNodeopArgs:
             nodeopArgs += " --contracts-console"
         if PFSetupPolicy.hasPreactivateFeature(pfSetupPolicy):
@@ -316,9 +328,9 @@ class Cluster(object):
 
         if genesisPath is None:
             argsArr.append("--max-block-cpu-usage")
-            argsArr.append(str(500000))
+            argsArr.append(str(400000))
             argsArr.append("--max-transaction-cpu-usage")
-            argsArr.append(str(475000))
+            argsArr.append(str(375000))
         else:
             argsArr.append("--genesis")
             argsArr.append(str(genesisPath))
@@ -372,17 +384,9 @@ class Cluster(object):
             biosNodeObject=None
             bridgeNodes={}
             producerNodes={}
-            producers=[]
-            for append in range(ord('a'),ord('a')+numProducers):
-                name="defproducer" + chr(append)
-                producers.append(name)
-
-            # first group starts at 0
-            secondGroupStart=int((numProducers+1)/2)
             producerGroup1=[]
             producerGroup2=[]
 
-            Utils.Print("producers=%s" % (producers))
             shapeFileNodeMap = {}
             def getNodeNum(nodeName):
                 p=re.compile(r'^testnet_(\d+)$')
@@ -409,31 +413,17 @@ class Cluster(object):
                 if (numNodeProducers==0):
                     bridgeNodes[nodeName]=shapeFileNode
                 else:
+                    # producer node, add it to our producerNodes map
                     producerNodes[nodeName]=shapeFileNode
-                    group=None
-                    # go through all the producers for this node and determine which group on the bridged network they are in
-                    for shapeFileNodeProd in shapeFileNodeProds:
-                        producerIndex=0
-                        for prod in producers:
-                            if prod==shapeFileNodeProd:
-                                break
-                            producerIndex+=1
 
-                        prodGroup=None
-                        if producerIndex<secondGroupStart:
-                            prodGroup=1
-                            if group is None:
-                                group=prodGroup
-                                producerGroup1.append(nodeName)
-                                Utils.Print("Group1 grouping producerIndex=%s, secondGroupStart=%s" % (producerIndex,secondGroupStart))
-                        else:
-                            prodGroup=2
-                            if group is None:
-                                group=prodGroup
-                                producerGroup2.append(nodeName)
-                                Utils.Print("Group2 grouping producerIndex=%s, secondGroupStart=%s" % (producerIndex,secondGroupStart))
-                        if group!=prodGroup:
-                            Utils.errorExit("Node configuration not consistent with \"bridge\" topology. Node %s has producers that fall into both halves of the bridged network" % (nodeName))
+                    # assign producer to either group1 or group2
+                    if len(producerGroup1) <= len(producerGroup2):
+                        producerGroup1.append(nodeName)
+                    else:
+                        producerGroup2.append(nodeName)
+
+            Utils.Print(f"Producer Group 1: {producerGroup1}")
+            Utils.Print(f"Producer Group 2: {producerGroup2}")
 
             for _,bridgeNode in bridgeNodes.items():
                 bridgeNode["peers"]=[]
@@ -462,15 +452,8 @@ class Cluster(object):
             argsArr.append("--shape")
             argsArr.append(topo)
 
-        if type(specificExtraNodeopArgs) is dict:
-            for args in specificExtraNodeopArgs.values():
-                if "--plugin sysio::history_api_plugin" in args:
-                    argsArr.append("--is-nodeop-v2")
-                    break
-
-        # Handle common case of specifying no block offset for older versions
-        if "v2" in self.nodeopVers or "v3" in self.nodeopVers or "v4" in self.nodeopVers:
-            argsArr = list(map(lambda st: str.replace(st, "--produce-block-offset-ms 0", "--last-block-time-offset-us 0 --last-block-cpu-effort-percent 100"), argsArr))
+        if signatureProviderForNonProducer:
+            argsArr.append("--signature-provider")
 
         Cluster.__LauncherCmdArr = argsArr.copy()
 
@@ -485,6 +468,9 @@ class Cluster(object):
             node = Node(self.host, self.port + nodeNum, nodeNum, Path(instance.data_dir_name),
                         Path(instance.config_dir_name), sysdcmd, unstarted=instance.dont_start,
                         launch_time=launcher.launch_time, walletMgr=self.walletMgr, nodeopVers=self.nodeopVers)
+            node.keys = instance.keys
+            node.isProducer = len(instance.producers) > 0
+            node.producerName = instance.producers[0] if node.isProducer else None
             if nodeNum == Node.biosNodeId:
                 self.biosNode = node
             else:
@@ -518,7 +504,7 @@ class Cluster(object):
             return True
 
         Utils.Print("Bootstrap cluster.")
-        if not self.bootstrap(self.biosNode, self.startedNodesCount, prodCount + sharedProducers, totalProducers, pfSetupPolicy, onlyBios, onlySetProds, loadSystemContract):
+        if not self.bootstrap(launcher, self.biosNode, self.startedNodesCount, prodCount + sharedProducers, totalProducers, pfSetupPolicy, onlyBios, onlySetProds, loadSystemContract, activateIF, biosFinalizer, signatureProviderForNonProducer):
             Utils.Print("ERROR: Bootstrap failed.")
             return False
 
@@ -750,7 +736,7 @@ class Cluster(object):
 
     # Spread funds across accounts with transactions spread through cluster nodes.
     #  Validate transactions are synchronized on root node
-    def spreadFunds(self, source, accounts, amount=1):
+    def spreadFunds(self, source, accounts, amount=1, waitForFinalization=False):
         assert(source)
         assert(isinstance(source, Account))
         assert(accounts)
@@ -813,9 +799,14 @@ class Cluster(object):
         # As an extra step wait for last transaction on the root node
         node=self.nodes[0]
         if Utils.Debug: Utils.Print("Wait for transaction id %s on node port %d" % (transId, node.port))
-        if node.waitForTransactionInBlock(transId) is False:
-            Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, node.port))
-            return False
+        if waitForFinalization:
+            if node.waitForTransFinalization(transId) is False:
+                Utils.Print("ERROR: Failed to validate transaction %s got rolled into a final block on server port %d." % (transId, node.port))
+                return False
+        else:
+            if node.waitForTransactionInBlock(transId) is False:
+                Utils.Print("ERROR: Failed to validate transaction %s got rolled into a block on server port %d." % (transId, node.port))
+                return False
 
         return True
 
@@ -844,7 +835,7 @@ class Cluster(object):
 
         return True
 
-    def spreadFundsAndValidate(self, transferAmount=1):
+    def spreadFundsAndValidate(self, transferAmount=1, waitForFinalization=False):
         """Sprays 'transferAmount' funds across configured accounts and validates action. The spray is done in a trickle down fashion with account 1
         receiving transferAmount*n SYS and forwarding x-transferAmount funds. Transfer actions are spread round-robin across the cluster to vaidate system cohesiveness."""
 
@@ -853,7 +844,7 @@ class Cluster(object):
         assert(initialBalances)
         assert(isinstance(initialBalances, dict))
 
-        if False == self.spreadFunds(self.defproduceraAccount, self.accounts, transferAmount):
+        if False == self.spreadFunds(self.defproduceraAccount, self.accounts, transferAmount, waitForFinalization=waitForFinalization):
             Utils.Print("ERROR: Failed to spread funds across nodes.")
             return False
 
@@ -995,7 +986,75 @@ class Cluster(object):
         Utils.Print(f'Found {len(producerKeys)} producer keys')
         return producerKeys
 
-    def bootstrap(self, biosNode, totalNodes, prodCount, totalProducers, pfSetupPolicy, onlyBios=False, onlySetProds=False, loadSystemContract=True):
+    def activateInstantFinality(self, biosFinalizer=True, waitForFinalization=True, signatureProviderForNonProducer=False):
+        nodes = self.nodes.copy()
+        nodes.append(self.biosNode)
+        for n in (self.nodes + [self.biosNode]):
+            if not n or not n.keys or not n.keys[0].blspubkey:
+                nodes.remove(n)
+                continue
+            if not signatureProviderForNonProducer and not n.isProducer:
+                nodes.remove(n)
+                continue
+            if n.nodeId == 'bios' and not biosFinalizer:
+                nodes.remove(n)
+                continue
+
+        transId = self.setFinalizers(nodes)
+        if transId is None:
+            return None, 0
+        if waitForFinalization:
+            if not self.biosNode.waitForTransFinalization(transId, timeout=21 * 12 * 3):
+                Utils.Print(f'ERROR: Failed to validate setfinalizer transaction {transId} got rolled into a '
+                            f'LIB block on server port {self.biosNode.port}.')
+                return None, transId
+        return True, transId
+
+    # finalizerNames specifies non-default finalizer name for each node
+    def setFinalizers(self, nodes, node=None, finalizerNames=None):
+        # finalizerNames, if present, must specify finalizer names for all the nodes
+        assert(finalizerNames is None or len(nodes) == len(finalizerNames))
+        if node is None:
+            node = self.biosNode
+        numFins = len(nodes)
+        threshold = int(numFins * 2 / 3 + 1)
+        if Utils.Debug: Utils.Print(f"threshold: {threshold}, numFins: {numFins}")
+        setFinStr =  f'{{"finalizer_policy": {{'
+        setFinStr += f'  "threshold": {threshold}, '
+        setFinStr += f'  "finalizers": ['
+        finNum = 1
+        for n in nodes:
+            finName = finalizerNames[finNum-1] if finalizerNames is not None else  n.producerName if n.producerName is not None else f"finalizer{finNum}"
+            setFinStr += f'    {{"description": "{finName}", '
+            setFinStr += f'     "weight":1, '
+            setFinStr += f'     "public_key": "{n.keys[0].blspubkey}", '
+            setFinStr += f'     "pop": "{n.keys[0].blspop}"'
+            setFinStr += f'    }}'
+            if finNum != numFins:
+                setFinStr += f', '
+            finNum = finNum + 1
+        setFinStr +=  f'  ]'
+        setFinStr +=  f'}}}}'
+        if Utils.Debug: Utils.Print("setfinalizers: %s" % (setFinStr))
+        Utils.Print("Setting finalizers")
+        opts = "--permission sysio@active"
+        # setfinalizer can fail on ci/cd because it required too much CPU, try a few times
+        retries = 3
+        while retries > 0:
+            trans = node.pushMessage("sysio", "setfinalizer", setFinStr, opts)
+            if trans is None or not trans[0]:
+                retries = retries - 1
+                continue
+            else:
+                break
+        if trans is None or not trans[0]:
+            Utils.Print("ERROR: Failed to set finalizers")
+            return None
+        Node.validateTransaction(trans[1])
+        transId = Node.getTransId(trans[1])
+        return transId
+
+    def bootstrap(self, launcher,  biosNode, totalNodes, prodCount, totalProducers, pfSetupPolicy, onlyBios=False, onlySetProds=False, loadSystemContract=True, activateIF=False, biosFinalizer=True, signatureProviderForNonProducer=False):
         """Create 'prodCount' init accounts and deposits 10000000000 SYS in each. If prodCount is -1 will initialize all possible producers.
         Ensure nodes are inter-connected prior to this call. One way to validate this will be to check if every node has block 1."""
 
@@ -1031,17 +1090,25 @@ class Cluster(object):
             Utils.Print("ERROR: Failed to import %s account keys into ignition wallet." % (sysioName))
             return None
 
-        if onlyBios or (not loadSystemContract and pfSetupPolicy == PFSetupPolicy.FULL):
-            contract="sysio.bios"
-            contractDir=str(self.libTestingContractsPath / contract)
-            wasmFile="%s.wasm" % (contract)
-            abiFile="%s.abi" % (contract)
-            Utils.Print("Publish %s contract" % (contract))
-            trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
-            if trans is None:
-                Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+        contract="sysio.bios"
+        contractDir=str(self.libTestingContractsPath / contract)
+        wasmFile="%s.wasm" % (contract)
+        abiFile="%s.abi" % (contract)
+        Utils.Print("Publish %s contract" % (contract))
+        trans=biosNode.publishContract(sysioAccount, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+        if trans is None:
+            Utils.Print("ERROR: Failed to publish contract %s." % (contract))
+            return None
+        Node.validateTransaction(trans)
+
+        if pfSetupPolicy == PFSetupPolicy.FULL:
+            biosNode.activateAllBuiltinProtocolFeature()
+
+        if activateIF:
+            success, transId = self.activateInstantFinality(biosFinalizer=biosFinalizer, signatureProviderForNonProducer=signatureProviderForNonProducer)
+            if not success:
+                Utils.Print("ERROR: Activate instant finality failed")
                 return None
-            Node.validateTransaction(trans)
 
         Utils.Print("Creating accounts: %s " % ", ".join(producerKeys.keys()))
         producerKeys.pop(sysioName)
@@ -1087,6 +1154,10 @@ class Cluster(object):
         if not biosNode.waitForTransactionsInBlock(transIds):
             Utils.Print('ERROR: Failed to validate creation of system accounts')
             return None
+        #
+        # Could activate instant finality here, but have to wait for finality which with all the producers takes a long time
+        #         if activateIF:
+        #             self.activateInstantFinality()
 
         noopAccount = copy.deepcopy(self.sysioAccount)
         noopAccount.name = 'sysio.noop'
@@ -1112,9 +1183,6 @@ class Cluster(object):
                 return None
 
             Node.validateTransaction(trans)
-
-        if pfSetupPolicy == PFSetupPolicy.FULL:
-            biosNode.preactivateAllBuiltinProtocolFeature()
 
         if prodCount == -1:
             setProdsFile="setprods.json"
@@ -1444,6 +1512,31 @@ class Cluster(object):
 
         for f in self.filesToCleanup:
             os.remove(f)
+
+    def setProds(self, producers):
+        """Call setprods with list of producers"""
+        setProdsStr = '{"schedule": ['
+        firstTime = True
+        for name in producers:
+            if firstTime:
+                firstTime = False
+            else:
+                setProdsStr += ','
+            if not self.defProducerAccounts[name]:
+                Utils.Print(f"ERROR: no account key for {name}")
+                return None
+            key = self.defProducerAccounts[name].activePublicKey
+            setProdsStr += '{"producer_name":' + name + ',"authority": ["block_signing_authority_v0", {"threshold":1, "keys":[{"key":' + key + ', "weight":1}]}]}'
+
+        setProdsStr += ' ] }'
+        Utils.Print("setprods: %s" % (setProdsStr))
+        opts = "--permission sysio@active"
+        # pylint: disable=redefined-variable-type
+        trans = self.biosNode.pushMessage("sysio", "setprods", setProdsStr, opts)
+        if trans is None or not trans[0]:
+            Utils.Print("ERROR: Failed to set producer with cmd %s" % (setProdsStr))
+            return None
+        return True
 
     # Create accounts, if account does not already exist, and validates that the last transaction is received on root node
     def createAccounts(self, creator, waitForTransBlock=True, stakedDeposit=1000, validationNodeIndex=-1):

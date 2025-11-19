@@ -2,13 +2,12 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/platform_timer.hpp>
-#include <signal.h>
 
 namespace sysio::benchmark {
    struct interface_in_benchmark; // for benchmark testing
 }
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
    struct transaction_checktime_timer {
       public:
@@ -21,20 +20,91 @@ namespace sysio { namespace chain {
          void start(fc::time_point tp);
          void stop();
 
+         platform_timer::state_t timer_state() const { return _timer.timer_state(); }
+
          /* Sets a callback for when timer expires. Be aware this could might fire from a signal handling context and/or
             on any particular thread. Only a single callback can be registered at once; trying to register more will
             result in an exception. Use nullptr to disable a previously set callback. */
          void set_expiration_callback(void(*func)(void*), void* user);
 
-         std::atomic_bool& expired;
       private:
          platform_timer& _timer;
 
          friend controller_impl;
    };
 
+   struct action_digests_t {
+      enum class store_which_t { legacy, savanna, both };
+
+      std::optional<digests_t> digests_l; // legacy
+      std::optional<digests_t> digests_s; // savanna
+
+      explicit action_digests_t(store_which_t sw) {
+         if (sw == store_which_t::legacy || sw == store_which_t::both)
+            digests_l = digests_t{};
+         if (sw == store_which_t::savanna || sw == store_which_t::both)
+            digests_s = digests_t{};
+      }
+
+      void append(action_digests_t&& o) {
+         if (digests_l)
+            fc::move_append(*digests_l, std::move(*o.digests_l));
+         if (digests_s)
+            fc::move_append(*digests_s, std::move(*o.digests_s));
+      }
+
+      void compute_and_append_digests_from(action_trace& trace) {
+         if (digests_l)
+            digests_l->emplace_back(trace.digest_legacy());
+         if (digests_s)
+            digests_s->emplace_back(trace.digest_savanna());
+      }
+
+      store_which_t store_which() const {
+         if (digests_l && digests_s)
+            return store_which_t::both;
+         if (digests_l)
+            return store_which_t::legacy;
+         assert(digests_s);
+         return store_which_t::savanna;
+      }
+
+      std::pair<size_t, size_t> size() const {
+         return { digests_l ? digests_l->size() : 0, digests_s ? digests_s->size() : 0 };
+      }
+
+      void resize(std::pair<size_t, size_t> sz) {
+         if (digests_l) digests_l->resize(sz.first);
+         if (digests_s) digests_s->resize(sz.second);
+      }
+   };
+
+   // transaction side affects to apply to block when block is assembled
+   struct trx_block_context {
+      std::optional<block_num_type>       proposed_schedule_block_num;
+      producer_authority_schedule         proposed_schedule;
+
+      std::optional<block_num_type>       proposed_fin_pol_block_num;
+      finalizer_policy                    proposed_fin_pol;
+
+      void apply(trx_block_context&& rhs) {
+         if (rhs.proposed_schedule_block_num) {
+            proposed_schedule_block_num = rhs.proposed_schedule_block_num;
+            proposed_schedule = std::move(rhs.proposed_schedule);
+         }
+         if (rhs.proposed_fin_pol_block_num) {
+            proposed_fin_pol_block_num = rhs.proposed_fin_pol_block_num;
+            proposed_fin_pol = std::move(rhs.proposed_fin_pol);
+         }
+      }
+   };
+
    class transaction_context {
       private:
+         // construction/reset initialization
+         void initialize();
+         void reset();
+         // common init called by init_for_* methods below
          void init( uint64_t initial_net_usage);
 
       public:
@@ -43,11 +113,12 @@ namespace sysio { namespace chain {
                               const packed_transaction& t,
                               const transaction_id_type& trx_id, // trx_id diff than t.id() before replace_deferred
                               transaction_checktime_timer&& timer,
-                              fc::time_point start = fc::time_point::now(),
-                              transaction_metadata::trx_type type = transaction_metadata::trx_type::input);
+                              action_digests_t::store_which_t sad,
+                              fc::time_point start,
+                              transaction_metadata::trx_type type);
          ~transaction_context();
 
-         void init_for_implicit_trx( uint64_t initial_net_usage = 0 );
+         void init_for_implicit_trx();
 
          void init_for_input_trx( uint64_t packed_trx_unprunable_size,
                                   uint64_t packed_trx_prunable_size );
@@ -57,7 +128,7 @@ namespace sysio { namespace chain {
          void squash();
          void undo();
 
-         inline void add_net_usage( uint64_t u ) { net_usage += u; check_net_usage(); }
+         inline void add_net_usage( uint64_t u ) { trace->net_usage += u; check_net_usage(); }
 
          void check_net_usage()const;
 
@@ -78,7 +149,7 @@ namespace sysio { namespace chain {
          }
 
          void pause_billing_timer();
-         void resume_billing_timer();
+         void resume_billing_timer(fc::time_point resume_from = fc::time_point{});
 
          uint32_t update_billed_cpu_time( fc::time_point now );
 
@@ -89,6 +160,12 @@ namespace sysio { namespace chain {
          bool is_dry_run()const { return trx_type == transaction_metadata::trx_type::dry_run; };
          bool is_read_only()const { return trx_type == transaction_metadata::trx_type::read_only; };
          bool is_transient()const { return trx_type == transaction_metadata::trx_type::read_only || trx_type == transaction_metadata::trx_type::dry_run; };
+         bool is_implicit()const { return trx_type == transaction_metadata::trx_type::implicit; };
+         bool is_scheduled()const { return trx_type == transaction_metadata::trx_type::scheduled; };
+         bool has_undo()const;
+
+         int64_t set_proposed_producers(vector<producer_authority> producers);
+         void    set_proposed_finalizers(finalizer_policy&& fin_pol);
 
       private:
 
@@ -137,8 +214,7 @@ namespace sysio { namespace chain {
 
          fc::time_point                published;
 
-
-         deque<digest_type>           executed_action_receipt_digests;
+         action_digests_t              executed_action_receipts;
          flat_set<account_name>        bill_to_accounts;
          flat_set<account_name>        validate_ram_usage;
 
@@ -165,7 +241,7 @@ namespace sysio { namespace chain {
          bool                          net_limit_due_to_block = true;
          bool                          net_limit_due_to_greylist = false;
          uint64_t                      eager_net_limit = 0;
-         uint64_t&                     net_usage; /// reference to trace->net_usage
+         uint64_t                      init_net_usage = 0;
 
          bool                          cpu_limit_due_to_greylist = false;
 
@@ -178,6 +254,7 @@ namespace sysio { namespace chain {
          int64_t                       billing_timer_exception_code = block_cpu_usage_exceeded::code_value;
          fc::time_point                pseudo_start;
          fc::microseconds              billed_time;
+         trx_block_context             trx_blk_context;
 
          // Roa Change
          // Store total RAM usage accumulated during actions here.
@@ -194,4 +271,4 @@ namespace sysio { namespace chain {
          tx_cpu_usage_exceeded_reason  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
    };
 
-} }
+} // namespace sysio::chain
