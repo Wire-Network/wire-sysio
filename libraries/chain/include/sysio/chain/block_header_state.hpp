@@ -77,6 +77,7 @@ struct block_header_state_input : public building_block_input {
    std::optional<finalizer_policy>   new_finalizer_policy; // Comes from building_block::new_finalizer_policy
    qc_claim_t                        most_recent_ancestor_with_qc; // Comes from traversing branch from parent and calling get_best_qc()
    digest_type                       finality_mroot_claim;
+   deque<s_header>                   s_headers; // Added new functionality to pass many state headers to be included in block header extension
 };
 
 struct block_header_state : fc::reflect_init {

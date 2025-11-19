@@ -392,6 +392,7 @@ struct building_block {
       deque<transaction_receipt>          pending_trx_receipts;
       checksum_or_digests                 trx_mroot_or_receipt_digests {digests_t{}};
       action_digests_t                    action_receipt_digests;
+      deque<s_header>                     s_headers; // Added new functionality to pass many state headers to be included in block header extension
       trx_block_context                   trx_blk_context;
 
       building_block_common(const vector<digest_type>& new_protocol_feature_activations,
@@ -635,6 +636,10 @@ struct building_block {
        return std::visit([](auto& bb) -> action_digests_t& { return bb.action_receipt_digests; }, v);
    }
 
+   deque<s_header>& s_headers() {
+      return std::visit([](auto& bb) -> deque<s_header>& { return bb.s_headers; }, v);
+   }
+
    const producer_authority_schedule& active_producers() const {
       return std::visit(overloaded{[](const building_block_legacy& bb) -> const producer_authority_schedule& {
                                       return bb.pending_block_header_state.active_schedule;
@@ -727,11 +732,10 @@ struct building_block {
                   bb.pending_block_header_state.qc_claim = validating_qc_data->qc_claim;
                }
 
-               const chain::deque<s_header> s_headers = {}; // TODO: add in s_headers
                // in dpos, we create a signed_block here. In IF mode, we do it later (when we are ready to sign it)
                auto block_ptr = signed_block::create_mutable_block(bb.pending_block_header_state.make_block_header(
                   transaction_mroot, action_mroot, bb.new_pending_producer_schedule, std::move(new_finalizer_policy),
-                  vector<digest_type>(bb.new_protocol_feature_activations), pfs, s_headers));
+                  vector<digest_type>(bb.new_protocol_feature_activations), pfs, bb.s_headers));
 
                block_ptr->transactions = std::move(bb.pending_trx_receipts);
 
@@ -791,7 +795,8 @@ struct building_block {
                   std::move(new_proposer_policy),
                   std::move(new_finalizer_policy),
                   qc_data.qc_claim,
-                  finality_mroot_claim
+                  finality_mroot_claim,
+                  std::move(bb.s_headers)
                };
 
                auto bhs = bb.parent.next(bhs_input);
@@ -3556,6 +3561,46 @@ struct controller_impl {
                           ("producer_block_id", producer_block_id)("validator_block_id", ab.id()));
             }
 
+            if( are_multiple_state_roots_supported() ) {
+               // New: Process the s_header from block header extensions
+               auto rcvd_it = b->header_extensions.begin();
+               const auto next_rcvd = [&itr=rcvd_it, end=b->header_extensions.end()](bool include_start) {
+                  if( !include_start ) ++itr;
+                  // find the first s_root_extension in the received block header extensions
+                  return std::find_if(itr, end,
+                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+               auto crtd_it = ab.header().header_extensions.begin();
+               const auto next_crtd = [&itr=crtd_it, end=ab.header().header_extensions.end()](bool include_start) {
+                  if( !include_start ) ++itr;
+                  // find the first s_root_extension in the locally constructed block header extensions
+                  // (which should be the same as the received block header extensions)
+                  return std::find_if(itr, end,
+                     [](const auto& ext) { return ext.first == s_root_extension::extension_id(); }); };
+               uint32_t count = 0;
+               bool rcvd = true;
+               bool crtd = true;
+               bool include_start = true;
+               while( rcvd ) {
+                  rcvd_it = next_rcvd(include_start);
+                  crtd_it = next_crtd(include_start);
+                  ++count;
+                  include_start = false; // only include start for the first iteration
+                  rcvd = rcvd_it != b->header_extensions.end();
+                  crtd = crtd_it != ab.header().header_extensions.end();
+                  SYS_ASSERT( rcvd == crtd, block_validate_exception,
+                              "The received block did${neg1} have $(count) root header extensions, but the locally constructed one did${neg2}",
+                              ("neg1", (rcvd ? "" : " not"))("count", count)("neg2", (crtd ? "" : " not")) );
+                  if( rcvd && rcvd_it->second != crtd_it->second ) {
+                     s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
+                     s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
+                     SYS_THROW( block_validate_exception,
+                                "The received block root header extension, at slot number ${count}: ${rcvd}; and the locally "
+                                "constructed one: ${crdt}; don't match!",
+                                ("count", count)("rcvd", rcvd_s_header.to_string())("crdt", crtd_s_header.to_string()) );
+                  }
+               }
+            }
+
             if( !use_bsp_cached ) {
                bsp->set_trxs_metas( ab.extract_trx_metas(), !skip_auth_checks );
             }
@@ -5135,8 +5180,7 @@ void controller_impl::set_s_headers( uint32_t block_num ) {
    SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finalize_block");
    // Try to set it first in the pending block
    auto& bb = std::get<building_block>(pending->_block_stage);
-   // TODO: s_header
-   // bb._s_header = merkle_processor->get_s_headers( block_num );
+   bb.s_headers() = merkle_processor->get_s_headers( block_num );
 }
 
 void controller::set_disable_replay_opts( bool v ) {

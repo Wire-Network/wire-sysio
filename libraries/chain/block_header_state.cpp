@@ -479,6 +479,15 @@ block_header_state block_header_state::next(block_header_state_input& input) con
       next_header_state.header_exts.emplace(ext_id, std::move(pfa_ext));
    }
 
+   // Add s_root_extensions to header extensions if present & relevant
+   for (const auto& header : input.s_headers) {
+      emplace_extension(
+         next_header_state.header.header_extensions,
+         s_root_extension::extension_id(),
+         fc::raw::pack( s_root_extension ( header ))
+      );
+   }
+
    finish_next(*this, next_header_state, std::move(input.new_protocol_feature_activations), std::move(new_f_ext), true);
 
    return next_header_state;
