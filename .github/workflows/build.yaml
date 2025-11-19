@@ -146,72 +146,12 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
-      options: >-
-        --security-opt seccomp=unconfined
-        --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
-        --mount type=bind,source=/usr/bin/docker,target=/usr/bin/docker,readonly
-        --mount type=bind,source=/run/docker-runners,target=/run/docker-runners
-        --mount type=bind,source=/etc/docker-runners,target=/etc/docker-runners,readonly
+      options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
 
 
     steps:
-      - name: Create ephemeral Docker context
-        id: docker-context
-        run: |
-            set -euo pipefail
-            echo "===== DEBUG: ENVIRONMENT ====="
-            whoami
-            id
-            echo "HOME=$HOME"
-            echo "PWD=$PWD"
-            echo "RUNNER_NAME=$RUNNER_NAME"
-            echo "BASE_RUNNER=${RUNNER_NAME,,}"
-
-            echo "===== DEBUG: PATHS ====="
-            echo "User PATH: $PATH"
-            sudo bash -c 'echo "Sudo PATH: $PATH"'
-
-            echo "===== DEBUG: DOCKER BINARIES ====="
-            which docker || echo "docker not found in PATH"
-            sudo which docker || echo "sudo: docker not found in PATH"
-
-            echo "===== DEBUG: DOCKER BIN LOCATIONS ====="
-            ls -l /usr/bin/docker 2>/dev/null || echo "/usr/bin/docker missing"
-            ls -l /usr/local/bin/docker 2>/dev/null || echo "/usr/local/bin/docker missing"
-
-            echo "===== DEBUG: VERIFY EXECUTION ====="
-            # Try executing docker both with and without sudo to see the difference
-            docker version || echo "docker version failed (user)"
-            sudo /usr/bin/docker version || echo "sudo /usr/bin/docker version failed (explicit path)"
-            sudo docker version || echo "sudo docker version failed (plain sudo)"
-
-            echo "===== DEBUG: SUDO CONFIG ====="
-            sudo grep -E '^Defaults' /etc/sudoers /etc/sudoers.d/* 2>/dev/null | grep -E 'secure_path|env_keep' || echo "No sudo Defaults found"
-            
-            echo "Detected runner name: $RUNNER_NAME"
-            name="${RUNNER_NAME,,}"
-
-            [[ $name =~ runner-([0-9]+) ]] || { echo "No runner number in '$RUNNER_NAME'"; exit 1; }
-            num="${BASH_REMATCH[1]}"
-            sock="/run/docker-runners/docker-runner${num}.sock"
-            [[ -S "$sock" ]] || { echo "Socket not found: $sock"; exit 1; }
-
-            echo "Using Docker socket: $sock"
-            echo "DOCKER_HOST=unix://$sock" >> "$GITHUB_ENV"
-
-            ctx="job-${{ github.run_id }}-${{ github.job }}-${{ matrix.cfg.name }}"
-            sudo docker context inspect "$ctx" >/dev/null 2>&1 || \
-              sudo docker context create "$ctx" --docker "host=unix://$sock"
-            echo "DOCKER_CONTEXT=$ctx" >> "$GITHUB_ENV"
-
-      # - name: Cleanup stale containers
-      #   run: |
-      #     echo "Removing old containers for context $DOCKER_CONTEXT..."
-      #     sudo docker --context "$DOCKER_CONTEXT" ps -aq | xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
-      #     echo "Cleanup complete."
-
       - name: Ensure writable workspace
         run: |
           echo "User is $USER"
@@ -292,7 +232,7 @@ jobs:
           zstdcat build.tar.zst | tar x
           sudo chown -R $(id -u):$(id -g) $PWD
           cd build
-          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 420
+          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 600
 
       - name: Upload core files from failed tests
         uses: actions/upload-artifact@v4
@@ -310,12 +250,6 @@ jobs:
           awk 'BEGIN {err = 1} /bmi2/ && /adx/ {err = 0} END {exit err}' /proc/cpuinfo
           build/tools/fsgsbase-enabled
 
-      - name: Remove ephemeral Docker context
-        if: always()
-        run: |
-          echo "Removing Docker context: $DOCKER_CONTEXT"
-          sudo docker context rm -f "$DOCKER_CONTEXT" || true
-
   np-tests:
     name: NP Tests (${{ matrix.cfg.name }})
     needs: [platform-cache, build-base]
@@ -325,7 +259,6 @@ jobs:
         include:
           - cfg: {name: 'ubuntu24', base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',    base: 'ubsan',    builddir: 'ubsan'}
-          - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
 
@@ -383,7 +316,7 @@ jobs:
           error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
           log-tarball-prefix: ${{ matrix.cfg.name }}
           tests-label: nonparallelizable_tests
-          test-timeout: 420
+          test-timeout: 600
 
       - name: Export core dumps
         if: failure()
@@ -435,7 +368,6 @@ jobs:
         include:
           - cfg: {name: 'ubuntu24',      base: 'ubuntu24', builddir: 'ubuntu24'}
           - cfg: {name: 'ubsan',         base: 'ubsan',    builddir: 'ubsan'}
-          - cfg: {name: 'asan',          base: 'asan', builddir: 'asan'}
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]

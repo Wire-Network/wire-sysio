@@ -567,30 +567,37 @@ class NodeopQueries:
         else:
             exitMsg=""
         trans=None
+        retries = 5
         start=time.perf_counter()
-        try:
-            if returnType==ReturnType.json:
-                trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
-            elif returnType==ReturnType.raw:
-                trans=Utils.runCmdReturnStr(cmd)
-            else:
-                unhandledEnumType(returnType)
-
-            if Utils.Debug:
-                end=time.perf_counter()
-                Utils.Print("cmd Duration: %.3f sec" % (end-start))
-        except subprocess.CalledProcessError as ex:
-            if not silentErrors:
-                end=time.perf_counter()
-                out=ex.output.decode("utf-8")
-                msg=ex.stderr.decode("utf-8")
-                errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-start, exitMsg)
-                if exitOnError:
-                    Utils.cmdError(errorMsg)
-                    Utils.errorExit(errorMsg)
+        while retries > 0:
+            retries -= 1
+            try:
+                if returnType==ReturnType.json:
+                    trans=Utils.runCmdReturnJson(cmd, silentErrors=silentErrors)
+                elif returnType==ReturnType.raw:
+                    trans=Utils.runCmdReturnStr(cmd)
                 else:
-                    Utils.Print("ERROR: %s" % (errorMsg))
-            return None
+                    unhandledEnumType(returnType)
+
+                if Utils.Debug:
+                    end=time.perf_counter()
+                    Utils.Print("cmd Duration: %.3f sec" % (end-start))
+            except subprocess.CalledProcessError as ex:
+                if not silentErrors:
+                    end=time.perf_counter()
+                    out=ex.output.decode("utf-8")
+                    msg=ex.stderr.decode("utf-8")
+                    if retries > 0 and "tx_cpu_usage_exceeded" in out:
+                        Utils.Print(f"Retrying {cmdDesc} due to: tx_cpu_usage_exceeded")
+                        continue # try again
+                    errorMsg="Exception during \"%s\". Exception message: %s.  stdout: %s.  cmd Duration=%.3f sec. %s" % (cmdDesc, msg, out, end-start, exitMsg)
+                    if exitOnError:
+                        Utils.cmdError(errorMsg)
+                        Utils.errorExit(errorMsg)
+                    else:
+                        Utils.Print("ERROR: %s" % (errorMsg))
+                return None
+            break
 
         if exitOnError and trans is None:
             Utils.cmdError("could not \"%s\". %s" % (cmdDesc,exitMsg))

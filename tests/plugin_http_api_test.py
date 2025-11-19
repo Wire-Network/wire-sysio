@@ -99,8 +99,9 @@ class PluginHttpTest(unittest.TestCase):
 
         start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.SysServerPath, nodeop_plugins, nodeop_flags)
         self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.kiod)
-        time.sleep(self.sleep_s*2)
-        self.nodeop.waitForBlock(1, timeout=30)
+        if not self.nodeop or not Utils.waitForBool(self.nodeop.checkPulse, timeout=15):
+            Utils.Print("ERROR: node doesn't appear to be running...")
+            self.assertTrue(False, msg="nodeop failed to start.")
 
     def activateAllBuiltinProtocolFeatures(self):
         contract = "sysio.bios"

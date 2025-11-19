@@ -22,17 +22,11 @@ namespace fc {
       class private_key_impl;
     }
 
-    typedef fc::sha256                  blind_factor_type;
-    typedef fc::array<char,33>          commitment_type;
     typedef fc::array<char,33>          public_key_data;
     typedef fc::sha256                  private_key_secret;
     typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
     typedef fc::array<char,72>          signature;
     typedef fc::array<unsigned char,65> compact_signature;
-    typedef std::vector<char>           range_proof_type;
-    typedef fc::array<char,78>          extended_key_data;
-    typedef fc::sha256                  blinded_hash;
-    typedef fc::sha256                  blind_signature;
 
     /**
      *  @class public_key
@@ -44,29 +38,20 @@ namespace fc {
            public_key();
            public_key(const public_key& k);
            ~public_key();
-//           bool verify( const fc::sha256& digest, const signature& sig );
            public_key_data serialize()const;
-           public_key_point_data serialize_ecc_point()const;
 
-           operator public_key_data()const { return serialize(); }
+           explicit operator public_key_data()const { return serialize(); }
 
 
-           public_key( const public_key_data& v );
-           public_key( const public_key_point_data& v );
+           explicit public_key( const public_key_data& v );
+           explicit public_key( const public_key_point_data& v );
            public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
            public_key( const compact_signature& c, const unsigned char* digest, bool check_canonical = true );
 
-           public_key child( const fc::sha256& offset )const;
-
            bool valid()const;
-           /** Computes new pubkey = generator * offset + old pubkey ?! */
-//           public_key mult( const fc::sha256& offset )const;
-           /** Computes new pubkey = regenerate(offset).pubkey + old pubkey
-            *                      = offset * G + 1 * old pubkey ?! */
-           public_key add( const fc::sha256& offset )const;
 
-           public_key( public_key&& pk );
-           public_key& operator=( public_key&& pk );
+           public_key( public_key&& pk ) noexcept;
+           public_key& operator=( public_key&& pk ) noexcept;
            public_key& operator=( const public_key& pk );
 
            inline friend bool operator==( const public_key& a, const public_key& b )
@@ -84,11 +69,11 @@ namespace fc {
            static public_key from_base58( const std::string& b58 );
 
            unsigned int fingerprint() const;
+           static bool is_canonical( const compact_signature& c );
 
         private:
           friend class private_key;
           static public_key from_key_data( const public_key_data& v );
-          static bool is_canonical( const compact_signature& c );
           fc::fwd<detail::public_key_impl,33> my;
     };
 
@@ -100,11 +85,11 @@ namespace fc {
     {
         public:
            private_key();
-           private_key( private_key&& pk );
+           private_key( private_key&& pk ) noexcept;
            private_key( const private_key& pk );
            ~private_key();
 
-           private_key& operator=( private_key&& pk );
+           private_key& operator=( private_key&& pk ) noexcept;
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
@@ -121,7 +106,7 @@ namespace fc {
 
            private_key_secret get_secret()const; // get the private key secret
 
-           operator private_key_secret ()const { return get_secret(); }
+           explicit operator private_key_secret ()const { return get_secret(); }
 
            /**
             *  Given a public key, calculatse a 512 bit shared secret between that
@@ -129,9 +114,7 @@ namespace fc {
             */
            fc::sha512 get_shared_secret( const public_key& pub )const;
 
-//           signature         sign( const fc::sha256& digest )const;
            compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
-//           bool              verify( const fc::sha256& digest, const signature& sig );
 
            public_key get_public_key()const;
 
@@ -151,43 +134,8 @@ namespace fc {
            unsigned int fingerprint() const { return get_public_key().fingerprint(); }
 
         private:
-           private_key( EC_KEY* k );
-           static fc::sha256 get_secret( const EC_KEY * const k );
            fc::fwd<detail::private_key_impl,32> my;
     };
-
-     struct range_proof_info
-     {
-         int          exp;
-         int          mantissa;
-         uint64_t     min_value;
-         uint64_t     max_value;
-     };
-
-     commitment_type   blind( const blind_factor_type& blind, uint64_t value );
-     blind_factor_type blind_sum( const std::vector<blind_factor_type>& blinds, uint32_t non_neg );
-     /**  verifies taht commnits + neg_commits + excess == 0 */
-     bool            verify_sum( const std::vector<commitment_type>& commits, const std::vector<commitment_type>& neg_commits, int64_t excess );
-     bool            verify_range( uint64_t& min_val, uint64_t& max_val, const commitment_type& commit, const range_proof_type& proof );
-
-     range_proof_type range_proof_sign( uint64_t min_value,
-                                       const commitment_type& commit,
-                                       const blind_factor_type& commit_blind,
-                                       const blind_factor_type& nonce,
-                                       int8_t base10_exp,
-                                       uint8_t min_bits,
-                                       uint64_t actual_value
-                                     );
-
-     bool            verify_range_proof_rewind( blind_factor_type& blind_out,
-                                          uint64_t& value_out,
-                                          std::string& message_out,
-                                          const blind_factor_type& nonce,
-                                          uint64_t& min_val,
-                                          uint64_t& max_val,
-                                          commitment_type commit,
-                                          const range_proof_type& proof );
-     range_proof_info range_get_info( const range_proof_type& proof );
 
       /**
        * Shims
@@ -205,33 +153,7 @@ namespace fc {
          using public_key_type = public_key_shim;
          using crypto::shim<compact_signature>::shim;
 
-         public_key_type recover(const sha256& digest, bool check_canonical) const {
-            // "x19Ethereum Signed Message:\n" is the header used by the `eth_sign` RPC call. We have converted the string to its hex value to save a step.
-            // std::string erc155_message_prefix = "19457468657265756d205369676e6564204d6573736167653a0a3332";
-            uint8_t eth_prefix[28] = {
-               25,  69, 116, 104, 101, 114, 101,
-               117, 109,  32,  83, 105, 103, 110,
-               101, 100,  32,  77, 101, 115, 115,
-               97, 103, 101,  58,  10,  51,  50
-            };
-            
-            // Hash (keccak256) the msg string
-            unsigned char eth_prefixed_msg_raw[28 + 32];
-            std::copy(std::begin(eth_prefix), std::end(eth_prefix), std::begin(eth_prefixed_msg_raw));
-            std::copy((unsigned char*) digest.data(), (unsigned char*) digest.data() + 32, std::begin(eth_prefixed_msg_raw) + 28);
-
-            SHA3_CTX msg_ctx;
-            keccak_init(&msg_ctx);
-            keccak_update(&msg_ctx, eth_prefixed_msg_raw, 60);
-            
-            // Hash the newly created raw message.
-            unsigned char msg_digest_result[32];
-            keccak_final(&msg_ctx, msg_digest_result);
-
-            // sha256 msg_digest 
-
-            return public_key_type(public_key(_data, msg_digest_result, false).serialize());
-         }
+         public_key_type recover(const sha256& digest, bool check_canonical) const;
       };
 
       struct private_key_shim : public crypto::shim<private_key_secret> {
@@ -304,7 +226,6 @@ namespace fc {
 
 FC_REFLECT_TYPENAME( fc::em::private_key )
 FC_REFLECT_TYPENAME( fc::em::public_key )
-FC_REFLECT( fc::em::range_proof_info, (exp)(mantissa)(min_value)(max_value) )
 FC_REFLECT_DERIVED( fc::em::public_key_shim, (fc::crypto::shim<fc::em::public_key_data>), BOOST_PP_SEQ_NIL )
 FC_REFLECT_DERIVED( fc::em::signature_shim, (fc::crypto::shim<fc::em::compact_signature>), BOOST_PP_SEQ_NIL )
 FC_REFLECT_DERIVED( fc::em::private_key_shim, (fc::crypto::shim<fc::em::private_key_secret>), BOOST_PP_SEQ_NIL )

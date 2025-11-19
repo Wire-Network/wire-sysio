@@ -396,11 +396,22 @@ class Utils:
 
     @staticmethod
     def pgrepCmd(serverName):
-        # pylint: disable=deprecated-method
         # pgrep differs on different platform (amazonlinux1 and 2 for example). We need to check if pgrep -h has -a available and add that if so:
         try:
-            pgrepHelp = re.search('-a', subprocess.Popen("pgrep --help 2>/dev/null", shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8'))
-            pgrepHelp.group(0) # group() errors if -a is not found, so we don't need to do anything else special here.
+            # Use subprocess.run()
+            # 'text=True' decodes output automatically
+            # 'stderr=subprocess.DEVNULL' replaces need for '2>/dev/null'
+            result = subprocess.run(
+                "pgrep --help", 
+                shell=True, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.DEVNULL, 
+                text=True,
+                check=False # Don't raise an error if pgrep fails
+            )
+            
+            pgrepHelp = re.search('-a', result.stdout)
+            pgrepHelp.group(0) # group() errors if -a is not found
             pgrepOpts="-a"
         except AttributeError as error:
             # If no -a, AttributeError: 'NoneType' object has no attribute 'group'

@@ -721,7 +721,7 @@ public:
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
    fc::microseconds                                  _max_irreversible_block_age_us;
-   block_num_type                                    _max_reversible_blocks{0};
+   block_num_type                                    _max_reversible_blocks{3600}; // pause production when reached (30 minutes)
    // produce-block-offset is in terms of the complete round, internally use calculated value for each block of round
    fc::microseconds                                  _produce_block_cpu_effort;
    fc::time_point                                    _pending_block_deadline;
@@ -1302,7 +1302,7 @@ void producer_plugin::set_program_options(
          ("max-irreversible-block-age", bpo::value<int32_t>()->default_value( -1 ),
           "Limits the maximum age (in seconds) of the DPOS Irreversible Block for a chain this node will produce blocks on (use negative value to indicate unlimited)")
          ("max-reversible-blocks", bpo::value<uint32_t>()->default_value(config::default_max_reversible_blocks),
-           "Maximum allowed reversible blocks beyond irreversible before block production is paused. Specify 0 to disable.")
+           "Maximum allowed reversible blocks beyond irreversible before block production is paused. Specify 0 to disable. Default 3600 blocks.")
          ("producer-name,p", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "ID of producer controlled by this node (e.g. inita; may specify multiple times)")
          ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()->default_value(
@@ -1439,6 +1439,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _max_transaction_time_ms = options.at("max-transaction-time").as<int32_t>();
 
    _max_irreversible_block_age_us = fc::seconds(options.at("max-irreversible-block-age").as<int32_t>());
+   _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
    _max_reversible_blocks = options.at("max-reversible-blocks").as<uint32_t>();
 
