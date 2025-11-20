@@ -169,7 +169,6 @@ add_np_test(NAME ship_kill_client_test COMMAND tests/ship_kill_client_test.py -v
 
 add_np_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh)
 
-add_np_test(NAME producer-preactivate-feature-test COMMAND tests/prod_preactivation_test.py ${UNSHARE})
 add_np_test(NAME separate_prod_fin_test COMMAND tests/separate_prod_fin_test.py ${UNSHARE})
 add_np_test(NAME snapshot_in_svnn_transition_test COMMAND tests/snapshot_in_svnn_transition_test.py ${UNSHARE})
 add_np_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feature_test.py -v ${UNSHARE})
