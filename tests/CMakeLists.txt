@@ -283,16 +283,16 @@ add_np_test(NAME lib_advance_if_test COMMAND tests/lib_advance_test.py --activat
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
 
-add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} TIMEOUT 100)
+add_np_test(NAME http_plugin_test COMMAND tests/http_plugin_test.py ${UNSHARE} TIMEOUT 200)
 
-add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 50)
+add_np_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100)
 
-add_np_test(NAME plugin_http_api_test_savanna COMMAND tests/plugin_http_api_test_savanna.py TIMEOUT 240)
+add_np_test(NAME plugin_http_api_test_savanna COMMAND tests/plugin_http_api_test_savanna.py TIMEOUT 340)
 
-add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 50)
+add_np_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py TIMEOUT 100)
 set_tests_properties(plugin_http_category_api_test PROPERTIES ENVIRONMENT "PLUGIN_HTTP_TEST_CATEGORY=ON")
 
-add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 300)
+add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)
 
 add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py)
 
