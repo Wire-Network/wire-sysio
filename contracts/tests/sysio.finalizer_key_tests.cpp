@@ -220,6 +220,8 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_failure_tests, finalizer_key_test
 FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_same_finalizer_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
 
    // Register first finalizer key
@@ -247,6 +249,8 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_same_finalizer_tests, finalize
 FC_LOG_AND_RETHROW() // register_finalizer_key_by_same_finalizer_tests
 
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_duplicate_key_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
 
    // The first finalizer key
@@ -267,6 +271,9 @@ BOOST_FIXTURE_TEST_CASE(register_finalizer_key_duplicate_key_tests, finalizer_ke
 FC_LOG_AND_RETHROW() // register_finalizer_key_duplicate_key_tests
 
 BOOST_FIXTURE_TEST_CASE(register_finalizer_key_by_different_finalizers_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   add_roa_policy(NODE_DADDY, bob, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // register 2 producers
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
    BOOST_REQUIRE_EQUAL( success(), regproducer(bob) );
@@ -292,6 +299,9 @@ FC_LOG_AND_RETHROW() // register_finalizer_key_by_different_finalizers_tests
 
 
 BOOST_FIXTURE_TEST_CASE(register_duplicate_key_from_different_finalizers_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   add_roa_policy(NODE_DADDY, bob, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
    BOOST_REQUIRE_EQUAL( success(), regproducer(bob) );
 
@@ -309,6 +319,9 @@ BOOST_FIXTURE_TEST_CASE(register_duplicate_key_from_different_finalizers_tests, 
 FC_LOG_AND_RETHROW() // register_duplicate_key_from_different_finalizers_tests
 
 BOOST_FIXTURE_TEST_CASE(activate_finalizer_key_failure_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   add_roa_policy(NODE_DADDY, bob, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // bob111111111 does not have Alice's authority
    BOOST_REQUIRE_EQUAL( error( "missing authority of bob111111111" ),
                         push_action(alice, "actfinkey"_n, mvo()
@@ -344,6 +357,8 @@ BOOST_FIXTURE_TEST_CASE(activate_finalizer_key_failure_tests, finalizer_key_test
 FC_LOG_AND_RETHROW() // activate_finalizer_key_failure_tests
 
 BOOST_FIXTURE_TEST_CASE(activate_finalizer_key_success_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // Alice registers as a producer
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
 
@@ -374,6 +389,9 @@ BOOST_FIXTURE_TEST_CASE(activate_finalizer_key_success_tests, finalizer_key_test
 FC_LOG_AND_RETHROW() // activate_finalizer_key_success_tests
 
 BOOST_FIXTURE_TEST_CASE(delete_finalizer_key_failure_tests, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   add_roa_policy(NODE_DADDY, bob, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // bob111111111 does not have Alice's authority
    BOOST_REQUIRE_EQUAL( error( "missing authority of bob111111111" ),
                         push_action(alice, "delfinkey"_n, mvo()
@@ -417,6 +435,8 @@ BOOST_FIXTURE_TEST_CASE(delete_finalizer_key_failure_tests, finalizer_key_tester
 FC_LOG_AND_RETHROW() // delete_finalizer_key_failure_tests
 
 BOOST_FIXTURE_TEST_CASE(delete_finalizer_key_success_test, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // Alice registers as a producer
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
 
@@ -442,6 +462,8 @@ BOOST_FIXTURE_TEST_CASE(delete_finalizer_key_success_test, finalizer_key_tester)
 FC_LOG_AND_RETHROW() // delete_finalizer_key_success_test
 
 BOOST_FIXTURE_TEST_CASE(delete_last_finalizer_key_test, finalizer_key_tester) try {
+   add_roa_policy(NODE_DADDY, alice, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+
    // Alice registers as a producer
    BOOST_REQUIRE_EQUAL( success(), regproducer(alice) );
 

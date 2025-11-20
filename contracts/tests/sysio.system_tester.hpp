@@ -120,27 +120,10 @@ public:
    }
 
 
-   transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts )
-   {
-      account_name creator(config::system_account_name);
-      signed_transaction trx;
-      set_transaction_headers(trx);
-
+   void setup_producer_accounts( const std::vector<account_name>& accounts ) {
       for (const auto& a: accounts) {
-         authority owner_auth( get_public_key( a, "owner" ) );
-         trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
-                                   newaccount{
-                                         .creator  = creator,
-                                         .name     = a,
-                                         .owner    = owner_auth,
-                                         .active   = authority( get_public_key( a, "active" ) )
-                                         });
-
+         create_account( a, config::system_account_name, false, false, true, true );
       }
-
-      set_transaction_headers(trx);
-      trx.sign( get_private_key( creator, "active" ), control->get_chain_id()  );
-      return push_transaction( trx );
    }
 
    action_result push_action( const account_name& signer, const action_name &name, const variant_object &data, bool auth = true ) {
