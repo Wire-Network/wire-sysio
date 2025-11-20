@@ -15,11 +15,11 @@ The `log_reader.py` support script is used primarily to analyze `nodeop` log fil
 # Getting Started
 ## Prerequisites
 
-Please refer to [Spring: Build and Install from Source](https://github.com/AntelopeIO/spring/#build-and-install-from-source) for a full list of prerequisites.
+Please refer to [Build and Install from Source](https://github.com/AntelopeIO/spring/#build-and-install-from-source) for a full list of prerequisites.
 
 ## Steps
 
-1. Build wire-sysio. For complete instructions on building from source please refer to [Spring: Build and Install from Source](https://github.com/AntelopeIO/spring/#build-and-install-from-source) For older compatible nodeop versions, such as 2.X, the following binaries need to be replaced with the older version: `build/programs/nodeop/nodeop`, `build/programs/cleos/cleos`, `bin/nodeop`, and `bin/cleos`.
+1. Build wire-sysio. For complete instructions on building from source please refer to [Build and Install from Source](https://github.com/wire-network/wire-sysio/Build.md) For older compatible nodeop versions, such as 2.X, the following binaries need to be replaced with the older version: `build/programs/nodeop/nodeop`, `build/programs/cleos/cleos`, `bin/nodeop`, and `bin/cleos`.
 2. Run Performance Tests
     1. Full Performance Harness Test Run (Standard):
         ``` bash

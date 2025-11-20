@@ -12,7 +12,7 @@ namespace fc {
  * @class ordered_diff
  * @brief Provides ability to generate and apply diff of containers of type T
  *
- * NOTE: Part of Spring Consensus. Used for finalizer and proposer policies.
+ * NOTE: Part of Consensus. Used for finalizer and proposer policies.
  *
  * Example use:
  *    std::vector<char> source = { 'a', 'b', 'f', 'c', 'd' };
