@@ -2407,7 +2407,7 @@ struct controller_impl {
          // TODO: less tha v3 detected ?
 
          if (std::clamp(header.version, v3::minimum_version, v3::maximum_version) == header.version ) {
-            snapshot->read_section("sysio::chain::block_state", [this,&head_header_state]( auto &section ){
+            snapshot->read_section("sysio::chain::block_state_legacy", [this,&head_header_state]( auto &section ){
                v3 legacy_header_state;
                section.read_row(legacy_header_state, db);
                static_cast<block_header_state_legacy&>(*head_header_state) = block_header_state_legacy(std::move(legacy_header_state));
