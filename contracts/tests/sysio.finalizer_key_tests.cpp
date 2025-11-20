@@ -486,6 +486,8 @@ BOOST_FIXTURE_TEST_CASE(delete_last_finalizer_key_test, finalizer_key_tester) tr
 }
 FC_LOG_AND_RETHROW() // delete_last_finalizer_key_test
 
+/* Wire currently has no ranking of producers. Need to update when producer reg and finalizer key reg implemented
+
 BOOST_FIXTURE_TEST_CASE(switchtosvnn_success_tests, finalizer_key_tester) try {
    // Register and vote 26 producers
    auto producer_names = activate_producers();
@@ -659,7 +661,7 @@ BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_changed_test, finali
    BOOST_REQUIRE_EQUAL( true, last_finkey_ids == last_finkey_ids_2 );
 }
 FC_LOG_AND_RETHROW()
-
+*/
 // An active finalizer deletes its only key. It is replaced by another finalizer in next round.
 BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_replaced_test, finalizer_key_tester) try {
    // Create and vote 26 producers

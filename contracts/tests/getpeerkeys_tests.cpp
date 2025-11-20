@@ -31,7 +31,7 @@ BOOST_FIXTURE_TEST_CASE( getpeerkeys_test, getpeerkeys_tester ) { try {
       if (i % 2 == 0)
          BOOST_REQUIRE_EQUAL(success(), regpeerkey(n, get_public_key(n)));
    }
-
+/* TODO: there is no ranking of producers currently in WIRE
    auto peerkeys = control->get_top_producer_keys(); // call readonly action from controller
    BOOST_REQUIRE_EQUAL(peerkeys.size(), 11);
 
@@ -47,6 +47,7 @@ BOOST_FIXTURE_TEST_CASE( getpeerkeys_test, getpeerkeys_tester ) { try {
       }
    }
    BOOST_REQUIRE_EQUAL(num_found, 11);
+*/
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()
