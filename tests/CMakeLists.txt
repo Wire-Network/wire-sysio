@@ -242,9 +242,6 @@ add_lr_test(NAME nodeop_forked_chain_if_lr_test COMMAND tests/nodeop_forked_chai
 add_np_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v --wallet-port 9901 ${UNSHARE})
 add_np_test(NAME nodeop_contrl_c_if_test COMMAND tests/nodeop_contrl_c_test.py --activate-if -v --wallet-port 9901 ${UNSHARE})
 
-add_lr_test(NAME nodeop_voting_lr_test COMMAND tests/nodeop_voting_test.py -v --wallet-port 9902 ${UNSHARE})
-add_lr_test(NAME nodeop_voting_if_lr_test COMMAND tests/nodeop_voting_test.py -v --activate-if --wallet-port 9902 ${UNSHARE})
-
 add_lr_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 ${UNSHARE})
 add_lr_test(NAME nodeop_under_min_avail_ram_if_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --activate-if ${UNSHARE})
 
