@@ -111,6 +111,8 @@ Options:
 #include "config.hpp"
 #include "httpc.hpp"
 
+#include <ranges>
+
 using namespace std;
 using namespace sysio;
 using namespace sysio::chain;
@@ -393,12 +395,27 @@ void prompt_for_wallet_password(string& pw, const string& name) {
    }
 }
 
+void get_or_prompt_wallet_password(string& pw, const string& name) {
+   if (!pw.empty())
+      return;
+
+   if (const char * pw_env = getenv("WALLET_PW"); !!pw_env && strlen(pw_env) > 0) {
+      pw.append(pw_env);
+   }
+
+   if (!pw.empty())
+      return;
+
+   prompt_for_wallet_password(pw, name);
+};
+
+
 fc::variant determine_required_keys(const signed_transaction& trx) {
    // TODO better error checking
    //wdump((trx));
    const auto& public_keys = call(wallet_url, wallet_public_keys);
    auto get_arg = fc::mutable_variant_object
-           ("transaction", (transaction)trx)
+           ("transaction", static_cast<transaction>(trx))
            ("available_keys", public_keys);
    const auto& required_keys = call(get_required_keys, get_arg);
    return required_keys["required_keys"];
@@ -895,17 +912,17 @@ struct set_account_permission_subcommand {
    bool remove_code = false;
 
    set_account_permission_subcommand(CLI::App* accountCmd) {
-      auto permissions = accountCmd->add_subcommand("permission", localized("Set parameters dealing with account permissions"));
-      permissions->add_option("account", account, localized("The account to set/delete a permission authority for"))->required();
-      permissions->add_option("permission", permission, localized("The permission name to set/delete an authority for"))->required();
-      permissions->add_option("authority", authority_json_or_file, localized("[delete] NULL, [create/update] public key, JSON string or filename defining the authority, [code] contract name"));
-      permissions->add_option("parent", parent, localized("[create] The permission name of this parents permission, defaults to 'active'"));
-      permissions->add_flag("--add-code", add_code, localized("[code] add '${code}' permission to specified permission authority", ("code", name(config::sysio_code_name))));
-      permissions->add_flag("--remove-code", remove_code, localized("[code] remove '${code}' permission from specified permission authority", ("code", name(config::sysio_code_name))));
+      auto permissions_cmd = accountCmd->add_subcommand("permission", localized("Set parameters dealing with account permissions"));
+      permissions_cmd->add_option("account", account, localized("The account to set/delete a permission authority for"))->required();
+      permissions_cmd->add_option("permission", permission, localized("The permission name to set/delete an authority for"))->required();
+      permissions_cmd->add_option("authority", authority_json_or_file, localized("[delete] NULL, [create/update] public key, JSON string or filename defining the authority, [code] contract name"));
+      permissions_cmd->add_option("parent", parent, localized("[create] The permission name of this parents permission, defaults to 'active'"));
+      permissions_cmd->add_flag("--add-code", add_code, localized("[code] add '${code}' permission to specified permission authority", ("code", name(config::sysio_code_name))));
+      permissions_cmd->add_flag("--remove-code", remove_code, localized("[code] remove '${code}' permission from specified permission authority", ("code", name(config::sysio_code_name))));
 
-      add_standard_transaction_options(permissions, "account@active");
+      add_standard_transaction_options(permissions_cmd, "account@active");
 
-      permissions->callback([this] {
+      permissions_cmd->callback([this] {
          SYSC_ASSERT( !(add_code && remove_code), "ERROR: Either --add-code or --remove-code can be set" );
          SYSC_ASSERT( (add_code ^ remove_code) || !authority_json_or_file.empty(), "ERROR: authority should be specified unless add or remove code permission" );
 
@@ -1024,15 +1041,15 @@ struct set_action_permission_subcommand {
    string requirementStr;
 
    set_action_permission_subcommand(CLI::App* actionRoot) {
-      auto permissions = actionRoot->add_subcommand("permission", localized("Set parameters dealing with account permissions"));
-      permissions->add_option("account", accountStr, localized("The account to set/delete a permission authority for"))->required();
-      permissions->add_option("code", codeStr, localized("The account that owns the code for the action"))->required();
-      permissions->add_option("action", actionStr, localized("The name of the action [use ALL for all actions]"))->required();
-      permissions->add_option("requirement", requirementStr, localized("The permission name required for executing the given action [use NULL to delete]"))->required();
+      auto permissions_cmd = actionRoot->add_subcommand("permission", localized("Set parameters dealing with account permissions"));
+      permissions_cmd->add_option("account", accountStr, localized("The account to set/delete a permission authority for"))->required();
+      permissions_cmd->add_option("code", codeStr, localized("The account that owns the code for the action"))->required();
+      permissions_cmd->add_option("action", actionStr, localized("The name of the action [use ALL for all actions]"))->required();
+      permissions_cmd->add_option("requirement", requirementStr, localized("The permission name required for executing the given action [use NULL to delete]"))->required();
 
-      add_standard_transaction_options_plus_signing(permissions, "account@active");
+      add_standard_transaction_options_plus_signing(permissions_cmd, "account@active");
 
-      permissions->callback([this] {
+      permissions_cmd->callback([this] {
          name account = name(accountStr);
          name code = name(codeStr);
          name action = (actionStr == "ALL") ? name{} : name(actionStr);
@@ -1820,26 +1837,26 @@ int main( int argc, char** argv ) {
    app.add_flag("--http-verbose", http_config.verbose, localized("Print HTTP verbose information to STDERR"));
    app.add_flag("--http-trace", http_config.trace, localized("Print HTTP debug trace information to STDERR"));
 
-   auto version = app.add_subcommand("version", localized("Retrieve version information"));
-   version->require_subcommand();
+   auto version_cmd = app.add_subcommand("version", localized("Retrieve version information"));
+   version_cmd->require_subcommand();
 
-   version->add_subcommand("client", localized("Retrieve basic version information of the client"))->callback([] {
+   version_cmd->add_subcommand("client", localized("Retrieve basic version information of the client"))->callback([] {
       std::cout << sysio::version::version_client() << '\n';
    });
 
-   version->add_subcommand("full", localized("Retrieve full version information of the client"))->callback([] {
+   version_cmd->add_subcommand("full", localized("Retrieve full version information of the client"))->callback([] {
      std::cout << sysio::version::version_full() << '\n';
    });
 
    // Create subcommand
-   auto create = app.add_subcommand("create", localized("Create various items, on and off the blockchain"));
-   create->require_subcommand();
+   auto create_cmd = app.add_subcommand("create", localized("Create various items, on and off the blockchain"));
+   create_cmd->require_subcommand();
 
    bool r1 = false;
    string key_file;
    bool print_console = false;
    // create key
-   auto create_key = create->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &key_file, &print_console](){
+   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &key_file, &print_console](){
       if (key_file.empty() && !print_console) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
@@ -1858,24 +1875,24 @@ int main( int argc, char** argv ) {
          out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       }
    });
-   create_key->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
-   create_key->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
-   create_key->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
+   create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
+   create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
+   create_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
 
    // create account
-   auto createAccount = create_account_subcommand( create, true /*simple*/ );
+   auto createAccount = create_account_subcommand( create_cmd, true /*simple*/ );
 
    // convert subcommand
-   auto convert = app.add_subcommand("convert", localized("Pack and unpack transactions")); // TODO also add converting action args based on abi from here ?
-   convert->require_subcommand();
+   auto convert_cmd = app.add_subcommand("convert", localized("Pack and unpack transactions")); // TODO also add converting action args based on abi from here ?
+   convert_cmd->require_subcommand();
 
    // pack transaction
    string plain_signed_transaction_json;
    bool pack_action_data_flag = false;
-   auto pack_transaction = convert->add_subcommand("pack_transaction", localized("From plain signed JSON to packed form"));
-   pack_transaction->add_option("transaction", plain_signed_transaction_json, localized("The plain signed JSON (string)"))->required();
-   pack_transaction->add_flag("--pack-action-data", pack_action_data_flag, localized("Pack all action data within transaction, needs interaction with ${n}", ("n", node_executable_name)));
-   pack_transaction->callback([&] {
+   auto pack_transaction_cmd = convert_cmd->add_subcommand("pack_transaction", localized("From plain signed JSON to packed form"));
+   pack_transaction_cmd->add_option("transaction", plain_signed_transaction_json, localized("The plain signed JSON (string)"))->required();
+   pack_transaction_cmd->add_flag("--pack-action-data", pack_action_data_flag, localized("Pack all action data within transaction, needs interaction with ${n}", ("n", node_executable_name)));
+   pack_transaction_cmd->callback([&] {
       fc::variant trx_var = json_from_file_or_string( plain_signed_transaction_json );
       if( pack_action_data_flag ) {
          signed_transaction trx;
@@ -1895,10 +1912,10 @@ int main( int argc, char** argv ) {
    // unpack transaction
    string packed_transaction_json;
    bool unpack_action_data_flag = false;
-   auto unpack_transaction = convert->add_subcommand("unpack_transaction", localized("From packed to plain signed JSON form"));
-   unpack_transaction->add_option("transaction", packed_transaction_json, localized("The packed transaction JSON (string containing packed_trx and optionally compression fields)"))->required();
-   unpack_transaction->add_flag("--unpack-action-data", unpack_action_data_flag, localized("Unpack all action data within transaction, needs interaction with ${n}", ("n", node_executable_name)));
-   unpack_transaction->callback([&] {
+   auto unpack_transaction_cmd = convert_cmd->add_subcommand("unpack_transaction", localized("From packed to plain signed JSON form"));
+   unpack_transaction_cmd->add_option("transaction", packed_transaction_json, localized("The packed transaction JSON (string containing packed_trx and optionally compression fields)"))->required();
+   unpack_transaction_cmd->add_flag("--unpack-action-data", unpack_action_data_flag, localized("Unpack all action data within transaction, needs interaction with ${n}", ("n", node_executable_name)));
+   unpack_transaction_cmd->callback([&] {
       fc::variant packed_trx_var = json_from_file_or_string( packed_transaction_json );
       packed_transaction packed_trx;
       try {
@@ -1919,11 +1936,11 @@ int main( int argc, char** argv ) {
    string unpacked_action_data_account_string;
    string unpacked_action_data_name_string;
    string unpacked_action_data_string;
-   auto pack_action_data = convert->add_subcommand("pack_action_data", localized("From JSON action data to packed form"));
-   pack_action_data->add_option("account", unpacked_action_data_account_string, localized("The name of the account hosting the contract"))->required();
-   pack_action_data->add_option("name", unpacked_action_data_name_string, localized("The name of the function called by this action"))->required();
-   pack_action_data->add_option("unpacked_action_data", unpacked_action_data_string, localized("The action data expressed as JSON"))->required();
-   pack_action_data->callback([&] {
+   auto pack_action_data_cmd = convert_cmd->add_subcommand("pack_action_data", localized("From JSON action data to packed form"));
+   pack_action_data_cmd->add_option("account", unpacked_action_data_account_string, localized("The name of the account hosting the contract"))->required();
+   pack_action_data_cmd->add_option("name", unpacked_action_data_name_string, localized("The name of the function called by this action"))->required();
+   pack_action_data_cmd->add_option("unpacked_action_data", unpacked_action_data_string, localized("The action data expressed as JSON"))->required();
+   pack_action_data_cmd->callback([&] {
       fc::variant unpacked_action_data_json = json_from_file_or_string(unpacked_action_data_string);
       bytes packed_action_data_string;
       try {
@@ -1936,11 +1953,11 @@ int main( int argc, char** argv ) {
    string packed_action_data_account_string;
    string packed_action_data_name_string;
    string packed_action_data_string;
-   auto unpack_action_data = convert->add_subcommand("unpack_action_data", localized("From packed to JSON action data form"));
-   unpack_action_data->add_option("account", packed_action_data_account_string, localized("The name of the account that hosts the contract"))->required();
-   unpack_action_data->add_option("name", packed_action_data_name_string, localized("The name of the function that's called by this action"))->required();
-   unpack_action_data->add_option("packed_action_data", packed_action_data_string, localized("The action data expressed as packed hex string"))->required();
-   unpack_action_data->callback([&] {
+   auto unpack_action_data_cmd = convert_cmd->add_subcommand("unpack_action_data", localized("From packed to JSON action data form"));
+   unpack_action_data_cmd->add_option("account", packed_action_data_account_string, localized("The name of the account that hosts the contract"))->required();
+   unpack_action_data_cmd->add_option("name", packed_action_data_name_string, localized("The name of the function that's called by this action"))->required();
+   unpack_action_data_cmd->add_option("packed_action_data", packed_action_data_string, localized("The action data expressed as packed hex string"))->required();
+   unpack_action_data_cmd->callback([&] {
       SYS_ASSERT( packed_action_data_string.size() >= 2, transaction_type_exception, "No packed_action_data found" );
       vector<char> packed_action_data_blob(packed_action_data_string.size()/2);
       fc::from_hex(packed_action_data_string, packed_action_data_blob.data(), packed_action_data_blob.size());
@@ -1949,9 +1966,9 @@ int main( int argc, char** argv ) {
    });
 
    string abi_file_name;
-   auto abi_to_hash = convert->add_subcommand("abi_to_hash", localized("From abi file to hash"));
-   abi_to_hash->add_option("abi-file", abi_file_name, localized("The ABI file name"))->required();
-   abi_to_hash->callback([&] {
+   auto abi_to_hash_cmd = convert_cmd->add_subcommand("abi_to_hash", localized("From abi file to hash"));
+   abi_to_hash_cmd->add_option("abi-file", abi_file_name, localized("The ABI file name"))->required();
+   abi_to_hash_cmd->callback([&] {
       SYS_ASSERT( std::filesystem::exists( abi_file_name ), abi_file_not_found, "ABI file not found: ${f}", ("f", abi_file_name)  );
       auto abi_bytes = fc::raw::pack(fc::json::from_file(abi_file_name).as<abi_def>());
       auto abi_hash = fc::sha256::hash( abi_bytes.data(), abi_bytes.size() );
@@ -1959,9 +1976,9 @@ int main( int argc, char** argv ) {
    });
 
    string wasm_file_name;
-   auto wasm_to_hash = convert->add_subcommand("wasm_to_hash", localized("From WASM file to hash"));
-   wasm_to_hash->add_option("wasm-file", wasm_file_name, localized("The WASM file name"))->required();
-   wasm_to_hash->callback([&] {
+   auto wasm_to_hash_cmd = convert_cmd->add_subcommand("wasm_to_hash", localized("From WASM file to hash"));
+   wasm_to_hash_cmd->add_option("wasm-file", wasm_file_name, localized("The WASM file name"))->required();
+   wasm_to_hash_cmd->callback([&] {
       SYS_ASSERT( std::filesystem::exists( wasm_file_name ), wasm_file_not_found, "WASM file not found: ${f}", ("f", wasm_file_name)  );
       std::string wasm_str;
       fc::read_file_contents(wasm_file_name, wasm_str);
@@ -1976,18 +1993,18 @@ int main( int argc, char** argv ) {
    });
 
    // validate subcommand
-   auto validate = app.add_subcommand("validate", localized("Validate transactions"));
-   validate->require_subcommand();
+   auto validate_cmd = app.add_subcommand("validate", localized("Validate transactions"));
+   validate_cmd->require_subcommand();
 
    // validate signatures
    string trx_json_to_validate;
    string str_chain_id;
-   auto validate_signatures = validate->add_subcommand("signatures", localized("Validate signatures and recover public keys"));
-   validate_signatures->add_option("transaction", trx_json_to_validate,
-                                   localized("The JSON string or filename defining the transaction to validate"))->required()->capture_default_str();
-   validate_signatures->add_option("-c,--chain-id", str_chain_id, localized("The chain id that will be used in signature verification"));
+   auto validate_signatures_cmd = validate_cmd->add_subcommand("signatures", localized("Validate signatures and recover public keys"));
+   validate_signatures_cmd->add_option("transaction", trx_json_to_validate,
+                                    localized("The JSON string or filename defining the transaction to validate"))->required()->capture_default_str();
+   validate_signatures_cmd->add_option("-c,--chain-id", str_chain_id, localized("The chain id that will be used in signature verification"));
 
-   validate_signatures->callback([&] {
+   validate_signatures_cmd->callback([&] {
       fc::variant trx_var = json_from_file_or_string(trx_json_to_validate);
       signed_transaction trx;
       try {
@@ -2012,19 +2029,19 @@ int main( int argc, char** argv ) {
    });
 
    // Get subcommand
-   auto get = app.add_subcommand("get", localized("Retrieve various items and information from the blockchain"));
-   get->require_subcommand();
+   auto get_cmd = app.add_subcommand("get", localized("Retrieve various items and information from the blockchain"));
+   get_cmd->require_subcommand();
 
    // get info
-   get->add_subcommand("info", localized("Get current blockchain information"))->callback([] {
+   get_cmd->add_subcommand("info", localized("Get current blockchain information"))->callback([] {
       std::cout << fc::json::to_pretty_string(get_info()) << std::endl;
    });
 
    // get transaction status
    string status_transaction_id;
-   auto getTransactionStatus = get->add_subcommand("transaction-status", localized("Get transaction status information"));
-   getTransactionStatus->add_option("id", status_transaction_id, localized("ID of the transaction to retrieve"))->required();
-   getTransactionStatus->callback([&status_transaction_id] {
+   auto get_transaction_status_cmd = get_cmd->add_subcommand("transaction-status", localized("Get transaction status information"));
+   get_transaction_status_cmd->add_option("id", status_transaction_id, localized("ID of the transaction to retrieve"))->required();
+   get_transaction_status_cmd->callback([&status_transaction_id] {
       try {
          chain::transaction_id_type transaction_id(status_transaction_id);
       } catch (...) {
@@ -2036,21 +2053,21 @@ int main( int argc, char** argv ) {
    });
 
    // get consensus parameters
-   get->add_subcommand("consensus_parameters", localized("Get current blockchain consensus parameters"))->callback([] {
+   get_cmd->add_subcommand("consensus_parameters", localized("Get current blockchain consensus parameters"))->callback([] {
       std::cout << fc::json::to_pretty_string(get_consensus_parameters()) << std::endl;
    });
 
    // get block
    get_block_params params;
-   auto getBlock = get->add_subcommand("block", localized("Retrieve a full block from the blockchain"));
-   getBlock->add_option("block", params.blockArg, localized("The number or ID of the block to retrieve"))->required();
-   getBlock->add_flag("--header-state", params.get_bhs, localized("Get block header state from fork database instead") );
-   getBlock->add_flag("--info", params.get_binfo, localized("Get block info from the blockchain by block num only") );
-   getBlock->add_flag("--raw", params.get_braw, localized("Get raw block from the blockchain") );
-   getBlock->add_flag("--header", params.get_bheader, localized("Get block header from the blockchain") );
-   getBlock->add_flag("--header-with-extensions", params.get_bheader_extensions, localized("Get block header with block exntesions from the blockchain") );
+   auto get_block_cmd = get_cmd->add_subcommand("block", localized("Retrieve a full block from the blockchain"));
+   get_block_cmd->add_option("block", params.blockArg, localized("The number or ID of the block to retrieve"))->required();
+   get_block_cmd->add_flag("--header-state", params.get_bhs, localized("Get block header state from fork database instead") );
+   get_block_cmd->add_flag("--info", params.get_binfo, localized("Get block info from the blockchain by block num only") );
+   get_block_cmd->add_flag("--raw", params.get_braw, localized("Get raw block from the blockchain") );
+   get_block_cmd->add_flag("--header", params.get_bheader, localized("Get block header from the blockchain") );
+   get_block_cmd->add_flag("--header-with-extensions", params.get_bheader_extensions, localized("Get block header with block exntesions from the blockchain") );
 
-   getBlock->callback([&params] {
+   get_block_cmd->callback([&params] {
       int num_flags = params.get_bhs + params.get_binfo + params.get_braw + params.get_bheader + params.get_bheader_extensions;
       SYSC_ASSERT( num_flags <= 1, "ERROR: Only one of the following flags can be set: --header-state, --info, --raw, --header, --header-with-extensions." );
       if (params.get_binfo) {
@@ -2084,22 +2101,22 @@ int main( int argc, char** argv ) {
    string accountName;
    string coresym;
    bool print_json = false;
-   auto getAccount = get->add_subcommand("account", localized("Retrieve an account from the blockchain"));
-   getAccount->add_option("name", accountName, localized("The name of the account to retrieve"))->required();
-   getAccount->add_option("core-symbol", coresym, localized("The expected core symbol of the chain you are querying"));
-   getAccount->add_flag("--json,-j", print_json, localized("Output in JSON format") );
-   getAccount->callback([&]() { get_account(accountName, coresym, print_json); });
+   auto get_account_cmd = get_cmd->add_subcommand("account", localized("Retrieve an account from the blockchain"));
+   get_account_cmd->add_option("name", accountName, localized("The name of the account to retrieve"))->required();
+   get_account_cmd->add_option("core-symbol", coresym, localized("The expected core symbol of the chain you are querying"));
+   get_account_cmd->add_flag("--json,-j", print_json, localized("Output in JSON format") );
+   get_account_cmd->callback([&]() { get_account(accountName, coresym, print_json); });
 
    // get code
    string codeFilename;
    string abiFilename;
    bool code_as_wasm = true;
-   auto getCode = get->add_subcommand("code", localized("Retrieve the code and ABI for an account"));
-   getCode->add_option("name", accountName, localized("The name of the account whose code should be retrieved"))->required();
-   getCode->add_option("-c,--code",codeFilename, localized("The name of the file to save the contract wasm to") );
-   getCode->add_option("-a,--abi",abiFilename, localized("The name of the file to save the contract .abi to") );
-   getCode->add_flag("--wasm", code_as_wasm, localized("Save contract as wasm (ignored, default)"));
-   getCode->callback([&] {
+   auto get_code_cmd = get_cmd->add_subcommand("code", localized("Retrieve the code and ABI for an account"));
+   get_code_cmd->add_option("name", accountName, localized("The name of the account whose code should be retrieved"))->required();
+   get_code_cmd->add_option("-c,--code",codeFilename, localized("The name of the file to save the contract wasm to") );
+   get_code_cmd->add_option("-a,--abi",abiFilename, localized("The name of the file to save the contract .abi to") );
+   get_code_cmd->add_flag("--wasm", code_as_wasm, localized("Save contract as wasm (ignored, default)"));
+   get_code_cmd->callback([&] {
       string code_hash, wasm, abi;
       try {
          const auto result = call(get_raw_code_and_abi_func, fc::mutable_variant_object("account_name", accountName));
@@ -2143,10 +2160,10 @@ int main( int argc, char** argv ) {
 
    // get abi
    string filename;
-   auto getAbi = get->add_subcommand("abi", localized("Retrieve the ABI for an account"));
-   getAbi->add_option("name", accountName, localized("The name of the account whose abi should be retrieved"))->required();
-   getAbi->add_option("-f,--file",filename, localized("The name of the file to save the contract .abi to instead of writing to console") );
-   getAbi->callback([&] {
+   auto get_abi_cmd = get_cmd->add_subcommand("abi", localized("Retrieve the ABI for an account"));
+   get_abi_cmd->add_option("name", accountName, localized("The name of the account whose abi should be retrieved"))->required();
+   get_abi_cmd->add_option("-f,--file",filename, localized("The name of the file to save the contract .abi to instead of writing to console") );
+   get_abi_cmd->callback([&] {
       const auto raw_abi_result = call(get_raw_abi_func, fc::mutable_variant_object("account_name", accountName));
       const auto raw_abi_blob = raw_abi_result["abi"].as_blob().data;
       if (raw_abi_blob.size() != 0) {
@@ -2178,30 +2195,30 @@ int main( int argc, char** argv ) {
    string index_position;
    bool reverse = false;
    bool show_payer = false;
-   auto getTable = get->add_subcommand( "table", localized("Retrieve the contents of a database table"));
-   getTable->add_option( "account", code, localized("The account who owns the table") )->required();
-   getTable->add_option( "scope", scope, localized("The scope within the contract in which the table is found") )->required();
-   getTable->add_option( "table", table, localized("The name of the table as specified by the contract abi") )->required();
-   getTable->add_option( "-l,--limit", limit, localized("The maximum number of rows to return") );
-   getTable->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds"));
-   getTable->add_option( "-k,--key", table_key, localized("Deprecated") );
-   getTable->add_option( "-L,--lower", lower, localized("JSON representation of lower bound value of key, defaults to first") );
-   getTable->add_option( "-U,--upper", upper, localized("JSON representation of upper bound value of key, defaults to last") );
-   getTable->add_option( "--index", index_position,
+   auto get_table_cmd = get_cmd->add_subcommand( "table", localized("Retrieve the contents of a database table"));
+   get_table_cmd->add_option( "account", code, localized("The account who owns the table") )->required();
+   get_table_cmd->add_option( "scope", scope, localized("The scope within the contract in which the table is found") )->required();
+   get_table_cmd->add_option( "table", table, localized("The name of the table as specified by the contract abi") )->required();
+   get_table_cmd->add_option( "-l,--limit", limit, localized("The maximum number of rows to return") );
+   get_table_cmd->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds"));
+   get_table_cmd->add_option( "-k,--key", table_key, localized("Deprecated") );
+   get_table_cmd->add_option( "-L,--lower", lower, localized("JSON representation of lower bound value of key, defaults to first") );
+   get_table_cmd->add_option( "-U,--upper", upper, localized("JSON representation of upper bound value of key, defaults to last") );
+   get_table_cmd->add_option( "--index", index_position,
                          localized("Index number, 1 - primary (first), 2 - secondary index (in order defined by multi_index), 3 - third index, etc.\n"
                                    "\t\t\t\tNumber or name of index can be specified, e.g. 'secondary' or '2'."));
-   getTable->add_option( "--key-type", key_type,
+   get_table_cmd->add_option( "--key-type", key_type,
                          localized("The key type of --index, primary only supports (i64), all others support (i64, i128, i256, float64, float128, ripemd160, sha256).\n"
                                    "\t\t\t\tSpecial type 'name' indicates an account name."));
-   getTable->add_option( "--encode-type", encode_type,
+   get_table_cmd->add_option( "--encode-type", encode_type,
                          localized("The encoding type of key_type (i64 , i128 , float64, float128) only support decimal encoding e.g. 'dec'"
                                     "i256 - supports both 'dec' and 'hex', ripemd160 and sha256 is 'hex' only"));
-   getTable->add_flag("-b,--binary", binary, localized("Return the value as BINARY rather than using abi to interpret as JSON"));
-   getTable->add_flag("-r,--reverse", reverse, localized("Iterate in reverse order"));
-   getTable->add_flag("--show-payer", show_payer, localized("Show RAM payer"));
+   get_table_cmd->add_flag("-b,--binary", binary, localized("Return the value as BINARY rather than using abi to interpret as JSON"));
+   get_table_cmd->add_flag("-r,--reverse", reverse, localized("Iterate in reverse order"));
+   get_table_cmd->add_flag("--show-payer", show_payer, localized("Show RAM payer"));
 
 
-   getTable->callback([&] {
+   get_table_cmd->callback([&] {
       fc::mutable_variant_object mo;
       mo( "json", !binary )
         ( "code", code )
@@ -2223,15 +2240,15 @@ int main( int argc, char** argv ) {
                 << std::endl;
    });
 
-   auto getScope = get->add_subcommand( "scope", localized("Retrieve a list of scopes and tables owned by a contract"));
-   getScope->add_option( "contract", code, localized("The contract who owns the table") )->required();
-   getScope->add_option( "-t,--table", table, localized("The name of the table as filter") );
-   getScope->add_option( "-l,--limit", limit, localized("The maximum number of rows to return") );
-   getScope->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds"));
-   getScope->add_option( "-L,--lower", lower, localized("Lower bound of scope") );
-   getScope->add_option( "-U,--upper", upper, localized("Upper bound of scope") );
-   getScope->add_flag("-r,--reverse", reverse, localized("Iterate in reverse order"));
-   getScope->callback([&] {
+   auto get_scope_cmd = get_cmd->add_subcommand( "scope", localized("Retrieve a list of scopes and tables owned by a contract"));
+   get_scope_cmd->add_option( "contract", code, localized("The contract who owns the table") )->required();
+   get_scope_cmd->add_option( "-t,--table", table, localized("The name of the table as filter") );
+   get_scope_cmd->add_option( "-l,--limit", limit, localized("The maximum number of rows to return") );
+   get_scope_cmd->add_option( "--time-limit", time_limit_ms, localized("Limit time of execution in milliseconds"));
+   get_scope_cmd->add_option( "-L,--lower", lower, localized("Lower bound of scope") );
+   get_scope_cmd->add_option( "-U,--upper", upper, localized("Upper bound of scope") );
+   get_scope_cmd->add_flag("-r,--reverse", reverse, localized("Iterate in reverse order"));
+   get_scope_cmd->callback([&] {
       fc::mutable_variant_object mo;
       mo( "code", code )
         ( "table", table )
@@ -2250,14 +2267,14 @@ int main( int argc, char** argv ) {
    // get currency balance
    string symbol;
    bool currency_balance_print_json = false;
-   auto get_currency = get->add_subcommand( "currency", localized("Retrieve information related to standard currencies"));
-   get_currency->require_subcommand();
-   auto get_balance = get_currency->add_subcommand( "balance", localized("Retrieve the balance of an account for a given currency"));
-   get_balance->add_option( "contract", code, localized("The contract that operates the currency") )->required();
-   get_balance->add_option( "account", accountName, localized("The account to query balances for") )->required();
-   get_balance->add_option( "symbol", symbol, localized("The symbol for the currency if the contract operates multiple currencies") );
-   get_balance->add_flag("--json,-j", currency_balance_print_json, localized("Output in JSON format") );
-   get_balance->callback([&] {
+   auto get_currency_cmd = get_cmd->add_subcommand( "currency", localized("Retrieve information related to standard currencies"));
+   get_currency_cmd->require_subcommand();
+   auto get_balance_cmd = get_currency_cmd->add_subcommand( "balance", localized("Retrieve the balance of an account for a given currency"));
+   get_balance_cmd->add_option( "contract", code, localized("The contract that operates the currency") )->required();
+   get_balance_cmd->add_option( "account", accountName, localized("The account to query balances for") )->required();
+   get_balance_cmd->add_option( "symbol", symbol, localized("The symbol for the currency if the contract operates multiple currencies") );
+   get_balance_cmd->add_flag("--json,-j", currency_balance_print_json, localized("Output in JSON format") );
+   get_balance_cmd->callback([&] {
       auto result = call(get_currency_balance_func, fc::mutable_variant_object
          ("account", accountName)
          ("code", code)
@@ -2273,10 +2290,10 @@ int main( int argc, char** argv ) {
       }
    });
 
-   auto get_currency_stats = get_currency->add_subcommand( "stats", localized("Retrieve the stats of for a given currency"));
-   get_currency_stats->add_option( "contract", code, localized("The contract that operates the currency") )->required();
-   get_currency_stats->add_option( "symbol", symbol, localized("The symbol for the currency if the contract operates multiple currencies") )->required();
-   get_currency_stats->callback([&] {
+   auto get_currency_stats_cmd = get_currency_cmd->add_subcommand( "stats", localized("Retrieve the stats of for a given currency"));
+   get_currency_stats_cmd->add_option( "contract", code, localized("The contract that operates the currency") )->required();
+   get_currency_stats_cmd->add_option( "symbol", symbol, localized("The symbol for the currency if the contract operates multiple currencies") )->required();
+   get_currency_stats_cmd->callback([&] {
       auto result = call(get_currency_stats_func, fc::mutable_variant_object("json", false)
          ("code", code)
          ("symbol", symbol)
@@ -2289,36 +2306,36 @@ int main( int argc, char** argv ) {
    // get transaction (history api plugin)
    string transaction_id_str;
    // get transaction_trace (trace api plugin)
-   auto getTransactionTrace = get->add_subcommand("transaction_trace", localized("Retrieve a transaction from trace logs"));
-   getTransactionTrace->add_option("id", transaction_id_str, localized("ID of the transaction to retrieve"))->required();
-   getTransactionTrace->callback([&] {
+   auto get_transaction_trace_cmd = get_cmd->add_subcommand("transaction_trace", localized("Retrieve a transaction from trace logs"));
+   get_transaction_trace_cmd->add_option("id", transaction_id_str, localized("ID of the transaction to retrieve"))->required();
+   get_transaction_trace_cmd->callback([&] {
       auto arg= fc::mutable_variant_object( "id", transaction_id_str);
       std::cout << fc::json::to_pretty_string(call(get_transaction_trace_func, arg)) << std::endl;
    });
 
    // get block_trace
    string blockNum;
-   auto getBlockTrace = get->add_subcommand("block_trace", localized("Retrieve a block from trace logs"));
-   getBlockTrace->add_option("block", blockNum, localized("The number of the block to retrieve"))->required();
+   auto get_block_trace_cmd = get_cmd->add_subcommand("block_trace", localized("Retrieve a block from trace logs"));
+   get_block_trace_cmd->add_option("block", blockNum, localized("The number of the block to retrieve"))->required();
 
-   getBlockTrace->callback([&] {
+   get_block_trace_cmd->callback([&] {
       auto arg= fc::mutable_variant_object( "block_num", blockNum);
       std::cout << fc::json::to_pretty_string(call(get_block_trace_func, arg)) << std::endl;
    });
 
-   get_schedule_subcommand{get};
-   auto getTransactionId = get_transaction_id_subcommand{get};
+   get_schedule_subcommand{get_cmd};
+   auto getTransactionId = get_transaction_id_subcommand{get_cmd};
 
    // get supported_protocol_features
-   get->add_subcommand("supported_protocol_features", localized("Get supported protocol features"))->callback([] {
+   get_cmd->add_subcommand("supported_protocol_features", localized("Get supported protocol features"))->callback([] {
       protocol_features_t supported_features;
       supported_features = get_supported_protocol_features();
       std::cout << supported_features.names << std::endl;
    });
 
    // set subcommand
-   auto setSubcommand = app.add_subcommand("set", localized("Set or update blockchain state"));
-   setSubcommand->require_subcommand();
+   auto set_cmd = app.add_subcommand("set", localized("Set or update blockchain state"));
+   set_cmd->require_subcommand();
 
    // set contract subcommand
    string account;
@@ -2328,29 +2345,29 @@ int main( int argc, char** argv ) {
    bool shouldSend = true;
    bool contract_clear = false;
    bool suppress_duplicate_check = false;
-   auto codeSubcommand = setSubcommand->add_subcommand("code", localized("Create or update the code on an account"));
-   codeSubcommand->add_option("account", account, localized("The account to set code for"))->required();
-   codeSubcommand->add_option("code-file", wasmPath, localized("The path containing the contract WASM"));//->required();
-   codeSubcommand->add_flag( "-c,--clear", contract_clear, localized("Remove code on an account"));
-   codeSubcommand->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+   auto code_cmd = set_cmd->add_subcommand("code", localized("Create or update the code on an account"));
+   code_cmd->add_option("account", account, localized("The account to set code for"))->required();
+   code_cmd->add_option("code-file", wasmPath, localized("The path containing the contract WASM"));//->required();
+   code_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove code on an account"));
+   code_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
 
-   auto abiSubcommand = setSubcommand->add_subcommand("abi", localized("Create or update the abi on an account"));
-   abiSubcommand->add_option("account", account, localized("The account to set the ABI for"))->required();
-   abiSubcommand->add_option("abi-file", abiPath, localized("The path containing the contract ABI"));//->required();
-   abiSubcommand->add_flag( "-c,--clear", contract_clear, localized("Remove abi on an account"));
-   abiSubcommand->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+   auto abi_cmd = set_cmd->add_subcommand("abi", localized("Create or update the abi on an account"));
+   abi_cmd->add_option("account", account, localized("The account to set the ABI for"))->required();
+   abi_cmd->add_option("abi-file", abiPath, localized("The path containing the contract ABI"));//->required();
+   abi_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove abi on an account"));
+   abi_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
 
-   auto contractSubcommand = setSubcommand->add_subcommand("contract", localized("Create or update the contract on an account"));
-   contractSubcommand->add_option("account", account, localized("The account to publish a contract for"))
-                     ->required();
-   contractSubcommand->add_option("contract-dir", contractPath, localized("The path containing the .wasm and .abi"));
-                     // ->required();
-   contractSubcommand->add_option("wasm-file", wasmPath, localized("The file containing the contract WASM relative to contract-dir"));
-//                     ->check(CLI::ExistingFile);
-   contractSubcommand->add_option("abi-file,-a,--abi", abiPath, localized("The ABI for the contract relative to contract-dir"));
-//                                ->check(CLI::ExistingFile);
-   contractSubcommand->add_flag( "-c,--clear", contract_clear, localized("Remove contract on an account"));
-   contractSubcommand->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
+   auto contract_cmd = set_cmd->add_subcommand("contract", localized("Create or update the contract on an account"));
+   contract_cmd->add_option("account", account, localized("The account to publish a contract for"))
+                      ->required();
+   contract_cmd->add_option("contract-dir", contractPath, localized("The path containing the .wasm and .abi"));
+                      // ->required();
+   contract_cmd->add_option("wasm-file", wasmPath, localized("The file containing the contract WASM relative to contract-dir"));
+ //                     ->check(CLI::ExistingFile);
+   contract_cmd->add_option("abi-file,-a,--abi", abiPath, localized("The ABI for the contract relative to contract-dir"));
+ //                                ->check(CLI::ExistingFile);
+   contract_cmd->add_flag( "-c,--clear", contract_clear, localized("Remove contract on an account"));
+   contract_cmd->add_flag( "--suppress-duplicate-check", suppress_duplicate_check, localized("Don't check for duplicate"));
 
    std::vector<chain::action> actions;
    auto set_code_callback = [&]() {
@@ -2472,10 +2489,10 @@ int main( int argc, char** argv ) {
       }
    };
 
-   add_standard_transaction_options_plus_signing(contractSubcommand, "account@active");
-   add_standard_transaction_options_plus_signing(codeSubcommand, "account@active");
-   add_standard_transaction_options_plus_signing(abiSubcommand, "account@active");
-   contractSubcommand->callback([&] {
+   add_standard_transaction_options_plus_signing(contract_cmd, "account@active");
+   add_standard_transaction_options_plus_signing(code_cmd, "account@active");
+   add_standard_transaction_options_plus_signing(abi_cmd, "account@active");
+   contract_cmd->callback([&] {
       if(!contract_clear) SYS_ASSERT( !contractPath.empty(), contract_exception, " contract-dir is null ", ("f", contractPath) );
       shouldSend = false;
       set_code_callback();
@@ -2489,20 +2506,20 @@ int main( int argc, char** argv ) {
          std::cout << "no transaction is sent" << std::endl;
       }
    });
-   codeSubcommand->callback(set_code_callback);
-   abiSubcommand->callback(set_abi_callback);
+   code_cmd->callback(set_code_callback);
+   abi_cmd->callback(set_abi_callback);
 
    // set account
-   auto setAccount = setSubcommand->add_subcommand("account", localized("Set or update blockchain account state"))->require_subcommand();
+   auto set_account_cmd = set_cmd->add_subcommand("account", localized("Set or update blockchain account state"))->require_subcommand();
 
    // set account permission
-   auto setAccountPermission = set_account_permission_subcommand(setAccount);
+   auto setAccountPermission = set_account_permission_subcommand(set_account_cmd);
 
    // set action
-   auto setAction = setSubcommand->add_subcommand("action", localized("Set or update blockchain action state"))->require_subcommand();
+   auto set_action_cmd = set_cmd->add_subcommand("action", localized("Set or update blockchain action state"))->require_subcommand();
 
    // set action permission
-   auto setActionPermission = set_action_permission_subcommand(setAction);
+   auto setActionPermission = set_action_permission_subcommand(set_action_cmd);
 
    // Transfer subcommand
    string con = "sysio.token";
@@ -2512,16 +2529,16 @@ int main( int argc, char** argv ) {
    string memo;
    bool pay_ram = false;
 
-   auto transfer = app.add_subcommand("transfer", localized("Transfer tokens from account to account"));
-   transfer->add_option("sender", sender, localized("The account sending tokens"))->required();
-   transfer->add_option("recipient", recipient, localized("The account receiving tokens"))->required();
-   transfer->add_option("amount", amount, localized("The amount of tokens to send"))->required();
-   transfer->add_option("memo", memo, localized("The memo for the transfer"));
-   transfer->add_option("--contract,-c", con, localized("The contract that controls the token"));
-   transfer->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
+   auto transfer_cmd = app.add_subcommand("transfer", localized("Transfer tokens from account to account"));
+   transfer_cmd->add_option("sender", sender, localized("The account sending tokens"))->required();
+   transfer_cmd->add_option("recipient", recipient, localized("The account receiving tokens"))->required();
+   transfer_cmd->add_option("amount", amount, localized("The amount of tokens to send"))->required();
+   transfer_cmd->add_option("memo", memo, localized("The memo for the transfer"));
+   transfer_cmd->add_option("--contract,-c", con, localized("The contract that controls the token"));
+   transfer_cmd->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
-   add_standard_transaction_options_plus_signing(transfer, "sender@active");
-   transfer->callback([&] {
+   add_standard_transaction_options_plus_signing(transfer_cmd, "sender@active");
+   transfer_cmd->callback([&] {
       auto transfer_amount = to_asset(name(con), amount);
       auto transfer = create_transfer(con, name(sender), name(recipient), transfer_amount, memo);
       if (!pay_ram) {
@@ -2534,31 +2551,31 @@ int main( int argc, char** argv ) {
 
    // Net subcommand
    string new_host;
-   auto net = app.add_subcommand( "net", localized("Interact with local p2p network connections"));
-   net->require_subcommand();
-   auto connect = net->add_subcommand("connect", localized("Start a new connection to a peer"));
-   connect->add_option("host", new_host, localized("The hostname:port to connect to."))->required();
-   connect->callback([&] {
+   auto net_cmd = app.add_subcommand( "net", localized("Interact with local p2p network connections"));
+   net_cmd->require_subcommand();
+   auto connect_cmd = net_cmd->add_subcommand("connect", localized("Start a new connection to a peer"));
+   connect_cmd->add_option("host", new_host, localized("The hostname:port to connect to."))->required();
+   connect_cmd->callback([&] {
       const auto& v = call(::default_url, net_connect, new_host);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
-   auto disconnect = net->add_subcommand("disconnect", localized("Close an existing connection"));
-   disconnect->add_option("host", new_host, localized("The hostname:port to disconnect from."))->required();
-   disconnect->callback([&] {
+   auto disconnect_cmd = net_cmd->add_subcommand("disconnect", localized("Close an existing connection"));
+   disconnect_cmd->add_option("host", new_host, localized("The hostname:port to disconnect from."))->required();
+   disconnect_cmd->callback([&] {
       const auto& v = call(::default_url, net_disconnect, new_host);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
-   auto status = net->add_subcommand("status", localized("Status of existing connection"));
-   status->add_option("host", new_host, localized("The hostname:port to query status of connection"))->required();
-   status->callback([&] {
+   auto status_cmd = net_cmd->add_subcommand("status", localized("Status of existing connection"));
+   status_cmd->add_option("host", new_host, localized("The hostname:port to query status of connection"))->required();
+   status_cmd->callback([&] {
       const auto& v = call(::default_url, net_status, new_host);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
-   auto connections = net->add_subcommand("peers", localized("Status of all existing peers"));
-   connections->callback([&] {
+   auto connections_cmd = net_cmd->add_subcommand("peers", localized("Status of all existing peers"));
+   connections_cmd->callback([&] {
       const auto& v = call(::default_url, net_connections);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
@@ -2566,16 +2583,16 @@ int main( int argc, char** argv ) {
 
 
    // Wallet subcommand
-   auto wallet = app.add_subcommand( "wallet", localized("Interact with local wallet"));
-   wallet->require_subcommand();
+   auto wallet_cmd = app.add_subcommand( "wallet", localized("Interact with local wallet"));
+   wallet_cmd->require_subcommand();
    // create wallet
    string wallet_name = "default";
    string password_file;
-   auto createWallet = wallet->add_subcommand("create", localized("Create a new wallet locally"));
-   createWallet->add_option("-n,--name", wallet_name, localized("The name of the new wallet"))->capture_default_str();
-   createWallet->add_option("-f,--file", password_file, localized("Name of file to write wallet password output to. (Must be set, unless \"--to-console\" is passed"));
-   createWallet->add_flag( "--to-console", print_console, localized("Print password to console."));
-   createWallet->callback([&wallet_name, &password_file, &print_console] {
+   auto create_wallet_cmd = wallet_cmd->add_subcommand("create", localized("Create a new wallet locally"));
+   create_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the new wallet"))->capture_default_str();
+   create_wallet_cmd->add_option("-f,--file", password_file, localized("Name of file to write wallet password output to. (Must be set, unless \"--to-console\" is passed"));
+   create_wallet_cmd->add_flag( "--to-console", print_console, localized("Print password to console."));
+   create_wallet_cmd->callback([&wallet_name, &password_file, &print_console] {
       SYSC_ASSERT( !password_file.empty() ^ print_console, "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" );
       SYSC_ASSERT( password_file.empty() || !std::ofstream(password_file.c_str()).fail(), "ERROR: Failed to create file in specified path" );
 
@@ -2595,34 +2612,34 @@ int main( int argc, char** argv ) {
    });
 
    // open wallet
-   auto openWallet = wallet->add_subcommand("open", localized("Open an existing wallet"));
-   openWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to open"));
-   openWallet->callback([&wallet_name] {
+   auto open_wallet_cmd = wallet_cmd->add_subcommand("open", localized("Open an existing wallet"));
+   open_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to open"));
+   open_wallet_cmd->callback([&wallet_name] {
       call(wallet_url, wallet_open, wallet_name);
       std::cout << localized("Opened: ${wallet_name}", ("wallet_name", wallet_name)) << std::endl;
    });
 
    // lock wallet
-   auto lockWallet = wallet->add_subcommand("lock", localized("Lock wallet"));
-   lockWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to lock"));
-   lockWallet->callback([&wallet_name] {
+   auto lock_wallet_cmd = wallet_cmd->add_subcommand("lock", localized("Lock wallet"));
+   lock_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to lock"));
+   lock_wallet_cmd->callback([&wallet_name] {
       call(wallet_url, wallet_lock, wallet_name);
       std::cout << localized("Locked: ${wallet_name}", ("wallet_name", wallet_name)) << std::endl;
    });
 
    // lock all wallets
-   auto locakAllWallets = wallet->add_subcommand("lock_all", localized("Lock all unlocked wallets"));
-   locakAllWallets->callback([] {
+   auto lock_all_wallets_cmd = wallet_cmd->add_subcommand("lock_all", localized("Lock all unlocked wallets"));
+   lock_all_wallets_cmd->callback([] {
       call(wallet_url, wallet_lock_all);
       std::cout << localized("Locked All Wallets") << std::endl;
    });
 
    // unlock wallet
    string wallet_pw;
-   auto unlockWallet = wallet->add_subcommand("unlock", localized("Unlock wallet"));
-   unlockWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to unlock"));
-   unlockWallet->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   unlockWallet->callback([&wallet_name, &wallet_pw] {
+   auto unlock_wallet_cmd = wallet_cmd->add_subcommand("unlock", localized("Unlock wallet"));
+   unlock_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to unlock"));
+   unlock_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+   unlock_wallet_cmd->callback([&wallet_name, &wallet_pw] {
       prompt_for_wallet_password(wallet_pw, wallet_name);
 
       fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
@@ -2632,10 +2649,10 @@ int main( int argc, char** argv ) {
 
    // import keys into wallet
    string wallet_key_str;
-   auto importWallet = wallet->add_subcommand("import", localized("Import private key into wallet"));
-   importWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
-   importWallet->add_option("--private-key", wallet_key_str, localized("Private key in WIF format to import"))->expected(0, 1);
-   importWallet->callback([&wallet_name, &wallet_key_str] {
+   auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
+   import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
+   import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key in WIF format to import"))->expected(0, 1);
+   import_wallet_cmd->callback([&wallet_name, &wallet_key_str] {
       if( wallet_key_str.size() == 0 ) {
          std::cout << localized("private key: ");
          fc::set_console_echo(false);
@@ -2658,15 +2675,16 @@ int main( int argc, char** argv ) {
 
    // remove keys from wallet
    string wallet_rm_key_str;
-   auto removeKeyWallet = wallet->add_subcommand("remove_key", localized("Remove key from wallet"));
-   removeKeyWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
-   removeKeyWallet->add_option("key", wallet_rm_key_str, localized("Public key in WIF format to remove"))->required();
-   removeKeyWallet->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   removeKeyWallet->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
+   auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove key from wallet"));
+   remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
+
+   // TODO: As a nice to have convert `key` option to 1 of 3 (pubkey, privkey, key_name)
+   remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key in WIF format to remove"))->required();
+   remove_key_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+   remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
       prompt_for_wallet_password(wallet_pw, wallet_name);
-      public_key_type pubkey;
       try {
-         pubkey = public_key_type( wallet_rm_key_str );
+         public_key_type pubkey = public_key_type(wallet_rm_key_str);
       } catch (...) {
          SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
       }
@@ -2677,10 +2695,10 @@ int main( int argc, char** argv ) {
 
    // create a key within wallet
    string wallet_create_key_type;
-   auto createKeyInWallet = wallet->add_subcommand("create_key", localized("Create private key within wallet"));
-   createKeyInWallet->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
-   createKeyInWallet->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1)"))->type_name("K1/R1")->capture_default_str();
-   createKeyInWallet->callback([&wallet_name, &wallet_create_key_type] {
+   auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
+   create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
+   create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1)"))->type_name("K1/R1")->capture_default_str();
+   create_key_in_wallet_cmd->callback([&wallet_name, &wallet_create_key_type] {
       //an empty key type is allowed -- it will let the underlying wallet pick which type it prefers
       fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_create_key_type)};
       const auto& v = call(wallet_url, wallet_create_key, vs);
@@ -2688,33 +2706,88 @@ int main( int argc, char** argv ) {
    });
 
    // list wallets
-   auto listWallet = wallet->add_subcommand("list", localized("List opened wallets, * = unlocked"));
-   listWallet->callback([] {
+   auto list_wallet_cmd = wallet_cmd->add_subcommand("list", localized("List opened wallets, * = unlocked"));
+   list_wallet_cmd->callback([] {
       std::cout << localized("Wallets:") << std::endl;
       const auto& v = call(wallet_url, wallet_list);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
    // list keys
-   auto listKeys = wallet->add_subcommand("keys", localized("List of public keys from all unlocked wallets."));
-   listKeys->callback([] {
+   auto list_keys_cmd = wallet_cmd->add_subcommand("keys", localized("List of public keys from all unlocked wallets."));
+   list_keys_cmd->callback([] {
       const auto& v = call(wallet_url, wallet_public_keys);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
+   // list keys by name
+   auto list_keys_by_name_cmd = wallet_cmd->add_subcommand("keys-by-name", localized("List of public keys from all unlocked wallets."));
+   list_keys_by_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
+   list_keys_by_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+   list_keys_by_name_cmd->callback([&] {
+      get_or_prompt_wallet_password(wallet_pw, wallet_name);
+      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
+      const auto& v = call(wallet_url, wallet_list_keys_by_name, vs);
+      std::cout << fc::json::to_pretty_string(v) << std::endl;
+   });
+
+   // TODO: Implement set-key-name
+   {
+      std::string new_key_name;
+      std::string current_key_name;
+      std::string pub_key_str;
+      std::string priv_key_str;
+
+      struct set_key_name_criteria {
+         std::string uri_path;
+         std::string value;
+      };
+
+      auto set_key_name_cmd = wallet_cmd->add_subcommand("set-key-name", localized("Set a key name."));
+      set_key_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
+      set_key_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+      set_key_name_cmd->add_option("--public-key", pub_key_str, localized("Public key mapped to desired name"));
+      set_key_name_cmd->add_option("--private-key", priv_key_str, localized("Private key mapped to desired name"));
+      set_key_name_cmd->add_option("--current-key-name", current_key_name, localized("Existing key name mapped to key pair"));
+      set_key_name_cmd->add_option("--new-key-name", new_key_name, localized("Desired key name"))->required(true);
+      set_key_name_cmd->callback([&] {
+
+         // DETERMINE CRITERIA PROVIDED, MAX 1
+         auto criteria_candidates = vector<set_key_name_criteria>{
+                                                          {wallet_set_key_name_with_public_key, pub_key_str},
+                                                          {wallet_set_key_name_with_private_key, priv_key_str},
+                                                          {wallet_set_key_name, current_key_name}
+                                                       } | views::filter([&](const set_key_name_criteria& c) { return !c.value.empty(); })
+         | ranges::to<std::vector>();
+
+         SYSC_ASSERT(criteria_candidates.size() == 1, "ERROR: Exactly one of --public-key, --private-key, or --current-key-name must be provided");
+         get_or_prompt_wallet_password(wallet_pw, wallet_name);
+
+         auto criteria = criteria_candidates.front();
+
+         fc::variants vs = {
+            fc::variant(wallet_name),
+            fc::variant(wallet_pw),
+            fc::variant(new_key_name),
+            fc::variant(criteria.value),
+         };
+         const auto& v = call(wallet_url, criteria.uri_path, vs);
+         std::cout << fc::json::to_pretty_string(v) << std::endl;
+      });
+   }
    // list private keys
-   auto listPrivKeys = wallet->add_subcommand("private_keys", localized("List of private keys from an unlocked wallet in wif or PVT_R1 format."));
-   listPrivKeys->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
-   listPrivKeys->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   listPrivKeys->callback([&wallet_name, &wallet_pw] {
-      prompt_for_wallet_password(wallet_pw, wallet_name);
+   auto list_priv_keys_cmd = wallet_cmd->add_subcommand("private_keys", localized("List of private keys from an unlocked wallet in wif or PVT_R1 format."));
+   list_priv_keys_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
+   list_priv_keys_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+   list_priv_keys_cmd->callback([&] {
+      get_or_prompt_wallet_password(wallet_pw, wallet_name);
       fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
       const auto& v = call(wallet_url, wallet_list_keys, vs);
       std::cout << fc::json::to_pretty_string(v) << std::endl;
    });
 
-   auto stopKiod = wallet->add_subcommand("stop", localized("Stop ${k}.", ("k", key_store_executable_name)));
-   stopKiod->callback([] {
+   auto stop_kiod_cmd = wallet_cmd->add_subcommand("stop", localized("Stop ${k}.", ("k", key_store_executable_name)));
+   stop_kiod_cmd->callback([] {
       const auto& v = call(wallet_url, kiod_stop);
       if ( !v.is_object() || v.get_object().size() != 0 ) { //on success kiod responds with empty object
          std::cerr << fc::json::to_pretty_string(v) << std::endl;
@@ -2731,15 +2804,15 @@ int main( int argc, char** argv ) {
    string str_public_key;
    bool push_trx = false;
 
-   auto sign = app.add_subcommand("sign", localized("Sign a transaction"));
-   sign->add_option("transaction", trx_json_to_sign,
-                                 localized("The JSON string or filename defining the transaction to sign"))->required()->capture_default_str();
-   sign->add_option("-k,--private-key", str_private_key, localized("The private key that will be used to sign the transaction"))->expected(0, 1);
-   sign->add_option("--public-key", str_public_key, localized("Ask ${exec} to sign with the corresponding private key of the given public key", ("exec", key_store_executable_name)));
-   sign->add_option("-c,--chain-id", str_chain_id, localized("The chain id that will be used to sign the transaction"));
-   sign->add_flag("-p,--push-transaction", push_trx, localized("Push transaction after signing"));
+   auto sign_cmd = app.add_subcommand("sign", localized("Sign a transaction"));
+   sign_cmd->add_option("transaction", trx_json_to_sign,
+                                  localized("The JSON string or filename defining the transaction to sign"))->required()->capture_default_str();
+   sign_cmd->add_option("-k,--private-key", str_private_key, localized("The private key that will be used to sign the transaction"))->expected(0, 1);
+   sign_cmd->add_option("--public-key", str_public_key, localized("Ask ${exec} to sign with the corresponding private key of the given public key", ("exec", key_store_executable_name)));
+   sign_cmd->add_option("-c,--chain-id", str_chain_id, localized("The chain id that will be used to sign the transaction"));
+   sign_cmd->add_flag("-p,--push-transaction", push_trx, localized("Push transaction after signing"));
 
-   sign->callback([&] {
+   sign_cmd->callback([&] {
 
       SYSC_ASSERT( str_private_key.empty() || str_public_key.empty(), "ERROR: Either -k/--private-key or --public-key or none of them can be set" );
       fc::variant trx_var = json_from_file_or_string(trx_json_to_sign);
@@ -2810,25 +2883,25 @@ int main( int argc, char** argv ) {
    });
 
    // Push subcommand
-   auto push = app.add_subcommand("push", localized("Push arbitrary transactions to the blockchain"));
-   push->require_subcommand();
+   auto push_cmd = app.add_subcommand("push", localized("Push arbitrary transactions to the blockchain"));
+   push_cmd->require_subcommand();
 
    // push action
    string contract_account;
    string action;
    string data;
    vector<string> permissions;
-   auto actionsSubcommand = push->add_subcommand("action", localized("Push a transaction with a single action"));
-   actionsSubcommand->fallthrough(false);
-   actionsSubcommand->add_option("account", contract_account,
+   auto action_cmd = push_cmd->add_subcommand("action", localized("Push a transaction with a single action"));
+   action_cmd->fallthrough(false);
+   action_cmd->add_option("account", contract_account,
                                  localized("The account providing the contract to execute"))->required()->capture_default_str();
-   actionsSubcommand->add_option("action", action,
+   action_cmd->add_option("action", action,
                                  localized("A JSON string or filename defining the action to execute on the contract"))->required()->capture_default_str();
-   actionsSubcommand->add_option("data", data, localized("The arguments to the contract"))->required();
-   actionsSubcommand->add_flag("--read", tx_read, localized("Specify an action is read-only"));
+   action_cmd->add_option("data", data, localized("The arguments to the contract"))->required();
+   action_cmd->add_flag("--read", tx_read, localized("Specify an action is read-only"));
 
-   add_standard_transaction_options_plus_signing(actionsSubcommand);
-   actionsSubcommand->callback([&] {
+   add_standard_transaction_options_plus_signing(action_cmd);
+   action_cmd->callback([&] {
       fc::variant action_args_var;
       if( !data.empty() ) {
          action_args_var = json_from_file_or_string(data, fc::json::parse_type::relaxed_parser);
@@ -2851,14 +2924,14 @@ int main( int argc, char** argv ) {
      return true;
    };
 
-   auto trxSubcommand = push->add_subcommand("transaction", localized("Push an arbitrary JSON transaction"));
-   trxSubcommand->add_option("transaction", trx_to_push, localized("The JSON string or filename defining the transaction to push"))->required();
-   trxSubcommand->add_option("--signature", extra_sig_opt_callback, localized("append a signature to the transaction; repeat this option to append multiple signatures"))->type_size(0, 1000);
-   add_standard_transaction_options_plus_signing(trxSubcommand);
-   trxSubcommand->add_flag("--dry-run", tx_dry_run, localized("Specify a transaction is dry-run"));
-   trxSubcommand->add_flag("--read", tx_read, localized("Specify a transaction is read-only"));
+   auto trx_cmd = push_cmd->add_subcommand("transaction", localized("Push an arbitrary JSON transaction"));
+   trx_cmd->add_option("transaction", trx_to_push, localized("The JSON string or filename defining the transaction to push"))->required();
+   trx_cmd->add_option("--signature", extra_sig_opt_callback, localized("append a signature to the transaction; repeat this option to append multiple signatures"))->type_size(0, 1000);
+   add_standard_transaction_options_plus_signing(trx_cmd);
+   trx_cmd->add_flag("--dry-run", tx_dry_run, localized("Specify a transaction is dry-run"));
+   trx_cmd->add_flag("--read", tx_read, localized("Specify a transaction is read-only"));
 
-   trxSubcommand->callback([&] {
+   trx_cmd->callback([&] {
       fc::variant trx_var = json_from_file_or_string(trx_to_push);
       signed_transaction trx;
       try {
@@ -2874,19 +2947,19 @@ int main( int argc, char** argv ) {
    });
 
    // push transactions
-   string trxsJson;
-   auto trxsSubcommand = push->add_subcommand("transactions", localized("Push an array of arbitrary JSON transactions"));
-   trxsSubcommand->add_option("transactions", trxsJson, localized("The JSON string or filename defining the array of the transactions to push"))->required();
-   trxsSubcommand->callback([&] {
-      fc::variant trx_var = json_from_file_or_string(trxsJson);
+   string trxs_json;
+   auto trxs_cmd = push_cmd->add_subcommand("transactions", localized("Push an array of arbitrary JSON transactions"));
+   trxs_cmd->add_option("transactions", trxs_json, localized("The JSON string or filename defining the array of the transactions to push"))->required();
+   trxs_cmd->callback([&] {
+      fc::variant trx_var = json_from_file_or_string(trxs_json);
       auto trxs_result = call(push_txns_func, trx_var);
       std::cout << fc::json::to_pretty_string(trxs_result) << std::endl;
    });
 
 
    // multisig subcommand
-   auto msig = app.add_subcommand("multisig", localized("Multisig contract commands"));
-   msig->require_subcommand();
+   auto msig_cmd = app.add_subcommand("multisig", localized("Multisig contract commands"));
+   msig_cmd->require_subcommand();
 
    // multisig propose
    string proposal_name;
@@ -2907,18 +2980,18 @@ int main( int argc, char** argv ) {
       return true;
    };
 
-   auto propose_action = msig->add_subcommand("propose", localized("Propose action"));
-   add_standard_transaction_options_plus_signing(propose_action, "proposer@active");
-   propose_action->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
-   propose_action->add_option("requested_permissions", requested_perm, localized("The JSON string or filename defining requested permissions"))->required();
-   propose_action->add_option("trx_permissions", transaction_perm, localized("The JSON string or filename defining transaction permissions"))->required();
-   propose_action->add_option("contract", proposed_contract, localized("The contract to which deferred transaction should be delivered"))->required();
-   propose_action->add_option("action", proposed_action, localized("The action of deferred transaction"))->required();
-   propose_action->add_option("data", proposed_transaction, localized("The JSON string or filename defining the action to propose"))->required();
-   propose_action->add_option("proposer", proposer, localized("Account proposing the transaction"));
-   propose_action->add_option("proposal_expiration", parse_expiration_hours, localized("Proposal expiration interval in hours"));
+   auto propose_action_cmd = msig_cmd->add_subcommand("propose", localized("Propose action"));
+   add_standard_transaction_options_plus_signing(propose_action_cmd, "proposer@active");
+   propose_action_cmd->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
+   propose_action_cmd->add_option("requested_permissions", requested_perm, localized("The JSON string or filename defining requested permissions"))->required();
+   propose_action_cmd->add_option("trx_permissions", transaction_perm, localized("The JSON string or filename defining transaction permissions"))->required();
+   propose_action_cmd->add_option("contract", proposed_contract, localized("The contract to which deferred transaction should be delivered"))->required();
+   propose_action_cmd->add_option("action", proposed_action, localized("The action of deferred transaction"))->required();
+   propose_action_cmd->add_option("data", proposed_transaction, localized("The JSON string or filename defining the action to propose"))->required();
+   propose_action_cmd->add_option("proposer", proposer, localized("Account proposing the transaction"));
+   propose_action_cmd->add_option("proposal_expiration", parse_expiration_hours, localized("Proposal expiration interval in hours"));
 
-   propose_action->callback([&] {
+   propose_action_cmd->callback([&] {
       fc::variant requested_perm_var = json_from_file_or_string(requested_perm);
       fc::variant transaction_perm_var = json_from_file_or_string(transaction_perm);
       fc::variant trx_var = json_from_file_or_string(proposed_transaction);
@@ -2972,27 +3045,27 @@ int main( int argc, char** argv ) {
    });
 
    //multisig propose transaction
-   auto propose_trx = msig->add_subcommand("propose_trx", localized("Propose transaction"));
-   add_standard_transaction_options_plus_signing(propose_trx, "proposer@active");
-   propose_trx->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
-   propose_trx->add_option("requested_permissions", requested_perm, localized("The JSON string or filename defining requested permissions"))->required();
-   propose_trx->add_option("transaction", trx_to_push, localized("The JSON string or filename defining the transaction to push"))->required();
-   propose_trx->add_option("proposer", proposer, localized("Account proposing the transaction"));
+   auto propose_trx_cmd = msig_cmd->add_subcommand("propose_trx", localized("Propose transaction"));
+   add_standard_transaction_options_plus_signing(propose_trx_cmd, "proposer@active");
+   propose_trx_cmd->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
+   propose_trx_cmd->add_option("requested_permissions", requested_perm, localized("The JSON string or filename defining requested permissions"))->required();
+   propose_trx_cmd->add_option("transaction", trx_to_push, localized("The JSON string or filename defining the transaction to push"))->required();
+   propose_trx_cmd->add_option("proposer", proposer, localized("Account proposing the transaction"));
 
-   propose_trx->callback([&] {
+   propose_trx_cmd->callback([&] {
       fc::variant requested_perm_var = json_from_file_or_string(requested_perm);
       fc::variant trx_var = json_from_file_or_string(trx_to_push);
 
-      auto accountPermissions = get_account_permissions(tx_permission);
-      if (accountPermissions.empty()) {
+      auto account_permissions = get_account_permissions(tx_permission);
+      if (account_permissions.empty()) {
          if (!proposer.empty()) {
-            accountPermissions = vector<permission_level>{{name(proposer), config::active_name}};
+            account_permissions = vector<permission_level>{{name(proposer), config::active_name}};
          } else {
             SYS_THROW(missing_auth_exception, "Authority is not provided (either by multisig parameter <proposer> or -p)");
          }
       }
       if (proposer.empty()) {
-         proposer = name(accountPermissions.at(0).actor).to_string();
+         proposer = name(account_permissions.at(0).actor).to_string();
       }
 
       auto args = fc::mutable_variant_object()
@@ -3001,18 +3074,18 @@ int main( int argc, char** argv ) {
          ("requested", requested_perm_var)
          ("trx", trx_var);
 
-      send_actions({chain::action{accountPermissions, "sysio.msig"_n, "propose"_n, variant_to_bin( "sysio.msig"_n, "propose"_n, args ) }}, signing_keys_opt.get_keys());
+      send_actions({chain::action{account_permissions, "sysio.msig"_n, "propose"_n, variant_to_bin( "sysio.msig"_n, "propose"_n, args ) }}, signing_keys_opt.get_keys());
    });
 
 
    // multisig review
    bool show_approvals_in_multisig_review = false;
-   auto review = msig->add_subcommand("review", localized("Review transaction"));
-   review->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
-   review->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
-   review->add_flag( "--show-approvals", show_approvals_in_multisig_review, localized("Show the status of the approvals requested within the proposal") );
+   auto review_cmd = msig_cmd->add_subcommand("review", localized("Review transaction"));
+   review_cmd->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
+   review_cmd->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
+   review_cmd->add_flag( "--show-approvals", show_approvals_in_multisig_review, localized("Show the status of the approvals requested within the proposal") );
 
-   review->callback([&] {
+   review_cmd->callback([&] {
       const auto result1 = call(get_table_func, fc::mutable_variant_object("json", true)
                                  ("code", "sysio.msig")
                                  ("scope", proposer)
@@ -3220,7 +3293,7 @@ int main( int argc, char** argv ) {
    };
 
    // multisig approve
-   auto approve = msig->add_subcommand("approve", localized("Approve proposed transaction"));
+   auto approve = msig_cmd->add_subcommand("approve", localized("Approve proposed transaction"));
    add_standard_transaction_options_plus_signing(approve, "proposer@active");
    approve->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
    approve->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
@@ -3229,7 +3302,7 @@ int main( int argc, char** argv ) {
    approve->callback([&] { approve_or_unapprove("approve"); });
 
    // multisig unapprove
-   auto unapprove = msig->add_subcommand("unapprove", localized("Unapprove proposed transaction"));
+   auto unapprove = msig_cmd->add_subcommand("unapprove", localized("Unapprove proposed transaction"));
    add_standard_transaction_options_plus_signing(unapprove, "proposer@active");
    unapprove->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
    unapprove->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
@@ -3238,7 +3311,7 @@ int main( int argc, char** argv ) {
 
    // multisig invalidate
    string invalidator;
-   auto invalidate = msig->add_subcommand("invalidate", localized("Invalidate all multisig approvals of an account"));
+   auto invalidate = msig_cmd->add_subcommand("invalidate", localized("Invalidate all multisig approvals of an account"));
    add_standard_transaction_options_plus_signing(invalidate, "invalidator@active");
    invalidate->add_option("invalidator", invalidator, localized("Invalidator name (string)"))->required();
    invalidate->callback([&] {
@@ -3251,7 +3324,7 @@ int main( int argc, char** argv ) {
 
    // multisig cancel
    string canceler;
-   auto cancel = msig->add_subcommand("cancel", localized("Cancel proposed transaction"));
+   auto cancel = msig_cmd->add_subcommand("cancel", localized("Cancel proposed transaction"));
    add_standard_transaction_options_plus_signing(cancel, "canceler@active");
    cancel->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
    cancel->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();
@@ -3279,7 +3352,7 @@ int main( int argc, char** argv ) {
 
    // multisig exec
    string executer;
-   auto exec = msig->add_subcommand("exec", localized("Execute proposed transaction"));
+   auto exec = msig_cmd->add_subcommand("exec", localized("Execute proposed transaction"));
    add_standard_transaction_options_plus_signing(exec, "executer@active");
    exec->add_option("proposer", proposer, localized("The proposer name (string)"))->required();
    exec->add_option("proposal_name", proposal_name, localized("The proposal name (string)"))->required();

@@ -5,11 +5,6 @@ macro(chain_target TARGET)
   message(NOTICE "Creating unittest target (${TARGET}) with sources: ${ARG_SOURCE_FILES}")
   add_executable(${TARGET} ${ARG_SOURCE_FILES})
 
-  #
-  #if(UNIX AND NOT APPLE)
-  #  set(rt_library rt)
-  #endif()
-
   target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
   if(UNIX)
