@@ -136,7 +136,7 @@ class TraceApiPluginTest(unittest.TestCase):
         xferAmount = Node.currencyIntToStr(1, CORE_SYMBOL)
         transIds = []
         for i in range(0, 3): # stride is 2
-            trans = node.transferFunds(self.accounts[0], self.accounts[1], xferAmount, "test transfer a->b")
+            trans = node.transferFunds(self.accounts[0], self.accounts[1], xferAmount, f"test transfer a->b {i}")
             node.waitForHeadToAdvance()
             transId = Node.getTransId(trans)
             transIds.append(transId)
