@@ -34,21 +34,11 @@ namespace sysio::chain {
       return r;
    }
 
-   std::string log_fork_comparison(const block_state_legacy& bs) {
-      std::string r;
-      r += "[ irreversible_blocknum: " + std::to_string(bs.irreversible_blocknum()) + ", ";
-      r += "block_num: " + std::to_string(bs.block_num()) + ", ";
-      r += "timestamp: " + bs.timestamp().to_time_point().to_iso_string() + ", ";
-      r += "id: " + bs.id().str();
-      r += " ]";
-      return r;
-   }
-
    struct by_block_id;
    struct by_best_branch;
    struct by_prev;
 
-   template<class BSP>  // either [block_state_legacy_ptr, block_state_ptr], same with block_header_state_ptr
+   template<class BSP>  // block_state_ptr, bhsp_t is block_header_state_ptr
    struct fork_database_impl {
       using bsp_t              = BSP;
       using bs_t               = bsp_t::element_type;
@@ -60,15 +50,7 @@ namespace sysio::chain {
       using full_branch_t      = fork_db_t::full_branch_t;
       using branch_pair_t      = fork_db_t::branch_pair_t;
 
-      using by_best_branch_legacy_t = ordered_unique<
-         tag<by_best_branch>,
-         composite_key<block_state_legacy,
-                       const_mem_fun<block_state_legacy,     uint32_t,             &block_state_legacy::irreversible_blocknum>,
-                       const_mem_fun<block_state_legacy,     uint32_t,             &block_state_legacy::block_num>,
-                       const_mem_fun<block_state_legacy,     const block_id_type&, &block_state_legacy::id>>,
-         composite_key_compare<std::greater<uint32_t>, std::greater<uint32_t>, std::greater<block_id_type>>>;
-
-      using by_best_branch_if_t = ordered_unique<
+      using by_best_branch_t = ordered_unique<
          tag<by_best_branch>,
          composite_key<block_state,
                        const_mem_fun<block_state,     block_timestamp_type, &block_state::latest_qc_block_timestamp>,
@@ -76,10 +58,6 @@ namespace sysio::chain {
                        const_mem_fun<block_state,     const block_id_type&, &block_state::id>>,
          composite_key_compare<std::greater<block_timestamp_type>,
                                std::greater<block_timestamp_type>, std::greater<block_id_type>>>;
-
-      using by_best_branch_t = std::conditional_t<std::is_same_v<bs_t, block_state>,
-                                                  by_best_branch_if_t,
-                                                  by_best_branch_legacy_t>;
 
       using fork_multi_index_type = multi_index_container<
          bsp_t,
