@@ -397,6 +397,14 @@ namespace sysio::testing {
             return get_private_key<KeyType>( keyname, role ).get_public_key();
          }
 
+         static auto get_bls_private_key( name keyname, string role = "default" ) {
+            auto secret = fc::sha256::hash(keyname.to_string() + role);
+            return bls_private_key(secret.to_uint8_span());
+         }
+
+         static auto get_bls_public_key( name keyname, string role = "default" ) {
+            return get_bls_private_key(keyname, role).get_public_key();
+         }
 
          void              set_contract( account_name contract, const vector<uint8_t>& wasm, const std::string& abi_json );
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );

@@ -1286,7 +1286,8 @@ void producer_plugin::set_program_options(
    using namespace std::string_literals;
 
    auto default_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
-   auto private_key_default = std::make_pair(default_priv_key.get_public_key(), default_priv_key );
+   auto default_bls_priv_key = bls_private_key(fc::sha256::hash(std::string("wire")).to_uint8_span());
+   //ilog("Default BLS key proof of possession: ${p}", ("p", default_bls_priv_key.proof_of_possession()));
 
    boost::program_options::options_description producer_options;
 
@@ -1306,8 +1307,10 @@ void producer_plugin::set_program_options(
          ("producer-name,p", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "ID of producer controlled by this node (e.g. inita; may specify multiple times)")
          ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()->default_value(
-               {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})},
-                default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})),
+               {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}),
+                default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()},
+                default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}) + ", " +
+                default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()),
                app().get_plugin<signature_provider_plugin>().signature_provider_help_text())
          ("greylist-account", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "account that can not access to extended CPU/NET virtual resources")
@@ -1378,6 +1381,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    LOAD_VALUE_SET(options, "producer-name", _producers)
 
    chain::controller& chain = chain_plug->chain();
+   _db_read_mode = chain.get_read_mode();
 
    chain.set_producer_node(is_configured_producer());
 
@@ -1393,6 +1397,11 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
             const auto bls = app().get_plugin<signature_provider_plugin>().bls_public_key_for_specification(key_spec_pair);
             if (bls) {
                const auto& [pubkey, privkey] = *bls;
+               if (irreversible_mode() && privkey == bls_private_key(fc::sha256::hash(std::string("wire")).to_uint8_span())) {
+                  dlog("Ignoring default bls key for irreversible mode");
+                  continue;
+               }
+               dlog("Configured finalizer bls key: ${pubkey}", ("pubkey", pubkey.to_string()));
                _finalizer_keys[pubkey.to_string()] = privkey.to_string();
             }
          } catch(secure_enclave_exception& e) {
@@ -1407,6 +1416,8 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
          }
       }
    }
+
+   chain.set_node_finalizer_keys(_finalizer_keys);
 
    auto subjective_account_max_failures_window_size = options.at("subjective-account-max-failures-window-size").as<uint32_t>();
    SYS_ASSERT(subjective_account_max_failures_window_size > 0, plugin_config_exception,
@@ -1598,7 +1609,6 @@ void producer_plugin_impl::plugin_startup() {
       dlog("producer plugin:  plugin_startup() begin");
 
       chain::controller& chain = chain_plug->chain();
-      _db_read_mode = chain.get_read_mode();
 
       SYS_ASSERT(!is_configured_producer() || !irreversible_mode(), plugin_config_exception,
                  "node cannot have any producer-name configured because block production is impossible when read_mode is \"irreversible\"");
@@ -1611,8 +1621,6 @@ void producer_plugin_impl::plugin_startup() {
 
       SYS_ASSERT(!is_configured_producer() || chain_plug->accept_transactions(), plugin_config_exception,
                  "node cannot have any producer-name configured because no block production is possible with no [api|p2p]-accepted-transactions");
-
-      chain.set_node_finalizer_keys(_finalizer_keys);
 
       _accepted_block_connection.emplace(chain.accepted_block().connect([this](const block_signal_params& t) {
          const auto& [ block, id ] = t;

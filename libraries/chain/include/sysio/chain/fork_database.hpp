@@ -187,7 +187,7 @@ namespace sysio::chain {
       static constexpr uint32_t magic_number = 0x30510FDB;
 
       const std::filesystem::path data_dir;
-      std::atomic<in_use_t>  in_use = in_use_t::legacy;
+      std::atomic<in_use_t>  in_use = in_use_t::savanna;
       fork_database_legacy_t fork_db_l; // legacy
       fork_database_if_t     fork_db_s; // savanna
 
