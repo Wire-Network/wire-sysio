@@ -4,6 +4,7 @@
 #include <sysio/chain/finalizer.hpp>
 #include <sysio/chain/snapshot_detail.hpp>
 #include <sysio/chain/exceptions.hpp>
+#include <sysio/chain/genesis_state.hpp>
 
 #include <fc/crypto/bls_utils.hpp>
 
@@ -192,6 +193,66 @@ block_state_ptr block_state::create_if_genesis_block(const block_state_legacy& b
 
    return result_ptr;
 }
+
+std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_state& g) {
+   auto result_ptr = std::make_shared<block_state>();
+   auto& result = *result_ptr;
+
+   // set block_header_state data ----
+   emplace_extension(result.header.header_extensions, finality_extension::extension_id(),
+                     fc::raw::pack(finality_extension{ {0, false}, {}, {} }));
+
+   result.activated_protocol_features = std::make_shared<protocol_feature_activation_set>(); // no activated protocol features in genesis
+   result.header.timestamp = g.initial_timestamp;
+   result.block_id = result.header.calculate_id();
+
+   result.active_finalizer_policy = std::make_shared<finalizer_policy>( 1u, 1u, std::vector<finalizer_authority>{{"sysio", 1u, g.initial_finalizer_key}} );
+   result.core = finality_core::create_core_for_genesis_block(result.block_id, result.timestamp());
+   result.last_pending_finalizer_policy_digest = fc::sha256::hash(*result.active_finalizer_policy);
+   result.last_pending_finalizer_policy_start_timestamp = result.timestamp();
+
+   result.active_proposer_policy = std::make_shared<proposer_policy>(proposer_policy{g.initial_timestamp, { 0, { producer_authority{config::system_account_name, block_signing_authority_v0{ 1, {{g.initial_key, 1}} } } } }});
+   result.latest_proposed_proposer_policy = {}; // none pending at IF genesis block
+   result.latest_pending_proposer_policy = {}; // none pending at IF genesis block
+   result.proposed_finalizer_policies = {}; // none proposed at IF genesis block
+   result.pending_finalizer_policy = std::nullopt; // none pending at IF genesis block
+   result.finalizer_policy_generation = 1;
+   result.header_exts = result.header.validate_and_extract_header_extensions();
+
+
+   // set block_state data ----
+   result.block = signed_block::create_signed_block(signed_block::create_mutable_block(signed_block_header{result.header}));
+   result.strong_digest = result.compute_finality_digest(); // all block_header_state data populated in result at this point
+   result.weak_digest = create_weak_digest(result.strong_digest);
+
+   // aggregating_qc will not be used in the genesis block as finalizers will not vote on it, but still create it for consistency.
+   result.aggregating_qc = aggregating_qc_t{result.active_finalizer_policy, finalizer_policy_ptr{}};
+
+   // build leaf_node and validation_tree
+   valid_t::finality_leaf_node_t leaf_node {
+      .block_num        = result.block_num(),
+      .timestamp        = result.timestamp(),
+      .parent_timestamp = block_timestamp_type(), // for the genesis block, the parent_timestamp is the the earliest representable timestamp.
+      .finality_digest  = result.strong_digest,
+      .action_mroot     = {}
+   };
+
+   // construct valid structure
+   incremental_merkle_tree validation_tree;
+   validation_tree.append(fc::sha256::hash(leaf_node));
+   result.valid = valid_t {
+      .validation_tree   = validation_tree,
+      .validation_mroots = { validation_tree.get_root() }
+   };
+
+   result.validated.store(true);
+   result.pub_keys_recovered = true;
+   result.cached_trxs = {};
+   result.action_mroot = {};
+   result.base_digest = {}; // calculated on demand in get_finality_data()
+
+   return result_ptr;
+};
 
 block_state_ptr block_state::create_transition_block(
                    const block_state&                prev,

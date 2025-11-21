@@ -9,6 +9,7 @@
 
 namespace sysio::chain {
 
+struct genesis_state;
 struct vote_message;
 
 using signer_callback_type = std::function<std::vector<signature_type>(const digest_type&)>;
@@ -176,6 +177,7 @@ public:
                const digest_type&                       action_mroot);
 
    static std::shared_ptr<block_state> create_if_genesis_block(const block_state_legacy& bsp);
+   static std::shared_ptr<block_state> create_genesis_block(const genesis_state& g);
 
    // Constructs a Transition Savanna block state from a Legacy block state.
    static std::shared_ptr<block_state> create_transition_block(

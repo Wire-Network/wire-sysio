@@ -42,6 +42,7 @@
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/variant_dynamic_bitset.hpp>
 #include <bls12-381/bls12-381.hpp>
 
 #include <future>
@@ -1677,25 +1678,8 @@ struct controller_impl {
    void initialize_blockchain_state(const genesis_state& genesis) {
       ilog( "Initializing new blockchain with genesis state" );
 
-      // genesis state starts in legacy mode
-      producer_authority_schedule initial_schedule = { 0, { producer_authority{config::system_account_name, block_signing_authority_v0{ 1, {{genesis.initial_key, 1}} } } } };
-      legacy::producer_schedule_type initial_legacy_schedule{ 0, {{config::system_account_name, genesis.initial_key}} };
-
-      block_header_state_legacy genheader;
-      genheader.active_schedule                = initial_schedule;
-      genheader.pending_schedule.schedule      = initial_schedule;
-      // NOTE: if wtmsig block signatures are enabled at genesis time this should be the hash of a producer authority schedule
-      genheader.pending_schedule.schedule_hash = fc::sha256::hash(initial_legacy_schedule);
-      genheader.header.timestamp               = genesis.initial_timestamp;
-      genheader.header.action_mroot            = genesis.compute_chain_id();
-      genheader.id                             = genheader.header.calculate_id();
-      genheader.block_num                      = genheader.header.block_num();
-
-      auto head = std::make_shared<block_state_legacy>();
-      static_cast<block_header_state_legacy&>(*head) = genheader;
-      head->activated_protocol_features = std::make_shared<protocol_feature_activation_set>(); // no activated protocol features in genesis
-      head->block = signed_block::create_signed_block(signed_block::create_mutable_block(genheader.header));
-      chain_head = block_handle{head};
+      auto g = block_state::create_genesis_block(genesis);
+      chain_head = block_handle{g};
 
       db.set_revision( chain_head.block_num() );
       initialize_database(genesis);
@@ -3927,7 +3911,7 @@ struct controller_impl {
       constexpr bool is_proper_savanna_block = std::is_same_v<typename std::decay_t<BS>, block_state>;
       assert(is_proper_savanna_block == b->is_proper_svnn_block());
 
-      std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
+      std::optional<qc_t> qc = prev.block_num() > 1u ? verify_basic_block_invariants(id, b, prev) : std::nullopt;
       log_and_drop_future<void> verify_qc_future;
       if constexpr (is_proper_savanna_block) {
          if (qc) {
