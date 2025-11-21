@@ -9,7 +9,7 @@ namespace sysio { namespace chain {
    struct packed_transaction;
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;
    struct signed_block;;
-   using signed_block_ptr = std::shared_ptr<signed_block>;
+   using signed_block_ptr = std::shared_ptr<const signed_block>;
 
    struct root_txn_identification_impl; 
    using root_txn_identification_impl_ptr = std::unique_ptr<root_txn_identification_impl>;

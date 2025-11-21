@@ -1,12 +1,27 @@
 #pragma once
 #include <sysio/chain/block_header.hpp>
-#include <sysio/chain/incremental_merkle.hpp>
+#include <sysio/chain/incremental_merkle_legacy.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
-#include <sysio/chain/s_root_extension.hpp>
 #include <future>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
+
+namespace snapshot_detail {
+   struct snapshot_block_header_state_legacy_v3;
+}
+
+namespace detail {
+   struct schedule_info {
+      // schedule_lib_num is compared with dpos lib, but the value is actually current block at time of pending
+      // After Savanna is activated, schedule_lib_num is compared to next().next() round for determination of
+      // changing from pending to active.
+      uint32_t                          schedule_lib_num = 0; /// block_num of pending
+      digest_type                       schedule_hash;
+      producer_authority_schedule       schedule;
+   };
+
+}
 
 using signer_callback_type = std::function<std::vector<signature_type>(const digest_type&)>;
 
@@ -18,22 +33,12 @@ namespace detail {
       uint32_t                          dpos_proposed_irreversible_blocknum = 0;
       uint32_t                          dpos_irreversible_blocknum = 0;
       producer_authority_schedule       active_schedule;
-      incremental_merkle                blockroot_merkle;
+      incremental_merkle_tree_legacy    blockroot_merkle;
       flat_map<account_name,uint32_t>   producer_to_last_produced;
       flat_map<account_name,uint32_t>   producer_to_last_implied_irb;
       block_signing_authority           valid_block_signing_authority;
       vector<uint8_t>                   confirm_count;
    };
-
-   struct schedule_info {
-      uint32_t                          schedule_lib_num = 0; /// last irr block num
-      digest_type                       schedule_hash;
-      producer_authority_schedule       schedule;
-   };
-
-   bool is_builtin_activated( const protocol_feature_activation_set_ptr& pfa,
-                              const protocol_feature_set& pfs,
-                              builtin_protocol_feature_t feature_codename );
 }
 
 struct pending_block_header_state_legacy : public detail::block_header_state_legacy_common {
@@ -45,42 +50,69 @@ struct pending_block_header_state_legacy : public detail::block_header_state_leg
    block_timestamp_type                 timestamp;
    uint32_t                             active_schedule_version = 0;
    uint16_t                             confirmed = 1;
+   std::optional<qc_claim_t>            qc_claim; // transition to savanna has begun
+
+   bool savanna_transition_block() const { return !!qc_claim;  }
+   std::optional<block_num_type> savanna_genesis_block_num() const;
 
    signed_block_header make_block_header( const checksum256_type& transaction_mroot,
                                           const checksum256_type& action_mroot,
                                           const std::optional<producer_authority_schedule>& new_producers,
+                                          std::optional<finalizer_policy>&& new_finalizer_policy,
                                           vector<digest_type>&& new_protocol_feature_activations,
                                           const protocol_feature_set& pfs,
                                           const chain::deque<s_header>& s_header)const;
 
    block_header_state_legacy  finish_next( const signed_block_header& h,
-                                    vector<signature_type>&& additional_signatures,
-                                    const protocol_feature_set& pfs,
-                                    const std::function<void( block_timestamp_type,
-                                                              const flat_set<digest_type>&,
-                                                              const vector<digest_type>& )>& validator,
-                                    bool skip_validate_signee = false) &&;
+                                           vector<signature_type>&& additional_signatures,
+                                           const protocol_feature_set& pfs,
+                                           validator_t& validator,
+                                           bool skip_validate_signee = false )&&;
 
    block_header_state_legacy  finish_next( signed_block_header& h,
                                            const protocol_feature_set& pfs,
-                                           const std::function<void( block_timestamp_type,
-                                                                     const flat_set<digest_type>&,
-                                                                     const vector<digest_type>& )>& validator,
+                                           validator_t& validator,
                                            const signer_callback_type& signer )&&;
 
 protected:
    block_header_state_legacy  _finish_next( const signed_block_header& h,
                                             const protocol_feature_set& pfs,
-                                            const std::function<void( block_timestamp_type,
-                                                                      const flat_set<digest_type>&,
-                                                                      const vector<digest_type>& )>& validator )&&;
+                                            validator_t& validator )&&;
 };
 
 /**
+ *  @struct block_header_state
+ *
+ *  Algorithm for producer schedule change (pre-savanna)
+ *     privileged contract -> set_proposed_producers(producers) ->
+ *        global_property_object.proposed_schedule_block_num = current_block_num
+ *        global_property_object.proposed_schedule           = producers
+ *
+ *     start_block -> (global_property_object.proposed_schedule_block_num == dpos_lib)
+ *        building_block._new_pending_producer_schedule = producers
+ *
+ *     finish_block ->
+ *        block_header.extensions.wtmsig_block_signatures = producers
+ *        block_header.new_producers                      = producers
+ *
+ *     create_block_state ->
+ *        block_state.schedule_lib_num          = current_block_num (note this should be named schedule_block_num)
+ *        block_state.pending_schedule.schedule = producers
+ *
+ *     start_block ->
+ *        block_state.prev_pending_schedule = pending_schedule (producers)
+ *        if (pending_schedule.schedule_lib_num == dpos_lib)
+ *           block_state.active_schedule = pending_schedule
+ *           block_state.was_pending_promoted = true
+ *           block_state.pending_schedule.clear() // doesn't get copied from previous
+ *        else
+ *           block_state.pending_schedule = prev_pending_schedule
+ *
+ *
  *  @struct block_header_state_legacy
  *  @brief defines the minimum state necessary to validate transaction headers
  */
-struct block_header_state_legacy : public detail::block_header_state_legacy_common {
+struct block_header_state_legacy : public detail::block_header_state_legacy_common, fc::reflect_init {
    block_id_type                        id;
    signed_block_header                  header;
    detail::schedule_info                pending_schedule;
@@ -89,7 +121,7 @@ struct block_header_state_legacy : public detail::block_header_state_legacy_comm
 
    /// this data is redundant with the data stored in header, but it acts as a cache that avoids
    /// duplication of work
-   flat_multimap<uint16_t, block_header_extension> header_exts;
+   header_extension_multimap            header_exts;
 
    block_header_state_legacy() = default;
 
@@ -97,31 +129,35 @@ struct block_header_state_legacy : public detail::block_header_state_legacy_comm
    :detail::block_header_state_legacy_common( std::move(base) )
    {}
 
-   pending_block_header_state_legacy  next( block_timestamp_type when, uint16_t num_prev_blocks_to_confirm )const;
+   explicit block_header_state_legacy( snapshot_detail::snapshot_block_header_state_legacy_v3&& snapshot );
 
-   block_header_state_legacy   next( const signed_block_header& h,
-                                     vector<signature_type>&& additional_signatures,
-                                     const protocol_feature_set& pfs,
-                                     const std::function<void( block_timestamp_type,
-                                                               const flat_set<digest_type>&,
-                                                               const vector<digest_type>& )>& validator,
-                                     bool skip_validate_signee = false )const;
+   pending_block_header_state_legacy next( block_timestamp_type when, uint16_t num_prev_blocks_to_confirm )const;
 
-   bool                 has_pending_producers()const { return pending_schedule.schedule.producers.size(); }
+   block_header_state_legacy  next( const signed_block_header& h,
+                                    vector<signature_type>&& additional_signatures,
+                                    const protocol_feature_set& pfs,
+                                    validator_t& validator,
+                                    bool skip_validate_signee = false )const;
+
    uint32_t             calc_dpos_last_irreversible( account_name producer_of_next_block )const;
 
-   producer_authority     get_scheduled_producer( block_timestamp_type t )const;
-   const block_id_type&   prev()const { return header.previous; }
+   const protocol_feature_activation_set_ptr& get_activated_protocol_features() const { return activated_protocol_features; }
+   const producer_authority& get_scheduled_producer( block_timestamp_type t )const;
+   const block_id_type&   previous()const { return header.previous; }
    digest_type            sig_digest()const;
    void                   sign( const signer_callback_type& signer );
    void                   verify_signee()const;
 
    const vector<digest_type>& get_new_protocol_feature_activations()const;
+
+   void reflector_init() {
+      header_exts = header.validate_and_extract_header_extensions();
+   }
 };
 
 using block_header_state_legacy_ptr = std::shared_ptr<block_header_state_legacy>;
 
-} } /// namespace sysio::chain
+} /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::detail::block_header_state_legacy_common,
             (block_num)

@@ -17,7 +17,9 @@ using namespace IR;
 
 namespace sysio { namespace chain { namespace sysvmoc {
 
-void run_compile(wrapped_fd&& response_sock, wrapped_fd&& wasm_code, uint64_t stack_size_limit, size_t generated_code_size_limit) noexcept {  //noexcept; we'll just blow up if anything tries to cross this boundry
+void run_compile(wrapped_fd&& response_sock, wrapped_fd&& wasm_code, uint64_t stack_size_limit, size_t generated_code_size_limit,
+                 fc::log_level log_level, account_name receiver, fc::time_point queued_time) noexcept {  //noexcept; we'll just blow up if anything tries to cross this boundry
+   fc::time_point start = fc::time_point::now();
    std::vector<uint8_t> wasm = vector_for_memfd(wasm_code);
 
    //ideally we catch exceptions and sent them upstream as strings for easier reporting
@@ -33,6 +35,7 @@ void run_compile(wrapped_fd&& response_sock, wrapped_fd&& wasm_code, uint64_t st
    instantiated_code code = LLVMJIT::instantiateModule(module, stack_size_limit, generated_code_size_limit);
 
    code_compilation_result_message result_message;
+   result_message.queued_time = queued_time;
 
    const std::map<unsigned, uintptr_t>& function_to_offsets = code.function_offsets;
 
@@ -131,9 +134,20 @@ void run_compile(wrapped_fd&& response_sock, wrapped_fd&& wasm_code, uint64_t st
    std::move(prologue_it, prologue.end(), std::back_inserter(initdata_prep));
    std::move(initial_mem.begin(), initial_mem.end(), std::back_inserter(initdata_prep));
 
-   std::vector<wrapped_fd> fds_to_send;
-   fds_to_send.emplace_back(memfd_for_bytearray(code.code));
-   fds_to_send.emplace_back(memfd_for_bytearray(initdata_prep));
+   if (log_level == fc::log_level::all) {
+      // compile trampoline is forked before logging config is loaded, also no SIGHUP support for updating logging,
+      // use provided log_level to determine if this should be logged. info level is available by default
+      auto get_resource_size = []() {
+         rusage usage{};
+         getrusage(RUSAGE_SELF, &usage);
+         // ru_maxrss is in kilobytes
+         return usage.ru_maxrss;
+      };
+      ilog("receiver ${a}, wasm size: ${ws} KB, oc code size: ${c} KB, max compile memory usage: ${rs} MB, time: ${t} ms, time since queued: ${qt} ms",
+           ("a", receiver)("ws", wasm.size()/1024)("c", code.code.size()/1024)("rs", get_resource_size()/1024)
+           ("t", (fc::time_point::now() - start).count()/1000)("qt", (fc::time_point::now() - queued_time).count()/1000));
+   }
+   std::array<wrapped_fd, 2> fds_to_send{ memfd_for_bytearray(code.code), memfd_for_bytearray(initdata_prep) };
    write_message_with_fds(response_sock, result_message, fds_to_send);
 }
 
@@ -166,28 +180,36 @@ void run_compile_trampoline(int fd) {
          prctl(PR_SET_NAME, "oc-compile");
          prctl(PR_SET_PDEATHSIG, SIGKILL);
 
-         const auto& conf = std::get<compile_wasm_message>(message).sysvmoc_config;
+         const auto& msg = std::get<compile_wasm_message>(message);
+         const auto& limits = msg.limits;
 
-         // enforce cpu limit only when it is set
-         // (libtester may disable it)
-         if(conf.cpu_limit) {
-            struct rlimit cpu_limit = {*conf.cpu_limit, *conf.cpu_limit};
-            setrlimit(RLIMIT_CPU, &cpu_limit);
-         }
+         uint64_t stack_size = std::numeric_limits<uint64_t>::max();
+         uint64_t generated_code_size_limit = std::numeric_limits<uint64_t>::max();
+         if(limits) {
+            // enforce cpu limit only when it is set (libtester may disable it)
+            if(limits->cpu_limit) {
+               struct rlimit cpu_limit = {*limits->cpu_limit, *limits->cpu_limit};
+               setrlimit(RLIMIT_CPU, &cpu_limit);
+            }
 
-         // enforce vm limit only when it is set
-         // (libtester may disable it)
-         if(conf.vm_limit) {
-            struct rlimit vm_limit = {*conf.vm_limit, *conf.vm_limit};
-            setrlimit(RLIMIT_AS, &vm_limit);
+            // enforce vm limit only when it is set (libtester may disable it)
+            if(limits->vm_limit) {
+               struct rlimit vm_limit = {*limits->vm_limit, *limits->vm_limit};
+               setrlimit(RLIMIT_AS, &vm_limit);
+            }
+
+            if(limits->stack_size_limit)
+               stack_size = *limits->stack_size_limit;
+
+            if(limits->generated_code_size_limit)
+               generated_code_size_limit = *limits->generated_code_size_limit;
          }
 
          struct rlimit core_limits = {0u, 0u};
          setrlimit(RLIMIT_CORE, &core_limits);
 
-         uint64_t stack_size_limit = conf.stack_size_limit ? *conf.stack_size_limit : std::numeric_limits<uint64_t>::max();
-         size_t generated_code_size_limit = conf.generated_code_size_limit ? * conf.generated_code_size_limit : std::numeric_limits<size_t>::max();
-         run_compile(std::move(fds[0]), std::move(fds[1]), stack_size_limit, generated_code_size_limit);
+         run_compile(std::move(fds[0]), std::move(fds[1]), stack_size, generated_code_size_limit,
+                     msg.log_level, msg.receiver, msg.queued_time);
          _exit(0);
       }
       else if(pid == -1)

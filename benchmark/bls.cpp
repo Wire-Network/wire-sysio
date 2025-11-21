@@ -6,6 +6,13 @@
 #include <bls12-381/bls12-381.hpp>
 #include <random>
 
+//This program isn't unit tests. But libtester, because of the way it depends on boost test, will ultimately require implementation of
+// various boost test detail/impl bits that are only implemented by including a boost test usage variant. The most obvious reason for this
+// is because libtester inspects the master_test_suite, but the master_test_suite is only defined after a usage variant is used.
+#define BOOST_TEST_MODULE benchmark dummy module
+#define BOOST_TEST_NO_MAIN
+#include <boost/test/included/unit_test.hpp>
+
 using namespace sysio;
 using namespace sysio::chain;
 using namespace sysio::testing;
@@ -70,7 +77,9 @@ struct interface_in_benchmark {
       // build transaction context from the packed transaction
       timer = std::make_unique<platform_timer>();
       trx_timer = std::make_unique<transaction_checktime_timer>(*timer);
-      trx_ctx = std::make_unique<transaction_context>(*chain->control.get(), *ptrx, ptrx->id(), std::move(*trx_timer));
+      trx_ctx = std::make_unique<transaction_context>(*chain->control.get(), *ptrx, ptrx->id(), std::move(*trx_timer),
+                                                      action_digests_t::store_which_t::legacy, fc::time_point::now(),
+                                                      transaction_metadata::trx_type::input);
       trx_ctx->max_transaction_time_subjective = fc::microseconds::maximum();
       trx_ctx->init_for_input_trx( ptrx->get_unprunable_size(), ptrx->get_prunable_size() );
       trx_ctx->exec(); // this is required to generate action traces to be used by apply_context constructor

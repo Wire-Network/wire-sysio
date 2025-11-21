@@ -114,7 +114,7 @@ def testCommon(title, extraNodeopArgs, expectedMsgs):
             errorExit ("Log should have contained \"%s\"" % (expectedMsgs))
 
 def extractTimestamp(msg):
-    matches = re.compile("\s+([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3})\s").search(msg)
+    matches = re.compile(r"\s+([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3})\s").search(msg)
     return datetime.strptime(matches.group(0).strip(), '%Y-%m-%dT%H:%M:%S.%f')
 
 intervalTolerance = 0.15 # 15%

@@ -4,6 +4,7 @@
 #include <fc/fwd_impl.hpp>
 #include <fc/log/logger_config.hpp> //set_os_thread_name()
 
+#include <boost/core/yield_primitives.hpp>
 #include <boost/asio.hpp>
 
 #include <mutex>
@@ -22,6 +23,7 @@ struct platform_timer::impl {
 };
 
 platform_timer::platform_timer() {
+   static_assert(std::atomic<timer_state_t>::is_always_lock_free, "Only lock-free atomics AS-safe.");
    static_assert(sizeof(impl) <= fwd_size);
 
    std::lock_guard guard(timer_ref_mutex);
@@ -47,6 +49,7 @@ platform_timer::platform_timer() {
 
 platform_timer::~platform_timer() {
    stop();
+   my->timer.reset();
    if(std::lock_guard guard(timer_ref_mutex); --refcount == 0) {
       checktime_ios->stop();
       checktime_thread.join();
@@ -55,40 +58,62 @@ platform_timer::~platform_timer() {
 }
 
 void platform_timer::start(fc::time_point tp) {
-   if(tp == fc::time_point::maximum()) {
-      expired = 0;
+   assert(timer_state() == state_t::stopped);
+   ++generation;
+   timer_running_forever = tp == fc::time_point::maximum();
+   if(timer_running_forever) {
+      _state.store(timer_state_t{.state = state_t::running, .callback_in_flight = false, .generation_running = generation});
       return;
    }
    fc::microseconds x = tp.time_since_epoch() - fc::time_point::now().time_since_epoch();
-   if(x.count() <= 0)
-      expired = 1;
-   else {
-#if 0
-      std::promise<void> p;
-      auto f = p.get_future();
-      checktime_ios->post([&p,this]() {
-         expired = 0;
-         p.set_value();
-      });
-      f.get();
-#endif
-      expired = 0;
+   timer_running_forever = false;
+   if(x.count() <= 0) {
+      _state.store(timer_state_t{.state = state_t::timed_out, .callback_in_flight = false, .generation_running = generation});
+   } else {
+      _state.store(timer_state_t{.state = state_t::running, .callback_in_flight = false, .generation_running = generation});
       my->timer->expires_after(std::chrono::microseconds(x.count()));
-      my->timer->async_wait([this](const boost::system::error_code& ec) {
+      my->timer->async_wait([this, generation=generation](const boost::system::error_code& ec) {
          if(ec)
             return;
-         expired = 1;
-         call_expiration_callback();
+         expire_now(generation);
       });
    }
 }
 
+void platform_timer::expire_now(generation_t expired_generation) {
+   timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = expired_generation};
+   if (_state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, true, expired_generation})) {
+      call_expiration_callback();
+      _state.store(timer_state_t{state_t::timed_out, false, expired_generation});
+   }
+}
+
+void platform_timer::interrupt_timer() {
+   const generation_t generation_running = _state.load().generation_running;
+   timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = generation_running};
+   if (_state.compare_exchange_strong(expected, timer_state_t{state_t::interrupted, true, generation_running})) {
+      call_expiration_callback();
+      _state.store(timer_state_t{state_t::interrupted, false, generation_running});
+   }
+}
+
 void platform_timer::stop() {
-   if(expired)
+   // if still running, then interrupt so expire_now() and interrupt_timer() can't start a callback call
+   timer_state_t prior_state{.state = state_t::running, .callback_in_flight = false, .generation_running = generation};
+   if (_state.compare_exchange_strong(prior_state, timer_state_t{state_t::interrupted, false, generation})) {
+      prior_state = timer_state_t{state_t::interrupted, false, generation};
+   }
+
+   for (; prior_state.callback_in_flight; prior_state = _state.load())
+      boost::core::sp_thread_pause();
+
+   if(prior_state.state == state_t::stopped)
+      return;
+   _state.store(timer_state_t{.state = state_t::stopped, .callback_in_flight = false, .generation_running = generation});
+   if(prior_state.state == state_t::timed_out || timer_running_forever)
       return;
 
    my->timer->cancel();
-   expired = 1;
 }
 
 }}

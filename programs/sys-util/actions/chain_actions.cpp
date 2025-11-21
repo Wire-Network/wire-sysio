@@ -25,7 +25,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
-#include <sysio/chain/chainbase_environment.hpp>
+#include <chainbase/environment.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>

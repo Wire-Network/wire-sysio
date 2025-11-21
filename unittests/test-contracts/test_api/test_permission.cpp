@@ -47,17 +47,6 @@ struct test_permission_last_used_msg {
    SYSLIB_SERIALIZE( test_permission_last_used_msg, (account)(permission)(last_used_time) )
 };
 
-void test_permission::test_permission_last_used( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
-   (void)code;
-   (void)action;
-   using namespace sysio;
-
-   auto params = unpack_action_data<test_permission_last_used_msg>();
-
-   time_point msec{ microseconds{params.last_used_time}};
-   sysio_assert( sysio::get_permission_last_used(params.account, params.permission) == msec, "unexpected last used permission time" );
-}
-
 void test_permission::test_account_creation_time( uint64_t /* receiver */, uint64_t code, uint64_t action ) {
    (void)code;
    (void)action;

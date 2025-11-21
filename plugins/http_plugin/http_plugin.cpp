@@ -9,7 +9,6 @@
 #include <fc/network/listener.hpp>
 
 #include <boost/asio.hpp>
-#include <boost/algorithm/string/predicate.hpp>
 
 #include <memory>
 #include <regex>
@@ -192,8 +191,7 @@ namespace sysio {
          }
          
          bool is_unix_socket_address(const std::string& address) const {
-            using boost::algorithm::starts_with;
-            return starts_with(address, "/") || starts_with(address, "./") || starts_with(address, "../");
+            return address.starts_with("/") || address.starts_with("./") || address.starts_with("../");
          }
 
          bool on_loopback_only(const std::string& address) {
@@ -232,7 +230,9 @@ namespace sysio {
             };
 
             fc::create_listener<Protocol>(plugin_state->thread_pool.get_executor(), logger(), accept_timeout, address,
-                                          extra_listening_log_info, create_session);
+                                          extra_listening_log_info,
+                                          [this](const auto&) -> boost::asio::io_context& { return plugin_state->thread_pool.get_executor(); },
+                                          create_session);
          }
 
          void create_beast_server(const std::string& address, api_category_set categories) {
@@ -474,9 +474,11 @@ namespace sysio {
    }
 
    void http_plugin::plugin_startup() {
-      app().executor().post(appbase::priority::high, [this] ()
-      {
-         // The reason we post here is because we want blockchain replay to happen before we start listening.
+      // post here because *_api_plugins that register api handlers depend on http_plugin. Since they depend on the
+      // http_plugin, this plugin_startup is called before any *_api_plugin::plugin_startup. The post avoid situation
+      // where the application is running and accepting http requests, but it doesn't have the request api handler
+      // registered yet.
+      app().executor().post(appbase::priority::high, exec_queue::read_write, [this]() {
          try {
             my->plugin_state->thread_pool.start( my->plugin_state->thread_pool_size, [](const fc::exception& e) {
                fc_elog( logger(), "Exception in http thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
@@ -490,13 +492,13 @@ namespace sysio {
             my->listening.store(true);
          } catch(fc::exception& e) {
             fc_elog(logger(), "http_plugin startup fails for ${e}", ("e", e.to_detail_string()));
-            app().quit();
+            throw; // allow application exec() to exit with error
          } catch(std::exception& e) {
             fc_elog(logger(), "http_plugin startup fails for ${e}", ("e", e.what()));
-            app().quit();
+            throw; // allow application exec() to exit with error
          } catch (...) {
             fc_elog(logger(), "http_plugin startup fails, shutting down");
-            app().quit();
+            throw; // allow application exec() to exit with error
          }
       });
    }
@@ -508,7 +510,7 @@ namespace sysio {
    void http_plugin::plugin_shutdown() {
       my->plugin_state->thread_pool.stop();
 
-      fc_ilog( logger(), "exit shutdown");
+      fc_dlog( logger(), "exit shutdown");
    }
 
    void log_add_handler(http_plugin_impl* my, api_entry& entry) {
@@ -604,6 +606,15 @@ namespace sysio {
                          });
    }
 
+   // returns true if `category` is enabled in http_plugin
+   bool http_plugin::is_enabled(api_category category) const {
+      return std::any_of(my->categories_by_address.begin(), my->categories_by_address.end(),
+                         [&category](const auto& entry) {
+                            const auto& [address, categories] = entry;
+                            return categories.contains(category);
+                         });
+   }
+
    bool http_plugin::verbose_errors() {
       return verbose_http_errors;
    }
@@ -618,6 +629,14 @@ namespace sysio {
 
    void  http_plugin::register_update_metrics(std::function<void(metrics)>&& fun) {
       my->plugin_state->update_metrics = std::move(fun);
+   }
+
+   size_t http_plugin::requests_in_flight() const {
+      return my->plugin_state->requests_in_flight;
+   }
+
+   size_t http_plugin::bytes_in_flight() const {
+      return my->plugin_state->bytes_in_flight;
    }
 
    std::atomic<bool>& http_plugin::listening() {

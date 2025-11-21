@@ -12,6 +12,10 @@ namespace sysiosystem {
    system_contract::system_contract( name s, name code, datastream<const char*> ds )
    :native(s,code,ds),
     _producers(get_self(), get_self().value),
+    _finalizer_keys(get_self(), get_self().value),
+    _finalizers(get_self(), get_self().value),
+    _last_prop_finalizers(get_self(), get_self().value),
+    _fin_key_id_generator(get_self(), get_self().value),
     _global(get_self(), get_self().value)
    {
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();

@@ -309,7 +309,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
 
          try {
             // search for the block that contains the transaction
-            get_block_n blk_num = common->store->get_trx_block_number(*trx_id, common->minimum_irreversible_history_blocks);
+            get_block_n blk_num = common->store->get_trx_block_number(*trx_id);
             if (!blk_num.has_value()){
                error_results results{404, "Trace API: transaction id missing in the transaction id log files"};
                cb( 404, fc::variant( results ));
@@ -433,7 +433,7 @@ void trace_api_plugin::plugin_startup() {
 void trace_api_plugin::plugin_shutdown() {
    my->plugin_shutdown();
    rpc->plugin_shutdown();
-   fc_ilog( _log, "exit shutdown");
+   fc_dlog( _log, "exit shutdown");
 }
 
 void trace_api_plugin::handle_sighup() {

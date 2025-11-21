@@ -33,7 +33,6 @@ namespace sysio { namespace client { namespace http {
    const string get_raw_block_func = chain_func_base + "/get_raw_block";
    const string get_block_header_func = chain_func_base + "/get_block_header";
    const string get_block_info_func = chain_func_base + "/get_block_info";
-   const string get_block_header_state_func = chain_func_base + "/get_block_header_state";
    const string get_account_func = chain_func_base + "/get_account";
    const string get_table_func = chain_func_base + "/get_table_rows";
    const string get_table_by_scope_func = chain_func_base + "/get_table_by_scope";
@@ -44,6 +43,7 @@ namespace sysio { namespace client { namespace http {
    const string get_raw_code_and_abi_func = chain_func_base + "/get_raw_code_and_abi";
    const string get_currency_balance_func = chain_func_base + "/get_currency_balance";
    const string get_currency_stats_func = chain_func_base + "/get_currency_stats";
+   const string get_finalizer_info_func = chain_func_base + "/get_finalizer_info";
    const string get_producers_func = chain_func_base + "/get_producers";
    const string get_schedule_func = chain_func_base + "/get_producer_schedule";
    const string get_required_keys = chain_func_base + "/get_required_keys";

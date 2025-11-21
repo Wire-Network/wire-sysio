@@ -6,6 +6,7 @@
 #include <CLI/CLI.hpp>
 
 #include "actions/blocklog_actions.hpp"
+#include "actions/bls_actions.hpp"
 #include "actions/chain_actions.hpp"
 #include "actions/generic_actions.hpp"
 #include "actions/snapshot_actions.hpp"
@@ -15,7 +16,7 @@
 int main(int argc, char** argv) {
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
 
-   CLI::App app{"Sys Command Line Utility"};
+   CLI::App app{"sysio Command Line Utility"};
 
    // custom leap formatter
    auto fmt = std::make_shared<CLI::LeapFormatter>();
@@ -32,6 +33,10 @@ int main(int argc, char** argv) {
    // blocklog sc tree from sysio-blocklog
    auto blocklog_subcommand = std::make_shared<blocklog_actions>();
    blocklog_subcommand->setup(app);
+
+   // bls sc tree
+   auto bls_subcommand = std::make_shared<bls_actions>();
+   bls_subcommand->setup(app);
 
    // snapshot sc tree
    auto snapshot_subcommand = std::make_shared<snapshot_actions>();

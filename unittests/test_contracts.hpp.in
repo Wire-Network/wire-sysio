@@ -49,7 +49,9 @@ namespace sysio {
          MAKE_READ_WASM_ABI(crypto_primitives_test,crypto_primitives_test,unittests/test-contracts)
          MAKE_READ_WASM_ABI(bls_primitives_test,   bls_primitives_test,   unittests/test-contracts)
          MAKE_READ_WASM_ABI(get_block_num_test,    get_block_num_test,    unittests/test-contracts)
+         MAKE_READ_WASM_ABI(db_find_secondary_test,db_find_secondary_test,unittests/test-contracts)
          MAKE_READ_WASM_ABI(nested_container_multi_index,   nested_container_multi_index,   unittests/test-contracts)
+         MAKE_READ_WASM_ABI(ibc,                   ibc,                   unittests/test-contracts/savanna)
 
       };
    } /// sysio::testing

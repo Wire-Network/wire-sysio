@@ -108,8 +108,7 @@ CONTRACT sysmechanics : public sysio::contract {
             uint64_t id;
             std::string one;
 
-            uint64_t primary_key() const { return id; }
-
+            uint64_t primary_key()const { return id; }
             SYSLIB_SERIALIZE(ramdata, (id)(one))
         };
 

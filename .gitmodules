@@ -2,14 +2,6 @@
 	path = libraries/appbase
 	url = https://github.com/Wire-Network/appbase
 
-[submodule "libraries/chainbase"]
-	path = libraries/chainbase
-	url = https://github.com/Wire-Network/chainbase
-
-[submodule "tests/abieos"]
-	path = tests/abieos
-	url = https://github.com/Wire-Network/abieos
-
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/Microsoft/vcpkg.git

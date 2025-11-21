@@ -171,7 +171,7 @@ class Transactions(NodeopQueries):
             retries = retries + 1
             start=time.perf_counter()
             try:
-                trans=Utils.runCmdReturnJson(cmd, trace=False)
+                trans=Utils.runCmdReturnJson(cmd, trace=False, silentErrors=shouldFail)
                 self.trackCmdTransaction(trans)
                 if Utils.Debug:
                     end=time.perf_counter()
@@ -357,8 +357,9 @@ class Transactions(NodeopQueries):
 
     # Require producer_api_plugin
     # Return an array of feature digests to be preactivated in a correct order respecting dependencies
+    # but skip "PREACTIVATE_FEATURE"
     # Require producer_api_plugin
-    def getAllBuiltinFeatureDigestsToPreactivate(self):
+    def getAllBuiltinFeatureDigestsToActivate(self):
         protocolFeatures = {}
         supportedProtocolFeatures = self.getSupportedProtocolFeatures()
         if Utils.Debug: Utils.Print(f"getSupportedProtocolFeatures: {json.dumps(supportedProtocolFeatures, indent=4)}")
@@ -374,7 +375,7 @@ class Transactions(NodeopQueries):
 
 
     # Require PREACTIVATE_FEATURE to be activated and require sysio.bios with preactivate_feature
-    def preactivateProtocolFeatures(self, featureDigests:list):
+    def activateProtocolFeatures(self, featureDigests:list):
         for group in featureDigests:
             for digest in group:
                 Utils.Print("push activate action with digest {}".format(digest))
@@ -385,9 +386,10 @@ class Transactions(NodeopQueries):
                     Utils.Print("ERROR: Failed to preactive digest {}".format(digest))
                     return None
             self.waitForTransactionInBlock(trans['transaction_id'])
+            # protocol features are activated in the next start_block, wait one more block
+            self.waitForHeadToAdvance()
 
     # Require PREACTIVATE_FEATURE to be activated and require sysio.bios with preactivate_feature
-    def preactivateAllBuiltinProtocolFeature(self):
-        allBuiltinProtocolFeatureDigests = self.getAllBuiltinFeatureDigestsToPreactivate()
-        self.preactivateProtocolFeatures(allBuiltinProtocolFeatureDigests)
-
+    def activateAllBuiltinProtocolFeature(self):
+        sorted_groups_of_digests = self.getAllBuiltinFeatureDigestsToActivate()
+        self.activateProtocolFeatures(sorted_groups_of_digests)

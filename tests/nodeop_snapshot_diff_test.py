@@ -32,7 +32,7 @@ Print=Utils.Print
 errorExit=Utils.errorExit
 
 appArgs=AppArgs()
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--wallet-port","--unshared"},
+args = TestHelper.parse_args({"--activate-if","--dump-error-details","--keep-logs","-v","--leave-running","--wallet-port","--unshared"},
                              applicationSpecificArgs=appArgs)
 
 relaunchTimeout = 30
@@ -42,6 +42,7 @@ testAccounts = 2
 trxGeneratorCnt=2
 startedNonProdNodes = 3
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
+activateIF=args.activate_if
 dumpErrorDetails=args.dump_error_details
 prodCount=2
 walletPort=args.wallet_port
@@ -57,27 +58,13 @@ trxGenLauncher=None
 
 snapshotScheduleDB = "snapshot-schedule.json"
 
-def getLatestSnapshot(nodeId):
-    snapshotDir = os.path.join(Utils.getNodeDataDir(nodeId), "snapshots")
-    snapshotDirContents = os.listdir(snapshotDir)
-    assert len(snapshotDirContents) > 0
-    # disregard snapshot schedule config in same folder
-    if snapshotScheduleDB in snapshotDirContents: snapshotDirContents.remove(snapshotScheduleDB)
-    snapshotDirContents.sort()
-    return os.path.join(snapshotDir, snapshotDirContents[-1])
-
-def removeState(nodeId):
-    dataDir = Utils.getNodeDataDir(nodeId)
-    state = os.path.join(dataDir, "state")
-    shutil.rmtree(state, ignore_errors=True)
-
 try:
     TestHelper.printSystemInfo("BEGIN")
     cluster.setWalletMgr(walletMgr)
 
     Print("Stand up cluster")
     if cluster.launch(prodCount=prodCount, onlyBios=False, pnodes=pnodes, totalNodes=totalNodes, totalProducers=pnodes*prodCount,
-                      loadSystemContract=True, maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
+                      activateIF=activateIF, loadSystemContract=True, maximumP2pPerHost=totalNodes+trxGeneratorCnt) is False:
         Utils.errorExit("Failed to stand up sys cluster.")
 
     Print("Create test wallet")
@@ -164,15 +151,27 @@ try:
     nodeSnap.kill(signal.SIGTERM)
 
     Print("Convert snapshot to JSON")
-    snapshotFile = getLatestSnapshot(snapshotNodeId)
-    Utils.processLeapUtilCmd("snapshot to-json --input-file {}".format(snapshotFile), "snapshot to-json", silentErrors=False)
+    snapshotFile = nodeSnap.getLatestSnapshot()
+    Utils.processSysioUtilCmd("snapshot to-json --input-file {}".format(snapshotFile), "snapshot to-json", silentErrors=False)
     snapshotFile = snapshotFile + ".json"
+
+    # There is a race condition that at the startup of node, net thread and http
+    # thread can start to work in different order. If http thread processes schedule_snapshot
+    # request after net thread starts to sync with the irrNode, schedule_snapshot
+    # request will miss the scheduled block number. If it is before net thread
+    # starts to sync with the irrNode, schedule_snapshot request will catch the
+    # scheduled block number and the snapshot is taken.
+
+    # Shut down irreversible node so that nodeProg won't sync up when starting up
+    Print("Kill irreversible node")
+    nodeIrr.kill(signal.SIGTERM)
 
     Print("Trim programmable blocklog to snapshot head block num and relaunch programmable node")
     nodeProg.kill(signal.SIGTERM)
     output=cluster.getBlockLog(progNodeId, blockLogAction=BlockLogAction.trim, first=0, last=ret_head_block_num, throwException=True)
-    removeState(progNodeId)
+    nodeProg.removeState()
     nodeProg.rmFromCmd('--p2p-peer-address')
+
     isRelaunchSuccess = nodeProg.relaunch(chainArg="--replay", addSwapFlags={}, timeout=relaunchTimeout)
     assert isRelaunchSuccess, "Failed to relaunch programmable node"
 
@@ -180,15 +179,19 @@ try:
     ret = nodeProg.scheduleSnapshotAt(ret_head_block_num)
     assert ret is not None, "Snapshot scheduling failed"
 
+    # Start irreversible node so that nodeProg can sync up with it
+    Print("Restart irreversible node")
+    nodeIrr.relaunch()
+
     Print("Wait for programmable node lib to advance")
-    waitForBlock(nodeProg, ret_head_block_num+1, blockType=BlockType.lib)
+    waitForBlock(nodeProg, ret_head_block_num, blockType=BlockType.lib)
 
     Print("Kill programmable node")
     nodeProg.kill(signal.SIGTERM)
 
     Print("Convert snapshot to JSON")
-    progSnapshotFile = getLatestSnapshot(progNodeId)
-    Utils.processLeapUtilCmd("snapshot to-json --input-file {}".format(progSnapshotFile), "snapshot to-json", silentErrors=False)
+    progSnapshotFile = nodeProg.getLatestSnapshot()
+    Utils.processSysioUtilCmd("snapshot to-json --input-file {}".format(progSnapshotFile), "snapshot to-json", silentErrors=False)
     progSnapshotFile = progSnapshotFile + ".json"
 
     Print("Trim irreversible blocklog to snapshot head block num")
@@ -196,7 +199,7 @@ try:
     output=cluster.getBlockLog(irrNodeId, blockLogAction=BlockLogAction.trim, first=0, last=ret_head_block_num, throwException=True)
 
     Print("Relaunch irreversible node in irreversible mode")
-    removeState(irrNodeId)
+    nodeIrr.removeState()
     nodeIrr.rmFromCmd('--p2p-peer-address')
     swapFlags = {"--read-mode":"irreversible", "--p2p-max-nodes-per-host":"0", "--max-clients":"0", "--allowed-connection":"none"}
     isRelaunchSuccess = nodeIrr.relaunch(chainArg="--replay", addSwapFlags=swapFlags, timeout=relaunchTimeout)
@@ -213,8 +216,8 @@ try:
     nodeIrr.kill(signal.SIGTERM)
 
     Print("Convert snapshot to JSON")
-    irrSnapshotFile = getLatestSnapshot(irrNodeId)
-    Utils.processLeapUtilCmd("snapshot to-json --input-file {}".format(irrSnapshotFile), "snapshot to-json", silentErrors=False)
+    irrSnapshotFile = nodeIrr.getLatestSnapshot()
+    Utils.processSysioUtilCmd("snapshot to-json --input-file {}".format(irrSnapshotFile), "snapshot to-json", silentErrors=False)
     irrSnapshotFile = irrSnapshotFile + ".json"
 
     assert Utils.compareFiles(snapshotFile, irrSnapshotFile), f"Snapshot files differ {snapshotFile} != {irrSnapshotFile}"

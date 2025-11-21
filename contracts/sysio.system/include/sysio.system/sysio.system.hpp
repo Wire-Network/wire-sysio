@@ -7,6 +7,7 @@
 #include <sysio/singleton.hpp>
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
+#include <sysio/instant_finality.hpp>
 
 #include <sysio.system/native.hpp>
 
@@ -14,6 +15,7 @@
 #include <optional>
 #include <string>
 #include <type_traits>
+#include <unordered_set>
 
 namespace sysiosystem {
 
@@ -132,6 +134,84 @@ namespace sysiosystem {
 
    typedef sysio::multi_index< "producers"_n, producer_info > producers_table;
 
+   // finalizer_key_info stores information about a finalizer key.
+   struct [[sysio::table("finkeys"), sysio::contract("sysio.system")]] finalizer_key_info {
+      uint64_t          id;                   // automatically generated ID for the key in the table
+      name              finalizer_name;       // name of the finalizer owning the key
+      std::string       finalizer_key;        // finalizer key in base64url format
+      std::vector<char> finalizer_key_binary; // finalizer key in binary format in Affine little endian non-montgomery g1
+
+      uint64_t    primary_key() const { return id; }
+      uint64_t    by_fin_name() const { return finalizer_name.value; }
+      // Use binary format to hash. It is more robust and less likely to change
+      // than the base64url text encoding of it.
+      // There is no need to store the hash key to avoid re-computation,
+      // which only happens if the table row is modified. There won't be any
+      // modification of the table rows of; it may only be removed.
+      checksum256 by_fin_key()  const { return sysio::sha256(finalizer_key_binary.data(), finalizer_key_binary.size()); }
+
+      bool is_active(uint64_t finalizer_active_key_id) const { return id == finalizer_active_key_id ; }
+   };
+   typedef sysio::multi_index<
+      "finkeys"_n, finalizer_key_info,
+      indexed_by<"byfinname"_n, const_mem_fun<finalizer_key_info, uint64_t, &finalizer_key_info::by_fin_name>>,
+      indexed_by<"byfinkey"_n, const_mem_fun<finalizer_key_info, checksum256, &finalizer_key_info::by_fin_key>>
+   > finalizer_keys_table;
+
+   // finalizer_info stores information about a finalizer.
+   struct [[sysio::table("finalizers"), sysio::contract("sysio.system")]] finalizer_info {
+      name              finalizer_name;           // finalizer's name
+      uint64_t          active_key_id;            // finalizer's active finalizer key's id in finalizer_keys_table, for fast finding key information
+      std::vector<char> active_key_binary;        // finalizer's active finalizer key's binary format in Affine little endian non-montgomery g1
+      uint32_t          finalizer_key_count = 0;  // number of finalizer keys registered by this finalizer
+
+      uint64_t primary_key() const { return finalizer_name.value; }
+   };
+   typedef sysio::multi_index< "finalizers"_n, finalizer_info > finalizers_table;
+
+   // finalizer_auth_info stores a finalizer's key id and its finalizer authority
+   struct finalizer_auth_info {
+      finalizer_auth_info() = default;
+      explicit finalizer_auth_info(const finalizer_info& finalizer);
+
+      uint64_t                   key_id;        // A finalizer's key ID in finalizer_keys_table
+      sysio::finalizer_authority fin_authority; // The finalizer's finalizer_authority
+
+      bool operator==(const finalizer_auth_info& other) const {
+         // Weight and description can never be changed by a user.
+         // They are not considered here.
+         return key_id == other.key_id &&
+                fin_authority.public_key == other.fin_authority.public_key;
+      };
+
+      SYSLIB_SERIALIZE( finalizer_auth_info, (key_id)(fin_authority) )
+   };
+
+   // A single entry storing information about last proposed finalizers.
+   // Should avoid  using the global singleton pattern as it unnecessarily
+   // serializes data at construction/desstruction of system_contract,
+   // even if the data is not used.
+   struct [[sysio::table("lastpropfins"), sysio::contract("sysio.system")]] last_prop_finalizers_info {
+      std::vector<finalizer_auth_info> last_proposed_finalizers; // sorted by ascending finalizer key id
+
+      uint64_t primary_key()const { return 0; }
+
+      SYSLIB_SERIALIZE( last_prop_finalizers_info, (last_proposed_finalizers) )
+   };
+
+   typedef sysio::multi_index< "lastpropfins"_n, last_prop_finalizers_info >  last_prop_fins_table;
+
+   // A single entry storing next available finalizer key_id to make sure
+   // key_id in finalizers_table will never be reused.
+   struct [[sysio::table("finkeyidgen"), sysio::contract("sysio.system")]] fin_key_id_generator_info {
+      uint64_t next_finalizer_key_id = 0;
+      uint64_t primary_key()const { return 0; }
+
+      SYSLIB_SERIALIZE( fin_key_id_generator_info, (next_finalizer_key_id) )
+   };
+
+   typedef sysio::multi_index< "finkeyidgen"_n, fin_key_id_generator_info >  fin_key_id_gen_table;
+
    typedef sysio::singleton< "global"_n, sysio_global_state >   global_state_singleton;
 
    /**
@@ -148,6 +228,11 @@ namespace sysiosystem {
 
       private:
          producers_table          _producers;
+         finalizer_keys_table     _finalizer_keys;
+         finalizers_table         _finalizers;
+         last_prop_fins_table     _last_prop_finalizers;
+         std::optional<std::vector<finalizer_auth_info>> _last_prop_finalizers_cached;
+         fin_key_id_gen_table     _fin_key_id_generator;
          global_state_singleton   _global;
          sysio_global_state       _gstate;
 
@@ -297,6 +382,68 @@ namespace sysiosystem {
          void unregprod( const name& producer );
 
          /**
+          * Action to permanently transition to Savanna consensus.
+          * Create the first generation of finalizer policy and activate
+          * the policy by using `set_finalizers` host function
+          *
+          * @pre Require the authority of the contract itself
+          * @pre A sufficient numner of the top 21 block producers have registered a finalizer key
+          */
+         [[sysio::action]]
+         void switchtosvnn();
+
+         /**
+          * Action to register a finalizer key by a registered producer.
+          * If this was registered before (and still exists) even
+          * by other block producers, the registration will fail.
+          * If this is the first registered finalizer key of the producer,
+          * it will also implicitly be marked active.
+          * A registered producer can have multiple registered finalizer keys.
+          *
+          * @param finalizer_name - account registering `finalizer_key`,
+          * @param finalizer_key - key to be registered. The key is in base64url format.
+          * @param proof_of_possession - a valid Proof of Possession signature to show the producer owns the private key of the finalizer_key. The signature is in base64url format.
+          *
+          * @pre `finalizer_name` must be a registered producer
+          * @pre `finalizer_key` must be in base64url format
+          * @pre `proof_of_possession` must be a valid of proof of possession signature
+          * @pre Authority of `finalizer_name` to register. `linkauth` may be used to allow a lower authrity to exectute this action.
+          */
+         [[sysio::action]]
+         void regfinkey( const name& finalizer_name, const std::string& finalizer_key, const std::string& proof_of_possession);
+
+         /**
+          * Action to activate a finalizer key. If the finalizer is currently an
+          * active block producer (in top 21), then immediately change Finalizer Policy.
+          * A finalizer may only have one active finalizer key. Activating a
+          * finalizer key implicitly deactivates the previously active finalizer
+          * key of that finalizer.
+          *
+          * @param finalizer_name - account activating `finalizer_key`,
+          * @param finalizer_key - key to be activated.
+          *
+          * @pre `finalizer_key` must be a registered finalizer key in base64url format
+          * @pre Authority of `finalizer_name`
+          */
+         [[sysio::action]]
+         void actfinkey( const name& finalizer_name, const std::string& finalizer_key );
+
+         /**
+          * Action to delete a finalizer key. An active finalizer key may not be deleted
+          * unless it is the last registered finalizer key. If it is the last one,
+          * it will be deleted.
+          *
+          * @param finalizer_name - account deleting `finalizer_key`,
+          * @param finalizer_key - key to be deleted.
+          *
+          * @pre `finalizer_key` must be a registered finalizer key in base64url format
+          * @pre `finalizer_key` must not be active, unless it is the last registered finalizer key
+          * @pre Authority of `finalizer_name`
+          */
+         [[sysio::action]]
+         void delfinkey( const name& finalizer_name, const std::string& finalizer_key );
+
+         /**
           * Set ram action sets the ram supply.
           * @param max_ram_size - the amount of ram supply to set.
           */
@@ -384,6 +531,13 @@ namespace sysiosystem {
 
          // defined in block_info.cpp
          void add_to_blockinfo_table(const sysio::checksum256& previous_block_id, const sysio::block_timestamp timestamp) const;
+
+         // defined in finalizer_key.cpp
+         bool is_savanna_consensus();
+         void set_proposed_finalizers( std::vector<finalizer_auth_info> finalizers );
+         const std::vector<finalizer_auth_info>& get_last_proposed_finalizers();
+         uint64_t get_next_finalizer_key_id();
+         finalizers_table::const_iterator get_finalizer_itr( const name& finalizer_name ) const;
    };
 
 }

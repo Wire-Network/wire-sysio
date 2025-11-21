@@ -5,17 +5,18 @@
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/testing/tester.hpp>
 
-// #include <boost/mpl/list.hpp>
-#include <boost/test/unit_test.hpp>
+#include <snapshot_suites.hpp>
+#include <snapshot_tester.hpp>
 
+#include <boost/test/unit_test.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
 #include <contracts.hpp>
 #include <fc/io/cfile.hpp>
-#include <snapshots.hpp>
+
 
 BOOST_AUTO_TEST_SUITE(partitioned_block_log_tests)
 
-using signed_block_log = sysio::chain::block_log<sysio::chain::signed_block>;
+using signed_block_log = sysio::chain::block_log;
 
 void remove_existing_states(sysio::chain::controller::config& config) {
    auto state_path = config.state_dir;
@@ -41,18 +42,18 @@ struct restart_from_block_log_test_fixture {
    restart_from_block_log_test_fixture() {
       using namespace sysio::chain;
       chain.create_account("replay1"_n, config::system_account_name, false, true, false);
-      chain.produce_blocks(1);
+      chain.produce_block();
       chain.create_account("replay2"_n, config::system_account_name, false, true, false);
-      chain.produce_blocks(1);
+      chain.produce_block();
       chain.create_account("replay3"_n, config::system_account_name, false, true, false);
-      chain.produce_blocks(1);
+      chain.produce_block();
       auto cutoff_block = chain.produce_block();
       cutoff_block_num  = cutoff_block->block_num();
-      chain.produce_blocks(10);
+      chain.produce_block();
 
-      BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay1"_n));
-      BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay2"_n));
-      BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay3"_n));
+      BOOST_REQUIRE_NO_THROW(chain.get_account("replay1"_n));
+      BOOST_REQUIRE_NO_THROW(chain.get_account("replay2"_n));
+      BOOST_REQUIRE_NO_THROW(chain.get_account("replay3"_n));
 
       chain.close();
    }
@@ -71,9 +72,9 @@ struct restart_from_block_log_test_fixture {
       remove_existing_states(copied_config);
       sysio::testing::tester from_block_log_chain(copied_config, *genesis);
       using namespace sysio::chain;
-      BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay1"_n));
-      BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay2"_n));
-      BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay3"_n));
+      BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay1"_n));
+      BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay2"_n));
+      BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay3"_n));
    }
 };
 
@@ -109,109 +110,23 @@ BOOST_AUTO_TEST_CASE(test_split_log) {
    BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.log"));
    BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.index"));
 
-   BOOST_CHECK(!chain.control->fetch_block_by_number(40));
+   BOOST_CHECK(!chain.fetch_block_by_number(40));
 
-   BOOST_CHECK(chain.control->fetch_block_by_number(81)->block_num() == 81u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(90)->block_num() == 90u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(100)->block_num() == 100u);
+   BOOST_CHECK(chain.fetch_block_by_number(81)->block_num() == 81u);
+   BOOST_CHECK(chain.fetch_block_by_number(90)->block_num() == 90u);
+   BOOST_CHECK(chain.fetch_block_by_number(100)->block_num() == 100u);
 
-   BOOST_CHECK(chain.control->fetch_block_by_number(41)->block_num() == 41u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(50)->block_num() == 50u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(60)->block_num() == 60u);
+   BOOST_CHECK(chain.fetch_block_by_number(41)->block_num() == 41u);
+   BOOST_CHECK(chain.fetch_block_by_number(50)->block_num() == 50u);
+   BOOST_CHECK(chain.fetch_block_by_number(60)->block_num() == 60u);
 
-   BOOST_CHECK(chain.control->fetch_block_by_number(121)->block_num() == 121u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(130)->block_num() == 130u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(140)->block_num() == 140u);
+   BOOST_CHECK(chain.fetch_block_by_number(121)->block_num() == 121u);
+   BOOST_CHECK(chain.fetch_block_by_number(130)->block_num() == 130u);
+   BOOST_CHECK(chain.fetch_block_by_number(140)->block_num() == 140u);
 
-   BOOST_CHECK(chain.control->fetch_block_by_number(145)->block_num() == 145u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(150)->block_num() == 150u);
+   BOOST_CHECK(chain.fetch_block_by_number(145)->block_num() == 145u);
 
-   BOOST_CHECK(!chain.control->fetch_block_by_number(160));
-}
-
-BOOST_AUTO_TEST_CASE(test_split_state_log) {
-   fc::temp_directory temp_dir;
-
-   sysio::testing::tester chain(
-         temp_dir,
-         [](sysio::chain::controller::config& config) {
-            config.blog = sysio::chain::partitioned_blocklog_config{ .archive_dir        = "archive",
-                                                                     .stride             = 20,
-                                                                     .max_retained_files = 5 };
-            config.keep_state_log = true;
-         },
-         true);
-   chain.produce_blocks(150);
-
-   auto blocks_dir         = chain.get_config().blocks_dir;
-   auto blocks_archive_dir = blocks_dir / "archive";
-
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir));
-
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-1-20.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-1-20.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-21-40.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "block_state-21-40.index"));
-
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-41-60.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-41-60.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-61-80.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-61-80.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-81-100.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-81-100.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-101-120.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-101-120.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-121-140.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "block_state-121-140.index"));
-
-   // ensure that block state log logic being turened on doesn't affect the block log
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-1-20.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-1-20.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-21-40.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_archive_dir / "blocks-21-40.index"));
-
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-41-60.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-41-60.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-80.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-80.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-81-100.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-81-100.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-101-120.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-101-120.index"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.log"));
-   BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-121-140.index"));
-
-
-   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(40));
-
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(81)->block_num == 81u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(90)->block_num == 90u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(100)->block_num == 100u);
-
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(41)->block_num == 41u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(50)->block_num == 50u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(60)->block_num == 60u);
-
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(121)->block_num == 121u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(130)->block_num == 130u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(140)->block_num == 140u);
-
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(145)->block_num == 145u);
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(150)->block_num == 150u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(150)->block_num() == 150u);
-   // block 151 won't be irreversible till the next block is published
-   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(151));
-   BOOST_CHECK(chain.control->fetch_block_by_number(151)->block_num() == 151u);
-   BOOST_CHECK(!chain.control->fetch_block_by_number(152));
-
-   chain.produce_block();
-
-   BOOST_CHECK(chain.control->fetch_irr_block_header_state_by_number(151)->block_num == 151u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(151)->block_num() == 151u);
-   BOOST_CHECK(!chain.control->fetch_irr_block_header_state_by_number(152));
-   BOOST_CHECK(chain.control->fetch_block_by_number(152)->block_num() == 152u);
-   BOOST_CHECK(!chain.control->fetch_block_by_number(153));
-
+   BOOST_CHECK(!chain.fetch_block_by_number(160));
 }
 
 BOOST_AUTO_TEST_CASE(test_split_log_zero_retained_file) {
@@ -265,12 +180,12 @@ BOOST_AUTO_TEST_CASE(test_split_log_all_in_retained_new_default) {
 }
 
 BOOST_AUTO_TEST_CASE(test_split_log_util1) {
-   fc::temp_directory temp_dir;
-
    sysio::testing::tester chain;
    chain.produce_blocks(160);
 
-   uint32_t head_block_num = chain.control->head_block_num();
+   uint32_t head_block_num = chain.head().block_num();
+   uint32_t lib_block_num;
+   lib_block_num = head_block_num - sysio::testing::num_chains_to_final; // two-chain
 
    sysio::chain::controller::config copied_config = chain.get_config();
    auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir,
@@ -279,9 +194,10 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
 
    chain.close();
 
+   fc::temp_directory temp_dir;
    auto blocks_dir   = chain.get_config().blocks_dir;
-   auto retained_dir = blocks_dir / "retained";
-   signed_block_log::split_blocklog(blocks_dir, retained_dir, 50);
+   auto retained_dir = temp_dir.path() / "retained";
+   sysio::chain::block_log::split_blocklog(blocks_dir, retained_dir, 50);
 
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-1-50.log"));
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-1-50.index"));
@@ -290,9 +206,9 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-101-150.log"));
    BOOST_CHECK(std::filesystem::exists(retained_dir / "blocks-101-150.index"));
    char buf[64];
-   snprintf(buf, 64, "blocks-151-%u.log", head_block_num - 1);
+   snprintf(buf, 64, "blocks-151-%u.log", lib_block_num);
    std::filesystem::path last_block_file = retained_dir / buf;
-   snprintf(buf, 64, "blocks-151-%u.index", head_block_num - 1);
+   snprintf(buf, 64, "blocks-151-%u.index", lib_block_num);
    std::filesystem::path last_index_file = retained_dir / buf;
    BOOST_CHECK(std::filesystem::exists(last_block_file));
    BOOST_CHECK(std::filesystem::exists(last_index_file));
@@ -309,11 +225,93 @@ BOOST_AUTO_TEST_CASE(test_split_log_util1) {
                                                                    .stride             = 50,
                                                                    .max_retained_files = 5 };
 
-   sysio::testing::tester from_block_log_chain(copied_config, *genesis);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(1)->block_num() == 1u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(75)->block_num() == 75u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(100)->block_num() == 100u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(150)->block_num() == 150u);
+   tester from_block_log_chain(copied_config, *genesis);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(1)->block_num() == 1u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(75)->block_num() == 75u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(100)->block_num() == 100u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(150)->block_num() == 150u);
+
+   from_block_log_chain.close();
+
+   //
+   // replay with no blocks.log, but blocks in retained_dir
+   //
+
+   // remove the state files to make sure we are starting from block log
+   remove_existing_states(copied_config);
+   // we need to remove all blocks but what is in retained
+   std::filesystem::remove(blocks_dir / "blocks.log");
+   std::filesystem::remove(blocks_dir / "blocks.index");
+
+   // Create a replay chain without starting it
+   sysio::testing::tester replay_chain(copied_config, *genesis, sysio::testing::call_startup_t::no);
+   // no fork db head yet
+   BOOST_REQUIRE(!replay_chain.fork_db_head().is_valid());
+   // works because it pulls from retain dir
+   BOOST_CHECK(replay_chain.fetch_block_by_number(42)->block_num() == 42u);
+
+   // Simulate shutdown by CTRL-C
+   bool is_quiting = false;
+   auto check_shutdown = [&is_quiting](){ return is_quiting; };
+   uint32_t stop_at = 25;
+   // Set up shutdown at a particular block number
+   replay_chain.control->irreversible_block().connect([&](const sysio::chain::block_signal_params& t) {
+      const auto& [ block, id ] = t;
+      // Stop replay at block `stop_at`
+      if (block->block_num() == stop_at) {
+         is_quiting = true;
+      }
+   });
+   // Start replay and stop at block `stop_at`
+   replay_chain.control->startup( [](){}, check_shutdown, *genesis );
+
+   // create snapshot at stop_at block
+   replay_chain.control->abort_block();
+   auto writer = variant_snapshot_suite::get_writer();
+   replay_chain.control->write_snapshot(writer);
+   auto snapshot = variant_snapshot_suite::finalize(writer);
+
+   BOOST_REQUIRE(replay_chain.head().is_valid());
+   BOOST_CHECK(replay_chain.head().block_num() == stop_at);
+   // no fork db head yet
+   BOOST_CHECK(!replay_chain.fork_db_head().is_valid());
+
+   replay_chain.close();
+
+   // replay chain from stop_at with no blocks in block_log, pulls from retained dir
+   sysio::testing::tester replay_chain_1(copied_config, *genesis, sysio::testing::call_startup_t::no);
+   replay_chain_1.control->startup( [](){}, []()->bool{ return false; } );
+
+   BOOST_REQUIRE(replay_chain_1.fork_db_head().is_valid());
+   BOOST_CHECK(replay_chain_1.fork_db_head().block_num() == 150u);
+
+   BOOST_CHECK(replay_chain_1.fetch_block_by_number(1)->block_num() == 1u);
+   BOOST_CHECK(replay_chain_1.fetch_block_by_number(75)->block_num() == 75u);
+   BOOST_CHECK(replay_chain_1.fetch_block_by_number(100)->block_num() == 100u);
+   BOOST_CHECK(replay_chain_1.fetch_block_by_number(150)->block_num() == 150u);
+
+   replay_chain_1.close();
+
+   //
+   // start chain from snapshot at stop_at with no blocks in block_log, pulls from retained dir
+   //
+
+   // remove the state files to make sure we are starting from block log
+   remove_existing_states(copied_config);
+   // we need to remove all blocks but what is in retained
+   std::filesystem::remove(blocks_dir / "blocks.log");
+   std::filesystem::remove(blocks_dir / "blocks.index");
+
+   int ordinal = 0;
+   snapshotted_tester replay_chain_2(copied_config, variant_snapshot_suite::get_reader(snapshot), ++ordinal);
+
+   BOOST_REQUIRE(replay_chain_2.fork_db_head().is_valid());
+   BOOST_CHECK(replay_chain_2.fork_db_head().block_num() == 150u);
+
+   BOOST_CHECK(replay_chain_2.fetch_block_by_number(1)->block_num() == 1u);
+   BOOST_CHECK(replay_chain_2.fetch_block_by_number(75)->block_num() == 75u);
+   BOOST_CHECK(replay_chain_2.fetch_block_by_number(100)->block_num() == 100u);
+   BOOST_CHECK(replay_chain_2.fetch_block_by_number(150)->block_num() == 150u);
 }
 
 BOOST_AUTO_TEST_CASE(test_split_log_no_archive) {
@@ -352,9 +350,9 @@ BOOST_AUTO_TEST_CASE(test_split_log_no_archive) {
    BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-70.log"));
    BOOST_CHECK(std::filesystem::exists(blocks_dir / "blocks-61-70.index"));
 
-   BOOST_CHECK(!chain.control->fetch_block_by_number(10));
-   BOOST_CHECK(chain.control->fetch_block_by_number(70));
-   BOOST_CHECK(!chain.control->fetch_block_by_number(80));
+   BOOST_CHECK(!chain.fetch_block_by_number(10));
+   BOOST_CHECK(chain.fetch_block_by_number(70));
+   BOOST_CHECK(!chain.fetch_block_by_number(80));
 }
 
 void split_log_replay(uint32_t replay_max_retained_block_files) {
@@ -384,24 +382,24 @@ void split_log_replay(uint32_t replay_max_retained_block_files) {
    copied_config.blog =
          sysio::chain::partitioned_blocklog_config{ .stride             = stride,
                                                     .max_retained_files = replay_max_retained_block_files };
-   sysio::testing::tester from_block_log_chain(copied_config, *genesis);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(1)->block_num() == 1);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(75)->block_num() == 75);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(100)->block_num() == 100);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(150)->block_num() == 150);
+   tester from_block_log_chain(copied_config, *genesis);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(1)->block_num() == 1);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(75)->block_num() == 75);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(100)->block_num() == 100);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(150)->block_num() == 150);
 
    // produce new blocks to cross the blocks_log_stride boundary
    from_block_log_chain.produce_blocks(stride);
 
-   const auto previous_chunk_end_block_num = (from_block_log_chain.control->head_block_num() / stride) * stride;
+   const auto previous_chunk_end_block_num = (from_block_log_chain.head().block_num() / stride) * stride;
    const auto num_removed_blocks = std::min(stride * replay_max_retained_block_files, previous_chunk_end_block_num);
    const auto min_retained_block_number = previous_chunk_end_block_num - num_removed_blocks + 1;
 
    if (min_retained_block_number > 1) {
       // old blocks beyond the max_retained_block_files will no longer be available
-      BOOST_CHECK(!from_block_log_chain.control->fetch_block_by_number(min_retained_block_number - 1));
+      BOOST_CHECK(!from_block_log_chain.fetch_block_by_number(min_retained_block_number - 1));
    }
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(min_retained_block_number)->block_num() ==
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(min_retained_block_number)->block_num() ==
                min_retained_block_number);
 }
 
@@ -440,11 +438,11 @@ BOOST_AUTO_TEST_CASE(test_restart_without_blocks_log_file) {
    std::filesystem::remove(copied_config.blocks_dir / "blocks.log");
    std::filesystem::remove(copied_config.blocks_dir / "blocks.index");
    copied_config.blog = sysio::chain::partitioned_blocklog_config{ .stride = stride, .max_retained_files = 10 };
-   sysio::testing::tester from_block_log_chain(copied_config, *genesis);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(1)->block_num() == 1u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(75)->block_num() == 75u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(100)->block_num() == 100u);
-   BOOST_CHECK(from_block_log_chain.control->fetch_block_by_number(160)->block_num() == 160u);
+   tester from_block_log_chain(copied_config, *genesis);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(1)->block_num() == 1u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(75)->block_num() == 75u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(100)->block_num() == 100u);
+   BOOST_CHECK(from_block_log_chain.fetch_block_by_number(160)->block_num() == 160u);
 
    from_block_log_chain.produce_blocks(10);
 }
@@ -510,10 +508,10 @@ BOOST_AUTO_TEST_CASE(test_split_from_v1_log) {
           true);
    chain.produce_blocks(75);
 
-   BOOST_CHECK(chain.control->fetch_block_by_number(1)->block_num() == 1u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(21)->block_num() == 21u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(41)->block_num() == 41u);
-   BOOST_CHECK(chain.control->fetch_block_by_number(75)->block_num() == 75u);
+   BOOST_CHECK(chain.fetch_block_by_number(1)->block_num() == 1u);
+   BOOST_CHECK(chain.fetch_block_by_number(21)->block_num() == 21u);
+   BOOST_CHECK(chain.fetch_block_by_number(41)->block_num() == 41u);
+   BOOST_CHECK(chain.fetch_block_by_number(75)->block_num() == 75u);
 }
 
 void trim_blocklog_front(uint32_t version) {
@@ -537,8 +535,7 @@ void trim_blocklog_front(uint32_t version) {
    signed_block_log new_log(temp1.path());
    // double check if the version has been set to the desired version
    const auto old_log_version = old_log.version();
-   BOOST_CHECK(old_log_version.has_value());
-   BOOST_CHECK(*old_log_version == version);
+   BOOST_CHECK(old_log_version == version);
    BOOST_CHECK(new_log.first_block_num() == 10u);
    BOOST_CHECK(new_log.head()->block_num() == old_log.head()->block_num());
 
@@ -578,9 +575,8 @@ BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
    std::filesystem::remove(blocks_dir / "blocks.index");
 
    signed_block_log blog(blocks_dir, sysio::chain::partitioned_blocklog_config{ .retained_dir = retained_dir });
-   const auto version = blog.version();
-   BOOST_CHECK(version.has_value());
-   BOOST_CHECK(*version != 0);
+
+   BOOST_CHECK(blog.version() != 0);
    BOOST_CHECK_EQUAL(blog.head()->block_num(), 150u);
 
    // test blocklog merge

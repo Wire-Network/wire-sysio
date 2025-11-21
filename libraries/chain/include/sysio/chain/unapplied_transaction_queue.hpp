@@ -2,18 +2,11 @@
 
 #include <sysio/chain/transaction_metadata.hpp>
 #include <sysio/chain/trace.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
-
-namespace fc {
-  inline std::size_t hash_value( const fc::sha256& v ) {
-     return v._hash[3];
-  }
-}
 
 namespace sysio { namespace chain {
 
@@ -133,16 +126,9 @@ public:
       }
    }
 
-   void add_forked( const branch_type& forked_branch ) {
-      // forked_branch is in reverse order
-      for( auto ritr = forked_branch.rbegin(), rend = forked_branch.rend(); ritr != rend; ++ritr ) {
-         const block_state_legacy_ptr& bsptr = *ritr;
-         for( auto itr = bsptr->trxs_metas().begin(), end = bsptr->trxs_metas().end(); itr != end; ++itr ) {
-            const auto& trx = *itr;
-            auto insert_itr = queue.insert( { trx, trx_enum_type::forked } );
-            if( insert_itr.second ) added( insert_itr.first );
-         }
-      }
+   void add_forked( const transaction_metadata_ptr& trx ) {
+      auto insert_itr = queue.insert( { trx, trx_enum_type::forked } );
+      if( insert_itr.second ) added( insert_itr.first );
    }
 
    void add_aborted( deque<transaction_metadata_ptr> aborted_trxs ) {

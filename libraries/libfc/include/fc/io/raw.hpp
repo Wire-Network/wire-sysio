@@ -11,13 +11,15 @@
 #include <fc/safe.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/io/raw_fwd.hpp>
+#include <fc/crypto/hex.hpp>
+#include <fc/bitutil.hpp>
+
+#include <boost/multiprecision/cpp_int.hpp>
+
 #include <array>
 #include <map>
 #include <deque>
 #include <list>
-
-#include <boost/multiprecision/cpp_int.hpp>
-#include <fc/crypto/hex.hpp>
 
 namespace fc {
     namespace raw {
@@ -34,6 +36,8 @@ namespace fc {
     template<typename Stream> void unpack( Stream& s,  Int<256>& n );
     template<typename Stream, typename T> void pack( Stream& s, const boost::multiprecision::number<T>& n );
     template<typename Stream, typename T> void unpack( Stream& s,  boost::multiprecision::number<T>& n );
+    template<typename Stream> void pack( Stream& s, const fc::dynamic_bitset& bs );
+    template<typename Stream> void unpack( Stream& s,  fc::dynamic_bitset& bs );
 
     template<typename Stream, typename Arg0, typename... Args>
     inline void pack( Stream& s, const Arg0& a0, const Args&... args ) {
@@ -66,7 +70,7 @@ namespace fc {
        fc::raw::unpack( s, what );
        fc::raw::unpack( s, msgs );
 
-       e = fc::exception( fc::move(msgs), code, name, what );
+       e = fc::exception( std::move(msgs), code, name, what );
     }
 
     template<typename Stream>
@@ -141,37 +145,38 @@ namespace fc {
        usec = fc::microseconds(usec_as_int64);
     } FC_RETHROW_EXCEPTIONS( warn, "" ) }
 
-    template<typename Stream, typename T, size_t N>
-    inline auto pack( Stream& s, const fc::array<T,N>& v) -> std::enable_if_t<!is_trivial_array<T>>
+    template<typename Stream, NotTrivialScalar T, size_t N>
+    inline void pack( Stream& s, const fc::array<T,N>& v)
     {
        static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        for (uint64_t i = 0; i < N; ++i)
          fc::raw::pack(s, v.data[i]);
     }
 
-    template<typename Stream, typename T, size_t N>
-    inline auto pack( Stream& s, const fc::array<T,N>& v) -> std::enable_if_t<is_trivial_array<T>>
+    template<typename Stream, TrivialScalar T, size_t N>
+    inline void pack( Stream& s, const fc::array<T,N>& v)
     {
        static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        s.write((const char*)&v.data[0], N*sizeof(T));
     }
 
-    template<typename Stream, typename T, size_t N>
-    inline auto unpack( Stream& s, fc::array<T,N>& v) -> std::enable_if_t<!is_trivial_array<T>>
+    template<typename Stream, NotTrivialScalar T, size_t N>
+    inline void unpack( Stream& s, fc::array<T,N>& v)
     { try {
        static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        for (uint64_t i = 0; i < N; ++i)
           fc::raw::unpack(s, v.data[i]);
     } FC_RETHROW_EXCEPTIONS( warn, "fc::array<${type},${length}>", ("type",fc::get_typename<T>::name())("length",N) ) }
 
-    template<typename Stream, typename T, size_t N>
-    inline auto unpack( Stream& s, fc::array<T,N>& v) -> std::enable_if_t<is_trivial_array<T>>
+    template<typename Stream, TrivialScalar T, size_t N>
+    inline void unpack( Stream& s, fc::array<T,N>& v)
     { try {
        static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        s.read((char*)&v.data[0], N*sizeof(T));
     } FC_RETHROW_EXCEPTIONS( warn, "fc::array<${type},${length}>", ("type",fc::get_typename<T>::name())("length",N) ) }
 
     template<typename Stream, typename T, size_t N>
+    requires (!std::is_same_v<std::remove_cv_t<T>, char>)
     inline void pack( Stream& s, T (&v)[N]) {
       fc::raw::pack( s, unsigned_int((uint32_t)N) );
       for (uint64_t i = 0; i < N; ++i)
@@ -179,6 +184,7 @@ namespace fc {
     }
 
     template<typename Stream, typename T, size_t N>
+    requires (!std::is_same_v<std::remove_cv_t<T>, char>)
     inline void unpack( Stream& s, T (&v)[N])
     { try {
       unsigned_int size; fc::raw::unpack( s, size );
@@ -198,7 +204,12 @@ namespace fc {
     inline void unpack( Stream& s, std::shared_ptr<T>& v)
     { try {
       bool b; fc::raw::unpack( s, b );
-      if( b ) { v = std::make_shared<T>(); fc::raw::unpack( s, *v ); }
+      if( b ) {
+         // want to be able to unpack std::shared_ptr<const T>
+         auto tmp = std::make_shared<std::remove_const_t<T>>();
+         fc::raw::unpack( s, *tmp );
+         v = std::move(tmp);
+      } else { v.reset(); }
     } FC_RETHROW_EXCEPTIONS( warn, "std::shared_ptr<T>", ("type",fc::get_typename<T>::name()) ) }
 
     template<typename Stream> inline void pack( Stream& s, const signed_int& v ) {
@@ -241,13 +252,6 @@ namespace fc {
       vi.value = static_cast<uint32_t>(v);
     }
 
-    template<typename Stream, typename T> inline void unpack( Stream& s, const T& vi )
-    {
-       T tmp;
-       fc::raw::unpack( s, tmp );
-       FC_ASSERT( vi == tmp );
-    }
-
     template<typename Stream> inline void pack( Stream& s, const char* v ) {
        size_t sz = std::strlen(v);
        FC_ASSERT( sz <= MAX_SIZE_OF_BYTE_ARRAYS );
@@ -263,12 +267,12 @@ namespace fc {
 
     template<typename Stream, typename T, unsigned int S, typename Align>
     void pack( Stream& s, const fc::fwd<T,S,Align>& v ) {
-       fc::raw::pack( *v );
+       fc::raw::pack( s, *v );
     }
 
     template<typename Stream, typename T, unsigned int S, typename Align>
     void unpack( Stream& s, fc::fwd<T,S,Align>& v ) {
-       fc::raw::unpack( *v );
+       fc::raw::unpack( s, *v );
     }
 
     // optional
@@ -283,6 +287,7 @@ namespace fc {
     { try {
       bool b; fc::raw::unpack( s, b );
       if( b ) { v = T(); fc::raw::unpack( s, *v ); }
+      else { v.reset(); } // in case v has already has a value
     } FC_RETHROW_EXCEPTIONS( warn, "optional<${type}>", ("type",fc::get_typename<T>::name() ) ) }
 
     // std::vector<char>
@@ -347,7 +352,11 @@ namespace fc {
         template<typename T, typename C, T(C::*p)>
         inline void operator()( const char* name )const
         { try {
-          fc::raw::unpack( s, this->obj.*p );
+          // `const_cast` because we want to be able to populate `const` members of a class, which
+          // are typically set only in the constructor, but because of the `reflect` and `raw`
+          // interfaces, we have to create the object first and then populate the members.
+          // -------------------------------------------------------------------------------------
+          fc::raw::unpack( s, const_cast<std::remove_const_t<T>&>(this->obj.*p) );
         } FC_RETHROW_EXCEPTIONS( warn, "Error unpacking field ${field}", ("field",name) ) }
 
         private:
@@ -564,6 +573,39 @@ namespace fc {
        }
     }
 
+    template<typename Stream>
+    inline void pack( Stream& s, const fc::dynamic_bitset& value ) {
+      // pack the size of the bitset, not the number of blocks
+      const auto num_blocks = value.num_blocks();
+      FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
+      fc::raw::pack( s, unsigned_int(value.size()) );
+      [[maybe_unused]] constexpr size_t word_size = sizeof(fc::dynamic_bitset::block_type) * CHAR_BIT;
+      assert(num_blocks == (value.size() + word_size - 1) / word_size);
+      // convert bitset to a vector of blocks
+      std::vector<fc::dynamic_bitset::block_type> blocks;
+      blocks.resize(num_blocks);
+      boost::to_block_range(value, blocks.begin());
+      // pack the blocks
+      for (const auto& b: blocks) {
+         fc::raw::pack( s, b );
+      }
+    }
+
+    template<typename Stream>
+    inline void unpack( Stream& s, fc::dynamic_bitset& value ) {
+      // the packed size is the number of bits in the set, not the number of blocks
+      unsigned_int size; fc::raw::unpack( s, size );
+      constexpr size_t word_size = sizeof(fc::dynamic_bitset::block_type) * CHAR_BIT;
+      size_t num_blocks = (size + word_size - 1) / word_size;
+      FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
+      std::vector<fc::dynamic_bitset::block_type> blocks(num_blocks);
+      for( size_t i = 0; i < num_blocks; ++i ) {
+         fc::raw::unpack( s, blocks[i] );
+      }
+      value = { blocks.cbegin(), blocks.cend() };
+      value.resize(size.value);
+    }
+
     template<typename Stream, typename T>
     inline void pack( Stream& s, const std::vector<T>& value ) {
       FC_ASSERT( value.size() <= MAX_NUM_ARRAY_ELEMENTS );
@@ -596,6 +638,7 @@ namespace fc {
     inline void unpack( Stream& s, std::list<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
+      value.clear();
       while( size.value-- ) {
          T i;
          fc::raw::unpack( s, i );
@@ -619,6 +662,7 @@ namespace fc {
     inline void unpack( Stream& s, std::set<T>& value ) {
       unsigned_int size; fc::raw::unpack( s, size );
       FC_ASSERT( size.value <= MAX_NUM_ARRAY_ELEMENTS );
+      value.clear();
       for( uint64_t i = 0; i < size.value; ++i )
       {
         T tmp;
@@ -627,29 +671,33 @@ namespace fc {
       }
     }
 
-    template<typename Stream, typename T, std::size_t S>
-    inline auto pack( Stream& s, const std::array<T, S>& value ) -> std::enable_if_t<is_trivial_array<T>>
+    template<typename Stream, TrivialScalar T, std::size_t S>
+    inline void pack( Stream& s, const std::array<T, S>& value )
     {
+       static_assert( S <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        s.write((const char*)value.data(), S * sizeof(T));
     }
 
-    template<typename Stream, typename T, std::size_t S>
-    inline auto pack( Stream& s, const std::array<T, S>& value ) -> std::enable_if_t<!is_trivial_array<T>>
+    template<typename Stream, NotTrivialScalar T, std::size_t S>
+    inline void pack( Stream& s, const std::array<T, S>& value )
     {
+       static_assert( S <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        for( std::size_t i = 0; i < S; ++i ) {
           fc::raw::pack( s, value[i] );
        }
     }
 
-    template<typename Stream, typename T, std::size_t S>
-    inline auto unpack( Stream& s, std::array<T, S>& value )  -> std::enable_if_t<is_trivial_array<T>>
+    template<typename Stream, TrivialScalar T, std::size_t S>
+    inline void unpack( Stream& s, std::array<T, S>& value )
     {
+       static_assert( S <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        s.read((char*)value.data(), S * sizeof(T));
     }
 
-    template<typename Stream, typename T, std::size_t S>
-    inline auto unpack( Stream& s, std::array<T, S>& value )  -> std::enable_if_t<!is_trivial_array<T>>
+    template<typename Stream, NotTrivialScalar T, std::size_t S>
+    inline void unpack( Stream& s, std::array<T, S>& value )
     {
+       static_assert( S <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
        for( std::size_t i = 0; i < S; ++i ) {
           fc::raw::unpack( s, value[i] );
        }

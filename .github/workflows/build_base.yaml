@@ -121,3 +121,4 @@ jobs:
           with:
             name: ${{matrix.platform}}-build
             path: build.tar.zst
+            compression-level: 0

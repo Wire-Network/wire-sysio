@@ -74,41 +74,9 @@ FC_REFLECT( base_reflect, (bv) )
 FC_REFLECT_DERIVED( derived_reflect, (base_reflect), (dv) )
 FC_REFLECT_DERIVED( final_reflect, (derived_reflect), (fv) )
 
-namespace sysio
-{
+namespace sysio {
 using namespace chain;
 using namespace std;
-
-static constexpr uint64_t name_suffix( name nv ) {
-   uint64_t n = nv.to_uint64_t();
-   uint32_t remaining_bits_after_last_actual_dot = 0;
-   uint32_t tmp = 0;
-   for( int32_t remaining_bits = 59; remaining_bits >= 4; remaining_bits -= 5 ) { // Note: remaining_bits must remain signed integer
-      // Get characters one-by-one in name in order from left to right (not including the 13th character)
-      auto c = (n >> remaining_bits) & 0x1Full;
-      if( !c ) { // if this character is a dot
-         tmp = static_cast<uint32_t>(remaining_bits);
-      } else { // if this character is not a dot
-         remaining_bits_after_last_actual_dot = tmp;
-      }
-   }
-
-   uint64_t thirteenth_character = n & 0x0Full;
-   if( thirteenth_character ) { // if 13th character is not a dot
-      remaining_bits_after_last_actual_dot = tmp;
-   }
-
-   if( remaining_bits_after_last_actual_dot == 0 ) // there is no actual dot in the name other than potentially leading dots
-      return n;
-
-   // At this point remaining_bits_after_last_actual_dot has to be within the range of 4 to 59 (and restricted to increments of 5).
-
-   // Mask for remaining bits corresponding to characters after last actual dot, except for 4 least significant bits (corresponds to 13th character).
-   uint64_t mask = (1ull << remaining_bits_after_last_actual_dot) - 16;
-   uint32_t shift = 64 - remaining_bits_after_last_actual_dot;
-
-   return ( ((n & mask) << shift) + (thirteenth_character << (shift-1)) );
-}
 
 BOOST_AUTO_TEST_SUITE(misc_tests)
 
@@ -122,21 +90,45 @@ BOOST_AUTO_TEST_CASE(reverse_endian_tests)
 
 BOOST_AUTO_TEST_CASE(name_suffix_tests)
 {
-   BOOST_CHECK_EQUAL( name{name_suffix(name(0))}, name{0} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abcdehijklmn"_n)}, name{"abcdehijklmn"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abcdehijklmn1"_n)}, name{"abcdehijklmn1"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abc.def"_n)}, name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix(".abc.def"_n)}, name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("..abc.def"_n)}, name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abc..def"_n)}, name{"def"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abc.def.ghi"_n)}, name{"ghi"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix(".abcdefghij"_n)}, name{"abcdefghij"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix(".abcdefghij.1"_n)}, name{"1"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("a.bcdefghij"_n)}, name{"bcdefghij"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("a.bcdefghij.1"_n)}, name{"1"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("......a.b.c"_n)}, name{"c"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abcdefhi.123"_n)}, name{"123"_n} );
-   BOOST_CHECK_EQUAL( name{name_suffix("abcdefhij.123"_n)}, name{"123"_n} );
+   BOOST_CHECK_EQUAL( name(0).suffix(), name{0} );
+   BOOST_CHECK_EQUAL( name{"sysio"_n}.suffix(), name{"sysio"_n} );
+   BOOST_CHECK_EQUAL( name{"sysio.any"_n}.suffix(), name{"any"_n} );
+   BOOST_CHECK_EQUAL( name{"abcdehijklmn"_n}.suffix(), name{"abcdehijklmn"_n} );
+   BOOST_CHECK_EQUAL( name{"abcdehijklmn1"_n}.suffix(), name{"abcdehijklmn1"_n} );
+   BOOST_CHECK_EQUAL( name{"abc.def"_n}.suffix(), name{"def"_n} );
+   BOOST_CHECK_EQUAL( name{".abc.def"_n}.suffix(), name{"def"_n} );
+   BOOST_CHECK_EQUAL( name{"..abc.def"_n}.suffix(), name{"def"_n} );
+   BOOST_CHECK_EQUAL( name{"abc..def"_n}.suffix(), name{"def"_n} );
+   BOOST_CHECK_EQUAL( name{"abc.def.ghi"_n}.suffix(), name{"ghi"_n} );
+   BOOST_CHECK_EQUAL( name{".abcdefghij"_n}.suffix(), name{"abcdefghij"_n} );
+   BOOST_CHECK_EQUAL( name{".abcdefghij.1"_n}.suffix(), name{"1"_n} );
+   BOOST_CHECK_EQUAL( name{"a.bcdefghij"_n}.suffix(), name{"bcdefghij"_n} );
+   BOOST_CHECK_EQUAL( name{"a.bcdefghij.1"_n}.suffix(), name{"1"_n} );
+   BOOST_CHECK_EQUAL( name{"......a.b.c"_n}.suffix(), name{"c"_n} );
+   BOOST_CHECK_EQUAL( name{"abcdefhi.123"_n}.suffix(), name{"123"_n} );
+   BOOST_CHECK_EQUAL( name{"abcdefhij.123"_n}.suffix(), name{"123"_n} );
+}
+
+BOOST_AUTO_TEST_CASE(name_suffix_additional_tests) {
+   // ----------------------------
+   // constexpr name suffix()const
+   BOOST_CHECK_EQUAL( name{".sysioaccounj"}.suffix(), name{"sysioaccounj"} );
+   BOOST_CHECK_EQUAL( name{"s.osioaccounj"}.suffix(), name{"osioaccounj"} );
+   BOOST_CHECK_EQUAL( name{"sy.sioaccounj"}.suffix(), name{"sioaccounj"} );
+   BOOST_CHECK_EQUAL( name{"sys.ioaccounj"}.suffix(), name{"ioaccounj"} );
+   BOOST_CHECK_EQUAL( name{"sysi.oaccounj"}.suffix(), name{"oaccounj"} );
+   BOOST_CHECK_EQUAL( name{"sysio.accounj"}.suffix(), name{"accounj"} );
+   BOOST_CHECK_EQUAL( name{"sysioa.ccounj"}.suffix(), name{"ccounj"} );
+   BOOST_CHECK_EQUAL( name{"sysioac.counj"}.suffix(), name{"counj"} );
+   BOOST_CHECK_EQUAL( name{"sysioacc.ounj"}.suffix(), name{"ounj"} );
+   BOOST_CHECK_EQUAL( name{"sysioacco.unj"}.suffix(), name{"unj"} );
+   BOOST_CHECK_EQUAL( name{"sysioaccou.nj"}.suffix(), name{"nj"} );
+   BOOST_CHECK_EQUAL( name{"sysioaccoun.j"}.suffix(), name{"j"} );
+   BOOST_CHECK_EQUAL( name{"sysioaccounja"}.suffix(), name{"sysioaccounja"} );
+   BOOST_CHECK_EQUAL( name{"sysioaccounj"}.suffix(),  name{"sysioaccounj"} );
+
+   BOOST_CHECK_EQUAL( name{"s.y.s.i.o.a.c"}.suffix(), name{"c"} );
+   BOOST_CHECK_EQUAL( name{"sys.ioa.cco"}.suffix(), name{"cco"} );
 }
 
 BOOST_AUTO_TEST_CASE(name_prefix_tests)
@@ -393,9 +385,9 @@ struct permission_visitor {
 
 };
 
-BOOST_AUTO_TEST_CASE(authority_checker)
+BOOST_AUTO_TEST_CASE_TEMPLATE( authority_checker, T, validating_testers )
 { try {
-   testing::validating_tester test;
+   T test;
    auto a = test.get_public_key(name("a"), "active");
    auto b = test.get_public_key(name("b"), "active");
    auto c = test.get_public_key(name("c"), "active");
@@ -716,9 +708,9 @@ BOOST_AUTO_TEST_CASE(alphabetic_sort)
 } FC_LOG_AND_RETHROW() }
 
 
-BOOST_AUTO_TEST_CASE(transaction_test) { try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( transaction_test, T, validating_testers ) { try {
 
-   testing::validating_tester test;
+   T test;
    signed_transaction trx;
 
    fc::variant pretty_trx = fc::mutable_variant_object()
@@ -752,11 +744,11 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    trx.expiration = fc::time_point_sec{fc::time_point::now()};
    trx.validate();
    BOOST_CHECK_EQUAL(0u, trx.signatures.size());
-   ((const signed_transaction &)trx).sign( test.get_private_key( config::system_account_name, "active" ), test.control->get_chain_id());
+   ((const signed_transaction &)trx).sign( test.get_private_key( config::system_account_name, "active" ), test.get_chain_id());
    BOOST_CHECK_EQUAL(0u, trx.signatures.size());
    auto private_key = test.get_private_key( config::system_account_name, "active" );
    auto public_key = private_key.get_public_key();
-   trx.sign( private_key, test.control->get_chain_id()  );
+   trx.sign( private_key, test.get_chain_id()  );
    BOOST_CHECK_EQUAL(1u, trx.signatures.size());
    trx.validate();
 
@@ -774,11 +766,11 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    BOOST_CHECK_EQUAL(pkt.get_signed_transaction().id(), pkt2.id());
 
    flat_set<public_key_type> keys;
-   auto cpu_time1 = pkt.get_signed_transaction().get_signature_keys(test.control->get_chain_id(), fc::time_point::maximum(), keys);
+   auto cpu_time1 = pkt.get_signed_transaction().get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
    BOOST_CHECK_EQUAL(1u, keys.size());
    BOOST_CHECK_EQUAL(public_key, *keys.begin());
    keys.clear();
-   auto cpu_time2 = pkt.get_signed_transaction().get_signature_keys(test.control->get_chain_id(), fc::time_point::maximum(), keys);
+   auto cpu_time2 = pkt.get_signed_transaction().get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
    BOOST_CHECK_EQUAL(1u, keys.size());
    BOOST_CHECK_EQUAL(public_key, *keys.begin());
 
@@ -815,7 +807,7 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
    BOOST_CHECK_EQUAL(true, trx.expiration == pkt4.expiration());
    BOOST_CHECK_EQUAL(true, trx.expiration == pkt4.get_signed_transaction().expiration);
    keys.clear();
-   pkt4.get_signed_transaction().get_signature_keys(test.control->get_chain_id(), fc::time_point::maximum(), keys);
+   pkt4.get_signed_transaction().get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
    BOOST_CHECK_EQUAL(1u, keys.size());
    BOOST_CHECK_EQUAL(public_key, *keys.begin());
 
@@ -868,9 +860,9 @@ BOOST_AUTO_TEST_CASE(signed_int_test) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE(transaction_metadata_test) { try {
+BOOST_AUTO_TEST_CASE_TEMPLATE( transaction_metadata_test, T, validating_testers ) { try {
 
-   testing::validating_tester test;
+   T test;
    signed_transaction trx;
 
    fc::variant pretty_trx = fc::mutable_variant_object()
@@ -903,7 +895,7 @@ BOOST_AUTO_TEST_CASE(transaction_metadata_test) { try {
 
       auto private_key = test.get_private_key( config::system_account_name, "active" );
       auto public_key = private_key.get_public_key();
-      trx.sign( private_key, test.control->get_chain_id()  );
+      trx.sign( private_key, test.get_chain_id()  );
       BOOST_CHECK_EQUAL(1u, trx.signatures.size());
 
       packed_transaction pkt(trx, packed_transaction::compression_type::none);
@@ -920,12 +912,12 @@ BOOST_AUTO_TEST_CASE(transaction_metadata_test) { try {
       named_thread_pool<struct misc> thread_pool;
       thread_pool.start( 5, {} );
 
-      auto fut = transaction_metadata::start_recover_keys( ptrx, thread_pool.get_executor(), test.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
-      auto fut2 = transaction_metadata::start_recover_keys( ptrx2, thread_pool.get_executor(), test.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      auto fut = transaction_metadata::start_recover_keys( ptrx, thread_pool.get_executor(), test.get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      auto fut2 = transaction_metadata::start_recover_keys( ptrx2, thread_pool.get_executor(), test.get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
 
       // start another key reovery on same packed_transaction, creates a new future with transaction_metadata, should not interfere with above
-      transaction_metadata::start_recover_keys( ptrx, thread_pool.get_executor(), test.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
-      transaction_metadata::start_recover_keys( ptrx2, thread_pool.get_executor(), test.control->get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      transaction_metadata::start_recover_keys( ptrx, thread_pool.get_executor(), test.get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
+      transaction_metadata::start_recover_keys( ptrx2, thread_pool.get_executor(), test.get_chain_id(), fc::microseconds::maximum(), transaction_metadata::trx_type::input );
 
       auto mtrx = fut.get();
       const auto& keys = mtrx->recovered_keys();
@@ -1206,8 +1198,8 @@ BOOST_AUTO_TEST_CASE(stable_priority_queue_test) {
    #endif
 #endif
 #ifndef __SANITIZE_ADDRESS__
-BOOST_AUTO_TEST_CASE(bad_alloc_test) {
-   tester t; // force a controller to be constructed and set the new_handler
+BOOST_AUTO_TEST_CASE_TEMPLATE( bad_alloc_test, T, testers ) {
+   T t; // force a controller to be constructed and set the new_handler
    int* ptr = nullptr;
    const auto fail = [&]() {
       ptr = new int[std::numeric_limits<int64_t>::max()/16];

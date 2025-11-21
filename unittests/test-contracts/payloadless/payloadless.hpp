@@ -11,4 +11,7 @@ public:
 
    [[sysio::action]]
    void doitslow();
+
+   [[sysio::action]]
+   void doitforever();
 };

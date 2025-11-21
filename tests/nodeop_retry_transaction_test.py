@@ -31,7 +31,7 @@ extraArgs = appArgs.add(flag="--transaction-time-delta", type=int, help="How man
 extraArgs = appArgs.add(flag="--num-transactions", type=int, help="How many total transactions should be sent", default=1000)
 extraArgs = appArgs.add(flag="--max-transactions-per-second", type=int, help="How many transactions per second should be sent", default=50)
 extraArgs = appArgs.add(flag="--total-accounts", type=int, help="How many accounts should be involved in sending transfers.  Must be greater than %d" % (minTotalAccounts), default=10)
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--unshared"}, applicationSpecificArgs=appArgs)
+args = TestHelper.parse_args({"--activate-if","--dump-error-details","--keep-logs","-v","--leave-running","--unshared"}, applicationSpecificArgs=appArgs)
 
 Utils.Debug=args.v
 totalProducerNodes=3
@@ -40,6 +40,7 @@ totalNonProducerNodes=totalNodes-totalProducerNodes
 maxActiveProducers=totalProducerNodes
 totalProducers=totalProducerNodes
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
+activateIF=args.activate_if
 dumpErrorDetails=args.dump_error_details
 walletPort=TestHelper.DEFAULT_WALLET_PORT
 blocksPerSec=2
@@ -77,7 +78,7 @@ try:
 
     # topo=ring all nodes are connected in a ring but also to the bios node
     if cluster.launch(pnodes=totalProducerNodes, totalNodes=totalNodes, totalProducers=totalProducers,
-                      topo="ring",
+                      topo="ring", activateIF=activateIF,
                       specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up sys cluster.")
@@ -129,14 +130,15 @@ try:
 
     apiNodeCount = len(apiNodes)
 
-    node=apiNodes[0]
+    node=cluster.biosNode # use biosNode to test configured as a producer but not producing
     checkTransIds = []
     startTime = time.perf_counter()
     Print("Create new accounts via %s" % (cluster.sysioAccount.name))
     for account in accounts:
-        trans = node.createInitializeAccount(account, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=(account == accounts[-1]), stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
+        trans = node.createInitializeAccount(account, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
         checkTransIds.append(Node.getTransId(trans))
 
+    node.waitForTransactionsInBlock(checkTransIds)
     nextTime = time.perf_counter()
     Print("Create new accounts took %s sec" % (nextTime - startTime))
     startTime = nextTime
@@ -145,9 +147,10 @@ try:
     for account in accounts:
         transferAmount="1000.0000 {0}".format(CORE_SYMBOL)
         Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
-        trans = node.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=(account == accounts[-1]), reportStatus=False)
+        trans = node.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=False, reportStatus=False)
         checkTransIds.append(Node.getTransId(trans))
 
+    node.waitForTransactionsInBlock(checkTransIds)
     nextTime = time.perf_counter()
     Print("Transfer funds took %s sec" % (nextTime - startTime))
     startTime = nextTime

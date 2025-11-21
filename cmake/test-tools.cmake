@@ -13,7 +13,6 @@ macro(unittest_target TARGET)
     sysio_testing
     fc
     custom_appbase
-    abieos
     libsodium::libsodium
   )
 

@@ -1,4 +1,11 @@
 #pragma once
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshift-count-overflow"
+// boost dynamic_bitset count() generates warning
+#include <boost/dynamic_bitset.hpp>
+#pragma GCC diagnostic pop
+
 #include <stdint.h>
 
 namespace fc {
@@ -24,5 +31,8 @@ inline uint32_t endian_reverse_u32( uint32_t x )
         | (((x        ) & 0xFF) << 0x18)
         ;
 }
+
+// Using uint8_t boost::dynamic_bitset provides a more expected raw pack/unpack format
+using dynamic_bitset = boost::dynamic_bitset<uint8_t>;
 
 } // namespace fc

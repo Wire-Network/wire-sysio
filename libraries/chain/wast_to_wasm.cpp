@@ -7,7 +7,6 @@
 #include <sstream>
 #include <iomanip>
 #include <fc/exception/exception.hpp>
-#include <fc/scoped_exit.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 namespace sysio { namespace chain {

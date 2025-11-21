@@ -29,8 +29,8 @@ bool is_prime(int p) {
 bool is_mersenne_prime(int p) {
    if (p == 2) return true;
 
-   const long long unsigned m_p = (1LLU << p) - 1;
    long long unsigned s = 4;
+   const long long unsigned m_p = (1LLU << (p % (sizeof(s) * 8))) - 1;
    int i;
    for (i = 3; i <= p; i++) {
       s = (s * s - 2) % m_p;
@@ -46,6 +46,20 @@ void payloadless::doitslow() {
       if (is_prime(p) && is_mersenne_prime(p)) {
          // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
          //sysio::print_f(" %u", p);
+      }
+   }
+}
+
+void payloadless::doitforever() {
+   print("Im a payloadless forever action");
+   constexpr size_t max_cpu_prime = std::numeric_limits<size_t>::max();
+
+   while (true) {
+      for (size_t p = 2; p <= max_cpu_prime; p += 1) {
+         if (is_prime(p) && is_mersenne_prime(p)) {
+            // We need to keep an eye on this to make sure it doesn't get optimized out. So far so good.
+            //sysio::print_f(" %u", p);
+         }
       }
    }
 }

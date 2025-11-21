@@ -19,6 +19,10 @@ configure_file(contracts.hpp.in include/testing_contracts/contracts.hpp ESCAPE_Q
 add_library(sysio_testing_contracts INTERFACE)
 target_include_directories(sysio_testing_contracts INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include/testing_contracts)
 
+if( BUILD_TEST_CONTRACTS )
+   add_dependencies( sysio_testing_contracts testing_contracts_project)
+endif()
+
 configure_file(contracts.cpp.in contracts.cpp ESCAPE_QUOTES)
 
 ## SORT .cpp by most likely to change / break compile

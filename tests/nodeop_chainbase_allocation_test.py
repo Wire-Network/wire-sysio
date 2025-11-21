@@ -16,9 +16,10 @@ from TestHarness import Account, Cluster, Node, TestHelper, Utils, WalletMgr
 ###############################################################
 
 # Parse command line arguments
-args = TestHelper.parse_args({"-v","--dump-error-details","--leave-running","--keep-logs","--unshared"})
+args = TestHelper.parse_args({"-v","--activate-if","--dump-error-details","--leave-running","--keep-logs","--unshared"})
 Utils.Debug = args.v
 dumpErrorDetails=args.dump_error_details
+activateIF=args.activate_if
 
 walletMgr=WalletMgr(True)
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
@@ -43,6 +44,7 @@ try:
         prodCount=1,
         totalProducers=1,
         totalNodes=3,
+        activateIF=activateIF,
         loadSystemContract=False,
         specificExtraNodeopArgs={
             1:"--read-mode irreversible --plugin sysio::producer_api_plugin"})
@@ -61,9 +63,9 @@ try:
     nonProdNode.createAccount(newProducerAcc, cluster.sysioAccount, waitForTransBlock=True)
 
     setProdsStr = '{"schedule": ['
-    setProdsStr += '{"producer_name":' + newProducerAcc.name + ',"block_signing_key":' + newProducerAcc.activePublicKey + '}'
+    setProdsStr += '{"producer_name":' + newProducerAcc.name + ',"authority": ["block_signing_authority_v0", {"threshold":1, "keys":[{"key":' + newProducerAcc.activePublicKey + ', "weight":1}]}]}'
     setProdsStr += ']}'
-    cmd="push action -j sysio setprodkeys '{}' -p sysio".format(setProdsStr)
+    cmd="push action -j sysio setprods '{}' -p sysio".format(setProdsStr)
     trans = producerNode.processClioCmd(cmd, cmd, silentErrors=False)
     assert trans
     setProdsBlockNum = int(trans["processed"]["block_num"])
@@ -76,6 +78,9 @@ try:
     producerNode.processUrllibRequest("producer", "pause")
 
     producerNode.kill(signal.SIGTERM)
+
+    # wait for all blocks to arrive and be processed by irrNode
+    time.sleep(3)
 
     # Create the snapshot and rename it to avoid name conflict later on
     res = irrNode.createSnapshot()

@@ -19,9 +19,10 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-args=TestHelper.parse_args({"--keep-logs" ,"--dump-error-details","-v","--leave-running","--unshared"})
+args=TestHelper.parse_args({"--keep-logs","--activate-if","--dump-error-details","-v","--leave-running","--unshared"})
 debug=args.v
 dumpErrorDetails=args.dump_error_details
+activateIF=args.activate_if
 
 seed=1
 Utils.Debug=debug
@@ -47,7 +48,7 @@ try:
     specificExtraNodeopArgs[1]=f' --block-log-retain-blocks 10 '
 
     Print("Stand up cluster")
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, activateIF=activateIF, specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")

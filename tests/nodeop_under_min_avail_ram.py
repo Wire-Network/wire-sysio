@@ -18,11 +18,12 @@ from TestHarness.accounts import NamedAccounts
 Print=Utils.Print
 errorExit=Utils.errorExit
 
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running","--wallet-port","--unshared"})
+args = TestHelper.parse_args({"--activate-if","--dump-error-details","--keep-logs","-v","--leave-running","--wallet-port","--unshared"})
 Utils.Debug=args.v
 pNodes=4
 totalNodes=5
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
+activateIF=args.activate_if
 dumpErrorDetails=args.dump_error_details
 walletPort=args.wallet_port
 
@@ -42,7 +43,9 @@ try:
     maxRAMFlag="--chain-state-db-size-mb"
     maxRAMValue=1010
     extraNodeopArgs=" %s %d %s %d  --http-max-response-time-ms 990000 " % (minRAMFlag, minRAMValue, maxRAMFlag, maxRAMValue)
-    if cluster.launch(onlyBios=False, pnodes=pNodes, totalNodes=totalNodes, totalProducers=totalNodes, extraNodeopArgs=extraNodeopArgs) is False:
+    # test relies on production continuing on restart
+    extraNodeopArgs+=" --production-pause-vote-timeout-ms 0 "
+    if cluster.launch(onlyBios=False, pnodes=pNodes, totalNodes=totalNodes, totalProducers=totalNodes, activateIF=activateIF, extraNodeopArgs=extraNodeopArgs) is False:
         Utils.cmdError("launcher")
         errorExit("Failed to stand up sys cluster.")
 

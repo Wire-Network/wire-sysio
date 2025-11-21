@@ -6,7 +6,7 @@
 #   - compiler-rt (builtins/crt; sanitizers optional)
 # Targets: X86, WebAssembly (plus AArch64 optional).
 #
-# Suitable for Antelope / EOSIO / Spring / Leap toolchains.
+# Suitable for Antelope / EOSIO / Spring / Leap / Wire toolchains.
 #
 # Usage:
 #   bash build-llvm11-release-11x.sh [--prefix /opt/llvm-11] [--jobs N] [--with-sanitizers]

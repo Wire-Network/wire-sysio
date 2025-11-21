@@ -72,6 +72,16 @@ void blocklog_actions::setup(CLI::App& app) {
    print_log->add_flag("--no-pretty-print", opt->no_pretty_print, "Do not pretty print the output.  Useful if piping to jq to improve performance.");
    print_log->add_flag("--as-json-array", opt->as_json_array, "Print out json blocks wrapped in json array (otherwise the output is free-standing json objects).");
 
+   std::map<std::string, print_from_t> print_from_map{
+      {"both",      print_from_t::both     },
+      {"block_log", print_from_t::block_log},
+      {"fork_db",   print_from_t::fork_db  }
+   };
+   print_log
+      ->add_flag("--print-from", opt->print_from,
+                 "Whether to print blocks from the block log, fork database, or both. Default is both.")
+      ->transform(CLI::CheckedTransformer(print_from_map, CLI::ignore_case));
+
    // subcommand - make index
    auto* make_index = sub->add_subcommand("make-index", "Create blocks.index from blocks.log. Must give 'blocks-dir'. Give 'output-file' relative to current directory or absolute path (default is <blocks-dir>/blocks.index).")->callback([err_guard]() { err_guard(&blocklog_actions::make_index); });
    make_index->add_option("--output-file,-o", opt->output_file, "The file to write the output to (absolute or relative path).  If not specified then output is to stdout.");
@@ -128,7 +138,7 @@ void blocklog_actions::initialize() {
 
       //if the log is pruned, keep it that way by passing in a config with a large block pruning value. There is otherwise no
       // way to tell block_log "keep the current non/pruneness of the log"
-      if(block_log<signed_block>::is_pruned_log(opt->blocks_dir))
+      if(block_log::is_pruned_log(opt->blocks_dir))
          opt->blog_conf = prune_blocklog_config { .prune_blocks = UINT32_MAX };
    }
    FC_LOG_AND_RETHROW()
@@ -143,7 +153,7 @@ int blocklog_actions::make_index() {
    report_time rt("making index");
    const auto log_level = fc::logger::get(DEFAULT_LOGGER).get_log_level();
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
-   block_log<signed_block>::construct_index(block_file.generic_string(), out_file.generic_string());
+   block_log::construct_index(block_file.generic_string(), out_file.generic_string());
    fc::logger::get(DEFAULT_LOGGER).set_log_level(log_level);
    rt.report();
 
@@ -168,7 +178,7 @@ int blocklog_actions::extract_blocks() {
 int blocklog_actions::do_genesis() {
    std::filesystem::path bld = opt->blocks_dir;
 
-   auto context = block_log<signed_block>::extract_chain_context(opt->blocks_dir,opt->blocks_dir);
+   auto context = block_log::extract_chain_context(opt->blocks_dir,opt->blocks_dir);
    
    if (!context) {
       std::cerr << "No blocks log found at '" << opt->blocks_dir.c_str() << "'." << std::endl;
@@ -205,14 +215,14 @@ int blocklog_actions::do_genesis() {
 int blocklog_actions::trim_blocklog_end(std::filesystem::path block_dir, uint32_t n) {//n is last block to keep (remove later blocks)
    report_time rt("trimming blocklog end");
    using namespace std;
-   int ret = block_log<signed_block>::trim_blocklog_end(block_dir, n);
+   int ret = block_log::trim_blocklog_end(block_dir, n);
    rt.report();
    return ret;
 }
 
 bool blocklog_actions::trim_blocklog_front(std::filesystem::path block_dir, uint32_t n) {//n is first block to keep (remove prior blocks)
    report_time rt("trimming blocklog start");
-   const bool status = block_log<signed_block>::trim_blocklog_front(block_dir, block_dir / "old", n);
+   const bool status = block_log::trim_blocklog_front(block_dir, block_dir / "old", n);
    rt.report();
    return status;
 }
@@ -220,7 +230,7 @@ bool blocklog_actions::trim_blocklog_front(std::filesystem::path block_dir, uint
 void blocklog_actions::extract_block_range(std::filesystem::path block_dir, std::filesystem::path output_dir, uint32_t start, uint32_t last) {
    report_time rt("extracting block range");
    SYS_ASSERT(last > start, block_log_exception, "extract range end must be greater than start");
-   block_log<signed_block>::extract_block_range(block_dir, output_dir, start, last);
+   block_log::extract_block_range(block_dir, output_dir, start, last);
    rt.report();
 }
 
@@ -228,7 +238,7 @@ int blocklog_actions::smoke_test() {
    using namespace std;
    std::filesystem::path block_dir = opt->blocks_dir;
    cout << "\nSmoke test of blocks.log and blocks.index in directory " << block_dir << '\n';
-   block_log<signed_block>::smoke_test(block_dir, 0);
+   block_log::smoke_test(block_dir, 0);
    cout << "\nno problems found\n"; // if get here there were no exceptions
    return 0;
 }
@@ -246,48 +256,13 @@ int blocklog_actions::do_vacuum() {
       std::cerr << "blocks.log is not a pruned log; nothing to vacuum" << std::endl;
       return -1;
    }
-   block_log<signed_block> blocks(opt->blocks_dir);// turns off pruning this performs a vacuum
+   block_log blocks(opt->blocks_dir);// turns off pruning this performs a vacuum
    std::cout << "Successfully vacuumed block log" << std::endl;
    return 0;
 }
 
 int blocklog_actions::read_log() {
    initialize();
-   report_time rt("reading log");
-   block_log<signed_block> block_logger(opt->blocks_dir, opt->blog_conf);
-   const auto end = block_logger.read_head();
-   SYS_ASSERT(end, block_log_exception, "No blocks found in block log");
-   SYS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
-
-   //fix message below, first block might not be 1, first_block_num is not set yet
-   ilog("existing block log contains block num ${first} through block num ${n}",
-        ("first", block_logger.first_block_num())("n", end->block_num()));
-   if(opt->first_block < block_logger.first_block_num()) {
-      opt->first_block = block_logger.first_block_num();
-   }
-
-   sysio::chain::branch_type fork_db_branch;
-
-   if(std::filesystem::exists(std::filesystem::path(opt->blocks_dir) / config::reversible_blocks_dir_name / config::forkdb_filename)) {
-      ilog("opening fork_db");
-      fork_database fork_db(std::filesystem::path(opt->blocks_dir) / config::reversible_blocks_dir_name);
-
-      fork_db.open([](block_timestamp_type timestamp,
-                      const flat_set<digest_type>& cur_features,
-                      const vector<digest_type>& new_features) {});
-
-      fork_db_branch = fork_db.fetch_branch(fork_db.head()->id);
-      if(fork_db_branch.empty()) {
-         elog("no blocks available in reversible block database: only block_log blocks are available");
-      } else {
-         auto first = fork_db_branch.rbegin();
-         auto last = fork_db_branch.rend() - 1;
-         ilog("existing reversible fork_db block num ${first} through block num ${last} ",
-              ("first", (*first)->block_num)("last", (*last)->block_num));
-         SYS_ASSERT(end->block_num() + 1 == (*first)->block_num, block_log_exception,
-                    "fork_db does not start at end of block log");
-      }
-   }
 
    std::ofstream output_blocks;
    std::ostream* out;
@@ -323,39 +298,86 @@ int blocklog_actions::read_log() {
          *out << fc::json::to_pretty_string(v) << "\n";
    };
    bool contains_obj = false;
-   while((block_num <= opt->last_block) && (next = block_logger.read_block_by_num(block_num))) {
-      if(opt->as_json_array && contains_obj)
-         *out << ",";
-      print_block(next);
-      ++block_num;
-      contains_obj = true;
-   }
 
-   if(!fork_db_branch.empty()) {
-      for(auto bitr = fork_db_branch.rbegin(); bitr != fork_db_branch.rend() && block_num <= opt->last_block; ++bitr) {
-         if(opt->as_json_array && contains_obj)
+   bool print_log     = opt->print_from == print_from_t::both || opt->print_from == print_from_t::block_log;
+   bool print_fork_db = opt->print_from == print_from_t::both || opt->print_from == print_from_t::fork_db;
+
+   signed_block_ptr end;
+
+   report_time rt(print_log && print_fork_db ? "reading both block log and fork_db"
+                                             : (print_log ? "reading block log" : "reading fork_db"));
+   if (print_log) {
+      block_log   block_logger(opt->blocks_dir, opt->blog_conf);
+      end = block_logger.read_head();
+      SYS_ASSERT(end, block_log_exception, "No blocks found in block log");
+      SYS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
+
+      ilog("existing block log contains block num ${first} through block num ${n}",
+           ("first", block_logger.first_block_num())("n", end->block_num()));
+      
+      block_num = std::max(block_num, block_logger.first_block_num());
+
+      while ((block_num <= opt->last_block) && (next = block_logger.read_block_by_num(block_num))) {
+         if (opt->as_json_array && contains_obj)
             *out << ",";
-         auto next = (*bitr)->block;
          print_block(next);
          ++block_num;
          contains_obj = true;
       }
    }
 
+   if (print_fork_db) {
+      block_branch_t fork_db_branch;
+      if (std::filesystem::exists(std::filesystem::path(opt->blocks_dir) / config::reversible_blocks_dir_name /
+                                  config::fork_db_filename)) {
+         ilog("opening fork_db");
+         fork_database fork_db(std::filesystem::path(opt->blocks_dir) / config::reversible_blocks_dir_name);
+
+         fork_db.open([](block_timestamp_type timestamp, const flat_set<digest_type>& cur_features,
+                         const vector<digest_type>& new_features) {});
+
+         fork_db_branch = fork_db.fetch_branch_from_head();
+         if (fork_db_branch.empty()) {
+            elog("no blocks available in reversible block database: only block_log blocks are available");
+         } else {
+            auto first = fork_db_branch.rbegin();
+            auto last  = fork_db_branch.rend() - 1;
+            ilog("existing reversible fork_db block num ${first} through block num ${last} ",
+                 ("first", (*first)->block_num())("last", (*last)->block_num()));
+            if (print_log) {
+               SYS_ASSERT(end->block_num() + 1 == (*first)->block_num(), block_log_exception,
+                          "fork_db does not start at end of block log");
+            } else {
+               block_num = (*first)->block_num();
+            }
+
+            for (auto bitr = fork_db_branch.rbegin(); bitr != fork_db_branch.rend() && block_num <= opt->last_block;
+                 ++bitr) {
+               if (opt->as_json_array && contains_obj)
+                  *out << ",";
+               auto& next = *bitr;
+               print_block(next);
+               ++block_num;
+               contains_obj = true;
+            }
+         }
+      }
+   }
+
    if(opt->as_json_array)
-      *out << "]";
+      *out << "]\n";
    rt.report();
 
    return 0;
 }
 
 int blocklog_actions::split_blocks() {
-   block_log<signed_block>::split_blocklog(opt->blocks_dir, opt->output_dir, opt->stride);
+   block_log::split_blocklog(opt->blocks_dir, opt->output_dir, opt->stride);
    return 0;
 
 }
 
 int blocklog_actions::merge_blocks() {
-   block_log<signed_block>::merge_blocklogs(opt->blocks_dir, opt->output_dir);
+   block_log::merge_blocklogs(opt->blocks_dir, opt->output_dir);
    return 0;
 }

@@ -27,9 +27,10 @@ namespace {
      template<typename F>
      struct guard {
         guard(transaction_checktime_timer& timer, F&& func)
-           : _timer(timer), _func(static_cast<F&&>(func)) {
+           : _timer(timer), _func(std::forward<F>(func)) {
            _timer.set_expiration_callback(&callback, this);
-           if(_timer.expired) {
+           platform_timer::state_t expired = _timer.timer_state();
+           if(expired == platform_timer::state_t::timed_out || expired == platform_timer::state_t::interrupted) {
               _func(); // it's harmless if _func is invoked twice
            }
         }
@@ -45,7 +46,7 @@ namespace {
      };
      template<typename F>
      guard<F> scoped_run(F&& func) {
-        return guard{_timer, static_cast<F&&>(func)};
+        return guard{_timer, std::forward<F>(func)};
      }
      transaction_checktime_timer& _timer;
   };
@@ -155,13 +156,13 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
          };
          try {
             checktime_watchdog wd(context.trx_context.transaction_timer);
-            _runtime->_bkend.timed_run(wd, fn);
+            _runtime->_bkend.timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "access violation");
+            FC_THROW_EXCEPTION(wasm_execution_error, "access violation: ${d}", ("d", e.detail()));
          } catch(sysio::vm::exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure");
+            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure: ${d}", ("d", e.detail()));
          }
       }
 
@@ -196,7 +197,7 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
          try {
             scoped_profile profile_runner(prof);
             checktime_watchdog wd(context.trx_context.transaction_timer);
-            _instantiated_module->timed_run(wd, fn);
+            _instantiated_module->timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
@@ -359,6 +360,7 @@ REGISTER_LEGACY_HOST_FUNCTION(get_blockchain_parameters_packed, privileged_check
 REGISTER_LEGACY_HOST_FUNCTION(set_blockchain_parameters_packed, privileged_check);
 REGISTER_HOST_FUNCTION(is_privileged, privileged_check);
 REGISTER_HOST_FUNCTION(set_privileged, privileged_check);
+REGISTER_HOST_FUNCTION(set_finalizers, privileged_check);
 
 // softfloat api
 REGISTER_INJECTED_HOST_FUNCTION(_sysio_f32_add);

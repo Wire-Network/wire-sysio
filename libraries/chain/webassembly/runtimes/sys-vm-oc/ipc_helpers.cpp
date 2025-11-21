@@ -71,11 +71,11 @@ std::tuple<bool, sysvmoc_message, std::vector<wrapped_fd>> read_message_with_fds
    return {true, message, std::move(fds)};
 }
 
-bool write_message_with_fds(boost::asio::local::datagram_protocol::socket& s, const sysvmoc_message& message, const std::vector<wrapped_fd>& fds) {
+bool write_message_with_fds(boost::asio::local::datagram_protocol::socket& s, const sysvmoc_message& message, std::span<wrapped_fd> fds) {
    return write_message_with_fds(s.native_handle(), message, fds);
 }
 
-bool write_message_with_fds(int fd_to_send_to, const sysvmoc_message& message, const std::vector<wrapped_fd>& fds) {
+bool write_message_with_fds(int fd_to_send_to, const sysvmoc_message& message, std::span<wrapped_fd> fds) {
    struct msghdr msg = {};
    struct cmsghdr* cmsg;
 

@@ -1,8 +1,14 @@
+#include <sysio/state_history/abi.hpp>
+#include <regex>
+
 extern const char* const state_history_plugin_abi = R"({
     "version": "sysio::abi/1.1",
     "structs": [
         {
             "name": "get_status_request_v0", "fields": []
+        },
+        {
+            "name": "get_status_request_v1", "fields": []
         },
         {
             "name": "block_position", "fields": [
@@ -22,6 +28,19 @@ extern const char* const state_history_plugin_abi = R"({
             ]
         },
         {
+            "name": "get_status_result_v1", "fields": [
+                { "name": "head", "type": "block_position" },
+                { "name": "last_irreversible", "type": "block_position" },
+                { "name": "trace_begin_block", "type": "uint32" },
+                { "name": "trace_end_block", "type": "uint32" },
+                { "name": "chain_state_begin_block", "type": "uint32" },
+                { "name": "chain_state_end_block", "type": "uint32" },
+                { "name": "chain_id", "type": "checksum256" },
+                { "name": "finality_data_begin_block", "type": "uint32" },
+                { "name": "finality_data_end_block", "type": "uint32" }
+            ]
+        },
+        {
             "name": "get_blocks_request_v0", "fields": [
                 { "name": "start_block_num", "type": "uint32" },
                 { "name": "end_block_num", "type": "uint32" },
@@ -31,6 +50,19 @@ extern const char* const state_history_plugin_abi = R"({
                 { "name": "fetch_block", "type": "bool" },
                 { "name": "fetch_traces", "type": "bool" },
                 { "name": "fetch_deltas", "type": "bool" }
+            ]
+        },
+        {
+            "name": "get_blocks_request_v1", "fields": [
+                { "name": "start_block_num", "type": "uint32" },
+                { "name": "end_block_num", "type": "uint32" },
+                { "name": "max_messages_in_flight", "type": "uint32" },
+                { "name": "have_positions", "type": "block_position[]" },
+                { "name": "irreversible_only", "type": "bool" },
+                { "name": "fetch_block", "type": "bool" },
+                { "name": "fetch_traces", "type": "bool" },
+                { "name": "fetch_deltas", "type": "bool" },
+                { "name": "fetch_finality_data", "type": "bool" }
             ]
         },
         {
@@ -47,6 +79,18 @@ extern const char* const state_history_plugin_abi = R"({
                 { "name": "block", "type": "bytes?" },
                 { "name": "traces", "type": "bytes?" },
                 { "name": "deltas", "type": "bytes?" }
+            ]
+        },
+        {
+            "name": "get_blocks_result_v1", "fields": [
+                { "name": "head", "type": "block_position" },
+                { "name": "last_irreversible", "type": "block_position" },
+                { "name": "this_block", "type": "block_position?" },
+                { "name": "prev_block", "type": "block_position?" },
+                { "name": "block", "type": "bytes?" },
+                { "name": "traces", "type": "bytes?" },
+                { "name": "deltas", "type": "bytes?" },
+                { "name": "finality_data", "type": "bytes?" }
             ]
         },
         {
@@ -546,14 +590,99 @@ extern const char* const state_history_plugin_abi = R"({
                 { "type": "uint32", "name": "account_cpu_usage_average_window" },
                 { "type": "uint32", "name": "account_net_usage_average_window" }
             ]
+        },
+        {
+            "name": "finalizer_authority", "fields": [
+                { "name": "description", "type": "string" },
+                { "name": "weight", "type": "uint64" },
+                { "name": "public_key", "type": "bytes" }
+            ]
+        },
+        {
+            "name": "finalizer_authority_with_string_key", "fields": [
+                { "name": "description", "type": "string" },
+                { "name": "weight", "type": "uint64" },
+                { "name": "public_key", "type": "string" }
+            ]
+        },
+        {
+            "name": "finalizer_policy_with_string_key", "fields": [
+                { "name": "generation", "type": "uint32" },
+                { "name": "threshold", "type": "uint64" },
+                { "name": "finalizers", "type": "finalizer_authority_with_string_key[]" }
+            ]
+        },
+        {
+            "name": "finality_data", "fields": [
+                { "name": "major_version", "type": "uint32" },
+                { "name": "minor_version", "type": "uint32" },
+                { "name": "active_finalizer_policy_generation", "type": "uint32" },
+                { "name": "action_mroot", "type": "checksum256" },
+                { "name": "reversible_blocks_mroot", "type": "checksum256" },
+                { "name": "latest_qc_claim_block_num", "type": "uint32" },
+                { "name": "latest_qc_claim_finality_digest", "type": "checksum256" },
+                { "name": "latest_qc_claim_timestamp", "type": "block_timestamp_type" },
+                { "name": "base_digest", "type": "checksum256" },
+                { "name": "pending_finalizer_policy", "type": "finalizer_policy_with_string_key?" },
+                { "name": "last_pending_finalizer_policy_generation", "type": "uint32" }
+            ]
+        },
+        {
+            "name": "protocol_feature_activation_extension", "fields": [
+                { "name": "protocol_features", "type": "checksum256[]" }
+            ]
+        },
+        {
+            "name": "producer_schedule_change_extension", "base": "producer_authority_schedule", "fields": []
+        },
+        {
+            "name": "qc_claim", "fields": [
+                { "name": "block_num", "type": "uint32" },
+                { "name": "is_strong_qc", "type": "bool" }
+            ]
+        },
+        {
+            "name": "insert_finalizer_policy_index_pair", "fields": [
+                { "name": "index", "type": "uint16" },
+                { "name": "value", "type": "finalizer_authority" }
+            ]
+        },
+        {
+            "name": "finalizer_policy_diff", "fields": [
+                { "name": "generation", "type": "uint32" },
+                { "name": "threshold", "type": "uint64" },
+                { "name": "remove_indexes", "type": "uint16[]" },
+                { "name": "insert_indexes", "type": "insert_finalizer_policy_index_pair[]" }
+            ]
+        },
+        {
+            "name": "insert_proposer_policy_index_pair", "fields": [
+                { "name": "index", "type": "uint16" },
+                { "name": "value", "type": "producer_authority" }
+            ]
+        },
+        {
+            "name": "proposer_policy_diff", "fields": [
+                { "name": "version", "type": "uint32" },
+                { "name": "proposal_time", "type": "block_timestamp_type" },
+                { "name": "remove_indexes", "type": "uint16[]" },
+                { "name": "insert_indexes", "type": "insert_proposer_policy_index_pair[]" }
+            ]
+        },
+        {
+            "name": "finality_extension", "fields": [
+                { "name": "qc_claim", "type": "qc_claim" },
+                { "name": "new_finalizer_policy_diff", "type": "finalizer_policy_diff?" },
+                { "name": "new_proposer_policy_diff", "type": "proposer_policy_diff?" }
+            ]
         }
     ],
     "types": [
         { "new_type_name": "transaction_id", "type": "checksum256" }
     ],
     "variants": [
-        { "name": "request", "types": ["get_status_request_v0", "get_blocks_request_v0", "get_blocks_ack_request_v0"] },
-        { "name": "result", "types": ["get_status_result_v0", "get_blocks_result_v0"] },
+        { "name": "request", "types": ["get_status_request_v0", "get_blocks_request_v0", "get_blocks_ack_request_v0", "get_blocks_request_v1", "get_status_request_v1"] },
+        { "name": "result", "types": ["get_status_result_v0", "get_blocks_result_v0", "get_blocks_result_v1", "get_status_result_v1"] },
 
         { "name": "action_receipt", "types": ["action_receipt_v0"] },
         { "name": "action_trace", "types": ["action_trace_v0", "action_trace_v1"] },
@@ -587,7 +716,8 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "resource_limits_ratio", "types": ["resource_limits_ratio_v0"] },
         { "name": "elastic_limit_parameters", "types": ["elastic_limit_parameters_v0"] },
         { "name": "resource_limits_config", "types": ["resource_limits_config_v0"] },
-        { "name": "block_signing_authority", "types": ["block_signing_authority_v0"] }
+        { "name": "block_signing_authority", "types": ["block_signing_authority_v0"] },
+        { "name": "block_header_extension", "types": ["protocol_feature_activation_extension", "producer_schedule_change_extension", "finality_extension"] }
     ],
     "tables": [
         { "name": "account", "type": "account", "key_names": ["name"] },
@@ -611,3 +741,10 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "resource_limits_config", "type": "resource_limits_config", "key_names": [] }
     ]
 })";
+
+namespace sysio::state_history {
+std::string ship_abi_without_tables() {
+    std::regex scrub_all_tables(R"(\{ "name": "[^"]+", "type": "[^"]+", "key_names": \[[^\]]*\] \},?)");
+    return std::regex_replace(state_history_plugin_abi, scrub_all_tables, "");
+}
+}

@@ -110,8 +110,8 @@ class datastream<Streambuf, typename std::enable_if_t<std::is_base_of_v<std::str
 
    size_t read(char* data, size_t n) { return buf.sgetn(data, n); }
    size_t write(const char* data, size_t n) { return buf.sputn(data, n); }
-   size_t tellp() { return this->pubseekoff(0, std::ios::cur); }
-   bool   skip(size_t p) { this->pubseekoff(p, std::ios::cur);  return true;  }
+   size_t tellp() { return buf.pubseekoff(0, std::ios::cur); }
+   bool   skip(size_t p) { buf.pubseekoff(p, std::ios::cur);  return true;  }
    bool   get(char& c) {
       c = buf.sbumpc();
       return true;
@@ -176,6 +176,40 @@ class datastream<Container, typename std::enable_if_t<(std::is_same_v<std::vecto
    const Container& storage() const { return _container; }
 };
 
+/**
+ * Datastream wrapper that creates a copy of the datastream data read. After reading
+ * the data is available via extract_mirror()
+ * @tparam DataStream datastream to wrap
+ */
+template <typename DataStream>
+class datastream_mirror {
+public:
+   explicit datastream_mirror( DataStream& ds, size_t reserve = 0 ) : ds(ds) {
+      mirror.reserve(reserve);
+   }
+
+   void skip( size_t s ) { ds.skip(s); }
+   bool read( char* d, size_t s ) {
+      if (ds.read(d, s)) {
+         auto size = mirror.size();
+         if (mirror.capacity() < size + s)
+            mirror.reserve(std::bit_ceil(size + s));
+         mirror.resize(size + s);
+         memcpy(mirror.data() + size, d, s);
+         return true;
+      }
+      return false;
+   }
+
+   bool   get( unsigned char& c ) { return read(&c, 1); }
+   bool   get( char& c ) { return read(&c, 1); }
+
+   std::vector<char> extract_mirror() { return std::move(mirror); }
+
+private:
+   DataStream& ds;
+   std::vector<char> mirror;
+};
 
 
 template<typename ST>
@@ -295,6 +329,7 @@ inline datastream<ST>& operator>>(datastream<ST>& ds, uint8_t& d) {
   ds.read((char*)&d, sizeof(d) );
   return ds;
 }
+
 /*
 template<typename ST, typename T>
 inline datastream<ST>& operator<<(datastream<ST>& ds, const boost::multiprecision::number<T>& n) {

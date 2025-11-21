@@ -1,8 +1,6 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/testing/tester.hpp>
 
-#include <fc/crypto/digest.hpp>
-
 #include <boost/test/unit_test.hpp>
 
 using namespace sysio::chain;
@@ -11,9 +9,9 @@ using namespace sysio::testing;
 BOOST_AUTO_TEST_SUITE(database_tests)
 
    // Simple tests of undo infrastructure
-   BOOST_AUTO_TEST_CASE(undo_test) {
+   BOOST_AUTO_TEST_CASE_TEMPLATE( undo_test, T, validating_testers ) {
       try {
-         validating_tester test;
+         T test;
 
          // Bypass read-only restriction on state DB access for this unit test which really needs to mutate the DB to properly conduct its test.
          sysio::chain::database& db = const_cast<sysio::chain::database&>( test.control->db() );
@@ -39,38 +37,102 @@ BOOST_AUTO_TEST_SUITE(database_tests)
    }
 
    // Test the block fetching methods on database, fetch_bock_by_id, and fetch_block_by_number
-   BOOST_AUTO_TEST_CASE(get_blocks) {
+   BOOST_AUTO_TEST_CASE_TEMPLATE( get_blocks, T, validating_testers ) {
       try {
-         validating_tester test;
+         T test;
          vector<block_id_type> block_ids;
 
-         const uint32_t num_of_blocks_to_prod = 200;
-         // Produce 200 blocks and check their IDs should match the above
+         const uint32_t num_of_blocks_to_prod = 20;
+         // Produce 20 blocks and check their IDs should match the above
          test.produce_blocks(num_of_blocks_to_prod);
          for (uint32_t i = 0; i < num_of_blocks_to_prod; ++i) {
-            block_ids.emplace_back(test.control->fetch_block_by_number(i + 1)->calculate_id());
+            block_ids.emplace_back(test.fetch_block_by_number(i + 1)->calculate_id());
             BOOST_TEST(block_header::num_from_id(block_ids.back()) == i + 1);
-            BOOST_TEST(test.control->fetch_block_by_number(i + 1)->calculate_id() == block_ids.back());
+            BOOST_TEST(test.fetch_block_by_number(i + 1)->calculate_id() == block_ids.back());
          }
 
-         // Check the last irreversible block number is set correctly, with one producer, irreversibility should only just 1 block before
-         const auto expected_last_irreversible_block_number = test.control->head_block_num() - 1;
-         BOOST_TEST(test.control->head_block_state()->dpos_irreversible_blocknum == expected_last_irreversible_block_number);
-         // Ensure that future block doesn't exist
-         const auto nonexisting_future_block_num = test.control->head_block_num() + 1;
-         BOOST_TEST(test.control->fetch_block_by_number(nonexisting_future_block_num) == nullptr);
+         // Check the last irreversible block number is set correctly.
+         if constexpr (std::is_same_v<T, savanna_validating_tester>) {
+            // In Savanna, after 2-chain finality is achieved.
+            const auto expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
+            BOOST_TEST(test.last_irreversible_block_num() == expected_last_irreversible_block_number);
+         } else {
+            // With one producer, irreversibility should only just 1 block before
+            const auto expected_last_irreversible_block_number = test.head().block_num() - 1;
+            BOOST_TEST(test.control->head_block_state_legacy()->dpos_irreversible_blocknum == expected_last_irreversible_block_number);
+         }
 
-         const uint32_t next_num_of_blocks_to_prod = 100;
+         // Ensure that future block doesn't exist
+         const auto nonexisting_future_block_num = test.head().block_num() + 1;
+         BOOST_TEST(test.fetch_block_by_number(nonexisting_future_block_num) == nullptr);
+
+         const uint32_t next_num_of_blocks_to_prod = 10;
          test.produce_blocks(next_num_of_blocks_to_prod);
 
-         const auto next_expected_last_irreversible_block_number = test.control->head_block_num() - 1;
          // Check the last irreversible block number is updated correctly
-         BOOST_TEST(test.control->head_block_state()->dpos_irreversible_blocknum == next_expected_last_irreversible_block_number);
+         if constexpr (std::is_same_v<T, savanna_validating_tester>) {
+            const auto next_expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
+            BOOST_TEST(test.last_irreversible_block_num() == next_expected_last_irreversible_block_number);
+         } else {
+            const auto next_expected_last_irreversible_block_number = test.head().block_num() - 1;
+            BOOST_TEST(test.control->head_block_state_legacy()->dpos_irreversible_blocknum == next_expected_last_irreversible_block_number);
+         }
          // Previous nonexisting future block should exist by now
-         BOOST_CHECK_NO_THROW(test.control->fetch_block_by_number(nonexisting_future_block_num));
+         BOOST_CHECK_NO_THROW(test.fetch_block_by_number(nonexisting_future_block_num));
          // Check the latest head block match
-         BOOST_TEST(test.control->fetch_block_by_number(test.control->head_block_num())->calculate_id() ==
-                    test.control->head_block_id());
+         BOOST_TEST(test.fetch_block_by_number(test.head().block_num())->calculate_id() ==
+                    test.head().id());
+
+         // Verify LIB can be found
+         const auto lib_num = test.last_irreversible_block_num();
+         auto lib           = test.fetch_block_by_number(lib_num);
+         BOOST_REQUIRE(lib);
+         auto lib_id = lib->calculate_id();
+         BOOST_TEST(lib_num == lib->block_num());
+         lib = test.fetch_block_by_id(lib_id);
+         BOOST_REQUIRE(lib);
+         BOOST_TEST(lib->calculate_id() == lib_id);
+
+      } FC_LOG_AND_RETHROW()
+   }
+
+   // Test the block fetching methods on database, fetch_bock_by_id, and fetch_block_by_number
+   BOOST_AUTO_TEST_CASE_TEMPLATE( get_blocks_no_block_log, T, validating_testers ) {
+      try {
+         fc::temp_directory tempdir;
+
+         constexpr bool use_genesis = true;
+         T test(
+            tempdir,
+            [&](controller::config& cfg) {
+               cfg.blog = sysio::chain::empty_blocklog_config{};
+            },
+            use_genesis
+         );
+
+         // Ensure that future block doesn't exist
+         const auto nonexisting_future_block_num = test.head().block_num() + 1;
+         BOOST_TEST(test.fetch_block_by_number(nonexisting_future_block_num) == nullptr);
+         BOOST_TEST(test.fetch_block_by_id(sha256::hash("xx")) == nullptr);
+
+         test.produce_block();
+
+         // Previous nonexisting future block should exist now
+         BOOST_CHECK_NO_THROW(test.fetch_block_by_number(nonexisting_future_block_num));
+         // Check the latest head block match
+         BOOST_TEST(test.fetch_block_by_number(test.head().block_num())->calculate_id() == test.head().id());
+         BOOST_TEST(test.fetch_block_by_id(test.head().id())->calculate_id() == test.head().id());
+
+         // Verify LIB can be found
+         const auto lib_num = test.last_irreversible_block_num();
+         auto lib           = test.fetch_block_by_number(lib_num);
+         BOOST_REQUIRE(lib);
+         auto lib_id = lib->calculate_id();
+         BOOST_TEST(lib_num == lib->block_num());
+         lib = test.fetch_block_by_id(lib_id);
+         BOOST_REQUIRE(lib);
+         BOOST_TEST(lib->calculate_id() == lib_id);
+
       } FC_LOG_AND_RETHROW()
    }
 

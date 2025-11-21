@@ -3,6 +3,7 @@
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/io/random_access_file.hpp>
 #include <boost/core/demangle.hpp>
 #include <ostream>
 #include <memory>
@@ -150,7 +151,9 @@ namespace sysio { namespace chain {
             write_section(detail::snapshot_section_traits<T>::section_name(), f);
          }
 
-      virtual ~snapshot_writer(){};
+         virtual ~snapshot_writer(){};
+
+         virtual const char* name() const = 0;
 
       protected:
          virtual void write_start_section( const std::string& section_name ) = 0;
@@ -164,6 +167,7 @@ namespace sysio { namespace chain {
       struct abstract_snapshot_row_reader {
          virtual void provide(std::istream& in) const = 0;
          virtual void provide(const fc::variant&) const = 0;
+         virtual void provide(fc::datastream<const char*>&) const = 0;
          virtual std::string row_type_name() const = 0;
       };
 
@@ -211,6 +215,12 @@ namespace sysio { namespace chain {
          void provide(const fc::variant& var) const override {
             row_validation_helper::apply(data, [&var,this]() {
                fc::from_variant(var, data);
+            });
+         }
+
+         void provide(fc::datastream<const char*>& ds) const override{
+            row_validation_helper::apply(data, [&ds,this]() {
+               fc::raw::unpack(ds, data);
             });
          }
 
@@ -278,9 +288,13 @@ namespace sysio { namespace chain {
          read_section(detail::snapshot_section_traits<T>::section_name(), f);
       }
 
-      virtual void validate() const = 0;
+      virtual void validate() = 0;
 
       virtual void return_to_header() = 0;
+
+      virtual size_t total_row_count() = 0;
+
+      virtual bool supports_threading() const {return false;}
 
       virtual ~snapshot_reader(){};
 
@@ -297,6 +311,7 @@ namespace sysio { namespace chain {
       public:
          variant_snapshot_writer(fc::mutable_variant_object& snapshot);
 
+         const char* name() const override { return "variant snapshot"; }
          void write_start_section( const std::string& section_name ) override;
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
          void write_end_section( ) override;
@@ -312,12 +327,13 @@ namespace sysio { namespace chain {
       public:
          explicit variant_snapshot_reader(const fc::variant& snapshot);
 
-         void validate() const override;
+         void validate() override;
          void set_section( const string& section_name ) override;
          bool read_row( detail::abstract_snapshot_row_reader& row_reader ) override;
          bool empty ( ) override;
          void clear_section() override;
          void return_to_header() override;
+         size_t total_row_count() override;
 
       private:
          const fc::variant& snapshot;
@@ -329,6 +345,7 @@ namespace sysio { namespace chain {
       public:
          explicit ostream_snapshot_writer(std::ostream& snapshot);
 
+         const char* name() const override { return "snapshot"; }
          void write_start_section( const std::string& section_name ) override;
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
          void write_end_section( ) override;
@@ -347,6 +364,7 @@ namespace sysio { namespace chain {
       public:
          explicit ostream_json_snapshot_writer(std::ostream& snapshot);
 
+         const char* name() const override { return "JSON snapshot"; }
          void write_start_section( const std::string& section_name ) override;
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
          void write_end_section() override;
@@ -363,12 +381,13 @@ namespace sysio { namespace chain {
       public:
          explicit istream_snapshot_reader(std::istream& snapshot);
 
-         void validate() const override;
+         void validate() override;
          void set_section( const string& section_name ) override;
          bool read_row( detail::abstract_snapshot_row_reader& row_reader ) override;
          bool empty ( ) override;
          void clear_section() override;
          void return_to_header() override;
+         size_t total_row_count() override;
 
       private:
          bool validate_section() const;
@@ -384,12 +403,13 @@ namespace sysio { namespace chain {
          explicit istream_json_snapshot_reader(const std::filesystem::path& p);
          ~istream_json_snapshot_reader();
 
-         void validate() const override;
+         void validate() override;
          void set_section( const string& section_name ) override;
          bool read_row( detail::abstract_snapshot_row_reader& row_reader ) override;
          bool empty ( ) override;
          void clear_section() override;
          void return_to_header() override;
+         size_t total_row_count() override;
 
       private:
          bool validate_section() const;
@@ -397,10 +417,34 @@ namespace sysio { namespace chain {
          std::unique_ptr<struct istream_json_snapshot_reader_impl> impl;
    };
 
+   class threaded_snapshot_reader : public snapshot_reader {
+      public:
+         explicit threaded_snapshot_reader(const std::filesystem::path& snapshot_path);
+
+         void validate() override;
+         void set_section( const string& section_name ) override;
+         bool read_row( detail::abstract_snapshot_row_reader& row_reader ) override;
+         bool empty ( ) override;
+         void clear_section() override;
+         void return_to_header() override;
+         size_t total_row_count() override;
+         bool supports_threading() const override {return true;}
+
+      private:
+         fc::random_access_file                   snapshot_file;
+         const boost::interprocess::mapped_region mapped_snap;
+         const char* const                        mapped_snap_addr;
+
+         thread_local inline static fc::datastream<const char*> ds = fc::datastream<const char*>(nullptr, 0);
+         thread_local inline static uint64_t                    num_rows;
+         thread_local inline static uint64_t                    cur_row;
+   };
+
    class integrity_hash_snapshot_writer : public snapshot_writer {
       public:
          explicit integrity_hash_snapshot_writer(fc::sha256::encoder&  enc);
 
+         const char* name() const override { return "integrity hash"; }
          void write_start_section( const std::string& section_name ) override;
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
          void write_end_section( ) override;
@@ -409,7 +453,23 @@ namespace sysio { namespace chain {
       private:
          fc::sha256::encoder&  enc;
 
-   };   
+   };
+   
+   struct snapshot_written_row_counter {
+      snapshot_written_row_counter(const size_t total, const char* name) : total(total), name(name) {}
+      void progress() {
+         if(++count % 50000 == 0 && time(NULL) - last_print >= 5) {
+            ilog("${n} creation ${pct}% complete", ("n", name)("pct",std::min((unsigned)(((double)count/total)*100),100u)));
+            last_print = time(NULL);
+         }
+      }
+      size_t count = 0;
+      const size_t total = 0;
+      const char* name = nullptr;
+      time_t last_print = time(NULL);
+   };
+
+   fc::variant snapshot_info(snapshot_reader& snapshot);
 }}
 namespace sysio { namespace chain { namespace detail {
 

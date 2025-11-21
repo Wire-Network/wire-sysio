@@ -4,6 +4,7 @@
 #include <sysio/chain/transaction_context.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
 #include <fc/utility.hpp>
 #include <sstream>
 #include <algorithm>
@@ -92,7 +93,7 @@ class apply_context {
             map<table_id_object::id_type, pair<const table_id_object*, int>> _table_cache;
             vector<const table_id_object*>                  _end_iterator_to_table;
             vector<const T*>                                _iterator_to_object;
-            map<const T*,int>                               _object_to_iterator;
+            boost::unordered_flat_map<const T*,int>         _object_to_iterator;
 
             /// Precondition: std::numeric_limits<int>::min() < ei < -1
             /// Iterator of -1 is reserved for invalid iterators (i.e. when the appropriate table has not yet been created).
@@ -598,6 +599,7 @@ class apply_context {
       action_name get_sender() const;
 
       bool is_applying_block() const { return trx_context.explicit_billed_cpu_time; }
+      bool is_sys_vm_oc_whitelisted() const;
       bool should_use_sys_vm_oc()const;
 
    /// Fields:

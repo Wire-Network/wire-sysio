@@ -8,14 +8,12 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
 
-#include <chrono>
 #include <bit>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
    transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
-         : expired(timer.expired), _timer(timer) {
-      expired = 0;
+         : _timer(timer) {
    }
 
    void transaction_checktime_timer::start(fc::time_point tp) {
@@ -39,6 +37,7 @@ namespace sysio { namespace chain {
                                              const packed_transaction& t,
                                              const transaction_id_type& trx_id,
                                              transaction_checktime_timer&& tmr,
+                                             action_digests_t::store_which_t store_which,
                                              fc::time_point s,
                                              transaction_metadata::trx_type type)
    :control(c)
@@ -47,21 +46,39 @@ namespace sysio { namespace chain {
    ,undo_session()
    ,trace(std::make_shared<transaction_trace>())
    ,start(s)
+   ,executed_action_receipts(store_which)
    ,transaction_timer(std::move(tmr))
    ,trx_type(type)
-   ,net_usage(trace->net_usage)
    ,pseudo_start(s)
    {
-      if (!c.skip_db_sessions() && !is_read_only()) {
-         undo_session.emplace(c.mutable_db().start_undo_session(true));
-      }
-      trace->id = id;
-      trace->block_num = c.head_block_num() + 1;
-      trace->block_time = c.pending_block_time();
-      trace->producer_block_id = c.pending_producer_block_id();
+      initialize();
+   }
 
-      if(auto dm_logger = c.get_deep_mind_logger(is_transient()))
-      {
+   void transaction_context::reset() {
+      undo();
+      *trace = transaction_trace{}; // reset trace
+      initialize();
+      transaction_timer.stop();
+      resume_billing_timer(start);
+
+      auto sw = executed_action_receipts.store_which();
+      executed_action_receipts = action_digests_t{sw};
+      // bill_to_accounts should only be updated in init(), not updated during transaction execution
+      validate_ram_usage.clear();
+   }
+
+   void transaction_context::initialize() {
+      if (!control.skip_db_sessions() && !is_read_only()) {
+         undo_session.emplace(control.mutable_db().start_undo_session(true));
+      }
+
+      trace->id = id;
+      trace->block_num = control.head().block_num() + 1;
+      trace->block_time = control.pending_block_time();
+      trace->producer_block_id = control.pending_producer_block_id();
+      trace->net_usage = init_net_usage;
+
+      if(auto dm_logger = control.get_deep_mind_logger(is_transient())) {
          dm_logger->on_start_transaction();
       }
    }
@@ -72,6 +89,12 @@ namespace sysio { namespace chain {
       {
          dm_logger->on_end_transaction();
       }
+   }
+
+   bool transaction_context::has_undo() const {
+      return !control.skip_db_sessions()
+             && !is_read_only()
+             && control.get_deep_mind_logger(is_transient()) == nullptr;
    }
 
    void transaction_context::disallow_transaction_extensions( const char* error_msg )const {
@@ -85,17 +108,24 @@ namespace sysio { namespace chain {
    void transaction_context::init(uint64_t initial_net_usage)
    {
       SYS_ASSERT( !is_initialized, transaction_exception, "cannot initialize twice" );
+      init_net_usage = initial_net_usage;
 
       // set maximum to a semi-valid deadline to allow for pause math and conversion to dates for logging
+      const fc::time_point far_future_time = start + fc::days(7*26);
       if( block_deadline == fc::time_point::maximum() )
-         block_deadline = start + fc::hours(24*7*52);
+         block_deadline = far_future_time;
 
       const auto& cfg = control.get_global_properties().configuration;
       auto& rl = control.get_mutable_resource_limits_manager();
 
       net_limit = rl.get_block_net_limit();
 
-      objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
+      if (is_read_only() && !control.is_write_window()) { // if in write window then honor objective block limit
+         // this is not objective, but plays the same role for read-only trxs
+         objective_duration_limit = block_deadline - start; // read-only window size
+      } else {
+         objective_duration_limit = fc::microseconds( rl.get_block_cpu_limit() );
+      }
       _deadline = start + objective_duration_limit;
 
       // Possibly lower net_limit to the maximum net usage a transaction is allowed to be billed
@@ -230,19 +260,21 @@ namespace sysio { namespace chain {
          add_net_usage( initial_net_usage );  // Fail early if current net usage exceeds limit
 
       if(control.skip_trx_checks()) {
-         transaction_timer.start( fc::time_point::maximum() );
-      } else {
-         transaction_timer.start( _deadline );
-         checktime(); // Fail early if deadline already exceeded
+         _deadline = block_deadline;
       }
 
+      if(_deadline < far_future_time)
+         transaction_timer.start( _deadline );
+      else
+         transaction_timer.start( fc::time_point::maximum() );  //avoids overhead in starting the timer at all
+      checktime(); // Fail early if deadline has already been exceeded
       is_initialized = true;
    }
 
-   void transaction_context::init_for_implicit_trx( uint64_t initial_net_usage  )
+   void transaction_context::init_for_implicit_trx()
    {
       published = control.pending_block_time();
-      init( initial_net_usage);
+      init(0);
    }
 
    void transaction_context::init_for_input_trx( uint64_t packed_trx_unprunable_size,
@@ -287,21 +319,33 @@ namespace sysio { namespace chain {
    void transaction_context::exec() {
       SYS_ASSERT( is_initialized, transaction_exception, "must first initialize" );
 
-      const transaction& trx = packed_trx.get_transaction();
-      if( apply_context_free ) {
-         for( const auto& act : trx.context_free_actions ) {
-            schedule_action( act, act.account, true, 0, 0 );
+      for (int i = 0; i < 2; ++i) { // interrupt_oc_exception can only happen once
+         try {
+            const transaction& trx = packed_trx.get_transaction();
+            if( apply_context_free ) {
+               for( const auto& act : trx.context_free_actions ) {
+                  schedule_action( act, act.account, true, 0, 0 );
+               }
+            }
+
+            for( const auto& act : trx.actions ) {
+               schedule_action( act, act.account, false, 0, 0 );
+            }
+
+            auto& action_traces = trace->action_traces;
+            uint32_t num_original_actions_to_execute = action_traces.size();
+            for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
+               execute_action( i, 0 );
+            }
+
+            break;
+         } catch ( const fc::exception& e ) {
+            if (i == 0 && e.code() == interrupt_oc_exception::code_value) {
+               reset();
+               continue;
+            }
+            throw;
          }
-      }
-
-      for( const auto& act : trx.actions ) {
-         schedule_action( act, act.account, false, 0, 0 );
-      }
-
-      auto& action_traces = trace->action_traces;
-      uint32_t num_original_actions_to_execute = action_traces.size();
-      for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
-         execute_action( i, 0 );
       }
    }
 
@@ -310,7 +354,7 @@ namespace sysio { namespace chain {
 
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
-         net_usage = ((net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
+         trace->net_usage = ((trace->net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
          trace->elapsed = fc::time_point::now() - start;
          return;
       }
@@ -356,8 +400,8 @@ namespace sysio { namespace chain {
          tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
       }
 
-      // Round up net_usage to the nearest multiple of 8 bytes and verify
-      net_usage = ((net_usage + 7)/8)*8;
+      trace->net_usage = ((trace->net_usage + 7)/8)*8; // Round up to nearest multiple of word size (8 bytes)
+
       eager_net_limit = net_limit;
       check_net_usage();
 
@@ -369,7 +413,7 @@ namespace sysio { namespace chain {
 
       validate_cpu_usage_to_bill( billed_cpu_time_us, account_cpu_limit, true, subjective_cpu_bill_us );
 
-      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), net_usage,
+      rl.add_transaction_usage( bill_to_accounts, static_cast<uint64_t>(billed_cpu_time_us), trace->net_usage,
                                 block_timestamp_type(control.pending_block_time()).slot, is_transient() ); // Should never fail
    }
 
@@ -377,27 +421,30 @@ namespace sysio { namespace chain {
 
    void transaction_context::squash() {
       if (undo_session) undo_session->squash();
+      control.apply_trx_block_context(trx_blk_context);
+      transaction_timer.stop();
    }
 
    void transaction_context::undo() {
       if (undo_session) undo_session->undo();
+      transaction_timer.stop();
    }
 
    void transaction_context::check_net_usage()const {
       if (!control.skip_trx_checks()) {
-         if( BOOST_UNLIKELY(net_usage > eager_net_limit) ) {
+         if( BOOST_UNLIKELY(trace->net_usage > eager_net_limit) ) {
             if ( net_limit_due_to_block ) {
                SYS_THROW( block_net_usage_exceeded,
                           "not enough space left in block: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             }  else if (net_limit_due_to_greylist) {
                SYS_THROW( greylist_net_usage_exceeded,
                           "greylisted transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             } else {
                SYS_THROW( tx_net_usage_exceeded,
                           "transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", net_usage)("net_limit", eager_net_limit) );
+                          ("net_usage", trace->net_usage)("net_limit", eager_net_limit) );
             }
          }
       }
@@ -425,13 +472,17 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::checktime()const {
-      if(BOOST_LIKELY(transaction_timer.expired == false))
+      platform_timer::state_t expired = transaction_timer.timer_state();
+      if(BOOST_LIKELY(expired == platform_timer::state_t::running))
          return;
 
       auto now = fc::time_point::now();
-      if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
+      if (expired == platform_timer::state_t::interrupted) {
+         SYS_THROW( interrupt_exception, "interrupt signaled, ran ${bt}us, start ${s}",
+                    ("bt", now - pseudo_start)("s", start) );
+      } else if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
          SYS_THROW( deadline_exception, "deadline exceeded ${billing_timer}us",
-                     ("billing_timer", now - pseudo_start)("now", now)("deadline", _deadline)("start", start) );
+                    ("billing_timer", now - pseudo_start)("now", now)("deadline", _deadline)("start", start) );
       } else if( deadline_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_THROW( block_cpu_usage_exceeded,
                      "not enough time left in block to complete executing transaction ${billing_timer}us",
@@ -461,16 +512,16 @@ namespace sysio { namespace chain {
    }
 
    void transaction_context::pause_billing_timer() {
-      if( explicit_billed_cpu_time || pseudo_start == fc::time_point() ) return; // either irrelevant or already paused
-
       paused_time = fc::time_point::now();
       billed_time = paused_time - pseudo_start;
       pseudo_start = fc::time_point();
       transaction_timer.stop();
    }
 
-   void transaction_context::resume_billing_timer() {
-      if( explicit_billed_cpu_time || pseudo_start != fc::time_point() ) return; // either irrelevant or already running
+   void transaction_context::resume_billing_timer(fc::time_point resume_from) {
+      if (resume_from != fc::time_point()) {
+         paused_time = resume_from;
+      }
 
       auto now = fc::time_point::now();
       auto paused = now - paused_time;
@@ -792,5 +843,23 @@ namespace sysio { namespace chain {
       }
    }
 
+   int64_t transaction_context::set_proposed_producers(vector<producer_authority> producers) {
+      if (producers.empty())
+         return -1; // SAVANNA depends on DISALLOW_EMPTY_PRODUCER_SCHEDULE
 
-} } /// sysio::chain
+      SYS_ASSERT(producers.size() <= config::max_proposers, wasm_execution_error,
+                 "Producer schedule exceeds the maximum proposer count for this chain");
+
+      trx_blk_context.proposed_schedule_block_num = control.head().block_num() + 1;
+      // proposed_schedule.version is set in assemble_block
+      trx_blk_context.proposed_schedule.producers = std::move(producers);
+
+      return std::numeric_limits<uint32_t>::max();
+   }
+
+   void transaction_context::set_proposed_finalizers(finalizer_policy&& fin_pol) {
+      trx_blk_context.proposed_fin_pol_block_num = control.head().block_num() + 1;
+      trx_blk_context.proposed_fin_pol = std::move(fin_pol);
+   }
+
+} /// sysio::chain

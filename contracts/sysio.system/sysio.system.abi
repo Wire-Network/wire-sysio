@@ -9,6 +9,10 @@
         {
             "new_type_name": "blockchain_parameters_t",
             "type": "blockchain_parameters"
+        },
+        {
+            "new_type_name": "getpeerkeys_res_t",
+            "type": "peerkeys_t[]"
         }
     ],
     "structs": [
@@ -23,6 +27,20 @@
                 {
                     "name": "hash",
                     "type": "checksum256"
+                }
+            ]
+        },
+        {
+            "name": "actfinkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "finalizer_key",
+                    "type": "string"
                 }
             ]
         },
@@ -221,6 +239,106 @@
             ]
         },
         {
+            "name": "delfinkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "finalizer_key",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "fin_key_id_generator_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "next_finalizer_key_id",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "finalizer_auth_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "fin_authority",
+                    "type": "finalizer_authority"
+                }
+            ]
+        },
+        {
+            "name": "finalizer_authority",
+            "base": "",
+            "fields": [
+                {
+                    "name": "description",
+                    "type": "string"
+                },
+                {
+                    "name": "weight",
+                    "type": "uint64"
+                },
+                {
+                    "name": "public_key",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
+            "name": "finalizer_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "active_key_id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "active_key_binary",
+                    "type": "bytes"
+                },
+                {
+                    "name": "finalizer_key_count",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "finalizer_key_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "finalizer_key",
+                    "type": "string"
+                },
+                {
+                    "name": "finalizer_key_binary",
+                    "type": "bytes"
+                }
+            ]
+        },
+        {
             "name": "init",
             "base": "",
             "fields": [
@@ -245,6 +363,16 @@
                 {
                     "name": "weight",
                     "type": "uint16"
+                }
+            ]
+        },
+        {
+            "name": "last_prop_finalizers_info",
+            "base": "",
+            "fields": [
+                {
+                    "name": "last_proposed_finalizers",
+                    "type": "finalizer_auth_info[]"
                 }
             ]
         },
@@ -429,6 +557,24 @@
                 {
                     "name": "producers",
                     "type": "producer_key[]"
+                }
+            ]
+        },
+        {
+            "name": "regfinkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "finalizer_key",
+                    "type": "string"
+                },
+                {
+                    "name": "proof_of_possession",
+                    "type": "string"
                 }
             ]
         },
@@ -649,6 +795,11 @@
             ]
         },
         {
+            "name": "switchtosvnn",
+            "base": "",
+            "fields": []
+        },
+        {
             "name": "sysio_global_state",
             "base": "blockchain_parameters",
             "fields": [
@@ -789,9 +940,85 @@
                     "type": "name[]"
                 }
             ]
+        },
+        {
+            "name": "delpeerkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer_finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "getpeerkeys",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "peer_key",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "data",
+                    "type": "variant_v0_data"
+                }
+            ]
+        },
+        {
+            "name": "peerkeys_t",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "peer_key",
+                    "type": "public_key?"
+                }
+            ]
+        },
+        {
+            "name": "regpeerkey",
+            "base": "",
+            "fields": [
+                {
+                    "name": "proposer_finalizer_name",
+                    "type": "name"
+                },
+                {
+                    "name": "key",
+                    "type": "public_key"
+                }
+            ]
+        },
+        {
+            "name": "v0_data",
+            "base": "",
+            "fields": [
+                {
+                    "name": "pubkey",
+                    "type": "public_key?"
+                }
+            ]
         }
     ],
     "actions": [
+        {
+            "name": "actfinkey",
+            "type": "actfinkey",
+            "ricardian_contract": ""
+        },
         {
             "name": "activate",
             "type": "activate",
@@ -800,6 +1027,11 @@
         {
             "name": "deleteauth",
             "type": "deleteauth",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "delfinkey",
+            "type": "delfinkey",
             "ricardian_contract": ""
         },
         {
@@ -825,6 +1057,11 @@
         {
             "name": "onblock",
             "type": "onblock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regfinkey",
+            "type": "regfinkey",
             "ricardian_contract": ""
         },
         {
@@ -898,6 +1135,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "switchtosvnn",
+            "type": "switchtosvnn",
+            "ricardian_contract": ""
+        },
+        {
             "name": "unlinkauth",
             "type": "unlinkauth",
             "ricardian_contract": ""
@@ -915,6 +1157,21 @@
         {
             "name": "wasmcfg",
             "type": "wasmcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "delpeerkey",
+            "type": "delpeerkey",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getpeerkeys",
+            "type": "getpeerkeys",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regpeerkey",
+            "type": "regpeerkey",
             "ricardian_contract": ""
         }
     ],
@@ -934,8 +1191,36 @@
             "key_types": []
         },
         {
+            "name": "finalizers",
+            "type": "finalizer_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "finkeyidgen",
+            "type": "fin_key_id_generator_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "finkeys",
+            "type": "finalizer_key_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "global",
             "type": "sysio_global_state",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "lastpropfins",
+            "type": "last_prop_finalizers_info",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -953,6 +1238,13 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
+        },
+        {
+            "name": "peerkeys",
+            "type": "peer_key",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
         }
     ],
     "ricardian_clauses": [],
@@ -960,7 +1252,16 @@
         {
             "name": "variant_block_signing_authority_v0",
             "types": ["block_signing_authority_v0"]
+        },
+        {
+            "name": "variant_v0_data",
+            "types": ["v0_data"]
         }
     ],
-    "action_results": []
+    "action_results": [
+        {
+            "name": "getpeerkeys",
+            "result_type": "getpeerkeys_res_t"
+        }
+    ]
 }

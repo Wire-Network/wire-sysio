@@ -13,7 +13,7 @@
 
 using boost::container::flat_set;
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
 static inline void print_debug(account_name receiver, const action_trace& ar) {
    if (!ar.console.empty()) {
@@ -111,13 +111,7 @@ void apply_context::exec_one()
          }
       } FC_RETHROW_EXCEPTIONS( warn, "${receiver} <= ${account}::${action} pending console output: ${console}", ("console", _pending_console_output)("account", act->account)("action", act->name)("receiver", receiver) )
 
-      act_digest =   generate_action_digest(
-                        [this](const char* data, uint32_t datalen) {
-                           return trx_context.hash_with_checktime<digest_type>(data, datalen);
-                        },
-                        *act,
-                        action_return_value
-                     );
+      act_digest = generate_action_digest(*act, action_return_value);
    } catch ( const std::bad_alloc& ) {
       throw;
    } catch ( const boost::interprocess::bad_alloc& ) {
@@ -158,7 +152,7 @@ void apply_context::exec_one()
       r.auth_sequence[auth.actor] = next_auth_sequence( auth.actor );
    }
 
-   trx_context.executed_action_receipt_digests.emplace_back( r.digest() );
+   trx_context.executed_action_receipts.compute_and_append_digests_from(trace);
 
    finalize_trace( trace, start );
 
@@ -243,17 +237,17 @@ void apply_context::exec()
       exec_one();
    }
 
-   if( _cfa_inline_actions.size() > 0 || _inline_actions.size() > 0 ) {
+   if( !_cfa_inline_actions.empty() || !_inline_actions.empty() ) {
       SYS_ASSERT( recurse_depth < control.get_global_properties().configuration.max_inline_action_depth,
                   transaction_exception, "max inline action depth per transaction reached" );
-   }
 
-   for( uint32_t ordinal : _cfa_inline_actions ) {
-      trx_context.execute_action( ordinal, recurse_depth + 1 );
-   }
+      for( uint32_t ordinal : _cfa_inline_actions ) {
+         trx_context.execute_action( ordinal, recurse_depth + 1 );
+      }
 
-   for( uint32_t ordinal : _inline_actions ) {
-      trx_context.execute_action( ordinal, recurse_depth + 1 );
+      for( uint32_t ordinal : _inline_actions ) {
+         trx_context.execute_action( ordinal, recurse_depth + 1 );
+      }
    }
 
 } /// exec()
@@ -852,19 +846,24 @@ action_name apply_context::get_sender() const {
    return action_name();
 }
 
+bool apply_context::is_sys_vm_oc_whitelisted() const {
+   return receiver.prefix() == config::system_account_name || // "sysio"_n
+          control.is_sys_vm_oc_whitelisted(receiver);
+}
+
 // Context             |    OC?
 //-------------------------------------------------------------------------------
-// Building block      | baseline, OC for sysio.*
-// Applying block      | OC unless a producer, OC for sysio.* including producers
-// Speculative API trx | baseline, OC for sysio.*
-// Speculative P2P trx | baseline, OC for sysio.*
-// Compute trx         | baseline, OC for sysio.*
+// Building block      | baseline, OC for whitelisted
+// Applying block      | OC unless a producer, OC for whitelisted including producers
+// Speculative API trx | baseline, OC for whitelisted
+// Speculative P2P trx | baseline, OC for whitelisted
+// Compute trx         | baseline, OC for whitelisted
 // Read only trx       | OC
 bool apply_context::should_use_sys_vm_oc()const {
-   return receiver.prefix() == config::system_account_name // "sysio"_n, all cases use OC
+   return is_sys_vm_oc_whitelisted() // all whitelisted accounts use OC always
           || (is_applying_block() && !control.is_producer_node()) // validating/applying block
           || trx_context.is_read_only();
 }
 
 
-} } /// sysio::chain
+} /// sysio::chain

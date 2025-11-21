@@ -2,7 +2,6 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/pending_snapshot.hpp>
 #include <sysio/chain/snapshot_scheduler.hpp>
-#include <fc/scoped_exit.hpp>
 
 namespace sysio::chain {
 
@@ -21,18 +20,38 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
       }
    };
 
-   std::vector<uint32_t> unschedule_snapshot_request_ids;
    for(const auto& req: _snapshot_requests.get<0>()) {
       // -1 since its called from start block
       bool recurring_snapshot  = req.block_spacing && (height >= req.start_block_num + 1) && (!((height - req.start_block_num - 1) % req.block_spacing));
       bool onetime_snapshot    = (!req.block_spacing) && (height == req.start_block_num + 1);
       
-      bool marked_for_deletion = ((!req.block_spacing) && (height >= req.start_block_num + 1)) || // if one time snapshot executed or scheduled for the past, it should be gone
-                                 (height > 0 && ((height-1) >= req.end_block_num));               // any snapshot can expire by end block num (end_block_num can be max value)
-
       if(recurring_snapshot || onetime_snapshot) {
          execute_snapshot_with_log(req);
       }
+
+   }
+}
+
+void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain) {
+   auto& snapshots_by_height = _pending_snapshot_index.get<by_height>();
+   uint32_t lib_height = lib->block_num();
+
+   while(!snapshots_by_height.empty() && snapshots_by_height.begin()->get_height() <= lib_height) {
+      const auto& pending = snapshots_by_height.begin();
+      auto next = pending->next;
+
+      try {
+         next(pending->finalize(block_id, chain));
+      }
+      CATCH_AND_CALL(next);
+
+      snapshots_by_height.erase(snapshots_by_height.begin());
+   }
+
+   std::vector<uint32_t> unschedule_snapshot_request_ids;
+   for(const auto& req: _snapshot_requests.get<0>()) {
+      bool marked_for_deletion = (!req.block_spacing && lib_height >= req.start_block_num) || // if one time snapshot executed or scheduled for the past, it should be gone
+                                 lib_height >= req.end_block_num;               // any snapshot can expire by end block num (end_block_num can be max value)
 
       // cleanup - remove expired (or invalid) request
       if(marked_for_deletion) {
@@ -42,23 +61,6 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
 
    for(const auto& i: unschedule_snapshot_request_ids) {
       unschedule_snapshot(i);
-   }
-}
-
-void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, const chain::controller& chain) {
-   auto& snapshots_by_height = _pending_snapshot_index.get<by_height>();
-   uint32_t lib_height = lib->block_num();
-
-   while(!snapshots_by_height.empty() && snapshots_by_height.begin()->get_height() <= lib_height) {
-      const auto& pending = snapshots_by_height.begin();
-      auto next = pending->next;
-
-      try {
-         next(pending->finalize(chain));
-      }
-      CATCH_AND_CALL(next);
-
-      snapshots_by_height.erase(snapshots_by_height.begin());
    }
 }
 
@@ -132,17 +134,7 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
    _inflight_sid = srid;
    auto next = [srid, this](const chain::next_function_variant<snapshot_information>& result) {
       if(std::holds_alternative<fc::exception_ptr>(result)) {
-         try {
-            std::get<fc::exception_ptr>(result)->dynamic_rethrow_exception();
-         } catch(const fc::exception& e) {
-            SYS_THROW(snapshot_execution_exception,
-                     "Snapshot creation error: ${details}",
-                     ("details", e.to_detail_string()));
-         } catch(const std::exception& e) {
-            SYS_THROW(snapshot_execution_exception,
-                     "Snapshot creation error: ${details}",
-                     ("details", e.what()));
-         }
+         wlog("Snapshot creation error: ${d}", ("d", std::get<fc::exception_ptr>(result)->to_detail_string()));
       } else {
          // success, snapshot finalized
          auto snapshot_info = std::get<snapshot_information>(result);
@@ -162,9 +154,9 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
 }
 
 void snapshot_scheduler::create_snapshot(next_function<snapshot_information> next, chain::controller& chain, std::function<void(void)> predicate) {
-   auto head_id = chain.head_block_id();
-   const auto head_block_num = chain.head_block_num();
-   const auto head_block_time = chain.head_block_time();
+   auto head_id = chain.head().id();
+   const auto head_block_num = chain.head().block_num();
+   const auto head_block_time = chain.head().block_time();
    const auto& snapshot_path = pending_snapshot<snapshot_information>::get_final_path(head_id, _snapshots_dir);
    const auto& temp_path = pending_snapshot<snapshot_information>::get_temp_path(head_id, _snapshots_dir);
 
@@ -189,6 +181,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
    if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
       try {
+         ilog("Starting snapshot creation at block ${bn}", ("bn", head_block_num));
          write_snapshot(temp_path);
          std::error_code ec;
          fs::rename(temp_path, snapshot_path, ec);
@@ -196,6 +189,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     "Unable to finalize valid snapshot of block number ${bn}: [code: ${ec}] ${message}",
                     ("bn", head_block_num)("ec", ec.value())("message", ec.message()));
 
+         ilog("Snapshot creation at block ${bn} complete; snapshot placed at ${fn}", ("bn", head_block_num)("fn", snapshot_path));
          next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string()});
       }
       CATCH_AND_CALL(next);
@@ -219,6 +213,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
       const auto& pending_path = pending_snapshot<snapshot_information>::get_pending_path(head_id, _snapshots_dir);
 
       try {
+         ilog("Starting snapshot creation at block ${bn}", ("bn", head_block_num));
          write_snapshot(temp_path);// create a new pending snapshot
 
          std::error_code ec;
@@ -227,7 +222,8 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     "Unable to promote temp snapshot ${t} to pending ${p} for block number ${bn}: [code: ${ec}] ${message}",
                     ("t", temp_path.generic_string())("p", pending_path.generic_string())
                     ("bn", head_block_num)("ec", ec.value())("message", ec.message()));
-         _pending_snapshot_index.emplace(head_id, next, pending_path.generic_string(), snapshot_path.generic_string());
+         ilog("Snapshot creation at block ${bn} complete; snapshot will be available once block becomes irreversible", ("bn", head_block_num));
+         _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string());
          add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string()});
       }
       CATCH_AND_CALL(next);
