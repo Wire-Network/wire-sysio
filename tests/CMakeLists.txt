@@ -293,7 +293,7 @@ set_tests_properties(plugin_http_category_api_test PROPERTIES ENVIRONMENT "PLUGI
 
 add_np_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v TIMEOUT 400)
 
-add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py)
+add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plugin_test.py -v)
 
 add_lr_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_transaction_test.py -v -p 4 -n 8 --num-transactions 1000 --max-transactions-per-second 500 --send-duplicates ${UNSHARE})
 
