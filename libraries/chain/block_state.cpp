@@ -204,6 +204,7 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
 
    result.activated_protocol_features = std::make_shared<protocol_feature_activation_set>(); // no activated protocol features in genesis
    result.header.timestamp = g.initial_timestamp;
+   result.header.schedule_version = block_header::proper_svnn_schedule_version;
    result.block_id = result.header.calculate_id();
 
    result.active_finalizer_policy = std::make_shared<finalizer_policy>( 1u, 1u, std::vector<finalizer_authority>{{"sysio", 1u, g.initial_finalizer_key}} );
