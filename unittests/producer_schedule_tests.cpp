@@ -12,104 +12,8 @@ using mvo = fc::mutable_variant_object;
 
 BOOST_AUTO_TEST_SUITE(producer_schedule_tests)
 
-namespace {
-
-// Calculate expected producer given the schedule and slot number
-account_name get_expected_producer(const vector<producer_authority>& schedule, block_timestamp_type t) {
-   const auto& index = (t.slot % (schedule.size() * config::producer_repetitions)) / config::producer_repetitions;
-   return schedule.at(index).producer_name;
-};
-
-} // anonymous namespace
-
-BOOST_FIXTURE_TEST_CASE( verify_producer_schedule, legacy_validating_tester ) try {
-
-   // Utility function to ensure that producer schedule work as expected
-   const auto& confirm_schedule_correctness = [&](const vector<producer_authority>& new_prod_schd, uint32_t expected_schd_ver)  {
-      const uint32_t check_duration = 1000; // number of blocks
-      bool scheduled_changed_to_new = false;
-      for (uint32_t i = 0; i < check_duration; ++i) {
-         const auto current_schedule = control->active_producers().producers;
-         if (new_prod_schd == current_schedule) {
-            scheduled_changed_to_new = true;
-            // verify sysio.prods updated
-            const name usr = config::producers_account_name;
-            const name active_permission = config::active_name;
-            const auto* perm = control->db().template find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
-            for (auto account : perm->auth.accounts) {
-               auto act = account.permission.actor;
-               auto itr = std::find_if( current_schedule.begin(), current_schedule.end(), [&](const auto& p) {
-                  return p.producer_name == act;
-               });
-               bool found = itr != current_schedule.end();
-               BOOST_TEST(found);
-            }
-         }
-
-         // Produce block
-         produce_block();
-         control->abort_block(); // abort started block in produce_block so activate_producers() is off head
-
-         // Check if the producer is the same as what we expect
-         const auto block_time = head().block_time();
-         const auto& expected_producer = get_expected_producer(current_schedule, block_time);
-         BOOST_TEST(head().producer() == expected_producer);
-
-         if (scheduled_changed_to_new)
-            break;
-      }
-
-      BOOST_TEST(scheduled_changed_to_new);
-
-      const auto current_schd_ver = head().header().schedule_version;
-      BOOST_TEST(current_schd_ver == expected_schd_ver);
-   };
-
-   // Create producer accounts
-   vector<account_name> producers = {
-           "inita"_n, "initb"_n, "initc"_n, "initd"_n, "inite"_n, "initf"_n, "initg"_n,
-           "inith"_n, "initi"_n, "initj"_n, "initk"_n, "initl"_n, "initm"_n, "initn"_n,
-           "inito"_n, "initp"_n, "initq"_n, "initr"_n, "inits"_n, "initt"_n, "initu"_n
-   };
-   create_accounts(producers);
-
-   // ---- Test first set of producers ----
-   // Send set prods action and confirm schedule correctness
-   set_producers(producers);
-   const auto first_prod_schd = get_producer_authorities(producers);
-   confirm_schedule_correctness(first_prod_schd, 1);
-
-   // ---- Test second set of producers ----
-   vector<account_name> second_set_of_producer = {
-           producers[3], producers[6], producers[9], producers[12], producers[15], producers[18], producers[20]
-   };
-   // Send set prods action and confirm schedule correctness
-   set_producers(second_set_of_producer);
-   const auto second_prod_schd = get_producer_authorities(second_set_of_producer);
-   confirm_schedule_correctness(second_prod_schd, 2);
-
-   // ---- Test deliberately miss some blocks ----
-   const int64_t num_of_missed_blocks = 5000;
-   produce_block(fc::microseconds(500 * 1000 * num_of_missed_blocks));
-   // Ensure schedule is still correct
-   confirm_schedule_correctness(second_prod_schd, 2);
-   produce_block();
-
-   // ---- Test third set of producers ----
-   vector<account_name> third_set_of_producer = {
-           producers[2], producers[5], producers[8], producers[11], producers[14], producers[17], producers[20],
-           producers[0], producers[3], producers[6], producers[9], producers[12], producers[15], producers[18],
-           producers[1], producers[4], producers[7], producers[10], producers[13], producers[16], producers[19]
-   };
-   // Send set prods action and confirm schedule correctness
-   set_producers(third_set_of_producer);
-   const auto third_prod_schd = get_producer_authorities(third_set_of_producer);
-   confirm_schedule_correctness(third_prod_schd, 3);
-
-} FC_LOG_AND_RETHROW()
-
-BOOST_AUTO_TEST_CASE_TEMPLATE(verify_producers, T, validating_testers) try {
-   T chain;
+BOOST_AUTO_TEST_CASE(verify_producers) try {
+   savanna_tester chain;
 
    vector<account_name> valid_producers = {
       "inita"_n, "initb"_n, "initc"_n, "initd"_n, "inite"_n, "initf"_n, "initg"_n,
@@ -164,8 +68,8 @@ BOOST_AUTO_TEST_CASE( switch_producers_test ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(producer_one_of_n_test, T, validating_testers) try {
-   T chain;
+BOOST_AUTO_TEST_CASE(producer_one_of_n_test) try {
+   savanna_tester chain;
 
    chain.create_accounts( {"alice"_n,"bob"_n} );
    chain.produce_block();
@@ -184,8 +88,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(producer_one_of_n_test, T, validating_testers) try
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(producer_m_of_n_test, T, validating_testers) try {
-   T chain;
+BOOST_AUTO_TEST_CASE(producer_m_of_n_test) try {
+   savanna_tester chain;
 
    chain.create_accounts( {"alice"_n,"bob"_n} );
    chain.produce_block();
@@ -207,8 +111,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(producer_m_of_n_test, T, validating_testers) try {
    BOOST_REQUIRE_EQUAL( chain.validate(), true );
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(satisfiable_msig_test, T, validating_testers) try {
-   T chain;
+BOOST_AUTO_TEST_CASE(satisfiable_msig_test) try {
+   savanna_tester chain;
    chain.create_accounts( {"alice"_n,"bob"_n} );
    chain.produce_block();
 
@@ -224,8 +128,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(satisfiable_msig_test, T, validating_testers) try 
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE_TEMPLATE(duplicate_producers_test, T, validating_testers) try {
-   T chain;
+BOOST_AUTO_TEST_CASE(duplicate_producers_test) try {
+   savanna_tester chain;
 
    chain.create_accounts( {"alice"_n} );
    chain.produce_block();
@@ -309,7 +213,7 @@ BOOST_AUTO_TEST_CASE( large_authority_overflow_test ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( extra_signatures_test ) try {
-   legacy_tester main;
+   savanna_tester main;
 
    main.create_accounts( {"alice"_n} );
    main.produce_block();
@@ -330,7 +234,7 @@ BOOST_AUTO_TEST_CASE( extra_signatures_test ) try {
    main.block_signing_private_keys.emplace(get_public_key("alice"_n, "bs2"), get_private_key("alice"_n, "bs2"));
 
    BOOST_REQUIRE( main.control->pending_block_producer() == "sysio"_n );
-   main.produce_blocks(3);
+   main.produce_blocks(24);
    BOOST_REQUIRE( main.control->pending_block_producer() == "alice"_n );
 
    mutable_block_ptr b;
@@ -360,10 +264,8 @@ BOOST_AUTO_TEST_CASE( extra_signatures_test ) try {
       BOOST_REQUIRE_EQUAL( additional_sigs.size(), 1u );
 
       // Generate the extra signature and add to additonal_sigs.
-      auto header_bmroot = digest_type::hash( std::make_pair( b->digest(), remote.control->head_block_state_legacy()->blockroot_merkle.get_root() ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      additional_sigs.emplace_back( remote.get_private_key("alice"_n, "bs3").sign(sig_digest) );
-      additional_sigs.emplace_back( remote.get_private_key("alice"_n, "bs4").sign(sig_digest) );
+      additional_sigs.emplace_back( remote.get_private_key("alice"_n, "bs3").sign(b->calculate_id()) );
+      additional_sigs.emplace_back( remote.get_private_key("alice"_n, "bs4").sign(b->calculate_id()) );
 
       // Serialize the augmented additional signatures back into the block extensions.
       b->block_extensions.clear();
