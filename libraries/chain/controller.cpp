@@ -121,97 +121,33 @@ class maybe_session {
       std::optional<database::session>     _session;
 };
 
-struct block_handle_accessor {
-   // apply methods of block_handle defined here as access to internal block_handle restricted to controller
-   template <class R, class F>
-   static R apply(const block_handle& bh, F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit<void>(overloaded{[&](const block_state_legacy_ptr& head) { std::forward<F>(f)(head); },
-                  [&](const block_state_ptr& head) { std::forward<F>(f)(head); }
-                  }, bh.internal());
-      else
-         return std::visit<R>(overloaded{[&](const block_state_legacy_ptr& head) -> R { return std::forward<F>(f)(head); },
-                  [&](const block_state_ptr& head) -> R { return std::forward<F>(f)(head); }
-                  }, bh.internal());
-   }
-
-   template <class R, class F, class S>
-   static R apply(const block_handle& bh, F&& f, S&& s) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit<void>(overloaded{[&](const block_state_legacy_ptr& head) { std::forward<F>(f)(head); },
-                  [&](const block_state_ptr& head) { std::forward<S>(s)(head); }
-                  }, bh.internal());
-      else
-         return std::visit<R>(overloaded{[&](const block_state_legacy_ptr& head) -> R { return std::forward<F>(f)(head); },
-                  [&](const block_state_ptr& head) -> R { return std::forward<S>(s)(head); }
-                  }, bh.internal());
-   }
-
-   // apply savanna block_state
-   template <class R, class F>
-   static R apply_s(const block_handle& bh, F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit<void>(overloaded{[&](const block_state_legacy_ptr&) {},
-                  [&](const block_state_ptr& head)   { std::forward<F>(f)(head); }}, bh.internal());
-      else
-         return std::visit<R>(overloaded{[&](const block_state_legacy_ptr&) -> R { return {}; },
-                  [&](const block_state_ptr& head)   -> R { return std::forward<F>(f)(head); }}, bh.internal());
-   }
-
-   // apply legancy block_state_legacy
-   template <class R, class F>
-   static R apply_l(const block_handle& bh, F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit<void>(overloaded{[&](const block_state_legacy_ptr& head) { std::forward<F>(f)(head); },
-                  [&](const block_state_ptr&)             {}}, bh.internal());
-      else
-         return std::visit<R>(overloaded{[&](const block_state_legacy_ptr& head) -> R { return std::forward<F>(f)(head); },
-                  [&](const block_state_ptr&)             -> R { return {}; }}, bh.internal());
-   }
-};
-
 struct completed_block {
-   block_handle bsp;
+   block_state_ptr bsp;
 
    deque<transaction_metadata_ptr> extract_trx_metas() {
-      return block_handle_accessor::apply<deque<transaction_metadata_ptr>>(bsp, [](auto& bsp) { return bsp->extract_trxs_metas(); });
+      return bsp->extract_trxs_metas();
    }
 
    const flat_set<digest_type>& get_activated_protocol_features() const {
-      return block_handle_accessor::apply<const flat_set<digest_type>&>(bsp, [](const auto& bsp) -> const flat_set<digest_type>& {
-         return bsp->get_activated_protocol_features()->protocol_features;
-      });
+      return bsp->get_activated_protocol_features()->protocol_features;
    }
 
-   const block_id_type& id() const { return bsp.id(); }
-   uint32_t block_num() const { return bsp.block_num(); }
-   block_timestamp_type timestamp() const { return bsp.block_time(); }
-   account_name producer() const { return bsp.producer(); }
+   const block_id_type& id() const { return bsp->id(); }
+   uint32_t block_num() const { return bsp->block_num(); }
+   block_timestamp_type timestamp() const { return bsp->timestamp(); }
+   account_name producer() const { return bsp->producer(); }
 
    const producer_authority_schedule& active_producers() const {
-      return block_handle_accessor::apply<const producer_authority_schedule&>(bsp, [](const auto& bsp) -> const producer_authority_schedule& {
-         return bsp->active_schedule_auth();
-      });
+      return bsp->active_schedule_auth();
    }
 
    const producer_authority_schedule* pending_producers() const {
-      return block_handle_accessor::apply<const producer_authority_schedule*>(bsp,
-         overloaded{[](const block_state_legacy_ptr& bsp) -> const producer_authority_schedule* {
-                       return bsp->pending_schedule_auth();
-                    },
-                    [](const block_state_ptr& bsp) -> const producer_authority_schedule* {
-                       return bsp->pending_producers();
-                    }
-         });
+      return bsp->pending_producers();
    }
 
    const producer_authority_schedule* pending_producers_legacy() const {
-      return block_handle_accessor::apply<const producer_authority_schedule*>(bsp,
-         overloaded{[](const block_state_legacy_ptr& bsp) -> const producer_authority_schedule* {
-                       return &bsp->pending_schedule.schedule;
-                    },
-                    [](const block_state_ptr&) -> const producer_authority_schedule* { return nullptr; }
-         });
+      assert(false);
+      return nullptr; // TODO: remove
    }
 
    bool is_protocol_feature_activated(const digest_type& digest) const {
@@ -367,16 +303,14 @@ struct assembled_block {
    completed_block complete_block(const protocol_feature_set& pfs, validator_t validator,
                                   const signer_callback_type& signer, const block_signing_authority& valid_block_signing_authority) {
       return std::visit(overloaded{[&](assembled_block_legacy& ab) {
-                                      auto bsp = std::make_shared<block_state_legacy>(
-                                         std::move(ab.pending_block_header_state), std::move(ab.unsigned_block),
-                                         std::move(ab.trx_metas), ab.action_receipt_digests_savanna, pfs, validator, signer);
-                                      return completed_block{block_handle{std::move(bsp)}};
+                                      assert(false);
+                                      return completed_block{};
                                    },
                                    [&](assembled_block_if& ab) {
                                       auto bsp = std::make_shared<block_state>(ab.bhs, std::move(ab.trx_metas),
                                                                                std::move(ab.trx_receipts), ab.valid, ab.qc, signer,
                                                                                valid_block_signing_authority, ab.action_mroot);
-                                      return completed_block{block_handle{std::move(bsp)}};
+                                      return completed_block{std::move(bsp)};
                                    }},
                         v);
    }
@@ -985,8 +919,6 @@ struct controller_impl {
    block_log                       blog;
    std::optional<pending_state>    pending;
    block_handle                    chain_head;
-   block_state_ptr                 chain_head_trans_svnn_block; // chain_head's Savanna representation during transition
-   std::vector<block_state_legacy_ptr> transition_legacy_branch; // transition legacy branch used during replay
    fork_database_t                 fork_db_;
    resource_limits_manager         resource_limits;
    subjective_billing              subjective_bill;
@@ -1055,64 +987,31 @@ struct controller_impl {
    int64_t set_proposed_producers_legacy( vector<producer_authority> producers );
 
    protocol_feature_activation_set_ptr head_activated_protocol_features() const {
-      return block_handle_accessor::apply<protocol_feature_activation_set_ptr>(chain_head, [](const auto& head) {
-         return head->get_activated_protocol_features();
-      });
+      return chain_head.internal()->get_activated_protocol_features();
    }
 
    const producer_authority_schedule& head_active_schedule_auth() const {
-      return block_handle_accessor::apply<const producer_authority_schedule&>(chain_head, [](const auto& head) -> const producer_authority_schedule& {
-         return head->active_schedule_auth();
-      });
+      return chain_head.internal()->active_schedule_auth();
    }
 
    const producer_authority_schedule& head_active_producers(block_timestamp_type next_block_timestamp) const {
-      return block_handle_accessor::apply<const producer_authority_schedule&>(chain_head,
-         overloaded{[](const block_state_legacy_ptr& head) -> const producer_authority_schedule& { return head->active_schedule_auth(); },
-                    [&](const block_state_ptr& head) -> const producer_authority_schedule& { return head->get_active_proposer_policy_for_block_at(next_block_timestamp)->proposer_schedule; }
-         });
+      return chain_head.internal()->get_active_proposer_policy_for_block_at(next_block_timestamp)->proposer_schedule;
    }
 
    const producer_authority_schedule* head_pending_schedule_auth_legacy() const {
-      return block_handle_accessor::apply<const producer_authority_schedule*>(chain_head,
-         overloaded{[](const block_state_legacy_ptr& head) -> const producer_authority_schedule* { return head->pending_schedule_auth(); },
-                    [](const block_state_ptr&) -> const producer_authority_schedule* { return nullptr; }
-         });
+      assert(false);
+      // TODO: remove
+      return nullptr;
    }
 
    const producer_authority_schedule* pending_producers() {
-      return block_handle_accessor::apply<const producer_authority_schedule*>(chain_head,
-         overloaded{
-         [](const block_state_legacy_ptr& head) -> const producer_authority_schedule* {
-            return head->pending_schedule_auth();
-         },
-         [](const block_state_ptr& head) -> const producer_authority_schedule* {
-            return head->pending_producers();
-         }
-      });
+      return chain_head.internal()->pending_producers();
    }
 
    void replace_producer_keys( const public_key_type& key ) {
       ilog("Replace producer keys with ${k}", ("k", key));
 
-      block_handle_accessor::apply<void>(chain_head,
-         overloaded{
-            [&](const block_state_legacy_ptr& head) {
-               auto version = head->pending_schedule.schedule.version;
-               head->pending_schedule = {};
-               head->pending_schedule.schedule.version = version;
-               for (auto& prod: head->active_schedule.producers ) {
-                  ilog("${n}", ("n", prod.producer_name));
-                  std::visit([&](auto &auth) {
-                     auth.threshold = 1;
-                     auth.keys = {key_weight{key, 1}};
-                  }, prod.authority);
-               }
-            },
-            [](const block_state_ptr&) {
-               // TODO IF: add instant-finality implementation, will need to replace finalizers as well
-            }
-         });
+      // TODO IF: add instant-finality implementation, will need to replace finalizers as well
    }
 
    // --------------- access fork_db head ----------------------------------------------------------------------
@@ -1370,12 +1269,6 @@ struct controller_impl {
          return apply_block(bsp, controller::block_status::complete, trx_meta_cache_lookup{});
       } else {
          assert(bsp->block);
-         block_handle_accessor::apply_l<void>(chain_head, [&](const auto&) {
-            // if chain_head is legacy, update to non-legacy chain_head, this is needed so that the correct block_state is created in apply_block
-            block_state_ptr prev = fork_db.get_block(bsp->previous(), include_root_t::yes);
-            assert(prev);
-            chain_head = block_handle{prev};
-         });
          return apply_block(bsp, controller::block_status::complete, trx_meta_cache_lookup{});
       }
    }
@@ -1393,18 +1286,6 @@ struct controller_impl {
       if (legacy->is_valid())
          new_bsp->set_valid(true);
       fork_db.add(new_bsp, ignore_duplicate_t::yes);
-   }
-
-   void transition_to_savanna_if_needed() {
-      block_handle_accessor::apply_l<void>(irreversible_mode() ? fork_db_head() : chain_head,
-         [&](const block_state_legacy_ptr& head) {
-            if (head->is_savanna_critical_block()) {
-               transition_to_savanna();
-            }
-         });
-   }
-
-   void transition_to_savanna() {
    }
 
    controller::apply_blocks_result_t log_irreversible() {
@@ -1555,47 +1436,7 @@ struct controller_impl {
       ilog( "existing block log, attempting to replay from ${s} to ${n} blocks", ("s", start_block_num)("n", blog_head->block_num()) );
       try {
          while( auto next = blog.read_block_by_num( chain_head.block_num() + 1 ) ) {
-            block_handle_accessor::apply_l<void>(chain_head, [&](const auto& head) {
-               if (next->is_proper_svnn_block()) {
-                  // validated already or not in replay_irreversible_block according to conf.force_all_checks;
-                  const bool skip_validate_signee = true;
-                  // should have started with a block_state chain_head or we transition during replay
-                  assert(!transition_legacy_branch.empty());
-                  // transition to savanna
-                  block_state_ptr prev = chain_head_trans_svnn_block;
-                  bool replay_not_from_snapshot = !chain_head_trans_svnn_block;
-                  for (size_t i = 0; i < transition_legacy_branch.size(); ++i) {
-                     if (i == 0 && replay_not_from_snapshot) {
-                        assert(!prev);
-                        prev = block_state::create_if_genesis_block(*transition_legacy_branch[0]);
-                     } else {
-                        const auto& bspl = transition_legacy_branch[i];
-                        assert(read_mode == db_read_mode::IRREVERSIBLE || bspl->action_mroot_savanna.has_value());
-                        auto new_bsp = block_state::create_transition_block(
-                              *prev,
-                              bspl->block,
-                              protocol_features.get_protocol_feature_set(),
-                              validator_t{}, skip_validate_signee,
-                              bspl->action_mroot_savanna);
-                        prev = new_bsp;
-                     }
-                  }
-                  chain_head = block_handle{ prev }; // apply_l will not execute again after this
-                  {
-                     // If Leap started at a block prior to the IF transition, it needs to provide a default safety
-                     // information for those finalizers that don't already have one. This typically should be done when
-                     // we create the non-legacy fork_db, as from this point we may need to cast votes to participate
-                     // to the IF consensus. See https://github.com/AntelopeIO/leap/issues/2070#issuecomment-1941901836
-                     my_finalizers.set_default_safety_information(
-                        finalizer_safety_information{.last_vote                = prev->make_block_ref(),
-                                                     .lock                     = prev->make_block_ref(),
-                                                     .other_branch_latest_time = block_timestamp_type{} });
-                  }
-               }
-            });
-            block_handle_accessor::apply<void>(chain_head, [&]<typename T>(const T&) {
-               replay_irreversible_block<T>( next );
-            });
+            replay_irreversible_block<block_state_ptr>( next );
             if( check_shutdown() ) {  // needed on every loop for terminate-at-block
                ilog( "quitting from replay_block_log because of shutdown" );
                break;
@@ -1608,7 +1449,6 @@ struct controller_impl {
          wlog("Exception caught while replaying block log: ${e}", ("e", e.what()));
          except_ptr = std::current_exception();
       }
-      transition_legacy_branch.clear(); // not needed after replay
       auto end = fc::time_point::now();
       ilog( "${n} irreversible blocks replayed from block log, chain head ${bn}",
             ("n", 1 + chain_head.block_num() - start_block_num)("bn", chain_head.block_num()) );
@@ -1683,10 +1523,7 @@ struct controller_impl {
       }
 
       auto fork_db_reset_root_to_chain_head = [&]() {
-         block_handle_accessor::apply<void>(chain_head, [&](const auto& head) {
-            if constexpr (std::is_same_v<std::decay_t<decltype(head)>, std::decay_t<decltype(fork_db_.root())>>)
-               fork_db_.reset_root(head);
-         });
+         fork_db_.reset_root(chain_head.internal());
       };
 
       if (startup == startup_t::genesis) {
@@ -2039,18 +1876,7 @@ struct controller_impl {
 
    block_state_pair get_block_state_to_snapshot() const
    {
-       return block_handle_accessor::apply<block_state_pair>(chain_head, overloaded{
-          [&](const block_state_legacy_ptr& head) -> block_state_pair {
-             if (head->header.contains_header_extension(finality_extension::extension_id())) {
-                // During transition to Savanna, we need to build Transition Savanna block
-                // from Savanna Genesis block
-                return { head, get_transition_savanna_block(head) };
-             }
-             return block_state_pair{ head, {} };
-          },
-          [](const block_state_ptr& head) {
-             return block_state_pair{ {}, head };
-          }});
+       return block_state_pair{ {}, chain_head.internal() };
    }
 
    size_t expected_snapshot_row_count() const {
@@ -2141,13 +1967,8 @@ struct controller_impl {
                if (block_state_data.bs_l) {
                   auto legacy_ptr = std::make_shared<block_state_legacy>();
                   static_cast<block_header_state_legacy&>(*legacy_ptr) = block_header_state_legacy(std::move(*block_state_data.bs_l));
-                  chain_head = block_handle{legacy_ptr};
+                  chain_head = block_handle{}; // TODO: update snapshot format for no legacy
                   result.first = std::move(legacy_ptr);
-
-                  // If we have both bs_l and bs, we are during Savanna transition
-                  if (block_state_data.bs) {
-                     chain_head_trans_svnn_block = std::make_shared<block_state>(std::move(*block_state_data.bs));
-                  }
                } else {
                   auto bs_ptr = std::make_shared<block_state>(std::move(*block_state_data.bs));
                   chain_head = block_handle{bs_ptr};
@@ -2167,7 +1988,7 @@ struct controller_impl {
          // -------------------------------------------------
          auto head_header_state = std::make_shared<block_state_legacy>();
          using v3 = snapshot_block_header_state_legacy_v3;
-         // TODO: less tha v3 detected ?
+         // TODO: cleanup, only need to support current version of snapshot
 
          if (std::clamp(header.version, v3::minimum_version, v3::maximum_version) == header.version ) {
             snapshot->read_section("sysio::chain::block_state_legacy", [this,&head_header_state]( auto &section ){
@@ -2178,7 +1999,7 @@ struct controller_impl {
          } else {
             SYS_THROW(snapshot_exception, "Unsupported block_header_state version");
          }
-         chain_head = block_handle{head_header_state};
+         chain_head = block_handle{};
          result.first = head_header_state;
       }
 
@@ -2611,18 +2432,10 @@ struct controller_impl {
                   "db revision is not on par with head block",
                   ("db.revision()", db.revision())("controller_head_block", chain_head.block_num())("fork_db_head_block", fork_db_head().block_num()) );
 
-      block_handle_accessor::apply<void>(chain_head, overloaded{
-                    [&](const block_state_legacy_ptr& head) {
-                       maybe_session session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
-                       pending.emplace(std::move(session), *head, when, confirm_block_count, new_protocol_feature_activations);
-                    },
-                    [&](const block_state_ptr& head) {
-                       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
-                       building_block_input bbi{head->id(), head->timestamp(), when, head->get_producer_for_block_at(when).producer_name,
-                                                new_protocol_feature_activations};
-                       pending.emplace(std::move(session), *head, bbi);
-                    }
-                 });
+      maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
+      building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
+                               new_protocol_feature_activations};
+      pending.emplace(std::move(session), *chain_head.internal(), bbi);
 
       pending->_block_status = s;
       pending->_producer_block_id = producer_block_id;
@@ -2883,8 +2696,7 @@ struct controller_impl {
          auto& cb = std::get<completed_block>(pending->_block_stage);
 
          if (s != controller::block_status::irreversible) {
-            assert(std::holds_alternative<std::decay_t<decltype(fork_db_.root())>>(cb.bsp.internal()));
-            const auto& bsp = std::get<std::decay_t<decltype(fork_db_.root())>>(cb.bsp.internal());
+            const auto& bsp = cb.bsp;
             if( s == controller::block_status::incomplete ) {
                bsp->set_valid(true);
                fork_db_.add( bsp, ignore_duplicate_t::no );
@@ -2899,66 +2711,39 @@ struct controller_impl {
          }
 
          // if an exception is thrown, reset chain_head to prior value
-         fc::scoped_set_value ch(chain_head, cb.bsp);
-
-         if (s == controller::block_status::irreversible && replaying) {
-            block_handle_accessor::apply_l<void>(chain_head, [&](const auto& head) {
-                  assert(!head->block->is_proper_svnn_block());
-                  if (head->block->contains_header_extension(finality_extension::extension_id())) {
-                     assert(transition_legacy_branch.empty() || head->block->previous == transition_legacy_branch.back()->block->calculate_id());
-                     transition_legacy_branch.push_back(head);
-                  }
-               });
-         }
+         fc::scoped_exit ch = fc::make_scoped_exit([org=chain_head, this]() { chain_head = org; });
+         chain_head = block_handle{cb.bsp};
 
          emit( accepted_block, std::tie(chain_head.block(), chain_head.id()), __FILE__, __LINE__ );
 
          if ( s == controller::block_status::incomplete || s == controller::block_status::complete || s == controller::block_status::validated ) {
             if (!irreversible_mode()) {
                log_irreversible();
-               transition_to_savanna_if_needed();
             }
 
             if (!my_finalizers.empty()) {
-               block_handle_accessor::apply_s<void>(chain_head, [&](const auto& head) {
-                  if (head->is_recent() || testing_allow_voting) {
-                     if (async_voting == async_t::no)
-                        create_and_send_vote_msg(head);
-                     else
-                        boost::asio::post(thread_pool.get_executor(), [this, head=head]() {
-                           create_and_send_vote_msg(head); });
+               if (chain_head.internal()->is_recent() || testing_allow_voting) {
+                  if (async_voting == async_t::no) {
+                     create_and_send_vote_msg(chain_head.internal());
+                  } else {
+                     boost::asio::post(thread_pool.get_executor(), [this, head=chain_head]() {
+                        create_and_send_vote_msg(head.internal()); });
                   }
-               });
+               }
             }
          }
 
          if (auto* dm_logger = get_deep_mind_logger(false)) {
-            block_handle_accessor::apply<void>(chain_head,
-                        [&](const block_state_legacy_ptr& head) {
-                           if (head->block->contains_header_extension(finality_extension::extension_id())) {
-                              auto bsp = get_transition_savanna_block(head);
-                              assert(bsp);
-                              assert(bsp->active_finalizer_policy);
-                              dm_logger->on_accepted_block_v2(head->id(), chain_head.irreversible_blocknum(), head->block,
-                                                              bsp->get_finality_data(),
-                                                              bsp->active_proposer_policy,
-                                                              finalizer_policy_with_string_key{*bsp->active_finalizer_policy});
-                           } else {
-                              dm_logger->on_accepted_block(head);
-                           }
-                        },
-                        [&](const block_state_ptr& head) {
-                           assert(head->active_finalizer_policy);
-                           dm_logger->on_accepted_block_v2(head->id(), chain_head.irreversible_blocknum(), head->block,
-                                                           head->get_finality_data(),
-                                                           head->active_proposer_policy,
-                                                           finalizer_policy_with_string_key{*head->active_finalizer_policy});
-                        });
+            assert(chain_head.internal()->active_finalizer_policy);
+            dm_logger->on_accepted_block_v2(chain_head.id(), chain_head.irreversible_blocknum(), chain_head.block(),
+                                            chain_head.internal()->get_finality_data(),
+                                            chain_head.internal()->active_proposer_policy,
+                                            finalizer_policy_with_string_key{*chain_head.internal()->active_finalizer_policy});
          }
 
          log_applied(s);
 
-         ch.dismiss(); // don't reset chain_head if no exception
+         ch.cancel(); // don't reset chain_head if no exception
       } catch (...) {
          // dont bother resetting pending, instead abort the block
          reset_pending_on_exit.cancel();
@@ -3358,7 +3143,7 @@ struct controller_impl {
                bsp->set_trxs_metas( ab.extract_trx_metas(), !skip_auth_checks );
             }
             // create completed_block with the existing block_state as we just verified it is the same as assembled_block
-            pending->_block_stage = completed_block{ block_handle{bsp} };
+            pending->_block_stage = completed_block{ bsp };
 
             commit_block(s);
 
@@ -3390,15 +3175,9 @@ struct controller_impl {
       if (my_finalizers.empty())
          return false;
 
-      return std::visit(
-         overloaded{
-            [&](const block_state_legacy_ptr& bsp) { return false; },
-            [&](const block_state_ptr& bsp) {
-               return bsp->block && bsp->block->is_proper_svnn_block() && my_finalizers.any_of_public_keys([&bsp](const auto& k) {
-                  return bsp->has_voted(k) == vote_status_t::not_voted;
-               });
-            }},
-         bh.internal());
+      return bh.block() && my_finalizers.any_of_public_keys([&bh](const auto& k) {
+         return bh.internal()->has_voted(k) == vote_status_t::not_voted;
+      });
    }
 
    std::optional<finalizer_policy> active_finalizer_policy(const block_id_type& id) const {
@@ -3829,36 +3608,33 @@ struct controller_impl {
             check_protocol_features(timestamp, cur_features, new_features);
          };
 
-         auto do_push = [&](const auto& head) {
-            if constexpr (std::is_same_v<BSP, typename std::decay_t<decltype(head)>>) {
-               std::optional<qc_t> qc = verify_basic_block_invariants({}, b, *head);
+         if constexpr (std::is_same_v<BSP, typename std::decay_t<decltype(chain_head.internal())>>) {
+            std::optional<qc_t> qc = verify_basic_block_invariants({}, b, *chain_head.internal());
 
-               if constexpr (std::is_same_v<typename std::decay_t<BSP>, block_state_ptr>) {
-                  // do basic checks always (excluding signature verification)
-                  if (qc) {
-                     head->verify_qc_basic(*qc);
+            if constexpr (std::is_same_v<typename std::decay_t<BSP>, block_state_ptr>) {
+               // do basic checks always (excluding signature verification)
+               if (qc) {
+                  chain_head.internal()->verify_qc_basic(*qc);
 
-                     if (conf.force_all_checks) {
-                        // verify signatures only if `conf.force_all_checks`
-                        head->verify_qc_signatures(*qc);
-                     }
-                  }
-               }
-
-               BSP bsp = std::make_shared<typename BSP::element_type>(*head, b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
-
-               if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
-                  // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
-                  // So emit it explicitly here.
-                  emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
-
-                  if (!skip_db_sessions(controller::block_status::irreversible)) {
-                     db.commit(bsp->block_num());
+                  if (conf.force_all_checks) {
+                     // verify signatures only if `conf.force_all_checks`
+                     chain_head.internal()->verify_qc_signatures(*qc);
                   }
                }
             }
-         };
-         block_handle_accessor::apply<void>(chain_head, do_push);
+
+            BSP bsp = std::make_shared<typename BSP::element_type>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
+
+            if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
+               // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
+               // So emit it explicitly here.
+               emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
+
+               if (!skip_db_sessions(controller::block_status::irreversible)) {
+                  db.commit(bsp->block_num());
+               }
+            }
+         }
 
       } FC_LOG_AND_RETHROW( )
    }
@@ -3870,7 +3646,6 @@ struct controller_impl {
          }
 
          auto result = log_irreversible();
-         transition_to_savanna_if_needed();
          return result;
       } catch (fc::exception& e) {
          if (e.code() != interrupt_exception::code_value) {
@@ -3893,8 +3668,7 @@ struct controller_impl {
 
       bool switch_fork = !old_head_branch.empty();
       if( switch_fork ) {
-         auto head_fork_comp_str =
-            block_handle_accessor::apply<std::string>(chain_head, [](auto& head) -> std::string { return log_fork_comparison(*head); });
+         auto head_fork_comp_str = log_fork_comparison(*chain_head.internal());
          ilog("switching forks from ${chid} (block number ${chn} ${cp}) ${c} to ${nhid} (block number ${nhn} ${np}) ${n}",
               ("chid", chain_head.id())("chn", chain_head.block_num())("cp", chain_head.producer())
               ("nhid", new_head->id())("nhn", new_head->block_num())("np", new_head->producer())
@@ -4020,7 +3794,6 @@ struct controller_impl {
 
       // irreversible can change even if block not applied to head, integrated qc can move LIB
       log_irreversible();
-      transition_to_savanna_if_needed();
 
       return result;
    }
@@ -4308,22 +4081,7 @@ struct controller_impl {
    }
 
    std::optional<finality_data_t> head_finality_data() const {
-      return block_handle_accessor::apply<std::optional<finality_data_t>>(chain_head, overloaded{
-         [&](const block_state_legacy_ptr& head) -> std::optional<finality_data_t> {
-            // When in Legacy, if it is during transition to Savana, we need to
-            // build finality_data for the corresponding Savanna block
-            if (head->header.contains_header_extension(finality_extension::extension_id())) {
-               // during transition
-               return get_transition_block_finality_data(head);
-            } else {
-               // pre transition
-               return {};
-            }
-         },
-         [](const block_state_ptr& head) {
-            // Returns finality_data from chain_head because we are in Savanna
-            return head->get_finality_data();
-         }});
+      return chain_head.internal()->get_finality_data();
    }
 
    uint32_t earliest_available_block_num() const {
@@ -4884,9 +4642,7 @@ const block_header& controller::head_block_header()const {
 
 block_state_legacy_ptr controller::head_block_state_legacy()const {
    // returns null after instant finality activated
-   return block_handle_accessor::apply_l<block_state_legacy_ptr>(my->chain_head, [](const auto& head) {
-      return head;
-   });
+   return nullptr; // TODO: remove
 }
 
 const signed_block_ptr& controller::head_block()const {
@@ -5179,15 +4935,12 @@ const producer_authority_schedule* controller::pending_producers()const {
 }
 
 finalizer_policy_ptr controller::head_active_finalizer_policy()const {
-   return block_handle_accessor::apply_s<finalizer_policy_ptr>(my->chain_head, [](const auto& head) {
-      return head->active_finalizer_policy;
-   });
+   return my->chain_head.internal()->active_finalizer_policy;
 }
 
 finalizer_policy_ptr controller::head_pending_finalizer_policy()const {
-   return block_handle_accessor::apply_s<finalizer_policy_ptr>(my->chain_head, [](const auto& head) {
-      return (head->pending_finalizer_policy ? head->pending_finalizer_policy->second : nullptr);
-   });
+   const auto& head = my->chain_head.internal();
+   return (head->pending_finalizer_policy ? head->pending_finalizer_policy->second : nullptr);
 }
 
 qc_vote_metrics_t controller::vote_metrics(const block_id_type& id, const qc_t& qc) const {

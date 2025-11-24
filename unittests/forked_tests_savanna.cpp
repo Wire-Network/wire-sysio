@@ -15,12 +15,8 @@ namespace sysio::chain {
 
    struct block_handle_accessor {
       static std::optional<core_info_t> core_info(const block_handle& h)  {
-         return std::visit(
-            overloaded{[](const block_state_legacy_ptr&) -> std::optional<core_info_t> { return {}; },
-                       [](const block_state_ptr& bsp) -> std::optional<core_info_t> {
-                          return core_info_t{bsp->last_final_block_num(), bsp->latest_qc_block_num(), bsp->timestamp()};
-                       }},
-            h.internal());
+         const auto& bsp = h.internal();
+         return core_info_t{bsp->last_final_block_num(), bsp->latest_qc_block_num(), bsp->timestamp()};
       }
    };
 

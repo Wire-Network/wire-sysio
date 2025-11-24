@@ -1,5 +1,4 @@
 #pragma once
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 
 namespace fc { class cfile_datastream; } // forward decl
