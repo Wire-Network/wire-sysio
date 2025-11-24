@@ -279,28 +279,6 @@ struct building_block {
    };
    
    // --------------------------------------------------------------------------------
-   struct building_block_legacy : public building_block_common {
-      pending_block_header_state_legacy          pending_block_header_state;
-      std::optional<producer_authority_schedule> new_pending_producer_schedule;
-
-      building_block_legacy( const block_header_state_legacy& prev,
-                             block_timestamp_type when,
-                             uint16_t num_prev_blocks_to_confirm,
-                             const vector<digest_type>& new_protocol_feature_activations,
-                             action_digests_t::store_which_t store_which)
-         : building_block_common(new_protocol_feature_activations, store_which),
-           pending_block_header_state(prev.next(when, num_prev_blocks_to_confirm))
-      {}
-
-      bool is_protocol_feature_activated(const digest_type& digest) const {
-         return building_block_common::is_protocol_feature_activated(
-            digest, pending_block_header_state.prev_activated_protocol_features->protocol_features);
-      }
-
-      uint32_t get_block_num() const { return pending_block_header_state.block_num; }
-   };
-
-   // --------------------------------------------------------------------------------
    struct building_block_if : public building_block_common {
       const block_state&                         parent;
       const block_timestamp_type                 timestamp;                        // Comes from building_block_input::timestamp
@@ -362,151 +340,79 @@ struct building_block {
 
    };
 
-   std::variant<building_block_legacy, building_block_if> v;
-
-   // legacy constructor
-   building_block(const block_header_state_legacy& prev, block_timestamp_type when, uint16_t num_prev_blocks_to_confirm,
-                  const vector<digest_type>& new_protocol_feature_activations) :
-      v(building_block_legacy(prev, when, num_prev_blocks_to_confirm, new_protocol_feature_activations,
-                              action_digests_t::store_which_t::both)) // [todo] should be both only when transition starts
-   {}
+   building_block_if bb;
 
    // if constructor
    building_block(const block_state& prev, const building_block_input& input) :
-      v(building_block_if(prev, input, action_digests_t::store_which_t::savanna))
+      bb(prev, input, action_digests_t::store_which_t::savanna)
    {}
 
-   template <class R, class F>
-   R apply(F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit(overloaded{[&](building_block_legacy& bb) { std::forward<F>(f)(bb); },
-                               [&](building_block_if& bb)     { std::forward<F>(f)(bb); }}, v);
-      else
-         return std::visit(overloaded{[&](building_block_legacy& bb) -> R { return std::forward<F>(f)(bb); },
-                                      [&](building_block_if& bb)     -> R { return std::forward<F>(f)(bb); }}, v);
-   }
-
-   template <class R, class F, class S>
-   R apply(F&& f, S&& s) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit(overloaded{[&](building_block_legacy& bb) { std::forward<F>(f)(bb); },
-                               [&](building_block_if& bb)     { std::forward<S>(s)(bb); }}, v);
-      else
-         return std::visit(overloaded{[&](building_block_legacy& bb) -> R { return std::forward<F>(f)(bb); },
-                                      [&](building_block_if& bb)     -> R { return std::forward<S>(s)(bb); }}, v);
-   }
-
    deque<transaction_metadata_ptr> extract_trx_metas() {
-      return std::visit([](auto& bb) { return std::move(bb.pending_trx_metas); }, v);
+      return std::move(bb.pending_trx_metas);
    }
 
    bool is_protocol_feature_activated(const digest_type& digest) const {
-      return std::visit([&digest](const auto& bb) { return bb.is_protocol_feature_activated(digest); }, v);
+      return bb.is_protocol_feature_activated(digest);
    }
 
    std::function<void()> make_block_restore_point() {
-      return std::visit([](auto& bb) { return bb.make_block_restore_point(); }, v);
+      return bb.make_block_restore_point();
    }
 
    uint32_t block_num() const {
-      return std::visit([](const auto& bb) { return bb.get_block_num(); }, v);
+      return bb.get_block_num();
    }
 
    block_timestamp_type timestamp() const {
-      return std::visit(
-         overloaded{[](const building_block_legacy& bb)  { return bb.pending_block_header_state.timestamp; },
-                    [](const building_block_if& bb)    { return bb.timestamp; }},
-         v);
+      return bb.timestamp;
    }
 
    account_name producer() const {
-      return std::visit(
-         overloaded{[](const building_block_legacy& bb)  { return bb.pending_block_header_state.producer; },
-                    [](const building_block_if& bb)    { return bb.active_producer_authority.producer_name; }},
-         v);
+      return bb.active_producer_authority.producer_name;
    }
 
    const vector<digest_type>& new_protocol_feature_activations() {
-      return std::visit([](auto& bb) -> const vector<digest_type>& { return bb.new_protocol_feature_activations; }, v);
+      return bb.new_protocol_feature_activations;
    }
 
    const block_signing_authority& pending_block_signing_authority() const {
-      return std::visit(overloaded{[](const building_block_legacy& bb) -> const block_signing_authority& {
-                                      return bb.pending_block_header_state.valid_block_signing_authority;
-                                   },
-                                   [](const building_block_if& bb) -> const block_signing_authority& {
-                                      return bb.active_producer_authority.authority;
-                                   }},
-                        v);
+      return bb.active_producer_authority.authority;
    }
 
    std::optional<uint32_t> get_next_proposer_schedule_version(const std::vector<producer_authority>& producers) const {
-      return std::visit(
-         overloaded{[](const building_block_legacy&) -> std::optional<uint32_t> { return std::nullopt; },
-                    [&](const building_block_if& bb) -> std::optional<uint32_t> {
-                       return bb.get_next_proposer_schedule_version(producers);
-                    }
-         },
-         v);
+      return bb.get_next_proposer_schedule_version(producers);
    }
 
    size_t& num_new_protocol_features_activated() {
-      return std::visit([](auto& bb) -> size_t& { return bb.num_new_protocol_features_that_have_activated; }, v);
+      return bb.num_new_protocol_features_that_have_activated;
    }
 
    deque<transaction_metadata_ptr>& pending_trx_metas() {
-      return std::visit([](auto& bb) -> deque<transaction_metadata_ptr>& { return bb.pending_trx_metas; }, v);
+      return bb.pending_trx_metas;
    }
 
    deque<transaction_receipt>& pending_trx_receipts() {
-      return std::visit([](auto& bb) -> deque<transaction_receipt>& { return bb.pending_trx_receipts; }, v);
+      return bb.pending_trx_receipts;
    }
 
    building_block_common::checksum_or_digests& trx_mroot_or_receipt_digests() {
-      return std::visit(
-         [](auto& bb) -> building_block_common::checksum_or_digests& { return bb.trx_mroot_or_receipt_digests; }, v);
+      return bb.trx_mroot_or_receipt_digests;
    }
 
    action_digests_t& action_receipt_digests() {
-       return std::visit([](auto& bb) -> action_digests_t& { return bb.action_receipt_digests; }, v);
+       return bb.action_receipt_digests;
    }
 
    deque<s_header>& s_headers() {
-      return std::visit([](auto& bb) -> deque<s_header>& { return bb.s_headers; }, v);
+      return bb.s_headers;
    }
 
    const producer_authority_schedule& active_producers() const {
-      return std::visit(overloaded{[](const building_block_legacy& bb) -> const producer_authority_schedule& {
-                                      return bb.pending_block_header_state.active_schedule;
-                                   },
-                                   [](const building_block_if& bb) -> const producer_authority_schedule& {
-                                      return bb.active_proposer_policy->proposer_schedule;
-                                   }},
-                        v);
+      return bb.active_proposer_policy->proposer_schedule;
    }
 
    const producer_authority_schedule* pending_producers() const {
-      return std::visit(overloaded{[](const building_block_legacy& bb) -> const producer_authority_schedule* {
-                                      if (bb.new_pending_producer_schedule)
-                                         return &bb.new_pending_producer_schedule.value();
-                                      return &bb.pending_block_header_state.prev_pending_schedule.schedule;
-                                   },
-                                   [](const building_block_if& bb) -> const producer_authority_schedule* {
-                                      return bb.parent.pending_producers();
-                                   }},
-                        v);
-   }
-
-   const producer_authority_schedule* pending_producers_legacy() const {
-      return std::visit(overloaded{[](const building_block_legacy& bb) -> const producer_authority_schedule* {
-                                      if (bb.new_pending_producer_schedule)
-                                         return &bb.new_pending_producer_schedule.value();
-                                      return &bb.pending_block_header_state.prev_pending_schedule.schedule;
-                                   },
-                                   [](const building_block_if&) -> const producer_authority_schedule* {
-                                      return nullptr;
-                                   }},
-                        v);
+      return bb.parent.pending_producers();
    }
 
    qc_data_t get_qc_data(fork_database_t& fork_db, const block_state& parent) {
@@ -544,117 +450,84 @@ struct building_block {
                                   std::optional<qc_data_t> validating_qc_data,
                                   const block_state_ptr& validating_bsp) {
       auto& action_receipts = action_receipt_digests();
-      return std::visit(
-         overloaded{
-            [&](building_block_legacy& bb) -> assembled_block {
-               // compute the action_mroot and transaction_mroot
-               auto [transaction_mroot, action_mroot] = std::visit(
-                  overloaded{[&](digests_t& trx_receipts) { // calculate the two merkle roots in separate threads
-                                auto trx_merkle_fut =
-                                   post_async_task(ioc, [&]() { return calculate_merkle_legacy(std::move(trx_receipts)); });
-                                auto action_merkle_fut =
-                                   post_async_task(ioc, [&]() { return calculate_merkle_legacy(std::move(*action_receipts.digests_l)); });
-                                return std::make_pair(trx_merkle_fut.get(), action_merkle_fut.get());
-                             },
-                             [&](const checksum256_type& trx_checksum) {
-                                return std::make_pair(trx_checksum, calculate_merkle_legacy(std::move(*action_receipts.digests_l)));
-                             }},
-                  trx_mroot_or_receipt_digests());
+      // compute the action_mroot and transaction_mroot
+      auto [transaction_mroot, action_mroot] = std::visit(
+         overloaded{[&](digests_t& trx_receipts) {
+                       // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
+                       return std::make_pair(calculate_merkle(trx_receipts),
+                                             calculate_merkle(*action_receipts.digests_s));
+                    },
+                    [&](const checksum256_type& trx_checksum) {
+                       return std::make_pair(trx_checksum,
+                                             calculate_merkle(*action_receipts.digests_s));
+                    }},
+         trx_mroot_or_receipt_digests());
 
-               if (validating_qc_data) {
-                  bb.pending_block_header_state.qc_claim = validating_qc_data->qc_claim;
-               }
+      qc_data_t qc_data;
+      digest_type finality_mroot_claim;
 
-               // in dpos, we create a signed_block here. In IF mode, we do it later (when we are ready to sign it)
-               auto block_ptr = signed_block::create_mutable_block(bb.pending_block_header_state.make_block_header(
-                  transaction_mroot, action_mroot, bb.new_pending_producer_schedule, std::move(new_finalizer_policy),
-                  vector<digest_type>(bb.new_protocol_feature_activations), pfs, bb.s_headers));
+      if (validating) {
+         // we are simulating a block received from the network. Use the embedded qc from the block
+         assert(validating_qc_data);
+         qc_data = *validating_qc_data;
 
-               block_ptr->transactions = std::move(bb.pending_trx_receipts);
+         assert(validating_bsp);
+         // Use the action_mroot from raceived block's header for
+         // finality_mroot_claim at the first stage such that the next
+         // block's header and block id can be built. The actual
+         // finality_mroot will be validated by apply_block at the
+         // second stage
+         finality_mroot_claim = validating_bsp->header.action_mroot;
+      } else {
+         qc_data = get_qc_data(fork_db, bb.parent);;
+         finality_mroot_claim = bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
+      }
 
-               return assembled_block{}; // TODO remove
-            },
-            [&](building_block_if& bb) -> assembled_block {
-               // compute the action_mroot and transaction_mroot
-               auto [transaction_mroot, action_mroot] = std::visit(
-                  overloaded{[&](digests_t& trx_receipts) {
-                                // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
-                                return std::make_pair(calculate_merkle(trx_receipts),
-                                                      calculate_merkle(*action_receipts.digests_s));
-                             },
-                             [&](const checksum256_type& trx_checksum) {
-                                return std::make_pair(trx_checksum,
-                                                      calculate_merkle(*action_receipts.digests_s));
-                             }},
-                  trx_mroot_or_receipt_digests());
+      building_block_input bb_input {
+         .parent_id = bb.parent.id(),
+         .parent_timestamp = bb.parent.timestamp(),
+         .timestamp = timestamp(),
+         .producer  = producer(),
+         .new_protocol_feature_activations = new_protocol_feature_activations()
+      };
 
-               qc_data_t qc_data;
-               digest_type finality_mroot_claim;
+      block_header_state_input bhs_input{
+         bb_input,
+         transaction_mroot,
+         std::move(new_proposer_policy),
+         std::move(new_finalizer_policy),
+         qc_data.qc_claim,
+         finality_mroot_claim,
+         std::move(bb.s_headers)
+      };
 
-               if (validating) {
-                  // we are simulating a block received from the network. Use the embedded qc from the block
-                  assert(validating_qc_data);
-                  qc_data = *validating_qc_data;
+      auto bhs = bb.parent.next(bhs_input);
 
-                  assert(validating_bsp);
-                  // Use the action_mroot from raceived block's header for
-                  // finality_mroot_claim at the first stage such that the next
-                  // block's header and block id can be built. The actual
-                  // finality_mroot will be validated by apply_block at the
-                  // second stage
-                  finality_mroot_claim = validating_bsp->header.action_mroot;
-               } else {
-                  qc_data = get_qc_data(fork_db, bb.parent);;
-                  finality_mroot_claim = bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
-               }
+      std::optional<valid_t> valid; // used for producing
 
-               building_block_input bb_input {
-                  .parent_id = bb.parent.id(),
-                  .parent_timestamp = bb.parent.timestamp(),
-                  .timestamp = timestamp(),
-                  .producer  = producer(),
-                  .new_protocol_feature_activations = new_protocol_feature_activations()
-               };
+      if (validating) {
+         // Create the valid structure for validating_bsp if it does not
+         // have one.
+         if (!validating_bsp->valid) {
+            validating_bsp->valid = bb.parent.new_valid(bhs, action_mroot, validating_bsp->strong_digest);
+            validating_bsp->action_mroot = action_mroot; // caching for constructing finality_data. Only needed when block is commited.
+         }
+      } else {
+         // Create the valid structure for producing
+         valid = bb.parent.new_valid(bhs, action_mroot, bhs.compute_finality_digest());
+      }
 
-               block_header_state_input bhs_input{
-                  bb_input,
-                  transaction_mroot,
-                  std::move(new_proposer_policy),
-                  std::move(new_finalizer_policy),
-                  qc_data.qc_claim,
-                  finality_mroot_claim,
-                  std::move(bb.s_headers)
-               };
+      assembled_block::assembled_block_if ab{
+         bb.active_producer_authority,
+         std::move(bhs),
+         std::move(bb.pending_trx_metas),
+         std::move(bb.pending_trx_receipts),
+         std::move(valid),
+         std::move(qc_data.qc),
+         action_mroot // caching for constructing finality_data.
+      };
 
-               auto bhs = bb.parent.next(bhs_input);
-
-               std::optional<valid_t> valid; // used for producing
-
-               if (validating) {
-                  // Create the valid structure for validating_bsp if it does not
-                  // have one.
-                  if (!validating_bsp->valid) {
-                     validating_bsp->valid = bb.parent.new_valid(bhs, action_mroot, validating_bsp->strong_digest);
-                     validating_bsp->action_mroot = action_mroot; // caching for constructing finality_data. Only needed when block is commited.
-                  }
-               } else {
-                  // Create the valid structure for producing
-                  valid = bb.parent.new_valid(bhs, action_mroot, bhs.compute_finality_digest());
-               }
-
-               assembled_block::assembled_block_if ab{
-                  bb.active_producer_authority,
-                  std::move(bhs),
-                  std::move(bb.pending_trx_metas),
-                  std::move(bb.pending_trx_receipts),
-                  std::move(valid),
-                  std::move(qc_data.qc),
-                  action_mroot // caching for constructing finality_data.
-               };
-
-               return assembled_block{.ab = std::move(ab)};
-            }},
-         v);
+      return assembled_block{.ab = std::move(ab)};
    }
 };
 
@@ -674,16 +547,6 @@ struct pending_state {
    controller::block_status       _block_status = controller::block_status::ephemeral;
    std::optional<block_id_type>   _producer_block_id;
    block_report                   _block_report;
-
-   // Legacy
-   pending_state(maybe_session&& s,
-                 const block_header_state_legacy& prev,
-                 block_timestamp_type when,
-                 uint16_t num_prev_blocks_to_confirm,
-                 const vector<digest_type>& new_protocol_feature_activations)
-   :_db_session(std::move(s))
-   ,_block_stage(building_block(prev, when, num_prev_blocks_to_confirm, new_protocol_feature_activations))
-   {}
 
    // Savanna
    pending_state(maybe_session&& s,
@@ -2495,33 +2358,21 @@ struct controller_impl {
          // Any proposer policy or finalizer policy?
          std::optional<finalizer_policy> new_finalizer_policy;
          std::optional<proposer_policy> new_proposer_policy;
-         bb.apply<void>(
-            overloaded{
-               [&](building_block::building_block_legacy& bb) -> void {
-                  // Make sure new_finalizer_policy is set only once in Legacy
-                  if (bb.trx_blk_context.proposed_fin_pol_block_num && !bb.pending_block_header_state.savanna_transition_block()) {
-                     new_finalizer_policy = std::move(bb.trx_blk_context.proposed_fin_pol);
-                     new_finalizer_policy->generation = 1;
-                  }
-               },
-               [&](building_block::building_block_if& bb) -> void {
-                  if (bb.trx_blk_context.proposed_fin_pol_block_num) {
-                     new_finalizer_policy = std::move(bb.trx_blk_context.proposed_fin_pol);
-                     new_finalizer_policy->generation = bb.parent.finalizer_policy_generation + 1;
-                  }
-                  if (bb.trx_blk_context.proposed_schedule_block_num) {
-                     std::optional<uint32_t> version = pending->get_next_proposer_schedule_version(bb.trx_blk_context.proposed_schedule.producers);
-                     if (version) {
-                        new_proposer_policy.emplace();
-                        new_proposer_policy->proposal_time     = bb.timestamp;
-                        new_proposer_policy->proposer_schedule = std::move(bb.trx_blk_context.proposed_schedule);
-                        new_proposer_policy->proposer_schedule.version = *version;
-                        ilog("Scheduling proposer schedule ${s}, proposed at: ${t}",
-                             ("s", new_proposer_policy->proposer_schedule)("t", new_proposer_policy->proposal_time));
-                     }
-                  }
-               }
-            });
+         if (bb.bb.trx_blk_context.proposed_fin_pol_block_num) {
+            new_finalizer_policy = std::move(bb.bb.trx_blk_context.proposed_fin_pol);
+            new_finalizer_policy->generation = bb.bb.parent.finalizer_policy_generation + 1;
+         }
+         if (bb.bb.trx_blk_context.proposed_schedule_block_num) {
+            std::optional<uint32_t> version = pending->get_next_proposer_schedule_version(bb.bb.trx_blk_context.proposed_schedule.producers);
+            if (version) {
+               new_proposer_policy.emplace();
+               new_proposer_policy->proposal_time     = bb.bb.timestamp;
+               new_proposer_policy->proposer_schedule = std::move(bb.bb.trx_blk_context.proposed_schedule);
+               new_proposer_policy->proposer_schedule.version = *version;
+               ilog("Scheduling proposer schedule ${s}, proposed at: ${t}",
+                    ("s", new_proposer_policy->proposer_schedule)("t", new_proposer_policy->proposal_time));
+            }
+         }
 
          auto assembled_block =
             bb.assemble_block(thread_pool.get_executor(),
@@ -2672,9 +2523,7 @@ struct controller_impl {
 
       // Savanna uses new algorithm for proposer schedule change
 
-      bb.apply<void>([&](auto& b) {
-         b.trx_blk_context.apply(std::move(trx_blk_context));
-      });
+      bb.bb.trx_blk_context.apply(std::move(trx_blk_context));
    }
 
    /**
@@ -4643,13 +4492,7 @@ bool controller::is_writing_snapshot() const {
 int64_t controller::set_proposed_producers( transaction_context& trx_context, vector<producer_authority> producers ) {
    assert(my->pending);
    assert(std::holds_alternative<building_block>(my->pending->_block_stage));
-   auto& bb = std::get<building_block>(my->pending->_block_stage);
-   return bb.apply<int64_t>([&](building_block::building_block_legacy&) {
-                               return 0; // TODO: remove
-                            },
-                            [&](building_block::building_block_if&) {
-                               return trx_context.set_proposed_producers(std::move(producers));
-                            });
+   return trx_context.set_proposed_producers(std::move(producers));
 }
 
 void controller::apply_trx_block_context(trx_block_context& trx_blk_context) {
