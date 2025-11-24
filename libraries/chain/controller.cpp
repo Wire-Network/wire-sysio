@@ -984,8 +984,6 @@ struct controller_impl {
                                       return fork_db_.get_block(id);
                                    }};
 
-   int64_t set_proposed_producers_legacy( vector<producer_authority> producers );
-
    protocol_feature_activation_set_ptr head_activated_protocol_features() const {
       return chain_head.internal()->get_activated_protocol_features();
    }
@@ -2517,35 +2515,6 @@ struct controller_impl {
 
          const auto& gpo = db.get<global_property_object>();
 
-         // instant finality uses alternative method for changing producer schedule
-         bb.apply_l<void>([&](building_block::building_block_legacy& bb_legacy) {
-            pending_block_header_state_legacy& pbhs = bb_legacy.pending_block_header_state;
-
-            if( gpo.proposed_schedule_block_num && // if there is a proposed schedule that was proposed in a block ...
-                ( *gpo.proposed_schedule_block_num <= pbhs.dpos_irreversible_blocknum ) && // ... that has now become irreversible ...
-                pbhs.prev_pending_schedule.schedule.producers.size() == 0 // ... and there was room for a new pending schedule prior to any possible promotion
-               )
-            {
-               SYS_ASSERT( gpo.proposed_schedule.version == pbhs.active_schedule_version + 1,
-                           producer_schedule_exception, "wrong producer schedule version specified" );
-
-               // Promote proposed schedule to pending schedule.
-               bb_legacy.new_pending_producer_schedule = producer_authority_schedule::from_shared(gpo.proposed_schedule);
-
-               if( !replaying ) {
-                  ilog( "promoting proposed schedule (set in block ${proposed_num}) to pending; current block: ${n} lib: ${lib} schedule: ${schedule} ",
-                        ("proposed_num", *gpo.proposed_schedule_block_num)("n", pbhs.block_num)
-                        ("lib", pbhs.dpos_irreversible_blocknum)("schedule", bb_legacy.new_pending_producer_schedule ) );
-               }
-
-               db.modify( gpo, [&]( auto& gp ) {
-                  gp.proposed_schedule_block_num = std::optional<block_num_type>();
-                  gp.proposed_schedule.version=0;
-                  gp.proposed_schedule.producers.clear();
-               });
-            }
-         });
-
          try {
             transaction_metadata_ptr onbtrx =
                   transaction_metadata::create_no_recover_keys( std::make_shared<packed_transaction>( get_on_block_transaction() ),
@@ -2814,21 +2783,6 @@ struct controller_impl {
       auto& bb = std::get<building_block>(pending->_block_stage);
 
       // Savanna uses new algorithm for proposer schedule change
-      // Prevent any in-flight legacy proposer schedule changes when finalizers are first proposed
-      if (trx_blk_context.proposed_fin_pol_block_num) {
-         bb.apply_l<void>([&](building_block::building_block_legacy& bl) {
-            const auto& gpo = db.get<global_property_object>();
-            if (gpo.proposed_schedule_block_num) {
-               db.modify(gpo, [&](auto& gp) {
-                  gp.proposed_schedule_block_num = std::optional<block_num_type>();
-                  gp.proposed_schedule.version   = 0;
-                  gp.proposed_schedule.producers.clear();
-               });
-            }
-            bl.new_pending_producer_schedule = {};
-            bl.pending_block_header_state.prev_pending_schedule.schedule.producers.clear();
-         });
-      }
 
       bb.apply<void>([&](auto& b) {
          b.trx_blk_context.apply(std::move(trx_blk_context));
@@ -3236,6 +3190,9 @@ struct controller_impl {
                                                              const block_state& prev ) {
       assert(b->is_proper_svnn_block());
 
+      if (prev.block_num() <= 1u)
+         return std::nullopt;
+
       auto qc_ext_id = quorum_certificate_extension::extension_id();
       auto f_ext_id  = finality_extension::extension_id();
 
@@ -3457,7 +3414,7 @@ struct controller_impl {
       constexpr bool is_proper_savanna_block = std::is_same_v<typename std::decay_t<BS>, block_state>;
       assert(is_proper_savanna_block == b->is_proper_svnn_block());
 
-      std::optional<qc_t> qc = prev.block_num() > 1u ? verify_basic_block_invariants(id, b, prev) : std::nullopt;
+      std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
       if constexpr (is_proper_savanna_block) {
          if (qc) {
@@ -4813,77 +4770,11 @@ int64_t controller::set_proposed_producers( transaction_context& trx_context, ve
    assert(std::holds_alternative<building_block>(my->pending->_block_stage));
    auto& bb = std::get<building_block>(my->pending->_block_stage);
    return bb.apply<int64_t>([&](building_block::building_block_legacy&) {
-                               return my->set_proposed_producers_legacy(std::move(producers));
+                               return 0; // TODO: remove
                             },
                             [&](building_block::building_block_if&) {
                                return trx_context.set_proposed_producers(std::move(producers));
                             });
-}
-
-int64_t controller_impl::set_proposed_producers_legacy( vector<producer_authority> producers ) {
-   SYS_ASSERT(producers.size() <= config::max_producers, wasm_execution_error,
-              "Producer schedule exceeds the maximum producer count for this chain");
-   const auto& gpo = db.get<global_property_object>();
-   auto cur_block_num = chain_head.block_num() + 1;
-
-   if( producers.size() == 0 ) {
-      return -1;
-   }
-
-   if( gpo.proposed_schedule_block_num ) {
-      if( *gpo.proposed_schedule_block_num != cur_block_num )
-         return -1; // there is already a proposed schedule set in a previous block, wait for it to become pending
-
-      if( std::equal( producers.begin(), producers.end(),
-                      gpo.proposed_schedule.producers.begin(), gpo.proposed_schedule.producers.end() ) )
-         return -1; // the proposed producer schedule does not change
-   }
-
-   producer_authority_schedule sch;
-
-   decltype(sch.producers.cend()) end;
-   decltype(end)                  begin;
-
-   const auto* pending_sch = pending_producers_legacy();
-   assert(pending_sch); // can't be null during dpos
-
-   if( pending_sch->producers.size() == 0 ) {
-      const auto& active_sch = active_producers();
-      begin = active_sch.producers.begin();
-      end   = active_sch.producers.end();
-      sch.version = active_sch.version + 1;
-   } else {
-      begin = pending_sch->producers.begin();
-      end   = pending_sch->producers.end();
-      sch.version = pending_sch->version + 1;
-   }
-
-   if( std::equal( producers.begin(), producers.end(), begin, end ) )
-      return -1; // the producer schedule would not change
-
-   // ignore proposed producers during transition
-   assert(pending);
-   auto& bb = std::get<building_block>(pending->_block_stage);
-   bool transition_block = bb.apply_l<bool>([&](building_block::building_block_legacy& bl) {
-      // The check for if there is a finalizer policy set is required because
-      // savanna_transition_block() is set in assemble_block so it is not set
-      // for the if genesis block.
-      return bl.pending_block_header_state.savanna_transition_block() || bl.trx_blk_context.proposed_fin_pol_block_num.has_value();
-   });
-   if (transition_block)
-      return -1;
-
-   sch.producers = std::move(producers);
-
-   int64_t version = sch.version;
-
-   ilog( "proposed producer schedule with version ${v}", ("v", version) );
-
-   db.modify( gpo, [&]( auto& gp ) {
-      gp.proposed_schedule_block_num = cur_block_num;
-      gp.proposed_schedule = sch;
-   });
-   return version;
 }
 
 void controller::apply_trx_block_context(trx_block_context& trx_blk_context) {
@@ -4913,18 +4804,6 @@ const producer_authority_schedule& controller::head_active_producers(block_times
 
 const producer_authority_schedule& controller::head_active_producers()const {
    return my->head_active_schedule_auth();
-}
-
-const producer_authority_schedule* controller::pending_producers_legacy()const {
-   return my->pending_producers_legacy();
-}
-
-std::optional<producer_authority_schedule> controller::proposed_producers_legacy()const {
-   const auto& gpo = get_global_properties();
-   if( !gpo.proposed_schedule_block_num )
-      return std::optional<producer_authority_schedule>();
-
-   return producer_authority_schedule::from_shared(gpo.proposed_schedule);
 }
 
 const producer_authority_schedule* controller::pending_producers()const {
@@ -5238,13 +5117,6 @@ std::optional<chain_id_type> controller::extract_chain_id_from_db( const path& s
 
 void controller::replace_producer_keys( const public_key_type& key ) {
    ilog("Replace producer keys with ${k}", ("k", key));
-   // can be done even after instant-finality, will be no-op then
-   mutable_db().modify( db().get<global_property_object>(), [&]( auto& gp ) {
-      gp.proposed_schedule_block_num = {};
-      gp.proposed_schedule.version = 0;
-      gp.proposed_schedule.producers.clear();
-   });
-
    my->replace_producer_keys(key);
 }
 

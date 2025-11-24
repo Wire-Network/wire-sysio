@@ -1814,9 +1814,6 @@ read_only::get_producer_schedule_result read_only::get_producer_schedule( const 
    to_variant(db.active_producers(), result.active);
    if (const auto* pending = db.pending_producers())
       to_variant(*pending, result.pending);
-   auto proposed = db.proposed_producers_legacy(); // empty for savanna
-   if(proposed && !proposed->producers.empty())
-      to_variant(*proposed, result.proposed);
    return result;
 }
 

@@ -509,7 +509,6 @@ public:
    struct get_producer_schedule_result {
       fc::variant active;
       fc::variant pending;
-      fc::variant proposed;
    };
 
    get_producer_schedule_result get_producer_schedule( const get_producer_schedule_params& params, const fc::time_point& deadline )const;
@@ -1028,7 +1027,7 @@ FC_REFLECT( sysio::chain_apis::read_only::get_producers_params, (json)(lower_bou
 FC_REFLECT( sysio::chain_apis::read_only::get_producers_result, (rows)(total_producer_vote_weight)(more) );
 
 FC_REFLECT_EMPTY( sysio::chain_apis::read_only::get_producer_schedule_params )
-FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)(pending)(proposed) );
+FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)(pending) );
 
 FC_REFLECT( sysio::chain_apis::read_only::account_resource_info, (used)(available)(max)(last_usage_update_time)(current_used) )
 FC_REFLECT( sysio::chain_apis::read_only::get_account_results,

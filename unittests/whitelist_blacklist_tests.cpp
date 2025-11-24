@@ -424,7 +424,6 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       ("cpu_weight", 249'999'999)
    );
 
-   const int64_t reqauth_net_charge = 120;
    auto push_reqauth = [&]( name acnt, name perm, uint32_t billed_cpu_time_us ) {
       signed_transaction trx;
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,

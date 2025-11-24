@@ -320,13 +320,8 @@ namespace sysio::chain {
          // is preferred.
          const producer_authority_schedule&         active_producers()const;
          const producer_authority_schedule&         head_active_producers()const;
-         // pending for pre-instant-finality, next proposed that will take affect, null if none are pending/proposed
+         // next proposed that will take affect, null if none are proposed
          const producer_authority_schedule*         pending_producers()const;
-         // post-instant-finality this always returns empty std::optional
-         std::optional<producer_authority_schedule> proposed_producers_legacy()const;
-         // pre-instant-finality this always returns a valid producer_authority_schedule
-         // post-instant-finality this always returns nullptr
-         const producer_authority_schedule*         pending_producers_legacy()const;
 
          finalizer_policy_ptr   head_active_finalizer_policy()const; // returns nullptr pre-savanna
          finalizer_policy_ptr   head_pending_finalizer_policy()const; // returns nullptr pre-savanna
