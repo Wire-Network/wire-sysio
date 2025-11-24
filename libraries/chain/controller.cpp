@@ -145,11 +145,6 @@ struct completed_block {
       return bsp->pending_producers();
    }
 
-   const producer_authority_schedule* pending_producers_legacy() const {
-      assert(false);
-      return nullptr; // TODO: remove
-   }
-
    bool is_protocol_feature_activated(const digest_type& digest) const {
       const auto& activated_features = get_activated_protocol_features();
       return (activated_features.find(digest) != activated_features.end());
@@ -163,21 +158,6 @@ struct completed_block {
 };
 
 struct assembled_block {
-   // --------------------------------------------------------------------------------
-   struct assembled_block_legacy {
-      block_id_type                     id;
-      pending_block_header_state_legacy pending_block_header_state;
-      deque<transaction_metadata_ptr>   trx_metas;
-      mutable_block_ptr                 unsigned_block;
-
-      // if the unsigned_block pre-dates block-signing authorities this may be present.
-      std::optional<producer_authority_schedule> new_producer_authority_cache;
-
-      // Passed to completed_block, to be used by Legacy to Savanna transisition
-      std::optional<digests_t>          action_receipt_digests_savanna;
-   };
-
-   // --------------------------------------------------------------------------------
    struct assembled_block_if {
       producer_authority                active_producer_authority; 
       block_header_state                bhs;
@@ -191,20 +171,10 @@ struct assembled_block {
       block_header_state& get_bhs() { return bhs; }
    };
 
-   std::variant<assembled_block_legacy, assembled_block_if> v;
-
-   template <class R, class F>
-   R apply_legacy(F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit(overloaded{[&](assembled_block_legacy& ab) { std::forward<F>(f)(ab); },
-                               [&](assembled_block_if& ab)     {}}, v);
-      else
-         return std::visit(overloaded{[&](assembled_block_legacy& ab) -> R { return std::forward<F>(f)(ab); },
-                                      [&](assembled_block_if& ab)     -> R { return {}; }}, v);
-   }
+   assembled_block_if ab;
 
    deque<transaction_metadata_ptr> extract_trx_metas() {
-      return std::visit([](auto& ab) { return std::move(ab.trx_metas); }, v);
+      return std::move(ab.trx_metas);
    }
 
    bool is_protocol_feature_activated(const digest_type& digest) const {
@@ -217,102 +187,43 @@ struct assembled_block {
    }
 
    const block_id_type& id() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) -> const block_id_type& { return ab.id; },
-                    [](const assembled_block_if& ab)     -> const block_id_type& { return ab.bhs.id(); }},
-         v);
+      return ab.bhs.id();
    }
    
    block_timestamp_type timestamp() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) { return ab.pending_block_header_state.timestamp; },
-                    [](const assembled_block_if& ab)     { return ab.bhs.header.timestamp; }},
-         v);
+      return ab.bhs.header.timestamp;
    }
 
    uint32_t block_num() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) { return ab.pending_block_header_state.block_num; },
-                    [](const assembled_block_if& ab)     { return ab.bhs.block_num(); }},
-         v);
+      return ab.bhs.block_num();
    }
 
    account_name producer() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) { return ab.pending_block_header_state.producer; },
-                    [](const assembled_block_if& ab)     { return ab.active_producer_authority.producer_name; }},
-         v);
+      return ab.active_producer_authority.producer_name;
    }
 
    const block_header& header() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) -> const block_header& { return *ab.unsigned_block; },
-                    [](const assembled_block_if& ab)     -> const block_header& { return ab.bhs.header; }},
-         v);
+      return ab.bhs.header;
    }
 
    const producer_authority_schedule& active_producers() const {
-      return std::visit(overloaded{[](const assembled_block_legacy& ab) -> const producer_authority_schedule& {
-                                      return ab.pending_block_header_state.active_schedule;
-                                   },
-                                   [](const assembled_block_if& ab) -> const producer_authority_schedule& {
-                                      return ab.bhs.active_schedule_auth();
-                                   }},
-                        v);
-   }
-
-   std::optional<digests_t> get_action_receipt_digests_savanna() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) -> std::optional<digests_t> { return ab.action_receipt_digests_savanna; },
-                    [](const assembled_block_if& ab)     -> std::optional<digests_t> { return {}; }},
-         v);
+      return ab.bhs.active_schedule_auth();
    }
 
    const producer_authority_schedule* pending_producers() const {
-      return std::visit(overloaded{[](const assembled_block_legacy& ab) -> const producer_authority_schedule* {
-                                      return ab.new_producer_authority_cache.has_value()
-                                                ? &ab.new_producer_authority_cache.value()
-                                                : nullptr;
-                                   },
-                                   [](const assembled_block_if& ab) -> const producer_authority_schedule* {
-                                      return ab.bhs.pending_producers();
-                                   }},
-                        v);
-   }
-
-   const producer_authority_schedule* pending_producers_legacy() const {
-      return std::visit(
-         overloaded{[](const assembled_block_legacy& ab) -> const producer_authority_schedule* {
-                       return ab.new_producer_authority_cache.has_value() ? &ab.new_producer_authority_cache.value()
-                                                                          : nullptr;
-                    },
-                    [](const assembled_block_if&) -> const producer_authority_schedule* { return nullptr; }},
-         v);
+      return ab.bhs.pending_producers();
    }
 
    const block_signing_authority& pending_block_signing_authority() const {
-      return std::visit(overloaded{[](const assembled_block_legacy& ab) -> const block_signing_authority& {
-                                      return ab.pending_block_header_state.valid_block_signing_authority;
-                                   },
-                                   [](const assembled_block_if& ab) -> const block_signing_authority& {
-                                      return ab.active_producer_authority.authority;
-                                   }},
-                        v);
+      return ab.active_producer_authority.authority;
    }
 
    completed_block complete_block(const protocol_feature_set& pfs, validator_t validator,
                                   const signer_callback_type& signer, const block_signing_authority& valid_block_signing_authority) {
-      return std::visit(overloaded{[&](assembled_block_legacy& ab) {
-                                      assert(false);
-                                      return completed_block{};
-                                   },
-                                   [&](assembled_block_if& ab) {
-                                      auto bsp = std::make_shared<block_state>(ab.bhs, std::move(ab.trx_metas),
-                                                                               std::move(ab.trx_receipts), ab.valid, ab.qc, signer,
-                                                                               valid_block_signing_authority, ab.action_mroot);
-                                      return completed_block{std::move(bsp)};
-                                   }},
-                        v);
+      auto bsp = std::make_shared<block_state>(ab.bhs, std::move(ab.trx_metas),
+                                               std::move(ab.trx_receipts), ab.valid, ab.qc, signer,
+                                               valid_block_signing_authority, ab.action_mroot);
+      return completed_block{std::move(bsp)};
    }
 };
 
@@ -464,17 +375,6 @@ struct building_block {
    building_block(const block_state& prev, const building_block_input& input) :
       v(building_block_if(prev, input, action_digests_t::store_which_t::savanna))
    {}
-
-   // apply legacy, building_block_legacy
-   template <class R, class F>
-   R apply_l(F&& f) {
-      if constexpr (std::is_same_v<void, R>)
-         std::visit(overloaded{[&](building_block_legacy& bb) { std::forward<F>(f)(bb); },
-                               [&](building_block_if&)        {}}, v);
-      else
-         return std::visit(overloaded{[&](building_block_legacy& bb) -> R { return std::forward<F>(f)(bb); },
-                                      [&](building_block_if&)        -> R { return {}; }}, v);
-   }
 
    template <class R, class F>
    R apply(F&& f) {
@@ -672,13 +572,7 @@ struct building_block {
 
                block_ptr->transactions = std::move(bb.pending_trx_receipts);
 
-               return assembled_block{
-                  .v = assembled_block::assembled_block_legacy{block_ptr->calculate_id(),
-                                                             std::move(bb.pending_block_header_state),
-                                                             std::move(bb.pending_trx_metas), std::move(block_ptr),
-                                                             std::move(bb.new_pending_producer_schedule),
-                                                             std::move(bb.action_receipt_digests.digests_s)}
-               };
+               return assembled_block{}; // TODO remove
             },
             [&](building_block_if& bb) -> assembled_block {
                // compute the action_mroot and transaction_mroot
@@ -758,7 +652,7 @@ struct building_block {
                   action_mroot // caching for constructing finality_data.
                };
 
-               return assembled_block{.v = std::move(ab)};
+               return assembled_block{.ab = std::move(ab)};
             }},
          v);
    }
@@ -832,12 +726,6 @@ struct pending_state {
    const producer_authority_schedule& active_producers() const {
       return std::visit(
          [](const auto& stage) -> const producer_authority_schedule& { return stage.active_producers(); },
-         _block_stage);
-   }
-
-   const producer_authority_schedule* pending_producers_legacy() const {
-      return std::visit(
-         [](const auto& stage) -> const producer_authority_schedule* { return stage.pending_producers_legacy(); },
          _block_stage);
    }
 
@@ -3034,12 +2922,6 @@ struct controller_impl {
                   ("r", bsp->finality_mroot())("a", actual_finality_mroot)("bn", bsp->block_num())("id", bsp->id()));
             } else {
                assemble_block(true, {}, nullptr);
-               auto& ab = std::get<assembled_block>(pending->_block_stage);
-               ab.apply_legacy<void>([&](assembled_block::assembled_block_legacy& abl) {
-                  assert(abl.action_receipt_digests_savanna);
-                  const auto& digests = *abl.action_receipt_digests_savanna;
-                  bsp->action_mroot_savanna = calculate_merkle(digests);
-               });
             }
             auto& ab = std::get<assembled_block>(pending->_block_stage);
 
@@ -4207,13 +4089,6 @@ struct controller_impl {
          return head_active_schedule_auth();
 
       return pending->active_producers();
-   }
-
-   const producer_authority_schedule* pending_producers_legacy()const {
-      if( !(pending) )
-         return head_pending_schedule_auth_legacy();
-
-      return pending->pending_producers_legacy();
    }
 
 }; /// controller_impl
