@@ -107,7 +107,9 @@ namespace sysio::chain {
    {}
 
    template<class BSP>
-   fork_database_type<BSP>::~fork_database_type() = default; // close is performed in fork_database::~fork_database()
+   fork_database_type<BSP>::~fork_database_type() {
+      close();
+   }
 
    template<class BSP>
    void fork_database_type<BSP>::open( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator ) {
@@ -706,6 +708,11 @@ namespace sysio::chain {
    template<class BSP>
    void fork_database_type<BSP>::close() {
       auto fork_db_file {my->data_dir / config::fork_db_filename};
+
+      if (!is_valid()) {
+         ilog("No fork_database to persist");
+         return;
+      }
 
       ilog("Persisting to fork_database file: ${f}", ("f", fork_db_file));
       std::ofstream out( fork_db_file.generic_string().c_str(), std::ios::out | std::ios::binary | std::ofstream::trunc );
