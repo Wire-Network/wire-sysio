@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
    std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
    BOOST_TEST(!!fin_policy_diff);
    BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == num_finalizers);
-   BOOST_TEST(fin_policy_diff->generation == 1);
+   BOOST_TEST(fin_policy_diff->generation == 2);
    // same as reference-contracts/.../contracts/sysio.system/src/finalizer_key.cpp#L73
    BOOST_TEST(fin_policy_diff->threshold == (num_finalizers * 2) / 3 + 1);
    block_id_type if_genesis_block_id = block->calculate_id();
@@ -80,7 +80,7 @@ void test_finality_transition(const vector<account_name>& accounts,
    std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
    BOOST_TEST(!!fin_policy_diff);
    BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == accounts.size());
-   BOOST_TEST(fin_policy_diff->generation == 1);
+   BOOST_TEST(fin_policy_diff->generation == 2);
    block_id_type if_genesis_block_id = block->calculate_id();
 
    block_num_type active_block_num = block->block_num();
