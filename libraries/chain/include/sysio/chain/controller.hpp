@@ -1,5 +1,4 @@
 #pragma once
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/block_handle.hpp>
 #include <sysio/chain/block_log.hpp>

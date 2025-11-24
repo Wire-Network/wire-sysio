@@ -747,12 +747,6 @@ struct controller_impl {
       return chain_head.internal()->get_active_proposer_policy_for_block_at(next_block_timestamp)->proposer_schedule;
    }
 
-   const producer_authority_schedule* head_pending_schedule_auth_legacy() const {
-      assert(false);
-      // TODO: remove
-      return nullptr;
-   }
-
    const producer_authority_schedule* pending_producers() {
       return chain_head.internal()->pending_producers();
    }
@@ -802,15 +796,14 @@ struct controller_impl {
    }
 
    // ---------------  fork_db APIs ----------------------------------------------------------------------
-   template<typename ForkDB>
-   uint32_t pop_block(ForkDB& fork_db) {
+   uint32_t pop_prev_block() {
       assert(fork_db_has_root());
-      typename ForkDB::bsp_t prev = fork_db.get_block( chain_head.previous() );
+      block_state_ptr prev = fork_db_.get_block( chain_head.previous() );
 
       if( !prev ) {
-         SYS_ASSERT( fork_db.root()->id() == chain_head.previous(), block_validate_exception,
+         SYS_ASSERT( fork_db_.root()->id() == chain_head.previous(), block_validate_exception,
                      "attempt to pop beyond last irreversible block" );
-         prev = fork_db.root();
+         prev = fork_db_.root();
       }
 
       SYS_ASSERT( chain_head.block(), block_validate_exception,
@@ -869,7 +862,7 @@ struct controller_impl {
    }
 
    void pop_block() {
-      uint32_t prev_block_num = pop_block(fork_db_);
+      uint32_t prev_block_num = pop_prev_block();
       db.undo();
       protocol_features.popped_blocks_to(prev_block_num);
    }
@@ -1010,33 +1003,6 @@ struct controller_impl {
       }
    }
 
-   // When in IRREVERSIBLE mode fork_db blocks are applied and marked valid when they become irreversible
-   template<typename ForkDB, typename BSP>
-   controller::apply_blocks_result_t::status_t apply_irreversible_block(ForkDB& fork_db, const BSP& bsp) {
-      if constexpr (std::is_same_v<block_state_legacy_ptr, std::decay_t<decltype(bsp)>>) {
-         // before transition to savanna
-         return apply_block(bsp, controller::block_status::complete, trx_meta_cache_lookup{});
-      } else {
-         assert(bsp->block);
-         return apply_block(bsp, controller::block_status::complete, trx_meta_cache_lookup{});
-      }
-   }
-
-   void transition_add_to_savanna_fork_db(fork_database_t& fork_db,
-                                          const block_state_legacy_ptr& legacy, const block_state_ptr& new_bsp,
-                                          const block_state_ptr& prev) {
-      // legacy_branch is from head, all will be validated unless irreversible_mode(),
-      // IRREVERSIBLE applies (validates) blocks when irreversible, new_valid will be done after apply in log_irreversible
-      assert(read_mode == db_read_mode::IRREVERSIBLE || legacy->action_mroot_savanna);
-      if (legacy->action_mroot_savanna && !new_bsp->valid) {
-         // Create the valid structure for producing
-         new_bsp->valid = prev->new_valid(*new_bsp, *legacy->action_mroot_savanna, new_bsp->strong_digest);
-      }
-      if (legacy->is_valid())
-         new_bsp->set_valid(true);
-      fork_db.add(new_bsp, ignore_duplicate_t::yes);
-   }
-
    controller::apply_blocks_result_t log_irreversible() {
       SYS_ASSERT( fork_db_has_root(), fork_database_exception, "fork database not properly initialized" );
 
@@ -1090,7 +1056,9 @@ struct controller_impl {
 
          for( auto bitr = branch.rbegin(); bitr != branch.rend() && should_process(*bitr); ++bitr ) {
             if (irreversible_mode()) {
-               controller::apply_blocks_result_t::status_t r = apply_irreversible_block(fork_db_, *bitr);
+               assert((*bitr)->block);
+               // When in IRREVERSIBLE mode fork_db blocks are applied and marked valid when they become irreversible
+               controller::apply_blocks_result_t::status_t r = apply_block(*bitr, controller::block_status::complete, trx_meta_cache_lookup{});
                if (r != controller::apply_blocks_result_t::status_t::complete) {
                   result.status = r;
                   break;
@@ -1185,7 +1153,7 @@ struct controller_impl {
       ilog( "existing block log, attempting to replay from ${s} to ${n} blocks", ("s", start_block_num)("n", blog_head->block_num()) );
       try {
          while( auto next = blog.read_block_by_num( chain_head.block_num() + 1 ) ) {
-            replay_irreversible_block<block_state_ptr>( next );
+            replay_irreversible_block( next );
             if( check_shutdown() ) {  // needed on every loop for terminate-at-block
                ilog( "quitting from replay_block_log because of shutdown" );
                break;
@@ -1684,11 +1652,6 @@ struct controller_impl {
       if (merkle_processor) {
          merkle_processor->add_to_snapshot(snapshot, row_counter);
       }
-   }
-
-   static std::optional<genesis_state> extract_legacy_genesis_state( snapshot_reader& snapshot, uint32_t version ) {
-      std::optional<genesis_state> genesis;
-      return genesis; // TODO
    }
 
    block_state_pair read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
@@ -2637,8 +2600,7 @@ struct controller_impl {
       return {};
    }
 
-   template<class BSP>
-   controller::apply_blocks_result_t::status_t apply_block( const BSP& bsp, controller::block_status s,
+   controller::apply_blocks_result_t::status_t apply_block( const block_state_ptr& bsp, controller::block_status s,
                                                             const trx_meta_cache_lookup& trx_lookup ) {
       try {
          try {
@@ -2752,26 +2714,23 @@ struct controller_impl {
                           ("lhs", r)("rhs", static_cast<const transaction_receipt_header&>(receipt)));
             }
 
-            if constexpr (std::is_same_v<BSP, block_state_ptr>) {
-               // assemble_block will mutate bsp by setting the valid structure
-               assemble_block(true, extract_qc_data(b), bsp);
+            // assemble_block will mutate bsp by setting the valid structure
+            assemble_block(true, extract_qc_data(b), bsp);
 
-               // verify received finality digest in action_mroot is the same as the actual one
+            // verify received finality digest in action_mroot is the same as the actual one
 
-               // For proper IF blocks that do not have an associated Finality Tree defined,
-               // its finality_mroot is empty
-               digest_type actual_finality_mroot;
+            // For proper IF blocks that do not have an associated Finality Tree defined,
+            // its finality_mroot is empty
+            digest_type actual_finality_mroot;
 
-               if (!bsp->core.is_genesis_block_num(bsp->core.latest_qc_claim().block_num)) {
-                  actual_finality_mroot = bsp->get_validation_mroot(bsp->core.latest_qc_claim().block_num);
-               }
-
-               SYS_ASSERT(bsp->finality_mroot() == actual_finality_mroot, block_validate_exception,
-                  "finality_mroot does not match, received finality_mroot: ${r} != actual_finality_mroot: ${a} for block ${bn} ${id}",
-                  ("r", bsp->finality_mroot())("a", actual_finality_mroot)("bn", bsp->block_num())("id", bsp->id()));
-            } else {
-               assemble_block(true, {}, nullptr);
+            if (!bsp->core.is_genesis_block_num(bsp->core.latest_qc_claim().block_num)) {
+               actual_finality_mroot = bsp->get_validation_mroot(bsp->core.latest_qc_claim().block_num);
             }
+
+            SYS_ASSERT(bsp->finality_mroot() == actual_finality_mroot, block_validate_exception,
+               "finality_mroot does not match, received finality_mroot: ${r} != actual_finality_mroot: ${a} for block ${bn} ${id}",
+               ("r", bsp->finality_mroot())("a", actual_finality_mroot)("bn", bsp->block_num())("id", bsp->id()));
+
             auto& ab = std::get<assembled_block>(pending->_block_stage);
 
             if( producer_block_id != ab.id() ) {
@@ -3033,136 +2992,33 @@ struct controller_impl {
       return std::optional{qc_proof};
    }
 
-   // verify legacy block invariants
-   void verify_legacy_block_invariants( const signed_block_ptr& b, const block_header_state_legacy& prev ) {
-      assert(b->is_legacy_block());
-
-      uint32_t block_num = b->block_num();
-      auto block_exts = b->validate_and_extract_extensions();
-      auto qc_ext_id = quorum_certificate_extension::extension_id();
-      bool qc_extension_present = block_exts.count(qc_ext_id) != 0;
-
-      SYS_ASSERT( !qc_extension_present, block_validate_exception,
-                  "Legacy block #${b} includes a QC block extension",
-                  ("b", block_num) );
-
-      SYS_ASSERT( !b->is_proper_svnn_block(), block_validate_exception,
-                  "Legacy block #${b} has invalid schedule_version",
-                  ("b", block_num) );
-
-      // Verify we don't go back from Savanna (Transition or Proper) block to Legacy block
-      SYS_ASSERT( prev.header.is_legacy_block(), block_validate_exception,
-                  "Legacy block #${b} must have previous block that is also a Legacy block",
-                  ("b", block_num) );
-   }
-
-   // verify transition block invariants
-   void verify_transition_block_invariants( const signed_block_ptr& b, const block_header_state_legacy& prev ) {
-      assert(!b->is_legacy_block() && !b->is_proper_svnn_block());
-
-      uint32_t block_num = b->block_num();
-      auto block_exts = b->validate_and_extract_extensions();
-      auto qc_ext_id = quorum_certificate_extension::extension_id();
-      bool qc_extension_present = block_exts.count(qc_ext_id) != 0;
-
-      SYS_ASSERT( !qc_extension_present, block_validate_exception,
-                  "Transition block #${b} includes a QC block extension",
-                  ("b", block_num) );
-
-      SYS_ASSERT( !prev.header.is_proper_svnn_block(), block_validate_exception,
-                  "Transition block #${b} may not have previous block that is a Proper Savanna block",
-                  ("b", block_num) );
-
-      auto f_ext_id = finality_extension::extension_id();
-      std::optional<block_header_extension> finality_ext = b->extract_header_extension(f_ext_id);
-      assert(finality_ext);
-      const auto& f_ext = std::get<finality_extension>(*finality_ext);
-
-      SYS_ASSERT( !f_ext.new_proposer_policy_diff, block_validate_exception,
-                  "Transition block #${b} has new_proposer_policy_diff",
-                  ("b", block_num) );
-
-      if (auto it = prev.header_exts.find(finality_extension::extension_id()); it != prev.header_exts.end()) {
-         // Transition block other than Genesis Block
-         const auto& prev_finality_ext = std::get<finality_extension>(it->second);
-         SYS_ASSERT( f_ext.qc_claim == prev_finality_ext.qc_claim, invalid_qc_claim,
-                     "Non Genesis Transition block #${b} QC claim ${this_qc_claim} not equal to previous QC claim ${prev_qc_claim}",
-                     ("b", block_num)("this_qc_claim", f_ext.qc_claim)("prev_qc_claim", prev_finality_ext.qc_claim) );
-         SYS_ASSERT( !f_ext.new_finalizer_policy_diff, block_validate_exception,
-                     "Non Genesis Transition block #${b} finality block header extension may not have new_finalizer_policy_diff",
-                     ("b", block_num) );
-      } else {
-         // Savanna Genesis Block
-         qc_claim_t genesis_qc_claim {.block_num = block_num, .is_strong_qc = false};
-         SYS_ASSERT( f_ext.qc_claim == genesis_qc_claim, invalid_qc_claim,
-                     "Savanna Genesis block #${b} has invalid QC claim ${qc_claim}",
-                     ("b", block_num)("qc_claim", f_ext.qc_claim) );
-         SYS_ASSERT( f_ext.new_finalizer_policy_diff, block_validate_exception,
-                     "Savanna Genesis block #${b} finality block header extension misses new_finalizer_policy_diff",
-                     ("b", block_num) );
-
-         // apply_diff will FC_ASSERT if new_finalizer_policy_diff is malformed
-         try {
-            finalizer_policy no_policy;
-            finalizer_policy genesis_policy = no_policy.apply_diff(*f_ext.new_finalizer_policy_diff);
-            SYS_ASSERT( genesis_policy.generation == 1, block_validate_exception,
-                        "Savanna Genesis block #${b} finalizer policy generation (${g}) not 1",
-                        ("b", block_num)("g", genesis_policy.generation) );
-         } SYS_RETHROW_EXCEPTIONS(block_validate_exception, "applying diff of Savanna Genesis Block")
-      }
-   }
-
    // verify basic_block invariants
-   template<typename BS>
-   std::optional<qc_t> verify_basic_block_invariants(const block_id_type& id, const signed_block_ptr& b, const BS& prev) {
-      constexpr bool is_proper_savanna_block = std::is_same_v<typename std::decay_t<BS>, block_state>;
-      assert(is_proper_savanna_block == b->is_proper_svnn_block());
-
-      if constexpr (is_proper_savanna_block) {
-         SYS_ASSERT( b->is_proper_svnn_block(), block_validate_exception,
-                     "create_block_state_i cannot be called on block #${b} which is not a Proper Savanna block unless the prev block state provided is of type block_state",
-                     ("b", b->block_num()) );
-         return verify_basic_proper_block_invariants(id, b, prev);
-      } else {
-         SYS_ASSERT( !b->is_proper_svnn_block(), block_validate_exception,
-                     "create_block_state_i cannot be called on block #${b} which is a Proper Savanna block unless the prev block state provided is of type block_state_legacy",
-                     ("b", b->block_num()) );
-
-         if (b->is_legacy_block()) {
-            verify_legacy_block_invariants(b, prev);
-         } else {
-            verify_transition_block_invariants(b, prev);
-         }
-      }
-
-      return {};
+   std::optional<qc_t> verify_basic_block_invariants(const block_id_type& id, const signed_block_ptr& b, const block_state& prev) {
+      SYS_ASSERT( b->is_proper_svnn_block(), block_validate_exception,
+                  "create_block_state_i cannot be called on block #${b} which is not a Proper Savanna block.",
+                  ("b", b->block_num()) );
+      return verify_basic_proper_block_invariants(id, b, prev);
    }
 
    // thread safe, expected to be called from thread other than the main thread
    // tuple<bool best_head, block_handle new_block_handle>
-   template<typename ForkDB, typename BS>
-   controller::accepted_block_result create_block_state_i( ForkDB& fork_db, const block_id_type& id, const signed_block_ptr& b, const BS& prev ) {
-      constexpr bool is_proper_savanna_block = std::is_same_v<typename std::decay_t<BS>, block_state>;
-      assert(is_proper_savanna_block == b->is_proper_svnn_block());
-
+   controller::accepted_block_result create_block_state_i( const block_id_type& id, const signed_block_ptr& b, const block_state& prev ) {
       std::optional<qc_t> qc = verify_basic_block_invariants(id, b, prev);
       log_and_drop_future<void> verify_qc_future;
-      if constexpr (is_proper_savanna_block) {
-         if (qc) {
-            verify_qc_future = post_async_task(thread_pool.get_executor(), [&qc, &prev] {
-               // do both signature verification and basic checks in the async task
-               prev.verify_qc(*qc);
-            });
-         }
+      if (qc) {
+         verify_qc_future = post_async_task(thread_pool.get_executor(), [&qc, &prev] {
+            // do both signature verification and basic checks in the async task
+            prev.verify_qc(*qc);
+         });
       }
 
-      auto trx_mroot = calculate_trx_merkle( b->transactions, is_proper_savanna_block );
+      auto trx_mroot = calculate_trx_merkle( b->transactions );
       SYS_ASSERT( b->transaction_mroot == trx_mroot,
                   block_validate_exception,
                   "invalid block transaction merkle root ${b} != ${c}", ("b", b->transaction_mroot)("c", trx_mroot) );
 
       const bool skip_validate_signee = false;
-      auto bsp = std::make_shared<BS>(
+      auto bsp = std::make_shared<block_state>(
             prev,
             b,
             protocol_features.get_protocol_feature_set(),
@@ -3176,30 +3032,24 @@ struct controller_impl {
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
                   "provided id ${id} does not match block id ${bid}", ("id", id)("bid", bsp->id()) );
 
-
-      if constexpr (is_proper_savanna_block) {
-         assert(!!qc == verify_qc_future.valid());
-         if (qc) {
-            verify_qc_future.get();
-         }
-         if (async_voting == async_t::yes) {
-            boost::asio::post(thread_pool.get_executor(), [this, bsp=bsp]() {
-               try {
-                  integrate_received_qc_to_block(bsp); // Save the received QC as soon as possible, no matter whether the block itself is valid or not
-                  consider_voting(bsp, use_thread_pool_t::no);
-               } FC_LOG_AND_DROP()
-            });
-         } else {
-            integrate_received_qc_to_block(bsp);
-            consider_voting(bsp, use_thread_pool_t::no);
-         }
+      assert(!!qc == verify_qc_future.valid());
+      if (qc) {
+         verify_qc_future.get();
+      }
+      if (async_voting == async_t::yes) {
+         boost::asio::post(thread_pool.get_executor(), [this, bsp=bsp]() {
+            try {
+               integrate_received_qc_to_block(bsp); // Save the received QC as soon as possible, no matter whether the block itself is valid or not
+               consider_voting(bsp, use_thread_pool_t::no);
+            } FC_LOG_AND_DROP()
+         });
       } else {
-         assert(!verify_qc_future.valid());
+         integrate_received_qc_to_block(bsp);
+         consider_voting(bsp, use_thread_pool_t::no);
       }
 
-      fork_db_add_t add_result = fork_db.add(bsp, ignore_duplicate_t::yes);
-      if constexpr (is_proper_savanna_block)
-         vote_processor.notify_new_block(async_aggregation);
+      fork_db_add_t add_result = fork_db_.add(bsp, ignore_duplicate_t::yes);
+      vote_processor.notify_new_block(async_aggregation);
 
       return controller::accepted_block_result{add_result, block_handle{std::move(bsp)}};
    }
@@ -3215,7 +3065,7 @@ struct controller_impl {
       if( !prev )
          return controller::accepted_block_result{.add_result = fork_db_add_t::failure, .block{}};
 
-      return create_block_state_i( fork_db_, id, b, *prev );
+      return create_block_state_i( id, b, *prev );
    }
 
    // thread safe, QC already verified by verify_proper_block_exts
@@ -3253,7 +3103,6 @@ struct controller_impl {
    }
 
    enum class use_thread_pool_t { no, yes };
-   void consider_voting(const block_state_legacy_ptr&, use_thread_pool_t) {}
    // thread safe
    void consider_voting(const block_state_ptr& bsp, use_thread_pool_t use_thread_pool) {
       // 1. Get the `core.latest_qc_claim().block_num` for the block you are considering to vote on and use that to find the actual block ID
@@ -3281,7 +3130,6 @@ struct controller_impl {
       }
    }
 
-   template <class BSP>
    void replay_irreversible_block( const signed_block_ptr& b ) {
       validate_db_available_size();
 
@@ -3296,31 +3144,27 @@ struct controller_impl {
             check_protocol_features(timestamp, cur_features, new_features);
          };
 
-         if constexpr (std::is_same_v<BSP, typename std::decay_t<decltype(chain_head.internal())>>) {
-            std::optional<qc_t> qc = verify_basic_block_invariants({}, b, *chain_head.internal());
+         std::optional<qc_t> qc = verify_basic_block_invariants({}, b, *chain_head.internal());
 
-            if constexpr (std::is_same_v<typename std::decay_t<BSP>, block_state_ptr>) {
-               // do basic checks always (excluding signature verification)
-               if (qc) {
-                  chain_head.internal()->verify_qc_basic(*qc);
+         // do basic checks always (excluding signature verification)
+         if (qc) {
+            chain_head.internal()->verify_qc_basic(*qc);
 
-                  if (conf.force_all_checks) {
-                     // verify signatures only if `conf.force_all_checks`
-                     chain_head.internal()->verify_qc_signatures(*qc);
-                  }
-               }
+            if (conf.force_all_checks) {
+               // verify signatures only if `conf.force_all_checks`
+               chain_head.internal()->verify_qc_signatures(*qc);
             }
+         }
 
-            BSP bsp = std::make_shared<typename BSP::element_type>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
+         auto bsp = std::make_shared<block_state>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
 
-            if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
-               // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
-               // So emit it explicitly here.
-               emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
+         if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
+            // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
+            // So emit it explicitly here.
+            emit( irreversible_block, std::tie(bsp->block, bsp->id()), __FILE__, __LINE__ );
 
-               if (!skip_db_sessions(controller::block_status::irreversible)) {
-                  db.commit(bsp->block_num());
-               }
+            if (!skip_db_sessions(controller::block_status::irreversible)) {
+               db.commit(bsp->block_num());
             }
          }
 
@@ -3517,21 +3361,17 @@ struct controller_impl {
    }
 
    // @param if_active true if instant finality is active
-   static checksum256_type calc_merkle( deque<digest_type>&& digests, bool if_active ) {
-      if (if_active) {
-         return calculate_merkle( digests );
-      } else {
-         return calculate_merkle_legacy( std::move(digests) );
-      }
+   static checksum256_type calc_merkle( deque<digest_type>&& digests ) {
+      return calculate_merkle( digests );
    }
 
-   static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs, bool if_active ) {
+   static checksum256_type calculate_trx_merkle( const deque<transaction_receipt>& trxs) {
       deque<digest_type> trx_digests;
       for( const auto& a : trxs ) {
          trx_digests.emplace_back( (a.digest)() );
       }
 
-      return calc_merkle(std::move(trx_digests), if_active);
+      return calc_merkle(std::move(trx_digests));
    }
 
    void update_producers_authority() {
