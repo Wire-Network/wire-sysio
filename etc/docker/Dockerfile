@@ -52,6 +52,7 @@ RUN apt-get update && \
         wget \
         software-properties-common
 
+# If we want to pin the same binutils version as Ubuntu 24 on Ubuntu 25+ we can add this back in.
 # Install identical Ubuntu-24 binutils on any base (24/25)
 # COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
 # RUN apt-get update && \
@@ -116,7 +117,7 @@ set(CMAKE_CXX_COMPILER /opt/clang/clang-18/bin/clang++)
 set(CMAKE_AR           /opt/clang/clang-18/bin/llvm-ar)
 set(CMAKE_RANLIB       /opt/clang/clang-18/bin/llvm-ranlib)
 # Be explicit; some ports gate on language level
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 EOF
 

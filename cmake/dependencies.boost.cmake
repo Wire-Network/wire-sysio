@@ -5,7 +5,7 @@ unset(BOOST_ROOT CACHE)
 # unset(Boost_NO_BOOST_CMAKE CACHE)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
-# Ask for the version you installed via vcpkg (or omit the version to accept any)
+# Ask for the version installed via vcpkg (or omit the version to accept any)
 find_package(Boost 1.89.0 EXACT CONFIG REQUIRED
   COMPONENTS
     system
@@ -35,7 +35,7 @@ find_package(Boost 1.89.0 EXACT CONFIG REQUIRED
     format
 )
 
-# Keep your uBLAS shim only if your code links Boost::numeric_ublas
+# Keep uBLAS shim if code links Boost::numeric_ublas
 if (NOT TARGET boost_numeric_ublas)
   add_library(boost_numeric_ublas INTERFACE)
   add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
