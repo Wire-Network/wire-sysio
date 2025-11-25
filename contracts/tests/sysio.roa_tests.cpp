@@ -30,9 +30,10 @@ public:
 
       produce_blocks();
 
-      const auto& accnt = control->db().get<account_object,by_name>( ROA );
+      const auto* accnt = control->find_account_metadata( ROA );
+      BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -49,7 +50,7 @@ public:
 
    transaction_trace_ptr push_paid_action( const account_name& signer, const action_name &name, const variant_object &data ) {
       return base_tester::push_action( ROA, name,
-         vector<permission_level>{{signer, "active"_n},{signer, "sysio.payer"_n}},
+         vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
    }
 

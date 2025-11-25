@@ -42,9 +42,10 @@ public:
       set_privileged("sysio.token"_n);
 
       {
-         const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
+         const auto* accnt = control->find_account_metadata( "sysio.token"_n );
+         BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
          token_abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
       }
    }
@@ -68,9 +69,10 @@ public:
       }
 
       {
-         const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+         const auto* accnt = control->find_account_metadata( config::system_account_name );
+         BOOST_REQUIRE( accnt != nullptr );
          abi_def abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
          abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
       }
    }
@@ -335,9 +337,10 @@ public:
       set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
       produce_blocks();
-      const auto& accnt = control->db().get<account_object,by_name>( "sysio.msig"_n );
+      const auto* accnt = control->find_account_metadata( "sysio.msig"_n );
+      BOOST_REQUIRE( accnt != nullptr );
       abi_def msig_abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, msig_abi), true);
       msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -363,7 +366,7 @@ public:
             schedule.push_back(legacy::producer_key{p, key});
          }
          auto trace = TESTER::push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, mvo()("schedule", schedule));
-         BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
+         BOOST_REQUIRE(!!trace->receipt);
       }
       produce_blocks( 250);
 
@@ -377,7 +380,7 @@ public:
                                                }
                                             ))
       );
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace_auth->receipt->status);
+      BOOST_REQUIRE(!!trace_auth->receipt);
 
       produce_blocks( 250 );
 

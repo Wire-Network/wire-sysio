@@ -316,9 +316,9 @@ class Cluster(object):
 
         if genesisPath is None:
             argsArr.append("--max-block-cpu-usage")
-            argsArr.append(str(500000))
+            argsArr.append(str(400000))
             argsArr.append("--max-transaction-cpu-usage")
-            argsArr.append(str(475000))
+            argsArr.append(str(375000))
         else:
             argsArr.append("--genesis")
             argsArr.append(str(genesisPath))
@@ -1115,6 +1115,10 @@ class Cluster(object):
 
         if pfSetupPolicy == PFSetupPolicy.FULL:
             biosNode.preactivateAllBuiltinProtocolFeature()
+
+        # verify node is synced before setting prods
+        headBlockNum=biosNode.getHeadBlockNum()
+        assert self.getNode().waitForBlock(headBlockNum, timeout=Utils.systemWaitTimeout)
 
         if prodCount == -1:
             setProdsFile="setprods.json"

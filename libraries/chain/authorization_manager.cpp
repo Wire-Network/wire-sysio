@@ -6,17 +6,16 @@
 #include <sysio/chain/controller.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/contract_types.hpp>
-#include <boost/tuple/tuple_io.hpp>
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <ranges>
 
 
 namespace sysio { namespace chain {
 
    using authorization_index_set = index_set<
       permission_index,
-      permission_usage_index,
       permission_link_index
    >;
 
@@ -48,10 +47,6 @@ namespace sysio { namespace chain {
             const auto& parent = db.get(value.parent);
             res.parent = parent.name;
 
-            // lookup the usage object
-            const auto& usage = db.get<permission_usage_object>(value.usage_id);
-            res.last_used = usage.last_used;
-
             return res;
          };
 
@@ -78,16 +73,6 @@ namespace sysio { namespace chain {
                SYS_ASSERT(parent.id != 0, snapshot_exception, "Unexpected mapping to reserved permission 0");
                value.parent = parent.id;
             }
-
-            if (value.id != 0) {
-               // create the usage object
-               const auto& usage = db.create<permission_usage_object>([&](auto& p) {
-                  p.last_used = row.last_used;
-               });
-               value.usage_id = usage.id;
-            } else {
-               value.usage_id = 0;
-            }
          }
       };
    }
@@ -95,11 +80,6 @@ namespace sysio { namespace chain {
    void authorization_manager::add_to_snapshot( const snapshot_writer_ptr& snapshot ) const {
       authorization_index_set::walk_indices([this, &snapshot]( auto utils ){
          using section_t = typename decltype(utils)::index_t::value_type;
-
-         // skip the permission_usage_index as its inlined with permission_index
-         if (std::is_same<section_t, permission_usage_object>::value) {
-            return;
-         }
 
          snapshot->write_section<section_t>([this]( auto& section ){
             decltype(utils)::walk(_db, [this, &section]( const auto &row ) {
@@ -112,11 +92,6 @@ namespace sysio { namespace chain {
    void authorization_manager::read_from_snapshot( const snapshot_reader_ptr& snapshot ) {
       authorization_index_set::walk_indices([this, &snapshot]( auto utils ){
          using section_t = typename decltype(utils)::index_t::value_type;
-
-         // skip the permission_usage_index as its inlined with permission_index
-         if (std::is_same<section_t, permission_usage_object>::value) {
-            return;
-         }
 
          snapshot->read_section<section_t>([this]( auto& section ) {
             bool more = !section.empty();
@@ -146,12 +121,7 @@ namespace sysio { namespace chain {
          creation_time = _control.pending_block_time();
       }
 
-      const auto& perm_usage = _db.create<permission_usage_object>([&](auto& p) {
-         p.last_used = creation_time;
-      });
-
       const auto& perm = _db.create<permission_object>([&](auto& p) {
-         p.usage_id     = perm_usage.id;
          p.parent       = parent;
          p.owner        = account;
          p.name         = name;
@@ -182,12 +152,7 @@ namespace sysio { namespace chain {
          creation_time = _control.pending_block_time();
       }
 
-      const auto& perm_usage = _db.create<permission_usage_object>([&](auto& p) {
-         p.last_used = creation_time;
-      });
-
       const auto& perm = _db.create<permission_object>([&](auto& p) {
-         p.usage_id     = perm_usage.id;
          p.parent       = parent;
          p.owner        = account;
          p.name         = name;
@@ -229,24 +194,11 @@ namespace sysio { namespace chain {
       SYS_ASSERT( range.first == range.second, action_validate_exception,
                   "Cannot remove a permission which has children. Remove the children first.");
 
-      _db.get_mutable_index<permission_usage_index>().remove_object( permission.usage_id._id );
-
       if (auto dm_logger = _control.get_deep_mind_logger(is_trx_transient)) {
          dm_logger->on_remove_permission(permission);
       }
 
       _db.remove( permission );
-   }
-
-   void authorization_manager::update_permission_usage( const permission_object& permission ) {
-      const auto& puo = _db.get<permission_usage_object, by_id>( permission.usage_id );
-      _db.modify( puo, [&](permission_usage_object& p) {
-         p.last_used = _control.pending_block_time();
-      });
-   }
-
-   fc::time_point authorization_manager::get_permission_last_used( const permission_object& permission )const {
-      return _db.get<permission_usage_object, by_id>( permission.usage_id ).last_used;
    }
 
    const permission_object*  authorization_manager::find_permission( const permission_level& level )const
@@ -469,13 +421,14 @@ namespace sysio { namespace chain {
          }
 
          account_name payer;
-         for( const auto& declared_auth : act.authorization ) {
+         for( const auto& [i, declared_auth] : std::views::enumerate(act.authorization) ) {
 
             checktime();
 
             // Special case for explicit payer
             if ( declared_auth.permission == config::sysio_payer_name ) {
                SYS_ASSERT(payer.empty(), irrelevant_auth_exception, "Multiple payers specified for action");
+               SYS_ASSERT(i == 0, irrelevant_auth_exception, "Explicit payer must be the first declared authorization");
                payer = declared_auth.actor;
                continue;
             }

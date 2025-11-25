@@ -246,10 +246,17 @@ class Node(Transactions):
             return self.getIrreversibleBlockNum() > currentLib
         return Utils.waitForBool(isLibAdvancing, timeout)
 
+    def waitForLibNotToAdvance(self, timeout=30):
+        endTime=time.time()+timeout
+        while self.waitForLibToAdvance(timeout=timeout):
+            if time.time() > endTime:
+                return False
+        return True
+
     def waitForProducer(self, producer, timeout=None, exitOnError=False):
         if timeout is None:
             # default to the typical configuration of 21 producers, each producing 12 blocks in a row (every 1/2 second)
-            timeout = 21 * 6;
+            timeout = 21 * 6
         start=time.perf_counter()
         Utils.Print(self.getInfo())
         initialProducer=self.getInfo()["head_block_producer"]
@@ -533,7 +540,7 @@ class Node(Transactions):
         it=os.scandir(path)
         for entry in it:
             if entry.is_file(follow_symlinks=False):
-                match=re.match("stderr\..+\.txt", entry.name)
+                match=re.match(r"stderr\..+\.txt", entry.name)
                 if match:
                     files.append(os.path.join(path, entry.name))
         files.sort()
@@ -569,6 +576,9 @@ class Node(Transactions):
                     if re.match(r".*unlinkable_block_exception", line):
                         lastRestartBlockNum = blockNumber
                         continue
+                    if re.match(r".*Block not applied to head", line):
+                        lastRestartBlockNum = blockNumber
+                        continue
                     match = re.match(r".*Starting block #(\d+)", line)
                     if match:
                         blockNumber = match.group(1)
@@ -591,7 +601,7 @@ class Node(Transactions):
         producedBlockPostStr=r')\s@\s([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3})'
         anyBlockPtrn=re.compile(initialTimestamp + producedBlockPreStr + anyBlockStr + producedBlockPostStr)
         producedBlockPtrn=re.compile(initialTimestamp + producedBlockPreStr + str(specificBlockNum) + producedBlockPostStr) if specificBlockNum is not None else anyBlockPtrn
-        producedBlockDonePtrn=re.compile(initialTimestamp + r'.+Producing\sBlock\s+#' + anyBlockStr + '\sreturned:\strue')
+        producedBlockDonePtrn=re.compile(initialTimestamp + r'.+Producing\sBlock\s+#' + anyBlockStr + r'\sreturned:\strue')
         for file in files:
             with open(file, 'r') as f:
                 line = f.readline()

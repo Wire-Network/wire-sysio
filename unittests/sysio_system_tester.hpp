@@ -38,9 +38,10 @@ public:
       set_privileged("sysio.token"_n);
 
       {
-         const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
+         const auto* accnt = control->find_account_metadata( "sysio.token"_n );
+         BOOST_REQUIRE(accnt != nullptr);
          abi_def abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
          token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
 
@@ -57,9 +58,10 @@ public:
                             ("core", symbol(CORE_SYMBOL).to_string()));
 
       {
-         const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+         const auto* accnt = control->find_account_metadata( config::system_account_name );
+         BOOST_REQUIRE(accnt != nullptr);
          abi_def abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
          abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
 
@@ -171,13 +173,13 @@ public:
          ("maximum_supply", maxsupply );
 
       base_tester::push_action(contract, "create"_n,
-         {permission_level(contract, config::active_name), permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(contract, config::active_name), permission_level(manager, config::active_name)},
          act );
    }
 
    void issue( name to, const asset& amount, name manager = config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "issue"_n,
-         {permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(manager, config::active_name)},
          mutable_variant_object()
                                 ("to",      to )
                                 ("quantity", amount )
@@ -186,7 +188,7 @@ public:
    }
    void transfer( name from, name to, const asset& amount, name manager = config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "transfer"_n,
-         {permission_level(manager, config::active_name), permission_level(manager, config::sysio_payer_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(manager, config::active_name)},
          mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
@@ -224,9 +226,10 @@ public:
          set_abi( "sysio.msig"_n, test_contracts::sysio_msig_abi() );
 
          produce_blocks();
-         const auto& accnt = control->db().get<account_object,by_name>( "sysio.msig"_n );
+         const auto* accnt = control->find_account_metadata( "sysio.msig"_n );
+         BOOST_REQUIRE(accnt != nullptr);
          abi_def msig_abi;
-         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, msig_abi), true);
+         BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, msig_abi), true);
          msig_abi_ser.set_abi(std::move(msig_abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
       return msig_abi_ser;

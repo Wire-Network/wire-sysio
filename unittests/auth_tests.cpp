@@ -374,6 +374,7 @@ try {
                          fc_exception_message_is("Only privileged accounts can create new accounts"));
 
    // Creating the same new account, this time with privileged account
+   chain.set_code("joe"_n, vector<uint8_t>{});
    chain.set_privileged("joe"_n);
    chain.produce_block();
 
@@ -431,14 +432,15 @@ try {
 
    chain.create_account(acc1, config::system_account_name, false, false, false, false);
    chain.create_account(acc1a, config::system_account_name, false, false, false, false);
-   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 50, 50, 50, false);
+   chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 1844, 50, 50, false); // just enough ram
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1a, 50, 50, 50, false);
+   chain.set_code(acc1, vector<uint8_t>{});
    chain.set_privileged(acc1);
    chain.produce_block();
 
    const chainbase::database &db = chain.control->db();
 
-   using resource_usage_object = sysio::chain::resource_limits::resource_usage_object;
+   using resource_object = sysio::chain::resource_limits::resource_object;
    using by_owner = sysio::chain::resource_limits::by_owner;
 
    auto create_acc = [&](account_name a) {
@@ -448,9 +450,10 @@ try {
 
       authority owner_auth =  authority( chain.get_public_key( a, "owner" ) );
 
-      vector<permission_level> pls = {{acc1, name("active")}};
-      pls.push_back({acc1, name("owner")}); // same account but different permission names
+      vector<permission_level> pls = {};
       pls.push_back({acc1, config::sysio_payer_name});
+      pls.push_back({acc1, name("active")});
+      pls.push_back({acc1, name("owner")}); // same account but different permission names
       pls.push_back({acc1a, name("owner")});
       trx.actions.emplace_back( pls,
                                 newaccount{
@@ -469,9 +472,9 @@ try {
 
    create_acc(acc2);
 
-   const auto &usage = db.get<resource_usage_object,by_owner>(acc1);
+   const auto &usage = db.get<resource_object,by_owner>(acc1);
 
-   const auto &usage2 = db.get<resource_usage_object,by_owner>(acc1a);
+   const auto &usage2 = db.get<resource_object,by_owner>(acc1a);
 
    BOOST_TEST(usage.cpu_usage.average() > 0U);
    BOOST_TEST(usage.net_usage.average() > 0U);
@@ -494,6 +497,7 @@ try {
    account_name acc4 = "acc4"_n;
 
    chain.create_account(acc1);
+   chain.set_code(acc1, vector<uint8_t>{});
    chain.set_privileged(acc1);
    chain.produce_block();
 
@@ -640,7 +644,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -650,15 +653,13 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
    trace = chain.push_action("sysio.token"_n, name("transfer"),
-      vector<permission_level>{{"tester"_n, config::active_name},{"tester"_n, config::sysio_payer_name}},
+      vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, config::active_name}},
       fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
        ("quantity", "1.0000 CUR")
        ("memo", "hi" )
    );
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "sysio.token"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("999900.0000 CUR"), liquid_balance);
@@ -683,14 +684,11 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
            ("account", "tester")
            ("code", "sysio.token")
            ("type", "transfer"));
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    // delete auth
    trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first"));
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks(1);;
 
@@ -700,7 +698,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "3.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 

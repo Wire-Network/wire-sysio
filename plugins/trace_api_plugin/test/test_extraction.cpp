@@ -26,7 +26,8 @@ namespace {
          block_number,
          chain::block_timestamp_type(slot),
          {},
-         chain::transaction_receipt_header{status},
+         chain::transaction_receipt_header{},
+         0,
          fc::microseconds(0),
          0,
          std::move(actions),
@@ -187,9 +188,9 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
          {
             ptrx1.id(),
             expected_action_traces,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[0].status},
-            bsp1->block->transactions[0].cpu_usage_us,
-            bsp1->block->transactions[0].net_usage_words,
+            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{0},
+            0,
+            0,
             ptrx1.get_signatures(),
             make_trx_header(ptrx1.get_transaction())
          }
@@ -286,9 +287,9 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             {
                ptrx1.id(),
                expected_action_trace1,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[0].status},
-               bsp1->block->transactions[0].cpu_usage_us,
-               bsp1->block->transactions[0].net_usage_words,
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               0,
+               0,
                ptrx1.get_signatures(),
                make_trx_header(ptrx1.get_transaction())
             }
@@ -297,9 +298,9 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             {
                ptrx2.id(),
                expected_action_trace2,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[1].status},
-               bsp1->block->transactions[1].cpu_usage_us,
-               bsp1->block->transactions[1].net_usage_words,
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               0,
+               0,
                ptrx2.get_signatures(),
                make_trx_header(ptrx2.get_transaction())
             }
@@ -308,9 +309,9 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             {
                ptrx3.id(),
                expected_action_trace3,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{bsp1->block->transactions[2].status},
-               bsp1->block->transactions[2].cpu_usage_us,
-               bsp1->block->transactions[2].net_usage_words,
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               0,
+               0,
                ptrx3.get_signatures(),
                make_trx_header(ptrx3.get_transaction())
             }

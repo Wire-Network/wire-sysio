@@ -23,7 +23,7 @@ dumpErrorDetails=args.dump_error_details
 def restartNode(node: Node, chainArg=None, addSwapFlags=None):
     if not node.killed:
         node.kill(signal.SIGTERM)
-    isRelaunchSuccess = node.relaunch(chainArg, addSwapFlags=addSwapFlags, timeout=5)
+    isRelaunchSuccess = node.relaunch(chainArg, addSwapFlags=addSwapFlags, timeout=15)
     assert isRelaunchSuccess, "Fail to relaunch"
 
 walletMgr=WalletMgr(True)

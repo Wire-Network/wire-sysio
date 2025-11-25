@@ -125,7 +125,7 @@ try:
     transferAmount="100000000.0000 {0}".format(CORE_SYMBOL)
     for account in accounts:
         Print(f"Create new account {account.name} via {cluster.sysioAccount.name} with private key: {account.activePrivateKey}")
-        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=10000, stakeCPU=10000, buyRAM=10000000, exitOnError=True)
+        trans=nonProdNode.createInitializeAccount(account, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=10000, stakeCPU=10000, buyRAM=200000, exitOnError=True)
     nonProdNode.waitForTransBlockIfNeeded(trans, True, exitOnError=True)
     for account in accounts:
         Print(f"Transfer funds {transferAmount} from account {cluster.sysioAccount.name} to {account.name}")
@@ -148,9 +148,11 @@ try:
     wasmFile = "%s.wasm" % (contract)
     abiFile = "%s.abi" % (contract)
 
-    nonProdNode.publishContract(accounts[0], contractDir, wasmFile, abiFile)
-    jumbotxn = {
+    trans = nonProdNode.publishContract(accounts[0], contractDir, wasmFile, abiFile)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (contract))
 
+    jumbotxn = {
         "actions": [{"account": "testeraaaaaa","name": "jumbotime",
                      "authorization": [{"actor": "testeraaaaaa","permission": "active"}],
                      "data": "",

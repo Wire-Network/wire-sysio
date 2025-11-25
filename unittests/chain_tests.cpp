@@ -83,10 +83,10 @@ BOOST_AUTO_TEST_CASE( decompressed_size_over_limit ) try {
    cf_action                        cfa;
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
-   trx.context_free_actions.push_back(act);
+   trx.context_free_actions.insert(trx.context_free_actions.end(), 129, act);
    // this is a over limit size 4*20*129*1024 = 1032*1024 > 10M
-   for(int i = 0; i < 129*1024; ++i){
-      vector<uint32_t> v(20, 1);
+   for(int i = 0; i < 129; ++i){
+      vector<uint32_t> v(20*1024, 1);
       trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
@@ -118,11 +118,12 @@ BOOST_AUTO_TEST_CASE( decompressed_size_under_limit ) try {
    cf_action                        cfa;
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
-   trx.context_free_actions.push_back(act);
-   // this is a under limit size  (4+4)*128*1024 = 1024*1024
-   for(int i = 0; i < 100*1024; ++i){
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
+   constexpr size_t num_cf_actions = 129;
+   trx.context_free_actions.insert(trx.context_free_actions.end(), num_cf_actions, act);
+   // this is a over limit size 4*129*1024 = ~2M < 10M
+   for(int i = 0; i < num_cf_actions; ++i){
+      vector<uint32_t> v(1024, 1);
+      trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};

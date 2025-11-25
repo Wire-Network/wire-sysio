@@ -69,47 +69,6 @@ std::string make_locals_wasm(int n_params, int n_locals, int n_stack)
 }
 
 }
-
-BOOST_AUTO_TEST_SUITE(wasm_config_tests)
-
-BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_mutable_global_bytes, data::make({ 4096, 8192 , 16384 }) * data::make({0, 1}), n_globals, oversize) {
-   produce_block();
-   create_accounts({"globals"_n});
-   produce_block();
-
-   auto params = genesis_state::default_initial_wasm_configuration;
-   params.max_mutable_global_bytes = n_globals;
-   set_wasm_params(params);
-
-   std::string code = [&] {
-      std::ostringstream ss;
-      ss << "(module ";
-      ss << " (func $sysio_assert (import \"env\" \"sysio_assert\") (param i32 i32))";
-      ss << " (memory 1)";
-      for(int i = 0; i < n_globals + oversize; i += 4)
-         ss << "(global (mut i32) (i32.const " << i << "))";
-      ss << " (func (export \"apply\") (param i64 i64 i64)";
-      for(int i = 0; i < n_globals + oversize; i += 4)
-         ss << "(call $sysio_assert (i32.eq (get_global " << i/4 << ") (i32.const " << i << ")) (i32.const 0))";
-      ss << " )";
-      ss << ")";
-      return ss.str();
-   }();
-
-   if(oversize) {
-      BOOST_CHECK_THROW(set_code("globals"_n, code.c_str()), wasm_exception);
-      produce_block();
-   } else {
-      set_code("globals"_n, code.c_str());
-      push_action("globals"_n);
-      produce_block();
-      --params.max_mutable_global_bytes;
-      set_wasm_params(params);
-      push_action("globals"_n);
-   }
-}
-
-
 static const char many_funcs_wast[] = R"=====(
 (module
   (export "apply" (func 0))
@@ -169,6 +128,48 @@ static const char many_data_wast[] = R"=====(
 )=====";
 static const char one_data[] =  "(data (i32.const 0))";
 
+
+// split test into multiple parts so individual run time is reduced for CI/CD
+BOOST_AUTO_TEST_SUITE(wasm_config_part1_tests)
+
+BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_mutable_global_bytes, data::make({ 4096, 8192 , 16384 }) * data::make({0, 1}), n_globals, oversize) {
+   produce_block();
+   create_accounts({"globals"_n});
+   produce_block();
+
+   auto params = genesis_state::default_initial_wasm_configuration;
+   params.max_mutable_global_bytes = n_globals;
+   set_wasm_params(params);
+
+   std::string code = [&] {
+      std::ostringstream ss;
+      ss << "(module ";
+      ss << " (func $sysio_assert (import \"env\" \"sysio_assert\") (param i32 i32))";
+      ss << " (memory 1)";
+      for(int i = 0; i < n_globals + oversize; i += 4)
+         ss << "(global (mut i32) (i32.const " << i << "))";
+      ss << " (func (export \"apply\") (param i64 i64 i64)";
+      for(int i = 0; i < n_globals + oversize; i += 4)
+         ss << "(call $sysio_assert (i32.eq (get_global " << i/4 << ") (i32.const " << i << ")) (i32.const 0))";
+      ss << " )";
+      ss << ")";
+      return ss.str();
+   }();
+
+   if(oversize) {
+      BOOST_CHECK_THROW(set_code("globals"_n, code.c_str()), wasm_exception);
+      produce_block();
+   } else {
+      set_code("globals"_n, code.c_str());
+      push_action("globals"_n);
+      produce_block();
+      --params.max_mutable_global_bytes;
+      set_wasm_params(params);
+      push_action("globals"_n);
+   }
+}
+
+
 BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_section_elements,
                        data::make({1024, 8192, 16384}) * data::make({0, 1}) *
                        (data::make({many_funcs_wast, many_types_wast, many_imports_wast, many_globals_wast, many_elem_wast, many_data_wast}) ^
@@ -202,6 +203,9 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_section_elements,
       BOOST_CHECK_THROW(set_code("section"_n, code.c_str()), wasm_exception);
    }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part2_tests)
 
 // export has to be formatted slightly differently because export names
 // must be unique and apply must be one of the exports.
@@ -238,6 +242,10 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_section_elements_export,
       BOOST_CHECK_THROW(set_code("section"_n, code.c_str()), wasm_exception);
    }
 }
+
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part3_tests)
 
 static const char max_linear_memory_wast[] = R"=====(
 (module
@@ -277,6 +285,9 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_linear_memory_init,
       BOOST_CHECK_THROW(set_code("initdata"_n, code.c_str()), wasm_exception);
    }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part4_tests)
 
 static const std::vector<std::tuple<int, int, bool, bool>> func_local_params = {
    // Default value of max_func_local_bytes
@@ -334,6 +345,9 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_func_local_bytes, data::make({0, 
    }
 }
 
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part5_tests)
+
 BOOST_FIXTURE_TEST_CASE(max_func_local_bytes_mixed, wasm_config_tester) {
    produce_blocks(2);
    create_accounts({"stackz"_n});
@@ -372,6 +386,9 @@ BOOST_FIXTURE_TEST_CASE(max_func_local_bytes_mixed, wasm_config_tester) {
    set_wasm_params(params);
    BOOST_CHECK_THROW(set_code("stackz"_n, code.c_str()), wasm_exception);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part6_tests)
 
 // Combines max_call_depth and max_func_local_bytes
 BOOST_FIXTURE_TEST_CASE(max_stack, wasm_config_tester) {
@@ -492,6 +509,9 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester, max_nested_structures,
       BOOST_CHECK_THROW(set_code("nested"_n, code.c_str()), wasm_exception);
    }
 }
+
+BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE(wasm_config_part7_tests)
 
 static const char max_symbol_func_wast[] = R"=====(
 (module

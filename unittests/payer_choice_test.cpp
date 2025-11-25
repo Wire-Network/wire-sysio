@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         ilog("Registering bob as node owner and assigning _just_ enough resources to tester1 to load the contract, wasm size ${w}",
             ("w", ram_restrictions_wasm.size()));
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0827 SYS", 0, 0);
+        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
         c.produce_block();
 
         ilog("Setting code and ABI for ${a}", ("a", tester1_account));
@@ -87,8 +87,8 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
 
         ilog("Attempt to charge node owner with sysio.payer permission should succeed");
         c.push_action(tester1_account, "setdata"_n, {
-                          permission_level(alice_account, "active"_n),
-                          permission_level(alice_account, config::sysio_payer_name)
+                          permission_level(alice_account, config::sysio_payer_name),
+                          permission_level(alice_account, "active"_n)
                       }, mutable_variant_object()
                       ("len1", 1000)
                       ("len2", 0)

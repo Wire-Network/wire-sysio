@@ -85,7 +85,7 @@ public:
    }
 
    template <typename A, typename B>
-   vector<A> deserialize_data(deltas_vector::iterator &it) {
+   static vector<A> deserialize_data(deltas_vector::iterator &it) {
       vector<A> result;
       for(size_t i=0; i < it->rows.obj.size(); i++) {
          sysio::input_stream stream{it->rows.obj[i].second.data(), it->rows.obj[i].second.size()};
@@ -113,28 +113,36 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   // Check that no account table deltas are present
-   BOOST_REQUIRE_EQUAL(chain.find_table_delta("account").first, false);
+   // verify only onblock recv_sequence in delta
+   auto result = chain.find_table_delta("account");
+   BOOST_REQUIRE(result.first);
+   auto& it_account = result.second;
+   BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
+   auto accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account);
+   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
 
    // Create new account
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Verify that a new record for the new account in the state delta of the block
-   auto result = chain.find_table_delta("account");
+   result = chain.find_table_delta("account");
    BOOST_REQUIRE(result.first);
-   auto &it_account = result.second;
-   BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
+   auto& it_account2 = result.second;
+   BOOST_REQUIRE_EQUAL(it_account2->rows.obj.size(), 2u);
 
-   auto accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account);
-   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), "newacc");
+   accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account2);
+   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
+   BOOST_REQUIRE_EQUAL(accounts[1].name.to_string(), "newacc");
 
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
    table_deltas_tester chain;
-   chain.produce_block();
 
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.produce_block();
+
+   chain.set_code("newacc"_n, std::vector<uint8_t>{}); // creates the account_metadata
 
    // Spot onto account metadata
    auto result = chain.find_table_delta("account_metadata");
@@ -350,11 +358,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
    auto trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "hello" ));
 
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
-
    trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 2));
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    // Spot onto contract_table
    auto result = chain.find_table_delta("contract_table");
@@ -406,7 +410,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
-      BOOST_REQUIRE(it==v.end());
+      BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
+      BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 1u);
+      auto resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
+      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
 
       main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
@@ -419,6 +426,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
       BOOST_REQUIRE(it!=v.end());
+      BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 2u);
+      resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
+      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
+      BOOST_REQUIRE_EQUAL(resources[1].owner.to_string(), "newacc");
 
       main.produce_block();
 
@@ -430,7 +441,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
       name="resource_limits";
       it = std::find_if(v.begin(), v.end(), find_by_name);
-      BOOST_REQUIRE(it==v.end());
+      BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
    }
 
    BOOST_AUTO_TEST_CASE(test_deltas_contract_several_rows){
@@ -447,22 +458,16 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.produce_blocks(2);
 
       auto trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "hello"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "world"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "!"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 2));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 3));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 4));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       // Spot onto contract_row with full snapshot
       auto result = chain.find_table_delta("contract_row", true);
@@ -486,10 +491,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.produce_block();
 
       trace = chain.push_action("tester"_n, "erasenumobj"_n, "tester"_n, mutable_variant_object()("id", 1));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "erasenumobj"_n, "tester"_n, mutable_variant_object()("id", 0));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       result = chain.find_table_delta("contract_row");
       BOOST_REQUIRE(result.first);

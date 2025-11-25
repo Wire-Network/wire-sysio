@@ -56,6 +56,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_multiple_listen_test.py ${CMAKE_C
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_listen_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_listen_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_sync_throttle_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/p2p_sync_throttle_test_shape.json COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pause_prod_max_reversible_test.py ${CMAKE_CURRENT_BINARY_DIR}/pause_prod_max_reversible_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_transaction_test.py ${CMAKE_CURRENT_BINARY_DIR}/compute_transaction_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/subjective_billing_test.py ${CMAKE_CURRENT_BINARY_DIR}/subjective_billing_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/get_account_test.py ${CMAKE_CURRENT_BINARY_DIR}/get_account_test.py COPYONLY)
@@ -192,6 +193,9 @@ set_tests_properties(p2p_no_listen_test PROPERTIES LABELS nonparallelizable_test
 add_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(p2p_sync_throttle_test PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 
+add_test(NAME pause_prod_max_reversible_test COMMAND tests/pause_prod_max_reversible_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+set_tests_properties(pause_prod_max_reversible_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
+
 # needs iproute-tc or iproute2 depending on platform
 #add_test(NAME p2p_high_latency_test COMMAND tests/p2p_high_latency_test.py -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 #set_tests_properties(p2p_high_latency_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
@@ -246,11 +250,11 @@ set_tests_properties(http_plugin_test PROPERTIES TIMEOUT 100)
 set_tests_properties(http_plugin_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME plugin_http_api_test COMMAND tests/plugin_http_api_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(plugin_http_api_test PROPERTIES TIMEOUT 50)
+set_tests_properties(plugin_http_api_test PROPERTIES TIMEOUT 100)
 set_tests_properties(plugin_http_api_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME plugin_http_category_api_test COMMAND tests/plugin_http_api_test.py WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-set_tests_properties(plugin_http_category_api_test PROPERTIES TIMEOUT 50 ENVIRONMENT "PLUGIN_HTTP_TEST_CATEGORY=ON")
+set_tests_properties(plugin_http_category_api_test PROPERTIES TIMEOUT 100 ENVIRONMENT "PLUGIN_HTTP_TEST_CATEGORY=ON")
 set_tests_properties(plugin_http_category_api_test PROPERTIES LABELS nonparallelizable_tests RUN_SERIAL TRUE)
 
 add_test(NAME trace_plugin_test COMMAND tests/trace_plugin_test.py -v WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -274,7 +278,7 @@ set_tests_properties(gelf_test PROPERTIES LABELS nonparallelizable_tests RUN_SER
 
 add_test(NAME performance_test_bp COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testBpOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_api COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 --calc-chain-threads lmax overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-add_test(NAME performance_test_read_only_trxs COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 overrideBasicTestConfig -v --tps-limit-per-generator 25 --api-nodes-read-only-threads 2 --read-only-write-window-time-us 1000 --read-only-read-window-time-us 165000 --account-name "payloadless" --abi-file payloadless.abi --wasm-file payloadless.wasm --contract-dir unittests/test-contracts/payloadless --user-trx-data-file tests/PerformanceHarness/readOnlySlowTrxData.json --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME performance_test_read_only_trxs COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testApiOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 overrideBasicTestConfig -v --tps-limit-per-generator 25 --api-nodes-read-only-threads 2 --read-only-write-window-time-us 1000 --read-only-read-window-time-us 375000 --account-name "payloadless" --abi-file payloadless.abi --wasm-file payloadless.wasm --contract-dir unittests/test-contracts/payloadless --user-trx-data-file tests/PerformanceHarness/readOnlySlowTrxData.json --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_cpu_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py findMax testBpOpMode --max-tps-to-test 50 --test-iteration-min-step 10 --test-iteration-duration-sec 10 --final-iterations-duration-sec 10 overrideBasicTestConfig -v --tps-limit-per-generator 25 --chain-state-db-size-mb 200 --account-name "c" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/cpuTrxData.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_basic_p2p COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_basic_http COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --endpoint-mode http --producer-nodes 1 --validation-nodes 1 --api-nodes 1 --target-tps 10 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
@@ -282,7 +286,7 @@ add_test(NAME performance_test_basic_transfer_trx_spec COMMAND tests/Performance
 add_test(NAME performance_test_basic_new_acct_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --user-trx-data-file tests/PerformanceHarness/userTrxDataNewAccount.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_basic_cpu_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "c" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/cpuTrxData.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 add_test(NAME performance_test_basic_ram_trx_spec COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --producer-nodes 1 --validation-nodes 1 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "r" --abi-file sysmechanics.abi --wasm-file sysmechanics.wasm --contract-dir unittests/system-test-contracts/sysio.mechanics --user-trx-data-file tests/PerformanceHarness/ramTrxData.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-add_test(NAME performance_test_basic_read_only_trxs COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --endpoint-mode http --producer-nodes 1 --validation-nodes 1 --api-nodes 1 --api-nodes-read-only-threads 2 --read-only-write-window-time-us 1000 --read-only-read-window-time-us 165000 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "payloadless" --abi-file payloadless.abi --wasm-file payloadless.wasm --contract-dir unittests/test-contracts/payloadless --user-trx-data-file tests/PerformanceHarness/readOnlySlowTrxData.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME performance_test_basic_read_only_trxs COMMAND tests/PerformanceHarnessScenarioRunner.py singleTest -v --endpoint-mode http --producer-nodes 1 --validation-nodes 1 --api-nodes 1 --api-nodes-read-only-threads 2 --read-only-write-window-time-us 1000 --read-only-read-window-time-us 375000 --target-tps 20 --tps-limit-per-generator 10 --test-duration-sec 5 --chain-state-db-size-mb 200 --account-name "payloadless" --abi-file payloadless.abi --wasm-file payloadless.wasm --contract-dir unittests/test-contracts/payloadless --user-trx-data-file tests/PerformanceHarness/readOnlySlowTrxData.json ${UNSHARE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
 set_tests_properties(performance_test_bp PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 set_tests_properties(performance_test_api PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)
 set_tests_properties(performance_test_read_only_trxs PROPERTIES LABELS long_running_tests RUN_SERIAL TRUE)

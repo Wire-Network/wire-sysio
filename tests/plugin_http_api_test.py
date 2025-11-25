@@ -99,8 +99,9 @@ class PluginHttpTest(unittest.TestCase):
 
         start_nodeop_cmd = ("%s -e -p sysio %s %s ") % (Utils.SysServerPath, nodeop_plugins, nodeop_flags)
         self.nodeop = Node(TestHelper.LOCAL_HOST, TestHelper.DEFAULT_PORT, self.node_id, self.data_dir, self.config_dir, shlex.split(start_nodeop_cmd), walletMgr=self.kiod)
-        time.sleep(self.sleep_s*2)
-        self.nodeop.waitForBlock(1, timeout=30)
+        if not self.nodeop or not Utils.waitForBool(self.nodeop.checkPulse, timeout=15):
+            Utils.Print("ERROR: node doesn't appear to be running...")
+            self.assertTrue(False, msg="nodeop failed to start.")
 
     def activateAllBuiltinProtocolFeatures(self):
         contract = "sysio.bios"
@@ -824,43 +825,7 @@ class PluginHttpTest(unittest.TestCase):
     # test all producer api
     def test_ProducerApi(self) :
         resource = "producer"
-        endpoint=self.endpoint("producer_rw")
-        # pause with empty parameter
-        command = "pause"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # pause with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # pause with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-
-        # resume with empty parameter
-        command = "resume"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # resume with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["result"], "ok")
-        # resume with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-
         endpoint=self.endpoint("producer_ro")
-        # paused with empty parameter
-        command = "paused"
-        ret_str = self.nodeop.processUrllibRequest(resource, command, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "false")
-        # paused with empty content parameter
-        ret_str = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
-        self.assertEqual(ret_str, "false")
-        # paused with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
 
         # get_runtime_options with empty parameter
         command = "get_runtime_options"
@@ -892,10 +857,18 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"max_transaction_time":30,
                    "max_irreversible_block_age":1,
                    "cpu_effort_us":400000,
-                   "max_scheduled_transaction_time_per_block_ms":10000,
                    "subjective_cpu_leeway_us":0,
-                   "incoming_defer_ratio":1.0,
                    "greylist_limit":100}
+        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
+        self.assertIn(ret_json["payload"]["result"], "ok")
+        # restore runtime options to default values such that future tests are not impacted
+        # by the modified values of last test (max_irreversible_block_age: 1 can make producer
+        # plugin stuck in speculative mode)
+        payload = {"max_transaction_time":499,
+                   "max_irreversible_block_age":-1,
+                   "cpu_effort_us":400000,
+                   "subjective_cpu_leeway_us":31000,
+                   "greylist_limit":1000}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn(ret_json["payload"]["result"], "ok")
 
@@ -1095,6 +1068,47 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"lower_bound":"", "limit":1, "time_limit_ms":500}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertIn("trxs", ret_json["payload"])
+
+        # place pause and resume tests at the end such that they are not impacted
+        # by update_runtime_options
+
+        endpoint=self.endpoint("producer_rw") # pause and resume are in producer_rw category
+        # pause with empty parameter
+        command = "pause"
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # pause with empty content parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # pause with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
+
+        # resume with empty parameter
+        command = "resume"
+        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # resume with empty content parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
+        self.assertEqual(ret_json["payload"]["result"], "ok")
+        # resume with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
+
+        endpoint=self.endpoint("producer_ro")
+        # paused with empty parameter
+        command = "paused"
+        ret_str = self.nodeop.processUrllibRequest(resource, command, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
+        self.assertEqual(ret_str, "false")
+        # paused with empty content parameter
+        ret_str = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, returnType=ReturnType.raw, endpoint=endpoint).decode('ascii')
+        self.assertEqual(ret_str, "false")
+        # paused with invalid parameter
+        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
+        self.assertEqual(ret_json["code"], 400)
+        self.assertEqual(ret_json["error"]["code"], 3200006)
 
     # test all wallet api
     def test_WalletApi(self) :

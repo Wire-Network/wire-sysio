@@ -122,12 +122,8 @@ struct trx_retry_db_impl {
    }
 
    void on_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
-      if( !trace->receipt ) return;
       // include only executed incoming transactions.
-      // soft_fail not included as only interested in incoming
-      if(trace->receipt->status != chain::transaction_receipt_header::executed) {
-         return;
-      }
+      if( !trace->receipt ) return;
       // Only want transactions in a block, if no producer id then not in a block
       if( !trace->producer_block_id ) return;
       // Don't care about implicit
