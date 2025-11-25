@@ -332,9 +332,9 @@ public:
       create_account( "sysio.msig"_n, config::system_account_name );
       produce_block();
 
-      set_privileged( "sysio.msig"_n );
       set_code( "sysio.msig"_n, contracts::msig_wasm() );
       set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
+      set_privileged( "sysio.msig"_n );
 
       produce_blocks();
       const auto* accnt = control->find_account_metadata( "sysio.msig"_n );

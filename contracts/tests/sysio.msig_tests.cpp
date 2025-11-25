@@ -22,9 +22,9 @@ public:
       create_accounts( { "sysio.msig"_n, "alice"_n, "bob"_n, "carol"_n } );
       produce_block();
 
-      set_privileged("sysio.msig"_n);
       set_code( "sysio.msig"_n, contracts::msig_wasm() );
       set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
+      set_privileged("sysio.msig"_n);
 
       produce_blocks();
       const auto* accnt = control->find_account_metadata( "sysio.msig"_n );
@@ -381,9 +381,9 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    produce_blocks(50);
 
    create_accounts( { "sysio.token"_n } );
-   set_privileged("sysio.token"_n);
    set_code( "sysio.token"_n, contracts::token_wasm() );
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
+   set_privileged("sysio.token"_n);
 
    create_currency( "sysio.token"_n, config::system_account_name, core_sym::from_string("10000000000.0000") );
    issue(config::system_account_name, core_sym::from_string("1000000000.0000"));
@@ -502,9 +502,9 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    produce_blocks(50);
 
    create_accounts( { "sysio.token"_n } );
-   set_privileged("sysio.token"_n);
    set_code( "sysio.token"_n, contracts::token_wasm() );
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
+   set_privileged("sysio.token"_n);
 
    create_currency( "sysio.token"_n, config::system_account_name, core_sym::from_string("10000000000.0000") );
    issue(config::system_account_name, core_sym::from_string("1000000000.0000"));
