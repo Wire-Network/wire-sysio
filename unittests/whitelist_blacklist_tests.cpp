@@ -403,7 +403,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    cfg.max_block_net_usage        = 128 * 1024; // 64 KiB max block size
    cfg.target_block_net_usage_pct = config::percent_1/10;
    // A total net usage of more than 131 bytes will keep the block above the target.
-   cfg.max_transaction_net_usage  = 69 * 1024; // needs to be large enough for setup_policy::full
+   cfg.max_transaction_net_usage  = 70 * 1024; // needs to be large enough for setup_policy::full
 
    cfg.max_block_cpu_usage        = 150'000; // maximum of 150 ms of CPU per block
    cfg.target_block_cpu_usage_pct = config::percent_1/10; // More than 150 us of CPU to keep the block above the target.

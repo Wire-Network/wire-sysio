@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         ilog("Registering bob as node owner and assigning _just_ enough resources to tester1 to load the contract, wasm size ${w}",
             ("w", ram_restrictions_wasm.size()));
         c.register_node_owner(bob_account, 2);
-        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
+        c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0835 SYS", 0, 0);
         c.produce_block();
 
         ilog("Setting code and ABI for ${a}", ("a", tester1_account));

@@ -22,14 +22,14 @@ public:
       produce_block();
 
 
+      set_code( "sysio.msig"_n, contracts::msig_wasm() );
+      set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
+
       base_tester::push_action(config::system_account_name, "setpriv"_n,
                                  config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.msig")
                                  ("is_priv", 1)
       );
-
-      set_code( "sysio.msig"_n, contracts::msig_wasm() );
-      set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
       produce_blocks();
 
@@ -48,15 +48,15 @@ public:
       trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id()  );
       push_transaction( trx );
 
+      auto system_private_key = get_private_key( config::system_account_name, "active" );
+      set_code( "sysio.wrap"_n, contracts::wrap_wasm(), &system_private_key );
+      set_abi( "sysio.wrap"_n, contracts::wrap_abi().data(), &system_private_key );
+
       base_tester::push_action(config::system_account_name, "setpriv"_n,
                                  config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.wrap")
                                  ("is_priv", 1)
       );
-
-      auto system_private_key = get_private_key( config::system_account_name, "active" );
-      set_code( "sysio.wrap"_n, contracts::wrap_wasm(), &system_private_key );
-      set_abi( "sysio.wrap"_n, contracts::wrap_abi().data(), &system_private_key );
 
       produce_blocks();
 

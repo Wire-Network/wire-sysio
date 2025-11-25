@@ -19,7 +19,8 @@ namespace sysiosystem {
    using sysio::permission_level;
    using sysio::public_key;
 
-   static constexpr uint64_t newaccount_ram = 1784; // to cover creation and small amount for variation in authorizations
+   static constexpr uint64_t newaccount_ram = 1768; // to cover creation and small amount for variation in authorizations
+   static_assert( newaccount_ram % 104 == 0 ); // bytes_per_unit is currently 104
 
    /**
     * A weighted permission.
