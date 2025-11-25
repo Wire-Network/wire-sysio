@@ -134,7 +134,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     BOOST_CHECK(results.total_resources.get_type() != fc::variant::type_id::null_type);
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["net_weight"].as<asset>());
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
-    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 4162808); // 40000*104+newaccount_ram(2808)
+    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 4161784); // 40000*104+newaccount_ram(1784)
 
 } FC_LOG_AND_RETHROW() }
 

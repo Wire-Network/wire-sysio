@@ -696,15 +696,15 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
 
       c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false, true);
       // Issuing _only_ enough RAM to load the contracts
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
       c.produce_block();
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
       c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
-      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0);
+      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0);
 
       c.register_node_owner(alice_account, 1);
       c.produce_block();
@@ -799,8 +799,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto &carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0829 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );

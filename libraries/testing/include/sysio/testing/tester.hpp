@@ -162,7 +162,9 @@ namespace sysio { namespace testing {
          static const uint32_t DEFAULT_BILLED_CPU_TIME_US = 2000;
          static const fc::microseconds abi_serializer_max_time;
 
-         static constexpr uint64_t newaccount_ram = 1784; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t newaccount_ram = 1768; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t bytes_per_unit = 104;
+         static_assert( newaccount_ram % bytes_per_unit == 0, "newaccount_ram must be a multiple of bytes_per_unit");
          static constexpr auto NODE_DADDY = "nodedaddy"_n;
          bool has_roa = false;
 
