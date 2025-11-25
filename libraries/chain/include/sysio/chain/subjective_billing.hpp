@@ -14,6 +14,8 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 
+#include <concepts>
+
 namespace sysio::chain {
 
 class subjective_billing {
@@ -49,7 +51,7 @@ private:
    using account_subjective_bill_cache = std::unordered_map<chain::account_name, subjective_billing_info>;
 
    bool                                      _disabled = false;
-   fc::microseconds                          _subjective_account_cpu_allowed{300000};
+   fc::microseconds                          _subjective_account_cpu_allowed{config::default_subjective_cpu_us};
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
    std::set<chain::account_name>             _disabled_accounts;
@@ -58,7 +60,7 @@ private:
 private:
    void _reset() { // for testing
       _disabled = false;
-      _subjective_account_cpu_allowed = fc::microseconds{300000};
+      _subjective_account_cpu_allowed = fc::microseconds{config::default_subjective_cpu_us};
       _trx_cache_index.clear();
       _account_subjective_bill_cache.clear();
       _disabled_accounts.clear();
@@ -204,7 +206,7 @@ public:
       }
    }
 
-   template <typename Yield>
+   template <std::predicate<> Yield>
    std::pair<bool,uint32_t> remove_expired( fc::logger& log, const fc::time_point& pending_block_time, const fc::time_point& now, Yield&& yield ) {
       bool exhausted = false;
       uint32_t num_expired = 0;

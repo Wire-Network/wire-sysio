@@ -1067,7 +1067,7 @@ void producer_plugin::set_program_options(
           "Sets the window size in number of blocks for subjective-account-max-failures.")
          ("subjective-account-decay-time-minutes", bpo::value<uint32_t>()->default_value( config::account_cpu_usage_average_window_ms / 1000 / 60 ),
           "Sets the time to return full subjective cpu for accounts")
-         ("subjective-account-cpu-allowed-us", bpo::value<int64_t>()->default_value( 300000 ),
+         ("subjective-account-cpu-allowed-us", bpo::value<int64_t>()->default_value( config::default_subjective_cpu_us ),
           "Sets the maximum allowed CPU, above account CPU, that can be used by an authorizing account within subjective-account-decay-time-minutes")
          ("incoming-transaction-queue-size-mb", bpo::value<uint16_t>()->default_value( 1024 ),
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")

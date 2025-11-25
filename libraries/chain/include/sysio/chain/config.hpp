@@ -65,6 +65,7 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_max_transaction_cpu_usage            = 3*default_max_block_cpu_usage/4; /// max trx cpu usage in microseconds
   static constexpr uint32_t   default_min_transaction_cpu_usage            = 100; /// min trx cpu usage in microseconds (10000 TPS equiv)
   static constexpr uint32_t   default_subjective_cpu_leeway_us             = 31000; /// default subjective cpu leeway in microseconds
+  static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
   static constexpr uint32_t   default_deferred_trx_expiration_window       = 0; // deferred trx not supported by Wire

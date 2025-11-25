@@ -118,9 +118,10 @@ BOOST_AUTO_TEST_CASE( decompressed_size_under_limit ) try {
    cf_action                        cfa;
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
-   trx.context_free_actions.insert(trx.context_free_actions.end(), 129, act);
+   constexpr size_t num_cf_actions = 129;
+   trx.context_free_actions.insert(trx.context_free_actions.end(), num_cf_actions, act);
    // this is a over limit size 4*129*1024 = ~2M < 10M
-   for(int i = 0; i < 129; ++i){
+   for(int i = 0; i < num_cf_actions; ++i){
       vector<uint32_t> v(1024, 1);
       trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
