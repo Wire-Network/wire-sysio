@@ -2436,10 +2436,9 @@ struct controller_impl {
       if (s == controller::block_status::incomplete) {
          const auto& new_b = chain_head.block();
          ilog("Produced block ${id}... #${n} @ ${t} signed by ${p} "
-              "[trxs: ${count}, lib: ${lib}${confs}, net: ${net}, cpu: ${cpu} us, elapsed: ${et} us, producing time: ${tt} us]",
+              "[trxs: ${count}, lib: ${lib}, net: ${net}, cpu: ${cpu} us, elapsed: ${et} us, producing time: ${tt} us]",
               ("id", chain_head.id().str().substr(8, 16))("n", new_b->block_num())("p", new_b->producer)("t", new_b->timestamp)
               ("count", new_b->transactions.size())("lib", chain_head.irreversible_blocknum())
-              ("confs", new_b->is_proper_svnn_block() ? "" : ", confirmed: " + std::to_string(new_b->confirmed))
               ("net", br.total_net_usage)("cpu", br.total_cpu_usage_us)("et", br.total_elapsed_time)
               ("tt", now - br.start_time));
 
@@ -2855,9 +2854,6 @@ struct controller_impl {
 
    // thread safe
    void create_and_send_vote_msg(const block_state_ptr& bsp) {
-      if (!bsp->block->is_proper_svnn_block())
-         return;
-
       // Each finalizer configured on the node which is present in the active finalizer policy may create and sign a vote.
       my_finalizers.maybe_vote(bsp, [&](const my_finalizers_t::vote_t& vote) {
               const auto& [vote_msg, active_auth, pending_auth] = vote;

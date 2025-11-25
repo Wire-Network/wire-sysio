@@ -156,20 +156,16 @@ public:
       fin_policy_pubkeys_0 = node0.finkeys.set_finalizer_policy(fin_policy_indices_0).pubkeys;
 
       if (config.transition_to_savanna) {
-         // transition to Savanna
+         // Since Wire starts in Savanna at Genesis this "transition_to_savanna" just means setup the finalizer policy.
+         // Produce enough blocks for finalizer policy to be active.
+         produce_blocks(24);
          // ---------------------
-         // TODO: remove
-         // fin_policy_0 = node0.finkeys.transition_to_savanna([&](const signed_block_ptr& b) {
-         //    for (size_t i=1; i<nodes.size(); ++i)
-         //       nodes[i].push_block(b);
-         //    process_votes(1, num_nodes - 1);
-         // });
+         fin_policy_0 = *node0.control->head_active_finalizer_policy();
 
          // at this point, node0 has a QC to include in next block.
          // Produce that block and push it, but don't process votes so that
          // we don't start with an existing QC
          // ---------------------------------------------------------------
-         produce_and_push_block();
 
          // reset votes and saved lib, so that each test starts in a clean slate
          // --------------------------------------------------------------------

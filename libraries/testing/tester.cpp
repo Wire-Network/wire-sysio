@@ -458,14 +458,7 @@ namespace sysio::testing {
    }
 
    transaction_trace_ptr base_tester::_start_block(fc::time_point block_time) {
-      auto head_block_number = control->head().block_num();
       auto producer = control->head_active_producers().get_scheduled_producer(block_time);
-
-      auto last_produced_block_num = control->fork_db_root().block_num();
-      auto itr = last_produced_block.find(producer.producer_name);
-      if (itr != last_produced_block.end()) {
-         last_produced_block_num = std::max(control->fork_db_root().block_num(), block_header::num_from_id(itr->second));
-      }
 
       unapplied_transactions.add_aborted( control->abort_block() );
 
