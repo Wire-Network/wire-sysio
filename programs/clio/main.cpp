@@ -2628,110 +2628,126 @@ int main( int argc, char** argv ) {
    });
 
    // lock all wallets
-   auto lock_all_wallets_cmd = wallet_cmd->add_subcommand("lock_all", localized("Lock all unlocked wallets"));
-   lock_all_wallets_cmd->callback([] {
-      call(wallet_url, wallet_lock_all);
-      std::cout << localized("Locked All Wallets") << std::endl;
-   });
+   {
+      auto lock_all_wallets_cmd = wallet_cmd->add_subcommand("lock_all", localized("Lock all unlocked wallets"));
+      lock_all_wallets_cmd->callback([] {
+         call(wallet_url, wallet_lock_all);
+         std::cout << localized("Locked All Wallets") << std::endl;
+      });
+   }
 
    // unlock wallet
    string wallet_pw;
-   auto unlock_wallet_cmd = wallet_cmd->add_subcommand("unlock", localized("Unlock wallet"));
-   unlock_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to unlock"));
-   unlock_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   unlock_wallet_cmd->callback([&wallet_name, &wallet_pw] {
-      prompt_for_wallet_password(wallet_pw, wallet_name);
+   {
+      auto unlock_wallet_cmd = wallet_cmd->add_subcommand("unlock", localized("Unlock wallet"));
+      unlock_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to unlock"));
+      unlock_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+      unlock_wallet_cmd->callback([&wallet_name, &wallet_pw] {
+         prompt_for_wallet_password(wallet_pw, wallet_name);
 
-      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
-      call(wallet_url, wallet_unlock, vs);
-      std::cout << localized("Unlocked: ${wallet_name}", ("wallet_name", wallet_name)) << std::endl;
-   });
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
+         call(wallet_url, wallet_unlock, vs);
+         std::cout << localized("Unlocked: ${wallet_name}", ("wallet_name", wallet_name)) << std::endl;
+      });
+   }
 
    // import keys into wallet
-   string wallet_key_str;
-   auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
-   import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
-   import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key in WIF format to import"))->expected(0, 1);
-   import_wallet_cmd->callback([&wallet_name, &wallet_key_str] {
-      if( wallet_key_str.size() == 0 ) {
-         std::cout << localized("private key: ");
-         fc::set_console_echo(false);
-         std::getline( std::cin, wallet_key_str, '\n' );
-         fc::set_console_echo(true);
-      }
+   {
+      string wallet_key_str;
+      auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
+      import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
+      import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key in WIF format to import"))->expected(0, 1);
+      import_wallet_cmd->callback([&wallet_name, &wallet_key_str] {
+         if( wallet_key_str.size() == 0 ) {
+            std::cout << localized("private key: ");
+            fc::set_console_echo(false);
+            std::getline( std::cin, wallet_key_str, '\n' );
+            fc::set_console_echo(true);
+         }
 
-      private_key_type wallet_key;
-      try {
-         wallet_key = private_key_type( wallet_key_str );
-      } catch (...) {
-         SYS_THROW(private_key_type_exception, "Invalid private key")
-      }
-      public_key_type pubkey = wallet_key.get_public_key();
+         private_key_type wallet_key;
+         try {
+            wallet_key = private_key_type( wallet_key_str );
+         } catch (...) {
+            SYS_THROW(private_key_type_exception, "Invalid private key")
+         }
+         public_key_type pubkey = wallet_key.get_public_key();
 
-      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_key)};
-      call(wallet_url, wallet_import_key, vs);
-      std::cout << localized("imported private key for: ${pubkey}", ("pubkey", pubkey.to_string({}))) << std::endl;
-   });
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_key)};
+         call(wallet_url, wallet_import_key, vs);
+         std::cout << localized("imported private key for: ${pubkey}", ("pubkey", pubkey.to_string({}))) << std::endl;
+      });
+   }
 
    // remove keys from wallet
-   string wallet_rm_key_str;
-   auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove key from wallet"));
-   remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
+   {
+      string wallet_rm_key_str;
+      auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove key from wallet"));
+      remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
 
-   // TODO: As a nice to have convert `key` option to 1 of 3 (pubkey, privkey, key_name)
-   remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key in WIF format to remove"))->required();
-   remove_key_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
-      prompt_for_wallet_password(wallet_pw, wallet_name);
-      try {
-         public_key_type pubkey = public_key_type(wallet_rm_key_str);
-      } catch (...) {
-         SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
-      }
-      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw), fc::variant(wallet_rm_key_str)};
-      call(wallet_url, wallet_remove_key, vs);
-      std::cout << localized("removed private key for: ${pubkey}", ("pubkey", wallet_rm_key_str)) << std::endl;
-   });
+      // TODO: As a nice to have convert `key` option to 1 of 3 (pubkey, privkey, key_name)
+      remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key in WIF format to remove"))->required();
+      remove_key_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+      remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
+         prompt_for_wallet_password(wallet_pw, wallet_name);
+         try {
+            public_key_type pubkey = public_key_type(wallet_rm_key_str);
+         } catch (...) {
+            SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
+         }
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw), fc::variant(wallet_rm_key_str)};
+         call(wallet_url, wallet_remove_key, vs);
+         std::cout << localized("removed private key for: ${pubkey}", ("pubkey", wallet_rm_key_str)) << std::endl;
+      });
+   }
 
    // create a key within wallet
-   string wallet_create_key_type;
-   auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
-   create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
-   create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1)"))->type_name("K1/R1")->capture_default_str();
-   create_key_in_wallet_cmd->callback([&wallet_name, &wallet_create_key_type] {
-      //an empty key type is allowed -- it will let the underlying wallet pick which type it prefers
-      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_create_key_type)};
-      const auto& v = call(wallet_url, wallet_create_key, vs);
-      std::cout << localized("Created new private key with a public key of: ") << fc::json::to_pretty_string(v) << std::endl;
-   });
+   {
+      string wallet_create_key_type;
+      auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
+      create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
+      create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1)"))->type_name("K1/R1")->capture_default_str();
+      create_key_in_wallet_cmd->callback([&wallet_name, &wallet_create_key_type] {
+         //an empty key type is allowed -- it will let the underlying wallet pick which type it prefers
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_create_key_type)};
+         const auto& v = call(wallet_url, wallet_create_key, vs);
+         std::cout << localized("Created new private key with a public key of: ") << fc::json::to_pretty_string(v) << std::endl;
+      });
+   }
 
    // list wallets
-   auto list_wallet_cmd = wallet_cmd->add_subcommand("list", localized("List opened wallets, * = unlocked"));
-   list_wallet_cmd->callback([] {
-      std::cout << localized("Wallets:") << std::endl;
-      const auto& v = call(wallet_url, wallet_list);
-      std::cout << fc::json::to_pretty_string(v) << std::endl;
-   });
+   {
+      auto list_wallet_cmd = wallet_cmd->add_subcommand("list", localized("List opened wallets, * = unlocked"));
+      list_wallet_cmd->callback([] {
+         std::cout << localized("Wallets:") << std::endl;
+         const auto& v = call(wallet_url, wallet_list);
+         std::cout << fc::json::to_pretty_string(v) << std::endl;
+      });
+   }
 
    // list keys
-   auto list_keys_cmd = wallet_cmd->add_subcommand("keys", localized("List of public keys from all unlocked wallets."));
-   list_keys_cmd->callback([] {
-      const auto& v = call(wallet_url, wallet_public_keys);
-      std::cout << fc::json::to_pretty_string(v) << std::endl;
-   });
+   {
+      auto list_keys_cmd = wallet_cmd->add_subcommand("keys", localized("List of public keys from all unlocked wallets."));
+      list_keys_cmd->callback([] {
+         const auto& v = call(wallet_url, wallet_public_keys);
+         std::cout << fc::json::to_pretty_string(v) << std::endl;
+      });
+   }
 
    // list keys by name
-   auto list_keys_by_name_cmd = wallet_cmd->add_subcommand("keys-by-name", localized("List of public keys from all unlocked wallets."));
-   list_keys_by_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
-   list_keys_by_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
-   list_keys_by_name_cmd->callback([&] {
-      get_or_prompt_wallet_password(wallet_pw, wallet_name);
-      fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
-      const auto& v = call(wallet_url, wallet_list_keys_by_name, vs);
-      std::cout << fc::json::to_pretty_string(v) << std::endl;
-   });
+   {
+      auto list_keys_by_name_cmd = wallet_cmd->add_subcommand("keys-by-name", localized("List of public keys from all unlocked wallets."));
+      list_keys_by_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
+      list_keys_by_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+      list_keys_by_name_cmd->callback([&] {
+         get_or_prompt_wallet_password(wallet_pw, wallet_name);
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw)};
+         const auto& v = call(wallet_url, wallet_list_keys_by_name, vs);
+         std::cout << fc::json::to_pretty_string(v) << std::endl;
+      });
+   }
 
-   // TODO: Implement set-key-name
+
    {
       std::string new_key_name;
       std::string current_key_name;
