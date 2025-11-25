@@ -78,6 +78,9 @@ public:
    /// @return A list of private keys from a wallet provided password is correct to said wallet
    map<public_key_type,private_key_type> list_keys(const string& name, const string& pw);
 
+   /// @return A list of human readable key names and the public/private keys from a wallet provided password is correct to said wallet
+   map<string,wallet_key_entry> list_keys_by_name(const string& name, const string& pw);
+
    /// @return A set of public keys from all unlocked wallets, use with chain_controller::get_required_keys.
    flat_set<public_key_type> get_public_keys();
 
@@ -120,6 +123,34 @@ public:
    /// @throws fc::exception if wallet not found or locked, or if the wallet cannot create said type of key
    /// @return The public key of the created key
    string create_key(const std::string& name, const std::string& key_type);
+
+   /// Sets a name for the specified public key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to set key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the name/alias to set for the key
+   /// @param pub_key_str the public key string to set name for
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name_with_public_key(const string& name, const string& pw, const string& key_name, const string& pub_key_str);
+
+   /// Sets a name for the specified private key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to set key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the name/alias to set for the key
+   /// @param priv_key_str the private key string to set name for
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name_with_private_key(const string& name, const string& pw, const string& key_name,
+                                      const string& priv_key_str);
+
+   /// Updates the name/alias of an existing key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to update key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the new name/alias to set for the key
+   /// @param current_key_name the current name/alias of the key to update
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name(const string& name, const string& pw, const string& key_name, const string& current_key_name);
 
    /// Takes ownership of a wallet to use
    void own_and_use_wallet(const string& name, std::unique_ptr<wallet_api>&& wallet);

@@ -51,6 +51,21 @@ using namespace sysio;
      } \
      auto result = api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>(), params.at(2).as<in_param2>());
 
+#define INVOKE_R_R_R_R_R(api_handle, call_name, in_param0, in_param1, in_param2, in_param3) \
+     const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
+     if (params.size() != 4) { \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+     } \
+     auto result = api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>(), params.at(2).as<in_param2>(), params.at(3).as<in_param3>());
+
+#define INVOKE_V_R_R_R_R(api_handle, call_name, in_param0, in_param1, in_param2, in_param3) \
+     const auto& params = parse_params<fc::variants, http_params_types::params_required>(body);\
+     if (params.size() != 4) { \
+        SYS_THROW(chain::invalid_http_request, "Missing valid input from POST body"); \
+     } \
+     api_handle.call_name(params.at(0).as<in_param0>(), params.at(1).as<in_param1>(), params.at(2).as<in_param2>(), params.at(3).as<in_param3>()); \
+     sysio::detail::wallet_api_plugin_empty result;
+
 #define INVOKE_R_V(api_handle, call_name) \
      body = parse_params<std::string, http_params_types::no_params>(body); \
      auto result = api_handle.call_name();
@@ -114,7 +129,15 @@ void wallet_api_plugin::plugin_startup() {
             INVOKE_R_V(wallet_mgr, list_wallets), 200),
        CALL_WITH_400(wallet, wallet_mgr, list_keys,
             INVOKE_R_R_R(wallet_mgr, list_keys, std::string, std::string), 200),
-       CALL_WITH_400(wallet, wallet_mgr, get_public_keys,
+      CALL_WITH_400(wallet, wallet_mgr, list_keys_by_name,
+            INVOKE_R_R_R(wallet_mgr, list_keys_by_name, std::string, std::string), 200),
+      CALL_WITH_400(wallet, wallet_mgr, set_key_name_with_public_key,
+            INVOKE_V_R_R_R_R(wallet_mgr, set_key_name_with_public_key, std::string, std::string, std::string, std::string), 200),
+      CALL_WITH_400(wallet, wallet_mgr, set_key_name_with_private_key,
+            INVOKE_V_R_R_R_R(wallet_mgr, set_key_name_with_private_key, std::string, std::string, std::string, std::string), 200),
+      CALL_WITH_400(wallet, wallet_mgr, set_key_name,
+            INVOKE_V_R_R_R_R(wallet_mgr, set_key_name, std::string, std::string, std::string, std::string), 200),
+      CALL_WITH_400(wallet, wallet_mgr, get_public_keys,
             INVOKE_R_V(wallet_mgr, get_public_keys), 200)
    }, appbase::exec_queue::read_write);
 }

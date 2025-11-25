@@ -1,7 +1,6 @@
 #include <sysio/chain/application.hpp>
 #include <sysio/wallet_plugin/wallet_manager.hpp>
 #include <sysio/wallet_plugin/wallet.hpp>
-#include <sysio/wallet_plugin/se_wallet.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <boost/algorithm/string.hpp>
 namespace sysio {
@@ -125,13 +124,63 @@ std::vector<std::string> wallet_manager::list_wallets() {
 map<public_key_type,private_key_type> wallet_manager::list_keys(const string& name, const string& pw) {
    check_timeout();
 
-   if (wallets.count(name) == 0)
+   if (!wallets.contains(name))
       SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", name));
    auto& w = wallets.at(name);
    if (w->is_locked())
       SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
    w->check_password(pw); //throws if bad password
    return w->list_keys();
+}
+
+map<string, wallet_key_entry> wallet_manager::list_keys_by_name(const string& name, const string& pw) {
+   check_timeout();
+
+   if (!wallets.contains(name))
+      SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", name));
+   auto& w = wallets.at(name);
+   if (w->is_locked())
+      SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
+   w->check_password(pw); //throws if bad password
+   return w->list_keys_by_name();
+}
+
+void wallet_manager::set_key_name_with_public_key(const string& name, const string& pw, const string& key_name, const string& pub_key_str) {
+   check_timeout();
+
+   if (!wallets.contains(name))
+      SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", name));
+   auto& w = wallets.at(name);
+   if (w->is_locked())
+      SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
+   w->check_password(pw); //throws if bad password
+   w->set_key_name(public_key_type(pub_key_str), key_name);
+}
+
+void wallet_manager::set_key_name_with_private_key(const string& name, const string& pw, const string& key_name,
+   const string& priv_key_str) {
+   check_timeout();
+
+   if (!wallets.contains(name))
+      SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", name));
+   auto& w = wallets.at(name);
+   if (w->is_locked())
+      SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
+   w->check_password(pw); //throws if bad password
+   w->set_key_name(private_key_type(priv_key_str), key_name);
+}
+
+void wallet_manager::set_key_name(const string& name, const string& pw, const string& key_name,
+   const string& current_key_name) {
+   check_timeout();
+
+   if (!wallets.contains(name))
+      SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", name));
+   auto& w = wallets.at(name);
+   if (w->is_locked())
+      SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
+   w->check_password(pw); //throws if bad password
+   w->set_key_name(current_key_name, key_name);
 }
 
 flat_set<public_key_type> wallet_manager::get_public_keys() {

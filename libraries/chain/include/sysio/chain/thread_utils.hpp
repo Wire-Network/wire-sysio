@@ -1,9 +1,8 @@
 #pragma once
 
-#include <sysio/chain/name.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger_config.hpp>
-#include <fc/traits.hpp>
+#include <fc/type_info.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <future>

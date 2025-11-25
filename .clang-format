@@ -20,5 +20,6 @@ BreakInheritanceList: BeforeComma
 ConstructorInitializerIndentWidth: 3
 ContinuationIndentWidth: 3
 MaxEmptyLinesToKeep: 3
-SortIncludes:    Never
+SortIncludes: true
+IncludeBlocks: Regroup
 IndentPPDirectives: BeforeHash
