@@ -448,9 +448,10 @@ try {
 
       authority owner_auth =  authority( chain.get_public_key( a, "owner" ) );
 
-      vector<permission_level> pls = {{acc1, name("active")}};
-      pls.push_back({acc1, name("owner")}); // same account but different permission names
+      vector<permission_level> pls = {};
       pls.push_back({acc1, config::sysio_payer_name});
+      pls.push_back({acc1, name("active")});
+      pls.push_back({acc1, name("owner")}); // same account but different permission names
       pls.push_back({acc1a, name("owner")});
       trx.actions.emplace_back( pls,
                                 newaccount{
@@ -640,7 +641,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "100.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 
@@ -650,15 +650,13 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
    trace = chain.push_action("sysio.token"_n, name("transfer"),
-      vector<permission_level>{{"tester"_n, config::active_name},{"tester"_n, config::sysio_payer_name}},
+      vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, config::active_name}},
       fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
        ("quantity", "1.0000 CUR")
        ("memo", "hi" )
    );
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    liquid_balance = chain.get_currency_balance("sysio.token"_n, symbol(SY(4,CUR)), "sysio.token"_n);
    BOOST_REQUIRE_EQUAL(asset::from_string("999900.0000 CUR"), liquid_balance);
@@ -683,14 +681,11 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
            ("account", "tester")
            ("code", "sysio.token")
            ("type", "transfer"));
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    // delete auth
    trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first"));
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks(1);;
 
@@ -700,7 +695,6 @@ BOOST_AUTO_TEST_CASE(delete_auth) { try {
        ("quantity", "3.0000 CUR")
        ("memo", "hi" )
    );
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    chain.produce_blocks();
 

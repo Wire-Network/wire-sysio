@@ -63,7 +63,7 @@ struct dry_run_trx_tester : validating_tester {
 
    void insert_a_record() {
       auto res = send_db_api_transaction("insert"_n, insert_data);
-      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+      BOOST_CHECK(!!res->receipt);
       produce_block();
    }
 
@@ -292,7 +292,7 @@ BOOST_FIXTURE_TEST_CASE(db_insert_test, dry_run_trx_tester) { try {
 
    // do a dry-run transaction and verify the return value (age) is the same as inserted
    auto res = send_db_api_transaction("getage"_n, getage_data, vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::dry_run);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 10);
    BOOST_CHECK_GT(res->net_usage, 0u);
    BOOST_CHECK_GT(res->elapsed.count(), 0u);
@@ -311,7 +311,7 @@ BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, dry_run_trx_tester) { try {
    auto prev_auth_sequence = amo->auth_sequence; 
 
    auto res = send_db_api_transaction("insert"_n, insert_data);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
 
    BOOST_CHECK_EQUAL( prev_global_action_sequence + 1, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence + 1, receiver_account->recv_sequence );

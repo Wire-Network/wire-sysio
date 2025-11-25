@@ -350,11 +350,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
 
    auto trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "hello" ));
 
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
-
    trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 2));
-
-   BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
    // Spot onto contract_table
    auto result = chain.find_table_delta("contract_table");
@@ -447,22 +443,16 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.produce_blocks(2);
 
       auto trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "hello"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "world"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "!"));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 2));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 3));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "addnumobj"_n, "tester"_n, mutable_variant_object()("input", 4));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       // Spot onto contract_row with full snapshot
       auto result = chain.find_table_delta("contract_row", true);
@@ -486,10 +476,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.produce_block();
 
       trace = chain.push_action("tester"_n, "erasenumobj"_n, "tester"_n, mutable_variant_object()("id", 1));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       trace = chain.push_action("tester"_n, "erasenumobj"_n, "tester"_n, mutable_variant_object()("id", 0));
-      BOOST_REQUIRE_EQUAL(transaction_receipt::executed, trace->receipt->status);
 
       result = chain.find_table_delta("contract_row");
       BOOST_REQUIRE(result.first);

@@ -9,6 +9,8 @@
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include <fstream>
+#include <array>
+#include <ranges>
 
 #include <contracts.hpp>
 
@@ -281,8 +283,7 @@ namespace sysio { namespace testing {
          const auto& [ block, id ] = t;
          FC_ASSERT( block );
          for( auto receipt : block->transactions ) {
-            auto& pt = std::get<packed_transaction>(receipt.trx);
-            chain_transactions[pt.get_transaction().id()] = std::move(receipt);
+            chain_transactions.insert_or_assign(receipt.trx.id(), std::move(receipt));
          }
       });
    }
@@ -340,7 +341,9 @@ namespace sysio { namespace testing {
 
       if( !skip_pending_trxs ) {
          for( auto itr = unapplied_transactions.begin(); itr != unapplied_transactions.end();  ) {
-            auto trace = control->push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), DEFAULT_BILLED_CPU_TIME_US, true, 0 );
+            const auto& trx = itr->trx_meta->packed_trx()->get_transaction();
+            cpu_usage_t billed_cpu_us(trx.total_actions(), DEFAULT_BILLED_CPU_TIME_US);
+            auto trace = control->test_push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
             traces.emplace_back( trace );
             if(!no_throw && trace->except) {
                // this always throws an fc::exception, since the original exception is copied into an fc::exception
@@ -659,7 +662,11 @@ namespace sysio { namespace testing {
             fc::microseconds::maximum() :
             fc::microseconds( deadline - fc::time_point::now() );
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, transaction_metadata::trx_type::input );
-      auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
+      const bool explicit_billed_cpu_time = billed_cpu_time_us > 0;
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx.get_transaction().total_actions(), billed_cpu_time_us/trx.get_transaction().total_actions());
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except ) throw *r->except;
       return r;
@@ -687,7 +694,13 @@ namespace sysio { namespace testing {
       if (c == packed_transaction::compression_type::zlib)
          ptrx->decompress();
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
-      auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
+      bool explicit_billed_cpu_time = billed_cpu_time_us > 0 && trx_type == transaction_metadata::trx_type::input;
+      if (trx_type == transaction_metadata::trx_type::implicit)
+         explicit_billed_cpu_time = true;
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), billed_cpu_time_us/trx.total_actions());
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if (no_throw) return r;
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except)  throw *r->except;
@@ -700,8 +713,9 @@ namespace sysio { namespace testing {
       signed_transaction trx;
       if (authorizer) {
          act.authorization = vector<permission_level>{
-            {account_name(authorizer), config::active_name},
-            {account_name(authorizer), config::sysio_payer_name}};
+               {account_name(authorizer), config::sysio_payer_name},
+               {account_name(authorizer), config::active_name}
+      };
       }
       trx.actions.emplace_back(std::move(act));
       set_transaction_headers(trx);

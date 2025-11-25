@@ -671,7 +671,7 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
       trx.set_reference_block( b->calculate_id() ); // tapos to dan's block should be rejected on fork switch
       trx.sign( get_private_key( config::system_account_name, "active" ), c.control->get_chain_id()  );
       trace4 = c.push_transaction( trx );
-      BOOST_CHECK( trace4->receipt->status == transaction_receipt_header::executed );
+      BOOST_CHECK( !!trace4->receipt );
    }
    c.produce_block();
    c.produce_blocks(9);
@@ -731,11 +731,11 @@ BOOST_AUTO_TEST_CASE( push_block_returns_forked_transactions ) try {
 
    BOOST_REQUIRE_EQUAL( 4u, traces.size() );
    BOOST_CHECK_EQUAL( trace1->id, traces.at(0)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(0)->receipt->status );
+   BOOST_CHECK( !!traces.at(0)->receipt );
    BOOST_CHECK_EQUAL( trace2->id, traces.at(1)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(1)->receipt->status );
+   BOOST_CHECK( !!traces.at(1)->receipt );
    BOOST_CHECK_EQUAL( trace3->id, traces.at(2)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(2)->receipt->status );
+   BOOST_CHECK( !!traces.at(2)->receipt );
    // test4 failed because it was tapos to a forked out block
    BOOST_CHECK_EQUAL( trace4->id, traces.at(3)->id );
    BOOST_CHECK( !traces.at(3)->receipt );

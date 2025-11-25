@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_test)
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = std::make_shared<signed_block>(std::move(*b));
-   auto signed_tx = std::get<packed_transaction>(copy_b->transactions.back().trx).get_signed_transaction();
+   auto signed_tx = copy_b->transactions.back().trx.get_signed_transaction();
    auto it = std::ranges::find_if(signed_tx.actions, [](const action& a) { return a.name == "newaccount"_n; });
    BOOST_REQUIRE(it != signed_tx.actions.end());
    auto& act = *it;
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(block_with_invalid_tx_mroot_test)
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = std::make_shared<signed_block>(std::move(*b));
-   const auto& packed_trx = std::get<packed_transaction>(copy_b->transactions.back().trx);
+   const auto& packed_trx = copy_b->transactions.back().trx;
    auto signed_tx = packed_trx.get_signed_transaction();
 
    // Change the transaction that will be run
@@ -102,7 +102,7 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(validating_te
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = std::make_shared<signed_block>(b->clone());
-   const auto& packed_trx = std::get<packed_transaction>(copy_b->transactions.back().trx);
+   const auto& packed_trx = copy_b->transactions.back().trx;
    auto signed_tx = packed_trx.get_signed_transaction();
    // Corrupt one signature
    signed_tx.signatures.clear();

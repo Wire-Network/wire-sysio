@@ -743,6 +743,8 @@ BOOST_AUTO_TEST_CASE(transaction_test) { try {
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy")))
          })
+      )
+      ("context_free_data", fc::variants({""})
       );
 
    abi_serializer::from_variant(pretty_trx, trx, test.get_resolver(), abi_serializer::create_yield_function( test.abi_serializer_max_time ));
@@ -894,6 +896,8 @@ BOOST_AUTO_TEST_CASE(transaction_metadata_test) { try {
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy data")))
          })
+      )
+      ("context_free_data", fc::variants({""})
       );
 
       abi_serializer::from_variant(pretty_trx, trx, test.get_resolver(), abi_serializer::create_yield_function( test.abi_serializer_max_time ));
