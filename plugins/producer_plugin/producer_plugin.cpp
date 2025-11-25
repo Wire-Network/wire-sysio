@@ -712,7 +712,6 @@ public:
    chain::bls_pub_priv_key_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
    chain::db_read_mode                               _db_read_mode = db_read_mode::HEAD;
-   block_timing_util::producer_watermarks            _producer_watermarks;
    pending_block_mode                                _pending_block_mode = pending_block_mode::speculating;
    unapplied_transaction_queue                       _unapplied_transactions;
    alignas(hardware_destructive_interference_sz)
@@ -874,13 +873,8 @@ public:
    }
 
    void on_accepted_block_header(const signed_block_ptr& block) {
-      if (!block->is_proper_svnn_block()) {
-         if (_producers.contains(block->producer))
-            _producer_watermarks.consider_new_watermark(block->producer, block->block_num(), block->timestamp);
-      } else {
-         _implicit_pause_vote_tracker.update_active_finalizers();
-         _implicit_pause_vote_tracker.record_received_block(fc::time_point::now(), block->timestamp);
-      }
+      _implicit_pause_vote_tracker.update_active_finalizers();
+      _implicit_pause_vote_tracker.record_received_block(fc::time_point::now(), block->timestamp);
    }
 
    void on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id) {
@@ -2117,24 +2111,6 @@ producer_plugin_impl::determine_pending_block_mode(const fc::time_point& now,
    }
 
    if (in_producing_mode()) {
-      // determine if our watermark excludes us from producing at this point
-      if (auto current_watermark = _producer_watermarks.get_watermark(scheduled_producer.producer_name)) {
-         const block_timestamp_type block_timestamp{block_time};
-         if (current_watermark->first > head_block_num) {
-            fc_elog(_log, "Not producing block because \"${producer}\" signed a block at a higher block number (${watermark}) than the current "
-                    "fork's head (${head_block_num})",
-                    ("producer", scheduled_producer.producer_name)("watermark", current_watermark->first)("head_block_num", head_block_num));
-            _pending_block_mode = pending_block_mode::speculating;
-         } else if (current_watermark->second >= block_timestamp) {
-            fc_elog(_log, "Not producing block because \"${producer}\" signed a block at the next block time or later (${watermark}) than the pending "
-                    "block time (${block_timestamp})",
-                    ("producer", scheduled_producer.producer_name)("watermark", current_watermark->second)("block_timestamp", block_timestamp));
-            _pending_block_mode = pending_block_mode::speculating;
-         }
-      }
-   }
-
-   if (in_producing_mode()) {
       uint32_t production_round_index = block_timestamp_type(block_time).slot % chain::config::producer_repetitions;
       if (production_round_index == 0) {
          // first block of our round, wait for block production window
@@ -2776,8 +2752,7 @@ void producer_plugin_impl::schedule_production_loop() {
          chain::controller& chain = chain_plug->chain();
          fc_dlog(_log, "Waiting till another block is received and scheduling Speculative/Production Change");
          auto wake_time = block_timing_util::calculate_producer_wake_up_time(_produce_block_cpu_effort, chain.head().block_num(), calculate_pending_block_time(),
-                                                                             _producers, chain.head_active_producers().producers,
-                                                                             _producer_watermarks);
+                                                                             _producers, chain.head_active_producers().producers);
          schedule_delayed_production_loop(weak_from_this(), wake_time);
       } else {
          fc_tlog(_log, "Waiting till another block is received");
@@ -2795,8 +2770,7 @@ void producer_plugin_impl::schedule_production_loop() {
       fc_dlog(_log, "Speculative Block Created; Scheduling Speculative/Production Change");
       SYS_ASSERT(chain.is_building_block(), missing_pending_block_state, "speculating without pending_block_state");
       auto wake_time = block_timing_util::calculate_producer_wake_up_time(fc::microseconds{config::block_interval_us}, chain.pending_block_num(), chain.pending_block_timestamp(),
-                                                                          _producers, chain.head_active_producers().producers,
-                                                                          _producer_watermarks);
+                                                                          _producers, chain.head_active_producers().producers);
       if (wake_time && fc::time_point::now() > *wake_time) {
          // if wake time has already passed then use the block deadline instead
          wake_time = _pending_block_deadline;
