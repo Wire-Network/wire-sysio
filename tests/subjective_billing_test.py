@@ -35,7 +35,7 @@ testSuccessful=False
 random.seed(seed) # Use a fixed seed for repeatability.
 cluster=Cluster(unshared=args.unshared, keepRunning=True if nodesFile is not None else args.leave_running, keepLogs=args.keep_logs)
 
-walletMgr=WalletMgr(True)
+walletMgr=WalletMgr(True, keepRunning=args.leave_running, keepLogs=args.keep_logs)
 SYSIO_ACCT_PRIVATE_DEFAULT_KEY = "5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3"
 SYSIO_ACCT_PUBLIC_DEFAULT_KEY = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
@@ -51,6 +51,8 @@ try:
         print("Stand up walletd")
         if walletMgr.launch() is False:
             errorExit("Failed to stand up kiod.")
+    else:
+        cluster.setWalletMgr(walletMgr)
 
     Print ("producing nodes: %s, non-producing nodes: %d, topology: %s, delay between nodes launch(seconds): %d" % (pnodes, total_nodes-pnodes, topo, delay))
 

@@ -44,6 +44,7 @@ namespace sysio { namespace chain {
    class global_property_object;
    class permission_object;
    class account_object;
+   class account_metadata_object;
    class deep_mind_handler;
    class subjective_billing;
    using resource_limits::resource_limits_manager;
@@ -189,6 +190,8 @@ namespace sysio { namespace chain {
          const fork_database& fork_db()const;
 
          const account_object&                 get_account( account_name n )const;
+         const account_object*                 find_account( account_name n )const;
+         const account_metadata_object*        find_account_metadata( account_name n )const;
          const global_property_object&         get_global_properties()const;
          const dynamic_global_property_object& get_dynamic_global_properties()const;
          const resource_limits_manager&        get_resource_limits_manager()const;

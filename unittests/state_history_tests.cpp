@@ -113,28 +113,36 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   // Check that no account table deltas are present
-   BOOST_REQUIRE_EQUAL(chain.find_table_delta("account").first, false);
+   // verify only onblock recv_sequence in delta
+   auto result = chain.find_table_delta("account");
+   BOOST_REQUIRE(result.first);
+   auto& it_account = result.second;
+   BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
+   auto accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account);
+   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
 
    // Create new account
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
    // Verify that a new record for the new account in the state delta of the block
-   auto result = chain.find_table_delta("account");
+   result = chain.find_table_delta("account");
    BOOST_REQUIRE(result.first);
-   auto &it_account = result.second;
-   BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
+   auto& it_account2 = result.second;
+   BOOST_REQUIRE_EQUAL(it_account2->rows.obj.size(), 2u);
 
-   auto accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account);
-   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), "newacc");
+   accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account2);
+   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
+   BOOST_REQUIRE_EQUAL(accounts[1].name.to_string(), "newacc");
 
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
    table_deltas_tester chain;
-   chain.produce_block();
 
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.produce_block();
+
+   chain.set_code("newacc"_n, std::vector<uint8_t>{}); // creates the account_metadata
 
    // Spot onto account metadata
    auto result = chain.find_table_delta("account_metadata");
