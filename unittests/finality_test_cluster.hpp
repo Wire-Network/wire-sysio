@@ -158,11 +158,12 @@ public:
       if (config.transition_to_savanna) {
          // transition to Savanna
          // ---------------------
-         fin_policy_0 = node0.finkeys.transition_to_savanna([&](const signed_block_ptr& b) {
-            for (size_t i=1; i<nodes.size(); ++i)
-               nodes[i].push_block(b);
-            process_votes(1, num_nodes - 1);
-         });
+         // TODO: remove
+         // fin_policy_0 = node0.finkeys.transition_to_savanna([&](const signed_block_ptr& b) {
+         //    for (size_t i=1; i<nodes.size(); ++i)
+         //       nodes[i].push_block(b);
+         //    process_votes(1, num_nodes - 1);
+         // });
 
          // at this point, node0 has a QC to include in next block.
          // Produce that block and push it, but don't process votes so that

@@ -37,9 +37,9 @@ BOOST_AUTO_TEST_SUITE(database_tests)
    }
 
    // Test the block fetching methods on database, fetch_bock_by_id, and fetch_block_by_number
-   BOOST_AUTO_TEST_CASE_TEMPLATE( get_blocks, T, validating_testers ) {
+   BOOST_AUTO_TEST_CASE( get_blocks ) {
       try {
-         T test;
+         savanna_validating_tester test;
          vector<block_id_type> block_ids;
 
          const uint32_t num_of_blocks_to_prod = 20;
@@ -52,15 +52,9 @@ BOOST_AUTO_TEST_SUITE(database_tests)
          }
 
          // Check the last irreversible block number is set correctly.
-         if constexpr (std::is_same_v<T, savanna_validating_tester>) {
-            // In Savanna, after 2-chain finality is achieved.
-            const auto expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
-            BOOST_TEST(test.last_irreversible_block_num() == expected_last_irreversible_block_number);
-         } else {
-            // With one producer, irreversibility should only just 1 block before
-            const auto expected_last_irreversible_block_number = test.head().block_num() - 1;
-            BOOST_TEST(test.control->head_block_state_legacy()->dpos_irreversible_blocknum == expected_last_irreversible_block_number);
-         }
+         // In Savanna, after 2-chain finality is achieved.
+         const auto expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
+         BOOST_TEST(test.last_irreversible_block_num() == expected_last_irreversible_block_number);
 
          // Ensure that future block doesn't exist
          const auto nonexisting_future_block_num = test.head().block_num() + 1;
@@ -70,13 +64,8 @@ BOOST_AUTO_TEST_SUITE(database_tests)
          test.produce_blocks(next_num_of_blocks_to_prod);
 
          // Check the last irreversible block number is updated correctly
-         if constexpr (std::is_same_v<T, savanna_validating_tester>) {
-            const auto next_expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
-            BOOST_TEST(test.last_irreversible_block_num() == next_expected_last_irreversible_block_number);
-         } else {
-            const auto next_expected_last_irreversible_block_number = test.head().block_num() - 1;
-            BOOST_TEST(test.control->head_block_state_legacy()->dpos_irreversible_blocknum == next_expected_last_irreversible_block_number);
-         }
+         const auto next_expected_last_irreversible_block_number = test.head().block_num() - num_chains_to_final;
+         BOOST_TEST(test.last_irreversible_block_num() == next_expected_last_irreversible_block_number);
          // Previous nonexisting future block should exist by now
          BOOST_CHECK_NO_THROW(test.fetch_block_by_number(nonexisting_future_block_num));
          // Check the latest head block match

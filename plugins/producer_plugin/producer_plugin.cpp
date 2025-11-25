@@ -730,7 +730,6 @@ public:
    bool                                              _disable_subjective_p2p_billing              = true;
    bool                                              _disable_subjective_api_billing              = true;
    fc::time_point                                    _irreversible_block_time;
-   std::atomic<bool>                                 _is_savanna_active                           = false;
 
    std::vector<chain::digest_type> _protocol_features_to_activate;
    bool                            _protocol_features_signaled = false; // to mark whether it has been signaled in start_block
@@ -889,9 +888,6 @@ public:
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
-      if (!_is_savanna_active) {
-         _is_savanna_active = lib->is_proper_svnn_block();
-      }
    }
 
    // called from multiple non-main threads
@@ -1212,8 +1208,7 @@ public:
 
       _pause_production = false;
       // reset vote received so production can be explicitly resumed, will pause again when received vote time limit hit again
-      if (_is_savanna_active)
-         _implicit_pause_vote_tracker.force_unpause();
+      _implicit_pause_vote_tracker.force_unpause();
 
       // it is possible that we are only speculating because of this policy which we have now changed
       // re-evaluate that now
@@ -1249,8 +1244,7 @@ public:
    bool in_speculating_mode() const { return _pending_block_mode == pending_block_mode::speculating; }
 
    void interrupt_transaction(controller::interrupt_t interrupt) {
-      if (_is_savanna_active) // interrupt during transition causes issues, so only allow after transition
-         chain_plug->chain().interrupt_transaction(interrupt);
+      chain_plug->chain().interrupt_transaction(interrupt);
    }
 };
 
@@ -1658,10 +1652,6 @@ void producer_plugin_impl::plugin_startup() {
       const auto fork_db_root = chain.fork_db_root();
       if (fork_db_root.block()) { // not available if starting from a snapshot
          on_irreversible_block(fork_db_root.block(), fork_db_root.id());
-
-         if (!_is_savanna_active && irreversible_mode() && chain_plug->accept_transactions()) {
-            wlog("Legacy consensus active. Accepting speculative transaction execution not recommended in read-mode=irreversible");
-         }
       } else {
          _irreversible_block_time = fc::time_point::maximum();
       }
@@ -2258,27 +2248,6 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
    try {
 
-      uint16_t blocks_to_confirm = 0;
-      if (in_producing_mode()) {
-         if (auto block_state = chain.head_block_state_legacy()) {  // only if savanna not enabled
-            // determine how many blocks this producer can confirm
-            // 1) if it is not a producer from this node, assume no confirmations (we will discard this block anyway)
-            // 2) if it is a producer on this node that has never produced, the conservative approach is to assume no
-            //    confirmations to make sure we don't double sign after a crash
-            // 3) if it is a producer on this node where this node knows the last block it produced, safely set it -UNLESS-
-            // 4) the producer on this node's last watermark is higher (meaning on a different fork)
-            if (auto current_watermark = _producer_watermarks.get_watermark(scheduled_producer.producer_name)) {
-               uint32_t watermark_bn = current_watermark->first;
-               if (watermark_bn < head_block_num) {
-                  blocks_to_confirm = (uint16_t)(std::min<uint32_t>(std::numeric_limits<uint16_t>::max(), (head_block_num - watermark_bn)));
-               }
-            }
-
-            // can not confirm irreversible blocks
-            blocks_to_confirm = (uint16_t)(std::min<uint32_t>(blocks_to_confirm, (head_block_num - block_state->dpos_irreversible_blocknum)));
-         }
-      }
-
       auto features_to_activate = chain.get_preactivated_protocol_features();
       if (in_producing_mode() && _protocol_features_to_activate.size() > 0) {
          bool drop_features_to_activate = false;
@@ -2322,7 +2291,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
 
       controller::block_status bs =
          in_producing_mode() ? controller::block_status::incomplete : controller::block_status::ephemeral;
-      chain.start_block(block_time, blocks_to_confirm, features_to_activate, bs, preprocess_deadline);
+      chain.start_block(block_time, features_to_activate, bs, preprocess_deadline);
    }
    LOG_AND_DROP();
 
@@ -3004,14 +2973,12 @@ void producer_plugin::received_block(uint32_t block_num, chain::fork_db_add_t fo
    my->_received_block = block_num;
    // fork_db_add_t::fork_switch means head block of best fork (different from the current branch) is received.
    // Since a better fork is available, interrupt current block validation and allow a fork switch to the better branch.
-   if (my->_is_savanna_active) { // interrupt during transition causes issues, so only allow after transition
-      if (fork_db_add_result == fork_db_add_t::appended_to_head) {
-         fc_tlog(_log, "new head block received, interrupting trx");
-         my->interrupt_transaction(controller::interrupt_t::speculative_block_trx);
-      } else if (fork_db_add_result == fork_db_add_t::fork_switch) {
-         fc_ilog(_log, "new best fork received, interrupting trx");
-         my->interrupt_transaction(controller::interrupt_t::all_trx);
-      }
+   if (fork_db_add_result == fork_db_add_t::appended_to_head) {
+      fc_tlog(_log, "new head block received, interrupting trx");
+      my->interrupt_transaction(controller::interrupt_t::speculative_block_trx);
+   } else if (fork_db_add_result == fork_db_add_t::fork_switch) {
+      fc_ilog(_log, "new best fork received, interrupting trx");
+      my->interrupt_transaction(controller::interrupt_t::all_trx);
    }
 }
 

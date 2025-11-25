@@ -171,7 +171,6 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
 
    BOOST_CHECK_EXCEPTION( c.control->start_block(
                               c.head().block_time() + fc::milliseconds(config::block_interval_ms),
-                              0,
                               {},
                               controller::block_status::incomplete
                           ),
@@ -375,7 +374,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   savanna_tester c;
 
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION( c.set_producers_legacy( {} ),
@@ -386,7 +385,7 @@ BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
    vector<name> producer_names = {"alice"_n,"bob"_n,"carol"_n};
    c.create_accounts( producer_names );
    c.set_producers_legacy( producer_names );
-   c.produce_blocks(2);
+   c.produce_blocks(24);
    const auto& schedule = c.get_producer_authorities( producer_names );
    BOOST_CHECK( std::equal( schedule.begin(), schedule.end(), c.control->active_producers().producers.begin()) );
 
@@ -1352,10 +1351,8 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
               fc::raw::pack(std::make_pair(remote.control->active_producers().version + 1, std::vector<char>{}))
       );
 
-      // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      // re-sign the bad block, with an unneeded sig
+      bad_block->producer_signature = remote.get_private_key("test"_n, "active").sign(bad_block->calculate_id());
 
       // ensure it is rejected because it doesn't match expected state (but the extention was accepted)
       BOOST_REQUIRE_EXCEPTION(
@@ -1370,9 +1367,7 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
       bad_block->not_used = legacy::producer_schedule_type{remote.control->active_producers().version + 1, {}};
 
       // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(bad_block->calculate_id());
 
       // ensure it is rejected because the not_used field is not null
       BOOST_REQUIRE_EXCEPTION(
@@ -1383,59 +1378,6 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
 
    remote.push_block(first_new_block);
    remote.push_block(c.produce_block());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_legacy_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
-
-   c.produce_blocks(2);
-
-   vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
-   c.produce_block();
-
-   // ensure the last block does not contains a not_used
-   auto last_legacy_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(last_legacy_block->not_used.has_value(), false);
-
-   // promote to active schedule
-   c.produce_block();
-
-   // ensure that the next block is updated to the new schedule
-   BOOST_REQUIRE_EXCEPTION( c.produce_block(), no_block_signatures, fc_exception_message_is( "Signer returned no signatures" ));
-   c.control->abort_block();
-
-   c.block_signing_private_keys.emplace(get_public_key("sysio"_n, "bsk"), get_private_key("sysio"_n, "bsk"));
-   c.produce_block();
-
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_extension_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
-
-   c.produce_blocks(3);
-
-   // start an in-flight producer schedule change before the activation is availble to header only validators
-   vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
-   c.produce_block();
-
-   // ensure the first possible new block contains a producer_schedule_change_extension
-   auto first_new_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(first_new_block->not_used.has_value(), false);
-   BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.size(), 1u);
-   BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.at(0).first, producer_schedule_change_extension::extension_id());
-
-   // promote to active schedule
-   c.produce_block();
-
-   // ensure that the next block is updated to the new schedule
-   BOOST_REQUIRE_EXCEPTION( c.produce_block(), no_block_signatures, fc_exception_message_is( "Signer returned no signatures" ));
-   c.control->abort_block();
-
-   c.block_signing_private_keys.emplace(get_public_key("sysio"_n, "bsk"), get_private_key("sysio"_n, "bsk"));
-   c.produce_block();
-
 } FC_LOG_AND_RETHROW() }
 
 static const char import_set_action_return_value_wast[] = R"=====(

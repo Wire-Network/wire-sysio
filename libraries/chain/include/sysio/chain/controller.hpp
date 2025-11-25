@@ -204,7 +204,6 @@ namespace sysio::chain {
           * returns the trace for the on_block action
           */
          transaction_trace_ptr start_block( block_timestamp_type time,
-                                            uint16_t confirm_block_count,
                                             const vector<digest_type>& new_protocol_feature_activations,
                                             block_status bs,
                                             const fc::time_point& deadline = fc::time_point::maximum() );
@@ -295,8 +294,6 @@ namespace sysio::chain {
          [[deprecated("Use head().header().")]]     const block_header&  head_block_header()const;
          [[deprecated("Use head().block().")]]      const signed_block_ptr& head_block()const;
 
-         // returns nullptr after instant finality enabled
-         block_state_legacy_ptr head_block_state_legacy()const;
          // returns finality_data associated with chain head for SHiP when in Savanna,
          // std::nullopt in Legacy
          std::optional<finality_data_t> head_finality_data() const;

@@ -484,7 +484,7 @@ namespace sysio::testing {
          preactivated_protocol_features.end()
       );
 
-      auto onblock_trace = control->start_block( block_time, head_block_number - last_produced_block_num,
+      auto onblock_trace = control->start_block( block_time,
                                                  feature_to_be_activated,
                                                  controller::block_status::incomplete );
 

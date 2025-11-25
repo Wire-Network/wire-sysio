@@ -2119,7 +2119,6 @@ struct controller_impl {
    } /// push_transaction
 
    transaction_trace_ptr start_block( block_timestamp_type when,
-                                      uint16_t confirm_block_count,
                                       const vector<digest_type>& new_protocol_feature_activations,
                                       controller::block_status s,
                                       const std::optional<block_id_type>& producer_block_id,
@@ -2634,7 +2633,7 @@ struct controller_impl {
             const auto& new_protocol_feature_activations = bsp->get_new_protocol_feature_activations();
             const auto& producer_block_id = bsp->id();
 
-            start_block( b->timestamp, b->confirmed, new_protocol_feature_activations, s, producer_block_id, fc::time_point::maximum() );
+            start_block( b->timestamp, new_protocol_feature_activations, s, producer_block_id, fc::time_point::maximum() );
             assert(pending); // created by start_block
 
             pending->_block_report.start_time = start;
@@ -3599,15 +3598,6 @@ struct controller_impl {
       fork_db_.set_pending_savanna_lib_id(id);
    }
 
-   // Returns corresponding Transition Savanna block for a given Legacy block.
-   block_state_ptr get_transition_savanna_block(const block_state_legacy_ptr& head) const {
-      return {};
-   }
-
-   std::optional<finality_data_t> get_transition_block_finality_data(const block_state_legacy_ptr& head) const {
-      return get_transition_savanna_block(head)->get_finality_data();
-   }
-
    std::optional<finality_data_t> head_finality_data() const {
       return chain_head.internal()->get_finality_data();
    }
@@ -3988,7 +3978,6 @@ void controller::validate_protocol_features( const vector<digest_type>& features
 }
 
 transaction_trace_ptr controller::start_block( block_timestamp_type when,
-                                               uint16_t confirm_block_count,
                                                const vector<digest_type>& new_protocol_feature_activations,
                                                block_status bs,
                                                const fc::time_point& deadline )
@@ -4001,7 +3990,7 @@ transaction_trace_ptr controller::start_block( block_timestamp_type when,
 
    SYS_ASSERT( bs == block_status::incomplete || bs == block_status::ephemeral, block_validate_exception, "speculative block type required" );
 
-   return my->start_block( when, confirm_block_count, new_protocol_feature_activations,
+   return my->start_block( when, new_protocol_feature_activations,
                            bs, std::optional<block_id_type>(), deadline );
 }
 
@@ -4161,12 +4150,7 @@ const block_header& controller::head_block_header()const {
    return my->chain_head.header();
 }
 
-block_state_legacy_ptr controller::head_block_state_legacy()const {
-   // returns null after instant finality activated
-   return nullptr; // TODO: remove
-}
-
-const signed_block_ptr& controller::head_block()const {
+ const signed_block_ptr& controller::head_block()const {
    return my->chain_head.block();
 }
 

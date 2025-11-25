@@ -8,9 +8,9 @@ using namespace chain;
 
 BOOST_AUTO_TEST_SUITE(block_tests)
 
-BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_test, T, testers )
+BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
 {
-   T main;
+   savanna_tester main;
 
    // First we create a valid block with valid transaction
    main.create_account("newacc"_n, config::system_account_name, false, true, false);
@@ -38,23 +38,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_test, T, testers )
    const auto& trxs = copy_b->transactions;
    for( const auto& a : trxs )
       trx_digests.emplace_back( a.digest() );
-   if constexpr (std::is_same_v<T, savanna_tester>) {
-      copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
-   } else {
-      copy_b->transaction_mroot = calculate_merkle_legacy( std::move(trx_digests) );
-   }
+   copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
 
    // Re-sign the block
-   if constexpr (std::is_same_v<T, savanna_tester>) {
-      copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
-   } else {
-      auto header_bmroot = digest_type::hash( std::make_pair( copy_b->digest(), main.control->head_block_state_legacy()->blockroot_merkle.get_root() ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, main.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(sig_digest);
-   }
+   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push block with invalid transaction to other chain
-   T validator;
+   savanna_tester validator;
    auto signed_copy_b = signed_block::create_signed_block(std::move(copy_b));
    auto [best_head, obh] = validator.control->accept_block( signed_copy_b->calculate_id(), signed_copy_b );
    BOOST_REQUIRE(obh);
@@ -66,9 +56,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_test, T, testers )
 
 }
 
-BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_mroot_test, T, testers )
+BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
 {
-   T main;
+   savanna_tester main;
 
    // First we create a valid block with valid transaction
    main.create_account("newacc"_n, config::system_account_name, false, true, false);
@@ -89,16 +79,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_mroot_test, T, testers )
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
 
    // Re-sign the block
-   if constexpr (std::is_same_v<T, savanna_tester>) {
-      copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
-   } else {
-      auto header_bmroot = digest_type::hash( std::make_pair( copy_b->digest(), main.control->head_block_state_legacy()->blockroot_merkle.get_root() ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, main.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(sig_digest);
-   }
+   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push block with invalid transaction to other chain
-   T validator;
+   savanna_tester validator;
    auto signed_copy_b = signed_block::create_signed_block(std::move(copy_b));
    BOOST_REQUIRE_EXCEPTION(validator.control->accept_block( signed_copy_b->calculate_id(), signed_copy_b ), fc::exception,
                            [] (const fc::exception &e)->bool {
@@ -107,7 +91,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( block_with_invalid_tx_mroot_test, T, testers )
                            }) ;
 }
 
-template <typename T>
+template <typename T = savanna_validating_tester>
 std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(T& main, account_name act_name) {
    // First we create a valid block with valid transaction
    main.create_account(act_name, config::system_account_name, false, true, false);
@@ -130,29 +114,19 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(T& main, acco
    const auto& trxs = copy_b->transactions;
    for( const auto& a : trxs )
       trx_digests.emplace_back( a.digest() );
-   if constexpr (std::is_same_v<T, savanna_validating_tester>) {
-      copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
-   } else {
-      copy_b->transaction_mroot = calculate_merkle_legacy( std::move(trx_digests) );
-   }
+   copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
 
    // Re-sign the block
-   if constexpr (std::is_same_v<T, savanna_validating_tester>) {
-      copy_b->producer_signature = main.get_private_key(b->producer, "active").sign(copy_b->calculate_id());
-   } else {
-      auto header_bmroot = digest_type::hash( std::make_pair( copy_b->digest(), main.control->head_block_state_legacy()->blockroot_merkle.get_root() ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, main.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      copy_b->producer_signature = main.get_private_key(b->producer, "active").sign(sig_digest);
-   }
+   copy_b->producer_signature = main.get_private_key(b->producer, "active").sign(copy_b->calculate_id());
 
    return std::pair<signed_block_ptr, signed_block_ptr>(b, signed_block::create_signed_block(std::move(copy_b)));
 }
 
 // verify that a block with a transaction with an incorrect signature, is blindly accepted from a trusted producer
-BOOST_AUTO_TEST_CASE_TEMPLATE( trusted_producer_test, T, validating_testers )
+BOOST_AUTO_TEST_CASE( trusted_producer_test )
 {
    flat_set<account_name> trusted_producers = { "defproducera"_n, "defproducerc"_n };
-   T main(trusted_producers);
+   savanna_validating_tester main(trusted_producers);
    // only using validating_tester to keep the 2 chains in sync, not to validate that the validating_node matches the main node,
    // since it won't be
    main.skip_validate = true;
@@ -170,7 +144,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( trusted_producer_test, T, validating_testers )
       b = main.produce_block();
    }
 
-   auto blocks = corrupt_trx_in_block<T>(main, "tstproducera"_n);
+   auto blocks = corrupt_trx_in_block(main, "tstproducera"_n);
    main.validate_push_block( blocks.second );
 }
 
@@ -347,8 +321,8 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions_tester, validating_tester) { t
    } FC_LOG_AND_RETHROW() }
 
 // Verify blocks are produced when onblock fails
-BOOST_AUTO_TEST_CASE_TEMPLATE(no_onblock_test, T, testers) { try {
-   T c;
+BOOST_AUTO_TEST_CASE(no_onblock_test) { try {
+   savanna_tester c;
 
    c.produce_block_ex();
    auto r = c.produce_block_ex();
@@ -369,17 +343,11 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(no_onblock_test, T, testers) { try {
    BOOST_TEST(!!r.onblock_trace->except);
    BOOST_TEST(!!r.onblock_trace->except_ptr);
 
-   // In Legacy, action_mroot is the mroot of all delivered action receipts.
    // In Savanna, action_mroot is the root of the Finality Tree
    // associated with the block, i.e. the root of
    // validation_tree(core.latest_qc_claim().block_num).
-   if constexpr (std::is_same_v<T, savanna_tester>) {
-      BOOST_TEST(r.block->is_proper_svnn_block());
-      BOOST_TEST(!r.block->action_mroot.empty());
-   } else {
-      BOOST_TEST(!r.block->is_proper_svnn_block());
-      BOOST_TEST(r.block->action_mroot.empty());
-   }
+   BOOST_TEST(r.block->is_proper_svnn_block());
+   BOOST_TEST(!r.block->action_mroot.empty());
    c.produce_empty_block();
 
 } FC_LOG_AND_RETHROW() }
@@ -426,6 +394,8 @@ BOOST_FIXTURE_TEST_CASE( invalid_qc_claim_block_num_test, validating_tester ) {
 // Verify that a block with an invalid action mroot is rejected
 BOOST_FIXTURE_TEST_CASE( invalid_action_mroot_test, tester )
 {
+   produce_blocks(5);
+
    // Create a block with transaction
    create_account("newacc"_n);
    auto b = produce_block();
@@ -437,7 +407,7 @@ BOOST_FIXTURE_TEST_CASE( invalid_action_mroot_test, tester )
    // Re-sign the block
    copy_b->producer_signature = get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
 
-   // Push the block containing corruptted action mroot. It should fail
+   // Push the block containing corrupted action mroot. It should fail
    BOOST_REQUIRE_EXCEPTION(push_block(signed_block::create_signed_block(std::move(copy_b))),
                            fc::exception,
                            [] (const fc::exception &e)->bool {
