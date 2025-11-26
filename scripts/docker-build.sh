@@ -12,6 +12,7 @@ TARGET="app-build-local"
 TAG="wire/sysio"
 SYSIO_BRANCH="master"
 CDT_BRANCH="master"
+UBUNTU_TAG="22.04"
 
 usage() {
   echo "Usage: $(basename "$0") [--target=<stage>] [--sysio-branch=<branch-name>] [--cdt-branch=<branch-name>] [--tag=<tag-name>]" 1>&2
@@ -19,6 +20,7 @@ usage() {
   echo "  --sysio-branch=<branch-or-ref> SYSIO Git branch or ref (default: ${SYSIO_BRANCH})" 1>&2
   echo "  --cdt-branch=<branch-or-ref> CDT Git branch or ref (default: ${SYSIO_BRANCH})" 1>&2
   echo "  --tag=<tag-name> Docker image tag to produce (default: ${TAG})" 1>&2
+  echo "  --ubuntu-tag=<22.04|24.04|25.04> Base Ubuntu tag (default: ${UBUNTU_TAG})" 1>&2
 }
 
 # Parse arguments
@@ -40,6 +42,10 @@ while [[ $# -gt 0 ]]; do
       CDT_BRANCH="${1#--cdt-branch=}"
       shift
       ;;    
+    --ubuntu-tag=*)
+      UBUNTU_TAG="${1#--ubuntu-tag=}"
+      shift
+      ;;
     -h|--help)
       usage
       exit 0
@@ -120,8 +126,10 @@ fi
 cd "${DOCKER_DIR}"
 docker build \
   --build-context llvm-11-scripts="${BASE_DIR}/scripts/llvm-11" \
+  --build-context clang-18-scripts="${BASE_DIR}/scripts/clang-18" \
   --build-context app-root="${BASE_DIR}" \
   --build-arg SYSIO_BRANCH=${SYSIO_BRANCH} \
+  --build-arg UBUNTU_TAG=${UBUNTU_TAG} \
   --build-arg CDT_BRANCH=${CDT_BRANCH} \
   --memory 32G \
   --tag "${TAG}" \
