@@ -165,7 +165,7 @@ void apply_sysio_setcode(apply_context& context) {
                                                      account_metadata->vm_type,
                                                      account_metadata->vm_version,
                                                      old_code_entry.first_block_used,
-                                                     context.control.head_block_num() + 1);
+                                                     context.control.head().block_num() + 1);
          } else {
             db.modify(old_code_entry, [](code_object& o) {
                --o.code_ref_count;

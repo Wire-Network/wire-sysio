@@ -4208,7 +4208,7 @@ namespace sysio {
 
       if (chain_plug->chain().get_read_mode() != db_read_mode::IRREVERSIBLE) {
          // irreversible notifies sync_manager when added to fork_db, non-irreversible notifies when applied
-         dispatcher.strand.post([sync_master = sync_master.get(), block, id]() {
+         boost::asio::post(dispatcher.strand, [sync_master = sync_master.get(), block, id]() {
             const fc::microseconds age(fc::time_point::now() - block->timestamp);
             sync_master->sync_recv_block(connection_ptr{}, id, block->block_num(), age);
          });
@@ -4243,7 +4243,7 @@ namespace sysio {
       chain::controller& cc = chain_plug->chain();
       if (cc.get_read_mode() == db_read_mode::IRREVERSIBLE) {
          // irreversible notifies sync_manager when added to fork_db, non-irreversible notifies when applied
-         dispatcher.strand.post([sync_master = sync_master.get(), block, id]() {
+         boost::asio::post(dispatcher.strand, [sync_master = sync_master.get(), block, id]() {
             const fc::microseconds age(fc::time_point::now() - block->timestamp);
             sync_master->sync_recv_block(connection_ptr{}, id, block->block_num(), age);
          });

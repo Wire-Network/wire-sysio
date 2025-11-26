@@ -394,7 +394,8 @@ public:
       std::streamsize read(char* s, std::streamsize n) {
          ssize_t total_red = 0;
          while(n - total_red) {
-            ssize_t red = ctx->read_from(boost::asio::buffer(s+total_red, n-total_red), pos);
+            std::vector<boost::asio::mutable_buffer> buf_seq = { boost::asio::buffer(s+total_red, n-total_red) };
+            ssize_t red = ctx->read_from(buf_seq, pos);
             if(red == 0)
                break;
             pos += red;
