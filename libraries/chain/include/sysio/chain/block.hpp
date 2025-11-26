@@ -5,43 +5,25 @@
 
 namespace sysio { namespace chain {
 
-   /**
-    * When a transaction is referenced by a block it could imply one of several outcomes which
-    * describe the state-transition undertaken by the block producer.
-    */
-
    struct transaction_receipt_header {
-      enum status_enum {
-         executed  = 0, ///< succeed, no error handler executed
-         expired   = 4  ///< transaction expired and storage space refuned to user
+      enum status_enum : uint8_t { // Used for backward compatibility of SHiP and TraceAPI
+         executed  = 0 ///< succeed
       };
+      bool operator==(const transaction_receipt_header&) const = default;
 
-      transaction_receipt_header():status(expired){}
-      explicit transaction_receipt_header( status_enum s ):status(s){}
-
-      friend inline bool operator ==( const transaction_receipt_header& lhs, const transaction_receipt_header& rhs ) {
-         return std::tie(lhs.status, lhs.cpu_usage_us, lhs.net_usage_words) == std::tie(rhs.status, rhs.cpu_usage_us, rhs.net_usage_words);
-      }
-
-      fc::enum_type<uint8_t,status_enum>   status;
-      uint32_t                             cpu_usage_us = 0; ///< total billed CPU usage (microseconds)
-      fc::unsigned_int                     net_usage_words; ///<  total billed NET usage, so we can reconstruct resource state when skipping context free data... hard failures...
+      cpu_usage_t    cpu_usage_us; ///< billed CPU for nth input action
    };
 
    struct transaction_receipt : public transaction_receipt_header {
 
-      transaction_receipt():transaction_receipt_header(){}
-      explicit transaction_receipt( const packed_transaction& ptrx ):transaction_receipt_header(executed),trx(std::in_place_type<packed_transaction>, ptrx){}
-      using not_used = transaction_id_type; // keep binary compatibility of transaction_receipt
-      std::variant<not_used, packed_transaction> trx;
+      transaction_receipt() = default;
+      explicit transaction_receipt( const packed_transaction& ptrx ):trx(ptrx){}
+      packed_transaction trx;
 
       digest_type digest()const {
          digest_type::encoder enc;
-         fc::raw::pack( enc, status );
          fc::raw::pack( enc, cpu_usage_us );
-         fc::raw::pack( enc, net_usage_words );
-         // wire uses digest() instead of packed_digest()
-         fc::raw::pack( enc, std::get<packed_transaction>(trx).digest() );
+         fc::raw::pack( enc, trx.digest() );
          return enc.result();
       }
    };
@@ -131,9 +113,9 @@ namespace sysio { namespace chain {
 } } /// sysio::chain
 
 FC_REFLECT_ENUM( sysio::chain::transaction_receipt::status_enum,
-                 (executed)(expired) )
+                 (executed) )
 
-FC_REFLECT(sysio::chain::transaction_receipt_header, (status)(cpu_usage_us)(net_usage_words) )
+FC_REFLECT(sysio::chain::transaction_receipt_header, (cpu_usage_us) )
 FC_REFLECT_DERIVED(sysio::chain::transaction_receipt, (sysio::chain::transaction_receipt_header), (trx) )
 FC_REFLECT(sysio::chain::additional_block_signatures_extension, (signatures));
 FC_REFLECT(sysio::chain::quorum_certificate_extension, (qc));

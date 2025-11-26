@@ -67,9 +67,10 @@ public:
                                   ("core", symbol(CORE_SYMBOL).to_string())
             );
       }
-      const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+      const auto* accnt = control->find_account_metadata( config::system_account_name );
+      BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
    }
 
@@ -117,9 +118,10 @@ public:
         set_code(account, wasm, signer);
         set_abi(account, abi, signer);
         if (account == config::system_account_name) {
-           const auto& accnt = control->db().get<account_object,by_name>( account );
+           const auto* accnt = control->find_account_metadata( account );
+           BOOST_REQUIRE(accnt != nullptr);
            abi_def abi_definition;
-           BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi_definition), true);
+           BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi_definition), true);
            abi_ser.set_abi(std::move(abi_definition), abi_serializer::create_yield_function( abi_serializer_max_time ));
         }
         produce_blocks();
@@ -157,12 +159,15 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         set_privileged("sysio.token"_n);
 
         // Verify sysio.msig and sysio.token is privileged
-        const auto& sysio_msig_acc = get<account_metadata_object, by_name>("sysio.msig"_n);
-        BOOST_TEST(sysio_msig_acc.is_privileged() == true);
-        const auto& sysio_roa_acc = get<account_metadata_object, by_name>("sysio.roa"_n);
-        BOOST_TEST(sysio_roa_acc.is_privileged() == true);
-        const auto& sysio_token_acc = get<account_metadata_object, by_name>("sysio.token"_n);
-        BOOST_TEST(sysio_token_acc.is_privileged() == true);
+        const auto* sysio_msig_acc = control->find_account_metadata("sysio.msig"_n);
+        BOOST_REQUIRE(sysio_msig_acc != nullptr);
+        BOOST_TEST(sysio_msig_acc->is_privileged() == true);
+        const auto* sysio_roa_acc = control->find_account_metadata("sysio.roa"_n);
+        BOOST_REQUIRE(sysio_roa_acc != nullptr);
+        BOOST_TEST(sysio_roa_acc->is_privileged() == true);
+        const auto* sysio_token_acc = control->find_account_metadata("sysio.token"_n);
+        BOOST_REQUIRE(sysio_token_acc != nullptr);
+        BOOST_TEST(sysio_token_acc->is_privileged() == true);
 
         // Create SYS tokens in sysio.token, set its manager as sysio
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens

@@ -55,7 +55,7 @@ namespace sysio {
    inline auto make_resolver(const controller& control, fc::microseconds abi_serializer_max_time, throw_on_yield yield_throw ) {
       return [&control, abi_serializer_max_time, yield_throw](const account_name& name) -> std::optional<abi_serializer> {
          if (name.good()) {
-            const auto* accnt = control.db().template find<chain::account_object, chain::by_name>( name );
+            const auto* accnt = control.find_account_metadata( name );
             if( accnt != nullptr ) {
                try {
                   if( abi_def abi; abi_serializer::to_abi( accnt->abi, abi ) ) {

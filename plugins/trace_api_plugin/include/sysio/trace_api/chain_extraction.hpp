@@ -49,9 +49,6 @@ private:
 
    void on_applied_transaction(const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& t) {
       if( !trace->receipt ) return;
-      if((trace->receipt->status != chain::transaction_receipt_header::executed)) {
-         return;
-      }
       if( chain::is_onblock( *trace )) {
          onblock_trace.emplace( cache_trace{trace, t} );
       } else {
@@ -88,7 +85,7 @@ private:
          if( onblock_trace )
             traces.emplace_back( to_transaction_trace<transaction_trace_t>( *onblock_trace ));
          for( const auto& r : block->transactions ) {
-            const transaction_id_type& id = std::get<packed_transaction>(r.trx).id();
+            const transaction_id_type& id = r.trx.id();
             const auto it = cached_traces.find( id );
             if( it != cached_traces.end() ) {
                traces.emplace_back( to_transaction_trace<transaction_trace_t>( it->second ));

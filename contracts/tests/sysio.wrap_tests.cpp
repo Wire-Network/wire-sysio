@@ -22,14 +22,14 @@ public:
       produce_block();
 
 
+      set_code( "sysio.msig"_n, contracts::msig_wasm() );
+      set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
+
       base_tester::push_action(config::system_account_name, "setpriv"_n,
                                  config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.msig")
                                  ("is_priv", 1)
       );
-
-      set_code( "sysio.msig"_n, contracts::msig_wasm() );
-      set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
       produce_blocks();
 
@@ -48,15 +48,15 @@ public:
       trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id()  );
       push_transaction( trx );
 
+      auto system_private_key = get_private_key( config::system_account_name, "active" );
+      set_code( "sysio.wrap"_n, contracts::wrap_wasm(), &system_private_key );
+      set_abi( "sysio.wrap"_n, contracts::wrap_abi().data(), &system_private_key );
+
       base_tester::push_action(config::system_account_name, "setpriv"_n,
                                  config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.wrap")
                                  ("is_priv", 1)
       );
-
-      auto system_private_key = get_private_key( config::system_account_name, "active" );
-      set_code( "sysio.wrap"_n, contracts::wrap_wasm(), &system_private_key );
-      set_abi( "sysio.wrap"_n, contracts::wrap_abi().data(), &system_private_key );
 
       produce_blocks();
 
@@ -78,7 +78,7 @@ public:
    }
 
    void propose( name proposer, name proposal_name, vector<permission_level> requested_permissions, const transaction& trx ) {
-      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::active_name},{proposer, config::sysio_payer_name}}, mvo()
+      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::sysio_payer_name},{proposer, config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
                      ("requested",     requested_permissions)
@@ -113,11 +113,11 @@ transaction sysio_wrap_tester::wrap_exec( account_name executer, const transacti
    fc::variants v;
    v.push_back( fc::mutable_variant_object()
                   ("actor", executer)
-                  ("permission", name{config::active_name})
+                  ("permission", name{config::sysio_payer_name} )
               );
    v.push_back( fc::mutable_variant_object()
                   ("actor", executer)
-                  ("permission", name{config::sysio_payer_name} )
+                  ("permission", name{config::active_name})
               );
   v.push_back( fc::mutable_variant_object()
                  ("actor", "sysio.wrap")
@@ -160,7 +160,7 @@ transaction sysio_wrap_tester::reqauth( account_name from, const vector<permissi
 void sysio_wrap_tester::check_traces(transaction_trace_ptr trace, std::vector<std::map<std::string, name>> res) {
 
    BOOST_REQUIRE( bool(trace) );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+   BOOST_REQUIRE( !!trace->receipt );
    BOOST_REQUIRE_EQUAL( res.size(), trace->action_traces.size() );
 
    for (size_t i = 0; i < res.size(); i++) {

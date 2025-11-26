@@ -911,7 +911,7 @@ struct controller_impl {
             transaction_metadata::trx_type::read_only);
 
          // allow a max of 20ms for getpeerkeys
-         auto trace = push_transaction(metadata, fc::time_point::maximum(), fc::milliseconds(20), 0, false, 0);
+         auto trace = push_transaction(metadata, fc::time_point::maximum(), fc::milliseconds(20), cpu_usage_t{}, false);
 
          if( trace->except_ptr )
             std::rethrow_exception(trace->except_ptr);
@@ -1808,16 +1808,14 @@ struct controller_impl {
       db.create<account_object>([&](auto& a) {
          a.name = name;
          a.creation_date = initial_timestamp;
-
-         if( name == config::system_account_name ) {
-            // The initial sysio ABI value affects consensus; see  https://github.com/SYSIO/sys/issues/7794
-            // TODO: This doesn't charge RAM; a fix requires a consensus upgrade.
-            a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
-         }
       });
       db.create<account_metadata_object>([&](auto & a) {
          a.name = name;
          a.set_privileged( is_privileged );
+
+         if( name == config::system_account_name ) {
+            a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
+         }
       });
 
       const auto& owner_permission  = authorization.create_permission(name, config::owner_name, 0,
@@ -1831,6 +1829,8 @@ struct controller_impl {
       ram_delta += 2*config::billable_size_v<permission_object>;
       ram_delta += owner_permission.auth.get_billable_size();
       ram_delta += active_permission.auth.get_billable_size();
+      if( name == config::system_account_name ) // see above
+         ram_delta += sizeof(sysio_abi_bin);
 
       // This is only called at startup, no transaction specific logging is possible
       if (auto dm_logger = get_deep_mind_logger(false)) {
@@ -1922,7 +1922,6 @@ struct controller_impl {
              || (code == block_cpu_usage_exceeded::code_value)
              || (code == greylist_cpu_usage_exceeded::code_value)
              || (code == deadline_exception::code_value)
-             || (code == leeway_deadline_exception::code_value)
              || (code == actor_whitelist_exception::code_value)
              || (code == actor_blacklist_exception::code_value)
              || (code == contract_whitelist_exception::code_value)
@@ -1942,17 +1941,12 @@ struct controller_impl {
     *  Adds the transaction receipt to the pending block and returns it.
     */
    template<typename T>
-   const transaction_receipt& push_receipt( const T& trx, transaction_receipt_header::status_enum status,
-                                            uint64_t cpu_usage_us, uint64_t net_usage ) {
-      uint64_t net_usage_words = net_usage / 8;
-      SYS_ASSERT( net_usage_words*8 == net_usage, transaction_exception, "net_usage is not divisible by 8" );
+   const transaction_receipt& push_receipt( const T& trx, const cpu_usage_t& cpu_usage_us ) {
       auto& bb = std::get<building_block>(pending->_block_stage);
       auto& receipts = bb.pending_trx_receipts();
       receipts.emplace_back( trx );
       transaction_receipt& r = receipts.back();
       r.cpu_usage_us         = cpu_usage_us;
-      r.net_usage_words      = net_usage_words;
-      r.status               = status;
       auto& mroot_or_digests = bb.trx_mroot_or_receipt_digests();
       if( std::holds_alternative<digests_t>(mroot_or_digests) )
          std::get<digests_t>(mroot_or_digests).emplace_back( r.digest() );
@@ -1967,9 +1961,8 @@ struct controller_impl {
    transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
                                            fc::time_point block_deadline,
                                            fc::microseconds max_transaction_time,
-                                           uint32_t billed_cpu_time_us,
-                                           bool explicit_billed_cpu_time,
-                                           int64_t subjective_cpu_bill_us )
+                                           const cpu_usage_t& billed_cpu_us,
+                                           bool explicit_billed_cpu_time )
    {
       SYS_ASSERT(block_deadline != fc::time_point(), transaction_exception, "deadline cannot be uninitialized");
 
@@ -2001,8 +1994,8 @@ struct controller_impl {
          trx_context.block_deadline = block_deadline;
          trx_context.max_transaction_time_subjective = max_transaction_time;
          trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-         trx_context.billed_cpu_time_us = billed_cpu_time_us;
-         trx_context.subjective_cpu_bill_us = subjective_cpu_bill_us;
+         trx_context.billed_cpu_us = billed_cpu_us;
+         trx_context.prev_accounts_billing = trx->prev_accounts_billing;
          trace = trx_context.trace;
 
          auto handle_exception =[&](const auto& e)
@@ -2010,7 +2003,11 @@ struct controller_impl {
             trace->error_code = controller::convert_exception_to_error_code( e );
             trace->except = e;
             trace->except_ptr = std::current_exception();
-            trace->elapsed = fc::time_point::now() - trx_context.start;
+            auto now = fc::time_point::now();
+            trx_context.update_billed_cpu_time(now);
+            trx->prev_accounts_billing = trx_context.accounts_billing;
+            trace->elapsed = now - trx_context.start;
+            trx->elapsed = std::max(trx->elapsed, trace->elapsed);
          };
 
          try {
@@ -2018,8 +2015,7 @@ struct controller_impl {
                trx_context.init_for_implicit_trx();
                trx_context.enforce_whiteblacklist = false;
             } else {
-               trx_context.init_for_input_trx( trx->packed_trx()->get_unprunable_size(),
-                                               trx->packed_trx()->get_prunable_size() );
+               trx_context.init_for_input_trx();
             }
 
             if( check_auth ) {
@@ -2037,18 +2033,14 @@ struct controller_impl {
 
             auto restore = make_block_restore_point( trx->is_read_only() );
 
-            trx->billed_cpu_time_us = trx_context.billed_cpu_time_us;
+            trx->prev_accounts_billing = trx_context.accounts_billing;
+            trx->elapsed = std::max(trx->elapsed, trace->elapsed);
             if (!trx->implicit() && !trx->is_read_only()) {
-               transaction_receipt::status_enum s = transaction_receipt::executed;
-               trace->receipt = push_receipt(*trx->packed_trx(), s, trx_context.billed_cpu_time_us, trace->net_usage);
+               trace->receipt = push_receipt(*trx->packed_trx(), trx_context.billed_cpu_us);
                bb.pending_trx_metas().emplace_back(trx);
             } else {
                transaction_receipt_header r;
-               r.status = transaction_receipt::executed;
-               if (!trx->is_read_only()) {
-                  r.cpu_usage_us = trx_context.billed_cpu_time_us;
-                  r.net_usage_words = trace->net_usage / 8;
-               }
+               r.cpu_usage_us = trx_context.billed_cpu_us;
                trace->receipt = r;
             }
 
@@ -2078,11 +2070,10 @@ struct controller_impl {
 
             if( !trx->is_transient() ) {
                pending->_block_report.total_net_usage += trace->net_usage;
-               pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
+               pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
                pending->_block_report.total_elapsed_time += trace->elapsed;
             }
 
-            trx->elapsed_time_us = std::max<decltype(trx->elapsed_time_us)>(trx->elapsed_time_us, trace->elapsed.count());
             return trace;
          } catch( const disallowed_transaction_extensions_bad_block_exception& ) {
             throw;
@@ -2109,11 +2100,10 @@ struct controller_impl {
             emit( applied_transaction, std::tie(trace, trx->packed_trx()), __FILE__, __LINE__ );
 
             pending->_block_report.total_net_usage += trace->net_usage;
-            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->receipt->cpu_usage_us;
+            if( trace->receipt ) pending->_block_report.total_cpu_usage_us += trace->total_cpu_usage_us;
             pending->_block_report.total_elapsed_time += trace->elapsed;
          }
 
-         trx->elapsed_time_us = std::max<decltype(trx->elapsed_time_us)>(trx->elapsed_time_us, trace->elapsed.count());
          return trace;
       } FC_CAPTURE_AND_RETHROW((trace))
    } /// push_transaction
@@ -2237,7 +2227,7 @@ struct controller_impl {
                });
             in_trx_requiring_checks = true;
             onblock_trace = push_transaction( onbtrx, fc::time_point::maximum(), fc::microseconds::maximum(),
-                                      gpo.configuration.min_transaction_cpu_usage, true, 0 );
+                                              cpu_usage_t{{gpo.configuration.min_transaction_cpu_usage}}, true );
             if( onblock_trace->except ) {
                if (onblock_trace->except->code() == interrupt_exception::code_value) {
                   ilog("Interrupt of onblock ${bn}", ("bn", chain_head.block_num() + 1));
@@ -2642,7 +2632,7 @@ struct controller_impl {
 
             const bool existing_trxs_metas = !bsp->trxs_metas().empty();
             const bool pub_keys_recovered = bsp->is_pub_keys_recovered();
-            const bool skip_auth_checks = skip_auth_check();
+            const bool skip_auth_checks = self.skip_auth_check();
             std::vector<std::tuple<transaction_metadata_ptr, recover_keys_future>> trx_metas;
             bool use_bsp_cached = false;
             if( pub_keys_recovered || (skip_auth_checks && existing_trxs_metas) ) {
@@ -2650,24 +2640,22 @@ struct controller_impl {
             } else {
                trx_metas.reserve( b->transactions.size() );
                for( const auto& receipt : b->transactions ) {
-                  if( std::holds_alternative<packed_transaction>(receipt.trx)) {
-                     const auto& pt = std::get<packed_transaction>(receipt.trx);
-                     transaction_metadata_ptr trx_meta_ptr = trx_lookup ? trx_lookup( pt.id() ) : transaction_metadata_ptr{};
-                     if( trx_meta_ptr && *trx_meta_ptr->packed_trx() != pt ) trx_meta_ptr = nullptr;
-                     if( trx_meta_ptr && ( skip_auth_checks || !trx_meta_ptr->recovered_keys().empty() ) ) {
-                        trx_metas.emplace_back( std::move( trx_meta_ptr ), recover_keys_future{} );
-                     } else if( skip_auth_checks ) {
-                        packed_transaction_ptr ptrx( b, &pt ); // alias signed_block_ptr
-                        trx_metas.emplace_back(
-                           transaction_metadata::create_no_recover_keys( std::move(ptrx), transaction_metadata::trx_type::input ),
-                           recover_keys_future{} );
-                     } else {
-                        packed_transaction_ptr ptrx( b, &pt ); // alias signed_block_ptr
-                        auto fut = transaction_metadata::start_recover_keys(
-                           std::move( ptrx ), thread_pool.get_executor(), chain_id, fc::microseconds::maximum(),
-                           transaction_metadata::trx_type::input  );
-                        trx_metas.emplace_back( transaction_metadata_ptr{}, std::move( fut ) );
-                     }
+                  const auto& pt =receipt.trx;
+                  transaction_metadata_ptr trx_meta_ptr = trx_lookup ? trx_lookup( pt.id() ) : transaction_metadata_ptr{};
+                  if( trx_meta_ptr && *trx_meta_ptr->packed_trx() != pt ) trx_meta_ptr = nullptr;
+                  if( trx_meta_ptr && ( skip_auth_checks || !trx_meta_ptr->recovered_keys().empty() ) ) {
+                     trx_metas.emplace_back( std::move( trx_meta_ptr ), recover_keys_future{} );
+                  } else if( skip_auth_checks ) {
+                     packed_transaction_ptr ptrx( b, &pt ); // alias signed_block_ptr
+                     trx_metas.emplace_back(
+                        transaction_metadata::create_no_recover_keys( std::move(ptrx), transaction_metadata::trx_type::input ),
+                        recover_keys_future{} );
+                  } else {
+                     packed_transaction_ptr ptrx( b, &pt ); // alias signed_block_ptr
+                     auto fut = transaction_metadata::start_recover_keys(
+                        std::move( ptrx ), thread_pool.get_executor(), chain_id, fc::microseconds::maximum(),
+                        transaction_metadata::trx_type::input  );
+                     trx_metas.emplace_back( transaction_metadata_ptr{}, std::move( fut ) );
                   }
                }
             }
@@ -2678,17 +2666,13 @@ struct controller_impl {
             const auto& trx_receipts = std::get<building_block>(pending->_block_stage).pending_trx_receipts();
             for( const auto& receipt : b->transactions ) {
                auto num_pending_receipts = trx_receipts.size();
-               if( std::holds_alternative<packed_transaction>(receipt.trx) ) {
-                  const auto& trx_meta = (use_bsp_cached ? bsp->trxs_metas().at(packed_idx)
-                                                         : (!!std::get<0>(trx_metas.at(packed_idx))
-                                                               ? std::get<0>(trx_metas.at(packed_idx))
-                                                               : std::get<1>(trx_metas.at(packed_idx)).get()));
-                  trace = push_transaction(trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(),
-                                           receipt.cpu_usage_us, true, 0);
-                  ++packed_idx;
-               } else {
-                  SYS_ASSERT( false, block_validate_exception, "encountered unexpected receipt type" );
-               }
+               const auto& trx_meta = (use_bsp_cached ? bsp->trxs_metas().at(packed_idx)
+                                                      : (!!std::get<0>(trx_metas.at(packed_idx))
+                                                            ? std::get<0>(trx_metas.at(packed_idx))
+                                                            : std::get<1>(trx_metas.at(packed_idx)).get()));
+               trace = push_transaction(trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(),
+                                        receipt.cpu_usage_us, true);
+               ++packed_idx;
 
                bool transaction_failed = trace && trace->except;
                if( transaction_failed) {
@@ -3744,8 +3728,12 @@ struct controller_impl {
 
    bool is_speculative_block()const {
       if( !pending ) return false;
-
       return (pending->_block_status == controller::block_status::incomplete || pending->_block_status == controller::block_status::ephemeral );
+   }
+
+   bool is_producing_block()const {
+      if( !pending ) return false;
+      return pending->_block_status == controller::block_status::incomplete;
    }
 
    std::optional<block_id_type> pending_producer_block_id()const {
@@ -3804,6 +3792,33 @@ subjective_billing& controller::get_mutable_subjective_billing() {
    return my->subjective_bill;
 }
 
+std::tuple<int64_t, bool, bool> controller::get_cpu_limit(account_name a) const {
+   static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
+   // Calculate the new highest network usage and CPU time that the billed account can afford to be billed
+   const auto& rl = get_resource_limits_manager();
+   int64_t account_cpu_limit = large_number_no_overflow;
+   bool greylisted_cpu = false;
+
+   uint32_t specified_greylist_limit = get_greylist_limit();
+   uint32_t greylist_limit = chain::config::maximum_elastic_resource_multiplier;
+   if( is_speculative_block() ) {
+      if( is_resource_greylisted(a) ) {
+         greylist_limit = 1;
+      } else {
+         greylist_limit = specified_greylist_limit;
+      }
+   }
+   auto [cpu_limit, cpu_was_greylisted] = rl.get_account_cpu_limit(a, greylist_limit);
+   if( cpu_limit >= 0 ) {
+      account_cpu_limit = cpu_limit;
+      greylisted_cpu = cpu_was_greylisted;
+   }
+
+   SYS_ASSERT( is_speculative_block() || !greylisted_cpu,
+               transaction_exception, "greylisted when not producing block" );
+
+   return {account_cpu_limit, greylisted_cpu, cpu_limit == -1};
+}
 
 controller::controller( const controller::config& cfg, const chain_id_type& chain_id )
 :my( new controller_impl( cfg, *this, protocol_feature_set{}, chain_id ) )
@@ -4048,12 +4063,19 @@ controller::accepted_block_result controller::accept_block( const block_id_type&
 }
 
 transaction_trace_ptr controller::push_transaction( const transaction_metadata_ptr& trx,
-                                                    fc::time_point block_deadline, fc::microseconds max_transaction_time,
-                                                    uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
-                                                    int64_t subjective_cpu_bill_us ) {
+                                                    fc::time_point block_deadline, fc::microseconds max_transaction_time ) {
    validate_db_available_size();
-   SYS_ASSERT( trx && !trx->implicit() && !trx->scheduled(), transaction_type_exception, "Implicit/Scheduled transaction not allowed" );
-   return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_time_us, explicit_billed_cpu_time, subjective_cpu_bill_us );
+   SYS_ASSERT( trx && !trx->implicit(), transaction_type_exception, "Implicit transaction not allowed" );
+   constexpr bool explicit_billed_cpu_time = false;
+   return my->push_transaction(trx, block_deadline, max_transaction_time, cpu_usage_t{}, explicit_billed_cpu_time );
+}
+
+transaction_trace_ptr controller::test_push_transaction( const transaction_metadata_ptr& trx,
+                                                         fc::time_point block_deadline, fc::microseconds max_transaction_time,
+                                                         const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time ) {
+   validate_db_available_size();
+   SYS_ASSERT( trx && !trx->implicit(), transaction_type_exception, "Implicit transaction not allowed" );
+   return my->push_transaction(trx, block_deadline, max_transaction_time, billed_cpu_us, explicit_billed_cpu_time );
 }
 
 const flat_set<account_name>& controller::get_actor_whitelist() const {
@@ -4455,6 +4477,16 @@ const account_object& controller::get_account( account_name name )const
    return my->db.get<account_object, by_name>(name);
 } FC_CAPTURE_AND_RETHROW( (name) ) }
 
+const account_object* controller::find_account( account_name name )const
+{ try {
+   return my->db.find<account_object, by_name>(name);
+} FC_CAPTURE_AND_RETHROW( (name) ) }
+
+const account_metadata_object* controller::find_account_metadata( account_name name )const
+{ try {
+   return my->db.find<account_metadata_object, by_name>(name);
+} FC_CAPTURE_AND_RETHROW( (name) ) }
+
 bool controller::sender_avoids_whitelist_blacklist_enforcement( account_name sender )const {
    return my->sender_avoids_whitelist_blacklist_enforcement( sender );
 }
@@ -4481,6 +4513,10 @@ bool controller::is_building_block()const {
 
 bool controller::is_speculative_block()const {
    return my->is_speculative_block();
+}
+
+bool controller::is_producing_block() const {
+   return my->is_producing_block();
 }
 
 uint32_t controller::configured_subjective_signature_length_limit()const {

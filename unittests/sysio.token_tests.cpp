@@ -33,9 +33,10 @@ public:
 
       T::produce_block();
 
-      const auto& accnt = T::control->db().template get<account_object,by_name>( "sysio.token"_n );
+      const auto* accnt = T::control->find_account_metadata( "sysio.token"_n );
+      BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( T::abi_serializer_max_time ));
    }
 

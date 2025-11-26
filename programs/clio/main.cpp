@@ -299,7 +299,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    vector<chain::permission_level> accountPermissions;
    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
    if (!tx_payer.empty()) {
-      accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+      accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
    }
    return accountPermissions;
 }
@@ -308,7 +308,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    if (permissions.empty()) {
       vector<chain::permission_level> accountPermissions{default_permission};
       if (!tx_payer.empty()) {
-         accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+         accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
       }
       return accountPermissions;
    } else {
@@ -674,9 +674,9 @@ void print_result( const fc::variant& result ) { try {
          if( processed.get_object().contains( "receipt" )) {
             const auto& receipt = processed["receipt"];
             if( receipt.is_object()) {
-               status = receipt["status"].as_string();
-               net = receipt["net_usage_words"].as_int64() * 8;
-               cpu = receipt["cpu_usage_us"].as_int64();
+               status = "executed";
+               net = processed["net_usage"].as_int64();
+               cpu = processed["total_cpu_usage_us"].as_int64();
             }
          }
 

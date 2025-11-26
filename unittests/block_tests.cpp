@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = b->clone();
-   auto signed_tx = std::get<packed_transaction>(copy_b->transactions.back().trx).get_signed_transaction();
+   auto signed_tx = copy_b->transactions.back().trx.get_signed_transaction();
    auto it = std::ranges::find_if(signed_tx.actions, [](const action& a) { return a.name == "newaccount"_n; });
    BOOST_REQUIRE(it != signed_tx.actions.end());
    auto& act = *it;
@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = b->clone();
-   const auto& packed_trx = std::get<packed_transaction>(copy_b->transactions.back().trx);
+   const auto& packed_trx = copy_b->transactions.back().trx;
    auto signed_tx = packed_trx.get_signed_transaction();
 
    // Change the transaction that will be run
@@ -99,7 +99,7 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(T& main, acco
 
    // Make a copy of the valid block and corrupt the transaction
    auto copy_b = b->clone();
-   const auto& packed_trx = std::get<packed_transaction>(copy_b->transactions.back().trx);
+   const auto& packed_trx = copy_b->transactions.back().trx;
    auto signed_tx = packed_trx.get_signed_transaction();
    // Corrupt one signature
    signed_tx.signatures.clear();
@@ -149,10 +149,10 @@ BOOST_AUTO_TEST_CASE( trusted_producer_test )
 }
 
 // like trusted_producer_test, except verify that any entry in the trusted_producer list is accepted
-BOOST_AUTO_TEST_CASE_TEMPLATE( trusted_producer_verify_2nd_test, T, validating_testers )
+BOOST_AUTO_TEST_CASE( trusted_producer_verify_2nd_test )
 {
    flat_set<account_name> trusted_producers = { "defproducera"_n, "defproducerc"_n };
-   T main(trusted_producers);
+   savanna_validating_tester main(trusted_producers);
    // only using validating_tester to keep the 2 chains in sync, not to validate that the validating_node matches the main node,
    // since it won't be
    main.skip_validate = true;
@@ -170,7 +170,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( trusted_producer_verify_2nd_test, T, validating_t
       b = main.produce_block();
    }
 
-   auto blocks = corrupt_trx_in_block<T>(main, "tstproducera"_n);
+   auto blocks = corrupt_trx_in_block(main, "tstproducera"_n);
    main.validate_push_block( blocks.second );
 }
 

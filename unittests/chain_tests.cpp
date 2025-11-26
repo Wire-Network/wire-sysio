@@ -63,10 +63,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_over_limit, T, testers ) try {
    cf_action                        cfa;
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
-   trx.context_free_actions.push_back(act);
+   trx.context_free_actions.insert(trx.context_free_actions.end(), 129, act);
    // this is a over limit size 4*20*129*1024 = 1032*1024 > 10M
-   for(int i = 0; i < 129*1024; ++i){
-      vector<uint32_t> v(20, 1);
+   for(int i = 0; i < 129; ++i){
+      vector<uint32_t> v(20*1024, 1);
       trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
@@ -98,11 +98,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_under_limit, T, testers ) try {
    cf_action                        cfa;
    sysio::chain::signed_transaction trx;
    sysio::chain::action             act({}, cfa);
-   trx.context_free_actions.push_back(act);
-   // this is a under limit size  (4+4)*128*1024 = 1024*1024
-   for(int i = 0; i < 100*1024; ++i){
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
+   constexpr size_t num_cf_actions = 129;
+   trx.context_free_actions.insert(trx.context_free_actions.end(), num_cf_actions, act);
+   // this is a over limit size 4*129*1024 = ~2M < 10M
+   for(int i = 0; i < num_cf_actions; ++i){
+      vector<uint32_t> v(1024, 1);
+      trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
@@ -174,8 +175,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( signal_validated_blocks, T, testers ) try {
 } FC_LOG_AND_RETHROW()
 
 // verify applied_transaction signals trx in blocks
-BOOST_AUTO_TEST_CASE_TEMPLATE( signal_applied_transaction, T, testers ) try {
-   T chain;
+BOOST_AUTO_TEST_CASE( signal_applied_transaction ) try {
+   savanna_tester chain;
 
    chain.produce_block();
 
@@ -197,12 +198,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( signal_applied_transaction, T, testers ) try {
       BOOST_REQUIRE(block);
       bool found = false;
       for (auto& r : block->transactions) {
-         std::visit(overloaded{
-            [](const transaction_id_type& id) {},
-            [&](const packed_transaction& x) {
-            found = true;
-            BOOST_TEST(x.get_transaction().actions.at(0).name == "newaccount"_n);
-         }}, r.trx);
+         found = true;
+         BOOST_TEST(r.trx.get_transaction().actions.at(0).name == "newaccount"_n);
       }
       BOOST_TEST(found);
    }
@@ -226,16 +223,12 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( signal_applied_transaction, T, testers ) try {
       BOOST_REQUIRE(last_trace);
       BOOST_TEST(create_account_trace->id == last_trace->id);
       BOOST_TEST(create_account_trace->block_num < last_trace->block_num); // different block
-      BOOST_TEST(trx_meta->elapsed_time_us == std::max(last_trace->elapsed.count(), create_account_trace->elapsed.count())); // verify trx_meta updated
+      BOOST_TEST(trx_meta->elapsed.count() == std::max(last_trace->elapsed, create_account_trace->elapsed).count()); // verify trx_meta updated
       BOOST_TEST(block->block_num() == last_trace->block_num);
       bool found = false;
       for (auto& r : block->transactions) {
-         std::visit(overloaded{
-            [](const transaction_id_type& id) {},
-            [&](const packed_transaction& x) {
-            found = true;
-            BOOST_TEST(x.get_transaction().actions.at(0).name == "newaccount"_n);
-         }}, r.trx);
+         found = true;
+         BOOST_TEST(r.trx.get_transaction().actions.at(0).name == "newaccount"_n);
       }
       BOOST_TEST(found);
    }

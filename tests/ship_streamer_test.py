@@ -108,11 +108,13 @@ try:
     wasmFile = "%s.wasm" % (contract)
     abiFile = "%s.abi" % (contract)
 
-    nonProdNode.publishContract(jumboAcc, contractDir, wasmFile, abiFile)
-    jumbotxn = {
+    trans = nonProdNode.publishContract(accounts[0], contractDir, wasmFile, abiFile)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (contract))
 
-        "actions": [{"account": "itsjumbotime","name": "jumbotime",
-                     "authorization": [{"actor": "itsjumbotime","permission": "active"}],
+    jumbotxn = {
+        "actions": [{"account": "testeraaaaaa","name": "jumbotime",
+                     "authorization": [{"actor": "testeraaaaaa","permission": "active"}],
                      "data": "",
                      "compression": "none"}]
     }

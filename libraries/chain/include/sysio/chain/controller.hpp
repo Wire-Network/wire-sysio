@@ -97,6 +97,7 @@ namespace sysio::chain {
    class global_property_object;
    class permission_object;
    class account_object;
+   class account_metadata_object;
    class deep_mind_handler;
    class subjective_billing;
    using resource_limits::resource_limits_manager;
@@ -217,13 +218,11 @@ namespace sysio::chain {
          enum class interrupt_t { all_trx, apply_block_trx, speculative_block_trx };
          void interrupt_transaction(interrupt_t interrupt);
 
-       /**
-        *
-        */
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
-                                                 fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                 uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
-                                                 int64_t subjective_cpu_bill_us );
+                                                 fc::time_point deadline, fc::microseconds max_transaction_time );
+         transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
+                                                      fc::time_point deadline, fc::microseconds max_transaction_time,
+                                                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time );
 
          void assemble_and_complete_block( const signer_callback_type& signer_callback );
          void sign_block( const signer_callback_type& signer_callback );
@@ -257,6 +256,8 @@ namespace sysio::chain {
          const chainbase::database& db()const;
 
          const account_object&                 get_account( account_name n )const;
+         const account_object*                 find_account( account_name n )const;
+         const account_metadata_object*        find_account_metadata( account_name n )const;
          const global_property_object&         get_global_properties()const;
          const dynamic_global_property_object& get_dynamic_global_properties()const;
          const resource_limits_manager&        get_resource_limits_manager()const;
@@ -266,6 +267,9 @@ namespace sysio::chain {
          const protocol_feature_manager&       get_protocol_feature_manager()const;
          const subjective_billing&             get_subjective_billing()const;
          subjective_billing&                   get_mutable_subjective_billing();
+
+         //        limit,greylisted,unlimited
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
 
          const flat_set<account_name>&   get_actor_whitelist() const;
          const flat_set<account_name>&   get_actor_blacklist() const;
@@ -375,7 +379,11 @@ namespace sysio::chain {
          void check_action_list( account_name code, action_name action )const;
          void check_key_list( const public_key_type& key )const;
          bool is_building_block()const;
+         // returns true for both is_producing_block() and ephemeral blocks
+         // blocks being produced are considered speculative blocks
          bool is_speculative_block()const;
+         // returns true for block_status::incomplete block
+         bool is_producing_block()const;
 
          //This is only an accessor to the user configured subjective limit: i.e. it does not do a
          // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently

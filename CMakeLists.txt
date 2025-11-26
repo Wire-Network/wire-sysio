@@ -197,6 +197,13 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
 
 add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
+
+contracts_target(
+        contracts_project
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
+        BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
+)
+
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
@@ -208,11 +215,6 @@ add_subdirectory(benchmark)
 
 add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
-contracts_target(
-  contracts_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
-  BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
-)
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 

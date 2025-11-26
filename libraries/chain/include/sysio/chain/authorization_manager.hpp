@@ -47,10 +47,6 @@ namespace sysio { namespace chain {
 
          void remove_permission( const permission_object& permission, bool is_trx_transient );
 
-         void update_permission_usage( const permission_object& permission );
-
-         fc::time_point get_permission_last_used( const permission_object& permission )const;
-
          const permission_object*  find_permission( const permission_level& level )const;
          const permission_object&  get_permission( const permission_level& level )const;
 

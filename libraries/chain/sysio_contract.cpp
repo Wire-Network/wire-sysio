@@ -82,8 +82,8 @@ void apply_sysio_newaccount(apply_context& context) {
       SYS_ASSERT(name_str.size() <= 12, action_validate_exception, "account names can only be 12 chars long");
 
       // Ensure only privileged accounts can create new accounts
-      const auto &creator = db.get<account_metadata_object, by_name>(create.creator);
-      SYS_ASSERT(creator.is_privileged(), action_validate_exception, "Only privileged accounts can create new accounts");
+      const auto* creator = db.find<account_metadata_object, by_name>(create.creator);
+      SYS_ASSERT(creator && creator->is_privileged(), action_validate_exception, "Only privileged accounts can create new accounts");
 
       auto existing_account = db.find<account_object, by_name>(create.name);
       SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
@@ -93,10 +93,6 @@ void apply_sysio_newaccount(apply_context& context) {
       db.create<account_object>([&](auto& a) {
          a.name = create.name;
          a.creation_date = context.control.pending_block_time();
-      });
-
-      db.create<account_metadata_object>([&](auto& a) {
-         a.name = create.name;
       });
 
       for (const auto& auth : { create.owner, create.active }) {
@@ -141,27 +137,40 @@ void apply_sysio_setcode(apply_context& context) {
      wasm_interface::validate(context.control, act.code);
    }
 
-   const auto& account = db.get<account_metadata_object,by_name>(act.account);
-   bool existing_code = (account.code_hash != digest_type());
-
-   SYS_ASSERT( code_size > 0 || existing_code, set_exact_code, "contract is already cleared" );
-
    int64_t old_size  = 0;
    int64_t new_size  = code_size * config::setcode_ram_bytes_multiplier;
 
-   if( existing_code ) {
-      const code_object& old_code_entry = db.get<code_object, by_code_hash>(boost::make_tuple(account.code_hash, account.vm_type, account.vm_version));
-      SYS_ASSERT( old_code_entry.code_hash != code_hash, set_exact_code,
-                  "contract is already running this version of code" );
-      old_size  = (int64_t)old_code_entry.code.size() * config::setcode_ram_bytes_multiplier;
-      if( old_code_entry.code_ref_count == 1 ) {
-         db.remove(old_code_entry);
-         context.control.code_block_num_last_used(account.code_hash, account.vm_type, account.vm_version,
-                                                  old_code_entry.first_block_used, context.control.head().block_num() + 1);
-      } else {
-         db.modify(old_code_entry, [](code_object& o) {
-            --o.code_ref_count;
-         });
+   SYS_ASSERT( context.control.find_account(act.account) != nullptr, account_query_exception, "Account not found ${a}", ("a", act.account));
+   const auto* account_metadata = db.find<account_metadata_object,by_name>(act.account);
+   int64_t metadata_ram_delta  = 0;
+   if(account_metadata == nullptr){
+      metadata_ram_delta += config::billable_size_v<account_metadata_object>;
+      account_metadata = &db.create<account_metadata_object>([&](auto& a) {
+         a.name = act.account;
+      });
+   } else {
+      bool existing_code = (account_metadata->code_hash != digest_type());
+
+      SYS_ASSERT( code_size > 0 || existing_code, set_exact_code, "contract is already cleared" );
+
+      if( existing_code ) {
+         const code_object& old_code_entry = db.get<code_object, by_code_hash>(
+            boost::make_tuple(std::cref(account_metadata->code_hash), account_metadata->vm_type, account_metadata->vm_version));
+         SYS_ASSERT( old_code_entry.code_hash != code_hash, set_exact_code,
+                     "contract is already running this version of code" );
+         old_size  = (int64_t)old_code_entry.code.size() * config::setcode_ram_bytes_multiplier;
+         if( old_code_entry.code_ref_count == 1 ) {
+            db.remove(old_code_entry);
+            context.control.code_block_num_last_used(account_metadata->code_hash,
+                                                     account_metadata->vm_type,
+                                                     account_metadata->vm_version,
+                                                     old_code_entry.first_block_used,
+                                                     context.control.head_block_num() + 1);
+         } else {
+            db.modify(old_code_entry, [](code_object& o) {
+               --o.code_ref_count;
+            });
+         }
       }
    }
 
@@ -184,7 +193,7 @@ void apply_sysio_setcode(apply_context& context) {
       }
    }
 
-   db.modify( account, [&]( auto& a ) {
+   db.modify( *account_metadata, [&]( auto& a ) {
       a.code_sequence += 1;
       a.code_hash = code_hash;
       a.vm_type = act.vmtype;
@@ -192,7 +201,7 @@ void apply_sysio_setcode(apply_context& context) {
       a.last_code_update = context.control.pending_block_time();
    });
 
-   if (new_size != old_size) {
+   if (new_size != old_size || metadata_ram_delta > 0) {
       if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          const char* operation = "update";
          if (old_size <= 0) {
@@ -204,7 +213,7 @@ void apply_sysio_setcode(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${account}", ("account", act.account)), "code", operation, "setcode");
       }
 
-      context.add_ram_usage( act.account, new_size - old_size );
+      context.add_ram_usage( act.account, new_size - old_size + metadata_ram_delta );
    }
 }
 
@@ -215,23 +224,29 @@ void apply_sysio_setabi(apply_context& context) {
 
    context.require_authorization(act.account);
 
-   const auto& account = db.get<account_object,by_name>(act.account);
+   const auto* account_metadata = db.find<account_metadata_object,by_name>(act.account);
+   int64_t metadata_ram_delta  = 0;
+   if(account_metadata == nullptr){
+      metadata_ram_delta += config::billable_size_v<account_metadata_object>;
+      account_metadata = &db.create<account_metadata_object>([&](auto& a) {
+         a.name = act.account;
+      });
+   }
 
    int64_t abi_size = act.abi.size();
 
-   int64_t old_size = (int64_t)account.abi.size();
+   int64_t old_size = (int64_t)account_metadata->abi.size();
    int64_t new_size = abi_size;
 
-   db.modify( account, [&]( auto& a ) {
+   db.modify( *account_metadata, [&]( auto& a ) {
+      a.abi_sequence += 1;
       a.abi.assign(act.abi.data(), abi_size);
    });
-
-   const auto& account_metadata = db.get<account_metadata_object, by_name>(act.account);
-   db.modify( account_metadata, [&]( auto& a ) {
-      a.abi_sequence += 1;
+   db.modify(db.get<account_object,by_name>(act.account), []( auto& ) {
+      // flag as modified so state_history will export abi of account_metadata as part of account
    });
 
-   if (new_size != old_size) {
+   if (new_size != old_size || metadata_ram_delta > 0) {
       if (auto dm_logger = context.control.get_deep_mind_logger(context.trx_context.is_transient())) {
          const char* operation = "update";
          if (old_size <= 0) {
@@ -243,7 +258,7 @@ void apply_sysio_setabi(apply_context& context) {
          dm_logger->on_ram_trace(RAM_EVENT_ID("${account}", ("account", act.account)), "abi", operation, "setabi");
       }
 
-      context.add_ram_usage( act.account, new_size - old_size );
+      context.add_ram_usage( act.account, new_size - old_size + metadata_ram_delta );
    }
 }
 

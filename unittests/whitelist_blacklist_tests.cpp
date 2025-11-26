@@ -1,4 +1,5 @@
 #include <sysio/chain/resource_limits.hpp>
+#include <sysio/chain/global_property_object.hpp>
 #include <sysio/testing/tester.hpp>
 #include <sysio/testing/tester_network.hpp>
 
@@ -8,6 +9,7 @@
 
 #include <contracts.hpp>
 #include <test_contracts.hpp>
+
 
 using namespace sysio;
 using namespace sysio::chain;
@@ -64,7 +66,7 @@ class whitelist_blacklist_tester {
       }
 
       transaction_trace_ptr transfer( account_name from, account_name to, string quantity = "1.00 TOK" ) {
-         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::active_name},{from, config::sysio_payer_name}}, mvo()
+         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::sysio_payer_name},{from, config::active_name}}, mvo()
             ( "from", from )
             ( "to", to )
             ( "quantity", quantity )
@@ -363,7 +365,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
       const auto& act = t->action_traces[0].act;
       if( act.account == "sysio"_n && act.name == "onblock"_n ) return;
 
-      if( t->receipt && t->receipt->status == transaction_receipt::executed ) {
+      if( t->receipt ) {
          wlog( "trx ${id} executed (first action is ${code}::${action})",
               ("id", t->id)("code", act.account)("action", act.name) );
       } else {
@@ -387,21 +389,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    fc::temp_directory tempdir;
    auto conf_genesis = tester::default_config( tempdir );
 
-   auto& cfg = conf_genesis.second.initial_configuration;
-
-   cfg.max_block_net_usage        = 128 * 1024; // 64 KiB max block size
-   cfg.target_block_net_usage_pct = config::percent_1/10;
-   // A total net usage of more than 131 bytes will keep the block above the target.
-   cfg.max_transaction_net_usage  = 69 * 1024; // needs to be large enough for setup_policy::full
-
-   cfg.max_block_cpu_usage        = 150'000; // maximum of 150 ms of CPU per block
-   cfg.target_block_cpu_usage_pct = config::percent_1/10; // More than 150 us of CPU to keep the block above the target.
-   cfg.max_transaction_cpu_usage  = 50'000;
-   cfg.min_transaction_cpu_usage  = 100; // Empty blocks (consisting of only onblock) would be below the target.
-   // But all it takes is one transaction in the block to be above the target.
-
-   tester c( conf_genesis.first, conf_genesis.second );
-   c.execute_setup_policy( setup_policy::full );
+   tester c;
 
    const resource_limits_manager& rm = c.control->get_resource_limits_manager();
 
@@ -409,6 +397,22 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    const auto& other_account = "other"_n;
 
    c.create_accounts( {user_account, other_account} );
+
+   auto& cfg = conf_genesis.second.initial_configuration;
+
+   cfg.max_block_net_usage        = 128 * 1024; // 64 KiB max block size
+   cfg.target_block_net_usage_pct = config::percent_1/10;
+   // A total net usage of more than 131 bytes will keep the block above the target.
+   cfg.max_transaction_net_usage  = 70 * 1024; // needs to be large enough for setup_policy::full
+
+   cfg.max_block_cpu_usage        = 150'000; // maximum of 150 ms of CPU per block
+   cfg.target_block_cpu_usage_pct = config::percent_1/10; // More than 150 us of CPU to keep the block above the target.
+   cfg.max_transaction_cpu_usage  = 50'000;
+   cfg.min_transaction_cpu_usage  = 100; // Empty blocks (consisting of only onblock) would be below the target.
+   // But all it takes is one transaction in the block to be above the target.
+
+   c.push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+                              ("params", cfg) );
 
    c.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
       ("account", user_account)
@@ -424,10 +428,11 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
       ("cpu_weight", 249'999'999)
    );
 
+   const int64_t reqauth_net_charge = 155;
    auto push_reqauth = [&]( name acnt, name perm, uint32_t billed_cpu_time_us ) {
       signed_transaction trx;
       trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
-                                              std::vector<permission_level>{{acnt, perm},{acnt,config::sysio_payer_name}},
+                                              std::vector<permission_level>{{acnt,config::sysio_payer_name}, {acnt, perm}},
                                               fc::mutable_variant_object()("from", acnt) ) );
       c.set_transaction_headers( trx, 6 );
       trx.sign( c.get_private_key( acnt, perm.to_string() ), c.control->get_chain_id() );
@@ -462,21 +467,19 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EXCEPTION(
       push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
       tx_net_usage_exceeded,
-      fc_exception_message_starts_with("transaction net usage is too high")
+      fc_exception_message_starts_with("account user net usage is too high")
    );
 
    wdump((rm.get_account_net_limit(user_account).first));
 
    // Allow congestion to reduce a little bit.
-   // TODO: re-enable with PR#111 - WIRE-12
-   /*
-   c.produce_blocks(1480);
+   c.produce_blocks(1850);
 
    BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() > (3*cfg.max_block_net_usage) );
-   BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() < (4*cfg.max_block_net_usage) );
+   BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() < (6*cfg.max_block_net_usage) );
    wdump((rm.get_account_net_limit_ex(user_account)));
    BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max > 3*reqauth_net_charge );
-   BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max < 4*reqauth_net_charge );
+   BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max < 5*reqauth_net_charge );
 
 
    // User can only push three reqauths per day even at this relaxed congestion level.
@@ -489,7 +492,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EXCEPTION(
       push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
       tx_net_usage_exceeded,
-      fc_exception_message_starts_with("transaction net usage is too high")
+      fc_exception_message_starts_with("account user net usage is too high")
    );
    c.produce_block( fc::days(1) );
    push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
@@ -500,42 +503,42 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    c.produce_block();
    c.produce_block( fc::days(1) );
 
-   // Reducing the greylist limit from 1000 to 5 should not make a difference since it would not be the
-   // bottleneck at this level of congestion. But dropping it to 4 is not a bottleneck for cpu but is for net.
+   // Reducing the greylist limit from 1000 to 7 should not make a difference since it would not be the
+   // bottleneck at this level of congestion. But dropping it to 6 is not a bottleneck for cpu but is for net.
    {
       auto user_elastic_cpu_limit = rm.get_account_cpu_limit_ex(user_account).first.max;
       auto user_elastic_net_limit = rm.get_account_net_limit_ex(user_account).first.max;
 
-      auto user_cpu_res1 = rm.get_account_cpu_limit_ex(user_account, 4);
+      auto user_cpu_res1 = rm.get_account_cpu_limit_ex(user_account, 6);
       BOOST_REQUIRE_EQUAL( user_cpu_res1.first.max, user_elastic_cpu_limit );
       BOOST_REQUIRE_EQUAL( user_cpu_res1.second, false );
-      auto user_net_res1 = rm.get_account_net_limit_ex(user_account, 5);
+      auto user_net_res1 = rm.get_account_net_limit_ex(user_account, 7);
       BOOST_REQUIRE_EQUAL( user_net_res1.first.max, user_elastic_net_limit );
       BOOST_REQUIRE_EQUAL( user_net_res1.second, false );
 
       auto user_cpu_res2 = rm.get_account_cpu_limit_ex(user_account, 3);
       BOOST_REQUIRE( user_cpu_res2.first.max < user_elastic_cpu_limit );
       BOOST_REQUIRE_EQUAL( user_cpu_res2.second, true );
-      auto user_net_res2 = rm.get_account_net_limit_ex(user_account, 3);
+      auto user_net_res2 = rm.get_account_net_limit_ex(user_account, 5);
       BOOST_REQUIRE( user_net_res2.first.max < user_elastic_net_limit );
       BOOST_REQUIRE_EQUAL( user_net_res2.second, true );
-      BOOST_REQUIRE( 2*reqauth_net_charge < user_net_res2.first.max );
-      BOOST_REQUIRE( user_net_res2.first.max < 3*reqauth_net_charge );
+      BOOST_TEST_REQUIRE( 2*reqauth_net_charge < user_net_res2.first.max );
+      BOOST_TEST_REQUIRE( user_net_res2.first.max < 3*reqauth_net_charge );
    }
+
+   ilog("setting greylist limit to 7");
+   c.control->set_greylist_limit( 7 );
+   c.produce_block();
+
+   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   c.produce_block();
+   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   c.produce_block();
+   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   c.produce_block();
 
    ilog("setting greylist limit to 5");
    c.control->set_greylist_limit( 5 );
-   c.produce_block();
-
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
-   c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
-   c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
-   c.produce_block();
-
-   ilog("setting greylist limit to 3");
-   c.control->set_greylist_limit( 3 );
    c.produce_block( fc::days(1) );
 
    push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
@@ -545,7 +548,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EXCEPTION(
       push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
       greylist_net_usage_exceeded,
-      fc_exception_message_starts_with("greylisted transaction net usage is too high")
+      fc_exception_message_starts_with("greylisted account user net usage is too high")
    );
    c.produce_block( fc::days(1) );
    push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
@@ -564,9 +567,8 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EXCEPTION(
       push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
       greylist_net_usage_exceeded,
-      fc_exception_message_starts_with("greylisted transaction net usage is too high")
+      fc_exception_message_starts_with("greylisted account user net usage is too high")
    );
-   */
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

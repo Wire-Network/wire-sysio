@@ -94,7 +94,14 @@ namespace sysio { namespace chain {
          return fc::raw::unpack<T>(data);
       }
 
-      account_name explicit_payer() const;
+      // sysio_payer_name actor or contract
+      account_name payer() const;
+      // first authorization actor (which will be sysio_payer_name actor if exists) or empty() if no authorizer
+      account_name first_authorizer()const;
+
+   private:
+      friend struct packed_transaction;
+      uint32_t get_billable_size()const { return fc::raw::pack_size(static_cast<const action_base&>(*this)) + data.size(); }
    };
 
    inline digest_type generate_action_digest(const action& act, const vector<char>& action_output) {
