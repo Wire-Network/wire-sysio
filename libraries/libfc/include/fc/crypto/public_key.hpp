@@ -1,4 +1,6 @@
 #pragma once
+#include "../../../../libfc-lite/include/fc-lite/crypto/chain_types.hpp"
+
 #include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/elliptic_webauthn.hpp>
@@ -10,7 +12,7 @@
 #include <fc/crypto/elliptic_ed.hpp>
 
 
-namespace fc { namespace crypto {
+namespace fc::crypto {
    namespace config {
       constexpr const char* public_key_legacy_prefix = "SYS";
       constexpr const char* public_key_base_prefix = "PUB";
@@ -22,6 +24,8 @@ namespace fc { namespace crypto {
          "EM",
          "ED"
       };
+
+      constexpr auto public_key_wire_prefixes = std::array{public_key_legacy_prefix, public_key_base_prefix};
    };
 
    class public_key
@@ -66,7 +70,9 @@ namespace fc { namespace crypto {
          friend class private_key;
    }; // public_key
 
-} }  // fc::crypto
+   chain_key_type get_public_key_type(const std::variant<std::string, public_key>& pub_key_var);
+
+} // fc::crypto
 
 namespace fc {
    void to_variant(const crypto::public_key& var, variant& vo, const fc::yield_function_t& yield = fc::yield_function_t());

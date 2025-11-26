@@ -84,6 +84,43 @@ namespace fc { namespace crypto {
       }
    }
 
+   chain_key_type get_public_key_type(const std::variant<std::string, public_key>& pub_key_var) {
+      if (std::holds_alternative<public_key>(pub_key_var)) {
+         auto pub_key = std::get<public_key>(pub_key_var);
+         if (!pub_key.valid())
+            return chain_key_type_unknown;
+
+         return get_public_key_type(pub_key.to_string({}));
+      }
+
+      auto pub_key_str = std::get<std::string>(pub_key_var);
+      auto pub_key_len = pub_key_str.length();
+      public_key pub_key(pub_key_str);
+
+      if (!pub_key.valid())
+         return chain_key_type_unknown;
+
+      for (auto& prefix : config::public_key_wire_prefixes) {
+         if (pub_key_str.starts_with(prefix) && pub_key.which() <= 1)
+            return chain_key_type_wire;
+      }
+
+      if (pub_key_str.starts_with("0x") || pub_key.which() == 0) {
+         return chain_key_type_ethereum;
+      }
+
+      if ((pub_key_len == 43 || pub_key_len == 44) && pub_key.which() == 4) {
+         return chain_key_type_solana;
+      }
+
+      return chain_key_type_unknown;
+
+
+
+
+
+   }
+
    std::ostream& operator<<(std::ostream& s, const public_key& k) {
       s << "public_key(" << k.to_string({}) << ')';
       return s;

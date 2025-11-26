@@ -36,10 +36,10 @@ public:
       produce_blocks();
 
 
-      const auto* accnt = control->find_account_metadata("sysio.depot"_n);
-      BOOST_REQUIRE(accnt != nullptr);
+      const auto* account_md = control->find_account_metadata("sysio.depot"_n);
+      BOOST_REQUIRE(account_md != nullptr);
       abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(account_md->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 

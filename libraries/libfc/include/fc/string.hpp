@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <vector>
 
 namespace fc
 {
@@ -30,4 +31,13 @@ namespace fc
   std::pair<std::string&, bool> escape_str( std::string& str, escape_control_chars escape_ctrl = escape_control_chars::on,
                                             std::size_t max_len = std::numeric_limits<std::size_t>::max(),
                                             std::string_view add_truncate_str = "..." );
+
+  /**
+   * Split a string by a provided delimiter
+   *
+   * @param str String to split
+   * @param delim delimiter
+   * @return vector of split strings
+   */
+  std::vector<std::string> split(const std::string& str, char delim);
 }
