@@ -8,6 +8,7 @@
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <fc/io/json.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test_log.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 
