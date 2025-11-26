@@ -745,7 +745,7 @@ namespace sysio::testing {
    };
 
    using savanna_tester = tester;
-   using testers = boost::mpl::list<legacy_tester, savanna_tester>;
+   using testers = boost::mpl::list<savanna_tester>;
 
    class validating_tester : public base_tester {
    public:
