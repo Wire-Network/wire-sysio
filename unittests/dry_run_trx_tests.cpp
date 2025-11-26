@@ -73,8 +73,7 @@ struct dry_run_trx_tester : T {
    bytes getage_data;
 };
 
-using dry_run_trx_testers = boost::mpl::list<dry_run_trx_tester<legacy_validating_tester>,
-                                             dry_run_trx_tester<savanna_validating_tester>>;
+using dry_run_trx_testers = boost::mpl::list<dry_run_trx_tester<savanna_validating_tester>>;
 
 BOOST_AUTO_TEST_SUITE(dry_run_trx_tests)
 
@@ -169,7 +168,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( setabi_test, T, dry_run_trx_testers ) { try {
    chain.send_action(act, true); // should not throw
    const auto* accnt = chain.control->find_account_metadata( "setabitest"_n );
    BOOST_REQUIRE(accnt == nullptr); // dry run, so not created, no abi actually set
-   BOOST_TEST(accnt->abi.size() == 0u); // no abi actually set
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( updateauth_test, T, dry_run_trx_testers ) { try {
