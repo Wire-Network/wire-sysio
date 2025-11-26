@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sysio/chain/exceptions.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include <string>
 #include <sstream>
