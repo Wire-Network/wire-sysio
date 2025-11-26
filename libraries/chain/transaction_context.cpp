@@ -256,8 +256,11 @@ namespace sysio::chain {
       if (trx_deadline >= six_months) {
          enforce_deadline = false;
          active_deadline = fc::time_point::maximum();
-         transaction_timer.start( active_deadline );
+      } else {
+         active_deadline = trx_deadline;
       }
+      transaction_timer.start( active_deadline );
+      checktime(); // Fail early if deadline as already been exceeded
 
       is_initialized = true;
    }
@@ -352,6 +355,7 @@ namespace sysio::chain {
                   }
                }
                if (enforce_deadline) {
+                  transaction_timer.stop();
                   transaction_timer.start(active_deadline);
                   checktime(); // Fail early if deadline already exceeded
                }
