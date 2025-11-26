@@ -1751,10 +1751,10 @@ BOOST_AUTO_TEST_CASE( code_size )  try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE_TEMPLATE( billed_cpu_test, T, testers ) try {
+BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    fc::temp_directory tempdir;
-   T chain( tempdir, true );
+   savanna_tester chain( tempdir, true );
    chain.execute_setup_policy( setup_policy::full );
 
    const resource_limits_manager& mgr = chain.control->get_resource_limits_manager();
