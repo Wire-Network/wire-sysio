@@ -1419,7 +1419,7 @@ namespace sysio::testing {
                ("pop", pop.to_string()));
       }
 
-      control->set_node_finalizer_keys(local_finalizer_keys);
+      control->test_set_node_finalizer_keys(local_finalizer_keys);
 
       fc::mutable_variant_object fin_policy_variant;
       fin_policy_variant("threshold", input.threshold);
@@ -1437,7 +1437,7 @@ namespace sysio::testing {
          auto [privkey, pubkey, pop] = get_bls_key(name);
          local_finalizer_keys[pubkey.to_string()] = privkey.to_string();
       }
-      control->set_node_finalizer_keys(local_finalizer_keys);
+      control->test_set_node_finalizer_keys(local_finalizer_keys);
    }
 
    base_tester::set_finalizers_output_t base_tester::set_active_finalizers(std::span<const account_name> names) {

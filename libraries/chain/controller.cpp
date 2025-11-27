@@ -3622,8 +3622,8 @@ struct controller_impl {
       wasmif.code_block_num_last_used(code_hash, vm_type, vm_version, first_used_block_num, block_num_last_used);
    }
 
-   void set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys) {
-      my_finalizers.set_keys(finalizer_keys);
+   void set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys, bool enforce_startup_constraints) {
+      my_finalizers.set_keys(finalizer_keys, enforce_startup_constraints);
    }
 
    bool irreversible_mode() const { return read_mode == db_read_mode::IRREVERSIBLE; }
@@ -4757,7 +4757,11 @@ platform_timer& controller::get_thread_local_timer() {
 }
 
 void controller::set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys) {
-   my->set_node_finalizer_keys(finalizer_keys);
+   my->set_node_finalizer_keys(finalizer_keys, true);
+}
+
+void controller::test_set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys) {
+   my->set_node_finalizer_keys(finalizer_keys, false);
 }
 
 bool controller::is_node_finalizer_key(const bls_public_key& key) const {
