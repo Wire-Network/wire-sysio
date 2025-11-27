@@ -2495,7 +2495,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
             auto except_ptr = std::static_pointer_cast<fc::exception>(std::make_shared<tx_cpu_usage_exceeded>(
                FC_LOG_MESSAGE(error, "transaction ${id} exceeded failure limit for account ${a} until ${next_reset_time}",
                               ("id", trx->id())("a", auth)
-                              ("next_reset_time", _account_fails.next_reset_timepoint(chain.head_block_num(), chain.head_block_time())))));
+                              ("next_reset_time", _account_fails.next_reset_timepoint(chain.head().block_num(), chain.head().block_time())))));
             log_trx_results(trx, except_ptr);
             next(except_ptr);
          }
@@ -2529,7 +2529,7 @@ producer_plugin_impl::push_result producer_plugin_impl::push_transaction(const f
          pr.trx_exhausted = true;
          fc_dlog(trx->is_transient() ? _transient_trx_failed_trace_log : _trx_failed_trace_log,
                  "[TRX_TRACE] Block ${bn} for producer ${prod} COULD NOT FIT, prev elapsed ${e}us, block cpu limit ${bl}, tx: ${txid} RETRYING ",
-                 ("bn", chain.head_block_num() + 1)("prod", get_pending_block_producer())("e", prev_elapsed)("bl", block_cpu_limit)("txid", trx->id()));
+                 ("bn", chain.head().block_num() + 1)("prod", get_pending_block_producer())("e", prev_elapsed)("bl", block_cpu_limit)("txid", trx->id()));
          return pr;
       }
    }
