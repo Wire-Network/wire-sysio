@@ -2,7 +2,8 @@ namespace sysio { namespace chain {
 
 // Initial value for sysio ABI. This value affects consensus; if different
 // nodeop versions have different versions of the initial sysio ABI, then
-// they could potentially fork. See https://github.com/SYSIO/sys/issues/7794
+// they could potentially fork. See https://github.com/EOSIO/eos/issues/7794
+// In WIRE this ABI RAM is correctly charged to sysio, so it is safe to change.
 //
 // This is a capture of the ABI produced by versions 1.7 and 1.8.
 

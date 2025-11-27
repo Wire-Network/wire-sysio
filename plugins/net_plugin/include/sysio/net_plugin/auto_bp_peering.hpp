@@ -187,7 +187,7 @@ public:
                         ("a", outbound_ip_address)("m", net_utils::max_p2p_address_length) );
             auto is_valid_ip_address = [](const std::string& ip_str) {
                try {
-                  boost::asio::ip::address::from_string(ip_str);
+                  boost::asio::ip::make_address(ip_str);
                } catch ( ... ) {
                   return false;
                }

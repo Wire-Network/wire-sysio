@@ -10,8 +10,7 @@ BOOST_AUTO_TEST_SUITE(finality_tests)
 
 // test set_finalizer host function serialization and tester set_finalizers
 BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
-   // Do not transition to Savanna at constrution. Transition explicitly later.
-   legacy_validating_tester t;
+   savanna_validating_tester t;
 
    // Create finalizer keys
    constexpr size_t num_finalizers = 21;
@@ -30,8 +29,8 @@ BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
    BOOST_TEST(!!ext);
    std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
    BOOST_TEST(!!fin_policy_diff);
-   BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == num_finalizers);
-   BOOST_TEST(fin_policy_diff->generation == 1);
+   BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == num_finalizers-1); // -1 because genesis has one finalizer
+   BOOST_TEST(fin_policy_diff->generation == 3u);
    // same as reference-contracts/.../contracts/sysio.system/src/finalizer_key.cpp#L73
    BOOST_TEST(fin_policy_diff->threshold == (num_finalizers * 2) / 3 + 1);
    block_id_type if_genesis_block_id = block->calculate_id();
@@ -61,8 +60,7 @@ BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
 void test_finality_transition(const vector<account_name>& accounts,
                               const base_tester::finalizer_policy_input& input,
                               bool lib_advancing_expected) {
-   // Do not transition to Savanna at constrution. Transition explicitly later.
-   legacy_validating_tester t;
+   savanna_validating_tester t;
 
    t.produce_block();
 
@@ -80,7 +78,7 @@ void test_finality_transition(const vector<account_name>& accounts,
    std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
    BOOST_TEST(!!fin_policy_diff);
    BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == accounts.size());
-   BOOST_TEST(fin_policy_diff->generation == 1);
+   BOOST_TEST(fin_policy_diff->generation == 3u);
    block_id_type if_genesis_block_id = block->calculate_id();
 
    block_num_type active_block_num = block->block_num();
@@ -195,6 +193,7 @@ BOOST_FIXTURE_TEST_CASE(quorum_of_votes, finality_test_cluster<4>) { try {
 BOOST_FIXTURE_TEST_CASE(no_votes, finality_test_cluster<4>) { try {
    BOOST_REQUIRE_EQUAL(num_lib_advancing(), 0u);
    produce_and_push_block();
+   num_lib_advancing();
    for (auto i = 0; i < 3; ++i) {
       produce_and_push_block();
       // don't process votes
@@ -210,6 +209,7 @@ BOOST_FIXTURE_TEST_CASE(no_votes, finality_test_cluster<4>) { try {
 BOOST_FIXTURE_TEST_CASE(quorum_minus_one, finality_test_cluster<4>) { try {
    BOOST_REQUIRE_EQUAL(num_lib_advancing(), 0u);
    produce_and_push_block();
+   num_lib_advancing();
    for (auto i = 0; i < 3; ++i) {
       produce_and_push_block();
       process_votes(1, num_needed_for_quorum - 1);
@@ -297,6 +297,8 @@ BOOST_FIXTURE_TEST_CASE(three_delayed_votes, finality_test_cluster<4>) { try {
    // produce 4 blocks and hold the votes for the first 3 to simulate delayed votes
    // The 4 blocks have the same QC claim as no QCs are created because quorum was
    // not reached
+   produce_and_push_block();
+   num_lib_advancing();
    for (auto i = 0; i < 4; ++i)
       produce_and_push_block();
 
@@ -413,6 +415,7 @@ BOOST_FIXTURE_TEST_CASE(lost_votes, finality_test_cluster<4>) { try {
 // ------------------------------------
 BOOST_FIXTURE_TEST_CASE(one_weak_vote, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    auto next_idx = process_votes(1, num_needed_for_quorum -1); // one less strong vote than needed for quorum
    process_vote(next_idx, -1, vote_mode::weak);   // and one weak vote
@@ -430,6 +433,7 @@ BOOST_FIXTURE_TEST_CASE(one_weak_vote, finality_test_cluster<4>) { try {
 // --------------------------------------------
 BOOST_FIXTURE_TEST_CASE(quorum_minus_one_weak_vote, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    process_votes(1, num_needed_for_quorum, -1, vote_mode::weak);
    produce_and_push_block();
@@ -446,6 +450,7 @@ BOOST_FIXTURE_TEST_CASE(quorum_minus_one_weak_vote, finality_test_cluster<4>) { 
 // -------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(weak_strong_weak_strong, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    process_votes(1, num_needed_for_quorum, -1, vote_mode::weak);
    produce_and_push_block();
@@ -470,6 +475,7 @@ BOOST_FIXTURE_TEST_CASE(weak_strong_weak_strong, finality_test_cluster<4>) { try
 // -------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(weak_weak_strong_strong, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    process_votes(1, num_needed_for_quorum, -1, vote_mode::weak);
    produce_and_push_block();
@@ -495,6 +501,7 @@ BOOST_FIXTURE_TEST_CASE(weak_weak_strong_strong, finality_test_cluster<4>) { try
 // -------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(weak_delayed_lost_vote, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    // quorum of weak votes
    process_votes(1, num_needed_for_quorum, -1, vote_mode::weak);
@@ -532,6 +539,7 @@ BOOST_FIXTURE_TEST_CASE(weak_delayed_lost_vote, finality_test_cluster<4>) { try 
 // -------------------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(delayed_strong_weak_lost_vote, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    // delay votes at index 1
    constexpr uint32_t delayed_index = 0;
@@ -574,6 +582,7 @@ BOOST_FIXTURE_TEST_CASE(delayed_strong_weak_lost_vote, finality_test_cluster<4>)
 // --------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(duplicate_votes, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    for (auto i = 0; i < 5; ++i) {
       process_votes(1, num_needed_for_quorum, i, vote_mode::strong);
@@ -593,6 +602,7 @@ BOOST_FIXTURE_TEST_CASE(duplicate_votes, finality_test_cluster<4>) { try {
 // --------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(unknown_proposal_votes, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    // intentionally corrupt block_id in node1's vote (vote index 0)
    node1.corrupt_vote_block_id();
@@ -618,6 +628,7 @@ BOOST_FIXTURE_TEST_CASE(unknown_proposal_votes, finality_test_cluster<4>) { try 
 BOOST_FIXTURE_TEST_CASE(unknown_finalizer_key_votes, finality_test_cluster<4>) { try {
    // node0 produces a block and pushes to node1
    produce_and_push_block();
+   num_lib_advancing();
 
    // intentionally corrupt finalizer_key in node1's vote
    node1.corrupt_vote_finalizer_key();
@@ -639,6 +650,7 @@ BOOST_FIXTURE_TEST_CASE(unknown_finalizer_key_votes, finality_test_cluster<4>) {
 // -----------------------------------------------------
 BOOST_FIXTURE_TEST_CASE(corrupted_signature_votes, finality_test_cluster<4>) { try {
    produce_and_push_block();
+   num_lib_advancing();
 
    // intentionally corrupt signature in node1's vote (vote index 0)
    node1.corrupt_vote_signature();
@@ -682,13 +694,13 @@ BOOST_FIXTURE_TEST_CASE(second_set_finalizers, finality_test_cluster<4>) { try {
    for (size_t i=0; i<(2*num_chains_to_final); ++i) {
       produce_and_push_block();
       process_votes(1, num_nodes - 1);
-      node0.check_head_finalizer_policy(1, fin_policy_pubkeys_0); // original policy still active
+      node0.check_head_finalizer_policy(2, fin_policy_pubkeys_0); // original policy still active
    }
 
    // we just completed the two 2-chains, so the next block we produce will have the new finalizer policy activated
    produce_and_push_block();
-   node0.check_head_finalizer_policy(2u, pubkeys1);
-   node1.check_head_finalizer_policy(2u, pubkeys1);
+   node0.check_head_finalizer_policy(3u, pubkeys1);
+   node1.check_head_finalizer_policy(3u, pubkeys1);
 
 } FC_LOG_AND_RETHROW() }
 
@@ -738,7 +750,7 @@ BOOST_FIXTURE_TEST_CASE(finality_skip, finality_test_cluster<4>) { try {
       // make sure we don't have duplicate finalizer policies for the same block number
       // in either `proposed` or `pending` state
       // ------------------------------------------------------------------------------
-      node0.check_head_finalizer_policy(1u, fin_policy_pubkeys_0);
+      node0.check_head_finalizer_policy(2u, fin_policy_pubkeys_0);
    }
 
    // now *only* the second `set_finalizers` should be `pending`, the one with
@@ -750,7 +762,7 @@ BOOST_FIXTURE_TEST_CASE(finality_skip, finality_test_cluster<4>) { try {
    for (size_t i=0; i<num_chains_to_final; ++i) {
       produce_and_push_block();
       process_votes(1, num_nodes - 1);
-      node0.check_head_finalizer_policy(1u, fin_policy_pubkeys_0);
+      node0.check_head_finalizer_policy(2u, fin_policy_pubkeys_0);
    }
 
    // when we receive the votes of that last block finishing the 2-chain, the active
@@ -758,7 +770,7 @@ BOOST_FIXTURE_TEST_CASE(finality_skip, finality_test_cluster<4>) { try {
    // ------------------------------------------------------------------------------
    produce_and_push_block();
    process_votes(1, num_nodes - 1);
-   node0.check_head_finalizer_policy(3u, pubkeys2);
+   node0.check_head_finalizer_policy(4u, pubkeys2);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -14,8 +14,7 @@ We currently support the following operating systems.
 | **Operating Systems** |
 |-----------------------|
 | Ubuntu 24.04 Jammy    |
-| Ubuntu 22.04 Jammy    |
-| Ubuntu 20.04 Focal    |
+| Ubuntu 25.04 Plucky   |
 
 <!-- TODO: needs to add and test build on unsupported environments -->
 

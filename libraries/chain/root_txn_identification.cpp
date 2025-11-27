@@ -121,7 +121,6 @@ namespace sysio { namespace chain {
 
    bool root_txn_identification_impl::is_desired_trace(const chain::transaction_trace_ptr& trace) const {
       if (!trace->receipt ||
-         trace->receipt->status != chain::transaction_receipt_header::executed ||
          chain::is_onblock(*trace)) {
          return false;
       }

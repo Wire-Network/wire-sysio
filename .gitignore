@@ -98,7 +98,7 @@ CMakeLists.txt.user
 node_modules
 package-lock.json
 
-snapshots
+/snapshots
 
 cliff.toml
 !cmake/build-options.cmake

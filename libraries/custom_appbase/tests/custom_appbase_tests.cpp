@@ -446,9 +446,8 @@ BOOST_AUTO_TEST_CASE( execute_from_read_only_and_read_exclusive_queues ) {
       BOOST_REQUIRE_EQUAL( app->executor().read_write_queue_size(), 3u );
       } );
 
-
-   std::optional<boost::asio::io_context::work> work;
-   work.emplace(app->get_io_context());
+   auto work = make_work_guard(app->get_io_context());
+   
    while( true ) {
       app->get_io_context().poll();
       size_t s = app->executor().read_only_queue_size() + app->executor().read_exclusive_queue_size() + app->executor().read_write_queue_size();

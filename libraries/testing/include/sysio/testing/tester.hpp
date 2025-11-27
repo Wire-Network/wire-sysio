@@ -8,6 +8,7 @@
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <fc/io/json.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test_log.hpp>
 #include <boost/tuple/tuple_io.hpp>
 #include <boost/unordered/unordered_flat_map.hpp>
 
@@ -183,7 +184,9 @@ namespace sysio::testing {
          static const fc::microseconds abi_serializer_max_time;
          static constexpr fc::microseconds default_skip_time = fc::milliseconds(config::block_interval_ms);
 
-         static constexpr uint64_t newaccount_ram = 2808; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t newaccount_ram = 1768; // Should match sysio.system native newaccount_ram
+         static constexpr uint64_t bytes_per_unit = 104;
+         static_assert( newaccount_ram % bytes_per_unit == 0, "newaccount_ram must be a multiple of bytes_per_unit");
          static constexpr auto NODE_DADDY = "nodedaddy"_n;
          bool has_roa = false;
 
@@ -397,15 +400,6 @@ namespace sysio::testing {
             return get_private_key<KeyType>( keyname, role ).get_public_key();
          }
 
-         static auto get_bls_private_key( name keyname, string role = "default" ) {
-            auto secret = fc::sha256::hash(keyname.to_string() + role);
-            return bls_private_key(secret.to_uint8_span());
-         }
-
-         static auto get_bls_public_key( name keyname, string role = "default" ) {
-            return get_bls_private_key(keyname, role).get_public_key();
-         }
-
          void              set_contract( account_name contract, const vector<uint8_t>& wasm, const std::string& abi_json );
          void              set_code( account_name name, const char* wast, const private_key_type* signer = nullptr );
          void              set_code( account_name name, const vector<uint8_t> wasm, const private_key_type* signer = nullptr  );
@@ -446,9 +440,10 @@ namespace sysio::testing {
          auto get_resolver() {
             return [this]( const account_name& name ) -> std::optional<abi_serializer> {
                try {
-                  const auto& accnt = control->db().get<account_object, by_name>( name );
-                  if( abi_def abi; abi_serializer::to_abi( accnt.abi, abi )) {
-                     return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                  if (const auto* accnt = control->find_account_metadata( name ); accnt != nullptr) {
+                     if( abi_def abi; abi_serializer::to_abi( accnt->abi, abi )) {
+                        return abi_serializer( std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ) );
+                     }
                   }
                   return std::optional<abi_serializer>();
                } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for ${name}", ("name", name))
@@ -500,7 +495,7 @@ namespace sysio::testing {
             genesis_state genesis;
             genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
             genesis.initial_key = get_public_key( config::system_account_name, "active" );
-
+            std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore) = get_bls_key("finalizeraa"_n);
             return genesis;
          }
 
@@ -751,7 +746,7 @@ namespace sysio::testing {
    };
 
    using savanna_tester = tester;
-   using testers = boost::mpl::list<legacy_tester, savanna_tester>;
+   using testers = boost::mpl::list<savanna_tester>;
 
    class validating_tester : public base_tester {
    public:
@@ -895,7 +890,7 @@ namespace sysio::testing {
    };
 
    using savanna_validating_tester = validating_tester;
-   using validating_testers = boost::mpl::list<legacy_validating_tester, savanna_validating_tester>;
+   using validating_testers = boost::mpl::list<savanna_validating_tester>;
 
    // -------------------------------------------------------------------------------------
    // creates and manages a set of `bls_public_key` used for finalizers voting and policies
@@ -1012,10 +1007,12 @@ namespace sysio::testing {
          return finalizer_policy{}.apply_diff(*fin_policy_diff);
       }
 
+      // For Wire Savanna is active in genesis, so this just means to set the expected finalizer policy
       void activate_savanna(size_t first_key_idx) {
          set_node_finalizers(first_key_idx, pubkeys.size());
          set_finalizer_policy(first_key_idx);
-         transition_to_savanna();
+         t.produce_blocks(24); // produce enough blocks for finalizer policy to be active
+         //TODO: remove transition_to_savanna();
       }
 
       Tester&                 t;

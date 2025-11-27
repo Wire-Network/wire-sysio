@@ -23,12 +23,10 @@ namespace sysio { namespace chain {
     */
    class global_property_object : public chainbase::object<global_property_object_type, global_property_object>
    {
-      OBJECT_CTOR(global_property_object, (proposed_schedule))
+      OBJECT_CTOR(global_property_object)
 
    public:
       id_type                             id;
-      std::optional<block_num_type>       proposed_schedule_block_num;
-      shared_producer_authority_schedule  proposed_schedule;
       chain_config                        configuration;
       chain_id_type                       chain_id;
       wasm_config                         wasm_configuration;
@@ -46,8 +44,6 @@ namespace sysio { namespace chain {
    >;
 
    struct snapshot_global_property_object {
-      std::optional<block_num_type>       proposed_schedule_block_num;
-      producer_authority_schedule         proposed_schedule;
       chain_config                        configuration;
       chain_id_type                       chain_id;
       wasm_config                         wasm_configuration;
@@ -60,12 +56,10 @@ namespace sysio { namespace chain {
          using snapshot_type = snapshot_global_property_object;
 
          static snapshot_global_property_object to_snapshot_row( const global_property_object& value, const chainbase::database& ) {
-            return {value.proposed_schedule_block_num, producer_authority_schedule::from_shared(value.proposed_schedule), value.configuration, value.chain_id, value.wasm_configuration};
+            return {value.configuration, value.chain_id, value.wasm_configuration};
          }
 
          static void from_snapshot_row( snapshot_global_property_object&& row, global_property_object& value, chainbase::database& ) {
-            value.proposed_schedule_block_num = row.proposed_schedule_block_num;
-            value.proposed_schedule = row.proposed_schedule;
             value.configuration = row.configuration;
             value.chain_id = row.chain_id;
             value.wasm_configuration = row.wasm_configuration;
@@ -103,11 +97,11 @@ CHAINBASE_SET_INDEX_TYPE(sysio::chain::dynamic_global_property_object,
                          sysio::chain::dynamic_global_property_multi_index)
 
 FC_REFLECT(sysio::chain::global_property_object,
-            (proposed_schedule_block_num)(proposed_schedule)(configuration)(chain_id)(wasm_configuration)
+            (configuration)(chain_id)(wasm_configuration)
           )
 
 FC_REFLECT(sysio::chain::snapshot_global_property_object,
-            (proposed_schedule_block_num)(proposed_schedule)(configuration)(chain_id)(wasm_configuration)
+            (configuration)(chain_id)(wasm_configuration)
           )
 
 FC_REFLECT(sysio::chain::dynamic_global_property_object,

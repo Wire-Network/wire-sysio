@@ -45,7 +45,7 @@ namespace sysio::chain {
          ("block_num", head_block_num)
          ("global_sequence_num", db.get<dynamic_global_property_object>().global_action_sequence)
       );
-      const auto& idx = db.get_index<account_index>();
+      const auto& idx = db.get_index<account_metadata_index>();
       for (auto& row : idx.indices()) {
          if (row.abi.size() != 0) {
             fc_dlog(_logger, "ABIDUMP ABI ${contract} ${abi}",
@@ -266,22 +266,57 @@ namespace sysio::chain {
          ("data", state)
       );
    }
-   void deep_mind_handler::on_newaccount_resource_limits(const resource_limits::resource_limits_object& limits, const resource_limits::resource_usage_object& usage)
+
+   // maintain expected format
+   struct resource_limits_object {
+      account_name owner; //< owner should not be changed within a chainbase modifier lambda
+
+      int64_t net_weight = -1;
+      int64_t cpu_weight = -1;
+      int64_t ram_bytes = -1;
+   };
+   struct resource_usage_object {
+      account_name owner; //< owner should not be changed within a chainbase modifier lambda
+
+      resource_limits::usage_accumulator net_usage;
+      resource_limits::usage_accumulator cpu_usage;
+      uint64_t                           ram_usage = 0;
+   };
+
+   void deep_mind_handler::on_newaccount_resource_limits(const resource_limits::resource_object& obj)
    {
+      resource_limits_object limits{
+         .owner = obj.owner,
+         .net_weight = obj.net_weight,
+         .cpu_weight = obj.cpu_weight,
+         .ram_bytes = obj.ram_bytes,
+      };
       fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS INS ${data}",
          ("data", limits)
       );
+      resource_usage_object usage{
+         .owner = obj.owner,
+         .net_usage = obj.net_usage,
+         .cpu_usage = obj.cpu_usage,
+         .ram_usage = obj.ram_usage,
+      };
       fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE INS ${data}",
          ("data", usage)
       );
    }
-   void deep_mind_handler::on_update_account_usage(const resource_limits::resource_usage_object& usage)
+   void deep_mind_handler::on_update_account_usage(const resource_limits::resource_object& obj)
    {
+      resource_usage_object usage{
+         .owner = obj.owner,
+         .net_usage = obj.net_usage,
+         .cpu_usage = obj.cpu_usage,
+         .ram_usage = obj.ram_usage,
+      };
       fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE UPD ${data}",
          ("data", usage)
       );
    }
-   void deep_mind_handler::on_set_account_limits(const resource_limits::resource_limits_object& limits)
+   void deep_mind_handler::on_set_account_limits(const resource_limits::resource_pending_object& limits)
    {
       fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS UPD ${data}",
          ("data", limits)
@@ -335,3 +370,6 @@ namespace sysio::chain {
    }
 
 }
+
+FC_REFLECT(sysio::chain::resource_limits_object, (owner)(net_weight)(cpu_weight)(ram_bytes));
+FC_REFLECT(sysio::chain::resource_usage_object, (owner)(net_usage)(cpu_usage)(ram_usage));

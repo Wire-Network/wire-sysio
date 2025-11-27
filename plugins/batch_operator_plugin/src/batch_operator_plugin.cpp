@@ -10,7 +10,7 @@ namespace sysio {
   namespace batch_operator_plugin {
 
     namespace {
-      inline fc::logger& logger() {
+      [[maybe_unused]] inline fc::logger& logger() {
         static fc::logger log{ "batch_operator_plugin" };
         return log;
       }

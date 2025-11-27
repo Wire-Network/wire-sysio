@@ -213,7 +213,8 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
          if(auto it = _prof.find(account); it != _prof.end()) {
             return it->second.get();
          } else {
-            auto code_sequence = context.control.db().get<account_metadata_object, by_name>(account).code_sequence;
+            const auto* account_metadata = context.control.db().find<account_metadata_object, by_name>(account);
+            auto code_sequence = account_metadata != nullptr ? account_metadata->code_sequence : 0;
             std::string basename = account.to_string() + "." + std::to_string(code_sequence);
             auto prof = std::make_unique<profile_data>(basename + ".profile", *_instantiated_module);
             auto [pos,_] = _prof.insert(std::pair{ account, std::move(prof)});
@@ -440,7 +441,6 @@ REGISTER_LEGACY_CF_HOST_FUNCTION(ripemd160);
 // permission api
 REGISTER_LEGACY_HOST_FUNCTION(check_transaction_authorization);
 REGISTER_LEGACY_HOST_FUNCTION(check_permission_authorization);
-REGISTER_HOST_FUNCTION(get_permission_last_used);
 REGISTER_HOST_FUNCTION(get_account_creation_time);
 
 // authorization api

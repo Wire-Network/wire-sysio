@@ -85,7 +85,8 @@ struct generate_fork_db_state {
             BOOST_TEST((fork_db.add(bsp13c, ignore_duplicate_t::no) == fork_db_add_t::added));
    }
 
-   fork_database_if_t fork_db;
+   fc::temp_directory tmpdir;
+   fork_database_t fork_db{tmpdir.path() / "fork_db"};
 
    // Setup fork database with blocks based on a root of block 10
    // Add a number of forks in the fork database

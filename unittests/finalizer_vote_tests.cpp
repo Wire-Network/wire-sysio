@@ -114,7 +114,8 @@ struct simulator_t {
 
    bls_keys_t           keys;
    finalizer            my_finalizer;
-   fork_database_if_t   fork_db;
+   fc::temp_directory   fork_db_tmpdir;
+   fork_database_t      fork_db{fork_db_tmpdir.path() / "fork_db"};
    finalizer_policy_ptr finpol;
    std::vector<bsp>     bsp_vec;
 

@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile
 # Stages:
 #   1) distro-deps   - Install OS-level toolchain and libraries (base for all other stages)
-#   2) source-deps   - Install source-built dependencies (LLVM 11) on top of distro-deps
+#   2) source-deps   - Install source-built dependencies (CLANG 18 + LLVM 11) on top of distro-deps
 #   3) app-source-*  - Prepare application sources (from local context or remote repo)
 #   4) app-build-*   - Build the application from the chosen app-source-* stage
 #
@@ -9,9 +9,21 @@
 #   docker build --target=app-build-local -t wire-sysio:local .
 #   docker build --target=app-build-repo  -t wire-sysio:repo  .
 
-# Stage 1: distro-deps
+# --- Stage 0: vendor-binutils-noble (Ubuntu 24.04) ---------------------------
+    # RUN apt-get update && \
+    #     apt-get install -y --download-only \
+    #         binutils \
+    #         binutils-x86-64-linux-gnu \
+    #         binutils-common && \
+    #     mkdir -p /opt/vendor/binutils && \
+    #     cp -v /var/cache/apt/archives/*.deb /opt/vendor/binutils/
+
+ARG UBUNTU_TAG=24.04
+FROM ubuntu:${UBUNTU_TAG} AS distro-deps
+ENV DEBIAN_FRONTEND=noninteractive
+
+# --- Stage 1: distro-deps ----------------------------------------------------
 # Base image with system packages required for building (compilers, cmake, Python, etc.)
-FROM ubuntu:24.04 AS distro-deps
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PLATFORM_DIR=/wire
@@ -25,78 +37,112 @@ ENV CDT_BUILD_DIR="${CDT_DIR}/build/${BUILD_TYPE}"
 ENV APP_DEV_BUILD_DIR="${APP_DIR}/build/debug-docker"
 ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
 
+ENV CLANG_18_DIR=/opt/clang/clang-18
 ENV LLVM_11_DIR=/opt/llvm/llvm-11
 
+# vcpkg deterministic behavior (manifests/registries/versions + compiler tracking)
+ENV VCPKG_FEATURE_FLAGS=manifests,registries,versions,compilertracking
+ENV VCPKG_DEFAULT_TRIPLET=x64-linux
+ENV VCPKG_OVERLAY_TRIPLETS=/wire/wire-sysio/vcpkg/triplets
+
 # Core package tools and repository helpers
-RUN apt-get update
-RUN apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
         lsb-release \
         wget \
         software-properties-common
 
-# Enable Python 3.12 PPA and refresh indexes
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-RUN apt-get update
+# If we want to pin the same binutils version as Ubuntu 24 on Ubuntu 25+ we can add this back in.
+# Install identical Ubuntu-24 binutils on any base (24/25)
+# COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
+# RUN apt-get update && \
+#     apt-get install -y /opt/vendor/binutils/*.deb && \
+#     update-alternatives --set ld /usr/bin/ld.bfd || true && \
+#     apt-mark hold binutils binutils-x86-64-linux-gnu binutils-common && \
+#     ld --version | head -1 && ld.bfd -v
 
-# Build toolchain and development libraries needed by the application
+# Build toolchain and development libraries (binutils intentionally omitted)
 RUN apt-get install -y \
-				build-essential \
-				ccache \
-				clang-18 \
-				clang-tools-18 \
-				cmake \
-				curl \
-				doxygen \
-				g++-10 \
-				g++-12 \
-				gcc-10 \
-				gcc-12 \
-				git \
-				gnupg \
-				golang \
-				libc++-18-dev \
-				libc++-dev \
-				libbz2-dev \
-				libboost-all-dev \
-				libcurl4-openssl-dev \
-				libgmp-dev \
-				liblzma-dev \
-				libncurses5-dev \
-				libssl-dev \
-				libstdc++-14-dev \
-				libusb-1.0-0-dev \
-				libzstd-dev \
-				llvm-18 \
-				ninja-build \
-				pkg-config \
-				python3-pip \
-				python3.12 \
-				sudo \
-				tar \
-				unzip \
-				vim \
-				zip \
-				zlib1g-dev
+        build-essential \
+        binutils \
+        ccache \
+        cmake \
+        curl \
+        doxygen \
+        git \
+        gnupg \
+        golang \
+        libbz2-dev \
+        libcurl4-openssl-dev \
+        libgmp-dev \
+        liblzma-dev \
+        libncurses5-dev \
+        libstdc++-14-dev \
+        libusb-1.0-0-dev \
+        libzstd-dev \
+        ninja-build \
+        pkg-config \
+        python3 \
+        python3-pip \
+        python3-venv \
+        python3-dev \
+        autoconf \
+        autoconf-archive \
+        automake \
+        libtool \
+        sudo \
+        tar \
+        unzip \
+        vim \
+        zip \
+        zlib1g-dev
 
-# Make Python 3.12 the default python3
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
-RUN mkdir -p /opt/ccache-storage & ccache -M 40GB -d /opt/ccache-storage
+RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
-# Stage 2: source-deps
-# Install dependencies built from source (LLVM 11) on top of distro-deps.
-FROM distro-deps AS source-deps
+# Stage 2a: clang18-build
+FROM distro-deps AS clang18-build
+# Prepare build context for Clang 18 scripts
+RUN mkdir -p /opt/clang/scripts
+
+# Build clang-18 once; this layer will cache unless scripts or args change
+RUN --mount=type=bind,from=clang-18-scripts,target=/opt/clang/scripts \
+    BASE_DIR=/opt/clang /opt/clang/scripts/clang-18-ubuntu-build-source.sh
+
+ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
+
+# A tiny chainloaded toolchain so vcpkg sub-builds always use clang-18
+RUN cat > /opt/clang/clang18-vcpkg-toolchain.cmake <<'EOF'
+set(CMAKE_C_COMPILER   /opt/clang/clang-18/bin/clang)
+set(CMAKE_CXX_COMPILER /opt/clang/clang-18/bin/clang++)
+set(CMAKE_AR           /opt/clang/clang-18/bin/llvm-ar)
+set(CMAKE_RANLIB       /opt/clang/clang-18/bin/llvm-ranlib)
+# Be explicit; some ports gate on language level
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+EOF
+
+# Make sure vcpkg keeps (and uses) the chainloaded toolchain in all sub-configures
+ENV B2_TOOLSET=clang \
+    CC=${CLANG_18_DIR}/bin/clang \
+    CXX=${CLANG_18_DIR}/bin/clang++ \
+    VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake \
+    VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
+
+# Stage 2b: source-deps
+# Install dependencies built from source (LLVM 11) on top of clang-18-build.
+FROM clang18-build AS source-deps
 
 # Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
-RUN mkdir -p /opt/llvm/scripts
-RUN mkdir -p LLVM_11_DIR
+RUN mkdir -p /opt/llvm/scripts 
+# RUN mkdir -p LLVM_11_DIR
 
 # Build and install LLVM 11 using the helper script
 RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
     BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
 
 ENV MAX_JOBS=16
-ENV CC=/usr/bin/clang-18
-ENV CXX=/usr/bin/clang++-18
+ENV CC=${CLANG_18_DIR}/bin/clang
+ENV CXX=${CLANG_18_DIR}/bin/clang++
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
@@ -126,15 +172,27 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN env CC=clang-18 CXX=clang++-18 cmake \
-    -S $(realpath --relative-to=$PWD ${APP_DIR}) \
-    -B . \
-    -G Ninja \
-    -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-    -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-    -DCMAKE_CC_COMPILER=${CC} \
-    -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+RUN set -eux; \
+  unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS || true; \
+  rc=0; \
+  env \
+    VCPKG_MAX_CONCURRENCY=8 \
+    CMAKE_BUILD_PARALLEL_LEVEL=8 \
+    CC=${CC} \
+    CXX=${CXX} \
+    cmake \
+      -S "$(realpath --relative-to=$PWD ${APP_DIR})" \
+      -B . \
+      -G Ninja \
+      -DCMAKE_MAKE_PROGRAM=/usr/bin/ninja \
+      -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
+      -DCMAKE_TOOLCHAIN_FILE="${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
+      -DCMAKE_C_COMPILER="${CC}" \
+      -DCMAKE_CXX_COMPILER="${CXX}" \
+      -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
+      -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
+      -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+      -DENABLE_CCACHE=ON 
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
@@ -147,7 +205,8 @@ ENV PATH="${APP_BUILD_DIR}/bin:${PATH}"
 FROM app-source-repo AS app-build-repo
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN cmake \
+RUN env CC=${CC} CXX=${CXX} \
+    cmake \
     -S $(realpath --relative-to=$PWD ${APP_DIR}) \
     -B . \
     -G Ninja \
@@ -155,7 +214,8 @@ RUN cmake \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=${CC} \
     -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH=${LLVM_11_DIR}
+    -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+    -DENABLE_CCACHE=ON
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
 
@@ -195,14 +255,16 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM cdt-source-repo AS cdt-build-repo
 RUN mkdir -p ${CDT_BUILD_DIR}
 WORKDIR ${CDT_BUILD_DIR} 
-RUN cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
+RUN env CC=${CC} CXX=${CXX} \
+        cmake -S $(realpath --relative-to=$PWD ${APP_DIR}) \
         -B . \
         -G Ninja \
         -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
-        -DCMAKE_CC_COMPILER=${CC} \
+        -DCMAKE_C_COMPILER=${CC} \
         -DCMAKE_CXX_COMPILER=${CXX} \
-        -DCMAKE_PREFIX_PATH=${LLVM_11_DIR} \
-        -Dsysio_DIR=${APP_BUILD_DIR} 
+        -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+        -Dsysio_DIR=${APP_BUILD_DIR} \
+        -DENABLE_CCACHE=ON
 
 RUN  cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))

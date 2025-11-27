@@ -107,17 +107,12 @@ void test_control_plugin_impl::swap_action_in_block(const chain::signed_block_pt
       return;
 
    bool found = std::find_if(b->transactions.cbegin(), b->transactions.cend(), [&](const auto& t) {
-      return std::visit(chain::overloaded{
-                    [](const transaction_id_type&) { return false; },
-                    [&](const chain::packed_transaction& pt) {
-                       for (const auto& a : pt.get_transaction().actions) {
+                       for (const auto& a : t.trx.get_transaction().actions) {
                           if (a.name == _swap_on_options.from)
                              return true;
                        }
                        return false;
-                    }
-                 }, t.trx);
-   }) != b->transactions.cend();
+                }) != b->transactions.cend();
    if (!found)
       return;
 
@@ -132,24 +127,19 @@ void test_control_plugin_impl::swap_action_in_block(const chain::signed_block_pt
    copy_b->timestamp = b->timestamp.next();
    // swap out action
    for (auto& t : copy_b->transactions) {
-      std::visit(chain::overloaded{
-                    [](const transaction_id_type&) {},
-                    [&](chain::packed_transaction& pt) {
-                       for (auto& a : pt.get_transaction().actions) {
-                          if (a.name == _swap_on_options.from) {
-                             auto signed_tx = pt.get_signed_transaction();
-                             auto& act = signed_tx.actions.back();
-                             act.name = _swap_on_options.to;
-                             // Re-sign the transaction
-                             signed_tx.signatures.clear();
-                             signed_tx.sign(_swap_on_options.trx_priv_key, _chain.get_chain_id());
-                             // Replace the transaction
-                             auto new_packed_tx = packed_transaction(signed_tx);
-                             const_cast<packed_transaction&>(pt) = std::move(new_packed_tx);
-                          }
-                       }
-                    }
-                 }, t.trx);
+      for (auto& a : t.trx.get_transaction().actions) {
+         if (a.name == _swap_on_options.from) {
+            auto signed_tx = t.trx.get_signed_transaction();
+            auto& act = signed_tx.actions.back();
+            act.name = _swap_on_options.to;
+            // Re-sign the transaction
+            signed_tx.signatures.clear();
+            signed_tx.sign(_swap_on_options.trx_priv_key, _chain.get_chain_id());
+            // Replace the transaction
+            auto new_packed_tx = packed_transaction(signed_tx);
+            t.trx = std::move(new_packed_tx);
+         }
+      }
    }
    // Re-calculate the transaction merkle
    std::deque<chain::digest_type> trx_digests;

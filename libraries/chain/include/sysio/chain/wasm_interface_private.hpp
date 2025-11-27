@@ -117,7 +117,7 @@ struct sysvmoc_tier {
             auto elapsed = fc::time_point::now() - queued_time;
             auto expire_in = std::max(fc::microseconds(0), fc::milliseconds(500) - elapsed);
             std::shared_ptr<boost::asio::steady_timer> timer = std::make_shared<boost::asio::steady_timer>(ctx);
-            timer->expires_from_now(std::chrono::microseconds(expire_in.count()));
+            timer->expires_after(std::chrono::microseconds(expire_in.count()));
             timer->async_wait([timer, this, code_id](const boost::system::error_code& ec) {
                if (ec)
                   return;
@@ -171,7 +171,7 @@ struct sysvmoc_tier {
          //   Not allowing interrupt for onblock seems rather harmless, so instead of distinguishing between onerror and
          //   onblock, just disallow for all implicit.
          const bool allow_oc_interrupt = attempt_tierup && context.is_applying_block() &&
-                                         context.trx_context.has_undo() && !context.trx_context.is_implicit() && !context.trx_context.is_scheduled();
+                                         context.trx_context.has_undo() && !context.trx_context.is_implicit();
          auto ex = fc::make_scoped_exit([&]() {
             if (allow_oc_interrupt) {
                sys_vm_oc_compile_interrupt = false;

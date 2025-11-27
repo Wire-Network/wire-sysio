@@ -350,9 +350,9 @@ BOOST_FIXTURE_TEST_CASE(finalizer_policies_change_edge_case_strong_qc_test, fina
    BOOST_REQUIRE(key_indices[0] == 0u);  // index 0 for node0 was used in active policy
 
    constexpr size_t node1_index = 1;
-   constexpr size_t policy_a_generation = 1;
-   constexpr size_t policy_b_generation = 2;
-   constexpr size_t policy_c_generation = 3;
+   constexpr size_t policy_a_generation = 2; // Wire starts with policy generation 1 at genesis
+   constexpr size_t policy_b_generation = 3;
+   constexpr size_t policy_c_generation = 4;
 
    // Propose Policy B by changing the index of the key used by node0 to 1
    key_indices[0] = 1;
@@ -402,9 +402,9 @@ BOOST_FIXTURE_TEST_CASE(finalizer_policies_change_edge_case_weak_qc_test, finali
 
    constexpr size_t node1_index = 1;
    constexpr size_t node2_index = 2;
-   constexpr size_t policy_a_generation = 1;
-   constexpr size_t policy_b_generation = 2;
-   constexpr size_t policy_c_generation = 3;
+   constexpr size_t policy_a_generation = 2; // Wire starts with policy generation 1 at genesis
+   constexpr size_t policy_b_generation = 3;
+   constexpr size_t policy_c_generation = 4;
 
    // Propose Policy B by changing the index of the key used by node0 to 1
    key_indices[0] = 1;

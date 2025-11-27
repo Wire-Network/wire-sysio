@@ -5,6 +5,10 @@
 
 namespace sysio { namespace chain {
 
+   using cpu_usage_t = std::vector<fc::unsigned_int>;
+   using account_subjective_cpu_bill_t = flat_map<account_name, fc::microseconds>;
+   using action_payers_t = flat_set<account_name>;
+
    /**
     *  This extension is for including an ED25519 public key in a transaction for signature verification. Generic public_key_type was used to future proof
     *  in the scenario where another ED25519 curve variant is added. We don't want to add another extension per variant.
@@ -47,7 +51,7 @@ namespace sysio { namespace chain {
       uint32_t               ref_block_prefix    = 0UL; ///< specifies the lower 32 bits of the blockid at get_ref_blocknum
       fc::unsigned_int       max_net_usage_words = 0UL; /// upper limit on total network bandwidth (in 8 byte words) billed for this transaction
       uint8_t                max_cpu_usage_ms    = 0; /// upper limit on the total CPU time billed for this transaction
-      fc::unsigned_int       delay_sec           = 0UL; /// Not used, asserted to be 0
+      fc::unsigned_int       delay_sec           = 0UL; /// Not used for input trx, asserted to be 0 for input trx
 
       /**
        * @return the absolute block number given the relative ref_block_num
@@ -81,13 +85,9 @@ namespace sysio { namespace chain {
 
       uint32_t total_actions()const { return context_free_actions.size() + actions.size(); }
 
-      account_name first_authorizer()const {
-         for( const auto& a : actions ) {
-            for( const auto& u : a.authorization )
-               return u.actor;
-         }
-         return account_name();
-      }
+      account_name first_authorizer()const;
+      action_payers_t first_authorizers()const;
+      action_payers_t payers()const;
 
       flat_multimap<uint16_t, transaction_extension> validate_and_extract_extensions()const;
    };
@@ -135,6 +135,7 @@ namespace sysio { namespace chain {
       {
          local_pack_transaction();
          local_pack_context_free_data();
+         init();
       }
 
       explicit packed_transaction(signed_transaction&& t, compression_type _compression = compression_type::none)
@@ -142,6 +143,7 @@ namespace sysio { namespace chain {
       {
          local_pack_transaction();
          local_pack_context_free_data();
+         init();
       }
 
       // used by abi_serializer
@@ -158,8 +160,7 @@ namespace sysio { namespace chain {
       }
       friend bool operator!=(const packed_transaction& lhs, const packed_transaction& rhs) { return !(lhs == rhs); }
 
-      uint32_t get_unprunable_size()const;
-      uint32_t get_prunable_size()const;
+      uint32_t get_action_billable_size(size_t action_index)const;
       size_t get_estimated_size()const;
 
       digest_type digest()const;
@@ -176,6 +177,7 @@ namespace sysio { namespace chain {
       const bytes&                  get_packed_transaction()const { return packed_trx; }
 
    private:
+      void init();
       void local_unpack_transaction(vector<bytes>&& context_free_data);
       void local_unpack_context_free_data();
       void local_pack_transaction();
@@ -196,6 +198,7 @@ namespace sysio { namespace chain {
       // cache unpacked trx, for thread safety do not modify after construction
       signed_transaction                      unpacked_trx;
       transaction_id_type                     trx_id;
+      uint32_t                                billable_net_per_action_overhead = 0;
    };
 
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;

@@ -78,14 +78,14 @@ chain::block_id_type make_block_id( uint32_t block_num ) {
    return block_id;
 }
 
-chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number, const sysio::chain::signed_block_ptr& b_ptr,
-                                                     chain::transaction_receipt_header::status_enum status = sysio::chain::transaction_receipt_header::executed ) {
+chain::transaction_trace_ptr make_transaction_trace( const packed_transaction_ptr trx, uint32_t block_number, const sysio::chain::signed_block_ptr& b_ptr ) {
    return std::make_shared<chain::transaction_trace>(chain::transaction_trace{
          trx->id(),
          block_number,
          chain::block_timestamp_type(fc::time_point::now()),
          b_ptr ? b_ptr->calculate_id() : std::optional<block_id_type> {},
-         chain::transaction_receipt_header{status},
+         chain::transaction_receipt_header{},
+         0,
          fc::microseconds(0),
          0,
          {}, // actions

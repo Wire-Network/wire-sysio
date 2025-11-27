@@ -89,6 +89,34 @@ class session : public std::enable_shared_from_this<session> {
           host, std::to_string(port), [self = this->shared_from_this()](beast::error_code ec, auto res) { self->on_resolve(ec, res); });
    }
 
+   // 1. Helper to normalize whatever async_connect gives us into a tcp::endpoint
+   template <typename T>
+   static auto extract_endpoint(const T& x) {
+      // Case A: x is a resolver entry (has .endpoint())
+      if constexpr (requires { x.endpoint(); }) {
+         return x.endpoint();
+      }
+      // Case B: x is a resolver iterator (operator* gives something with .endpoint())
+      else if constexpr (requires { (*x).endpoint(); }) {
+         return (*x).endpoint();
+      }
+      // Case C: x is already a tcp::endpoint (has .address())
+      else if constexpr (requires { x.address(); x.port(); }) {
+         // x looks like boost::asio::ip::basic_endpoint<Tcp>
+         return x;
+      }
+      // Fallback: hard error if a future Boost type shows up
+      else {
+         static_assert(!sizeof(T), "extract_endpoint(): unknown endpoint-like type passed from async_connect");
+      }
+   }
+
+   // 2. Adapter that always forwards a tcp::endpoint to on_connect
+   template <typename T>
+   void on_connect_adapter(beast::error_code ec, const T& entry_like) {
+      on_connect(ec, extract_endpoint(entry_like));
+   }
+
    void on_resolve(beast::error_code ec, tcp::resolver::results_type results) {
       if (ec) {
          response_callback_(ec, {});
@@ -99,8 +127,8 @@ class session : public std::enable_shared_from_this<session> {
       stream_.expires_after(std::chrono::seconds(30));
 
       // Make the connection on the IP address we get from a lookup
-      stream_.async_connect(results, [self = this->shared_from_this()](beast::error_code ec, auto endpt) {
-         self->on_connect(ec, endpt);
+      stream_.async_connect(results, [self = this->shared_from_this()](beast::error_code ec, auto const& entry_like) {
+         self->on_connect_adapter(ec, entry_like);
       });
    }
 

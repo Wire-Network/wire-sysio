@@ -113,6 +113,40 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW() }
 
+account_name transaction::first_authorizer()const {
+   for( const auto& a : actions ) {
+      for( const auto& u : a.authorization )
+         return u.actor;
+   }
+   return account_name();
+}
+
+action_payers_t transaction::first_authorizers()const {
+   action_payers_t result;
+   for (const auto& a : context_free_actions) {
+      auto auth = a.first_authorizer();
+      if (!auth.empty())
+         result.insert(auth);
+   }
+   for (const auto& a : actions) {
+      auto auth = a.first_authorizer();
+      if (!auth.empty())
+         result.insert(auth);
+   }
+   return result;
+}
+
+action_payers_t transaction::payers()const {
+   action_payers_t result;
+   for (const auto& a : context_free_actions) {
+      result.insert(a.payer());
+   }
+   for (const auto& a : actions) {
+      result.insert(a.payer());
+   }
+   return result;
+}
+
 flat_multimap<uint16_t, transaction_extension> transaction::validate_and_extract_extensions()const {
    using decompose_t = transaction_extension_types::decompose_t;
 
@@ -169,18 +203,21 @@ signed_transaction::get_signature_keys( const chain_id_type& chain_id, fc::time_
    return transaction::get_signature_keys(signatures, chain_id, deadline, context_free_data, recovered_pub_keys, allow_duplicate_keys);
 }
 
-uint32_t packed_transaction::get_unprunable_size()const {
-   uint64_t size = config::fixed_net_overhead_of_packed_trx;
-   size += packed_trx.size();
-   SYS_ASSERT( size <= std::numeric_limits<uint32_t>::max(), tx_too_big, "packed_transaction is too big" );
-   return static_cast<uint32_t>(size);
-}
+uint32_t packed_transaction::get_action_billable_size(size_t action_index)const {
+   assert(action_index < unpacked_trx.total_actions());
+   assert(billable_net_per_action_overhead > 0);
 
-uint32_t packed_transaction::get_prunable_size()const {
-   uint64_t size = fc::raw::pack_size(signatures);
-   size += packed_context_free_data.size();
-   SYS_ASSERT( size <= std::numeric_limits<uint32_t>::max(), tx_too_big, "packed_transaction is too big" );
-   return static_cast<uint32_t>(size);
+   uint32_t size = billable_net_per_action_overhead;
+   if (action_index < unpacked_trx.context_free_actions.size()) {
+      // asserted to be less than or equal to context_free_actions.size()
+      if (unpacked_trx.context_free_data.size() > action_index) {
+         size += unpacked_trx.context_free_data[action_index].size();
+      }
+      size += unpacked_trx.context_free_actions[action_index].get_billable_size();
+   } else {
+      size += unpacked_trx.actions[action_index - unpacked_trx.context_free_actions.size()].get_billable_size();
+   }
+   return size;
 }
 
 size_t packed_transaction::get_estimated_size()const {
@@ -313,6 +350,7 @@ packed_transaction::packed_transaction( bytes&& packed_txn, vector<signature_typ
    if( !packed_context_free_data.empty() ) {
       local_unpack_context_free_data();
    }
+   init();
 }
 
 packed_transaction::packed_transaction( bytes&& packed_txn, vector<signature_type>&& sigs, vector<bytes>&& cfd, compression_type _compression )
@@ -324,6 +362,7 @@ packed_transaction::packed_transaction( bytes&& packed_txn, vector<signature_typ
    if( !unpacked_trx.context_free_data.empty() ) {
       local_pack_context_free_data();
    }
+   init();
 }
 
 packed_transaction::packed_transaction( transaction&& t, vector<signature_type>&& sigs, bytes&& packed_cfd, compression_type _compression )
@@ -337,6 +376,7 @@ packed_transaction::packed_transaction( transaction&& t, vector<signature_type>&
    if( !packed_context_free_data.empty() ) {
       local_unpack_context_free_data();
    }
+   init();
 }
 
 void packed_transaction::decompress() {
@@ -355,6 +395,22 @@ void packed_transaction::decompress() {
    compression = compression_type::none;
 }
 
+void packed_transaction::init()
+{
+   SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
+   SYS_ASSERT( unpacked_trx.context_free_data.empty() || unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
+              "Context free data size ${cfd} not equal to context free actions size ${cfa}",
+              ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
+
+   int64_t size = config::fixed_net_overhead_of_packed_trx;
+   size += fc::raw::pack_size(signatures);
+   size += fc::raw::pack_size(unpacked_trx.transaction_extensions);
+   size += fc::raw::pack_size(static_cast<const transaction_header&>(unpacked_trx));
+   SYS_ASSERT( size + packed_trx.size() + packed_context_free_data.size() <= std::numeric_limits<uint32_t>::max(),
+               tx_too_big, "packed_transaction is too big" );
+   billable_net_per_action_overhead = (size / unpacked_trx.total_actions()) + 1;
+}
+
 void packed_transaction::reflector_init()
 {
    // called after construction, but always on the same thread and before packed_transaction passed to any other threads
@@ -364,6 +420,7 @@ void packed_transaction::reflector_init()
    local_unpack_transaction({});
    local_unpack_context_free_data();
    decompress();
+   init();
 }
 
 void packed_transaction::local_unpack_transaction(vector<bytes>&& context_free_data)
@@ -385,6 +442,7 @@ void packed_transaction::local_unpack_transaction(vector<bytes>&& context_free_d
 
 void packed_transaction::local_unpack_context_free_data()
 {
+   assert(!trx_id.empty()); // must call after local_unpack_transaction
    try {
       SYS_ASSERT(unpacked_trx.context_free_data.empty(), tx_decompression_error, "packed_transaction.context_free_data not empty");
       switch( compression ) {

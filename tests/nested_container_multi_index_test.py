@@ -103,7 +103,9 @@ try:
     node.pushMessage(cluster.sysioAccount.name, 'setpriv', '["nestcontnmi", 1]', '-p sysio@active')
 
     Print("Loading nested container contract")
-    node.publishContract(MIacct, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+    trans = node.publishContract(MIacct, contractDir, wasmFile, abiFile, waitForTransBlock=True)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (wasmFile))
 
     Print("Test action for set< set< uint16_t >>")
     create_action('setstst', '["alice", [[10, 10], [3], [400, 500, 600]]]', 'nestcontnmi', 'alice')

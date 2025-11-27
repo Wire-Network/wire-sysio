@@ -383,11 +383,18 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
 
 
 // ----------------------------------------------------------------------------------------
-void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finalizer_keys) {
+void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finalizer_keys, bool enforce_startup_constraints) {
    if (finalizer_keys.empty())
       return;
 
-   assert(finalizers.empty()); // set_keys should be called only once at startup
+   if (!enforce_startup_constraints) {
+      // allow unittest to set_keys more than once
+      if (cfile_ds.is_open())
+         cfile_ds.close();
+   } else {
+      assert(finalizers.empty()); // set_keys should be called only once at startup
+   }
+
    fsi_map safety_info = load_finalizer_safety_info();
    for (const auto& [pub_key_str, priv_key_str] : finalizer_keys) {
       auto public_key {bls_public_key{pub_key_str}};

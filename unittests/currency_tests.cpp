@@ -27,7 +27,7 @@ class currency_tester : public T {
          action act;
          act.account = "sysio.token"_n;
          act.name = name;
-         act.authorization = vector<permission_level>{{signer, config::active_name}, {signer, config::sysio_payer_name}};
+         act.authorization = vector<permission_level>{{signer, config::sysio_payer_name}, {signer, config::active_name}};
          act.data = abi_ser.variant_to_binary(action_type_name, data, abi_serializer::create_yield_function( T::abi_serializer_max_time ));
 
          signed_transaction trx;

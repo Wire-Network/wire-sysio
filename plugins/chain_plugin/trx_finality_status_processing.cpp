@@ -102,9 +102,6 @@ namespace sysio::chain_apis {
       }
 
       if (!trace->receipt) return;
-      if (trace->receipt->status != chain::transaction_receipt_header::executed) {
-         return;
-      }
       if (chain::is_onblock(*trace)) return;
 
       if (!trace->producer_block_id) {

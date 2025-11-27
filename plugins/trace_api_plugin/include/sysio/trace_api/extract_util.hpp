@@ -33,9 +33,10 @@ inline TransactionTrace to_transaction_trace( const cache_trace& t ) {
                 std::is_same_v<TransactionTrace, transaction_trace_v2>  ||
                 std::is_same_v<TransactionTrace, transaction_trace_v3>) {
       if (t.trace->receipt) {
-         r.status = t.trace->receipt->status;
-         r.cpu_usage_us = t.trace->receipt->cpu_usage_us;
-         r.net_usage_words = t.trace->receipt->net_usage_words;
+         r.status = chain::transaction_receipt_header::status_enum::executed; // executed is 0
+         r.cpu_usage_us = t.trace->total_cpu_usage_us;
+         // Round up net_usage and convert to words
+         r.net_usage_words = (t.trace->net_usage + 7)/8;
       }
       r.signatures = t.trx->get_signatures();
       r.trx_header = static_cast<const chain::transaction_header&>( t.trx->get_transaction() );

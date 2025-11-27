@@ -1,5 +1,4 @@
 #pragma once
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/block_handle.hpp>
 #include <sysio/chain/block_log.hpp>
@@ -98,6 +97,7 @@ namespace sysio::chain {
    class global_property_object;
    class permission_object;
    class account_object;
+   class account_metadata_object;
    class deep_mind_handler;
    class subjective_billing;
    using resource_limits::resource_limits_manager;
@@ -205,7 +205,6 @@ namespace sysio::chain {
           * returns the trace for the on_block action
           */
          transaction_trace_ptr start_block( block_timestamp_type time,
-                                            uint16_t confirm_block_count,
                                             const vector<digest_type>& new_protocol_feature_activations,
                                             block_status bs,
                                             const fc::time_point& deadline = fc::time_point::maximum() );
@@ -219,13 +218,11 @@ namespace sysio::chain {
          enum class interrupt_t { all_trx, apply_block_trx, speculative_block_trx };
          void interrupt_transaction(interrupt_t interrupt);
 
-       /**
-        *
-        */
          transaction_trace_ptr push_transaction( const transaction_metadata_ptr& trx,
-                                                 fc::time_point deadline, fc::microseconds max_transaction_time,
-                                                 uint32_t billed_cpu_time_us, bool explicit_billed_cpu_time,
-                                                 int64_t subjective_cpu_bill_us );
+                                                 fc::time_point deadline, fc::microseconds max_transaction_time );
+         transaction_trace_ptr test_push_transaction( const transaction_metadata_ptr& trx,
+                                                      fc::time_point deadline, fc::microseconds max_transaction_time,
+                                                      const cpu_usage_t& billed_cpu_us, bool explicit_billed_cpu_time );
 
          void assemble_and_complete_block( const signer_callback_type& signer_callback );
          void sign_block( const signer_callback_type& signer_callback );
@@ -259,6 +256,8 @@ namespace sysio::chain {
          const chainbase::database& db()const;
 
          const account_object&                 get_account( account_name n )const;
+         const account_object*                 find_account( account_name n )const;
+         const account_metadata_object*        find_account_metadata( account_name n )const;
          const global_property_object&         get_global_properties()const;
          const dynamic_global_property_object& get_dynamic_global_properties()const;
          const resource_limits_manager&        get_resource_limits_manager()const;
@@ -268,6 +267,9 @@ namespace sysio::chain {
          const protocol_feature_manager&       get_protocol_feature_manager()const;
          const subjective_billing&             get_subjective_billing()const;
          subjective_billing&                   get_mutable_subjective_billing();
+
+         //        limit,greylisted,unlimited
+         std::tuple<int64_t, bool, bool> get_cpu_limit(account_name a) const;
 
          const flat_set<account_name>&   get_actor_whitelist() const;
          const flat_set<account_name>&   get_actor_blacklist() const;
@@ -296,8 +298,6 @@ namespace sysio::chain {
          [[deprecated("Use head().header().")]]     const block_header&  head_block_header()const;
          [[deprecated("Use head().block().")]]      const signed_block_ptr& head_block()const;
 
-         // returns nullptr after instant finality enabled
-         block_state_legacy_ptr head_block_state_legacy()const;
          // returns finality_data associated with chain head for SHiP when in Savanna,
          // std::nullopt in Legacy
          std::optional<finality_data_t> head_finality_data() const;
@@ -320,13 +320,8 @@ namespace sysio::chain {
          // is preferred.
          const producer_authority_schedule&         active_producers()const;
          const producer_authority_schedule&         head_active_producers()const;
-         // pending for pre-instant-finality, next proposed that will take affect, null if none are pending/proposed
+         // next proposed that will take affect, null if none are proposed
          const producer_authority_schedule*         pending_producers()const;
-         // post-instant-finality this always returns empty std::optional
-         std::optional<producer_authority_schedule> proposed_producers_legacy()const;
-         // pre-instant-finality this always returns a valid producer_authority_schedule
-         // post-instant-finality this always returns nullptr
-         const producer_authority_schedule*         pending_producers_legacy()const;
 
          finalizer_policy_ptr   head_active_finalizer_policy()const; // returns nullptr pre-savanna
          finalizer_policy_ptr   head_pending_finalizer_policy()const; // returns nullptr pre-savanna
@@ -384,7 +379,11 @@ namespace sysio::chain {
          void check_action_list( account_name code, action_name action )const;
          void check_key_list( const public_key_type& key )const;
          bool is_building_block()const;
+         // returns true for both is_producing_block() and ephemeral blocks
+         // blocks being produced are considered speculative blocks
          bool is_speculative_block()const;
+         // returns true for block_status::incomplete block
+         bool is_producing_block()const;
 
          //This is only an accessor to the user configured subjective limit: i.e. it does not do a
          // check similar to is_ram_billing_in_notify_allowed() to check if controller is currently
@@ -504,6 +503,7 @@ namespace sysio::chain {
       void code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version,
                                     block_num_type first_used_block_num, block_num_type block_num_last_used);
       void set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys);
+      void test_set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys); // for use in tests
 
       // is the bls key a registered finalizer key of this node, thread safe
       bool is_node_finalizer_key(const bls_public_key& key) const;

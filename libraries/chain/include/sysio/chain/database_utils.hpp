@@ -80,7 +80,7 @@ namespace sysio::chain {
 
       template<typename F>
       static void walk_indices_via_post( boost::asio::io_context& ctx, F function ) {
-         ctx.post([function]() {
+         boost::asio::post(ctx, [function]() {
             function( index_utils<Index>() );
          });
       }

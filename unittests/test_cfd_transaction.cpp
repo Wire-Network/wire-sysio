@@ -19,7 +19,6 @@ sysio::chain::transaction_trace_ptr push_test_cfd_transaction(sysio::testing::te
    sysio::chain::action             act({}, cfa);
    trx.context_free_actions.push_back(act);
    trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100));
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    sysio::chain::action act1(

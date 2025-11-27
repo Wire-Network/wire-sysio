@@ -20,7 +20,10 @@ namespace sysio::chain {
     * Version 1: initial version of the new refactored fork database portable format
     * Version 2: Savanna version, store either `block_state`, `block_state_legacy` or both versions,
     *            root is full `block_state`, not just the header.
-    */
+    * Version 3: Spring 1.0.1 updated block_header_state (core with policy gen #)
+    *            (two possible fork_db, one containing `block_state_legacy`, one containing `block_state`)
+    * version 4: Wire 6.0.0 - Only one fork database with Savanna block_state
+ */
 
    std::string log_fork_comparison(const block_state& bs) {
       std::string r;
@@ -31,41 +34,23 @@ namespace sysio::chain {
       return r;
    }
 
-   std::string log_fork_comparison(const block_state_legacy& bs) {
-      std::string r;
-      r += "[ irreversible_blocknum: " + std::to_string(bs.irreversible_blocknum()) + ", ";
-      r += "block_num: " + std::to_string(bs.block_num()) + ", ";
-      r += "timestamp: " + bs.timestamp().to_time_point().to_iso_string() + ", ";
-      r += "id: " + bs.id().str();
-      r += " ]";
-      return r;
-   }
-
    struct by_block_id;
    struct by_best_branch;
    struct by_prev;
 
-   template<class BSP>  // either [block_state_legacy_ptr, block_state_ptr], same with block_header_state_ptr
+   template<class BSP>  // block_state_ptr, bhsp_t is block_header_state_ptr
    struct fork_database_impl {
       using bsp_t              = BSP;
       using bs_t               = bsp_t::element_type;
       using bhsp_t             = bs_t::bhsp_t;
       using bhs_t              = bhsp_t::element_type;
 
-      using fork_db_t          = fork_database_t<BSP>;
+      using fork_db_t          = fork_database_type<BSP>;
       using branch_t           = fork_db_t::branch_t;
       using full_branch_t      = fork_db_t::full_branch_t;
       using branch_pair_t      = fork_db_t::branch_pair_t;
 
-      using by_best_branch_legacy_t = ordered_unique<
-         tag<by_best_branch>,
-         composite_key<block_state_legacy,
-                       const_mem_fun<block_state_legacy,     uint32_t,             &block_state_legacy::irreversible_blocknum>,
-                       const_mem_fun<block_state_legacy,     uint32_t,             &block_state_legacy::block_num>,
-                       const_mem_fun<block_state_legacy,     const block_id_type&, &block_state_legacy::id>>,
-         composite_key_compare<std::greater<uint32_t>, std::greater<uint32_t>, std::greater<block_id_type>>>;
-
-      using by_best_branch_if_t = ordered_unique<
+      using by_best_branch_t = ordered_unique<
          tag<by_best_branch>,
          composite_key<block_state,
                        const_mem_fun<block_state,     block_timestamp_type, &block_state::latest_qc_block_timestamp>,
@@ -74,10 +59,6 @@ namespace sysio::chain {
          composite_key_compare<std::greater<block_timestamp_type>,
                                std::greater<block_timestamp_type>, std::greater<block_id_type>>>;
 
-      using by_best_branch_t = std::conditional_t<std::is_same_v<bs_t, block_state>,
-                                                  by_best_branch_if_t,
-                                                  by_best_branch_legacy_t>;
-
       using fork_multi_index_type = multi_index_container<
          bsp_t,
          indexed_by<hashed_unique<tag<by_block_id>, BOOST_MULTI_INDEX_CONST_MEM_FUN(bs_t, const block_id_type&, id),
@@ -85,12 +66,13 @@ namespace sysio::chain {
                     ordered_non_unique<tag<by_prev>, const_mem_fun<bs_t, const block_id_type&, &bs_t::previous>>,
                     by_best_branch_t>>;
 
+      const std::filesystem::path data_dir;
       std::mutex             mtx;
       bsp_t                  root;
       block_id_type          pending_savanna_lib_id; // under Savanna the id of what will become root
       fork_multi_index_type  index;
 
-      explicit fork_database_impl() = default;
+      explicit fork_database_impl(const std::filesystem::path& data_dir) : data_dir(data_dir) {}
 
       void             open_impl( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator );
       void             close_impl( std::ofstream& out );
@@ -111,6 +93,7 @@ namespace sysio::chain {
       branch_t         fetch_branch_impl( const block_id_type& h, uint32_t trim_after_block_num ) const;
       block_branch_t   fetch_block_branch_impl( const block_id_type& h, uint32_t trim_after_block_num ) const;
       branch_t         fetch_branch_impl( const block_id_type& h, const block_id_type& b ) const;
+      block_branch_t   fetch_branch_from_head_impl() const;
       full_branch_t    fetch_full_branch_impl(const block_id_type& h) const;
       bsp_t            search_on_branch_impl( const block_id_type& h, uint32_t block_num, include_root_t include_root ) const;
       bsp_t            search_on_head_branch_impl( uint32_t block_num, include_root_t include_root ) const;
@@ -119,15 +102,17 @@ namespace sysio::chain {
    };
 
    template<class BSP>
-   fork_database_t<BSP>::fork_database_t()
-      :my( new fork_database_impl<BSP>() )
+   fork_database_type<BSP>::fork_database_type(const std::filesystem::path& data_dir)
+      :my( new fork_database_impl<BSP>(data_dir) )
    {}
 
    template<class BSP>
-   fork_database_t<BSP>::~fork_database_t() = default; // close is performed in fork_database::~fork_database()
+   fork_database_type<BSP>::~fork_database_type() {
+      close();
+   }
 
    template<class BSP>
-   void fork_database_t<BSP>::open( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator ) {
+   void fork_database_type<BSP>::open( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator ) {
       std::lock_guard g( my->mtx );
       my->open_impl( desc, fork_db_file, ds, validator );
    }
@@ -151,13 +136,13 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   void fork_database_t<BSP>::close(std::ofstream& out) {
+   void fork_database_type<BSP>::close(std::ofstream& out) {
       std::lock_guard g( my->mtx );
       my->close_impl(out);
    }
 
    template<class BSP>
-   size_t fork_database_t<BSP>::size() const {
+   size_t fork_database_type<BSP>::size() const {
       std::lock_guard g( my->mtx );
       return my->index.size();
    }
@@ -190,7 +175,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   void fork_database_t<BSP>::reset_root( const bsp_t& root_bsp ) {
+   void fork_database_type<BSP>::reset_root( const bsp_t& root_bsp ) {
       std::lock_guard g( my->mtx );
       my->reset_root_impl(root_bsp);
    }
@@ -205,7 +190,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   void fork_database_t<BSP>::advance_root( const block_id_type& id ) {
+   void fork_database_type<BSP>::advance_root( const block_id_type& id ) {
       std::lock_guard g( my->mtx );
       my->advance_root_impl( id );
    }
@@ -305,7 +290,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   fork_db_add_t fork_database_t<BSP>::add( const bsp_t& n, ignore_duplicate_t ignore_duplicate ) {
+   fork_db_add_t fork_database_type<BSP>::add( const bsp_t& n, ignore_duplicate_t ignore_duplicate ) {
       std::lock_guard g( my->mtx );
       return my->add_impl(n, ignore_duplicate, false,
                           [](block_timestamp_type         timestamp,
@@ -314,7 +299,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::is_valid() const {
+   bool fork_database_type<BSP>::is_valid() const {
       std::lock_guard g( my->mtx );
       return my->is_valid();
    }
@@ -325,19 +310,19 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::has_root() const {
+   bool fork_database_type<BSP>::has_root() const {
       std::lock_guard g( my->mtx );
       return !!my->root;
    }
 
    template<class BSP>
-   BSP fork_database_t<BSP>::root() const {
+   BSP fork_database_type<BSP>::root() const {
       std::lock_guard g( my->mtx );
       return my->root;
    }
 
    template<class BSP>
-   BSP fork_database_t<BSP>::head(include_root_t include_root) const {
+   BSP fork_database_type<BSP>::head(include_root_t include_root) const {
       std::lock_guard g( my->mtx );
       return my->head_impl(include_root);
    }
@@ -354,13 +339,13 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   block_id_type fork_database_t<BSP>::pending_savanna_lib_id() const {
+   block_id_type fork_database_type<BSP>::pending_savanna_lib_id() const {
       std::lock_guard g( my->mtx );
       return my->pending_savanna_lib_id;
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::set_pending_savanna_lib_id(const block_id_type& id) {
+   bool fork_database_type<BSP>::set_pending_savanna_lib_id(const block_id_type& id) {
       std::lock_guard g( my->mtx );
       return my->set_pending_savanna_lib_id_impl(id);
    }
@@ -378,7 +363,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::is_descendant_of_pending_savanna_lib( const block_id_type& id ) const {
+   bool fork_database_type<BSP>::is_descendant_of_pending_savanna_lib( const block_id_type& id ) const {
       std::lock_guard g( my->mtx );
       return my->is_descendant_of_pending_savanna_lib_impl(id);
    }
@@ -391,7 +376,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::is_descendant_of(const block_id_type& ancestor, const block_id_type& descendant) const {
+   bool fork_database_type<BSP>::is_descendant_of(const block_id_type& ancestor, const block_id_type& descendant) const {
       std::lock_guard g( my->mtx );
       return my->is_descendant_of_impl(ancestor, descendant);
    }
@@ -417,14 +402,14 @@ namespace sysio::chain {
    }
 
    template <class BSP>
-   sysio::chain::fork_database_t<BSP>::branch_t
-   fork_database_t<BSP>::fetch_branch(const block_id_type& h, uint32_t trim_after_block_num) const {
+   sysio::chain::fork_database_type<BSP>::branch_t
+   fork_database_type<BSP>::fetch_branch(const block_id_type& h, uint32_t trim_after_block_num) const {
       std::lock_guard g(my->mtx);
       return my->fetch_branch_impl(h, trim_after_block_num);
    }
 
    template <class BSP>
-   fork_database_t<BSP>::branch_t
+   fork_database_type<BSP>::branch_t
    fork_database_impl<BSP>::fetch_branch_impl(const block_id_type& h, uint32_t trim_after_block_num) const {
       branch_t result;
       result.reserve(index.size());
@@ -437,14 +422,14 @@ namespace sysio::chain {
    }
 
    template <class BSP>
-   fork_database_t<BSP>::branch_t
-   fork_database_t<BSP>::fetch_branch(const block_id_type& h, const block_id_type& b) const {
+   fork_database_type<BSP>::branch_t
+   fork_database_type<BSP>::fetch_branch(const block_id_type& h, const block_id_type& b) const {
       std::lock_guard g(my->mtx);
       return my->fetch_branch_impl(h, b);
    }
 
    template <class BSP>
-   fork_database_t<BSP>::branch_t
+   fork_database_type<BSP>::branch_t
    fork_database_impl<BSP>::fetch_branch_impl(const block_id_type& h, const block_id_type& b) const {
       branch_t result;
       result.reserve(index.size());
@@ -460,7 +445,7 @@ namespace sysio::chain {
 
    template <class BSP>
    block_branch_t
-   fork_database_t<BSP>::fetch_block_branch(const block_id_type& h, uint32_t trim_after_block_num) const {
+   fork_database_type<BSP>::fetch_block_branch(const block_id_type& h, uint32_t trim_after_block_num) const {
       std::lock_guard g(my->mtx);
       return my->fetch_block_branch_impl(h, trim_after_block_num);
    }
@@ -479,14 +464,28 @@ namespace sysio::chain {
    }
 
    template <class BSP>
-   fork_database_t<BSP>::full_branch_t
-   fork_database_t<BSP>::fetch_full_branch(const block_id_type& h) const {
+   block_branch_t fork_database_type<BSP>::fetch_branch_from_head() const {
+      std::lock_guard g(my->mtx);
+      return my->fetch_branch_from_head_impl();
+   }
+
+   template <class BSP>
+   block_branch_t fork_database_impl<BSP>::fetch_branch_from_head_impl() const {
+      auto head = head_impl(include_root_t::no);
+      if (head)
+         return this->fetch_block_branch_impl(head->id(), std::numeric_limits<uint32_t>::max());
+      return block_branch_t{};
+   }
+
+   template <class BSP>
+   fork_database_type<BSP>::full_branch_t
+   fork_database_type<BSP>::fetch_full_branch(const block_id_type& h) const {
       std::lock_guard g(my->mtx);
       return my->fetch_full_branch_impl(h);
    }
 
    template <class BSP>
-   fork_database_t<BSP>::full_branch_t
+   fork_database_type<BSP>::full_branch_t
    fork_database_impl<BSP>::fetch_full_branch_impl(const block_id_type& h) const {
       full_branch_t result;
       result.reserve(index.size());
@@ -498,7 +497,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   BSP fork_database_t<BSP>::search_on_branch( const block_id_type& h, uint32_t block_num, include_root_t include_root /* = include_root_t::no */ ) const {
+   BSP fork_database_type<BSP>::search_on_branch( const block_id_type& h, uint32_t block_num, include_root_t include_root /* = include_root_t::no */ ) const {
       std::lock_guard g( my->mtx );
       return my->search_on_branch_impl( h, block_num, include_root );
    }
@@ -522,7 +521,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   BSP fork_database_t<BSP>::search_on_head_branch( uint32_t block_num, include_root_t include_root /* = include_root_t::no */ ) const {
+   BSP fork_database_type<BSP>::search_on_head_branch( uint32_t block_num, include_root_t include_root /* = include_root_t::no */ ) const {
       std::lock_guard g(my->mtx);
       return my->search_on_head_branch_impl(block_num, include_root);
    }
@@ -540,14 +539,14 @@ namespace sysio::chain {
     *  end with a common ancestor (same prior block)
     */
    template <class BSP>
-   fork_database_t<BSP>::branch_pair_t
-   fork_database_t<BSP>::fetch_branch_from(const block_id_type& first, const block_id_type& second) const {
+   fork_database_type<BSP>::branch_pair_t
+   fork_database_type<BSP>::fetch_branch_from(const block_id_type& first, const block_id_type& second) const {
       std::lock_guard g(my->mtx);
       return my->fetch_branch_from_impl(first, second);
    }
 
    template <class BSP>
-   fork_database_t<BSP>::branch_pair_t
+   fork_database_type<BSP>::branch_pair_t
    fork_database_impl<BSP>::fetch_branch_from_impl(const block_id_type& first, const block_id_type& second) const {
       branch_pair_t result;
       auto first_branch = (first == root->id()) ? root : get_block_impl(first);
@@ -608,7 +607,7 @@ namespace sysio::chain {
 
    /// remove all of the invalid forks built off of this id including this id
    template<class BSP>
-   void fork_database_t<BSP>::remove( const block_id_type& id ) {
+   void fork_database_type<BSP>::remove( const block_id_type& id ) {
       std::lock_guard g( my->mtx );
       return my->remove_impl( id );
    }
@@ -632,7 +631,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   void fork_database_t<BSP>::remove( block_num_type block_num ) {
+   void fork_database_type<BSP>::remove( block_num_type block_num ) {
       std::lock_guard g( my->mtx );
       return my->remove_impl( block_num );
    }
@@ -650,7 +649,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   BSP fork_database_t<BSP>::get_block(const block_id_type& id,
+   BSP fork_database_type<BSP>::get_block(const block_id_type& id,
                                        include_root_t include_root /* = include_root_t::no */) const {
       std::lock_guard g( my->mtx );
       return my->get_block_impl(id, include_root);
@@ -669,7 +668,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::block_exists(const block_id_type& id) const {
+   bool fork_database_type<BSP>::block_exists(const block_id_type& id) const {
       std::lock_guard g( my->mtx );
       return my->block_exists_impl(id);
    }
@@ -680,7 +679,7 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   bool fork_database_t<BSP>::validated_block_exists(const block_id_type& id, const block_id_type& claimed_id) const {
+   bool fork_database_type<BSP>::validated_block_exists(const block_id_type& id, const block_id_type& claimed_id) const {
       std::lock_guard g( my->mtx );
       return my->validated_block_exists_impl(id, claimed_id);
    }
@@ -706,33 +705,14 @@ namespace sysio::chain {
       return id_present || id == root->id();
    }
 
-// ------------------ fork_database -------------------------
+   template<class BSP>
+   void fork_database_type<BSP>::close() {
+      auto fork_db_file {my->data_dir / config::fork_db_filename};
 
-   fork_database::fork_database(const std::filesystem::path& data_dir)
-      : data_dir(data_dir)
-   {
-   }
-
-   fork_database::~fork_database() {
-      close();
-   }
-
-   void fork_database::close() {
-      auto fork_db_file {data_dir / config::fork_db_filename};
-      bool legacy_valid  = fork_db_l.is_valid();
-      bool savanna_valid = fork_db_s.is_valid();
-
-      auto in_use_value = in_use.load();
-      // check that fork_dbs are in a consistent state
-      if (!legacy_valid && !savanna_valid) {
+      if (!is_valid()) {
          ilog("No fork_database to persist");
          return;
-      } else if (legacy_valid && savanna_valid && in_use_value == in_use_t::savanna) {
-         legacy_valid = false; // don't write legacy if not needed, we delay 'clear' of legacy until close
       }
-      assert( (legacy_valid  && (in_use_value == in_use_t::legacy))  ||
-              (savanna_valid && (in_use_value == in_use_t::savanna)) ||
-              (legacy_valid && savanna_valid && (in_use_value == in_use_t::both)) );
 
       ilog("Persisting to fork_database file: ${f}", ("f", fork_db_file));
       std::ofstream out( fork_db_file.generic_string().c_str(), std::ios::out | std::ios::binary | std::ofstream::trunc );
@@ -746,32 +726,27 @@ namespace sysio::chain {
       //                  unsupported by Spring 1.0.1 and above
       // version == 3 -> Spring 1.0.1 updated block_header_state (core with policy gen #)
       //                 (two possible fork_db, one containing `block_state_legacy`, one containing `block_state`)
+      // version == 4 -> Wire 6.0.0 - Only one fork database with Savanna block_state
       // ---------------------------------------------------------------------------------------------------------
       fc::raw::pack( out, max_supported_version );
 
-      fc::raw::pack(out, static_cast<uint32_t>(in_use_value));
-
-      fc::raw::pack(out, legacy_valid);
-      if (legacy_valid)
-         fork_db_l.close(out);
-
-      fc::raw::pack(out, savanna_valid);
-      if (savanna_valid)
-         fork_db_s.close(out);
+      close(out);
    }
 
-   bool fork_database::file_exists() const {
-      auto fork_db_file = data_dir / config::fork_db_filename;
+   template<class BSP>
+   bool fork_database_type<BSP>::file_exists() const {
+      auto fork_db_file = my->data_dir / config::fork_db_filename;
       return std::filesystem::exists( fork_db_file );
    };
 
-   void fork_database::open( validator_t& validator ) {
-      if (!std::filesystem::is_directory(data_dir))
-         std::filesystem::create_directories(data_dir);
+   template<class BSP>
+   void fork_database_type<BSP>::open( validator_t& validator ) {
+      if (!std::filesystem::is_directory(my->data_dir))
+         std::filesystem::create_directories(my->data_dir);
 
-      assert(!fork_db_l.is_valid() && !fork_db_s.is_valid());
+      assert(!my->is_valid());
 
-      auto fork_db_file = data_dir / config::fork_db_filename;
+      auto fork_db_file = my->data_dir / config::fork_db_filename;
       if( std::filesystem::exists( fork_db_file ) ) {
          try {
             fc::cfile f;
@@ -789,94 +764,20 @@ namespace sysio::chain {
 
             uint32_t version = 0;
             fc::raw::unpack( ds, version );
-            SYS_ASSERT( version != 2, fork_database_exception,
-                        "Version 2 of fork_database (created by Spring 1.0.0) is not supported" );
-            SYS_ASSERT( version >= fork_database::min_supported_version && version <= fork_database::max_supported_version,
+            SYS_ASSERT( version >= min_supported_version && version <= max_supported_version,
                         fork_database_exception,
                        "Unsupported version of fork database file '${filename}'. "
                        "Fork database version is ${version} while code supports version(s) [${min},${max}]",
                        ("filename", fork_db_file)("version", version)("min", min_supported_version)("max", max_supported_version));
 
-            switch(version) {
-            case 1:
-            {
-               // ---------- pre-Savanna format. Just a single fork_database_l ----------------
-               in_use = in_use_t::legacy;
-               fork_db_l.open("legacy", fork_db_file, ds, validator);
-               break;
-            }
-
-            case 3:
-            {
-               // ---------- Savanna format ----------------------------
-               uint32_t in_use_raw;
-               fc::raw::unpack( ds, in_use_raw );
-               in_use = static_cast<in_use_t>(in_use_raw);
-
-               bool legacy_valid { false };
-               fc::raw::unpack( ds, legacy_valid );
-               if (legacy_valid) {
-                  fork_db_l.open("legacy", fork_db_file, ds, validator);
-               }
-
-               bool savanna_valid { false };
-               fc::raw::unpack( ds, savanna_valid );
-               if (savanna_valid) {
-                  fork_db_s.open("savanna", fork_db_file, ds, validator);
-               }
-               break;
-            }
-
-            default:
-               assert(0);
-               break;
-            }
+            open("savanna", fork_db_file, ds, validator);
          } FC_CAPTURE_AND_RETHROW( (fork_db_file) );
          std::filesystem::remove( fork_db_file );
       }
    }
 
-   size_t fork_database::size() const {
-      return apply<size_t>([](const auto& fork_db) {
-         return fork_db.size();
-      });
-   }
-
-   // only called from the main thread
-   void fork_database::switch_from_legacy(const block_state_ptr& root) {
-      // no need to close fork_db because we don't want to write anything out, file is removed on open
-      // threads may be accessing (or locked on mutex about to access legacy fork_db) so don't delete it until program exit
-      if (in_use == in_use_t::legacy) {
-         fork_db_s.reset_root(root);
-         if (fork_db_l.has_root()) {
-            dlog("Switching fork_db from legacy to both");
-            in_use = in_use_t::both;
-         } else {
-            dlog("Switching fork_db from legacy to savanna");
-            in_use = in_use_t::savanna;
-         }
-      } else if (in_use == in_use_t::both) {
-         dlog("Switching fork_db from legacy, already both root ${rid}, fork_db root ${fid}", ("rid", root->id())("fid", fork_db_s.root()->id()));
-         assert(fork_db_s.root()->id() == root->id()); // should always set the same root
-      } else {
-         assert(false);
-      }
-   }
-
-   block_branch_t fork_database::fetch_branch_from_head() const {
-      return apply<block_branch_t>([&](auto& fork_db) {
-         auto head = fork_db.head();
-         if (head)
-            return fork_db.fetch_block_branch(head->id());
-         return block_branch_t{};
-      });
-   }
-
    // do class instantiations
-   template class fork_database_t<block_state_legacy_ptr>;
-   template class fork_database_t<block_state_ptr>;
-   
-   template struct fork_database_impl<block_state_legacy_ptr>;
+   template class fork_database_type<block_state_ptr>;
    template struct fork_database_impl<block_state_ptr>;
 
 } /// sysio::chain

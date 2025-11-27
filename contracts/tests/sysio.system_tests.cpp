@@ -282,7 +282,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
 
    BOOST_REQUIRE( bool(trace) );
    BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+   BOOST_REQUIRE( !!trace->receipt );
 
    produce_blocks( 250 );
 
@@ -392,7 +392,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
 
    BOOST_REQUIRE( bool(trace) );
    BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+   BOOST_REQUIRE( !!trace->receipt );
 
    produce_blocks( 250 );
 
@@ -482,7 +482,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
 
    BOOST_REQUIRE( bool(trace) );
    BOOST_REQUIRE_EQUAL( 1, trace->action_traces.size() );
-   BOOST_REQUIRE_EQUAL( transaction_receipt::executed, trace->receipt->status );
+   BOOST_REQUIRE( !!trace->receipt );
 
    produce_blocks( 250 );
 

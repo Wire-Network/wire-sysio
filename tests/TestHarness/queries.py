@@ -105,7 +105,7 @@ class NodeopQueries:
             if not cntxt.isSectionNull("except"):
                 return "exception"
             cntxt.add("receipt")
-            return cntxt.add("status")
+            return "executed"
 
         # or what the history plugin returns
         cntxt.add("trx")

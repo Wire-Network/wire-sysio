@@ -52,20 +52,15 @@ namespace sysio::chain::config {
   static constexpr uint32_t block_size_average_window_ms         = 60*1000l;
   static constexpr uint32_t maximum_elastic_resource_multiplier  = 1000;
 
-  //const static uint64_t   default_max_storage_size       = 10 * 1024;
-  //const static uint32_t   default_max_trx_runtime        = 10*1000;
-  //const static uint32_t   default_max_gen_trx_size       = 64 * 1024;
-
   static constexpr uint32_t   rate_limiting_precision        = 1000*1000;
-
 
   static constexpr uint32_t   default_max_block_net_usage                  = 1024 * 1024; /// at 500ms blocks and 200byte trx, this enables ~10,000 TPS burst
   static constexpr uint32_t   default_target_block_net_usage_pct           = 10 * percent_1; /// we target 1000 TPS
   static constexpr uint32_t   default_max_transaction_net_usage            = default_max_block_net_usage / 2;
   static constexpr uint32_t   default_base_per_transaction_net_usage       = 12;  // 12 bytes (11 bytes for worst case of transaction_receipt_header + 1 byte for static_variant tag)
-  static constexpr uint32_t   default_net_usage_leeway                     = 500; // TODO: is this reasonable?
-  static constexpr uint32_t   default_context_free_discount_net_usage_num  = 20; // TODO: is this reasonable?
-  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 100;
+  static constexpr uint32_t   default_net_usage_leeway                     = 500; // is this reasonable?
+  static constexpr uint32_t   default_context_free_discount_net_usage_num  = 0; // Wire does not support discount of context free data
+  static constexpr uint32_t   default_context_free_discount_net_usage_den  = 1; // Wire does not support discount of context free data
   static constexpr uint32_t   transaction_id_net_usage                     = 32; // 32 bytes for the size of a transaction id
 
   static constexpr uint32_t   default_max_block_cpu_usage                  = 200'000; /// max block cpu usage in microseconds
@@ -73,9 +68,10 @@ namespace sysio::chain::config {
   static constexpr uint32_t   default_max_transaction_cpu_usage            = 3*default_max_block_cpu_usage/4; /// max trx cpu usage in microseconds
   static constexpr uint32_t   default_min_transaction_cpu_usage            = 100; /// min trx cpu usage in microseconds (10000 TPS equiv)
   static constexpr uint32_t   default_subjective_cpu_leeway_us             = 31000; /// default subjective cpu leeway in microseconds
+  static constexpr uint32_t   default_subjective_cpu_us                    = 300000; /// default subjective cpu given to each account
 
   static constexpr uint32_t   default_max_trx_lifetime                     = 60*60; // 1 hour
-  static constexpr uint32_t   default_deferred_trx_expiration_window       = 10*60; // 10 minutes
+  static constexpr uint32_t   default_deferred_trx_expiration_window       = 0; // deferred trx not supported by Wire
   static constexpr uint32_t   default_max_trx_delay                        = 45*24*3600; // 45 days
   static constexpr uint32_t   default_max_inline_action_size               = 512 * 1024;   // 512 KB
   static constexpr uint16_t   default_max_inline_action_depth              = 4;
@@ -110,11 +106,11 @@ namespace sysio::chain::config {
   // Should be large enough to allow recovery from badly set blockchain parameters without a hard fork
   // (unless net_usage_leeway is set to 0 and so are the net limits of all accounts that can help with resetting blockchain parameters).
 
-  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // TODO: is this reasonable?
+  static constexpr uint32_t   fixed_net_overhead_of_packed_trx = 16; // is this reasonable?
 
   static constexpr uint32_t   fixed_overhead_shared_vector_ram_bytes = 16; ///< overhead accounts for fixed portion of size of shared_vector field
   static constexpr uint32_t   overhead_per_row_per_index_ram_bytes = 32;    ///< overhead accounts for basic tracking structures in a row per index
-  static constexpr uint32_t   overhead_per_account_ram_bytes     = 2*1024; ///< overhead accounts for basic account storage and pre-pays features like account recovery
+  static constexpr uint32_t   overhead_per_account_ram_bytes     = 1024;    ///< overhead accounts for basic account storage
   static constexpr uint32_t   setcode_ram_bytes_multiplier       = 10;     ///< multiplier on contract size to account for multiple copies and cached compilation
 
   static constexpr uint32_t   hashing_checktime_block_size       = 10*1024;  /// call checktime from hashing intrinsic once per this number of bytes

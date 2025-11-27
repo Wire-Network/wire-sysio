@@ -81,7 +81,7 @@ struct interface_in_benchmark {
                                                       action_digests_t::store_which_t::legacy, fc::time_point::now(),
                                                       transaction_metadata::trx_type::input);
       trx_ctx->max_transaction_time_subjective = fc::microseconds::maximum();
-      trx_ctx->init_for_input_trx( ptrx->get_unprunable_size(), ptrx->get_prunable_size() );
+      trx_ctx->init_for_input_trx();
       trx_ctx->exec(); // this is required to generate action traces to be used by apply_context constructor
 
       // build apply context from the control and transaction context

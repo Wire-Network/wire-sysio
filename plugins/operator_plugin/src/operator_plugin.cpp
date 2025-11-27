@@ -6,7 +6,7 @@ namespace sysio::operator_plugin {
   static auto _operator_plugin = application::register_plugin<operator_plugin>();
 
   namespace {
-    inline fc::logger& logger() {
+    [[maybe_unused]] inline fc::logger& logger() {
       static fc::logger log{ "operator_plugin" };
       return log;
     }

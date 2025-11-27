@@ -363,7 +363,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_serialization_io ) try {
    std::vector<bls_keys_t> keys = create_keys(3);
    bls_pub_priv_key_map_t local_finalizer_keys;
    local_finalizer_keys[keys.back().pubkey_str] = keys.back().privkey_str;
-   t.control->set_node_finalizer_keys(local_finalizer_keys);
+   t.control->test_set_node_finalizer_keys(local_finalizer_keys);
 
    // Since we didn't vote, the file time should not have changed.
    auto last_time = fs::last_write_time(tmp_path);
