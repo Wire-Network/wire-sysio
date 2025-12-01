@@ -12,13 +12,13 @@ testSuccessful=False
 
 expected_results = [
     {
-        "file": "unittests/snapshots/snap_v8.bin.gz",
+        "file": "unittests/snapshots/snap_v1.bin.gz",
         "result": {
-            "version": 8,
-            "chain_id": "526169f0107d4390d1f87e4ab46ff9da11b7f286139599d557dd6234d3855f94",
-            "head_block_id": "000000037b815d696953eda2e1bd049e467b977b8b69ce1572f7bcb0b9f5003c",
-            "head_block_num": 3,
-            "head_block_time": "2020-01-01T00:00:01.000"
+            "version": 1,
+            "chain_id": "70b972fe45a55e057d342b84a059d29eba3628954f3a04164765ab0d2d48a8dd",
+            "head_block_id": "0000001d1e92aa618e8591457c3d2b2a4b52dd7f600c9be13a9649d70d35d7d9",
+            "head_block_num": 29,
+            "head_block_time": "2020-01-01T00:00:14.000"
         }
     }
 ]
