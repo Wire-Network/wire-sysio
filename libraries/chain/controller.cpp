@@ -1307,16 +1307,15 @@ struct controller_impl {
       try {
          auto snapshot_load_start_time = fc::time_point::now();
          snapshot->validate();
-         block_state_pair block_states;
          if( auto blog_head = blog.head() ) {
             ilog( "Starting initialization from snapshot and block log ${b}-${e}, this may take a significant amount of time",
                   ("b", blog.first_block_num())("e", blog_head->block_num()) );
-            block_states = read_from_snapshot( snapshot, blog.first_block_num(), blog_head->block_num() );
+            read_from_snapshot( snapshot, blog.first_block_num(), blog_head->block_num() );
          } else {
             SYS_ASSERT( !fork_db_.file_exists(), fork_database_exception,
                         "When starting from a snapshot with no block log, we shouldn't have a fork database either" );
             ilog( "Starting initialization from snapshot and no block log, this may take a significant amount of time" );
-            block_states = read_from_snapshot( snapshot, 0, std::numeric_limits<uint32_t>::max() );
+            read_from_snapshot( snapshot, 0, std::numeric_limits<uint32_t>::max() );
             SYS_ASSERT( chain_head.block_num() > 0, snapshot_exception,
                         "Snapshot indicates controller head at block number 0, but that is not allowed. "
                         "Snapshot is invalid." );
@@ -1591,11 +1590,6 @@ struct controller_impl {
       });
    }
 
-   block_state_pair get_block_state_to_snapshot() const
-   {
-       return block_state_pair{ {}, chain_head.internal() };
-   }
-
    size_t expected_snapshot_row_count() const {
       size_t ret = 0;
 
@@ -1626,7 +1620,8 @@ struct controller_impl {
       });
 
       snapshot->write_section("sysio::chain::block_state", [&]( auto& section ) {
-         section.add_row(snapshot_detail::snapshot_block_state_data_v8(get_block_state_to_snapshot()), db);
+         FC_ASSERT(chain_head.internal(), "Cannot create snapshot without chain head block state");
+         section.add_row(snapshot_detail::snapshot_block_state_data_v1(*chain_head.internal()), db);
       });
 
       controller_index_set::walk_indices([this, &snapshot, &row_counter]( auto utils ){
@@ -1654,7 +1649,7 @@ struct controller_impl {
       }
    }
 
-   block_state_pair read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
+   block_state_ptr read_from_snapshot( const snapshot_reader_ptr& snapshot, uint32_t blog_start, uint32_t blog_end ) {
       const size_t total_snapshot_rows = snapshot->total_row_count();
       std::atomic_size_t rows_loaded;
 
@@ -1665,54 +1660,23 @@ struct controller_impl {
       });
 
       using namespace snapshot_detail;
-      using v8 = snapshot_block_state_data_v8;
+      using v1 = snapshot_block_state_data_v1;
 
-      block_state_pair result;
-      if (header.version >= v8::minimum_version) {
-         // loading a snapshot saved by Spring 1.0.1 and above.
-         // ---------------------------------------------------
-         if (std::clamp(header.version, v8::minimum_version, v8::maximum_version) == header.version ) {
+      block_state_ptr result;
+      if (header.version >= v1::minimum_version) {
+         if (std::clamp(header.version, v1::minimum_version, v1::maximum_version) == header.version ) {
             snapshot->read_section("sysio::chain::block_state", [this, &result]( auto &section ){
-               v8 block_state_data;
+               v1 block_state_data;
                section.read_row(block_state_data, db);
-               assert(block_state_data.bs_l || block_state_data.bs);
-               if (block_state_data.bs_l) {
-                  auto legacy_ptr = std::make_shared<block_state_legacy>();
-                  static_cast<block_header_state_legacy&>(*legacy_ptr) = block_header_state_legacy(std::move(*block_state_data.bs_l));
-                  chain_head = block_handle{}; // TODO: update snapshot format for no legacy
-                  result.first = std::move(legacy_ptr);
-               } else {
-                  auto bs_ptr = std::make_shared<block_state>(std::move(*block_state_data.bs));
-                  chain_head = block_handle{bs_ptr};
-                  result.second = std::move(bs_ptr);
-               }
+               auto bs_ptr = std::make_shared<block_state>(std::move(block_state_data.bs));
+               chain_head = block_handle{bs_ptr};
+               result = std::move(bs_ptr);
             });
          } else {
             SYS_THROW(snapshot_exception, "Unsupported block_state version");
          }
-      } else if (header.version == 7) {
-         // snapshot created with Spring 1.0.0, which was very soon superseded by Spring 1.0.1
-         // and a new snapshot format.
-         // ----------------------------------------------------------------------------------
-         SYS_THROW(snapshot_exception, "v7 snapshots are not supported in Wire");
       } else {
-         // loading a snapshot saved by Leap up to version 6.
-         // -------------------------------------------------
-         auto head_header_state = std::make_shared<block_state_legacy>();
-         using v3 = snapshot_block_header_state_legacy_v3;
-         // TODO: cleanup, only need to support current version of snapshot
-
-         if (std::clamp(header.version, v3::minimum_version, v3::maximum_version) == header.version ) {
-            snapshot->read_section("sysio::chain::block_state_legacy", [this,&head_header_state]( auto &section ){
-               v3 legacy_header_state;
-               section.read_row(legacy_header_state, db);
-               static_cast<block_header_state_legacy&>(*head_header_state) = block_header_state_legacy(std::move(legacy_header_state));
-            });
-         } else {
-            SYS_THROW(snapshot_exception, "Unsupported block_header_state version");
-         }
-         chain_head = block_handle{};
-         result.first = head_header_state;
+         SYS_THROW(snapshot_exception, "Unsupported block_header_state version ${v}", ("v", header.version));
       }
 
       snapshot_head_block = chain_head.block_num();

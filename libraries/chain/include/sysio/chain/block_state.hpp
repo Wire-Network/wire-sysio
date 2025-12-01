@@ -188,7 +188,7 @@ public:
          bool                              skip_validate_signee,
          const std::optional<digest_type>& action_mroot_savanna);
 
-   explicit block_state(snapshot_detail::snapshot_block_state_v8&& sbs);
+   explicit block_state(snapshot_detail::snapshot_block_state_v1&& sbs);
 
    // Only defined for latest_qc_block_num() <= num <= block_num()
    finalizer_policies_t get_finalizer_policies(block_num_type num) const {
@@ -199,7 +199,6 @@ public:
 };
 
 using block_state_ptr       = std::shared_ptr<block_state>;
-using block_state_pair      = std::pair<std::shared_ptr<block_state_legacy>, block_state_ptr>;
 
 } // namespace sysio::chain
 

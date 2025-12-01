@@ -129,8 +129,6 @@ struct block_header_state_legacy : public detail::block_header_state_legacy_comm
    :detail::block_header_state_legacy_common( std::move(base) )
    {}
 
-   explicit block_header_state_legacy( snapshot_detail::snapshot_block_header_state_legacy_v3&& snapshot );
-
    pending_block_header_state_legacy next( block_timestamp_type when, uint16_t num_prev_blocks_to_confirm )const;
 
    block_header_state_legacy  next( const signed_block_header& h,

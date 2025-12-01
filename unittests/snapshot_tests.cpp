@@ -199,7 +199,6 @@ void exhaustive_snapshot_test()
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_exhaustive_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
-   exhaustive_snapshot_test<legacy_tester, SNAPSHOT_SUITE>();
    exhaustive_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
@@ -301,7 +300,6 @@ void replay_over_snapshot_test()
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_replay_over_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
-   replay_over_snapshot_test<legacy_tester, SNAPSHOT_SUITE>();
    replay_over_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
@@ -443,7 +441,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_chain_id_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
-   chain_id_in_snapshot_test<legacy_tester, SNAPSHOT_SUITE>();
    chain_id_in_snapshot_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
@@ -479,7 +476,7 @@ void compatible_versions_test()
    if (generate_log) {
       ///< Begin deterministic code to generate blockchain for comparison
 
-      TESTER chain(setup_policy::none, db_read_mode::HEAD, {legacy_default_max_inline_action_size});
+      TESTER chain(setup_policy::full, db_read_mode::HEAD, {legacy_default_max_inline_action_size});
       chain.create_account("snapshot"_n);
       chain.produce_block();
       chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
@@ -507,15 +504,13 @@ void compatible_versions_test()
    std::filesystem::copy(source_log_dir / "blocks.index", config.blocks_dir / "blocks.index");
    TESTER base_chain(config, *genesis);
 
-   std::string current_version = "v8";
+   std::string current_version = "v1";
 
    int ordinal = 0;
    // No need to support old snapshots for Wire 6.0
-//   for(std::string version : {"v6", "v8"}) // v7 version not supported in Spring 1.0.1 and above
-   for(std::string version : {"v8"}) // v7 version not supported in Spring 1.0.1 and above
+   for(std::string version : {"v1"})
    {
       if(save_snapshot && version == current_version) continue;
-      static_assert(chain_snapshot_header::minimum_compatible_version <= 6, "version 6 unit test is no longer needed.  Please clean up data files");
       auto old_snapshot = SNAPSHOT_SUITE::load_from_file("snap_" + version);
       BOOST_TEST_CHECKPOINT("loading snapshot: " << version);
       snapshotted_tester old_snapshot_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(old_snapshot), ordinal++);
@@ -536,7 +531,7 @@ void compatible_versions_test()
    // Process for supporting a new snapshot version in this test:
    // ----------------------------------------------------------
    // 1. update `current_version` and the list of versions in `for` loop
-   // 2. run: `unittests/unit_test -t "snapshot_tests/test_com*" -- --save-snapshot` to generate new snapshot files
+   // 2. run: `unittests/unit_test -t "snapshot_part2_tests/test_com*" -- --save-snapshot` to generate new snapshot files
    // 3. copy the newly generated files (see `ls -lrth ./unittests/snapshots/snap_*` to `spring/unittests/snapshots`
    //    for example `cp ./unittests/snapshots/snap_v8.* ../unittests/snapshots`
    // 4. edit `unittests/snapshots/CMakeLists.txt` and add the `configure_file` commands for the 3 new files.
@@ -561,7 +556,6 @@ void compatible_versions_test()
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_compatible_versions, SNAPSHOT_SUITE, snapshot_suites)
 {
-   compatible_versions_test<legacy_tester, SNAPSHOT_SUITE>();
    compatible_versions_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 
@@ -652,7 +646,6 @@ void restart_with_existing_state_and_truncated_block_log_test()
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_restart_with_existing_state_and_truncated_block_log, SNAPSHOT_SUITE, snapshot_suites)
 {
-   restart_with_existing_state_and_truncated_block_log_test<legacy_tester, SNAPSHOT_SUITE>();
    restart_with_existing_state_and_truncated_block_log_test<savanna_tester, SNAPSHOT_SUITE>();
 }
 

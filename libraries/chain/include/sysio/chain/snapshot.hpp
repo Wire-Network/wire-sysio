@@ -351,7 +351,7 @@ namespace sysio { namespace chain {
          void write_end_section( ) override;
          void finalize();
 
-         static const uint32_t magic_number = 0x30510550;
+         static const uint32_t magic_number = 0x57495245; // WIRE in ASCII
 
       private:
          detail::ostream_wrapper snapshot;
@@ -370,7 +370,7 @@ namespace sysio { namespace chain {
          void write_end_section() override;
          void finalize();
 
-         static const uint32_t magic_number = 0x30510550;
+         static const uint32_t magic_number = 0x57495245; // WIRE in ASCII
 
       private:
          detail::ostream_wrapper snapshot;
