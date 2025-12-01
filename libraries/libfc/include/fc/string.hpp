@@ -37,7 +37,8 @@ namespace fc
    *
    * @param str String to split
    * @param delim delimiter
+   * @param max_split a maximum number of chunks allowed, the remainder are grouped as the final element, 0 denotes no limit
    * @return vector of split strings
    */
-  std::vector<std::string> split(const std::string& str, char delim);
+  std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split = 0);
 }

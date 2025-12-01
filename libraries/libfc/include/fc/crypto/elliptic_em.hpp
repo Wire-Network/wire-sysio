@@ -22,11 +22,18 @@ namespace fc {
       class private_key_impl;
     }
 
-    typedef fc::array<char,33>          public_key_data;
-    typedef fc::sha256                  private_key_secret;
-    typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
-    typedef fc::array<char,72>          signature;
-    typedef fc::array<unsigned char,65> compact_signature;
+    constexpr uint8_t public_key_prefix_uncompressed = 0x04;
+    constexpr uint8_t public_key_prefix_compressed = 0x02;
+
+    using message_hash_type = std::array<uint8_t,32>;
+    using message_body_type = std::variant<std::string,fc::sha256>;
+
+    using public_key_data = fc::array<char,33>;
+    using public_key_data_uncompressed = fc::array<char,65>;
+    using private_key_secret = fc::sha256;
+
+    using signature = fc::array<char,72>;
+    using compact_signature = fc::array<unsigned char,65>;
 
     /**
      *  @class public_key
@@ -39,12 +46,12 @@ namespace fc {
            public_key(const public_key& k);
            ~public_key();
            public_key_data serialize()const;
+           public_key_data_uncompressed serialize_uncompressed()const;
 
            explicit operator public_key_data()const { return serialize(); }
 
-
            explicit public_key( const public_key_data& v );
-           explicit public_key( const public_key_point_data& v );
+           explicit public_key( const public_key_data_uncompressed& v );
            public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
            public_key( const compact_signature& c, const unsigned char* digest, bool check_canonical = true );
 
@@ -116,6 +123,9 @@ namespace fc {
 
            compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
 
+           compact_signature sign_compact_ex(const message_body_type& digest,
+                                             bool                                       require_canonical) const;
+
            public_key get_public_key()const;
 
            inline friend bool operator==( const private_key& a, const private_key& b )
@@ -146,6 +156,8 @@ namespace fc {
          bool valid()const {
             return public_key(_data).valid();
          }
+
+         public_key unwrapped()const { return public_key(_data); }
       };
 
       struct signature_shim : public crypto::shim<compact_signature> {
@@ -154,6 +166,7 @@ namespace fc {
          using crypto::shim<compact_signature>::shim;
 
          public_key_type recover(const sha256& digest, bool check_canonical) const;
+         public_key_type recover_ex(const em::message_body_type& digest, bool check_canonical) const;
       };
 
       struct private_key_shim : public crypto::shim<private_key_secret> {

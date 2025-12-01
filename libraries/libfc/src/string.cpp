@@ -3,6 +3,7 @@
 #include <fc/io/json.hpp>
 #include <fc/string.hpp>
 #include <fc/utf8.hpp>
+#include <format>
 #include <iomanip>
 #include <limits>
 #include <ranges>
@@ -85,11 +86,18 @@ std::pair<std::string&, bool> escape_str(std::string& str, escape_control_chars 
    return std::make_pair(std::ref(str), modified);
 }
 
-std::vector<std::string> split(const std::string& str, char delim) {
+std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split) {
    std::vector<std::string> out;
-
+   std::string delim_str{&delim, 1};
    for (auto&& token : std::views::split(str, delim)) {
-      out.emplace_back(std::string_view{token.begin(), token.end()});
+      std::string_view token_str{token.begin(), token.end()};
+      if (max_split > 0 && out.size() >= max_split) {
+         out.back()
+            .append(delim_str)
+            .append(token_str.data(), token_str.size());
+      } else {
+         out.emplace_back(token_str);
+      }
    }
    return out;
 }

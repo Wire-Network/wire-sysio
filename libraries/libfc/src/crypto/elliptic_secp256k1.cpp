@@ -125,15 +125,18 @@ namespace fc { namespace ecc {
         FC_ASSERT( my->_key != empty_pub );
         return my->_key;
     }
-
+    // TODO:  @jglanz OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
+    //   `EC_KEY` curve related implementations, but I need to investigate.
+    //   this should likely be swapped out the same way that I resolved `fc::em::public_key`
+    //   support, via `libsecp256k1`
     public_key::public_key( const public_key_point_data& dat )
     {
-        const char* front = &dat.data[0];
+        auto front = dat.begin();
         if( *front == 0 ){}
         else
         {
             EC_KEY *key = EC_KEY_new_by_curve_name( NID_secp256k1 );
-            key = o2i_ECPublicKey( &key, (const unsigned char**)&front, sizeof(dat) );
+            key = o2i_ECPublicKey( &key, &front, static_cast<long>(dat.size()) );
             FC_ASSERT( key );
             EC_KEY_set_conv_form( key, POINT_CONVERSION_COMPRESSED );
             unsigned char* buffer = (unsigned char*) my->_key.begin();

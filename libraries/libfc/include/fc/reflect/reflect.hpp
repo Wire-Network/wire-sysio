@@ -184,11 +184,14 @@ static inline void visit( Visitor&& v ) { \
   v.operator()(BOOST_PP_STRINGIZE(elem), int64_t(enum_type::elem) );
 #define FC_REFLECT_ENUM_TO_STRING( r, enum_type, elem ) \
    case enum_type::elem: return BOOST_PP_STRINGIZE(elem);
+
+
 #define FC_REFLECT_ENUM_TO_FC_STRING( r, enum_type, elem ) \
    case enum_type::elem: return std::string(BOOST_PP_STRINGIZE(elem));
 
 #define FC_REFLECT_ENUM_FROM_STRING( r, enum_type, elem ) \
-  if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem;
+  if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 || strcmp( s, BOOST_PP_STRINGIZE(enum_type) "_" BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem;
+
 #define FC_REFLECT_ENUM_FROM_STRING_CASE( r, enum_type, elem ) \
    case enum_type::elem:
 
@@ -249,6 +252,95 @@ template<> struct reflector<ENUM> { \
 };  \
 template<> struct get_typename<ENUM>  { static const char* name()  { return BOOST_PP_STRINGIZE(ENUM);  } }; \
 }
+
+// Variants of FC_REFLECT_ENUM that allow stripping the base enum name from the string representation
+#define FC_REFLECT_ENUM_TO_FC_STRING_WITH_STRIP( r, enum_type, elem ) \
+   case enum_type::elem: { \
+      std::string s(BOOST_PP_STRINGIZE(elem)); \
+      if (strip_base_enum) { \
+         std::string b(BOOST_PP_STRINGIZE(enum_type) "_" ); \
+         auto last_split_pos = b.find_last_of("::"); \
+         if (last_split_pos != b.npos) {\
+            b = b.substr(last_split_pos + 1); \
+         } \
+         if (s.starts_with(b)) s = s.substr(b.length()); \
+      } \
+      return s; \
+   }
+
+#define FC_REFLECT_ENUM_FROM_STRING_WITH_STRIP( r, enum_type, elem ) \
+   { \
+      if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem; \
+      std::string str(s); \
+      if (strip_base_enum) { \
+         std::string b(BOOST_PP_STRINGIZE(enum_type) "_" ); \
+         auto last_split_pos = b.find_last_of("::"); \
+         if (last_split_pos != b.npos) {\
+            b = b.substr(last_split_pos + 1); \
+         } \
+         if (!str.starts_with(b)) str = b + str; \
+      } \
+      if (str == BOOST_PP_STRINGIZE(elem)) return enum_type::elem; \
+   }
+
+#define FC_REFLECT_ENUM_WITH_STRIP( ENUM, FIELDS, STRIP_BASE_ENUM_DEFAULT ) \
+namespace fc { \
+template<> struct reflector<ENUM> { \
+    typedef fc::true_type is_defined; \
+    typedef fc::true_type is_enum; \
+    static const char* to_string(ENUM elem) { \
+      switch( elem ) { \
+        BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_TO_STRING, ENUM, FIELDS ) \
+        default: \
+           fc::throw_bad_enum_cast( std::to_string(int64_t(elem)).c_str(), BOOST_PP_STRINGIZE(ENUM) ); \
+      }\
+      return nullptr; \
+    } \
+    static const char* to_string(int64_t i) { \
+      return to_string(ENUM(i)); \
+    } \
+    static std::string to_fc_string(ENUM elem, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT) { \
+      switch( elem ) { \
+        BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_TO_FC_STRING_WITH_STRIP, ENUM, FIELDS ) \
+      } \
+      return std::to_string(int64_t(elem)); \
+    } \
+    static std::string to_fc_string(int64_t i, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT) { \
+      return to_fc_string(ENUM(i), strip_base_enum); \
+    } \
+    static ENUM from_int(int64_t i) { \
+      ENUM e = ENUM(i); \
+      switch( e ) \
+      { \
+        BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_FROM_STRING_CASE, ENUM, FIELDS ) \
+          break; \
+        default: \
+          fc::throw_bad_enum_cast( i, BOOST_PP_STRINGIZE(ENUM) ); \
+      } \
+      return e;\
+    } \
+    static ENUM from_string( const char* s, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT) { \
+        BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_ENUM_FROM_STRING_WITH_STRIP, ENUM, FIELDS ) \
+        int64_t i = 0; \
+        try \
+        { \
+           i = boost::lexical_cast<int64_t>(s); \
+        } \
+        catch( const boost::bad_lexical_cast& e ) \
+        { \
+           fc::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
+        } \
+        return from_int(i); \
+    } \
+    template< typename Visitor > \
+    static void visit( Visitor& v ) \
+    { \
+        BOOST_PP_SEQ_FOR_EACH( FC_REFLECT_VISIT_ENUM, ENUM, FIELDS ) \
+    } \
+};  \
+template<> struct get_typename<ENUM>  { static const char* name()  { return BOOST_PP_STRINGIZE(ENUM);  } }; \
+}
+
 
 /*  Note: FC_REFLECT_ENUM previously defined this function, but I don't think it ever
  *        did what we expected it to do.  I've disabled it for now.

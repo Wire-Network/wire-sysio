@@ -10,7 +10,6 @@ enum chain_kind : uint8_t {
    chain_kind_ethereum = 2,
    chain_kind_solana = 3,
    chain_kind_sui = 4,
-   // chain_kind_count = 5,
 };
 
 enum chain_key_type : uint8_t {
@@ -19,12 +18,21 @@ enum chain_key_type : uint8_t {
    chain_key_type_ethereum = 2,
    chain_key_type_solana = 3,
    chain_key_type_sui = 4,
-   // chain_key_type_count = 5,
 };
+
+
+// enum class chain_format : uint8_t {
+//    chain_key_type_unknown = 0,
+//    chain_key_type_wire = 1,
+//    chain_key_type_ethereum = 2,
+//    chain_key_type_solana = 3,
+//    chain_key_type_sui = 4,
+// };
+
 
 // SIZES INCLUDE SCHEME FLAG
 constexpr std::size_t key_size_ed25519  = 33;
-constexpr std::size_t key_size_sec256k1 = 34;
+constexpr std::size_t key_size_sec256k1 = 33;
 constexpr std::size_t key_size_sec256r1 = key_size_sec256k1;
 
 constexpr std::size_t chain_address_size_sui      = 32; // base 64 (Blake2b256(pubkey))
@@ -50,3 +58,4 @@ constexpr auto chain_address_sizes = std::tuple{
 };
 
 }
+

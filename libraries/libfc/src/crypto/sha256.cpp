@@ -28,8 +28,8 @@ namespace fc {
     }
     sha256::operator std::string()const { return  str(); }
 
-    const char* sha256::data()const { return (const char*)&_hash[0]; }
-    char* sha256::data() { return (char*)&_hash[0]; }
+    const char* sha256::data()const { return reinterpret_cast<const char*>(&_hash[0]); }
+    char*       sha256::data() { return reinterpret_cast<char*>(&_hash[0]); }
 
 
     struct sha256::encoder::impl {

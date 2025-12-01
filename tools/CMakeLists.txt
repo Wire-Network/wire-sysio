@@ -1,4 +1,6 @@
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/llvm-gcov.sh ${CMAKE_CURRENT_BINARY_DIR}/llvm-gcov.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ctestwrapper.sh ${CMAKE_CURRENT_BINARY_DIR}/ctestwrapper.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/validate_reflection.py ${CMAKE_CURRENT_BINARY_DIR}/validate_reflection.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/keygen-ethereum.py ${CMAKE_CURRENT_BINARY_DIR}/keygen-ethereum.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/keygen-solana.py ${CMAKE_CURRENT_BINARY_DIR}/keygen-solana.py COPYONLY)
 configure_file(net-util.py net-util.py COPYONLY)

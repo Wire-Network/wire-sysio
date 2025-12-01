@@ -21,7 +21,7 @@ namespace fc {
     typedef fc::array<char,33>          commitment_type;
     typedef fc::array<char,33>          public_key_data;
     typedef fc::sha256                  private_key_secret;
-    typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
+    typedef fc::array<unsigned char,65> public_key_point_data; ///< the full non-compressed version of the ECC point
     typedef fc::array<char,72>          signature;
     typedef fc::array<unsigned char,65> compact_signature;
     typedef fc::array<char,78>          extended_key_data;
