@@ -130,7 +130,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    BOOST_REQUIRE_EQUAL(it_account2->rows.obj.size(), 2u);
 
    accounts = chain.deserialize_data(it_account, "account_v0", "account");
-   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), "newacc");
+   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), "sysio"); // onblock
+   BOOST_REQUIRE_EQUAL(accounts[1]["name"].get_string(), "newacc");
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
