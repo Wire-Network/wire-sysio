@@ -23,6 +23,9 @@ public:
       create_accounts( { "iftester"_n } );
       produce_block();
 
+      set_code( "iftester"_n, contracts::bios_wasm() );
+      set_abi( "iftester"_n, contracts::bios_abi().data() );
+
       // instant finality actions are privileged
       base_tester::push_action(config::system_account_name, "setpriv"_n,
                                config::system_account_name,  mutable_variant_object()
@@ -30,8 +33,6 @@ public:
                                ("is_priv", 1)
       );
 
-      set_code( "iftester"_n, contracts::bios_wasm() );
-      set_abi( "iftester"_n, contracts::bios_abi().data() );
       produce_block();
    }
 };
@@ -57,7 +58,7 @@ BOOST_FIXTURE_TEST_CASE( set_1_finalizer, sysio_bios_if_tester ) try {
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
     BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
-    BOOST_TEST(output_json.find("\"generation\": 1") != std::string::npos);
+    BOOST_TEST(output_json.find("\"generation\": 2") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 2") != std::string::npos);
     BOOST_TEST(output_json.find("set_1_finalizer") != std::string::npos);
     BOOST_TEST(output_json.find("PUB_BLS_6j4Y3LfsRiBxY-DgvqrZNMCttHftBQPIWwDiN2CMhHWULjN1nGwM1O_nEEJefqwAG4X09n4Kdt4a1mfZ1ES1cLGjQo6uLLSloiVW4i9BUhMHU2nVujP1_U_9ihdI3egZ17N-iA") != std::string::npos);
@@ -88,7 +89,7 @@ BOOST_FIXTURE_TEST_CASE( set_2_finalizers, sysio_bios_if_tester ) try {
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
     BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
-    BOOST_TEST(output_json.find("\"generation\": 1") != std::string::npos);
+    BOOST_TEST(output_json.find("\"generation\": 2") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 5") != std::string::npos);
     BOOST_TEST(output_json.find("set_2_finalizer_2") != std::string::npos);
     BOOST_TEST(output_json.find("PUB_BLS_kV0d54mbPRbd65t4ttv_-CxNt8ktKmf8q4uKZzNTzFSHDSj5rLlP_hdovTsHAPQOAyyzJ4bRTheKjSUj-IoTW96v3VdlifgtDbSVmg4JZR8H_tlStQSWsTHGo8pTX8cR_HEVoA") != std::string::npos);
