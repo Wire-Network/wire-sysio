@@ -2294,6 +2294,7 @@ read_only::get_raw_abi_results read_only::get_raw_abi( const get_raw_abi_params&
       const auto* accnt_metadata_obj = db.find_account_metadata(params.account_name);
 
       if (accnt_metadata_obj != nullptr) {
+         result.abi_hash = fc::sha256::hash( accnt_metadata_obj->abi.data(), accnt_metadata_obj->abi.size() );
          if (accnt_metadata_obj->code_hash != digest_type())
             result.code_hash = accnt_metadata_obj->code_hash;
          if (!params.abi_hash || *params.abi_hash != result.abi_hash)
