@@ -18,6 +18,8 @@ from TestHarness import Cluster, TestHelper, Utils, WalletMgr
 #      and a block whose block number greater than Savanna Genesis block (post Savanna)
 #   4. Verify `finality_data` field in every block before Savanna Genesis block is NULL,
 #      and `finality_data` field in every block after Savanna Genesis block contains a value.
+#
+#  For Wire just verify finality_data is present in every block.
 # 
 ###############################################################
 
@@ -90,23 +92,6 @@ try:
     Print("Shutdown SHiP node")
     shipNode.kill(signal.SIGTERM)
 
-    # Find the Savanna Genesis Block number
-    svnnGensisBlockNum = 0
-    shipStderrFileName=Utils.getNodeDataDir(shipNodeNum, "stderr.txt")
-    with open(shipStderrFileName, 'r') as f:
-        line = f.readline()
-        while line:
-            match =  re.search(r'Transitioning to savanna, IF Genesis Block (\d+)', line)
-            if match:
-                svnnGensisBlockNum = int(match.group(1))
-                break
-            line = f.readline()
-    Print(f"Savanna Genesis Block number: {svnnGensisBlockNum}")
-
-    # Make sure start_block_num is indeed pre Savanna and end_block_num is post Savanna
-    assert svnnGensisBlockNum > start_block_num, f'svnnGensisBlockNum {svnnGensisBlockNum} must be greater than start_block_num {start_block_num}'
-    assert svnnGensisBlockNum < end_block_num, f'svnnGensisBlockNum {svnnGensisBlockNum} must be less than end_block_num {end_block_num}'
-
     Print("Verify ship_client output is well formed")
     blocks_result_v1 = None
     # Verify SHiP client receives well formed results
@@ -116,6 +101,8 @@ try:
             blocks_result_v1 = json.loads(" ".join(lines))
         except json.decoder.JSONDecodeError as er:
             Utils.errorExit(f"ship_client output was malformed. Exception: {er}")
+
+    svnnGensisBlockNum = 2
 
     # Verify `finality_data` field in every block before Savanna Genesis block is Null,
     # and `finality_data` field in every block after Savanna Genesis block has a value.
