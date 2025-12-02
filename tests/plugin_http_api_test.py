@@ -1507,7 +1507,7 @@ class PluginHttpTest(unittest.TestCase):
 
         enc = "utf-8"
         sock.settimeout(3)
-        maxMsgSize = 2048
+        maxMsgSize = 1024*1024
         resp1_data, resp2_data, resp3_data = None, None, None
         try:
             # send first request
@@ -1538,7 +1538,7 @@ class PluginHttpTest(unittest.TestCase):
                 sock.send(bytes(req2, enc))
                 d = sock.recv(64)
                 if(len(d) > 0):
-                    Utils.errorExit('Socket still open after "Connection: close" in header')
+                    Utils.errorExit('Socket still open after "Connection: close" in header: ' + d.decode(enc))
             except Exception as e:
                 pass
 
