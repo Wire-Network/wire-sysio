@@ -3,6 +3,7 @@
 .vscode-ctags
 tmp
 .run/
+/.data
 *.a
 *.sw*
 *.dylib

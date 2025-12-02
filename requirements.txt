@@ -1,3 +1,4 @@
+click
 safe-pysha3
 pysha3
 eth-keys

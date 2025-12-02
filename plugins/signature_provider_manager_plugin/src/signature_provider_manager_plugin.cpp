@@ -242,8 +242,8 @@ signature_provider_manager_plugin::create_provider(
    const std::string&         key_name,
    fc::crypto::chain_kind     target_chain,
    fc::crypto::chain_key_type key_type,
-   std::string                public_key_text,
-   std::string                private_key_provider_spec
+   const std::string&         public_key_text,
+   const std::string&         private_key_provider_spec
    ) {
    using namespace fc::crypto;
 
