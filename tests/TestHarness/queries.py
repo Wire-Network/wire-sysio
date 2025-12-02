@@ -726,7 +726,7 @@ class NodeopQueries:
 
     def getBlockProducer(self, timeout=None, waitForBlock=True, exitOnError=True, blockType=BlockType.head):
         blockNum=self.getBlockNum(blockType=blockType)
-        block=self.getBlock(blockNum, exitOnError=exitOnError, blockType=blockType)
+        block=self.getBlock(blockNum, exitOnError=exitOnError)
         if block is None:
             if exitOnError:
                 Utils.errorExit(f"getBlock returned None for {blockNum}")
