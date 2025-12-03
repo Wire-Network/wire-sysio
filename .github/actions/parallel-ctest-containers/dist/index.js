@@ -6089,6 +6089,7 @@ var error_log_paths = JSON.parse(import_core.default.getInput("error-log-paths",
 var log_tarball_prefix = import_core.default.getInput("log-tarball-prefix", { required: true });
 var tests_label = import_core.default.getInput("tests-label", { required: true });
 var test_timeout = import_core.default.getInput("test-timeout", { required: true });
+var batch_size = parseInt(import_core.default.getInput("batch-size") || "10");
 var repo_name = import_node_process.default.env.GITHUB_REPOSITORY.split("/")[1];
 var dockerHost = import_node_process.default.env.DOCKER_HOST || "";
 var dockerArgs = dockerHost ? ["--host", dockerHost] : [];
@@ -6104,6 +6105,7 @@ async function main() {
     console.log(`Base Image: ${baseImage}`);
     console.log(`Working Directory: ${import_node_process.default.cwd()}`);
     console.log(`Repository: ${repo_name}`);
+    console.log(`Batch Size: ${batch_size}`);
     console.log(`==================
 `);
     import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", "-f", baseContainer], { stdio: "ignore" });
@@ -6142,63 +6144,82 @@ async function main() {
       console.log(`=== Sanity check complete ===
 `);
     }
-    console.log("Starting parallel test execution...\n");
-    const subprocesses = tests.map((t) => new Promise((resolve) => {
-      const cname = `${t.name}-${suffix}`;
-      const args = [
-        ...dockerArgs,
-        "run",
-        "--security-opt",
-        "seccomp=unconfined",
-        "-e",
-        "GITHUB_ACTIONS=True",
-        "--name",
-        cname,
-        "--init",
-        baseImage,
-        "bash",
-        "-c",
-        `cd build; ctest --output-on-failure -R '^${t.name}$' --timeout ${test_timeout}`
-      ];
-      console.log(`[${t.name}] Starting container ${cname}`);
-      const proc = import_node_child_process.default.spawn("docker", args, { stdio: "pipe" });
-      let stdout = "";
-      let stderr = "";
-      proc.stdout.on("data", (data) => {
-        const output = data.toString();
-        stdout += output;
-        output.split("\n").forEach((line) => {
-          if (line) console.log(`[${t.name}] ${line}`);
+    const totalBatches = Math.ceil(tests.length / batch_size);
+    console.log(`Starting parallel test execution in ${totalBatches} batch(es) of up to ${batch_size} tests...
+`);
+    const results = [];
+    for (let batchNum = 0; batchNum < totalBatches; batchNum++) {
+      const start = batchNum * batch_size;
+      const end = Math.min(start + batch_size, tests.length);
+      const batch = tests.slice(start, end);
+      console.log(`
+${"=".repeat(60)}`);
+      console.log(`BATCH ${batchNum + 1}/${totalBatches}: Running tests ${start + 1}-${end} of ${tests.length}`);
+      console.log(`${"=".repeat(60)}
+`);
+      const subprocesses = batch.map((t) => new Promise((resolve) => {
+        const cname = `${t.name}-${suffix}`;
+        const args = [
+          ...dockerArgs,
+          "run",
+          "--security-opt",
+          "seccomp=unconfined",
+          "-e",
+          "GITHUB_ACTIONS=True",
+          "--name",
+          cname,
+          "--init",
+          baseImage,
+          "bash",
+          "-c",
+          `cd build; ctest --output-on-failure -R '^${t.name}$' --timeout ${test_timeout}`
+        ];
+        console.log(`[${t.name}] Starting container ${cname}`);
+        const proc = import_node_child_process.default.spawn("docker", args, { stdio: "pipe" });
+        let stdout = "";
+        let stderr = "";
+        proc.stdout.on("data", (data) => {
+          const output = data.toString();
+          stdout += output;
+          output.split("\n").forEach((line) => {
+            if (line) console.log(`[${t.name}] ${line}`);
+          });
         });
-      });
-      proc.stderr.on("data", (data) => {
-        const output = data.toString();
-        stderr += output;
-        output.split("\n").forEach((line) => {
-          if (line) console.error(`[${t.name}] ERR: ${line}`);
+        proc.stderr.on("data", (data) => {
+          const output = data.toString();
+          stderr += output;
+          output.split("\n").forEach((line) => {
+            if (line) console.error(`[${t.name}] ERR: ${line}`);
+          });
         });
-      });
-      proc.on("close", (code) => {
-        if (code !== 0) {
-          console.error(`
+        proc.on("close", (code) => {
+          if (code !== 0) {
+            console.error(`
 === Test ${t.name} FAILED with exit code ${code} ===`);
-          if (stderr) {
-            console.error("STDERR:");
-            console.error(stderr);
+            if (stderr) {
+              console.error("STDERR:");
+              console.error(stderr);
+            }
+            console.error("================================\n");
+          } else {
+            console.log(`[${t.name}] \u2713 PASSED`);
           }
-          console.error("================================\n");
-        } else {
-          console.log(`[${t.name}] \u2713 PASSED`);
-        }
-        resolve({ name: t.name, code, stdout, stderr });
-      });
-      proc.on("error", (err) => {
-        console.error(`[${t.name}] Process error:`, err);
-        resolve({ name: t.name, code: -1, stdout, stderr, error: err.message });
-      });
-    }));
-    const results = await Promise.all(subprocesses);
-    console.log("\n==== Parallel test results ====");
+          resolve({ name: t.name, code, stdout, stderr });
+        });
+        proc.on("error", (err) => {
+          console.error(`[${t.name}] Process error:`, err);
+          resolve({ name: t.name, code: -1, stdout, stderr, error: err.message });
+        });
+      }));
+      const batchResults = await Promise.all(subprocesses);
+      results.push(...batchResults);
+      const batchPassed = batchResults.filter((r) => r.code === 0).length;
+      const batchFailed = batchResults.filter((r) => r.code !== 0).length;
+      console.log(`
+--- Batch ${batchNum + 1} Summary: ${batchPassed} passed, ${batchFailed} failed ---
+`);
+    }
+    console.log("\n==== Final test results ====");
     const passed = results.filter((r) => r.code === 0).length;
     const failed = results.filter((r) => r.code !== 0).length;
     console.log(`Total: ${results.length} tests, ${passed} passed, ${failed} failed

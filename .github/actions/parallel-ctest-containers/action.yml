@@ -11,6 +11,10 @@ inputs:
     required: true
   test-timeout:
     required: true
+  batch-size:
+    description: 'Number of tests to run concurrently (default: 10)'
+    required: false
+    default: '10'
 runs:
   using: 'node20'
   main: 'dist/index.js'
