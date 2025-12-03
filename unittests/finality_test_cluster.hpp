@@ -27,7 +27,7 @@ struct finality_node_t : public sysio::testing::tester {
    sysio::testing::finalizer_keys<tester>  finkeys;
    size_t                                  cur_key{0}; // index of key used in current policy
 
-   finality_node_t() : sysio::testing::tester(sysio::testing::setup_policy::full_except_do_not_transition_to_savanna),  finkeys(*this) {}
+   finality_node_t() : sysio::testing::tester(sysio::testing::setup_policy::full_except_do_not_set_finalizers),  finkeys(*this) {}
 
    size_t last_vote_index() const {
       assert(!votes.empty());

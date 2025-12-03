@@ -160,8 +160,6 @@ inline void activate_protocol_features_set_bios_contract(appbase::scoped_app& ap
 
             vector<digest_type> feature_digests;
             feature_digests.push_back(*pfm.get_builtin_digest(builtin_protocol_feature_t::reserved_second_protocol_feature));
-            // savanna
-            feature_digests.push_back(*pfm.get_builtin_digest(builtin_protocol_feature_t::savanna));
 
             for (const auto feature_digest : feature_digests) {
                chain_plug->chain().preactivate_feature( feature_digest, false );

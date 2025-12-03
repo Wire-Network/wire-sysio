@@ -71,8 +71,7 @@ std::string make_locals_wasm(int n_params, int n_locals, int n_stack)
 
 }
 
-using wasm_config_testers = boost::mpl::list<wasm_config_tester<legacy_tester>,
-                                             wasm_config_tester<savanna_tester>>;
+using wasm_config_testers = boost::mpl::list<wasm_config_tester<savanna_tester>>;
 
 
 // Split the tests into multiple parts so that they can be finished within CICD time limit
@@ -210,7 +209,7 @@ void test_max_section_elements(T& chain, int32_t n_elements, int32_t oversize, c
 // so that they can finish within CICD time limits
 BOOST_AUTO_TEST_SUITE(wasm_config_part1_tests)
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_mutable_global_bytes_lgcy, data::make({ 4096, 8192 , 16384 }) * data::make({0, 1}), n_globals, oversize) {
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_mutable_global_bytes_lgcy, data::make({ 4096, 8192 , 16384 }) * data::make({0, 1}), n_globals, oversize) {
    test_max_mutable_global_bytes(*this, n_globals, oversize);
 }
 
@@ -218,7 +217,7 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester<savanna_validating_tester>, max_mutabl
    test_max_mutable_global_bytes(*this, n_globals, oversize);
 }
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_section_elements_lgcy,
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_section_elements_lgcy,
                        data::make({1024, 8192, 16384}) * data::make({0, 1}) *
                        (data::make({many_funcs_wast, many_types_wast, many_imports_wast, many_globals_wast, many_elem_wast, many_data_wast}) ^
                         data::make({one_func       , one_type       , one_import,        one_global       , one_elem      , one_data})),
@@ -334,7 +333,7 @@ void test_max_section_elements_export(T& chain, int32_t n_elements, int32_t over
 
 BOOST_AUTO_TEST_SUITE(wasm_config_part3_tests)
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_section_elements_export_lgcy,
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_section_elements_export_lgcy,
                        data::make({1024, 8192, 16384}) * data::make({0, 1}),
                        n_elements, oversize) {
    test_max_section_elements_export(*this, n_elements, oversize);
@@ -385,7 +384,7 @@ void test_max_linear_memory_init(T& chain, int32_t n_init, int32_t oversize) {
    }
 }
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_linear_memory_init_lgcy,
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_linear_memory_init_lgcy,
                        data::make({32768, 65536, 86513, 131072}) * data::make({0, 1}),
                        n_init, oversize) {
    test_max_linear_memory_init(*this, n_init, oversize);
@@ -397,7 +396,7 @@ BOOST_DATA_TEST_CASE_F(wasm_config_tester<savanna_validating_tester>, max_linear
    test_max_linear_memory_init(*this, n_init, oversize);
 }
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_func_local_bytes_lgcy, data::make({0, 8192, 16384}) * data::make(func_local_params), n_params, n_locals, n_stack, set_high, expect_success) {
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_func_local_bytes_lgcy, data::make({0, 8192, 16384}) * data::make(func_local_params), n_params, n_locals, n_stack, set_high, expect_success) {
    test_max_func_local_bytes(*this, n_params, n_locals, n_stack, set_high, expect_success);
 }
 
@@ -535,7 +534,7 @@ void test_max_table_elements(T& chain, int32_t max_table_elements, int32_t overs
    }
 }
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_table_elements_lgcy, data::make({512, 2048}) * data::make({0, 1}), max_table_elements, oversize) {
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_table_elements_lgcy, data::make({512, 2048}) * data::make({0, 1}), max_table_elements, oversize) {
    test_max_table_elements(*this, max_table_elements, oversize);
 }
 
@@ -581,7 +580,7 @@ void test_max_nested_structures(T& chain, int32_t n_nesting, int32_t oversize) {
    }
 }
 
-BOOST_DATA_TEST_CASE_F(wasm_config_tester<legacy_validating_tester>, max_nested_structures_lgcy,
+BOOST_DATA_TEST_CASE_F(wasm_config_tester<validating_tester>, max_nested_structures_lgcy,
                        data::make({512, 1024, 2048}) * data::make({0, 1}),
                        n_nesting, oversize) {
    test_max_nested_structures(*this, n_nesting, oversize);
@@ -652,7 +651,7 @@ void test_max_symbol_bytes_export(T& chain, int32_t n_symbol, int32_t oversize, 
    }
 }
 
-BOOST_DATA_TEST_CASE_F( wasm_config_tester<legacy_validating_tester>, max_symbol_bytes_export_lgcy, data::make({4096, 8192, 16384}) * data::make({0, 1}) *
+BOOST_DATA_TEST_CASE_F( wasm_config_tester<validating_tester>, max_symbol_bytes_export_lgcy, data::make({4096, 8192, 16384}) * data::make({0, 1}) *
                         data::make({max_symbol_func_wast, max_symbol_global_wast, max_symbol_memory_wast, max_symbol_table_wast}),
                         n_symbol, oversize, wast ) {
    test_max_symbol_bytes_export(*this, n_symbol, oversize, wast);

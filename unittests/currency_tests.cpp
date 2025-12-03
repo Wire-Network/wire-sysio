@@ -92,8 +92,7 @@ class currency_tester : public T {
       static const name sysio_token;
 };
 
-using currency_testers = boost::mpl::list<currency_tester<legacy_validating_tester>,
-                                          currency_tester<savanna_validating_tester>>;
+using currency_testers = boost::mpl::list<currency_tester<savanna_validating_tester>>;
 
 template <typename T>
 const name currency_tester<T>::sysio_token = "sysio.token"_n;

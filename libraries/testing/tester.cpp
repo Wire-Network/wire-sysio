@@ -40,6 +40,9 @@ namespace sysio::testing {
          case setup_policy::preactivate_feature_and_new_bios:
             os << "preactivate_feature_and_new_bios";
             break;
+         case setup_policy::full_except_do_not_set_finalizers:
+            os << "full_except_do_not_set_finalizers";
+            break;
          case setup_policy::full:
             os << "full";
             break;
@@ -233,7 +236,7 @@ namespace sysio::testing {
             break;
          }
          case setup_policy::full:
-         case setup_policy::full_except_do_not_transition_to_savanna: {
+         case setup_policy::full_except_do_not_set_finalizers: {
             produce_block();
             set_bios_contract();
             preactivate_all_builtin_protocol_features();
@@ -1472,12 +1475,7 @@ namespace sysio::testing {
    }
 
    void base_tester::preactivate_savanna_protocol_features() {
-      const auto& pfm = control->get_protocol_feature_manager();
-
-      // dependencies of builtin_protocol_feature_t::savanna
       vector<digest_type> feature_digests;
-      // savanna
-      feature_digests.push_back(*pfm.get_builtin_digest(builtin_protocol_feature_t::savanna));
 
       preactivate_protocol_features( feature_digests );
    }

@@ -99,8 +99,7 @@ public:
    abi_serializer abi_ser;
 };
 
-using sysio_token_testers = boost::mpl::list<sysio_token_tester<legacy_tester>,
-                                             sysio_token_tester<savanna_tester>>;
+using sysio_token_testers = boost::mpl::list<sysio_token_tester<savanna_tester>>;
 
 BOOST_AUTO_TEST_SUITE(sysio_token_tests)
 

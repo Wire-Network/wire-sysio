@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(duplicate_producers_test) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE( duplicate_keys_test, legacy_validating_tester ) try {
+BOOST_FIXTURE_TEST_CASE( duplicate_keys_test, validating_tester ) try {
    create_accounts( {"alice"_n,"bob"_n} );
    produce_block();
 

@@ -241,10 +241,8 @@ struct building_block {
       deque<s_header>                     s_headers; // Added new functionality to pass many state headers to be included in block header extension
       trx_block_context                   trx_blk_context;
 
-      building_block_common(const vector<digest_type>& new_protocol_feature_activations,
-                            action_digests_t::store_which_t store_which) :
-         new_protocol_feature_activations(new_protocol_feature_activations),
-         action_receipt_digests(store_which)
+      explicit building_block_common(const vector<digest_type>& new_protocol_feature_activations) :
+         new_protocol_feature_activations(new_protocol_feature_activations)
       {
       }
       
@@ -287,8 +285,8 @@ struct building_block {
       const proposer_policy_ptr                  active_proposer_policy;           // Cached: parent.get_next_active_proposer_policy(timestamp)
       const uint32_t                             block_num;                        // Cached: parent.block_num() + 1
 
-      building_block_if(const block_state& parent, const building_block_input& input, action_digests_t::store_which_t store_which)
-         : building_block_common(input.new_protocol_feature_activations, store_which)
+      building_block_if(const block_state& parent, const building_block_input& input)
+         : building_block_common(input.new_protocol_feature_activations)
          , parent (parent)
          , timestamp(input.timestamp)
          , active_producer_authority{input.producer,
@@ -344,7 +342,7 @@ struct building_block {
 
    // if constructor
    building_block(const block_state& prev, const building_block_input& input) :
-      bb(prev, input, action_digests_t::store_which_t::savanna)
+      bb(prev, input)
    {}
 
    deque<transaction_metadata_ptr> extract_trx_metas() {
@@ -455,11 +453,11 @@ struct building_block {
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
                        return std::make_pair(calculate_merkle(trx_receipts),
-                                             calculate_merkle(*action_receipts.digests_s));
+                                             calculate_merkle(action_receipts.digests_s));
                     },
                     [&](const checksum256_type& trx_checksum) {
                        return std::make_pair(trx_checksum,
-                                             calculate_merkle(*action_receipts.digests_s));
+                                             calculate_merkle(action_receipts.digests_s));
                     }},
          trx_mroot_or_receipt_digests());
 
@@ -963,7 +961,6 @@ struct controller_impl {
       } );
 
       set_activation_handler<builtin_protocol_feature_t::reserved_first_protocol_feature>();
-      set_activation_handler<builtin_protocol_feature_t::savanna>();
 
       irreversible_block.connect([this](const block_signal_params& t) {
          const auto& [ block, id] = t;
@@ -1951,7 +1948,7 @@ struct controller_impl {
          const signed_transaction& trn = trx->packed_trx()->get_signed_transaction();
          transaction_checktime_timer trx_timer(timer);
          transaction_context trx_context(self, *trx->packed_trx(), trx->id(), std::move(trx_timer),
-                                         bb.action_receipt_digests().store_which(), start, trx->get_trx_type());
+                                         start, trx->get_trx_type());
          if ((bool)subjective_cpu_leeway && is_speculative_block()) {
             trx_context.leeway = *subjective_cpu_leeway;
          }
@@ -4783,9 +4780,6 @@ void controller_impl::on_activation<builtin_protocol_feature_t::reserved_first_p
 //    } );
 // }
 
-template<>
-void controller_impl::on_activation<builtin_protocol_feature_t::savanna>() {
-}
 
 /// End of protocol feature activation handlers
 

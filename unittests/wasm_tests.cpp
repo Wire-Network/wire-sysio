@@ -699,7 +699,6 @@ void test_big_memory(setup_policy policy) {
 }
 
 BOOST_DATA_TEST_CASE( big_memory, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
-   test_big_memory<legacy_validating_tester>(policy);
    test_big_memory<savanna_validating_tester>(policy);
 } FC_LOG_AND_RETHROW()
 
@@ -719,7 +718,6 @@ void test_table_init(setup_policy policy) {
 }
 
 BOOST_DATA_TEST_CASE( table_init_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
-   test_table_init<legacy_validating_tester>(policy);
    test_table_init<savanna_validating_tester>(policy);
 } FC_LOG_AND_RETHROW()
 
@@ -942,7 +940,6 @@ void test_lotso_globals(setup_policy policy) {
 }
 
 BOOST_DATA_TEST_CASE( lotso_globals, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
-   test_lotso_globals<legacy_validating_tester>(policy);
    test_lotso_globals<savanna_validating_tester>(policy);
 } FC_LOG_AND_RETHROW()
 
@@ -1668,7 +1665,6 @@ void test_depth(setup_policy policy) {
 }
 
 BOOST_DATA_TEST_CASE( depth_tests, bdata::make({setup_policy::preactivate_feature_and_new_bios, setup_policy::full}), policy ) try {
-   test_depth<legacy_validating_tester>(policy);
    test_depth<savanna_validating_tester>(policy);
 } FC_LOG_AND_RETHROW()
 

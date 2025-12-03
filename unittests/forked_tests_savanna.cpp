@@ -352,7 +352,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_1, savanna_cluster::cluster_t
    auto hbn1 = _nodes[0].head().block_num();
    auto lib1 = _nodes[0].last_irreversible_block_num();
 
-   legacy_tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
+   tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
 
    _nodes[0].push_blocks_to(irreversible, hbn1);
    BOOST_CHECK_EQUAL( irreversible.fork_db_head().block_num(), hbn1 );
@@ -437,7 +437,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_2, savanna_cluster::cluster_t
 
    BOOST_CHECK_GT(lib0, lib3);
 
-   legacy_tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
+   tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
 
    // push the branch where `lib` has not advanced past lib1
    // ------------------------------------------------------

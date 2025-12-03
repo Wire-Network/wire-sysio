@@ -96,7 +96,7 @@ private:
    abi_serializer shipabi = abi_serializer(json::from_string(sysio::state_history::ship_abi_without_tables()).as<abi_def>(), null_yield_function);
 };
 
-using testers = boost::mpl::list<legacy_tester, savanna_tester>;
+using testers = boost::mpl::list<savanna_tester>;
 
 BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
    table_deltas_tester chain;
@@ -578,8 +578,7 @@ struct state_history_tester : state_history_tester_logs, T {
    }) {}
 };
 
-using state_history_testers = boost::mpl::list<state_history_tester<legacy_tester>,
-                                               state_history_tester<savanna_tester>>;
+using state_history_testers = boost::mpl::list<state_history_tester<savanna_tester>>;
 
 static std::vector<char> get_decompressed_entry(sysio::state_history::log_catalog& log, block_num_type block_num) {
    std::optional<sysio::state_history::ship_log_entry> entry = log.get_entry(block_num);
@@ -666,10 +665,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_splitted_log, T, state_history_testers) {
       BOOST_CHECK_EQUAL(chain.traces_log.block_range().first, 41u);
    }
 
-   if constexpr (std::is_same_v<T, state_history_tester<legacy_tester>>) {
-      BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-41-60.log" ));
-      BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-41-60.index" ));
-   }
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-61-80.log" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-61-80.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-81-100.log" ));

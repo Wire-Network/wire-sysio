@@ -40,7 +40,6 @@ namespace sysio::chain {
                                              const packed_transaction& t,
                                              const transaction_id_type& trx_id,
                                              transaction_checktime_timer&& tmr,
-                                             action_digests_t::store_which_t store_which,
                                              fc::time_point s,
                                              transaction_metadata::trx_type type)
    :control(c)
@@ -49,7 +48,7 @@ namespace sysio::chain {
    ,undo_session()
    ,trace(std::make_shared<transaction_trace>())
    ,start(s)
-   ,executed_action_receipts(store_which)
+   ,executed_action_receipts()
    ,transaction_timer(std::move(tmr))
    ,trx_type(type)
    ,pseudo_start(s)
@@ -68,8 +67,7 @@ namespace sysio::chain {
       transaction_timer.stop();
       resume_billing_timer(start);
 
-      auto sw = executed_action_receipts.store_which();
-      executed_action_receipts = action_digests_t{sw};
+      executed_action_receipts = action_digests_t{};
       // bill_to_accounts should only be updated in init(), not updated during transaction execution
       validate_ram_usage.clear();
    }
