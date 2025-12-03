@@ -1960,15 +1960,14 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
 
    SYS_ASSERT( sbp, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num_or_id));
 
-   block_header_state_legacy ret;
-   ret.block_num = sbp->block_num();
-   ret.id = sbp->calculate_id();
-   ret.header = *sbp;
-   ret.additional_signatures = detail::extract_additional_signatures(sbp);
-
-   fc::variant vo;
-   fc::to_variant( ret, vo );
-   return vo;
+   fc::mutable_variant_object result;
+   result
+      ("block_num", sbp->block_num())
+      ("id", sbp->calculate_id())
+      ("header", static_cast<const signed_block_header&>(*sbp))
+      ("additional_signatures", detail::extract_additional_signatures(sbp))
+   ;
+   return result;
 }
 
 void read_write::push_block(read_write::push_block_params&& params, next_function<read_write::push_block_results> next) {

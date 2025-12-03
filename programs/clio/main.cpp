@@ -1978,7 +1978,7 @@ int main( int argc, char** argv ) {
    });
 
    // pack hex
-   using try_types = std::tuple<block_state_legacy, signed_block, transaction_trace, action_trace, transaction_receipt,
+   using try_types = std::tuple<signed_block, transaction_trace, action_trace, transaction_receipt,
                                 packed_transaction, signed_transaction, transaction, abi_def, action>;
    string json;
    string type;

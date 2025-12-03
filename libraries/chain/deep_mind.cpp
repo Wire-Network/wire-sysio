@@ -1,5 +1,4 @@
 #include <sysio/chain/deep_mind.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/chain/resource_limits_private.hpp>
@@ -60,16 +59,6 @@ namespace sysio::chain {
    void deep_mind_handler::on_start_block(uint32_t block_num)
    {
       fc_dlog(_logger, "START_BLOCK ${block_num}", ("block_num", block_num));
-   }
-
-   void deep_mind_handler::on_accepted_block(const std::shared_ptr<block_state_legacy>& bsp)
-   {
-      auto packed_blk = fc::raw::pack(*bsp);
-
-      fc_dlog(_logger, "ACCEPTED_BLOCK ${num} ${blk}",
-         ("num", bsp->block_num())
-         ("blk", fc::to_hex(packed_blk))
-      );
    }
 
    void deep_mind_handler::on_accepted_block_v2(const block_id_type& id, block_num_type lib,

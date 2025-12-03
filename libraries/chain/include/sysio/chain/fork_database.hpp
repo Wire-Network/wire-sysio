@@ -21,7 +21,6 @@ namespace sysio::chain {
 
    // Used for logging of comparison values used for best fork determination
    std::string log_fork_comparison(const block_state& bs);
-   std::string log_fork_comparison(const block_state_legacy& bs);
 
    /**
     * @class fork_database_type

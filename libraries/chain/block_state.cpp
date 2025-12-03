@@ -1,6 +1,5 @@
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/block_header_state_utils.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/finalizer.hpp>
 #include <sysio/chain/snapshot_detail.hpp>
 #include <sysio/chain/exceptions.hpp>
@@ -129,71 +128,6 @@ block_state::block_state(const block_header_state&                bhs,
    block = signed_block::create_signed_block(std::move(new_block));
 }
 
-// Used for transition from dpos to Savanna.
-block_state_ptr block_state::create_if_genesis_block(const block_state_legacy& bsp) {
-   dlog("Create if genesis block ${bn}", ("bn", bsp.block_num()));
-   assert(bsp.action_mroot_savanna);
-
-   auto result_ptr = std::make_shared<block_state>();
-   auto &result = *result_ptr;
-
-   // set block_header_state data ----
-   result.block_id = bsp.id();
-   result.header = bsp.header;
-   result.activated_protocol_features = bsp.activated_protocol_features;
-
-   assert(bsp.header.contains_header_extension(finality_extension::extension_id())); // required by transition mechanism
-   finality_extension f_ext = bsp.header.extract_header_extension<finality_extension>();
-   assert(f_ext.new_finalizer_policy_diff); // required by transition mechanism
-   result.active_finalizer_policy = std::make_shared<finalizer_policy>(finalizer_policy{}.apply_diff(std::move(*f_ext.new_finalizer_policy_diff)));
-
-   result.core = finality_core::create_core_for_genesis_block(bsp.id(), bsp.timestamp());
-
-   result.last_pending_finalizer_policy_digest = fc::sha256::hash(*result.active_finalizer_policy);
-   result.last_pending_finalizer_policy_start_timestamp = bsp.timestamp();
-   result.active_proposer_policy = std::make_shared<proposer_policy>();
-   result.active_proposer_policy->proposer_schedule = bsp.active_schedule;
-   result.latest_proposed_proposer_policy = {}; // none pending at IF genesis block
-   result.latest_pending_proposer_policy = {}; // none pending at IF genesis block
-   result.proposed_finalizer_policies = {}; // none proposed at IF genesis block
-   result.pending_finalizer_policy = std::nullopt; // none pending at IF genesis block
-   result.finalizer_policy_generation = 1;
-   result.header_exts = bsp.header_exts;
-
-   // set block_state data ----
-   result.block = bsp.block;
-   result.strong_digest = result.compute_finality_digest(); // all block_header_state data populated in result at this point
-   result.weak_digest = create_weak_digest(result.strong_digest);
-
-   // aggregating_qc will not be used in the genesis block as finalizers will not vote on it, but still create it for consistency.
-   result.aggregating_qc = aggregating_qc_t{result.active_finalizer_policy, finalizer_policy_ptr{}};
-
-   // build leaf_node and validation_tree
-   valid_t::finality_leaf_node_t leaf_node {
-      .block_num        = bsp.block_num(),
-      .timestamp        = bsp.timestamp(),
-      .parent_timestamp = block_timestamp_type(), // for the genesis block, the parent_timestamp is the the earliest representable timestamp.
-      .finality_digest  = result.strong_digest,
-      .action_mroot     = *bsp.action_mroot_savanna
-   };
-
-   // construct valid structure
-   incremental_merkle_tree validation_tree;
-   validation_tree.append(fc::sha256::hash(leaf_node));
-   result.valid = valid_t {
-      .validation_tree   = validation_tree,
-      .validation_mroots = { validation_tree.get_root() }
-   };
-
-   result.validated.store(bsp.is_valid());
-   result.pub_keys_recovered = bsp._pub_keys_recovered;
-   result.cached_trxs = bsp._cached_trxs;
-   result.action_mroot = *bsp.action_mroot_savanna;
-   result.base_digest = {}; // calculated on demand in get_finality_data()
-
-   return result_ptr;
-}
-
 std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_state& g) {
    auto result_ptr = std::make_shared<block_state>();
    auto& result = *result_ptr;
@@ -254,26 +188,6 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
 
    return result_ptr;
 };
-
-block_state_ptr block_state::create_transition_block(
-                   const block_state&                prev,
-                   signed_block_ptr                  b,
-                   const protocol_feature_set&       pfs,
-                   const validator_t&                validator,
-                   bool                              skip_validate_signee,
-                   const std::optional<digest_type>& action_mroot_savanna) {
-   dlog("Create transition block ${bn}", ("bn", prev.block_num()+1));
-   auto result_ptr = std::make_shared<block_state>(prev, b, pfs, validator, skip_validate_signee);
-
-   result_ptr->action_mroot = action_mroot_savanna.has_value() ? *action_mroot_savanna : digest_type();
-   // action_mroot_savanna can be empty in IRREVERSIBLE mode. Do not create valid structure
-   // if action_mroot is empty.
-   if( !result_ptr->action_mroot.empty() ) {
-     result_ptr->valid = prev.new_valid(*result_ptr, result_ptr->action_mroot, result_ptr->strong_digest);
-   }
-
-   return result_ptr;
-}
 
 block_state::block_state(snapshot_detail::snapshot_block_state_v1&& sbs)
    : block_header_state {

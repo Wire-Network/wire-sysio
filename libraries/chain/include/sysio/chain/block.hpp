@@ -96,7 +96,6 @@ namespace sysio { namespace chain {
 
    private:
       friend struct block_state;
-      friend struct block_state_legacy;
       template<typename Stream> friend void fc::raw::unpack(Stream& s, sysio::chain::signed_block& v);
       void pack() { packed_block = fc::raw::pack( *this ); }
 

@@ -14,7 +14,6 @@ struct vote_message;
 
 using signer_callback_type = std::function<std::vector<signature_type>(const digest_type&)>;
 
-struct block_state_legacy;
 struct block_state_accessor;
 
 /*
@@ -176,17 +175,7 @@ public:
                const block_signing_authority&           valid_block_signing_authority,
                const digest_type&                       action_mroot);
 
-   static std::shared_ptr<block_state> create_if_genesis_block(const block_state_legacy& bsp);
    static std::shared_ptr<block_state> create_genesis_block(const genesis_state& g);
-
-   // Constructs a Transition Savanna block state from a Legacy block state.
-   static std::shared_ptr<block_state> create_transition_block(
-         const block_state&                prev,
-         signed_block_ptr                  b,
-         const protocol_feature_set&       pfs,
-         const validator_t&                validator,
-         bool                              skip_validate_signee,
-         const std::optional<digest_type>& action_mroot_savanna);
 
    explicit block_state(snapshot_detail::snapshot_block_state_v1&& sbs);
 

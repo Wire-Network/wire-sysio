@@ -1,6 +1,5 @@
 #pragma once
 
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 #include <fc/reflect/reflect.hpp>
 
