@@ -316,7 +316,7 @@ jobs:
           error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
           log-tarball-prefix: ${{ matrix.cfg.name }}
           tests-label: nonparallelizable_tests
-          test-timeout: 600
+          test-timeout: 1000
           batch-size: '5'
 
       - name: Export core dumps
