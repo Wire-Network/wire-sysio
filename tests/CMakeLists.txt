@@ -142,7 +142,6 @@ target_link_libraries(ship_streamer sysio_chain Boost::program_options Boost::sy
 add_np_test(NAME cluster_launcher COMMAND tests/cluster_launcher.py -v ${UNSHARE})
 
 add_np_test(NAME transition_to_if COMMAND tests/transition_to_if.py -v ${UNSHARE})
-add_lr_test(NAME transition_to_if_lr COMMAND tests/transition_to_if.py -v -p 20 ${UNSHARE})
 
 add_np_test(NAME disaster_recovery COMMAND tests/disaster_recovery.py -v ${UNSHARE})
 add_np_test(NAME disaster_recovery_2 COMMAND tests/disaster_recovery_2.py -v ${UNSHARE})
