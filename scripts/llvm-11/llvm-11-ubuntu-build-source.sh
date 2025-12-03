@@ -22,6 +22,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LLVM_SRC_DIR="${BASE_DIR}/llvm-project"
 BUILD_DIR="${BASE_DIR}/llvm-11-build"
 PREFIX="${LLVM_11_PREFIX:-${BASE_DIR}/llvm-11}"
+<<<<<<< Updated upstream
+=======
+: "${CLANG_18_DIR:=/opt/clang/clang-18}"
+>>>>>>> Stashed changes
 
 ### ---------- Config (overridable by flags) ----------
 
