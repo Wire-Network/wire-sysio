@@ -1,6 +1,6 @@
 #include <print>
-#include <sysio/ethereum/ethereum_client.hpp>
-#include <sysio/ethereum/utility.hpp>
+#include <sysio/outpost_client/ethereum/ethereum_client.hpp>
+#include <sysio/outpost_client/ethereum/utility.hpp>
 
 /**
  * @brief Main function that demonstrates interaction with the Ethereum client.
@@ -17,7 +17,7 @@
  * @return int Exit code of the program.
  */
 int main() {
-   using namespace sysio::ethereum;
+   using namespace sysio::outpost_client::ethereum;
     // Load the configuration (node URL) from the config.json file.
     /**
      * @brief Load the Ethereum node URL from a configuration file.
@@ -28,7 +28,7 @@ int main() {
      */
     std::string node_url = "https://ethereum.publicnode.com";
 
-    if (auto node_url_opt = sysio::ethereum::load_config("config.json"); node_url_opt.has_value()) {
+    if (auto node_url_opt = sysio::outpost_client::ethereum::load_config("config.json"); node_url_opt.has_value()) {
        node_url = *node_url_opt;
     }
 

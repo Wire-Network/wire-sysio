@@ -6,7 +6,7 @@
 #include <string>
 #include <fc-lite/macros.hpp>
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 /**
  * @class network_adapter
@@ -55,4 +55,4 @@ private:
    static size_t write_callback(char* ptr, size_t size, size_t chunk_count, void* userdata);
 };
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum

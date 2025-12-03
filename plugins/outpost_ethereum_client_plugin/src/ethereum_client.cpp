@@ -1,8 +1,8 @@
 #include <fc/log/logger.hpp>
 #include <iostream>
-#include <sysio/ethereum/ethereum_client.hpp>
+#include <sysio/outpost_client/ethereum/ethereum_client.hpp>
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 ethereum_client::ethereum_client(const std::string& node_url, network_adapter& net_adapter)
     : node_url_(node_url), net_adapter_(net_adapter) {}  // Correct initialization list
@@ -172,4 +172,4 @@ std::optional<Json::Value> ethereum_client::get_transaction_receipt(const std::s
     return parse_json_response(*response);
 }
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum

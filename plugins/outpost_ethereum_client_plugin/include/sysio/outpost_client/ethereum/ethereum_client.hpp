@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-#include <sysio/ethereum/network_adapter.hpp>
+#include <sysio/outpost_client/ethereum/network_adapter.hpp>
 
 #include <json/json.h>
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 /**
  * @class ethereum_client
@@ -144,4 +144,4 @@ public:
     network_adapter& net_adapter_; ///< Reference to the network adapter used for sending requests.
 };
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum

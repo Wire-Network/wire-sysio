@@ -1,9 +1,9 @@
-#include <sysio/ethereum/network_adapter.hpp>
+#include <sysio/outpost_client/ethereum/network_adapter.hpp>
 
 #include <cstring>   // std::memset
 #include <utility>   // std::move
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 network_adapter::network_adapter()
     : curl_(nullptr)
@@ -117,4 +117,4 @@ std::optional<std::string> network_adapter::send_post_request(const std::string&
     return response;
 }
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum

@@ -1,9 +1,9 @@
 #include <fc/filesystem.hpp>
 #include <fc/log/logger.hpp>
 #include <fstream>
-#include <sysio/ethereum/utility.hpp>
+#include <sysio/outpost_client/ethereum/utility.hpp>
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 std::optional<std::string> load_config(const std::string& filename) {
 
@@ -24,4 +24,4 @@ std::optional<std::string> load_config(const std::string& filename) {
    return std::nullopt;
 }
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum

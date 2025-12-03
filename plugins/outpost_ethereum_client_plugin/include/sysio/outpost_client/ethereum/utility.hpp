@@ -3,7 +3,7 @@
 
 #include <json/json.h>
 
-namespace sysio::ethereum {
+namespace sysio::outpost_client::ethereum {
 
 /**
  * @file utility.hpp
@@ -24,4 +24,4 @@ namespace sysio::ethereum {
  */
 std::optional<std::string> load_config(const std::string& filename = "config.json");
 
-} // namespace sysio::ethereum
+} // namespace sysio::outpost_client::ethereum
