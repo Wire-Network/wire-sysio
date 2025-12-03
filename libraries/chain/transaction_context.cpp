@@ -65,7 +65,11 @@ namespace sysio::chain {
       billed_cpu_us.clear();
       trx_blk_context = trx_block_context{};
       transaction_timer.stop();
-      resume_billing_timer(start);
+      if (paused_timer) {
+         resume_billing_timer();
+      } else {
+         transaction_timer.start(active_deadline);
+      }
 
       executed_action_receipts = action_digests_t{};
       // bill_to_accounts should only be updated in init(), not updated during transaction execution
