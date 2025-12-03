@@ -78,7 +78,7 @@ struct interface_in_benchmark {
       timer = std::make_unique<platform_timer>();
       trx_timer = std::make_unique<transaction_checktime_timer>(*timer);
       trx_ctx = std::make_unique<transaction_context>(*chain->control.get(), *ptrx, ptrx->id(), std::move(*trx_timer),
-                                                      action_digests_t::store_which_t::legacy, fc::time_point::now(),
+                                                      fc::time_point::now(),
                                                       transaction_metadata::trx_type::input);
       trx_ctx->max_transaction_time_subjective = fc::microseconds::maximum();
       trx_ctx->init_for_input_trx();
