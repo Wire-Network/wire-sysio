@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(finality_extension_with_values_test)
 
    BOOST_REQUIRE( !!f_ext.new_proposer_policy_diff );
    fc::time_point t = (fc::time_point)(f_ext.new_proposer_policy_diff->proposal_time);
-   BOOST_REQUIRE_EQUAL(t.time_since_epoch().to_seconds(), 946684900ll);
+   BOOST_REQUIRE_EQUAL(t.time_since_epoch().to_seconds(), config::block_timestamp_epoch/1000);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
