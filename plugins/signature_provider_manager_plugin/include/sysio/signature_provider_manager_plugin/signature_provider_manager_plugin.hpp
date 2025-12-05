@@ -6,9 +6,36 @@
 namespace sysio {
 
 using namespace appbase;
-struct signature_provider;
-using signature_provider_key_type  = std::variant<std::string, chain::public_key_type>;
+
+using signature_provider_id_t  = std::variant<std::string, chain::public_key_type>;
 using signature_provider_sign_fn = std::function<chain::signature_type(chain::digest_type)>;
+
+/**
+ * `signature_provider_entry` constructed provider
+ */
+struct signature_provider  {
+
+   /** The chain/key type */
+   fc::crypto::chain_kind_t target_chain;
+
+   /** The chain/key type */
+   fc::crypto::chain_key_type_t key_type;
+
+
+   /** The alias or name assigned to identify this key pair */
+   string key_name;
+
+
+   /** The public key component of this key pair */
+   fc::crypto::public_key public_key;
+
+
+
+   signature_provider_sign_fn sign;
+};
+
+using signature_provider_ptr = std::shared_ptr<signature_provider>;
+
 
 /**
  * Plugin responsible for managing signature providers.
@@ -34,7 +61,7 @@ public:
     * @param spec string spec described in source
     * @return a signature provider
     */
-   signature_provider& create_provider(const std::string& spec);
+   signature_provider_ptr create_provider(const std::string& spec);
 
    /**
     * Create a key without parsing a spec
@@ -46,20 +73,20 @@ public:
     * @param key_name
     * @return
     */
-   signature_provider&
+   signature_provider_ptr
    create_provider(
       const std::string&         key_name,
-      fc::crypto::chain_kind     target_chain,
-      fc::crypto::chain_key_type key_type,
+      fc::crypto::chain_kind_t     target_chain,
+      fc::crypto::chain_key_type_t key_type,
       const std::string&         public_key_text,
       const std::string&         private_key_provider_spec
 
       );
 
-   signature_provider&
+   signature_provider_ptr
    create_kiod_provider(
-      fc::crypto::chain_kind target_chain,
-      fc::crypto::chain_key_type key_type,
+      fc::crypto::chain_kind_t target_chain,
+      fc::crypto::chain_key_type_t key_type,
       std::string public_key_text,
       std::string url,
       const std::string& key_name
@@ -78,7 +105,7 @@ public:
     * @param key public key or key name to check for existence of a signature provider
     * @return true if provider exists, false otherwise
     */
-   bool has_provider(const signature_provider_key_type& key);
+   bool has_provider(const signature_provider_id_t& key);
 
    /**
     * Get a provider by public key or key name
@@ -86,7 +113,7 @@ public:
     * @param key to lookup provider
     * @return provider if found, otherwise assert/throw
     */
-   signature_provider& get_provider(const signature_provider_key_type& key);
+   signature_provider_ptr get_provider(const signature_provider_id_t& key);
 
    /**
     * List all existing registered signature providers,
@@ -94,35 +121,38 @@ public:
     *
     * @return list of available signature providers
     */
-   std::vector<std::pair<std::string,chain::public_key_type>> list_providers();
+   std::vector<signature_provider_ptr> query_providers(
+      const std::optional<signature_provider_id_t>& id_opt = std::nullopt,
+      std::optional<fc::crypto::chain_kind_t> target_chain = std::nullopt
+      );
 private:
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;
 };
 
 /**
- * `signature_provider_entry` constructed provider
+ * @brief Get a signature provider
+ *
+ * if exactly 1 provider matches, it will be returned, otherwise throws
+ *
+ * @param query
+ * @param target_chain
+ * @return if exactly 1 provider matches, it will be returned, otherwise throws
  */
-struct signature_provider  {
+signature_provider_ptr get_signature_provider(
+   const signature_provider_id_t& id,
+   std::optional<fc::crypto::chain_kind_t> target_chain = std::nullopt
+);
 
-   /** The chain/key type */
-   fc::crypto::chain_kind target_chain;
-
-   /** The chain/key type */
-   fc::crypto::chain_key_type key_type;
-
-
-   /** The alias or name assigned to identify this key pair */
-   string key_name;
-
-
-   /** The public key component of this key pair */
-   fc::crypto::public_key public_key;
-
-
-
-   signature_provider_sign_fn sign;
-};
-
-
+/**
+ * @brief Query signature providers
+ *
+ * @param query
+ * @param target_chain
+ * @return list of matching signature providers
+ */
+std::vector<signature_provider_ptr> query_signature_providers(
+   const std::optional<signature_provider_id_t>& id_opt = std::nullopt,
+   std::optional<fc::crypto::chain_kind_t> target_chain = std::nullopt
+);
 
 }

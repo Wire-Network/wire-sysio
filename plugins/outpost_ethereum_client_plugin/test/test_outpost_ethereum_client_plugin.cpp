@@ -20,7 +20,8 @@ namespace {
 BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
 
   BOOST_AUTO_TEST_CASE(init_plugin) try {
-   BOOST_CHECK(1 > 0);
+    std::println(std::cerr, "This works");
+    BOOST_CHECK(1 > 0);
   } FC_LOG_AND_RETHROW();
 
 

@@ -70,7 +70,7 @@ namespace fc::crypto {
          friend class private_key;
    }; // public_key
 
-   chain_key_type get_public_key_type(const std::variant<std::string, public_key>& pub_key_var);
+   chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var);
 
 } // fc::crypto
 

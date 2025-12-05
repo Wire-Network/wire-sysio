@@ -1,0 +1,10 @@
+{
+  "key_name": "ethereum-02",
+  "chain_type": "ethereum",
+  "chain_key_type": "ethereum",
+  "private_key": "0x07b1f3360f3b4fec0fd1ead322991c2ccbf891b904e7be0db1027794cfd5cad9",
+  "public_key": "0xb7c30a29f51475159871ed93f634affb638d2b310fea39bb12300bea9b757a125f82607d24c378fbf878b927b3e26fa7d0978baf2ea28e4f44fbb1d2e6945f41",
+  "address": "0x3b1598b6127fd645dd8a8d1f904ab75fc61582ea",
+  "signature": "08e2dbc04f6623a35432720a4e0eb85cb890f4814c786b3652b339f4e302723a10bb435efb321a2a26befb6780874742f3dde159d1f68212666ec0264631b5e11c",
+  "payload": "simple-text-payload"
+}

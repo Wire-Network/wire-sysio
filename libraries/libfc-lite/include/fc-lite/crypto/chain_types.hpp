@@ -4,7 +4,7 @@
 #include <utility>
 namespace fc::crypto {
 
-enum chain_kind : uint8_t {
+enum chain_kind_t : uint8_t {
    chain_kind_unknown = 0,
    chain_kind_wire = 1,
    chain_kind_ethereum = 2,
@@ -12,7 +12,7 @@ enum chain_kind : uint8_t {
    chain_kind_sui = 4,
 };
 
-enum chain_key_type : uint8_t {
+enum chain_key_type_t : uint8_t {
    chain_key_type_unknown = 0,
    chain_key_type_wire = 1,
    chain_key_type_ethereum = 2,
@@ -48,7 +48,7 @@ constexpr auto chain_public_key_types = std::tuple{
    std::pair{chain_kind_sui,      std::pair{chain_key_type_sui, key_size_ed25519}      },
 };
 
-// fc::lut<chain_kind, std::pair<chain_key_type, std::size_t>, chain_kind_count>
+// fc::lut<chain_kind_t, std::pair<chain_key_type_t, std::size_t>, chain_kind_count>
 constexpr auto chain_address_sizes = std::tuple{
    std::pair{chain_kind_unknown,       std::pair{chain_key_type_unknown, chain_key_type_unknown}  },
    std::pair{chain_kind_wire,     std::pair{chain_key_type_wire, chain_key_type_wire}        },

@@ -3,7 +3,7 @@
     "version": "sysio::abi/1.2",
     "types": [
         {
-            "new_type_name": "chain_kind",
+            "new_type_name": "chain_kind_t",
             "type": "uint8"
         }
     ],
@@ -42,7 +42,7 @@
             "fields": [
                 {
                     "name": "kind",
-                    "type": "chain_kind"
+                    "type": "chain_kind_t"
                 },
                 {
                     "name": "delta",

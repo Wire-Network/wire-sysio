@@ -480,7 +480,7 @@ public:
    bool                                  _pause_production   = false;
 
    using signature_provider_type = signature_provider_sign_fn;
-   std::map<chain::public_key_type, signature_provider> _signature_providers;
+   std::map<chain::public_key_type, signature_provider_ptr> _signature_providers;
    std::set<chain::account_name>                             _producers;
    boost::asio::deadline_timer                               _timer;
    block_timing_util::producer_watermarks            _producer_watermarks;
@@ -957,7 +957,7 @@ public:
 
          auto sig_provider = _signature_providers.at(key);
 
-         return sig_provider.sign(digest);
+         return sig_provider->sign(digest);
       } else {
          return chain::signature_type();
       }
@@ -1132,7 +1132,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
       for (const auto& key_spec_pair : key_spec_pairs) {
          try {
             const auto entry = sig_plug.create_provider(key_spec_pair);
-            _signature_providers[entry.public_key] = entry;
+            _signature_providers[entry->public_key] = entry;
          } catch(secure_enclave_exception& e) {
             elog("Error with Secure Enclave signature provider: ${e}; ignoring ${val}", ("e", e.top_message())("val", key_spec_pair));
          } catch (fc::exception& e) {
@@ -2467,7 +2467,7 @@ void producer_plugin_impl::produce_block() {
               "pending_block_state does not exist but it should, another plugin may have corrupted it");
 
    const auto&                                                        auth = chain.pending_block_signing_authority();
-   std::vector<std::reference_wrapper<const signature_provider>> relevant_providers;
+   std::vector<signature_provider_ptr> relevant_providers;
 
    relevant_providers.reserve(_signature_providers.size());
 
@@ -2495,7 +2495,7 @@ void producer_plugin_impl::produce_block() {
 
       // sign with all relevant public keys
       for (const auto& p : relevant_providers) {
-         sigs.emplace_back(p.get().sign(d));
+         sigs.emplace_back(p.get()->sign(d));
       }
       return sigs;
    });

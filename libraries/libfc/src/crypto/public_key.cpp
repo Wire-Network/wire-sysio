@@ -84,7 +84,7 @@ namespace fc { namespace crypto {
       }
    }
 
-   chain_key_type get_public_key_type(const std::variant<std::string, public_key>& pub_key_var) {
+   chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var) {
       if (std::holds_alternative<public_key>(pub_key_var)) {
          auto pub_key = std::get<public_key>(pub_key_var);
          if (!pub_key.valid())

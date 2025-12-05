@@ -165,7 +165,7 @@ struct message_balance_sheet : message_base, std::enable_shared_from_this<messag
    constexpr static auto asset_size = sizeof(ASSET_TYPE);
    static_assert(asset_size == sizeof(uint128_t), "Asset size is not 16 bytes");
 
-   chain_kind         chain{chain_kind_unknown};
+   chain_kind_t         chain{chain_kind_unknown};
    std::vector<ASSET_TYPE> assets{};
 
    bool unpack(META_DATASTREAM* ds) override;
@@ -178,12 +178,12 @@ struct message_balance_sheet : message_base, std::enable_shared_from_this<messag
 };
 
 struct message_swap : message_base, std::enable_shared_from_this<message_swap> {
-   chain_kind source_chain{chain_kind_unknown};
+   chain_kind_t source_chain{chain_kind_unknown};
    ASSET_TYPE source_amount{};
 
    uint64_t divisor{};
 
-   chain_kind target_chain{chain_kind_unknown};
+   chain_kind_t target_chain{chain_kind_unknown};
    ASSET_TYPE target_amount{};
 
    bool unpack(META_DATASTREAM* ds) override;

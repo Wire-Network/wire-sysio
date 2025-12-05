@@ -1,0 +1,10 @@
+{
+  "key_name": "solana-01",
+  "chain_type": "solana",
+  "chain_key_type": "solana",
+  "private_key": "0x0d1febb69241b4ae0727e1b0cd1b74a390df78ede1b3eb0227d0b96e504f4c50",
+  "public_key": "0xe104c7a4ca837b430087154dd242978e201310f338501e066f118e594e500b52",
+  "address": "G9NxeBExRJJdNVd4kcgXdAyEScKoZoBLFGBwZz3TnGJu",
+  "payload": "simple-text-payload",
+  "signature": "0x712bbdf51f5196eee367c360c3a95d2070d3290ad644555da379c0a957c545932c2f19d91b202ffb9cd5e0beb2a36bcb3109091c3bd0db7a36747e16d0534e00"
+}

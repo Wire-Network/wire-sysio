@@ -258,7 +258,9 @@ template<> struct get_typename<ENUM>  { static const char* name()  { return BOOS
    case enum_type::elem: { \
       std::string s(BOOST_PP_STRINGIZE(elem)); \
       if (strip_base_enum) { \
-         std::string b(BOOST_PP_STRINGIZE(enum_type) "_" ); \
+         std::string b(BOOST_PP_STRINGIZE(enum_type)); \
+         if (b.ends_with("_t")) b = b.substr(0, b.length() - 2); \
+         b += "_"; \
          auto last_split_pos = b.find_last_of("::"); \
          if (last_split_pos != b.npos) {\
             b = b.substr(last_split_pos + 1); \
@@ -273,7 +275,9 @@ template<> struct get_typename<ENUM>  { static const char* name()  { return BOOS
       if( strcmp( s, BOOST_PP_STRINGIZE(elem)  ) == 0 ) return enum_type::elem; \
       std::string str(s); \
       if (strip_base_enum) { \
-         std::string b(BOOST_PP_STRINGIZE(enum_type) "_" ); \
+         std::string b(BOOST_PP_STRINGIZE(enum_type)); \
+         if (b.ends_with("_t")) b = b.substr(0, b.length() - 2); \
+         b += "_"; \
          auto last_split_pos = b.find_last_of("::"); \
          if (last_split_pos != b.npos) {\
             b = b.substr(last_split_pos + 1); \

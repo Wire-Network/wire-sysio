@@ -24,6 +24,7 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(build-init NO_POLICY_SCOPE)
 include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)

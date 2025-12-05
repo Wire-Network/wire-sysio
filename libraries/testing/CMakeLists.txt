@@ -15,6 +15,8 @@ endif()
 add_subdirectory(contracts)
 file(GLOB HEADERS "include/sysio/testing/*.hpp")
 
+# TODO: move src files to subdirectory `src` and then make this GLOB_RECURSIVE `src/*.cpp`
+file(GLOB SRC_FILES *.cpp)
 configure_file(contracts.hpp.in include/testing_contracts/contracts.hpp ESCAPE_QUOTES)
 add_library(sysio_testing_contracts INTERFACE)
 target_include_directories(sysio_testing_contracts INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include/testing_contracts)
@@ -23,8 +25,7 @@ configure_file(contracts.cpp.in contracts.cpp ESCAPE_QUOTES)
 
 ## SORT .cpp by most likely to change / break compile
 add_library(sysio_testing
-  tester.cpp
-  tester_network.cpp
+  ${SRC_FILES}
   ${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp
   ${HEADERS}
 )
