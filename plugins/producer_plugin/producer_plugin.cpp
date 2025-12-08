@@ -3074,6 +3074,7 @@ bool producer_plugin_impl::read_only_execution_task(uint32_t pending_block_num) 
       }
    }
 
+   fc_dlog(_log, "Exiting read_only_execution_task ${t}", ("t", _ro_num_active_exec_tasks.load()));
    // If all tasks are finished, do not wait until end of read window; switch to write window now.
    if (--_ro_num_active_exec_tasks == 0) {
       // Needs to be on read_only because that is what is being processed until switch_to_write_window().
