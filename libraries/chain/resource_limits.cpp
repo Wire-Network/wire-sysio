@@ -105,7 +105,7 @@ void resource_limits_manager::read_from_snapshot( const snapshot_reader_ptr& sna
    });
 }
 
-void resource_limits_manager::initialize_account(const account_name& account, bool is_trx_transient) {
+int64_t resource_limits_manager::initialize_account(const account_name& account, bool is_trx_transient) {
    const auto& usage = _db.create<resource_object>([&]( resource_object& bl ) {
       bl.owner = account;
    });
@@ -113,6 +113,8 @@ void resource_limits_manager::initialize_account(const account_name& account, bo
    if (auto dm_logger = _get_deep_mind_logger(is_trx_transient)) {
       dm_logger->on_newaccount_resource_limits(usage);
    }
+
+   return config::billable_size<resource_object>::value + config::billable_size<resource_pending_object>::value;
 }
 
 void resource_limits_manager::set_block_parameters(const elastic_limit_parameters& cpu_limit_parameters, const elastic_limit_parameters& net_limit_parameters ) {

@@ -1766,32 +1766,36 @@ struct controller_impl {
    }
 
    void create_native_account( const fc::time_point& initial_timestamp, account_name name, const authority& owner, const authority& active, bool is_privileged = false ) {
+      int64_t ram_delta = 0;
       db.create<account_object>([&](auto& a) {
          a.name = name;
          a.creation_date = initial_timestamp;
       });
-      db.create<account_metadata_object>([&](auto & a) {
-         a.name = name;
-         a.set_privileged( is_privileged );
+      ram_delta += config::billable_size_v<account_object>;
 
-         if( name == config::system_account_name ) {
-            a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
-         }
-      });
+      if (is_privileged) {
+         db.create<account_metadata_object>([&](auto & a) {
+            a.name = name;
+            a.set_privileged( is_privileged );
+
+            if( name == config::system_account_name ) {
+               a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
+               ram_delta += sizeof(sysio_abi_bin);
+            }
+         });
+         ram_delta += config::billable_size_v<account_metadata_object>;
+      }
 
       const auto& owner_permission  = authorization.create_permission(name, config::owner_name, 0,
                                                                       owner, false, initial_timestamp );
       const auto& active_permission = authorization.create_permission(name, config::active_name, owner_permission.id,
                                                                       active, false, initial_timestamp );
 
-      resource_limits.initialize_account(name, false);
-
-      int64_t ram_delta = config::overhead_per_account_ram_bytes;
-      ram_delta += 2*config::billable_size_v<permission_object>;
+      ram_delta += 2 * config::billable_size_v<permission_object>;
       ram_delta += owner_permission.auth.get_billable_size();
       ram_delta += active_permission.auth.get_billable_size();
-      if( name == config::system_account_name ) // see above
-         ram_delta += sizeof(sysio_abi_bin);
+
+      ram_delta += resource_limits.initialize_account(name, false);
 
       // This is only called at startup, no transaction specific logging is possible
       if (auto dm_logger = get_deep_mind_logger(false)) {
