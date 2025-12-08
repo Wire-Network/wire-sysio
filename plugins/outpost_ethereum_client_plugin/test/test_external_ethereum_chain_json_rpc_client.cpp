@@ -18,7 +18,7 @@ namespace {
 
 }
 
-BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
+BOOST_AUTO_TEST_SUITE(external_ethereum_chain_json_rpc_client)
 
   BOOST_AUTO_TEST_CASE(init_plugin) try {
     std::println(std::cerr, "This works");

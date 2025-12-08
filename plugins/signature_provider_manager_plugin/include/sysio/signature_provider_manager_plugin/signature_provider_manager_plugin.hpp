@@ -1,14 +1,17 @@
 #pragma once
 #include <sysio/chain/application.hpp>
 #include <sysio/http_client_plugin/http_client_plugin.hpp>
-#include <sysio/chain/types.hpp>
+#include <fc/crypto/chain_types_reflect.hpp>
+#include <fc/crypto/private_key.hpp>
+#include <fc/crypto/public_key.hpp>
+#include <fc/crypto/signature.hpp>
 
 namespace sysio {
 
 using namespace appbase;
 
-using signature_provider_id_t  = std::variant<std::string, chain::public_key_type>;
-using signature_provider_sign_fn = std::function<chain::signature_type(chain::digest_type)>;
+using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
+using signature_provider_sign_fn = std::function<fc::crypto::signature(fc::sha256)>;
 
 /**
  * `signature_provider_entry` constructed provider
@@ -97,7 +100,7 @@ public:
     * @param priv private key to use
     * @return an anonymous signature provider
     */
-   signature_provider_sign_fn create_anonymous_provider_from_private_key(chain::private_key_type priv) const;
+   signature_provider_sign_fn create_anonymous_provider_from_private_key(fc::crypto::private_key priv) const;
 
    /**
     * Check for the existence of a provider

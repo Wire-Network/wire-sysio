@@ -11,19 +11,18 @@ namespace sysio::outpost_client {
 
 using payload_default_t = std::variant<std::string, fc::bytes>;
 
-template<fc::crypto::chain_kind_t TargetChain,
+template<
+fc::crypto::chain_kind_t TargetChain,
 typename MessageType,
 typename DigestType = fc::sha256,
 typename PayloadType = payload_default_t
 >
-
 class outpost_client
 {
 protected:
    sysio::signature_provider_ptr  _signing_provider;
 
 public:
-   using target_chain_kind = TargetChain;
    using action_payload_type = PayloadType;
 
    constexpr static auto target_chain = TargetChain;
@@ -31,10 +30,10 @@ public:
    explicit outpost_client(std::shared_ptr<sysio::signature_provider> signing_provider) : _signing_provider(signing_provider) {}
 
    explicit outpost_client(const signature_provider_id_t& sig_provider_query) :
-   _signing_provider(sysio::signature_provider_manager_plugin::get_signature_provider(sig_provider_query)) {}
+   _signing_provider(sysio::get_signature_provider(sig_provider_query)) {}
 
    virtual ~outpost_client() = default;
-   virtual fc::transaction sign_and_send(PayloadType payload) = 0;
+   // virtual fc::transaction_t sign_and_send(PayloadType payload) = 0;
 
 protected:
    virtual MessageType send_message(MessageType message) = 0;

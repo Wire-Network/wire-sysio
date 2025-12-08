@@ -21,3 +21,4 @@ add_subdirectory(prometheus_plugin)
 
 add_subdirectory(outpost_client_plugin)
 add_subdirectory(outpost_ethereum_client_plugin)
+add_subdirectory(outpost_solana_client_plugin)

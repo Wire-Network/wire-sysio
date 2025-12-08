@@ -6,8 +6,12 @@
 #include <fc/network/url.hpp>
 #include <fc/time.hpp>
 #include <ranges>
+
+#include <sysio/chain/types.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <sysio/http_client_plugin/http_client_plugin.hpp>
+
 
 namespace sysio {
 namespace {

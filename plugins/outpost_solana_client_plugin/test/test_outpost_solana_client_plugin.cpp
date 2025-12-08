@@ -6,19 +6,18 @@
 #include <optional>
 #include <set>
 
-#include <sysio/outpost_client/ethereum/external_ethereum_chain_json_rpc_client.hpp>
-#include <sysio/outpost_ethereum_client_plugin.hpp>
-#include <sysio/outpost_client/ethereum/ethereum_client.hpp>
+#include <sysio/outpost_solana_client_plugin.hpp>
+#include <sysio/outpost_client/solana/solana_client.hpp>
 
 using namespace std::literals;
 using namespace sysio::outpost_client;
-using namespace sysio::outpost_client::ethereum;
+using namespace sysio::outpost_client::solana;
 
 namespace {
 
 }
 
-BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
+BOOST_AUTO_TEST_SUITE(outpost_solana_client_plugin)
 
   BOOST_AUTO_TEST_CASE(init_plugin) try {
     std::println(std::cerr, "This works");

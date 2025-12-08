@@ -1,5 +1,5 @@
 #pragma once
-#include <fc/fwd.hpp>
+#include<fc/fwd.hpp>
 #include <fc/string.hpp>
 #include <fc/platform_independence.hpp>
 #include <fc/io/raw_fwd.hpp>
@@ -104,7 +104,7 @@ class sha256
     uint64_t _hash[4];
 };
 
-  typedef sha256 uint256;
+  // typedef sha256 uint256;
 
   class variant;
   void to_variant( const sha256& bi, variant& v );
