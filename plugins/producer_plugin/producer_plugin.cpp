@@ -3042,14 +3042,15 @@ void producer_plugin_impl::switch_to_read_window() {
       app().executor().post(priority::high, exec_queue::read_only, [this, ec]() {
          if (ec != boost::asio::error::operation_aborted) {
             // tests have seen to deadlock here, unable to reproduce so add a guard for it, also so we can log
-            const fc::time_point safe_guard_deadline = _ro_window_deadline + _ro_read_window_minimum_time_us;
+            const fc::time_point safe_guard_deadline = _ro_window_deadline + _ro_read_window_effective_time_us; // give plenty of time
             std::chrono::time_point<std::chrono::system_clock> deadline{std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
             // use future to make sure all read-only tasks finished before switching to write window
             for (auto& task : _ro_exec_tasks_fut) {
                if (std::future_status::timeout != task.wait_until(deadline)) {
                   task.get();
                } else {
-                  fc_elog(_log, "read-only execution task timed out, deadline ${d}, stack: ${s}", ("d", safe_guard_deadline));
+                  fc_elog(_log, "read-only execution task timed out, read only deadline ${rod}, waited until deadline ${d}",
+                     ("rod", _ro_window_deadline)("d", safe_guard_deadline));
                }
             }
          }
