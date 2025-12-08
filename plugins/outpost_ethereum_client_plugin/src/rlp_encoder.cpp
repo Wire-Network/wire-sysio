@@ -124,4 +124,83 @@ bytes rlp::from_hex_noprefix(const std::string& hex) {
    }
    return out;
 }
+
+bytes rlp::from_hex_any(const std::string& hex) {
+   if (hex.starts_with("0x") || hex.starts_with("0X")) {
+      return from_hex_noprefix(hex.substr(2));
+   }
+   return from_hex_noprefix(hex);
+}
+
+bytes rlp::encode_eip1559_unsigned(const eip1559_tx& tx) {
+   bytes to_bytes   = tx.to; // size 0 or 20
+   bytes data_bytes = tx.data;
+
+   bytes access_list_rlp = rlp::encode_list({}); // empty list => 0xc0
+
+   // TODO: Encode `tx.access_list`
+   return rlp::encode_list({
+      rlp::encode_uint(tx.chain_id),
+     rlp::encode_uint(tx.nonce),
+     rlp::encode_uint(tx.max_priority_fee_per_gas),
+     rlp::encode_uint(tx.max_fee_per_gas),
+     rlp::encode_uint(tx.gas_limit),
+     rlp::encode_bytes(to_bytes),
+     rlp::encode_uint(tx.value),
+     rlp::encode_bytes(data_bytes),
+     access_list_rlp
+   });
+}
+
+bytes rlp::encode_eip1559_signed(const eip1559_tx& tx, std::uint8_t y_parity, std::span<const std::uint8_t, 32> r,
+                                 std::span<const std::uint8_t, 32> s) {
+   bytes to_bytes   = tx.to;
+   bytes data_bytes = tx.data;
+
+   // TODO: Encode `tx.access_list`
+   bytes access_list_rlp = rlp::encode_list({});
+
+   // r/s are raw 32-byte big-endian scalars
+   bytes r_bytes(r.begin(), r.end());
+   bytes s_bytes(s.begin(), s.end());
+
+   bytes y_parity_bytes = rlp::encode_uint(static_cast<std::uint64_t>(y_parity));
+
+   return rlp::encode_list({
+      rlp::encode_uint(tx.chain_id),
+      rlp::encode_uint(tx.nonce),
+      rlp::encode_uint(tx.max_priority_fee_per_gas),
+      rlp::encode_uint(tx.max_fee_per_gas),
+      rlp::encode_uint(tx.gas_limit),
+      rlp::encode_bytes(to_bytes),
+      rlp::encode_uint(tx.value),
+      rlp::encode_bytes(data_bytes),
+      access_list_rlp,
+      y_parity_bytes,
+      rlp::encode_bytes(r_bytes),
+      rlp::encode_bytes(s_bytes)
+   });
+}
+
+bytes rlp::encode_eip1559_signed_typed(const eip1559_tx& tx, std::uint8_t y_parity, std::span<const std::uint8_t, 32> r,
+                                       std::span<const std::uint8_t, 32> s) {
+   bytes body = encode_eip1559_signed(tx, y_parity, r, s);
+   bytes out;
+   out.reserve(1 + body.size());
+   out.push_back(0x02);
+   out.insert(out.end(), body.begin(), body.end());
+   return out;
+}
+
+std::string rlp::build_eth_send_raw_transaction_json(const bytes& signed_tx, std::uint32_t id) {
+   std::string hex = rlp::to_hex_prefixed(signed_tx);
+
+   std::ostringstream oss;
+   oss << R"({"jsonrpc":"2.0","id":)"
+      << id
+      << R"(,"method":"eth_sendRawTransaction","params":[")"
+      << hex
+      << R"("]})";
+   return oss.str();
+}
 }

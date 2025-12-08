@@ -27,12 +27,24 @@ BOOST_AUTO_TEST_CASE(encode_be_numbers_to_bytes) try {
       0x0000000000000003,
       0x3000000000000000
    };
-
+   // TODO: Write proper tests
    auto encoded_values = values | std::views::transform([](const auto& v) { return rlp::encode_uint(v); })
-                         | std::ranges::to<std::vector<bytes>>();
+                         | std::ranges::to<std::vector>();
 
 
    BOOST_CHECK(encoded_values.size() == values.size());
+
+   eip1559_tx tx{
+      .chain_id = 1,
+      .nonce = 1,
+      .max_priority_fee_per_gas = 1,
+      .max_fee_per_gas = 1,
+      .gas_limit = 1,
+      .to = {},
+      .value = 1,
+      .data = {},
+      .access_list = {}
+   };
 } FC_LOG_AND_RETHROW();
 
 
