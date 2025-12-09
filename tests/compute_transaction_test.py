@@ -55,7 +55,7 @@ try:
 
     Print("Stand up cluster")
     extraNodeopArgs=" --http-max-response-time-ms 990000 --disable-subjective-api-billing false "
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, topo=topo, delay=delay,extraNodeopArgs=extraNodeopArgs ) is False:
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, activateIF=True, topo=topo, delay=delay,extraNodeopArgs=extraNodeopArgs ) is False:
        errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")
@@ -100,6 +100,10 @@ try:
     }
 
     results = node.pushTransaction(trx, opts='--dry-run', permissions=account1.name)
+    assert(results[0])
+
+    Print("Sending read-only transfer as action")
+    results = node.pushMessage('sysio.token', 'transfer', '{"from": "account1","to": "account2","quantity": "1.0001 SYS","memo": "act1"}', '--dry-run -p account1@active')
     assert(results[0])
     node.waitForLibToAdvance(30)
 

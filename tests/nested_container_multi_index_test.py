@@ -69,7 +69,7 @@ try:
             (pnodes, total_nodes-pnodes, topo, delay))
 
     Print("Stand up cluster")
-    if cluster.launch(pnodes=1, totalNodes=1) is False:
+    if cluster.launch(pnodes=1, totalNodes=1, activateIF=True) is False:
         errorExit("Failed to stand up sys cluster.")
 
     Print ("Wait for Cluster stabilization")

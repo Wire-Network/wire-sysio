@@ -314,8 +314,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
          }
 
          SYS_THROW(  protocol_feature_validation_exception,
-                     "Not all the builtin dependencies of the builtin protocol feature with codename '${codename}' and digest of ${digest} were satisfied.",
-                     ("missing_dependencies", missing_builtins_with_names)
+                     "Not all the builtin dependencies of the builtin protocol feature with codename '${codename}' and digest of ${digest} were satisfied. Missing dependencies: ${missing_dependencies}",
+                     ("codename", f.builtin_feature_codename)("digest",feature_digest)("missing_dependencies", missing_builtins_with_names)
          );
       }
 
@@ -695,22 +695,23 @@ Example protocol feature. No functionality is triggered by this protocol feature
          auto file_path = p / filename;
 
          SYS_ASSERT( !std::filesystem::exists( file_path ), plugin_exception,
-                     "Could not save builtin protocol feature with codename '${codename}' because a file at the following path already exists: ${path}",
+                     "Could not save builtin protocol feature with codename '${codename}' because a file at "
+                     "the following path already exists: ${path}",
                      ("codename", builtin_protocol_feature_codename( f.get_codename() ))
-                           ("path", file_path)
+                     ("path", file_path)
          );
 
          if( fc::json::save_to_file( f, file_path ) ) {
             ilog( "Saved default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
                   ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                        ("digest", feature_digest)
-                        ("path", file_path)
+                  ("digest", feature_digest)
+                  ("path", file_path)
             );
          } else {
             elog( "Error occurred while writing default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
                   ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                        ("digest", feature_digest)
-                        ("path", file_path)
+                  ("digest", feature_digest)
+                  ("path", file_path)
             );
          }
       };

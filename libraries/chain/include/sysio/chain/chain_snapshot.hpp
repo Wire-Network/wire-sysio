@@ -2,31 +2,18 @@
 
 #include <sysio/chain/exceptions.hpp>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
 struct chain_snapshot_header {
    /**
     * Version history
-    *   1: initial version
-    *   2: Updated chain snapshot for v1.8.0 initial protocol features release:
-    *         - Incompatible with version 1.
-    *         - Adds new indices for: protocol_state_object and account_ram_correction_object
-    *   3: Updated for v2.0.0 protocol features:
-    *         - forwards compatible with version 2
-    *         - WebAuthn keys
-    *         - wtmsig block siganatures: the block header state changed to include producer authorities and additional signatures
-    *         - removed genesis_state and added chain ID to global_property_object
-    *   4: Updated for v3.0.0 protocol features:
-    *         - forwards compatible with versions 2 and 3
-    *         - kv database
-    *         - Configurable wasm limits
-    *   5: Updated for v3.0.0 sys features:
-    *         - chain_config update
-    *   6: Updated for v3.1.0 release
+    *   1: initial WIRE version
     */
 
-   static constexpr uint32_t minimum_compatible_version = 6;
-   static constexpr uint32_t current_version = 6;
+   static constexpr uint32_t minimum_compatible_version = 1;
+   static constexpr uint32_t current_version = 1;
+
+   static constexpr uint32_t first_version_with_split_table_sections = 1;
 
    uint32_t version = current_version;
 
@@ -40,6 +27,6 @@ struct chain_snapshot_header {
    }
 };
 
-} }
+} // namespace sysio::chain
 
 FC_REFLECT(sysio::chain::chain_snapshot_header,(version))

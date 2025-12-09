@@ -83,6 +83,8 @@ struct block_position {
 
 struct get_status_request_v0 {};
 
+struct get_status_request_v1 : get_status_request_v0 {};
+
 struct get_status_result_v0 {
    block_position head                    = {};
    block_position last_irreversible       = {};
@@ -91,6 +93,11 @@ struct get_status_result_v0 {
    uint32_t       chain_state_begin_block = 0;
    uint32_t       chain_state_end_block   = 0;
    fc::sha256     chain_id                = {};
+};
+
+struct get_status_result_v1 : get_status_result_v0 {
+   uint32_t       finality_data_begin_block = 0;
+   uint32_t       finality_data_end_block   = 0;
 };
 
 struct get_blocks_request_v0 {
@@ -102,6 +109,10 @@ struct get_blocks_request_v0 {
    bool                        fetch_block            = false;
    bool                        fetch_traces           = false;
    bool                        fetch_deltas           = false;
+};
+
+struct get_blocks_request_v1 : get_blocks_request_v0 {
+   bool                        fetch_finality_data    = false;
 };
 
 struct get_blocks_ack_request_v0 {
@@ -121,8 +132,15 @@ struct get_blocks_result_v0 : get_blocks_result_base {
    std::optional<bytes>          deltas;
 };
 
-using state_request = std::variant<get_status_request_v0, get_blocks_request_v0, get_blocks_ack_request_v0>;
-using state_result  = std::variant<get_status_result_v0, get_blocks_result_v0>;
+struct get_blocks_result_v1 : get_blocks_result_v0 {
+   std::optional<bytes>          finality_data;
+};
+
+// remember to add new request & result messages to end so binary numbering remains fixed for clients that don't consume the given current ABI
+using state_request = std::variant<get_status_request_v0, get_blocks_request_v0, get_blocks_ack_request_v0, get_blocks_request_v1, get_status_request_v1>;
+using state_result  = std::variant<get_status_result_v0, get_blocks_result_v0, get_blocks_result_v1, get_status_result_v1>;
+using get_blocks_request = std::variant<get_blocks_request_v0, get_blocks_request_v1>;
+using get_blocks_result = std::variant<get_blocks_result_v0, get_blocks_result_v1>;
 
 } // namespace state_history
 } // namespace sysio
@@ -131,9 +149,13 @@ using state_result  = std::variant<get_status_result_v0, get_blocks_result_v0>;
 FC_REFLECT(sysio::state_history::table_delta, (struct_version)(name)(rows));
 FC_REFLECT(sysio::state_history::block_position, (block_num)(block_id));
 FC_REFLECT_EMPTY(sysio::state_history::get_status_request_v0);
+FC_REFLECT_DERIVED(sysio::state_history::get_status_request_v1, (sysio::state_history::get_status_request_v0), )
 FC_REFLECT(sysio::state_history::get_status_result_v0, (head)(last_irreversible)(trace_begin_block)(trace_end_block)(chain_state_begin_block)(chain_state_end_block)(chain_id));
+FC_REFLECT_DERIVED(sysio::state_history::get_status_result_v1, (sysio::state_history::get_status_result_v0), (finality_data_begin_block)(finality_data_end_block));
 FC_REFLECT(sysio::state_history::get_blocks_request_v0, (start_block_num)(end_block_num)(max_messages_in_flight)(have_positions)(irreversible_only)(fetch_block)(fetch_traces)(fetch_deltas));
+FC_REFLECT_DERIVED(sysio::state_history::get_blocks_request_v1, (sysio::state_history::get_blocks_request_v0), (fetch_finality_data));
 FC_REFLECT(sysio::state_history::get_blocks_ack_request_v0, (num_messages));
 FC_REFLECT(sysio::state_history::get_blocks_result_base, (head)(last_irreversible)(this_block)(prev_block)(block));
 FC_REFLECT_DERIVED(sysio::state_history::get_blocks_result_v0, (sysio::state_history::get_blocks_result_base), (traces)(deltas));
+FC_REFLECT_DERIVED(sysio::state_history::get_blocks_result_v1, (sysio::state_history::get_blocks_result_v0), (finality_data));
 // clang-format on

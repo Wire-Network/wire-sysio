@@ -3,6 +3,7 @@
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
+#include <sysio/chain_plugin/tracked_votes.hpp>
 
 #include <prometheus/counter.h>
 #include <prometheus/info.h>
@@ -64,7 +65,6 @@ struct catalog_type {
    };
    p2p_connection_metrics p2p_metrics;
 
-   // producer plugin
    prometheus::Family<Counter>& cpu_usage_us;
    prometheus::Family<Counter>& net_usage_us;
 
@@ -234,7 +234,7 @@ struct catalog_type {
       }
    }
 
-   void update(block_metrics& blk_metrics, const producer_plugin::speculative_block_metrics& metrics) {
+   void update(block_metrics& blk_metrics, const speculative_block_metrics& metrics) {
       blk_metrics.num_blocks_created.Increment(1);
       blk_metrics.current_block_num.Set(metrics.block_num);
       blk_metrics.block_total_time_us_block.Increment(metrics.block_total_time_us);
@@ -248,7 +248,7 @@ struct catalog_type {
       blk_metrics.block_other_time_us_block.Increment(metrics.block_other_time_us);
    }
 
-   void update(const producer_plugin::produced_block_metrics& metrics) {
+   void update(const produced_block_metrics& metrics) {
       unapplied_transactions_total.Increment(metrics.unapplied_transactions_total);
       subjective_bill_account_size_total.Increment(metrics.subjective_bill_account_size_total);
       trxs_produced_total.Increment(metrics.trxs_produced_total);
@@ -258,16 +258,17 @@ struct catalog_type {
       net_usage_us_produced_block.Increment(metrics.net_usage_us);
 
       update(produced_metrics, metrics);
+      update(speculative_metrics, metrics);
 
       last_irreversible.Set(metrics.last_irreversible);
       head_block_num.Set(metrics.head_block_num);
    }
 
-   void update(const producer_plugin::speculative_block_metrics& metrics) {
+   void update(const speculative_block_metrics& metrics) {
       update(speculative_metrics, metrics);
    }
 
-   void update(const producer_plugin::incoming_block_metrics& metrics) {
+   void update(const incoming_block_metrics& metrics) {
       trxs_incoming_total.Increment(metrics.trxs_incoming_total);
       blocks_incoming.Increment(1);
       cpu_usage_us_incoming_block.Increment(metrics.cpu_usage_us);
@@ -282,7 +283,7 @@ struct catalog_type {
 
    void update_prometheus_info() {
       info_details = info.Add({
-            {"server_version", chain_apis::itoh(static_cast<uint32_t>(app().version()))},
+            {"server_version", fc::itoh(static_cast<uint32_t>(app().version()))},
             {"chain_id", app().get_plugin<chain_plugin>().get_chain_id()},
             {"server_version_string", app().version_string()},
             {"server_full_version_string", app().full_version_string()},
@@ -310,16 +311,18 @@ struct catalog_type {
       });
 
       auto& producer = app().get_plugin<producer_plugin>();
-      producer.register_update_produced_block_metrics(
-          [&strand, this](const producer_plugin::produced_block_metrics& metrics) {
+      producer.register_update_speculative_block_metrics(
+              [&strand, this](const speculative_block_metrics& metrics) {
+                 boost::asio::post(strand,[metrics, this]() { update(metrics); });
+              });
+
+      auto& chain = app().get_plugin<chain_plugin>().chain();
+      chain.register_update_produced_block_metrics(
+          [&strand, this](const produced_block_metrics& metrics) {
              boost::asio::post(strand, [metrics, this]() { update(metrics); });
           });
-      producer.register_update_speculative_block_metrics(
-              [&strand, this](const producer_plugin::speculative_block_metrics& metrics) {
-                 boost::asio::post(strand, [metrics, this]() { update(metrics); });
-              });
-      producer.register_update_incoming_block_metrics(
-          [&strand, this](const producer_plugin::incoming_block_metrics& metrics) {
+      chain.register_update_incoming_block_metrics(
+          [&strand, this](const incoming_block_metrics& metrics) {
              boost::asio::post(strand, [metrics, this]() { update(metrics); });
           });
    }

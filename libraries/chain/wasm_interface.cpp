@@ -32,8 +32,9 @@
 
 namespace sysio { namespace chain {
 
-   wasm_interface::wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile)
-     : sysvmoc_tierup(sysvmoc_tierup), my( new wasm_interface_impl(vm, sysvmoc_tierup, d, data_dir, sysvmoc_config, profile) ) {}
+   wasm_interface::wasm_interface(vm_type vm, vm_oc_enable sysvmoc_tierup, const chainbase::database& d,
+                                  platform_timer& main_thread_timer, const std::filesystem::path data_dir, const sysvmoc::config& sysvmoc_config, bool profile)
+     : my( new wasm_interface_impl(vm, sysvmoc_tierup, d, main_thread_timer, data_dir, sysvmoc_config, profile) ) {}
 
    wasm_interface::~wasm_interface() {}
 
@@ -59,8 +60,10 @@ namespace sysio { namespace chain {
       //Hard: Kick off instantiation in a separate thread at this location
    }
 
-   void wasm_interface::code_block_num_last_used(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, const uint32_t& block_num) {
-      my->code_block_num_last_used(code_hash, vm_type, vm_version, block_num);
+   void wasm_interface::code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version,
+                                                 block_num_type first_used_block_num, block_num_type block_num_last_used)
+   {
+      my->code_block_num_last_used(code_hash, vm_type, vm_version, first_used_block_num, block_num_last_used);
    }
 
    void wasm_interface::current_lib(const uint32_t lib) {
@@ -70,33 +73,7 @@ namespace sysio { namespace chain {
    void wasm_interface::apply( const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version, apply_context& context ) {
       if (substitute_apply && substitute_apply(code_hash, vm_type, vm_version, context))
          return;
-#ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
-      if (my->sysvmoc && (sysvmoc_tierup == wasm_interface::vm_oc_enable::oc_all || context.should_use_sys_vm_oc())) {
-         const chain::sysvmoc::code_descriptor* cd = nullptr;
-         chain::sysvmoc::code_cache_base::get_cd_failure failure = chain::sysvmoc::code_cache_base::get_cd_failure::temporary;
-         try {
-            const bool high_priority = context.get_receiver().prefix() == chain::config::system_account_name;
-            cd = my->sysvmoc->cc.get_descriptor_for_code(high_priority, code_hash, vm_version, context.control.is_write_window(), failure);
-            if (test_disable_tierup)
-               cd = nullptr;
-         } catch (...) {
-            // swallow errors here, if SYS VM OC has gone in to the weeds we shouldn't bail: continue to try and run baseline
-            // In the future, consider moving bits of SYS VM that can fire exceptions and such out of this call path
-            static bool once_is_enough;
-            if (!once_is_enough)
-               elog("SYS VM OC has encountered an unexpected failure");
-            once_is_enough = true;
-         }
-         if (cd) {
-            if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
-               tlog("${a} speculatively executing ${h} with sys vm oc", ("a", context.get_receiver())("h", code_hash));
-            my->sysvmoc->exec->execute(*cd, *my->sysvmoc->mem, context);
-            return;
-         }
-      }
-#endif
-
-      my->get_instantiated_module(code_hash, vm_type, vm_version, context.trx_context)->apply(context);
+      my->apply( code_hash, vm_type, vm_version, context );
    }
 
    bool wasm_interface::is_code_cached(const digest_type& code_hash, const uint8_t& vm_type, const uint8_t& vm_version) const {
@@ -106,6 +83,10 @@ namespace sysio { namespace chain {
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
    bool wasm_interface::is_sys_vm_oc_enabled() const {
       return my->is_sys_vm_oc_enabled();
+   }
+
+   uint64_t wasm_interface::get_sys_vm_oc_compile_interrupt_count() const {
+      return my->get_sys_vm_oc_compile_interrupt_count();
    }
 #endif
 
@@ -124,7 +105,7 @@ std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
       runtime = sysio::chain::wasm_interface::vm_type::sys_vm;
    else if (s == "sys-vm-jit")
       runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
-   else if (s == "sys-vm-oc")
+   else if (s == "sys-vm-oc-forced")
       runtime = sysio::chain::wasm_interface::vm_type::sys_vm_oc;
    else
       in.setstate(std::ios_base::failbit);

@@ -12,6 +12,10 @@ namespace sysiosystem {
    system_contract::system_contract( name s, name code, datastream<const char*> ds )
    :native(s,code,ds),
     _producers(get_self(), get_self().value),
+    _finalizer_keys(get_self(), get_self().value),
+    _finalizers(get_self(), get_self().value),
+    _last_prop_finalizers(get_self(), get_self().value),
+    _fin_key_id_generator(get_self(), get_self().value),
     _global(get_self(), get_self().value)
    {
       _gstate  = _global.exists() ? _global.get() : get_default_parameters();
@@ -31,7 +35,7 @@ namespace sysiosystem {
       require_auth( get_self() );
 
       check( _gstate.max_ram_size < max_ram_size, "ram may only be increased" ); /// decreasing ram might result market maker issues
-      check( max_ram_size < 1024ll*1024*1024*1024*1024, "ram size is unrealistic large" );
+      check( max_ram_size < 1024ll*1024*1024*1024*1024, "ram size is unrealistic" );
       check( max_ram_size > _gstate.total_ram_bytes_reserved, "attempt to set max below reserved" );
 
       _gstate.max_ram_size = max_ram_size;

@@ -23,7 +23,7 @@ Print=Utils.Print
 errorExit=Utils.errorExit
 
 
-args = TestHelper.parse_args({"--dump-error-details","--keep-logs","-v","--leave-running",
+args = TestHelper.parse_args({"--activate-if","--dump-error-details","--keep-logs","-v","--leave-running",
                               "--wallet-port","--unshared"})
 Utils.Debug=args.v
 totalProducerNodes=4
@@ -32,6 +32,7 @@ totalNodes=totalProducerNodes+totalNonProducerNodes
 maxActiveProducers=3
 totalProducers=maxActiveProducers
 cluster=Cluster(unshared=args.unshared, keepRunning=args.leave_running, keepLogs=args.keep_logs)
+activateIF=args.activate_if
 dumpErrorDetails=args.dump_error_details
 walletPort=args.wallet_port
 
@@ -46,6 +47,8 @@ try:
     specificExtraNodeopArgs={}
     # producer nodes will be mapped to 0 through totalProducerNodes-1, so the number totalProducerNodes will be the non-producing node
     specificExtraNodeopArgs[totalProducerNodes]="--plugin sysio::test_control_api_plugin"
+    # test expects split network to advance with single producer
+    extraNodeopArgs=" --production-pause-vote-timeout-ms 0 "
 
     # ***   setup topogrophy   ***
 
@@ -53,6 +56,7 @@ try:
     # and the only connection between those 2 groups is through the bridge (node4)
     if cluster.launch(topo="./tests/bridge_for_fork_test_shape.json", pnodes=totalProducerNodes,
                       totalNodes=totalNodes, totalProducers=totalProducerNodes, loadSystemContract=False,
+                      activateIF=activateIF, biosFinalizer=False, extraNodeopArgs=extraNodeopArgs,
                       specificExtraNodeopArgs=specificExtraNodeopArgs) is False:
         Utils.cmdError("launcher")
         Utils.errorExit("Failed to stand up sysio cluster.")
@@ -70,7 +74,7 @@ try:
     prodNodes=[ prodNode0, prodNode1, prodNode2, prodNode3 ]
 
     prodA=prodNode0 # defproducera
-    prodD=prodNode3 # defproducerc
+    prodD=prodNode3 # defproducerd
 
     # ***   Identify a block where production is stable   ***
 
@@ -137,11 +141,11 @@ try:
     assert prodA.getIrreversibleBlockNum() > max(libProdABeforeKill, libProdDBeforeKill)
     assert prodD.getIrreversibleBlockNum() > max(libProdABeforeKill, libProdDBeforeKill)
 
-    logFile = Utils.getNodeDataDir(prodNode3.nodeId) + "/stderr.txt"
-    f = open(logFile)
-    contents = f.read()
-    if contents.count("3030001 unlinkable_block_exception: Unlinkable block") > (afterBlockNum-beforeBlockNum):  # a few are fine
-        errorExit(f"Node{prodNode3.nodeId} has more than {afterBlockNum-beforeBlockNum} unlinkable blocks: {logFile}.")
+    # instant finality does not drop late blocks, but can still get unlinkable when syncing and getting a produced block
+    allowedUnlinkableBlocks = afterBlockNum-beforeBlockNum
+    numUnlinkableBlocks = prodNode3.numUniqueUnlinkableBlocks()
+    if numUnlinkableBlocks > allowedUnlinkableBlocks:
+        errorExit(f"Node{prodNode3.nodeId} has {numUnlinkableBlocks} unlinkable blocks which is more than allowed {allowedUnlinkableBlocks}.")
 
     testSuccessful=True
 finally:

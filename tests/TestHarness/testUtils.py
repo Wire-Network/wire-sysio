@@ -17,6 +17,7 @@ import traceback
 import shutil
 import sys
 from pathlib import Path
+import threading
 
 # Fancy import to maintain compatibility with python 3.10
 try:
@@ -56,7 +57,9 @@ class BlockLogAction(EnumType):
 addEnum(BlockLogAction, "make_index")
 addEnum(BlockLogAction, "trim")
 addEnum(BlockLogAction, "smoke_test")
-addEnum(BlockLogAction, "return_blocks")
+addEnum(BlockLogAction, "return_blocks")              # returns both block log and fork_db blocks
+addEnum(BlockLogAction, "return_blocks_only_log")     # returns block log blocks
+addEnum(BlockLogAction, "return_blocks_only_fork_db") # returns fork_db blocks
 
 ###########################################################################################
 class Utils:
@@ -68,7 +71,7 @@ class Utils:
     SysClientPath=str(testBinPath / "clio")
     MiscSysClientArgs="--no-auto-kiod"
 
-    LeapClientPath=str(testBinPath / "sys-util")
+    SysioClientPath=str(testBinPath / "sys-util")
 
     SysWalletName="kiod"
     SysWalletPath=str(testBinPath / SysWalletName)
@@ -87,6 +90,8 @@ class Utils:
     ConfigDir=f"{DataPath}/"
 
     TimeFmt='%Y-%m-%dT%H:%M:%S.%f'
+    # lock to serialize writes to subprocess_results.log across threads
+    _check_output_lock = threading.Lock()
 
     @staticmethod
     def timestamp():
@@ -95,25 +100,22 @@ class Utils:
     @staticmethod
     def checkOutputFileWrite(time, cmd, output, error):
         stop=Utils.timestamp()
-        if not os.path.isdir(Utils.TestLogRoot):
-            if Utils.Debug: Utils.Print("TestLogRoot creating dir %s in dir: %s" % (Utils.TestLogRoot, os.getcwd()))
-            os.mkdir(Utils.TestLogRoot)
-        if not os.path.isdir(Utils.DataPath):
-            if Utils.Debug: Utils.Print("DataPath creating dir %s in dir: %s" % (Utils.DataPath, os.getcwd()))
-            os.mkdir(Utils.DataPath)
-        if not hasattr(Utils, "checkOutputFile"):
-            Utils.checkOutputFilename=f"{Utils.DataPath}/subprocess_results.log"
-            if Utils.Debug: Utils.Print("opening %s in dir: %s" % (Utils.checkOutputFilename, os.getcwd()))
-            Utils.checkOutputFile=open(Utils.checkOutputFilename,"w")
-        else:
-            Utils.checkOutputFile=open(Utils.checkOutputFilename,"a")
+        # Serialize concurrent writes and open file per write to avoid sharing closed handles
+        with Utils._check_output_lock:
+            os.makedirs(Utils.TestLogRoot, exist_ok=True)
+            os.makedirs(Utils.DataPath, exist_ok=True)
 
-        Utils.checkOutputFile.write(Utils.FileDivider + "\n")
-        Utils.checkOutputFile.write("start={%s}\n" % (time))
-        Utils.checkOutputFile.write("cmd={%s}\n" % (" ".join(cmd)))
-        Utils.checkOutputFile.write("cout={%s}\n" % (output))
-        Utils.checkOutputFile.write("cerr={%s}\n" % (error))
-        Utils.checkOutputFile.write("stop={%s}\n" % (stop))
+            # Ensure filename is set
+            if not hasattr(Utils, "checkOutputFilename"):
+                Utils.checkOutputFilename=f"{Utils.DataPath}/subprocess_results.log"
+
+            with open(Utils.checkOutputFilename, "a") as f:
+                f.write(Utils.FileDivider + "\n")
+                f.write("start={%s}\n" % (time))
+                f.write("cmd={%s}\n" % (" ".join(cmd)))
+                f.write("cout={%s}\n" % (output))
+                f.write("cerr={%s}\n" % (error))
+                f.write("stop={%s}\n" % (stop))
 
     @staticmethod
     def Print(*args, **kwargs):
@@ -166,15 +168,6 @@ class Utils:
         if trailingSlash:
            path=os.path.join(path, "")
         return path
-
-    @staticmethod
-    def rmNodeDataDir(ext, rmState=True, rmBlocks=True, rmStateHist=True):
-        if rmState:
-            shutil.rmtree(Utils.getNodeDataDir(ext, "state"))
-        if rmBlocks:
-            shutil.rmtree(Utils.getNodeDataDir(ext, "blocks"))
-        if rmStateHist:
-            shutil.rmtree(Utils.getNodeDataDir(ext, "state-history"), ignore_errors=True)
 
     @staticmethod
     def getNodeConfigDir(ext, relativeDir=None, trailingSlash=False):
@@ -324,7 +317,7 @@ class Utils:
     @staticmethod
     def runCmdArrReturnJson(cmdArr, trace=False, silentErrors=True):
         retStr=Utils.checkOutput(cmdArr)
-        return Utils.toJson(retStr)
+        return Utils.toJson(retStr, trace, silentErrors)
 
     @staticmethod
     def runCmdReturnStr(cmd, trace=False, ignoreError=False):
@@ -343,8 +336,8 @@ class Utils:
         return Utils.runCmdArrReturnJson(cmdArr, trace=trace, silentErrors=silentErrors)
 
     @staticmethod
-    def processLeapUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
-        cmd="%s %s" % (Utils.LeapClientPath, cmd)
+    def processSysioUtilCmd(cmd, cmdDesc, silentErrors=True, exitOnError=False, exitMsg=None):
+        cmd="%s %s" % (Utils.SysioClientPath, cmd)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if exitMsg is not None:
             exitMsg="Context: " + exitMsg
@@ -440,8 +433,14 @@ class Utils:
         blockLogActionStr=None
         returnType=ReturnType.raw
         if blockLogAction==BlockLogAction.return_blocks:
-            blockLogActionStr=" print-log --as-json-array "
-            returnType=ReturnType.json
+            blockLogActionStr = " print-log --as-json-array "
+            returnType = ReturnType.json
+        elif blockLogAction==BlockLogAction.return_blocks_only_log:
+            blockLogActionStr = " print-log --as-json-array --print-from=block_log "
+            returnType = ReturnType.json
+        elif blockLogAction==BlockLogAction.return_blocks_only_fork_db:
+            blockLogActionStr = " print-log --as-json-array --print-from=fork_db "
+            returnType = ReturnType.json
         elif blockLogAction==BlockLogAction.make_index:
             blockLogActionStr=" make-index "
         elif blockLogAction==BlockLogAction.trim:
@@ -451,7 +450,7 @@ class Utils:
         else:
             unhandledEnumType(blockLogAction)
 
-        cmd="%s block-log %s --blocks-dir %s  %s%s%s" % (Utils.LeapClientPath, blockLogActionStr, blockLogLocation, outputFileStr, firstStr, lastStr)
+        cmd="%s block-log %s --blocks-dir %s  %s%s%s" % (Utils.SysioClientPath, blockLogActionStr, blockLogLocation, outputFileStr, firstStr, lastStr)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         rtn=None
         try:
@@ -541,9 +540,9 @@ class Utils:
         return "comparison of %s type is not supported, context=%s" % (typeName,context)
 
     @staticmethod
-    def compareFiles(file1: str, file2: str):
-        f1 = open(file1)
-        f2 = open(file2)
+    def compareFiles(file1: str, file2: str, mode="r"):
+        f1 = open(file1, mode)
+        f2 = open(file2, mode)
 
         i = 0
         same = True

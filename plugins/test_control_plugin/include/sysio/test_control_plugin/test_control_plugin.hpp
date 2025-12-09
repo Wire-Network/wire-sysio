@@ -1,6 +1,7 @@
 #pragma once
 #include <sysio/chain/application.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/net_plugin/net_plugin.hpp>
 #include <fc/variant.hpp>
 #include <memory>
 
@@ -27,7 +28,24 @@ class read_write {
       using kill_node_on_producer_results = empty;
       kill_node_on_producer_results kill_node_on_producer(const kill_node_on_producer_params& params) const;
 
-   private:
+      struct throw_on_params {
+         std::string  signal;    // which signal handler to throw exception from
+         std::string  exception; // exception to throw
+      };
+      empty throw_on(const throw_on_params& params) const;
+
+      // produce a next block with `from` action replaced with `to` action
+      // requires Savanna to be active, this assumes blocks are is_proper_svnn_block
+      struct swap_action_params {
+         chain::name from;  // replace from action in block to `to` action
+         chain::name to;
+         fc::crypto::private_key trx_priv_key;
+         fc::crypto::private_key blk_priv_key;
+         bool shutdown = false; // shutdown node before next block
+      };
+      empty swap_action(const swap_action_params& params) const;
+
+private:
       test_control_ptr my;
 };
 
@@ -37,7 +55,7 @@ class read_write {
 
 class test_control_plugin : public plugin<test_control_plugin> {
 public:
-   APPBASE_PLUGIN_REQUIRES((chain_plugin))
+   APPBASE_PLUGIN_REQUIRES((chain_plugin)(net_plugin))
 
    test_control_plugin();
    test_control_plugin(const test_control_plugin&) = delete;
@@ -61,3 +79,5 @@ private:
 
 FC_REFLECT(sysio::test_control_apis::empty, )
 FC_REFLECT(sysio::test_control_apis::read_write::kill_node_on_producer_params, (producer)(where_in_sequence)(based_on_lib) )
+FC_REFLECT(sysio::test_control_apis::read_write::throw_on_params, (signal)(exception) )
+FC_REFLECT(sysio::test_control_apis::read_write::swap_action_params, (from)(to)(trx_priv_key)(blk_priv_key)(shutdown) )

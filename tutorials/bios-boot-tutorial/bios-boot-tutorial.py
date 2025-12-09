@@ -96,6 +96,7 @@ def startNode(nodeIndex, account):
     if not nodeIndex: otherOpts += (
         '    --plugin sysio::trace_api_plugin --trace-no-abis'
     )
+    # if SVN blsFinKeys 
     cmd = (
         args.nodeop +
         '    --max-irreversible-block-age -1'
@@ -128,6 +129,7 @@ def startNode(nodeIndex, account):
         '    --plugin sysio::producer_api_plugin'
         '    --plugin sysio::producer_plugin' +
         otherOpts)
+        # + blsFinKeys
     with open(dir + 'stderr', mode='w') as f:
         f.write(cmd + '\n\n')
     background(cmd + '    2>>' + dir + 'stderr')
@@ -170,6 +172,8 @@ def regProducers(b, e):
     for i in range(b, e):
         a = accounts[i]
         retry(args.clio + 'system regproducer ' + a['name'] + ' ' + a['pub'] + ' https://' + a['name'] + '.com' + '/' + a['pub'])
+
+#dfe regFinKeys(b, e): for i in range(b,e): a = account[i] reg fin key all point 8000
 
 def listProducers():
     run(args.clio + 'system listproducers')
@@ -266,7 +270,7 @@ def stepSetSystemContract():
         '-d \'{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}\'')
     sleep(3)
 
-    # install sysio.boot which supports the native actions and activate
+    # install sysio.bios which supports the native actions and activate
     # action that allows activating desired protocol features prior to 
     # deploying a system contract with more features such as sysio.bios
     # or sysio.system
@@ -289,6 +293,13 @@ def stepInitSystemContract():
     sleep(1)
 def stepCreateAccounts():
     createAccounts(0, len(accounts))
+
+def stepIssueAToken():
+    # issue tokens
+    if args.vaulta_contracts_dir:
+        run(args.cleos + 'push action core.vaulta init' + jsonArg(['10000000000.0000 A']) + ' -p core.vaulta')
+        sleep(1)
+    
 def stepRegProducers():
     regProducers(firstProducer, firstProducer + numProducers)
     sleep(1)
@@ -310,6 +321,8 @@ def stepLog():
 
 parser = argparse.ArgumentParser()
 
+# r reg fin keys 
+# f SVN clio --url $ENDPOINT push action sysio switchtosvnn '{}' -p sysio
 commands = [
     ('w', 'wallet',             stepStartWallet,            True,    "Start kiod, create wallet, fill with keys"),
     ('b', 'boot',               stepStartBoot,              True,    "Start boot node"),

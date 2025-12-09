@@ -38,15 +38,6 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    set_source_files_properties(webassembly/runtimes/sys-vm-oc/LLVMEmitIR.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    set_source_files_properties(webassembly/runtimes/sys-vm-oc/switch_stack_linux.s PROPERTIES COMPILE_FLAGS "-Wno-unused-command-line-argument")
 
-   if(LLVM_VERSION VERSION_LESS 7.1 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-      enable_language(ASM-LLVMWAR)
-      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar)
-      set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.llvmwar PROPERTIES COMPILE_FLAGS "--std=gnu++17")
-   else()
-      list(APPEND CHAIN_SYSVMOC_SOURCES webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp)
-      set_source_files_properties(webassembly/runtimes/sys-vm-oc/llvmWARshim.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
-   endif()
-
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit)
    include_directories(SYSTEM ${LLVM_INCLUDE_DIRS})
    add_definitions(${LLVM_DEFINITIONS})
@@ -80,15 +71,18 @@ set(CHAIN_WEBASSEMBLY_SOURCES
 
 ## SORT .cpp by most likely to change / break compile
 add_library( sysio_chain
-             merkle.cpp
              name.cpp
              action.cpp
              transaction.cpp
              block.cpp
+             block_handle.cpp
              block_header.cpp
-             block_header_state_legacy.cpp
-             block_state_legacy.cpp
+             block_header_state.cpp
+             block_state.cpp
+             finalizer.cpp
              fork_database.cpp
+             qc.cpp
+             finality_core.cpp
              controller.cpp
              authorization_manager.cpp
              resource_limits.cpp
@@ -132,6 +126,7 @@ add_library( sysio_chain
              symbol.cpp
              whitelisted_intrinsics.cpp
              thread_utils.cpp
+             peer_keys_db.cpp
              platform_timer_accuracy.cpp
              ${PLATFORM_TIMER_IMPL}
              ${HEADERS}
@@ -161,6 +156,7 @@ target_link_libraries(
   Boost::lockfree
   Boost::assign
   Boost::accumulators
+  atomic
 )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"

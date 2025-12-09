@@ -3,7 +3,7 @@
 #include <sysio/chain/types.hpp>
 #include <iterator>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
 class deep_mind_handler;
 
@@ -381,7 +381,7 @@ private:
 std::optional<builtin_protocol_feature> read_builtin_protocol_feature( const std::filesystem::path& p  );
 protocol_feature_set initialize_protocol_features( const std::filesystem::path& p, bool populate_missing_builtins = true );
 
-} } // namespace sysio::chain
+} // namespace sysio::chain
 
 FC_REFLECT(sysio::chain::protocol_feature_subjective_restrictions,
                (earliest_allowed_activation_time)(preactivation_required)(enabled))

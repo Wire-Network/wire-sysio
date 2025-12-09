@@ -130,173 +130,42 @@ inline void unpack( Stream& s, crypto::ed::private_key_shim& sk ) {
 
 namespace fc::crypto::ed {
 
-// sha256::encoder overloads
-inline sha256::encoder& operator<<(sha256::encoder& e, const crypto::ed::public_key_shim& pk) {
-   e.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-   return e;
-}
-
-inline sha256::encoder& operator<<(sha256::encoder& e, const crypto::ed::signature_shim& sig) {
-   e.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
-   return e;
-}
-
-// datastream<> overloads
-template<typename Storage, typename Enable>
-inline datastream<Storage, Enable>& operator<<(datastream<Storage, Enable>& ds, const crypto::ed::public_key_shim& pk) {
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const crypto::ed::public_key_shim& pk) {
    ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
-template<typename Storage, typename Enable>
-inline datastream<Storage, Enable>& operator>>(datastream<Storage, Enable>& ds, crypto::ed::public_key_shim& pk) {
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, crypto::ed::public_key_shim& pk) {
    ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
-template<typename Storage, typename Enable>
-inline datastream<Storage, Enable>& operator<<(datastream<Storage, Enable>& ds, const crypto::ed::signature_shim& sig) {
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const crypto::ed::signature_shim& sig) {
    ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
    return ds;
 }
 
-template<typename Storage, typename Enable>
-inline datastream<Storage, Enable>& operator>>(datastream<Storage, Enable>& ds, crypto::ed::signature_shim& sig) {
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, crypto::ed::signature_shim& sig) {
    ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
+   // pad the extra byte to zero so serialize() remains correct
    sig._data.data[crypto_sign_BYTES] = 0;
    return ds;
 }
 
-// std::ostream overloads
-inline std::ostream& operator<<(std::ostream& os, const crypto::ed::public_key_shim& pk) {
-   os.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-   return os;
-}
-
-inline std::ostream& operator<<(std::ostream& os, const crypto::ed::signature_shim& sig) {
-   os.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
-   return os;
-}
-
-// let raw::unpack(std::istream&, public_key_shim&) work:
-inline std::istream&
-operator>>(std::istream& is, crypto::ed::public_key_shim& pk) {
-   is.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-   return is;
-}
-
-// let raw::unpack(std::istream&, signature_shim&) work:
-inline std::istream&
-operator>>(std::istream& is, crypto::ed::signature_shim& sig) {
-   is.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
-   // pad the extra byte to zero so serialize() remains correct
-   sig._data.data[crypto_sign_BYTES] = 0;
-   return is;
-}
-
-inline cfile_datastream&
-operator>>( cfile_datastream& ds, crypto::ed::public_key_shim& pk ) {
-  ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-  return ds;
-}
-
-inline cfile_datastream&
-operator>>( cfile_datastream& ds, crypto::ed::signature_shim& sig ) {
-  ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
-  sig._data.data[crypto_sign_BYTES] = 0;
-  return ds;
-}
-
-// datastream<> overloads for ED private key shim
-template<typename Storage, typename Enable>
-inline datastream<Storage,Enable>& operator<<( datastream<Storage,Enable>& ds
-                                             , const crypto::ed::private_key_shim& sk ) {
+template <typename DataStream>
+DataStream& operator<<(DataStream& ds, const crypto::ed::private_key_shim& sk) {
    ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 
-template<typename Storage, typename Enable>
-inline datastream<Storage,Enable>& operator>>( datastream<Storage,Enable>& ds
-                                             , crypto::ed::private_key_shim& sk ) {
+template <typename DataStream>
+DataStream& operator>>(DataStream& ds, crypto::ed::private_key_shim& sk) {
    ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 
-// support for in‐memory mb_datastream<S>
-template<uint32_t S>
-inline mb_datastream<S>& operator<<( mb_datastream<S>& ds, const crypto::ed::public_key_shim& pk ) {
-    ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-    return ds;
-}
-template<uint32_t S>
-inline mb_datastream<S>& operator>>( mb_datastream<S>& ds, crypto::ed::public_key_shim& pk ) {
-    ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-    return ds;
-}
-template<uint32_t S>
-inline mb_datastream<S>& operator<<( mb_datastream<S>& ds, const crypto::ed::signature_shim& sig ) {
-    ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
-    return ds;
-}
-template<uint32_t S>
-inline mb_datastream<S>& operator>>( mb_datastream<S>& ds, crypto::ed::signature_shim& sig ) {
-    ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
-    // ensure the padding byte is zero
-    sig._data.data[crypto_sign_BYTES] = 0;
-    return ds;
-}
-template<uint32_t S>
-inline mb_datastream<S>& operator<<( mb_datastream<S>& ds, const crypto::ed::private_key_shim& sk ) {
-    ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
-    return ds;
-}
-template<uint32_t S>
-inline mb_datastream<S>& operator>>( mb_datastream<S>& ds, crypto::ed::private_key_shim& sk ) {
-    ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED public key shim
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator>>(mb_peek_datastream<S>& ds, crypto::ed::public_key_shim& pk) {
-    ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED signature shim
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator>>(mb_peek_datastream<S>& ds, crypto::ed::signature_shim& sig) {
-    ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
-    // Pad the extra byte
-    sig._data.data[crypto_sign_BYTES] = 0;
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED private key shim
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator>>(mb_peek_datastream<S>& ds, crypto::ed::private_key_shim& sk) {
-    ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED public key shim (write)
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator<<(mb_peek_datastream<S>& ds, const crypto::ed::public_key_shim& pk) {
-    ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED signature shim (write)
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator<<(mb_peek_datastream<S>& ds, const crypto::ed::signature_shim& sig) {
-    ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
-    return ds;
-}
-
-// mb_peek_datastream<> overloads for ED private key shim (write)
-template<uint32_t S>
-inline mb_peek_datastream<S>& operator<<(mb_peek_datastream<S>& ds, const crypto::ed::private_key_shim& sk) {
-    ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
-    return ds;
-}
 } // namespace fc::crypto::ed

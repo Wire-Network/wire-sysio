@@ -63,15 +63,19 @@ class replay_tester : public base_tester {
          control->applied_transaction().connect(on_applied_trx);
          control->startup( [](){}, []() { return false; }, genesis );
       });
+      apply_blocks();
    }
    using base_tester::produce_block;
 
-   signed_block_ptr produce_block(fc::microseconds skip_time = fc::milliseconds(config::block_interval_ms)) override {
-      return _produce_block(skip_time, false);
+   produce_block_result_t produce_block_ex(fc::microseconds skip_time = default_skip_time, bool no_throw = false) override {
+      return _produce_block(skip_time, false, no_throw);
    }
 
-   signed_block_ptr
-   produce_empty_block(fc::microseconds skip_time = fc::milliseconds(config::block_interval_ms)) override {
+   signed_block_ptr produce_block(fc::microseconds skip_time = default_skip_time, bool no_throw = false) override {
+      return produce_block_ex(skip_time, no_throw).block;
+   }
+
+   signed_block_ptr produce_empty_block(fc::microseconds skip_time = default_skip_time) override {
       unapplied_transactions.add_aborted(control->abort_block());
       return _produce_block(skip_time, true);
    }
@@ -83,16 +87,16 @@ class replay_tester : public base_tester {
 
 BOOST_AUTO_TEST_SUITE(restart_chain_tests)
 
-BOOST_AUTO_TEST_CASE(test_existing_state_without_block_log) {
-   tester chain;
+BOOST_AUTO_TEST_CASE_TEMPLATE( test_existing_state_without_block_log, T, testers ) {
+   T chain;
 
    std::vector<signed_block_ptr> blocks;
    blocks.push_back(chain.produce_block());
    blocks.push_back(chain.produce_block());
    blocks.push_back(chain.produce_block());
 
-   tester other;
-   for (auto new_block : blocks) {
+   T other;
+   for (const auto& new_block : blocks) {
       other.push_block(new_block);
    }
    blocks.clear();
@@ -108,21 +112,21 @@ BOOST_AUTO_TEST_CASE(test_existing_state_without_block_log) {
    blocks.push_back(chain.produce_block());
    chain.control->abort_block();
 
-   for (auto new_block : blocks) {
+   for (const auto& new_block : blocks) {
       other.push_block(new_block);
    }
 }
 
-BOOST_AUTO_TEST_CASE(test_restart_with_different_chain_id) {
-   tester chain;
+BOOST_AUTO_TEST_CASE_TEMPLATE( test_restart_with_different_chain_id, T, testers ) {
+   T chain;
 
    std::vector<signed_block_ptr> blocks;
    blocks.push_back(chain.produce_block());
    blocks.push_back(chain.produce_block());
    blocks.push_back(chain.produce_block());
 
-   tester other;
-   for (auto new_block : blocks) {
+   T other;
+   for (const auto& new_block : blocks) {
       other.push_block(new_block);
    }
    blocks.clear();
@@ -136,24 +140,24 @@ BOOST_AUTO_TEST_CASE(test_restart_with_different_chain_id) {
                            fc_exception_message_starts_with("chain ID in state "));
 }
 
-BOOST_AUTO_TEST_CASE(test_restart_from_block_log) {
-   tester chain;
+BOOST_AUTO_TEST_CASE_TEMPLATE( test_restart_from_block_log, T, testers ) {
+   T chain;
 
    chain.create_account("replay1"_n);
-   chain.produce_blocks(1);
+   chain.produce_block();
    chain.create_account("replay2"_n);
-   chain.produce_blocks(1);
+   chain.produce_block();
    chain.create_account("replay3"_n);
-   chain.produce_blocks(1); // replay3 will be in fork_db.dat
+   chain.produce_block(); // replay3 will be in fork_db.dat
 
-   BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay1"_n));
-   BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay2"_n));
-   BOOST_REQUIRE_NO_THROW(chain.control->get_account("replay3"_n));
+   BOOST_REQUIRE_NO_THROW(chain.get_account("replay1"_n));
+   BOOST_REQUIRE_NO_THROW(chain.get_account("replay2"_n));
+   BOOST_REQUIRE_NO_THROW(chain.get_account("replay3"_n));
 
    chain.close();
 
    controller::config copied_config = chain.get_config();
-   auto               genesis       = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
+   auto               genesis       = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
 
    // remove the state files to make sure we are starting from block log & fork_db.dat
@@ -161,13 +165,13 @@ BOOST_AUTO_TEST_CASE(test_restart_from_block_log) {
 
    tester from_block_log_chain(copied_config, *genesis);
 
-   BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay1"_n));
-   BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay2"_n));
-   BOOST_REQUIRE_NO_THROW(from_block_log_chain.control->get_account("replay3"_n));
+   BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay1"_n));
+   BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay2"_n));
+   BOOST_REQUIRE_NO_THROW(from_block_log_chain.get_account("replay3"_n));
 }
 
-BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
-   tester chain(setup_policy::full);
+BOOST_AUTO_TEST_CASE_TEMPLATE( test_light_validation_restart_from_block_log, T, testers ) {
+   T chain(setup_policy::full);
 
    chain.create_account("testapi"_n);
    chain.create_account("dummy"_n);
@@ -186,7 +190,7 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    // run normal passing case
-   auto sigs  = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.control->get_chain_id());
+   auto sigs  = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
    auto trace = chain.push_transaction(trx);
    chain.produce_block();
 
@@ -202,7 +206,7 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
    chain.close();
 
    controller::config copied_config = chain.get_config();
-   auto               genesis       = chain::block_log<signed_block>::extract_genesis_state(chain.get_config().blocks_dir);
+   auto               genesis       = chain::block_log::extract_genesis_state(chain.get_config().blocks_dir);
    BOOST_REQUIRE(genesis);
 
    // remove the state files to make sure we are starting from block log
@@ -217,21 +221,24 @@ BOOST_AUTO_TEST_CASE(test_light_validation_restart_from_block_log) {
                                           }
                                        });
 
-
    BOOST_REQUIRE(other_trace);
    BOOST_REQUIRE(other_trace->receipt);
    BOOST_CHECK(*trace->receipt == *other_trace->receipt);
    BOOST_CHECK_EQUAL(2u, other_trace->action_traces.size());
 
+   auto check_action_traces = [](const auto& t, const auto& ot) {
+      BOOST_CHECK_EQUAL("", ot.console); // cfa not executed for replay
+      BOOST_CHECK_EQUAL(t.receipt->global_sequence, ot.receipt->global_sequence);
+      // both legacy and savanna digests should be the same
+      BOOST_CHECK_EQUAL(t.digest_legacy(), ot.digest_legacy());
+      BOOST_CHECK_EQUAL(t.digest_savanna(), ot.digest_savanna());
+   };
+
    BOOST_CHECK(other_trace->action_traces.at(0).context_free); // cfa
-   BOOST_CHECK_EQUAL("", other_trace->action_traces.at(0).console); // cfa not executed for replay
-   BOOST_CHECK_EQUAL(trace->action_traces.at(0).receipt->global_sequence, other_trace->action_traces.at(0).receipt->global_sequence);
-   BOOST_CHECK_EQUAL(trace->action_traces.at(0).receipt->digest(), other_trace->action_traces.at(0).receipt->digest());
+   check_action_traces(trace->action_traces.at(0), other_trace->action_traces.at(0));
 
    BOOST_CHECK(!other_trace->action_traces.at(1).context_free); // non-cfa
-   BOOST_CHECK_EQUAL("", other_trace->action_traces.at(1).console);
-   BOOST_CHECK_EQUAL(trace->action_traces.at(1).receipt->global_sequence, other_trace->action_traces.at(1).receipt->global_sequence);
-   BOOST_CHECK_EQUAL(trace->action_traces.at(1).receipt->digest(), other_trace->action_traces.at(1).receipt->digest());
+   check_action_traces(trace->action_traces.at(1), other_trace->action_traces.at(1));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

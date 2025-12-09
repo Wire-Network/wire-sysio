@@ -164,7 +164,8 @@ void apply_sysio_setcode(apply_context& context) {
             context.control.code_block_num_last_used(account_metadata->code_hash,
                                                      account_metadata->vm_type,
                                                      account_metadata->vm_version,
-                                                     context.control.head_block_num() + 1);
+                                                     old_code_entry.first_block_used,
+                                                     context.control.head().block_num() + 1);
          } else {
             db.modify(old_code_entry, [](code_object& o) {
                --o.code_ref_count;
@@ -185,7 +186,7 @@ void apply_sysio_setcode(apply_context& context) {
             o.code_hash = code_hash;
             o.code.assign(act.code.data(), code_size);
             o.code_ref_count = 1;
-            o.first_block_used = context.control.head_block_num() + 1;
+            o.first_block_used = context.control.head().block_num() + 1;
             o.vm_type = act.vmtype;
             o.vm_version = act.vmversion;
          });

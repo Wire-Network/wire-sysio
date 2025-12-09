@@ -1,164 +1,197 @@
 #pragma once
 
 #include <sysio/testing/tester.hpp>
-#include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/chain/application.hpp>
-#include <sysio/chain/types.hpp>
-#include <sysio/chain/trace.hpp>
-#include <sysio/chain/config.hpp>
-#include <sysio/chain/transaction.hpp>
-#include <sysio/chain/controller.hpp>
 
 #include <fc/exception/exception.hpp>
 
-#include <contracts.hpp>
 #include <exception>
-#include <future>
-#include <stdexcept>
-#include <thread>
 
 namespace sysio::test_utils {
 
 using namespace sysio::chain;
-using namespace sysio::chain::literals;
 
-struct testit {
-   uint64_t id;
-   explicit testit(uint64_t id = 0)
-      :id(id){}
+inline bool is_access_violation(const fc::unhandled_exception& e) {
+   try {
+      std::rethrow_exception(e.get_inner_exception());
+    }
+    catch (const wasm_execution_error& e) {
+       return true;
+    } catch (...) {
+
+    }
+   return false;
+}
+
+inline bool is_assert_exception(const fc::assert_exception& e) { return true; }
+inline bool is_page_memory_error(const page_memory_error& e) { return true; }
+inline bool is_unsatisfied_authorization(const unsatisfied_authorization& e) { return true;}
+inline bool is_wasm_execution_error(const wasm_execution_error& e) {return true;}
+inline bool is_tx_net_usage_exceeded(const tx_net_usage_exceeded& e) { return true; }
+inline bool is_block_net_usage_exceeded(const block_net_usage_exceeded& e) { return true; }
+inline bool is_tx_cpu_usage_exceeded(const tx_cpu_usage_exceeded& e) { return true; }
+inline bool is_block_cpu_usage_exceeded(const block_cpu_usage_exceeded& e) { return true; }
+inline bool is_deadline_exception(const deadline_exception& e) { return true; }
+
+template<uint64_t NAME>
+struct test_api_action {
    static account_name get_account() {
-      return chain::config::system_account_name;
+      return "testapi"_n;
    }
+
    static action_name get_name() {
-      return "testit"_n;
+      return action_name(NAME);
    }
 };
 
-// Corresponds to the reqactivated action of the bios contract.
-// See libraries/testing/contracts/sysio.bios/sysio.bios.hpp
-struct reqactivated {
-   chain::digest_type feature_digest;
 
-   explicit reqactivated(const chain::digest_type& fd)
-      :feature_digest(fd){};
-
+template<uint64_t NAME>
+struct test_pause_action {
    static account_name get_account() {
-      return chain::config::system_account_name;
+      return "pause"_n;
    }
+
    static action_name get_name() {
-      return "reqactivated"_n;
+      return action_name(NAME);
    }
 };
 
-// Create a read-only trx that works with bios reqactivated action
-inline auto make_bios_ro_trx(sysio::chain::controller& control) {
-   const auto& pfm = control.get_protocol_feature_manager();
-   static auto feature_digest = pfm.get_builtin_digest(builtin_protocol_feature_t::reserved_first_protocol_feature);
 
-   signed_transaction trx;
-   trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds(30)};
-   vector<permission_level> no_auth{};
-   trx.actions.emplace_back( no_auth, reqactivated{*feature_digest} );
-   return std::make_shared<packed_transaction>( std::move(trx) );
-}
-
-// Push an input transaction to controller and return trx trace
-// If account is sysio then signs with the default private key
-inline auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, signed_transaction& trx) {
-   trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds(30)};
-   trx.set_reference_block( control.head_block_id() );
-   if (account == config::system_account_name) {
-      auto default_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
-      trx.sign(default_priv_key, control.get_chain_id());
-   } else {
-      trx.sign(testing::tester::get_private_key(account, "active"), control.get_chain_id());
-   }
-   auto ptrx = std::make_shared<packed_transaction>( trx, packed_transaction::compression_type::zlib );
-   ptrx->decompress();
-
-   auto trx_promise = std::make_shared<std::promise<transaction_trace_ptr>>();
-   std::future<transaction_trace_ptr> trx_future = trx_promise->get_future();
-
-   app->executor().post( priority::low, exec_queue::read_write, [&ptrx, &app, trx_promise]() {
-      app->get_method<plugin_interface::incoming::methods::transaction_async>()(ptrx,
-                                                                                false, // api_trx
-                                                                                transaction_metadata::trx_type::input, // trx_type
-                                                                                true, // return_failure_traces
-           [trx_promise](const next_function_variant<transaction_trace_ptr>& result) {
-              if( std::holds_alternative<fc::exception_ptr>( result ) ) {
-                 try {
-                    std::get<fc::exception_ptr>(result)->dynamic_rethrow_exception();
-                 } catch(...) {
-                    trx_promise->set_exception(std::current_exception());
-                 }
-              } else if ( std::get<chain::transaction_trace_ptr>( result )->except ) {
-                 try {
-                    std::get<chain::transaction_trace_ptr>(result)->except->dynamic_rethrow_exception();
-                 } catch(...) {
-                    trx_promise->set_exception(std::current_exception());
-                 }
-              } else {
-                 trx_promise->set_value(std::get<chain::transaction_trace_ptr>(result));
-              }
-           });
-   });
-
-   if (trx_future.wait_for(std::chrono::seconds(5)) == std::future_status::timeout)
-      throw std::runtime_error("failed to execute trx: " + ptrx->get_transaction().actions.at(0).name.to_string() + " to account: " + account.to_string());
-
-   return trx_future.get();
-}
-
-// Push setcode trx to controller and return trx trace
-inline auto set_code(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, const vector<uint8_t>& wasm) {
-   signed_transaction trx;
-   trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
-                            chain::setcode{
-                               .account = account,
-                               .vmtype = 0,
-                               .vmversion = 0,
-                               .code = bytes(wasm.begin(), wasm.end())
-                            });
-   return push_input_trx(app, control, account, trx);
-}
-
-inline void activate_protocol_features_set_bios_contract(appbase::scoped_app& app, chain_plugin* chain_plug) {
-   using namespace appbase;
-
-   auto feature_set = std::make_shared<std::atomic<bool>>(false);
-   // has to execute when pending block is not null
-   for (int tries = 0; tries < 100; ++tries) {
-      app->executor().post( priority::high, exec_queue::read_write, [&chain_plug=chain_plug, feature_set](){
-         try {
-            if (!chain_plug->chain().is_building_block() || *feature_set)
-               return;
-            const auto& pfm = chain_plug->chain().get_protocol_feature_manager();
-            std::vector<builtin_protocol_feature_t> pfs{
-               builtin_protocol_feature_t::reserved_first_protocol_feature };
-            for (const auto t : pfs) {
-               auto feature_digest = pfm.get_builtin_digest(t);
-               BOOST_CHECK( feature_digest );
-               chain_plug->chain().preactivate_feature( *feature_digest, false );
-            }
-            *feature_set = true;
-            return;
-         } FC_LOG_AND_DROP()
-         BOOST_CHECK(!"exception setting protocol features");
-      });
-      if (*feature_set)
-         break;
-      std::this_thread::sleep_for(std::chrono::milliseconds(50));
+template<uint64_t NAME>
+struct test_chain_action {
+   static account_name get_account() {
+      return account_name(config::system_account_name);
    }
 
-   // Wait for next block
-   std::this_thread::sleep_for( std::chrono::milliseconds(config::block_interval_ms) );
+   static action_name get_name() {
+      return action_name(NAME);
+   }
+};
 
-   auto r = set_code(app, chain_plug->chain(), config::system_account_name, testing::contracts::sysio_bios_wasm());
-   BOOST_CHECK(!!r->receipt);
+template<class T, typename Tester>
+void push_trx(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cpu_usage_ms, uint32_t max_block_cpu_ms,
+              bool explicit_bill, std::vector<char> payload = {}, name account = "testapi"_n, transaction_metadata::trx_type trx_type = transaction_metadata::trx_type::input ) {
+   signed_transaction trx;
+
+   action act;
+   act.account = ac.get_account();
+   act.name = ac.get_name();
+   if ( trx_type != transaction_metadata::trx_type::read_only ) {
+      auto pl = vector<permission_level>{{account, config::active_name}};
+      act.authorization = pl;
+   }
+   act.data = payload;
+
+   trx.actions.push_back(act);
+   test.set_transaction_headers(trx);
+   if ( trx_type != transaction_metadata::trx_type::read_only ) {
+      auto sigs = trx.sign(test.get_private_key(account, "active"), test.get_chain_id());
+   }
+   flat_set<public_key_type> keys;
+   trx.get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
+   auto total_actions = trx.total_actions();
+   auto ptrx = std::make_shared<packed_transaction>( std::move(trx) );
+   auto fut = transaction_metadata::start_recover_keys( std::move( ptrx ), test.control->get_thread_pool(),
+                                                        test.get_chain_id(), fc::microseconds::maximum(),
+                                                        trx_type );
+   auto trx_meta = fut.get();
+   if (billed_cpu_time_us > 0)
+      trx_meta->prev_accounts_billing = {{act.account, {.cpu_usage_us = billed_cpu_time_us}}};
+   cpu_usage_t billed_cpu_us;
+   if (explicit_bill)
+      billed_cpu_us.insert(billed_cpu_us.end(), total_actions, billed_cpu_time_us);
+   auto res = test.control->test_push_transaction( trx_meta, fc::time_point::now() + fc::milliseconds(max_block_cpu_ms),
+                                              fc::milliseconds(max_cpu_usage_ms), billed_cpu_us, explicit_bill );
+   if( res->except_ptr ) std::rethrow_exception( res->except_ptr );
+   if( res->except ) throw *res->except;
+};
+
+static constexpr unsigned int DJBH(const char* cp) {
+   unsigned int hash = 5381;
+   while (*cp)
+      hash = 33 * hash ^ (unsigned char) *cp++;
+   return hash;
 }
 
+static constexpr unsigned long long WASM_TEST_ACTION(const char* cls, const char* method) {
+   return static_cast<unsigned long long>(DJBH(cls)) << 32 | static_cast<unsigned long long>(DJBH(method));
+}
+
+template <typename T>
+transaction_trace_ptr CallAction(testing::validating_tester& test, T ac, const vector<account_name>& scope = {"testapi"_n}) {
+   signed_transaction trx;
+
+
+   auto pl = vector<permission_level>{{scope[0], config::active_name}};
+   if (scope.size() > 1)
+      for (size_t i = 1; i < scope.size(); i++)
+         pl.push_back({scope[i], config::active_name});
+
+   action act(pl, ac);
+   trx.actions.push_back(act);
+
+   test.set_transaction_headers(trx);
+   auto sigs = trx.sign(test.get_private_key(scope[0], "active"), test.get_chain_id());
+   flat_set<public_key_type> keys;
+   trx.get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
+   auto res = test.push_transaction(trx);
+   BOOST_CHECK(!!res->receipt);
+   test.produce_block();
+   return res;
+}
+
+template <typename T, typename Tester>
+std::pair<transaction_trace_ptr, signed_block_ptr> _CallFunction(Tester& test, T ac, const vector<char>& data, const vector<account_name>& scope = {"testapi"_n}, bool no_throw = false) {
+   {
+      signed_transaction trx;
+
+      auto pl = vector<permission_level>{{scope[0], config::active_name}};
+      if (scope.size() > 1)
+         for (unsigned int i = 1; i < scope.size(); i++)
+            pl.push_back({scope[i], config::active_name});
+
+      action act(pl, ac);
+      act.data = data;
+      act.authorization = {{"testapi"_n, config::active_name}};
+      trx.actions.push_back(act);
+
+      test.set_transaction_headers(trx, test.DEFAULT_EXPIRATION_DELTA);
+      auto sigs = trx.sign(test.get_private_key(scope[0], "active"), test.get_chain_id());
+
+      flat_set<public_key_type> keys;
+      trx.get_signature_keys(test.get_chain_id(), fc::time_point::maximum(), keys);
+
+      auto res = test.push_transaction(trx, fc::time_point::maximum(), Tester::DEFAULT_BILLED_CPU_TIME_US, no_throw);
+      if (!no_throw) {
+         BOOST_CHECK(!!res->receipt);
+      }
+      auto block = test.produce_block();
+      return { res, block };
+   }
+}
+
+template <typename T, typename Tester>
+transaction_trace_ptr CallFunction(Tester& test, T ac, const vector<char>& data, const vector<account_name>& scope = {"testapi"_n}, bool no_throw = false) {
+   {
+      return _CallFunction(test, ac, data, scope, no_throw).first;
+   }
+}
+
+#define CALL_TEST_FUNCTION(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA)
+#define CALL_TEST_FUNCTION_WITH_BLOCK(_TESTER, CLS, MTH, DATA) _CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA)
+#define CALL_TEST_FUNCTION_SYSTEM(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_chain_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, {config::system_account_name} )
+#define CALL_TEST_FUNCTION_SCOPE(_TESTER, CLS, MTH, DATA, ACCOUNT) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, ACCOUNT)
+#define CALL_TEST_FUNCTION_NO_THROW(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, {"testapi"_n}, true)
+#define CALL_TEST_FUNCTION_AND_CHECK_EXCEPTION(_TESTER, CLS, MTH, DATA, EXC, EXC_MESSAGE) \
+BOOST_CHECK_EXCEPTION( \
+   CALL_TEST_FUNCTION( _TESTER, CLS, MTH, DATA), \
+                       EXC, \
+                       [](const EXC& e) { \
+                          return expect_assert_message(e, EXC_MESSAGE); \
+                     } \
+);
 
 } // namespace sysio::test_utils
 
-FC_REFLECT( sysio::test_utils::testit, (id) )
-FC_REFLECT( sysio::test_utils::reqactivated, (feature_digest) )
+FC_REFLECT_TEMPLATE((uint64_t T), sysio::test_utils::test_api_action<T>, BOOST_PP_SEQ_NIL)
+FC_REFLECT_TEMPLATE((uint64_t T), sysio::test_utils::test_pause_action<T>, BOOST_PP_SEQ_NIL)
+FC_REFLECT_TEMPLATE((uint64_t T), sysio::test_utils::test_chain_action<T>, BOOST_PP_SEQ_NIL)

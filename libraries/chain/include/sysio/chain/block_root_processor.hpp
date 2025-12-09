@@ -1,7 +1,10 @@
 #include <sysio/chain/root_processor.hpp>
 
 namespace sysio { namespace chain {
-   class snapshot_writer;
+
+struct snapshot_written_row_counter;
+
+class snapshot_writer;
    using snapshot_writer_ptr = std::shared_ptr<snapshot_writer>;
    class snapshot_reader;
    using snapshot_reader_ptr = std::shared_ptr<snapshot_reader>;
@@ -15,7 +18,8 @@ namespace sysio { namespace chain {
       chain::deque<chain::s_header> get_s_headers(uint32_t block_num);
       void initialize_database();
       void add_indices();
-      void add_to_snapshot( const snapshot_writer_ptr& snapshot ) const;
+      size_t expected_snapshot_row_count() const;
+      void add_to_snapshot( const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter ) const;
       void read_from_snapshot( const snapshot_reader_ptr& snapshot );
 
    private:

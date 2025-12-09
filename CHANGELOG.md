@@ -4998,7 +4998,7 @@ All notable changes to this project will be documented in this file.
 
 - Read only transaction feature support was added in 4.0, don't test in prior releases.([`441f5d30`](https://github.com///commit/441f5d308c089690e3179d4f623ddf6db1f1c1a6))
 
-- Use full nodeosVersion.([`3a0960e0`](https://github.com///commit/3a0960e00441f6e0a820009bc142b08d52cd84f9))
+- Use full nodeopVersion.([`3a0960e0`](https://github.com///commit/3a0960e00441f6e0a820009bc142b08d52cd84f9))
 
 - Make sure to change to the build dir.([`ea37b697`](https://github.com///commit/ea37b69738f18e79d5ff10eeabde0d3a4ee446e0))
 
@@ -5452,9 +5452,9 @@ All notable changes to this project will be documented in this file.
 
 - ([`8327ad6d`](https://github.com///commit/8327ad6d933b982ed13eafd73d2abbf4cf42665e))
 
-- ExtraNodeosArgs should be empty string when not used, not list.([`326aa030`](https://github.com///commit/326aa030981143fc9cc262ed3f28460acd1aefe8))
+- ExtraNodeopArgs should be empty string when not used, not list.([`326aa030`](https://github.com///commit/326aa030981143fc9cc262ed3f28460acd1aefe8))
 
-- Use empty list instead of None for unused extraNodeosArgs.([`4bda5910`](https://github.com///commit/4bda591042f2cc539e19d59e8dedba350a9a501c))
+- Use empty list instead of None for unused extraNodeopArgs.([`4bda5910`](https://github.com///commit/4bda591042f2cc539e19d59e8dedba350a9a501c))
 
 - Cluster_launcher needs to work without a plugin argument.([`62549089`](https://github.com///commit/6254908957244487122f8b4b0aa04cae940f63bb))
 
@@ -8220,7 +8220,7 @@ All notable changes to this project will be documented in this file.
 
 - Restore lost raise_if_missing argument from bounce/down consolidation.([`86336041`](https://github.com///commit/863360411b4599aacb5551e448e53f1078d90a08))
 
-- Restore nodeosVers to performance test ClusterConfig.([`837a5761`](https://github.com///commit/837a5761f15d8af38cfb8bd85618a6406f05a13a))
+- Restore nodeopVers to performance test ClusterConfig.([`837a5761`](https://github.com///commit/837a5761f15d8af38cfb8bd85618a6406f05a13a))
 
 - Remove use of eosio-launcher in Cluster killall().([`4e9a7ec8`](https://github.com///commit/4e9a7ec8ecf797f2c771e2d08e0cf6100e0d80ac))
 
@@ -8246,7 +8246,7 @@ All notable changes to this project will be documented in this file.
 
 - Stop using deprecated boost resolver overload.([`3c78db67`](https://github.com///commit/3c78db67772e6d0abfd6712193c7476a22a10e18))
 
-- NodeosLogPath still a string, not a pathlib Path.([`ac8002b2`](https://github.com///commit/ac8002b2d195cdab72a8c24d658d9d593896706e))
+- nodeopLogPath still a string, not a pathlib Path.([`ac8002b2`](https://github.com///commit/ac8002b2d195cdab72a8c24d658d9d593896706e))
 
 - Enum class _generate_next_value can't be staticmethod on older Pythons([`ec5681d7`](https://github.com///commit/ec5681d7756de1a25693d982bfdef7454c8b979f))
 
@@ -10590,7 +10590,7 @@ All notable changes to this project will be documented in this file.
 
 - ([`d2348f31`](https://github.com///commit/d2348f31c6ddc1fb82233be0ad3cb416dfef0338))
 
-- Address futureproof issues by converting nodeosVers from enum to string. Assert that an unsupport nodeos is not being used. Reduce code.([`893e4a30`](https://github.com///commit/893e4a301848669aa00b3e06d3f8700a527acf08))
+- Address futureproof issues by converting nodeopVers from enum to string. Assert that an unsupport nodeos is not being used. Reduce code.([`893e4a30`](https://github.com///commit/893e4a301848669aa00b3e06d3f8700a527acf08))
 
 - Change isNodeosV2 name and from bool to enum. Conver to use postinit handling for functions([`36855331`](https://github.com///commit/36855331ed6dba1d3f097481f92dd2f02cf3f2c9))
 

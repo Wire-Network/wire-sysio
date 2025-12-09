@@ -54,7 +54,7 @@ class whitelist_blacklist_tester {
               ( "quantity", "1000000.00 TOK" )
               ( "memo", "issue" )
          );
-         chain->produce_blocks();
+         chain->produce_block();
       }
 
       void shutdown() {
@@ -124,13 +124,13 @@ BOOST_AUTO_TEST_CASE( actor_whitelist ) { try {
                              })
                            );
    test.chain->set_transaction_headers(trx);
-   trx.sign( test.chain->get_private_key( "alice"_n, "active" ), test.chain->control->get_chain_id() );
-   trx.sign( test.chain->get_private_key( "bob"_n, "active" ), test.chain->control->get_chain_id() );
+   trx.sign( test.chain->get_private_key( "alice"_n, "active" ), test.chain->get_chain_id() );
+   trx.sign( test.chain->get_private_key( "bob"_n, "active" ), test.chain->get_chain_id() );
    BOOST_CHECK_EXCEPTION( test.chain->push_transaction( trx ),
                           actor_whitelist_exception,
                           fc_exception_message_starts_with("authorizing actor(s) in transaction are not on the actor whitelist: [\"bob\"]")
                         );
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( actor_blacklist ) { try {
@@ -158,13 +158,13 @@ BOOST_AUTO_TEST_CASE( actor_blacklist ) { try {
                              })
                            );
    test.chain->set_transaction_headers(trx);
-   trx.sign( test.chain->get_private_key( "alice"_n, "active" ), test.chain->control->get_chain_id() );
-   trx.sign( test.chain->get_private_key( "bob"_n, "active" ), test.chain->control->get_chain_id() );
+   trx.sign( test.chain->get_private_key( "alice"_n, "active" ), test.chain->get_chain_id() );
+   trx.sign( test.chain->get_private_key( "bob"_n, "active" ), test.chain->get_chain_id() );
    BOOST_CHECK_EXCEPTION( test.chain->push_transaction( trx ),
                           actor_blacklist_exception,
                           fc_exception_message_starts_with("authorizing actor(s) in transaction are on the actor blacklist: [\"bob\"]")
                         );
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
@@ -181,19 +181,19 @@ BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
 
    test.transfer( "charlie"_n, "alice"_n );
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("bob"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("charlie"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.transfer( "alice"_n, "bob"_n );
 
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
                           contract_whitelist_exception,
                           fc_exception_message_starts_with("account 'charlie' is not on the contract whitelist")
                         );
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
@@ -232,19 +232,19 @@ BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
 
    test.transfer( "charlie"_n, "alice"_n );
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("bob"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("charlie"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.transfer( "alice"_n, "bob"_n );
 
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
                           contract_blacklist_exception,
                           fc_exception_message_starts_with("account 'charlie' is on the contract blacklist")
                         );
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
@@ -277,19 +277,19 @@ BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
 
    test.transfer( "sysio.token"_n, "alice"_n, "1000.00 TOK" );
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("bob"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("bob"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("bob"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.chain->set_code("charlie"_n, test_contracts::sysio_token_wasm() );
    test.chain->set_abi("charlie"_n, test_contracts::sysio_token_abi() );
    test.chain->set_privileged("charlie"_n);
 
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 
    test.transfer( "alice"_n, "bob"_n );
 
@@ -307,7 +307,7 @@ BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
                           action_blacklist_exception,
                           fc_exception_message_starts_with("action 'charlie::create' is on the action blacklist")
                         );
-   test.chain->produce_blocks();
+   test.chain->produce_block();
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
@@ -323,15 +323,15 @@ BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
    whitelist_blacklist_tester<tester> tester2;
    tester2.init(false);
 
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
+   while( tester2.chain->head().block_num() < tester1.chain->head().block_num() ) {
+      auto b = tester1.chain->fetch_block_by_number( tester2.chain->head().block_num()+1 );
       tester2.chain->push_block( b );
    }
 
-   tester1.chain->produce_blocks(2);
+   tester1.chain->produce_block();
 
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
+   while( tester2.chain->head().block_num() < tester1.chain->head().block_num() ) {
+      auto b = tester1.chain->fetch_block_by_number( tester2.chain->head().block_num()+1 );
       tester2.chain->push_block( b );
    }
 } FC_LOG_AND_RETHROW() }
@@ -353,8 +353,8 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
    whitelist_blacklist_tester<tester> tester2;
    tester2.init(false);
 
-   while( tester2.chain->control->head_block_num() < tester1.chain->control->head_block_num() ) {
-      auto b = tester1.chain->control->fetch_block_by_number( tester2.chain->control->head_block_num()+1 );
+   while( tester2.chain->head().block_num() < tester1.chain->head().block_num() ) {
+      auto b = tester1.chain->fetch_block_by_number( tester2.chain->head().block_num()+1 );
       tester2.chain->push_block( b );
    }
 

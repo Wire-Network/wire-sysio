@@ -362,6 +362,7 @@ def abi_file_with_nodeop_test():
         if not node or not Utils.waitForBool(node.checkPulse, timeout=15):
             Utils.Print("ERROR: node doesn't appear to be running...")
             assert False, "node doesn't appear to be running"
+        node.waitForBlock(2)
         accountNames = ["sysio", "sysio.token", "alice", "bob"]
         accounts = []
         for name in accountNames:

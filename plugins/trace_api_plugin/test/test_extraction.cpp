@@ -5,7 +5,6 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/transaction.hpp>
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 
 #include <sysio/trace_api/test_common.hpp>
 #include <sysio/trace_api/chain_extraction.hpp>
@@ -118,8 +117,8 @@ struct extraction_test_fixture {
       extraction_impl.signal_applied_transaction(trace, ptrx);
    }
 
-   void signal_accepted_block( const chain::block_state_legacy_ptr& bsp ) {
-      extraction_impl.signal_accepted_block(bsp->block, bsp->id);
+   void signal_accepted_block( const chain::signed_block_ptr& bp ) {
+      extraction_impl.signal_accepted_block(bp, bp->calculate_id());
    }
 
    // fixture data and methods
@@ -150,10 +149,10 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             std::make_shared<packed_transaction>(ptrx1) );
       
       // accept the block with one transaction
-      auto bsp1 = make_block_state( chain::block_id_type(), 1, 1, "bp.one"_n,
+      auto bp1 = make_block( chain::block_id_type(), 1, 1, "bp.one"_n,
             { chain::packed_transaction(ptrx1) } );
-      signal_accepted_block( bsp1 );
-      
+      signal_accepted_block( bp1 );
+
       const std::vector<action_trace_v1> expected_action_traces {
          {
             {
@@ -197,14 +196,14 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
       };
 
       const block_trace_v2 expected_block_trace {
-         bsp1->id,
+         bp1->calculate_id(),
          1,
-         bsp1->prev(),
+         bp1->previous,
          chain::block_timestamp_type(1),
          "bp.one"_n,
-         bsp1->block->transaction_mroot,
-         bsp1->block->action_mroot,
-         bsp1->block->schedule_version,
+         bp1->transaction_mroot,
+         bp1->action_mroot,
+         bp1->schedule_version,
          std::vector<transaction_trace_v3> {
             expected_transaction_trace
          }
@@ -214,7 +213,7 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
       BOOST_REQUIRE(data_log.size() == 1u);
       BOOST_REQUIRE(std::holds_alternative<block_trace_v2>(data_log.at(0)));
       BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(data_log.at(0)), expected_block_trace);
-      BOOST_REQUIRE_EQUAL(id_log.at(bsp1->block_num).size(),  bsp1->block->transactions.size());
+      BOOST_REQUIRE_EQUAL(id_log.at(bp1->block_num()).size(),  bp1->transactions.size());
    }
 
    BOOST_FIXTURE_TEST_CASE(basic_multi_transaction_block, extraction_test_fixture) {
@@ -242,9 +241,9 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             std::make_shared<packed_transaction>( ptrx3 ) );
 
       // accept the block with three transaction
-      auto bsp1 = make_block_state( chain::block_id_type(), 1, 1, "bp.one"_n,
+      auto bp1 = make_block( chain::block_id_type(), 1, 1, "bp.one"_n,
             { chain::packed_transaction(ptrx1), chain::packed_transaction(ptrx2), chain::packed_transaction(ptrx3) } );
-      signal_accepted_block( bsp1 );
+      signal_accepted_block( bp1 );
 
       const std::vector<action_trace_v1> expected_action_trace1 {
          {
@@ -319,14 +318,14 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
       };
 
       const block_trace_v2 expected_block_trace {
-         bsp1->id,
+         bp1->calculate_id(),
          1,
-         bsp1->prev(),
+         bp1->previous,
          chain::block_timestamp_type(1),
          "bp.one"_n,
-         bsp1->block->transaction_mroot,
-         bsp1->block->action_mroot,
-         bsp1->block->schedule_version,
+         bp1->transaction_mroot,
+         bp1->action_mroot,
+         bp1->schedule_version,
          expected_transaction_traces
       };
 

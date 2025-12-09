@@ -203,12 +203,18 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         set_producers(producers);
 
         produce_blocks(2); // sysio is producing by itself
-        auto active_schedule = control->head_block_state()->active_schedule;
+        auto active_schedule = control->head_active_producers();
         BOOST_TEST(active_schedule.producers.size() == 1u);
         BOOST_TEST(active_schedule.producers.front().producer_name == name("sysio"));
-        produce_blocks(1); // switching to the new set
+        produce_block();
+        // finishes round and does a complete another round before switching
+        for (size_t i = 0; i < 24; ++i) {
+           produce_block(); // switching to the new set
+           active_schedule = control->head_active_producers();
+           if (active_schedule.producers.size() > 1u)
+              break;
+        }
 
-        active_schedule = control->head_block_state()->active_schedule;
         BOOST_TEST_REQUIRE(active_schedule.producers.size() == 21);
         BOOST_TEST(active_schedule.producers.at( 0).producer_name == name("proda"));
         BOOST_TEST(active_schedule.producers.at( 1).producer_name == name("prodb"));

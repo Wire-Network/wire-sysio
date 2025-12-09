@@ -4,6 +4,8 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/testing/tester.hpp>
 
+#include <fc/scoped_exit.hpp>
+
 #include <regex>
 
 using namespace sysio;
@@ -233,7 +235,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
    int found = 0;
    for(const std::filesystem::directory_entry& dir_entry : std::filesystem::directory_iterator(temp / "snapshots"))
       found += std::regex_search(dir_entry.path().filename().string(), snapshotfile_regex);
-   BOOST_REQUIRE_GE(found, 3);
+   BOOST_REQUIRE_EQUAL(found, 3u);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -2,12 +2,22 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <string>
 #include <sstream>
 #include <regex>
 
 namespace sysio::net_utils {
+
+// Longest domain name is 253 characters according to wikipedia.
+// Addresses include ":port" where max port is 65535, which adds 6 chars.
+// Addresses may also include ":bitrate" with suffix and separators, which adds 30 chars,
+// for the maximum comma-separated value that fits in a size_t expressed in decimal plus a suffix.
+// We also add our own extentions of "[:trx|:blk] - xxxxxxx", which adds 14 chars, total= 273.
+// Allow for future extentions as well, hence 384.
+constexpr size_t max_p2p_address_length = 253 + 6 + 30;
+constexpr size_t max_handshake_str_length = 384;
 
 namespace detail {
 
@@ -40,29 +50,113 @@ namespace detail {
       return block_sync_rate_limit;
    }
 
-} // namespace detail
+   /// @return host, port, remainder
+   inline std::tuple<std::string, std::string, std::string> split_host_port_remainder(const std::string& endpoint_input, bool should_throw) {
+      using std::string;
+      // host:port[:trx|:blk][:<rate>]
+      if (endpoint_input.size() > max_p2p_address_length) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception, "Address specification exceeds max p2p address length" );
+         return {};
+      }
+      string endpoint = endpoint_input;
+      boost::trim(endpoint);
+      if (endpoint.empty()) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception, "Address specification is empty" );
+         return {};
+      }
+      auto colon_count = std::count(endpoint.begin(), endpoint.end(), ':');
+      string::size_type end_bracket = 0;
+      if (endpoint[0] == '[') {
+         end_bracket = endpoint.find(']');
+         if (end_bracket == string::npos) {
+            SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                       "Invalid address specification ${a}, IPv6 no closing square bracket", ("a", endpoint) );
+            return {};
+         }
+      } else if (colon_count >= 7) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification ${a}; IPv6 addresses must be enclosed in square brackets.", ("a", endpoint));
+         return {};
 
-   /// @return listen address and block sync rate limit (in bytes/sec) of address string
-   inline std::tuple<std::string, size_t> parse_listen_address( const std::string& address ) {
-      auto listen_addr = address;
-      auto limit = std::string("0");
-      auto last_colon_location = address.rfind(':');
-      if( auto right_bracket_location = address.find(']'); right_bracket_location != address.npos ) {
-         if( std::count(address.begin()+right_bracket_location, address.end(), ':') > 1 ) {
-            listen_addr = std::string(address, 0, last_colon_location);
-            limit = std::string(address, last_colon_location+1);
+      } else if (colon_count < 1 || colon_count > 3) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification ${a}; unexpected number of colons.", ("a", endpoint));
+         return {};
+      }
+      string::size_type colon = endpoint.find(':', end_bracket+1);
+      if (colon == string::npos) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification ${a}; missing port specification.", ("a", endpoint));
+         return {};
+      }
+      if (end_bracket != 0 && end_bracket+1 != colon) {
+         SYS_ASSERT(!should_throw, chain::plugin_config_exception,
+                    "Invalid address specification ${a}; unexpected character after ']'.", ("a", endpoint));
+         return {};
+      }
+      string::size_type colon2 = endpoint.find(':', colon + 1);
+      string host = end_bracket != 0 ? endpoint.substr( 1, end_bracket - 1 ) : endpoint.substr( 0, colon );
+      string port = endpoint.substr( colon + 1, colon2 == string::npos ? string::npos : colon2 - (colon + 1));
+      string remainder;
+      if (colon2 == string::npos) {
+         auto port_end = port.find_first_not_of("0123456789");
+         if (port_end != string::npos) {
+            port = port.substr(0, port_end);
+            remainder = port.substr( port_end );
          }
       } else {
-         if( auto colon_count = std::count(address.begin(), address.end(), ':'); colon_count > 1 ) {
-            SYS_ASSERT( colon_count <= 2, chain::plugin_config_exception,
-                        "Invalid address specification ${addr}; IPv6 addresses must be enclosed in square brackets.", ("addr", address));
-            listen_addr = std::string(address, 0, last_colon_location);
-            limit = std::string(address, last_colon_location+1);
-         }
+         remainder = endpoint.substr( colon2 + 1 );
+      }
+      return {std::move(host), std::move(port), std::move(remainder)};
+   }
+
+} // namespace detail
+
+   struct endpoint {
+      std::string host;
+      std::string port;
+
+      std::string address() const { return host + ":" + port; }
+
+      friend std::ostream& operator<<(std::ostream& os, const endpoint& e) { return os << e.host << ":" << e.port; }
+
+      bool operator==(const endpoint& lhs) const = default;
+      auto operator<=>(const endpoint& lhs) const = default;
+   };
+
+   /// @return host, port, type. returns empty on invalid endpoint, does not throw
+   inline std::tuple<std::string, std::string, std::string> split_host_port_type(const std::string& endpoint) {
+      // host:port[:trx|:blk][:<rate>]   // rate is discarded
+      constexpr bool should_throw = false;
+      auto [host, port, remainder] = detail::split_host_port_remainder(endpoint, should_throw);
+      if (host.empty() || port.empty()) return {};
+
+      std::string type;
+      if (remainder.starts_with("blk") || remainder.starts_with("trx")) {
+         type = remainder.substr(0, 3);
+      }
+
+      return {std::move(host), std::move(port), std::move(type)};
+   }
+
+   /// @return listen address and block sync rate limit (in bytes/sec) of address string
+   /// @throws chain::plugin_config_exception on invalid address
+   inline std::tuple<std::string, size_t> parse_listen_address( const std::string& address ) {
+      constexpr bool should_throw = true;
+      auto [host, port, remainder] = detail::split_host_port_remainder(address, should_throw);
+      SYS_ASSERT(!host.empty() && !port.empty(), chain::plugin_config_exception,
+                 "Invalid address specification ${a}; host or port missing.", ("a", address));
+      auto listen_addr = host + ":" + port;
+      auto limit = remainder;
+      auto last_colon_location = remainder.rfind(':');
+      if (last_colon_location != std::string::npos) {
+         limit = std::string(remainder, last_colon_location+1);
       }
       auto block_sync_rate_limit = detail::parse_connection_rate_limit(limit);
 
-      return {listen_addr, block_sync_rate_limit};
+      return {std::move(listen_addr), block_sync_rate_limit};
    }
 
 } // namespace sysio::net_utils
+
+FC_REFLECT(sysio::net_utils::endpoint, (host)(port))

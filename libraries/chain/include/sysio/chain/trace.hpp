@@ -4,7 +4,7 @@
 #include <sysio/chain/action_receipt.hpp>
 #include <sysio/chain/block.hpp>
 
-namespace sysio { namespace chain {
+namespace sysio::chain {
 
    struct account_delta {
       account_delta( const account_name& n, int64_t d):account(n),delta(d){}
@@ -47,6 +47,50 @@ namespace sysio { namespace chain {
       std::optional<fc::exception>    except;
       std::optional<uint64_t>         error_code;
       std::vector<char>               return_value;
+
+      //savanna_witness_hash can be computed separately, since it is not relevant to IBC action proofs
+      digest_type savanna_witness_hash() const {
+         assert(!!receipt);
+         const action_receipt& r = *receipt;
+
+         digest_type::encoder e;
+         fc::raw::pack(e, r.global_sequence);
+         fc::raw::pack(e, r.auth_sequence);
+         fc::raw::pack(e, r.code_sequence);
+         fc::raw::pack(e, r.abi_sequence);
+   
+         return e.result();
+      }
+
+      digest_type digest_savanna() const {
+         assert(!!receipt);
+         const action_receipt& r = *receipt;
+
+         digest_type::encoder e;
+         fc::raw::pack(e, r.receiver);
+         fc::raw::pack(e, r.recv_sequence);
+         fc::raw::pack(e, act.account);
+         fc::raw::pack(e, act.name);
+         fc::raw::pack(e, r.act_digest);
+         fc::raw::pack(e, savanna_witness_hash());
+
+         return e.result();
+      }
+
+      digest_type digest_legacy()const {
+         assert(!!receipt);
+         const action_receipt& r = *receipt;
+
+         digest_type::encoder e;
+         fc::raw::pack(e, r.receiver);
+         fc::raw::pack(e, r.act_digest);
+         fc::raw::pack(e, r.global_sequence);
+         fc::raw::pack(e, r.recv_sequence);
+         fc::raw::pack(e, r.auth_sequence);
+         fc::raw::pack(e, r.code_sequence);
+         fc::raw::pack(e, r.abi_sequence);
+         return e.result();
+      }
    };
 
    struct transaction_trace {
@@ -56,7 +100,7 @@ namespace sysio { namespace chain {
       std::optional<block_id_type>               producer_block_id;
       std::optional<transaction_receipt_header>  receipt;
       fc::unsigned_int                           total_cpu_usage_us = 0;
-      fc::microseconds                           elapsed;
+      fc::microseconds                           elapsed{};
       uint64_t                                   net_usage = 0;
       vector<action_trace>                       action_traces;
       std::optional<account_delta>               account_ram_delta;
@@ -81,7 +125,7 @@ namespace sysio { namespace chain {
              auth.permission == sysio::chain::config::active_name;
    }
 
-} }  /// namespace sysio::chain
+}  /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::account_delta,
             (account)(delta) )

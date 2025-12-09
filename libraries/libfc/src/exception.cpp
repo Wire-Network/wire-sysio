@@ -7,63 +7,46 @@
 
 namespace fc
 {
-   FC_REGISTER_EXCEPTIONS( (timeout_exception)
-                           (file_not_found_exception)
-                           (parse_error_exception)
-                           (invalid_arg_exception)
-                           (invalid_operation_exception)
-                           (key_not_found_exception)
-                           (bad_cast_exception)
-                           (out_of_range_exception)
-                           (canceled_exception)
-                           (assert_exception)
-                           (eof_exception)
-                           (unknown_host_exception)
-                           (null_optional)
-                           (udt_exception)
-                           (aes_exception)
-                           (overflow_exception)
-                           (underflow_exception)
-                           (divide_by_zero_exception)
-                         )
-
    namespace detail
    {
       class exception_impl
       {
          public:
+            exception_impl(std::string_view name_value,
+                        std::string_view what_value,
+                        int64_t code,
+                        log_messages msgs)
+            : _name(name_value)
+            , _what(what_value)
+            , _code(code)
+            , _elog(std::move(msgs))
+            {}
+
             std::string     _name;
             std::string     _what;
             int64_t         _code;
             log_messages    _elog;
       };
    }
-   exception::exception( log_messages&& msgs, int64_t code,
-                                    const std::string& name_value,
-                                    const std::string& what_value )
-   :my( new detail::exception_impl() )
+   exception::exception( log_messages&& msgs,
+                         int64_t code,
+                         std::string_view name_value,
+                         std::string_view what_value )
+   :my( new detail::exception_impl{name_value, what_value, code, std::move(msgs)} )
    {
-      my->_code = code;
-      my->_what = what_value;
-      my->_name = name_value;
-      my->_elog = fc::move(msgs);
    }
 
    exception::exception(
       const log_messages& msgs,
       int64_t code,
-      const std::string& name_value,
-      const std::string& what_value )
-   :my( new detail::exception_impl() )
+      std::string_view name_value,
+      std::string_view what_value )
+   :my( new detail::exception_impl{name_value, what_value, code, msgs} )
    {
-      my->_code = code;
-      my->_what = what_value;
-      my->_name = name_value;
-      my->_elog = msgs;
    }
 
    unhandled_exception::unhandled_exception( log_message&& m, std::exception_ptr e )
-   :exception( fc::move(m) )
+   :exception( std::move(m) )
    {
       _inner = e;
    }
@@ -73,15 +56,9 @@ namespace fc
    }
    unhandled_exception::unhandled_exception( log_messages m )
    :exception()
-   { my->_elog = fc::move(m); }
+   { my->_elog = std::move(m); }
 
    std::exception_ptr unhandled_exception::get_inner_exception()const { return _inner; }
-
-   NO_RETURN void     unhandled_exception::dynamic_rethrow_exception()const
-   {
-      if( !(_inner == std::exception_ptr()) ) std::rethrow_exception( _inner );
-      else { fc::exception::dynamic_rethrow_exception(); }
-   }
 
    std::shared_ptr<exception> unhandled_exception::dynamic_copy_exception()const
    {
@@ -91,34 +68,30 @@ namespace fc
    }
 
    exception::exception( int64_t code,
-                         const std::string& name_value,
-                         const std::string& what_value )
-   :my( new detail::exception_impl() )
+                         std::string_view name_value,
+                         std::string_view what_value )
+   :my( new detail::exception_impl{name_value, what_value, code, {}} )
    {
-      my->_code = code;
-      my->_what = what_value;
-      my->_name = name_value;
    }
 
    exception::exception( log_message&& msg,
                          int64_t code,
-                         const std::string& name_value,
-                         const std::string& what_value )
-   :my( new detail::exception_impl() )
+                         std::string_view name_value,
+                         std::string_view what_value )
+   :my( new detail::exception_impl{name_value, what_value, code, {std::move(msg)}} )
    {
-      my->_code = code;
-      my->_what = what_value;
-      my->_name = name_value;
-      my->_elog.push_back( fc::move( msg ) );
    }
    exception::exception( const exception& c )
    :my( new detail::exception_impl(*c.my) )
    { }
-   exception::exception( exception&& c )
-   :my( fc::move(c.my) ){}
+   exception::exception( exception&& c ) noexcept = default;
 
    const char*  exception::name()const throw() { return my->_name.c_str(); }
-   const char*  exception::what()const noexcept { return my->_what.c_str(); }
+   const char*  exception::what()const noexcept {
+      static thread_local std::string last_exception;
+      last_exception = to_detail_string();
+      return last_exception.c_str();
+   }
    int64_t      exception::code()const throw() { return my->_code;         }
 
    exception::~exception(){}
@@ -127,7 +100,7 @@ namespace fc
    {
       v = mutable_variant_object( "code", e.code() )
                                 ( "name", e.name() )
-                                ( "message", e.what() )
+                                ( "message", e.my->_what )
                                 ( "stack", e.get_log() );
 
    }
@@ -147,7 +120,7 @@ namespace fc
    const log_messages&   exception::get_log()const { return my->_elog; }
    void                  exception::append_log( log_message m )
    {
-      my->_elog.emplace_back( fc::move(m) );
+      my->_elog.emplace_back( std::move(m) );
    }
 
    /**
@@ -176,7 +149,7 @@ namespace fc
             } catch( std::bad_alloc& ) {
                throw;
             } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_detail_string: " << e.what() << "\n";
+               ss << "<- timeout exception in to_detail_string: " << e.my->_what << "\n";
                break;
             } catch( ... ) {
                ss << "<- exception in to_detail_string.\n";
@@ -214,7 +187,7 @@ namespace fc
             } catch( std::bad_alloc& ) {
                throw;
             } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_string: " << e.what();
+               ss << "<- timeout exception in to_string: " << e.my->_what;
                break;
             } catch( ... ) {
                ss << "<- exception in to_string.\n";
@@ -242,23 +215,6 @@ namespace fc
          }
       }
       return std::string();
-   }
-
-   void NO_RETURN exception_factory::rethrow( const exception& e )const
-   {
-      auto itr = _registered_exceptions.find( e.code() );
-      if( itr != _registered_exceptions.end() )
-         itr->second->rethrow( e );
-      throw e;
-   }
-   /**
-    * Rethrows the exception restoring the proper type based upon
-    * the error code.  This is used to propagate exception types
-    * across conversions to/from JSON
-    */
-   NO_RETURN void  exception::dynamic_rethrow_exception()const
-   {
-      exception_factory::instance().rethrow( *this );
    }
 
    exception_ptr exception::dynamic_copy_exception()const
@@ -327,7 +283,7 @@ namespace fc
    std_exception_wrapper::std_exception_wrapper( log_message&& m, std::exception_ptr e,
                                                  const std::string& name_value,
                                                  const std::string& what_value)
-   :exception( fc::move(m), exception_code::std_exception_code, name_value, what_value )
+   :exception( std::move(m), exception_code::std_exception_code, name_value, what_value )
    {
       _inner = {std::move(e)};
    }
@@ -341,12 +297,6 @@ namespace fc
    }
 
    std::exception_ptr std_exception_wrapper::get_inner_exception()const { return _inner; }
-
-   NO_RETURN void std_exception_wrapper::dynamic_rethrow_exception()const
-   {
-      if( !(_inner == std::exception_ptr()) ) std::rethrow_exception( _inner );
-      else { fc::exception::dynamic_rethrow_exception(); }
-   }
 
    std::shared_ptr<exception> std_exception_wrapper::dynamic_copy_exception()const
    {

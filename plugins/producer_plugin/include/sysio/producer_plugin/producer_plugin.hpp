@@ -69,7 +69,14 @@ public:
    virtual void plugin_shutdown();
    void handle_sighup() override;
 
+   controller::apply_blocks_result_t on_incoming_block();
+
+   struct pause_at_block_params {
+      chain::block_num_type block_num{0}; // block height to pause block evaluation/production
+   };
+
    void pause();
+   void pause_at_block(const pause_at_block_params& params);
    void resume();
    bool paused() const;
    void update_runtime_options(const runtime_options& options);
@@ -124,55 +131,19 @@ public:
 
    void log_failed_transaction(const transaction_id_type& trx_id, const chain::packed_transaction_ptr& packed_trx_ptr, const char* reason) const;
 
+   // initiate calls to process_incoming_block to process all queued blocks
+   void process_blocks();
+
    // thread-safe, called when a new block is received
-   void received_block(uint32_t block_num);
+   void received_block(uint32_t block_num, chain::fork_db_add_t fork_db_add_result);
+   // thread-safe, called when ctrl-c/SIGINT/SIGTERM/SIGPIPE is received
+   void interrupt();
 
    const std::set<account_name>& producer_accounts() const;
 
    static void set_test_mode(bool m) { test_mode_ = m; }
 
-   struct speculative_block_metrics {
-      account_name block_producer{};
-      uint32_t     block_num             = 0;
-      int64_t      block_total_time_us   = 0;
-      int64_t      block_idle_us         = 0;
-      std::size_t  num_success_trx       = 0;
-      int64_t      success_trx_time_us   = 0;
-      std::size_t  num_fail_trx          = 0;
-      int64_t      fail_trx_time_us      = 0;
-      std::size_t  num_transient_trx     = 0;
-      int64_t      transient_trx_time_us = 0;
-      int64_t      block_other_time_us   = 0;
-   };
-
-   struct produced_block_metrics : public speculative_block_metrics {
-      std::size_t unapplied_transactions_total       = 0;
-      std::size_t subjective_bill_account_size_total = 0;
-      std::size_t trxs_produced_total                = 0;
-      uint64_t    cpu_usage_us                       = 0;
-      int64_t     total_elapsed_time_us              = 0;
-      int64_t     total_time_us                      = 0;
-      uint64_t    net_usage_us                       = 0;
-
-      uint32_t last_irreversible = 0;
-      uint32_t head_block_num    = 0;
-   };
-
-   struct incoming_block_metrics {
-      std::size_t trxs_incoming_total   = 0;
-      uint64_t    cpu_usage_us          = 0;
-      int64_t     total_elapsed_time_us = 0;
-      int64_t     total_time_us         = 0;
-      uint64_t    net_usage_us          = 0;
-      int64_t     block_latency_us      = 0;
-
-      uint32_t last_irreversible = 0;
-      uint32_t head_block_num    = 0;
-   };
-
-   void register_update_produced_block_metrics(std::function<void(produced_block_metrics)>&&);
-   void register_update_speculative_block_metrics(std::function<void(speculative_block_metrics)>&&);
-   void register_update_incoming_block_metrics(std::function<void(incoming_block_metrics)>&&);
+   void register_update_speculative_block_metrics(std::function<void(chain::speculative_block_metrics)>&&);
 
    inline static bool test_mode_{false}; // to be moved into appbase (application_base)
 
@@ -191,3 +162,4 @@ FC_REFLECT(sysio::producer_plugin::get_supported_protocol_features_params, (excl
 FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_params, (lower_bound)(limit)(time_limit_ms))
 FC_REFLECT(sysio::producer_plugin::unapplied_trx, (trx_id)(expiration)(trx_type)(first_auth)(first_receiver)(first_action)(total_actions)(accounts_billing)(size))
 FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_result, (size)(incoming_size)(trxs)(more))
+FC_REFLECT(sysio::producer_plugin::pause_at_block_params, (block_num));

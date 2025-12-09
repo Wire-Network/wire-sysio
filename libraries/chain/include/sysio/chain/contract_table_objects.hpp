@@ -321,7 +321,7 @@ namespace detail {
    SNAPSHOT_SECONDARY_SECTION_NAME(sysio::chain::index_long_double_object)
 }
 
-} }  // namespace eosio::chain
+} }  // namespace sysio::chain
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::table_id_object, sysio::chain::table_id_multi_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::key_value_object, sysio::chain::key_value_index)

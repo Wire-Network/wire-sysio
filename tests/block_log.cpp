@@ -36,7 +36,7 @@ struct block_log_fixture {
       }
       else {
          sysio::chain::genesis_state gs;
-         log->reset(gs, std::make_shared<sysio::chain::signed_block>());
+         log->reset(gs, sysio::chain::signed_block::create_signed_block(sysio::chain::signed_block::create_mutable_block({})));
 
          //in this case it's not really empty since the "genesis block" is present. These tests only
          // work because the default ctor of a block_header (used above) has previous 0'ed out which
@@ -54,11 +54,12 @@ struct block_log_fixture {
       std::vector<char> a;
       a.assign(size, fillchar);
 
-      sysio::chain::signed_block_ptr p = std::make_shared<sysio::chain::signed_block>();
+      auto p = sysio::chain::signed_block::create_mutable_block({});
       p->previous._hash[0] = fc::endian_reverse_u32(index-1);
       p->header_extensions.push_back(std::make_pair<uint16_t, std::vector<char>>(0, std::vector<char>(a)));
 
-      log->append(p, p->calculate_id(), fc::raw::pack(*p));
+      auto sp = sysio::chain::signed_block::create_signed_block(std::move(p));
+      log->append(sp, sp->calculate_id(), sp->packed_signed_block());
 
       if(index + 1 > written_data.size())
          written_data.resize(index + 1);
@@ -98,7 +99,7 @@ struct block_log_fixture {
    std::optional<uint32_t> partition_stride;
    fc::temp_directory dir;
 
-   std::optional<sysio::chain::block_log<sysio::chain::signed_block>> log;
+   std::optional<sysio::chain::block_log> log;
 
    std::vector<std::vector<char>> written_data;
 
@@ -587,8 +588,8 @@ BOOST_DATA_TEST_CASE(no_block_log_basic_nongenesis, bdata::xrange(2) * bdata::xr
 void no_block_log_public_functions_test( block_log_fixture& t) {
    BOOST_REQUIRE_NO_THROW(t.log->flush());
    BOOST_REQUIRE(t.log->read_block_by_num(1) == nullptr);
-   BOOST_REQUIRE(t.log->read_block_id_by_num(1) == sysio::chain::block_id_type{});
-   BOOST_REQUIRE(t.log->get_block_pos(1) == std::numeric_limits<uint64_t>::max());
+   BOOST_REQUIRE(!t.log->read_block_id_by_num(1));
+   BOOST_REQUIRE(t.log->get_block_pos(1) == sysio::chain::block_log::npos);
    BOOST_REQUIRE(t.log->read_head() == nullptr);
 }
 
@@ -641,6 +642,28 @@ BOOST_DATA_TEST_CASE(empty_prune_to_partitioned_transitions, bdata::xrange(1, 11
    t.check_not_present(expected_smallest_block_num-1);
 
 
+}  FC_LOG_AND_RETHROW() }
+
+//This test adds "a lot" more blocks to the log before transitioning from flat to pruned.
+BOOST_DATA_TEST_CASE(nonprune_to_prune_on_start, bdata::make({1, 1500}) * bdata::make({10, 50}), starting_block, prune_blocks)  { try {
+   //start non pruned
+   block_log_fixture t(true, true, false, std::optional<uint32_t>());
+   t.startup(starting_block);
+
+   const unsigned num_blocks_to_add = prune_blocks*3;
+   unsigned next_block = starting_block == 1 ? 2 : starting_block;
+   for(auto i = 0; i < prune_blocks*3; ++i)
+      t.add(next_block++, payload_size(), 'z');
+   t.check_n_bounce([&]() {});
+
+   //now switch over to pruned mode
+   t.prune_blocks = prune_blocks;
+   t.check_n_bounce([&]() {});
+
+   if(starting_block == 1)
+      t.check_range_present(num_blocks_to_add-prune_blocks+2, next_block-1);
+   else
+      t.check_range_present(starting_block+num_blocks_to_add-prune_blocks, next_block-1);
 }  FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_SUITE_END()

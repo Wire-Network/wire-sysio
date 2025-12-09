@@ -34,7 +34,7 @@ namespace sysio::resource_monitor {
             []( const fc::exception& e ) {
               elog("Exception in resource monitor plugin thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
               appbase::app().quit(); },
-            [&]() { space_monitor_loop(); }
+            [&](size_t) { space_monitor_loop(); }
          );
       }
 

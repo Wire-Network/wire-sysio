@@ -1,4 +1,11 @@
 #pragma once
+
+#include <sysio/chain_plugin/account_query_db.hpp>
+#include <sysio/chain_plugin/trx_retry_db.hpp>
+#include <sysio/chain_plugin/trx_finality_status_processing.hpp>
+#include <sysio/chain_plugin/tracked_votes.hpp>
+#include <sysio/chain_plugin/get_info_db.hpp>
+
 #include <sysio/chain/application.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/authority.hpp>
@@ -16,11 +23,6 @@
 #include <boost/container/flat_set.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
-#include <sysio/chain_plugin/account_query_db.hpp>
-#include <sysio/chain_plugin/trx_retry_db.hpp>
-#include <sysio/chain_plugin/trx_finality_status_processing.hpp>
-
-#include <fc/static_variant.hpp>
 #include <fc/time.hpp>
 
 namespace fc { class variant; }
@@ -138,7 +140,9 @@ protected:
 
 class read_only : public api_base {
    const controller& db;
+   const std::optional<get_info_db>& gidb;
    const std::optional<account_query_db>& aqdb;
+   std::optional<tracked_votes>& last_tracked_votes;
    const fc::microseconds abi_serializer_max_time;
    const fc::microseconds http_max_response_time;
    bool  shorten_abi_errors = true;
@@ -148,11 +152,17 @@ class read_only : public api_base {
 public:
    static const string KEYi64;
 
-   read_only(const controller& db, const std::optional<account_query_db>& aqdb,
-             const fc::microseconds& abi_serializer_max_time, const fc::microseconds& http_max_response_time,
-             const trx_finality_status_processing* trx_finality_status_proc)
+   read_only(const controller&                      db,
+             const std::optional<get_info_db>&      gidb,
+             const std::optional<account_query_db>& aqdb,
+             std::optional<tracked_votes>&          last_tracked_votes, // tracking_enabled of last_tracked_votes is set after it is constructed. const cannot be used here.
+             const fc::microseconds&                abi_serializer_max_time,
+             const fc::microseconds&                http_max_response_time,
+             const trx_finality_status_processing*  trx_finality_status_proc)
       : db(db)
+      , gidb(gidb)
       , aqdb(aqdb)
+      , last_tracked_votes(last_tracked_votes)
       , abi_serializer_max_time(abi_serializer_max_time)
       , http_max_response_time(http_max_response_time)
       , trx_finality_status_proc(trx_finality_status_proc) {
@@ -168,37 +178,15 @@ public:
 
    void set_shorten_abi_errors( bool f ) { shorten_abi_errors = f; }
 
+   void set_tracked_votes_tracking_enabled( bool flag ) {
+      if (last_tracked_votes) {
+         last_tracked_votes->set_tracking_enabled(flag);
+      }
+   }
+
    using get_info_params = empty;
 
-   struct get_info_results {
-      string                               server_version;
-      chain::chain_id_type                 chain_id;
-      uint32_t                             head_block_num = 0;
-      uint32_t                             last_irreversible_block_num = 0;
-      chain::block_id_type                 last_irreversible_block_id;
-      chain::block_id_type                 head_block_id;
-      fc::time_point                       head_block_time;
-      account_name                         head_block_producer;
-
-      uint64_t                             virtual_block_cpu_limit = 0;
-      uint64_t                             virtual_block_net_limit = 0;
-
-      uint64_t                             block_cpu_limit = 0;
-      uint64_t                             block_net_limit = 0;
-      //string                               recent_slots;
-      //double                               participation_rate = 0;
-      std::optional<string>                server_version_string;
-      std::optional<uint32_t>              fork_db_head_block_num;
-      std::optional<chain::block_id_type>  fork_db_head_block_id;
-      std::optional<string>                server_full_version_string;
-      std::optional<uint64_t>              total_cpu_weight;
-      std::optional<uint64_t>              total_net_weight;
-      std::optional<uint32_t>              earliest_available_block_num;
-      std::optional<fc::time_point>        last_irreversible_block_time;
-      std::optional<uint64_t>              number_accounts;
-      std::optional<uint64_t>              number_contracts;
-   };
-   get_info_results get_info(const get_info_params&, const fc::time_point& deadline) const;
+   get_info_db::get_info_results get_info(const get_info_params&, const fc::time_point& deadline) const;
 
    struct get_transaction_status_params {
       chain::transaction_id_type           id;
@@ -430,7 +418,7 @@ public:
     };
 
    struct get_table_rows_result {
-      vector<fc::variant> rows; ///< one row per item, either encoded as hex String or JSON object
+      fc::variants        rows; ///< one row per item, either encoded as hex String or JSON object
       bool                more = false; ///< true if last element in data is not the end and sizeof data() < limit
       string              next_key; ///< fill lower_bound with this value to fetch more rows
    };
@@ -484,6 +472,22 @@ public:
 
    fc::variant get_currency_stats( const get_currency_stats_params& params, const fc::time_point& deadline )const;
 
+   struct get_finalizer_info_params {
+   };
+
+   struct get_finalizer_info_result {
+      fc::variant                            active_finalizer_policy;  // current active policy
+      fc::variant                            pending_finalizer_policy; // current pending policy. Empty if not existing
+
+      // Last tracked vote information for each of the finalizers in
+      // active_finalizer_policy and pending_finalizer_policy.
+      // if a finalizer votes on both active_finalizer_policy and pending_finalizer_policy,
+      // the vote information on pending_finalizer_policy is used.
+      std::vector<tracked_votes::vote_info>  last_tracked_votes;
+   };
+
+   get_finalizer_info_result get_finalizer_info( const get_finalizer_info_params& params, const fc::time_point& deadline )const;
+
    struct get_producers_params {
       bool        json = false;
       string      lower_bound;
@@ -492,7 +496,7 @@ public:
    };
 
    struct get_producers_result {
-      vector<fc::variant> rows; ///< one row per item, either encoded as hex string or JSON object
+      fc::variants        rows; ///< one row per item, either encoded as hex string or JSON object
       double              total_producer_vote_weight;
       string              more; ///< fill lower_bound with this value to fetch more rows
    };
@@ -505,7 +509,6 @@ public:
    struct get_producer_schedule_result {
       fc::variant active;
       fc::variant pending;
-      fc::variant proposed;
    };
 
    get_producer_schedule_result get_producer_schedule( const get_producer_schedule_params& params, const fc::time_point& deadline )const;
@@ -809,7 +812,7 @@ public:
 
    using get_consensus_parameters_params = empty;
    struct get_consensus_parameters_results {
-     chain::chain_config               chain_config;
+     fc::variant                       chain_config; //filled as chain_config_v0, v1, etc depending on activated features
      std::optional<chain::wasm_config> wasm_config;
    };
    get_consensus_parameters_results get_consensus_parameters(const get_consensus_parameters_params&, const fc::time_point& deadline) const;
@@ -935,15 +938,6 @@ public:
      }
  };
 
- template<typename I>
- std::string itoh(I n, size_t hlen = sizeof(I)<<1) {
-     static const char* digits = "0123456789abcdef";
-     std::string r(hlen, '0');
-     for(size_t i = 0, j = (hlen - 1) * 4 ; i < hlen; ++i, j -= 4)
-         r[i] = digits[(n>>j) & 0x0f];
-     return r;
- }
-
 } // namespace chain_apis
 
 class chain_plugin : public plugin<chain_plugin> {
@@ -963,7 +957,6 @@ public:
    chain_apis::read_write get_read_write_api(const fc::microseconds& http_max_response_time);
    chain_apis::read_only get_read_only_api(const fc::microseconds& http_max_response_time) const;
 
-   bool accept_block( const chain::signed_block_ptr& block, const chain::block_id_type& id, const chain::block_state_legacy_ptr& bsp );
    void accept_transaction(const chain::packed_transaction_ptr& trx, chain::plugin_interface::next_function<chain::transaction_trace_ptr> next);
 
    // Only call this after plugin_initialize()!
@@ -977,6 +970,8 @@ public:
    // set true by other plugins if any plugin allows transactions
    bool accept_transactions() const;
    void enable_accept_transactions();
+   // true if vote processing is enabled
+   bool accept_votes() const;
 
    static void handle_guard_exception(const chain::guard_exception& e);
 
@@ -989,6 +984,7 @@ public:
    fc::variant get_log_trx(const transaction& trx) const;
 
    const controller::config& chain_config() const;
+
 private:
 
    unique_ptr<class chain_plugin_impl> my;
@@ -999,13 +995,6 @@ private:
 FC_REFLECT( sysio::chain_apis::linked_action, (account)(action) )
 FC_REFLECT( sysio::chain_apis::permission, (perm_name)(parent)(required_auth)(linked_actions) )
 FC_REFLECT(sysio::chain_apis::empty, )
-FC_REFLECT(sysio::chain_apis::read_only::get_info_results,
-           (server_version)(chain_id)(head_block_num)(last_irreversible_block_num)(last_irreversible_block_id)
-           (head_block_id)(head_block_time)(head_block_producer)
-           (virtual_block_cpu_limit)(virtual_block_net_limit)(block_cpu_limit)(block_net_limit)
-           (server_version_string)(fork_db_head_block_num)(fork_db_head_block_id)(server_full_version_string)
-           (total_cpu_weight)(total_net_weight)(earliest_available_block_num)(last_irreversible_block_time)
-           (number_accounts)(number_contracts))
 FC_REFLECT(sysio::chain_apis::read_only::get_transaction_status_params, (id) )
 FC_REFLECT(sysio::chain_apis::read_only::get_transaction_status_results, (state)(block_number)(block_id)(block_timestamp)(expiration)(head_number)(head_id)
            (head_timestamp)(irreversible_number)(irreversible_id)(irreversible_timestamp)(earliest_tracked_block_id)(earliest_tracked_block_number) )
@@ -1031,11 +1020,14 @@ FC_REFLECT( sysio::chain_apis::read_only::get_currency_balance_params, (code)(ac
 FC_REFLECT( sysio::chain_apis::read_only::get_currency_stats_params, (code)(symbol));
 FC_REFLECT( sysio::chain_apis::read_only::get_currency_stats_result, (supply)(max_supply)(issuer));
 
+FC_REFLECT_EMPTY( sysio::chain_apis::read_only::get_finalizer_info_params )
+FC_REFLECT( sysio::chain_apis::read_only::get_finalizer_info_result, (active_finalizer_policy)(pending_finalizer_policy)(last_tracked_votes) );
+
 FC_REFLECT( sysio::chain_apis::read_only::get_producers_params, (json)(lower_bound)(limit)(time_limit_ms) )
 FC_REFLECT( sysio::chain_apis::read_only::get_producers_result, (rows)(total_producer_vote_weight)(more) );
 
 FC_REFLECT_EMPTY( sysio::chain_apis::read_only::get_producer_schedule_params )
-FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)(pending)(proposed) );
+FC_REFLECT( sysio::chain_apis::read_only::get_producer_schedule_result, (active)(pending) );
 
 FC_REFLECT( sysio::chain_apis::read_only::account_resource_info, (used)(available)(max)(last_usage_update_time)(current_used) )
 FC_REFLECT( sysio::chain_apis::read_only::get_account_results,

@@ -171,7 +171,7 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) try {
-   auto producer_names = active_producers();
+   auto producer_names = activate_producers();
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
@@ -309,7 +309,7 @@ fc::mutable_variant_object config_to_variant( const sysio::chain::chain_config& 
 }
 
 BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
-   auto producer_names = active_producers();
+   auto producer_names = activate_producers();
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 
@@ -405,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
-   auto producer_names = active_producers();
+   auto producer_names = activate_producers();
 
    add_roa_policy(NODE_DADDY, "alice1111111"_n, "32.0000 SYS", "32.0000 SYS", "500.0000 SYS", 0, 0);
 

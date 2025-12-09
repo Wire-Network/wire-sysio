@@ -24,7 +24,7 @@
 #include <fc/variant.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
-#include <sysio/chain/chainbase_environment.hpp>
+#include <chainbase/environment.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
@@ -375,6 +375,9 @@ int chain_actions::run_subcommand_configure() {
     crypto::public_key public_key;
     std::string private_key_str;
     std::string public_key_str;
+    std::string bls_priv_str;
+    std::string bls_pub_str;
+    std::string bls_pop_str;
     fs::path key_file;
   };
 
@@ -548,16 +551,20 @@ int chain_actions::run_subcommand_configure() {
 
     // FUNC TO CREATE ACCOUNTS
     auto create_chain_account_detail = [&](const std::string& name) -> chain_account_detail& {
-      // CREATE KEY
+      // CREATE KEYs
       auto pk = private_key_type::generate();
       auto privs = pk.to_string({});
       auto pubs = pk.get_public_key().to_string({});
+      auto bls_priv = bls_private_key::generate();;
+      auto bls_pub = bls_priv.get_public_key();
+      auto bls_pop = bls_priv.proof_of_possession();
       auto key_file = secrets_dir / std::format("{}_key.txt", name);
 
       std::println(std::cout, "ACCOUNT[{}]: saving keys to {}", name, key_file.generic_string());
       {
         std::ofstream out(key_file.c_str());
-        out << std::format("Private key: {}\nPublic key: {}\n", privs, pubs);
+        out << std::format("Private key: {}\nPublic key: {}\nBLS Priv key: {}\nBLS Pub key: {}\nBLS Proof of Possession: {}\n",
+                           privs, pubs, bls_priv.to_string(), bls_pub.to_string(), bls_pop.to_string());
         out.close();
       }
 
@@ -570,6 +577,9 @@ int chain_actions::run_subcommand_configure() {
         .public_key = pk.get_public_key(),
         .private_key_str = privs,
         .public_key_str = pubs,
+        .bls_priv_str = bls_priv.to_string(),
+        .bls_pub_str = bls_pub.to_string(),
+        .bls_pop_str = bls_pop.to_string(),
         .key_file = key_file
       };
       std::println(std::cout, "ACCOUNT[{}]: key imported", name);
@@ -627,6 +637,7 @@ int chain_actions::run_subcommand_configure() {
     std::println(std::cout, "chain_id_data: {}, chain_id: {}", chain_id_data, chain_id);
     result_v("initial_timestamp", timestamp);
     result_v("initial_key", sysio_account_detail.public_key_str);
+    result_v("initial_finalizer_key", sysio_account_detail.bls_pub_str);
     result_v("initial_chain_id", chain_id);
 
     // Write resulting JSON
@@ -750,14 +761,20 @@ int chain_actions::run_subcommand_configure() {
           sysio_account_detail.public_key_str,
           sysio_account_detail.private_key_str
         );
+        auto bls_signature_provider_arg = std::format(
+          "--signature-provider={}=KEY:{}",
+          sysio_account_detail.bls_pub_str,
+          sysio_account_detail.bls_priv_str
+        );
         char* app_argv[] = {
           const_cast<char*>(exe_name.c_str()),
           const_cast<char*>(genesis_json_arg.c_str()),
           const_cast<char*>(signature_provider_arg.c_str()),
+          const_cast<char*>(bls_signature_provider_arg.c_str()),
           nullptr
         };
         if (!app->initialize<chain_plugin, net_plugin, producer_plugin, producer_api_plugin, resource_monitor_plugin>(
-          3,
+          sizeof(app_argv) / sizeof(char*) - 1,
           app_argv,
           initialize_logging
         )) {

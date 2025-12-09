@@ -1,5 +1,3 @@
-#include <fc/log/logger_config.hpp> //set_thread_name
-
 #include <sysio/chain/webassembly/sys-vm-oc/code_cache.hpp>
 #include <sysio/chain/webassembly/sys-vm-oc/config.hpp>
 #include <sysio/chain/webassembly/common.hpp>
@@ -9,17 +7,11 @@
 #include <sysio/chain/webassembly/sys-vm-oc/compile_monitor.hpp>
 #include <sysio/chain/exceptions.hpp>
 
+#include <fc/log/logger_config.hpp> //set_thread_name
+
+#include <fstream>
 #include <unistd.h>
-#include <sys/syscall.h>
 #include <sys/mman.h>
-#include <linux/memfd.h>
-
-#include "IR/Module.h"
-#include "IR/Validate.h"
-#include "WASM/WASM.h"
-#include "LLVMJIT.h"
-
-using namespace IR;
 
 namespace sysio { namespace chain { namespace sysvmoc {
 
@@ -38,12 +30,15 @@ static constexpr size_t descriptor_ptr_from_file_start = header_offset + offseto
 
 static_assert(sizeof(code_cache_header) <= header_size, "code_cache_header too big");
 
-code_cache_async::code_cache_async(const std::filesystem::path& data_dir, const sysvmoc::config& sysvmoc_config, const chainbase::database& db) :
+code_cache_async::code_cache_async(const std::filesystem::path& data_dir, const sysvmoc::config& sysvmoc_config,
+                                   const chainbase::database& db, compile_complete_callback cb) :
    code_cache_base(data_dir, sysvmoc_config, db),
+   _compile_complete_func(std::move(cb)),
    _result_queue(sysvmoc_config.threads * 2),
    _threads(sysvmoc_config.threads)
 {
    FC_ASSERT(_threads, "SYS VM OC requires at least 1 compile thread");
+   assert(_compile_complete_func);
 
    wait_on_compile_monitor_message();
 
@@ -54,7 +49,9 @@ code_cache_async::code_cache_async(const std::filesystem::path& data_dir, const 
 }
 
 code_cache_async::~code_cache_async() {
+   std::unique_lock g(_mtx);
    _compile_monitor_write_socket.shutdown(local::datagram_protocol::socket::shutdown_send);
+   g.unlock();
    _monitor_reply_thread.join();
    consume_compile_thread_queue();
 }
@@ -73,102 +70,126 @@ void code_cache_async::wait_on_compile_monitor_message() {
          return;
       }
 
-      _result_queue.push(std::get<wasm_compilation_result_message>(message));
+      --_outstanding_compiles;
+
+      const auto& msg = std::get<wasm_compilation_result_message>(message);
+      [[maybe_unused]] const bool p = _result_queue.push(msg);
+      assert(p);
+
+      _compile_complete_func(_ctx, msg.code.code_id, msg.queued_time);
+
+      process_queued_compiles();
 
       wait_on_compile_monitor_message();
    });
 }
 
+//call with _mtx locked
+void code_cache_async::write_message(const digest_type& code_id, const sysvmoc_message& message, std::span<wrapped_fd> fds) {
+   _outstanding_compiles_and_poison.emplace(code_id, false);
+   ++_outstanding_compiles;
+   if (!write_message_with_fds(_compile_monitor_write_socket, message, fds)) {
+      wlog("SYS VM failed to communicate to OOP manager");
+   }
+}
 
+//called from non-main thread
+void code_cache_async::process_queued_compiles() {
+   std::lock_guard g(_mtx);
+   while (_outstanding_compiles < _threads && !_queued_compiles.empty()) {
+      auto nextup = _queued_compiles.begin();
+
+      auto fd = memfd_for_bytearray(nextup->code);
+      write_message(nextup->code_id(), nextup->msg, std::span<wrapped_fd>{&fd, 1});
+
+      _queued_compiles.erase(nextup);
+   }
+}
+
+//called from main thread
 //number processed, bytes available (only if number processed > 0)
 std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
+   std::unique_lock g(_mtx);
+   // will be relatively small, ~ _threads. Can be larger than _threads if multiple compiles finish before
+   // consume_compile_thread_queue() is called on the main thread
+   auto outstanding_compiles = _outstanding_compiles_and_poison;
+   g.unlock();
+
+   std::vector<digest_type> erased;
+   erased.reserve(outstanding_compiles.size());
    size_t bytes_remaining = 0;
    size_t gotsome = _result_queue.consume_all([&](const wasm_compilation_result_message& result) {
-      if(_outstanding_compiles_and_poison[result.code] == false) {
+      if(outstanding_compiles[result.code.code_id] == false) {
          std::visit(overloaded {
             [&](const code_descriptor& cd) {
                _cache_index.push_front(cd);
             },
             [&](const compilation_result_unknownfailure&) {
                wlog("code ${c} failed to tier-up with SYS VM OC", ("c", result.code.code_id));
-               _blacklist.emplace(result.code);
+               _blacklist.emplace(result.code.code_id);
             },
             [&](const compilation_result_toofull&) {
-               run_eviction_round();
+               run_eviction_round(); // call without mutex lock
             }
          }, result.result);
       }
-      _outstanding_compiles_and_poison.erase(result.code);
+      erased.push_back(result.code.code_id);
       bytes_remaining = result.cache_free_bytes;
    });
+
+   g.lock();
+   for (const auto& e : erased) {
+      [[maybe_unused]] const auto c = _outstanding_compiles_and_poison.erase(e);
+      assert(c > 0);
+   }
+   g.unlock();
 
    return {gotsome, bytes_remaining};
 }
 
 
-const code_descriptor* const code_cache_async::get_descriptor_for_code(bool high_priority, const digest_type& code_id, const uint8_t& vm_version, bool is_write_window, get_cd_failure& failure) {
+const code_descriptor* const
+code_cache_async::get_descriptor_for_code(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version, get_cd_failure& failure) {
    //if there are any outstanding compiles, process the result queue now
    //When app is in write window, all tasks are running sequentially and read-only threads
    //are not running. Safe to update cache entries.
-   if(is_write_window && _outstanding_compiles_and_poison.size()) {
+   if(m.write_window) {
       auto [count_processed, bytes_remaining] = consume_compile_thread_queue();
 
       if(count_processed)
          check_eviction_threshold(bytes_remaining);
-
-      while(count_processed && _queued_compiles.size()) {
-         auto nextup = _queued_compiles.begin();
-
-         //it's not clear this check is required: if apply() was called for code then it existed in the code_index; and then
-         // if we got notification of it no longer existing we would have removed it from queued_compiles
-         const code_object* const codeobject = _db.find<code_object,by_code_hash>(boost::make_tuple(nextup->code_id, 0, nextup->vm_version));
-         if(codeobject) {
-            _outstanding_compiles_and_poison.emplace(*nextup, false);
-            std::vector<wrapped_fd> fds_to_pass;
-            fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-            FC_ASSERT(write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ *nextup, _sysvmoc_config }, fds_to_pass), "SYS VM failed to communicate to OOP manager");
-            --count_processed;
-         }
-         _queued_compiles.erase(nextup);
-      }
    }
 
    //check for entry in cache
-   code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(boost::make_tuple(code_id, vm_version));
-   if(it != _cache_index.get<by_hash>().end()) {
-      if (is_write_window)
+   if(auto it = _cache_index.get<by_hash>().find(code_id); it != _cache_index.get<by_hash>().end()) {
+      if (m.write_window)
          _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
       return &*it;
    }
-   if(!is_write_window) {
+   if(!m.write_window) {
       failure = get_cd_failure::temporary; // Compile might not be done yet
       return nullptr;
    }
 
-   const code_tuple ct = code_tuple{code_id, vm_version};
-
-   if(_blacklist.find(ct) != _blacklist.end()) {
-      failure = get_cd_failure::permanent; // Compile will not start
-      return nullptr;
+   if(_blacklist.find(code_id) != _blacklist.end()) {
+      if (!m.whitelisted) {
+         failure = get_cd_failure::permanent; // Compile will not start
+         return nullptr;
+      }
+      // whitelisted, remove from blacklist and allow to try compile again
+      _blacklist.erase(code_id);
    }
-   if(auto it = _outstanding_compiles_and_poison.find(ct); it != _outstanding_compiles_and_poison.end()) {
+   std::unique_lock g(_mtx);
+   if(auto it = _outstanding_compiles_and_poison.find(code_id); it != _outstanding_compiles_and_poison.end()) {
       failure = get_cd_failure::temporary; // Compile might not be done yet
       it->second = false;
       return nullptr;
    }
-   if(auto it = _queued_compiles.get<by_hash>().find(boost::make_tuple(std::ref(code_id), vm_version)); it != _queued_compiles.get<by_hash>().end()) {
+   if(_queued_compiles.get<by_hash>().contains(code_id)) {
       failure = get_cd_failure::temporary; // Compile might not be done yet
       return nullptr;
    }
-
-   if(_outstanding_compiles_and_poison.size() >= _threads) {
-      if (high_priority)
-         _queued_compiles.push_front(ct);
-      else
-         _queued_compiles.push_back(ct);
-      failure = get_cd_failure::temporary; // Compile might not be done yet
-      return nullptr;
-   }
+   g.unlock();
 
    const code_object* const codeobject = _db.find<code_object,by_code_hash>(boost::make_tuple(code_id, 0, vm_version));
    if(!codeobject) { //should be impossible right?
@@ -176,10 +197,27 @@ const code_descriptor* const code_cache_async::get_descriptor_for_code(bool high
       return nullptr;
    }
 
-   _outstanding_compiles_and_poison.emplace(ct, false);
-   std::vector<wrapped_fd> fds_to_pass;
-   fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ ct, _sysvmoc_config }, fds_to_pass);
+   auto msg = compile_wasm_message{
+      .log_level = fc::logger::default_logger().get_log_level(),
+      .receiver = receiver,
+      .code = { code_id, vm_version },
+      .queued_time = fc::time_point::now(),
+      .limits = !m.whitelisted ? _sysvmoc_config.non_whitelisted_limits : std::optional<subjective_compile_limits>{}
+   };
+
+   g.lock();
+   if(_outstanding_compiles >= _threads) {
+      std::vector<char> code{codeobject->code.begin(), codeobject->code.end()};
+      if (m.high_priority)
+         _queued_compiles.emplace_front(std::move(msg), std::move(code));
+      else
+         _queued_compiles.emplace_back(std::move(msg), std::move(code));
+      failure = get_cd_failure::temporary; // Compile might not be done yet
+      return nullptr;
+   }
+
+   auto fd = memfd_for_bytearray(codeobject->code);
+   write_message(code_id, msg, std::span<wrapped_fd>{&fd, 1});
    failure = get_cd_failure::temporary; // Compile might not be done yet
    return nullptr;
 }
@@ -193,25 +231,30 @@ code_cache_sync::~code_cache_sync() {
       elog("unexpected response from SYS VM OC compile monitor during shutdown");
 }
 
-const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(const digest_type& code_id, const uint8_t& vm_version, bool is_write_window) {
+const code_descriptor* const code_cache_sync::get_descriptor_for_code_sync(mode m, account_name receiver, const digest_type& code_id, const uint8_t& vm_version) {
    //check for entry in cache
-   code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(boost::make_tuple(code_id, vm_version));
+   code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(code_id);
    if(it != _cache_index.get<by_hash>().end()) {
-      if (is_write_window)
+      if (m.write_window)
          _cache_index.relocate(_cache_index.begin(), _cache_index.project<0>(it));
       return &*it;
    }
-   if(!is_write_window)
+   if(!m.write_window)
       return nullptr;
 
    const code_object* const codeobject = _db.find<code_object,by_code_hash>(boost::make_tuple(code_id, 0, vm_version));
    if(!codeobject) //should be impossible right?
       return nullptr;
 
-   std::vector<wrapped_fd> fds_to_pass;
-   fds_to_pass.emplace_back(memfd_for_bytearray(codeobject->code));
-
-   write_message_with_fds(_compile_monitor_write_socket, compile_wasm_message{ {code_id, vm_version}, _sysvmoc_config }, fds_to_pass);
+   auto msg = compile_wasm_message{
+      .log_level = fc::logger::default_logger().get_log_level(),
+      .receiver = receiver,
+      .code = { code_id, vm_version },
+      .queued_time = fc::time_point{}, // could use now() if compile time measurement desired
+      .limits = !m.whitelisted ? _sysvmoc_config.non_whitelisted_limits : std::optional<subjective_compile_limits>{}
+   };
+   auto fd = memfd_for_bytearray(codeobject->code);
+   write_message_with_fds(_compile_monitor_write_socket, msg, std::span<wrapped_fd>{&fd, 1});
    auto [success, message, fds] = read_message_with_fds(_compile_monitor_read_socket);
    SYS_ASSERT(success, wasm_execution_error, "failed to read response from monitor process");
    SYS_ASSERT(std::holds_alternative<wasm_compilation_result_message>(message), wasm_execution_error, "unexpected response from monitor process");
@@ -388,34 +431,40 @@ code_cache_base::~code_cache_base() {
 
 }
 
+// called from main thread
 void code_cache_base::free_code(const digest_type& code_id, const uint8_t& vm_version) {
-   code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(boost::make_tuple(code_id, vm_version));
+   code_cache_index::index<by_hash>::type::iterator it = _cache_index.get<by_hash>().find(code_id);
+
+   std::lock_guard g(_mtx);
    if(it != _cache_index.get<by_hash>().end()) {
       write_message_with_fds(_compile_monitor_write_socket, evict_wasms_message{ {*it} });
       _cache_index.get<by_hash>().erase(it);
    }
 
    //if it's in the queued list, erase it
-   if(auto i = _queued_compiles.get<by_hash>().find(boost::make_tuple(std::ref(code_id), vm_version)); i != _queued_compiles.get<by_hash>().end())
+   if(auto i = _queued_compiles.get<by_hash>().find(code_id); i != _queued_compiles.get<by_hash>().end())
       _queued_compiles.get<by_hash>().erase(i);
 
    //however, if it's currently being compiled there is no way to cancel the compile,
    //so instead set a poison boolean that indicates not to insert the code in to the cache
    //once the compile is complete
-   const std::unordered_map<code_tuple, bool>::iterator compiling_it = _outstanding_compiles_and_poison.find({code_id, vm_version});
+   const std::unordered_map<digest_type, bool>::iterator compiling_it = _outstanding_compiles_and_poison.find(code_id);
    if(compiling_it != _outstanding_compiles_and_poison.end())
       compiling_it->second = true;
 }
 
+// called from main thread
 void code_cache_base::run_eviction_round() {
    evict_wasms_message evict_msg;
    for(unsigned int i = 0; i < 25 && _cache_index.size() > 1; ++i) {
       evict_msg.codes.emplace_back(_cache_index.back());
       _cache_index.pop_back();
    }
+   std::lock_guard g(_mtx);
    write_message_with_fds(_compile_monitor_write_socket, evict_msg);
 }
 
+// called from main thread
 void code_cache_base::check_eviction_threshold(size_t free_bytes) {
    if(free_bytes < _free_bytes_eviction_threshold)
       run_eviction_round();

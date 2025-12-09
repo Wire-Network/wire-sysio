@@ -83,10 +83,10 @@ namespace sysio::chain {
 
    using chainbase::allocator;
    using shared_string = chainbase::shared_string;
-   
+
    template<typename T>
    using shared_vector = chainbase::shared_vector<T>;
-   
+
    template<typename K, typename V>
    using shared_flat_multimap = boost::interprocess::flat_multimap< K, V, std::less<K>, allocator< std::pair<K,V> > >;
 
@@ -244,15 +244,6 @@ namespace sysio::chain {
    using bytes               = vector<char>;
    using digests_t           = deque<digest_type>;
 
-   struct sha256_less {
-      bool operator()( const fc::sha256& lhs, const fc::sha256& rhs ) const {
-       return
-             std::tie(lhs._hash[0], lhs._hash[1], lhs._hash[2], lhs._hash[3]) <
-             std::tie(rhs._hash[0], rhs._hash[1], rhs._hash[2], rhs._hash[3]);
-      }
-   };
-
-
    /**
     *  Extentions are prefixed with type and are a buffer that can be
     *  interpreted by code that is aware and ignored by unaware code.
@@ -403,6 +394,9 @@ namespace sysio::chain {
 
    template<typename T>
    using next_function = std::function<void(const next_function_variant<T>&)>;
+
+   // to configure whether a process should be done asynchronously or not
+   enum class async_t { no, yes };
 
 }  // sysio::chain
 

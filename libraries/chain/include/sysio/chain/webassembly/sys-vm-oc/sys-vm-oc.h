@@ -7,7 +7,6 @@
 #ifdef __cplusplus
 #include <vector>
 #include <list>
-#include <exception>
 namespace sysio::chain {
    class apply_context;
 }

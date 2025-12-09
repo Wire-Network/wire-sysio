@@ -8,7 +8,7 @@ namespace sysio {
    struct handshake_message;
 
    namespace chain_apis {
-      class read_only;
+      class get_info_db;
    }
 
    class chain_plugin;
@@ -43,11 +43,10 @@ namespace chain {
          template<typename T>
          friend T fc::variant::as()const;
 
-         friend class sysio::chain_apis::read_only;
+         friend class sysio::chain_apis::get_info_db;
 
          friend class sysio::net_plugin_impl;
          friend struct sysio::handshake_message;
-         template<typename StoredType>
          friend class block_log;
          friend struct trim_data;
          friend class controller;

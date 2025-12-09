@@ -5,6 +5,7 @@
 #include <sysio/chain/exceptions.hpp>
 #include <utility>
 #include <fc/variant_object.hpp>
+#include <fc/variant_dynamic_bitset.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
 
@@ -47,7 +48,7 @@ struct abi_serializer {
    /// @return string_view of `t` or internal string type
    std::string_view resolve_type(const std::string_view& t)const;
    bool      is_array(const std::string_view& type)const;
-   bool      is_szarray(const std::string_view& type)const;
+   std::optional<fc::unsigned_int> is_szarray(const std::string_view& type)const;
    bool      is_optional(const std::string_view& type)const;
    bool      is_type( const std::string_view& type, const yield_function_t& yield )const;
    bool      is_type(const std::string_view& type, const fc::microseconds& max_serialization_time)const;
@@ -375,7 +376,7 @@ namespace impl {
       static void add( mutable_variant_object &mvo, const char* name, const vector<M>& v, const Resolver& resolver, abi_traverse_context& ctx )
       {
          auto h = ctx.enter_scope();
-         vector<fc::variant> array;
+         fc::variants array;
          array.reserve(v.size());
 
          for (const auto& iter: v) {
@@ -653,6 +654,8 @@ namespace impl {
          out(name, std::move(mvo));
       }
 
+      static void add_block_header_finality_extension( mutable_variant_object& mvo, const header_extension_multimap& header_exts );
+
       /**
        * overload of to_variant_object for signed_block
        *
@@ -676,10 +679,9 @@ namespace impl {
 
          // process contents of block.header_extensions
          flat_multimap<uint16_t, block_header_extension> header_exts = block.validate_and_extract_header_extensions();
-         if ( header_exts.count(protocol_feature_activation::extension_id() > 0) ) {
-            const auto& new_protocol_features =
-                  std::get<protocol_feature_activation>(header_exts.lower_bound(protocol_feature_activation::extension_id())->second).protocol_features;
-            vector<fc::variant> pf_array;
+         if (auto it = header_exts.find(protocol_feature_activation::extension_id()); it != header_exts.end()) {
+            const auto& new_protocol_features = std::get<protocol_feature_activation>(it->second).protocol_features;
+            fc::variants pf_array;
             pf_array.reserve(new_protocol_features.size());
             for (auto feature : new_protocol_features) {
                mutable_variant_object feature_mvo;
@@ -688,21 +690,24 @@ namespace impl {
             }
             mvo("new_protocol_features", pf_array);
          }
-         if ( header_exts.count(producer_schedule_change_extension::extension_id())) {
-            const auto& new_producer_schedule =
-                  std::get<producer_schedule_change_extension>(header_exts.lower_bound(producer_schedule_change_extension::extension_id())->second);
+         if (auto it = header_exts.find(producer_schedule_change_extension::extension_id()); it != header_exts.end()) {
+            const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(it->second);
             mvo("new_producer_schedule", new_producer_schedule);
          }
+         add_block_header_finality_extension(mvo, header_exts);
 
          mvo("producer_signature", block.producer_signature);
          add(mvo, "transactions", block.transactions, resolver, ctx);
 
          // process contents of block.block_extensions
          auto block_exts = block.validate_and_extract_extensions();
-         if ( block_exts.count(additional_block_signatures_extension::extension_id()) > 0) {
-            const auto& additional_signatures =
-                  std::get<additional_block_signatures_extension>(block_exts.lower_bound(additional_block_signatures_extension::extension_id())->second);
+         if (auto it = block_exts.find(additional_block_signatures_extension::extension_id()); it != block_exts.end()) {
+            const auto& additional_signatures = std::get<additional_block_signatures_extension>(it->second);
             mvo("additional_signatures", additional_signatures);
+         }
+         if (auto it = block_exts.find(quorum_certificate_extension::extension_id()); it != block_exts.end()) {
+            const auto& qc_extension = std::get<quorum_certificate_extension>(it->second);
+            mvo("qc_extension", qc_extension);
          }
 
          out(name, std::move(mvo));
@@ -946,7 +951,7 @@ namespace impl {
          {
             auto itr = _vo.find(name);
             if( itr != _vo.end() )
-               abi_from_variant::extract( itr->value(), this->obj.*member, _resolver, _ctx );
+               abi_from_variant::extract( itr->value(), const_cast<std::remove_const_t<Member>&>(this->obj.*member), _resolver, _ctx );
          }
 
       private:

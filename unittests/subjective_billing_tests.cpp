@@ -373,7 +373,7 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    for (; i < num_itrs; ++i) {
       ptrx = create_trx(0, {1,1,1,0});
       BOOST_CHECK_THROW(push_trx( ptrx, fc::time_point::maximum(), {}, false ), sysio_assert_message_exception);
-      if (sub_bill.get_subjective_bill(other, b->timestamp) > sub_bill.get_subjective_account_cpu_allowed())
+      if (sub_bill.get_subjective_bill(other, b->timestamp) >= sub_bill.get_subjective_account_cpu_allowed())
          break;
    }
    BOOST_REQUIRE(i < num_itrs); // failed to accumulate subjective billing

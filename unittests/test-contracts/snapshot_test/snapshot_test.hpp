@@ -39,4 +39,14 @@ public:
       sysio::indexed_by< "byiiii"_n, sysio::const_mem_fun< main_record, const sysio::checksum256&,
                                                            &main_record::get_index_i256 > >
    >;
+
+   struct [[sysio::table("test")]] test_record {
+      uint64_t id = 0;
+      sysio::checksum256 payload;
+      uint64_t primary_key() const {return id;}
+   };
+   using test_table = sysio::multi_index<"test"_n, test_record>;
+   [[sysio::action]] void add(sysio::name scope, uint64_t id, sysio::checksum256 payload);
+   [[sysio::action]] void remove(sysio::name scope, uint64_t id);
+   [[sysio::action]] void verify(sysio::name scope, uint64_t id, sysio::checksum256 payload);
 };

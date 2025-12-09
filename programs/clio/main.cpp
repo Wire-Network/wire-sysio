@@ -69,7 +69,9 @@ Options:
 #include <regex>
 #include <iostream>
 #include <locale>
+#include <tuple>
 #include <unordered_map>
+#include <utility>
 #include <fc/crypto/hex.hpp>
 #include <fc/variant.hpp>
 #include <fc/io/datastream.hpp>
@@ -77,17 +79,14 @@ Options:
 #include <fc/io/console.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/variant_object.hpp>
+#include <fc/io/fstream.hpp>
 
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/chain/contract_types.hpp>
-
 #include <sysio/version/version.hpp>
-
-#pragma push_macro("N")
-#undef N
 
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
@@ -99,10 +98,6 @@ Options:
 #include <boost/range/algorithm/copy.hpp>
 #define BOOST_DLL_USE_STD_FS
 #include <boost/dll/runtime_symbol_info.hpp>
-
-#pragma pop_macro("N")
-
-#include <fc/io/fstream.hpp>
 
 #define CLI11_HAS_FILESYSTEM 0
 #include <CLI/CLI.hpp>
@@ -119,6 +114,13 @@ using namespace sysio::client::help;
 using namespace sysio::client::http;
 using namespace sysio::client::localize;
 using namespace sysio::client::config;
+
+template <typename... Types>
+bool try_each_type(const std::tuple<Types...>&, auto&& func) {
+   return [&]<std::size_t... Idxs>(std::index_sequence<Idxs...>) {
+      return (func.template operator()<std::tuple_element_t<Idxs, std::tuple<Types...>>>() || ...);
+   }(std::make_index_sequence<sizeof...(Types)>{});
+}
 
 FC_DECLARE_EXCEPTION( explained_exception, 9000000, "explained exception, see error log" );
 FC_DECLARE_EXCEPTION( localized_exception, 10000000, "an error occured" );
@@ -348,8 +350,8 @@ sysio::chain_apis::read_only::get_consensus_parameters_results get_consensus_par
    return call(::default_url, get_consensus_parameters_func).as<sysio::chain_apis::read_only::get_consensus_parameters_results>();
 }
 
-sysio::chain_apis::read_only::get_info_results get_info() {
-   return call(::default_url, get_info_func).as<sysio::chain_apis::read_only::get_info_results>();
+sysio::chain_apis::get_info_db::get_info_results get_info() {
+   return call(::default_url, get_info_func).as<sysio::chain_apis::get_info_db::get_info_results>();
 }
 
 string generate_nonce_string() {
@@ -603,15 +605,19 @@ fc::variant bin_to_variant( const account_name& account, const action_name& acti
 fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_type ptype = fc::json::parse_type::legacy_parser)
 {
    regex r("^[ \t]*[\{\[]");
-   if ( !regex_search(file_or_str, r) && std::filesystem::is_regular_file(file_or_str) ) {
+   bool looks_like_json = regex_search(file_or_str, r);
+   std::error_code ec;
+   if ( !looks_like_json && std::filesystem::is_regular_file(file_or_str, ec) ) {
       try {
          return fc::json::from_file(file_or_str, ptype);
       } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", file_or_str));
 
-   } else {
+   } else if (looks_like_json) {
       try {
          return fc::json::from_string(file_or_str, ptype);
       } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", file_or_str));
+   } else {
+      return file_or_str;
    }
 }
 
@@ -676,19 +682,32 @@ void print_result( const fc::variant& result ) { try {
          }
 
          cerr << status << " transaction: " << transaction_id << "  ";
-         if( net < 0 ) {
-            cerr << "<unknown>";
+         if (!tx_read) {
+            if( net < 0 ) {
+               cerr << "<unknown>";
+            } else {
+               cerr << net;
+            }
+            cerr << " bytes  ";
+            if( cpu < 0 ) {
+               cerr << "<unknown>";
+            } else {
+               cerr << cpu;
+            }
+            cerr << " us\n";
          } else {
-            cerr << net;
+            int64_t elapsed = -1;
+            if (processed.get_object().contains( "elapsed" )) {
+               elapsed = processed["elapsed"].as_int64();
+            }
+            cerr << " elapsed ";
+            if (elapsed < 0) {
+               cerr << "<unknown>";
+            } else {
+               cerr << elapsed;
+            }
+            cerr << " us\n";
          }
-         cerr << " bytes  ";
-         if( cpu < 0 ) {
-            cerr << "<unknown>";
-         } else {
-            cerr << cpu;
-         }
-
-         cerr << " us\n";
 
          if( status == "failed" ) {
             auto soft_except = processed["except"].as<std::optional<fc::exception>>();
@@ -700,7 +719,8 @@ void print_result( const fc::variant& result ) { try {
             for( const auto& a : actions ) {
                print_action_tree( a );
             }
-            wlog( "\rwarning: transaction executed locally, but may not be confirmed by the network yet" );
+            if (!tx_read && !tx_dry_run)
+               wlog( "\rwarning: transaction executed locally, but may not be confirmed by the network yet" );
          }
       } else {
          cerr << fc::json::to_pretty_string( result ) << endl;
@@ -1764,6 +1784,8 @@ int main( int argc, char** argv ) {
 
    fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
 
+   setlocale(LC_CTYPE, "C.UTF-8");
+
    wallet_url = default_wallet_url;
 
    CLI::App app{"Command Line Interface to SYSIO Client"};
@@ -1955,6 +1977,99 @@ int main( int argc, char** argv ) {
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
    });
 
+   // pack hex
+   using try_types = std::tuple<signed_block, transaction_trace, action_trace, transaction_receipt,
+                                packed_transaction, signed_transaction, transaction, abi_def, action>;
+   string json;
+   string type;
+   string abi_file;
+   auto pack_hex = convert->add_subcommand("pack_hex", localized("From JSON to packed HEX form"));
+   pack_hex->add_option("json", json, localized("The JSON of built-in types including: signed_block, transaction/action_trace, transaction, action, abi_def"))->required();
+   pack_hex->add_option("--type", type, (localized("Type of the JSON data")))->required();
+   pack_hex->add_option("--abi-file", abi_file, localized("The abi file that contains --type for packing"));
+   pack_hex->callback([&] {
+      fc::variant unpacked_json = json_from_file_or_string(json);
+
+      std::cerr << "Packing: " << fc::json::to_pretty_string(unpacked_json) << "\n" << std::endl;
+      bool success = false;
+      std::optional<abi_def> abi;
+      if (!abi_file.empty()) {
+         abi = json::from_file(abi_file).as<abi_def>();
+      }
+      try {
+         abi_serializer s = abi ? abi_serializer(*abi, abi_serializer::create_yield_function( abi_serializer_max_time )) : abi_serializer{};
+         auto v = s.variant_to_binary(type, unpacked_json, fc::microseconds::maximum());
+         std::cout << fc::json::to_pretty_string(v) << std::endl;
+         success = true;
+      } catch (...) {}
+      if (!success) {
+         success = try_each_type(try_types{}, [&]<typename Type>() {
+            std::string type_name = boost::core::demangle(typeid(Type).name());
+            type_name = type_name.substr(type_name.find_last_of(':') + 1);
+            if (type == type_name) {
+               try {
+                  Type t;
+                  from_variant(unpacked_json, t);
+                  auto v = fc::raw::pack(t);
+                  std::cout << fc::json::to_pretty_string(v) << std::endl;
+                  return true;
+               } catch (...) {}
+            }
+            return false;
+         });
+      }
+
+      if (!success) {
+         std::cerr << "ERROR: Unable to convert the JSON";
+         if (!type.empty()) {
+            std::cerr << " to type: " << type;
+         }
+         std::cerr << std::endl;
+      }
+   });
+
+   // unpack hex
+   string packed_hex;
+   auto unpack_hex = convert->add_subcommand("unpack_hex", localized("From packed HEX to JSON form"));
+   unpack_hex->add_option("hex", packed_hex, localized("The packed HEX of built-in types including: signed_block, transaction/action_trace, transaction, action, abi_def"))->required();
+   unpack_hex->add_option("--type", type, (localized("Type of the HEX data, if not specified then some common types are attempted")));
+   unpack_hex->add_option("--abi-file", abi_file, localized("The abi file that contains --type for unpacking"));
+   unpack_hex->callback([&] {
+      SYS_ASSERT( packed_hex.size() >= 2, misc_exception, "No packed HEX data found" );
+      vector<char> packed_blob(packed_hex.size()/2);
+      fc::from_hex(packed_hex, packed_blob.data(), packed_blob.size());
+      bool success = false;
+      if (!type.empty()) {
+         std::optional<abi_def> abi;
+         if (!abi_file.empty()) {
+            abi = json::from_file(abi_file).as<abi_def>();
+         }
+         try {
+            abi_serializer s = abi ? abi_serializer(*abi, abi_serializer::create_yield_function( abi_serializer_max_time )) : abi_serializer{};
+            auto v = s.binary_to_variant(type, packed_blob, fc::microseconds::maximum());
+            std::cout << fc::json::to_pretty_string(v) << std::endl;
+            success = true;
+         } catch (...) {}
+      } else {
+         SYS_ASSERT( abi_file.empty(), misc_exception, "--type required if --abi-file specified");
+         success = try_each_type(try_types{}, [&]<typename Type>(){
+            try {
+               auto v = fc::raw::unpack<Type>( packed_blob );
+               std::cout << fc::json::to_pretty_string(v) << std::endl;
+               return true;
+            } catch(...) {}
+            return false;
+         });
+      }
+      if (!success) {
+         std::cerr << "ERROR: Unable to convert the packed hex";
+         if (!type.empty()) {
+            std::cerr << " to type: " << type;
+         }
+         std::cerr << std::endl;
+      }
+   });
+
    // validate subcommand
    auto validate = app.add_subcommand("validate", localized("Validate transactions"));
    validate->require_subcommand();
@@ -2000,6 +2115,11 @@ int main( int argc, char** argv ) {
       std::cout << fc::json::to_pretty_string(get_info()) << std::endl;
    });
 
+   // get finalizer info
+   get->add_subcommand("finalizer_info", localized("Get current finalizer information"))->callback([] {
+      std::cout << fc::json::to_pretty_string(call(get_finalizer_info_func, fc::mutable_variant_object())) << std::endl;
+   });
+
    // get transaction status
    string status_transaction_id;
    auto getTransactionStatus = get->add_subcommand("transaction-status", localized("Get transaction status information"));
@@ -2024,7 +2144,6 @@ int main( int argc, char** argv ) {
    get_block_params params;
    auto getBlock = get->add_subcommand("block", localized("Retrieve a full block from the blockchain"));
    getBlock->add_option("block", params.blockArg, localized("The number or ID of the block to retrieve"))->required();
-   getBlock->add_flag("--header-state", params.get_bhs, localized("Get block header state from fork database instead") );
    getBlock->add_flag("--info", params.get_binfo, localized("Get block info from the blockchain by block num only") );
    getBlock->add_flag("--raw", params.get_braw, localized("Get raw block from the blockchain") );
    getBlock->add_flag("--header", params.get_bheader, localized("Get block header from the blockchain") );
@@ -2032,7 +2151,7 @@ int main( int argc, char** argv ) {
 
    getBlock->callback([&params] {
       int num_flags = params.get_bhs + params.get_binfo + params.get_braw + params.get_bheader + params.get_bheader_extensions;
-      SYSC_ASSERT( num_flags <= 1, "ERROR: Only one of the following flags can be set: --header-state, --info, --raw, --header, --header-with-extensions." );
+      SYSC_ASSERT( num_flags <= 1, "ERROR: Only one of the following flags can be set: --info, --raw, --header, --header-with-extensions." );
       if (params.get_binfo) {
          std::optional<int64_t> block_num;
          try {
@@ -2045,9 +2164,7 @@ int main( int argc, char** argv ) {
          std::cout << fc::json::to_pretty_string(call(get_block_info_func, arg)) << std::endl;
       } else {
          const auto arg = fc::variant_object("block_num_or_id", params.blockArg);
-         if (params.get_bhs) {
-            std::cout << fc::json::to_pretty_string(call(get_block_header_state_func, arg)) << std::endl;
-         } else if (params.get_braw) {
+         if (params.get_braw) {
             std::cout << fc::json::to_pretty_string(call(get_raw_block_func, arg)) << std::endl;
          } else if (params.get_bheader || params.get_bheader_extensions) {
             std::cout << fc::json::to_pretty_string(
@@ -2497,7 +2614,7 @@ int main( int argc, char** argv ) {
    transfer->add_option("recipient", recipient, localized("The account receiving tokens"))->required();
    transfer->add_option("amount", amount, localized("The amount of tokens to send"))->required();
    transfer->add_option("memo", memo, localized("The memo for the transfer"));
-   transfer->add_option("--contract,-c", con, localized("The contract that controls the token"));
+   transfer->add_option("--contract,-c", con, localized("The contract that controls the token, defaults to sysio.token for asset amounts"));
    transfer->add_flag("--pay-ram-to-open", pay_ram, localized("Pay RAM to open recipient's token balance row"));
 
    add_standard_transaction_options_plus_signing(transfer, "sender@active");
@@ -2805,6 +2922,7 @@ int main( int argc, char** argv ) {
    actionsSubcommand->add_option("action", action,
                                  localized("A JSON string or filename defining the action to execute on the contract"))->required()->capture_default_str();
    actionsSubcommand->add_option("data", data, localized("The arguments to the contract"))->required();
+   actionsSubcommand->add_flag("--dry-run", tx_dry_run, localized("Specify an action is dry-run"));
    actionsSubcommand->add_flag("--read", tx_read, localized("Specify an action is read-only"));
 
    add_standard_transaction_options_plus_signing(actionsSubcommand);

@@ -18,46 +18,26 @@ BOOST_AUTO_TEST_SUITE(chain_tests)
 BOOST_AUTO_TEST_CASE( replace_producer_keys ) try {
    validating_tester tester;
 
-   const auto head_ptr = tester.control->head_block_state();
-   BOOST_REQUIRE(head_ptr);
-
    const auto new_key = get_public_key(name("newkey"), config::active_name.to_string());
 
    // make sure new keys is not used
-   for(const auto& prod : head_ptr->active_schedule.producers) {
+   for(const auto& prod : tester.control->active_producers().producers) {
       for(const auto& key : std::get<block_signing_authority_v0>(prod.authority).keys){  
          BOOST_REQUIRE(key.key != new_key);
       }
    }
 
-   const auto old_version = head_ptr->pending_schedule.schedule.version;
-   BOOST_REQUIRE_NO_THROW(tester.control->replace_producer_keys(new_key));
-   const auto new_version = head_ptr->pending_schedule.schedule.version;
-   // make sure version not been changed
-   BOOST_REQUIRE(old_version == new_version);
+   // Add test with instant-finality enabled
+   // - Not implemented yet
 
-   const auto& gpo = tester.control->db().get<global_property_object>();
-   BOOST_REQUIRE(!gpo.proposed_schedule_block_num);
-   BOOST_REQUIRE(gpo.proposed_schedule.version == 0);
-   BOOST_REQUIRE(gpo.proposed_schedule.producers.empty());
-
-   const uint32_t expected_threshold = 1;
-   const weight_type expected_key_weight = 1;
-   for(const auto& prod : head_ptr->active_schedule.producers) {
-      BOOST_REQUIRE_EQUAL(std::get<block_signing_authority_v0>(prod.authority).threshold, expected_threshold);
-      for(const auto& key : std::get<block_signing_authority_v0>(prod.authority).keys){
-         BOOST_REQUIRE_EQUAL(key.key, new_key);
-         BOOST_REQUIRE_EQUAL(key.weight, expected_key_weight);
-       }
-   }
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE( replace_account_keys ) try {
-   validating_tester tester;
+BOOST_AUTO_TEST_CASE_TEMPLATE( replace_account_keys, T, validating_testers ) try {
+   T tester;
    const name usr = config::system_account_name;
    const name active_permission = config::active_name;
    const auto& rlm = tester.control->get_resource_limits_manager();
-   const auto* perm = tester.control->db().find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
+   const auto* perm = tester.control->db().template find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
    BOOST_REQUIRE(perm != NULL);
 
    const int64_t old_size = (int64_t)(chain::config::billable_size_v<permission_object> + perm->auth.get_billable_size());
@@ -76,8 +56,8 @@ BOOST_AUTO_TEST_CASE( replace_account_keys ) try {
 
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE( decompressed_size_over_limit ) try {
-   tester chain;
+BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_over_limit, T, testers ) try {
+   T chain;
 
    // build a transaction, add cf data, sign
    cf_action                        cfa;
@@ -95,7 +75,7 @@ BOOST_AUTO_TEST_CASE( decompressed_size_over_limit ) try {
        std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
-   auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.control->get_chain_id());
+   auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
 
    // pack
    packed_transaction pt(trx, packed_transaction::compression_type::zlib);
@@ -111,8 +91,8 @@ BOOST_AUTO_TEST_CASE( decompressed_size_over_limit ) try {
                            });
 } FC_LOG_AND_RETHROW()
 
-BOOST_AUTO_TEST_CASE( decompressed_size_under_limit ) try {
-   tester chain;
+BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_under_limit, T, testers ) try {
+   T chain;
 
    // build a transaction, add cf data, sign
    cf_action                        cfa;
@@ -131,7 +111,7 @@ BOOST_AUTO_TEST_CASE( decompressed_size_under_limit ) try {
        std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
-   auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.control->get_chain_id());
+   auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
 
    // pack
    packed_transaction pt(trx, packed_transaction::compression_type::zlib);
@@ -146,9 +126,9 @@ BOOST_AUTO_TEST_CASE( decompressed_size_under_limit ) try {
 } FC_LOG_AND_RETHROW()
 
 // verify accepted_block signals validated blocks
-BOOST_AUTO_TEST_CASE( signal_validated_blocks ) try {
-   tester chain;
-   tester validator;
+BOOST_AUTO_TEST_CASE_TEMPLATE( signal_validated_blocks, T, testers ) try {
+   T chain;
+   T validator;
 
    signed_block_ptr accepted_block;
    block_id_type accepted_id;
@@ -156,12 +136,9 @@ BOOST_AUTO_TEST_CASE( signal_validated_blocks ) try {
       const auto& [ block, id ] = t;
       auto block_num = block->block_num();
       BOOST_CHECK(block);
-      const auto& bsp_by_id = chain.control->fetch_block_state_by_id(id);
-      BOOST_CHECK(bsp_by_id->block_num == block_num);
-      const auto& bsp_by_number = chain.control->fetch_block_state_by_number(block_num);  // verify it can be found (has to be validated)
-      BOOST_CHECK(bsp_by_number->id == id);
-      BOOST_CHECK(chain.control->fetch_block_by_id(id) == block);
-      BOOST_CHECK(chain.control->fetch_block_by_number(block_num) == block);
+      BOOST_CHECK(chain.fetch_block_by_id(id) == block);
+      BOOST_CHECK(chain.block_exists(id));
+      BOOST_CHECK(chain.fetch_block_by_number(block_num) == block);
       BOOST_REQUIRE(chain.control->fetch_block_header_by_number(block_num));
       BOOST_CHECK(chain.control->fetch_block_header_by_number(block_num)->calculate_id() == id);
       BOOST_REQUIRE(chain.control->fetch_block_header_by_id(id));
@@ -175,12 +152,9 @@ BOOST_AUTO_TEST_CASE( signal_validated_blocks ) try {
       const auto& [ block, id ] = t;
       auto block_num = block->block_num();
       BOOST_CHECK(block);
-      const auto& bsp_by_id = validator.control->fetch_block_state_by_id(id);
-      BOOST_CHECK(bsp_by_id->block_num == block_num);
-      const auto& bsp_by_number = validator.control->fetch_block_state_by_number(block_num);  // verify it can be found (has to be validated)
-      BOOST_CHECK(bsp_by_number->id == id);
-      BOOST_CHECK(validator.control->fetch_block_by_id(id) == block);
-      BOOST_CHECK(validator.control->fetch_block_by_number(block_num) == block);
+      BOOST_CHECK(validator.fetch_block_by_id(id) == block);
+      BOOST_CHECK(validator.block_exists(id));
+      BOOST_CHECK(validator.fetch_block_by_number(block_num) == block);
       BOOST_REQUIRE(validator.control->fetch_block_header_by_number(block_num));
       BOOST_CHECK(validator.control->fetch_block_header_by_number(block_num)->calculate_id() == id);
       BOOST_REQUIRE(validator.control->fetch_block_header_by_id(id));
@@ -189,7 +163,7 @@ BOOST_AUTO_TEST_CASE( signal_validated_blocks ) try {
       validated_id = id;
    });
 
-   chain.produce_blocks(1);
+   chain.produce_block();
    validator.push_block(accepted_block);
 
    chain.create_account("hello"_n);
@@ -197,6 +171,67 @@ BOOST_AUTO_TEST_CASE( signal_validated_blocks ) try {
    validator.push_block(accepted_block);
    BOOST_CHECK(produced_block->calculate_id() == accepted_id);
    BOOST_CHECK(accepted_id == validated_id);
+
+} FC_LOG_AND_RETHROW()
+
+// verify applied_transaction signals trx in blocks
+BOOST_AUTO_TEST_CASE( signal_applied_transaction ) try {
+   savanna_tester chain;
+
+   chain.produce_block();
+
+   transaction_trace_ptr last_trace;
+   auto c = chain.control->applied_transaction().connect([&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> x) {
+      auto& t = std::get<0>(x);
+      if (std::get<1>(x)->get_transaction().actions.at(0).name != "onblock"_n)
+         last_trace = t;
+   } );
+
+   {
+      transaction_trace_ptr create_account_trace = chain.create_account("hello"_n);
+      BOOST_REQUIRE(last_trace);
+      BOOST_REQUIRE(create_account_trace);
+      BOOST_TEST(create_account_trace->id == last_trace->id);
+      BOOST_TEST(create_account_trace->elapsed.count() == last_trace->elapsed.count());
+      BOOST_TEST(create_account_trace->block_num == last_trace->block_num);
+      signed_block_ptr block = chain.produce_block();
+      BOOST_REQUIRE(block);
+      bool found = false;
+      for (auto& r : block->transactions) {
+         found = true;
+         BOOST_TEST(r.trx.get_transaction().actions.at(0).name == "newaccount"_n);
+      }
+      BOOST_TEST(found);
+   }
+   // abort block with create account
+   {
+      last_trace = nullptr;
+      transaction_trace_ptr create_account_trace = chain.create_account("hello2"_n);
+      BOOST_REQUIRE(last_trace);
+      BOOST_REQUIRE(create_account_trace);
+      BOOST_TEST(create_account_trace->id == last_trace->id);
+      BOOST_TEST(create_account_trace->elapsed.count() == last_trace->elapsed.count());
+      BOOST_TEST(create_account_trace->block_num == last_trace->block_num);
+      signed_block_ptr empty_block = chain.produce_empty_block(); // aborts block, places in unapplied trx queue
+      auto trx_meta = chain.get_unapplied_transaction_queue().get_trx(create_account_trace->id);
+      BOOST_REQUIRE(trx_meta);
+      BOOST_REQUIRE(empty_block);
+      BOOST_TEST(empty_block->transactions.empty());
+      last_trace = nullptr;
+      signed_block_ptr block = chain.produce_block();
+      BOOST_REQUIRE(block);
+      BOOST_REQUIRE(last_trace);
+      BOOST_TEST(create_account_trace->id == last_trace->id);
+      BOOST_TEST(create_account_trace->block_num < last_trace->block_num); // different block
+      BOOST_TEST(trx_meta->elapsed.count() == std::max(last_trace->elapsed, create_account_trace->elapsed).count()); // verify trx_meta updated
+      BOOST_TEST(block->block_num() == last_trace->block_num);
+      bool found = false;
+      for (auto& r : block->transactions) {
+         found = true;
+         BOOST_TEST(r.trx.get_transaction().actions.at(0).name == "newaccount"_n);
+      }
+      BOOST_TEST(found);
+   }
 
 } FC_LOG_AND_RETHROW()
 

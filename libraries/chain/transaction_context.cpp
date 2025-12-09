@@ -9,17 +9,14 @@
 #include <sysio/chain/deep_mind.hpp>
 #include <sysio/chain/subjective_billing.hpp>
 
-#include <chrono>
 #include <bit>
 #include <ranges>
 
 namespace sysio::chain {
-
    static constexpr int64_t large_number_no_overflow = std::numeric_limits<int64_t>::max()/2;
 
    transaction_checktime_timer::transaction_checktime_timer(platform_timer& timer)
-         : expired(timer.expired), _timer(timer) {
-      expired = false;
+         : _timer(timer) {
    }
 
    void transaction_checktime_timer::start(fc::time_point tp) {
@@ -51,20 +48,45 @@ namespace sysio::chain {
    ,undo_session()
    ,trace(std::make_shared<transaction_trace>())
    ,start(s)
+   ,executed_action_receipts()
    ,transaction_timer(std::move(tmr))
    ,trx_type(type)
    ,pseudo_start(s)
    {
-      if (!c.skip_db_sessions() && !is_read_only()) {
-         undo_session.emplace(c.mutable_db().start_undo_session(true));
-      }
-      trace->id = id;
-      trace->block_num = c.head_block_num() + 1;
-      trace->block_time = c.pending_block_time();
-      trace->producer_block_id = c.pending_producer_block_id();
+      initialize();
+   }
 
-      if(auto dm_logger = c.get_deep_mind_logger(is_transient()))
-      {
+   void transaction_context::reset() {
+      undo();
+      auto net_usage = trace->net_usage; // doesn't change during execution
+      *trace = transaction_trace{}; // reset trace
+      trace->net_usage = net_usage;
+      initialize();
+      billed_cpu_us.clear();
+      trx_blk_context = trx_block_context{};
+      transaction_timer.stop();
+      if (paused_timer) {
+         resume_billing_timer();
+      } else {
+         transaction_timer.start(active_deadline);
+      }
+
+      executed_action_receipts = action_digests_t{};
+      // bill_to_accounts should only be updated in init(), not updated during transaction execution
+      validate_ram_usage.clear();
+   }
+
+   void transaction_context::initialize() {
+      if (!control.skip_db_sessions() && !is_read_only()) {
+         undo_session.emplace(control.mutable_db().start_undo_session(true));
+      }
+
+      trace->id = id;
+      trace->block_num = control.head().block_num() + 1;
+      trace->block_time = control.pending_block_time();
+      trace->producer_block_id = control.pending_producer_block_id();
+
+      if(auto dm_logger = control.get_deep_mind_logger(is_transient())) {
          dm_logger->on_start_transaction();
       }
    }
@@ -75,6 +97,12 @@ namespace sysio::chain {
       {
          dm_logger->on_end_transaction();
       }
+   }
+
+   bool transaction_context::has_undo() const {
+      return !control.skip_db_sessions()
+             && !is_read_only()
+             && control.get_deep_mind_logger(is_transient()) == nullptr;
    }
 
    void transaction_context::disallow_transaction_extensions( const char* error_msg )const {
@@ -230,8 +258,11 @@ namespace sysio::chain {
       if (trx_deadline >= six_months) {
          enforce_deadline = false;
          active_deadline = fc::time_point::maximum();
-         transaction_timer.start( active_deadline );
+      } else {
+         active_deadline = trx_deadline;
       }
+      transaction_timer.start( active_deadline );
+      checktime(); // Fail early if deadline as already been exceeded
 
       is_initialized = true;
    }
@@ -272,7 +303,7 @@ namespace sysio::chain {
    void transaction_context::exec() {
       assert( is_initialized );
       const transaction& trx = packed_trx.get_transaction();
-      auto& sub_bill = control.get_subjective_billing();
+      const auto& sub_bill = control.get_subjective_billing();
       const auto pending_block_time = control.pending_block_time();
 
       auto add_trace_net = [&]( size_t idx ) {
@@ -281,67 +312,83 @@ namespace sysio::chain {
          trace->action_traces[idx].net_usage = packed_trx.get_action_billable_size(idx);
       };
 
-      size_t idx = 0;
-      for( const auto& act : trx.context_free_actions ) {
-         schedule_action( act, act.account, true, 0, 0 );
-         add_trace_net(idx);
-         ++idx;
-      }
+      for (int i = 0; i < 2; ++i) { // interrupt_oc_exception can only happen once
+         try {
+            size_t idx = 0;
 
-      for( const auto& act : trx.actions ) {
-         schedule_action( act, act.account, false, 0, 0 );
-         add_trace_net(idx);
-         ++idx;
-      }
+            for (const auto& act : trx.context_free_actions) {
+               schedule_action(act, act.account, true, 0, 0);
+               add_trace_net(idx);
+               ++idx;
+            }
 
-      auto& action_traces = trace->action_traces;
-      const uint32_t num_original_actions_to_execute = action_traces.size();
-      assert( num_original_actions_to_execute == idx );
-      for( uint32_t i = 1; i <= num_original_actions_to_execute; ++i ) {
-         action_start = fc::time_point::now();
-         const auto& act = action_traces[i-1].act;
-         auto _ = fc::make_scoped_exit([this, org_code=billing_timer_exception_code, org_reason=tx_cpu_usage_reason](){
-            billing_timer_exception_code = org_code;
-            tx_cpu_usage_reason = org_reason;
-         });
-         active_deadline = trx_deadline;
-         if (!explicit_billed_cpu_time) {
-            account_name a = act.payer();
-            auto& b = accounts_billing[a];
-            cpu_limit_due_to_greylist = b.cpu_greylisted;
-            if (!is_read_only()) {
-               subjective_cpu_bill = sub_bill.get_subjective_bill(a, pending_block_time);
-               int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill.count() + leeway.count(); // Add leeway to allow powerup
-               // Possibly limit deadline to account subjective cpu left
-               if( action_start + fc::microseconds(account_cpu_limit) < trx_deadline ) {
-                  active_deadline = action_start + fc::microseconds(account_cpu_limit);
-                  billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
-                  tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+            for (const auto& act : trx.actions) {
+               schedule_action(act, act.account, false, 0, 0);
+               add_trace_net(idx);
+               ++idx;
+            }
+
+            auto& action_traces = trace->action_traces;
+            const uint32_t num_original_actions_to_execute = action_traces.size();
+            assert(num_original_actions_to_execute == idx);
+            for (uint32_t i = 1; i <= num_original_actions_to_execute; ++i) {
+               action_start = fc::time_point::now();
+               const auto& act = action_traces[i - 1].act;
+               auto _ = fc::make_scoped_exit(
+                  [this, org_code=billing_timer_exception_code, org_reason=tx_cpu_usage_reason]() {
+                     billing_timer_exception_code = org_code;
+                     tx_cpu_usage_reason = org_reason;
+                  });
+               active_deadline = trx_deadline;
+               if (!explicit_billed_cpu_time) {
+                  account_name a = act.payer();
+                  auto& b = accounts_billing[a];
+                  cpu_limit_due_to_greylist = b.cpu_greylisted;
+                  if (!is_read_only()) {
+                     subjective_cpu_bill = sub_bill.get_subjective_bill(a, pending_block_time);
+                     int64_t account_cpu_limit = b.cpu_limit_us - subjective_cpu_bill.count() + leeway.count();
+                     // Add leeway to allow powerup
+                     // Possibly limit deadline to account subjective cpu left
+                     if (action_start + fc::microseconds(account_cpu_limit) < trx_deadline) {
+                        active_deadline = action_start + fc::microseconds(account_cpu_limit);
+                        billing_timer_exception_code = tx_cpu_usage_exceeded::code_value;
+                        tx_cpu_usage_reason = tx_cpu_usage_exceeded_reason::account_cpu_limit;
+                     }
+                  }
+               }
+               if (enforce_deadline) {
+                  transaction_timer.stop();
+                  transaction_timer.start(active_deadline);
+                  checktime(); // Fail early if deadline already exceeded
+               }
+               try {
+                  execute_action(i, 0);
+               } catch (const fc::exception& e) {
+                  if (!explicit_billed_cpu_time && e.code() != interrupt_oc_exception::code_value) {
+                     auto billed_time = fc::time_point::now() - action_start;
+                     assert(billed_cpu_us.size() == i-1);
+                     billed_cpu_us.emplace_back(billed_time.count());
+                  }
+                  throw;
+               }
+               if (enforce_deadline)
+                  transaction_timer.stop();
+               auto billed_time = fc::time_point::now() - action_start;
+               if (explicit_billed_cpu_time) {
+                  action_traces[i - 1].cpu_usage_us = billed_cpu_us[i - 1];
+               } else {
+                  assert(billed_cpu_us.size() == i-1);
+                  billed_cpu_us.emplace_back(billed_time.count()); // will be updated to include trx time in finalize
                }
             }
-         }
-         if (enforce_deadline) {
-            transaction_timer.start( active_deadline );
-            checktime(); // Fail early if deadline already exceeded
-         }
-         try {
-            execute_action( i, 0 );
-         } catch ( ... ) {
-            if (!explicit_billed_cpu_time) {
-               auto billed_time = fc::time_point::now() - action_start;
-               assert(billed_cpu_us.size() == i-1);
-               billed_cpu_us.emplace_back( billed_time.count() );
+
+            break; // only loop on interrupt_oc_exception
+         } catch(const fc::exception& e) {
+            if (i == 0 && e.code() == interrupt_oc_exception::code_value) {
+               reset();
+               continue;
             }
             throw;
-         }
-         if (enforce_deadline)
-            transaction_timer.stop();
-         auto billed_time = fc::time_point::now() - action_start;
-         if (explicit_billed_cpu_time) {
-            action_traces[i-1].cpu_usage_us = billed_cpu_us[i-1];
-         } else {
-            assert(billed_cpu_us.size() == i-1);
-            billed_cpu_us.emplace_back( billed_time.count() ); // will be updated to include trx time in finalize
          }
       }
    }
@@ -397,10 +444,13 @@ namespace sysio::chain {
 
    void transaction_context::squash() {
       if (undo_session) undo_session->squash();
+      control.apply_trx_block_context(trx_blk_context);
+      transaction_timer.stop();
    }
 
    void transaction_context::undo() {
       if (undo_session) undo_session->undo();
+      transaction_timer.stop();
    }
 
    void transaction_context::check_trx_net_usage()const {
@@ -441,13 +491,17 @@ namespace sysio::chain {
    }
 
    void transaction_context::checktime()const {
-      if(BOOST_LIKELY(transaction_timer.expired == false))
+      platform_timer::state_t expired = transaction_timer.timer_state();
+      if(BOOST_LIKELY(expired == platform_timer::state_t::running))
          return;
 
       auto now = fc::time_point::now();
-      if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
+      if (expired == platform_timer::state_t::interrupted) {
+         SYS_THROW( interrupt_exception, "interrupt signaled, ran ${bt}us, start ${s}",
+                    ("bt", now - pseudo_start)("s", start) );
+      } else if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
          SYS_THROW( deadline_exception, "deadline exceeded ${billing_timer}us",
-                     ("billing_timer", now - pseudo_start)("now", now)("deadline", active_deadline)("start", start) );
+                    ("billing_timer", now - pseudo_start)("now", now)("deadline", active_deadline)("start", start) );
       } else if( deadline_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_THROW( block_cpu_usage_exceeded,
                      "not enough time left in block to complete executing transaction ${billing_timer}us",
@@ -480,9 +534,13 @@ namespace sysio::chain {
       transaction_timer.stop();
    }
 
-   void transaction_context::resume_billing_timer() {
+   void transaction_context::resume_billing_timer(fc::time_point resume_from) {
       if( !enforce_deadline || explicit_billed_cpu_time ) return; // irrelevant
-      assert(paused_timer);
+      if (resume_from != fc::time_point()) {
+         paused_time = resume_from;
+      } else {
+         assert(paused_timer);
+      }
 
       auto now = fc::time_point::now();
       auto paused = now - paused_time;
@@ -968,6 +1026,25 @@ namespace sysio::chain {
       if( enforce_actor_whitelist_blacklist ) {
          control.check_actor_list( actors );
       }
+   }
+
+   int64_t transaction_context::set_proposed_producers(vector<producer_authority> producers) {
+      if (producers.empty())
+         return -1; // SAVANNA depends on DISALLOW_EMPTY_PRODUCER_SCHEDULE
+
+      SYS_ASSERT(producers.size() <= config::max_proposers, wasm_execution_error,
+                 "Producer schedule exceeds the maximum proposer count for this chain");
+
+      trx_blk_context.proposed_schedule_block_num = control.head().block_num() + 1;
+      // proposed_schedule.version is set in assemble_block
+      trx_blk_context.proposed_schedule.producers = std::move(producers);
+
+      return std::numeric_limits<uint32_t>::max();
+   }
+
+   void transaction_context::set_proposed_finalizers(finalizer_policy&& fin_pol) {
+      trx_blk_context.proposed_fin_pol_block_num = control.head().block_num() + 1;
+      trx_blk_context.proposed_fin_pol = std::move(fin_pol);
    }
 
 } /// sysio::chain

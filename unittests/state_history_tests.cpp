@@ -3,17 +3,17 @@
 #include <boost/test/unit_test.hpp>
 #include <contracts.hpp>
 #include <test_contracts.hpp>
+#include <sysio/state_history/abi.hpp>
 #include <sysio/state_history/create_deltas.hpp>
-#include <sysio/state_history/log.hpp>
+#include <sysio/state_history/log_catalog.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/testing/tester.hpp>
 #include <fc/io/json.hpp>
+#include <fc/io/cfile.hpp>
 #include <sysio/chain/global_property_object.hpp>
 
 #include "test_cfd_transaction.hpp"
 
-#include <sysio/stream.hpp>
-#include <sysio/ship_protocol.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
 #include <boost/iostreams/copy.hpp>
 
@@ -21,11 +21,7 @@ using namespace sysio::chain;
 using namespace sysio::testing;
 using namespace std::literals;
 
-extern const char* const state_history_plugin_abi;
-
-bool operator==(const sysio::checksum256& lhs, const transaction_id_type& rhs) {
-   return memcmp(lhs.extract_as_byte_array().data(), rhs.data(), rhs.data_size()) == 0;
-}
+static const abi_serializer::yield_function_t null_yield_function{};
 
 namespace sysio::state_history {
 
@@ -84,23 +80,26 @@ public:
       return make_pair(it != v.end(), it);
    }
 
-   template <typename A, typename B>
-   static vector<A> deserialize_data(deltas_vector::iterator &it) {
-      vector<A> result;
+   variants deserialize_data(deltas_vector::iterator &it, const std::string& type, const std::string& in_variant_type) {
+      variants result;
       for(size_t i=0; i < it->rows.obj.size(); i++) {
-         sysio::input_stream stream{it->rows.obj[i].second.data(), it->rows.obj[i].second.size()};
-         result.push_back(std::get<A>(sysio::from_bin<B>(stream)));
+         fc::variant v = shipabi.binary_to_variant(in_variant_type, it->rows.obj[i].second, null_yield_function);
+         BOOST_REQUIRE(v.is_array() && v.size() == 2 && v[0ul].is_string());
+         BOOST_REQUIRE_EQUAL(v[0ul].get_string(), type);
+         result.push_back(std::move(v[1ul]));
       }
       return result;
    }
 
 private:
    deltas_vector v;
+   abi_serializer shipabi = abi_serializer(json::from_string(sysio::state_history::ship_abi_without_tables()).as<abi_def>(), null_yield_function);
 };
+
+using testers = boost::mpl::list<savanna_tester>;
 
 BOOST_AUTO_TEST_CASE(test_deltas_not_empty) {
    table_deltas_tester chain;
-   chain.produce_block();
 
    auto deltas = sysio::state_history::create_deltas(chain.control->db(), false);
 
@@ -118,8 +117,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    BOOST_REQUIRE(result.first);
    auto& it_account = result.second;
    BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
-   auto accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account);
-   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
+   auto accounts = chain.deserialize_data(it_account, "account_v0", "account");
+   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), config::system_account_name.to_string());
 
    // Create new account
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
@@ -130,10 +129,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    auto& it_account2 = result.second;
    BOOST_REQUIRE_EQUAL(it_account2->rows.obj.size(), 2u);
 
-   accounts = chain.deserialize_data<sysio::ship_protocol::account_v0, sysio::ship_protocol::account>(it_account2);
-   BOOST_REQUIRE_EQUAL(accounts[0].name.to_string(), config::system_account_name.to_string());
-   BOOST_REQUIRE_EQUAL(accounts[1].name.to_string(), "newacc");
-
+   accounts = chain.deserialize_data(it_account, "account_v0", "account");
+   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), "sysio"); // onblock
+   BOOST_REQUIRE_EQUAL(accounts[1]["name"].get_string(), "newacc");
 }
 
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
@@ -150,10 +148,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
    auto &it_account_metadata = result.second;
    BOOST_REQUIRE_EQUAL(it_account_metadata->rows.obj.size(), 1u);
 
-   auto accounts_metadata = chain.deserialize_data<sysio::ship_protocol::account_metadata_v0, sysio::ship_protocol::account_metadata>(it_account_metadata);
-   BOOST_REQUIRE_EQUAL(accounts_metadata[0].name.to_string(), "newacc");
-   BOOST_REQUIRE_EQUAL(accounts_metadata[0].privileged, false);
-
+   const variants accounts_metadata = chain.deserialize_data(it_account_metadata, "account_metadata_v0", "account_metadata");
+   BOOST_REQUIRE_EQUAL(accounts_metadata[0]["name"].get_string(), "newacc");
+   BOOST_REQUIRE_EQUAL(accounts_metadata[0]["privileged"].as_bool(), false);
 }
 
 
@@ -169,12 +166,12 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
    BOOST_REQUIRE(result.first);
    auto &it_permission = result.second;
    BOOST_REQUIRE_EQUAL(it_permission->rows.obj.size(), 2u);
-   auto accounts_permissions = chain.deserialize_data<sysio::ship_protocol::permission_v0, sysio::ship_protocol::permission>(it_permission);
+   const variants accounts_permissions = chain.deserialize_data(it_permission, "permission_v0", "permission");
    for(size_t i = 0; i < accounts_permissions.size(); i++)
    {
       BOOST_REQUIRE_EQUAL(it_permission->rows.obj[i].first, true);
-      BOOST_REQUIRE_EQUAL(accounts_permissions[i].owner.to_string(), "newacc");
-      BOOST_REQUIRE_EQUAL(accounts_permissions[i].name.to_string(), expected_permission_names[i]);
+      BOOST_REQUIRE_EQUAL(accounts_permissions[i]["owner"].get_string(), "newacc");
+      BOOST_REQUIRE_EQUAL(accounts_permissions[i]["name"].get_string(), expected_permission_names[i]);
    }
 }
 
@@ -202,10 +199,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
    auto &it_permission = result.second;
    BOOST_REQUIRE_EQUAL(it_permission->rows.obj.size(), 3u);
    BOOST_REQUIRE_EQUAL(it_permission->rows.obj[2].first, true);
-   auto accounts_permissions = chain.deserialize_data<sysio::ship_protocol::permission_v0, sysio::ship_protocol::permission>(it_permission);
-   BOOST_REQUIRE_EQUAL(accounts_permissions[2].owner.to_string(), "newacc");
-   BOOST_REQUIRE_EQUAL(accounts_permissions[2].name.to_string(), "mypermission");
-   BOOST_REQUIRE_EQUAL(accounts_permissions[2].parent.to_string(), "active");
+   variants accounts_permissions = chain.deserialize_data(it_permission, "permission_v0", "permission");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[2]["owner"].get_string(), "newacc");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[2]["name"].get_string(), "mypermission");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[2]["parent"].get_string(), "active");
 
    chain.produce_block();
 
@@ -217,10 +214,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
    auto &it_permission_del = result.second;
    BOOST_REQUIRE_EQUAL(it_permission_del->rows.obj.size(), 1u);
    BOOST_REQUIRE_EQUAL(it_permission_del->rows.obj[0].first, false);
-   accounts_permissions = chain.deserialize_data<sysio::ship_protocol::permission_v0, sysio::ship_protocol::permission>(it_permission_del);
-   BOOST_REQUIRE_EQUAL(accounts_permissions[0].owner.to_string(), "newacc");
-   BOOST_REQUIRE_EQUAL(accounts_permissions[0].name.to_string(), "mypermission");
-   BOOST_REQUIRE_EQUAL(accounts_permissions[0].parent.to_string(), "active");
+   accounts_permissions = chain.deserialize_data(it_permission_del, "permission_v0", "permission");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[0]["owner"].get_string(), "newacc");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[0]["name"].get_string(), "mypermission");
+   BOOST_REQUIRE_EQUAL(accounts_permissions[0]["parent"].get_string(), "active");
 }
 
 
@@ -234,7 +231,6 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
          public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s), // Test for correct serialization of WA key, see issue #9087
          public_key_type("PUB_K1_12wkBET2rRgE8pahuaczxKbmv7ciehqsne57F9gtzf1PVb7Rf7o"s),
          public_key_type("PUB_R1_6FPFZqw5ahYrR9jD96yDbbDNTdKtNqRbze6oTDLntrsANgQKZu"s)};
-   const int K1_storage_type_which_value = 0;
 
    for(auto &key: keys) {
       // Modify the permission authority
@@ -246,14 +242,11 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
 
       auto &it_permission = result.second;
       BOOST_REQUIRE_EQUAL(it_permission->rows.obj.size(), 1u);
-      auto accounts_permissions = chain.deserialize_data<sysio::ship_protocol::permission_v0, sysio::ship_protocol::permission>(it_permission);
-      BOOST_REQUIRE_EQUAL(accounts_permissions[0].owner.to_string(), "newacc");
-      BOOST_REQUIRE_EQUAL(accounts_permissions[0].name.to_string(), "active");
-      BOOST_REQUIRE_EQUAL(accounts_permissions[0].auth.keys.size(), 1u);
-      if(key.which() != K1_storage_type_which_value)
-         BOOST_REQUIRE_EQUAL(public_key_to_string(accounts_permissions[0].auth.keys[0].key), key.to_string({}));
-      else
-         BOOST_REQUIRE_EQUAL(public_key_to_string(accounts_permissions[0].auth.keys[0].key), "PUB_K1_12wkBET2rRgE8pahuaczxKbmv7ciehqsne57F9gtzf1PVb7Rf7o");
+      const variants accounts_permissions = chain.deserialize_data(it_permission, "permission_v0", "permission");
+      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["owner"].get_string(), "newacc");
+      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["name"].get_string(), "active");
+      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["auth"]["keys"].size(), 1u);
+      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["auth"]["keys"][0ul]["key"].get_string(), key.to_string({}));
 
       chain.produce_block();
    }
@@ -279,10 +272,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_permission_link) {
    BOOST_REQUIRE(result.first);
    auto &it_permission_link = result.second;
    BOOST_REQUIRE_EQUAL(it_permission_link->rows.obj.size(), 1u);
-   auto permission_links = chain.deserialize_data<sysio::ship_protocol::permission_link_v0, sysio::ship_protocol::permission_link>(it_permission_link);
-   BOOST_REQUIRE_EQUAL(permission_links[0].account.to_string(), "newacc");
-   BOOST_REQUIRE_EQUAL(permission_links[0].message_type.to_string(), "reqauth");
-   BOOST_REQUIRE_EQUAL(permission_links[0].required_permission.to_string(), "spending");
+   const variants permission_links = chain.deserialize_data(it_permission_link, "permission_link_v0", "permission_link");
+   BOOST_REQUIRE_EQUAL(permission_links[0]["account"].get_string(), "newacc");
+   BOOST_REQUIRE_EQUAL(permission_links[0]["message_type"].get_string(), "reqauth");
+   BOOST_REQUIRE_EQUAL(permission_links[0]["required_permission"].get_string(), "spending");
 }
 
 
@@ -303,9 +296,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_global_property_history) {
    BOOST_REQUIRE(result.first);
    auto &it_global_property = result.second;
    BOOST_REQUIRE_EQUAL(it_global_property->rows.obj.size(), 1u);
-   auto global_properties = chain.deserialize_data<sysio::ship_protocol::global_property_v1, sysio::ship_protocol::global_property>(it_global_property);
-   auto configuration = std::get<sysio::ship_protocol::chain_config_v1>(global_properties[0].configuration);
-   BOOST_REQUIRE_EQUAL(configuration.max_transaction_delay, 60u);
+   const variants global_properties = chain.deserialize_data(it_global_property, "global_property_v1", "global_property");
+   BOOST_REQUIRE_EQUAL(global_properties[0]["configuration"][0ul].get_string(), "chain_config_v1");
+   BOOST_REQUIRE_EQUAL(global_properties[0]["configuration"][1ul]["max_transaction_delay"].as_uint64(), 60u);
 }
 
 
@@ -330,17 +323,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_protocol_feature_history) {
    BOOST_REQUIRE(result.first);
    auto &it_protocol_state = result.second;
    BOOST_REQUIRE_EQUAL(it_protocol_state->rows.obj.size(), 1u);
-   auto protocol_states = chain.deserialize_data<sysio::ship_protocol::protocol_state_v0, sysio::ship_protocol::protocol_state>(it_protocol_state);
-   BOOST_REQUIRE_EQUAL(protocol_states.size(), 1u);
-   BOOST_REQUIRE_EQUAL(protocol_states[0].activated_protocol_features.size(), 1u);
-   // activated_protocol_features[0] is preactivate_feature
-   auto protocol_feature = std::get<sysio::ship_protocol::activated_protocol_feature_v0>(protocol_states[0].activated_protocol_features[0]);
-
-   auto digest_byte_array = protocol_feature.feature_digest.extract_as_byte_array();
-   char digest_array[digest_byte_array.size()];
-   for(size_t i=0; i < digest_byte_array.size(); i++) digest_array[i] = digest_byte_array[i];
-   sysio::chain::digest_type digest_in_delta(digest_array, digest_byte_array.size());
-
+   const variants protocol_states = chain.deserialize_data(it_protocol_state, "protocol_state_v0", "protocol_state");
+   BOOST_REQUIRE_EQUAL(protocol_states[0]["activated_protocol_features"][0ul][0ul].get_string(), "activated_protocol_feature_v0");
+   const digest_type digest_in_delta = protocol_states[0]["activated_protocol_features"][0ul][1ul]["feature_digest"].as<digest_type>();
    BOOST_REQUIRE_EQUAL(digest_in_delta, *d);
 }
 
@@ -365,37 +350,37 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
    BOOST_REQUIRE(result.first);
    auto &it_contract_table = result.second;
    BOOST_REQUIRE_EQUAL(it_contract_table->rows.obj.size(), 6u);
-   auto contract_tables = chain.deserialize_data<sysio::ship_protocol::contract_table_v0, sysio::ship_protocol::contract_table>(it_contract_table);
-   BOOST_REQUIRE_EQUAL(contract_tables[0].table.to_string(), "hashobjs");
-   BOOST_REQUIRE_EQUAL(contract_tables[1].table.to_string(), "hashobjs....1");
-   BOOST_REQUIRE_EQUAL(contract_tables[2].table.to_string(), "numobjs");
-   BOOST_REQUIRE_EQUAL(contract_tables[3].table.to_string(), "numobjs.....1");
-   BOOST_REQUIRE_EQUAL(contract_tables[4].table.to_string(), "numobjs.....2");
-   BOOST_REQUIRE_EQUAL(contract_tables[5].table.to_string(), "numobjs.....3");
+   const variants contract_tables = chain.deserialize_data(it_contract_table, "contract_table_v0", "contract_table");
+   BOOST_REQUIRE_EQUAL(contract_tables[0]["table"].get_string(), "hashobjs");
+   BOOST_REQUIRE_EQUAL(contract_tables[1]["table"].get_string(), "hashobjs....1");
+   BOOST_REQUIRE_EQUAL(contract_tables[2]["table"].get_string(), "numobjs");
+   BOOST_REQUIRE_EQUAL(contract_tables[3]["table"].get_string(), "numobjs.....1");
+   BOOST_REQUIRE_EQUAL(contract_tables[4]["table"].get_string(), "numobjs.....2");
+   BOOST_REQUIRE_EQUAL(contract_tables[5]["table"].get_string(), "numobjs.....3");
 
    // Spot onto contract_row
    result = chain.find_table_delta("contract_row");
    BOOST_REQUIRE(result.first);
    auto &it_contract_row = result.second;
    BOOST_REQUIRE_EQUAL(it_contract_row->rows.obj.size(), 2u);
-   auto contract_rows = chain.deserialize_data<sysio::ship_protocol::contract_row_v0, sysio::ship_protocol::contract_row>(it_contract_row);
-   BOOST_REQUIRE_EQUAL(contract_rows[0].table.to_string(), "hashobjs");
-   BOOST_REQUIRE_EQUAL(contract_rows[1].table.to_string(), "numobjs");
+   const variants contract_rows = chain.deserialize_data(it_contract_row, "contract_row_v0", "contract_row");
+   BOOST_REQUIRE_EQUAL(contract_rows[0]["table"].get_string(), "hashobjs");
+   BOOST_REQUIRE_EQUAL(contract_rows[1]["table"].get_string(), "numobjs");
 
    // Spot onto contract_index256
    result = chain.find_table_delta("contract_index256");
    BOOST_REQUIRE(result.first);
    auto &it_contract_index256 = result.second;
    BOOST_REQUIRE_EQUAL(it_contract_index256->rows.obj.size(), 2u);
-   auto contract_indices = chain.deserialize_data<sysio::ship_protocol::contract_index256_v0, sysio::ship_protocol::contract_index256>(it_contract_index256);
-   BOOST_REQUIRE_EQUAL(contract_indices[0].table.to_string(), "hashobjs");
-   BOOST_REQUIRE_EQUAL(contract_indices[1].table.to_string(), "hashobjs....1");
+   const variants contract_indices = chain.deserialize_data(it_contract_index256, "contract_index256_v0", "contract_index256");
+   BOOST_REQUIRE_EQUAL(contract_indices[0]["table"].get_string(), "hashobjs");
+   BOOST_REQUIRE_EQUAL(contract_indices[1]["table"].get_string(), "hashobjs....1");
 }
 
 
 
    BOOST_AUTO_TEST_CASE(test_deltas) {
-      tester main;
+      table_deltas_tester main;
       main.produce_block();
 
       auto v = sysio::state_history::create_deltas(main.control->db(), false);
@@ -412,8 +397,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       it = std::find_if(v.begin(), v.end(), find_by_name);
       BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
       BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 1u);
-      auto resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
-      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
+      auto resources = main.deserialize_data(it, "resource_limits_v0", "resource_limits");
+      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), config::system_account_name.to_string());
 
       main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
 
@@ -427,9 +412,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       it = std::find_if(v.begin(), v.end(), find_by_name);
       BOOST_REQUIRE(it!=v.end());
       BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 2u);
-      resources = table_deltas_tester::deserialize_data<sysio::ship_protocol::resource_limits_v0, sysio::ship_protocol::resource_limits>(it);
-      BOOST_REQUIRE_EQUAL(resources[0].owner.to_string(), config::system_account_name.to_string());
-      BOOST_REQUIRE_EQUAL(resources[1].owner.to_string(), "newacc");
+      resources = main.deserialize_data(it, "resource_limits_v0", "resource_limits");
+      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), config::system_account_name.to_string());
+      BOOST_REQUIRE_EQUAL(resources[1]["owner"].get_string(), "newacc");
 
       main.produce_block();
 
@@ -455,7 +440,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
       chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
 
-      chain.produce_blocks(2);
+      chain.produce_block();
 
       auto trace = chain.push_action("tester"_n, "addhashobj"_n, "tester"_n, mutable_variant_object()("hashinput", "hello"));
 
@@ -474,7 +459,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       BOOST_REQUIRE(result.first);
       auto &it_contract_row = result.second;
       BOOST_REQUIRE_EQUAL(it_contract_row->rows.obj.size(), 8u);
-      auto contract_rows = chain.deserialize_data<sysio::ship_protocol::contract_row_v0, sysio::ship_protocol::contract_row>(it_contract_row);
+      variants contract_rows = chain.deserialize_data(it_contract_row, "contract_row_v0", "contract_row");
 
       std::multiset<std::string> expected_contract_row_table_names {"abihash", "abihash", "hashobjs", "hashobjs", "hashobjs", "numobjs", "numobjs", "numobjs"};
 
@@ -482,8 +467,8 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       std::multiset<std::string> result_contract_row_table_names;
       std::multiset<uint64_t> result_contract_row_table_primary_keys;
       for(auto &contract_row : contract_rows) {
-         result_contract_row_table_names.insert(contract_row.table.to_string());
-         result_contract_row_table_primary_keys.insert(contract_row.primary_key);
+         result_contract_row_table_names.insert(contract_row["table"].get_string());
+         result_contract_row_table_primary_keys.insert(contract_row["primary_key"].as_uint64());
       }
       BOOST_TEST_REQUIRE(expected_contract_row_table_names == result_contract_row_table_names);
       BOOST_TEST_REQUIRE(expected_contract_row_table_primary_keys == result_contract_row_table_primary_keys);
@@ -497,22 +482,22 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       result = chain.find_table_delta("contract_row");
       BOOST_REQUIRE(result.first);
       BOOST_REQUIRE_EQUAL(it_contract_row->rows.obj.size(), 2u);
-      contract_rows = chain.deserialize_data<sysio::ship_protocol::contract_row_v0, sysio::ship_protocol::contract_row>(it_contract_row);
+      contract_rows = chain.deserialize_data(it_contract_row, "contract_row_v0", "contract_row");
 
       for(size_t i=0; i < contract_rows.size(); i++) {
          BOOST_REQUIRE_EQUAL(it_contract_row->rows.obj[i].first, 0);
-         BOOST_REQUIRE_EQUAL(contract_rows[i].table.to_string(), "numobjs");
+         BOOST_REQUIRE_EQUAL(contract_rows[i]["table"].get_string(), "numobjs");
       }
 
       result = chain.find_table_delta("contract_index_double");
       BOOST_REQUIRE(result.first);
       auto &it_contract_index_double = result.second;
       BOOST_REQUIRE_EQUAL(it_contract_index_double->rows.obj.size(), 2u);
-      auto contract_index_double_elems = chain.deserialize_data<sysio::ship_protocol::contract_index_double_v0, sysio::ship_protocol::contract_index_double>(it_contract_index_double);
+      const variants contract_index_double_elems = chain.deserialize_data(it_contract_index_double, "contract_index_double_v0", "contract_index_double");
 
       for(size_t i=0; i < contract_index_double_elems.size(); i++) {
          BOOST_REQUIRE_EQUAL(it_contract_index_double->rows.obj[i].first, 0);
-         BOOST_REQUIRE_EQUAL(contract_index_double_elems[i].table.to_string(), "numobjs.....2");
+         BOOST_REQUIRE_EQUAL(contract_index_double_elems[i]["table"].get_string(), "numobjs.....2");
       }
 
    }
@@ -557,21 +542,19 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       BOOST_CHECK(std::any_of(partial_txns.begin(), partial_txns.end(), contains_transaction_extensions));
    }
 
-
 struct state_history_tester_logs  {
-   state_history_tester_logs(const std::filesystem::path& dir, const sysio::state_history_log_config& config)
-      : traces_log("trace_history",dir, config) , chain_state_log("chain_state_history", dir, config) {}
+   state_history_tester_logs(const std::filesystem::path& dir, const sysio::state_history::state_history_log_config& config)
+      : traces_log(dir, config, "trace_history") , chain_state_log(dir, config, "chain_state_history") {}
 
-   sysio::state_history_log traces_log;
-   sysio::state_history_log chain_state_log;
+   sysio::state_history::log_catalog traces_log;
+   sysio::state_history::log_catalog chain_state_log;
    sysio::state_history::trace_converter trace_converter;
 };
 
-struct state_history_tester : state_history_tester_logs, tester {
-
-
-   state_history_tester(const std::filesystem::path& dir, const sysio::state_history_log_config& config)
-   : state_history_tester_logs(dir, config), tester ([this](sysio::chain::controller& control) {
+template<typename T>
+struct state_history_tester : state_history_tester_logs, T {
+   state_history_tester(const std::filesystem::path& dir, const sysio::state_history::state_history_log_config& config)
+   : state_history_tester_logs(dir, config), T ([this](sysio::chain::controller& control) {
       control.applied_transaction().connect(
        [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
           trace_converter.add_transaction(std::get<0>(t), std::get<1>(t));
@@ -579,15 +562,12 @@ struct state_history_tester : state_history_tester_logs, tester {
 
       control.accepted_block().connect([&](block_signal_params t) {
          const auto& [ block, id ] = t;
-         sysio::state_history_log_header header{.magic        = sysio::ship_magic(sysio::ship_current_version, 0),
-                                      .block_id     = id,
-                                      .payload_size = 0};
 
-         traces_log.pack_and_write_entry(header, block->previous, [this, &block](auto&& buf) {
+         traces_log.pack_and_write_entry(id, block->previous, [this, &block](auto&& buf) {
             trace_converter.pack(buf, false, block);
          });
 
-         chain_state_log.pack_and_write_entry(header, block->previous, [&control](auto&& buf) {
+         chain_state_log.pack_and_write_entry(id, block->previous, [&control](auto&& buf) {
             sysio::state_history::pack_deltas(buf, control.db(), true);
          });
       });
@@ -598,34 +578,31 @@ struct state_history_tester : state_history_tester_logs, tester {
    }) {}
 };
 
-static std::vector<char> get_decompressed_entry(sysio::state_history_log& log, block_num_type block_num) {
-   auto result = log.create_locked_decompress_stream();
-   log.get_unpacked_entry(block_num, result);
+using state_history_testers = boost::mpl::list<state_history_tester<savanna_tester>>;
+
+static std::vector<char> get_decompressed_entry(sysio::state_history::log_catalog& log, block_num_type block_num) {
+   std::optional<sysio::state_history::ship_log_entry> entry = log.get_entry(block_num);
+   if(!entry) //existing tests expect failure to find a block returns an empty vector here
+      return {};
+
    namespace bio = boost::iostreams;
-   return std::visit(sysio::chain::overloaded{ [](std::vector<char>& bytes) {
-                                                 return bytes;
-                                              },
-                                               [](std::unique_ptr<bio::filtering_istreambuf>& strm) {
-                                                  std::vector<char> bytes;
-                                                  bio::copy(*strm, bio::back_inserter(bytes));
-                                                  return bytes;
-                                               } },
-                     result.buf);
+   bio::filtering_istreambuf istream = entry->get_stream();
+   std::vector<char> bytes;
+   bio::copy(istream, bio::back_inserter(bytes));
+   return bytes;
 }
 
-static std::vector<sysio::ship_protocol::transaction_trace> get_traces(sysio::state_history_log& log,
-                                                                       block_num_type            block_num) {
-   auto                                                          entry = get_decompressed_entry(log, block_num);
-   std::vector<sysio::ship_protocol::transaction_trace>          traces;
+static variants get_traces(sysio::state_history::log_catalog& log, block_num_type            block_num) {
+   auto     entry = get_decompressed_entry(log, block_num);
 
    if (entry.size()) {
-      sysio::input_stream traces_bin{ entry.data(), entry.data() + entry.size() };
-      BOOST_REQUIRE_NO_THROW(from_bin(traces, traces_bin));
+      abi_serializer shipabi = abi_serializer(json::from_string(sysio::state_history::ship_abi_without_tables()).as<abi_def>(), null_yield_function);
+      return shipabi.binary_to_variant("transaction_trace[]", entry, null_yield_function).get_array();
    }
-   return traces;
+   return variants();
 }
 
-BOOST_AUTO_TEST_CASE(test_splitted_log) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_splitted_log, T, state_history_testers) {
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{
@@ -635,13 +612,15 @@ BOOST_AUTO_TEST_CASE(test_splitted_log) {
       .max_retained_files = 5
    };
 
-   state_history_tester chain(state_history_dir.path(), config);
-   chain.produce_blocks(50);
+   T chain(state_history_dir.path(), config);
+   chain.produce_block();
+   chain.produce_blocks(49, true);
 
    deploy_test_api(chain);
    auto cfd_trace = push_test_cfd_transaction(chain);
 
-   chain.produce_blocks(100);
+   chain.produce_block();
+   chain.produce_blocks(99, true);
 
    auto log_dir = state_history_dir.path();
    auto archive_dir  = log_dir / "archive";
@@ -657,8 +636,15 @@ BOOST_AUTO_TEST_CASE(test_splitted_log) {
    BOOST_CHECK(std::filesystem::exists( archive_dir / "chain_state_history-21-40.log" ));
    BOOST_CHECK(std::filesystem::exists( archive_dir / "chain_state_history-21-40.index" ));
 
-   BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-41-60.log" ));
-   BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-41-60.index" ));
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      // Under Savanna, logs are archived earlier because LIB advances faster.
+      BOOST_CHECK(std::filesystem::exists( archive_dir / "trace_history-41-60.log" ));
+      BOOST_CHECK(std::filesystem::exists( archive_dir / "trace_history-41-60.index" ));
+   } else {
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-41-60.log" ));
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-41-60.index" ));
+   }
+
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-61-80.log" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-61-80.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-81-100.log" ));
@@ -667,11 +653,18 @@ BOOST_AUTO_TEST_CASE(test_splitted_log) {
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-101-120.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-121-140.log" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-121-140.index" ));
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-141-160.log" ));
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "trace_history-141-160.index" ));
+   }
 
-   BOOST_CHECK_EQUAL(chain.traces_log.block_range().first, 41u);
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      BOOST_CHECK_EQUAL(chain.traces_log.block_range().first, 61u);
+   }
+   else {
+      BOOST_CHECK_EQUAL(chain.traces_log.block_range().first, 41u);
+   }
 
-   BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-41-60.log" ));
-   BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-41-60.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-61-80.log" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-61-80.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-81-100.log" ));
@@ -680,33 +673,49 @@ BOOST_AUTO_TEST_CASE(test_splitted_log) {
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-101-120.index" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-121-140.log" ));
    BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-121-140.index" ));
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-141-160.log" ));
+      BOOST_CHECK(std::filesystem::exists( retained_dir / "chain_state_history-141-160.index" ));
+   }
 
-   BOOST_CHECK_EQUAL(chain.chain_state_log.block_range().first, 41u);
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+     BOOST_CHECK_EQUAL(chain.chain_state_log.block_range().first, 61u);
+   } else {
+     BOOST_CHECK_EQUAL(chain.chain_state_log.block_range().first, 41u);
+   }
 
    BOOST_CHECK(get_traces(chain.traces_log, 10).empty());
    BOOST_CHECK(get_traces(chain.traces_log, 100).size());
    BOOST_CHECK(get_traces(chain.traces_log, 140).size());
    BOOST_CHECK(get_traces(chain.traces_log, 150).size());
-   BOOST_CHECK(get_traces(chain.traces_log, 160).empty());
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      BOOST_CHECK(get_traces(chain.traces_log, 160).size());
+   } else {
+      BOOST_CHECK(get_traces(chain.traces_log, 160).empty());
+   }
 
    BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 10).empty());
    BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 100).size());
    BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 140).size());
    BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 150).size());
-   BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 160).empty());
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 160).size());
+   } else {
+      BOOST_CHECK(get_decompressed_entry(chain.chain_state_log, 160).empty());
+   }
 }
 
 void push_blocks( tester& from, tester& to ) {
-   while( to.control->fork_db_head_block_num()
-            < from.control->fork_db_head_block_num() )
+   while( to.fork_db_head().block_num()
+            < from.fork_db_head().block_num() )
    {
-      auto fb = from.control->fetch_block_by_number( to.control->fork_db_head_block_num()+1 );
+      auto fb = from.fetch_block_by_number( to.fork_db_head().block_num()+1 );
       to.push_block( fb );
    }
 }
 
+template<typename T>
 bool test_fork(uint32_t stride, uint32_t max_retained_files) {
-
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{
@@ -716,7 +725,7 @@ bool test_fork(uint32_t stride, uint32_t max_retained_files) {
       .max_retained_files = max_retained_files
    };
 
-   state_history_tester chain1(state_history_dir.path(), config);
+   T chain1(state_history_dir.path(), config);
    chain1.produce_blocks(2);
 
    chain1.create_accounts( {"dan"_n,"sam"_n,"pam"_n} );
@@ -724,49 +733,68 @@ bool test_fork(uint32_t stride, uint32_t max_retained_files) {
    chain1.set_producers( {"dan"_n,"sam"_n,"pam"_n} );
    chain1.produce_blocks(30);
 
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      // Produce one more block; do not vote it such that it won't become final when
+      // the first block from chain2 is pushed to chain1. This is to ensure LIBs
+      // on chain1 and chain2 are the same, and further blocks from chain2 can be
+      // pushed into chain1's fork_db.
+      chain1.control->testing_allow_voting(false);
+      chain1.produce_block();
+   }
+
    tester chain2(setup_policy::none);
    push_blocks(chain1, chain2);
 
-   auto fork_block_num = chain1.control->head_block_num();
+   auto fork_block_num = chain1.head().block_num();
 
    chain1.produce_blocks(12);
    auto create_account_traces = chain2.create_accounts( {"adam"_n} );
    auto create_account_trace_id = create_account_traces[0]->id;
 
+   if constexpr (std::is_same_v<T, state_history_tester<savanna_tester>>) {
+      // Disable voting on chain2 such that chain2's blocks can form a fork when
+      // pushed to chain1
+      chain2.control->testing_allow_voting(false);
+   }
+
    auto b = chain2.produce_block();
    chain2.produce_blocks(11+12);
 
-   for( uint32_t start = fork_block_num + 1, end = chain2.control->head_block_num(); start <= end; ++start ) {
-      auto fb = chain2.control->fetch_block_by_number( start );
+   // Merge blocks from chain2 to chain1 and make the chain from chain2 as the best chain.
+   // Specifically in Savanna, as voting is disabled on both chains, block timestamps
+   // are used to decide best chain. chain2 is selected because its last block's
+   // timestamp is bigger than chain1's last block's.
+   for( uint32_t start = fork_block_num + 1, end = chain2.head().block_num(); start <= end; ++start ) {
+      auto fb = chain2.fetch_block_by_number( start );
       chain1.push_block( fb );
    }
-   auto traces = get_traces(chain1.traces_log, b->block_num());
 
+   auto traces = get_traces(chain1.traces_log, b->block_num());
    bool trace_found = std::find_if(traces.begin(), traces.end(), [create_account_trace_id](const auto& v) {
-                         return std::get<sysio::ship_protocol::transaction_trace_v0>(v).id == create_account_trace_id;
+                         return v[1ul]["id"].template as<digest_type>() == create_account_trace_id;
                       }) != traces.end();
 
    return trace_found;
 }
 
-BOOST_AUTO_TEST_CASE(test_fork_no_stride) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_fork_no_stride, T, state_history_testers) {
    // In this case, the chain fork would NOT trunk the trace log across the stride boundary.
-   BOOST_CHECK(test_fork(UINT32_MAX, 10));
+   BOOST_CHECK(test_fork<T>(UINT32_MAX, 10));
 }
-BOOST_AUTO_TEST_CASE(test_fork_with_stride1) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_fork_with_stride1, T, state_history_testers) {
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, there are still some traces remains after the truncation.
-   BOOST_CHECK(test_fork(10, 10));
+   BOOST_CHECK(test_fork<T>(10, 10));
 }
-BOOST_AUTO_TEST_CASE(test_fork_with_stride2) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_fork_with_stride2, T, state_history_testers) {
    // In this case, the chain fork would trunk the trace log across the stride boundary.
    // However, no existing trace remain after the truncation. Because we only keep a very
    // short history, the create_account_trace is not available to be found. We just need
    // to make sure no exception is throw.
-   BOOST_CHECK_NO_THROW(test_fork(5, 1));
+   BOOST_CHECK_NO_THROW(test_fork<T>(5, 1));
 }
 
-BOOST_AUTO_TEST_CASE(test_corrupted_log_recovery) {
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_corrupted_log_recovery, T, state_history_testers) {
    fc::temp_directory state_history_dir;
 
    sysio::state_history::partition_config config{
@@ -775,8 +803,9 @@ BOOST_AUTO_TEST_CASE(test_corrupted_log_recovery) {
       .max_retained_files = 5
    };
 
-   state_history_tester chain(state_history_dir.path(), config);
-   chain.produce_blocks(50);
+   T chain(state_history_dir.path(), config);
+   chain.produce_block();
+   chain.produce_blocks(49, true);
    chain.close();
 
    // write a few random bytes to block log indicating the last block entry is incomplete
@@ -785,11 +814,92 @@ BOOST_AUTO_TEST_CASE(test_corrupted_log_recovery) {
    logfile.open("ab");
    const char random_data[] = "12345678901231876983271649837";
    logfile.write(random_data, sizeof(random_data));
+   logfile.close();
 
    std::filesystem::remove_all(chain.get_config().blocks_dir/"reversible");
 
-   state_history_tester new_chain(state_history_dir.path(), config);
-   new_chain.produce_blocks(50);
+   T new_chain(state_history_dir.path(), config);
+   new_chain.produce_block();
+   new_chain.produce_blocks(49, true);
+
+   BOOST_CHECK(get_traces(new_chain.traces_log, 10).size());
+   BOOST_CHECK(get_decompressed_entry(new_chain.chain_state_log,10).size());
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_no_index_recovery, T, state_history_testers) {
+   fc::temp_directory state_history_dir;
+
+   sysio::state_history::partition_config config{};
+
+   T chain(state_history_dir.path(), config);
+   chain.produce_block();
+   chain.produce_blocks(21, true);
+   chain.close();
+
+   std::filesystem::remove(state_history_dir.path() / "trace_history.index");
+
+   T new_chain(state_history_dir.path(), config);
+   new_chain.produce_block();
+
+   BOOST_CHECK(get_traces(new_chain.traces_log, 10).size());
+   BOOST_CHECK(get_decompressed_entry(new_chain.chain_state_log,10).size());
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_curropted_index_recovery, T, state_history_testers) {
+   fc::temp_directory state_history_dir;
+
+   sysio::state_history::partition_config config{};
+
+   T chain(state_history_dir.path(), config);
+   chain.produce_block();
+   chain.produce_blocks(21, true);
+   chain.close();
+
+   // write a few random bytes to end of index log, size will not match and it will be auto-recreated
+   fc::cfile indexfile;
+   indexfile.set_file_path(state_history_dir.path() / "trace_history.index");
+   indexfile.open("ab");
+   const char random_data[] = "12345678901231876983271649837";
+   indexfile.seek_end(0);
+   indexfile.write(random_data, sizeof(random_data));
+   indexfile.close();
+
+   T new_chain(state_history_dir.path(), config);
+   new_chain.produce_block();
+
+   BOOST_CHECK(get_traces(new_chain.traces_log, 10).size());
+   BOOST_CHECK(get_decompressed_entry(new_chain.chain_state_log,10).size());
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(test_curropted_index_error, T, state_history_testers) {
+   fc::temp_directory state_history_dir;
+
+   sysio::state_history::partition_config config{};
+
+   T chain(state_history_dir.path(), config);
+   chain.produce_block();
+   chain.produce_blocks(21, true);
+   chain.close();
+
+   // write a few random bytes to end of index log, size will not match and it will be auto-recreated
+   fc::cfile indexfile;
+   indexfile.set_file_path(state_history_dir.path() / "trace_history.index");
+   indexfile.open("rb+");
+   const char random_data[] = "12345678901231876983271649837";
+   indexfile.seek_end(-(sizeof(random_data)));
+   indexfile.write(random_data, sizeof(random_data));
+   indexfile.close();
+
+   BOOST_CHECK_EXCEPTION(T(state_history_dir.path(), config),
+                         plugin_exception, [](const plugin_exception& e) {
+                            return e.to_detail_string().find("trace_history.index is corrupted and cannot be repaired, will be automatically regenerated if removed") != std::string::npos;
+                         });
+
+   // remove index for auto recovery
+   std::filesystem::remove(state_history_dir.path() / "trace_history.index");
+
+   T new_chain(state_history_dir.path(), config);
+   new_chain.produce_block();
 
    BOOST_CHECK(get_traces(new_chain.traces_log, 10).size());
    BOOST_CHECK(get_decompressed_entry(new_chain.chain_state_log,10).size());

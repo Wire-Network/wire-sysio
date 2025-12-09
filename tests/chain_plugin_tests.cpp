@@ -36,7 +36,7 @@ static auto get_account_full = [](chain_apis::read_only& plugin,
 BOOST_AUTO_TEST_SUITE(chain_plugin_tests)
 
 BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
-   produce_blocks(2);
+   produce_block();
 
    create_accounts( {"asserter"_n} );
    produce_block();
@@ -44,7 +44,7 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
    // setup contract and abi
    set_code( "asserter"_n, test_contracts::asserter_wasm() );
    set_abi( "asserter"_n, test_contracts::asserter_abi() );
-   produce_blocks(1);
+   produce_block();
 
    auto resolver = [&,this]( const account_name& name ) -> std::optional<abi_serializer> {
       try {
@@ -82,15 +82,16 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
    set_transaction_headers(trx);
    trx.sign( get_private_key( "asserter"_n, "active" ), control->get_chain_id() );
    push_transaction( trx );
-   produce_blocks(1);
+   produce_block();
 
    // retrieve block num
-   uint32_t headnum = this->control->head_block_num();
+   uint32_t headnum = this->control->head().block_num();
 
    char headnumstr[20];
    sprintf(headnumstr, "%d", headnum);
    chain_apis::read_only::get_raw_block_params param{headnumstr};
-   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), {});
 
    // block should be decoded successfully
    auto block = plugin.get_raw_block(param, fc::time_point::maximum());
@@ -107,7 +108,7 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
    BOOST_TEST(pos != std::string::npos);
    abi2.replace(pos, 4, "xxxx");
    set_abi("asserter"_n, abi2.c_str());
-   produce_blocks(1);
+   produce_block();
 
    // resolving the invalid abi result in exception
    BOOST_CHECK_THROW(resolver("asserter"_n), invalid_type_inside_abi);
@@ -127,42 +128,50 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
 
    BOOST_TEST(get_bh_result.id == block->calculate_id());
    BOOST_TEST(json::to_string(get_bh_result.signed_block_header, fc::time_point::maximum()) ==
-              json::to_string(fc::variant{static_cast<signed_block_header&>(*block)}, fc::time_point::maximum()));
+              json::to_string(fc::variant{static_cast<const signed_block_header&>(*block)}, fc::time_point::maximum()));
 
 } FC_LOG_AND_RETHROW() /// get_block_with_invalid_abi
 
 BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
    tester t{setup_policy::preactivate_feature_and_new_bios};
-   t.produce_blocks(1);
+   t.produce_block();
 
-   chain_apis::read_only plugin(*(t.control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(t.control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
 
    auto parms = plugin.get_consensus_parameters({}, fc::time_point::maximum());
 
+   chain_config_v0 v0config;
+   from_variant(parms.chain_config, v0config);
+
    // verifying chain_config
-   BOOST_TEST(parms.chain_config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
-   BOOST_TEST(parms.chain_config.target_block_net_usage_pct == t.control->get_global_properties().configuration.target_block_net_usage_pct);
-   BOOST_TEST(parms.chain_config.max_transaction_net_usage == t.control->get_global_properties().configuration.max_transaction_net_usage);
-   BOOST_TEST(parms.chain_config.base_per_transaction_net_usage == t.control->get_global_properties().configuration.base_per_transaction_net_usage);
-   BOOST_TEST(parms.chain_config.net_usage_leeway == t.control->get_global_properties().configuration.net_usage_leeway);
-   BOOST_TEST(parms.chain_config.context_free_discount_net_usage_num == t.control->get_global_properties().configuration.context_free_discount_net_usage_num);
-   BOOST_TEST(parms.chain_config.context_free_discount_net_usage_den == t.control->get_global_properties().configuration.context_free_discount_net_usage_den);
-   BOOST_TEST(parms.chain_config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
-   BOOST_TEST(parms.chain_config.target_block_cpu_usage_pct == t.control->get_global_properties().configuration.target_block_cpu_usage_pct);
-   BOOST_TEST(parms.chain_config.max_transaction_cpu_usage == t.control->get_global_properties().configuration.max_transaction_cpu_usage);
-   BOOST_TEST(parms.chain_config.min_transaction_cpu_usage == t.control->get_global_properties().configuration.min_transaction_cpu_usage);
-   BOOST_TEST(parms.chain_config.max_transaction_lifetime == t.control->get_global_properties().configuration.max_transaction_lifetime);
-   BOOST_TEST(parms.chain_config.deferred_trx_expiration_window == t.control->get_global_properties().configuration.deferred_trx_expiration_window);
-   BOOST_TEST(parms.chain_config.max_transaction_delay == t.control->get_global_properties().configuration.max_transaction_delay);
-   BOOST_TEST(parms.chain_config.max_inline_action_size == t.control->get_global_properties().configuration.max_inline_action_size);
-   BOOST_TEST(parms.chain_config.max_inline_action_depth == t.control->get_global_properties().configuration.max_inline_action_depth);
-   BOOST_TEST(parms.chain_config.max_authority_depth == t.control->get_global_properties().configuration.max_authority_depth);
-   BOOST_TEST(parms.chain_config.max_action_return_value_size == t.control->get_global_properties().configuration.max_action_return_value_size);
+   BOOST_TEST(v0config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
+   BOOST_TEST(v0config.target_block_net_usage_pct == t.control->get_global_properties().configuration.target_block_net_usage_pct);
+   BOOST_TEST(v0config.max_transaction_net_usage == t.control->get_global_properties().configuration.max_transaction_net_usage);
+   BOOST_TEST(v0config.base_per_transaction_net_usage == t.control->get_global_properties().configuration.base_per_transaction_net_usage);
+   BOOST_TEST(v0config.net_usage_leeway == t.control->get_global_properties().configuration.net_usage_leeway);
+   BOOST_TEST(v0config.context_free_discount_net_usage_num == t.control->get_global_properties().configuration.context_free_discount_net_usage_num);
+   BOOST_TEST(v0config.context_free_discount_net_usage_den == t.control->get_global_properties().configuration.context_free_discount_net_usage_den);
+   BOOST_TEST(v0config.max_block_cpu_usage == t.control->get_global_properties().configuration.max_block_cpu_usage);
+   BOOST_TEST(v0config.target_block_cpu_usage_pct == t.control->get_global_properties().configuration.target_block_cpu_usage_pct);
+   BOOST_TEST(v0config.max_transaction_cpu_usage == t.control->get_global_properties().configuration.max_transaction_cpu_usage);
+   BOOST_TEST(v0config.min_transaction_cpu_usage == t.control->get_global_properties().configuration.min_transaction_cpu_usage);
+   BOOST_TEST(v0config.max_transaction_lifetime == t.control->get_global_properties().configuration.max_transaction_lifetime);
+   BOOST_TEST(v0config.deferred_trx_expiration_window == t.control->get_global_properties().configuration.deferred_trx_expiration_window);
+   BOOST_TEST(v0config.max_transaction_delay == t.control->get_global_properties().configuration.max_transaction_delay);
+   BOOST_TEST(v0config.max_inline_action_size == t.control->get_global_properties().configuration.max_inline_action_size);
+   BOOST_TEST(v0config.max_inline_action_depth == t.control->get_global_properties().configuration.max_inline_action_depth);
+   BOOST_TEST(v0config.max_authority_depth == t.control->get_global_properties().configuration.max_authority_depth);
 
-   BOOST_TEST(!!parms.wasm_config); // enabled at genesis for wire
+   BOOST_TEST(!!parms.chain_config.get_object().contains("max_action_return_value_size")); // enabled at genesis for Wire
+   BOOST_TEST(!!parms.wasm_config); // enabled at genesis for Wire
 
-   t.preactivate_all_builtin_protocol_features();
-   t.produce_block();
+   parms = plugin.get_consensus_parameters({}, fc::time_point::maximum());
+   chain_config_v1 v1config;
+   from_variant(parms.chain_config, v1config);
+
+   BOOST_TEST(v1config.max_action_return_value_size == t.control->get_global_properties().configuration.max_action_return_value_size);
+   BOOST_TEST(!!parms.wasm_config);
 
    parms = plugin.get_consensus_parameters({}, fc::time_point::maximum());
 
@@ -184,14 +193,15 @@ BOOST_AUTO_TEST_CASE( get_consensus_parameters ) try {
 } FC_LOG_AND_RETHROW() //get_consensus_parameters
 
 BOOST_FIXTURE_TEST_CASE( get_account, validating_tester ) try {
-   produce_blocks(2);
+   produce_block();
 
    std::vector<account_name> accs{{ "alice"_n, "bob"_n, "cindy"_n}};
    create_accounts(accs, false, false);
 
    produce_block();
 
-   chain_apis::read_only plugin(*(this->control), {}, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
+   std::optional<sysio::chain_apis::tracked_votes> _tracked_votes;
+   chain_apis::read_only plugin(*(this->control), {}, {}, _tracked_votes, fc::microseconds::maximum(), fc::microseconds::maximum(), nullptr);
 
    chain_apis::read_only::get_account_params p{"alice"_n};
 

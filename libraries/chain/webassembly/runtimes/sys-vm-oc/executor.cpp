@@ -30,7 +30,7 @@
 
 extern "C" int arch_prctl(int code, unsigned long* addr);
 
-namespace sysio { namespace chain { namespace sysvmoc {
+namespace sysio::chain::sysvmoc {
 
 static constexpr auto signal_sentinel = 0x4D56534F45534559ul;
 
@@ -39,9 +39,8 @@ static void segv_handler(int sig, siginfo_t* info, void* ctx)  {
    control_block* cb_in_main_segment;
 
    //a 0 GS value is an indicator an executor hasn't been active on this thread recently
-   uint64_t current_gs;
-   syscall(SYS_arch_prctl, ARCH_GET_GS, &current_gs);
-   if(current_gs == 0)
+   uint64_t current_gs = sys_vm_oc_getgs();
+   if(sys_vm_oc_getgs() == 0)
       goto notus;
 
    cb_in_main_segment = reinterpret_cast<control_block*>(current_gs - memory::cb_offset);
@@ -88,8 +87,9 @@ static intrinsic sysio_exit_intrinsic("env.sysio_exit", IR::FunctionType::get(IR
   std::integral_constant<std::size_t, find_intrinsic_index("env.sysio_exit")>::value
 );
 
-static void throw_internal_exception(const char* const s) {
-   *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::make_exception_ptr(wasm_execution_error(FC_LOG_MESSAGE(error, s)));
+template <typename E>
+static void throw_internal_exception(const E& e) {
+   *reinterpret_cast<std::exception_ptr*>(sys_vm_oc_get_exception_ptr()) = std::make_exception_ptr(e);
    siglongjmp(*sys_vm_oc_get_jmp_buf(), SYSVMOC_EXIT_EXCEPTION);
    __builtin_unreachable();
 }
@@ -102,24 +102,41 @@ static void throw_internal_exception(const char* const s) {
 	void name()
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,depth_assert) {
-   throw_internal_exception("Exceeded call depth maximum");
+   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Exceeded call depth maximum")));
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,div0_or_overflow) {
-   throw_internal_exception("Division by 0 or integer overflow trapped");
+   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Division by 0 or integer overflow trapped")));
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_mismatch) {
-   throw_internal_exception("Indirect call function type mismatch");
+   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Indirect call function type mismatch")));
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,indirect_call_oob) {
-   throw_internal_exception("Indirect call index out of bounds");
+   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Indirect call index out of bounds")));
 }
 
 DEFINE_SYSVMOC_TRAP_INTRINSIC(sysvmoc_internal,unreachable) {
-   throw_internal_exception("Unreachable reached");
+   throw_internal_exception(wasm_execution_error(FC_LOG_MESSAGE(error, "Unreachable reached")));
 }
+
+static void sys_vm_oc_check_memcpy_params(int32_t dest, int32_t src, int32_t length) {
+   //make sure dest & src are zexted when converted from signed 32-bit to signed ptrdiff_t; length should always be small but do it too
+   const unsigned udest = dest;
+   const unsigned usrc = src;
+   const unsigned ulength = length;
+
+   //this must remain the same behavior as the memcpy host function
+   if((size_t)(std::abs((ptrdiff_t)udest - (ptrdiff_t)usrc)) >= ulength)
+      return;
+   throw_internal_exception(overlapping_memory_error(FC_LOG_MESSAGE(error, "memcpy can only accept non-aliasing pointers")));
+}
+
+static intrinsic check_memcpy_params_intrinsic("sysvmoc_internal.check_memcpy_params", IR::FunctionType::get(IR::ResultType::none,{IR::ValueType::i32,IR::ValueType::i32,IR::ValueType::i32}),
+  (void*)&sys_vm_oc_check_memcpy_params,
+  std::integral_constant<std::size_t, find_intrinsic_index("sysvmoc_internal.check_memcpy_params")>::value
+);
 
 struct executor_signal_init {
    executor_signal_init() {
@@ -168,11 +185,11 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
          mprotect(mem.full_page_memory_base() + initial_page_offset * sysio::chain::wasm_constraints::wasm_page_size,
                   (code.starting_memory_pages - initial_page_offset) * sysio::chain::wasm_constraints::wasm_page_size, PROT_READ | PROT_WRITE);
       }
-      arch_prctl(ARCH_SET_GS, (unsigned long*)(mem.zero_page_memory_base()+initial_page_offset*memory::stride));
+      sys_vm_oc_setgs((uint64_t)mem.zero_page_memory_base()+initial_page_offset*memory::stride);
       memset(mem.full_page_memory_base(), 0, 64u*1024u*code.starting_memory_pages);
    }
    else
-      arch_prctl(ARCH_SET_GS, (unsigned long*)mem.zero_page_memory_base());
+      sys_vm_oc_setgs((uint64_t)mem.zero_page_memory_base());
 
    void* globals;
    if(code.initdata_prologue_size > memory::max_prologue_size) {
@@ -212,7 +229,6 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
       syscall(SYS_mprotect, self->code_mapping, self->code_mapping_size, PROT_NONE);
       self->mapping_is_executable = false;
    }, this);
-   context.trx_context.checktime(); //catch any expiration that might have occurred before setting up callback
 
    auto cleanup = fc::make_scoped_exit([cb, &tt=context.trx_context.transaction_timer, &mem=mem](){
       cb->is_running = false;
@@ -225,6 +241,8 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
                   (cb->current_linear_memory_pages - base_pages) * sysio::chain::wasm_constraints::wasm_page_size, PROT_NONE);
       }
    });
+
+   context.trx_context.checktime(); //catch any expiration that might have occurred before setting up callback
 
    void(*apply_func)(uint64_t, uint64_t, uint64_t) = (void(*)(uint64_t, uint64_t, uint64_t))(cb->running_code_base + code.apply_offset);
 
@@ -259,8 +277,8 @@ void executor::execute(const code_descriptor& code, memory& mem, apply_context& 
 }
 
 executor::~executor() {
-   arch_prctl(ARCH_SET_GS, nullptr);
+   sys_vm_oc_setgs(0);
    munmap(code_mapping, code_mapping_size);
 }
 
-}}}
+} // namespace sysio::chain::sysvmoc

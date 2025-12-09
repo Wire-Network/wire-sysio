@@ -38,6 +38,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(GNUInstallDirs)
 include(MASSigning)
+include(AddTestHelpers)
 
 # Options
 option(ENABLE_WERROR "Enable `-Werror` compilation flag." Off)
@@ -168,8 +169,12 @@ message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
 if("${SYSIO_ROOT_KEY}" STREQUAL "")
   set(SYSIO_ROOT_KEY "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
 endif()
+if("${SYSIO_ROOT_FINALIZER_KEY}" STREQUAL "")
+    set(SYSIO_ROOT_FINALIZER_KEY "PUB_BLS_3igm9y-m3poDQL9IU-oE2E3rjKVD025aN5_Kpod8aVKjqtg4xOrP-jGtz4wLg_IFzc7gay9YghYwVgNafpxphE2xOY5gzEPa8li1rmtFfdpXguDFhNw2FpuLWSWami8WXgUo3A")
+endif()
 
 message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
+message(STATUS "Using '${SYSIO_ROOT_FINALIZER_KEY}' as finalizer key for 'sysio' account")
 
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if(ENABLE_TCMALLOC)
@@ -294,6 +299,7 @@ endif()
 include(doxygen)
 
 option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
+option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
 include(package.cmake)
 include(CPack)

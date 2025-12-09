@@ -1,4 +1,5 @@
 #include <sysio/chain/block.hpp>
+#include <sysio/chain/finalizer_authority.hpp>
 #include <sysio/chain/merkle.hpp>
 #include <fc/io/raw.hpp>
 #include <fc/bitutil.hpp>
@@ -24,10 +25,10 @@ namespace sysio { namespace chain {
       return result;
    }
 
-   flat_multimap<uint16_t, block_header_extension> block_header::validate_and_extract_header_extensions()const {
+   header_extension_multimap block_header::validate_and_extract_header_extensions()const {
       using decompose_t = block_header_extension_types::decompose_t;
 
-      flat_multimap<uint16_t, block_header_extension> results;
+      header_extension_multimap results;
 
       uint16_t id_type_lower_bound = 0;
 
@@ -62,6 +63,41 @@ namespace sysio { namespace chain {
       }
 
       return results;
+   }
+
+   // Does not validate ordering, assumes validate_and_extract_header_extensions() has been called in block_state creation
+   std::optional<block_header_extension> block_header::extract_header_extension(uint16_t extension_id)const {
+      using decompose_t = block_header_extension_types::decompose_t;
+
+      assert(std::ranges::is_sorted(header_extensions)); // currently all extensions are unique so default compare works
+
+      for( size_t i = 0; i < header_extensions.size(); ++i ) {
+         const auto& e = header_extensions[i];
+         auto id = e.first;
+
+         if (id > extension_id)
+            break;
+         if (id != extension_id)
+            continue;
+
+         block_header_extension ext;
+
+         auto match = decompose_t::extract<block_header_extension>( id, e.second, ext );
+         SYS_ASSERT( match, invalid_block_header_extension,
+                     "Block header extension with id type ${id} is not supported",
+                     ("id", id)
+         );
+
+         return ext;
+      }
+
+      return {};
+   }
+
+   bool block_header::contains_header_extension(uint16_t extension_id)const {
+      return std::any_of(header_extensions.cbegin(), header_extensions.cend(), [&](const auto& p) {
+         return p.first == extension_id;
+      });
    }
 
 } }

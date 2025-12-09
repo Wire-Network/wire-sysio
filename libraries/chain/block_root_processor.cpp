@@ -30,7 +30,7 @@ bool block_root_processor::calculate_root_blocks(uint32_t block_num)
       stored = true;
       auto& contract_root_idx = _db.get_index<contract_root_multi_index, by_contract>();
       auto itr = contract_root_idx.find(boost::make_tuple(contract.first, contract.second));
-      const auto merkle_root = chain::merkle(transactions);
+      const auto merkle_root = chain::calculate_merkle(transactions);
       if (itr == contract_root_idx.end()) {
          const auto previous_root_id = chain::checksum256_type();
          const auto curr_root_id = compute_curr_root_id(previous_root_id, merkle_root);
@@ -117,11 +117,20 @@ void block_root_processor::add_indices() {
    block_root_index_set::add_indices(_db);
 }
 
-void block_root_processor::add_to_snapshot( const snapshot_writer_ptr& snapshot ) const {
-   block_root_index_set::walk_indices([this, &snapshot]( auto utils ){
-      snapshot->write_section<typename decltype(utils)::index_t::value_type>([this]( auto& section ){
-         decltype(utils)::walk(_db, [this, &section]( const auto &row ) {
+size_t block_root_processor::expected_snapshot_row_count() const {
+   size_t ret = 0;
+   block_root_index_set::walk_indices([this, &ret]( auto utils ) {
+      ret += _db.get_index<typename decltype(utils)::index_t>().size();
+   });
+   return ret;
+}
+
+void block_root_processor::add_to_snapshot( const snapshot_writer_ptr& snapshot, snapshot_written_row_counter& row_counter ) const {
+   block_root_index_set::walk_indices([this, &snapshot, &row_counter]( auto utils ){
+      snapshot->write_section<typename decltype(utils)::index_t::value_type>([this, &row_counter]( auto& section ){
+         decltype(utils)::walk(_db, [this, &section, &row_counter]( const auto &row ) {
             section.add_row(row, _db);
+            row_counter.progress();
          });
       });
    });

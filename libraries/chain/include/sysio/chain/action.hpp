@@ -104,41 +104,10 @@ namespace sysio { namespace chain {
       uint32_t get_billable_size()const { return fc::raw::pack_size(static_cast<const action_base&>(*this)) + data.size(); }
    };
 
-   template <typename Hasher>
-   auto generate_action_digest(Hasher&& hash, const action& act, const vector<char>& action_output) {
-      using hash_type = decltype(hash(nullptr, 0));
-      hash_type hashes[2];
-      const action_base* base = &act;
-      const auto action_base_size   = fc::raw::pack_size(*base);
-      const auto action_input_size  = fc::raw::pack_size(act.data);
-      const auto action_output_size = fc::raw::pack_size(action_output);
-      const auto rhs_size           = action_input_size + action_output_size;
-      std::vector<char> buff;
-      buff.reserve(std::max(action_base_size, rhs_size));
-      {
-         buff.resize(action_base_size);
-         fc::datastream<char*> ds(buff.data(), action_base_size);
-         fc::raw::pack(ds, *base);
-         hashes[0] = hash(buff.data(), action_base_size);
-      }
-      {
-         buff.resize(rhs_size);
-         fc::datastream<char*> ds(buff.data(), rhs_size);
-         fc::raw::pack(ds, act.data);
-         fc::raw::pack(ds, action_output);
-         hashes[1] = hash(buff.data(), rhs_size);
-      }
-      auto hashes_size = fc::raw::pack_size(hashes[0]) + fc::raw::pack_size(hashes[1]);
-      buff.resize(hashes_size); // may cause reallocation but in practice will be unlikely
-      fc::datastream<char*> ds(buff.data(), hashes_size);
-      fc::raw::pack(ds, hashes[0]);
-      fc::raw::pack(ds, hashes[1]);
-      return hash(buff.data(), hashes_size);
+   inline digest_type generate_action_digest(const action& act, const vector<char>& action_output) {
+      const action_base& base = act;
+      return fc::sha256::packhash(fc::sha256::packhash(base), fc::sha256::packhash(act.data, action_output));
    }
-
-   struct action_notice : public action {
-      account_name receiver;
-   };
 
 } } /// namespace sysio::chain
 

@@ -1,5 +1,6 @@
 #include <boost/test/unit_test.hpp>
 #include <sysio/testing/tester.hpp>
+#include <sysio/chain/fork_database.hpp>
 #include <sysio/chain/unapplied_transaction_queue.hpp>
 #include <sysio/chain/contract_types.hpp>
 
@@ -20,6 +21,26 @@ struct testit {
 };
 FC_REFLECT( testit, (id) )
 
+namespace sysio::chain {
+struct test_block_state_accessor {
+   static auto create_test_block_state( deque<transaction_metadata_ptr> trx_metas ) {
+      auto block = std::make_unique<signed_block>();
+      for( auto& trx_meta : trx_metas ) {
+         block->transactions.emplace_back( *trx_meta->packed_trx() );
+      }
+      block->producer = sysio::chain::config::system_account_name;
+
+      auto bsp = std::make_shared<block_state>();
+      bsp->block = std::move( block );
+      bsp->set_trxs_metas(std::move(trx_metas), true);
+      return bsp;
+   }
+
+   static const auto& get_trx_metas(auto bsp) {
+      return bsp->trxs_metas();
+   }
+};
+}
 
 BOOST_AUTO_TEST_SUITE(unapplied_transaction_queue_tests)
 
@@ -48,49 +69,22 @@ auto next( unapplied_transaction_queue& q ) {
 }
 
 auto create_test_block_state( deque<transaction_metadata_ptr> trx_metas ) {
-   signed_block_ptr block = std::make_shared<signed_block>();
-   for( auto& trx_meta : trx_metas ) {
-      block->transactions.emplace_back( *trx_meta->packed_trx() );
+   return test_block_state_accessor::create_test_block_state(trx_metas);
+}
+
+using branch_t = fork_database_t::branch_t;
+
+template<class BRANCH_TYPE>
+void add_forked( unapplied_transaction_queue& queue, const BRANCH_TYPE& forked_branch ) {
+   // forked_branch is in reverse order
+   for( auto ritr = forked_branch.rbegin(), rend = forked_branch.rend(); ritr != rend; ++ritr ) {
+      const auto& bsptr = *ritr;
+      auto trxs_metas = test_block_state_accessor::get_trx_metas(bsptr);
+      for( auto itr = trxs_metas.begin(), end = trxs_metas.end(); itr != end; ++itr ) {
+         const auto& trx = *itr;
+         queue.add_forked(trx);
+      }
    }
-
-   block->producer = sysio::chain::config::system_account_name;
-
-   auto priv_key = sysio::testing::base_tester::get_private_key( block->producer, "active" );
-   auto pub_key  = sysio::testing::base_tester::get_public_key( block->producer, "active" );
-
-   auto prev = std::make_shared<block_state_legacy>();
-   auto header_bmroot = digest_type::hash( std::make_pair( block->digest(), prev->blockroot_merkle.get_root() ) );
-   auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, prev->pending_schedule.schedule_hash) );
-   block->producer_signature = priv_key.sign( sig_digest );
-
-   vector<private_key_type> signing_keys;
-   signing_keys.emplace_back( std::move( priv_key ) );
-
-   auto signer = [&]( digest_type d ) {
-      std::vector<signature_type> result;
-      result.reserve(signing_keys.size());
-      for (const auto& k: signing_keys)
-         result.emplace_back(k.sign(d));
-      return result;
-   };
-   pending_block_header_state_legacy pbhs;
-   pbhs.producer = block->producer;
-   producer_authority_schedule schedule = { 0, { producer_authority{block->producer, block_signing_authority_v0{ 1, {{pub_key, 1}} } } } };
-   pbhs.active_schedule = schedule;
-   pbhs.valid_block_signing_authority = block_signing_authority_v0{ 1, {{pub_key, 1}} };
-   auto bsp = std::make_shared<block_state_legacy>(
-         std::move( pbhs ),
-         std::move( block ),
-         std::move( trx_metas ),
-         protocol_feature_set(),
-         []( block_timestamp_type timestamp,
-             const flat_set<digest_type>& cur_features,
-             const vector<digest_type>& new_features )
-         {},
-         signer
-   );
-
-   return bsp;
 }
 
 // given a current itr make sure expected number of items are iterated over
@@ -151,8 +145,8 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_test ) try {
    auto bs1 = create_test_block_state( { trx1, trx2 } );
    auto bs2 = create_test_block_state( { trx3, trx4, trx5 } );
    auto bs3 = create_test_block_state( { trx6 } );
-   q.add_forked( { bs3, bs2, bs1, bs1 } ); // bs1 duplicate ignored
-   BOOST_CHECK( q.size() == 6u );
+   add_forked( q, branch_t{ bs3, bs2, bs1, bs1 } ); // bs1 duplicate ignored
+   BOOST_TEST( q.size() == 6u );
    BOOST_REQUIRE( next( q ) == trx1 );
    BOOST_CHECK( q.size() == 5u );
    BOOST_REQUIRE( next( q ) == trx2 );
@@ -170,9 +164,9 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_test ) try {
 
    // fifo forked
    auto bs4 = create_test_block_state( { trx7 } );
-   q.add_forked( { bs1 } );
-   q.add_forked( { bs3, bs2 } );
-   q.add_forked( { bs4 } );
+   add_forked( q, branch_t{ bs1 } );
+   add_forked( q, branch_t{ bs3, bs2 } );
+   add_forked( q, branch_t{ bs4 } );
    BOOST_CHECK( q.size() == 7u );
    BOOST_REQUIRE( next( q ) == trx1 );
    BOOST_CHECK( q.size() == 6u );
@@ -204,10 +198,10 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_test ) try {
    // fifo forked, multi forks
    auto bs5 = create_test_block_state( { trx11, trx12, trx13 } );
    auto bs6 = create_test_block_state( { trx11, trx15 } );
-   q.add_forked( { bs3, bs2, bs1 } );
-   q.add_forked( { bs4 } );
-   q.add_forked( { bs3, bs2 } ); // dups ignored
-   q.add_forked( { bs6, bs5 } );
+   add_forked( q, branch_t{ bs3, bs2, bs1 } );
+   add_forked( q, branch_t{ bs4 } );
+   add_forked( q, branch_t{ bs3, bs2 } ); // dups ignored
+   add_forked( q, branch_t{ bs6, bs5 } );
    BOOST_CHECK_EQUAL( q.size(), 11u );
    BOOST_REQUIRE( next( q ) == trx1 );
    BOOST_CHECK( q.size() == 10u );
@@ -235,10 +229,10 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_test ) try {
    BOOST_CHECK( q.empty() );
 
    // altogether, order fifo: forked, aborted
-   q.add_forked( { bs3, bs2, bs1 } );
+   add_forked( q, branch_t{ bs3, bs2, bs1 } );
    q.add_aborted( { trx9, trx14 } );
    q.add_aborted( { trx18, trx19 } );
-   q.add_forked( { bs6, bs5, bs4 } );
+   add_forked( q, branch_t{ bs6, bs5, bs4 } );
    // verify order
    verify_order( q, q.begin(), 15 );
    // verify type order
@@ -304,7 +298,7 @@ BOOST_AUTO_TEST_CASE( unapplied_transaction_queue_test ) try {
    BOOST_REQUIRE( next( q ) == trx22 );
    BOOST_CHECK( q.empty() );
 
-   q.add_forked( { bs3, bs2, bs1 } );
+   add_forked( q, branch_t{ bs3, bs2, bs1 } );
    q.add_aborted( { trx9, trx11 } );
    q.clear();
    BOOST_CHECK( q.empty() );

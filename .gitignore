@@ -98,8 +98,7 @@ CMakeLists.txt.user
 node_modules
 package-lock.json
 
-snapshots
+/snapshots
 
-find-eosio-wasm.sh
 cliff.toml
 !cmake/build-options.cmake

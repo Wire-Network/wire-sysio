@@ -2,9 +2,9 @@
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
-#include <sysio/state_history/compression.hpp>
 #include <sysio/state_history/create_deltas.hpp>
-#include <sysio/state_history/log.hpp>
+#include <sysio/state_history/log_config.hpp>
+#include <sysio/state_history/log_catalog.hpp>
 #include <sysio/state_history/serialization.hpp>
 #include <sysio/state_history/trace_converter.hpp>
 #include <sysio/state_history_plugin/session.hpp>
@@ -21,8 +21,6 @@
 
 #include <fc/network/listener.hpp>
 
-namespace ws = boost::beast::websocket;
-
 namespace sysio {
 using namespace chain;
 using namespace state_history;
@@ -38,22 +36,21 @@ template <typename F>
 auto catch_and_log(F f) {
    try {
       return f();
-   } catch (const fc::exception& e) {
+   } catch(const fc::exception& e) {
       fc_elog(_log, "${e}", ("e", e.to_detail_string()));
-   } catch (const std::exception& e) {
+   } catch(const std::exception& e) {
       fc_elog(_log, "${e}", ("e", e.what()));
-   } catch (...) {
+   } catch(...) {
       fc_elog(_log, "unknown exception");
    }
 }
 
-struct state_history_plugin_impl : std::enable_shared_from_this<state_history_plugin_impl> {
-   constexpr static uint64_t default_frame_size = 1024 * 1024;
-
+struct state_history_plugin_impl {
 private:
    chain_plugin*                    chain_plug = nullptr;
-   std::optional<state_history_log> trace_log;
-   std::optional<state_history_log> chain_state_log;
+   std::optional<log_catalog>       trace_log;
+   std::optional<log_catalog>       chain_state_log;
+   std::optional<log_catalog>       finality_data_log;
    uint32_t                         first_available_block = 0;
    bool                             trace_debug_mode = false;
    std::optional<scoped_connection> applied_transaction_connection;
@@ -63,151 +60,99 @@ private:
    string                           unix_path;
    state_history::trace_converter   trace_converter;
 
-   mutable std::mutex mtx;
-   block_id_type      head_id;
-   block_id_type      lib_id;
-   time_point         head_timestamp;
+   named_thread_pool<struct ship>   thread_pool;
 
-   named_thread_pool<struct ship> thread_pool;
-
-   session_manager                  session_mgr{thread_pool.get_executor()};
-
-   bool  plugin_started = false;
+   struct connection_map_key_less {
+      using is_transparent = void;
+      template<typename L, typename R> bool operator()(const L& lhs, const R& rhs) const {
+         return std::to_address(lhs) < std::to_address(rhs);
+      }
+   };
+   //connections must only be touched by the main thread because on_accepted_block() will iterate over it
+   std::set<std::unique_ptr<session_base>, connection_map_key_less> connections; //gcc 11+ required for unordered_set
 
 public:
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
    void plugin_shutdown();
-   session_manager& get_session_manager() { return session_mgr; }
 
-   static fc::logger& get_logger() { return _log; }
-
-   std::optional<state_history_log>& get_trace_log() { return trace_log; }
-   std::optional<state_history_log>& get_chain_state_log(){ return chain_state_log; }
-
-   boost::asio::io_context& get_ship_executor() { return thread_pool.get_executor(); }
-
-   // thread-safe
-   signed_block_ptr get_block(uint32_t block_num, uint32_t block_state_block_num, const signed_block_ptr& block) const {
-      chain::signed_block_ptr p;
-      try {
-         if (block_num == block_state_block_num) {
-            p = block;
-         } else {
-            p = chain_plug->chain().fetch_block_by_number(block_num);
-         }
-      } catch (...) {
-      }
-      return p;
-   }
-
-   // thread safe
-   fc::sha256 get_chain_id() const {
-      return chain_plug->chain().get_chain_id();
-   }
-
-   // thread-safe
-   void get_block(uint32_t block_num, uint32_t block_state_block_num, const signed_block_ptr& block, std::optional<bytes>& result) const {
-      auto p = get_block(block_num, block_state_block_num, block);
-      if (p)
-         result = fc::raw::pack(*p);
-   }
-
-   // thread-safe
-   std::optional<chain::block_id_type> get_block_id(uint32_t block_num) {
-      std::optional<chain::block_id_type> id;
-      if( trace_log ) {
-         id = trace_log->get_block_id( block_num );
-         if( id )
+   std::optional<chain::block_id_type> get_block_id(block_num_type block_num) {
+      if(trace_log) {
+         if(std::optional<block_id_type> id = trace_log->get_block_id(block_num))
             return id;
       }
-      if( chain_state_log ) {
-         id = chain_state_log->get_block_id( block_num );
-         if( id )
+      if(chain_state_log) {
+         if(std::optional<block_id_type> id = chain_state_log->get_block_id(block_num))
+            return id;
+      }
+      if(finality_data_log) {
+         if(std::optional<block_id_type> id = finality_data_log->get_block_id(block_num))
             return id;
       }
       try {
-         return chain_plug->chain().get_block_id_for_num(block_num);
-      } catch (...) {
+         // not thread safe, only call from main application thread
+         return chain_plug->chain().chain_block_id_for_num(block_num);
+      } catch(...) {
       }
       return {};
-   }
-
-   // thread-safe
-   block_position get_block_head() const {
-      std::lock_guard g(mtx);
-      return { block_header::num_from_id(head_id), head_id };
-   }
-
-   // thread-safe
-   block_position get_last_irreversible() const {
-      std::lock_guard g(mtx);
-      return { block_header::num_from_id(lib_id), lib_id };
-   }
-
-   // thread-safe
-   time_point get_head_block_timestamp() const {
-      std::lock_guard g(mtx);
-      return head_timestamp;
-   }
-
-   // thread-safe
-   uint32_t get_first_available_block_num() const {
-      return first_available_block;
    }
 
    template <typename Protocol>
    void create_listener(const std::string& address) {
       const boost::posix_time::milliseconds accept_timeout(200);
-      using socket_type = typename Protocol::socket;
-      fc::create_listener<Protocol>(
-          thread_pool.get_executor(), _log, accept_timeout, address, "", [this](socket_type&& socket) {
-             // Create a session object and run it
-             catch_and_log([&, this] {
-                auto s = std::make_shared<session<state_history_plugin_impl, socket_type>>(*this, std::move(socket),
-                                                                                           session_mgr);
-                session_mgr.insert(s);
-                s->start();
-             });
-          });
+      // run listener on ship thread so that thread_pool.stop() will shutdown the listener since this captures `this`
+      fc::create_listener<Protocol>(thread_pool.get_executor(), _log, accept_timeout, address, "",
+         [this](const auto&) { return boost::asio::make_strand(thread_pool.get_executor()); },
+         [this](Protocol::socket&& socket) {
+            // connections set must only be modified by the main thread
+            app().executor().post(priority::high, exec_queue::read_write, [this, socket{std::move(socket)}]() mutable {
+               catch_and_log([this, &socket]() {
+                  connections.emplace(new session(std::move(socket), chain_plug->chain(),
+                                                  trace_log, chain_state_log, finality_data_log,
+                                                  [this](const chain::block_num_type block_num) {
+                                                     return get_block_id(block_num);
+                                                  },
+                                                  [this](const chain::block_id_type& block_id) {
+                                                     return chain_plug->chain().fetch_block_by_id(block_id);
+                                                  },
+                                                  [this](session_base* conn) {
+                                                     app().executor().post(priority::high, exec_queue::read_write, [conn, this]() {
+                                                        //Main thread may have post()s inflight to session strand (via block_applied() -> awake_if_idle()) that
+                                                        // could execute during destruction. Drain any possible post() before destruction. This is in main
+                                                        // thread now so guaranteed no new block_applied() will be called during these lines below, and the
+                                                        // session has already indicated it is "done" so it will not be running any operations of its own
+                                                        // on the strand
+                                                        conn->drain_strand();
+                                                        connections.erase(connections.find(conn));
+                                                     });
+                                                  }, _log));
+               });
+            });
+         });
    }
 
    void listen(){
       try {
-         if (!endpoint_address.empty()) {
+         if(!endpoint_address.empty())
             create_listener<boost::asio::ip::tcp>(endpoint_address);
-         }
-         if (!unix_path.empty()) {
+         if(!unix_path.empty())
             create_listener<boost::asio::local::stream_protocol>(unix_path);
-         }
-      } catch (std::exception&) {
+      } catch(std::exception&) {
          FC_THROW_EXCEPTION(plugin_exception, "unable to open listen socket");
       }
    }
 
-   // called from main thread
    void on_applied_transaction(const transaction_trace_ptr& p, const packed_transaction_ptr& t) {
-      if (trace_log)
+      if(trace_log)
          trace_converter.add_transaction(p, t);
    }
 
-   // called from main thread
-   void update_current() {
-      const auto& chain = chain_plug->chain();
-      std::lock_guard g(mtx);
-      head_id = chain.head_block_id();
-      lib_id = chain.last_irreversible_block_id();
-      head_timestamp = chain.head_block_time();
-   }
-
-   // called from main thread
    void on_accepted_block(const signed_block_ptr& block, const block_id_type& id) {
-      update_current();
-
       try {
          store_traces(block, id);
-         store_chain_state(id, static_cast<signed_block_header>(*block), block->block_num());
-      } catch (const fc::exception& e) {
+         store_chain_state(id, block->previous, block->block_num());
+         store_finality_data(id, block->previous);
+      } catch(const fc::exception& e) {
          fc_elog(_log, "fc::exception: ${details}", ("details", e.to_detail_string()));
          // Both app().quit() and exception throwing are required. Without app().quit(),
          // the exception would be caught and drop before reaching main(). The exception is
@@ -219,64 +164,59 @@ public:
              "the process");
       }
 
-      // avoid accumulating all these posts during replay before ship threads started
-      // that can lead to a large memory consumption and failures
-      // this is safe as there are no clients connected until after replay is complete
-      // this method is called from the main thread and "plugin_started" is set on the main thread as well when plugin is started
-      if (plugin_started) {
-         boost::asio::post(get_ship_executor(), [self = this->shared_from_this(), block, id]() {
-            self->get_session_manager().send_update(block, id);
-         });
-      }
-
+      for(const std::unique_ptr<session_base>& c : connections)
+         c->block_applied(block->block_num());
    }
 
-   // called from main thread
    void on_block_start(uint32_t block_num) {
       clear_caches();
    }
 
-   // called from main thread
    void clear_caches() {
       trace_converter.cached_traces.clear();
       trace_converter.onblock_trace.reset();
    }
 
-   // called from main thread
    void store_traces(const signed_block_ptr& block, const block_id_type& id) {
-      if (!trace_log)
+      if(!trace_log)
          return;
 
-      state_history_log_header header{.magic        = ship_magic(ship_current_version, 0),
-                                      .block_id     = id,
-                                      .payload_size = 0};
-      trace_log->pack_and_write_entry(header, block->previous, [this, &block](auto&& buf) {
+      trace_log->pack_and_write_entry(id, block->previous, [this, &block](bio::filtering_ostreambuf& buf) {
          trace_converter.pack(buf, trace_debug_mode, block);
       });
    }
 
-   // called from main thread
-   void store_chain_state(const block_id_type& id, const signed_block_header& block_header, uint32_t block_num) {
-      if (!chain_state_log)
+   void store_chain_state(const block_id_type& id, const block_id_type& previous_id, uint32_t block_num) {
+      if(!chain_state_log)
          return;
       bool fresh = chain_state_log->empty();
-      if (fresh)
+      if(fresh)
          fc_ilog(_log, "Placing initial state in block ${n}", ("n", block_num));
 
-      state_history_log_header header{
-          .magic = ship_magic(ship_current_version, 0), .block_id = id, .payload_size = 0};
-      chain_state_log->pack_and_write_entry(header, block_header.previous, [this, fresh](auto&& buf) {
+      chain_state_log->pack_and_write_entry(id, previous_id, [this, fresh](bio::filtering_ostreambuf& buf) {
          pack_deltas(buf, chain_plug->chain().db(), fresh);
       });
    } // store_chain_state
 
-   ~state_history_plugin_impl() {
-   }
+   void store_finality_data(const block_id_type& id, const block_id_type& previous_id) {
+      if(!finality_data_log)
+         return;
 
+      std::optional<finality_data_t> finality_data = chain_plug->chain().head_finality_data();
+      if(!finality_data.has_value()) {
+         finality_data_log->clear();
+         return;
+      }
+
+      finality_data_log->pack_and_write_entry(id, previous_id, [finality_data](bio::filtering_ostreambuf& buf) {
+         fc::datastream<boost::iostreams::filtering_ostreambuf&> ds{buf};
+         fc::raw::pack(ds, *finality_data);
+      });
+   }
 }; // state_history_plugin_impl
 
 state_history_plugin::state_history_plugin()
-    : my(std::make_shared<state_history_plugin_impl>()) {}
+    : my(new state_history_plugin_impl()) {}
 
 state_history_plugin::~state_history_plugin() = default;
 
@@ -302,15 +242,14 @@ void state_history_plugin::set_program_options(options_description& cli, options
    cli.add_options()("delete-state-history", bpo::bool_switch()->default_value(false), "clear state history files");
    options("trace-history", bpo::bool_switch()->default_value(false), "enable trace history");
    options("chain-state-history", bpo::bool_switch()->default_value(false), "enable chain state history");
+   options("finality-data-history", bpo::bool_switch()->default_value(false), "enable finality data history");
    options("state-history-endpoint", bpo::value<string>()->default_value("127.0.0.1:8080"),
            "the endpoint upon which to listen for incoming connections. Caution: only expose this port to "
            "your internal network.");
    options("state-history-unix-socket-path", bpo::value<string>(),
            "the path (relative to data-dir) to create a unix socket upon which to listen for incoming connections.");
    options("trace-history-debug-mode", bpo::bool_switch()->default_value(false), "enable debug mode for trace history");
-
-   if(cfile::supports_hole_punching())
-      options("state-history-log-retain-blocks", bpo::value<uint32_t>(), "if set, periodically prune the state history files to store only configured number of most recent blocks");
+   options("state-history-log-retain-blocks", bpo::value<uint32_t>(), "if set, periodically prune the state history files to store only configured number of most recent blocks");
 }
 
 void state_history_plugin_impl::plugin_initialize(const variables_map& options) {
@@ -319,7 +258,7 @@ void state_history_plugin_impl::plugin_initialize(const variables_map& options) 
       SYS_ASSERT(chain_plug, chain::missing_chain_plugin_exception, "");
       auto& chain = chain_plug->chain();
 
-      if (!options.at("disable-replay-opts").as<bool>() && options.at("chain-state-history").as<bool>()) {
+      if(!options.at("disable-replay-opts").as<bool>() && options.at("chain-state-history").as<bool>()) {
          ilog("Setting disable-replay-opts=true required by state_history_plugin chain-state-history=true option");
          chain.set_disable_replay_opts(true);
       }
@@ -338,29 +277,29 @@ void state_history_plugin_impl::plugin_initialize(const variables_map& options) 
 
       auto                    dir_option = options.at("state-history-dir").as<std::filesystem::path>();
       std::filesystem::path state_history_dir;
-      if (dir_option.is_relative())
+      if(dir_option.is_relative())
          state_history_dir = app().data_dir() / dir_option;
       else
          state_history_dir = dir_option;
-      if (auto resmon_plugin = app().find_plugin<resource_monitor_plugin>())
+      if(auto resmon_plugin = app().find_plugin<resource_monitor_plugin>())
          resmon_plugin->monitor_directory(state_history_dir);
 
       endpoint_address = options.at("state-history-endpoint").as<string>();
 
-      if (options.count("state-history-unix-socket-path")) {
+      if(options.count("state-history-unix-socket-path")) {
          std::filesystem::path sock_path = options.at("state-history-unix-socket-path").as<string>();
-         if (sock_path.is_relative())
+         if(sock_path.is_relative())
             sock_path = app().data_dir() / sock_path;
          unix_path = sock_path.generic_string();
       }
 
-      if (options.at("delete-state-history").as<bool>()) {
+      if(options.at("delete-state-history").as<bool>()) {
          fc_ilog(_log, "Deleting state history");
          std::filesystem::remove_all(state_history_dir);
       }
       std::filesystem::create_directories(state_history_dir);
 
-      if (options.at("trace-history-debug-mode").as<bool>()) {
+      if(options.at("trace-history-debug-mode").as<bool>()) {
          trace_debug_mode = true;
       }
 
@@ -369,30 +308,32 @@ void state_history_plugin_impl::plugin_initialize(const variables_map& options) 
           options.count("state-history-stride") || options.count("max-retained-history-files");
 
       state_history_log_config ship_log_conf;
-      if (options.count("state-history-log-retain-blocks")) {
-         auto& ship_log_prune_conf = ship_log_conf.emplace<state_history::prune_config>();
+      if(options.count("state-history-log-retain-blocks")) {
+         state_history::prune_config& ship_log_prune_conf = ship_log_conf.emplace<state_history::prune_config>();
          ship_log_prune_conf.prune_blocks = options.at("state-history-log-retain-blocks").as<uint32_t>();
          //the arbitrary limit of 1000 here is mainly so that there is enough buffer for newly applied forks to be delivered to clients
          // before getting pruned out. ideally pruning would have been smart enough to know not to prune reversible blocks
          SYS_ASSERT(ship_log_prune_conf.prune_blocks >= 1000, plugin_exception, "state-history-log-retain-blocks must be 1000 blocks or greater");
          SYS_ASSERT(!has_state_history_partition_options, plugin_exception, "state-history-log-retain-blocks cannot be used together with state-history-retained-dir,"
                   " state-history-archive-dir, state-history-stride or max-retained-history-files");
-      } else if (has_state_history_partition_options){
-         auto& config  = ship_log_conf.emplace<state_history::partition_config>();
-         if (options.count("state-history-retained-dir"))
+      } else if(has_state_history_partition_options){
+         state_history::partition_config& config = ship_log_conf.emplace<state_history::partition_config>();
+         if(options.count("state-history-retained-dir"))
             config.retained_dir       = options.at("state-history-retained-dir").as<std::filesystem::path>();
-         if (options.count("state-history-archive-dir"))
+         if(options.count("state-history-archive-dir"))
             config.archive_dir        = options.at("state-history-archive-dir").as<std::filesystem::path>();
-         if (options.count("state-history-stride"))
+         if(options.count("state-history-stride"))
             config.stride             = options.at("state-history-stride").as<uint32_t>();
-         if (options.count("max-retained-history-files"))
+         if(options.count("max-retained-history-files"))
             config.max_retained_files = options.at("max-retained-history-files").as<uint32_t>();
       }
 
-      if (options.at("trace-history").as<bool>())
-         trace_log.emplace("trace_history", state_history_dir , ship_log_conf);
-      if (options.at("chain-state-history").as<bool>())
-         chain_state_log.emplace("chain_state_history", state_history_dir, ship_log_conf);
+      if(options.at("trace-history").as<bool>())
+         trace_log.emplace(state_history_dir, ship_log_conf, "trace_history", [this](chain::block_num_type bn) {return get_block_id(bn);});
+      if(options.at("chain-state-history").as<bool>())
+         chain_state_log.emplace(state_history_dir, ship_log_conf, "chain_state_history", [this](chain::block_num_type bn) {return get_block_id(bn);});
+      if(options.at("finality-data-history").as<bool>())
+         finality_data_log.emplace(state_history_dir, ship_log_conf, "finality_data_history", [this](chain::block_num_type bn) {return get_block_id(bn);});
    }
    FC_LOG_AND_RETHROW()
 } // state_history_plugin::plugin_initialize
@@ -403,37 +344,36 @@ void state_history_plugin::plugin_initialize(const variables_map& options) {
 }
 
 void state_history_plugin_impl::plugin_startup() {
-   try {
-      const auto& chain = chain_plug->chain();
-      update_current();
-      auto bsp = chain.head_block_state();
-      if( bsp && chain_state_log && chain_state_log->empty() ) {
-         fc_ilog( _log, "Storing initial state on startup, this can take a considerable amount of time" );
-         store_chain_state( bsp->id, bsp->header, bsp->block_num );
-         fc_ilog( _log, "Done storing initial state on startup" );
-      }
-      first_available_block = chain.earliest_available_block_num();
-      if (trace_log) {
-         auto first_trace_block = trace_log->block_range().first;
-         if( first_trace_block > 0 )
-            first_available_block = std::min( first_available_block, first_trace_block );
-      }
-      if (chain_state_log) {
-         auto first_state_block = chain_state_log->block_range().first;
-         if( first_state_block > 0 )
-            first_available_block = std::min( first_available_block, first_state_block );
-      }
-      fc_ilog(_log, "First available block for SHiP ${b}", ("b", first_available_block));
-      listen();
-      // use of executor assumes only one thread
-      thread_pool.start( 1, [](const fc::exception& e) {
-         fc_elog( _log, "Exception in SHiP thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
-         app().quit();
-      });
-      plugin_started = true;
-   } catch (std::exception& ex) {
-      appbase::app().quit();
+   const auto& chain = chain_plug->chain();
+
+   uint32_t block_num = chain.head().block_num();
+   if( block_num > 0 && chain_state_log && chain_state_log->empty() ) {
+      fc_ilog( _log, "Storing initial state on startup, this can take a considerable amount of time" );
+      store_chain_state( chain.head().id(), chain.head().header().previous, block_num );
+      fc_ilog( _log, "Done storing initial state on startup" );
    }
+   first_available_block = chain.earliest_available_block_num();
+   if(trace_log) {
+      auto first_trace_block = trace_log->block_range().first;
+      if( first_trace_block > 0 )
+         first_available_block = std::min( first_available_block, first_trace_block );
+   }
+   if(chain_state_log) {
+      auto first_state_block = chain_state_log->block_range().first;
+      if( first_state_block > 0 )
+         first_available_block = std::min( first_available_block, first_state_block );
+   }
+   if(finality_data_log) {
+      auto first_state_block = finality_data_log->block_range().first;
+      if( first_state_block > 0 )
+         first_available_block = std::min( first_available_block, first_state_block );
+   }
+   fc_ilog(_log, "First available block for SHiP ${b}", ("b", first_available_block));
+   listen();
+   thread_pool.start(1, [](const fc::exception& e) {
+      fc_elog( _log, "Exception in SHiP thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+      app().quit();
+   });
 }
 
 void state_history_plugin::plugin_startup() {
@@ -441,8 +381,9 @@ void state_history_plugin::plugin_startup() {
 }
 
 void state_history_plugin_impl::plugin_shutdown() {
-   fc_ilog(_log, "shutdown");
+   fc_dlog(_log, "stopping");
    thread_pool.stop();
+   fc_dlog(_log, "exit shutdown");
 }
 
 void state_history_plugin::plugin_shutdown() {
@@ -451,16 +392,6 @@ void state_history_plugin::plugin_shutdown() {
 
 void state_history_plugin::handle_sighup() {
    fc::logger::update(logger_name, _log);
-}
-
-const state_history_log* state_history_plugin::trace_log() const {
-   const auto& log = my->get_trace_log();
-   return log ? std::addressof(*log) : nullptr;
-}
-
-const state_history_log* state_history_plugin::chain_state_log() const {
-   const auto& log = my->get_chain_state_log();
-   return log ? std::addressof(*log) : nullptr;
 }
 
 } // namespace sysio

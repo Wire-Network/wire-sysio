@@ -2,7 +2,6 @@
 
 #include <sysio/chain/pending_snapshot.hpp>
 
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/chain/resource_limits.hpp>
@@ -188,7 +187,7 @@ public:
    void on_start_block(uint32_t height, chain::controller& chain);
 
    // to promote pending snapshots
-   void on_irreversible_block(const signed_block_ptr& lib, const chain::controller& chain);
+   void on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const chain::controller& chain);
 
    // snapshot scheduler handlers
    snapshot_schedule_result schedule_snapshot(const snapshot_request_information& sri);

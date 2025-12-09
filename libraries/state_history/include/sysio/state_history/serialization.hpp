@@ -385,8 +385,8 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper_stat
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const history_serial_wrapper<sysio::chain::global_property_object>& obj) {
    fc::raw::pack(ds, fc::unsigned_int(1));
-   fc::raw::pack(ds, as_type<std::optional<sysio::chain::block_num_type>>(obj.obj.proposed_schedule_block_num));
-   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::shared_producer_authority_schedule>(obj.obj.proposed_schedule)));
+   fc::raw::pack(ds, as_type<std::optional<sysio::chain::block_num_type>>(0)); // proposed_schedule_block_num not part of Savanna
+   fc::raw::pack(ds, make_history_serial_wrapper(obj.db, as_type<sysio::chain::shared_producer_authority_schedule>({}))); // not part of Savanna
    fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::chain_config>(obj.obj.configuration)));
    fc::raw::pack(ds, as_type<sysio::chain::chain_id_type>(obj.obj.chain_id));
    fc::raw::pack(ds, make_history_serial_wrapper(as_type<sysio::chain::wasm_config>(obj.obj.wasm_configuration)));
@@ -699,13 +699,16 @@ datastream<ST>& operator<<(datastream<ST>& ds, const history_context_wrapper_sta
 
 template <typename ST>
 datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::get_blocks_result_v0& obj) {
-   fc::raw::pack(ds, obj.head);
-   fc::raw::pack(ds, obj.last_irreversible);
-   fc::raw::pack(ds, obj.this_block);
-   fc::raw::pack(ds, obj.prev_block);
-   history_pack_big_bytes(ds, obj.block);
+   ds << static_cast<const sysio::state_history::get_blocks_result_base&>(obj);
    history_pack_big_bytes(ds, obj.traces);
    history_pack_big_bytes(ds, obj.deltas);
+   return ds;
+}
+
+template <typename ST>
+datastream<ST>& operator<<(datastream<ST>& ds, const sysio::state_history::get_blocks_result_v1& obj) {
+   ds << static_cast<const sysio::state_history::get_blocks_result_v0&>(obj);
+   history_pack_big_bytes(ds, obj.finality_data);
    return ds;
 }
 
