@@ -286,9 +286,6 @@ namespace sysio::chain_apis {
        */
       void cache_transaction_trace( const chain::transaction_trace_ptr& trace ) {
          if( !trace->receipt ) return;
-         if((trace->receipt->status != chain::transaction_receipt_header::executed)) {
-            return;
-         }
          if( is_onblock( trace )) {
             onblock_trace.emplace( trace );
          } else {
@@ -336,7 +333,7 @@ namespace sysio::chain_apis {
             process_trace(*onblock_trace);
 
          for( const auto& r : block->transactions ) {
-            const chain::transaction_id_type& id = std::get<chain::packed_transaction>(r.trx).id();
+            const chain::transaction_id_type& id = r.trx.id();
             const auto it = cached_trace_map.find( id );
             if( it != cached_trace_map.end() ) {
                process_trace( it->second );

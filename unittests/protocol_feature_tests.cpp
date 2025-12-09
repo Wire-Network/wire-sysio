@@ -171,7 +171,6 @@ BOOST_AUTO_TEST_CASE( require_preactivation_test ) try {
 
    BOOST_CHECK_EXCEPTION( c.control->start_block(
                               c.head().block_time() + fc::milliseconds(config::block_interval_ms),
-                              0,
                               {},
                               controller::block_status::incomplete
                           ),
@@ -375,7 +374,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
+   savanna_tester c;
 
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION( c.set_producers_legacy( {} ),
@@ -386,7 +385,7 @@ BOOST_AUTO_TEST_CASE( disallow_empty_producer_schedule_test ) { try {
    vector<name> producer_names = {"alice"_n,"bob"_n,"carol"_n};
    c.create_accounts( producer_names );
    c.set_producers_legacy( producer_names );
-   c.produce_blocks(2);
+   c.produce_blocks(24);
    const auto& schedule = c.get_producer_authorities( producer_names );
    BOOST_CHECK( std::equal( schedule.begin(), schedule.end(), c.control->active_producers().producers.begin()) );
 
@@ -482,9 +481,9 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
    {
       auto auths = vector<permission_level>{
+            {tester_account2, config::sysio_payer_name},
             {tester_account, config::active_name},
-            {tester_account2, config::active_name},
-            {tester_account2, config::sysio_payer_name}
+            {tester_account2, config::active_name}
       };
 
       signed_transaction trx;
@@ -502,16 +501,15 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
       chain.push_transaction(trx);
 
-      // explicit payer so bills both the explicit payer and the contract
-      // TODO: This should only bill the explicit payer WIRE-173
+      // explicit payer so only bill the explicit payer
       auto tester_cpu_limit1  = mgr.get_account_cpu_limit_ex(tester_account).first;
       auto tester2_cpu_limit1 = mgr.get_account_cpu_limit_ex(tester_account2).first;
       auto tester_net_limit1  = mgr.get_account_net_limit_ex(tester_account).first;
       auto tester2_net_limit1 = mgr.get_account_net_limit_ex(tester_account2).first;
 
-      BOOST_CHECK(tester_cpu_limit1.used > tester_cpu_limit0.used);
+      BOOST_CHECK(tester_cpu_limit1.used == tester_cpu_limit0.used);
       BOOST_CHECK(tester2_cpu_limit1.used > tester2_cpu_limit0.used);
-      BOOST_CHECK(tester_net_limit1.used > tester_net_limit0.used);
+      BOOST_CHECK(tester_net_limit1.used == tester_net_limit0.used);
       BOOST_CHECK(tester2_net_limit1.used > tester2_net_limit0.used);
    }
 
@@ -640,7 +638,7 @@ BOOST_AUTO_TEST_CASE(move_my_ram) {
       c.produce_block();
 
       wlog("Adding data using alice");
-      vector<permission_level> levels = vector<permission_level>{{alice_account, config::active_name}, {alice_account, config::sysio_payer_name}};
+      vector<permission_level> levels = vector<permission_level>{{alice_account, config::sysio_payer_name},{alice_account, config::active_name}};
       c.push_action(tester1_account, "setdata"_n, levels, mutable_variant_object()
                     ("len1", 10)
                     ("len2", 0)
@@ -697,15 +695,15 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
 
       c.create_accounts({tester1_account, tester2_account, alice_account, bob_account}, false, true, false, true);
       // Issuing _only_ enough RAM to load the contracts
-      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0828 SYS", 0, 0);
-      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0828 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
+      c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
       c.produce_block();
       c.set_code(tester1_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester1_account, test_contracts::ram_restrictions_test_abi());
       c.set_code(tester2_account, test_contracts::ram_restrictions_test_wasm());
       c.set_abi(tester2_account, test_contracts::ram_restrictions_test_abi());
       c.produce_block();
-      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0828 SYS", 0);
+      c.reduce_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0);
 
       c.register_node_owner(alice_account, 1);
       c.produce_block();
@@ -800,8 +798,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    const auto &carl_account = account_name("carl");
 
    c.create_accounts( {tester1_account, tester2_account, alice_account, bob_account, carl_account}, false, true, false);
-   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0828 SYS", 0, 0);
-   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0828 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
+   c.add_roa_policy(c.NODE_DADDY, tester2_account, "1.0000 SYS", "1.0000 SYS", "0.0830 SYS", 0, 0);
    c.produce_block();
    c.set_code( tester1_account, test_contracts::ram_restrictions_test_wasm() );
    c.set_abi( tester1_account, test_contracts::ram_restrictions_test_abi() );
@@ -823,7 +821,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.produce_block();
 
    // Basic setup
-   auto alice_payer = vector<permission_level>{{alice_account, config::active_name}, {alice_account, config::sysio_payer_name}};
+   auto alice_payer = vector<permission_level>{{alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
    c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -832,7 +830,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    wlog("A");
 
    // Cannot bill more RAM to another account that has not authorized the action.
-   auto bob_payer = vector<permission_level>{{bob_account, config::active_name}, {bob_account, config::sysio_payer_name}};
+   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, config::active_name}};
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
          ("len1", 20)
@@ -1016,8 +1014,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
    // Basic setup
    vector<permission_level> alice_auths;
-   alice_auths.push_back( permission_level{alice_account, config::active_name} );
    alice_auths.push_back( permission_level{alice_account, config::sysio_payer_name} );
+   alice_auths.push_back( permission_level{alice_account, config::active_name} );
    c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -1026,8 +1024,8 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
    // Cannot bill more RAM to another account that has not authorized the action.
    vector<permission_level> bob_auths;
-   bob_auths.push_back( permission_level{bob_account, config::active_name} );
    bob_auths.push_back( permission_level{bob_account, config::sysio_payer_name} );
+   bob_auths.push_back( permission_level{bob_account, config::active_name} );
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
          ("len1", 20)
@@ -1352,10 +1350,8 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
               fc::raw::pack(std::make_pair(remote.control->active_producers().version + 1, std::vector<char>{}))
       );
 
-      // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      // re-sign the bad block, with an unneeded sig
+      bad_block->producer_signature = remote.get_private_key("test"_n, "active").sign(bad_block->calculate_id());
 
       // ensure it is rejected because it doesn't match expected state (but the extention was accepted)
       BOOST_REQUIRE_EXCEPTION(
@@ -1370,9 +1366,7 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
       bad_block->not_used = legacy::producer_schedule_type{remote.control->active_producers().version + 1, {}};
 
       // re-sign the bad block
-      auto header_bmroot = digest_type::hash( std::make_pair( bad_block->digest(), remote.control->head_block_state_legacy()->blockroot_merkle ) );
-      auto sig_digest = digest_type::hash( std::make_pair(header_bmroot, remote.control->head_block_state_legacy()->pending_schedule.schedule_hash) );
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(sig_digest);
+      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(bad_block->calculate_id());
 
       // ensure it is rejected because the not_used field is not null
       BOOST_REQUIRE_EXCEPTION(
@@ -1383,59 +1377,6 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
 
    remote.push_block(first_new_block);
    remote.push_block(c.produce_block());
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_legacy_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
-
-   c.produce_blocks(2);
-
-   vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
-   c.produce_block();
-
-   // ensure the last block does not contains a not_used
-   auto last_legacy_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(last_legacy_block->not_used.has_value(), false);
-
-   // promote to active schedule
-   c.produce_block();
-
-   // ensure that the next block is updated to the new schedule
-   BOOST_REQUIRE_EXCEPTION( c.produce_block(), no_block_signatures, fc_exception_message_is( "Signer returned no signatures" ));
-   c.control->abort_block();
-
-   c.block_signing_private_keys.emplace(get_public_key("sysio"_n, "bsk"), get_private_key("sysio"_n, "bsk"));
-   c.produce_block();
-
-} FC_LOG_AND_RETHROW() }
-
-BOOST_AUTO_TEST_CASE( wtmsig_block_signing_inflight_extension_test ) { try {
-   tester c( setup_policy::preactivate_feature_and_new_bios );
-
-   c.produce_blocks(3);
-
-   // start an in-flight producer schedule change before the activation is availble to header only validators
-   vector<legacy::producer_key> sched = {{"sysio"_n, c.get_public_key("sysio"_n, "bsk")}};
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", sched));
-   c.produce_block();
-
-   // ensure the first possible new block contains a producer_schedule_change_extension
-   auto first_new_block = c.produce_block();
-   BOOST_REQUIRE_EQUAL(first_new_block->not_used.has_value(), false);
-   BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.size(), 1u);
-   BOOST_REQUIRE_EQUAL(first_new_block->header_extensions.at(0).first, producer_schedule_change_extension::extension_id());
-
-   // promote to active schedule
-   c.produce_block();
-
-   // ensure that the next block is updated to the new schedule
-   BOOST_REQUIRE_EXCEPTION( c.produce_block(), no_block_signatures, fc_exception_message_is( "Signer returned no signatures" ));
-   c.control->abort_block();
-
-   c.block_signing_private_keys.emplace(get_public_key("sysio"_n, "bsk"), get_private_key("sysio"_n, "bsk"));
-   c.produce_block();
-
 } FC_LOG_AND_RETHROW() }
 
 static const char import_set_action_return_value_wast[] = R"=====(

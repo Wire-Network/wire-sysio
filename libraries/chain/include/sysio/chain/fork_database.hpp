@@ -1,5 +1,4 @@
 #pragma once
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 
 namespace fc { class cfile_datastream; } // forward decl
@@ -22,10 +21,9 @@ namespace sysio::chain {
 
    // Used for logging of comparison values used for best fork determination
    std::string log_fork_comparison(const block_state& bs);
-   std::string log_fork_comparison(const block_state_legacy& bs);
 
    /**
-    * @class fork_database_t
+    * @class fork_database_type
     * @brief manages light-weight state for all potential unconfirmed forks
     *
     * As new blocks are received, they are pushed into the fork database. The fork
@@ -38,8 +36,8 @@ namespace sysio::chain {
     * fork_database should be used instead of fork_database_t directly as it manages
     * the different supported types.
     */
-   template<class BSP>  // either block_state_legacy_ptr or block_state_ptr
-   class fork_database_t {
+   template<class BSP = block_state_ptr>
+   class fork_database_type {
    public:
       using bsp_t            = BSP;
       using bs_t             = bsp_t::element_type;
@@ -48,12 +46,19 @@ namespace sysio::chain {
       using branch_t         = std::vector<bsp_t>;
       using full_branch_t    = std::vector<bhsp_t>;
       using branch_pair_t    = pair<branch_t, branch_t>;
+      static constexpr uint32_t magic_number = 0x30510FDB;
+      // Update max_supported_version if the persistent file format changes.
+      static constexpr uint32_t min_supported_version = 4;
+      static constexpr uint32_t max_supported_version = 4;
 
-      explicit fork_database_t();
-      ~fork_database_t();
+      explicit fork_database_type(const std::filesystem::path& data_dir);
+      ~fork_database_type();
 
-      void open( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator );
-      void close( std::ofstream& out );
+      // not thread safe, expected to be called from main thread before allowing concurrent access
+      void open( validator_t& validator );
+      void close();
+      bool file_exists() const;
+
       size_t size() const;
 
       bsp_t get_block( const block_id_type& id, include_root_t include_root = include_root_t::no ) const;
@@ -136,6 +141,11 @@ namespace sysio::chain {
       block_branch_t fetch_block_branch( const block_id_type& h, uint32_t trim_after_block_num = std::numeric_limits<uint32_t>::max() ) const;
 
       /**
+       * Equivalent to fetch_branch(fork_db->head()->id())
+       */
+      block_branch_t fetch_branch_from_head() const;
+
+      /**
        * Returns the sequence of block states resulting from trimming the branch from the
        * root block (exclusive) to the block with an id of `h` (inclusive) by removing any
        * block states that are after block `b`. Returns empty if `b` not found on `h` branch.
@@ -167,172 +177,15 @@ namespace sysio::chain {
       branch_pair_t fetch_branch_from(const block_id_type& first, const block_id_type& second) const;
 
    private:
+      void open( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator );
+      void close( std::ofstream& out );
+
+   private:
       unique_ptr<fork_database_impl<BSP>> my;
    };
 
-   using fork_database_legacy_t = fork_database_t<block_state_legacy_ptr>;
-   using fork_database_if_t     = fork_database_t<block_state_ptr>;
+   using fork_database_t = fork_database_type<>;
 
-   /**
-    * Provides mechanism for opening the correct type
-    * as well as switching from legacy (old dpos) to instant-finality.
-    *
-    * All methods assert until open() is closed.
-    */
-   class fork_database {
-   public:
-      enum class in_use_t : uint32_t { legacy, savanna, both };
-
-   private:
-      static constexpr uint32_t magic_number = 0x30510FDB;
-
-      const std::filesystem::path data_dir;
-      std::atomic<in_use_t>  in_use = in_use_t::savanna;
-      fork_database_legacy_t fork_db_l; // legacy
-      fork_database_if_t     fork_db_s; // savanna
-
-   public:
-      explicit fork_database(const std::filesystem::path& data_dir);
-      ~fork_database(); // close on destruction
-
-      // not thread safe, expected to be called from main thread before allowing concurrent access
-      void open( validator_t& validator );
-      void close();
-      bool file_exists() const;
-
-      // return the size of the active fork_database
-      size_t size() const;
-
-      // switches to using both legacy and savanna during transition
-      void switch_from_legacy(const block_state_ptr& root);
-      void switch_to(in_use_t v) { in_use = v; }
-
-      in_use_t version_in_use() const { return in_use.load(); }
-
-      // see fork_database_t::fetch_branch(fork_db->head()->id())
-      block_branch_t fetch_branch_from_head() const;
-
-      template <class R, class F>
-      R apply(const F& f) const {
-         if constexpr (std::is_same_v<void, R>) {
-            if (in_use.load() == in_use_t::legacy) {
-               f(fork_db_l);
-            } else {
-               f(fork_db_s);
-            }
-         } else {
-            if (in_use.load() == in_use_t::legacy) {
-               return f(fork_db_l);
-            } else {
-               return f(fork_db_s);
-            }
-         }
-      }
-
-      template <class R, class F>
-      R apply(const F& f) {
-         if constexpr (std::is_same_v<void, R>) {
-            if (in_use.load() == in_use_t::legacy) {
-               f(fork_db_l);
-            } else {
-               f(fork_db_s);
-            }
-         } else {
-            if (in_use.load() == in_use_t::legacy) {
-               return f(fork_db_l);
-            } else {
-               return f(fork_db_s);
-            }
-         }
-      }
-
-      /// Apply for when only need lambda executed on savanna fork db
-      template <class R, class F>
-      R apply_s(const F& f) {
-         if constexpr (std::is_same_v<void, R>) {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::savanna || in_use_value == in_use_t::both) {
-               f(fork_db_s);
-            }
-         } else {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::savanna || in_use_value == in_use_t::both) {
-               return f(fork_db_s);
-            }
-            return {};
-         }
-      }
-
-      /// Apply for when only need lambda executed on savanna fork db
-      template <class R, class F>
-      R apply_s(const F& f) const {
-         if constexpr (std::is_same_v<void, R>) {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::savanna || in_use_value == in_use_t::both) {
-               f(fork_db_s);
-            }
-         } else {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::savanna || in_use_value == in_use_t::both) {
-               return f(fork_db_s);
-            }
-            return {};
-         }
-      }
-
-      /// Apply for when only need lambda executed on legacy fork db
-      template <class R, class F>
-      R apply_l(const F& f) const {
-         if constexpr (std::is_same_v<void, R>) {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::legacy || in_use_value == in_use_t::both) {
-               f(fork_db_l);
-            }
-         } else {
-            if (auto in_use_value = in_use.load(); in_use_value == in_use_t::legacy || in_use_value == in_use_t::both) {
-               return f(fork_db_l);
-            }
-            return {};
-         }
-      }
-
-      /// @param legacy_f the lambda to execute if in legacy mode
-      /// @param savanna_f the lambda to execute if in savanna mode
-      template <class R, class LegacyF, class SavannaF>
-      R apply(const LegacyF& legacy_f, const SavannaF& savanna_f) {
-         if constexpr (std::is_same_v<void, R>) {
-            if (in_use.load() == in_use_t::legacy) {
-               legacy_f(fork_db_l);
-            } else {
-               savanna_f(fork_db_s);
-            }
-         } else {
-            if (in_use.load() == in_use_t::legacy) {
-               return legacy_f(fork_db_l);
-            } else {
-               return savanna_f(fork_db_s);
-            }
-         }
-      }
-
-      /// @param legacy_f the lambda to execute if in legacy mode
-      /// @param savanna_f the lambda to execute if in savanna mode
-      template <class R, class LegacyF, class SavannaF>
-      R apply(const LegacyF& legacy_f, const SavannaF& savanna_f) const {
-         if constexpr (std::is_same_v<void, R>) {
-            if (in_use.load() == in_use_t::legacy) {
-               legacy_f(fork_db_l);
-            } else {
-               savanna_f(fork_db_s);
-            }
-         } else {
-            if (in_use.load() == in_use_t::legacy) {
-               return legacy_f(fork_db_l);
-            } else {
-               return savanna_f(fork_db_s);
-            }
-         }
-      }
-
-      // Update max_supported_version if the persistent file format changes.
-      static constexpr uint32_t min_supported_version = 1;
-      static constexpr uint32_t max_supported_version = 3;
-   };
 } /// sysio::chain
 
 FC_REFLECT_ENUM( sysio::chain::fork_db_add_t,

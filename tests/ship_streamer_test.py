@@ -101,16 +101,18 @@ try:
     jumboAcc = Account("itsjumbotime")
     jumboAcc.ownerPublicKey = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
     jumboAcc.activePublicKey = "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
-    nonProdNode.createAccount(jumboAcc, cluster.sysioAccount)
+    nonProdNode.createInitializeAccount(jumboAcc, cluster.sysioAccount, nodeOwner=cluster.carlAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=10000, stakeCPU=10000, buyRAM=2000000, exitOnError=True)
 
     contract = "jumborow"
     contractDir = "unittests/system-test-contracts/%s" % (contract)
     wasmFile = "%s.wasm" % (contract)
     abiFile = "%s.abi" % (contract)
 
-    nonProdNode.publishContract(jumboAcc, contractDir, wasmFile, abiFile)
-    jumbotxn = {
+    trans = nonProdNode.publishContract(jumboAcc, contractDir, wasmFile, abiFile)
+    if trans is None:
+        Utils.errorExit("ERROR: Failed to publish contract %s." % (contract))
 
+    jumbotxn = {
         "actions": [{"account": "itsjumbotime","name": "jumbotime",
                      "authorization": [{"actor": "itsjumbotime","permission": "active"}],
                      "data": "",

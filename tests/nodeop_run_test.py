@@ -204,6 +204,10 @@ try:
 
     # Make pefproducera privileged so they can create accounts
     Print("Set privileged for account %s" % (cluster.defproduceraAccount.name))
+    # Add a contract to defproduceraAccount as an easy way to allow setpriv
+    wasmFile="unittests/test-contracts/payloadless/payloadless.wasm"
+    trans=node.setCodeOrAbi(cluster.defproduceraAccount, "code", wasmFile, returnTrans=True)
+    node.waitForTransactionInBlock(trans["transaction_id"])
     transId=node.setPriv(cluster.defproduceraAccount, cluster.sysioAccount, waitForTransBlock=True, exitOnError=True)
 
     Print("Create new account %s via %s" % (testeraAccount.name, cluster.defproduceraAccount.name))

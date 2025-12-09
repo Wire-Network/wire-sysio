@@ -89,7 +89,8 @@ BOOST_AUTO_TEST_CASE(test_split_log) {
                                                                      .max_retained_files = 5 };
          },
          true);
-   chain.produce_blocks(150);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(150-chain.head().block_num());
 
    auto blocks_dir         = chain.get_config().blocks_dir;
    auto blocks_archive_dir = blocks_dir / "archive";
@@ -139,7 +140,9 @@ BOOST_AUTO_TEST_CASE(test_split_log_zero_retained_file) {
          };
       },
       true);
-   chain.produce_blocks(150);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(150-chain.last_irreversible_block_num());
+
    auto blocks_dir   = chain.get_config().blocks_dir;
    auto retained_dir = blocks_dir / "retained";
    auto archive_dir  = blocks_dir / "archive";
@@ -164,7 +167,8 @@ BOOST_AUTO_TEST_CASE(test_split_log_all_in_retained_new_default) {
                                                                   .stride       = 50 };
       },
       true);
-   chain.produce_blocks(150);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(150-chain.last_irreversible_block_num());
    auto blocks_dir   = chain.get_config().blocks_dir;
    auto retained_dir = blocks_dir / "retained";
    auto archive_dir  = blocks_dir / "archive";
@@ -181,7 +185,7 @@ BOOST_AUTO_TEST_CASE(test_split_log_all_in_retained_new_default) {
 
 BOOST_AUTO_TEST_CASE(test_split_log_util1) {
    sysio::testing::tester chain;
-   chain.produce_blocks(160);
+   chain.produce_blocks(160-chain.head().block_num());
 
    uint32_t head_block_num = chain.head().block_num();
    uint32_t lib_block_num;
@@ -325,7 +329,8 @@ BOOST_AUTO_TEST_CASE(test_split_log_no_archive) {
                   sysio::chain::partitioned_blocklog_config{ .archive_dir = "", .stride = 10, .max_retained_files = 5 };
          },
          true);
-   chain.produce_blocks(75);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(75-chain.head().block_num());
 
    auto blocks_dir         = chain.get_config().blocks_dir;
    auto blocks_archive_dir = blocks_dir;
@@ -366,7 +371,8 @@ void split_log_replay(uint32_t replay_max_retained_block_files) {
             config.blog = sysio::chain::partitioned_blocklog_config{ .stride = stride, .max_retained_files = 10 };
          },
          true);
-   chain.produce_blocks(150);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(150-chain.last_irreversible_block_num());
 
    auto copied_config = chain.get_config();
    auto genesis =
@@ -377,21 +383,25 @@ void split_log_replay(uint32_t replay_max_retained_block_files) {
 
    // remove the state files to make sure we are starting from block log
    remove_existing_states(copied_config);
-   // we need to remove the reversible blocks so that new blocks can be produced from the new chain
-   std::filesystem::remove_all(copied_config.blocks_dir / "reversible");
+   // Do not remove the reversible blocks since we will be locked on a reversible block, replay reversible as well
    copied_config.blog =
          sysio::chain::partitioned_blocklog_config{ .stride             = stride,
                                                     .max_retained_files = replay_max_retained_block_files };
    tester from_block_log_chain(copied_config, *genesis);
+   // set finalizers as they were in the original chain
+   finalizer_keys fin_keys(from_block_log_chain, 1u /* num_keys */, 1u /* finset_size */); // so LIB moves
+   fin_keys.set_node_finalizers(0u, fin_keys.pubkeys.size());
+   fin_keys.set_finalizer_policy(0u);
+
    BOOST_CHECK(from_block_log_chain.fetch_block_by_number(1)->block_num() == 1);
    BOOST_CHECK(from_block_log_chain.fetch_block_by_number(75)->block_num() == 75);
    BOOST_CHECK(from_block_log_chain.fetch_block_by_number(100)->block_num() == 100);
    BOOST_CHECK(from_block_log_chain.fetch_block_by_number(150)->block_num() == 150);
 
    // produce new blocks to cross the blocks_log_stride boundary
-   from_block_log_chain.produce_blocks(stride);
+   from_block_log_chain.produce_blocks(stride+2);
 
-   const auto previous_chunk_end_block_num = (from_block_log_chain.head().block_num() / stride) * stride;
+   const auto previous_chunk_end_block_num = (from_block_log_chain.last_irreversible_block_num() / stride) * stride;
    const auto num_removed_blocks = std::min(stride * replay_max_retained_block_files, previous_chunk_end_block_num);
    const auto min_retained_block_number = previous_chunk_end_block_num - num_removed_blocks + 1;
 
@@ -423,7 +433,8 @@ BOOST_AUTO_TEST_CASE(test_restart_without_blocks_log_file) {
             config.blog = sysio::chain::partitioned_blocklog_config{ .stride = stride, .max_retained_files = 10 };
          },
          true);
-   chain.produce_blocks(160);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(160-chain.last_irreversible_block_num());
 
    sysio::chain::controller::config copied_config = chain.get_config();
    auto genesis = signed_block_log::extract_genesis_state(chain.get_config().blocks_dir, get_retained_dir(copied_config));
@@ -506,7 +517,8 @@ BOOST_AUTO_TEST_CASE(test_split_from_v1_log) {
             config.blog = sysio::chain::partitioned_blocklog_config{ .stride = 20, .max_retained_files = 5 };
          },
           true);
-   chain.produce_blocks(75);
+   chain.execute_setup_policy(setup_policy::full);
+   chain.produce_blocks(75-chain.head().block_num());
 
    BOOST_CHECK(chain.fetch_block_by_number(1)->block_num() == 1u);
    BOOST_CHECK(chain.fetch_block_by_number(21)->block_num() == 21u);
@@ -517,8 +529,7 @@ BOOST_AUTO_TEST_CASE(test_split_from_v1_log) {
 void trim_blocklog_front(uint32_t version) {
    blocklog_version_setter set_version(version);
    sysio::testing::tester  chain;
-   chain.produce_blocks(10);
-   chain.produce_blocks(20);
+   chain.produce_blocks(30-chain.last_irreversible_block_num());
    chain.close();
 
 
@@ -552,7 +563,7 @@ BOOST_AUTO_TEST_CASE(test_trim_blocklog_front_v2) { trim_blocklog_front(2); }
 BOOST_AUTO_TEST_CASE(test_blocklog_split_then_merge) {
 
    sysio::testing::tester chain;
-   chain.produce_blocks(160);
+   chain.produce_blocks(160-chain.last_irreversible_block_num());
    chain.close();
 
    auto               blocks_dir   = chain.get_config().blocks_dir;

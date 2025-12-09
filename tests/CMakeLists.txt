@@ -125,13 +125,9 @@ add_p_test(NAME plugin_test COMMAND plugin_test --report_level=detailed --color_
 
 add_np_test(NAME nodeop_sanity_test COMMAND tests/nodeop_run_test.py -v --sanity-test ${UNSHARE})
 add_np_test(NAME nodeop_run_test COMMAND tests/nodeop_run_test.py -v ${UNSHARE})
-add_np_test(NAME nodeop_run_if_test COMMAND tests/nodeop_run_test.py -v --activate-if ${UNSHARE})
 add_np_test(NAME nodeop_lib_test COMMAND tests/nodeop_lib_test.py -n 4 -p 3 -s ring -v ${UNSHARE})
-add_np_test(NAME nodeop_lib_if_test COMMAND tests/nodeop_lib_test.py -n 4 -p 3 -s ring -v --activate-if ${UNSHARE})
 add_np_test(NAME block_log_util_test COMMAND tests/block_log_util_test.py -v ${UNSHARE})
-add_np_test(NAME block_log_util_if_test COMMAND tests/block_log_util_test.py --activate-if -v ${UNSHARE})
 add_np_test(NAME block_log_retain_blocks_test COMMAND tests/block_log_retain_blocks_test.py -v ${UNSHARE})
-add_np_test(NAME block_log_retain_blocks_if_test COMMAND tests/block_log_retain_blocks_test.py --activate-if -v ${UNSHARE})
 
 add_subdirectory( TestHarness )
 add_subdirectory( trx_generator )
@@ -144,10 +140,8 @@ add_executable(ship_streamer ship_streamer.cpp)
 target_link_libraries(ship_streamer sysio_chain Boost::program_options Boost::system Boost::asio Boost::beast Threads::Threads)
 
 add_np_test(NAME cluster_launcher COMMAND tests/cluster_launcher.py -v ${UNSHARE})
-add_np_test(NAME cluster_launcher_if COMMAND tests/cluster_launcher.py --activate-if -v ${UNSHARE})
 
 add_np_test(NAME transition_to_if COMMAND tests/transition_to_if.py -v ${UNSHARE})
-add_lr_test(NAME transition_to_if_lr COMMAND tests/transition_to_if.py -v -p 20 ${UNSHARE})
 
 add_np_test(NAME disaster_recovery COMMAND tests/disaster_recovery.py -v ${UNSHARE})
 add_np_test(NAME disaster_recovery_2 COMMAND tests/disaster_recovery_2.py -v ${UNSHARE})
@@ -160,11 +154,9 @@ add_np_test(NAME ship_reqs_across_svnn_test COMMAND tests/ship_reqs_across_svnn_
 add_np_test(NAME ship_restart_test COMMAND tests/ship_restart_test.py -v ${UNSHARE})
 add_np_test(NAME ship_test COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE})
 add_np_test(NAME ship_test_unix COMMAND tests/ship_test.py -v --num-clients 10 --num-requests 5000 ${UNSHARE} --unix-socket)
-add_np_test(NAME ship_if_test COMMAND tests/ship_test.py -v --activate-if --num-clients 10 --num-requests 5000 ${UNSHARE})
 
 add_lr_test(NAME ship_streamer_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 ${UNSHARE})
-add_lr_test(NAME ship_streamer_if_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 --activate-if ${UNSHARE})
-add_lr_test(NAME ship_streamer_if_fetch_finality_data_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 --activate-if --finality-data-history ${UNSHARE})
+add_lr_test(NAME ship_streamer_if_fetch_finality_data_test COMMAND tests/ship_streamer_test.py -v --num-clients 10 --finality-data-history ${UNSHARE})
 add_np_test(NAME ship_kill_client_test COMMAND tests/ship_kill_client_test.py -v --num-clients 20 ${UNSHARE})
 
 add_np_test(NAME p2p_dawn515_test COMMAND tests/p2p_tests/dawn_515/test.sh)
@@ -175,8 +167,6 @@ add_np_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feat
 add_np_test(NAME compute_transaction_test COMMAND tests/compute_transaction_test.py -v -p 2 -n 3 ${UNSHARE})
 add_np_test(NAME read-only-trx-basic-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 1 ${UNSHARE})
 add_np_test(NAME read-only-trx-parallel-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 16 --num-test-runs 2 ${UNSHARE})
-add_np_test(NAME read-only-trx-basic-if-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 1 --activate-if ${UNSHARE})
-add_np_test(NAME read-only-trx-parallel-if-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 16 --num-test-runs 2 --activate-if ${UNSHARE})
 add_np_test(NAME read-only-trx-parallel-if-sys-vm-oc-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable all --read-only-threads 16 --num-test-runs 2 --activate-if ${UNSHARE})
 add_np_test(NAME read-only-trx-parallel-no-oc-if-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --sys-vm-oc-enable none --read-only-threads 6 --num-test-runs 2 --activate-if ${UNSHARE})
 add_np_test(NAME interrupt-read-only-trx-basic-test COMMAND tests/interrupt_read_only_trx_test.py -p 2 -n 3 --read-only-threads 1 ${UNSHARE})
@@ -187,34 +177,23 @@ add_np_test(NAME get_account_test COMMAND tests/get_account_test.py -v -p 2 -n 3
 add_np_test(NAME pause_at_block_test COMMAND tests/pause_at_block_test.py -v ${UNSHARE})
 
 add_np_test(NAME distributed-transactions-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 -v ${UNSHARE})
-add_np_test(NAME distributed-transactions-if-test COMMAND tests/distributed-transactions-test.py -d 2 -p 4 -n 6 --activate-if -v ${UNSHARE})
 add_np_test(NAME restart-scenarios-test-resync COMMAND tests/restart-scenarios-test.py -c resync -p4 -v ${UNSHARE})
-add_np_test(NAME restart-scenarios-if-test-resync COMMAND tests/restart-scenarios-test.py -c resync -p4 -v --activate-if ${UNSHARE})
 add_np_test(NAME restart-scenarios-test-hard_replay COMMAND tests/restart-scenarios-test.py -c hardReplay -p4 -v ${UNSHARE})
-add_np_test(NAME restart-scenarios-if-test-hard_replay COMMAND tests/restart-scenarios-test.py -c hardReplay -p4 -v --activate-if ${UNSHARE})
 add_np_test(NAME restart-scenarios-test-none COMMAND tests/restart-scenarios-test.py -c none --kill-sig term -p4 -v ${UNSHARE})
-add_np_test(NAME restart-scenarios-if-test-none COMMAND tests/restart-scenarios-test.py -c none --kill-sig term -p4 -v --activate-if ${UNSHARE})
 add_np_test(NAME terminate-scenarios-test-resync COMMAND tests/terminate-scenarios-test.py -c resync --terminate-at-block 10 --kill-sig term ${UNSHARE})
 add_np_test(NAME terminate-scenarios-test-replay COMMAND tests/terminate-scenarios-test.py -c replay --terminate-at-block 10 --kill-sig term ${UNSHARE})
 add_np_test(NAME terminate-scenarios-test-hard_replay COMMAND tests/terminate-scenarios-test.py -c hardReplay --terminate-at-block 10 --kill-sig term ${UNSHARE})
-add_np_test(NAME terminate-scenarios-if-test-resync COMMAND tests/terminate-scenarios-test.py -c resync --terminate-at-block 10 --kill-sig term --activate-if ${UNSHARE})
-add_np_test(NAME terminate-scenarios-if-test-replay COMMAND tests/terminate-scenarios-test.py -c replay --terminate-at-block 10 --kill-sig term --activate-if ${UNSHARE})
-add_np_test(NAME terminate-scenarios-if-test-hard_replay COMMAND tests/terminate-scenarios-test.py -c hardReplay --terminate-at-block 10 --kill-sig term --activate-if ${UNSHARE})
 add_np_test(NAME terminate-scenarios-if-test-replay-pass-transition COMMAND tests/terminate-scenarios-test.py -c replay --terminate-at-block 150 --kill-sig term --activate-if ${UNSHARE})
 add_np_test(NAME terminate-scenarios-if-test-hard_replay-pass-transition COMMAND tests/terminate-scenarios-test.py -c hardReplay --terminate-at-block 150 --kill-sig term --activate-if ${UNSHARE})
 add_np_test(NAME validate_dirty_db_test COMMAND tests/validate-dirty-db.py -v ${UNSHARE})
 add_np_test(NAME kiod_auto_launch_test COMMAND tests/kiod_auto_launch_test.py)
 add_np_test(NAME nodeop_snapshot_diff_test COMMAND tests/nodeop_snapshot_diff_test.py -v ${UNSHARE})
-add_np_test(NAME nodeop_snapshot_diff_if_test COMMAND tests/nodeop_snapshot_diff_test.py -v --activate-if ${UNSHARE})
 add_np_test(NAME nodeop_snapshot_forked_test COMMAND tests/nodeop_snapshot_forked_test.py -v ${UNSHARE})
-add_np_test(NAME nodeop_snapshot_forked_if_test COMMAND tests/nodeop_snapshot_forked_test.py -v --activate-if ${UNSHARE})
 add_np_test(NAME nodeop_late_block_test COMMAND tests/nodeop_late_block_test.py -v ${UNSHARE})
 
 add_np_test(NAME trx_finality_status_test COMMAND tests/trx_finality_status_test.py -v ${UNSHARE})
-add_np_test(NAME trx_finality_status_if_test COMMAND tests/trx_finality_status_test.py -v --activate-if ${UNSHARE})
 
 add_np_test(NAME trx_finality_status_forked_test COMMAND tests/trx_finality_status_forked_test.py -v ${UNSHARE})
-add_np_test(NAME trx_finality_status_forked_if_test COMMAND tests/trx_finality_status_forked_test.py -v --activate-if ${UNSHARE})
 
 add_p_test(NAME db_modes_test COMMAND tests/db_modes_test.sh -v COST 6000)
 add_p_test(NAME version-label-test COMMAND tests/version-label.sh "v${VERSION_FULL}")
@@ -222,10 +201,8 @@ add_p_test(NAME full-version-label-test COMMAND tests/full-version-label.sh "v${
 add_np_test(NAME nested_container_multi_index_test COMMAND tests/nested_container_multi_index_test.py -n 2)
 
 add_np_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test.py -v ${UNSHARE})
-add_np_test(NAME p2p_multiple_listen_if_test COMMAND tests/p2p_multiple_listen_test.py -v --activate-if ${UNSHARE})
 add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v ${UNSHARE})
 add_lr_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2 ${UNSHARE})
-add_lr_test(NAME p2p_sync_throttle_if_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2 --activate-if ${UNSHARE})
 add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2 ${UNSHARE})
 
 # needs iproute-tc or iproute2 depending on platform
@@ -233,51 +210,38 @@ add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d
 
 # This test is too much for CI/CD machines. We do run it with fewer nodes as a nonparallelizable_tests above
 #add_lr_test(NAME distributed_transactions_lr_test COMMAND tests/distributed-transactions-test.py -d 2 -p 21 -n 21 -v)
-#add_lr_test(NAME distributed_transactions_if_lr_test COMMAND tests/distributed-transactions-test.py -d 2 -p 21 -n 21 --activate-if -v)
 
 add_lr_test(NAME nodeop_forked_chain_lr_test COMMAND tests/nodeop_forked_chain_test.py -v --wallet-port 9901 ${UNSHARE})
-add_lr_test(NAME nodeop_forked_chain_if_lr_test COMMAND tests/nodeop_forked_chain_test.py -v --activate-if --wallet-port 9901 ${UNSHARE})
 
 add_np_test(NAME nodeop_contrl_c_test COMMAND tests/nodeop_contrl_c_test.py -v --wallet-port 9901 ${UNSHARE})
-add_np_test(NAME nodeop_contrl_c_if_test COMMAND tests/nodeop_contrl_c_test.py --activate-if -v --wallet-port 9901 ${UNSHARE})
 
 add_lr_test(NAME nodeop_under_min_avail_ram_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --wallet-port 9904 ${UNSHARE})
-add_lr_test(NAME nodeop_under_min_avail_ram_if_lr_test COMMAND tests/nodeop_under_min_avail_ram.py -v --activate-if ${UNSHARE})
 
 add_lr_test(NAME nodeop_irreversible_mode_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v ${UNSHARE})
-add_lr_test(NAME nodeop_irreversible_mode_if_lr_test COMMAND tests/nodeop_irreversible_mode_test.py -v --activate-if ${UNSHARE})
 
 add_lr_test(NAME nodeop_read_terminate_at_block_lr_test COMMAND tests/nodeop_read_terminate_at_block_test.py -v ${UNSHARE})
-add_lr_test(NAME nodeop_read_terminate_at_block_if_lr_test COMMAND tests/nodeop_read_terminate_at_block_test.py --activate-if -v ${UNSHARE})
 
 add_np_test(NAME liveness_test COMMAND tests/liveness_test.py -v ${UNSHARE})
 
 add_np_test(NAME nodeop_chainbase_allocation_test COMMAND tests/nodeop_chainbase_allocation_test.py -v ${UNSHARE})
-add_np_test(NAME nodeop_chainbase_allocation_if_test COMMAND tests/nodeop_chainbase_allocation_test.py --activate-if -v ${UNSHARE})
 
 add_np_test(NAME nodeop_signal_throw_test COMMAND tests/nodeop_signal_throw_test.py -v ${UNSHARE})
 
 add_lr_test(NAME nodeop_startup_catchup_lr_test COMMAND tests/nodeop_startup_catchup.py -v ${UNSHARE})
-add_lr_test(NAME nodeop_startup_catchup_if_lr_test COMMAND tests/nodeop_startup_catchup.py -p3 --activate-if -v ${UNSHARE})
 
 add_np_test(NAME nodeop_short_fork_take_over_test COMMAND tests/nodeop_short_fork_take_over_test.py -v --wallet-port 9905 ${UNSHARE})
-add_np_test(NAME nodeop_short_fork_take_over_if_test COMMAND tests/nodeop_short_fork_take_over_test.py -v --activate-if --wallet-port 9905 ${UNSHARE})
 
 add_np_test(NAME nodeop_extra_packed_data_test COMMAND tests/nodeop_extra_packed_data_test.py -v -p 2 ${UNSHARE})
 
 add_lr_test(NAME nodeop_producer_watermark_lr_test COMMAND tests/nodeop_producer_watermark_test.py -v ${UNSHARE})
-add_lr_test(NAME nodeop_producer_watermark_if_lr_test COMMAND tests/nodeop_producer_watermark_test.py -v --activate-if ${UNSHARE})
 
 add_lr_test(NAME nodeop_high_transaction_lr_test COMMAND tests/nodeop_high_transaction_test.py -p 4 -n 8 --num-transactions 10000 --max-transactions-per-second 500 ${UNSHARE})
-add_lr_test(NAME nodeop_high_transaction_if_lr_test COMMAND tests/nodeop_high_transaction_test.py --activate-if -p 4 -n 8 --num-transactions 10000 --max-transactions-per-second 500 ${UNSHARE})
 
 add_lr_test(NAME nodeop_retry_transaction_lr_test COMMAND tests/nodeop_retry_transaction_test.py -v --num-transactions 100 --max-transactions-per-second 10 --total-accounts 5 ${UNSHARE})
-add_lr_test(NAME nodeop_retry_transaction_if_lr_test COMMAND tests/nodeop_retry_transaction_test.py -v --activate-if --num-transactions 100 --max-transactions-per-second 10 --total-accounts 5 ${UNSHARE})
 
 add_np_test(NAME cli_test COMMAND tests/cli_test.py)
 
 add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v ${UNSHARE})
-add_np_test(NAME lib_advance_if_test COMMAND tests/lib_advance_test.py --activate-if -v ${UNSHARE})
 
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)
@@ -298,12 +262,11 @@ add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plu
 add_lr_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_transaction_test.py -v -p 4 -n 8 --num-transactions 1000 --max-transactions-per-second 500 --send-duplicates ${UNSHARE})
 
 add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_test.py -v ${UNSHARE})
-add_np_test(NAME light_validation_sync_if_test COMMAND tests/light_validation_sync_test.py --activate-if -v ${UNSHARE})
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v ${UNSHARE})
 
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE})
-add_lr_test(NAME auto_bp_peering_if_test COMMAND tests/auto_bp_peering_test.py -v --activate-if ${UNSHARE})
-add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v ${UNSHARE})
+# TODO: needs system contract support, WIRE-221
+# add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v ${UNSHARE})
 
 add_np_test(NAME gelf_test COMMAND tests/gelf_test.py ${UNSHARE})
 

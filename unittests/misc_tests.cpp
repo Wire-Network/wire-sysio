@@ -735,6 +735,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( transaction_test, T, validating_testers ) { try {
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy")))
          })
+      )
+      ("context_free_data", fc::variants({""})
       );
 
    abi_serializer::from_variant(pretty_trx, trx, test.get_resolver(), abi_serializer::create_yield_function( test.abi_serializer_max_time ));
@@ -886,6 +888,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( transaction_metadata_test, T, validating_testers 
             ("name", "nonce")
             ("data", fc::raw::pack(std::string("dummy data")))
          })
+      )
+      ("context_free_data", fc::variants({""})
       );
 
       abi_serializer::from_variant(pretty_trx, trx, test.get_resolver(), abi_serializer::create_yield_function( test.abi_serializer_max_time ));
@@ -1143,7 +1147,7 @@ BOOST_AUTO_TEST_CASE(stable_priority_queue_test) {
 
      appbase::execution_priority_queue pri_queue;
      auto io_serv = std::make_shared<boost::asio::io_context>();
-     auto work_ptr = std::make_unique<boost::asio::io_context::work>(*io_serv);
+     auto work_guard = boost::asio::make_work_guard(*io_serv);
      std::atomic<int> posted{0};
 
      std::thread t( [io_serv, &pri_queue, &posted]() {
@@ -1176,7 +1180,7 @@ BOOST_AUTO_TEST_CASE(stable_priority_queue_test) {
 
      while( ran < 100 ) std::this_thread::sleep_for( 5us );
 
-     work_ptr.reset();
+     work_guard.reset();
      io_serv->stop();
      t.join();
 

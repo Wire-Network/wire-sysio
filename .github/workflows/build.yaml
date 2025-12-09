@@ -232,7 +232,7 @@ jobs:
           zstdcat build.tar.zst | tar x
           sudo chown -R $(id -u):$(id -g) $PWD
           cd build
-          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 600
+          ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
 
       - name: Upload core files from failed tests
         uses: actions/upload-artifact@v4
@@ -316,7 +316,8 @@ jobs:
           error-log-paths: '["build/etc", "build/var", "build/sysio-ignition-wd", "build/TestLogs"]'
           log-tarball-prefix: ${{ matrix.cfg.name }}
           tests-label: nonparallelizable_tests
-          test-timeout: 600
+          test-timeout: 1000
+          batch-size: '5'
 
       - name: Export core dumps
         if: failure()
@@ -418,6 +419,7 @@ jobs:
           log-tarball-prefix: ${{matrix.cfg.name}}
           tests-label: long_running_tests
           test-timeout: 2700
+          batch-size: '5'
 
       - name: Export core dumps
         if: failure()

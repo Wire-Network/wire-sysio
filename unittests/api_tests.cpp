@@ -152,7 +152,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
    };
 
    auto result = chain.push_reqauth( config::system_account_name, "active" );
-   BOOST_REQUIRE_EQUAL( result->receipt->status, transaction_receipt::executed );
    BOOST_REQUIRE( result->action_traces[0].receipt->auth_sequence.find( config::system_account_name )
                      != result->action_traces[0].receipt->auth_sequence.end() );
    auto base_global_sequence_num = result->action_traces[0].receipt->global_sequence;
@@ -164,7 +163,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
    uint64_t base_test_recv_seq_num = 0;
    uint64_t base_test_auth_seq_num = 0;
    call_doit_and_check( "test"_n, "test"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+      BOOST_CHECK( !!res->receipt );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->global_sequence, base_global_sequence_num + 1 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->code_sequence.value, 1 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->abi_sequence.value, 0 );
@@ -183,7 +182,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
    chain.set_code( config::system_account_name, test_contracts::payloadless_wasm() );
 
    call_provereset_and_check( "test"_n, "test"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+      BOOST_CHECK( !!res->receipt );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->global_sequence, base_global_sequence_num + 4 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->recv_sequence, base_test_recv_seq_num + 2 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->code_sequence.value, 2 );
@@ -199,7 +198,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
    // and the recv and auth sequences numbers for the system account.
 
    call_doit_and_check( config::system_account_name, "test"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+      BOOST_CHECK( !!res->receipt );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->global_sequence, base_global_sequence_num + 6 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->recv_sequence, base_system_recv_seq_num + 4 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->code_sequence.value, base_system_code_seq_num + 1 );
@@ -217,7 +216,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
    chain.set_code( "test"_n, test_contracts::payloadless_wasm() );
 
    call_doit_and_check( "test"_n, "test"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed);
+      BOOST_CHECK( !!res->receipt );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->global_sequence, base_global_sequence_num + 11 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->recv_sequence, base_test_recv_seq_num + 3 );
       BOOST_CHECK_EQUAL( res->action_traces[0].receipt->code_sequence.value, 4 );
@@ -233,6 +232,78 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(action_receipt_tests, T, validating_testers) { try
 /*************************************************************************************
  * action_tests test case
  *************************************************************************************/
+BOOST_FIXTURE_TEST_CASE(action_verification_tests, validating_tester) { try {
+   produce_blocks(2);
+   create_account( "testapi"_n );
+   create_account( "acc1"_n );
+   create_account( "acc2"_n );
+   create_account( "acc3"_n );
+   create_account( "acc4"_n );
+   produce_block();
+   set_code( "testapi"_n, test_contracts::test_api_wasm() );
+   produce_block();
+
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      auto res = push_transaction(trx); // throws if invalid
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action, with explicit payer
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      auto res = push_transaction(trx);
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action, with explicit payer (but not in correct possition)
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::active_name},{"testapi"_n, config::sysio_payer_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::irrelevant_auth_exception,
+                            fc_exception_message_is("Explicit payer must be the first declared authorization"));
+   }
+   {
+      signed_transaction trx;
+      set_transaction_headers(trx);
+
+      // add a normal action, with 2 explicit payers
+      dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
+      auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},
+                                         {"testapi"_n, config::active_name},
+                                         {"testapi"_n, config::sysio_payer_name}};
+      action act1(pl, da);
+      trx.actions.push_back(act1);
+      set_transaction_headers(trx);
+      auto sigs = trx.sign(get_private_key("testapi"_n, "active"), control->get_chain_id());
+      BOOST_CHECK_EXCEPTION(push_transaction(trx), sysio::chain::transaction_exception,
+         fc_exception_message_is("action cannot have multiple payers"));
+   }
+
+
+   BOOST_REQUIRE_EQUAL( validate(), true );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_FIXTURE_TEST_CASE(action_tests, validating_tester) { try {
 	produce_blocks(2);
 	create_account( "testapi"_n );
@@ -293,7 +364,6 @@ BOOST_FIXTURE_TEST_CASE(action_tests, validating_tester) { try {
       test.set_transaction_headers(trx);
       trx.sign(test.get_private_key("inita"_n, "active"), get_chain_id());
       auto res = test.push_transaction(trx);
-      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
    };
 
    BOOST_CHECK_EXCEPTION(test_require_notice(*this, raw_bytes, scope), unsatisfied_authorization,
@@ -348,7 +418,6 @@ BOOST_FIXTURE_TEST_CASE(action_tests, validating_tester) { try {
       trx.sign(get_private_key("acc3"_n, "active"), control->get_chain_id());
       trx.sign(get_private_key("acc4"_n, "active"), control->get_chain_id());
       auto res = push_transaction(trx);
-      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
    }
 
    uint64_t now = static_cast<uint64_t>( head().block_time().time_since_epoch().count() );
@@ -404,7 +473,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(require_notice_tests, T, validating_testers) { try
       chain.set_transaction_headers( trx );
       trx.sign( chain.get_private_key( "testapi"_n, "active" ), chain.get_chain_id() );
       auto res = chain.push_transaction( trx );
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
 
    } FC_LOG_AND_RETHROW() }
 
@@ -452,24 +520,16 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cf_action_tests, T, validating_testers) { try {
       cf_action cfa;
       signed_transaction trx;
       chain.set_transaction_headers(trx);
-      // need at least one normal action
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_auths,
-                            [](const fc::assert_exception& e) {
-                               return expect_assert_message(e, "transaction must have at least one authorization");
-                            }
-      );
+      // need at least one action
+      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_action, fc_exception_message_is("packed_transaction contains no actions"));
 
       action act({}, cfa);
       trx.context_free_actions.push_back(act);
       trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
       chain.set_transaction_headers(trx);
 
-      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_auths,
-                            [](const fc::exception& e) {
-                               return expect_assert_message(e, "transaction must have at least one authorization");
-                            }
-      );
+      // need at least one normal action
+      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), tx_no_action, fc_exception_message_is("packed_transaction contains no actions"));
 
       trx.signatures.clear();
 
@@ -478,21 +538,90 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cf_action_tests, T, validating_testers) { try {
       auto pl = vector<permission_level>{{"testapi"_n, config::active_name}};
       action act1(pl, da);
       trx.actions.push_back(act1);
+      // add an extra cfa data to verify cfa data and cfa must match
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+      chain.set_transaction_headers(trx);
+
+      auto sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+      BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
+                            fc_exception_message_is("Context free data size 2 not equal to context free actions size 1"));
+
+      trx.signatures.clear();
+
+      // add a normal action along with cfa
+      trx.actions.clear();
+      trx.context_free_data.clear();
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+      trx.actions.push_back(act1);
       chain.set_transaction_headers(trx);
       // run normal passing case
-      auto sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
       auto res = chain.push_transaction(trx);
 
       chain.produce_block();
 
+      // verify context_free_actions can't have a normal authorizations
+      {
+         signed_transaction trx;
+         action act({pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         chain.set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         trx.actions.push_back(act1);
+         chain.set_transaction_headers(trx);
+         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+         BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
+                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
+      }
+
+      // verify context_free_actions can have an explicit payer
+      {
+         signed_transaction trx;
+         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}};
+         action act({cfa_pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         chain.set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
+         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
+         action act1(pl, tm);
+         trx.actions.push_back(act1);
+         chain.set_transaction_headers(trx);
+         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+         chain.push_transaction(trx);
+      }
+
+      chain.produce_block();
+
+      // verify context_free_actions can have an explicit payer, but not more than one
+      {
+         signed_transaction trx;
+         auto cfa_pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name}, {"testapi"_n, config::active_name}};
+         action act({cfa_pl}, cfa);
+         trx.context_free_actions.push_back(act);
+         chain.set_transaction_headers(trx);
+         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
+         auto pl = vector<permission_level>{{"testapi"_n, config::sysio_payer_name},{"testapi"_n, config::active_name}};
+         auto tm = test_api_action<TEST_METHOD("test_checktime", "checktime_pass")>{};
+         action act1(pl, tm);
+         trx.actions.push_back(act1);
+         chain.set_transaction_headers(trx);
+         sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
+         BOOST_CHECK_EXCEPTION(chain.push_transaction(trx), transaction_exception,
+                               fc_exception_message_is("context-free actions can only have a valid explicit payer authorization"));
+      }
+
+
       // add a large trx so that it is compressed
       trx.signatures.clear();
       chain.set_transaction_headers(trx);
+      trx.context_free_actions.push_back(act);
+      trx.context_free_data.clear();
+      trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
       trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(vector<uint32_t>(251, 1))); // 251*4 > 1000
       BOOST_TEST( fc::raw::pack_size(trx) > 1000); // so that it is compressed
-      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.control->get_chain_id());
+      sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
       res = chain.push_transaction(trx);
-      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
 
       // attempt to access context free api in non context free action
 
@@ -513,9 +642,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cf_action_tests, T, validating_testers) { try {
          // back to normal action
          action act1(pl, da);
          signed_transaction trx;
-         trx.context_free_actions.push_back(act);
-         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-         trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
 
          trx.actions.push_back(act1);
          // attempt to access non context free api
@@ -526,6 +652,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cf_action_tests, T, validating_testers) { try {
             cfa.cfd_idx = 1;
             action cfa_act({}, cfa);
             trx.context_free_actions.emplace_back(cfa_act);
+            trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
             trx.signatures.clear();
             chain.set_transaction_headers(trx);
             sigs = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
@@ -599,6 +726,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(cfa_stateful_api, T, validating_testers)  try {
                                  });
    action act({}, test_api_action<TEST_METHOD("test_transaction", "stateful_api")>{});
    trx.context_free_actions.push_back(act);
+   trx.context_free_data.emplace_back();
    chain.set_transaction_headers(trx);
    trx.sign( chain.get_private_key( creator, "active" ), chain.get_chain_id()  );
    BOOST_CHECK_EXCEPTION(chain.push_transaction( trx ), fc::exception,
@@ -626,7 +754,6 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
    action act({}, cfa);
    trx.context_free_actions.push_back(act);
    trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
-   trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(200));
    // add a normal action along with cfa
    dummy_action da = { DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C };
    action act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
@@ -638,7 +765,6 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
    blocks.push_back(chain.produce_block());
 
    BOOST_REQUIRE(trace->receipt);
-   BOOST_CHECK_EQUAL(trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK_EQUAL(2, trace->action_traces.size());
 
    BOOST_CHECK(trace->action_traces.at(0).context_free); // cfa
@@ -672,7 +798,6 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
 
    BOOST_REQUIRE(other_trace);
    BOOST_REQUIRE(other_trace->receipt);
-   BOOST_CHECK_EQUAL(other_trace->receipt->status, transaction_receipt::executed);
    BOOST_CHECK(*trace->receipt == *other_trace->receipt);
    BOOST_CHECK_EQUAL(2, other_trace->action_traces.size());
 
@@ -860,8 +985,12 @@ void transaction_tests(T& chain) {
       BOOST_CHECK(pkt.get_packed_transaction() == packed_copy);
       ptrx = std::make_shared<packed_transaction>( pkt );
 
-      auto fut = transaction_metadata::start_recover_keys( std::move( ptrx ), chain.control->get_thread_pool(), chain.get_chain_id(), time_limit, transaction_metadata::trx_type::input );
-      auto r = chain.control->push_transaction( fut.get(), fc::time_point::maximum(), fc::microseconds::maximum(), T::DEFAULT_BILLED_CPU_TIME_US, true, 0 );
+      auto fut = transaction_metadata::start_recover_keys( std::move( ptrx ), chain.control->get_thread_pool(), chain.control->get_chain_id(), time_limit, transaction_metadata::trx_type::input );
+      const bool explicit_billed_cpu_time = true;
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), T::DEFAULT_BILLED_CPU_TIME_US);
+      auto r = chain.control->test_push_transaction( fut.get(), fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except) throw *r->except;
       tx_trace = r;
@@ -1904,7 +2033,6 @@ BOOST_AUTO_TEST_CASE( set_producers_legacy ) { try {
 
    auto trace = t.set_producers_legacy(prods);
    BOOST_REQUIRE(trace && trace->receipt);
-   BOOST_CHECK_EQUAL(trace->receipt->status, transaction_receipt::executed);
 
 } FC_LOG_AND_RETHROW() }
 
@@ -2622,7 +2750,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( action_results_tests, T, validating_testers ) { t
    };
 
    call_autoresret_and_check( "test"_n, "test"_n, "actionresret"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+      BOOST_CHECK( !!res->receipt );
 
       auto &atrace = res->action_traces;
       BOOST_REQUIRE_EQUAL( atrace[0].receipt.has_value(), true );
@@ -2633,7 +2761,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( action_results_tests, T, validating_testers ) { t
    t.produce_block();
 
    call_autoresret_and_check( "test"_n, "test"_n, "retlim"_n, [&]( const transaction_trace_ptr& res ) {
-      BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+      BOOST_CHECK( !!res->receipt );
 
       auto &atrace = res->action_traces;
       BOOST_REQUIRE_EQUAL( atrace[0].receipt.has_value(), true );
@@ -2660,7 +2788,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( action_results_tests, T, validating_testers ) { t
                               config::system_account_name,
                               "retmaxlim"_n,
                               [&]( const transaction_trace_ptr& res ) {
-                                 BOOST_CHECK_EQUAL( res->receipt->status, transaction_receipt::executed );
+                                 BOOST_CHECK( !!res->receipt );
 
                                  auto &atrace = res->action_traces;
                                  BOOST_REQUIRE_EQUAL( atrace[0].receipt.has_value(), true );
@@ -2735,7 +2863,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( get_code_hash_tests, T, validating_testers ) { tr
       t.set_transaction_headers(trx, t.DEFAULT_EXPIRATION_DELTA);
       trx.sign(t.get_private_key("gethash"_n, "active"), t.get_chain_id());
       auto tx_trace = t.push_transaction(trx);
-      BOOST_CHECK_EQUAL(tx_trace->receipt->status, transaction_receipt::executed);
+      BOOST_CHECK(!!tx_trace->receipt);
       BOOST_REQUIRE(tx_trace->action_traces.front().console == expected);
       t.produce_block();
    };

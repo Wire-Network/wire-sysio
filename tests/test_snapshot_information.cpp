@@ -69,7 +69,6 @@ void test_snapshot_information() {
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(snapshot_information_test, SNAPSHOT_SUITE, snapshot_suites) {
-   test_snapshot_information<legacy_tester, SNAPSHOT_SUITE>();
    test_snapshot_information<savanna_tester, SNAPSHOT_SUITE>();
 }
 

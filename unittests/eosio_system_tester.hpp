@@ -647,7 +647,6 @@ inline uint64_t M( const string& eos_str ) {
    return core_from_string( eos_str ).get_amount();
 }
 
-using sysio_system_testers = boost::mpl::list<sysio_system_tester<legacy_validating_tester>,
-                                              sysio_system_tester<savanna_validating_tester>>;
+using sysio_system_testers = boost::mpl::list<sysio_system_tester<savanna_validating_tester>>;
 
 }

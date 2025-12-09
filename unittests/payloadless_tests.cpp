@@ -23,8 +23,7 @@ class payloadless_tester : public T {
 
 };
 
-using payloadless_testers = boost::mpl::list<payloadless_tester<legacy_validating_tester>,
-                                             payloadless_tester<savanna_validating_tester>>;
+using payloadless_testers = boost::mpl::list<payloadless_tester<savanna_validating_tester>>;
 
 BOOST_AUTO_TEST_SUITE(payloadless_tests)
 

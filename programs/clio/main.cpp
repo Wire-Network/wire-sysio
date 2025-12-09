@@ -91,9 +91,10 @@ Options:
 #include <boost/asio.hpp>
 #include <boost/format.hpp>
 #include <boost/process.hpp>
-#include <boost/process/spawn.hpp>
+#include <boost/process/v1/child.hpp>
+#include <boost/process/v1/io.hpp>
 #include <boost/range/adaptor/transformed.hpp>
-#include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #define BOOST_DLL_USE_STD_FS
 #include <boost/dll/runtime_symbol_info.hpp>
@@ -299,7 +300,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    vector<chain::permission_level> accountPermissions;
    boost::range::copy(fixedPermissions, back_inserter(accountPermissions));
    if (!tx_payer.empty()) {
-      accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+      accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
    }
    return accountPermissions;
 }
@@ -308,7 +309,7 @@ vector<chain::permission_level> get_account_permissions(const vector<string>& pe
    if (permissions.empty()) {
       vector<chain::permission_level> accountPermissions{default_permission};
       if (!tx_payer.empty()) {
-         accountPermissions.push_back(chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
+         accountPermissions.insert(accountPermissions.begin(), chain::permission_level{ .actor = name(tx_payer), .permission = name("sysio.payer") });
       }
       return accountPermissions;
    } else {
@@ -674,9 +675,9 @@ void print_result( const fc::variant& result ) { try {
          if( processed.get_object().contains( "receipt" )) {
             const auto& receipt = processed["receipt"];
             if( receipt.is_object()) {
-               status = receipt["status"].as_string();
-               net = receipt["net_usage_words"].as_int64() * 8;
-               cpu = receipt["cpu_usage_us"].as_int64();
+               status = "executed";
+               net = processed["net_usage"].as_int64();
+               cpu = processed["total_cpu_usage_us"].as_int64();
             }
          }
 
@@ -1118,7 +1119,7 @@ void ensure_kiod_running(CLI::App* app) {
     }
 
     if (std::filesystem::exists(binPath)) {
-        namespace bp = boost::process;
+        namespace bp = boost::process::v1;
         binPath = std::filesystem::canonical(binPath);
 
         vector<std::string> pargs;
@@ -1127,7 +1128,7 @@ void ensure_kiod_running(CLI::App* app) {
         pargs.push_back("--unix-socket-path");
         pargs.push_back(string(key_store_executable_name) + ".sock");
 
-        ::boost::process::child ksys(binPath.string(), pargs,
+        bp::child ksys(binPath.string(), pargs,
                                      bp::std_in.close(),
                                      bp::std_out > bp::null,
                                      bp::std_err > bp::null);
@@ -1977,7 +1978,7 @@ int main( int argc, char** argv ) {
    });
 
    // pack hex
-   using try_types = std::tuple<block_state_legacy, signed_block, transaction_trace, action_trace, transaction_receipt,
+   using try_types = std::tuple<signed_block, transaction_trace, action_trace, transaction_receipt,
                                 packed_transaction, signed_transaction, transaction, abi_def, action>;
    string json;
    string type;

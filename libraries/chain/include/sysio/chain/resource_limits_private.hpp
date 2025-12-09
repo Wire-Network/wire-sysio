@@ -190,57 +190,47 @@ namespace sysio { namespace chain { namespace resource_limits {
 
    using usage_accumulator = impl::exponential_moving_average_accumulator<>;
 
-   /**
-    * Every account that authorizes a transaction is billed for the full size of that transaction. This object
-    * tracks the average usage of that account.
-    */
-   struct resource_limits_object : public chainbase::object<resource_limits_object_type, resource_limits_object> {
-
-      OBJECT_CTOR(resource_limits_object)
+   struct resource_object : public chainbase::object<resource_object_type, resource_object> {
+      OBJECT_CTOR(resource_object)
 
       id_type id;
       account_name owner; //< owner should not be changed within a chainbase modifier lambda
-      bool pending = false; //< pending should not be changed within a chainbase modifier lambda
 
       int64_t net_weight = -1;
       int64_t cpu_weight = -1;
       int64_t ram_bytes = -1;
 
+      usage_accumulator        net_usage;
+      usage_accumulator        cpu_usage;
+      uint64_t                 ram_usage = 0;
    };
 
    struct by_owner;
-   struct by_dirty;
 
-   using resource_limits_index = chainbase::shared_multi_index_container<
-      resource_limits_object,
+   using resource_index = chainbase::shared_multi_index_container<
+      resource_object,
       indexed_by<
-         ordered_unique<tag<by_id>, member<resource_limits_object, resource_limits_object::id_type, &resource_limits_object::id>>,
-         ordered_unique<tag<by_owner>,
-            composite_key<resource_limits_object,
-               BOOST_MULTI_INDEX_MEMBER(resource_limits_object, bool, pending),
-               BOOST_MULTI_INDEX_MEMBER(resource_limits_object, account_name, owner)
-            >
-         >
+         ordered_unique<tag<by_id>, member<resource_object, resource_object::id_type, &resource_object::id>>,
+         ordered_unique<tag<by_owner>, member<resource_object, account_name, &resource_object::owner> >
       >
    >;
 
-   struct resource_usage_object : public chainbase::object<resource_usage_object_type, resource_usage_object> {
-      OBJECT_CTOR(resource_usage_object)
+   struct resource_pending_object : public chainbase::object<resource_pending_object_type, resource_pending_object> {
+      OBJECT_CTOR(resource_pending_object)
 
       id_type id;
       account_name owner; //< owner should not be changed within a chainbase modifier lambda
 
-      usage_accumulator        net_usage;
-      usage_accumulator        cpu_usage;
-
-      uint64_t                 ram_usage = 0;
+      int64_t net_weight = -1;
+      int64_t cpu_weight = -1;
+      int64_t ram_bytes = -1;
    };
 
-   using resource_usage_index = chainbase::shared_multi_index_container<
-      resource_usage_object,
+   using resource_pending_index = chainbase::shared_multi_index_container<
+      resource_pending_object,
       indexed_by<
-         ordered_unique<tag<by_id>, member<resource_usage_object, resource_usage_object::id_type, &resource_usage_object::id>>,
-         ordered_unique<tag<by_owner>, member<resource_usage_object, account_name, &resource_usage_object::owner> >
+         ordered_unique<tag<by_id>, member<resource_pending_object, resource_pending_object::id_type, &resource_pending_object::id>>,
+         ordered_unique<tag<by_owner>, member<resource_pending_object, account_name, &resource_pending_object::owner> >
       >
    >;
 
@@ -326,15 +316,15 @@ namespace sysio { namespace chain { namespace resource_limits {
 
 } } } /// sysio::chain::resource_limits
 
-CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_limits_object,        sysio::chain::resource_limits::resource_limits_index)
-CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_usage_object,         sysio::chain::resource_limits::resource_usage_index)
+CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_object,               sysio::chain::resource_limits::resource_index)
+CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_pending_object,       sysio::chain::resource_limits::resource_pending_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_limits_config_object, sysio::chain::resource_limits::resource_limits_config_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_limits_state_object,  sysio::chain::resource_limits::resource_limits_state_index)
 
 FC_REFLECT(sysio::chain::resource_limits::usage_accumulator, (last_ordinal)(value_ex)(consumed))
 
 // @ignore pending
-FC_REFLECT(sysio::chain::resource_limits::resource_limits_object, (owner)(net_weight)(cpu_weight)(ram_bytes))
-FC_REFLECT(sysio::chain::resource_limits::resource_usage_object,  (owner)(net_usage)(cpu_usage)(ram_usage))
+FC_REFLECT(sysio::chain::resource_limits::resource_object, (owner)(net_weight)(cpu_weight)(ram_bytes)(net_usage)(cpu_usage)(ram_usage))
+FC_REFLECT(sysio::chain::resource_limits::resource_pending_object,  (owner)(net_weight)(cpu_weight)(ram_bytes))
 FC_REFLECT(sysio::chain::resource_limits::resource_limits_config_object, (cpu_limit_parameters)(net_limit_parameters)(account_cpu_usage_average_window)(account_net_usage_average_window))
 FC_REFLECT(sysio::chain::resource_limits::resource_limits_state_object, (average_block_net_usage)(average_block_cpu_usage)(pending_net_usage)(pending_cpu_usage)(total_net_weight)(total_cpu_weight)(total_ram_bytes)(virtual_net_limit)(virtual_cpu_limit))

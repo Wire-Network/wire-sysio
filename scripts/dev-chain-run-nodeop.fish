@@ -61,6 +61,8 @@ fish_add_path $CMAKE_BUILD_ROOT/bin
 set WALLET_PW (cat $TARGET_ROOT/secrets/sysio_wallet_pw.txt)
 set SYS_PUBLIC_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep Public | grep -Eo '(SYS.*)')
 set SYS_PRIVATE_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep Private | grep -oP 'Private\skey:\s\K([a-zA-Z0-9]+)$')
+set SYS_BLS_PUBLIC_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep 'BLS Pub key' | grep -Eo '(PUB_BLS_.*)')
+set SYS_BLS_PRIVATE_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep 'BLS Priv key' | grep -Eo '(PVT_BLS_.*)')
 
 if test $GENERATE_RUN -eq 1
     # Generate CLion run configuration XMLs under .run/
@@ -127,4 +129,5 @@ nodeop --config-dir $CONFIG_ROOT \
   --data-dir "$TARGET_ROOT/data" \
   --genesis-json "$CONFIG_ROOT/genesis.json" \
   --contracts-console \
-  --signature-provider "$SYS_PUBLIC_KEY=KEY:$SYS_PRIVATE_KEY"
+  --signature-provider "$SYS_PUBLIC_KEY=KEY:$SYS_PRIVATE_KEY" \
+  --signature-provider "$SYS_BLS_PUBLIC_KEY=KEY:$SYS_BLS_PRIVATE_KEY"

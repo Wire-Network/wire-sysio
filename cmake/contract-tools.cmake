@@ -12,6 +12,9 @@ if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
   set(
     CDT_CMAKE_ARGS -DCDT_ROOT=${CDT_ROOT} -DCMAKE_TOOLCHAIN_FILE=${CDT_ROOT}/lib/cmake/cdt/CDTWasmToolchain.cmake -DCMAKE_PREFIX_PATH=${CMAKE_BINARY_DIR}  -DBUILD_SYSTEM_CONTRACTS=ON -DBUILD_TEST_CONTRACTS=${BUILD_TEST_CONTRACTS} -DCDT_BUILD=ON
   )
+  if (CDT_ROOT AND EXISTS ${CDT_ROOT}/lib/cmake/cdt/cdt-config.cmake)
+      list(APPEND CDT_CMAKE_ARGS -DCDT_ROOT=${CDT_ROOT})
+  endif ()
 endif()
 
 # Adds an external project target for building smart contracts

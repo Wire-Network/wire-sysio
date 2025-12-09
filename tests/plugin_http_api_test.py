@@ -102,6 +102,8 @@ class PluginHttpTest(unittest.TestCase):
         if not self.nodeop or not Utils.waitForBool(self.nodeop.checkPulse, timeout=15):
             Utils.Print("ERROR: node doesn't appear to be running...")
             self.assertTrue(False, msg="nodeop failed to start.")
+        # wait for 2 block otherwise if the first block is received for TAPOS it will cause expired trx since it will be old
+        self.nodeop.waitForBlock(2)
 
     def activateAllBuiltinProtocolFeatures(self):
         contract = "sysio.bios"
@@ -585,22 +587,6 @@ class PluginHttpTest(unittest.TestCase):
         payload = {"code":"sysio.token","symbol":"SYS"}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
-
-        # Make sure calling get_finalizer_info in Legacy does not do any harm and
-        # returns empty JSON.
-        # Tests in Savanna are in plugin_http_api_test_savanna.py.
-        #
-        # get_finalizer_info with empty parameter
-        command = "get_finalizer_info"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["active_finalizer_policy"], None)
-        # get_finalizer_info with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["payload"]["active_finalizer_policy"], None)
-        # get_finalizer_info with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
 
         # get_producers with empty parameter
         command = "get_producers"
@@ -1523,7 +1509,7 @@ class PluginHttpTest(unittest.TestCase):
 
         enc = "utf-8"
         sock.settimeout(3)
-        maxMsgSize = 2048
+        maxMsgSize = 1024*1024
         resp1_data, resp2_data, resp3_data = None, None, None
         try:
             # send first request
@@ -1554,7 +1540,7 @@ class PluginHttpTest(unittest.TestCase):
                 sock.send(bytes(req2, enc))
                 d = sock.recv(64)
                 if(len(d) > 0):
-                    Utils.errorExit('Socket still open after "Connection: close" in header')
+                    Utils.errorExit('Socket still open after "Connection: close" in header: ' + d.decode(enc))
             except Exception as e:
                 pass
 
