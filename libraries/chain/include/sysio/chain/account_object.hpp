@@ -83,8 +83,17 @@ namespace sysio { namespace chain {
    namespace config {
       template<>
       struct billable_size<account_metadata_object> {
-         static const uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
-         static const uint64_t value = 78 + overhead; ///< fixed field + overhead
+         // protocol feature will be needed if this increases
+         static_assert(sizeof(account_metadata_object) == 88, "account_metadata_object size changed");
+         static constexpr uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
+         static constexpr uint64_t value = 88 + overhead; ///< fixed field + overhead
+      };
+      template<>
+      struct billable_size<account_object> {
+         // protocol feature will be needed if this increases
+         static_assert(sizeof(account_object) == 40, "account_object size changed");
+         static constexpr uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
+         static constexpr uint64_t value = 40 + overhead; ///< fixed field + overhead
       };
    }
 
