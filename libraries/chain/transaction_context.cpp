@@ -264,6 +264,11 @@ namespace sysio::chain {
       transaction_timer.start( active_deadline );
       checktime(); // Fail early if deadline as already been exceeded
 
+      if (!explicit_billed_cpu_time) {
+         const auto& act = packed_trx.get_transaction().actions.at(0);
+         dlog("Start executing ${receiver} <= ${account}::${action} with deadline ${d}",
+            ("account", act.account)("action", act.name)("receiver", act.account)("d", active_deadline));
+      }
       is_initialized = true;
    }
 
@@ -694,6 +699,10 @@ namespace sysio::chain {
 
    void transaction_context::update_billed_cpu_time( fc::time_point now ) {
       if( explicit_billed_cpu_time || is_cpu_updated ) return; // updated in init() for explicit_billed_cpu
+
+      const auto& act = packed_trx.get_transaction().actions.at(0);
+      dlog("Done executing ${receiver} <= ${account}::${action}",
+         ("account", act.account)("action", act.name)("receiver", act.account));
 
       trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
       const auto& cfg = control.get_global_properties().configuration;
