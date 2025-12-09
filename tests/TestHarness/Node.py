@@ -653,16 +653,18 @@ class Node(Transactions):
         files.sort()
         return files
 
-    def findInLog(self, searchStr):
-        dataDir=Utils.getNodeDataDir(self.nodeId)
-        files=Node.findStderrFiles(dataDir)
+    def findInLog(self, searchStr, startLine=1):
+        dataDir = Utils.getNodeDataDir(self.nodeId)
+        files = Node.findStderrFiles(dataDir)
         pattern = re.compile(searchStr)
         for file in files:
             with open(file, 'r') as f:
-                for line in f:
+                for lineNum, line in enumerate(f, start=1):
+                    if lineNum < startLine:
+                        continue
                     if pattern.search(line):
-                        return True
-        return False
+                        return lineNum
+        return None
 
     def linesInLog(self, searchStr):
         dataDir=Utils.getNodeDataDir(self.nodeId)
