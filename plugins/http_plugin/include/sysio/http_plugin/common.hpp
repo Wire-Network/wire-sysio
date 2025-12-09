@@ -160,7 +160,7 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
       plugin_state.bytes_in_flight += payload_size;
 
       // post back to an HTTP thread to allow the response handler to be called from any thread
-      boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
+      boost::asio::post(plugin_state.thread_pool.get_executor(),
                         [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size, response = std::move(response), content_type]() {
                            auto on_exit = fc::make_scoped_exit([&](){plugin_state.bytes_in_flight -= payload_size;});
 
