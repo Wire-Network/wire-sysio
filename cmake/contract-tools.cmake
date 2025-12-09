@@ -6,6 +6,8 @@ option(BUILD_SYSTEM_CONTRACTS "Build system contracts" OFF)
 cmake_dependent_option(BUILD_TEST_CONTRACTS "Build test contracts" OFF "BUILD_SYSTEM_CONTRACTS" OFF)
 cmake_dependent_option(CDT_BUILD "Indicates that the CDT is being built" OFF "BUILD_SYSTEM_CONTRACTS" ON)
 
+message(STATUS "CDT_ROOT is set to: ${CDT_ROOT}")
+
 if(BUILD_SYSTEM_CONTRACTS AND NOT CDT_BUILD)
   set(SYSIO_WASM_OLD_BEHAVIOR "Off")
   find_package(cdt REQUIRED)
