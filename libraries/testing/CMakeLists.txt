@@ -35,19 +35,36 @@ add_library(sysio_testing
   ${HEADERS}
 )
 
-add_custom_target(sysio_testing_contracts_copy ALL
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm
-        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi
-        DEPENDS ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm
-                ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi
-                ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm
-                ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi
-        COMMENT "Copying test contracts to testing libraries build directory"
+# Explicitly produce copied contract artifacts so cmake knows how to build them
+set(TESTING_DST_BIOS_DIR ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios)
+set(TESTING_DST_ROA_DIR  ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa)
+
+set(BIOS_WASM_SRC ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm)
+set(BIOS_ABI_SRC  ${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi)
+set(ROA_WASM_SRC  ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm)
+set(ROA_ABI_SRC   ${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi)
+
+set(BIOS_WASM_DST ${TESTING_DST_BIOS_DIR}/sysio.bios.wasm)
+set(BIOS_ABI_DST  ${TESTING_DST_BIOS_DIR}/sysio.bios.abi)
+set(ROA_WASM_DST  ${TESTING_DST_ROA_DIR}/sysio.roa.wasm)
+set(ROA_ABI_DST   ${TESTING_DST_ROA_DIR}/sysio.roa.abi)
+
+add_custom_command(
+  OUTPUT ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_BIOS_DIR}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_ROA_DIR}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BIOS_WASM_SRC} ${BIOS_WASM_DST}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BIOS_ABI_SRC}  ${BIOS_ABI_DST}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ROA_WASM_SRC}  ${ROA_WASM_DST}
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ROA_ABI_SRC}   ${ROA_ABI_DST}
+  DEPENDS ${BIOS_WASM_SRC} ${BIOS_ABI_SRC} ${ROA_WASM_SRC} ${ROA_ABI_SRC}
+  COMMENT "Copying test contracts to testing libraries build directory"
 )
+
+add_custom_target(sysio_testing_contracts_copy ALL
+  DEPENDS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
+)
+
 add_dependencies(sysio_testing sysio_testing_contracts_copy)
 
 # Could not figure out how to make this work correctly.
