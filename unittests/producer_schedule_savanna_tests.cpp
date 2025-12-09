@@ -20,8 +20,7 @@ inline account_name get_expected_producer(const vector<producer_authority>& sche
 
 } // anonymous namespace
 
-// Use legacy_validating_tester because it transitions to savanna as part of the test.
-BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, legacy_validating_tester ) try {
+BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, validating_tester ) try {
 
    // Utility function to ensure that producer schedule work as expected
    const auto& confirm_schedule_correctness = [&](const vector<producer_authority>& new_prod_schd, uint32_t expected_schd_ver, uint32_t expected_block_num = 0)  {
@@ -84,8 +83,8 @@ BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, lega
    // Send set prods action and confirm schedule correctness
    auto trace = set_producers(producers);
    const auto first_prod_schd = get_producer_authorities(producers);
-   // called in first round so complete it, skip one round of 12 and start on next round, so block 24
-   confirm_schedule_correctness(first_prod_schd, 1, 24);
+   // called in first round so complete it, skip one round of 12 and start on next round, so block 48 (activation uses 24)
+   confirm_schedule_correctness(first_prod_schd, 1, 48);
 
    // ---- Test second set of producers ----
    vector<account_name> second_set_of_producer = {
@@ -94,8 +93,8 @@ BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, lega
    // Send set prods action and confirm schedule correctness
    set_producers(second_set_of_producer);
    const auto second_prod_schd = get_producer_authorities(second_set_of_producer);
-   // called after block 24, so next,next is 48
-   confirm_schedule_correctness(second_prod_schd, 2, 48);
+   // called after block 24, so next,next is 72
+   confirm_schedule_correctness(second_prod_schd, 2, 72);
 
    // ---- Test deliberately miss some blocks ----
    const int64_t num_of_missed_blocks = 5000;
@@ -121,7 +120,7 @@ bool compare_schedules( const vector<producer_authority>& a, const producer_auth
       return std::equal( a.begin(), a.end(), b.producers.begin(), b.producers.end() );
 };
 
-BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, legacy_validating_tester ) try {
+BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) try {
    create_accounts( {"alice"_n,"bob"_n,"carol"_n} );
 
    // set_producers in same block, do it the explicit way to use a diff expiration and avoid duplicate trx
@@ -370,7 +369,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, legacy_validating_tes
 } FC_LOG_AND_RETHROW()
 
 
-BOOST_FIXTURE_TEST_CASE( proposer_policy_misc_tests, legacy_validating_tester ) try {
+BOOST_FIXTURE_TEST_CASE( proposer_policy_misc_tests, validating_tester ) try {
    create_accounts( {"alice"_n,"bob"_n} );
 
    while (head().block_num() < 3) {
@@ -407,7 +406,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_misc_tests, legacy_validating_tester ) 
 } FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_CASE( switch_producers_test ) try {
-   legacy_validating_tester chain;
+   validating_tester chain;
 
    const std::vector<account_name> accounts = { "aliceaccount"_n, "bobbyaccount"_n, "carolaccount"_n, "emilyaccount"_n };
    chain.create_accounts( accounts );

@@ -4,6 +4,7 @@
 #include <sysio/chain/wasm_config.hpp>
 #include <sysio/chain/types.hpp>
 
+#include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/sha256.hpp>
 
 #include <string>
@@ -15,6 +16,7 @@ struct genesis_state {
    genesis_state();
 
    static const string sysio_root_key;
+   static const string sysio_root_finalizer_key;
 
    chain_config_v0   initial_configuration = {
       .max_block_net_usage                  = config::default_max_block_net_usage,
@@ -54,6 +56,7 @@ struct genesis_state {
 
    time_point                               initial_timestamp;
    public_key_type                          initial_key;
+   fc::crypto::blslib::bls_public_key       initial_finalizer_key;
 
    /**
     * Get the chain_id corresponding to this genesis state.
@@ -62,12 +65,7 @@ struct genesis_state {
     */
    chain_id_type compute_chain_id() const;
 
-   friend inline bool operator==( const genesis_state& lhs, const genesis_state& rhs ) {
-      return std::tie( lhs.initial_configuration, lhs.initial_timestamp, lhs.initial_key )
-               == std::tie( rhs.initial_configuration, rhs.initial_timestamp, rhs.initial_key );
-   };
-
-   friend inline bool operator!=( const genesis_state& lhs, const genesis_state& rhs ) { return !(lhs == rhs); }
+   friend inline bool operator==( const genesis_state& lhs, const genesis_state& rhs ) = default;
 
 };
 
@@ -75,4 +73,4 @@ struct genesis_state {
 
 // @swap initial_timestamp initial_key initial_configuration
 FC_REFLECT(sysio::chain::genesis_state,
-           (initial_timestamp)(initial_key)(initial_configuration))
+           (initial_timestamp)(initial_key)(initial_finalizer_key)(initial_configuration))

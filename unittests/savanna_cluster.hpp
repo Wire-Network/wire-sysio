@@ -380,7 +380,7 @@ namespace savanna_cluster {
          assert(_num_nodes > 3); // cluster should have a minimum of 4 nodes (quorum = 3)
 
          _nodes.reserve(_num_nodes);
-         _nodes.emplace_back(0, *this, setup_policy::full_except_do_not_transition_to_savanna);
+         _nodes.emplace_back(0, *this, setup_policy::full_except_do_not_set_finalizers);
          for (size_t i=1; i<_num_nodes; ++i)
             _nodes.emplace_back(i, *this);
 

@@ -3,66 +3,14 @@
 #include <sysio/chain/incremental_merkle_legacy.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/block_state.hpp>
 
 namespace sysio::chain::snapshot_detail {
 
    /**
-    * a fc::raw::unpack compatible version of the old block_state_legacy structure stored in
-    * version 3 to 6 snapshots
+    *  Snapshot V1 Data structure
     */
-   struct snapshot_block_header_state_legacy_v3 {
-      static constexpr uint32_t minimum_version = 3;
-      static constexpr uint32_t maximum_version = 6;
-      static_assert(chain_snapshot_header::minimum_compatible_version <= maximum_version,
-                    "snapshot_block_header_state_v3 is no longer needed");
-
-      /// from block_header_state_legacy_common
-      uint32_t                             block_num = 0;
-      uint32_t                             dpos_proposed_irreversible_blocknum = 0;
-      uint32_t                             dpos_irreversible_blocknum = 0;
-      producer_authority_schedule          active_schedule;
-      incremental_merkle_tree_legacy       blockroot_merkle;
-      flat_map<account_name,uint32_t>      producer_to_last_produced;
-      flat_map<account_name,uint32_t>      producer_to_last_implied_irb;
-      block_signing_authority              valid_block_signing_authority;
-      vector<uint8_t>                      confirm_count;
-
-      // from block_header_state_legacy
-      block_id_type                        id;
-      signed_block_header                  header;
-      detail::schedule_info                pending_schedule;
-      protocol_feature_activation_set_ptr  activated_protocol_features;
-      vector<signature_type>               additional_signatures;
-
-      snapshot_block_header_state_legacy_v3() = default;
-
-      explicit snapshot_block_header_state_legacy_v3(const block_state_legacy& bs)
-         : block_num(bs.block_num())
-         , dpos_proposed_irreversible_blocknum(bs.dpos_proposed_irreversible_blocknum)
-         , dpos_irreversible_blocknum(bs.dpos_irreversible_blocknum)
-         , active_schedule(bs.active_schedule)
-         , blockroot_merkle(bs.blockroot_merkle)
-         , producer_to_last_produced(bs.producer_to_last_produced)
-         , producer_to_last_implied_irb(bs.producer_to_last_implied_irb)
-         , valid_block_signing_authority(bs.valid_block_signing_authority)
-         , confirm_count(bs.confirm_count)
-         , id(bs.id())
-         , header(bs.header)
-         , pending_schedule(bs.pending_schedule)
-         , activated_protocol_features(bs.activated_protocol_features)
-         , additional_signatures(bs.additional_signatures)
-      {}
-   };
-
-   /**
-    *      Snapshot V8 Data structures
-    *      ---------------------------
-    *  Spring 1.0.1 to ? snapshot v8 format. Updated `finality_core` to include finalizer policies
-    *  generation numbers. Also new member `block_state::latest_qc_claim_block_active_finalizer_policy`
-    */
-   struct snapshot_block_state_v8 {
+   struct snapshot_block_state_v1 {
       // from block_header_state
       block_id_type                                       block_id;
       block_header                                        header;
@@ -82,10 +30,10 @@ namespace sysio::chain::snapshot_detail {
       // from block_state
       std::optional<valid_t>                              valid;
 
-      snapshot_block_state_v8() = default;
+      snapshot_block_state_v1() = default;
 
-      // When adding a member initialization here also update block_state(snapshot_block_state_v8) constructor
-      explicit snapshot_block_state_v8(const block_state& bs)
+      // When adding a member initialization here also update block_state(snapshot_block_state_v1) constructor
+      explicit snapshot_block_state_v1(const block_state& bs)
          : block_id(bs.block_id)
          , header(bs.header)
          , activated_protocol_features(bs.activated_protocol_features)
@@ -104,44 +52,23 @@ namespace sysio::chain::snapshot_detail {
       {}
    };
 
-   struct snapshot_block_state_data_v8 {
-      static constexpr uint32_t minimum_version = 8;
-      static constexpr uint32_t maximum_version = 8;
+   struct snapshot_block_state_data_v1 {
+      static constexpr uint32_t minimum_version = 1;
+      static constexpr uint32_t maximum_version = 1;
 
-      std::optional<snapshot_block_header_state_legacy_v3> bs_l;
-      std::optional<snapshot_block_state_v8>               bs;
+      snapshot_block_state_v1               bs;
 
-      snapshot_block_state_data_v8() = default;
+      snapshot_block_state_data_v1() = default;
 
-      explicit snapshot_block_state_data_v8(const block_state_pair& p)
+      explicit snapshot_block_state_data_v1(const block_state& b)
       {
-         if (p.first)
-            bs_l = snapshot_block_header_state_legacy_v3(*p.first);
-         if (p.second)
-            bs = snapshot_block_state_v8(*p.second);
+         bs = snapshot_block_state_v1(b);
       }
    };
 
 }
 
-FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_header_state_legacy_v3,
-          ( block_num )
-          ( dpos_proposed_irreversible_blocknum )
-          ( dpos_irreversible_blocknum )
-          ( active_schedule )
-          ( blockroot_merkle )
-          ( producer_to_last_produced )
-          ( producer_to_last_implied_irb )
-          ( valid_block_signing_authority )
-          ( confirm_count )
-          ( id )
-          ( header )
-          ( pending_schedule )
-          ( activated_protocol_features )
-          ( additional_signatures )
-)
-
-FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_state_v8,
+FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_state_v1,
             (block_id)
             (header)
             (activated_protocol_features)
@@ -159,7 +86,6 @@ FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_state_v8,
             (valid)
    )
 
-FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_state_data_v8,
-            (bs_l)
+FC_REFLECT( sysio::chain::snapshot_detail::snapshot_block_state_data_v1,
             (bs)
    )

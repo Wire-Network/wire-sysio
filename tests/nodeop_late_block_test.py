@@ -48,6 +48,7 @@ try:
 
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, extraNodeopArgs=extraNodeopArgs,
                       topo="./tests/nodeop_late_block_test_shape.json", delay=delay, loadSystemContract=False,
+                      biosFinalizer=False,
                       activateIF=True, signatureProviderForNonProducer=True) is False:
         errorExit("Failed to stand up sys cluster.")
 

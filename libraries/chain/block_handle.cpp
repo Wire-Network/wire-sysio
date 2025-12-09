@@ -9,9 +9,10 @@ namespace sysio::chain {
 // file. Let's call this the implicit version 0, which is not supported anymore in
 // Spring 1.0.1 and above.
 // However, we need to make sure that `chain_head_magic` can't match the tag of a std::variant
+// Wire 6.0.0 Version 2 for only block_state_ptr
 // -------------------------------------------------------------------------------------------
 constexpr uint64_t chain_head_magic   = 0xf1f2f3f4f4f3f2f1;
-constexpr uint64_t chain_head_version = 1;
+constexpr uint64_t chain_head_version = 2;
 
 
 void block_handle::write(const std::filesystem::path& state_file) {
@@ -45,7 +46,7 @@ bool block_handle::read(const std::filesystem::path& state_file) {
       fc::raw::unpack(f, version);
 
       SYS_ASSERT(magic == chain_head_magic && version == chain_head_version, chain_exception,
-                 "Error reading `chain_head.dat` file. It is likely a Spring 1.0.0 version which is not supported by Spring 1.0.1 and above. "
+                 "Error reading `chain_head.dat` file. It is likely a Spring version which is not supported by Wire. "
                  "The best course of action might be to restart from a snapshot" );
 
       fc::raw::unpack(f, *this);

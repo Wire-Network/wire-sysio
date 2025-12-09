@@ -2,7 +2,7 @@
 
 #include <sysio/chain/exceptions.hpp>
 #include <boost/numeric/conversion/cast.hpp>
-#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 #include <string>
 #include <sstream>

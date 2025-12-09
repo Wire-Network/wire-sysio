@@ -30,9 +30,10 @@ public:
 
       produce_blocks();
 
-      const auto& accnt = control->db().get<account_object,by_name>( ROA );
+      const auto* accnt = control->find_account_metadata( ROA );
+      BOOST_REQUIRE( accnt != nullptr );
       abi_def abi;
-      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+      BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
       abi_ser.set_abi(abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
@@ -49,7 +50,7 @@ public:
 
    transaction_trace_ptr push_paid_action( const account_name& signer, const action_name &name, const variant_object &data ) {
       return base_tester::push_action( ROA, name,
-         vector<permission_level>{{signer, "active"_n},{signer, "sysio.payer"_n}},
+         vector<permission_level>{{signer, "sysio.payer"_n},{signer, "active"_n}},
          data);
    }
 
@@ -339,6 +340,63 @@ BOOST_FIXTURE_TEST_CASE( newuser_nonce_collision, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
+
+   create_accounts( { "alice.com"_n, "bob.m"_n, "a.longonexxx"_n }, false, false, false, false );
+   produce_blocks(1);
+   auto result = regnodeowner("alice.com"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   result = regnodeowner("bob.m"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   result = regnodeowner("a.longonexxx"_n, 1);
+   BOOST_REQUIRE_EQUAL(success(), result);
+   produce_blocks(1);
+
+   auto alice_owner = get_nodeowner("alice.com"_n);
+   BOOST_REQUIRE_EQUAL(alice_owner.is_null(), false);
+   BOOST_REQUIRE_EQUAL(alice_owner["tier"].as<uint32_t>(), 1);
+
+   auto empty = get_sponsorship("alice.com"_n, "nonce1"_n);
+   BOOST_REQUIRE_EQUAL(empty.is_null(), true);
+   BOOST_REQUIRE_EQUAL(0, get_sponsor_count("alice.com"_n));
+
+   auto newuser_result = newuser("alice.com"_n, "nonce1"_n, get_public_key("alice.com"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   auto newuser_action_trace = newuser_result->action_traces[0];
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.name, "newuser"_n);
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.receiver, ROA);
+   BOOST_REQUIRE_EQUAL(newuser_action_trace.act.account, ROA);
+   auto new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_REQUIRE_NE(""_n, new_name);
+   BOOST_TEST(new_name.suffix() == "alice.com"_n.suffix());
+   BOOST_TEST(new_name.suffix() == "com"_n);
+
+   auto newaccount_action_trace = newuser_result->action_traces[1];
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.name, "newaccount"_n);
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.receiver, "sysio"_n);
+   BOOST_REQUIRE_EQUAL(newaccount_action_trace.act.account, "sysio"_n);
+   produce_blocks(1);
+
+   BOOST_REQUIRE_EQUAL(1, get_sponsor_count("alice.com"_n));
+   auto sponsorship = get_sponsorship("alice.com"_n, "nonce1"_n);
+   BOOST_REQUIRE_EQUAL(sponsorship.is_null(), false);
+   BOOST_REQUIRE_EQUAL(sponsorship["username"].as<name>(), new_name);
+
+   newuser_result = newuser("bob.m"_n, "nonce1"_n, get_public_key("bob.m"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   newuser_action_trace = newuser_result->action_traces[0];
+   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_TEST(new_name.suffix() == "m"_n);
+
+   newuser_result = newuser("a.longonexxx"_n, "nonce1"_n, get_public_key("a.longonexxx"_n, "active"));
+   BOOST_REQUIRE_EQUAL(2, newuser_result->action_traces.size());
+   newuser_action_trace = newuser_result->action_traces[0];
+   new_name = fc::raw::unpack<name>(newuser_action_trace.return_value);
+   BOOST_TEST(new_name.suffix() == "longonexxx"_n);
+
+} FC_LOG_AND_RETHROW()
+
+
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    // load system contract for newaccount functionality
    set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
@@ -409,7 +467,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy("sysio.acct"_n, "sysio"_n);
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "0.0027 SYS");  // newaccount_ram (2808 / bytes_per_unit 104) == 27
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0017 SYS");  // newaccount_ram (1768 / bytes_per_unit 104) == 17
 
    // create another roa::newuser and verify resources
    auto newuser2 = create_newuser(node_owners[2]);
@@ -435,7 +493,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy("sysio.acct"_n, "sysio"_n);
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS");  // 2*newaccount_ram 2*(2808 / bytes_per_unit 104) == 54
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0034 SYS");  // 2*newaccount_ram 2*(1758 / bytes_per_unit 104) == 34
 
    // Provide newuser a policy and verify resources
    add_roa_policy(node_owners[2], newuser, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
@@ -465,7 +523,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS"); // 2*newaccount_ram 2*(2808 / bytes_per_unit 104) == 54 (nothing for policy)
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0034 SYS"); // 2*newaccount_ram 2*(1768 / bytes_per_unit 104) == 34 (nothing for policy)
 
    // Expand policy and verify resources:     net           cpu            ram
    expand_roa_policy(node_owners[2], newuser, "5.0000 SYS", "10.0000 SYS", "15.0000 SYS", 0);
@@ -495,7 +553,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS"); // 2*newaccount_ram 2*(2808 / bytes_per_unit 104) == 54 (nothing for policy)
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0034 SYS"); // 2*newaccount_ram 2*(1768 / bytes_per_unit 104) == 34 (nothing for policy)
 
    // Add policy from another node owner:     net           cpu            ram
    add_roa_policy(node_owners[3], newuser, "1.0000 SYS", "2.0000 SYS", "3.0000 SYS", 0, 0);
@@ -529,7 +587,7 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    p = get_policy("sysio.acct"_n, "sysio"_n); // sysio.acct policy not changed for a user policy
    BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
    BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
-   BOOST_TEST(p["ram_weight"].as_string() == "0.0054 SYS"); // 2*newaccount_ram 2*(2808 / bytes_per_unit 104) == 54 (nothing for policy)
+   BOOST_TEST(p["ram_weight"].as_string() == "0.0034 SYS"); // 2*newaccount_ram 2*(1768 / bytes_per_unit 104) == 34 (nothing for policy)
 
    produce_block();
 

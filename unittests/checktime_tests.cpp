@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
 
    // Make a copy of the valid block and swicth the checktime_pass transaction with checktime_failure
    auto copy_b = b->clone();
-   auto signed_tx = std::get<packed_transaction>(copy_b->transactions.back().trx).get_signed_transaction();
+   auto signed_tx = copy_b->transactions.back().trx.get_signed_transaction();
    auto& act = signed_tx.actions.back();
    constexpr chain::name checktime_fail_n{WASM_TEST_ACTION("test_checktime", "checktime_failure")};
    act.name = checktime_fail_n;

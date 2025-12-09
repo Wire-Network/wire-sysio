@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 3.16)
-
-# Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file")
@@ -27,6 +25,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
+include(linker-config NO_POLICY_SCOPE)
+include(hardening-config NO_POLICY_SCOPE)
 include(chain-tools NO_POLICY_SCOPE)
 include(test-tools NO_POLICY_SCOPE)
 include(contract-tools NO_POLICY_SCOPE)
@@ -169,8 +169,12 @@ message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
 if("${SYSIO_ROOT_KEY}" STREQUAL "")
   set(SYSIO_ROOT_KEY "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
 endif()
+if("${SYSIO_ROOT_FINALIZER_KEY}" STREQUAL "")
+    set(SYSIO_ROOT_FINALIZER_KEY "PUB_BLS_3igm9y-m3poDQL9IU-oE2E3rjKVD025aN5_Kpod8aVKjqtg4xOrP-jGtz4wLg_IFzc7gay9YghYwVgNafpxphE2xOY5gzEPa8li1rmtFfdpXguDFhNw2FpuLWSWami8WXgUo3A")
+endif()
 
 message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
+message(STATUS "Using '${SYSIO_ROOT_FINALIZER_KEY}' as finalizer key for 'sysio' account")
 
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if(ENABLE_TCMALLOC)
@@ -193,6 +197,13 @@ set(CMAKE_DISABLE_FIND_PACKAGE_OpenSSL On)
 add_compile_definitions(BOOST_TEST_DEFAULTS_TO_CORE_DUMP)
 
 add_definitions(-DSYSIO_SYS_VM_RUNTIME_ENABLED)
+
+contracts_target(
+        contracts_project
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
+        BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
+)
+
 add_subdirectory(libraries)
 add_subdirectory(plugins)
 add_subdirectory(programs)
@@ -204,11 +215,6 @@ add_subdirectory(benchmark)
 
 add_subdirectory(contracts)
 add_subdirectory(contracts/tests)
-contracts_target(
-  contracts_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/contracts
-  BINARY_DIR ${CMAKE_BINARY_DIR}/contracts
-)
 
 option(DISABLE_WASM_SPEC_TESTS "disable building of wasm spec unit tests" OFF)
 

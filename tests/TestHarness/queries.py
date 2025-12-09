@@ -105,7 +105,7 @@ class NodeopQueries:
             if not cntxt.isSectionNull("except"):
                 return "exception"
             cntxt.add("receipt")
-            return cntxt.add("status")
+            return "executed"
 
         # or what the history plugin returns
         cntxt.add("trx")
@@ -726,7 +726,7 @@ class NodeopQueries:
 
     def getBlockProducer(self, timeout=None, waitForBlock=True, exitOnError=True, blockType=BlockType.head):
         blockNum=self.getBlockNum(blockType=blockType)
-        block=self.getBlock(blockNum, exitOnError=exitOnError, blockType=blockType)
+        block=self.getBlock(blockNum, exitOnError=exitOnError)
         if block is None:
             if exitOnError:
                 Utils.errorExit(f"getBlock returned None for {blockNum}")

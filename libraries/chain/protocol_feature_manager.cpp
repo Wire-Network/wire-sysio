@@ -39,19 +39,6 @@ Example protocol feature. No functionality is triggered by this protocol feature
 */
             {}
          } )
-         (  builtin_protocol_feature_t::savanna, builtin_protocol_feature_spec{
-            "SAVANNA",
-            fc::variant("14a0069b7bad52bc8f8abcd92a41325ba0f3fc7e83bd7bc6048facbf9eadd089").as<digest_type>(),
-            // SHA256 hash of the raw message below within the comment delimiters (exclude newline after /*) (do not modify message below).
-/*
-Builtin protocol feature: SAVANNA
-
-Once this protocol feature is activated, the first subsequent block including a `set_finalizers`
-host function call will trigger a transition to the Savanna consensus algorithm.
-*/
-            {
-            }
-         } )
    ;
 
 

@@ -10,6 +10,8 @@
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include <fstream>
+#include <array>
+#include <ranges>
 
 #include <contracts.hpp>
 
@@ -37,6 +39,9 @@ namespace sysio::testing {
             break;
          case setup_policy::preactivate_feature_and_new_bios:
             os << "preactivate_feature_and_new_bios";
+            break;
+         case setup_policy::full_except_do_not_set_finalizers:
+            os << "full_except_do_not_set_finalizers";
             break;
          case setup_policy::full:
             os << "full";
@@ -231,7 +236,7 @@ namespace sysio::testing {
             break;
          }
          case setup_policy::full:
-         case setup_policy::full_except_do_not_transition_to_savanna: {
+         case setup_policy::full_except_do_not_set_finalizers: {
             produce_block();
             set_bios_contract();
             preactivate_all_builtin_protocol_features();
@@ -341,8 +346,7 @@ namespace sysio::testing {
             assert(_check_signal(id, block_signal::accepted_block));
 
             for (auto receipt : block->transactions) {
-               auto& pt = std::get<packed_transaction>(receipt.trx);
-               chain_transactions[pt.get_transaction().id()] = std::move(receipt);
+               chain_transactions.insert_or_assign(receipt.trx.id(), std::move(receipt));
             }
          });
 
@@ -437,7 +441,9 @@ namespace sysio::testing {
 
       if( !skip_pending_trxs ) {
          for( auto itr = unapplied_transactions.begin(); itr != unapplied_transactions.end();  ) {
-            auto trace = control->push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), DEFAULT_BILLED_CPU_TIME_US, true, 0 );
+            const auto& trx = itr->trx_meta->packed_trx()->get_transaction();
+            cpu_usage_t billed_cpu_us(trx.total_actions(), DEFAULT_BILLED_CPU_TIME_US);
+            auto trace = control->test_push_transaction( itr->trx_meta, fc::time_point::maximum(), fc::microseconds::maximum(), billed_cpu_us, true );
             if(!no_throw && trace->except) {
                // this always throws an fc::exception, since the original exception is copied into an fc::exception
                throw *trace->except;
@@ -458,14 +464,7 @@ namespace sysio::testing {
    }
 
    transaction_trace_ptr base_tester::_start_block(fc::time_point block_time) {
-      auto head_block_number = control->head().block_num();
       auto producer = control->head_active_producers().get_scheduled_producer(block_time);
-
-      auto last_produced_block_num = control->fork_db_root().block_num();
-      auto itr = last_produced_block.find(producer.producer_name);
-      if (itr != last_produced_block.end()) {
-         last_produced_block_num = std::max(control->fork_db_root().block_num(), block_header::num_from_id(itr->second));
-      }
 
       unapplied_transactions.add_aborted( control->abort_block() );
 
@@ -484,7 +483,7 @@ namespace sysio::testing {
          preactivated_protocol_features.end()
       );
 
-      auto onblock_trace = control->start_block( block_time, head_block_number - last_produced_block_num,
+      auto onblock_trace = control->start_block( block_time,
                                                  feature_to_be_activated,
                                                  controller::block_status::incomplete );
 
@@ -647,8 +646,9 @@ namespace sysio::testing {
       include_ram_gift &= a.prefix() != config::system_account_name;
       if (include_ram_gift) {
          // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
-         const auto& acnt = control->get_account(config::system_account_name);
-         auto abi = acnt.get_abi();
+         const auto* acnt = control->find_account_metadata(config::system_account_name);
+         FC_ASSERT(acnt != nullptr, "system account metadata not found");
+         auto abi = acnt->get_abi();
          if (std::ranges::any_of(abi.actions, [](const auto& action) { return action.name == "setalimits"_n; })) {
             trx.actions.emplace_back(get_action(config::system_account_name, "setalimits"_n,
                                                 vector<permission_level>{{config::system_account_name, config::active_name}},
@@ -782,7 +782,11 @@ namespace sysio::testing {
             fc::microseconds::maximum() :
             fc::microseconds( deadline - fc::time_point::now() );
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, transaction_metadata::trx_type::input );
-      auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
+      const bool explicit_billed_cpu_time = billed_cpu_time_us > 0;
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx.get_transaction().total_actions(), billed_cpu_time_us/trx.get_transaction().total_actions());
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except ) throw *r->except;
       return r;
@@ -810,7 +814,13 @@ namespace sysio::testing {
       if (c == packed_transaction::compression_type::zlib)
          ptrx->decompress();
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
-      auto r = control->push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_time_us, billed_cpu_time_us > 0, 0 );
+      bool explicit_billed_cpu_time = billed_cpu_time_us > 0 && trx_type != transaction_metadata::trx_type::read_only;
+      if (trx_type == transaction_metadata::trx_type::implicit)
+         explicit_billed_cpu_time = true;
+      cpu_usage_t billed_cpu_us;
+      if (explicit_billed_cpu_time)
+         billed_cpu_us.insert(billed_cpu_us.end(), trx.total_actions(), billed_cpu_time_us/trx.total_actions());
+      auto r = control->test_push_transaction( fut.get(), deadline, fc::microseconds::maximum(), billed_cpu_us, explicit_billed_cpu_time );
       if (no_throw) return r;
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except)  throw *r->except;
@@ -823,8 +833,9 @@ namespace sysio::testing {
       signed_transaction trx;
       if (authorizer) {
          act.authorization = vector<permission_level>{
-            {account_name(authorizer), config::active_name},
-            {account_name(authorizer), config::sysio_payer_name}};
+               {account_name(authorizer), config::sysio_payer_name},
+               {account_name(authorizer), config::active_name}
+      };
       }
       trx.actions.emplace_back(std::move(act));
       set_transaction_headers(trx);
@@ -917,8 +928,9 @@ namespace sysio::testing {
 
    action base_tester::get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                    const variant_object& data )const { try {
-      const auto& acnt = control->get_account(code);
-      auto abi = acnt.get_abi();
+      const auto* acnt = control->find_account_metadata(code);
+      FC_ASSERT(acnt != nullptr, "account metadata not found");
+      auto abi = acnt->get_abi();
       chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
       string action_type_name = abis.get_action_type(acttype);
@@ -1175,9 +1187,8 @@ namespace sysio::testing {
    }
 
    bool base_tester::is_code_cached( sysio::chain::account_name name ) const {
-      const auto& db  = control->db();
-      const account_metadata_object* receiver_account = &db.template get<account_metadata_object,by_name>( name );
-      if ( receiver_account->code_hash == digest_type() ) return false;
+      const account_metadata_object* receiver_account = control->find_account_metadata( name );
+      if ( receiver_account == nullptr || receiver_account->code_hash == digest_type() ) return false;
       return control->get_wasm_interface().is_code_cached( receiver_account->code_hash, receiver_account->vm_type, receiver_account->vm_version );
    }
 
@@ -1411,7 +1422,7 @@ namespace sysio::testing {
                ("pop", pop.to_string()));
       }
 
-      control->set_node_finalizer_keys(local_finalizer_keys);
+      control->test_set_node_finalizer_keys(local_finalizer_keys);
 
       fc::mutable_variant_object fin_policy_variant;
       fin_policy_variant("threshold", input.threshold);
@@ -1429,7 +1440,7 @@ namespace sysio::testing {
          auto [privkey, pubkey, pop] = get_bls_key(name);
          local_finalizer_keys[pubkey.to_string()] = privkey.to_string();
       }
-      control->set_node_finalizer_keys(local_finalizer_keys);
+      control->test_set_node_finalizer_keys(local_finalizer_keys);
    }
 
    base_tester::set_finalizers_output_t base_tester::set_active_finalizers(std::span<const account_name> names) {
@@ -1464,12 +1475,7 @@ namespace sysio::testing {
    }
 
    void base_tester::preactivate_savanna_protocol_features() {
-      const auto& pfm = control->get_protocol_feature_manager();
-
-      // dependencies of builtin_protocol_feature_t::savanna
       vector<digest_type> feature_digests;
-      // savanna
-      feature_digests.push_back(*pfm.get_builtin_digest(builtin_protocol_feature_t::savanna));
 
       preactivate_protocol_features( feature_digests );
    }

@@ -49,6 +49,7 @@ try:
     specificExtraNodeopArgs[total_nodes-2]="--vote-threads 0 "
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes,
                       topo="./tests/separate_prod_fin_test_shape.json", delay=delay,
+                      biosFinalizer=False,
                       activateIF=True, signatureProviderForNonProducer=True) is False:
         errorExit("Failed to stand up sys cluster.")
 

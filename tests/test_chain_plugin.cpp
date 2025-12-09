@@ -74,9 +74,10 @@ public:
        set_privileged("sysio.token"_n);
 
        {
-           const auto& accnt = control->db().get<account_object,by_name>( "sysio.token"_n );
+           const auto& accnt = control->find_account_metadata( "sysio.token"_n );
+           FC_ASSERT(accnt != nullptr, "sysio.token account metadata not found");
            abi_def abi;
-           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
            token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
        }
 
@@ -93,9 +94,10 @@ public:
                                         ("core", symbol(CORE_SYMBOL).to_string()));
 
        {
-           const auto& accnt = control->db().get<account_object,by_name>( config::system_account_name );
+           const auto& accnt = control->find_account_metadata( config::system_account_name );
+           FC_ASSERT(accnt != nullptr, "sysio account metadata not found");
            abi_def abi;
-           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt.abi, abi), true);
+           BOOST_CHECK_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
            abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
        }
 
@@ -132,7 +134,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     BOOST_CHECK(results.total_resources.get_type() != fc::variant::type_id::null_type);
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["net_weight"].as<asset>());
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
-    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 4162808); // 40000*104+newaccount_ram(2808)
+    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 4161768); // 40000*104+newaccount_ram(1768)
 
 } FC_LOG_AND_RETHROW() }
 

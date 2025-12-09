@@ -61,6 +61,7 @@ try:
     Print("Stand up cluster")
     # For now do not load system contract as it does not support setfinalizer
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, delay=delay, loadSystemContract=False,
+                      biosFinalizer=False,
                       activateIF=True, topo="./tests/production_restart_test_shape.json") is False:
         errorExit("Failed to stand up sys cluster.")
 

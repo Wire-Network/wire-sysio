@@ -16,7 +16,6 @@ enum class protocol_feature_t : uint32_t {
 enum class builtin_protocol_feature_t : uint32_t {
    reserved_first_protocol_feature = 0,  // keep an example protocol feature mainly for tests
    reserved_second_protocol_feature = 1, // used for tests, no functionality
-   savanna = 24,
    // 2-24+ reserved, used by Spring, new wire protocol features should start at 500001
    reserved_private_fork_protocol_features = 500000,
 };

@@ -7,7 +7,6 @@
 #include <sysio/chain/abi_def.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/block.hpp>
-#include <sysio/chain/block_state_legacy.hpp>
 #include <sysio/chain/name.hpp>
 #include <sysio/chain/types.hpp>
 
@@ -20,15 +19,15 @@ namespace sysio::trace_api {
     */
 
    namespace test_common {
-      inline fc::sha256 operator"" _h(const char* input, std::size_t) {
+      inline fc::sha256 operator""_h(const char* input, std::size_t) {
          return fc::sha256(input);
       }
 
-      inline chain::name operator"" _n(const char* input, std::size_t) {
+      inline chain::name operator""_n(const char* input, std::size_t) {
          return chain::name(input);
       }
 
-      inline chain::asset operator"" _t(const char* input, std::size_t) {
+      inline chain::asset operator""_t(const char* input, std::size_t) {
          return chain::asset::from_string(input);
       }
 

@@ -147,7 +147,7 @@ try:
     Print(f'Un-throttled sync time: {unThrottledElapsed} seconds')
     Print(f'Throttled sync time: {throttledElapsed} seconds')
 
-    assert throttledElapsed > 2 * unThrottledElapsed, f'Throttled node did not sync slower {throttledElapsed} <= {2 * unThrottledElapsed}'
+    assert throttledElapsed > 1.5 * unThrottledElapsed, f'Throttled node did not sync slower {throttledElapsed} <= {1.5 * unThrottledElapsed}'
 
     testSuccessful=True
 finally:

@@ -280,9 +280,6 @@ def stepSetSystemContract():
     # activate remaining features
     # RESERVED_FIRST_PROTOCOL_FEATURE
     retry(args.clio + 'push action sysio activate \'["30df9517cb8808f198723c030f597bb64645d52315f2e8f1ea77424ea33d896a"]\' -p sysio@active')
-    # SAVANNA
-    # Depends on all previous protocol features
-    retry(args.cleos + 'push action sysio activate \'["cbe0fafc8fcc6cc998395e9b6de6ebd94644467b1b4a97ec126005df07013c52"]\' -p sysio@active')
     sleep(1)
 
     # install sysio.system latest version

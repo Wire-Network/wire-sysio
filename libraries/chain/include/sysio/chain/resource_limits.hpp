@@ -5,6 +5,7 @@
 #include <sysio/chain/trace.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/block_timestamp.hpp>
+#include <sysio/chain/transaction_context.hpp>
 #include <chainbase/chainbase.hpp>
 #include <set>
 
@@ -78,8 +79,8 @@ namespace sysio { namespace chain {
          void initialize_account( const account_name& account, bool is_trx_transient );
          void set_block_parameters( const elastic_limit_parameters& cpu_limit_parameters, const elastic_limit_parameters& net_limit_parameters );
 
-         void update_account_usage( const flat_set<account_name>& accounts, uint32_t ordinal );
-         void add_transaction_usage( const flat_set<account_name>& accounts, uint64_t cpu_usage, uint64_t net_usage, uint32_t ordinal, bool is_trx_transient = false );
+         void update_account_usage( const accounts_billing_t& accounts, uint32_t ordinal );
+         void add_transaction_usage( const accounts_billing_t& accounts, uint64_t total_cpu_usage, uint64_t total_net_usage, uint32_t ordinal, bool is_trx_transient = false );
 
          void add_pending_ram_usage( const account_name account, int64_t ram_delta, bool is_trx_transient = false );
          void verify_account_ram_usage( const account_name accunt )const;

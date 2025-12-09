@@ -181,7 +181,7 @@ namespace sysio::chain {
       void    set_default_safety_information(const fsi_t& fsi);
 
       /// only call on startup
-      void    set_keys(const std::map<std::string, std::string>& finalizer_keys);
+      void    set_keys(const std::map<std::string, std::string>& finalizer_keys, bool enforce_startup_constraints = true);
 
       // following two member functions could be private, but are used in testing, not thread safe
       bool    save_finalizer_safety_info() const;

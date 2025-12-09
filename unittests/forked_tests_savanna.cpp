@@ -15,12 +15,8 @@ namespace sysio::chain {
 
    struct block_handle_accessor {
       static std::optional<core_info_t> core_info(const block_handle& h)  {
-         return std::visit(
-            overloaded{[](const block_state_legacy_ptr&) -> std::optional<core_info_t> { return {}; },
-                       [](const block_state_ptr& bsp) -> std::optional<core_info_t> {
-                          return core_info_t{bsp->last_final_block_num(), bsp->latest_qc_block_num(), bsp->timestamp()};
-                       }},
-            h.internal());
+         const auto& bsp = h.internal();
+         return core_info_t{bsp->last_final_block_num(), bsp->latest_qc_block_num(), bsp->timestamp()};
       }
    };
 
@@ -356,7 +352,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_1, savanna_cluster::cluster_t
    auto hbn1 = _nodes[0].head().block_num();
    auto lib1 = _nodes[0].last_irreversible_block_num();
 
-   legacy_tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
+   tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
 
    _nodes[0].push_blocks_to(irreversible, hbn1);
    BOOST_CHECK_EQUAL( irreversible.fork_db_head().block_num(), hbn1 );
@@ -441,7 +437,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_2, savanna_cluster::cluster_t
 
    BOOST_CHECK_GT(lib0, lib3);
 
-   legacy_tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
+   tester irreversible(setup_policy::none, db_read_mode::IRREVERSIBLE);
 
    // push the branch where `lib` has not advanced past lib1
    // ------------------------------------------------------
@@ -642,7 +638,7 @@ BOOST_FIXTURE_TEST_CASE( push_block_returns_forked_transactions_savanna, savanna
       trx.set_reference_block( b->calculate_id() ); // tapos to dan's block should be rejected on fork switch
       trx.sign( get_private_key( config::system_account_name, "active" ), _nodes[0].get_chain_id()  );
       trace4 = _nodes[0].push_transaction( trx );
-      BOOST_CHECK( trace4->receipt->status == transaction_receipt_header::executed );
+      BOOST_CHECK( !!trace4->receipt );
    }
    _nodes[0].produce_block();
    _nodes[0].produce_blocks(9);
@@ -702,11 +698,11 @@ BOOST_FIXTURE_TEST_CASE( push_block_returns_forked_transactions_savanna, savanna
 
    BOOST_REQUIRE_EQUAL( 4u, traces.size() );
    BOOST_CHECK_EQUAL( trace1->id, traces.at(0)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(0)->receipt->status );
+   BOOST_CHECK( !!traces.at(0)->receipt );
    BOOST_CHECK_EQUAL( trace2->id, traces.at(1)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(1)->receipt->status );
+   BOOST_CHECK( !!traces.at(1)->receipt );
    BOOST_CHECK_EQUAL( trace3->id, traces.at(2)->id );
-   BOOST_CHECK_EQUAL( transaction_receipt_header::executed, traces.at(2)->receipt->status );
+   BOOST_CHECK( !!traces.at(2)->receipt );
    // test4 failed because it was tapos to a forked out block
    BOOST_CHECK_EQUAL( trace4->id, traces.at(3)->id );
    BOOST_CHECK( !traces.at(3)->receipt );

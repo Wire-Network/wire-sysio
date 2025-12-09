@@ -61,7 +61,7 @@ struct read_only_trx_tester : validating_tester {
 
    void insert_a_record() {
       auto res = send_db_api_transaction("insert"_n, insert_data);
-      BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+      BOOST_CHECK(!!res->receipt);
       produce_block();
    }
 
@@ -181,7 +181,7 @@ BOOST_FIXTURE_TEST_CASE(db_read_only_mode_test, read_only_trx_tester) { try {
 
    // verify a read-only transaction in read-only mode
    auto res = send_db_api_transaction("getage"_n, getage_data, {}, transaction_metadata::trx_type::read_only);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 10);
    control->unset_db_read_only_mode();
 
@@ -200,7 +200,7 @@ BOOST_FIXTURE_TEST_CASE(db_insert_test, read_only_trx_tester) { try {
    
    // do a read-only transaction and verify the return value (age) is the same as inserted
    auto res = send_db_api_transaction("getage"_n, getage_data, {}, transaction_metadata::trx_type::read_only);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 10);
    BOOST_CHECK_GT(res->net_usage, 0u);
    BOOST_CHECK_GT(res->elapsed.count(), 0u);
@@ -234,12 +234,12 @@ BOOST_FIXTURE_TEST_CASE(db_modify_test, read_only_trx_tester) { try {
 
    // verify DB update still works in by non-read-only transaction
    auto res = send_db_api_transaction("modify"_n, modify_data);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    produce_block();
 
    // verify the value was successfully updated
    res = send_db_api_transaction("getage"_n, getage_data, {}, transaction_metadata::trx_type::read_only);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 25);
 
    // verify DB update by secondary key is not allowed by read-only transaction
@@ -251,12 +251,12 @@ BOOST_FIXTURE_TEST_CASE(db_modify_test, read_only_trx_tester) { try {
 
    // verify DB update by secondary key still works in by non-read-only transaction
    res = send_db_api_transaction("modifybyid"_n, modifybyid_data);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    produce_block();
 
    // verify the value was successfully updated
    res = send_db_api_transaction("getage"_n, getage_data, {}, transaction_metadata::trx_type::read_only);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 50);
 } FC_LOG_AND_RETHROW() }
 
@@ -281,15 +281,17 @@ BOOST_FIXTURE_TEST_CASE(db_erase_test, read_only_trx_tester) { try {
 
    // verify DB erase still works in by non-read-only transaction
    auto res = send_db_api_transaction("erase"_n, erase_data);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, read_only_trx_tester) { try {
    set_up_test_contract();
 
    const auto& p = control->get_dynamic_global_properties();
-   auto receiver_account = control->db().find<account_metadata_object,by_name>("noauthtable"_n);
-   auto amo = control->db().find<account_metadata_object,by_name>("alice"_n);
+   const auto* receiver_account = control->find_account("noauthtable"_n);
+   BOOST_REQUIRE(receiver_account != nullptr);
+   const auto* amo = control->find_account("alice"_n);
+   BOOST_REQUIRE(amo != nullptr);
 
    // verify sequence numbers in state increment for non-read-only transactions
    auto prev_global_action_sequence = p.global_action_sequence;
@@ -297,7 +299,7 @@ BOOST_FIXTURE_TEST_CASE(sequence_numbers_test, read_only_trx_tester) { try {
    auto prev_auth_sequence = amo->auth_sequence; 
 
    auto res = send_db_api_transaction("insert"_n, insert_data);
-   BOOST_CHECK_EQUAL(res->receipt->status, transaction_receipt::executed);
+   BOOST_CHECK(!!res->receipt);
 
    BOOST_CHECK_EQUAL( prev_global_action_sequence + 1, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence + 1, receiver_account->recv_sequence );
