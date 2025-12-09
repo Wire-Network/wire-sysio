@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
+# Silence warning about CMP0144 and ensure find_package() honors UPPERCASE <PKG>_ROOT vars
+# This is safe on older CMake versions due to the POLICY check.
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "Vcpkg toolchain file")
