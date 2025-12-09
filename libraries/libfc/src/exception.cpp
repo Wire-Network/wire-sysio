@@ -87,7 +87,11 @@ namespace fc
    exception::exception( exception&& c ) noexcept = default;
 
    const char*  exception::name()const throw() { return my->_name.c_str(); }
-   const char*  exception::what()const noexcept { return my->_what.c_str(); }
+   const char*  exception::what()const noexcept {
+      static thread_local std::string last_exception;
+      last_exception = to_detail_string();
+      return last_exception.c_str();
+   }
    int64_t      exception::code()const throw() { return my->_code;         }
 
    exception::~exception(){}
@@ -96,7 +100,7 @@ namespace fc
    {
       v = mutable_variant_object( "code", e.code() )
                                 ( "name", e.name() )
-                                ( "message", e.what() )
+                                ( "message", e.my->_what )
                                 ( "stack", e.get_log() );
 
    }
@@ -145,7 +149,7 @@ namespace fc
             } catch( std::bad_alloc& ) {
                throw;
             } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_detail_string: " << e.what() << "\n";
+               ss << "<- timeout exception in to_detail_string: " << e.my->_what << "\n";
                break;
             } catch( ... ) {
                ss << "<- exception in to_detail_string.\n";
@@ -183,7 +187,7 @@ namespace fc
             } catch( std::bad_alloc& ) {
                throw;
             } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_string: " << e.what();
+               ss << "<- timeout exception in to_string: " << e.my->_what;
                break;
             } catch( ... ) {
                ss << "<- exception in to_string.\n";

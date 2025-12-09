@@ -102,6 +102,8 @@ class PluginHttpTest(unittest.TestCase):
         if not self.nodeop or not Utils.waitForBool(self.nodeop.checkPulse, timeout=15):
             Utils.Print("ERROR: node doesn't appear to be running...")
             self.assertTrue(False, msg="nodeop failed to start.")
+        # wait for 2 block otherwise if the first block is received for TAPOS it will cause expired trx since it will be old
+        self.nodeop.waitForBlock(2)
 
     def activateAllBuiltinProtocolFeatures(self):
         contract = "sysio.bios"
