@@ -814,7 +814,7 @@ namespace sysio::testing {
       if (c == packed_transaction::compression_type::zlib)
          ptrx->decompress();
       auto fut = transaction_metadata::start_recover_keys( ptrx, control->get_thread_pool(), control->get_chain_id(), time_limit, trx_type );
-      bool explicit_billed_cpu_time = billed_cpu_time_us > 0 && trx_type == transaction_metadata::trx_type::input;
+      bool explicit_billed_cpu_time = billed_cpu_time_us > 0 && trx_type != transaction_metadata::trx_type::read_only;
       if (trx_type == transaction_metadata::trx_type::implicit)
          explicit_billed_cpu_time = true;
       cpu_usage_t billed_cpu_us;

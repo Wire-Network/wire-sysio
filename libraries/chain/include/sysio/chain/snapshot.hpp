@@ -121,6 +121,8 @@ namespace sysio { namespace chain {
 
    class snapshot_writer {
       public:
+         static constexpr uint32_t magic_number = 0x57495245; // WIRE in ASCII
+
          class section_writer {
             public:
                template<typename T>
@@ -351,8 +353,6 @@ namespace sysio { namespace chain {
          void write_end_section( ) override;
          void finalize();
 
-         static const uint32_t magic_number = 0x57495245; // WIRE in ASCII
-
       private:
          detail::ostream_wrapper snapshot;
          std::streampos          header_pos;
@@ -369,8 +369,6 @@ namespace sysio { namespace chain {
          void write_row( const detail::abstract_snapshot_row_writer& row_writer ) override;
          void write_end_section() override;
          void finalize();
-
-         static const uint32_t magic_number = 0x57495245; // WIRE in ASCII
 
       private:
          detail::ostream_wrapper snapshot;

@@ -265,7 +265,7 @@ add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v ${UNSHARE})
 
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE})
-# TODO: needs system contract support
+# TODO: needs system contract support, WIRE-221
 # add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v ${UNSHARE})
 
 add_np_test(NAME gelf_test COMMAND tests/gelf_test.py ${UNSHARE})

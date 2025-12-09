@@ -76,7 +76,8 @@ try:
     Print("Verify Node_03 fork switches even though it is producing")
     node3.waitForProducer("defproduceri", exitOnError=True)
     Print("Verify fork switch")
-    assert node3.findInLog("switching forks .* defproducerk"), "Expected to find 'switching forks' in node_03 log"
+    switchForkLineNum = node3.findInLog("switching forks .* defproducerk")
+    assert switchForkLineNum, "Expected to find 'switching forks' in node_03 log"
 
     Print("Wait until Node_00 to produce")
     node3.waitForProducer("defproducera")
@@ -91,7 +92,7 @@ try:
     # It can take a while to resolve the fork, but should have at least one defproducerk block unless defproducerl
     # wins the fork in which case there will be another fork switch
     expectedProd = "defproducerk"
-    if node3.findInLog("switching forks .* defproducerl"):
+    if node3.findInLog("switching forks .* defproducerl", switchForkLineNum):
         expectedProd = "defproducera"
     iProdBlockNum += 12 # into the next set of blocks
     found_defproducer = False

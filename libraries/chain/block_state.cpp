@@ -141,6 +141,7 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
    result.header.schedule_version = block_header::proper_svnn_schedule_version;
    result.block_id = result.header.calculate_id();
 
+   ilog("Using initial finalizer key: ${k}", ("k", g.initial_finalizer_key.to_string()));
    result.active_finalizer_policy = std::make_shared<finalizer_policy>( 1u, 1u, std::vector<finalizer_authority>{{"sysio", 1u, g.initial_finalizer_key}} );
    result.core = finality_core::create_core_for_genesis_block(result.block_id, result.timestamp());
    result.last_pending_finalizer_policy_digest = fc::sha256::hash(*result.active_finalizer_policy);

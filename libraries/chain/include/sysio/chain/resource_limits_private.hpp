@@ -314,7 +314,26 @@ namespace sysio { namespace chain { namespace resource_limits {
       >
    >;
 
-} } } /// sysio::chain::resource_limits
+}  // resource_limits
+
+namespace config {
+   template<>
+   struct billable_size<resource_limits::resource_object> {
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(resource_limits::resource_object) == 96, "resource_limits::resource_object size changed");
+      static constexpr uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
+      static constexpr uint64_t value = 96 + overhead; ///< fixed field + overhead
+   };
+   template<>
+   struct billable_size<resource_limits::resource_pending_object> {
+      // protocol feature will be needed if this increases
+      static_assert(sizeof(resource_limits::resource_pending_object) == 40, "resource_limits::resource_pending_object size changed");
+      static constexpr uint64_t overhead = overhead_per_row_per_index_ram_bytes * 2; ///< 2x indices id, name
+      static constexpr uint64_t value = 40 + overhead; ///< fixed field + overhead
+   };
+}
+
+} } /// sysio::chain::resource_limits
 
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_object,               sysio::chain::resource_limits::resource_index)
 CHAINBASE_SET_INDEX_TYPE(sysio::chain::resource_limits::resource_pending_object,       sysio::chain::resource_limits::resource_pending_index)
