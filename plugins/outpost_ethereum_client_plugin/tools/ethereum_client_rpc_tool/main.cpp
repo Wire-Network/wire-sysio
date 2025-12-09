@@ -1,6 +1,57 @@
 #include <print>
+#include <sysio/chain/application.hpp>
 #include <sysio/outpost_client/ethereum/ethereum_client.hpp>
-#include <sysio/outpost_client/ethereum/utility.hpp>
+#include <fc/io/json.hpp>
+#include <fc/time.hpp>
+#include <fc/log/logger_config.hpp>
+#include <sysio/outpost_client_plugin.hpp>
+#include <sysio/outpost_ethereum_client_plugin.hpp>
+#include <sysio/version/version.hpp>
+
+using namespace appbase;
+using namespace sysio;
+
+void configure_logging(const std::filesystem::path& config_path) {
+   try {
+      try {
+         fc::configure_logging(config_path);
+      } catch (...) {
+         elog("Error reloading logging.json");
+         throw;
+      }
+   } catch (const fc::exception& e) {
+      //
+      elog("${e}", ("e", e.to_detail_string()));
+   } catch (const boost::exception& e) {
+      elog("${e}", ("e", boost::diagnostic_information(e)));
+   } catch (const std::exception& e) {
+      //
+      elog("${e}", ("e", e.what()));
+   } catch (...) {
+      // empty
+   }
+}
+
+void logging_conf_handler() {
+   auto config_path = app().get_logging_conf();
+   if (std::filesystem::exists(config_path)) {
+      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+   } else {
+      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+   }
+   configure_logging(config_path);
+   fc::log_config::initialize_appenders();
+}
+
+
+void initialize_logging() {
+   auto config_path = app().get_logging_conf();
+   // if (std::filesystem::exists(config_path))
+   //    fc::configure_logging(config_path); // intentionally allowing exceptions to escape
+   fc::log_config::initialize_appenders();
+
+   app().set_sighup_callback(logging_conf_handler);
+}
 
 /**
  * @brief Main function that demonstrates interaction with the Ethereum client.
@@ -16,85 +67,107 @@
  *
  * @return int Exit code of the program.
  */
-int main() {
+int main(int argc, char* argv[]) {
    using namespace sysio::outpost_client::ethereum;
-    // Load the configuration (node URL) from the config.json file.
-    /**
-     * @brief Load the Ethereum node URL from a configuration file.
-     *
-     * The loadConfig function tries to read the node URL from the provided configuration file.
-     * If the configuration is missing or there is an issue loading it, the program will log an error
-     * and exit.
-     */
-    std::string node_url = "https://ethereum.publicnode.com";
+   try {
+      appbase::scoped_app app;
 
-    if (auto node_url_opt = sysio::outpost_client::ethereum::load_config("config.json"); node_url_opt.has_value()) {
-       node_url = *node_url_opt;
-    }
+      app->set_version_string(sysio::version::version_client());
+      app->set_full_version_string(sysio::version::version_full());
+
+      application::register_plugin<signature_provider_manager_plugin>();
+      application::register_plugin<outpost_client_plugin>();
+      application::register_plugin<outpost_ethereum_client_plugin>();
+      if (!app->initialize<signature_provider_manager_plugin, outpost_client_plugin, outpost_ethereum_client_plugin>(
+         argc, argv, initialize_logging)) {
+         const auto& opts = app->get_options();
+         if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") ||
+             opts.contains("print-default-config")) {
+            return 0;
+         }
+         return 1;
+      }
+      // auto& http = app->get_plugin<http_plugin>();
+      // http.add_handler({"/v1/" + kiod::config::key_store_executable_name + "/stop",
+      //                   api_category::node,
+      //                   [&a=app](string, string, url_response_callback cb) {
+      //                      cb(200, fc::variant(fc::variant_object()));
+      //                      a->quit();
+      //                   }}, appbase::exec_queue::read_write);
+      // app->startup();
+      // app->exec();
+
+      std::string node_url = "https://ethereum.publicnode.com";
+
+      // if (auto node_url_opt = sysio::outpost_client::ethereum::load_config("config.json"); node_url_opt.has_value()) {
+      //    node_url = *node_url_opt;
+      // }
 
 
-           // Create NetworkAdapter and EthereumClient
-    /**
-     * @brief Create instances of NetworkAdapter and EthereumClient.
-     *
-     * NetworkAdapter is used to send HTTP requests to the Ethereum node, while EthereumClient
-     * is used to interact with the Ethereum node via the RPC methods.
-     */
-    network_adapter adapter;
-    ethereum_client client(node_url, adapter);
 
-           // Example 1: Get the current block number
-    /**
-     * @brief Get the current block number using the `eth_blockNumber` method.
-     *
-     * The `getBlockNumber` method sends a request to the Ethereum node to retrieve the current block
-     * number. The block number is returned as a string, which is printed to the console.
-     */
-    auto block_number = client.get_block_number();
-    if (block_number) {
-       std::println("Current Block Number: {}", *block_number);
-    }
+      auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
+      auto& eth_plug = app->get_plugin<sysio::outpost_ethereum_client_plugin>();
 
-           // Example 2: Get block information by block number
-    /**
-     * @brief Get block data by block number using the `eth_getBlockByNumber` method.
-     *
-     * The `getBlockByNumber` method sends a request to the Ethereum node to retrieve the block data
-     * corresponding to a given block number (in hexadecimal format). It fetches the block's transactions
-     * if `fullTransactionData` is true.
-     */
-    std::string block_number_str = "0x5d5f"; ///< Example block number in hexadecimal format.
-    auto        block_data       = client.get_block_by_number(block_number_str, true); // Fetch full transaction data
-    if (block_data) {
-       std::println("Block Data: {}", block_data->toStyledString());
-    }
+      auto  client_entry = eth_plug.get_clients()[0];
+      auto& client       = client_entry->client;
 
-           // Example 3: Estimate gas for a transaction
-    /**
-     * @brief Estimate the gas required for a transaction using the `eth_estimateGas` method.
-     *
-     * The `estimateGas` method estimates the gas required to send a transaction from one address to
-     * another, with a specified value (in hexadecimal format). It returns the estimated gas as a string.
-     */
-    std::string from = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "from" address.
-    std::string to = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "to" address.
-    std::string value = "0x9184e72a"; ///< Example value in hexadecimal.
-    auto        gas_estimate = client.estimate_gas(from, to, value);
-    if (gas_estimate) {
-       std::println("Estimated Gas: {}", *gas_estimate);
-    }
+      auto chain_id_str = client->get_chain_id();
+      auto chain_id     = fc::hex_to_number<std::uint64_t>(chain_id_str);
 
-           // Example 4: Get Ethereum network version
-    /**
-     * @brief Get the Ethereum network version using the `net_version` method.
-     *
-     * The `getNetworkVersion` method retrieves the version of the Ethereum network the node is connected to.
-     * It returns the network version as a string.
-     */
-    auto protocol_version = client.get_network_version();
-    if (protocol_version) {
-       std::println("Ethereum Protocol Version: {}", *protocol_version);
-    }
+      std::println("Current chain id: {}", chain_id);
 
-    return 0; ///< Return 0 if the program executed successfully.
+      // Example 1: Get the current block number
+      /**
+       * @brief Get the current block number using the `eth_blockNumber` method.
+       *
+       * The `getBlockNumber` method sends a request to the Ethereum node to retrieve the current block
+       * number. The block number is returned as a string, which is printed to the console.
+       */
+      auto block_number = client->get_block_number();
+      std::println("Current Block Number: {}", block_number);
+
+      // Example 2: Get block information by block number
+      /**
+       * @brief Get block data by block number using the `eth_getBlockByNumber` method.
+       *
+       * The `getBlockByNumber` method sends a request to the Ethereum node to retrieve the block data
+       * corresponding to a given block number (in hexadecimal format). It fetches the block's transactions
+       * if `fullTransactionData` is true.
+       */
+      // std::string block_number_str = "0x5d5f"; ///< Example block number in hexadecimal format.
+      // auto        block_data       = client->get_block_by_number(block_number_str, true); // Fetch full transaction data
+      // std::println("Block Data: {}", fc::json::to_string(block_data, fc::time_point::maximum()));
+
+      // Example 3: Estimate gas for a transaction
+      /**
+       * @brief Estimate the gas required for a transaction using the `eth_estimateGas` method.
+       *
+       * The `estimateGas` method estimates the gas required to send a transaction from one address to
+       * another, with a specified value (in hexadecimal format). It returns the estimated gas as a string.
+       */
+      // std::string from         = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "from" address.
+      // std::string to           = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "to" address.
+      // std::string value        = "0x9184e72a"; ///< Example value in hexadecimal.
+      // auto        gas_estimate = client->estimate_gas(from, to, value);
+      // std::println("Estimated Gas: {}", gas_estimate);
+
+      // Example 4: Get Ethereum network version
+      /**
+       * @brief Get the Ethereum network version using the `net_version` method.
+       *
+       * The `getNetworkVersion` method retrieves the version of the Ethereum network the node is connected to.
+       * It returns the network version as a string.
+       */
+      auto protocol_version = client->get_network_version();
+      std::println("Ethereum Protocol Version: {}", protocol_version);
+   } catch (const fc::exception& e) {
+      elog("${e}", ("e",e.to_detail_string()));
+   } catch (const boost::exception& e) {
+      elog("${e}", ("e",boost::diagnostic_information(e)));
+   } catch (const std::exception& e) {
+      elog("${e}", ("e",e.what()));
+   } catch (...) {
+      elog("unknown exception");
+   }
+   return 0; ///< Return 0 if the program executed successfully.
 }

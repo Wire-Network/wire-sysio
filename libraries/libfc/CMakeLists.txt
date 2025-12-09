@@ -53,11 +53,12 @@ set(fc_sources
   src/crypto/k1_recover.cpp
   src/network/url.cpp
   src/network/http/http_client.cpp
+  src/network/json_rpc/json_rpc_client.cpp
   src/compress/zlib.cpp
   src/log/gelf_appender.cpp
 )
 
-file(GLOB_RECURSE fc_headers ${CMAKE_CURRENT_SOURCE_DIR} *.hpp *.h)
+file(GLOB_RECURSE fc_headers src/*.hpp src/*.h include/*.hpp include/*.h)
 add_library(fc ${fc_sources} ${fc_headers})
 
 target_include_directories(fc PUBLIC include)
@@ -92,10 +93,11 @@ target_link_libraries(
   libsodium::libsodium
   GMP::gmp
   ZLIB::ZLIB
+  nlohmann_json::nlohmann_json
   rapidjson
+  boringssl::ssl
   boringssl::crypto
   boringssl::decrepit
-  #boringssl::ssl
   gsl-lite::gsl-lite
   secp256k1::secp256k1-internal
   bls12-381::bls12-381

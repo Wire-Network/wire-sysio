@@ -122,7 +122,7 @@ public:
                  "A signature provider with key_name \"${keyName}\" or public_key \"${pubKey}\" already exists",
                  ("keyName", provider->key_name)("pubKey", provider->public_key));
 
-      auto res = _signing_providers_by_pubkey.insert_or_assign(provider->public_key, provider);
+      _signing_providers_by_pubkey.insert_or_assign(provider->public_key, provider);
 
       _signing_providers_by_name.insert({provider->key_name, provider});
       return provider;
@@ -291,8 +291,8 @@ signature_provider_ptr signature_provider_manager_plugin::create_provider(
    }
    }
 
-   auto provider = std::make_shared<signature_provider>(
-      signature_provider{target_chain, key_type, key_name, pubkey,
+   auto provider = std::make_shared<signature_provider_t>(
+      signature_provider_t{target_chain, key_type, key_name, pubkey,
                          my->create_provider_from_spec(key_type, pubkey, private_key_provider_spec)});
 
    return my->set_provider(provider);

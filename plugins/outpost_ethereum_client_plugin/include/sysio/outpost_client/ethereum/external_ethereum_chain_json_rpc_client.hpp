@@ -29,7 +29,7 @@ public:
    using base::invoke_read;
    using base::invoke_write;
 
-   external_ethereum_chain_json_rpc_client(std::shared_ptr<sysio::signature_provider> signing_provider,
+   external_ethereum_chain_json_rpc_client(std::shared_ptr<sysio::signature_provider_t> signing_provider,
                             std::string                                endpoint)
       : base(std::move(signing_provider), std::move(endpoint)) {}
 

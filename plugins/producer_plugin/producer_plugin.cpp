@@ -1046,10 +1046,11 @@ void producer_plugin::set_program_options(
           "Maximum number of blocks beyond irreversible before pausing production. Set to 0 to disable. Default 3600 blocks.")
          ("producer-name,p", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "ID of producer controlled by this node (e.g. inita; may specify multiple times)")
-         ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()->default_value(
-               {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})},
-                default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})),
-               app().get_plugin<signature_provider_manager_plugin>().signature_provider_help_text())
+         // ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()
+         //    ->default_value(
+         //       {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})},
+         //        default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({})),
+         //       app().get_plugin<signature_provider_manager_plugin>().signature_provider_help_text())
          ("greylist-account", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "account that can not access to extended CPU/NET virtual resources")
          ("greylist-limit", boost::program_options::value<uint32_t>()->default_value(1000),

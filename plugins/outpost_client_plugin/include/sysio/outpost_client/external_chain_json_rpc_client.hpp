@@ -43,7 +43,7 @@ protected:
 public:
    constexpr static auto target_chain = TargetChain;
 
-   external_chain_json_rpc_client(std::shared_ptr<sysio::signature_provider> signing_provider, std::string endpoint)
+   external_chain_json_rpc_client(std::shared_ptr<sysio::signature_provider_t> signing_provider, std::string endpoint)
       : _signing_provider(std::move(signing_provider))
       , _endpoint(std::move(endpoint)) {
       FC_ASSERT(_signing_provider, "A signing provider is required for chain=${c}", ("c", TargetChain));

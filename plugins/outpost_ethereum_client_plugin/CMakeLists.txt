@@ -1,7 +1,7 @@
 set(TARGET_LIB_NAME outpost_ethereum_client_plugin)
 set(TARGET_TOOL_NAME outpost_ethereum_client_tool)
 
-file(GLOB_RECURSE TOOL_FILES tools/ethereum_client_rpc_tool/*.cpp)
+
 
 plugin_target(
         ${TARGET_LIB_NAME}
@@ -9,33 +9,28 @@ plugin_target(
         chain_plugin
         fc
         fc-lite
-        JsonCpp::JsonCpp
-        CURL::libcurl
-        boringssl::ssl
-        boringssl::crypto
+#        JsonCpp::JsonCpp
+#        CURL::libcurl
+#        boringssl::ssl
+#        boringssl::crypto
         outpost_client_plugin
         signature_provider_manager_plugin
 )
 
 
 if (ENABLE_TESTS)
-    add_executable(${TARGET_TOOL_NAME} ${TOOL_FILES})
-    target_include_directories(
-            ${TARGET_TOOL_NAME}
-            PUBLIC
-            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-            $<INSTALL_INTERFACE:include>
-#           ${CMAKE_CURRENT_SOURCE_DIR}/include
-    )
-
+    file(GLOB_RECURSE TOOL_FILES tools/ethereum_client_rpc_tool/*.cpp)
+    chain_target(${TARGET_TOOL_NAME} SOURCE_FILES ${TOOL_FILES})
     target_link_libraries(
             ${TARGET_TOOL_NAME}
             PUBLIC
             ${TARGET_LIB_NAME}
-            fc
-            JsonCpp::JsonCpp
-            CURL::libcurl
-            boringssl::ssl
-            boringssl::crypto
+            signature_provider_manager_plugin
+            outpost_client_plugin
+            outpost_ethereum_client_plugin
+#            boringssl::ssl
+#            boringssl::crypto
+#            boringssl::decrepit
+
     )
 endif ()

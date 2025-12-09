@@ -20,7 +20,7 @@ namespace sysio {
 
   void outpost_solana_client_plugin::plugin_startup() {
     ilog("Starting outpost client plugin");
-    auto chain = app().find_plugin<sysio::chain_plugin>();
+    // auto chain = app().find_plugin<sysio::chain_plugin>();
     // auto& controller = chain->chain();
     // events.irreversible_block.set_on_subscribe([&] (auto) {
     //   if (!_irreversible_block_connection) {

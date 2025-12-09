@@ -27,7 +27,7 @@ public:
 
    constexpr static auto target_chain = TargetChain;
 
-   explicit outpost_client(std::shared_ptr<sysio::signature_provider> signing_provider) : _signing_provider(signing_provider) {}
+   explicit outpost_client(std::shared_ptr<sysio::signature_provider_t> signing_provider) : _signing_provider(signing_provider) {}
 
    explicit outpost_client(const signature_provider_id_t& sig_provider_query) :
    _signing_provider(sysio::get_signature_provider(sig_provider_query)) {}

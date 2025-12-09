@@ -41,4 +41,14 @@ namespace fc
    * @return vector of split strings
    */
   std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split = 0);
+
+
+  /**
+   * Convert a string to lowercase using the specified locale
+   *
+   * @param s String to convert to lowercase
+   * @param loc Locale to use for case conversion, defaults to system locale
+   * @return A new string with all characters converted to lowercase
+   */
+  std::string to_lower(std::string s, const std::locale& loc = std::locale{});
 }
