@@ -38,7 +38,7 @@ namespace sysio::chain::config {
 
   static constexpr int      block_interval_ms = 500;
   static constexpr int      block_interval_us = block_interval_ms*1000;
-  static constexpr uint64_t block_timestamp_epoch = 946684800000ll; // epoch is year 2000.
+  static constexpr uint64_t block_timestamp_epoch = 1735689600000ull; // epoch is year 2025.
   static constexpr uint32_t genesis_num_supported_key_types = 5; // wire-sysio supports 5 at genesis
   static constexpr uint32_t k1_r1_num_supported_key_types = 2; // see interface::recover_key
 

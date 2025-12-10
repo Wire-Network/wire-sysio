@@ -493,7 +493,7 @@ namespace sysio::testing {
 
          static genesis_state default_genesis() {
             genesis_state genesis;
-            genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
+            genesis.initial_timestamp = fc::time_point::from_iso_string("2025-01-01T00:00:00.000");
             genesis.initial_key = get_public_key( config::system_account_name, "active" );
             std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore) = get_bls_key("finalizeraa"_n);
             return genesis;

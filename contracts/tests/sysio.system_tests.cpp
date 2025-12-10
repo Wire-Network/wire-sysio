@@ -211,7 +211,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
       std::copy( msg.begin(), msg.end(), it );
 
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)
@@ -340,7 +340,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
    transaction trx;
    {
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)
@@ -430,7 +430,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    transaction trx;
    {
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)
