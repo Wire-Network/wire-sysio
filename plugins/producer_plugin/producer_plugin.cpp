@@ -2917,6 +2917,7 @@ void producer_plugin::process_blocks() {
 }
 
 void producer_plugin::received_block(uint32_t block_num, chain::fork_db_add_t fork_db_add_result) {
+   fc_dlog(_log, "Received block ${num} from network", ("num", block_num));
    my->_received_block = block_num;
    // fork_db_add_t::fork_switch means head block of best fork (different from the current branch) is received.
    // Since a better fork is available, interrupt current block validation and allow a fork switch to the better branch.
@@ -3014,12 +3015,14 @@ void producer_plugin_impl::switch_to_read_window() {
       start_write_window();                          // restart write window timer for next round
       return;
    }
-   fc_dlog(_log, "Read only queue size ${s1}, read exclusive size ${s2}",
-           ("s1", app().executor().read_only_queue_size())("s2", app().executor().read_exclusive_queue_size()));
 
    uint32_t pending_block_num = chain.head().block_num() + 1;
    _ro_read_window_start_time = fc::time_point::now();
    _ro_window_deadline        = _ro_read_window_start_time + _ro_read_window_effective_time_us;
+
+   fc_dlog(_log, "Read only queue size ${s1}, read exclusive size ${s2}, deadline ${d}",
+           ("s1", app().executor().read_only_queue_size())("s2", app().executor().read_exclusive_queue_size())("d", _ro_window_deadline));
+
    app().executor().set_to_read_window([received_block = &_received_block, pending_block_num, ro_window_deadline = _ro_window_deadline]() {
          return fc::time_point::now() >= ro_window_deadline || (received_block->load() >= pending_block_num); // should_exit()
       });
@@ -3074,7 +3077,8 @@ bool producer_plugin_impl::read_only_execution_task(uint32_t pending_block_num) 
       }
    }
 
-   fc_dlog(_log, "Exiting read_only_execution_task ${t}", ("t", _ro_num_active_exec_tasks.load()));
+   fc_dlog(_log, "Exiting read_only_execution_task ${t}, deadline ${d}, received_block ${b}, pending_block ${pb}",
+           ("t", _ro_num_active_exec_tasks.load())("d", _ro_window_deadline)("b", _received_block.load())("pb", pending_block_num));
    // If all tasks are finished, do not wait until end of read window; switch to write window now.
    if (--_ro_num_active_exec_tasks == 0) {
       // Needs to be on read_only because that is what is being processed until switch_to_write_window().
