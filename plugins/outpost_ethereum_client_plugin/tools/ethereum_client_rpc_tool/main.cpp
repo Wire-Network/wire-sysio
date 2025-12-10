@@ -78,6 +78,7 @@ int main(int argc, char* argv[]) {
       application::register_plugin<signature_provider_manager_plugin>();
       application::register_plugin<outpost_client_plugin>();
       application::register_plugin<outpost_ethereum_client_plugin>();
+
       if (!app->initialize<signature_provider_manager_plugin, outpost_client_plugin, outpost_ethereum_client_plugin>(
          argc, argv, initialize_logging)) {
          const auto& opts = app->get_options();
@@ -87,23 +88,6 @@ int main(int argc, char* argv[]) {
          }
          return 1;
       }
-      // auto& http = app->get_plugin<http_plugin>();
-      // http.add_handler({"/v1/" + kiod::config::key_store_executable_name + "/stop",
-      //                   api_category::node,
-      //                   [&a=app](string, string, url_response_callback cb) {
-      //                      cb(200, fc::variant(fc::variant_object()));
-      //                      a->quit();
-      //                   }}, appbase::exec_queue::read_write);
-      // app->startup();
-      // app->exec();
-
-      std::string node_url = "https://ethereum.publicnode.com";
-
-      // if (auto node_url_opt = sysio::outpost_client::ethereum::load_config("config.json"); node_url_opt.has_value()) {
-      //    node_url = *node_url_opt;
-      // }
-
-
 
       auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app->get_plugin<sysio::outpost_ethereum_client_plugin>();
@@ -114,7 +98,7 @@ int main(int argc, char* argv[]) {
       auto chain_id_str = client->get_chain_id();
       auto chain_id     = fc::hex_to_number<std::uint64_t>(chain_id_str);
 
-      std::println("Current chain id: {}", chain_id);
+      ilogf("Current chain id: {}", chain_id);
 
       // Example 1: Get the current block number
       /**
@@ -124,7 +108,7 @@ int main(int argc, char* argv[]) {
        * number. The block number is returned as a string, which is printed to the console.
        */
       auto block_number = client->get_block_number();
-      std::println("Current Block Number: {}", block_number);
+      ilogf("Current Block Number: {}", block_number);
 
       // Example 2: Get block information by block number
       /**
@@ -159,7 +143,7 @@ int main(int argc, char* argv[]) {
        * It returns the network version as a string.
        */
       auto protocol_version = client->get_network_version();
-      std::println("Ethereum Protocol Version: {}", protocol_version);
+      ilogf("Ethereum Protocol Version: {}", protocol_version);
    } catch (const fc::exception& e) {
       elog("${e}", ("e",e.to_detail_string()));
    } catch (const boost::exception& e) {

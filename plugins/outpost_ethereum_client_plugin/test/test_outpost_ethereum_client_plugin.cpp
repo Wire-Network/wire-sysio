@@ -6,7 +6,6 @@
 #include <optional>
 #include <set>
 
-#include <sysio/outpost_client/ethereum/external_ethereum_chain_json_rpc_client.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 #include <sysio/outpost_client/ethereum/ethereum_client.hpp>
 

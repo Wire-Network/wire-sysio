@@ -102,11 +102,11 @@ std::vector<std::string> split(const std::string& str, char delim, std::size_t m
    return out;
 }
 
-std::string to_lower(std::string s, const std::locale& loc) {
+std::string to_lower(std::string s) {
    std::ranges::transform(
       s, s.begin(),
-      [&](unsigned char c) {
-         return std::tolower(c, loc);
+      [](unsigned char c) {
+         return std::tolower(c);
       }
       );
    return s;

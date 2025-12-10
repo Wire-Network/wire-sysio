@@ -11,8 +11,12 @@
 #include <fc/int256.hpp>
 
 namespace sysio::outpost_client::ethereum {
+
+constexpr std::uint8_t ethereum_eip1559_tx_type = 0x02;
+
 using bytes = std::vector<std::uint8_t>;
 using bytes32 = std::array<std::uint8_t, 32>;
+using bytes_span = std::span<std::uint8_t>;
 using address = std::array<std::uint8_t, 20>;
 
 struct access_list_entry {
@@ -30,6 +34,9 @@ struct eip1559_tx {
    fc::uint256 value;
    bytes data;
    std::vector<access_list_entry> access_list;
+   fc::uint256 v;
+   fc::uint256 r;
+   fc::uint256 s;
 };
 
 }

@@ -17,23 +17,46 @@ namespace sysio::outpost_client::ethereum::rlp {
 // Helpers
 // ---------------------------------------------------------
 
-using rlp_input_data = std::variant<bytes, bytes32, std::span<const std::uint8_t>>;
+// using rlp_input_data = std::variant<bytes, bytes32, bytes_span>;
+//
+// using rlp_input_data_items = std::vector<rlp_input_data>;
 
-void append(bytes& out, const rlp_input_data& in_var);
+// 1. Forward declare the recursive struct
+struct rlp_input_data;
 
-void append(bytes& out, std::uint8_t b);
+// 2. Define the container for the recursive case
+//    std::vector is guaranteed to support incomplete types since C++17
+using rlp_input_data_items = std::vector<rlp_input_data>;
 
-bytes encode_length(std::size_t len);
+// 3. Define the underlying variant type, including the recursive container
+using rlp_input_variant = std::variant<bytes, bytes32, bytes_span, address, rlp_input_data_items>;
+
+// 4. Define the struct inheriting from the variant
+struct rlp_input_data : rlp_input_variant {
+   // Inherit constructors (allows implicit construction from inner types)
+   using rlp_input_variant::rlp_input_variant;
+
+   // Inherit assignment operators
+   using rlp_input_variant::operator=;
+};
+
+void append(bytes& out, rlp_input_variant in_var);
+
+void append_byte(bytes& out, std::uint8_t b);
+
+bytes encode_length(std::size_t len,std::size_t offset);
 
 // ---------------------------------------------------------
 // Core RLP encoders
 // ---------------------------------------------------------
 
-bytes encode_bytes(std::span<const std::uint8_t> data);
+bytes encode_bytes(address& data);
+bytes encode_bytes(bytes32& b);
+bytes encode_bytes(std::span<std::uint8_t> data);
 
 bytes encode_bytes(const bytes& b);
 
-bytes encode_string(const std::string& s);
+bytes encode_string(std::string& s);
 
 // Ethereum-style uint (0 => empty byte string => 0x80)
 
@@ -82,34 +105,34 @@ bytes encode_uint(T value) {
    }
    FC_THROW_EXCEPTION(fc::exception, "Unsupported type for encode_uint");
 }
-
-bytes encode_list(const std::vector<rlp_input_data>& items);
+bytes encode_access_list(const std::vector<access_list_entry>& access_list);
+bytes encode_list(std::vector<rlp_input_variant> items);
 
 // ---------------------------------------------------------
 // Generic encode(T)
 // ---------------------------------------------------------
 
 template <typename T>
-bytes encode(const T& value);
+bytes encode(T& value);
 
 template <>
-inline bytes encode<bytes>(const bytes& value) {
+inline bytes encode<bytes>(bytes& value) {
    return encode_bytes(value);
 }
 
 template <>
-inline bytes encode<std::string>(const std::string& value) {
+inline bytes encode<std::string>(std::string& value) {
    return encode_string(value);
 }
 
 template <>
-inline bytes encode<std::uint64_t>(const std::uint64_t& value) {
+inline bytes encode<std::uint64_t>(std::uint64_t& value) {
    return encode_uint(value);
 }
 
 template <typename... Ts>
 bytes make_list(const Ts&... args) {
-   std::vector<rlp_input_data> items;
+   std::vector<rlp_input_variant> items;
    items.reserve(sizeof...(Ts));
    (items.push_back(encode(args)), ...);
    return encode_list(items);
@@ -119,9 +142,11 @@ bytes make_list(const Ts&... args) {
 // Hex helpers
 // ---------------------------------------------------------
 
-std::string to_hex_prefixed(const bytes& b);
+std::string to_hex(const bytes& b, bool prefixed = true);
 
-bytes from_hex_noprefix(const std::string& hex);
+std::string to_hex(std::size_t num, bool prefixed = false);
+
+bytes from_hex_no_prefix(const std::string& hex);
 
 bytes from_hex_any(const std::string& hex);
 
@@ -131,19 +156,18 @@ bytes from_hex_any(const std::string& hex);
 //  gasLimit, to, value, data, accessList]
 bytes encode_eip1559_unsigned(const eip1559_tx& tx);
 
+bytes encode_eip1559_unsigned_typed(const eip1559_tx&                 tx);
 // RLP of the *signed* tx body (EIP-1559):
 // [chainId, nonce, maxPriorityFeePerGas, maxFeePerGas,
 //  gasLimit, to, value, data, accessList, yParity, r, s]
-bytes encode_eip1559_signed(const eip1559_tx&                 tx,
-                            std::uint8_t                      y_parity,
-                            std::span<const std::uint8_t, 32> r,
-                            std::span<const std::uint8_t, 32> s);
+bytes encode_eip1559_signed(const eip1559_tx&                 tx);
+// ,
+//                             std::uint8_t                      y_parity,
+//                             std::span<const std::uint8_t, 32> r,
+//                             std::span<const std::uint8_t, 32> s);
 
 // Final typed-transaction wire encoding: 0x02 || rlp(signed_body)
-bytes encode_eip1559_signed_typed(const eip1559_tx&                 tx,
-                                  std::uint8_t                      y_parity,
-                                  std::span<const std::uint8_t, 32> r,
-                                  std::span<const std::uint8_t, 32> s);
+bytes encode_eip1559_signed_typed(const eip1559_tx&                 tx);
 
 // Build JSON body for eth_sendRawTransaction
 std::string build_eth_send_raw_transaction_json(const bytes&  signed_tx,

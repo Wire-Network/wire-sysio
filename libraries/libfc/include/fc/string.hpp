@@ -6,8 +6,8 @@
 
 namespace fc
 {
-  int64_t  to_int64( const std::string& );
-  uint64_t to_uint64( const std::string& );
+  std::int64_t  to_int64( const std::string& );
+  std::uint64_t to_uint64( const std::string& );
   double   to_double( const std::string& );
 
   class variant_object;
@@ -50,5 +50,5 @@ namespace fc
    * @param loc Locale to use for case conversion, defaults to system locale
    * @return A new string with all characters converted to lowercase
    */
-  std::string to_lower(std::string s, const std::locale& loc = std::locale{});
+  std::string to_lower(std::string s);
 }
