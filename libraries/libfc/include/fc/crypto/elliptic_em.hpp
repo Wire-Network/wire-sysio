@@ -26,7 +26,7 @@ namespace fc {
     constexpr uint8_t public_key_prefix_compressed = 0x02;
 
     using message_hash_type = std::array<uint8_t,32>;
-    using message_body_type = std::variant<std::string,fc::sha256>;
+    using message_body_type = std::variant<std::string,fc::sha256,std::vector<uint8_t>>;
 
     using public_key_data = fc::array<char,33>;
     using public_key_data_uncompressed = fc::array<char,65>;

@@ -67,7 +67,46 @@ em::message_hash_type hash_message(const em::message_body_type& payload) {
 
    em::message_hash_type     eth_message_digest{};
    std::vector<std::uint8_t> eth_message;
-   if (std::holds_alternative<std::string>(payload)) {
+   if (std::holds_alternative<std::vector<std::uint8_t>>(payload)) {
+      eth_message = std::get<std::vector<std::uint8_t>>(payload);
+   } else if (std::holds_alternative<std::string>(payload)) {
+      auto payload_str = std::get<std::string>(payload);
+
+      eth_message.resize(payload_str.size());
+      std::copy(payload_str.begin(), payload_str.end(), eth_message.begin());
+   } else {
+      auto payload_hash     = std::get<fc::sha256>(payload);
+      auto eth_message_size = payload_hash.data_size();
+      eth_message.resize(eth_message_size);
+
+      std::copy_n(payload_hash.data(),
+                  payload_hash.data_size(),
+                  eth_message.begin());
+
+   }
+
+   SHA3_CTX msg_ctx;
+   keccak_init(&msg_ctx);
+   keccak_update(
+      &msg_ctx,
+      eth_message.data(),
+      static_cast<uint16_t>(eth_message.size()));
+
+
+   keccak_final(&msg_ctx, eth_message_digest.data());
+
+   return eth_message_digest;
+}
+
+em::message_hash_type hash_user_message(const em::message_body_type& payload) {
+
+   em::message_hash_type     eth_message_digest{};
+   std::vector<std::uint8_t> eth_message;
+   if (std::holds_alternative<std::vector<std::uint8_t>>(payload)) {
+      auto payload_bytes = std::get<std::vector<std::uint8_t>>(payload);
+      auto payload_str   = std::string{reinterpret_cast<const char*>(payload_bytes.data()), payload_bytes.size()};
+      return hash_user_message(payload_str);
+   } else if (std::holds_alternative<std::string>(payload)) {
       auto payload_str        = std::get<std::string>(payload);
       auto payload_length_str = std::to_string(payload_str.size());
 

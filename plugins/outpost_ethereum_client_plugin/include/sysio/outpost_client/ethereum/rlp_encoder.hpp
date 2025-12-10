@@ -52,6 +52,7 @@ bytes encode_length(std::size_t len,std::size_t offset);
 
 bytes encode_bytes(address& data);
 bytes encode_bytes(bytes32& b);
+bytes encode_bytes(const bytes32& b);
 bytes encode_bytes(std::span<std::uint8_t> data);
 
 bytes encode_bytes(const bytes& b);
@@ -143,6 +144,7 @@ bytes make_list(const Ts&... args) {
 // ---------------------------------------------------------
 
 std::string to_hex(const bytes& b, bool prefixed = true);
+std::string to_hex(const bytes32& b, bool prefixed = true);
 
 std::string to_hex(std::size_t num, bool prefixed = false);
 

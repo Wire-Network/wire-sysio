@@ -65,6 +65,8 @@ std::vector<uint8_t> hex_to_bytes(const std::string& hex);
  */
 em::message_hash_type hash_message(const em::message_body_type& payload);
 
+em::message_hash_type hash_user_message(const em::message_body_type& payload);
+
 /**
  * Parses a hexadecimal public key string into a public key object
  * @param pubkey_hex The public key in hexadecimal format

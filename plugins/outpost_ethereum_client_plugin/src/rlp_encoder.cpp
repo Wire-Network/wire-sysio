@@ -82,6 +82,11 @@ bytes rlp::encode_bytes(bytes32& b) {
    return encode_bytes(std::span<std::uint8_t>(b.data(), b.size()));
 }
 
+bytes rlp::encode_bytes(const bytes32& b) {
+   bytes32 tmp = b;
+   return encode_bytes(tmp);
+}
+
 
 bytes rlp::encode_bytes(address& data) {
    return encode_bytes(std::span<std::uint8_t>(data.data(), data.size()));
@@ -112,6 +117,17 @@ bytes rlp::encode_list(std::vector<rlp_input_variant> items) {
    append(out, payload);
 
    return out;
+}
+
+std::string rlp::to_hex(const bytes32& b, bool prefixed) {
+   std::ostringstream oss;
+   if (prefixed)
+      oss << "0x";
+   for (auto v : b) {
+      oss << std::hex << std::setw(2) << std::setfill('0')
+         << static_cast<int>(v);
+   }
+   return oss.str();
 }
 
 std::string rlp::to_hex(const bytes& b, bool prefixed) {
@@ -221,8 +237,8 @@ bytes rlp::encode_eip1559_signed(const eip1559_tx& tx) {
    bytes data_bytes = tx.data;
 
    auto v = encode_uint(tx.v);
-   auto r = encode_uint(tx.r);
-   auto s = encode_uint(tx.s);
+   auto r = encode_bytes(tx.r);
+   auto s = encode_bytes(tx.s);
 
    return encode_list({
       encode_uint(tx.chain_id),

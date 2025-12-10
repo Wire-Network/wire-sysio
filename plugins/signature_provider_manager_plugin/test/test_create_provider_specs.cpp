@@ -70,12 +70,7 @@ std::unique_ptr<sig_provider_tester> create_app(const std::vector<std::string>& 
 template <typename... Args>
    requires((std::same_as<std::decay_t<Args>, std::string>) && ...)
 std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
-   // auto tester = std::make_unique<sig_provider_tester>();
-
-   // Convert variadic arguments into a vector<string> and delegate to the overload
    std::vector<std::string> args_vec = {std::forward<Args>(extra_args)...};
-   // Use the new overload to perform initialization
-
    return create_app(args_vec);
 }
 

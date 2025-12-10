@@ -35,8 +35,8 @@ struct eip1559_tx {
    bytes data;
    std::vector<access_list_entry> access_list;
    fc::uint256 v;
-   fc::uint256 r;
-   fc::uint256 s;
+   bytes32 r;
+   bytes32 s;
 };
 
 }
