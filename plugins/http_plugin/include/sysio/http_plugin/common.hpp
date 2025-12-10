@@ -159,9 +159,13 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
       auto payload_size = detail::in_flight_sizeof(response);
       plugin_state.bytes_in_flight += payload_size;
 
+      static thread_local uint32_t unique = 0;
+      ++unique;
+      dlog("before dispatch ${r}", ("r", unique));
       // post back to an HTTP thread to allow the response handler to be called from any thread
-      boost::asio::post(plugin_state.thread_pool.get_executor(),
-                        [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size, response = std::move(response), content_type]() {
+      boost::asio::dispatch(plugin_state.thread_pool.get_executor(),
+                        [&plugin_state, session_ptr{std::move(session_ptr)}, code, payload_size, response = std::move(response), content_type, unique=unique]() {
+                           dlog("in dispatch ${r}", ("r", unique));
                            auto on_exit = fc::make_scoped_exit([&](){plugin_state.bytes_in_flight -= payload_size;});
 
                            if(auto error_str = session_ptr->verify_max_bytes_in_flight(0); !error_str.empty()) {
@@ -183,6 +187,7 @@ inline auto make_http_response_handler(http_plugin_state& plugin_state, detail::
                               session_ptr->handle_exception();
                            }
                         });
+      dlog("after dispatch ${r}", ("r", unique));
    };// end lambda
 
 }
