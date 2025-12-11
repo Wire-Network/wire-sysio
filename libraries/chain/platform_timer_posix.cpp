@@ -18,6 +18,8 @@ namespace sysio::chain {
 
 static_assert(std::atomic_bool::is_always_lock_free, "Only lock-free atomics AS-safe.");
 
+   static std::atomic<bool> initialized = false;
+
 struct platform_timer::impl {
    constexpr static unsigned num_timers = 8;
    static_assert(std::has_single_bit(num_timers), "num_timers must be a power of two");
@@ -65,6 +67,7 @@ platform_timer::platform_timer() {
    }
 
    compute_and_print_timer_accuracy(*this);
+   initialized = true;
 }
 
 platform_timer::~platform_timer() {
@@ -78,13 +81,15 @@ void platform_timer::start(fc::time_point tp) {
    timer_running_forever = tp == fc::time_point::maximum();
    if(timer_running_forever) {
       _state.store(timer_state_t{.state = state_t::running, .callback_in_flight = false, .generation_running = generation});
-      dlog("${t} starting a run forever timer", ("t", (uint64_t)(void*)this));
+      if (initialized)
+         dlog("${t} starting a run forever timer", ("t", (uint64_t)(void*)this));
       return;
    }
    fc::microseconds x = tp.time_since_epoch() - fc::time_point::now().time_since_epoch();
    if(x.count() <= 0) {
       _state.store(timer_state_t{.state = state_t::timed_out, .callback_in_flight = false, .generation_running = generation});
-      dlog("${t} starting an already timed out timer", ("t", (uint64_t)(void*)this));
+      if (initialized)
+         dlog("${t} starting an already timed out timer", ("t", (uint64_t)(void*)this));
    } else {
       time_t secs = x.count() / 1000000;
       long nsec = (x.count() - (secs*1000000)) * 1000;
@@ -93,7 +98,8 @@ void platform_timer::start(fc::time_point tp) {
       if(timer_settime(my->timerid[generation], 0, &enable, NULL) != 0) {
          _state.store(timer_state_t{.state = state_t::timed_out, .callback_in_flight = false, .generation_running = generation});
       }
-      dlog("${t} starting timer with deadline ${d}", ("t", (uint64_t)(void*)this)("d", tp));
+      if (initialized)
+         dlog("${t} starting timer with deadline ${d}", ("t", (uint64_t)(void*)this)("d", tp));
    }
 }
 
@@ -103,7 +109,8 @@ void platform_timer::expire_now(generation_t expired_generation) {
       call_expiration_callback();
       _state.store(timer_state_t{state_t::timed_out, false, expired_generation});
    }
-   dlog("${t} timer expired", ("t", (uint64_t)(void*)this));
+   if (initialized)
+      dlog("${t} timer expired", ("t", (uint64_t)(void*)this));
 }
 
 void platform_timer::interrupt_timer() {
@@ -113,11 +120,13 @@ void platform_timer::interrupt_timer() {
       call_expiration_callback();
       _state.store(timer_state_t{state_t::interrupted, false, generation_running});
    }
-   dlog("${t} timer interrupted", ("t", (uint64_t)(void*)this));
+   if (initialized)
+      dlog("${t} timer interrupted", ("t", (uint64_t)(void*)this));
 }
 
 void platform_timer::stop() {
-   dlog("${t} timer stop called", ("t", (uint64_t)(void*)this));
+   if (initialized)
+      dlog("${t} timer stop called", ("t", (uint64_t)(void*)this));
    // if still running, then interrupt so expire_now() and interrupt_timer() can't start a callback call
    timer_state_t prior_state{.state = state_t::running, .callback_in_flight = false, .generation_running = generation};
    if (_state.compare_exchange_strong(prior_state, timer_state_t{state_t::interrupted, false, generation})) {
@@ -128,17 +137,20 @@ void platform_timer::stop() {
       boost::core::sp_thread_pause();
 
    if(prior_state.state == state_t::stopped) {
-      dlog("${t} timer already stopped", ("t", (uint64_t)(void*)this));
+      if (initialized)
+         dlog("${t} timer already stopped", ("t", (uint64_t)(void*)this));
       return;
    }
    _state.store(timer_state_t{.state = state_t::stopped, .callback_in_flight = false, .generation_running = generation});
    if(prior_state.state == state_t::timed_out || timer_running_forever) {
-      dlog("${t} timer already timed out or running forever", ("t", (uint64_t)(void*)this));
+      if (initialized)
+         dlog("${t} timer already timed out or running forever", ("t", (uint64_t)(void*)this));
       return;
    }
    struct itimerspec disable = {{0, 0}, {0, 0}};
    timer_settime(my->timerid[generation], 0, &disable, NULL);
-   dlog("${t} timer stopped", ("t", (uint64_t)(void*)this));
+   if (initialized)
+      dlog("${t} timer stopped", ("t", (uint64_t)(void*)this));
 }
 
 }
