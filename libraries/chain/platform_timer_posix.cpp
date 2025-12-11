@@ -115,9 +115,14 @@ void platform_timer::expire_now(generation_t expired_generation) {
    if (_state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, true, expired_generation})) {
       call_expiration_callback();
       _state.store(timer_state_t{state_t::timed_out, false, expired_generation});
+      if (initialized)
+         dlog("${t} timer expired ${g}", ("t", (uint64_t)(void*)this)("g", generation));
+   } else {
+      if (initialized)
+         dlog("${t} timer expire_now called, but not expired generation ${g} expired generation ${eg} value ${s}, ${c}, ${gr}",
+              ("t", (uint64_t)(void*)this)("g", generation)("eg", expired_generation)
+              ("s", (int)expected.state)("c", expected.callback_in_flight)("gr", expected.generation_running));
    }
-   if (initialized)
-      dlog("${t} timer expired ${g}", ("t", (uint64_t)(void*)this)("g", generation));
 }
 
 void platform_timer::interrupt_timer() {
