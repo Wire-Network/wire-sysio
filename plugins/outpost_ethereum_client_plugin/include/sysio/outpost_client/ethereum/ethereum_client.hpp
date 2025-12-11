@@ -58,11 +58,11 @@ public:
 
    /**
     * @brief Retrieves block information by block number.
-    * @param blockNumber The block number (hexadecimal).
-    * @param fullTransactionData Flag to determine whether to fetch full transaction data.
+    * @param block_number The block number (hexadecimal).
+    * @param full_transaction_data Flag to determine whether to fetch full transaction data.
     * @return The block data in JSON format, or an empty std::optional if an error occurs.
     */
-   fc::variant get_block_by_number(const std::string& blockNumber, bool fullTransactionData);
+   fc::variant get_block_by_number(const std::string& block_number, bool full_transaction_data);
 
    /**
     * @brief Retrieves block information by block hash.

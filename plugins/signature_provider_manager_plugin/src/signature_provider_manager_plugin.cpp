@@ -2,7 +2,7 @@
 
 #include <boost/algorithm/string.hpp>
 #include <fc/crypto/chain_types_reflect.hpp>
-#include <fc/crypto/ethereum_utils.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/network/url.hpp>
 #include <fc/time.hpp>
 #include <ranges>

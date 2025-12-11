@@ -19,13 +19,13 @@
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/elliptic_em.hpp>
-#include <fc/crypto/ethereum_utils.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
-#include <fc/crypto/keccak256_ethereum.hpp>
 #include <fc/crypto/rand.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
 #include <fc/crypto/sha256.hpp>
+#include <fc/crypto/ethereum/ethereum_abi.hpp>
 
 #include <sysio/outpost_client/ethereum/types.hpp>
 #include <sysio/outpost_client/ethereum/rlp_encoder.hpp>
@@ -92,13 +92,33 @@ using namespace sysio::outpost_client;
 using namespace sysio::outpost_client::ethereum;
 
 namespace {
+/* RLP encoding test data 01 */
 std::pair<std::string, std::string> test_str_01{"test123", "c88774657374313233"};
 
+/* RLP vector of encoding tests */
 std::vector<std::pair<std::string, std::string>> test_str_pairs{
    test_str_01
 };
 
-std::vector<std::uint8_t> sample_data_01_raw {
+std::string test_tx_01_sig {"setNumber(uint256)"};
+std::vector<std::string> test_tx_01_sig_params {"60"};
+std::string test_tx_01_sig_encoded {"3fb5c1cb000000000000000000000000000000000000000000000000000000000000003c"};
+
+/* RLP tx 01 */
+eip1559_tx test_tx_01{
+   .chain_id = 31337,
+   .nonce = 13,
+   .max_priority_fee_per_gas = 2000000000,
+   .max_fee_per_gas = 2000101504,
+   .gas_limit = 0x18c80,
+   .to = fc::from_hex("5FbDB2315678afecb367f032d93F642f64180aa3"),
+   .value = 0,
+   .data = fc::from_hex(test_tx_01_sig_encoded),
+   .access_list = {}
+};
+
+/* RLP Encoded result of `test_tx_01` */
+std::vector<std::uint8_t> test_tx_01_unsigned_result {
    0x02, 0xf8, 0x4e, 0x82, 0x7a, 0x69, 0x0d, 0x84, 0x77, 0x35, 0x94, 0x00,
    0x84, 0x77, 0x37, 0x20, 0x80, 0x83, 0x01, 0x8c, 0x80, 0x94, 0x5f, 0xbd,
    0xb2, 0x31, 0x56, 0x78, 0xaf, 0xec, 0xb3, 0x67, 0xf0, 0x32, 0xd9, 0x3f,
@@ -108,18 +128,6 @@ std::vector<std::uint8_t> sample_data_01_raw {
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x3c, 0xc0
  };
 
-eip1559_tx test_tx_01{
-   .chain_id = 31337,
-   .nonce = 13,
-   .max_priority_fee_per_gas = 2000000000,
-   .max_fee_per_gas = 2000101504,
-   .gas_limit = 0x18c80,
-   .to = fc::from_hex("5FbDB2315678afecb367f032d93F642f64180aa3"),
-   .value = 0,
-   .data = fc::from_hex("3fb5c1cb000000000000000000000000000000000000000000000000000000000000003c"),
-   .access_list = {}
-
-};
 
 std::string test_tx_01_r = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
 std::string test_tx_01_s = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
@@ -139,6 +147,11 @@ BOOST_AUTO_TEST_CASE(can_encode_list_of_strings) try {
    }
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(can_encode_call_sig) try {
+   auto encoded_call_sig = fc::crypto::ethereum::ethereum_contract_call_encode(test_tx_01_sig, test_tx_01_sig_params);
+   BOOST_CHECK(encoded_call_sig == test_tx_01_sig_encoded);
+} FC_LOG_AND_RETHROW();
+
 
 BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    using namespace fc::crypto;
@@ -155,7 +168,7 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
 
    auto actual_unsigned     = rlp::encode_eip1559_unsigned_typed(test_tx_01);
 
-   BOOST_CHECK(std::memcmp(actual_unsigned.data(), sample_data_01_raw.data(), 81) == 0);
+   BOOST_CHECK(std::memcmp(actual_unsigned.data(), test_tx_01_unsigned_result.data(), 81) == 0);
    auto actual_unsigned_hex = rlp::to_hex(actual_unsigned, false);
    BOOST_CHECK_EQUAL(actual_unsigned_hex, test_tx_01_result);
 

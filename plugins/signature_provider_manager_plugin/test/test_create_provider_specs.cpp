@@ -6,7 +6,7 @@
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/elliptic_em.hpp>
-#include <fc/crypto/ethereum_utils.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/rand.hpp>
 #include <fc/io/fstream.hpp>

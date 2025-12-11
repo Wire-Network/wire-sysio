@@ -7,7 +7,6 @@
 #include <fc/fwd.hpp>
 #include <fc/array.hpp>
 #include <fc/io/raw_fwd.hpp>
-#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/elliptic.hpp>
 #include <fc/static_variant.hpp>
 #include <string>

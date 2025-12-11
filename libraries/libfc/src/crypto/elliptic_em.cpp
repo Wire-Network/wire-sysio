@@ -1,5 +1,5 @@
 #include <fc/crypto/elliptic_em.hpp>
-#include <fc/crypto/ethereum_utils.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/hmac.hpp>
 #include <fc/crypto/openssl.hpp>

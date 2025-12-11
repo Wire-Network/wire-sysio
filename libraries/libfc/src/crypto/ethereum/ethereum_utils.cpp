@@ -1,5 +1,5 @@
 #include <fc/crypto/hex.hpp>
-#include <fc/crypto/ethereum_utils.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 
 #include <ethash/keccak.hpp>
 

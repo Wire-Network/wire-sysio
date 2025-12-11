@@ -42,9 +42,9 @@ std::string ethereum_client::get_block_number() {
    return resp.as_string();
 }
 
-fc::variant ethereum_client::get_block_by_number(const std::string& blockNumber,
-                                                 bool               fullTransactionData) {
-   fc::variants params{ blockNumber, fullTransactionData };
+fc::variant ethereum_client::get_block_by_number(const std::string& block_number,
+                                                 bool               full_transaction_data) {
+   fc::variants params{ block_number, full_transaction_data };
    return execute("eth_getBlockByNumber", params);
 }
 

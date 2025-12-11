@@ -35,8 +35,8 @@ set(fc_sources
   src/crypto/sha256.cpp
   src/crypto/sha224.cpp
   src/crypto/sha512.cpp
-  src/crypto/keccak256.cpp
-  src/crypto/keccak256_ethereum.cpp
+  src/crypto/ethereum/ethereum_abi.cpp
+  src/crypto/ethereum/ethereum_utils.cpp
   src/crypto/elliptic_common.cpp
   src/crypto/elliptic_impl_priv.cpp
   src/crypto/elliptic_secp256k1.cpp
@@ -44,7 +44,6 @@ set(fc_sources
   src/crypto/elliptic_em.cpp
   src/crypto/elliptic_webauthn.cpp
   src/crypto/elliptic_ed.cpp
-  src/crypto/ethereum_utils.cpp
   src/crypto/rand.cpp
   src/crypto/public_key.cpp
   src/crypto/private_key.cpp

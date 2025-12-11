@@ -1,10 +1,11 @@
 #pragma once
-#include <fc/crypto/sha256.hpp>
 
-#include <fc/utility.hpp>
 #include <string>
 #include <vector>
+
 #include <fc/crypto/public_key.hpp>
+#include <fc/crypto/sha256.hpp>
+#include <fc/utility.hpp>
 
 // Forward declarations in the case of circular dependencies
 namespace fc::em {
