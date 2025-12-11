@@ -1,7 +1,7 @@
-#include "fc/crypto/hex.hpp"
-#include "fc/crypto/keccak256.hpp"
-
+#include <fc/crypto/hex.hpp>
 #include <fc/crypto/ethereum_utils.hpp>
+
+#include <ethash/keccak.hpp>
 
 namespace fc::crypto::ethereum {
 
@@ -85,15 +85,17 @@ em::message_hash_type hash_message(const em::message_body_type& payload) {
 
    }
 
-   SHA3_CTX msg_ctx;
-   keccak_init(&msg_ctx);
-   keccak_update(
-      &msg_ctx,
-      eth_message.data(),
-      static_cast<uint16_t>(eth_message.size()));
-
-
-   keccak_final(&msg_ctx, eth_message_digest.data());
+   auto h256 = ethash::keccak256(eth_message.data(), eth_message.size());
+   std::copy_n(h256.bytes, sizeof(h256.bytes), eth_message_digest.data());
+   // SHA3_CTX msg_ctx;
+   // keccak_init(&msg_ctx);
+   // keccak_update(
+   //    &msg_ctx,
+   //    eth_message.data(),
+   //    static_cast<uint16_t>(eth_message.size()));
+   //
+   //
+   // keccak_final(&msg_ctx, eth_message_digest.data());
 
    return eth_message_digest;
 }
@@ -135,15 +137,17 @@ em::message_hash_type hash_user_message(const em::message_body_type& payload) {
 
    }
 
-   SHA3_CTX msg_ctx;
-   keccak_init(&msg_ctx);
-   keccak_update(
-      &msg_ctx,
-      eth_message.data(),
-      static_cast<uint16_t>(eth_message.size()));
-
-
-   keccak_final(&msg_ctx, eth_message_digest.data());
+   auto h256 = ethash::keccak256(eth_message.data(), eth_message.size());
+   std::copy_n(h256.bytes, sizeof(h256.bytes), eth_message_digest.data());
+   // SHA3_CTX msg_ctx;
+   // keccak_init(&msg_ctx);
+   // keccak_update(
+   //    &msg_ctx,
+   //    eth_message.data(),
+   //    static_cast<uint16_t>(eth_message.size()));
+   //
+   //
+   // keccak_final(&msg_ctx, eth_message_digest.data());
 
    return eth_message_digest;
 }

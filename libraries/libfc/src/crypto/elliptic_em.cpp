@@ -376,8 +376,13 @@ fc::ecc::compact_signature private_key::sign_compact(const fc::sha256& digest, b
 }
 fc::ecc::compact_signature private_key::sign_compact_ex(const em::message_body_type& digest, bool require_canonical) const {
    // --- 1. Prepare the eth_sign prefixed hash (same as in recover) ---
-   auto msg_digest = crypto::ethereum::hash_message(digest);
-
+   message_hash_type msg_digest;
+   if (std::holds_alternative<fc::sha256>(digest)) {
+      auto msg_hash = std::get<fc::sha256>(digest);
+      std::copy_n(msg_hash.data(), msg_hash.data_size(), msg_digest.begin());
+   } else {
+      msg_digest = crypto::ethereum::hash_message(digest);
+   }
    // --- 2. Sign the new prefixed hash (msg_digest_result) ---
    const secp256k1_context* ctx = detail::_get_context();
    secp256k1_ecdsa_recoverable_signature sig;

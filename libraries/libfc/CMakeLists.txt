@@ -36,6 +36,7 @@ set(fc_sources
   src/crypto/sha224.cpp
   src/crypto/sha512.cpp
   src/crypto/keccak256.cpp
+  src/crypto/keccak256_ethereum.cpp
   src/crypto/elliptic_common.cpp
   src/crypto/elliptic_impl_priv.cpp
   src/crypto/elliptic_secp256k1.cpp
@@ -89,6 +90,7 @@ target_link_libraries(
   Boost::asio
   Boost::thread
   Boost::unit_test_framework
+  ethash::keccak
   Threads::Threads
   libsodium::libsodium
   GMP::gmp

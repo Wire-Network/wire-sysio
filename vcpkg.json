@@ -13,7 +13,7 @@
     "secp256k1-internal",
     "softfloat",
     "zlib",
-
+    "ethash",
     "cryptopp",
     "gtest",
     "jsoncpp",
