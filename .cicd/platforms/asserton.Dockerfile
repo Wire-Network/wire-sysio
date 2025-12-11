@@ -3,6 +3,9 @@ FROM ubuntu:noble
 ENV TZ="America/New_York"
 ENV DEBIAN_FRONTEND=noninteractive
 
+ENV CLANG_18_DIR=/opt/clang/clang-18
+ENV LLVM_11_DIR=/opt/llvm/llvm-11
+
 RUN apt-get update && apt-get install -y \
     lsb-release \
     wget \
@@ -36,6 +39,10 @@ RUN apt-get update && apt-get upgrade -y && \
                        sudo                 \
                        doxygen              \
                        golang               \
+                       gcc-10               \
+                       g++-10               \
+                       gcc-12               \
+                       g++-12               \
                        gcc-14               \
                        g++-14               \
                        libstdc++-14-dev     \
@@ -53,20 +60,22 @@ RUN apt-get update && apt-get upgrade -y && \
                        liblzma-dev          \
                        clang-18             \
                        clang-tools-18       \
-                       autoconf             \
-                       automake             \
-                       libtool              \
+                       libc++-18-dev        \
+                       libc++-dev           \
+                       autoconf automake libtool libltdl-dev \
+                       python3-venv         \
                        htop
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 100 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-14 100
 
 RUN mkdir -p /opt/llvm && chmod 777 /opt/llvm
+RUN mkdir -p /opt/clang && chmod 777 /opt/clang
 
 ENV CC=/usr/bin/clang-18
 ENV CXX=/usr/bin/clang++-18
 ENV CMAKE_MAKE_PROGRAM=/usr/bin/ninja
-ENV CMAKE_PREFIX_PATH=/opt/llvm/llvm-11
+ENV CMAKE_PREFIX_PATH="${LLVM_11_DIR}"
 
 COPY <<-EOF /extras.cmake
   # reset the build type to empty to disable any cmake default flags
@@ -79,5 +88,17 @@ EOF
 ENV SYSIO_PLATFORM_HAS_EXTRAS_CMAKE=1
 
 COPY scripts /scripts
-RUN chmod +x /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-RUN BASE_DIR=/opt/llvm /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+
+RUN mkdir -p /opt/clang/scripts && \
+    ln -sf /scripts/clang-18/clang-18-ubuntu-build-source.sh \
+           /opt/clang/scripts/clang-18-ubuntu-build-source.sh
+
+RUN chmod +x /scripts/clang-18/clang-18-ubuntu-build-source.sh && \
+    BASE_DIR=/opt/clang /scripts/clang-18/clang-18-ubuntu-build-source.sh
+
+RUN chmod +x /scripts/llvm-11/llvm-11-ubuntu-build-source.sh && \
+    BASE_DIR=/opt/llvm /scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+
+ENV PATH="${CLANG_18_DIR}/bin:${PATH}"
+ENV CC=${CLANG_18_DIR}/bin/clang
+ENV CXX=${CLANG_18_DIR}/bin/clang++
