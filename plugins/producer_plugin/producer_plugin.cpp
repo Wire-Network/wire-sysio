@@ -1316,6 +1316,8 @@ void producer_plugin::set_program_options(
           "Maximum size (in MiB) of the incoming transaction queue. Exceeding this value will subjectively drop transaction with resource exhaustion.")
          ("disable-subjective-account-billing", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "Account which is excluded from subjective CPU billing")
+         ("disable-subjective-payer-billing", bpo::value<bool>()->default_value(false),
+          "Disable subjective CPU billing for all contract payer accounts")
          ("disable-subjective-p2p-billing", bpo::value<bool>()->default_value(true),
           "Disable subjective CPU billing for P2P transactions")
          ("disable-subjective-api-billing", bpo::value<bool>()->default_value(true),
@@ -1446,8 +1448,9 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    chain.get_mutable_subjective_billing().set_subjective_account_cpu_allowed(fc::microseconds(options.at("subjective-account-cpu-allowed-us").as<int64_t>()));
    _disable_subjective_p2p_billing = options.at("disable-subjective-p2p-billing").as<bool>();
    _disable_subjective_api_billing = options.at("disable-subjective-api-billing").as<bool>();
-   dlog("disable-subjective-p2p-billing: ${p2p}, disable-subjective-api-billing: ${api}",
-        ("p2p", _disable_subjective_p2p_billing)("api", _disable_subjective_api_billing));
+   chain.get_mutable_subjective_billing().disable_payer_billing(options.at("disable-subjective-payer-billing").as<bool>());
+   dlog("disable-subjective-p2p-billing: ${p2p}, disable-subjective-api-billing: ${api}, disable-subjective-payer-billing: ${payer}",
+        ("p2p", _disable_subjective_p2p_billing)("api", _disable_subjective_api_billing)("payer", chain.get_subjective_billing().is_payer_billing_disabled()));
    if (_disable_subjective_p2p_billing && _disable_subjective_api_billing) {
       chain.get_mutable_subjective_billing().set_disabled(true);
       ilog("Subjective CPU billing disabled");
