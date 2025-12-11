@@ -576,6 +576,12 @@ jobs:
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+          else
+            BRANCH="${{ github.ref_name }}"
+          fi
+          
           # Determine overall status
           if [[ "${{ needs.tests.result }}" == "success" && \
                 "${{ needs.np-tests.result }}" == "success" && \
@@ -593,6 +599,11 @@ jobs:
           [[ "${{ needs.np-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **NP Tests**: ❌ ${{ needs.np-tests.result }}"
           [[ "${{ needs.lr-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **LR Tests**: ❌ ${{ needs.lr-tests.result }}"
           
+          PR_INFO=""
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_INFO="\n**PR**: [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+          fi
+          
           # Create message payload
           PAYLOAD=$(cat <<EOF
           {
@@ -602,7 +613,7 @@ jobs:
             "attachments": [{
               "color": "$COLOR",
               "title": "$STATUS: Build & Test Workflow",
-              "text": "**Repository**: ${{ github.repository }}\n**Branch**: ${{ github.ref_name }}\n**Commit**: [\`${GITHUB_SHA::7}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by**: ${{ github.actor }}\n**Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})${JOB_DETAILS}"
+              "text": "**Repository**: ${{ github.repository }}\n**Branch**: $BRANCH${PR_INFO}\n**Commit**: [\`${GITHUB_SHA::7}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by**: ${{ github.actor }}\n**Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})${JOB_DETAILS}"
             }]
           }
           EOF
