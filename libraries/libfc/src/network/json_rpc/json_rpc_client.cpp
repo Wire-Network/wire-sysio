@@ -45,9 +45,6 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
 json_rpc_client::json_rpc_client(fc::url                           url,
                                  const std::optional<std::string>& user_agent)
    : _url(std::move(url))
-     // _host(std::move(host))
-     //     , _port(std::move(port))
-     //     , _path(std::move(path))
      , _user_agent(user_agent.value_or(BOOST_BEAST_VERSION_STRING))
      , _next_id(1) {}
 
@@ -92,9 +89,8 @@ variant json_rpc_client::call(const std::string& method, const fc::variant& para
             const auto& cv = eo["code"];
             if (cv.is_int64())
                code = static_cast<int>(cv.as_int64());
-            else
-               if (cv.is_uint64())
-                  code = static_cast<int>(cv.as_uint64());
+            else if (cv.is_uint64())
+               code = static_cast<int>(cv.as_uint64());
          }
          if (eo.contains("message")) {
             msg = eo["message"].as_string();

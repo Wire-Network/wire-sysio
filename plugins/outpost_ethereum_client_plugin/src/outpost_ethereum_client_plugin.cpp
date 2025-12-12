@@ -4,7 +4,7 @@
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
 namespace sysio {
-using namespace outpost_client::ethereum;
+// using namespace outpost_client::ethereum;
 
 namespace {
 constexpr auto option_name_client     = "outpost-ethereum-client";
@@ -43,19 +43,26 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
    for (auto& client_spec : client_specs) {
       dlog("Adding ethereum client with spec: ${spec}", ("spec", client_spec));
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 3, "Invalid spec ${spec}", ("spec", client_spec));
+      FC_ASSERT(parts.size() == 4, "Invalid spec ${spec}", ("spec", client_spec));
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
+      fc::ostring chain_id_str = parts[3];
+      std::optional<fc::uint256> chain_id;
+      if (chain_id_str.has_value())
+         chain_id = std::make_optional<fc::uint256>(fc::parse_uint256(chain_id_str.value()));
+
       auto  sig_provider = plug_sig->get_provider(sig_id);
       my->add_client(id,
                      std::make_shared<ethereum_client_entry_t>(
                         id,
                         url,
                         sig_provider,
-                        std::make_shared<ethereum_client>(sig_provider, url)));
+                        std::make_shared<ethereum_client>(sig_provider, url,
+                           chain_id)));
 
-      ilog("Added ethereum client (id=${id},sig_id=${sig_id},url=${url})", ("id", id)("sig_id",sig_id)("url",url));
+      ilogf("Added ethereum client (id={},sig_id={},chainId={},url={})",
+         id,sig_id,url,chain_id_str.value_or("none"));
    }
 }
 
@@ -72,7 +79,7 @@ void outpost_ethereum_client_plugin::set_program_options(options_description& cl
       option_name_client,
       boost::program_options::value<std::vector<std::string>>()->multitoken()->required(),
       "Outpost Ethereum Client spec, the plugin supports 1 to many clients in a given process"
-      "`<eth-client-id>,<sig-provider-id>,<eth-node-url>`");
+      "`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`");
 }
 
 

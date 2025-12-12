@@ -479,8 +479,8 @@ public:
    bool                                  _production_enabled = false;
    bool                                  _pause_production   = false;
 
-   using signature_provider_type = signature_provider_sign_fn;
-   std::map<chain::public_key_type, signature_provider_ptr> _signature_providers;
+   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
    std::set<chain::account_name>                             _producers;
    boost::asio::deadline_timer                               _timer;
    block_timing_util::producer_watermarks            _producer_watermarks;
@@ -2468,7 +2468,7 @@ void producer_plugin_impl::produce_block() {
               "pending_block_state does not exist but it should, another plugin may have corrupted it");
 
    const auto&                                                        auth = chain.pending_block_signing_authority();
-   std::vector<signature_provider_ptr> relevant_providers;
+   std::vector<fc::crypto::signature_provider_ptr> relevant_providers;
 
    relevant_providers.reserve(_signature_providers.size());
 

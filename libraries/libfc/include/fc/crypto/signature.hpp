@@ -1,5 +1,6 @@
 #pragma once
 #include <fc/static_variant.hpp>
+#include <fc-lite/crypto/chain_types.hpp>
 #include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/elliptic_webauthn.hpp>

@@ -35,13 +35,14 @@ size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len)
       }
       ++out_pos;
    }
-   return out_pos - (uint8_t*)out_data;
+   return out_pos - reinterpret_cast<uint8_t*>(out_data);
 }
 
 
-std::vector<uint8_t> from_hex(const std::string& hex) {
+std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix) {
+   auto cleaned_hex = trim_prefix ? trim_hex_prefix(hex) : hex;
    std::vector<uint8_t> out;
-   out.reserve(hex.size() / 2);
+   out.reserve(cleaned_hex.size() / 2);
 
    auto from_hex = [](char c) -> int {
       if (c >= '0' && c <= '9')
@@ -53,13 +54,26 @@ std::vector<uint8_t> from_hex(const std::string& hex) {
       throw std::runtime_error("Invalid hex char");
    };
 
-   for (size_t i = 0; i < hex.size(); i += 2) {
+   for (size_t i = 0; i < cleaned_hex.size(); i += 2) {
       uint8_t byte =
-         (from_hex(hex[i]) << 4) | from_hex(hex[i + 1]);
+         (from_hex(cleaned_hex[i]) << 4) | from_hex(cleaned_hex[i + 1]);
       out.push_back(byte);
    }
 
    return out;
+}
+
+std::string trim_hex_prefix(const std::string& hex) {
+   if (hex.starts_with("0x") || hex.starts_with("0X")) {
+      return hex.substr(2);
+   }
+   return hex;
+}
+
+fc::uint256 parse_uint256(fc::variant v) {
+   auto s = v.as_string();
+   // FC_ASSERT(s.starts_with("0x"));
+   return fc::uint256(fc::from_hex(s));
 }
 
 }

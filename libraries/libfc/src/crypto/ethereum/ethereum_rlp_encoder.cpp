@@ -1,12 +1,12 @@
 #include <fc/log/logger.hpp>
 #include <iostream>
 #include <ranges>
-#include <sysio/outpost_client/ethereum/rlp_encoder.hpp>
+#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
 
-namespace sysio::outpost_client::ethereum {
+namespace fc::crypto::ethereum {
 
-void rlp::append(bytes& out, rlp_input_variant in_var) {
 
+void rlp::append(bytes& out, std::vector<rlp_input_variant>& in_vars) {
    auto rlp_visitor = [&](this const auto& self, auto&& arg) {
       using T = std::decay_t<decltype(arg)>;
       if constexpr (std::is_same_v<T, rlp_input_data_items>) {
@@ -18,8 +18,9 @@ void rlp::append(bytes& out, rlp_input_variant in_var) {
       }
    };
 
-   std::visit(rlp_visitor, in_var);
-
+   for (auto& in_var : in_vars) {
+      std::visit(rlp_visitor, in_var);
+   }
 }
 
 void rlp::append_byte(bytes& out, std::uint8_t b) {
@@ -35,21 +36,6 @@ bytes rlp::encode_length(std::size_t len,std::size_t offset) {
    auto first_byte_hex = to_hex(offset + 55 + lit_len, false);
    auto enc_len_hex = first_byte_hex + hex_len;
    return from_hex_no_prefix(enc_len_hex);
-   // bool  started = false;
-   //
-   // for (int shift = (sizeof(std::size_t) - 1) * 8; shift >= 0; shift -= 8) {
-   //    std::uint8_t byte = static_cast<std::uint8_t>((len >> shift) & 0xff);
-   //    if (byte == 0 && !started)
-   //       continue;
-   //    started = true;
-   //    out.push_back(byte);
-   // }
-   //
-   // if (out.empty()) {
-   //    out.push_back(0);
-   // }
-   //
-   // return out;
 }
 
 bytes rlp::encode_bytes(std::span<std::uint8_t> data) {
@@ -99,22 +85,14 @@ bytes rlp::encode_string(std::string& s) {
 
 bytes rlp::encode_list(std::vector<rlp_input_variant> items) {
    bytes payload;
-   for (auto& item : items) {
-      append(payload, item);
-   }
+   append(payload, items);
 
    const std::size_t len = payload.size();
    bytes             out;
 
-   // if (len <= 55) {
-   //    out.push_back(static_cast<std::uint8_t>(0xc0 + len));
-   //    append(out, payload);
-   //    return out;
-   // }
-
    bytes len_enc = encode_length(len,192);
-   append(out, len_enc);
-   append(out, payload);
+   append(out, len_enc,payload);
+
 
    return out;
 }
@@ -266,15 +244,4 @@ bytes rlp::encode_eip1559_signed_typed(
    return out;
 }
 
-std::string rlp::build_eth_send_raw_transaction_json(const bytes& signed_tx, std::uint32_t id) {
-   std::string hex = rlp::to_hex(signed_tx);
-
-   std::ostringstream oss;
-   oss << R"({"jsonrpc":"2.0","id":)"
-      << id
-      << R"(,"method":"eth_sendRawTransaction","params":[")"
-      << hex
-      << R"("]})";
-   return oss.str();
-}
 }

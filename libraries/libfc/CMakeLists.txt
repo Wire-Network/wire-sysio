@@ -37,6 +37,8 @@ set(fc_sources
   src/crypto/sha512.cpp
   src/crypto/ethereum/ethereum_abi.cpp
   src/crypto/ethereum/ethereum_utils.cpp
+  src/crypto/ethereum/ethereum_client.cpp
+  src/crypto/ethereum/ethereum_rlp_encoder.cpp
   src/crypto/elliptic_common.cpp
   src/crypto/elliptic_impl_priv.cpp
   src/crypto/elliptic_secp256k1.cpp

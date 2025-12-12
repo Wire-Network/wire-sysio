@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <concepts>
 #include <type_traits>
 
 #include <boost/multiprecision/cpp_int.hpp>
@@ -35,4 +36,6 @@ T from_bytes_be(const std::uint8_t* data) {
    boost::multiprecision::import_bits(v, data, data + sizeof(T), 8, false);
    return v;
 }
+
+
 }

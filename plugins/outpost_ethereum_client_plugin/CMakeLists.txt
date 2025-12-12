@@ -28,6 +28,17 @@ if (ENABLE_TESTS)
             signature_provider_manager_plugin
             outpost_client_plugin
             outpost_ethereum_client_plugin
+            fc-lite
+            Boost::date_time
+            Boost::chrono
+            Boost::iostreams
+            Boost::interprocess
+            Boost::multi_index
+            Boost::dll
+            Boost::multiprecision
+            Boost::beast
+            Boost::asio
+            Boost::thread
 #            boringssl::ssl
 #            boringssl::crypto
 #            boringssl::decrepit

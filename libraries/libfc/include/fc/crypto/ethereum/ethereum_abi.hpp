@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <fc/variant.hpp>
 
 namespace fc::crypto::ethereum {
 
@@ -21,11 +22,13 @@ struct ethereum_contract_abi {
    std::string signature; // "setNumber(uint256,string)"
 };
 
+ethereum_contract_abi parse_ethereum_contract_abi_signature(const std::string& sig);
+
 /**
  * Encode a contract call
  * @return hex string of encoded call `data` field in RLP format
  */
-std::string ethereum_contract_call_encode(const std::variant<ethereum_contract_abi,std::string>& abi, const std::vector<std::string>& params);
+std::string ethereum_contract_call_encode(const std::variant<ethereum_contract_abi,std::string>& abi, const std::vector<fc::variant>& params);
 
 template<typename ...Args>
 std::string ethereum_contract_call_encode(const std::variant<ethereum_contract_abi,std::string>& abi, const Args&... args) {;

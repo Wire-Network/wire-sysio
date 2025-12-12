@@ -1,6 +1,6 @@
 #include <print>
 #include <sysio/chain/application.hpp>
-#include <sysio/outpost_client/ethereum/ethereum_client.hpp>
+#include <fc/crypto/ethereum/ethereum_client.hpp>
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
 #include <fc/log/logger_config.hpp>
@@ -53,6 +53,19 @@ void initialize_logging() {
    app().set_sighup_callback(logging_conf_handler);
 }
 
+struct ethereum_contract_test_counter_client : fc::crypto::ethereum::ethereum_contract_client {
+
+   ethereum_contract_tx_fn<fc::uint256> set_number;
+   ethereum_contract_call_fn<> get_number;
+   ethereum_contract_test_counter_client(const ethereum_client_ptr& client,
+                                         const address_compat_type& contract_address_compat)
+      : ethereum_contract_client(client, contract_address_compat),
+   set_number(create_tx<fc::uint256>("setNumber(uint256)")),
+   get_number(create_call("number()")) {
+
+   };
+};
+
 /**
  * @brief Main function that demonstrates interaction with the Ethereum client.
  *
@@ -68,7 +81,7 @@ void initialize_logging() {
  * @return int Exit code of the program.
  */
 int main(int argc, char* argv[]) {
-   using namespace sysio::outpost_client::ethereum;
+   using namespace fc::crypto::ethereum;
    try {
       appbase::scoped_app app;
 
@@ -89,16 +102,16 @@ int main(int argc, char* argv[]) {
          return 1;
       }
 
-      auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
+      // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app->get_plugin<sysio::outpost_ethereum_client_plugin>();
 
       auto  client_entry = eth_plug.get_clients()[0];
       auto& client       = client_entry->client;
 
-      auto chain_id_str = client->get_chain_id();
-      auto chain_id     = fc::hex_to_number<std::uint64_t>(chain_id_str);
+      auto chain_id = client->get_chain_id();
 
-      ilogf("Current chain id: {}", chain_id);
+
+      ilogf("Current chain id: {}", chain_id.str());
 
       // Example 1: Get the current block number
       /**
@@ -108,8 +121,11 @@ int main(int argc, char* argv[]) {
        * number. The block number is returned as a string, which is printed to the console.
        */
       auto block_number = client->get_block_number();
-      ilogf("Current Block Number: {}", block_number);
+      ilogf("Current Block Number: {}", block_number.str());
 
+      auto counter_contract = client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+      auto counter_contract_num = counter_contract->get_number("latest");
+      ilogf("Current counter value: {}", counter_contract_num.as_string());
       // Example 2: Get block information by block number
       /**
        * @brief Get block data by block number using the `eth_getBlockByNumber` method.
@@ -143,7 +159,7 @@ int main(int argc, char* argv[]) {
        * It returns the network version as a string.
        */
       auto protocol_version = client->get_network_version();
-      ilogf("Ethereum Protocol Version: {}", protocol_version);
+      ilogf("Ethereum Protocol Version: {}", protocol_version.str());
    } catch (const fc::exception& e) {
       elog("${e}", ("e",e.to_detail_string()));
    } catch (const boost::exception& e) {

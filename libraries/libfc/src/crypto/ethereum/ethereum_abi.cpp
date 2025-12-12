@@ -48,30 +48,6 @@ std::vector<std::string> split_types(const std::string& inside) {
    return out;
 }
 
-ethereum_contract_abi parse_signature(const std::string& sig) {
-   // Expected: name(type1,type2,...)
-   auto parts = fc::split(sig, '(', 2);
-   FC_ASSERT(parts.size() == 2, "Invalid function signature: ${sig}", ("sig", sig));
-
-   auto right = fc::split(parts[1], ')', 2);
-   FC_ASSERT(!right.empty(), "Invalid function signature: ${sig}", ("sig", sig));
-
-   const std::string& name   = parts[0];
-   const std::string& inside = right[0];
-
-   ethereum_contract_abi abi{};
-   abi.type      = ethereum_contract_abi_type::function;
-   abi.name      = name;
-   abi.signature = sig;
-
-   auto types = split_types(inside);
-   abi.inputs.reserve(types.size());
-   for (const auto& t : types) {
-      abi.inputs.emplace_back("", t);
-   }
-   return abi;
-}
-
 std::vector<uint8_t> be_pad_left_32(const std::vector<uint8_t>& in) {
    std::vector<uint8_t> out(32, 0);
    if (in.size() >= 32) {
@@ -104,24 +80,25 @@ std::vector<uint8_t> be_uint_from_decimal(const std::string& dec) {
    return be_pad_left_32(tmp);
 }
 
-std::vector<uint8_t> encode_static_value(const std::string& type, const std::string& value) {
+std::vector<uint8_t> encode_static_value(const std::string& type, const fc::variant& value) {
    auto t = type;
    // Normalize
    std::ranges::transform(t, t.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
 
    if (t == "uint" || t.rfind("uint", 0) == 0) {
-      return be_uint_from_decimal(value);
+      FC_ASSERT(value.is_numeric(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
+      return be_uint_from_decimal(value.as_string());
    }
    if (t == "bool") {
       return be_uint_from_decimal((value == "true" || value == "1") ? std::string("1") : std::string("0"));
    }
    if (t == "address") {
-      auto bytes = fc::crypto::ethereum::hex_to_bytes(value);
+      auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
       FC_ASSERT(bytes.size() == 20, "Address must be 20 bytes, got ${n}", ("n", bytes.size()));
       return be_pad_left_32(bytes);
    }
    if (t == "bytes32") {
-      auto bytes = fc::crypto::ethereum::hex_to_bytes(value);
+      auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
       FC_ASSERT(bytes.size() <= 32, "bytes32 too long: ${n}", ("n", bytes.size()));
       std::vector<uint8_t> out(32, 0);
       std::copy(bytes.begin(), bytes.end(), out.begin());
@@ -131,7 +108,7 @@ std::vector<uint8_t> encode_static_value(const std::string& type, const std::str
    if (t.rfind("bytes", 0) == 0 && t.size() > 5) {
       auto sz = std::stoul(t.substr(5));
       if (sz >= 1 && sz <= 32) {
-         auto bytes = fc::crypto::ethereum::hex_to_bytes(value);
+         auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
          FC_ASSERT(bytes.size() == sz, "${t} expects ${sz} bytes, got ${n}", ("t", t)("sz", sz)("n", bytes.size()));
          std::vector<uint8_t> out(32, 0);
          std::copy(bytes.begin(), bytes.end(), out.begin());
@@ -149,15 +126,17 @@ bool is_dynamic(const std::string& type) {
    return false;
 }
 
-std::vector<uint8_t> encode_dynamic_data(const std::string& type, const std::string& value) {
+std::vector<uint8_t> encode_dynamic_data(const std::string& type, const fc::variant& value) {
    auto t = type;
    std::ranges::transform(t, t.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
    std::vector<uint8_t> data;
    if (t == "string") {
-      const auto& s = value;
+      FC_ASSERT(value.is_string(), "String value expected for ABI encoding, got ${v}", ("v", value));
+      const auto& s = value.as_string();
       data.assign(s.begin(), s.end());
    } else if (t == "bytes") {
-      data = fc::crypto::ethereum::hex_to_bytes(value);
+      FC_ASSERT(value.is_string(), "Bytes value expected for ABI encoding, got ${v}", ("v", value));
+      data = fc::crypto::ethereum::hex_to_bytes(value.as_string());
    } else {
       FC_THROW_EXCEPTION(fc::exception, "Unsupported dynamic type for ABI encoding: ${t}", ("t", t));
    }
@@ -179,13 +158,37 @@ std::vector<uint8_t> encode_dynamic_data(const std::string& type, const std::str
 
 } // anonymous namespace
 
+ethereum_contract_abi parse_ethereum_contract_abi_signature(const std::string& sig) {
+   // Expected: name(type1,type2,...)
+   auto parts = fc::split(sig, '(', 2);
+   FC_ASSERT(parts.size() == 2, "Invalid function signature: ${sig}", ("sig", sig));
+
+   auto right = fc::split(parts[1], ')', 2);
+   FC_ASSERT(!right.empty(), "Invalid function signature: ${sig}", ("sig", sig));
+
+   const std::string& name   = parts[0];
+   const std::string& inside = right[0];
+
+   ethereum_contract_abi abi{};
+   abi.type      = ethereum_contract_abi_type::function;
+   abi.name      = name;
+   abi.signature = sig;
+
+   auto types = split_types(inside);
+   abi.inputs.reserve(types.size());
+   for (const auto& t : types) {
+      abi.inputs.emplace_back("", t);
+   }
+   return abi;
+}
+
 std::string ethereum_contract_call_encode(const std::variant<ethereum_contract_abi, std::string>& abi,
-                                          const std::vector<std::string>&                                   params) {
+                                          const std::vector<fc::variant>&                                   params) {
    // Obtain ABI struct
    ethereum_contract_abi a{};
    if (std::holds_alternative<std::string>(abi)) {
       auto sig = std::get<std::string>(abi);
-      a        = parse_signature(sig);
+      a        = parse_ethereum_contract_abi_signature(sig);
    } else {
       a = std::get<ethereum_contract_abi>(abi);
       if (a.signature.empty()) {

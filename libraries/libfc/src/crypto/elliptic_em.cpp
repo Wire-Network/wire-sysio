@@ -137,24 +137,8 @@ public_key::public_key( const public_key_data& dat ) {
   my->_key = dat;
 }
 
-public_key::public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical ) {
-  int nV = c.data[0];
-  if (nV<27 || nV>=35)
-      FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
+public_key::public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical ) : public_key(c, crypto::ethereum::hash_message(digest).data(), check_canonical) {
 
-  if( check_canonical ) {
-      FC_ASSERT( is_canonical( c ), "signature is not canonical" );
-  }
-
-  secp256k1_pubkey secp_pub;
-  secp256k1_ecdsa_recoverable_signature secp_sig;
-
-  FC_ASSERT( secp256k1_ecdsa_recoverable_signature_parse_compact( detail::_get_context(), &secp_sig, (unsigned char*)c.begin() + 1, (*c.begin() - 27) & 3) );
-  FC_ASSERT( secp256k1_ecdsa_recover( detail::_get_context(), &secp_pub, &secp_sig, (unsigned char*) digest.data() ) );
-
-  size_t serialized_result_sz = my->_key.size();
-  secp256k1_ec_pubkey_serialize( detail::_get_context(), (unsigned char*)&my->_key.data, &serialized_result_sz, &secp_pub, SECP256K1_EC_COMPRESSED );
-  FC_ASSERT( serialized_result_sz == my->_key.size() );
 }
 
 public_key::public_key(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
@@ -252,7 +236,7 @@ bool public_key::is_canonical(const compact_signature& c) {
    // The S value is the 32 bytes starting at index 33.
    // We check if S <= half_order.
    // memcmp returns <= 0 if S is less than or equal to half_order.
-   return memcmp(c.data + 33, half_order, 32) <= 0;
+   return memcmp(c.data + 32, half_order, 32) <= 0;
 }
 
 //

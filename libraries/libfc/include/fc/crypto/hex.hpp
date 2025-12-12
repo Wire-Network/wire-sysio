@@ -2,7 +2,10 @@
 #include <fc/utility.hpp>
 #include <string>
 #include <vector>
+#include <concepts>
+#include <fc/int256.hpp>
 #include <fc/string.hpp>
+#include <fc/variant.hpp>
 
 namespace fc {
     uint8_t     from_hex(char c);
@@ -18,11 +21,11 @@ namespace fc {
        }
     }
 
-    template <typename T>
-    std::string to_hex(const std::vector<T>& data) {
-       if (data.size())
-          return to_hex(reinterpret_cast<const char*>(data.data()), data.size());
-       return "";
+    template <typename Container>
+       requires std::contiguous_iterator<typename Container::iterator>
+    std::string to_hex(const Container& data, bool add_prefix = false) {
+       auto hex = data.size() ? to_hex(reinterpret_cast<const char*>(data.data()), data.size()) : "0";
+       return add_prefix ? "0x" + hex : hex;
     }
 
     /**
@@ -30,5 +33,11 @@ namespace fc {
      */
     size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len);
 
-    std::vector<uint8_t> from_hex(const std::string& hex);
+    std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix = true);
+
+    std::string trim_hex_prefix(const std::string& hex);
+
+    fc::uint256
+    parse_uint256(fc::variant v);
+
 } // namespace fc

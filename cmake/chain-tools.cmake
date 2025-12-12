@@ -65,7 +65,7 @@ macro(chain_target TARGET)
 
             Boost::process
             Boost::dll
-
+            Boost::multiprecision
             -Wl,${build_id_flag}
     )
 

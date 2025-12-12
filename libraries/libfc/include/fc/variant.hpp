@@ -14,12 +14,19 @@
 #include <fc/time.hpp>
 #include <fc/container/deque_fwd.hpp>
 #include <fc/container/flat_fwd.hpp>
+// #include <fc/int256.hpp>
 #include <boost/multi_index_container_fwd.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <variant>
 
+
 namespace fc
 {
+   using int256   = boost::multiprecision::int256_t;
+   using int256_t = int256;
+
+   using uint256   = boost::multiprecision::uint256_t;
+   using uint256_t = uint256;
    /**
     * @defgroup serializable Serializable _types
     * @brief Clas_ses that may be converted to/from an variant
@@ -195,12 +202,14 @@ namespace fc
            null_type   = 0,
            int64_type  = 1,
            uint64_type = 2,
-           double_type = 3,
-           bool_type   = 4,
-           string_type = 5,
-           array_type  = 6,
-           object_type = 7,
-           blob_type   = 8
+           int256_type = 3,
+           uint256_type = 4,
+           double_type = 5,
+           bool_type   = 6,
+           string_type = 7,
+           array_type  = 8,
+           object_type = 9,
+           blob_type   = 10
         };
 
         /// Constructs a null_type variant
@@ -222,6 +231,8 @@ namespace fc
         variant( int32_t val );
         variant( uint64_t val );
         variant( int64_t val );
+        variant( fc::uint256 val );
+        variant( fc::int256 val );
         variant( double val );
         variant( bool val );
         variant( blob val );
@@ -261,6 +272,8 @@ namespace fc
         bool                        is_bool()const;
         bool                        is_int64()const;
         bool                        is_uint64()const;
+        bool                        is_int256()const;
+        bool                        is_uint256()const;
         bool                        is_double()const;
         bool                        is_object()const;
         bool                        is_array()const;
@@ -276,6 +289,9 @@ namespace fc
 
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
+        fc::int256                  as_int256()const;
+        fc::uint256                 as_uint256()const;
+
         bool                        as_bool()const;
         double                      as_double()const;
 
@@ -377,6 +393,10 @@ namespace fc
    void from_variant( const fc::variant& var,  int64_t& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint64_t& vo );
+   /** @ingroup Serializable */
+   void from_variant( const fc::variant& var,  int256& vo );
+   /** @ingroup Serializable */
+   void from_variant( const fc::variant& var,  uint256& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  bool& vo );
    /** @ingroup Serializable */
@@ -708,5 +728,5 @@ namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::variant )
-FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
+FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
 FC_REFLECT( fc::blob, (data) );

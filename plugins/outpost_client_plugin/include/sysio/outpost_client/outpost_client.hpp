@@ -5,6 +5,8 @@
 #pragma once
 #include <memory>
 #include <fc/crypto/blake2.hpp>
+#include <fc/crypto/sha256.hpp>
+#include <fc/crypto/signature_provider.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 namespace sysio::outpost_client {
@@ -20,16 +22,16 @@ typename PayloadType = payload_default_t
 class outpost_client
 {
 protected:
-   sysio::signature_provider_ptr  _signing_provider;
+   fc::crypto::signature_provider_ptr  _signing_provider;
 
 public:
    using action_payload_type = PayloadType;
 
    constexpr static auto target_chain = TargetChain;
 
-   explicit outpost_client(std::shared_ptr<sysio::signature_provider_t> signing_provider) : _signing_provider(signing_provider) {}
+   explicit outpost_client(std::shared_ptr<fc::crypto::signature_provider_t> signing_provider) : _signing_provider(signing_provider) {}
 
-   explicit outpost_client(const signature_provider_id_t& sig_provider_query) :
+   explicit outpost_client(const fc::crypto::signature_provider_id_t& sig_provider_query) :
    _signing_provider(sysio::get_signature_provider(sig_provider_query)) {}
 
    virtual ~outpost_client() = default;

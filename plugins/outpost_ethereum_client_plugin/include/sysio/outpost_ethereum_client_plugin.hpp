@@ -2,16 +2,16 @@
 
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/outpost_client/ethereum/ethereum_client.hpp>
+#include <fc/crypto/ethereum/ethereum_client.hpp>
 
 namespace sysio {
-using namespace sysio::outpost_client::ethereum;
+using namespace fc::crypto::ethereum;
 
 struct ethereum_client_entry_t {
-   std::string id;
-   std::string url;
-   signature_provider_ptr signature_provider;
-   ethereum_client_ptr client;
+   std::string                        id;
+   std::string                        url;
+   fc::crypto::signature_provider_ptr signature_provider;
+   ethereum_client_ptr                client;
 };
 
 using ethereum_client_entry_ptr = std::shared_ptr<ethereum_client_entry_t>;

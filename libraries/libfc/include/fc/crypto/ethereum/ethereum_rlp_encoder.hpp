@@ -8,9 +8,9 @@
 #include <sstream>
 #include <iomanip>
 #include <fc/exception/exception.hpp>
-#include <sysio/outpost_client/ethereum/types.hpp>
+#include <fc/crypto/ethereum/ethereum_types.hpp>
 
-namespace sysio::outpost_client::ethereum::rlp {
+namespace fc::crypto::ethereum::rlp {
 
 
 // ---------------------------------------------------------
@@ -40,11 +40,24 @@ struct rlp_input_data : rlp_input_variant {
    using rlp_input_variant::operator=;
 };
 
-void append(bytes& out, rlp_input_variant in_var);
+
+
+
+void append(bytes& out, std::vector<rlp_input_variant>& in_vars);
+
+template <typename T>
+concept not_rlp_input_vector = !std::is_same_v<std::decay_t<T>, std::vector<rlp::rlp_input_variant>>;
+
+template <typename... Args>
+   requires not_rlp_input_vector<std::tuple_element_t<0, std::tuple<Args...>>>
+void append(bytes& out, Args&&... args) {
+   std::vector<rlp_input_variant> items = {std::forward<Args>(args)...};
+   append(out, items);
+}
 
 void append_byte(bytes& out, std::uint8_t b);
 
-bytes encode_length(std::size_t len,std::size_t offset);
+bytes encode_length(std::size_t len, std::size_t offset);
 
 // ---------------------------------------------------------
 // Core RLP encoders
@@ -106,6 +119,7 @@ bytes encode_uint(T value) {
    }
    FC_THROW_EXCEPTION(fc::exception, "Unsupported type for encode_uint");
 }
+
 bytes encode_access_list(const std::vector<access_list_entry>& access_list);
 bytes encode_list(std::vector<rlp_input_variant> items);
 
@@ -158,80 +172,14 @@ bytes from_hex_any(const std::string& hex);
 //  gasLimit, to, value, data, accessList]
 bytes encode_eip1559_unsigned(const eip1559_tx& tx);
 
-bytes encode_eip1559_unsigned_typed(const eip1559_tx&                 tx);
+bytes encode_eip1559_unsigned_typed(const eip1559_tx& tx);
 // RLP of the *signed* tx body (EIP-1559):
 // [chainId, nonce, maxPriorityFeePerGas, maxFeePerGas,
 //  gasLimit, to, value, data, accessList, yParity, r, s]
-bytes encode_eip1559_signed(const eip1559_tx&                 tx);
-// ,
-//                             std::uint8_t                      y_parity,
-//                             std::span<const std::uint8_t, 32> r,
-//                             std::span<const std::uint8_t, 32> s);
+bytes encode_eip1559_signed(const eip1559_tx& tx);
 
 // Final typed-transaction wire encoding: 0x02 || rlp(signed_body)
-bytes encode_eip1559_signed_typed(const eip1559_tx&                 tx);
+bytes encode_eip1559_signed_typed(const eip1559_tx& tx);
 
-// Build JSON body for eth_sendRawTransaction
-std::string build_eth_send_raw_transaction_json(const bytes&  signed_tx,
-                                                std::uint32_t id = 1);
 
 } // namespace eth
-
-// ============================================================================
-// Optional: simple send_raw_transaction over HTTP JSON-RPC (libcurl)
-// ============================================================================
-
-#ifdef ETH_WITH_LIBCURL
-#include <curl/curl.h>
-#include <stdexcept>
-
-namespace eth {
-
-inline std::size_t curl_write_callback(char*       ptr,
-                                       std::size_t size,
-                                       std::size_t nmemb,
-                                       void*       userdata) {
-   auto* out = static_cast<std::string*>(userdata);
-   out->append(ptr, size * nmemb);
-   return size * nmemb;
-}
-
-// Returns full HTTP response body as string (JSON).
-inline std::string send_raw_transaction(const std::string& rpc_url,
-                                        const bytes&       signed_tx,
-                                        std::uint32_t      id = 1) {
-   std::string json_body = build_eth_send_raw_transaction_json(signed_tx, id);
-
-   CURL* curl = curl_easy_init();
-   if (!curl) {
-      throw std::runtime_error("curl_easy_init failed");
-   }
-
-   std::string response;
-   curl_easy_setopt(curl, CURLOPT_URL, rpc_url.c_str());
-   curl_easy_setopt(curl, CURLOPT_POST, 1L);
-   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json_body.c_str());
-   curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, static_cast<long>(json_body.size()));
-
-   struct curl_slist* headers = nullptr;
-   headers                    = curl_slist_append(headers, "Content-Type: application/json");
-   curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
-
-   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
-   curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-
-   CURLcode res = curl_easy_perform(curl);
-   if (res != CURLE_OK) {
-      curl_slist_free_all(headers);
-      curl_easy_cleanup(curl);
-      throw std::runtime_error(std::string("curl_easy_perform failed: ") +
-                               curl_easy_strerror(res));
-   }
-
-   curl_slist_free_all(headers);
-   curl_easy_cleanup(curl);
-   return response;
-}
-
-} // namespace eth
-#endif

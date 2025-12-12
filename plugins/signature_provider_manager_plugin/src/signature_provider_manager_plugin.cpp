@@ -29,12 +29,12 @@ public:
     */
    fc::microseconds _kiod_provider_timeout_us;
 
-   signature_provider_sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
+   fc::crypto::signature_provider_sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
       return [key](const chain::digest_type& digest) { return key.sign(digest); };
    }
 
-   signature_provider_sign_fn make_kiod_signature_provider(const string&                url_str,
-                                                           const chain::public_key_type pubkey) const {
+   fc::crypto::signature_provider_sign_fn make_kiod_signature_provider(const string&                url_str,
+                                                                       const chain::public_key_type pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
          // send the entire string after unix:// to http_plugin. It'll auto-detect which part
@@ -56,8 +56,8 @@ public:
       };
    }
 
-   signature_provider_sign_fn create_provider_from_spec(fc::crypto::chain_key_type_t key_type,
-                                                        fc::crypto::public_key public_key, const std::string& spec) {
+   fc::crypto::signature_provider_sign_fn create_provider_from_spec(fc::crypto::chain_key_type_t key_type,
+                                                                    fc::crypto::public_key public_key, const std::string& spec) {
       using namespace fc::crypto;
       auto spec_parts    = fc::split(spec, ':', 2);
       auto spec_type_str = spec_parts[0];
@@ -114,7 +114,7 @@ public:
     *
     * @param provider to set
     */
-   signature_provider_ptr set_provider(const signature_provider_ptr& provider) {
+   fc::crypto::signature_provider_ptr set_provider(const fc::crypto::signature_provider_ptr& provider) {
       std::scoped_lock lock(_signing_providers_mutex);
       SYS_ASSERT(!_signing_providers_by_pubkey.contains(provider->public_key) &&
                     !_signing_providers_by_name.contains(provider->key_name),
@@ -129,7 +129,7 @@ public:
    }
 
 
-   bool has_provider(const signature_provider_id_t& key) {
+   bool has_provider(const fc::crypto::signature_provider_id_t& key) {
       std::scoped_lock lock(_signing_providers_mutex);
       if (holds_alternative<std::string>(key)) {
          return _signing_providers_by_name.contains(std::get<std::string>(key));
@@ -138,7 +138,7 @@ public:
       return _signing_providers_by_pubkey.contains(std::get<chain::public_key_type>(key));
    }
 
-   signature_provider_ptr get_provider(const signature_provider_id_t& key) {
+   fc::crypto::signature_provider_ptr get_provider(const fc::crypto::signature_provider_id_t& key) {
       std::scoped_lock lock(_signing_providers_mutex);
       if (holds_alternative<std::string>(key)) {
          auto keyName = std::get<std::string>(key);
@@ -155,8 +155,8 @@ public:
       return _signing_providers_by_pubkey.at(pub_key);
    }
 
-   std::vector<signature_provider_ptr> query_providers(const std::optional<signature_provider_id_t>& id_opt,
-                                                       std::optional<fc::crypto::chain_kind_t>       target_chain) {
+   std::vector<fc::crypto::signature_provider_ptr> query_providers(const std::optional<fc::crypto::signature_provider_id_t>& id_opt,
+                                                                   std::optional<fc::crypto::chain_kind_t>       target_chain) {
       std::scoped_lock lock(_signing_providers_mutex);
       return std::views::values(_signing_providers_by_pubkey) | std::views::filter([&](const auto& entry) {
                 if (target_chain.has_value() && entry->target_chain != target_chain.value()) {
@@ -181,8 +181,8 @@ private:
    /**
     * Internal map for storing signature providers
     */
-   std::map<std::string, signature_provider_ptr>            _signing_providers_by_name{};
-   std::map<chain::public_key_type, signature_provider_ptr> _signing_providers_by_pubkey{};
+   std::map<std::string, fc::crypto::signature_provider_ptr>            _signing_providers_by_name{};
+   std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signing_providers_by_pubkey{};
 };
 
 
@@ -230,7 +230,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    }
 }
 
-signature_provider_ptr signature_provider_manager_plugin::create_provider(const std::string& spec) {
+fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(const std::string& spec) {
    using namespace fc::crypto;
    //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
    auto spec_parts = fc::split(spec, ',', 5);
@@ -259,7 +259,7 @@ signature_provider_ptr signature_provider_manager_plugin::create_provider(const 
 }
 
 
-signature_provider_ptr signature_provider_manager_plugin::create_provider(
+fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_provider(
    const std::string& key_name, fc::crypto::chain_kind_t target_chain, fc::crypto::chain_key_type_t key_type,
    const std::string& public_key_text, const std::string& private_key_provider_spec) {
    using namespace fc::crypto;
@@ -298,7 +298,7 @@ signature_provider_ptr signature_provider_manager_plugin::create_provider(
    return my->set_provider(provider);
 }
 
-signature_provider_ptr signature_provider_manager_plugin::create_kiod_provider(fc::crypto::chain_kind_t target_chain,
+fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_kiod_provider(fc::crypto::chain_kind_t target_chain,
                                                                                fc::crypto::chain_key_type_t key_type,
                                                                                std::string        public_key_text,
                                                                                std::string        url,
@@ -307,33 +307,33 @@ signature_provider_ptr signature_provider_manager_plugin::create_kiod_provider(f
 }
 
 
-signature_provider_sign_fn
+fc::crypto::signature_provider_sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
    return my->make_key_signature_provider(priv);
 }
 
-bool signature_provider_manager_plugin::has_provider(const signature_provider_id_t& key) {
+bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {
    return my->has_provider(key);
 }
 
-signature_provider_ptr signature_provider_manager_plugin::get_provider(const signature_provider_id_t& key) {
+fc::crypto::signature_provider_ptr signature_provider_manager_plugin::get_provider(const fc::crypto::signature_provider_id_t& key) {
    return my->get_provider(key);
 }
 
-std::vector<signature_provider_ptr>
-signature_provider_manager_plugin::query_providers(const std::optional<signature_provider_id_t>& id_opt,
+std::vector<fc::crypto::signature_provider_ptr>
+signature_provider_manager_plugin::query_providers(const std::optional<fc::crypto::signature_provider_id_t>& id_opt,
                                                    std::optional<fc::crypto::chain_kind_t> target_chain) {
    return my->query_providers(id_opt, target_chain);
 }
 
-std::vector<signature_provider_ptr> query_signature_providers(const std::optional<signature_provider_id_t>&          id_opt,
+std::vector<fc::crypto::signature_provider_ptr> query_signature_providers(const std::optional<fc::crypto::signature_provider_id_t>&          id_opt,
                                                               std::optional<fc::crypto::chain_kind_t> target_chain) {
    auto& plug = app().get_plugin<signature_provider_manager_plugin>();
    return plug.query_providers(id_opt, target_chain);
 }
 
 
-signature_provider_ptr get_signature_provider(const signature_provider_id_t&                      id,
+fc::crypto::signature_provider_ptr get_signature_provider(const fc::crypto::signature_provider_id_t&                      id,
                                               std::optional<fc::crypto::chain_kind_t> target_chain) {
    auto& plug      = app().get_plugin<signature_provider_manager_plugin>();
    auto  providers = plug.query_providers(id, target_chain);
