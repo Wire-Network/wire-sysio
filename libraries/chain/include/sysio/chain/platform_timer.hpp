@@ -27,6 +27,7 @@ struct platform_timer {
       However, set_expiration_callback() is synchronized with the callback.
    */
    void set_expiration_callback(void(*func)(void*), void* user) {
+      dlog("${t} setting expiration callback ${g}", ("t", (uint64_t)(void*)this)("g", generation));
       bool expect_false = false;
       while(!atomic_compare_exchange_strong(&_callback_variables_busy, &expect_false, true))
          expect_false = false;
@@ -37,6 +38,7 @@ struct platform_timer {
 
       _expiration_callback = func;
       _expiration_callback_data = user;
+      dlog("${t} set expiration callback ${g}", ("t", (uint64_t)(void*)this)("g", generation));
    }
 
    enum class state_t : uint8_t {
@@ -67,11 +69,15 @@ private:
 
    void call_expiration_callback() {
       bool expect_false = false;
+      dlog("${t} attempt call to expire callback ${g}", ("t", (uint64_t)(void*)this)("g", generation));
       if(atomic_compare_exchange_strong(&_callback_variables_busy, &expect_false, true)) {
          void(*cb)(void*) = _expiration_callback;
          void* cb_data = _expiration_callback_data;
          if(cb) {
+            dlog("${t} calling callback ${g}", ("t", (uint64_t)(void*)this)("g", generation));
             cb(cb_data);
+         } else {
+            dlog("${t} callback null ${g}", ("t", (uint64_t)(void*)this)("g", generation));
          }
          _callback_variables_busy.store(false, std::memory_order_release);
       }
