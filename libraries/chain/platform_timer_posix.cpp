@@ -18,8 +18,6 @@ namespace sysio::chain {
 
 static_assert(std::atomic_bool::is_always_lock_free, "Only lock-free atomics AS-safe.");
 
-   static bool initialized = false;
-
 struct platform_timer::impl {
    constexpr static unsigned num_timers = 8;
    static_assert(std::has_single_bit(num_timers), "num_timers must be a power of two");
