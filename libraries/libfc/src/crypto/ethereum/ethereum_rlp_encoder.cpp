@@ -211,8 +211,8 @@ bytes rlp::encode_eip1559_unsigned_typed(const eip1559_tx& tx) {
 }
 
 bytes rlp::encode_eip1559_signed(const eip1559_tx& tx) {
-   bytes to_bytes   = tx.to;
-   bytes data_bytes = tx.data;
+   bytes to_bytes   = encode_bytes(tx.to);
+   bytes data_bytes = encode_bytes(tx.data);
 
    auto v = encode_uint(tx.v);
    auto r = encode_bytes(tx.r);

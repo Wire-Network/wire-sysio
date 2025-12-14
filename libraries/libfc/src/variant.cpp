@@ -82,12 +82,13 @@ variant::variant( int64_t val )
 
 variant::variant( int256 val )
 {
-   *reinterpret_cast<int256*>(this)  = val;
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   // *reinterpret_cast<int256*>(this)  = val;
    set_variant_type( this, int256_type );
 }
 
 variant::variant(fc::uint256 val) {
-   *reinterpret_cast<uint256*>(this)  = val;
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
    set_variant_type( this, uint256_type );
 }
 
@@ -442,18 +443,18 @@ uint64_t variant::as_uint64()const
 } FC_CAPTURE_AND_RETHROW( (*this) ) }
 
 
-fc::int256 variant::as_int256()const
+fc::int256 fc::variant::as_int256()const
 {
    switch( get_type() )
    {
    case int64_type:
-      return *reinterpret_cast<const int256*>(this);
+      return fc::int256(*reinterpret_cast<const int64_t*>(this));
    case uint64_type:
-      return int256(*reinterpret_cast<const uint256*>(this));
+      return fc::int256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return *reinterpret_cast<const int256*>(this);
+      return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return int256(*reinterpret_cast<const uint256*>(this));
+      return fc::int256(as_string());
    case bool_type:
       return int256(*reinterpret_cast<const bool*>(this));
    case null_type:
@@ -463,18 +464,18 @@ fc::int256 variant::as_int256()const
    }
 }
 
-fc::uint256 variant::as_uint256()const
+fc::uint256 fc::variant::as_uint256()const
 { try {
    switch( get_type() )
    {
    case int64_type:
-      return static_cast<uint256>(*reinterpret_cast<const int256*>(this));
+      return fc::uint256(*reinterpret_cast<const int64_t*>(this));
    case uint64_type:
-      return *reinterpret_cast<const uint256*>(this);
+      return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
    case int256_type:
-      return uint256(*reinterpret_cast<const int256*>(this));
+      return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
-      return *reinterpret_cast<const fc::uint256*>(this);   
+      return fc::uint256(as_string());
    case bool_type:
       return uint256(*reinterpret_cast<const bool*>(this));
    case null_type:
@@ -546,6 +547,8 @@ std::string variant::as_string()const
 {
    switch( get_type() )
    {
+      case uint256_type:
+      case int256_type:
       case string_type:
           return **reinterpret_cast<const const_string_ptr*>(this);
       case double_type:
@@ -779,6 +782,14 @@ void from_variant( const variant& var,  int64_t& vo )
 void from_variant( const variant& var,  uint64_t& vo )
 {
    vo = var.as_uint64();
+}
+
+void from_variant(const fc::variant& var, fc::int256& vo) {
+   vo = var.as_int256();
+}
+
+void from_variant(const fc::variant& var, fc::uint256& vo) {
+   vo = var.as_uint256();
 }
 
 void from_variant( const variant& var,  bool& vo )

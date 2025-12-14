@@ -87,7 +87,7 @@ std::vector<uint8_t> encode_static_value(const std::string& type, const fc::vari
 
    if (t == "uint" || t.rfind("uint", 0) == 0) {
       FC_ASSERT(value.is_numeric(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
-      return be_uint_from_decimal(value.as_string());
+      return be_uint_from_decimal(value.as_uint256().str());
    }
    if (t == "bool") {
       return be_uint_from_decimal((value == "true" || value == "1") ? std::string("1") : std::string("0"));

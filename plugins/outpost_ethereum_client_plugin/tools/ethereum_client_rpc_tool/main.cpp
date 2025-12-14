@@ -3,6 +3,8 @@
 #include <fc/crypto/ethereum/ethereum_client.hpp>
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
+#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/log/logger_config.hpp>
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
@@ -83,6 +85,13 @@ struct ethereum_contract_test_counter_client : fc::crypto::ethereum::ethereum_co
 int main(int argc, char* argv[]) {
    using namespace fc::crypto::ethereum;
    try {
+      // auto                priv_key_byes = hex_to_bytes("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
+      // fc::sha256          priv_key_hash(reinterpret_cast<const char*>(priv_key_byes.data()), priv_key_byes.size());
+      // auto                priv_key     = fc::em::private_key::regenerate(priv_key_hash);
+      // auto                pub_key      = priv_key.get_public_key();
+      // auto                pub_key_data = pub_key.serialize_uncompressed();
+      // auto                pub_key_hex  = fc::to_hex(pub_key_data.data, pub_key_data.size(), true);
+      // ilogf("Public key: {}", pub_key_hex);
       appbase::scoped_app app;
 
       app->set_version_string(sysio::version::version_client());
@@ -124,8 +133,19 @@ int main(int argc, char* argv[]) {
       ilogf("Current Block Number: {}", block_number.str());
 
       auto counter_contract = client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3");
-      auto counter_contract_num = counter_contract->get_number("latest");
-      ilogf("Current counter value: {}", counter_contract_num.as_string());
+      auto counter_contract_num_res = counter_contract->get_number("pending");
+      auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
+      ilogf("Current counter value: {}", counter_contract_num.str());
+
+      fc::uint256 new_num = counter_contract_num + 1;
+      ilogf("Setting New counter value: {}", new_num.str());
+      auto counter_contract_set_num_receipt = counter_contract->set_number(new_num);
+      ilogf("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
+
+      counter_contract_num_res = counter_contract->get_number("pending");
+      counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
+      ilogf("New counter value: {}", counter_contract_num.str());
+
       // Example 2: Get block information by block number
       /**
        * @brief Get block data by block number using the `eth_getBlockByNumber` method.

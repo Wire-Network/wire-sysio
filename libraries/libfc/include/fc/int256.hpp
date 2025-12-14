@@ -13,6 +13,8 @@ using int256_t = int256;
 using uint256   = boost::multiprecision::uint256_t;
 using uint256_t = uint256;
 
+#if __cplusplus >= 202002L
+
 // Concept: requires T to be a specialization of boost::multiprecision::number
 template <typename T>
 struct is_boost_number : std::false_type {};
@@ -36,6 +38,6 @@ T from_bytes_be(const std::uint8_t* data) {
    boost::multiprecision::import_bits(v, data, data + sizeof(T), 8, false);
    return v;
 }
-
+#endif
 
 }

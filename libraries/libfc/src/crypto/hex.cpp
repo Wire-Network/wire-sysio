@@ -1,4 +1,5 @@
 #include <fc/crypto/hex.hpp>
+#include <fc/string.hpp>
 #include <fc/exception/exception.hpp>
 
 namespace fc {
@@ -13,13 +14,13 @@ uint8_t from_hex(char c) {
    FC_THROW_EXCEPTION(exception, "Invalid hex character '${c}'", ("c", std::string(&c,1) ));
 }
 
-std::string to_hex(const char* d, uint32_t s) {
+std::string to_hex(const char* d, uint32_t s, bool add_prefix) {
    std::string r;
    auto to_hex = "0123456789abcdef";
    auto        c      = reinterpret_cast<const uint8_t*>(d);
    for (uint32_t i = 0; i < s; ++i)
       (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
-   return r;
+   return add_prefix ? "0x" + r : r;
 }
 
 size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len) {
@@ -41,6 +42,9 @@ size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len)
 
 std::vector<uint8_t> from_hex(const std::string& hex, bool trim_prefix) {
    auto cleaned_hex = trim_prefix ? trim_hex_prefix(hex) : hex;
+   if (cleaned_hex.size() % 2) {
+      cleaned_hex = "0" + cleaned_hex;
+   }
    std::vector<uint8_t> out;
    out.reserve(cleaned_hex.size() / 2);
 
@@ -70,10 +74,5 @@ std::string trim_hex_prefix(const std::string& hex) {
    return hex;
 }
 
-fc::uint256 parse_uint256(fc::variant v) {
-   auto s = v.as_string();
-   // FC_ASSERT(s.starts_with("0x"));
-   return fc::uint256(fc::from_hex(s));
-}
 
 }

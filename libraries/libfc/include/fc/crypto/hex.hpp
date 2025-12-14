@@ -3,13 +3,12 @@
 #include <string>
 #include <vector>
 #include <concepts>
-#include <fc/int256.hpp>
-#include <fc/string.hpp>
+
 #include <fc/variant.hpp>
 
 namespace fc {
     uint8_t     from_hex(char c);
-    std::string to_hex(const char* d, uint32_t s);
+    std::string to_hex(const char* d, uint32_t s, bool add_prefix = false);
 
     template<typename T>
     T hex_to_number(const std::string& hex_str) {
@@ -37,7 +36,5 @@ namespace fc {
 
     std::string trim_hex_prefix(const std::string& hex);
 
-    fc::uint256
-    parse_uint256(fc::variant v);
 
 } // namespace fc

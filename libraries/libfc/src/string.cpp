@@ -3,12 +3,14 @@
 #include <fc/io/json.hpp>
 #include <fc/string.hpp>
 #include <fc/utf8.hpp>
+#include <fc/variant.hpp>
 #include <format>
 #include <iomanip>
 #include <limits>
 #include <ranges>
 #include <sstream>
 #include <string>
+#include <fc/crypto/hex.hpp>
 
 /**
  *  Implemented with std::string for now.
@@ -40,6 +42,12 @@ uint64_t to_uint64(const std::string& i) {
       FC_RETHROW_EXCEPTIONS(warn, "${i} => uint64_t", ("i", i))
    }
    FC_CAPTURE_AND_RETHROW((i))
+}
+bool all_digits(std::string_view s) {
+    return std::ranges::all_of(
+        s,
+        [](unsigned char c) { return std::isdigit(c); }
+    );
 }
 
 double to_double(const std::string& i) {
@@ -110,6 +118,26 @@ std::string to_lower(std::string s) {
       }
       );
    return s;
+}
+
+
+fc::uint256 parse_uint256(fc::variant v) {
+   auto s = v.as_string();
+   if (all_digits(s))
+      return fc::uint256(s);
+
+   return fc::uint256(fc::from_hex(s));
+}
+
+bool all_digits(const std::string_view& s) {
+   return all_digits(std::string{s.data(),  s.size()});
+};
+
+bool all_digits(const std::string& s) {
+   return std::ranges::all_of(
+       s,
+       [](unsigned char c) { return std::isdigit(c); }
+   );
 }
 
 } // namespace fc

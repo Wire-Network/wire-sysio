@@ -3,6 +3,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <fc/int256.hpp>
 
 namespace fc
 {
@@ -51,4 +52,11 @@ namespace fc
    * @return A new string with all characters converted to lowercase
    */
   std::string to_lower(std::string s);
+
+  class variant;
+  fc::uint256 parse_uint256(fc::variant v);
+  bool all_digits(const std::string_view& s);
+  bool all_digits(const std::string& s);
 }
+
+

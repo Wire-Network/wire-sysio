@@ -1,5 +1,6 @@
 #include <fc/log/logger.hpp>
 #include <iostream>
+#include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_client.hpp>
 #include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
@@ -53,10 +54,13 @@ fc::variant ethereum_client::execute_contract_tx(const eip1559_tx& source_tx, co
 
 // JSON parsing helpers removed in favor of fc::variant returned by json_rpc_client
 
-fc::uint256 ethereum_client::get_transaction_count(const std::string& address) {
-   fc::variants params{ address };
-
-   return parse_uint256(execute("eth_getTransactionCount", params));
+fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& address, const std::string& block_tag) {
+   auto from_addr = fc::crypto::ethereum::to_address(address);
+   auto from_addr_hex = to_hex(from_addr, true);
+   fc::variants params{ from_addr_hex, block_tag   };
+   auto res = execute("eth_getTransactionCount", params);
+   dlogf("tx_count: {}", res.as_string());
+   return parse_uint256(res);
 }
 
 fc::uint256 ethereum_client::get_chain_id() {
@@ -83,13 +87,19 @@ fc::variant ethereum_client::get_syncing_status() {
 }
 
 eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to) {
+   auto from_addr = to_address(_signature_provider->public_key);
+   auto nonce = get_transaction_count(from_addr, "pending");
+   dlogf("from_addr={}", to_hex(from_addr, true));
+   dlogf("nonce={}", nonce.str());
    return eip1559_tx{
       .chain_id = get_chain_id(),
-      .nonce = get_transaction_count("latest"),
+      .nonce = nonce,
       .max_priority_fee_per_gas = 2000000000,
       .max_fee_per_gas = 2000101504,
       .gas_limit = 0x18c80,
+
       .to = ethereum::address_to_bytes(to),
+      .value = 0,
       .data = {},
       .access_list = {}
    };
@@ -97,7 +107,9 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to) {
 
 fc::uint256 ethereum_client::get_block_number() {
    fc::variants params; // empty
-   return parse_uint256(execute("eth_blockNumber", params));
+   auto resp = execute("eth_blockNumber", params);
+   // ilogf("Block number: {}", fc::json::to_pretty_string(resp));
+   return parse_uint256(resp);
 }
 
 fc::variant ethereum_client::get_block_by_number(const std::string& block_number,

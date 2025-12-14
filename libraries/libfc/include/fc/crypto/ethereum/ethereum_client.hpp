@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-#include <boost/hana/detail/create.hpp>
 #include <fc/int256.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/crypto/signature_provider.hpp>
@@ -183,7 +182,7 @@ public:
     * @param address The address for which to fetch the transaction count.
     * @return The transaction count (nonce) as a string, or an empty std::optional if an error occurs.
     */
-   fc::uint256 get_transaction_count(const std::string& address);
+   fc::uint256 get_transaction_count(const address_compat_type& address, const std::string& block_tag = "pending");
 
    /**
     * @brief Retrieves the chain ID of the connected Ethereum network.
@@ -246,7 +245,7 @@ ethereum_contract_tx_fn<Args...> ethereum_contract_client::create_tx(const std::
       abi_map[abi_signature] = parse_ethereum_contract_abi_signature(abi_signature);
    }
    ethereum_contract_abi& abi = abi_map[abi_signature];
-   return [this, abi](Args&... args) -> fc::variant {
+   return [this, abi](const Args&... args) -> fc::variant {
       fc::variants params = {args...};
       auto tx = client->create_default_tx(contract_address);
       return client->execute_contract_tx(tx, abi, params);

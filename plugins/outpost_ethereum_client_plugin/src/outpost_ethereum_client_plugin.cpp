@@ -43,7 +43,7 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
    for (auto& client_spec : client_specs) {
       dlog("Adding ethereum client with spec: ${spec}", ("spec", client_spec));
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 4, "Invalid spec ${spec}", ("spec", client_spec));
+      FC_ASSERT(parts.size() == 3 || parts.size() == 4, "Invalid spec ${spec}", ("spec", client_spec));
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];

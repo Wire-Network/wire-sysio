@@ -45,6 +45,9 @@ macro(chain_target TARGET)
             boringssl::decrepit
             chain_plugin
             fc
+            Boost::process
+            Boost::dll
+            Boost::multiprecision
             -Wl,${no_whole_archive_flag}
             http_client_plugin
             http_plugin
@@ -63,9 +66,7 @@ macro(chain_target TARGET)
             ${CMAKE_DL_LIBS}
             ${PLATFORM_SPECIFIC_LIBS}
 
-            Boost::process
-            Boost::dll
-            Boost::multiprecision
+
             -Wl,${build_id_flag}
     )
 

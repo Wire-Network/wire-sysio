@@ -14,7 +14,7 @@
 #include <fc/time.hpp>
 #include <fc/container/deque_fwd.hpp>
 #include <fc/container/flat_fwd.hpp>
-// #include <fc/int256.hpp>
+#include <fc/int256.hpp>
 #include <boost/multi_index_container_fwd.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <variant>
@@ -22,11 +22,6 @@
 
 namespace fc
 {
-   using int256   = boost::multiprecision::int256_t;
-   using int256_t = int256;
-
-   using uint256   = boost::multiprecision::uint256_t;
-   using uint256_t = uint256;
    /**
     * @defgroup serializable Serializable _types
     * @brief Clas_ses that may be converted to/from an variant
@@ -394,9 +389,9 @@ namespace fc
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint64_t& vo );
    /** @ingroup Serializable */
-   void from_variant( const fc::variant& var,  int256& vo );
+   void from_variant( const fc::variant& var,  fc::int256& vo );
    /** @ingroup Serializable */
-   void from_variant( const fc::variant& var,  uint256& vo );
+   void from_variant( const fc::variant& var,  fc::uint256& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  bool& vo );
    /** @ingroup Serializable */

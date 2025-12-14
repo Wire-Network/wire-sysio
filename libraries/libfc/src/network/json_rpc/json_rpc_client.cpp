@@ -242,7 +242,8 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
       FC_THROW("Empty HTTP body, expected JSON-RPC response");
    }
 
-   variant j = fc::json::from_string(res.body());
+   auto body_str = res.body();
+   variant j = fc::json::from_string(body_str);
 
    return j;
 }
