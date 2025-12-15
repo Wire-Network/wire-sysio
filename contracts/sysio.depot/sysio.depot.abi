@@ -1,0 +1,140 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [
+        {
+            "new_type_name": "chain_kind_t",
+            "type": "uint8"
+        }
+    ],
+    "structs": [
+        {
+            "name": "msgchain_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "reserve_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "balance",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "reservedelta",
+            "base": "",
+            "fields": [
+                {
+                    "name": "kind",
+                    "type": "chain_kind_t"
+                },
+                {
+                    "name": "delta",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "swap_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                },
+                {
+                    "name": "status",
+                    "type": "uint8"
+                },
+                {
+                    "name": "source_chain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "source_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "target_chain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "target_amount",
+                    "type": "asset"
+                }
+            ]
+        },
+        {
+            "name": "swapquote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "source_chain",
+                    "type": "uint8"
+                },
+                {
+                    "name": "source_amount",
+                    "type": "asset"
+                },
+                {
+                    "name": "target_chain",
+                    "type": "uint8"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "reservedelta",
+            "type": "reservedelta",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "swapquote",
+            "type": "swapquote",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "msgchain",
+            "type": "msgchain_s",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "reserve",
+            "type": "reserve_s",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "swap",
+            "type": "swap_s",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
