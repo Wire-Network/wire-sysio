@@ -4,6 +4,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/utility.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
 
 using namespace fc::crypto;
 using namespace fc;
@@ -93,15 +94,18 @@ BOOST_AUTO_TEST_CASE(test_em) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em_recovery) try {
-   auto payload = "Test Cases";
-   auto digest = sha256::hash(payload, const_strlen(payload));
-   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
-   auto pub = key.get_public_key();
-   auto sig = key.sign(digest);
+   auto        payload    = "Test Cases";
+   auto        digest_raw = ethereum::hash_message(payload);
+   sha256      digest(reinterpret_cast<const char*>(digest_raw.data()),digest_raw.size());
+   auto        key     = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto        pub     = key.get_public_key();
+   auto        sig     = key.sign(digest);
    std::string sig_str = sig.to_string({});
    BOOST_TEST(fc::em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
 
-   auto recovered_pub = fc::crypto::public_key(sig, digest);
+   auto recovered_pub = public_key(em::public_key_shim(sig.get<em::signature_shim>().recover_ex(payload, true)));
+   // TODO: @jglanz Debug in detail - above works, but using the facade doesn't
+   //   auto recovered_pub = fc::crypto::public_key(sig, digest);
 
    BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
    BOOST_CHECK_EQUAL(sig_str, fc::crypto::signature(sig_str).to_string({}));
@@ -117,7 +121,7 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
 
    // Force S > n/2 to simulate a non-canonical signature
    signature non_canonical = sig;
-   const_cast<em::compact_signature*>(&non_canonical.get<em::signature_shim>()._data)->at(33) ^= 0x80;  // flip highest bit of S to make it > n/2 artificially
+   const_cast<em::compact_signature*>(&non_canonical.get<em::signature_shim>()._data)->at(32) ^= 0x80;  // flip highest bit of S to make it > n/2 artificially
 
    BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
