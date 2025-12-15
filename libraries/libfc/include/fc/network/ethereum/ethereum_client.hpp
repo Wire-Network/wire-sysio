@@ -4,10 +4,12 @@
 #include <fc/int256.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
 #include <fc/crypto/signature_provider.hpp>
-#include <fc/crypto/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 
-namespace fc::crypto::ethereum {
+namespace fc::network::ethereum {
+using namespace fc::crypto;
+using namespace fc::crypto::ethereum;
 using namespace fc::network::json_rpc;
 
 class ethereum_client;
@@ -202,6 +204,7 @@ public:
     */
    fc::variant get_syncing_status();
 
+   ethereum::address get_signer_address();
    eip1559_tx create_default_tx(const address_compat_type& to);
 
    template<typename C>

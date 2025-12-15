@@ -7,11 +7,17 @@
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace fc {
+class variant;
 using int256   = boost::multiprecision::int256_t;
 using int256_t = int256;
 
 using uint256   = boost::multiprecision::uint256_t;
 using uint256_t = uint256;
+
+
+
+fc::uint256 to_uint256(fc::variant v);
+fc::int256 to_int256(fc::variant v);
 
 #if __cplusplus >= 202002L
 
@@ -38,6 +44,7 @@ T from_bytes_be(const std::uint8_t* data) {
    boost::multiprecision::import_bits(v, data, data + sizeof(T), 8, false);
    return v;
 }
+
 #endif
 
 }

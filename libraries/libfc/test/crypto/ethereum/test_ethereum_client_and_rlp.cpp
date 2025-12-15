@@ -28,23 +28,18 @@
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/signature_provider.hpp>
-#include <fc/crypto/ethereum/ethereum_abi.hpp>
-
 #include <fc/crypto/ethereum/ethereum_types.hpp>
-#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
 namespace sysio {
 class signature_provider_manager_plugin;
 }
 
-using fc::crypto::signature_provider_ptr;
-using fc::crypto::private_key;
-using fc::crypto::public_key;
-
-
 using namespace std::literals;
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
+using namespace fc::network::ethereum;
 
 namespace {
 /* RLP encoding test data 01 */
@@ -66,7 +61,7 @@ eip1559_tx test_tx_01{
    .max_priority_fee_per_gas = 2000000000,
    .max_fee_per_gas = 2000101504,
    .gas_limit = 0x18c80,
-   .to = fc::from_hex("5FbDB2315678afecb367f032d93F642f64180aa3"),
+   .to = to_address("5FbDB2315678afecb367f032d93F642f64180aa3"),
    .value = 0,
    .data = fc::from_hex(test_tx_01_sig_encoded),
    .access_list = {}
@@ -87,8 +82,9 @@ std::vector<std::uint8_t> test_tx_01_unsigned_result {
 std::string test_tx_01_r = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
 std::string test_tx_01_s = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
 fc::uint256 test_tx_01_v = 0;
-std::string test_tx_01_result =
-   "02f84e827a690d8477359400847737208083018c80945fbdb2315678afecb367f032d93f642f64180aa380a43fb5c1cb000000000000000000000000000000000000000000000000000000000000003cc0";
+
+//noinspection SpellCheckingInspection
+std::string test_tx_01_result = "02f84e827a690d8477359400847737208083018c80945fbdb2315678afecb367f032d93f642f64180aa380a43fb5c1cb000000000000000000000000000000000000000000000000000000000000003cc0";
 
 }
 
@@ -103,7 +99,7 @@ BOOST_AUTO_TEST_CASE(can_encode_list_of_strings) try {
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(can_encode_call_sig) try {
-   auto encoded_call_sig = fc::crypto::ethereum::ethereum_contract_call_encode(test_tx_01_sig, test_tx_01_sig_params);
+   auto encoded_call_sig = ethereum_contract_call_encode(test_tx_01_sig, test_tx_01_sig_params);
    BOOST_CHECK(encoded_call_sig == test_tx_01_sig_encoded);
 } FC_LOG_AND_RETHROW();
 

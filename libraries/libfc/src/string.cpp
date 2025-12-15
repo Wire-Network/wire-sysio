@@ -121,13 +121,6 @@ std::string to_lower(std::string s) {
 }
 
 
-fc::uint256 parse_uint256(fc::variant v) {
-   auto s = v.as_string();
-   if (all_digits(s))
-      return fc::uint256(s);
-
-   return fc::uint256(fc::from_hex(s));
-}
 
 bool all_digits(const std::string_view& s) {
    return all_digits(std::string{s.data(),  s.size()});

@@ -1,9 +1,9 @@
 #include <print>
 #include <sysio/chain/application.hpp>
-#include <fc/crypto/ethereum/ethereum_client.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
-#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/log/logger_config.hpp>
 #include <sysio/outpost_client_plugin.hpp>
@@ -55,7 +55,7 @@ void initialize_logging() {
    app().set_sighup_callback(logging_conf_handler);
 }
 
-struct ethereum_contract_test_counter_client : fc::crypto::ethereum::ethereum_contract_client {
+struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
    ethereum_contract_tx_fn<fc::uint256> set_number;
    ethereum_contract_call_fn<> get_number;

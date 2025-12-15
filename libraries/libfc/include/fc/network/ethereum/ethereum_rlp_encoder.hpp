@@ -5,12 +5,13 @@
 #include <string>
 #include <span>
 #include <array>
-#include <sstream>
-#include <iomanip>
+
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 
-namespace fc::crypto::ethereum::rlp {
+namespace fc::network::ethereum::rlp {
+using namespace fc::crypto;
+using namespace fc::crypto::ethereum;
 
 
 // ---------------------------------------------------------
@@ -41,15 +42,15 @@ struct rlp_input_data : rlp_input_variant {
 };
 
 
-
-
 void append(bytes& out, std::vector<rlp_input_variant>& in_vars);
+void append(bytes& out, const std::uint8_t* data, std::size_t len);
 
 template <typename T>
 concept not_rlp_input_vector = !std::is_same_v<std::decay_t<T>, std::vector<rlp::rlp_input_variant>>;
 
 template <typename... Args>
-   requires not_rlp_input_vector<std::tuple_element_t<0, std::tuple<Args...>>>
+   requires (not_rlp_input_vector<std::tuple_element_t<0, std::tuple<Args...>>> &&
+             !std::is_pointer_v<std::tuple_element_t<0, std::tuple<Args...>>>)
 void append(bytes& out, Args&&... args) {
    std::vector<rlp_input_variant> items = {std::forward<Args>(args)...};
    append(out, items);
@@ -63,12 +64,14 @@ bytes encode_length(std::size_t len, std::size_t offset);
 // Core RLP encoders
 // ---------------------------------------------------------
 
-bytes encode_bytes(address& data);
+bytes encode_bytes(const address& data);
 bytes encode_bytes(bytes32& b);
+// bytes encode_bytes(std::span<std::uint8_t> data);
+// bytes encode_bytes(std::span<std::uint8_t>& data);
+bytes encode_bytes(const std::span<std::uint8_t>& data);
 bytes encode_bytes(const bytes32& b);
-bytes encode_bytes(std::span<std::uint8_t> data);
-
 bytes encode_bytes(const bytes& b);
+bytes encode_bytes(const std::uint8_t* data, std::size_t len);
 
 bytes encode_string(std::string& s);
 

@@ -12,11 +12,10 @@
 #include <optional>
 #include <set>
 
-// #include <sysio/outpost_client/ethereum/ethereum_client.hpp>
-#include <fc/crypto/ethereum/ethereum_client.hpp>
-#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
+#include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
@@ -26,23 +25,14 @@
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
 using namespace std::literals;
-// using namespace sysio::outpost_client;
-// using namespace sysio::outpost_client::ethereum;
+
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
+using namespace fc::network::ethereum;
+
+using namespace sysio::testing;
 
 using sysio::signature_provider_manager_plugin;
-using fc::crypto::private_key;
-using fc::crypto::public_key;
-using namespace sysio::testing;
-using fc::crypto::signature_provider_ptr;
-using fc::crypto::private_key;
-using fc::crypto::public_key;
-
-
-using namespace std::literals;
-using namespace fc::crypto;
-using namespace fc::crypto::ethereum;
 
 namespace {
 /* RLP encoding test data 01 */
@@ -64,7 +54,7 @@ eip1559_tx test_tx_01{
    .max_priority_fee_per_gas = 2000000000,
    .max_fee_per_gas = 2000101504,
    .gas_limit = 0x18c80,
-   .to = fc::from_hex("5FbDB2315678afecb367f032d93F642f64180aa3"),
+   .to = to_address("5FbDB2315678afecb367f032d93F642f64180aa3"),
    .value = 0,
    .data = fc::from_hex(test_tx_01_sig_encoded),
    .access_list = {}
@@ -136,7 +126,7 @@ std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
    return create_app(args_vec);
 }
 
-struct ethereum_contract_test_counter_client : fc::crypto::ethereum::ethereum_contract_client {
+struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
    ethereum_contract_tx_fn<fc::uint256> set_number;
    ethereum_contract_call_fn<> get_number;

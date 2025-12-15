@@ -84,7 +84,7 @@ struct eip1559_tx {
    fc::uint256 max_priority_fee_per_gas;
    fc::uint256 max_fee_per_gas;
    fc::uint256 gas_limit;
-   bytes to;
+   address to;
    fc::uint256 value;
    bytes data;
    std::vector<access_list_entry> access_list;

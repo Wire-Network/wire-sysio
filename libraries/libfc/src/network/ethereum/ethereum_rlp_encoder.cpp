@@ -1,33 +1,57 @@
 #include <fc/log/logger.hpp>
-#include <iostream>
 #include <ranges>
-#include <fc/crypto/ethereum/ethereum_rlp_encoder.hpp>
+#include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
-namespace fc::crypto::ethereum {
+namespace fc::network::ethereum::rlp {
+namespace {
+using namespace fc::crypto;
+using namespace fc::crypto::ethereum;
 
+struct rlp_visitor {
+   bytes& out;
 
-void rlp::append(bytes& out, std::vector<rlp_input_variant>& in_vars) {
-   auto rlp_visitor = [&](this const auto& self, auto&& arg) {
+   rlp_visitor() = delete;
+   explicit rlp_visitor(bytes& out) : out(out) {}
+
+   void operator()(auto&& arg) {
       using T = std::decay_t<decltype(arg)>;
       if constexpr (std::is_same_v<T, rlp_input_data_items>) {
          for (const auto& item : arg) {
-            std::visit(self, item); // Recurse
+            std::visit(*this, item); // Recurse
          }
       } else {
          out.insert(out.end(), arg.begin(), arg.end());
       }
-   };
+   }
+};
+}
+void append(bytes& out, std::vector<rlp_input_variant>& in_vars) {
+   // auto rlp_visitor = [&](this const auto& self, auto&& arg) {
+   //    using T = std::decay_t<decltype(arg)>;
+   //    if constexpr (std::is_same_v<T, rlp_input_data_items>) {
+   //       for (const auto& item : arg) {
+   //          std::visit(self, item); // Recurse
+   //       }
+   //    } else {
+   //       out.insert(out.end(), arg.begin(), arg.end());
+   //    }
+   // };
 
+   rlp_visitor visitor{out};
    for (auto& in_var : in_vars) {
-      std::visit(rlp_visitor, in_var);
+      std::visit(visitor, in_var);
    }
 }
 
-void rlp::append_byte(bytes& out, std::uint8_t b) {
+void append(bytes& out, const std::uint8_t* data, std::size_t len) {
+   std::copy_n(data, len, std::back_inserter(out));
+}
+
+void append_byte(bytes& out, std::uint8_t b) {
    out.push_back(b);
 }
 
-bytes rlp::encode_length(std::size_t len,std::size_t offset) {
+bytes encode_length(std::size_t len,std::size_t offset) {
    if (len < 56)
       return bytes{static_cast<std::uint8_t>(len + offset)};
 
@@ -38,8 +62,14 @@ bytes rlp::encode_length(std::size_t len,std::size_t offset) {
    return from_hex_no_prefix(enc_len_hex);
 }
 
-bytes rlp::encode_bytes(std::span<std::uint8_t> data) {
-   const std::size_t len = data.size();
+// bytes encode_bytes(std::span<std::uint8_t>& data) {
+//    return encode_bytes(static_cast<const std::span<std::uint8_t>&>(data));
+// }
+bytes encode_bytes(const std::span<std::uint8_t>& data) {
+   return encode_bytes(data.data(), data.size());
+}
+bytes encode_bytes(const std::uint8_t* data, std::size_t len) {
+
    bytes             out;
 
    if (len == 1 && data[0] < 0x80) {
@@ -49,41 +79,41 @@ bytes rlp::encode_bytes(std::span<std::uint8_t> data) {
 
    if (len <= 55) {
       out.push_back(static_cast<std::uint8_t>(0x80 + len));
-      append(out, data);
+      append(out, data, len);
       return out;
    }
    bytes len_enc = encode_length(len, 128);
    append(out, len_enc);
-   append(out, data);
+   append(out, data, len);
 
    return out;
 }
 
-bytes rlp::encode_bytes(const bytes& b) {
+bytes encode_bytes(const bytes& b) {
    bytes tmp = b;
    return encode_bytes(std::span<std::uint8_t>(tmp.data(), tmp.size()));
 }
 
-bytes rlp::encode_bytes(bytes32& b) {
+bytes encode_bytes(bytes32& b) {
    return encode_bytes(std::span<std::uint8_t>(b.data(), b.size()));
 }
 
-bytes rlp::encode_bytes(const bytes32& b) {
+bytes encode_bytes(const bytes32& b) {
    bytes32 tmp = b;
    return encode_bytes(tmp);
 }
 
 
-bytes rlp::encode_bytes(address& data) {
-   return encode_bytes(std::span<std::uint8_t>(data.data(), data.size()));
+bytes encode_bytes(const address& data) {
+   return encode_bytes(data.data(), data.size());
 }
 
-bytes rlp::encode_string(std::string& s) {
+bytes encode_string(std::string& s) {
    return encode_bytes(std::span<std::uint8_t>(
       reinterpret_cast<std::uint8_t*>(s.data()), s.size()));
 }
 
-bytes rlp::encode_list(std::vector<rlp_input_variant> items) {
+bytes encode_list(std::vector<rlp_input_variant> items) {
    bytes payload;
    append(payload, items);
 
@@ -97,7 +127,7 @@ bytes rlp::encode_list(std::vector<rlp_input_variant> items) {
    return out;
 }
 
-std::string rlp::to_hex(const bytes32& b, bool prefixed) {
+std::string to_hex(const bytes32& b, bool prefixed) {
    std::ostringstream oss;
    if (prefixed)
       oss << "0x";
@@ -108,7 +138,7 @@ std::string rlp::to_hex(const bytes32& b, bool prefixed) {
    return oss.str();
 }
 
-std::string rlp::to_hex(const bytes& b, bool prefixed) {
+std::string to_hex(const bytes& b, bool prefixed) {
    std::ostringstream oss;
    if (prefixed)
       oss << "0x";
@@ -119,7 +149,7 @@ std::string rlp::to_hex(const bytes& b, bool prefixed) {
    return oss.str();
 }
 
-std::string rlp::to_hex(std::size_t num, bool prefixed) {
+std::string to_hex(std::size_t num, bool prefixed) {
    std::ostringstream oss;
 
    oss << std::hex << num;
@@ -130,7 +160,7 @@ std::string rlp::to_hex(std::size_t num, bool prefixed) {
    return s;
 }
 
-bytes rlp::from_hex_no_prefix(const std::string& hex) {
+bytes from_hex_no_prefix(const std::string& hex) {
    bytes out;
    if (hex.size() % 2 != 0)
       return out;
@@ -156,44 +186,44 @@ bytes rlp::from_hex_no_prefix(const std::string& hex) {
    return out;
 }
 
-bytes rlp::from_hex_any(const std::string& hex) {
+bytes from_hex_any(const std::string& hex) {
    if (hex.starts_with("0x") || hex.starts_with("0X")) {
       return from_hex_no_prefix(hex.substr(2));
    }
    return from_hex_no_prefix(hex);
 }
 
-bytes rlp::encode_access_list(const std::vector<access_list_entry>& access_list) {
+bytes encode_access_list(const std::vector<access_list_entry>& access_list) {
    auto access_list_items =
       access_list | std::views::transform([](const auto& v) {
-         auto storage_key_bytes = rlp::encode_list(v.storage_keys |
+         auto storage_key_bytes = encode_list(v.storage_keys |
                                                    std::views::transform([](auto key) {
-                                                      return rlp::encode_bytes(key);
+                                                      return encode_bytes(key);
                                                    }) | std::ranges::to<std::vector<rlp_input_variant>>());
-         return rlp_input_variant(rlp::encode_list({
+         return rlp_input_variant(encode_list({
             v.addr,
             storage_key_bytes
          }));
       }) |
       std::ranges::to<std::vector>();
 
-   return rlp::encode_list(access_list_items);
+   return encode_list(access_list_items);
 }
 
-bytes rlp::encode_eip1559_unsigned(const eip1559_tx& tx) {
+bytes encode_eip1559_unsigned(const eip1559_tx& tx) {
    bytes to_bytes   = encode_bytes(tx.to);
    bytes data_bytes = encode_bytes(tx.data);
 
    // std::vector<rlp_input_variant>
 
-   return rlp::encode_list({
-      rlp::encode_uint(tx.chain_id),
-      rlp::encode_uint(tx.nonce),
-      rlp::encode_uint(tx.max_priority_fee_per_gas),
-      rlp::encode_uint(tx.max_fee_per_gas),
-      rlp::encode_uint(tx.gas_limit),
+   return encode_list({
+      encode_uint(tx.chain_id),
+      encode_uint(tx.nonce),
+      encode_uint(tx.max_priority_fee_per_gas),
+      encode_uint(tx.max_fee_per_gas),
+      encode_uint(tx.gas_limit),
       to_bytes,
-      rlp::encode_uint(tx.value),
+      encode_uint(tx.value),
       data_bytes,
       encode_access_list(tx.access_list)
    });
@@ -201,7 +231,7 @@ bytes rlp::encode_eip1559_unsigned(const eip1559_tx& tx) {
 
 
 
-bytes rlp::encode_eip1559_unsigned_typed(const eip1559_tx& tx) {
+bytes encode_eip1559_unsigned_typed(const eip1559_tx& tx) {
    bytes body = encode_eip1559_unsigned(tx);
    bytes out;
    out.reserve(1 + body.size());
@@ -210,7 +240,7 @@ bytes rlp::encode_eip1559_unsigned_typed(const eip1559_tx& tx) {
    return out;
 }
 
-bytes rlp::encode_eip1559_signed(const eip1559_tx& tx) {
+bytes encode_eip1559_signed(const eip1559_tx& tx) {
    bytes to_bytes   = encode_bytes(tx.to);
    bytes data_bytes = encode_bytes(tx.data);
 
@@ -234,7 +264,7 @@ bytes rlp::encode_eip1559_signed(const eip1559_tx& tx) {
    });
 }
 
-bytes rlp::encode_eip1559_signed_typed(
+bytes encode_eip1559_signed_typed(
    const eip1559_tx& tx) {
    bytes body = encode_eip1559_signed(tx);
    bytes out;

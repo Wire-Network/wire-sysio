@@ -6,7 +6,9 @@
 #include <variant>
 #include <fc/variant.hpp>
 
-namespace fc::crypto::ethereum {
+namespace fc::network::ethereum {
+
+// using namespace fc::crypto::ethereum;
 
 enum class ethereum_contract_abi_type {
    function,

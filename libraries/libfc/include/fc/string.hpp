@@ -53,8 +53,6 @@ namespace fc
    */
   std::string to_lower(std::string s);
 
-  class variant;
-  fc::uint256 parse_uint256(fc::variant v);
   bool all_digits(const std::string_view& s);
   bool all_digits(const std::string& s);
 }

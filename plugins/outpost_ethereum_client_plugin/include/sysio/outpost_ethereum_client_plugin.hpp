@@ -2,10 +2,11 @@
 
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <fc/crypto/ethereum/ethereum_client.hpp>
+#include <fc/network/ethereum/ethereum_client.hpp>
 
 namespace sysio {
 using namespace fc::crypto::ethereum;
+using namespace fc::network::ethereum;
 
 struct ethereum_client_entry_t {
    std::string                        id;

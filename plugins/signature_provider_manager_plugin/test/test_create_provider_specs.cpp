@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
    // Create pub key from fixture
    auto fixture_pub_key_bytes = fc::from_hex(fixture_pub_key_stripped);
 
-   fc::em::public_key em_pub_key_parsed      = fc::crypto::ethereum::parse_public_key(fixture_pub_key_stripped);
+   fc::em::public_key em_pub_key_parsed      = fc::crypto::ethereum::to_em_public_key(fixture_pub_key_stripped);
    auto               em_pub_key_parsed_data = em_pub_key_parsed.serialize();
 
    auto em_pub_key      = em_priv_key.get_public_key();
@@ -196,17 +196,13 @@ BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
    auto          fixture_spec2 = keygen_fixture_to_spec("ethereum", 2);
 
    std::vector<std::string> args = {
-
       "--signature-provider", fixture_spec1, "--signature-provider", fixture_spec2};
    auto  tester = create_app(args);
    auto& mgr    = tester->plugin();
 
    auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_ethereum);
    BOOST_CHECK(all_providers.size() >= 2);
-   for (const auto& provider : all_providers) {
-      std::println(std::cerr, "Provider: key_name={}, public_key={}", provider->key_name,
-                   provider->public_key.to_string({}));
-   }
+
    // Provider 1 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
    // Provider 2 should be retrievable
@@ -224,22 +220,17 @@ BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
    auto          fixture_spec1 = keygen_fixture_to_spec("wire", 1);
 
    std::vector<std::string> args = {
-
       "--signature-provider", fixture_spec1};
    auto  tester = create_app(args);
    auto& mgr    = tester->plugin();
 
    auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_wire);
    BOOST_CHECK(all_providers.size() >= 1);
-   // for (const auto& provider : all_providers) {
-   //    std::println(std::cerr, "Provider: key_name={}, public_key={}", provider->key_name,
-   //                 provider->public_key.to_string({}));
-   // }
+
    // Provider 1 should be retrievable
    BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
 
 }
-
 
 // BOOST_AUTO_TEST_CASE(test_signature_provider_manager_plugin_with_app) {
 //    test_wire_signature_provider_spec_options();

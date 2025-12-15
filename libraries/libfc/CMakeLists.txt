@@ -1,6 +1,7 @@
 
 set(fc_sources
   src/uint128.cpp
+  src/int256.cpp
   src/variant.cpp
   src/exception.cpp
   src/variant_object.cpp
@@ -35,10 +36,7 @@ set(fc_sources
   src/crypto/sha256.cpp
   src/crypto/sha224.cpp
   src/crypto/sha512.cpp
-  src/crypto/ethereum/ethereum_abi.cpp
   src/crypto/ethereum/ethereum_utils.cpp
-  src/crypto/ethereum/ethereum_client.cpp
-  src/crypto/ethereum/ethereum_rlp_encoder.cpp
   src/crypto/elliptic_common.cpp
   src/crypto/elliptic_impl_priv.cpp
   src/crypto/elliptic_secp256k1.cpp
@@ -54,6 +52,9 @@ set(fc_sources
   src/crypto/blake2.cpp
   src/crypto/k1_recover.cpp
   src/network/url.cpp
+  src/network/ethereum/ethereum_abi.cpp
+  src/network/ethereum/ethereum_client.cpp
+  src/network/ethereum/ethereum_rlp_encoder.cpp
   src/network/http/http_client.cpp
   src/network/json_rpc/json_rpc_client.cpp
   src/compress/zlib.cpp

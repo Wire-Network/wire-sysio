@@ -224,7 +224,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
       for (const auto& spec : specs) {
          dlog("Registering signature provider from spec: ${spec}", ("spec", spec));
          auto provider = create_provider(spec);
-         ilog("Registered signature provider (${name}): ${publicKey}",
+         dlog("Registered signature provider (${name}): ${publicKey}",
               ("name", provider->key_name)("publicKey", provider->public_key.to_string({})));
       }
    }
@@ -244,7 +244,6 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
    } else {
       key_name = spec_parts[0];
    }
-
 
    auto kind                      = chain_kind_reflector::from_string(spec_parts[target_chain_idx].c_str());
    auto key_type                  = chain_key_type_reflector::from_string(spec_parts[target_chain_idx + 1].c_str());
@@ -274,7 +273,7 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
       break;
    }
    case chain_key_type_ethereum: {
-      auto em_pubkey      = fc::crypto::ethereum::parse_public_key(public_key_text);
+      auto em_pubkey      = fc::crypto::ethereum::to_em_public_key(public_key_text);
       auto em_pubkey_data = em_pubkey.serialize();
       auto em_pubkey_shim = fc::em::public_key_shim(em_pubkey_data);
       pubkey              = fc::crypto::public_key(em_pubkey_shim);
@@ -297,15 +296,6 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
 
    return my->set_provider(provider);
 }
-
-fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_kiod_provider(fc::crypto::chain_kind_t target_chain,
-                                                                               fc::crypto::chain_key_type_t key_type,
-                                                                               std::string        public_key_text,
-                                                                               std::string        url,
-                                                                               const std::string& key_name) {
-   FC_ASSERT(false, "Not implemented yet");
-}
-
 
 fc::crypto::signature_provider_sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {

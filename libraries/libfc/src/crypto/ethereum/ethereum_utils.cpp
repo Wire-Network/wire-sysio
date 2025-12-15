@@ -152,7 +152,14 @@ em::message_hash_type hash_user_message(const em::message_body_type& payload) {
    return eth_message_digest;
 }
 
-fc::em::public_key parse_public_key(const std::string& pubkey_hex) {
+fc::crypto::public_key to_public_key(const std::string& pubkey_hex) {
+   auto em_pubkey = to_em_public_key(pubkey_hex);
+   auto em_pubkey_data = em_pubkey.serialize();
+   auto em_pubkey_shim = fc::em::public_key_shim(em_pubkey_data);
+   return fc::crypto::public_key(em_pubkey_shim);
+}
+
+fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
    auto clean_hex         = trim(pubkey_hex);
    auto pubkey_bytes      = hex_to_bytes(clean_hex);
    auto pubkey_byte_count = pubkey_bytes.size();

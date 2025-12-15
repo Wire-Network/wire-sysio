@@ -39,16 +39,11 @@ macro(chain_target TARGET)
             test_control_api_plugin
             test_control_plugin
             trace_api_plugin
-            appbase
-            boringssl::ssl
-            boringssl::crypto
-            boringssl::decrepit
             chain_plugin
-            fc
-            Boost::process
-            Boost::dll
-            Boost::multiprecision
+            appbase
+            ${PLUGIN_DEFAULT_DEPENDENCIES}
             -Wl,${no_whole_archive_flag}
+
             http_client_plugin
             http_plugin
             net_plugin

@@ -73,7 +73,7 @@ em::message_hash_type hash_user_message(const em::message_body_type& payload);
  * @param pubkey_hex The public key in hexadecimal format
  * @return The parsed public key object
  */
-fc::em::public_key parse_public_key(const std::string& pubkey_hex);
+fc::em::public_key to_em_public_key(const std::string& pubkey_hex);
 
 fc::em::private_key parse_private_key(const std::string& privkey_hex);
 

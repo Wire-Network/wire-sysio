@@ -1,3 +1,28 @@
+if (PLUGIN_DEFAULT_DEPENDENCIES)
+    return()
+endif ()
+
+set(PLUGIN_DEFAULT_DEPENDENCIES
+        fc
+        fc-lite
+
+        Boost::asio
+        Boost::beast
+        Boost::chrono
+        Boost::date_time
+        Boost::dll
+        Boost::interprocess
+        Boost::iostreams
+        Boost::multiprecision
+        Boost::multi_index
+        Boost::process
+        Boost::thread
+
+        boringssl::ssl
+        boringssl::crypto
+        boringssl::decrepit
+        PARENT_SCOPE
+)
 
 macro(plugin_target TARGET_NAME)
 
@@ -31,6 +56,8 @@ macro(plugin_target TARGET_NAME)
     target_link_libraries(
             ${TARGET_NAME}
             PUBLIC
+            fc
+            fc-lite
             ${ARG_LIBRARIES}
     )
 

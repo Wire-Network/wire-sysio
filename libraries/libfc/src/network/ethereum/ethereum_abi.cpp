@@ -1,4 +1,4 @@
-#include <fc/crypto/ethereum/ethereum_abi.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
@@ -15,8 +15,10 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <ranges>
 
-namespace fc::crypto::ethereum {
+namespace fc::network::ethereum {
 
+using namespace fc::crypto;
+using namespace fc::crypto::ethereum;
 using boost::multiprecision::cpp_int;
 
 // Anonymous namespace for internal helpers (instead of marking them static)

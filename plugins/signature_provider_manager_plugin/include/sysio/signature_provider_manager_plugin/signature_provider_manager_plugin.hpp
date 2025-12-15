@@ -57,17 +57,8 @@ public:
       fc::crypto::chain_key_type_t key_type,
       const std::string&         public_key_text,
       const std::string&         private_key_provider_spec
-
       );
 
-   fc::crypto::signature_provider_ptr
-   create_kiod_provider(
-      fc::crypto::chain_kind_t target_chain,
-      fc::crypto::chain_key_type_t key_type,
-      std::string public_key_text,
-      std::string url,
-      const std::string& key_name
-   );
    /**
     * Create a signature provider for use by the caller and only the caller
     *
