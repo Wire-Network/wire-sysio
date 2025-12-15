@@ -1630,9 +1630,9 @@ Finally, the full detail test report for each of the determined max TPS throughp
         "_resourceMonitorWarningIntervalNodeopDefault": 30,
         "_resourceMonitorWarningIntervalNodeopArg": "--resource-monitor-warning-interval"
       },
-      "signatureProviderPluginArgs": {
+      "signatureProviderManagerPluginArgs": {
         "_pluginNamespace": "sysio",
-        "_pluginName": "signature_provider_plugin",
+        "_pluginName": "signature_provider_manager_plugin",
         "kiodProviderTimeout": null,
         "_kiodProviderTimeoutNodeopDefault": 5,
         "_kiodProviderTimeoutNodeopArg": "--kiod-provider-timeout"
@@ -2286,9 +2286,9 @@ The Performance Test Basic generates, by default, a report that details results 
         "_resourceMonitorWarningIntervalNodeopDefault": 30,
         "_resourceMonitorWarningIntervalNodeopArg": "--resource-monitor-warning-interval"
       },
-      "signatureProviderPluginArgs": {
+      "signatureProviderManagerPluginArgs": {
         "_pluginNamespace": "sysio",
-        "_pluginName": "signature_provider_plugin",
+        "_pluginName": "signature_provider_manager_plugin",
         "kiodProviderTimeout": null,
         "_kiodProviderTimeoutNodeopDefault": 5,
         "_kiodProviderTimeoutNodeopArg": "--kiod-provider-timeout"
