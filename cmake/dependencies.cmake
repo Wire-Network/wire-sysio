@@ -30,6 +30,9 @@ find_package(Threads REQUIRED)
 
 # OTHER DEPENDENCIES
 find_package(ZLIB REQUIRED)
+find_package(boringssl-custom CONFIG REQUIRED)
+find_package(ethash CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(gsl-lite CONFIG REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)
@@ -39,5 +42,6 @@ find_package(softfloat CONFIG REQUIRED)
 find_package(secp256k1-internal CONFIG REQUIRED)
 find_package(bn256 CONFIG REQUIRED)
 find_package(bls12-381 CONFIG REQUIRED)
-find_package(boringssl-custom CONFIG REQUIRED)
+
+find_package(CURL 8.16.0 CONFIG REQUIRED)
 find_package(sys-vm CONFIG REQUIRED)

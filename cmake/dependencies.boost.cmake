@@ -1,39 +1,80 @@
-# Use vcpkg’s BoostConfig.cmake (CONFIG mode), not FindBoost.
-unset(Boost_DIR CACHE)
-unset(BOOST_ROOT CACHE)
-# Make sure we don't force module-mode anywhere:
-# unset(Boost_NO_BOOST_CMAKE CACHE)
+set(BOOST_VERSION 1.89.0)
+# Ask for the version installed via vcpkg (or omit the version to accept any)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
-# Ask for the version installed via vcpkg (or omit the version to accept any)
-find_package(Boost 1.89.0 EXACT CONFIG REQUIRED
-  COMPONENTS
-    system
-    filesystem
-    iostreams
-    date_time
-    thread
-    chrono
-    context
-    coroutine
-    program_options
-    interprocess
-    process
-    unit_test_framework
-    dll
-    beast
-    bimap
-    multi_index
-    signals2
-    multiprecision 
-    hana
-    property_tree
-    lockfree
-    assign
-    accumulators
-    rational
-    format
+set(Boost_USE_STATIC_LIBS ON)
+set(BOOST_COMPONENTS
+        system
+        container
+        process
+        filesystem
+        iostreams
+        date_time
+        thread
+        chrono
+        context
+        coroutine
+        program_options
+        interprocess
+        unit_test_framework
+        dll
+        beast
+        bimap
+        multi_index
+        signals2
+        multiprecision
+        hana
+        property_tree
+        lockfree
+        assign
+        accumulators
+        rational
+        format
+        asio
+        headers
+        regex
+        atomic
 )
+foreach (COMPONENT ${BOOST_COMPONENTS})
+#    list(APPEND BOOST_COMPONENTS_REQUIRED ${COMPONENT})
+    find_package(boost_${COMPONENT} ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+endforeach()
+#find_package(boost_container ${BOOST_VERSION} CONFIG REQUIRED)
+#find_package(Boost ${BOOST_VERSION} CONFIG REQUIRED
+#        COMPONENTS
+#        system
+#        container
+#        process
+#
+#    filesystem
+#    iostreams
+#    date_time
+#    thread
+#    chrono
+#    context
+#    coroutine
+#    program_options
+#    interprocess
+#
+#    unit_test_framework
+#    dll
+#    beast
+#    bimap
+#    multi_index
+#    signals2
+#    multiprecision
+#    hana
+#    property_tree
+#    lockfree
+#    assign
+#    accumulators
+#    rational
+#    format
+#    asio
+#    headers
+#    regex
+#    atomic
+#)
 
 # Keep uBLAS shim if code links Boost::numeric_ublas
 if (NOT TARGET boost_numeric_ublas)
