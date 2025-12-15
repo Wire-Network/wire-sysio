@@ -1,7 +1,9 @@
 .idea
+.run
 .vscode-ctags
 tmp
 .run/
+/.data
 *.a
 *.sw*
 *.dylib
@@ -9,6 +11,7 @@ tmp
 *.bc
 *.dot
 *.abi.hpp
+/plugins/outpost_ethereum_client_plugin/test_original
 !unittests/system-test-contracts/*/*.abi.hpp
 !unittests/system-test-contracts/*.abi.hpp
 *.ninja
@@ -104,3 +107,4 @@ snapshots
 find-eosio-wasm.sh
 cliff.toml
 !cmake/build-options.cmake
+!/scripts/package-lock.json

@@ -13,6 +13,14 @@
     "secp256k1-internal",
     "softfloat",
     "zlib",
+    "ethash",
+    "cryptopp",
+    "gtest",
+    "jsoncpp",
+    {
+      "name": "curl",
+      "features": ["boringssl-custom"]
+    },
     {
       "name": "catch2",
       "features": [

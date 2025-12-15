@@ -30,6 +30,10 @@ find_package(Threads REQUIRED)
 
 # OTHER DEPENDENCIES
 find_package(ZLIB REQUIRED)
+find_package(CURL CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
+find_package(ethash CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
 find_package(gsl-lite CONFIG REQUIRED)
 find_package(RapidJSON CONFIG REQUIRED)
 find_package(CLI11 CONFIG REQUIRED)

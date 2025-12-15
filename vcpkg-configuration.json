@@ -9,12 +9,14 @@
     {
       "kind": "git",
       "repository": "https://github.com/wire-network/wire-vcpkg-registry",
-      "baseline": "95beafd810db85421125a9e3d63b1a45b617b6a6",
+      "baseline": "4974d03eea020d751f9f8d2a8abfa996b900c87a",
       "packages": [
         "softfloat",
         "libsodium",
+        "ethash",
         "catch2",
         "cli11",
+        "curl",
         "boost",
         "boringssl-custom",
         "secp256k1-internal",

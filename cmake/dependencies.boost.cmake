@@ -9,6 +9,7 @@ find_package(Boost ${BOOST_VERSION}
   multiprecision
   signals2
   beast
+  asio
   property_tree
   headers
   hana
