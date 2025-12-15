@@ -1,5 +1,8 @@
-#include <fc/filesystem.hpp>
+#pragma once
+#include <filesystem>
 #include <string>
+#include <vector>
+#include <fc/filesystem.hpp>
 
 namespace fc {
   /**
@@ -8,4 +11,13 @@ namespace fc {
    * if the file may be very large.
    */
   void read_file_contents( const std::filesystem::path& filename, std::string& result );
+
+
+  /**
+   * Read a file into a vector of bytes
+   *
+   * @param filename file name to read
+   * @return vector of bytes
+   */
+  std::vector<unsigned char> read_file_contents(const std::filesystem::path& filename);
 }

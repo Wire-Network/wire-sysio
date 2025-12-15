@@ -323,6 +323,11 @@ namespace fc
     throw fc::exception( FC_INDIRECT_EXPAND(FC_LOG_MESSAGE, ( error, __VA_ARGS__ )) );  \
   FC_MULTILINE_MACRO_END
 
+#define FC_THROW_FMT(  ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+    throw fc::exception( FC_INDIRECT_EXPAND(FC_LOG_MESSAGE_FMT, ( error, __VA_ARGS__ )) );  \
+  FC_MULTILINE_MACRO_END
+
 #define FC_EXCEPTION( EXCEPTION_TYPE, FORMAT, ... ) \
     EXCEPTION_TYPE( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) )
 /**
@@ -335,6 +340,10 @@ namespace fc
     throw EXCEPTION( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) ); \
   FC_MULTILINE_MACRO_END
 
+#define FC_THROW_EXCEPTION_FMT( EXCEPTION, FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+    throw EXCEPTION( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
 
 /**
  *  @def FC_RETHROW_EXCEPTION(ER,LOG_LEVEL,FORMAT,...)

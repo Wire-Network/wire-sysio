@@ -156,7 +156,7 @@ namespace fc
          */
       iterator             find( const std::string& key );
       iterator             find( const char* key );
-
+      bool                 contains( const char* key );
 
       /** replaces the value at \a key with \a var or inserts \a key if not found */
       mutable_variant_object& set( std::string key, variant var ) &;
