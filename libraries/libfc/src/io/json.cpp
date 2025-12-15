@@ -15,12 +15,12 @@ namespace fc
 {
     // forward declarations of provided functions
     template<typename T, json::parse_type parser_type> variant variant_from_stream( T& in, uint32_t max_depth );
-    template<typename T> char parseEscape( T& in );
-    template<typename T> std::string stringFromStream( T& in );
+    template<typename T> char parse_escape( T& in );
+    template<typename T> std::string string_from_stream( T& in );
     template<typename T> bool skip_white_space( T& in );
-    template<typename T> std::string stringFromToken( T& in );
-    template<typename T, json::parse_type parser_type> variant_object objectFromStream( T& in, uint32_t max_depth );
-    template<typename T, json::parse_type parser_type> variants arrayFromStream( T& in, uint32_t max_depth );
+    template<typename T> std::string string_from_token( T& in );
+    template<typename T, json::parse_type parser_type> variant_object object_from_stream( T& in, uint32_t max_depth );
+    template<typename T, json::parse_type parser_type> variants array_from_stream( T& in, uint32_t max_depth );
     template<typename T, json::parse_type parser_type> variant number_from_stream( T& in );
     template<typename T> variant token_from_stream( T& in );
     template<typename T> void to_stream( T& os, const variants& a, const json::yield_function_t& yield, json::output_formatting format );
@@ -34,7 +34,7 @@ namespace fc
 namespace fc
 {
    template<typename T>
-   char parseEscape( T& in )
+   char parse_escape( T& in )
    {
       if( in.peek() == '\\' )
       {
@@ -87,7 +87,7 @@ namespace fc
    }
 
    template<typename T>
-   std::string stringFromStream( T& in )
+   std::string string_from_stream( T& in )
    {
       std::string token;
       try
@@ -104,7 +104,7 @@ namespace fc
             switch( c = in.peek() )
             {
                case '\\':
-                  token += parseEscape( in );
+                  token += parse_escape( in );
                   break;
                case 0x04:
                   FC_THROW_EXCEPTION( parse_error_exception, "EOF before closing '\"' in string '${token}'",
@@ -124,7 +124,7 @@ namespace fc
    }
 
    template<typename T>
-   std::string stringFromToken( T& in )
+   std::string string_from_token( T& in )
    {
       std::string token;
       try
@@ -136,7 +136,7 @@ namespace fc
             switch( c = in.peek() )
             {
                case '\\':
-                  token += parseEscape( in );
+                  token += parse_escape( in );
                   break;
                case '\t':
                case ' ':
@@ -169,7 +169,7 @@ namespace fc
    }
 
    template<typename T, json::parse_type parser_type>
-   variant_object objectFromStream( T& in, uint32_t max_depth )
+   variant_object object_from_stream( T& in, uint32_t max_depth )
    {
       mutable_variant_object obj;
       try
@@ -188,7 +188,7 @@ namespace fc
                continue;
             }
             if( skip_white_space(in) ) continue;
-            std::string key = stringFromStream( in );
+            std::string key = string_from_stream( in );
             skip_white_space(in);
             if( in.peek() != ':' )
             {
@@ -219,7 +219,7 @@ namespace fc
    }
 
    template<typename T, json::parse_type parser_type>
-   variants arrayFromStream( T& in, uint32_t max_depth )
+   variants array_from_stream( T& in, uint32_t max_depth )
    {
       variants ar;
       try
@@ -292,7 +292,7 @@ namespace fc
               default:
                  if( isalnum( c ) )
                  {
-                    s += stringFromToken( in );
+                    s += string_from_token( in );
                     return s;
                  }
                 done = true;
@@ -381,7 +381,7 @@ namespace fc
           // make out ("falfe")
           // A strict JSON parser would signal this as an error, but we
           // will just treat the malformed token as an un-quoted string.
-          return str + stringFromToken(in);;
+          return str + string_from_token(in);;
         }
       }
    }
@@ -406,11 +406,11 @@ namespace fc
               in.get();
               continue;
             case '"':
-              return stringFromStream( in );
+              return string_from_stream( in );
             case '{':
-               return objectFromStream<T, parser_type>( in, max_depth - 1 );
+               return object_from_stream<T, parser_type>( in, max_depth - 1 );
             case '[':
-              return arrayFromStream<T, parser_type>( in, max_depth - 1 );
+              return array_from_stream<T, parser_type>( in, max_depth - 1 );
             case '-':
             case '.':
             case '0':
@@ -435,7 +435,7 @@ namespace fc
               FC_THROW_EXCEPTION( eof_exception, "unexpected end of file" );
             default:
               FC_THROW_EXCEPTION( parse_error_exception, "Unexpected char '${c}' in \"${s}\"",
-                                 ("c", c)("s", stringFromToken(in)) );
+                                 ("c", c)("s", string_from_token(in)) );
          }
       }
 	  return variant();

@@ -53,12 +53,13 @@ namespace fc { namespace crypto {
          explicit private_key(const std::string& base58str);
          std::string to_string(const fc::yield_function_t& yield) const;
 
+          explicit private_key( storage_type&& other_storage )
+             :_storage(other_storage)
+          {}
+
       private:
          storage_type _storage;
 
-         private_key( storage_type&& other_storage )
-            :_storage(other_storage)
-         {}
 
          friend bool operator==( const private_key& p1, const private_key& p2 );
          friend bool operator<( const private_key& p1, const private_key& p2 );
