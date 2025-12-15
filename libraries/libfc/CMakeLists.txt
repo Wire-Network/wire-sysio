@@ -94,8 +94,10 @@ target_link_libraries(
   GMP::gmp
   ZLIB::ZLIB
   rapidjson
+  boringssl::ssl
   boringssl::crypto
   boringssl::decrepit
+
 
   secp256k1::secp256k1-internal
   bls12-381::bls12-381
