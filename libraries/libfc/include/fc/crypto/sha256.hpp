@@ -1,4 +1,5 @@
 #pragma once
+
 #include <span>
 #include <compare>
 #include <fc/fwd.hpp>
@@ -106,8 +107,9 @@ class sha256 : public add_packhash_to_hash<sha256>
 
     uint64_t _hash[4];
 };
-
-  typedef sha256 uint256;
+  // TODO: @jglanz confirm that the general purpose
+  //   int256/uint256 introduced in `int256.hpp` works in place of this
+  // typedef sha256 uint256;
 
   class variant;
   void to_variant( const sha256& bi, variant& v );

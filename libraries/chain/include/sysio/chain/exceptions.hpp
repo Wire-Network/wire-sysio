@@ -439,6 +439,8 @@ namespace sysio { namespace chain {
                                     3100010, "JSON parse exception" )
       FC_DECLARE_DERIVED_EXCEPTION( sig_variable_size_limit_exception,      misc_exception,
                                     3100011, "Variable length component of signature too large" )
+      FC_DECLARE_DERIVED_EXCEPTION( pending_impl_exception,      misc_exception,
+                                    3100012, "Pending implementation" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( plugin_exception, chain_exception,

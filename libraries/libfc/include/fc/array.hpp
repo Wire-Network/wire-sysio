@@ -57,7 +57,7 @@ namespace fc {
     const T*     begin()const  {  return &data[0]; }
     const T*     end()const    {  return &data[N]; }
 
-    size_t       size()const { return N; }
+    constexpr size_t       size()const { return N; }
 
     T data[N];
   };
