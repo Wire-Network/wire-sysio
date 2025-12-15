@@ -1,13 +1,22 @@
 cmake_minimum_required(VERSION 3.16)
+
+#set(VCPKG_LIBRARY_LINKAGE static)
+#if(NOT DEFINED VCPKG_TARGET_TRIPLET)
+# set(VCPKG_TARGET_TRIPLET x64-linux-static)
+#endif ()
+# Set vcpkg toolchain if not already set
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            CACHE STRING "Vcpkg toolchain file")
+endif()
+
+
 # Silence warning about CMP0144 and ensure find_package() honors UPPERCASE <PKG>_ROOT vars
 # This is safe on older CMake versions due to the POLICY check.
-if(POLICY CMP0144)
-  cmake_policy(SET CMP0144 NEW)
-endif()
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
-endif()
+#if(POLICY CMP0144)
+#  cmake_policy(SET CMP0144 NEW)
+#endif()
+
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -27,11 +36,13 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(build-init NO_POLICY_SCOPE)
 include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
 include(linker-config NO_POLICY_SCOPE)
 include(hardening-config NO_POLICY_SCOPE)
+include(plugin-tools NO_POLICY_SCOPE)
 include(chain-tools NO_POLICY_SCOPE)
 include(test-tools NO_POLICY_SCOPE)
 include(contract-tools NO_POLICY_SCOPE)
