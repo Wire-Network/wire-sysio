@@ -8,14 +8,9 @@ namespace sysiosystem {
    // - - - - LOCAL EMISSIONS CONSTANTS - - - -
 
    // Adjust precision here to match your core symbol
-   static constexpr sysio::symbol WIRE_SYMBOL = sysio::symbol("WIRE", 8); // TODO: Set precision once we know. Can we somehow pull this from sysio.token based on the actually created TOKEN/SYMBOL?
-
+   static constexpr sysio::symbol WIRE_SYMBOL = sysio::symbol("WIRE", 8); // TODO: Set precision once we know.
    // Minimum amount any claim action will allow.
    static const sysio::asset MIN_CLAIMABLE = sysio::asset(1000000000, WIRE_SYMBOL);
-
-   // TODO: Fix these types, used for liq staking
-   // static const wns::uint256_t ETH_RAY = pow(10, 27);
-   // static const uint64_t SOL_RAY = pow(10, 12);
 
    // Node Owner total_claimable amounts (in WIRE subunits)
    static const sysio::asset T1_ALLOCATION(750000000000000, WIRE_SYMBOL);
@@ -108,7 +103,6 @@ namespace sysiosystem {
    }
 
    void system_contract::addnodeowner(const sysio::name &account_name, const uint8_t &tier) {
-      // TODO: Not positive this would be sent from sysio.roa's authority need to check. Idea is this would be called as an inline action.
       // Called inline from sysio.roa
       require_auth("sysio.roa"_n);
 

@@ -6,14 +6,7 @@
 //  - viewnodedist functional behavior (claimable/can_claim) across time states
 //  - claimnodedis authorization + gating rules + claimed accounting updates + inline token ftransfer
 //  - sysio.roa::forcereg wiring: inline addnodeowner occurs and writes nodedist
-//
-// TODO:
-//  - Add tests for liq_stake/stakemanager logic (once actions are built).
-//  - Revisit time stamp tests related to node owner dist. Check with team on type / format of these.
-//  - Producer pay
-//  - BatchOp pay
-//  - Challenger pay
-//  - Underwriter pay
+
 
 #include <test_contracts.hpp>
 
