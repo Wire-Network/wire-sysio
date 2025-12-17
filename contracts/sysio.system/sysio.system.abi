@@ -55,6 +55,20 @@
             ]
         },
         {
+            "name": "addnodeowner",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
             "name": "authority",
             "base": "",
             "fields": [
@@ -111,24 +125,6 @@
                 {
                     "name": "new_producers",
                     "type": "producer_schedule?"
-                }
-            ]
-        },
-        {
-            "name": "block_info_record",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "block_height",
-                    "type": "uint32"
-                },
-                {
-                    "name": "block_timestamp",
-                    "type": "time_point"
                 }
             ]
         },
@@ -221,6 +217,16 @@
             ]
         },
         {
+            "name": "claimnodedis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -249,6 +255,16 @@
                 {
                     "name": "finalizer_key",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "emission_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "node_rewards_start",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -439,6 +455,50 @@
                 {
                     "name": "active",
                     "type": "authority"
+                }
+            ]
+        },
+        {
+            "name": "node_claim_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "can_claim",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "node_owner_distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_duration",
+                    "type": "uint32"
                 }
             ]
         },
@@ -741,6 +801,16 @@
             ]
         },
         {
+            "name": "setinittime",
+            "base": "",
+            "fields": [
+                {
+                    "name": "no_reward_init_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "setparams",
             "base": "",
             "fields": [
@@ -896,6 +966,16 @@
             ]
         },
         {
+            "name": "viewnodedist",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "wait_weight",
             "base": "",
             "fields": [
@@ -1011,6 +1091,24 @@
                     "type": "public_key?"
                 }
             ]
+        },
+        {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
         }
     ],
     "actions": [
@@ -1022,6 +1120,16 @@
         {
             "name": "activate",
             "type": "activate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addnodeowner",
+            "type": "addnodeowner",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimnodedis",
+            "type": "claimnodedis",
             "ricardian_contract": ""
         },
         {
@@ -1110,6 +1218,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setinittime",
+            "type": "setinittime",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setparams",
             "type": "setparams",
             "ricardian_contract": ""
@@ -1155,6 +1268,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "viewnodedist",
+            "type": "viewnodedist",
+            "ricardian_contract": ""
+        },
+        {
             "name": "wasmcfg",
             "type": "wasmcfg",
             "ricardian_contract": ""
@@ -1184,8 +1302,8 @@
             "key_types": []
         },
         {
-            "name": "blockinfo",
-            "type": "block_info_record",
+            "name": "emissionmngr",
+            "type": "emission_state",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1226,6 +1344,13 @@
             "key_types": []
         },
         {
+            "name": "nodedist",
+            "type": "node_owner_distribution",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "producers",
             "type": "producer_info",
             "index_type": "i64",
@@ -1245,6 +1370,13 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
+        },
+        {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
         }
     ],
     "ricardian_clauses": [],
@@ -1259,6 +1391,10 @@
         }
     ],
     "action_results": [
+        {
+            "name": "viewnodedist",
+            "result_type": "node_claim_result"
+        },
         {
             "name": "getpeerkeys",
             "result_type": "getpeerkeys_res_t"
