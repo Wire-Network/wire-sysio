@@ -67,6 +67,7 @@ apiNode = None
 testAccountName = "test"
 userAccountName = "user"
 payloadlessAccountName = "payloadless"
+infiniteAccountName = "infinite"
 
 def getCodeHash(node, account):
     # Example get code result: code hash: 67d0598c72e2521a1d588161dad20bbe9f8547beb5ce6d14f3abd550ab27d3dc
@@ -193,6 +194,16 @@ def deployTestContracts():
     payloadlessAbiFile="payloadless.abi"
     producerNode.publishContract(payloadlessAccount, payloadlessContractDir, payloadlessWasmFile, payloadlessAbiFile, waitForTransBlock=True)
 
+    Utils.Print("Create infinite account and deploy infinite contract")
+    infiniteAccount = Account(infiniteAccountName)
+    infiniteAccount.ownerPublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    infiniteAccount.activePublicKey = SYSIO_ACCT_PUBLIC_DEFAULT_KEY
+    cluster.createAccountAndVerify(infiniteAccount, cluster.sysioAccount, nodeOwner=cluster.carlAccount, buyRAM=100000)
+    infiniteContractDir="unittests/test-contracts/infinite"
+    infiniteWasmFile="infinite.wasm"
+    infiniteAbiFile="infinite.abi"
+    producerNode.publishContract(infiniteAccount, infiniteContractDir, infiniteWasmFile, infiniteAbiFile, waitForTransBlock=True)
+
 def sendTransaction(account, action, data, auth=[], opts=None):
     trx = {
        "actions": [{
@@ -212,6 +223,9 @@ def sendReadOnlySlowPayloadless():
 
 def sendReadOnlyForeverPayloadless():
     return sendTransaction('payloadless', action='doitforever', data={}, auth=[], opts='--read')
+
+def sendReadOnlyForeverInfinite():
+    return sendTransaction('infinite', action='runforever', data={}, auth=[], opts='--read')
 
 # Send read-only trxs from mutltiple threads to bump load
 def sendReadOnlyTrxOnThread(startId, numTrxs):
@@ -389,9 +403,11 @@ def slowTransactions():
 
 def foreverTransactions():
     Print("foreverTransactions")
-    for i in range(5): # run fewer number than slowPayloadless so total running time is close
-        result = sendReadOnlyForeverPayloadless()
-        assert(result[0] == False) # should fail
+    for i in range(9): # run fewer number than slowPayloadless so total running time is close
+        result1 = sendReadOnlyForeverPayloadless()
+        assert(result1[0] == False) # should fail
+        result1 = sendReadOnlyForeverInfinite()
+        assert(result1[0] == False) # should fail
 
 def timeoutTest():
     Print("timeoutTest")
@@ -424,6 +440,12 @@ def timeoutTest():
     threadList.append(threading.Thread(target = fastTransactions))
     threadList.append(threading.Thread(target = slowTransactions))
     threadList.append(threading.Thread(target = foreverTransactions))
+    threadList.append(threading.Thread(target = foreverTransactions))
+    threadList.append(threading.Thread(target = foreverTransactions))
+    threadList.append(threading.Thread(target = foreverTransactions))
+    threadList.append(threading.Thread(target = foreverTransactions))
+    threadList.append(threading.Thread(target = foreverTransactions))
+
     Print("Sending different speeds of read only transactions simutaneously")
     for thr in threadList:
         thr.start()
@@ -443,9 +465,7 @@ try:
             netApiTests()
             mixedOpsTest()
             runEverythingParallel()
-
-        # should be running under multiple threads but no need to run multiple times
-        timeoutTest()
+            timeoutTest()
 
     testSuccessful = True
 finally:
