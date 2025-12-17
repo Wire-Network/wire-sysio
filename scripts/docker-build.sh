@@ -12,7 +12,7 @@ TARGET="app-build-local"
 TAG="wire/sysio"
 SYSIO_BRANCH="master"
 CDT_BRANCH="master"
-UBUNTU_TAG="22.04"
+UBUNTU_TAG="24.04"
 
 usage() {
   echo "Usage: $(basename "$0") [--target=<stage>] [--sysio-branch=<branch-name>] [--cdt-branch=<branch-name>] [--tag=<tag-name>]" 1>&2

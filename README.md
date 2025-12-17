@@ -42,6 +42,10 @@ v3.1.2-0b64f879e3ebe2e4df09d2e62f1fc164cc1125d1
 Follow the instructions [BUILD.md](./BUILD.md) to build Wire Sysio
 from source.
 
+## Local Development (Docker)
+
+See the [Docker development guide](./docker-dev-doc.md) for setting up a containerized development environment.
+
 ## Testing
 
 Wire Sysio supports the following test suites:

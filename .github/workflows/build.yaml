@@ -105,7 +105,7 @@ jobs:
           name: ${{matrix.platform}}-build
       - name: Build packages
         run: |
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
           cd build
           cpack
           ../tools/tweak-deb.sh wire-sysio_*.deb
@@ -229,7 +229,7 @@ jobs:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           # https://github.com/actions/runner/issues/2033
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
           sudo chown -R $(id -u):$(id -g) $PWD
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
