@@ -508,18 +508,8 @@ BOOST_FIXTURE_TEST_CASE( setinittime_singleton_write_and_reprotect, sysio_emissi
 // addnodeowner
 // -----------------------------------------------------------------------------
 
-BOOST_FIXTURE_TEST_CASE( addnodeowner_requires_emission_initialized, sysio_emissions_tester ) try {
-   create_user_accounts({ "nodeowner1"_n });
-
-   auto r = addnodeowner( ROA, "nodeowner1"_n, 1 );
-   BOOST_REQUIRE( r != success() );
-   require_substr( r, "emission state not initialized" );
-} FC_LOG_AND_RETHROW()
-
 BOOST_FIXTURE_TEST_CASE( addnodeowner_requires_sysio_roa_auth, sysio_emissions_tester ) try {
    create_user_accounts({ "alice"_n, "nodeowner2"_n });
-
-   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(head_secs()) ) );
 
    auto r = addnodeowner( "alice"_n, "nodeowner2"_n, 1 );
    BOOST_REQUIRE( r != success() );
@@ -529,8 +519,6 @@ BOOST_FIXTURE_TEST_CASE( addnodeowner_requires_sysio_roa_auth, sysio_emissions_t
 BOOST_FIXTURE_TEST_CASE( addnodeowner_rejects_invalid_tier, sysio_emissions_tester ) try {
    // Tier must be 1..3
    create_user_accounts({ "nodeowner3"_n });
-
-   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(head_secs()) ) );
 
    auto r1 = addnodeowner( ROA, "nodeowner3"_n, 0 );
    BOOST_REQUIRE( r1 != success() );
@@ -545,8 +533,6 @@ BOOST_FIXTURE_TEST_CASE( addnodeowner_writes_expected_rows_for_each_tier, sysio_
    // Valid tiers should create a row in nodedist with expected allocations/durations.
    // Also verifies uniqueness constraint (account already exists).
    create_user_accounts({ "t1"_n, "t2"_n, "t3"_n });
-
-   BOOST_REQUIRE_EQUAL( success(), setinittime( config::system_account_name, tpsec(head_secs()) ) );
 
    BOOST_REQUIRE_EQUAL( success(), addnodeowner( ROA, "t1"_n, 1 ) );
    auto r1 = get_nodedist_row("t1"_n);

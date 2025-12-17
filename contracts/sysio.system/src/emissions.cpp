@@ -109,10 +109,6 @@ namespace sysiosystem {
       // Tier sanity check
       sysio::check(tier >= 1 && tier <=3, "invalid tier");
 
-      // Get Emission state info
-      emissionstate_t emission_s(get_self(), get_self().value);
-      sysio::check(emission_s.exists(), "emission state not initialized");
-
       // Ensure this account isn't already in the table.
       nodedist_t nodedist(get_self(), get_self().value);
       auto itr = nodedist.find(account_name.value);

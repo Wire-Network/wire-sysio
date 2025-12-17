@@ -408,15 +408,6 @@ BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
                             ("core", symbol(CORE_SYMBOL).to_string()));
    produce_block();
 
-   // initialize emissions state so ROA inline addnodeowner can succeed
-   base_tester::push_action(
-      config::system_account_name,
-      "setinittime"_n,
-      config::system_account_name,
-      mvo()("no_reward_init_time", time_point_sec(control->head().block_time()))
-   );
-   produce_blocks(1);
-
    // roa has been activated with NODE_DADDY as a node owner
    // Accounts already created with ROA policy { "alice"_n, "bob"_n, "carol"_n, "darcy"_n }
    int64_t ram; int64_t net; int64_t cpu;
