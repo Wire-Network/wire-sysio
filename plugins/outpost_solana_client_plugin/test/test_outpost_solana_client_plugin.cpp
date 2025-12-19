@@ -7,11 +7,11 @@
 #include <set>
 
 #include <sysio/outpost_solana_client_plugin.hpp>
-#include <sysio/outpost_client/solana/solana_client.hpp>
+
 
 using namespace std::literals;
-using namespace sysio::outpost_client;
-using namespace sysio::outpost_client::solana;
+// using namespace sysio::outpost_client;
+// using namespace sysio::outpost_client::solana;
 
 namespace {
 
