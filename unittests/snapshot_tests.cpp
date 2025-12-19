@@ -329,7 +329,7 @@ void chain_id_in_snapshot_test()
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_suites)
 {
    contract_action_matches matches;
-   matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+   matches.push_back(contract_action_match("s"_n, sysio::chain::config::system_account_name, contract_action_match::match_type::exact));
    matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
    tester chain(matches);
    chain.produce_block();
@@ -367,7 +367,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    BOOST_REQUIRE(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext_snap = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header_snap = crtd_s_ext_snap.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_snap.contract_name);
+   BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header_snap.contract_name);
    BOOST_CHECK_EQUAL(4u, crtd_s_header_snap.previous_block_num); // might change if tester setup is updated
    BOOST_CHECK(checksum256_type() != crtd_s_header_snap.current_s_id);
    BOOST_CHECK(checksum256_type() != crtd_s_header_snap.current_s_root);
@@ -383,7 +383,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    BOOST_CHECK(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext_multiple = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header_multiple = crtd_s_ext_multiple.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_multiple.contract_name);
+   BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header_multiple.contract_name);
    BOOST_CHECK_EQUAL(crtd_s_header_snap.current_s_id, crtd_s_header_multiple.previous_s_id);
    BOOST_CHECK_EQUAL(block_with_snapshot->block_num(), crtd_s_header_multiple.previous_block_num);
    BOOST_CHECK(checksum256_type() != crtd_s_header_multiple.current_s_id);
@@ -415,7 +415,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    BOOST_CHECK(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext7 = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header7 = crtd_s_ext7.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header7.contract_name);
+   BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header7.contract_name);
    BOOST_CHECK_EQUAL(crtd_s_header_multiple.current_s_id, crtd_s_header7.previous_s_id);
    BOOST_CHECK_EQUAL(block_with_multiple->block_num(), crtd_s_header7.previous_block_num);
    BOOST_CHECK(checksum256_type() != crtd_s_header7.current_s_id);
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    BOOST_CHECK(crtd_it != header_exts.end());
    s_root_extension crtd_s_ext_snap7 = std::get<s_root_extension>(crtd_it->second);
    s_header crtd_s_header_snap7 = crtd_s_ext_snap7.s_header_data;
-   BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_snap7.contract_name);
+   BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header_snap7.contract_name);
    BOOST_CHECK_EQUAL(crtd_s_header_multiple.current_s_id, crtd_s_header_snap7.previous_s_id);
    BOOST_CHECK_EQUAL(block_with_multiple->block_num(), crtd_s_header_snap7.previous_block_num);
    BOOST_CHECK_EQUAL(crtd_s_header7.current_s_id, crtd_s_header_snap7.current_s_id);
@@ -730,7 +730,7 @@ void jumbo_row_test()
    action act;
    act.account = "jumbo"_n;
    act.name = "jumbo"_n;
-   act.authorization = vector<permission_level>{{"jumbo"_n,config::active_name}};
+   act.authorization = vector<permission_level>{{"jumbo"_n,sysio::chain::config::active_name}};
    trx.actions.push_back(act);
 
    chain.set_transaction_headers(trx);

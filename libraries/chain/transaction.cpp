@@ -92,7 +92,7 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
                   // If public key can be recovered from signature
                   auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
                   SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key ${k}", ("k", *itr) );
-               } else {
+               } else if constexpr ( !std::is_same_v<Shim, fc::crypto::bls::signature_shim>) {
                   // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.
                   SYS_ASSERT( pk_index < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{i}", ("i", pk_index) );
 

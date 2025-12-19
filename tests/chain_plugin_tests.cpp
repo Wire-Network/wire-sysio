@@ -69,7 +69,7 @@ BOOST_FIXTURE_TEST_CASE( get_block_with_invalid_abi, validating_tester ) try {
             ("authorization", variants({
                mutable_variant_object()
                   ("actor", "asserter")
-                  ("permission", name(config::active_name).to_string())
+                  ("permission", name(sysio::chain::config::active_name).to_string())
             }))
             ("data", mutable_variant_object()
                ("condition", 1)

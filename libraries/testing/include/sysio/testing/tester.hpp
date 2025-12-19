@@ -275,7 +275,7 @@ namespace sysio::testing {
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code, include_roa_policy, include_ram_gift ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, sysio::chain::config::system_account_name, multisig, include_code, include_roa_policy, include_ram_gift ) );
             return traces;
          }
 
@@ -348,7 +348,7 @@ namespace sysio::testing {
          void delete_authority( account_name account, permission_name perm );
 
          transaction_trace_ptr create_account( account_name name,
-                                               account_name creator = config::system_account_name,
+                                               account_name creator = sysio::chain::config::system_account_name,
                                                bool multisig = false,
                                                bool include_code = true,
                                                bool include_roa_policy = true,
@@ -494,8 +494,8 @@ namespace sysio::testing {
          static genesis_state default_genesis() {
             genesis_state genesis;
             genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
-            genesis.initial_key = get_public_key( config::system_account_name, "active" );
-            std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore) = get_bls_key("finalizeraa"_n);
+            genesis.initial_key = get_public_key( sysio::chain::config::system_account_name, "active" );
+            std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore, std::ignore) = get_bls_key("finalizeraa"_n);
             return genesis;
          }
 
@@ -860,10 +860,10 @@ namespace sysio::testing {
          pubkeys.reserve(num_keys);
          privkeys.reserve(num_keys);
          for (size_t i=0; i<num_keys; ++i) {
-            account_name name { std::string("finalizer") + (char)('a' + i/26) + (char)('a' + i%26) };
+            account_name name { std::string("finalizer") + static_cast<char>('a' + i / 26) + static_cast<char>('a' + i % 26) };
             key_names.push_back(name);
 
-            auto [privkey, pubkey, pop] = get_bls_key(name);
+            auto [privkey, pubkey, pop, _] = get_bls_key(name);
             pubkeys.push_back(pubkey);
             privkeys.push_back(privkey);
          }

@@ -448,7 +448,7 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
 
    bool verified_sig = false;
    auto verify_sig = [&]() -> vote_result_t {
-      if (!verified_sig && !fc::crypto::blslib::verify(vote.finalizer_key, finalizer_digest, vote.sig)) {
+      if (!verified_sig && !fc::crypto::bls::verify(vote.finalizer_key, finalizer_digest, vote.sig)) {
          fc_wlog(vote_logger, "connection - ${c} block_num: ${bn} block_id: ${id}, signature from finalizer ${k}.. cannot be verified, vote strong: ${sv}",
                  ("c", connection_id)("bn", block_num)("id", block_id)("k", vote.finalizer_key.to_string().substr(8,16))("sv", vote.strong));
          return vote_result_t::invalid_signature;

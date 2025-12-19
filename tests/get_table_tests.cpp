@@ -42,7 +42,7 @@ issue_tokens( validating_tester& t, account_name issuer, account_name to, const 
    signed_transaction trx;
 
    trx.actions.emplace_back( t.get_action( token_contract, "issue"_n,
-                                           vector<permission_level>{{issuer, config::active_name}},
+                                           vector<permission_level>{{issuer, sysio::chain::config::active_name}},
                                            mutable_variant_object()
                                              ("to", issuer.to_string())
                                              ("quantity", amount)
@@ -50,7 +50,7 @@ issue_tokens( validating_tester& t, account_name issuer, account_name to, const 
    ) );
 
    trx.actions.emplace_back( t.get_action( token_contract, "transfer"_n,
-                                           vector<permission_level>{{issuer, config::active_name}},
+                                           vector<permission_level>{{issuer, sysio::chain::config::active_name}},
                                            mutable_variant_object()
                                              ("from", issuer.to_string())
                                              ("to", to.to_string())
@@ -86,7 +86,7 @@ BOOST_FIXTURE_TEST_CASE( get_scope_test, validating_tester ) try {
 
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("999.0000 SYS") );
+      issue_tokens( *this, sysio::chain::config::system_account_name, a, sysio::chain::asset::from_string("999.0000 SYS") );
    }
    produce_block();
 
@@ -161,7 +161,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
 
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
+      issue_tokens( *this, sysio::chain::config::system_account_name, a, sysio::chain::asset::from_string("10000.0000 SYS") );
    }
    produce_block();
 
@@ -172,7 +172,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("9999.0000 AAA") );
+      issue_tokens( *this, sysio::chain::config::system_account_name, a, sysio::chain::asset::from_string("9999.0000 AAA") );
    }
    produce_block();
 
@@ -183,7 +183,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("7777.0000 CCC") );
+      issue_tokens( *this, sysio::chain::config::system_account_name, a, sysio::chain::asset::from_string("7777.0000 CCC") );
    }
    produce_block();
 
@@ -194,7 +194,7 @@ BOOST_FIXTURE_TEST_CASE( get_table_test, validating_tester ) try {
    push_action("sysio.token"_n, "create"_n, "sysio.token"_n, act );
    // issue
    for (account_name a: accs) {
-      issue_tokens( *this, config::system_account_name, a, sysio::chain::asset::from_string("8888.0000 BBB") );
+      issue_tokens( *this, sysio::chain::config::system_account_name, a, sysio::chain::asset::from_string("8888.0000 BBB") );
    }
    produce_block();
 

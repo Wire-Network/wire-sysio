@@ -920,15 +920,15 @@ class Cluster(object):
         with open(startFile, 'r') as f:
             startStr=f.read()
 
-        pattern=r"\s*--signature-provider\s*(\w+)=KEY:(\w+)"
+        pattern=r"\s*--signature-provider\s*([A-Za-z0-9-_]+),([A-Za-z0-9-_]+),([A-Za-z0-9-_]+),([A-Za-z0-9-_]+),KEY:([A-Za-z0-9-_]+)"
         m=re.search(pattern, startStr)
         regMsg="None" if m is None else "NOT None"
         if m is None:
             if Utils.Debug: Utils.Print(f'No producer keys found in node {nodeName}')
             return None
 
-        pubKey=m.group(1)
-        privateKey=m.group(2)
+        pubKey=m.group(4)
+        privateKey=m.group(5)
 
         pattern=r"\s*--producer-name\s*\W*(\w+)"
         matches=re.findall(pattern, startStr)

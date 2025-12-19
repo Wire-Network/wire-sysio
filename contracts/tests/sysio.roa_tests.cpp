@@ -399,11 +399,11 @@ BOOST_FIXTURE_TEST_CASE( newuser_tld_test, sysio_roa_tester ) try {
 
 BOOST_FIXTURE_TEST_CASE( verify_ram, sysio_roa_tester ) try {
    // load system contract for newaccount functionality
-   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+   set_code( sysio::chain::config::system_account_name, test_contracts::sysio_system_wasm() );
+   set_abi( sysio::chain::config::system_account_name, test_contracts::sysio_system_abi() );
 
-   base_tester::push_action(config::system_account_name, "init"_n,
-                            config::system_account_name, mutable_variant_object()
+   base_tester::push_action(sysio::chain::config::system_account_name, "init"_n,
+                            sysio::chain::config::system_account_name, mutable_variant_object()
                             ("version", 0)
                             ("core", symbol(CORE_SYMBOL).to_string()));
    produce_block();

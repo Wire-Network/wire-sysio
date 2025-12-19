@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(nothing_there) {
 BOOST_AUTO_TEST_CASE(nothing_to_report) {
    try {
       contract_action_matches matches;
-      matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+      matches.push_back(contract_action_match("s"_n, sysio::chain::config::system_account_name, contract_action_match::match_type::exact));
       matches[0].add_action("batchw"_n, contract_action_match::match_type::exact);
       tester chain(matches);
       chain.produce_block();
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(nothing_to_report) {
 BOOST_AUTO_TEST_CASE(something_to_report) {
    try {
       contract_action_matches matches;
-      matches.push_back(contract_action_match("s"_n, config::system_account_name, contract_action_match::match_type::exact));
+      matches.push_back(contract_action_match("s"_n, sysio::chain::config::system_account_name, contract_action_match::match_type::exact));
       matches[0].add_action("newaccount"_n, contract_action_match::match_type::exact);
       tester chain(matches);
       chain.produce_block();
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(something_to_report) {
       BOOST_CHECK(crtd_it != header_exts.end());
       s_root_extension crtd_s_ext_brian = std::get<s_root_extension>(crtd_it->second);
       s_header crtd_s_header_brian = crtd_s_ext_brian.s_header_data;
-      BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_brian.contract_name);
+      BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header_brian.contract_name);
       BOOST_CHECK_EQUAL(previous_s_root, crtd_s_header_brian.previous_s_id);
       BOOST_CHECK_EQUAL(previous_block_num, crtd_s_header_brian.previous_block_num);
       BOOST_CHECK(checksum256_type() != crtd_s_header_brian.current_s_id);
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(something_to_report) {
       BOOST_CHECK(crtd_it != header_exts.end());
       s_root_extension crtd_s_ext_multiple = std::get<s_root_extension>(crtd_it->second);
       s_header crtd_s_header_multiple = crtd_s_ext_multiple.s_header_data;
-      BOOST_CHECK_EQUAL(config::system_account_name, crtd_s_header_multiple.contract_name);
+      BOOST_CHECK_EQUAL(sysio::chain::config::system_account_name, crtd_s_header_multiple.contract_name);
       BOOST_CHECK_EQUAL(crtd_s_header_brian.current_s_id, crtd_s_header_multiple.previous_s_id);
       BOOST_CHECK_EQUAL(brian_block->block_num(), crtd_s_header_multiple.previous_block_num);
       BOOST_CHECK(checksum256_type() != crtd_s_header_multiple.current_s_id);

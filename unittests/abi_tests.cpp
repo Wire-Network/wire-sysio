@@ -1674,23 +1674,23 @@ BOOST_AUTO_TEST_CASE(packed_transaction)
    txn.expiration.from_iso_string("2021-12-20T15:30");
    name a = "alice"_n;
    txn.context_free_actions.emplace_back(
-         vector<permission_level>{{"testapi1"_n, config::active_name}},
+         vector<permission_level>{{"testapi1"_n, sysio::chain::config::active_name}},
          newaccount{
-               .creator  = config::system_account_name,
+               .creator  = sysio::chain::config::system_account_name,
                .name     = a,
                .owner    = authority( get_public_key( a, "owner" )),
                .active   = authority( get_public_key( a, "active" ) )
          });
    txn.context_free_data.emplace_back(fc::raw::pack(42));
    txn.context_free_actions.emplace_back(
-         vector<permission_level>{{"testapi2"_n, config::active_name}},
+         vector<permission_level>{{"testapi2"_n, sysio::chain::config::active_name}},
          action1{ 15, 23, (uint8_t)3});
    txn.context_free_data.emplace_back();
    txn.actions.emplace_back(
-         vector<permission_level>{{"testapi3"_n, config::active_name}},
+         vector<permission_level>{{"testapi3"_n, sysio::chain::config::active_name}},
          action2{ 42, 67, (uint8_t)1});
    txn.actions.emplace_back(
-         vector<permission_level>{{"testapi4"_n, config::active_name}},
+         vector<permission_level>{{"testapi4"_n, sysio::chain::config::active_name}},
          action2{ 61, 23, (uint8_t)2});
    txn.max_net_usage_words = 15;
    txn.max_cpu_usage_ms = 43;
@@ -2604,7 +2604,7 @@ BOOST_AUTO_TEST_CASE(abi_large_signature)
 
       name a = "hello"_n;
       authority owner_auth =  authority( get_public_key( a, "owner" ) );
-      chain::action large_act( vector<permission_level>{{config::system_account_name,config::active_name}},
+      chain::action large_act( vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
                                act_sig{
                                   .sig = sig
                                });

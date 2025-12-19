@@ -82,12 +82,14 @@ fc::logger        _transient_trx_failed_trace_log;
 
 namespace sysio {
 
-static auto _producer_plugin = application::register_plugin<producer_plugin>();
+
 
 using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
+constexpr std::array required_sig_provider_key_types = {crypto::chain_key_type_wire_bls, crypto::chain_key_type_wire};
+auto _producer_plugin = application::register_plugin<producer_plugin>();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -699,9 +701,9 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
 
-   using signature_provider_type = signature_provider_plugin::signature_provider_type;
-   std::map<chain::public_key_type, signature_provider_type> _signature_providers;
-   chain::bls_pub_priv_key_map_t                     _finalizer_keys; // public, private
+   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
+   chain::bls_pub_key_sig_provider_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
    chain::db_read_mode                               _db_read_mode = db_read_mode::HEAD;
    pending_block_mode                                _pending_block_mode = pending_block_mode::speculating;
@@ -1167,11 +1169,12 @@ public:
    // thread safe, not modified after plugin_initialize
    chain::signature_type sign_compact(const chain::public_key_type& key, const fc::sha256& digest) const {
       if (key != chain::public_key_type()) {
-         auto private_key_itr = _signature_providers.find(key);
-         SYS_ASSERT(private_key_itr != _signature_providers.end(), producer_priv_key_not_found,
-                    "Local producer has no private key in config.ini corresponding to public key ${key}", ("key", key));
+         SYS_ASSERT(_signature_providers.contains(key), producer_priv_key_not_found,
+                             "Local producer has no private key in config.ini corresponding to public key ${key}", ("key", key));
 
-         return private_key_itr->second(digest);
+         auto sig_provider = _signature_providers.at(key);
+
+         return sig_provider->sign(digest);
       } else {
          return chain::signature_type();
       }
@@ -1265,10 +1268,6 @@ void producer_plugin::set_program_options(
 {
    using namespace std::string_literals;
 
-   auto default_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
-   auto default_bls_priv_key = bls_private_key(fc::sha256::hash(std::string("wire")).to_uint8_span());
-   //ilog("Default BLS key proof of possession: ${p}", ("p", default_bls_priv_key.proof_of_possession()));
-
    boost::program_options::options_description producer_options;
 
    producer_options.add_options()
@@ -1286,12 +1285,6 @@ void producer_plugin::set_program_options(
            "Maximum allowed reversible blocks beyond irreversible before block production is paused. Specify 0 to disable. Default 3600 blocks.")
          ("producer-name,p", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "ID of producer controlled by this node (e.g. inita; may specify multiple times)")
-         ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()->default_value(
-               {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}),
-                default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()},
-                default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}) + ", " +
-                default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()),
-               app().get_plugin<signature_provider_plugin>().signature_provider_help_text())
          ("greylist-account", boost::program_options::value<vector<string>>()->composing()->multitoken(),
           "account that can not access to extended CPU/NET virtual resources")
          ("greylist-limit", boost::program_options::value<uint32_t>()->default_value(1000),
@@ -1367,39 +1360,49 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
    chain.set_producer_node(is_configured_producer());
 
-   if (options.count("signature-provider")) {
-      const std::vector<std::string> key_spec_pairs = options["signature-provider"].as<std::vector<std::string>>();
-      for (const auto& key_spec_pair : key_spec_pairs) {
-         try {
-            const auto v = app().get_plugin<signature_provider_plugin>().signature_provider_for_specification(key_spec_pair);
-            if (v) {
-               const auto& [pubkey, provider] = *v;
-               _signature_providers[pubkey] = provider;
-            }
-            const auto bls = app().get_plugin<signature_provider_plugin>().bls_public_key_for_specification(key_spec_pair);
-            if (bls) {
-               const auto& [pubkey, privkey] = *bls;
-               if (irreversible_mode() && privkey == bls_private_key(fc::sha256::hash(std::string("wire")).to_uint8_span())) {
-                  dlog("Ignoring default bls key for irreversible mode");
-                  continue;
-               }
-               dlog("Configured finalizer bls key: ${pubkey}", ("pubkey", pubkey.to_string()));
-               _finalizer_keys[pubkey.to_string()] = privkey.to_string();
-            }
-         } catch(secure_enclave_exception& e) {
-            elog("Error with Secure Enclave signature provider: ${e}; ignoring ${val}", ("e", e.top_message())("val", key_spec_pair));
-            throw;
-         } catch (fc::exception& e) {
-            elog("Malformed signature provider: \"${val}\": ${e}, ignoring!", ("val", key_spec_pair)("e", e));
-            throw;
-         } catch (...) {
-            elog("Malformed signature provider: \"${val}\", ignoring!", ("val", key_spec_pair));
-            throw;
+   if (!_producers.empty()) {
+      // Get the signature provider plugin
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+
+      auto keys_exist = sig_plug.has_signature_providers(required_sig_provider_key_types);
+      if (!keys_exist) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls,crypto::chain_key_type_wire});
+      }
+      // LOAD `chain_key_type_wire_bls` SIGNATURE PROVIDERS
+      {
+         auto finalizer_candidate_sig_providers = sig_plug.query_providers(
+           std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
+
+         // auto default_bls_key = crypto::bls::private_key(fc::sha256::hash(std::string("wire")).to_uint8_span());
+         // auto default_bls_key_shim = crypto::bls::private_key_shim{default_bls_key.get_secret()};
+         // auto default_priv_key = crypto::private_key{default_bls_key_shim};
+
+         for (auto& candidate : finalizer_candidate_sig_providers) {
+
+            SYS_ASSERT(candidate->private_key.has_value(), plugin_config_exception, "ALL BLS keys must be provided via command line arguments or config file.");
+            // if (irreversible_mode() && candidate->private_key && candidate->private_key.value() == default_priv_key) {
+            //    dlog("Ignoring default bls key for irreversible mode");
+            //    continue;
+            // }
+            // TODO: @jglanz replace below once `{to,from}_string` is implemented properly
+            crypto::bls::public_key bls_pub_key = candidate->public_key.get<crypto::bls::public_key_shim>().unwrapped();
+            auto bls_pub_key_str = bls_pub_key.to_string();
+            _finalizer_keys.insert({bls_pub_key_str, candidate});
+         }
+         chain.set_node_finalizer_keys(_finalizer_keys);
+      }
+
+      // LOAD `chain_key_type_wire` SIGNATURE PROVIDERS
+      {
+         auto wire_sig_providers = sig_plug.query_providers(
+           std::nullopt,std::nullopt, crypto::chain_key_type_wire);
+
+         for (auto& sig_prov : wire_sig_providers) {
+            SYS_ASSERT(sig_prov->private_key.has_value(), plugin_config_exception, "ALL signature provider keys must be provided via command line arguments or config file.");
+            _signature_providers.emplace(sig_prov->public_key, sig_prov);
          }
       }
    }
-
-   chain.set_node_finalizer_keys(_finalizer_keys);
 
    auto subjective_account_max_failures_window_size = options.at("subjective-account-max-failures-window-size").as<uint32_t>();
    SYS_ASSERT(subjective_account_max_failures_window_size > 0, plugin_config_exception,
@@ -2855,7 +2858,7 @@ void producer_plugin_impl::produce_block() {
               "pending_block_state does not exist but it should, another plugin may have corrupted it");
 
    auto auth = chain.pending_block_signing_authority();
-   std::vector<std::reference_wrapper<const signature_provider_type>> relevant_providers;
+   std::vector<fc::crypto::signature_provider_ptr> relevant_providers;
 
    relevant_providers.reserve(_signature_providers.size());
 
@@ -2882,7 +2885,7 @@ void producer_plugin_impl::produce_block() {
 
       // sign with all relevant public keys
       for (const auto& p : relevant_providers) {
-         sigs.emplace_back(p.get()(d));
+         sigs.emplace_back(p.get()->sign(d));
       }
       return sigs;
    });

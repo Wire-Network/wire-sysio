@@ -118,10 +118,10 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
    auto& it_account = result.second;
    BOOST_REQUIRE_EQUAL(it_account->rows.obj.size(), 1u);
    auto accounts = chain.deserialize_data(it_account, "account_v0", "account");
-   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), config::system_account_name.to_string());
+   BOOST_REQUIRE_EQUAL(accounts[0]["name"].get_string(), sysio::chain::config::system_account_name.to_string());
 
    // Create new account
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
    // Verify that a new record for the new account in the state delta of the block
    result = chain.find_table_delta("account");
@@ -137,7 +137,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_creation) {
 BOOST_AUTO_TEST_CASE(test_deltas_account_metadata) {
    table_deltas_tester chain;
 
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
    chain.produce_block();
 
    chain.set_code("newacc"_n, std::vector<uint8_t>{}); // creates the account_metadata
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
    // Check that the permissions of this new account are in the delta
    vector<string> expected_permission_names{ "owner", "active" };
@@ -180,7 +180,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_creation_and_deletion) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
    auto& authorization_manager = chain.control->get_authorization_manager();
    const permission_object* ptr = authorization_manager.find_permission( {"newacc"_n, "active"_n} );
@@ -225,7 +225,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
    chain.produce_block();
    public_key_type keys[] = {
          public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s), // Test for correct serialization of WA key, see issue #9087
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_permission_link) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
    // Spot onto permission_link
    const auto spending_priv_key = chain.get_private_key("newacc"_n, "spending");
@@ -287,7 +287,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_global_property_history) {
    // Change max_transaction_delay to 60 sec
    auto params = chain.control->get_global_properties().configuration;
    params.max_transaction_delay = 60;
-   chain.push_action( config::system_account_name, "setparams"_n, config::system_account_name,
+   chain.push_action( sysio::chain::config::system_account_name, "setparams"_n, sysio::chain::config::system_account_name,
                              mutable_variant_object()
                              ("params", params) );
 
@@ -334,7 +334,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
    table_deltas_tester chain;
    chain.produce_block();
 
-   chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
+   chain.create_account("tester"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
    chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
    chain.set_abi("tester"_n, test_contracts::get_table_test_abi());
@@ -398,9 +398,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       BOOST_REQUIRE(it!=v.end()); // updated by onblock in start_block
       BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 1u);
       auto resources = main.deserialize_data(it, "resource_limits_v0", "resource_limits");
-      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), config::system_account_name.to_string());
+      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), sysio::chain::config::system_account_name.to_string());
 
-      main.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+      main.create_account("newacc"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
       v = sysio::state_history::create_deltas(main.control->db(), false);
 
@@ -413,7 +413,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       BOOST_REQUIRE(it!=v.end());
       BOOST_REQUIRE_EQUAL(it->rows.obj.size(), 2u);
       resources = main.deserialize_data(it, "resource_limits_v0", "resource_limits");
-      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), config::system_account_name.to_string());
+      BOOST_REQUIRE_EQUAL(resources[0]["owner"].get_string(), sysio::chain::config::system_account_name.to_string());
       BOOST_REQUIRE_EQUAL(resources[1]["owner"].get_string(), "newacc");
 
       main.produce_block();
@@ -435,7 +435,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_contract) {
       chain.set_bios_contract();
 
       chain.produce_block();
-      chain.create_account("tester"_n, config::system_account_name, false, false, false, false);
+      chain.create_account("tester"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
       chain.set_code("tester"_n, test_contracts::get_table_test_wasm());
       chain.set_abi("tester"_n, test_contracts::get_table_test_abi());

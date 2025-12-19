@@ -32,18 +32,18 @@ struct finalizer_key_tester : sysio_system_tester {
    static const std::vector<key_pair_t> key_pair;
 
    fc::variant get_finalizer_key_info( uint64_t id ) {
-      vector<char> data = get_row_by_id( config::system_account_name, config::system_account_name, "finkeys"_n, id );
+      vector<char> data = get_row_by_id( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "finkeys"_n, id );
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_key_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    fc::variant get_finalizer_info( const account_name& act ) {
-      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "finalizers"_n, act );
+      vector<char> data = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "finalizers"_n, act );
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "finalizer_info", data, abi_serializer::create_yield_function(abi_serializer_max_time) );
    }
 
    std::vector<finalizer_auth_info> get_last_prop_finalizers_info() {
       const auto* table_id_itr = control->db().find<sysio::chain::table_id_object, sysio::chain::by_code_scope_table>(
-         boost::make_tuple(config::system_account_name, config::system_account_name, "lastpropfins"_n));
+         boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "lastpropfins"_n));
 
       if (!table_id_itr) {
          return {};
@@ -493,7 +493,7 @@ BOOST_FIXTURE_TEST_CASE(switchtosvnn_success_tests, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    // Register 21 finalizer keys for the first 21 producers
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL(success(),  push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 
    // Verify finalizers_table and last_prop_fins_table match
    verify_last_proposed_finalizers(producer_names);
@@ -507,7 +507,7 @@ BOOST_FIXTURE_TEST_CASE(switchtosvnn_success_tests, finalizer_key_tester) try {
 
    // Cannot switch to Savanna multiple times
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "switchtosvnn can be run only once" ),
-                        push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+                        push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 }
 FC_LOG_AND_RETHROW()
 
@@ -517,7 +517,7 @@ BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    // Register 21 finalizer keys for the first 21 producers
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL(success(),  push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 
    // Verify finalizers_table and last_prop_fins_table match
    verify_last_proposed_finalizers(producer_names);
@@ -586,7 +586,7 @@ BOOST_FIXTURE_TEST_CASE(switchtosvnn_not_enough_finalizer_keys_tests, finalizer_
 
    // Have only 20 finalizer keys, short by 1
    BOOST_REQUIRE_EQUAL( wasm_assert_msg( "not enough top producers have registered finalizer keys, has 20, require 21" ),
-                        push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+                        push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 }
 FC_LOG_AND_RETHROW()
 
@@ -594,7 +594,7 @@ FC_LOG_AND_RETHROW()
 BOOST_FIXTURE_TEST_CASE(update_elected_producers_no_finalizers_changed_test, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL(success(),  push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 
    // Produce enough blocks so transition to Savanna finishes
    produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
@@ -621,7 +621,7 @@ FC_LOG_AND_RETHROW()
 BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_changed_test, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL(success(),  push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 
    // Produce enough blocks so transition to Savanna finishes
    produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
@@ -672,7 +672,7 @@ BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_replaced_test, final
    register_finalizer_keys(producer_names, 21);
 
    // Transition to Savanna
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   BOOST_REQUIRE_EQUAL(success(),  push_action( sysio::chain::config::system_account_name, "switchtosvnn"_n, mvo()) );
 
    auto last_finkey_ids = get_last_prop_fin_ids();
 

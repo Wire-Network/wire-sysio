@@ -1,5 +1,5 @@
 #pragma once
-#include "../../../../libfc-lite/include/fc-lite/crypto/chain_types.hpp"
+#include <fc-lite/crypto/chain_types.hpp>
 
 #include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
@@ -13,7 +13,7 @@
 
 
 namespace fc::crypto {
-   namespace config {
+   namespace constants {
       constexpr const char* public_key_legacy_prefix = "SYS";
       constexpr const char* public_key_base_prefix = "PUB";
 
@@ -22,7 +22,8 @@ namespace fc::crypto {
          "R1",
          "WA",
          "EM",
-         "ED"
+         "ED",
+         "BLS"
       };
 
       constexpr auto public_key_wire_prefixes = std::array{public_key_legacy_prefix, public_key_base_prefix};
@@ -31,8 +32,10 @@ namespace fc::crypto {
    class public_key
    {
       public:
-         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim, ed::public_key_shim>;
-         
+         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim, ed::public_key_shim, bls::public_key_shim>;
+
+         static public_key::storage_type parse_base58(const std::string& base58str);
+
          public_key() = default;
          public_key( public_key&& ) = default;
          public_key( const public_key& ) = default;
@@ -40,7 +43,7 @@ namespace fc::crypto {
 
          public_key( const signature& c, const sha256& digest, bool check_canonical = true );
 
-         public_key( storage_type&& other_storage )
+         explicit public_key( storage_type&& other_storage )
             :_storage(std::move(other_storage))
          {}
 
@@ -51,6 +54,8 @@ namespace fc::crypto {
          // serialize to/from string
          explicit public_key(const std::string& base58str);
          std::string to_string(const fc::yield_function_t& yield) const;
+
+         std::string to_native_string(const fc::yield_function_t& yield) const;
 
          template<typename T>
          bool contains() const { return std::holds_alternative<T>(_storage); }
@@ -70,6 +75,7 @@ namespace fc::crypto {
          friend class private_key;
    }; // public_key
 
+
    chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var);
 
 } // fc::crypto
@@ -81,3 +87,4 @@ namespace fc {
 } // namespace fc
 
 FC_REFLECT(fc::crypto::public_key, (_storage) )
+

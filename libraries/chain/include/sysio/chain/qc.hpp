@@ -17,10 +17,10 @@
 
 namespace sysio::chain {
 
-   using bls_public_key          = fc::crypto::blslib::bls_public_key;
-   using bls_signature           = fc::crypto::blslib::bls_signature;
-   using bls_aggregate_signature = fc::crypto::blslib::bls_aggregate_signature;
-   using bls_private_key         = fc::crypto::blslib::bls_private_key;
+   using bls_public_key          = fc::crypto::bls::public_key;
+   using bls_signature           = fc::crypto::bls::signature;
+   using bls_aggregate_signature = fc::crypto::bls::aggregate_signature;
+   using bls_private_key         = fc::crypto::bls::private_key;
 
    using vote_bitset_t = fc::dynamic_bitset;
    using bls_key_map_t = std::map<bls_public_key, bls_private_key>;

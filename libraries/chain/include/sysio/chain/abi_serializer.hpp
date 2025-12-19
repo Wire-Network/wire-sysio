@@ -451,7 +451,7 @@ namespace impl {
 
          try {
 
-            if( act.account == config::system_account_name && act.name == "setcode"_n ) {
+            if( act.account == sysio::chain::config::system_account_name && act.name == "setcode"_n ) {
                auto setcode_act = act.data_as<setcode>();
                if( setcode_act.code.size() > 0 ) {
                   fc::sha256 code_hash = fc::sha256::hash(setcode_act.code.data(), (uint32_t) setcode_act.code.size());

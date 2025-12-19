@@ -55,12 +55,12 @@ transaction_trace_ptr push_dummy(base_tester& t, account_name from, const string
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", name(config::system_account_name))
+            ("account", name(sysio::chain::config::system_account_name))
             ("name", "reqauth")
             ("authorization", fc::variants({
                fc::mutable_variant_object()
                   ("actor", from)
-                  ("permission", name(config::active_name))
+                  ("permission", name(sysio::chain::config::active_name))
             }))
             ("data", fc::mutable_variant_object()
                ("from", from)
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_fail_tests, T, validating_testers ) { t
                                     5000, 10, 200, false, fc::raw::pack(10000000000000000000ULL) ),
                           tx_cpu_usage_exceeded, fc_exception_message_contains("reached speculative executed adjusted trx max time") );
 
-   uint32_t time_left_in_block_us = config::default_max_block_cpu_usage - config::default_min_transaction_cpu_usage;
+   uint32_t time_left_in_block_us = chain::config::default_max_block_cpu_usage - chain::config::default_min_transaction_cpu_usage;
    std::string dummy_string = "nonce";
-   uint32_t increment = config::default_max_transaction_cpu_usage / 3;
+   uint32_t increment = chain::config::default_max_transaction_cpu_usage / 3;
    for( auto i = 0; time_left_in_block_us > 2*increment; ++i ) {
       push_dummy( t, "testapi"_n, dummy_string + std::to_string(i), increment );
       time_left_in_block_us -= increment;
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
       trx_digests.emplace_back( a.digest() );
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
    // Re-sign the block
-   copy_b->producer_signature = t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = t.get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
 
    std::promise<bool> block_start_promise;
    std::future<bool> block_start_future = block_start_promise.get_future();
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_max_trx_cpu_extended_test, T, tes
    }
    t.execute_setup_policy( setup_policy::full );
    t.produce_block();
-   t.create_account( "pause"_n, config::system_account_name, false, false, false, false );
+   t.create_account( "pause"_n, sysio::chain::config::system_account_name, false, false, false, false );
    t.set_code( "pause"_n, test_contracts::test_api_wasm() );
    t.produce_block();
 

@@ -24,10 +24,10 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
 
     auto& resource_manager = control->get_mutable_resource_limits_manager();
     int64_t org_sys_ram_bytes, org_sys_net_limit, org_sys_cpu_limit;
-    resource_manager.get_account_limits(config::system_account_name, org_sys_ram_bytes, org_sys_net_limit, org_sys_cpu_limit);
-    int64_t org_sys_ram_usage = resource_manager.get_account_ram_usage(config::system_account_name);
+    resource_manager.get_account_limits(sysio::chain::config::system_account_name, org_sys_ram_bytes, org_sys_net_limit, org_sys_cpu_limit);
+    int64_t org_sys_ram_usage = resource_manager.get_account_ram_usage(sysio::chain::config::system_account_name);
 
-    create_account("kevin"_n, config::system_account_name, false, false, false, false);
+    create_account("kevin"_n, sysio::chain::config::system_account_name, false, false, false, false);
 
     int64_t ram_bytes, net_limit, cpu_limit;
     resource_manager.get_account_limits("kevin"_n, ram_bytes, net_limit, cpu_limit);
@@ -38,8 +38,8 @@ BOOST_FIXTURE_TEST_CASE(new_account_ram_tests, sysio_system::sysio_system_tester
     BOOST_TEST( ram_usage == 1052 ); // RAM used by "kevin" during account creation, provided by sysio
 
     int64_t sys_ram_bytes, sys_net_limit, sys_cpu_limit;
-    resource_manager.get_account_limits(config::system_account_name, sys_ram_bytes, sys_net_limit, sys_cpu_limit);
-    int64_t sys_ram_usage = resource_manager.get_account_ram_usage(config::system_account_name);
+    resource_manager.get_account_limits(sysio::chain::config::system_account_name, sys_ram_bytes, sys_net_limit, sys_cpu_limit);
+    int64_t sys_ram_usage = resource_manager.get_account_ram_usage(sysio::chain::config::system_account_name);
     BOOST_TEST( sys_ram_bytes == org_sys_ram_bytes - ram_bytes ); // sysio has ram_bytes less because they were provided to kevin
     BOOST_TEST( sys_ram_usage == org_sys_ram_usage ); // no change in what sysio used, the RAM was used by kevin
 
@@ -94,7 +94,7 @@ BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
     auto noauthtable_ram_usage0 = mgr.get_account_ram_usage("noauthtable"_n);
     auto alice_ram_usage0 = mgr.get_account_ram_usage("alice"_n);
 
-    vector<permission_level> noauthtable_auth {{"noauthtable"_n, config::active_name} };
+    vector<permission_level> noauthtable_auth {{"noauthtable"_n, sysio::chain::config::active_name} };
     // noauthtable pays for CPU,NET
     push_action( "noauthtable"_n, "insert"_n, noauthtable_auth, mvo()("user", "a") ("id", 1) ("age", 10));
 
@@ -112,7 +112,7 @@ BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
     BOOST_TEST(noauthtable_ram_usage0 < noauthtable_ram_usage1);
     BOOST_TEST(alice_ram_usage0 == alice_ram_usage1);
 
-    vector<permission_level> alice_auth {{"alice"_n, config::active_name} };
+    vector<permission_level> alice_auth {{"alice"_n, sysio::chain::config::active_name} };
     // noauthtable still pays for CPU,NET
     push_action( "noauthtable"_n, "insert"_n, alice_auth, mvo()("user", "b") ("id", 1) ("age", 10));
 
@@ -130,7 +130,7 @@ BOOST_FIXTURE_TEST_CASE(auth_ram_tests, validating_tester) { try {
     BOOST_TEST(noauthtable_ram_usage1 < noauthtable_ram_usage2);
     BOOST_TEST(alice_ram_usage1 == alice_ram_usage2);
 
-    vector<permission_level> alice_explicit {{"alice"_n, config::sysio_payer_name}, {"alice"_n, config::active_name} };
+    vector<permission_level> alice_explicit {{"alice"_n, config::sysio_payer_name}, {"alice"_n, sysio::chain::config::active_name} };
     // alice pays for CPU,NET
     push_action( "noauthtable"_n, "insert"_n, alice_explicit, mvo()("user", "c") ("id", 1) ("age", 10));
 

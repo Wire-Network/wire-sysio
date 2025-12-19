@@ -1,9 +1,16 @@
+#include <fc/crypto/hex.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/common.hpp>
 #include <fc/exception/exception.hpp>
+#include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <ranges>
+#include <fc/crypto/key_serdes.hpp>
 
 namespace fc { namespace crypto {
+   namespace {
 
+
+   }
    struct recovery_visitor : fc::visitor<public_key::storage_type> {
       recovery_visitor(const sha256& digest, bool check_canonical)
       :_digest(digest)
@@ -13,6 +20,11 @@ namespace fc { namespace crypto {
       template<typename SignatureType>
       public_key::storage_type operator()(const SignatureType& s) const {
          return public_key::storage_type(s.recover(_digest, _check_canonical));
+      }
+
+      public_key::storage_type operator()(const bls::signature_shim& s) const {
+         FC_THROW_EXCEPTION(fc::exception, "BLS Signatures dont support recovery");
+         //return public_key::storage_type(s.recover(_digest, _check_canonical));
       }
 
       const sha256& _digest;
@@ -28,21 +40,21 @@ namespace fc { namespace crypto {
       return _storage.index();
    }
 
-   static public_key::storage_type parse_base58(const std::string& base58str)
+   public_key::storage_type public_key::parse_base58(const std::string& base58str)
    {
-      constexpr auto legacy_prefix = config::public_key_legacy_prefix;
+      constexpr auto legacy_prefix = fc::crypto::constants::public_key_legacy_prefix;
       if(prefix_matches(legacy_prefix, base58str) && base58str.find('_') == std::string::npos ) {
          auto sub_str = base58str.substr(const_strlen(legacy_prefix));
          using default_type = typename std::variant_alternative_t<0, public_key::storage_type>; //public_key::storage_type::template type_at<0>;
          using data_type = default_type::data_type;
-         using wrapper = checksummed_data<data_type>;
+         using wrapper = checksum_data<data_type>;
          auto bin = fc::from_base58(sub_str);
          FC_ASSERT(bin.size() == sizeof(data_type) + sizeof(uint32_t), "");
          auto wrapped = fc::raw::unpack<wrapper>(bin);
          FC_ASSERT(wrapper::calculate_checksum(wrapped.data) == wrapped.check);
          return public_key::storage_type(default_type(wrapped.data));
       } else {
-         constexpr auto prefix = config::public_key_base_prefix;
+         constexpr auto prefix = fc::crypto::constants::public_key_base_prefix;
 
          const auto pivot = base58str.find('_');
          FC_ASSERT(pivot != std::string::npos, "No delimiter in string, cannot determine data type: ${str}", ("str", base58str));
@@ -52,7 +64,7 @@ namespace fc { namespace crypto {
 
          auto data_str = base58str.substr(pivot + 1);
          FC_ASSERT(!data_str.empty(), "Public Key has no data: ${str}", ("str", base58str));
-         return base58_str_parser<public_key::storage_type, config::public_key_prefix>::apply(data_str);
+         return base58_str_parser<public_key::storage_type, fc::crypto::constants::public_key_prefix>::apply(data_str);
       }
    }
 
@@ -79,16 +91,21 @@ namespace fc { namespace crypto {
       // if (which == 3) {
       //
       // } else {
-      //    data_str = std::visit(base58str_visitor<storage_type, config::public_key_prefix, 0>(yield), _storage);
+      //    data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
       // }
-      data_str = std::visit(base58str_visitor<storage_type, config::public_key_prefix, 0>(yield), _storage);
+      data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
       if (which == 0) {
-         return std::string(config::public_key_legacy_prefix) + data_str;
+         return std::string(fc::crypto::constants::public_key_legacy_prefix) + data_str;
       } else {
-         return std::string(config::public_key_base_prefix) + "_" + data_str;
+         return std::string(fc::crypto::constants::public_key_base_prefix) + "_" + data_str;
       }
    }
 
+   std::string public_key::to_native_string(const fc::yield_function_t& yield) const {
+      return std::visit(
+         to_native_string_from_public_key_visitor<storage_type, fc::crypto::constants::public_key_prefix,0>(yield),
+         _storage);
+   }
    chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var) {
       if (std::holds_alternative<public_key>(pub_key_var)) {
          auto pub_key = std::get<public_key>(pub_key_var);
@@ -105,7 +122,7 @@ namespace fc { namespace crypto {
       if (!pub_key.valid())
          return chain_key_type_unknown;
 
-      for (auto& prefix : config::public_key_wire_prefixes) {
+      for (auto& prefix : fc::crypto::constants::public_key_wire_prefixes) {
          if (pub_key_str.starts_with(prefix) && pub_key.which() <= 1)
             return chain_key_type_wire;
       }

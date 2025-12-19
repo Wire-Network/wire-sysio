@@ -106,7 +106,7 @@ public:
    using signed_block_ptr = sysio::chain::signed_block_ptr;
    using tester           = sysio::testing::tester;
    using vote_mode        = finality_node_t::vote_mode;
-   using bls_public_key   = fc::crypto::blslib::bls_public_key;
+   using bls_public_key   = fc::crypto::bls::public_key;
 
    static constexpr size_t num_nodes = NUM_NODES;
    static constexpr size_t keys_per_node = 10;

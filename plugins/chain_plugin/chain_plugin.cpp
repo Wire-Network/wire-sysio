@@ -1734,7 +1734,7 @@ fc::variant get_global_row( const database& db, const abi_def& abi, const abi_se
    const auto table_type = get_table_type(abi, "global"_n);
    SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table global", ("type",table_type));
 
-   const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(config::system_account_name, config::system_account_name, "global"_n));
+   const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "global"_n));
    SYS_ASSERT(table_id, chain::contract_table_query_exception, "Missing table global");
 
    const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
@@ -1751,7 +1751,7 @@ read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_o
 
    // Finalizer keys present in active_finalizer_policy and pending_finalizer_policy.
    // Use std::set for eliminating duplications.
-   std::set<fc::crypto::blslib::bls_public_key> finalizer_keys;
+   std::set<fc::crypto::bls::public_key> finalizer_keys;
 
    // Populate a particular finalizer policy
    auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy, fc::variant& to_policy) {

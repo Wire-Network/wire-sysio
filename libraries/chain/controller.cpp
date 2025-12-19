@@ -896,7 +896,7 @@ struct controller_impl {
       try {
          auto get_getpeerkeys_transaction = [&]() {
             auto perms = vector<permission_level>{};
-            action act(perms, config::system_account_name, "getpeerkeys"_n, {});
+            action act(perms, sysio::chain::config::system_account_name, "getpeerkeys"_n, {});
             signed_transaction trx;
 
             trx.actions.emplace_back(std::move(act));
@@ -1778,7 +1778,7 @@ struct controller_impl {
             a.name = name;
             a.set_privileged( is_privileged );
 
-            if( name == config::system_account_name ) {
+            if( name == sysio::chain::config::system_account_name ) {
                a.abi.assign(sysio_abi_bin, sizeof(sysio_abi_bin));
                ram_delta += sizeof(sysio_abi_bin);
             }
@@ -1788,7 +1788,7 @@ struct controller_impl {
 
       const auto& owner_permission  = authorization.create_permission(name, config::owner_name, 0,
                                                                       owner, false, initial_timestamp );
-      const auto& active_permission = authorization.create_permission(name, config::active_name, owner_permission.id,
+      const auto& active_permission = authorization.create_permission(name, sysio::chain::config::active_name, owner_permission.id,
                                                                       active, false, initial_timestamp );
 
       ram_delta += 2 * config::billable_size_v<permission_object>;
@@ -1845,15 +1845,15 @@ struct controller_impl {
       }
 
       authority system_auth(genesis.initial_key);
-      create_native_account( genesis.initial_timestamp, config::system_account_name, system_auth, system_auth, true );
+      create_native_account( genesis.initial_timestamp, sysio::chain::config::system_account_name, system_auth, system_auth, true );
 
       auto empty_authority = authority(1, {}, {});
       auto active_producers_authority = authority(1, {}, {});
-      active_producers_authority.accounts.push_back({{config::system_account_name, config::active_name}, 1});
+      active_producers_authority.accounts.push_back({{sysio::chain::config::system_account_name, sysio::chain::config::active_name}, 1});
 
       create_native_account( genesis.initial_timestamp, config::null_account_name, empty_authority, empty_authority );
       create_native_account( genesis.initial_timestamp, config::producers_account_name, empty_authority, active_producers_authority );
-      const auto& active_permission       = authorization.get_permission({config::producers_account_name, config::active_name});
+      const auto& active_permission       = authorization.get_permission({config::producers_account_name, sysio::chain::config::active_name});
       const auto& majority_permission     = authorization.create_permission( config::producers_account_name,
                                                                              config::majority_producers_permission_name,
                                                                              active_permission.id,
@@ -3326,7 +3326,7 @@ struct controller_impl {
          auto auth = authority(threshold, {}, {});
          for (auto& p : producers) {
             auth.accounts.push_back({
-               {p.producer_name, config::active_name},
+               {p.producer_name, sysio::chain::config::active_name},
                1
             });
          }
@@ -3341,7 +3341,7 @@ struct controller_impl {
          return ((num_producers * numerator) / denominator) + 1;
       };
 
-      update_permission(authorization.get_permission({config::producers_account_name, config::active_name}),
+      update_permission(authorization.get_permission({config::producers_account_name, sysio::chain::config::active_name}),
                         calculate_threshold(2, 3) /* more than two-thirds */);
 
       update_permission(
@@ -3518,9 +3518,9 @@ struct controller_impl {
    signed_transaction get_on_block_transaction()
    {
       action on_block_act;
-      on_block_act.account = config::system_account_name;
+      on_block_act.account = sysio::chain::config::system_account_name;
       on_block_act.name = "onblock"_n;
-      on_block_act.authorization = vector<permission_level>{{config::system_account_name, config::active_name}};
+      on_block_act.authorization = vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}};
       on_block_act.data = fc::raw::pack(chain_head.header());
 
       signed_transaction trx;
@@ -3587,7 +3587,7 @@ struct controller_impl {
       wasmif.code_block_num_last_used(code_hash, vm_type, vm_version, first_used_block_num, block_num_last_used);
    }
 
-   void set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys, bool enforce_startup_constraints) {
+   void set_node_finalizer_keys(const bls_pub_key_sig_provider_map_t& finalizer_keys, bool enforce_startup_constraints) {
       my_finalizers.set_keys(finalizer_keys, enforce_startup_constraints);
    }
 
@@ -4721,11 +4721,11 @@ platform_timer& controller::get_thread_local_timer() {
     return my->timer;
 }
 
-void controller::set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys) {
+void controller::set_node_finalizer_keys(const bls_pub_key_sig_provider_map_t& finalizer_keys) {
    my->set_node_finalizer_keys(finalizer_keys, true);
 }
 
-void controller::test_set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys) {
+void controller::test_set_node_finalizer_keys(const bls_pub_key_sig_provider_map_t& finalizer_keys) {
    my->set_node_finalizer_keys(finalizer_keys, false);
 }
 

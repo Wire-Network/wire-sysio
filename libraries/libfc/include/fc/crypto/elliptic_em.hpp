@@ -31,7 +31,7 @@ namespace fc {
     using public_key_data_uncompressed = fc::array<char,65>;
     using private_key_secret = fc::sha256;
 
-    using signature = fc::array<char,72>;
+    //using signature = fc::array<char,72>;
     using compact_signature = fc::array<unsigned char,65>;
 
     /**
@@ -72,6 +72,13 @@ namespace fc {
            /// Allows to convert current public key object into base58 number.
            std::string to_base58() const;
            static std::string to_base58( const public_key_data &key );
+
+           /**
+            * @brief
+            * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
+            * @return public key
+            */
+           static public_key from_native_string( const std::string& pub_key_str );
            static public_key from_base58( const std::string& b58 );
 
            unsigned int fingerprint() const;
@@ -109,6 +116,14 @@ namespace fc {
             *  the new public key without having to know the private key.
             */
            static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
+
+
+       /**
+        * @brief
+        * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
+        * @return public key
+        */
+       static private_key from_native_string( const std::string& priv_key_str );
 
            private_key_secret get_secret()const; // get the private key secret
 

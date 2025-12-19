@@ -60,7 +60,7 @@ struct interface_in_benchmark {
                ("authorization", fc::variants({
                   fc::mutable_variant_object()
                      ("actor", name("payloadless"_n))
-                     ("permission", name(config::active_name))
+                     ("permission", name(sysio::chain::config::active_name))
                }))
                ("data", fc::mutable_variant_object()
                )

@@ -25,8 +25,8 @@ public:
       set_code( "sysio.msig"_n, contracts::msig_wasm() );
       set_abi( "sysio.msig"_n, contracts::msig_abi().data() );
 
-      base_tester::push_action(config::system_account_name, "setpriv"_n,
-                                 config::system_account_name,  mutable_variant_object()
+      base_tester::push_action(sysio::chain::config::system_account_name, "setpriv"_n,
+                                 sysio::chain::config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.msig")
                                  ("is_priv", 1)
       );
@@ -35,37 +35,37 @@ public:
 
       signed_transaction trx;
       set_transaction_headers(trx);
-      authority auth( 1, {}, {{{config::system_account_name, config::active_name}, 1}} );
-      trx.actions.emplace_back( vector<permission_level>{{config::system_account_name, config::active_name}},
+      authority auth( 1, {}, {{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}, 1}} );
+      trx.actions.emplace_back( vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
                                 newaccount{
-                                   .creator  = config::system_account_name,
+                                   .creator  = sysio::chain::config::system_account_name,
                                    .name     = "sysio.wrap"_n,
                                    .owner    = auth,
                                    .active   = auth,
                                 });
 
       set_transaction_headers(trx);
-      trx.sign( get_private_key( config::system_account_name, "active" ), control->get_chain_id()  );
+      trx.sign( get_private_key( sysio::chain::config::system_account_name, "active" ), control->get_chain_id()  );
       push_transaction( trx );
 
-      auto system_private_key = get_private_key( config::system_account_name, "active" );
+      auto system_private_key = get_private_key( sysio::chain::config::system_account_name, "active" );
       set_code( "sysio.wrap"_n, contracts::wrap_wasm(), &system_private_key );
       set_abi( "sysio.wrap"_n, contracts::wrap_abi().data(), &system_private_key );
 
-      base_tester::push_action(config::system_account_name, "setpriv"_n,
-                                 config::system_account_name,  mutable_variant_object()
+      base_tester::push_action(sysio::chain::config::system_account_name, "setpriv"_n,
+                                 sysio::chain::config::system_account_name,  mutable_variant_object()
                                  ("account", "sysio.wrap")
                                  ("is_priv", 1)
       );
 
       produce_blocks();
 
-      set_authority( config::system_account_name, config::active_name,
-                     authority( 1, {{get_public_key( config::system_account_name, "active" ), 1}},
-                                   {{{config::producers_account_name, config::active_name}, 1}} ),
+      set_authority( sysio::chain::config::system_account_name, sysio::chain::config::active_name,
+                     authority( 1, {{get_public_key( sysio::chain::config::system_account_name, "active" ), 1}},
+                                   {{{config::producers_account_name, sysio::chain::config::active_name}, 1}} ),
                      config::owner_name,
-                     { { config::system_account_name, config::owner_name } },
-                     { get_private_key( config::system_account_name, "active" ) }
+                     { { sysio::chain::config::system_account_name, config::owner_name } },
+                     { get_private_key( sysio::chain::config::system_account_name, "active" ) }
                    );
 
       set_producers( {"prod1"_n, "prod2"_n, "prod3"_n, "prod4"_n, "prod5"_n} );
@@ -78,7 +78,7 @@ public:
    }
 
    void propose( name proposer, name proposal_name, vector<permission_level> requested_permissions, const transaction& trx ) {
-      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::sysio_payer_name},{proposer, config::active_name}}, mvo()
+      push_action( "sysio.msig"_n, "propose"_n, {{proposer, config::sysio_payer_name},{proposer, sysio::chain::config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
                      ("requested",     requested_permissions)
@@ -87,18 +87,18 @@ public:
    }
 
    void approve( name proposer, name proposal_name, name approver ) {
-      push_action( "sysio.msig"_n, "approve"_n,  vector<permission_level>{{approver, config::active_name}}, mvo()
+      push_action( "sysio.msig"_n, "approve"_n,  vector<permission_level>{{approver, sysio::chain::config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
-                     ("level",         permission_level{approver, config::active_name} )
+                     ("level",         permission_level{approver, sysio::chain::config::active_name} )
       );
    }
 
    void unapprove( name proposer, name proposal_name, name unapprover ) {
-      push_action( "sysio.msig"_n, "unapprove"_n, vector<permission_level>{{unapprover, config::active_name}}, mvo()
+      push_action( "sysio.msig"_n, "unapprove"_n, vector<permission_level>{{unapprover, sysio::chain::config::active_name}}, mvo()
                      ("proposer",      proposer)
                      ("proposal_name", proposal_name)
-                     ("level",         permission_level{unapprover, config::active_name})
+                     ("level",         permission_level{unapprover, sysio::chain::config::active_name})
       );
    }
 
@@ -117,11 +117,11 @@ transaction sysio_wrap_tester::wrap_exec( account_name executer, const transacti
               );
    v.push_back( fc::mutable_variant_object()
                   ("actor", executer)
-                  ("permission", name{config::active_name})
+                  ("permission", name{sysio::chain::config::active_name})
               );
   v.push_back( fc::mutable_variant_object()
                  ("actor", "sysio.wrap")
-                 ("permission", name{config::active_name})
+                 ("permission", name{sysio::chain::config::active_name})
              );
    auto act_obj = fc::mutable_variant_object()
                      ("account", "sysio.wrap")
@@ -145,7 +145,7 @@ transaction sysio_wrap_tester::reqauth( account_name from, const vector<permissi
       );
    }
    auto act_obj = fc::mutable_variant_object()
-                     ("account", name{config::system_account_name})
+                     ("account", name{sysio::chain::config::system_account_name})
                      ("name", "reqauth")
                      ("authorization", v)
                      ("data", fc::mutable_variant_object() ("from", from) );
@@ -173,7 +173,7 @@ void sysio_wrap_tester::check_traces(transaction_trace_ptr trace, std::vector<st
 BOOST_AUTO_TEST_SUITE(sysio_wrap_tests)
 
 BOOST_FIXTURE_TEST_CASE( wrap_exec_direct, sysio_wrap_tester ) try {
-   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}} );
+   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, sysio::chain::config::active_name}} );
 
    signed_transaction wrap_trx( wrap_exec( "alice"_n, trx ), {}, {} );
    wrap_trx.sign( get_private_key( "alice"_n, "active" ), control->get_chain_id() );
@@ -184,12 +184,12 @@ BOOST_FIXTURE_TEST_CASE( wrap_exec_direct, sysio_wrap_tester ) try {
 
    check_traces( trace, {
                            {{"receiver", "sysio.wrap"_n}, {"act_name", "exec"_n}},
-                           {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                           {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                          } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( wrap_with_msig, sysio_wrap_tester ) try {
-   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}} );
+   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, sysio::chain::config::active_name}} );
    auto wrap_trx = wrap_exec( "alice"_n, trx );
 
    propose( "carol"_n, "first"_n,
@@ -215,13 +215,13 @@ BOOST_FIXTURE_TEST_CASE( wrap_with_msig, sysio_wrap_tester ) try {
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
                         {{"receiver", "sysio.wrap"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( wrap_with_msig_unapprove, sysio_wrap_tester ) try {
-   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}} );
+   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, sysio::chain::config::active_name}} );
    auto wrap_trx = wrap_exec( "alice"_n, trx );
 
    propose( "carol"_n, "first"_n,
@@ -258,7 +258,7 @@ BOOST_FIXTURE_TEST_CASE( wrap_with_msig_unapprove, sysio_wrap_tester ) try {
 BOOST_FIXTURE_TEST_CASE( wrap_with_msig_producers_change, sysio_wrap_tester ) try {
    create_accounts( { "newprod1"_n } );
 
-   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, config::active_name}}, 120 );
+   auto trx = reqauth( "bob"_n, {permission_level{"bob"_n, sysio::chain::config::active_name}}, 120 );
    auto wrap_trx = wrap_exec( "alice"_n, trx, 36000 );
 
    propose( "carol"_n, "first"_n,
@@ -315,7 +315,7 @@ BOOST_FIXTURE_TEST_CASE( wrap_with_msig_producers_change, sysio_wrap_tester ) tr
    check_traces( trace, {
                      {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
                      {{"receiver", "sysio.wrap"_n}, {"act_name", "exec"_n}},
-                     {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                     {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                      } );
 
 } FC_LOG_AND_RETHROW()
