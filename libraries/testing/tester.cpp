@@ -241,7 +241,9 @@ namespace sysio::testing {
             set_bios_contract();
             preactivate_all_builtin_protocol_features();
             produce_block();
-            init_roa();
+            if( policy == setup_policy::full ) {
+               init_roa();
+            }
             // Do not transition to Savanna under full_except_do_not_transition_to_savanna or
             // full_except_do_not_disable_deferred_trx
             if( policy == setup_policy::full ) {
