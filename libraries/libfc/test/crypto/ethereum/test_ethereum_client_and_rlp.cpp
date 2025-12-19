@@ -122,41 +122,5 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    BOOST_CHECK(std::memcmp(actual_unsigned.data(), test_tx_01_unsigned_result.data(), 81) == 0);
    auto actual_unsigned_hex = rlp::to_hex(actual_unsigned, false);
    BOOST_CHECK_EQUAL(actual_unsigned_hex, test_tx_01_result);
-
-   // TODO: @jglanz Move base signature_provider spec functions to `fc/crypto/signature_provider.{h,c}pp`
-   // auto msg_hash_data = fc::crypto::ethereum::hash_message(actual_unsigned);
-   // fc::sha256 msg_hash(reinterpret_cast<const char*>(msg_hash_data.data()), msg_hash_data.size());
-   //
-   // auto clean_app = gsl_lite::finally([]() {
-   //    appbase::application::reset_app_singleton();
-   // });
-   // // Load fixture
-   // auto private_key_spec = to_private_key_spec("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
-   //
-   // auto  tester           = create_app();
-   // auto& sig_provider_mgr = tester->plugin();
-   //
-   // auto sig_provider =
-   //    sig_provider_mgr.create_provider(
-   //       "eth-01",
-   //       chain_kind_ethereum,
-   //       chain_key_type_ethereum,
-   //       "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5",
-   //       private_key_spec);
-   //
-   //
-   // // Provider should be retrievable
-   // auto sig = sig_provider->sign(msg_hash);
-   // BOOST_CHECK(sig.contains<fc::em::signature_shim>());
-   // auto& sig_shim = sig.get<fc::em::signature_shim>();
-   // auto& sig_data = sig_shim.serialize();
-   // eip1559_tx test_tx_01_signed = test_tx_01;
-   // std::copy_n(sig_data.begin(),32, test_tx_01_signed.r.begin());
-   // std::copy_n(sig_data.begin()+32,32, test_tx_01_signed.s.begin());
-   // test_tx_01_signed.v = sig_data.data[64] - 27; // recovery id
-   // BOOST_CHECK(rlp::to_hex(test_tx_01_signed.r, false) == test_tx_01_r);
-   // BOOST_CHECK(rlp::to_hex(test_tx_01_signed.s, false) == test_tx_01_s);
-   // BOOST_CHECK(test_tx_01_signed.v == test_tx_01_v);
-
 } FC_LOG_AND_RETHROW();
 BOOST_AUTO_TEST_SUITE_END()
