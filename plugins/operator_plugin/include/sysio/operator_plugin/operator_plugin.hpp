@@ -3,7 +3,7 @@
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/operator_plugin/utils/event_emitter.hpp>
 
-namespace sysio::operator_plugin {
+namespace sysio {
 
   using utils::event_emitter;
 
@@ -11,7 +11,7 @@ namespace sysio::operator_plugin {
     public:
 
       APPBASE_PLUGIN_REQUIRES((chain_plugin))
-
+      operator_plugin() = default;
       virtual ~operator_plugin() = default;
 
       virtual void set_program_options(options_description& cli, options_description& cfg) override;
