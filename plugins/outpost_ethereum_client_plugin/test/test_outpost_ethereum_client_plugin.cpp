@@ -2,8 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/dll.hpp>
-#include <boost/process.hpp>
-#include <boost/process/io.hpp>
+#include <boost/process/v1/io.hpp>
 
 
 #include <atomic>
