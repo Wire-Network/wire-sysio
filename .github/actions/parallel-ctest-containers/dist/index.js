@@ -1506,13 +1506,13 @@ var require_async_iterator = __commonJS({
       return obj;
     }
     var finished = require_end_of_stream();
-    var kLastResolve = Symbol("lastResolve");
-    var kLastReject = Symbol("lastReject");
-    var kError = Symbol("error");
-    var kEnded = Symbol("ended");
-    var kLastPromise = Symbol("lastPromise");
-    var kHandlePromise = Symbol("handlePromise");
-    var kStream = Symbol("stream");
+    var kLastResolve = /* @__PURE__ */ Symbol("lastResolve");
+    var kLastReject = /* @__PURE__ */ Symbol("lastReject");
+    var kError = /* @__PURE__ */ Symbol("error");
+    var kEnded = /* @__PURE__ */ Symbol("ended");
+    var kLastPromise = /* @__PURE__ */ Symbol("lastPromise");
+    var kHandlePromise = /* @__PURE__ */ Symbol("handlePromise");
+    var kStream = /* @__PURE__ */ Symbol("stream");
     function createIterResult(value, done) {
       return {
         value,
@@ -2740,7 +2740,7 @@ var require_BufferList = __commonJS({
   ".github/actions/parallel-ctest-containers/node_modules/bl/BufferList.js"(exports2, module2) {
     "use strict";
     var { Buffer: Buffer2 } = require("buffer");
-    var symbol = Symbol.for("BufferList");
+    var symbol = /* @__PURE__ */ Symbol.for("BufferList");
     function BufferList(buf) {
       if (!(this instanceof BufferList)) {
         return new BufferList(buf);
@@ -6110,7 +6110,7 @@ async function main() {
 `);
     import_node_child_process.default.spawnSync("docker", [...dockerArgs, "rm", "-f", baseContainer], { stdio: "ignore" });
     console.log("Creating base container...");
-    if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${import_node_process.default.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], { stdio: "inherit" }).status)
+    if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${import_node_process.default.cwd()}/build.tar.gz:/build.tar.gz`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "tar xzf /build.tar.gz"], { stdio: "inherit" }).status)
       throw new Error("Failed to create base container");
     console.log("Committing base image...");
     if (import_node_child_process.default.spawnSync("docker", [...dockerArgs, "commit", baseContainer, baseImage], { stdio: "inherit" }).status)

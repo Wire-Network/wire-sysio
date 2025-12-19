@@ -58,10 +58,10 @@ mkdir -p build/debug-docker
 cmake -S . \
   -B build/debug-docker \
   -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_C_COMPILER=gcc-10 \
-  -DCMAKE_CXX_COMPILER=g++-10 \
+  -DCMAKE_C_COMPILER=/opt/clang/clang-18/bin/clang-18 \
+  -DCMAKE_CXX_COMPILER=/opt/clang/clang-18/bin/clang++ \
   -DCMAKE_INSTALL_PREFIX=/opt/llvm/llvm-11 \
-  -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11
+  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18"
 
 cmake --build build/debug-docker -- -j"$(nproc)"
 
@@ -79,10 +79,10 @@ mkdir -p build/debug-docker
 cmake -S . \
   -B build/debug-docker \
   -DCMAKE_BUILD_TYPE=Debug \
-  -DCMAKE_C_COMPILER=gcc-10 \
-  -DCMAKE_CXX_COMPILER=g++-10 \
+  -DCMAKE_C_COMPILER=/opt/clang/clang-18/bin/clang-18 \
+  -DCMAKE_CXX_COMPILER=/opt/clang/clang-18/bin/clang++ \
   -DCMAKE_INSTALL_PREFIX=/opt/llvm/llvm-11 \
-  -DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11
+  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18"
 
 cmake --build build/debug-docker -- -j"$(nproc)"
 

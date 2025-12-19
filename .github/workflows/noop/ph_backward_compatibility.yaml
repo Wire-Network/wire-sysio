@@ -53,7 +53,7 @@ jobs:
           name: ${{matrix.platform}}-build
       - name: Extract Build Directory
         run: |
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
       - name: Download Prev Leap Version
         uses: AntelopeIO/asset-artifact-download-action@v3
         with:

@@ -70,11 +70,6 @@ jobs:
         - uses: actions/checkout@v4
           with:
             submodules: recursive
-        - name: Verify system zstd presence
-          run: |
-            dpkg -L libzstd-dev | grep -E "libzstd\.so|zstd\.h" || true
-            ls -l /usr/lib/x86_64-linux-gnu/libzstd.so*
-            ls -l /usr/include/zstd.h
         - name: Build
           id: build
           run: |
@@ -100,11 +95,11 @@ jobs:
 
             if [[ "${{ matrix.platform }}" == "gcc" ]]; then
               echo "Using reduced parallelism for gcc platform"
-              cmake --build build -- -j 4
+              cmake --build build -- -j 8
             else
               cmake --build build -- -j 11
             fi
-            tar -pc --exclude "*.o" build | zstd --long -T0 -9 > build.tar.zst
+            tar -pcz --exclude "*.o" build > build.tar.gz
         - name: Show vcpkg logs if failure
           if: failure()            # this runs only when something failed above
           run: |
@@ -120,5 +115,5 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: ${{matrix.platform}}-build
-            path: build.tar.zst
+            path: build.tar.gz
             compression-level: 0
