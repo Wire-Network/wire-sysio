@@ -30,12 +30,12 @@ using namespace sysio::test_utils;
 auto make_unique_trx() {
    static uint64_t nextid = 0;
    ++nextid;
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
    signed_transaction trx;
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds( nextid % 50 == 0 ? 0 : 60 )}; // fail some transactions via expired
    if( nextid % 10 == 0 ) {
       // fail some for authorization (read-only transaction should not have authorization)
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}}, testit{nextid} );
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}}, testit{nextid} );
    } else {
       vector<permission_level> no_auth{};
       trx.actions.emplace_back( no_auth, testit{nextid} );
@@ -135,7 +135,7 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
          for( size_t i = 1; i <= num_pushes; ++i ) {
             auto ptrx = i % 3 == 0 ? make_unique_trx() : make_bios_ro_trx(chain_plug->chain());
             app->executor().post( priority::low, exec_queue::read_only, [&chain_plug=chain_plug, &num_get_account_calls]() {
-               chain_plug->get_read_only_api(fc::seconds(90)).get_account(chain_apis::read_only::get_account_params{.account_name=config::system_account_name}, fc::time_point::now()+fc::seconds(90));
+               chain_plug->get_read_only_api(fc::seconds(90)).get_account(chain_apis::read_only::get_account_params{.account_name=sysio::chain::config::system_account_name}, fc::time_point::now()+fc::seconds(90));
                ++num_get_account_calls;
             });
             app->executor().post( priority::low, exec_queue::read_exclusive, [ptrx, &next_calls, &num_posts, &trace_with_except, &trx_match, &app]() {

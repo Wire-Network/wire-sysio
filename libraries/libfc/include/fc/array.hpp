@@ -13,6 +13,18 @@ namespace fc {
   template<typename T, size_t N>
   class array {
     public:
+    using value_type = T;
+    using std_array_type = std::array<T, N>;
+    static constexpr std::size_t value_count = N;
+    array(){ memset( data, 0, sizeof(data) ); }
+    explicit array(const std::array<T, N>& arr){ memcpy( data, arr.data(), sizeof(data) ); };
+
+     std::array<T, N> to_std_array()const {
+        std::array<T, N> target;
+        std::copy_n(data, N, target.begin());
+        return target;
+     }
+
     /**
      *  Checked indexing (when in debug build) that also simplifies dereferencing
      *  when you have an array<T,N>*.
@@ -33,7 +45,15 @@ namespace fc {
     T*           end()         {  return &data[N]; }
 
     size_t       size()const { return N; }
-
+    auto operator<=>(const fc::array<T, N>& other) const
+    requires requires(T const& x, T const& y) { x <=> y; } {
+       int cmp = memcmp(data, other.data, N * sizeof(T));
+       if (cmp < 0)
+          return std::strong_ordering::less;
+       if (cmp > 0)
+          return std::strong_ordering::greater;
+       return std::strong_ordering::equal;
+    }
     T data[N];
   };
 
@@ -42,8 +62,19 @@ namespace fc {
   class array<unsigned char,N>
   {
     public:
-    typedef unsigned char T;
+    using T = unsigned char;
+    using std_array_type = std::array<T, N>;
+    using value_type = T;
+    static constexpr std::size_t value_count = N;
     array(){ memset( data, 0, sizeof(data) ); }
+    explicit array(const std::array<T, N>& arr){ memcpy( data, arr.data(), sizeof(data) ); }
+
+    std::array<T, N> to_std_array()const {
+       std::array<T, N> target;
+       std::copy_n(data, N, target.begin());
+       return target;
+    }
+
     /**
      *  Checked indexing (when in debug build) that also simplifies dereferencing
      *  when you have an array<T,N>*.
@@ -59,6 +90,16 @@ namespace fc {
 
     constexpr size_t       size()const { return N; }
 
+    auto operator<=>(const fc::array<T, N>& other) const
+       requires requires(T const& x, T const& y) { x <=> y; } {
+       int cmp = memcmp(data, other.data, N * sizeof(T));
+       if (cmp < 0)
+          return std::strong_ordering::less;
+       if (cmp > 0)
+          return std::strong_ordering::greater;
+       return std::strong_ordering::equal;
+    }
+
     T data[N];
   };
 
@@ -67,8 +108,19 @@ namespace fc {
   class array<char,N>
   {
     public:
-    typedef char T;
+    using T = char;
+    using std_array_type = std::array<T, N>;
+    using value_type = T;
+    static constexpr std::size_t value_count = N;
     array(){ memset( data, 0, sizeof(data) ); }
+    explicit array(const std::array<T, N>& arr){ memcpy( data, arr.data(), sizeof(data) ); }
+
+     std::array<T, N> to_std_array()const {
+       std::array<T, N> target;
+       std::copy_n(data, N, target.begin());
+       return target;
+    }
+
     /**
      *  Checked indexing (when in debug build) that also simplifies dereferencing
      *  when you have an array<T,N>*.
@@ -83,6 +135,15 @@ namespace fc {
     const T*     end()const    {  return &data[N]; }
 
     size_t       size()const { return N; }
+    auto operator<=>(const fc::array<T, N>& other) const
+    requires requires(T const& x, T const& y) { x <=> y; } {
+       int cmp = memcmp(data, other.data, N * sizeof(T));
+       if (cmp < 0)
+          return std::strong_ordering::less;
+       if (cmp > 0)
+          return std::strong_ordering::greater;
+       return std::strong_ordering::equal;
+    }
 
     T data[N];
   };
@@ -105,7 +166,7 @@ namespace fc {
   template<typename T, size_t N>
   void to_variant( const array<T,N>& bi, variant& v )
   {
-     v = std::vector<char>( (const char*)&bi, ((const char*)&bi) + sizeof(bi) );
+     v = std::vector<char>( static_cast<const char*>(bi.data), static_cast<const char*>(bi.data) + sizeof(bi) );
   }
   template<typename T, size_t N>
   void from_variant( const variant& v, array<T,N>& bi )

@@ -56,7 +56,7 @@ struct genesis_state {
 
    time_point                               initial_timestamp;
    public_key_type                          initial_key;
-   fc::crypto::blslib::bls_public_key       initial_finalizer_key;
+   fc::crypto::bls::public_key       initial_finalizer_key;
 
    /**
     * Get the chain_id corresponding to this genesis state.

@@ -46,10 +46,6 @@ keygen_result load_keygen_fixture(const std::string& keygen_name, std::uint32_t 
 
 std::string to_private_key_spec(const std::string& priv);
 
-std::string to_provider_spec(const std::string&           key_name, fc::crypto::chain_kind_t target_chain,
-                             fc::crypto::chain_key_type_t key_type, std::string              public_key_text,
-                             std::string                  private_key_provider_spec);
-
 std::string keygen_fixture_to_spec(const std::string& keygen_name, std::uint32_t id);
 
 std::vector<std::string> keygen_fixtures_to_specs(const std::string& keygen_name);

@@ -18,7 +18,7 @@ void finality_node_t::corrupt_vote_finalizer_key() {
    auto g1 = last_vote->finalizer_key.jacobian_montgomery_le();
    g1 = bls12_381::aggregate_public_keys(std::array{g1, g1});
    auto affine = g1.toAffineBytesLE(bls12_381::from_mont::yes);
-   last_vote->finalizer_key = fc::crypto::blslib::bls_public_key(affine);
+   last_vote->finalizer_key = fc::crypto::bls::public_key(affine);
 }
 
 void finality_node_t::corrupt_vote_signature() {
@@ -29,7 +29,7 @@ void finality_node_t::corrupt_vote_signature() {
    auto g2 = last_vote->sig.jacobian_montgomery_le();
    g2 = bls12_381::aggregate_signatures(std::array{g2, g2});
    auto affine = g2.toAffineBytesLE(bls12_381::from_mont::yes);
-   last_vote->sig = fc::crypto::blslib::bls_signature(affine);
+   last_vote->sig = fc::crypto::bls::signature(affine);
 }
 
 bool finality_node_t::lib_advancing() {

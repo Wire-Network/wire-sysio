@@ -147,7 +147,7 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
    result.last_pending_finalizer_policy_digest = fc::sha256::hash(*result.active_finalizer_policy);
    result.last_pending_finalizer_policy_start_timestamp = result.timestamp();
 
-   result.active_proposer_policy = std::make_shared<proposer_policy>(proposer_policy{g.initial_timestamp, { 0, { producer_authority{config::system_account_name, block_signing_authority_v0{ 1, {{g.initial_key, 1}} } } } }});
+   result.active_proposer_policy = std::make_shared<proposer_policy>(proposer_policy{g.initial_timestamp, { 0, { producer_authority{sysio::chain::config::system_account_name, block_signing_authority_v0{ 1, {{g.initial_key, 1}} } } } }});
    result.latest_proposed_proposer_policy = {}; // none pending at IF genesis block
    result.latest_pending_proposer_policy = {}; // none pending at IF genesis block
    result.proposed_finalizer_policies = {}; // none proposed at IF genesis block

@@ -2,6 +2,7 @@
 #include <sysio/chain/block_state.hpp>
 #include <sysio/chain/vote_message.hpp>
 #include <fc/crypto/bls_utils.hpp>
+#include <fc/crypto/signature_provider.hpp>
 #include <fc/io/cfile.hpp>
 #include <fc/io/datastream_crc.hpp>
 #include <compare>
@@ -181,7 +182,8 @@ namespace sysio::chain {
       void    set_default_safety_information(const fsi_t& fsi);
 
       /// only call on startup
-      void    set_keys(const std::map<std::string, std::string>& finalizer_keys, bool enforce_startup_constraints = true);
+      void    set_keys(const std::map<std::string, fc::crypto::signature_provider_ptr>& finalizer_keys, bool enforce_startup_constraints =
+                          true);
 
       // following two member functions could be private, but are used in testing, not thread safe
       bool    save_finalizer_safety_info() const;

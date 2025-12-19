@@ -41,11 +41,11 @@ struct restart_from_block_log_test_fixture {
 
    restart_from_block_log_test_fixture() {
       using namespace sysio::chain;
-      chain.create_account("replay1"_n, config::system_account_name, false, true, false);
+      chain.create_account("replay1"_n, sysio::chain::config::system_account_name, false, true, false);
       chain.produce_block();
-      chain.create_account("replay2"_n, config::system_account_name, false, true, false);
+      chain.create_account("replay2"_n, sysio::chain::config::system_account_name, false, true, false);
       chain.produce_block();
-      chain.create_account("replay3"_n, config::system_account_name, false, true, false);
+      chain.create_account("replay3"_n, sysio::chain::config::system_account_name, false, true, false);
       chain.produce_block();
       auto cutoff_block = chain.produce_block();
       cutoff_block_num  = cutoff_block->block_num();

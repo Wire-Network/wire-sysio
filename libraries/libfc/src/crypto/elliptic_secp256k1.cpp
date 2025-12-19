@@ -49,7 +49,24 @@ namespace fc { namespace ecc {
                 public_key_impl( const public_key_impl& cpy ) BOOST_NOEXCEPT
                     : _key( cpy._key ) {}
 
+                public_key_impl( public_key_impl&& cpy ) BOOST_NOEXCEPT
+                    : _key( std::move(cpy._key) ) {}
+
                 public_key_data _key;
+
+                public_key_impl& operator=( const public_key_impl& pk ) BOOST_NOEXCEPT {
+                     if ( this != &pk ) {
+                             _key = pk._key;
+                     }
+                     return *this;
+                }
+
+                public_key_impl& operator=( public_key_impl&& pk ) BOOST_NOEXCEPT {
+                     if ( this != &pk ) {
+                             _key = std::move(pk._key);
+                     }
+                }
+
         };
 
         typedef fc::array<char,37> chr37;

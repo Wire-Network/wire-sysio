@@ -24,7 +24,7 @@ bool within_error(int64_t a, int64_t b, int64_t err) { return std::abs(a - b) <=
 bool within_one(int64_t a, int64_t b) { return within_error(a, b, 1); }
 
 BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try {
-   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
+   issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  sysio::chain::config::system_account_name );
 
    //fc::variant params = producer_parameters_example(1);
    auto key =  fc::crypto::public_key( std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV") ); // cspell:disable-line
@@ -96,7 +96,7 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
 
    BOOST_REQUIRE_EQUAL( control->active_producers().version, 0u );
 
-   issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  config::system_account_name );
+   issue_and_transfer( "alice1111111"_n, core_sym::from_string("200000000.0000"),  sysio::chain::config::system_account_name );
    block_signing_authority_v0 alice_signing_authority;
    alice_signing_authority.threshold = 1;
    alice_signing_authority.keys.push_back( {.key = get_public_key( "alice1111111"_n, "bs1"), .weight = 1} );
@@ -178,7 +178,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
    //change `default_max_inline_action_size` to 512 KB
    sysio::chain::chain_config params = control->get_global_properties().configuration;
    params.max_inline_action_size = 512 * 1024;
-   base_tester::push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+   base_tester::push_action( sysio::chain::config::system_account_name, "setparams"_n, sysio::chain::config::system_account_name, mutable_variant_object()
                               ("params", params) );
 
    produce_blocks();
@@ -197,7 +197,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
    // test begins
    vector<permission_level> prod_perms;
    for ( auto& x : producer_names ) {
-      prod_perms.push_back( { name(x), config::active_name } );
+      prod_perms.push_back( { name(x), sysio::chain::config::active_name } );
    }
 
    transaction trx;
@@ -219,10 +219,10 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
          ("delay_sec", 0)
          ("actions", fc::variants({
                fc::mutable_variant_object()
-                  ("account", name(config::system_account_name))
+                  ("account", name(sysio::chain::config::system_account_name))
                   ("name", "setcode")
-                  ("authorization", vector<permission_level>{ { config::system_account_name, config::active_name } })
-                  ("data", fc::mutable_variant_object() ("account", name(config::system_account_name))
+                  ("authorization", vector<permission_level>{ { sysio::chain::config::system_account_name, sysio::chain::config::active_name } })
+                  ("data", fc::mutable_variant_object() ("account", name(sysio::chain::config::system_account_name))
                    ("vmtype", 0)
                    ("vmversion", "0")
                    ("code", bytes( code.begin(), code.end() ))
@@ -245,7 +245,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
       BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[i]), "approve"_n, mvo()
                                                        ("proposer",      "alice1111111")
                                                        ("proposal_name", "upgrade1")
-                                                       ("level",         permission_level{ name(producer_names[i]), config::active_name })
+                                                       ("level",         permission_level{ name(producer_names[i]), sysio::chain::config::active_name })
                           )
       );
    }
@@ -263,7 +263,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
    BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[14]), "approve"_n, mvo()
                                                     ("proposer",      "alice1111111")
                                                     ("proposal_name", "upgrade1")
-                                                    ("level",         permission_level{ name(producer_names[14]), config::active_name })
+                                                    ("level",         permission_level{ name(producer_names[14]), sysio::chain::config::active_name })
                           )
    );
 
@@ -328,7 +328,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
    // test begins
    vector<permission_level> prod_perms;
    for ( auto& x : producer_names ) {
-      prod_perms.push_back( { name(x), config::active_name } );
+      prod_perms.push_back( { name(x), sysio::chain::config::active_name } );
    }
 
    sysio::chain::chain_config params;
@@ -348,9 +348,9 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
          ("delay_sec", 0)
          ("actions", fc::variants({
                fc::mutable_variant_object()
-                  ("account", name(config::system_account_name))
+                  ("account", name(sysio::chain::config::system_account_name))
                   ("name", "setparams")
-                  ("authorization", vector<permission_level>{ { config::system_account_name, config::active_name } })
+                  ("authorization", vector<permission_level>{ { sysio::chain::config::system_account_name, sysio::chain::config::active_name } })
                   ("data", fc::mutable_variant_object()
                    ("params", params)
                   )
@@ -372,7 +372,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
       BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[i]), "approve"_n, mvo()
                                                        ("proposer",      "alice1111111")
                                                        ("proposal_name", "setparams1")
-                                                       ("level",         permission_level{ name(producer_names[i]), config::active_name })
+                                                       ("level",         permission_level{ name(producer_names[i]), sysio::chain::config::active_name })
                           )
       );
    }
@@ -424,7 +424,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    // test begins
    vector<permission_level> prod_perms;
    for ( auto& x : producer_names ) {
-      prod_perms.push_back( { name(x), config::active_name } );
+      prod_perms.push_back( { name(x), sysio::chain::config::active_name } );
    }
 
    transaction trx;
@@ -438,9 +438,9 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
          ("delay_sec", 0)
          ("actions", fc::variants({
                fc::mutable_variant_object()
-                  ("account", name(config::system_account_name))
+                  ("account", name(sysio::chain::config::system_account_name))
                   ("name", "wasmcfg")
-                  ("authorization", vector<permission_level>{ { config::system_account_name, config::active_name } })
+                  ("authorization", vector<permission_level>{ { sysio::chain::config::system_account_name, sysio::chain::config::active_name } })
                   ("data", fc::mutable_variant_object()
                    ("settings", "high"_n)
                   )
@@ -462,7 +462,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
       BOOST_REQUIRE_EQUAL(success(), push_action_msig( name(producer_names[i]), "approve"_n, mvo()
                                                        ("proposer",      "alice1111111")
                                                        ("proposal_name", "setparams1")
-                                                       ("level",         permission_level{ name(producer_names[i]), config::active_name })
+                                                       ("level",         permission_level{ name(producer_names[i]), sysio::chain::config::active_name })
                           )
       );
    }
@@ -498,12 +498,12 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
 
    abi_serializer abi_ser(fc::json::from_string( (const char*)contracts::bios_abi().data()).template as<abi_def>(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
    // bios_wasm and bios_abi set by set execute_setup_policy full
-   // t.set_code( config::system_account_name, contracts::bios_wasm() );
-   // t.set_abi( config::system_account_name, contracts::bios_abi().data() );
+   // t.set_code( sysio::chain::config::system_account_name, contracts::bios_wasm() );
+   // t.set_abi( sysio::chain::config::system_account_name, contracts::bios_abi().data() );
    t.create_account("sysio.token"_n);
    t.set_abi( "sysio.token"_n, contracts::token_abi().data() );
    {
-      auto res = t.get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
+      auto res = t.get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
       auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(base_tester::abi_serializer_max_time) );
       abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
@@ -515,7 +515,7 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
 
    t.set_abi( "sysio.token"_n, contracts::system_abi().data() );
    {
-      auto res = t.get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
+      auto res = t.get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
       auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(base_tester::abi_serializer_max_time) );
       abi_serializer::from_variant( abi_hash_var, abi_hash, t.get_resolver(), abi_serializer::create_yield_function(base_tester::abi_serializer_max_time));
@@ -529,7 +529,7 @@ BOOST_AUTO_TEST_CASE( setabi_bios ) try {
 BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
    {
-      auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
+      auto res = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
       auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
       abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));
@@ -541,7 +541,7 @@ BOOST_FIXTURE_TEST_CASE( setabi, sysio_system_tester ) try {
 
    set_abi( "sysio.token"_n, contracts::system_abi().data() );
    {
-      auto res = get_row_by_account( config::system_account_name, config::system_account_name, "abihash"_n, "sysio.token"_n );
+      auto res = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "abihash"_n, "sysio.token"_n );
       _abi_hash abi_hash;
       auto abi_hash_var = abi_ser.binary_to_variant( "abi_hash", res, abi_serializer::create_yield_function(abi_serializer_max_time) );
       abi_serializer::from_variant( abi_hash_var, abi_hash, get_resolver(), abi_serializer::create_yield_function(abi_serializer_max_time));

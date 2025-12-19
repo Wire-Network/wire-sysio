@@ -750,7 +750,7 @@ BOOST_FIXTURE_TEST_CASE(verify_block_compatibitity, savanna_cluster::cluster_t) 
    set_partition({&A});                                 // and don't vote on it
 
    // push action so that the block is not empty
-   A.push_action(config::system_account_name, updateauth::get_name(), tester_account,
+   A.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), tester_account,
                  fc::mutable_variant_object()("account", "tester")("permission", "first")("parent", "active")(
                     "auth", authority(A.get_public_key(tester_account, "first"))));
 

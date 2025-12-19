@@ -27,7 +27,6 @@ set(fc_sources
   src/crypto/crc.cpp
   src/crypto/city.cpp
   src/crypto/base58.cpp
-  src/crypto/base64.cpp
   src/crypto/bigint.cpp
   src/crypto/hex.cpp
   src/crypto/sha1.cpp
@@ -48,6 +47,7 @@ set(fc_sources
   src/crypto/public_key.cpp
   src/crypto/private_key.cpp
   src/crypto/signature.cpp
+  src/crypto/signature_provider.cpp
   src/crypto/bls_private_key.cpp
   src/crypto/bls_public_key.cpp
   src/crypto/bls_signature.cpp

@@ -24,16 +24,16 @@ namespace {
 template<typename T>
 struct wasm_config_tester : T {
    wasm_config_tester() {
-      T::set_abi(config::system_account_name, test_contracts::wasm_config_bios_abi());
-      T::set_code(config::system_account_name, test_contracts::wasm_config_bios_wasm());
-      bios_abi_ser = *T::get_resolver()(config::system_account_name);
+      T::set_abi(sysio::chain::config::system_account_name, test_contracts::wasm_config_bios_abi());
+      T::set_code(sysio::chain::config::system_account_name, test_contracts::wasm_config_bios_wasm());
+      bios_abi_ser = *T::get_resolver()(sysio::chain::config::system_account_name);
    }
    void set_wasm_params(const wasm_config& params) {
       signed_transaction trx;
-      trx.actions.emplace_back(vector<permission_level>{{"sysio"_n,config::active_name}}, "sysio"_n, "setwparams"_n,
+      trx.actions.emplace_back(vector<permission_level>{{"sysio"_n,sysio::chain::config::active_name}}, "sysio"_n, "setwparams"_n,
                                bios_abi_ser.variant_to_binary("setwparams", fc::mutable_variant_object()("cfg", params),
                                                               abi_serializer::create_yield_function( T::abi_serializer_max_time )));
-      trx.actions[0].authorization = vector<permission_level>{{"sysio"_n,config::active_name}};
+      trx.actions[0].authorization = vector<permission_level>{{"sysio"_n,sysio::chain::config::active_name}};
       T::set_transaction_headers(trx);
       trx.sign(T::get_private_key("sysio"_n, "active"), T::get_chain_id());
       T::push_transaction(trx);
@@ -41,7 +41,7 @@ struct wasm_config_tester : T {
    // Pushes an empty action
    void push_action(account_name account) {
        signed_transaction trx;
-       trx.actions.push_back({{{account,config::active_name}}, account, name(), {}});
+       trx.actions.push_back({{{account,sysio::chain::config::active_name}}, account, name(), {}});
        T::set_transaction_headers(trx);
        trx.sign(T::get_private_key( account, "active" ), T::get_chain_id());
        T::push_transaction(trx);
@@ -269,7 +269,7 @@ void test_max_func_local_bytes(T& chain, int32_t n_params, int32_t n_locals, int
       action act;
       act.account = "stackz"_n;
       act.name = name();
-      act.authorization = vector<permission_level>{{"stackz"_n,config::active_name}};
+      act.authorization = vector<permission_level>{{"stackz"_n,sysio::chain::config::active_name}};
       signed_transaction trx;
       trx.actions.push_back(act);
 
@@ -489,7 +489,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( max_stack, T, wasm_config_testers ) {
    auto params = genesis_state::default_initial_wasm_configuration;
    auto pushit = [&]{
       signed_transaction trx;
-      trx.actions.push_back({{{"stackz"_n,config::active_name}}, "stackz"_n, name(params.max_call_depth - 2), {}});
+      trx.actions.push_back({{{"stackz"_n,sysio::chain::config::active_name}}, "stackz"_n, name(params.max_call_depth - 2), {}});
       chain.set_transaction_headers(trx);
       trx.sign(chain.get_private_key( "stackz"_n, "active" ), chain.get_chain_id());
       chain.push_transaction(trx);
@@ -510,7 +510,7 @@ void test_max_table_elements(T& chain, int32_t max_table_elements, int32_t overs
 
    auto pushit = [&]{
       signed_transaction trx;
-      trx.actions.push_back({{{"table"_n,config::active_name}}, "table"_n, name(), {}});
+      trx.actions.push_back({{{"table"_n,sysio::chain::config::active_name}}, "table"_n, name(), {}});
       chain.set_transaction_headers(trx);
       trx.sign(chain.get_private_key( "table"_n, "active" ), chain.get_chain_id());
       chain.push_transaction(trx);
@@ -807,7 +807,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( max_pages, T, wasm_config_testers ) try {
          action act;
          act.account = "bigmem"_n;
          act.name = name(extra_pages);
-         act.authorization = vector<permission_level>{{"bigmem"_n,config::active_name}};
+         act.authorization = vector<permission_level>{{"bigmem"_n,sysio::chain::config::active_name}};
          signed_transaction trx;
          trx.actions.push_back(act);
 
@@ -822,7 +822,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( max_pages, T, wasm_config_testers ) try {
          action act;
          act.account = "accessmem"_n;
          act.name = name(pagenum);
-         act.authorization = vector<permission_level>{{"accessmem"_n,config::active_name}};
+         act.authorization = vector<permission_level>{{"accessmem"_n,sysio::chain::config::active_name}};
          signed_transaction trx;
          trx.actions.push_back(act);
 
@@ -837,7 +837,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( max_pages, T, wasm_config_testers ) try {
          action act;
          act.account = "intrinsicmem"_n;
          act.name = name(pages);
-         act.authorization = vector<permission_level>{{"intrinsicmem"_n,config::active_name}};
+         act.authorization = vector<permission_level>{{"intrinsicmem"_n,sysio::chain::config::active_name}};
          signed_transaction trx;
          trx.actions.push_back(act);
 
@@ -914,8 +914,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( call_depth, T, wasm_config_testers ) try {
    chain.produce_block();
 
    signed_transaction trx;
-   trx.actions.emplace_back(vector<permission_level>{{"depth"_n,config::active_name}}, "depth"_n, ""_n, bytes{});
-   trx.actions[0].authorization = vector<permission_level>{{"depth"_n,config::active_name}};
+   trx.actions.emplace_back(vector<permission_level>{{"depth"_n,sysio::chain::config::active_name}}, "depth"_n, ""_n, bytes{});
+   trx.actions[0].authorization = vector<permission_level>{{"depth"_n,sysio::chain::config::active_name}};
 
    auto pushit = [&]() {
       chain.produce_block();
@@ -1031,9 +1031,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( reset_chain_tests, T, wasm_config_testers ) {
       auto make_setcode = [](const std::vector<uint8_t>& code) {
          return setcode{ "sysio"_n, 0, 0, bytes(code.begin(), code.end()) };
       };
-      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, make_setcode(wast_to_wasm(min_set_parameters_wast)) });
-      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, "sysio"_n, ""_n, fc::raw::pack(genesis_state::default_initial_wasm_configuration) });
-      trx.actions.push_back({ { { "sysio"_n, config::active_name} }, make_setcode(contracts::sysio_bios_wasm()) });
+      trx.actions.push_back({ { { "sysio"_n, sysio::chain::config::active_name} }, make_setcode(wast_to_wasm(min_set_parameters_wast)) });
+      trx.actions.push_back({ { { "sysio"_n, sysio::chain::config::active_name} }, "sysio"_n, ""_n, fc::raw::pack(genesis_state::default_initial_wasm_configuration) });
+      trx.actions.push_back({ { { "sysio"_n, sysio::chain::config::active_name} }, make_setcode(contracts::sysio_bios_wasm()) });
       chain.set_transaction_headers(trx);
       trx.sign(chain.get_private_key("sysio"_n, "active"), chain.get_chain_id());
       chain.push_transaction(trx);
@@ -1098,7 +1098,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( get_wasm_parameters_test, T, validating_testers )
 
    auto check_wasm_params = [&](const std::vector<char>& params){
       signed_transaction trx;
-      trx.actions.emplace_back(vector<permission_level>{{"test"_n,config::active_name}}, "test"_n, ""_n,
+      trx.actions.emplace_back(vector<permission_level>{{"test"_n,sysio::chain::config::active_name}}, "test"_n, ""_n,
                                params);
       chain.set_transaction_headers(trx);
       trx.sign(chain.get_private_key("test"_n, "active"), chain.get_chain_id());
@@ -1151,7 +1151,7 @@ BOOST_FIXTURE_TEST_CASE(large_custom_section, validating_tester)
    set_code( "hugecustom"_n, custom_section_wasm );
 
    signed_transaction trx;
-   trx.actions.emplace_back(vector<permission_level>{{"hugecustom"_n,config::active_name}}, "hugecustom"_n, ""_n, std::vector<char>{});
+   trx.actions.emplace_back(vector<permission_level>{{"hugecustom"_n,sysio::chain::config::active_name}}, "hugecustom"_n, ""_n, std::vector<char>{});
    set_transaction_headers(trx);
    trx.sign(get_private_key("hugecustom"_n, "active"), get_chain_id());
    push_transaction(trx);

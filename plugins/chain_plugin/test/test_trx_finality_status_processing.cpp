@@ -60,11 +60,11 @@ auto make_unique_trx( const fc::microseconds& expiration ) {
 
    genesis_state gs{};
    const auto& chain_id = gs.compute_chain_id();
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
    signed_transaction trx;
    const auto now_exp = fc::time_point::now() + expiration;
    trx.expiration = fc::time_point_sec{now_exp};
-   trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+   trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                              testit{ unique_id } );
    trx.sign( get_private_key("test"_n), chain_id );
 

@@ -13,8 +13,8 @@
 
 #include <boost/test/unit_test.hpp>
 #include <boost/dll.hpp>
-#include <boost/process.hpp>
-#include <boost/process/io.hpp>
+#include <boost/process/v1/spawn.hpp>
+#include <boost/process/v1/io.hpp>
 
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
@@ -79,9 +79,9 @@ std::vector<std::uint8_t> test_tx_01_unsigned_result {
  };
 
 
-std::string test_tx_01_r = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
-std::string test_tx_01_s = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
-fc::uint256 test_tx_01_v = 0;
+[[maybe_unused]] std::string test_tx_01_r = "93166a3ed10a4050dce7261c4ca8bcba16a1731117c453a326a1742c959b33f0";
+[[maybe_unused]] std::string test_tx_01_s = "7c17a232cd69ce93f21a30579a2a94309b2d71918043134b4c5df5788078a0e4";
+[[maybe_unused]] fc::uint256 test_tx_01_v = 0;
 
 //noinspection SpellCheckingInspection
 std::string test_tx_01_result = "02f84e827a690d8477359400847737208083018c80945fbdb2315678afecb367f032d93f642f64180aa380a43fb5c1cb000000000000000000000000000000000000000000000000000000000000003cc0";

@@ -49,7 +49,5 @@ namespace fc {
            r[i] = digits[(n>>j) & 0x0f];
        return r;
    }
-}     
-
 } // namespace fc
 
