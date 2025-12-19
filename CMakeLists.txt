@@ -277,12 +277,20 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
 
   add_custom_target(link_target ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory lib/python3/dist-packages
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../../share/leap_testing/tests/TestHarness lib/python3/dist-packages/TestHarness
-    COMMAND ${CMAKE_COMMAND} -E make_directory share/leap_testing
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/leap_testing/bin)
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../../share/sysio_testing/tests/TestHarness lib/python3/dist-packages/TestHarness
+    COMMAND ${CMAKE_COMMAND} -E make_directory share/sysio_testing
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/sysio_testing/bin)
 
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/python3/dist-packages/TestHarness DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/python3/dist-packages COMPONENT dev EXCLUDE_FROM_ALL)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/leap_testing/bin/* DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/leap_testing COMPONENT dev EXCLUDE_FROM_ALL)
+  install(PROGRAMS
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/clio
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/kiod
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/nodeop
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/sys-util
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/trace_api_util
+          DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/bin
+          COMPONENT dev
+          EXCLUDE_FROM_ALL)
 else()
   # The following install(SCRIPT ...) steps are necessary for `make dev-install` to work on cmake versions < 3.21.
   install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/scripts/install_testharness_symlinks.cmake COMPONENT dev EXCLUDE_FROM_ALL)

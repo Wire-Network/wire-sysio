@@ -1,47 +1,62 @@
-cmake_minimum_required(VERSION 3.5)
-cmake_policy(SET CMP0116 OLD) #suppress warning about Boost::xxxx targets not being imported
+cmake_minimum_required(VERSION 3.15)
+# Prefer NEW behavior; we’ll make Boost targets resilient instead of relying on OLD policies
+cmake_policy(SET CMP0116 NEW)
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
+
 message(STATUS "Setting up Sysio Tester @VERSION_FULL@ at @SYS_ROOT_DIR@")
 
 # VERSION
 set(SYSIO_VERSION "@VERSION_FULL@")
 
-# FORWARD COMPILER SETTINGS
-set(CMAKE_INSTALL_RPATH "${HOME}/lib;${HOME}/lib64")
+# Forward compilers
 set(CMAKE_CXX_COMPILER @CMAKE_CXX_COMPILER@)
-set(CMAKE_C_COMPILER @CMAKE_C_COMPILER@)
+set(CMAKE_C_COMPILER   @CMAKE_C_COMPILER@)
 
 # CXX CONFIG
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
-set(CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# CXX FLAGS
+# Flags
 set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -Wall")
 if(APPLE)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-endif(APPLE)
+  string(APPEND CMAKE_CXX_FLAGS " -Wno-deprecated-declarations")
+endif()
 
 enable_testing()
 
-if(LLVM_DIR STREQUAL "" OR NOT LLVM_DIR)
-   set(LLVM_DIR @LLVM_DIR@)
+# Options to relax hard dependencies and allow callers to tweak behavior
+option(SYSIO_TESTER_REQUIRE_LLVM "Require LLVM to be present" OFF)
+set(SYSIO_TESTER_BOOST_MIN_VERSION "1.70" CACHE STRING "Minimum Boost version to accept")
+set(SYSIO_TESTER_EXTRA_INCLUDE_DIRS "" CACHE PATH "Extra include dirs for Sysio tests")
+
+# LLVM (optional)
+if(SYSIO_TESTER_REQUIRE_LLVM OR DEFINED LLVM_DIR)
+  if(LLVM_DIR STREQUAL "" OR NOT LLVM_DIR)
+    set(LLVM_DIR @LLVM_DIR@)
+  endif()
+  if(LLVM_DIR)
+    find_package(LLVM QUIET CONFIG)
+    if(LLVM_FOUND)
+      llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native DebugInfoDWARF orcjit)
+    endif()
+  endif()
 endif()
 
-find_package(Gperftools QUIET)
-if(GPERFTOOLS_FOUND)
-   message(STATUS "Found gperftools; compiling tests with TCMalloc")
-   list(APPEND PLATFORM_SPECIFIC_LIBS tcmalloc)
-endif()
-
-if(NOT "@LLVM_FOUND@" STREQUAL "")
-   find_package(LLVM @LLVM_VERSION@ EXACT REQUIRED CONFIG)
-   llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native DebugInfoDWARF orcjit)
-   # link_directories(AFTER ${LLVM_LIBRARY_DIR})
-endif()
-
-#adds -pthread. Ubuntu sysio.contracts build breaks without this flag specified
+# Threads and libatomic fallback
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
+find_library(SYSIO_TESTER_ATOMIC_LIB atomic)
+set(SYSIO_TESTER_ATOMIC_LINK "")
+if(SYSIO_TESTER_ATOMIC_LIB)
+  set(SYSIO_TESTER_ATOMIC_LINK ${SYSIO_TESTER_ATOMIC_LIB})
+else()
+  # Fall back to linking by name; harmless if not needed/available
+  set(SYSIO_TESTER_ATOMIC_LINK atomic)
+endif()
 
 # CALCULATE PATHS
 get_filename_component(sysioPrefixDir ${CMAKE_CURRENT_LIST_DIR}/../../.. ABSOLUTE)
@@ -53,40 +68,71 @@ set(sysioIncludeDir ${sysioPrefixDir}/include)
 list(APPEND CMAKE_PREFIX_PATH "${sysioPrefixDir}" "${sysioLibDir}" "${sysioLibCmakeDir}")
 
 # Helper macro to find sysio-provided libraries from ${sysioLibDir}
+option(SYSIO_TESTER_ALLOW_EXTRA_LIBRARY_DIRS "Allow adding extra library search paths for SysioTester" ON)
+set(SYSIO_TESTER_EXTRA_LIBRARY_DIRS "" CACHE PATH "Extra library directories to help SysioTester locate libs (build-tree)" )
+
 macro(find_sysio_library VAR)
   cmake_parse_arguments(_FSL "" "" "NAMES" ${ARGN})
   if(NOT _FSL_NAMES)
     message(FATAL_ERROR "find_sysio_library(<var> NAMES <names...>) requires NAMES.")
   endif()
-  find_library(${VAR} NAMES ${_FSL_NAMES} PATHS ${sysioLibDir} NO_DEFAULT_PATH REQUIRED)
+  if(SYSIO_TESTER_ALLOW_EXTRA_LIBRARY_DIRS AND SYSIO_TESTER_EXTRA_LIBRARY_DIRS)
+    find_library(${VAR} NAMES ${_FSL_NAMES}
+      PATHS ${sysioLibDir} ${SYSIO_TESTER_EXTRA_LIBRARY_DIRS}
+      NO_DEFAULT_PATH REQUIRED)
+  else()
+    find_library(${VAR} NAMES ${_FSL_NAMES} PATHS ${sysioLibDir} NO_DEFAULT_PATH REQUIRED)
+  endif()
 endmacro()
 
-# FIND BOOST & OTHERS
-set(BOOST_VERSION 1.83.0)
-find_package(Boost ${BOOST_VERSION}
-   EXACT
-   CONFIG
-   REQUIRED
-   PATHS
-   ${sysioLibDir}
-   ${sysioLibCmakeDir}
-   NO_DEFAULT_PATH
-   COMPONENTS
-   date_time
-   filesystem
-   system
-   chrono
-   multi_index
-   multiprecision
-   interprocess
-   asio
-   signals2
-   iostreams
-   algorithm
-   unit_test_framework
-)
+# Boost: robust discovery with fallback to synthesize imported targets
+# Allow callers to extend/override components by predefining SYSIO_TESTER_BOOST_COMPONENTS
+set(_sysio_boost_components_all
+  date_time filesystem system chrono iostreams unit_test_framework
+  # header-only components below; do not request them from find_package to avoid warnings
+  multi_index multiprecision interprocess asio signals2)
+if(NOT DEFINED SYSIO_TESTER_BOOST_COMPONENTS)
+  set(SYSIO_TESTER_BOOST_COMPONENTS ${_sysio_boost_components_all})
+endif()
 
-find_package(Threads REQUIRED)
+# Split compiled and header-only components: only request compiled ones from find_package to avoid warnings
+set(_sysio_boost_compiled_components date_time filesystem system chrono iostreams unit_test_framework)
+
+# First try CONFIG mode (vcpkg-style), then fallback to module mode
+set(_boost_found FALSE)
+# Suppress the noisy "New Boost version" warning
+set(Boost_NO_WARN_NEW_VERSIONS ON)
+find_package(Boost ${SYSIO_TESTER_BOOST_MIN_VERSION} QUIET CONFIG
+  COMPONENTS ${_sysio_boost_compiled_components})
+if(Boost_FOUND)
+  set(_boost_found TRUE)
+else()
+  # Module mode fallback
+  find_package(Boost ${SYSIO_TESTER_BOOST_MIN_VERSION} QUIET
+    COMPONENTS ${_sysio_boost_compiled_components})
+  if(Boost_FOUND)
+    set(_boost_found TRUE)
+  endif()
+endif()
+
+# Ensure include dirs are available if Boost was found in any mode
+if(_boost_found AND Boost_INCLUDE_DIRS)
+  include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
+# Synthesize missing imported targets as INTERFACE for any referenced components
+foreach(_bcomp IN LISTS SYSIO_TESTER_BOOST_COMPONENTS)
+  if(NOT TARGET Boost::${_bcomp})
+    add_library(Boost::${_bcomp} INTERFACE IMPORTED)
+  endif()
+endforeach()
+
+# Gperftools (optional)
+find_package(Gperftools QUIET)
+if(GPERFTOOLS_FOUND)
+  message(STATUS "Found gperftools; compiling tests with TCMalloc")
+  list(APPEND PLATFORM_SPECIFIC_LIBS tcmalloc)
+endif()
 
 # Sysio libraries (deduplicated via macro)
 find_sysio_library(libtester NAMES libsysio_testing sysio_testing)
@@ -108,6 +154,7 @@ find_sysio_library(libsodium NAMES libsodium sodium)
 find_sysio_library(libgmp NAMES libgmp gmp)
 
 set(SYSIO_WASM_RUNTIMES @SYSIO_WASM_RUNTIMES@)
+set(WRAP_MAIN "")
 if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
    set(WRAP_MAIN "-Wl,-wrap=main")
 endif()
@@ -142,26 +189,25 @@ target_link_libraries(SysioChain INTERFACE
    Boost::asio
    Boost::signals2
    Boost::iostreams
-   "-lz" # Needed by Boost iostreams
+
+   # Needed by Boost iostreams
+   -lz
 
    ${LLVM_LIBS}
-
    ${PLATFORM_SPECIFIC_LIBS}
-
    ${WRAP_MAIN}
    Threads::Threads
+   ${SYSIO_TESTER_ATOMIC_LINK}
 )
-
-
 
 target_include_directories(SysioChain INTERFACE
    ${sysioIncludeDir}
+   ${SYSIO_TESTER_EXTRA_INCLUDE_DIRS}
    @OPENSSL_INCLUDE_DIR@
    @CMAKE_INSTALL_PREFIX@
    @CMAKE_INSTALL_FULL_INCLUDEDIR@
    @CMAKE_INSTALL_FULL_INCLUDEDIR@/wasm-jit
    @CMAKE_INSTALL_FULL_INCLUDEDIR@/softfloat)
-
 
 add_library(SysioTester INTERFACE)
 
@@ -173,9 +219,7 @@ target_link_libraries(SysioTester INTERFACE
 
 macro(add_sysio_test_executable test_name)
    add_executable(${test_name} ${ARGN})
-   target_link_libraries(${test_name}
-      SysioTester
-   )   
+   target_link_libraries(${test_name} SysioTester)
 endmacro()
 
 macro(add_sysio_test test_name)
