@@ -84,7 +84,7 @@ witness_node_data_dir
 Testing/*
 build.tar.gz
 [Bb]uild*/*
-build**
+build**/
 deps/*
 dependencies/*
 
