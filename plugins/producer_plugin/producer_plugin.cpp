@@ -3129,6 +3129,7 @@ bool producer_plugin_impl::push_read_only_transaction(transaction_metadata_ptr t
       // use read-window/write-window deadline
       auto window_deadline = _ro_window_deadline;
 
+      fc_dlog(_transient_trx_failed_trace_log, "Pushing read-only trx ${trx}", ("trx", trx->id()));
       // Ensure the trx to finish by the end of read-window or write-window or block_deadline depending on
       auto trace = chain.push_transaction(trx, window_deadline, _ro_max_trx_time_us);
       _ro_all_threads_exec_time_us += (fc::time_point::now() - start).count();
@@ -3140,6 +3141,7 @@ bool producer_plugin_impl::push_read_only_transaction(transaction_metadata_ptr t
       // the end of read window. Retry in next round.
       retry = pr.trx_exhausted;
       if (retry) {
+         fc_dlog(_transient_trx_failed_trace_log, "Exhausted read-only, schedule retry: ${trx}", ("trx", trx->id()));
          _ro_exhausted_trx_queue.push_front({std::move(trx), std::move(next)});
       }
 
