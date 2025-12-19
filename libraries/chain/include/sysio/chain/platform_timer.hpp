@@ -18,6 +18,8 @@ struct platform_timer {
    void stop();
    //interrupt_timer() can be called from any thread
    void interrupt_timer();
+   //explicit set to expired
+   void set_expired();
 
    /* Sets a callback for when timer expires. Be aware this could fire from a signal handling context and/or
       on any particular thread. Only a single callback can be registered at once; trying to register more will
