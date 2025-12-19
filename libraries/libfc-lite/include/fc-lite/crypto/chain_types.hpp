@@ -15,20 +15,11 @@ enum chain_kind_t : uint8_t {
 enum chain_key_type_t : uint8_t {
    chain_key_type_unknown = 0,
    chain_key_type_wire = 1,
-   chain_key_type_ethereum = 2,
-   chain_key_type_solana = 3,
-   chain_key_type_sui = 4,
+   chain_key_type_wire_bls = 2,
+   chain_key_type_ethereum = 3,
+   chain_key_type_solana = 4,
+   chain_key_type_sui = 5,
 };
-
-
-// enum class chain_format : uint8_t {
-//    chain_key_type_unknown = 0,
-//    chain_key_type_wire = 1,
-//    chain_key_type_ethereum = 2,
-//    chain_key_type_solana = 3,
-//    chain_key_type_sui = 4,
-// };
-
 
 // SIZES INCLUDE SCHEME FLAG
 constexpr std::size_t key_size_ed25519  = 33;
@@ -55,6 +46,14 @@ constexpr auto chain_address_sizes = std::tuple{
    std::pair{chain_kind_ethereum, std::pair{chain_key_type_ethereum, chain_key_type_ethereum}},
    std::pair{chain_kind_solana,   std::pair{chain_key_type_solana, chain_key_type_solana}    },
    std::pair{chain_kind_sui,      std::pair{chain_key_type_sui, chain_key_type_sui}          },
+};
+
+constexpr auto chain_key_types = std::tuple{
+   std::pair{chain_kind_unknown, std::tuple{chain_key_type_unknown}},
+   std::pair{chain_kind_wire, std::tuple{chain_key_type_wire,chain_key_type_wire_bls}},
+   std::pair{chain_kind_ethereum, std::tuple{chain_key_type_ethereum}},
+   std::pair{chain_kind_solana, std::tuple{chain_key_type_solana}},
+   std::pair{chain_kind_sui, std::tuple{chain_key_type_sui}},
 };
 
 }

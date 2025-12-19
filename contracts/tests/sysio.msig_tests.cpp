@@ -41,14 +41,14 @@ public:
 
       base_tester::push_action(contract, "create"_n, contract, act );
    }
-   void issue( name to, const asset& amount, name manager = config::system_account_name ) {
+   void issue( name to, const asset& amount, name manager = sysio::chain::config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "issue"_n, manager, mutable_variant_object()
                                 ("to",      to )
                                 ("quantity", amount )
                                 ("memo", "")
                                 );
    }
-   void transfer( name from, name to, const string& amount, name manager = config::system_account_name ) {
+   void transfer( name from, name to, const string& amount, name manager = sysio::chain::config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "transfer"_n, manager, mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
@@ -57,7 +57,7 @@ public:
                                 );
    }
    asset get_balance( const account_name& act ) {
-      //return get_currency_balance( config::system_account_name, symbol(CORE_SYMBOL), act );
+      //return get_currency_balance( sysio::chain::config::system_account_name, symbol(CORE_SYMBOL), act );
       //temporary code. current get_currency_balancy uses table name "accounts"_n from currency.h
       //generic_currency table name is "account"_n.
       const auto& db  = control->db();
@@ -122,7 +122,7 @@ transaction sysio_msig_tester::reqauth( account_name from, const vector<permissi
       ("delay_sec", 0)
       ("actions", fc::variants({
             fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
+               ("account", name(sysio::chain::config::system_account_name))
                ("name", "reqauth")
                ("authorization", v)
                ("data", fc::mutable_variant_object() ("from", from) )
@@ -149,13 +149,13 @@ void sysio_msig_tester::check_traces(transaction_trace_ptr trace, std::vector<st
 BOOST_AUTO_TEST_SUITE(sysio_msig_tests)
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    //fail to execute before approval
@@ -172,7 +172,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
@@ -183,31 +183,31 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_execute, sysio_msig_tester ) try {
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 } FC_LOG_AND_RETHROW()
 
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_unapprove, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    push_action( "alice"_n, "unapprove"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "exec"_n, mvo()
@@ -223,19 +223,19 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_unapprove, sysio_msig_tester ) try {
 
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_by_two, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } }, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, sysio::chain::config::active_name }, { "bob"_n, sysio::chain::config::active_name } }, abi_serializer_max_time );
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{ { "alice"_n, config::active_name }, { "bob"_n, config::active_name } })
+                  ("requested", vector<permission_level>{ { "alice"_n, sysio::chain::config::active_name }, { "bob"_n, sysio::chain::config::active_name } })
    );
 
    //approve by alice
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    //fail because approval by bob is missing
@@ -253,7 +253,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_by_two, sysio_msig_tester ) try {
    push_action( "bob"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "bob"_n, config::active_name })
+                  ("level",         permission_level{ "bob"_n, sysio::chain::config::active_name })
    );
 
    transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
@@ -264,19 +264,19 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_by_two, sysio_msig_tester ) try {
 
    check_traces( trace, {
                      {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                     {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                     {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                      } );
 } FC_LOG_AND_RETHROW()
 
 
 BOOST_FIXTURE_TEST_CASE( propose_with_wrong_requested_auth, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, config::active_name },  { "bob"_n, config::active_name } }, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, vector<permission_level>{ { "alice"_n, sysio::chain::config::active_name },  { "bob"_n, sysio::chain::config::active_name } }, abi_serializer_max_time );
    //try with not enough requested auth
    BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "propose"_n, mvo()
                                              ("proposer",      "alice")
                                              ("proposal_name", "third")
                                              ("trx",           trx)
-                                             ("requested", vector<permission_level>{ { "alice"_n, config::active_name } } )
+                                             ("requested", vector<permission_level>{ { "alice"_n, sysio::chain::config::active_name } } )
                             ),
                             sysio_assert_message_exception,
                             sysio_assert_message_is("transaction authorization failed")
@@ -289,12 +289,12 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
    //change `default_max_inline_action_size` to 512 KB
    sysio::chain::chain_config params = control->get_global_properties().configuration;
    params.max_inline_action_size = 512 * 1024;
-   base_tester::push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+   base_tester::push_action( sysio::chain::config::system_account_name, "setparams"_n, sysio::chain::config::system_account_name, mutable_variant_object()
                               ("params", params) );
 
    produce_blocks();
 
-   vector<permission_level> perm = { { "alice"_n, config::active_name }, { "bob"_n, config::active_name } };
+   vector<permission_level> perm = { { "alice"_n, sysio::chain::config::active_name }, { "bob"_n, sysio::chain::config::active_name } };
    auto wasm = contracts::util::exchange_wasm();
 
    fc::variant pretty_trx = fc::mutable_variant_object()
@@ -306,7 +306,7 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
       ("delay_sec", 0)
       ("actions", fc::variants({
             fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
+               ("account", name(sysio::chain::config::system_account_name))
                ("name", "setcode")
                ("authorization", perm)
                ("data", fc::mutable_variant_object()
@@ -332,13 +332,13 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
    //approve by bob and execute
    push_action( "bob"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "bob"_n, config::active_name })
+                  ("level",         permission_level{ "bob"_n, sysio::chain::config::active_name })
    );
 
    transaction_trace_ptr trace = push_action( "alice"_n, "exec"_n, mvo()
@@ -349,7 +349,7 @@ BOOST_FIXTURE_TEST_CASE( big_transaction, sysio_msig_tester ) try {
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "setcode"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "setcode"_n}}
                         } );
 } FC_LOG_AND_RETHROW()
 
@@ -366,15 +366,15 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    // alice active     bob active   carol active
 
    set_authority(
-      config::system_account_name,
-      config::active_name,
+      sysio::chain::config::system_account_name,
+      sysio::chain::config::active_name,
       authority( 1,
-                 vector<key_weight>{{get_private_key(config::system_account_name, "active").get_public_key(), 1}},
-                 vector<permission_level_weight>{{{"sysio.prods"_n, config::active_name}, 1}}
+                 vector<key_weight>{{get_private_key(sysio::chain::config::system_account_name, "active").get_public_key(), 1}},
+                 vector<permission_level_weight>{{{"sysio.prods"_n, sysio::chain::config::active_name}, 1}}
       ),
       config::owner_name,
-      {{config::system_account_name, config::active_name}},
-      {get_private_key(config::system_account_name, "active")}
+      {{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
+      {get_private_key(sysio::chain::config::system_account_name, "active")}
    );
 
    set_producers( {"alice"_n,"bob"_n,"carol"_n} );
@@ -385,15 +385,15 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
    set_privileged("sysio.token"_n);
 
-   create_currency( "sysio.token"_n, config::system_account_name, core_sym::from_string("10000000000.0000") );
-   issue(config::system_account_name, core_sym::from_string("1000000000.0000"));
+   create_currency( "sysio.token"_n, sysio::chain::config::system_account_name, core_sym::from_string("10000000000.0000") );
+   issue(sysio::chain::config::system_account_name, core_sym::from_string("1000000000.0000"));
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"),
-                        get_balance(config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
+                        get_balance(sysio::chain::config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
 
-   set_code( config::system_account_name, contracts::system_wasm() );
-   set_abi( config::system_account_name, contracts::system_abi().data() );
-   base_tester::push_action( config::system_account_name, "init"_n,
-                             config::system_account_name,  mutable_variant_object()
+   set_code( sysio::chain::config::system_account_name, contracts::system_wasm() );
+   set_abi( sysio::chain::config::system_account_name, contracts::system_abi().data() );
+   base_tester::push_action( sysio::chain::config::system_account_name, "init"_n,
+                             sysio::chain::config::system_account_name,  mutable_variant_object()
                               ("version", 0)
                               ("core", CORE_SYM_STR)
    );
@@ -403,12 +403,12 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    create_account( "carol1111111"_n, "sysio"_n );
 
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"),
-                        get_balance(config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
+                        get_balance(sysio::chain::config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
 
-   vector<permission_level> perm = { { "alice"_n, config::active_name }, { "bob"_n, config::active_name },
-      {"carol"_n, config::active_name} };
+   vector<permission_level> perm = { { "alice"_n, sysio::chain::config::active_name }, { "bob"_n, sysio::chain::config::active_name },
+      {"carol"_n, sysio::chain::config::active_name} };
 
-   vector<permission_level> action_perm = {{"sysio"_n, config::active_name}};
+   vector<permission_level> action_perm = {{"sysio"_n, sysio::chain::config::active_name}};
 
    auto wasm = contracts::util::reject_all_wasm();
 
@@ -421,11 +421,11 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
       ("delay_sec", 0)
       ("actions", fc::variants({
             fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
+               ("account", name(sysio::chain::config::system_account_name))
                ("name", "setcode")
                ("authorization", action_perm)
                ("data", fc::mutable_variant_object()
-                ("account", name(config::system_account_name))
+                ("account", name(sysio::chain::config::system_account_name))
                 ("vmtype", 0)
                 ("vmversion", 0)
                 ("code", bytes( wasm.begin(), wasm.end() ))
@@ -448,19 +448,19 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
    //approve by bob
    push_action( "bob"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "bob"_n, config::active_name })
+                  ("level",         permission_level{ "bob"_n, sysio::chain::config::active_name })
    );
    //approve by carol
    push_action( "carol"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "carol"_n, config::active_name })
+                  ("level",         permission_level{ "carol"_n, sysio::chain::config::active_name })
    );
 
    // execute by alice to replace the sysio system contract
@@ -472,7 +472,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_all_approve, sysio_msig_tester )
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "setcode"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "setcode"_n}}
                         } );
 
    // can't create account because system contract was replaced by the reject_all contract
@@ -486,15 +486,15 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
 
    // set up the link between (sysio active) and (sysio.prods active)
    set_authority(
-      config::system_account_name,
-      config::active_name,
+      sysio::chain::config::system_account_name,
+      sysio::chain::config::active_name,
       authority( 1,
-                 vector<key_weight>{{get_private_key(config::system_account_name, "active").get_public_key(), 1}},
-                 vector<permission_level_weight>{{{"sysio.prods"_n, config::active_name}, 1}}
+                 vector<key_weight>{{get_private_key(sysio::chain::config::system_account_name, "active").get_public_key(), 1}},
+                 vector<permission_level_weight>{{{"sysio.prods"_n, sysio::chain::config::active_name}, 1}}
       ),
       config::owner_name,
-      {{config::system_account_name, config::active_name}},
-      {get_private_key(config::system_account_name, "active")}
+      {{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
+      {get_private_key(sysio::chain::config::system_account_name, "active")}
    );
 
    create_accounts( { "apple"_n } );
@@ -506,14 +506,14 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    set_abi( "sysio.token"_n, contracts::token_abi().data() );
    set_privileged("sysio.token"_n);
 
-   create_currency( "sysio.token"_n, config::system_account_name, core_sym::from_string("10000000000.0000") );
-   issue(config::system_account_name, core_sym::from_string("1000000000.0000"));
-   BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"), get_balance( config::system_account_name ) );
+   create_currency( "sysio.token"_n, sysio::chain::config::system_account_name, core_sym::from_string("10000000000.0000") );
+   issue(sysio::chain::config::system_account_name, core_sym::from_string("1000000000.0000"));
+   BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"), get_balance( sysio::chain::config::system_account_name ) );
 
-   set_code( config::system_account_name, contracts::system_wasm() );
-   set_abi( config::system_account_name, contracts::system_abi().data() );
-   base_tester::push_action( config::system_account_name, "init"_n,
-                             config::system_account_name,  mutable_variant_object()
+   set_code( sysio::chain::config::system_account_name, contracts::system_wasm() );
+   set_abi( sysio::chain::config::system_account_name, contracts::system_abi().data() );
+   base_tester::push_action( sysio::chain::config::system_account_name, "init"_n,
+                             sysio::chain::config::system_account_name,  mutable_variant_object()
                                  ("version", 0)
                                  ("core", CORE_SYM_STR)
    );
@@ -524,12 +524,12 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    create_account( "carol1111111"_n, "sysio"_n );
 
    BOOST_REQUIRE_EQUAL( core_sym::from_string("1000000000.0000"),
-                        get_balance(config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
+                        get_balance(sysio::chain::config::system_account_name) + get_balance("sysio.ramfee"_n) + get_balance("sysio.stake"_n) + get_balance("sysio.ram"_n) );
 
-   vector<permission_level> perm = { { "alice"_n, config::active_name }, { "bob"_n, config::active_name },
-      {"carol"_n, config::active_name}, {"apple"_n, config::active_name}};
+   vector<permission_level> perm = { { "alice"_n, sysio::chain::config::active_name }, { "bob"_n, sysio::chain::config::active_name },
+      {"carol"_n, sysio::chain::config::active_name}, {"apple"_n, sysio::chain::config::active_name}};
 
-   vector<permission_level> action_perm = {{"sysio"_n, config::active_name}};
+   vector<permission_level> action_perm = {{"sysio"_n, sysio::chain::config::active_name}};
 
    auto wasm = contracts::util::reject_all_wasm();
 
@@ -542,11 +542,11 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
       ("delay_sec", 0)
       ("actions", fc::variants({
             fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
+               ("account", name(sysio::chain::config::system_account_name))
                ("name", "setcode")
                ("authorization", action_perm)
                ("data", fc::mutable_variant_object()
-                ("account", name(config::system_account_name))
+                ("account", name(sysio::chain::config::system_account_name))
                 ("vmtype", 0)
                 ("vmversion", 0)
                 ("code", bytes( wasm.begin(), wasm.end() ))
@@ -569,13 +569,13 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
    //approve by bob
    push_action( "bob"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "bob"_n, config::active_name })
+                  ("level",         permission_level{ "bob"_n, sysio::chain::config::active_name })
    );
 
    // not enough approvers
@@ -592,7 +592,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
    push_action( "apple"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "apple"_n, config::active_name })
+                  ("level",         permission_level{ "apple"_n, sysio::chain::config::active_name })
    );
    // execute by another producer different from proposer
    transaction_trace_ptr trace = push_action( "apple"_n, "exec"_n, mvo()
@@ -603,7 +603,7 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "setcode"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "setcode"_n}}
                         } );
 
    // can't create account because system contract was replaced by the reject_all contract
@@ -614,13 +614,13 @@ BOOST_FIXTURE_TEST_CASE( update_system_contract_major_approve, sysio_msig_tester
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( propose_approve_invalidate, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    //fail to execute before approval
@@ -637,7 +637,7 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_invalidate, sysio_msig_tester ) try {
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    //invalidate
@@ -657,13 +657,13 @@ BOOST_FIXTURE_TEST_CASE( propose_approve_invalidate, sysio_msig_tester ) try {
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    //fail to execute before approval
@@ -685,7 +685,7 @@ BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
    );
 
    transaction_trace_ptr trace = push_action( "bob"_n, "exec"_n, mvo()
@@ -696,12 +696,12 @@ BOOST_FIXTURE_TEST_CASE( propose_invalidate_approve, sysio_msig_tester ) try {
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
-   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
    auto trx_hash = fc::sha256::hash( trx );
    auto not_trx_hash = fc::sha256::hash( trx_hash );
 
@@ -709,14 +709,14 @@ BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    //fail to approve with incorrect hash
    BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "approve"_n, mvo()
                                           ("proposer",      "alice")
                                           ("proposal_name", "first")
-                                          ("level",         permission_level{ "alice"_n, config::active_name })
+                                          ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
                                           ("proposal_hash", not_trx_hash)
                             ),
                             sysio::chain::crypto_api_exception,
@@ -727,7 +727,7 @@ BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
    push_action( "alice"_n, "approve"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
-                  ("level",         permission_level{ "alice"_n, config::active_name })
+                  ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
                   ("proposal_hash", trx_hash)
    );
 
@@ -738,23 +738,23 @@ BOOST_FIXTURE_TEST_CASE( approve_with_hash, sysio_msig_tester ) try {
    );
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 } FC_LOG_AND_RETHROW()
 
 BOOST_FIXTURE_TEST_CASE( switch_proposal_and_fail_approve_with_hash, sysio_msig_tester ) try {
-   auto trx1 = reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, abi_serializer_max_time );
+   auto trx1 = reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, abi_serializer_max_time );
    auto trx1_hash = fc::sha256::hash( trx1 );
 
    push_action( "alice"_n, "propose"_n, mvo()
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx1)
-                  ("requested", vector<permission_level>{{ "alice"_n, config::active_name }})
+                  ("requested", vector<permission_level>{{ "alice"_n, sysio::chain::config::active_name }})
    );
 
    auto trx2 = reqauth( "alice"_n,
-                       { permission_level{"alice"_n, config::active_name},
+                       { permission_level{"alice"_n, sysio::chain::config::active_name},
                          permission_level{"alice"_n, config::owner_name}  },
                        abi_serializer_max_time );
 
@@ -768,7 +768,7 @@ BOOST_FIXTURE_TEST_CASE( switch_proposal_and_fail_approve_with_hash, sysio_msig_
                   ("proposer",      "alice")
                   ("proposal_name", "first")
                   ("trx",           trx2)
-                  ("requested", vector<permission_level>{ { "alice"_n, config::active_name },
+                  ("requested", vector<permission_level>{ { "alice"_n, sysio::chain::config::active_name },
                                                           { "alice"_n, config::owner_name } })
    );
 
@@ -776,7 +776,7 @@ BOOST_FIXTURE_TEST_CASE( switch_proposal_and_fail_approve_with_hash, sysio_msig_
    BOOST_REQUIRE_EXCEPTION( push_action( "alice"_n, "approve"_n, mvo()
                                           ("proposer",      "alice")
                                           ("proposal_name", "first")
-                                          ("level",         permission_level{ "alice"_n, config::active_name })
+                                          ("level",         permission_level{ "alice"_n, sysio::chain::config::active_name })
                                           ("proposal_hash", trx1_hash)
                             ),
                             sysio::chain::crypto_api_exception,
@@ -794,27 +794,27 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
    set_abi( "wrongcon"_n, system_contracts::testing::test_contracts::sendinline_abi().data() );
    produce_blocks();
 
-   action act = get_action( config::system_account_name, "reqauth"_n, {}, mvo()("from", "alice"));
+   action act = get_action( sysio::chain::config::system_account_name, "reqauth"_n, {}, mvo()("from", "alice"));
 
    BOOST_REQUIRE_EXCEPTION( base_tester::push_action( "sendinline"_n, "send"_n, "bob"_n, mvo()
                                                        ("contract", "sysio")
                                                        ("action_name", "reqauth")
-                                                       ("auths", std::vector<permission_level>{ {"alice"_n, config::active_name} })
+                                                       ("auths", std::vector<permission_level>{ {"alice"_n, sysio::chain::config::active_name} })
                                                        ("payload", act.data)
                           ),
                           unsatisfied_authorization,
                           fc_exception_message_starts_with("transaction declares authority")
    );
 
-   base_tester::push_action(config::system_account_name, "updateauth"_n, "alice"_n, mvo()
+   base_tester::push_action(sysio::chain::config::system_account_name, "updateauth"_n, "alice"_n, mvo()
                               ("account", "alice")
                               ("permission", "perm")
                               ("parent", "active")
-                              ("auth",  authority{ 1, {}, {permission_level_weight{ {"sendinline"_n, config::active_name}, 1}}, {} })
+                              ("auth",  authority{ 1, {}, {permission_level_weight{ {"sendinline"_n, sysio::chain::config::active_name}, 1}}, {} })
    );
    produce_blocks();
 
-   base_tester::push_action( config::system_account_name, "linkauth"_n, "alice"_n, mvo()
+   base_tester::push_action( sysio::chain::config::system_account_name, "linkauth"_n, "alice"_n, mvo()
                               ("account", "alice")
                               ("code", "sysio")
                               ("type", "reqauth")
@@ -830,7 +830,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
    );
    check_traces( trace, {
                         {{"receiver", "sendinline"_n}, {"act_name", "send"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 
    produce_blocks();
@@ -838,7 +838,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
    action approve_act = get_action("sysio.msig"_n, "approve"_n, {}, mvo()
                                     ("proposer", "bob")
                                     ("proposal_name", "first")
-                                    ("level", permission_level{"sendinline"_n, config::active_name})
+                                    ("level", permission_level{"sendinline"_n, sysio::chain::config::active_name})
    );
 
    transaction trx = reqauth( "alice"_n, {permission_level{"alice"_n, "perm"_n}}, abi_serializer_max_time );
@@ -847,14 +847,14 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
                               ("proposer", "bob")
                               ("proposal_name", "first")
                               ("trx", trx)
-                              ("requested", std::vector<permission_level>{{ "sendinline"_n, config::active_name}})
+                              ("requested", std::vector<permission_level>{{ "sendinline"_n, sysio::chain::config::active_name}})
    );
    produce_blocks();
 
    base_tester::push_action( "sendinline"_n, "send"_n, "bob"_n, mvo()
                               ("contract", "sysio.msig")
                               ("action_name", "approve")
-                              ("auths", std::vector<permission_level>{{"sendinline"_n, config::active_name}})
+                              ("auths", std::vector<permission_level>{{"sendinline"_n, sysio::chain::config::active_name}})
                               ("payload", approve_act.data)
    );
    produce_blocks();
@@ -867,7 +867,7 @@ BOOST_FIXTURE_TEST_CASE( sendinline, sysio_msig_tester ) try {
 
    check_traces( trace, {
                         {{"receiver", "sysio.msig"_n}, {"act_name", "exec"_n}},
-                        {{"receiver", config::system_account_name}, {"act_name", "reqauth"_n}}
+                        {{"receiver", sysio::chain::config::system_account_name}, {"act_name", "reqauth"_n}}
                         } );
 
 } FC_LOG_AND_RETHROW()

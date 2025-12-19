@@ -6,6 +6,7 @@
 #include <sysio/chain/genesis_state.hpp>
 #include <chainbase/pinnable_mapped_file.hpp>
 #include <boost/signals2/signal.hpp>
+#include <fc/crypto/signature_provider.hpp>
 
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
@@ -77,7 +78,7 @@ namespace sysio::chain {
       uint32_t head_block_num    = 0;
    };
 
-   using bls_pub_priv_key_map_t = std::map<std::string, std::string>;
+   using bls_pub_key_sig_provider_map_t = std::map<std::string, fc::crypto::signature_provider_ptr>;
    struct finalizer_policy;
 
    class authorization_manager;
@@ -502,8 +503,8 @@ namespace sysio::chain {
 
       void code_block_num_last_used(const digest_type& code_hash, uint8_t vm_type, uint8_t vm_version,
                                     block_num_type first_used_block_num, block_num_type block_num_last_used);
-      void set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys);
-      void test_set_node_finalizer_keys(const bls_pub_priv_key_map_t& finalizer_keys); // for use in tests
+      void set_node_finalizer_keys(const bls_pub_key_sig_provider_map_t& finalizer_keys);
+      void test_set_node_finalizer_keys(const bls_pub_key_sig_provider_map_t& finalizer_keys); // for use in tests
 
       // is the bls key a registered finalizer key of this node, thread safe
       bool is_node_finalizer_key(const bls_public_key& key) const;

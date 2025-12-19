@@ -1,5 +1,6 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/utility.hpp>
+#include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
 
 namespace fc { namespace crypto {
@@ -88,7 +89,7 @@ namespace fc { namespace crypto {
       return Data(fc::variant(key_bytes).as<typename Data::data_type>());
    }
 
-   static private_key::storage_type priv_parse_base58(const string& base58str)
+   private_key::storage_type private_key::priv_parse_base58(const std::string& base58str)
    {
       const auto pivot = base58str.find('_');
 
@@ -97,13 +98,13 @@ namespace fc { namespace crypto {
          using default_type = std::variant_alternative_t<0, private_key::storage_type>;
          return private_key::storage_type(from_wif<default_type>(base58str));
       } else {
-         constexpr auto prefix = config::private_key_base_prefix;
+         constexpr auto prefix = fc::crypto::constants::private_key_base_prefix;
          const auto prefix_str = base58str.substr(0, pivot);
          FC_ASSERT(prefix == prefix_str, "Private Key has invalid prefix: ${str}", ("str", base58str)("prefix_str", prefix_str));
 
          auto data_str = base58str.substr(pivot + 1);
          FC_ASSERT(!data_str.empty(), "Private Key has no data: ${str}", ("str", base58str));
-         return base58_str_parser<private_key::storage_type, config::private_key_prefix>::apply(data_str);
+         return base58_str_parser<private_key::storage_type, fc::crypto::constants::private_key_prefix>::apply(data_str);
       }
    }
 
@@ -120,8 +121,15 @@ namespace fc { namespace crypto {
          return to_wif(std::template get<default_type>(_storage), yield);
       }
 
-      auto data_str = std::visit(base58str_visitor<storage_type, config::private_key_prefix>(yield), _storage);
-      return std::string(config::private_key_base_prefix) + "_" + data_str;
+      auto data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::private_key_prefix>(yield), _storage);
+      return std::string(fc::crypto::constants::private_key_base_prefix) + "_" + data_str;
+   }
+
+   std::string private_key::to_native_string(const fc::yield_function_t& yield) const {
+      if (_storage.index() == 0) {
+         return to_string(yield);
+      }
+      return std::visit(to_native_string_from_private_key_visitor<storage_type, fc::crypto::constants::private_key_prefix>(yield), _storage);
    }
 
    bool operator==( const private_key& p1, const private_key& p2 ) {

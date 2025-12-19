@@ -23,8 +23,12 @@ namespace fc {
          memset( (char*)_hash + bytes_written, 0, (sizeof(_hash) - bytes_written) );
     }
 
-    std::string sha256::str()const {
-      return fc::to_hex( (char*)_hash, sizeof(_hash) );
+
+    sha256::sha256(const hash_array_type& hash_arr) : _hash{hash_arr[0], hash_arr[1], hash_arr[2], hash_arr[3]} {
+
+    }
+    std::string sha256::str() const {
+       return fc::to_hex((char*)_hash, sizeof(_hash));
     }
     sha256::operator std::string()const { return  str(); }
 

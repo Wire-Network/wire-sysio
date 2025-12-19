@@ -253,7 +253,7 @@ namespace sysio { namespace chain {
                                                                                   )const
    {
       // Special case native actions cannot be linked to a minimum permission, so there is no need to check.
-      if( scope == config::system_account_name ) {
+      if( scope == sysio::chain::config::system_account_name ) {
           SYS_ASSERT( act_name != updateauth::get_name() &&
                      act_name != deleteauth::get_name() &&
                      act_name != linkauth::get_name() &&
@@ -266,7 +266,7 @@ namespace sysio { namespace chain {
       try {
          std::optional<permission_name> linked_permission = lookup_linked_permission(authorizer_account, scope, act_name);
          if( !linked_permission )
-            return config::active_name;
+            return sysio::chain::config::active_name;
 
          if( *linked_permission == config::sysio_any_name )
             return std::optional<permission_name>();
@@ -333,7 +333,7 @@ namespace sysio { namespace chain {
       SYS_ASSERT( auth.actor == link.account, irrelevant_auth_exception,
                   "the owner of the linked permission needs to be the actor of the declared authorization" );
 
-      if( link.code == config::system_account_name)
+      if( link.code == sysio::chain::config::system_account_name)
       {
          SYS_ASSERT( link.type != updateauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::updateauth to a minimum permission" );
@@ -415,7 +415,7 @@ namespace sysio { namespace chain {
       for( const auto& act : actions ) {
          bool special_case = false;
 
-         if( act.account == config::system_account_name ) {
+         if( act.account == sysio::chain::config::system_account_name ) {
             special_case = true;
 
             if( act.name == updateauth::get_name() ) {
@@ -558,7 +558,7 @@ namespace sysio { namespace chain {
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
             if (declared_auth.permission == config::sysio_payer_name) {
-               auto active_auth = permission_level{declared_auth.actor, config::active_name};
+               auto active_auth = permission_level{declared_auth.actor, sysio::chain::config::active_name};
                SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
                            "transaction declares payer authority '${auth}', but does not have signatures for it.",
                            ("auth", active_auth) );

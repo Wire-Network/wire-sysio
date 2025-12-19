@@ -13,7 +13,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
    savanna_tester main;
 
    // First we create a valid block with valid transaction
-   main.create_account("newacc"_n, config::system_account_name, false, true, false);
+   main.create_account("newacc"_n, sysio::chain::config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
    act.data = fc::raw::pack(act_data);
    // Re-sign the transaction
    signed_tx.signatures.clear();
-   signed_tx.sign(main.get_private_key(config::system_account_name, "active"), main.get_chain_id());
+   signed_tx.sign(main.get_private_key(sysio::chain::config::system_account_name, "active"), main.get_chain_id());
    // Replace the valid transaction with the invalid transaction
    auto invalid_packed_tx = packed_transaction(signed_tx);
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
 
    // Re-sign the block
-   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = main.get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push block with invalid transaction to other chain
    savanna_tester validator;
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
    savanna_tester main;
 
    // First we create a valid block with valid transaction
-   main.create_account("newacc"_n, config::system_account_name, false, true, false);
+   main.create_account("newacc"_n, sysio::chain::config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -73,13 +73,13 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
    signed_tx.actions[0].name = "something"_n;
    // Re-sign the transaction
    signed_tx.signatures.clear();
-   signed_tx.sign(main.get_private_key(config::system_account_name, "active"), main.get_chain_id());
+   signed_tx.sign(main.get_private_key(sysio::chain::config::system_account_name, "active"), main.get_chain_id());
    // Replace the valid transaction with the invalid transaction
    auto invalid_packed_tx = packed_transaction(std::move(signed_tx), packed_trx.get_compression());
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
 
    // Re-sign the block
-   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = main.get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push block with invalid transaction to other chain
    savanna_tester validator;
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
 template <typename T = savanna_validating_tester>
 std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(T& main, account_name act_name) {
    // First we create a valid block with valid transaction
-   main.create_account(act_name, config::system_account_name, false, true, false);
+   main.create_account(act_name, sysio::chain::config::system_account_name, false, true, false);
    signed_block_ptr b = main.produce_block_no_validation();
 
    // Make a copy of the valid block and corrupt the transaction
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE( trusted_producer_test )
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod, config::system_account_name, false, true, false);
+       main.create_account(prod, sysio::chain::config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE( trusted_producer_verify_2nd_test )
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod, config::system_account_name, false, true, false);
+       main.create_account(prod, sysio::chain::config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( untrusted_producer_test, T, validating_testers )
    // First we create a valid block with valid transaction
    std::set<account_name> producers = { "defproducera"_n, "defproducerb"_n, "defproducerc"_n, "defproducerd"_n };
    for (auto prod : producers)
-       main.create_account(prod, config::system_account_name, false, true, false);
+       main.create_account(prod, sysio::chain::config::system_account_name, false, true, false);
    auto b = main.produce_block();
 
    std::vector<account_name> schedule(producers.cbegin(), producers.cend());
@@ -241,7 +241,7 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions, validating_tester) { try {
       signed_transaction trx;
 
       account_name a = "newco"_n;
-      account_name creator = config::system_account_name;
+      account_name creator = sysio::chain::config::system_account_name;
 
       // account does not exist before test
       BOOST_REQUIRE_EXCEPTION(control->get_account( a ), fc::exception,
@@ -250,7 +250,7 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions, validating_tester) { try {
                               }) ;
 
       auto owner_auth = authority( get_public_key( a, "owner" ) );
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator,sysio::chain::config::active_name}},
                                 newaccount{
                                       .creator  = creator,
                                       .name     = a,
@@ -288,7 +288,7 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions_tester, validating_tester) { t
       signed_transaction trx;
 
       account_name a = "newco"_n;
-      account_name creator = config::system_account_name;
+      account_name creator = sysio::chain::config::system_account_name;
 
       // account does not exist before test
       BOOST_REQUIRE_EXCEPTION(get_account( a ), fc::exception,
@@ -297,7 +297,7 @@ BOOST_FIXTURE_TEST_CASE( abort_block_transactions_tester, validating_tester) { t
                               }) ;
 
       auto owner_auth = authority( get_public_key( a, "owner" ) );
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator,sysio::chain::config::active_name}},
                                 newaccount{
                                       .creator  = creator,
                                       .name     = a,
@@ -335,7 +335,7 @@ BOOST_AUTO_TEST_CASE(no_onblock_test) { try {
    // Deploy contract that rejects all actions dispatched to it with the following exceptions:
    //   * sysio::setcode to set code on the sysio is allowed (unless the rejectall account exists)
    //   * sysio::newaccount is allowed only if it creates the rejectall account.
-   c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
+   c.set_code( sysio::chain::config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
    r = c.produce_block_ex(); // empty block, no valid onblock since it is rejected
    BOOST_TEST_REQUIRE(!!r.onblock_trace);
@@ -381,7 +381,7 @@ BOOST_FIXTURE_TEST_CASE( invalid_qc_claim_block_num_test, validating_tester ) {
    emplace_extension(h_exts, fin_ext_id, fc::raw::pack(f_ext));
 
    // Re-sign the block
-   copy_b->producer_signature = get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push the corrupted block. It must be rejected.
    BOOST_REQUIRE_EXCEPTION(validate_push_block(signed_block::create_signed_block(std::move(copy_b))), fc::exception,
@@ -405,7 +405,7 @@ BOOST_FIXTURE_TEST_CASE( invalid_action_mroot_test, tester )
    copy_b->action_mroot = digest_type::hash("corrupted");
 
    // Re-sign the block
-   copy_b->producer_signature = get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
 
    // Push the block containing corrupted action mroot. It should fail
    BOOST_REQUIRE_EXCEPTION(push_block(signed_block::create_signed_block(std::move(copy_b))),

@@ -16,7 +16,7 @@ class public_key_impl
         public_key_impl() BOOST_NOEXCEPT;
         public_key_impl( const public_key_impl& cpy ) BOOST_NOEXCEPT;
         public_key_impl( public_key_impl&& cpy ) BOOST_NOEXCEPT;
-        ~public_key_impl() BOOST_NOEXCEPT;
+        ~public_key_impl() BOOST_NOEXCEPT = default;
 
         public_key_impl& operator=( const public_key_impl& pk ) BOOST_NOEXCEPT;
 

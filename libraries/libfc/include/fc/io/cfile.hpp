@@ -35,6 +35,10 @@ class cfile_datastream;
 class cfile {
    friend class temp_cfile;
 public:
+   static constexpr auto create_or_update_rw_mode = "ab+";
+   static constexpr auto update_rw_mode = "rb+";
+   static constexpr auto truncate_rw_mode = "wb+";
+
    cfile()
      : _file(nullptr, &detail::close_file)
    {}
@@ -45,6 +49,11 @@ public:
      , _file_blk_size(other._file_blk_size)
      , _file(std::move(other._file))
    {}
+
+   explicit cfile(const std::filesystem::path& file_path, const char* mode = truncate_rw_mode) : cfile() {
+      set_file_path(file_path);
+      open(mode);
+   }
 
    cfile& operator=(cfile&& other){
       swap(*this, other);
@@ -72,9 +81,6 @@ public:
       return fd;
    }
 
-   static constexpr const char* create_or_update_rw_mode = "ab+";
-   static constexpr const char* update_rw_mode = "rb+";
-   static constexpr const char* truncate_rw_mode = "wb+";
 
    /// @param mode is any mode supported by fopen
    ///        Tested with:

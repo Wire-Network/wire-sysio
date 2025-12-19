@@ -66,7 +66,7 @@ class whitelist_blacklist_tester {
       }
 
       transaction_trace_ptr transfer( account_name from, account_name to, string quantity = "1.00 TOK" ) {
-         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::sysio_payer_name},{from, config::active_name}}, mvo()
+         return chain->push_action( "sysio.token"_n, "transfer"_n, vector<permission_level>{{from, config::sysio_payer_name},{from, sysio::chain::config::active_name}}, mvo()
             ( "from", from )
             ( "to", to )
             ( "quantity", quantity )
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_SUITE(whitelist_blacklist_tests)
 
 BOOST_AUTO_TEST_CASE( actor_whitelist ) { try {
    whitelist_blacklist_tester<> test;
-   test.actor_whitelist = {config::system_account_name, "sysio.roa"_n, "nodedaddy"_n, "sysio.token"_n, "alice"_n};
+   test.actor_whitelist = {sysio::chain::config::system_account_name, "sysio.roa"_n, "nodedaddy"_n, "sysio.token"_n, "alice"_n};
    test.init();
 
    test.transfer( "sysio.token"_n, "alice"_n, "1000.00 TOK" );
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE( actor_whitelist ) { try {
                           fc_exception_message_is("authorizing actor(s) in transaction are not on the actor whitelist: [\"bob\"]")
                        );
    signed_transaction trx;
-   trx.actions.emplace_back( vector<permission_level>{{"alice"_n,config::active_name}, {"bob"_n,config::active_name}},
+   trx.actions.emplace_back( vector<permission_level>{{"alice"_n,sysio::chain::config::active_name}, {"bob"_n,sysio::chain::config::active_name}},
                              "sysio.token"_n, "transfer"_n,
                              fc::raw::pack(transfer_args{
                                .from  = "alice"_n,
@@ -148,7 +148,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist ) { try {
                         );
 
    signed_transaction trx;
-   trx.actions.emplace_back( vector<permission_level>{{"alice"_n,config::active_name}, {"bob"_n,config::active_name}},
+   trx.actions.emplace_back( vector<permission_level>{{"alice"_n,sysio::chain::config::active_name}, {"bob"_n,sysio::chain::config::active_name}},
                              "sysio.token"_n, "transfer"_n,
                              fc::raw::pack(transfer_args{
                                 .from  = "alice"_n,
@@ -169,7 +169,7 @@ BOOST_AUTO_TEST_CASE( actor_blacklist ) { try {
 
 BOOST_AUTO_TEST_CASE( contract_whitelist ) { try {
    whitelist_blacklist_tester<> test;
-   test.contract_whitelist = {config::system_account_name, "sysio.roa"_n, "sysio.token"_n, "bob"_n};
+   test.contract_whitelist = {sysio::chain::config::system_account_name, "sysio.roa"_n, "sysio.token"_n, "bob"_n};
    test.init();
 
    test.transfer( "sysio.token"_n, "alice"_n, "1000.00 TOK" );
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE( contract_blacklist ) { try {
 
 BOOST_AUTO_TEST_CASE( action_blacklist ) { try {
    whitelist_blacklist_tester<> test;
-   test.contract_whitelist = {config::system_account_name, "sysio.roa"_n, "sysio.token"_n, "bob"_n, "charlie"_n};
+   test.contract_whitelist = {sysio::chain::config::system_account_name, "sysio.roa"_n, "sysio.token"_n, "bob"_n, "charlie"_n};
    test.action_blacklist = {{"charlie"_n, "create"_n}};
    test.init();
 
@@ -314,10 +314,10 @@ BOOST_AUTO_TEST_CASE( blacklist_sysio ) { try {
    whitelist_blacklist_tester<tester> tester1;
    tester1.init();
    tester1.chain->produce_blocks();
-   tester1.chain->set_code(config::system_account_name, test_contracts::sysio_token_wasm() );
+   tester1.chain->set_code(sysio::chain::config::system_account_name, test_contracts::sysio_token_wasm() );
    tester1.chain->produce_blocks();
    tester1.shutdown();
-   tester1.contract_blacklist = {config::system_account_name};
+   tester1.contract_blacklist = {sysio::chain::config::system_account_name};
    tester1.init(false);
 
    whitelist_blacklist_tester<tester> tester2;
@@ -411,17 +411,17 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    cfg.min_transaction_cpu_usage  = 100; // Empty blocks (consisting of only onblock) would be below the target.
    // But all it takes is one transaction in the block to be above the target.
 
-   c.push_action( config::system_account_name, "setparams"_n, config::system_account_name, mutable_variant_object()
+   c.push_action( sysio::chain::config::system_account_name, "setparams"_n, sysio::chain::config::system_account_name, mutable_variant_object()
                               ("params", cfg) );
 
-   c.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
+   c.push_action( sysio::chain::config::system_account_name, "setalimits"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()
       ("account", user_account)
       ("ram_bytes", -1)
       ("net_weight", 1)
       ("cpu_weight", 1)
    );
 
-   c.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
+   c.push_action( sysio::chain::config::system_account_name, "setalimits"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()
       ("account", other_account)
       ("ram_bytes", -1)
       ("net_weight", 249'999'999)
@@ -431,7 +431,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    const int64_t reqauth_net_charge = 155;
    auto push_reqauth = [&]( name acnt, name perm, uint32_t billed_cpu_time_us ) {
       signed_transaction trx;
-      trx.actions.emplace_back( c.get_action( config::system_account_name, "reqauth"_n,
+      trx.actions.emplace_back( c.get_action( sysio::chain::config::system_account_name, "reqauth"_n,
                                               std::vector<permission_level>{{acnt,config::sysio_payer_name}, {acnt, perm}},
                                               fc::mutable_variant_object()("from", acnt) ) );
       c.set_transaction_headers( trx, 6 );
@@ -444,7 +444,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    // Force contraction of elastic resources until fully congested.
    c.produce_block();
    for( size_t i = 0; i < 300; ++i ) {
-      push_reqauth( other_account, config::active_name, cfg.min_transaction_cpu_usage );
+      push_reqauth( other_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
       push_reqauth( other_account, config::owner_name, cfg.min_transaction_cpu_usage );
       c.produce_block();
    }
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
 
    // The reqauth transaction will use more NET than the user can currently support under full congestion.
    BOOST_REQUIRE_EXCEPTION(
-      push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
+      push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage ),
       tx_net_usage_exceeded,
       fc_exception_message_starts_with("account user net usage is too high")
    );
@@ -483,23 +483,23 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
 
 
    // User can only push three reqauths per day even at this relaxed congestion level.
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION(
-      push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
+      push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage ),
       tx_net_usage_exceeded,
       fc_exception_message_starts_with("account user net usage is too high")
    );
    c.produce_block( fc::days(1) );
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
    c.produce_block( fc::days(1) );
 
@@ -530,30 +530,30 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    c.control->set_greylist_limit( 7 );
    c.produce_block();
 
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
 
    ilog("setting greylist limit to 5");
    c.control->set_greylist_limit( 5 );
    c.produce_block( fc::days(1) );
 
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
    BOOST_REQUIRE_EXCEPTION(
-      push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
+      push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage ),
       greylist_net_usage_exceeded,
       fc_exception_message_starts_with("greylisted account user net usage is too high")
    );
    c.produce_block( fc::days(1) );
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
-   push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage );
+   push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage );
    c.produce_block();
 
    // Finally, dropping the greylist limit to 1 will restrict the user's NET bandwidth so much that this user
@@ -565,7 +565,7 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
    BOOST_REQUIRE_EQUAL( rm.get_account_cpu_limit_ex(user_account, 1).first.max, user_cpu_per_day  );
    BOOST_REQUIRE_EQUAL( rm.get_account_net_limit_ex(user_account, 1).first.max, user_net_per_day  );
    BOOST_REQUIRE_EXCEPTION(
-      push_reqauth( user_account, config::active_name, cfg.min_transaction_cpu_usage ),
+      push_reqauth( user_account, sysio::chain::config::active_name, cfg.min_transaction_cpu_usage ),
       greylist_net_usage_exceeded,
       fc_exception_message_starts_with("greylisted account user net usage is too high")
    );

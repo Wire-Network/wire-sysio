@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <fc-lite/crypto/chain_types.hpp>
 #include <fc/reflect/reflect.hpp>
 
@@ -15,6 +14,7 @@ FC_REFLECT_ENUM_WITH_STRIP(fc::crypto::chain_kind_t,
 FC_REFLECT_ENUM_WITH_STRIP(fc::crypto::chain_key_type_t,
    (chain_key_type_unknown)
    (chain_key_type_wire)
+   (chain_key_type_wire_bls)
    (chain_key_type_ethereum)
    (chain_key_type_solana)
    (chain_key_type_sui), true);

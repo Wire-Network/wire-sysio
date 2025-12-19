@@ -139,15 +139,6 @@ em::message_hash_type hash_user_message(const em::message_body_type& payload) {
 
    auto h256 = ethash::keccak256(eth_message.data(), eth_message.size());
    std::copy_n(h256.bytes, sizeof(h256.bytes), eth_message_digest.data());
-   // SHA3_CTX msg_ctx;
-   // keccak_init(&msg_ctx);
-   // keccak_update(
-   //    &msg_ctx,
-   //    eth_message.data(),
-   //    static_cast<uint16_t>(eth_message.size()));
-   //
-   //
-   // keccak_final(&msg_ctx, eth_message_digest.data());
 
    return eth_message_digest;
 }
@@ -160,7 +151,7 @@ fc::crypto::public_key to_public_key(const std::string& pubkey_hex) {
 }
 
 fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
-   auto clean_hex         = trim(pubkey_hex);
+   auto clean_hex         = trim_public_key(pubkey_hex);
    auto pubkey_bytes      = hex_to_bytes(clean_hex);
    auto pubkey_byte_count = pubkey_bytes.size();
    auto copy_to_offset    = 0;
@@ -200,9 +191,17 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
 
 }
 
-fc::em::private_key parse_private_key(const std::string& privkey_hex) {
+fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    auto privkey_bytes = fc::from_hex(fc::crypto::ethereum::trim(privkey_hex));
    auto privkey_data  = fc::sha256(reinterpret_cast<const char*>(privkey_bytes.data()), privkey_bytes.size());
    return fc::em::private_key::regenerate(privkey_data);
+}
+
+fc::em::compact_signature to_em_signature(const std::string& signature_hex) {
+   auto signature_bytes = fc::from_hex(fc::crypto::ethereum::trim(signature_hex));
+   FC_ASSERT(signature_bytes.size() == fc::em::compact_signature::value_count, "Invalid signature size, expected ${size} character hex string",("size",fc::em::compact_signature::value_count));
+   fc::em::compact_signature sig;
+   std::copy_n(signature_bytes.data(), signature_bytes.size(), sig.data);
+   return sig;
 }
 }

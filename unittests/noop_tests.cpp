@@ -38,7 +38,7 @@ BOOST_FIXTURE_TEST_CASE(noop, sysio::testing::validating_tester) { try {
     {
         signed_transaction trx;
         // action( vector<permission_level> auth, account_name account, action_name name, const bytes& data )
-        trx.actions.emplace_back( vector<permission_level>{{"noop"_n, config::active_name}}, // auth
+        trx.actions.emplace_back( vector<permission_level>{{"noop"_n, sysio::chain::config::active_name}}, // auth
                                   "noop"_n,     // account_name
                                   "notexist"_n, // action_name notexist does not exist in the contract
                                   bytes{});     // data
@@ -50,7 +50,7 @@ BOOST_FIXTURE_TEST_CASE(noop, sysio::testing::validating_tester) { try {
     // push a non-existing action to an account without a contract
     {
         signed_transaction trx;
-        trx.actions.emplace_back( vector<permission_level>{{"noop2"_n, config::active_name}}, // auth
+        trx.actions.emplace_back( vector<permission_level>{{"noop2"_n, sysio::chain::config::active_name}}, // auth
                                   "noop2"_n,    // account_name
                                   "notexist"_n, // action_name notexist does not exist in the contract
                                   bytes{});     // data

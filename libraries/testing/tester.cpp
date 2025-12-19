@@ -21,8 +21,8 @@ sysio::chain::asset core_from_string(const std::string& s) {
   return sysio::chain::asset::from_string(s + " " CORE_SYMBOL_NAME);
 }
 
-using bls_private_key = fc::crypto::blslib::bls_private_key;
-using bls_public_key = fc::crypto::blslib::bls_public_key;
+using bls_private_key = fc::crypto::bls::private_key;
+using bls_public_key = fc::crypto::bls::public_key;
 
 namespace sysio::testing {
 
@@ -608,7 +608,7 @@ namespace sysio::testing {
       authority owner_auth;
       if( multisig ) {
          // multisig between account's owner key and creators active permission
-         owner_auth = authority(2, {key_weight{get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, config::active_name}, 1}});
+         owner_auth = authority(2, {key_weight{get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, sysio::chain::config::active_name}, 1}});
       } else {
          owner_auth =  authority( get_public_key( a, "owner" ) );
       }
@@ -634,7 +634,7 @@ namespace sysio::testing {
          sort_permissions(active_auth);
       }
 
-      trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator,sysio::chain::config::active_name}},
                                 newaccount{
                                    .creator  = creator,
                                    .name     = a,
@@ -643,15 +643,15 @@ namespace sysio::testing {
                                 });
 
       include_ram_gift &= has_roa;
-      include_ram_gift &= a.prefix() != config::system_account_name;
+      include_ram_gift &= a.prefix() != sysio::chain::config::system_account_name;
       if (include_ram_gift) {
          // if bios contract with setalimits available then provide ram for account which is similar to what sysio.system contract does
-         const auto* acnt = control->find_account_metadata(config::system_account_name);
+         const auto* acnt = control->find_account_metadata(sysio::chain::config::system_account_name);
          FC_ASSERT(acnt != nullptr, "system account metadata not found");
          auto abi = acnt->get_abi();
          if (std::ranges::any_of(abi.actions, [](const auto& action) { return action.name == "setalimits"_n; })) {
-            trx.actions.emplace_back(get_action(config::system_account_name, "setalimits"_n,
-                                                vector<permission_level>{{config::system_account_name, config::active_name}},
+            trx.actions.emplace_back(get_action(sysio::chain::config::system_account_name, "setalimits"_n,
+                                                vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
                                                 fc::mutable_variant_object()
                                                 ("account", a)
                                                 ("ram_bytes", newaccount_ram) // matches newaccount_ram of system contract
@@ -661,12 +661,12 @@ namespace sysio::testing {
       }
 
       include_roa_policy &= has_roa;
-      include_roa_policy &= a.prefix() != config::system_account_name;
+      include_roa_policy &= a.prefix() != sysio::chain::config::system_account_name;
       if( include_roa_policy ) {
          // ramWeight of 4 SYS needed to cover wasmtest contract use
          trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
                                              vector<permission_level>{
-                                                {NODE_DADDY, config::active_name},
+                                                {NODE_DADDY, sysio::chain::config::active_name},
                                              },
                                              mutable_variant_object()
                                              ("owner", a)
@@ -694,7 +694,7 @@ namespace sysio::testing {
       wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
 
       trx.actions.emplace_back(get_action(config::roa_account_name, "forcereg"_n,
-                                          vector<permission_level>{{config::roa_account_name, config::active_name}},
+                                          vector<permission_level>{{config::roa_account_name, sysio::chain::config::active_name}},
                                           mutable_variant_object()
                                           ("owner", owner)
                                           ("tier", tier)
@@ -711,7 +711,7 @@ namespace sysio::testing {
       set_transaction_headers(trx);
 
       trx.actions.emplace_back(get_action(config::roa_account_name, "addpolicy"_n,
-                                          vector<permission_level>{{issuer, config::active_name}},
+                                          vector<permission_level>{{issuer, sysio::chain::config::active_name}},
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
@@ -733,7 +733,7 @@ namespace sysio::testing {
       set_transaction_headers(trx);
 
       trx.actions.emplace_back(get_action("sysio.roa"_n, "expandpolicy"_n,
-                                          vector<permission_level>{{issuer, config::active_name}},
+                                          vector<permission_level>{{issuer, sysio::chain::config::active_name}},
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
@@ -754,7 +754,7 @@ namespace sysio::testing {
       set_transaction_headers(trx);
 
       trx.actions.emplace_back(get_action("sysio.roa"_n, "reducepolicy"_n,
-                                          vector<permission_level>{{issuer, config::active_name}},
+                                          vector<permission_level>{{issuer, sysio::chain::config::active_name}},
                                           fc::mutable_variant_object
                                           ("owner", owner)
                                           ("issuer", issuer)
@@ -834,7 +834,7 @@ namespace sysio::testing {
       if (authorizer) {
          act.authorization = vector<permission_level>{
                {account_name(authorizer), config::sysio_payer_name},
-               {account_name(authorizer), config::active_name}
+               {account_name(authorizer), sysio::chain::config::active_name}
       };
       }
       trx.actions.emplace_back(std::move(act));
@@ -858,7 +858,7 @@ namespace sysio::testing {
       signed_transaction trx;
       if (authorizer) {
          act.authorization = vector<permission_level>{
-            {account_name(authorizer), config::active_name}};
+            {account_name(authorizer), sysio::chain::config::active_name}};
       }
       trx.actions.emplace_back(std::move(act));
       set_transaction_headers(trx);
@@ -886,7 +886,7 @@ namespace sysio::testing {
 
    {
       vector<permission_level> auths;
-      auths.push_back( permission_level{actor, config::active_name} );
+      auths.push_back( permission_level{actor, sysio::chain::config::active_name} );
       return push_action( code, acttype, auths, data, expiration );
    }
 
@@ -900,7 +900,7 @@ namespace sysio::testing {
    {
       vector<permission_level> auths;
       for (const auto& actor : actors) {
-         auths.push_back( permission_level{actor, config::active_name} );
+         auths.push_back( permission_level{actor, sysio::chain::config::active_name} );
       }
       return push_action( code, acttype, auths, data, expiration );
    }
@@ -946,7 +946,7 @@ namespace sysio::testing {
       fc::variant pretty_trx = fc::mutable_variant_object()
          ("actions", fc::variants({
             fc::mutable_variant_object()
-               ("account", name(config::system_account_name))
+               ("account", name(sysio::chain::config::system_account_name))
                ("name", "reqauth")
                ("authorization", auths)
                ("data", fc::mutable_variant_object()
@@ -970,7 +970,7 @@ namespace sysio::testing {
                                         {get_private_key(from, role)});
         } else {
             return push_reqauth(from, vector<permission_level>{{from, config::owner_name}},
-                                        {get_private_key(from, role), get_private_key( config::system_account_name, "active" )} );
+                                        {get_private_key(from, role), get_private_key( sysio::chain::config::system_account_name, "active" )} );
         }
     }
 
@@ -989,7 +989,7 @@ namespace sysio::testing {
                ("authorization", fc::variants({
                   fc::mutable_variant_object()
                      ("actor", from)
-                     ("permission", name(config::active_name))
+                     ("permission", name(sysio::chain::config::active_name))
                }))
                ("data", fc::mutable_variant_object()
                   ("from", from)
@@ -1004,7 +1004,7 @@ namespace sysio::testing {
       abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
       set_transaction_headers(trx);
 
-      trx.sign( get_private_key( from, name(config::active_name).to_string() ), control->get_chain_id()  );
+      trx.sign( get_private_key( from, name(sysio::chain::config::active_name).to_string() ), control->get_chain_id()  );
       return push_transaction( trx );
    }
 
@@ -1018,7 +1018,7 @@ namespace sysio::testing {
                ("authorization", fc::variants({
                   fc::mutable_variant_object()
                      ("actor", currency )
-                     ("permission", name(config::active_name))
+                     ("permission", name(sysio::chain::config::active_name))
                }))
                ("data", fc::mutable_variant_object()
                   ("to", to)
@@ -1032,7 +1032,7 @@ namespace sysio::testing {
       abi_serializer::from_variant(pretty_trx, trx, get_resolver(), abi_serializer::create_yield_function( abi_serializer_max_time ));
       set_transaction_headers(trx);
 
-      trx.sign( get_private_key( currency, name(config::active_name).to_string() ), control->get_chain_id()  );
+      trx.sign( get_private_key( currency, name(sysio::chain::config::active_name).to_string() ), control->get_chain_id()  );
       return push_transaction( trx );
    }
 
@@ -1040,7 +1040,7 @@ namespace sysio::testing {
    void base_tester::link_authority( account_name account, account_name code, permission_name req, action_name type ) {
       signed_transaction trx;
 
-      trx.actions.emplace_back( vector<permission_level>{{account, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account, sysio::chain::config::active_name}},
                                 linkauth(account, code, type, req));
       set_transaction_headers(trx);
       trx.sign( get_private_key( account, "active" ), control->get_chain_id()  );
@@ -1052,7 +1052,7 @@ namespace sysio::testing {
    void base_tester::unlink_authority( account_name account, account_name code, action_name type ) {
       signed_transaction trx;
 
-      trx.actions.emplace_back( vector<permission_level>{{account, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account, sysio::chain::config::active_name}},
                                 unlinkauth(account, code, type ));
       set_transaction_headers(trx);
       trx.sign( get_private_key( account, "active" ), control->get_chain_id()  );
@@ -1121,14 +1121,14 @@ namespace sysio::testing {
       auto abi = fc::json::from_string(abi_json).template as<abi_def>();
 
       signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{{account, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account, sysio::chain::config::active_name}},
          setcode{
             .account    = account,
             .vmtype     = 0,
             .vmversion  = 0,
             .code       = bytes(wasm.begin(), wasm.end())
          });
-      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account,sysio::chain::config::active_name}},
          setabi{
             .account    = account,
             .abi        = fc::raw::pack(abi)
@@ -1146,7 +1146,7 @@ namespace sysio::testing {
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
       signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account,sysio::chain::config::active_name}},
                                 setcode{
                                    .account    = account,
                                    .vmtype     = 0,
@@ -1167,7 +1167,7 @@ namespace sysio::testing {
    void base_tester::set_abi( account_name account, const std::string& abi_json, const private_key_type* signer ) {
       auto abi = fc::json::from_string(abi_json).template as<abi_def>();
       signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{{account,config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{account,sysio::chain::config::active_name}},
                                 setabi{
                                    .account    = account,
                                    .abi        = fc::raw::pack(abi)
@@ -1183,7 +1183,7 @@ namespace sysio::testing {
    }
 
    void base_tester::set_privileged( account_name name ) {
-      push_action(config::system_account_name, "setpriv"_n, config::system_account_name,  fc::mutable_variant_object()("account", name)("is_priv", 1));
+      push_action(sysio::chain::config::system_account_name, "setpriv"_n, sysio::chain::config::system_account_name,  fc::mutable_variant_object()("account", name)("is_priv", 1));
    }
 
    bool base_tester::is_code_cached( sysio::chain::account_name name ) const {
@@ -1308,17 +1308,17 @@ namespace sysio::testing {
    }
 
    void base_tester::set_bios_contract() {
-      set_code(config::system_account_name, contracts::sysio_bios_wasm());
-      set_abi(config::system_account_name, contracts::sysio_bios_abi());
+      set_code(sysio::chain::config::system_account_name, contracts::sysio_bios_wasm());
+      set_abi(sysio::chain::config::system_account_name, contracts::sysio_bios_abi());
    }
 
    void base_tester::init_roa() {
       // Create the ROA account and mark it as privileged
-      create_account(config::roa_account_name, config::system_account_name, false, true, false, false);
-      create_account("sysio.acct"_n, config::system_account_name, false, false, false, false); // used for tracking account creation
+      create_account(config::roa_account_name, sysio::chain::config::system_account_name, false, true, false, false);
+      create_account("sysio.acct"_n, sysio::chain::config::system_account_name, false, false, false, false); // used for tracking account creation
       set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
-      push_action(config::system_account_name, "setpriv"_n,
-                  config::system_account_name,
+      push_action(sysio::chain::config::system_account_name, "setpriv"_n,
+                  sysio::chain::config::system_account_name,
                   fc::mutable_variant_object()("account", config::roa_account_name)("is_priv", 1)
       );
 
@@ -1330,7 +1330,7 @@ namespace sysio::testing {
       );
 
       // Setup default node daddy for easier resource allocation during testing
-      create_account(NODE_DADDY, config::system_account_name, false, false, false, false);
+      create_account(NODE_DADDY, sysio::chain::config::system_account_name, false, false, false, false);
       register_node_owner(NODE_DADDY, 1);
       has_roa = true;
    }
@@ -1359,7 +1359,7 @@ namespace sysio::testing {
          schedule_variant.emplace_back(e.get_abi_variant());
       }
 
-      return push_action( config::system_account_name, "setprods"_n, config::system_account_name,
+      return push_action( sysio::chain::config::system_account_name, "setprods"_n, sysio::chain::config::system_account_name,
                           fc::mutable_variant_object()("schedule", schedule_variant));
    }
 
@@ -1375,7 +1375,7 @@ namespace sysio::testing {
          }, p.authority);
       }
 
-      return push_action( config::system_account_name, "setprodkeys"_n, config::system_account_name,
+      return push_action( sysio::chain::config::system_account_name, "setprodkeys"_n, sysio::chain::config::system_account_name,
                           fc::mutable_variant_object()("schedule", legacy_keys));
    }
 
@@ -1399,16 +1399,16 @@ namespace sysio::testing {
    base_tester::set_finalizers_output_t base_tester::set_finalizers(const finalizer_policy_input& input) {
       set_finalizers_output_t res;
 
-      chain::bls_pub_priv_key_map_t local_finalizer_keys;
+      chain::bls_pub_key_sig_provider_map_t local_finalizer_keys;
       fc::variants finalizer_auths;
 
       for (const auto& f: input.finalizers) {
-         auto [privkey, pubkey, pop] = get_bls_key( f.name );
+         auto [privkey, pubkey, pop, sig_prov] = get_bls_key( f.name );
 
          // if it is a local finalizer, set up public to private key mapping for voting
          if( auto it = std::ranges::find_if(input.local_finalizers, [&](const auto& name) { return name == f.name; });
              it != input.local_finalizers.end()) {
-            local_finalizer_keys[pubkey.to_string()] = privkey.to_string();
+            local_finalizer_keys[pubkey.to_string()] = sig_prov;
             res.privkeys.emplace_back(privkey);
          };
 
@@ -1429,16 +1429,16 @@ namespace sysio::testing {
       fin_policy_variant("finalizers", std::move(finalizer_auths));
 
       res.setfinalizer_trace =
-         push_action( config::system_account_name, "setfinalizer"_n, config::system_account_name,
+         push_action( sysio::chain::config::system_account_name, "setfinalizer"_n, sysio::chain::config::system_account_name,
                       fc::mutable_variant_object()("finalizer_policy", std::move(fin_policy_variant)));
       return res;
    }
 
    void base_tester::set_node_finalizers(std::span<const account_name> names) {
-      bls_pub_priv_key_map_t local_finalizer_keys;
+      bls_pub_key_sig_provider_map_t local_finalizer_keys;
       for (auto name: names) {
-         auto [privkey, pubkey, pop] = get_bls_key(name);
-         local_finalizer_keys[pubkey.to_string()] = privkey.to_string();
+         auto [privkey, pubkey, pop, sig_prov] = get_bls_key(name);
+         local_finalizer_keys[pubkey.to_string()] = sig_prov;
       }
       control->test_set_node_finalizer_keys(local_finalizer_keys);
    }
@@ -1469,7 +1469,7 @@ namespace sysio::testing {
 
    void base_tester::preactivate_protocol_features(const vector<digest_type>& feature_digests) {
       for( const auto& feature_digest: feature_digests ) {
-         push_action( config::system_account_name, "activate"_n, config::system_account_name,
+         push_action( sysio::chain::config::system_account_name, "activate"_n, sysio::chain::config::system_account_name,
                       fc::mutable_variant_object()("feature_digest", feature_digest) );
       }
    }

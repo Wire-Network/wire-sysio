@@ -19,13 +19,13 @@ public:
 
    void setup(){
       //set parameters intrinsics are priviledged so we need system account here
-      set_code(config::system_account_name, sysio::testing::test_contracts::params_test_wasm());
-      set_abi(config::system_account_name, sysio::testing::test_contracts::params_test_abi());
+      set_code(sysio::chain::config::system_account_name, sysio::testing::test_contracts::params_test_wasm());
+      set_abi(sysio::chain::config::system_account_name, sysio::testing::test_contracts::params_test_abi());
       produce_block();
    }
 
    void action(name action_name, mvo mvo){
-      push_action( config::system_account_name, action_name, config::system_account_name, mvo );
+      push_action( sysio::chain::config::system_account_name, action_name, sysio::chain::config::system_account_name, mvo );
       produce_block();
    }
 };

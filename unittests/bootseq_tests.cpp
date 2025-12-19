@@ -58,16 +58,16 @@ std::vector<genesis_account> test_genesis( {
 class bootseq_tester : public validating_tester {
 public:
    void deploy_contract( bool call_init = true ) {
-      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
-      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+      set_code( sysio::chain::config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( sysio::chain::config::system_account_name, test_contracts::sysio_system_abi() );
       if( call_init ) {
-         base_tester::push_action(config::system_account_name, "init"_n,
-                                  config::system_account_name,  mutable_variant_object()
+         base_tester::push_action(sysio::chain::config::system_account_name, "init"_n,
+                                  sysio::chain::config::system_account_name,  mutable_variant_object()
                                   ("version", 0)
                                   ("core", symbol(CORE_SYMBOL).to_string())
             );
       }
-      const auto* accnt = control->find_account_metadata( config::system_account_name );
+      const auto* accnt = control->find_account_metadata( sysio::chain::config::system_account_name );
       BOOST_REQUIRE(accnt != nullptr);
       abi_def abi;
       BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
@@ -75,7 +75,7 @@ public:
    }
 
    fc::variant get_global_state() {
-      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
+      vector<char> data = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "global"_n, "global"_n );
       if (data.empty()) std::cout << "\nData is empty\n" << std::endl;
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
    }
@@ -99,7 +99,7 @@ public:
     }
 
     auto register_producer(name producer) {
-       auto r = base_tester::push_action(config::system_account_name, "regproducer"_n, producer, mvo()
+       auto r = base_tester::push_action(sysio::chain::config::system_account_name, "regproducer"_n, producer, mvo()
                        ("producer",  name(producer))
                        ("producer_key", get_public_key( producer, "active" ) )
                        ("url", "" )
@@ -117,7 +117,7 @@ public:
        wdump((account));
         set_code(account, wasm, signer);
         set_abi(account, abi, signer);
-        if (account == config::system_account_name) {
+        if (account == sysio::chain::config::system_account_name) {
            const auto* accnt = control->find_account_metadata( account );
            BOOST_REQUIRE(accnt != nullptr);
            abi_def abi_definition;
@@ -172,16 +172,16 @@ BOOST_FIXTURE_TEST_CASE( bootseq_test, bootseq_tester ) {
         // Create SYS tokens in sysio.token, set its manager as sysio
         auto max_supply = core_from_string("10000000000.0000"); /// 1x larger than 1B initial tokens
         auto initial_supply = core_from_string("1000000000.0000"); /// 1x larger than 1B initial tokens
-        create_currency("sysio.token"_n, config::system_account_name, max_supply);
+        create_currency("sysio.token"_n, sysio::chain::config::system_account_name, max_supply);
         // Issue the genesis supply of 1 billion SYS tokens to sysio.system
-        issue("sysio.token"_n, config::system_account_name, config::system_account_name, initial_supply);
+        issue("sysio.token"_n, sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, initial_supply);
 
-        auto actual = get_balance(config::system_account_name);
+        auto actual = get_balance(sysio::chain::config::system_account_name);
         BOOST_REQUIRE_EQUAL(initial_supply, actual);
 
         // Create genesis accounts
         for( const auto& a : test_genesis ) {
-           create_account( a.aname, config::system_account_name );
+           create_account( a.aname, sysio::chain::config::system_account_name );
         }
 
         deploy_contract();

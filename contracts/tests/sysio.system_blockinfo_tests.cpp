@@ -130,13 +130,13 @@ public:
          result;
 
       signed_transaction trx;
-      trx.actions.emplace_back(std::vector<permission_level>{{config::system_account_name, config::active_name}},
+      trx.actions.emplace_back(std::vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
                                blockinfo_tester_account_name, "call"_n,
                                fc::raw::pack(blockinfo_tester::input_type{std::move(request)}));
       trx.actions.emplace_back(std::vector<permission_level>{}, blockinfo_tester_account_name, "abort"_n,
                                std::vector<char>{});
       set_transaction_headers(trx);
-      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
+      trx.sign(get_private_key(sysio::chain::config::system_account_name, "active"), control->get_chain_id());
 
       result.second =
          push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, true); // no_throw set to true
@@ -319,7 +319,7 @@ try {
    static_assert(5 <= rolling_window_size && rolling_window_size <= 100000);
 
    // Deploy the blockinfo_tester contract.
-   create_account(blockinfo_tester_account_name, config::system_account_name );
+   create_account(blockinfo_tester_account_name, sysio::chain::config::system_account_name );
    set_code(blockinfo_tester_account_name, test_contracts::blockinfo_tester_wasm());
 
    auto latest_block_batch_info = [this](uint32_t batch_start_height_offset,

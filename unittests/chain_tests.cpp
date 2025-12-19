@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(chain_tests)
 BOOST_AUTO_TEST_CASE( replace_producer_keys ) try {
    validating_tester tester;
 
-   const auto new_key = get_public_key(name("newkey"), config::active_name.to_string());
+   const auto new_key = get_public_key(name("newkey"), sysio::chain::config::active_name.to_string());
 
    // make sure new keys is not used
    for(const auto& prod : tester.control->active_producers().producers) {
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE( replace_producer_keys ) try {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( replace_account_keys, T, validating_testers ) try {
    T tester;
-   const name usr = config::system_account_name;
-   const name active_permission = config::active_name;
+   const name usr = sysio::chain::config::system_account_name;
+   const name active_permission = sysio::chain::config::active_name;
    const auto& rlm = tester.control->get_resource_limits_manager();
    const auto* perm = tester.control->db().template find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
    BOOST_REQUIRE(perm != NULL);
