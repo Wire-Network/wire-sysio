@@ -12,6 +12,11 @@
             "name": "runslow",
             "base": "",
             "fields": []
+        },
+        {
+            "name": "segv",
+            "base": "",
+            "fields": []
         }
     ],
     "actions": [
@@ -23,6 +28,11 @@
         {
             "name": "runslow",
             "type": "runslow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "segv",
+            "type": "segv",
             "ricardian_contract": ""
         }
     ],

@@ -60,3 +60,10 @@ void infinite::runforever() {
    }
 }
 
+void infinite::segv() {
+   volatile int* p = nullptr;
+   int x = *p; // cause segfault
+   while (true) {
+      x = *++p;
+   }
+}

@@ -15,4 +15,7 @@ public:
 
    [[sysio::action]]
    void runforever();
+
+   [[sysio::action]]
+   void segv();
 };

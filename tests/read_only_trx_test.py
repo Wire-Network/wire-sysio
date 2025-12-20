@@ -228,6 +228,9 @@ def sendReadOnlyForeverPayloadless():
 def sendReadOnlyForeverInfinite():
     return sendTransaction('infinite', action='runforever', data={}, auth=[], opts='--read')
 
+def sendReadOnlySEGV():
+    return sendTransaction('infinite', action='segv', data={}, auth=[], opts='--read')
+
 # Send read-only trxs from mutltiple threads to bump load
 def sendReadOnlyTrxOnThread(startId, numTrxs):
     Print("start sendReadOnlyTrxOnThread")
@@ -346,6 +349,14 @@ def basicTests():
     assert(results[0])
     apiNode.waitForTransactionInBlock(results[1]['transaction_id'])
 
+    Print("Send a non-read-only SEGV transaction")
+    result = sendTransaction('infinite', action='segv', data={}, auth=[{"actor": userAccountName, "permission": "active"}])
+    assert(result[0] == False)
+
+    Print("Send a read-only SEGV transaction")
+    result = sendReadOnlySEGV()
+    assert(result[0] == False)
+
 def multiReadOnlyTests():
     sendMulReadOnlyTrx(numThreads=5)
 
@@ -407,11 +418,15 @@ def foreverTransactions():
     for i in range(5): # run fewer number than slowPayloadless so total running time is close
         result = sendReadOnlyForeverPayloadless()
         assert(result[0] == False) # should fail
+        result = sendReadOnlySEGV()
+        assert(result[0] == False) # should fail
 
 def infiniteTransactions():
     Print("infiniteTransactions")
     for i in range(5): # run fewer number than slowPayloadless so total running time is close
         result = sendReadOnlyForeverInfinite()
+        assert(result[0] == False) # should fail
+        result = sendReadOnlySEGV()
         assert(result[0] == False) # should fail
 
 def timeoutTest():
@@ -472,7 +487,6 @@ try:
 
             # should be running under multiple threads
             timeoutTest()
-            apiNode.waitForNextBlock()
 
     testSuccessful = True
 finally:
