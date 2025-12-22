@@ -51,7 +51,7 @@ std::vector<std::pair<std::string, std::string>> test_str_pairs{
 };
 
 std::string test_tx_01_sig {"setNumber(uint256)"};
-std::vector<std::string> test_tx_01_sig_params {"60"};
+std::vector<fc::variant> test_tx_01_sig_params {"60"};
 std::string test_tx_01_sig_encoded {"3fb5c1cb000000000000000000000000000000000000000000000000000000000000003c"};
 
 /* RLP tx 01 */
