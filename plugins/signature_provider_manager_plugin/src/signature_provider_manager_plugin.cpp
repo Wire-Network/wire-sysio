@@ -203,12 +203,10 @@ public:
       fc::mutable_variant_object vo;
       for (const auto& [key_type, spec] : _default_signature_provider_specs) {
          auto key_type_str = fc::crypto::chain_key_type_reflector::to_string(key_type);
-         dlogf("Saving default signature provider spec (type={},spec={})", key_type_str, spec);
          vo(key_type_str, spec);
       }
 
       auto file_content = fc::json::to_string(vo, {});
-      dlogf("Saving default signature provider specs (file={}): {}", def_sig_prov_file.string(), file_content);
 
       {
          fc::cfile file(def_sig_prov_file, fc::cfile::truncate_rw_mode);
@@ -235,7 +233,6 @@ public:
       for (const auto& item : vo) {
          auto key_type_str = item.key();
          auto spec = item.value().as_string();
-         dlogf("Loading default signature provider spec (type={},spec={})", key_type_str, spec);
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(key_type_str.c_str());
          _default_signature_provider_specs[key_type] = spec;
       }
@@ -287,8 +284,8 @@ public:
             changed = true;
          }
 
-         dlogf("Registering default signature provider spec (type={},spec={})",
-               fc::crypto::chain_key_type_reflector::to_string(key_type), spec);
+         dlogf("Registering default signature provider spec (type={})",
+               fc::crypto::chain_key_type_reflector::to_string(key_type));
          create_provider(spec);
       }
 
