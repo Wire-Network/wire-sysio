@@ -1,38 +1,26 @@
 #pragma once
 
-#include <cstdint>
-#include <vector>
-#include <string>
-#include <span>
 #include <array>
+#include <concepts>
+#include <cstdint>
+#include <span>
+#include <string>
+#include <vector>
 
-#include <fc/exception/exception.hpp>
+#include <fc/int256.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
+#include <fc/exception/exception.hpp>
 
 namespace fc::network::ethereum::rlp {
+
 using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 
-
-// ---------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------
-
-// using rlp_input_data = std::variant<bytes, bytes32, bytes_span>;
-//
-// using rlp_input_data_items = std::vector<rlp_input_data>;
-
-// 1. Forward declare the recursive struct
 struct rlp_input_data;
 
-// 2. Define the container for the recursive case
-//    std::vector is guaranteed to support incomplete types since C++17
 using rlp_input_data_items = std::vector<rlp_input_data>;
-
-// 3. Define the underlying variant type, including the recursive container
 using rlp_input_variant = std::variant<bytes, bytes32, bytes_span, address, rlp_input_data_items>;
 
-// 4. Define the struct inheriting from the variant
 struct rlp_input_data : rlp_input_variant {
    // Inherit constructors (allows implicit construction from inner types)
    using rlp_input_variant::rlp_input_variant;
@@ -42,15 +30,15 @@ struct rlp_input_data : rlp_input_variant {
 };
 
 
-void append(bytes& out, std::vector<rlp_input_variant>& in_vars);
+void append(bytes& out, const std::vector<rlp_input_variant>& in_vars);
 void append(bytes& out, const std::uint8_t* data, std::size_t len);
 
 template <typename T>
 concept not_rlp_input_vector = !std::is_same_v<std::decay_t<T>, std::vector<rlp::rlp_input_variant>>;
 
 template <typename... Args>
-   requires (not_rlp_input_vector<std::tuple_element_t<0, std::tuple<Args...>>> &&
-             !std::is_pointer_v<std::tuple_element_t<0, std::tuple<Args...>>>)
+   requires(not_rlp_input_vector<std::tuple_element_t<0, std::tuple<Args...>>> &&
+            !std::is_pointer_v<std::tuple_element_t<0, std::tuple<Args...>>>)
 void append(bytes& out, Args&&... args) {
    std::vector<rlp_input_variant> items = {std::forward<Args>(args)...};
    append(out, items);
@@ -65,7 +53,6 @@ bytes encode_length(std::size_t len, std::size_t offset);
 // ---------------------------------------------------------
 
 bytes encode_bytes(const address& data);
-bytes encode_bytes(bytes32& b);
 bytes encode_bytes(const std::span<std::uint8_t>& data);
 bytes encode_bytes(const bytes32& b);
 bytes encode_bytes(const bytes& b);
@@ -75,6 +62,10 @@ bytes encode_string(std::string& s);
 
 // Ethereum-style uint (0 => empty byte string => 0x80)
 template <typename T>
+concept EncodableUint = std::integral<T> || std::is_same_v<T, fc::uint256> || std::is_same_v<T, fc::int256> ||
+                        std::is_same_v<T, fc::uint128>;
+
+template <EncodableUint T>
 bytes encode_uint(T value) {
    if constexpr (std::is_same_v<T, std::uint64_t>) {
       return encode_uint<fc::uint256>(value);
@@ -85,7 +76,7 @@ bytes encode_uint(T value) {
       }
 
       bytes buf;
-      bool  started = false;
+      bool started = false;
 
       for (int shift = 56; shift >= 0; shift -= 8) {
          std::uint8_t byte = static_cast<std::uint8_t>((value >> shift) & 0xff);
@@ -101,7 +92,7 @@ bytes encode_uint(T value) {
 }
 
 bytes encode_access_list(const std::vector<access_list_entry>& access_list);
-bytes encode_list(std::vector<rlp_input_variant> items);
+bytes encode_list(const std::vector<rlp_input_variant>& items);
 
 // ---------------------------------------------------------
 // Generic encode(T)
@@ -162,4 +153,4 @@ bytes encode_eip1559_signed(const eip1559_tx& tx);
 bytes encode_eip1559_signed_typed(const eip1559_tx& tx);
 
 
-} // namespace eth
+} // namespace fc::network::ethereum::rlp

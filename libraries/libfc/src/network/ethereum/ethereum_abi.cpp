@@ -88,6 +88,10 @@ std::vector<uint8_t> encode_static_value(const std::string& type, const fc::vari
    std::ranges::transform(t, t.begin(), [](unsigned char c){ return static_cast<char>(std::tolower(c)); });
 
    if (t == "uint" || t.rfind("uint", 0) == 0) {
+      if (t == "uint256" || t == "int256") {
+         FC_ASSERT(value.is_string(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
+         return be_uint_from_decimal(value.as_string());
+      }
       FC_ASSERT(value.is_numeric(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
       return be_uint_from_decimal(value.as_uint256().str());
    }
