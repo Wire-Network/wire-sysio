@@ -10,12 +10,12 @@ namespace fc::crypto::bls {
 using from_mont = bls12_381::from_mont;
 
 public_key private_key::get_public_key() const {
-   bls12_381::g1 pk = bls12_381::public_key(_sk.to_uint64_array());
+   bls12_381::g1 pk = bls12_381::public_key(_sk);
    return public_key(pk.toAffineBytesLE(from_mont::yes));
 }
 
 signature private_key::proof_of_possession() const {
-   bls12_381::g2 proof = bls12_381::pop_prove(_sk.to_uint64_array());
+   bls12_381::g2 proof = bls12_381::pop_prove(_sk);
    return signature(proof.toAffineBytesLE(from_mont::yes));
 }
 
@@ -24,7 +24,7 @@ bls::signature private_key::sign(const fc::sha256& digest) const {
 }
 
 signature private_key::sign(std::span<const uint8_t> message) const {
-   bls12_381::g2 sig = bls12_381::sign(_sk.to_uint64_array(), message);
+   bls12_381::g2 sig = bls12_381::sign(_sk, message);
    return signature(sig.toAffineBytesLE(from_mont::yes));
 }
 
@@ -58,7 +58,7 @@ private_key::private_key(const std::string& base64urlstr)
    : _sk(priv_parse_base64url(base64urlstr)) {}
 
 std::string private_key::to_string() const {
-   std::string data_str = fc::crypto::bls::serialize_base64url<sha256::hash_array_type>(_sk.to_uint64_array());
+   std::string data_str = fc::crypto::bls::serialize_base64url<sha256::hash_array_type>(_sk);
 
    return bls::constants::bls_private_key_prefix + data_str;
 }
