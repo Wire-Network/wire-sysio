@@ -4645,8 +4645,9 @@ namespace sysio {
 
          if ( options.count( "p2p-bp-gossip-endpoint" ) ) {
             set_bp_producer_peers(options.at( "p2p-bp-gossip-endpoint" ).as<vector<string>>());
-            // SYS_ASSERT(options.count("signature-provider"), chain::plugin_config_exception,
-            //            "signature-provider of associated key required for p2p-bp-gossip-endpoint");
+            auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+            SYS_ASSERT(!sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).empty(), chain::plugin_config_exception,
+                       "signature-provider of associated key required for p2p-bp-gossip-endpoint");
          }
 
          if( options.count( "allowed-connection" )) {

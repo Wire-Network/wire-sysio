@@ -1,4 +1,3 @@
-// #include <sysio/wallet_plugin/wallet_api.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <fc/crypto/chain_types_reflect.hpp>
@@ -43,7 +42,7 @@ public:
    }
 
    fc::crypto::signature_provider_sign_fn make_kiod_signature_provider(const string& url_str,
-                                                                       const chain::public_key_type pubkey) const {
+                                                                       const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
          // send the entire string after unix:// to http_plugin. It'll auto-detect which part
@@ -67,7 +66,7 @@ public:
 
    std::pair<fc::crypto::signature_provider_sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
       fc::crypto::chain_key_type_t key_type,
-      fc::crypto::public_key public_key,
+      const fc::crypto::public_key& public_key,
       const std::string& spec) {
       using namespace fc::crypto;
       auto spec_parts = fc::split(spec, ':', 2);
@@ -81,7 +80,6 @@ public:
          switch (key_type) {
          case chain_key_type_wire: {
             privkey = from_native_string_to_private_key<chain_key_type_wire>(spec_data);
-            //privkey = fc::crypto::private_key(spec_data);
             break;
          }
          case chain_key_type_wire_bls: {
@@ -155,14 +153,14 @@ public:
    fc::crypto::signature_provider_ptr get_provider(const fc::crypto::signature_provider_id_t& key) {
       std::scoped_lock lock(_signing_providers_mutex);
       if (holds_alternative<std::string>(key)) {
-         auto keyName = std::get<std::string>(key);
+         auto& keyName = std::get<std::string>(key);
          SYS_ASSERT(_signing_providers_by_name.contains(keyName), chain::plugin_config_exception,
                     "No signature provider exists with name \"${keyName}\"", ("keyName", keyName));
 
          return _signing_providers_by_name.at(keyName);
       }
 
-      auto pub_key = std::get<chain::public_key_type>(key);
+      auto& pub_key = std::get<chain::public_key_type>(key);
       SYS_ASSERT(_signing_providers_by_pubkey.contains(pub_key), chain::plugin_config_exception,
                  "No signature provider exists with public key \"${pubKey}\"", ("pubKey", pub_key));
 
@@ -246,9 +244,6 @@ public:
       std::scoped_lock lock(_signing_providers_mutex);
       load_default_signature_provider_specs();
       bool changed = false;
-
-
-
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: ${keyType}", ("keyType", key_type));
@@ -256,7 +251,7 @@ public:
          if (_default_signature_provider_specs.contains(key_type)) {
             spec = _default_signature_provider_specs.at(key_type);
          } else {
-            // create ananonymous key
+            // create anonymous key
             auto key_name = std::format("{}-default", fc::crypto::chain_key_type_reflector::to_string(key_type));
             fc::crypto::private_key privkey;
             switch (key_type) {
