@@ -30,7 +30,6 @@ namespace sysio { namespace chain {
             set_time_point(t);
          }
 
-         static block_timestamp maximum() { return block_timestamp( 0xffff ); }
          static block_timestamp min() { return block_timestamp(0); }
 
          block_timestamp next() const {
