@@ -6,7 +6,7 @@ namespace sysio {
 namespace {
 [[maybe_unused]] auto _batch_operator_plugin = application::register_plugin<batch_operator_plugin>();
 
-inline fc::logger &logger() {
+[[maybe_unused]] inline fc::logger &logger() {
   static fc::logger log{"batch_operator_plugin"};
   return log;
 }
