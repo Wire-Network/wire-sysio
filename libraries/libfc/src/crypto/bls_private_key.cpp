@@ -34,6 +34,14 @@ private_key private_key::generate() {
    return private_key(v);
 }
 
+sha512 private_key_shim::generate_shared_secret(const public_key_type& pub_key) const {
+   FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS does not support shared secrets");
+}
+
+signature_shim::public_key_type signature_shim::recover(const sha256& digest, bool check_canonical) const {
+   FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS Signature Recovery is not supported");
+}
+
 static fc::sha256::uint64_array_type priv_parse_base64url(const std::string& base64urlstr) {
    auto res = std::mismatch(bls::constants::bls_private_key_prefix.begin(),
                             bls::constants::bls_private_key_prefix.end(),

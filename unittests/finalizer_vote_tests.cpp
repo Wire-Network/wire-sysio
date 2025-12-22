@@ -42,7 +42,7 @@ struct bls_keys_t {
 
    bls_keys_t(name n) {
       bls_signature pop;
-      std::tie(privkey, pubkey, pop, std::ignore)    = sysio::testing::get_bls_key(n);
+      std::tie(privkey, pubkey, pop, std::ignore) = sysio::testing::get_bls_key(n);
       std::tie(privkey_str, pubkey_str) = std::pair{ privkey.to_string(), pubkey.to_string() };
    }
 };

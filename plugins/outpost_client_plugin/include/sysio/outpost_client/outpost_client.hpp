@@ -29,13 +29,13 @@ public:
 
    constexpr static auto target_chain = TargetChain;
 
-   explicit outpost_client(std::shared_ptr<fc::crypto::signature_provider_t> signing_provider) : _signing_provider(signing_provider) {}
+   explicit outpost_client(fc::crypto::signature_provider_ptr signing_provider) : _signing_provider(std::move(signing_provider)) {}
 
    explicit outpost_client(const fc::crypto::signature_provider_id_t& sig_provider_query) :
    _signing_provider(sysio::get_signature_provider(sig_provider_query)) {}
 
    virtual ~outpost_client() = default;
-   // virtual fc::transaction_t sign_and_send(PayloadType payload) = 0;
+
 
 protected:
    virtual MessageType send_message(MessageType message) = 0;

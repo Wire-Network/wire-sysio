@@ -62,10 +62,9 @@ fc::sha512 private_key::get_shared_secret(const public_key& other) const {
    FC_ASSERT(my->_key != empty_priv);
    FC_ASSERT(other.my->_key != empty_pub);
    secp256k1_pubkey secp_pubkey;
-   FC_ASSERT(
-      secp256k1_ec_pubkey_parse( detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data, other.
-         serialize().size() ));
-   FC_ASSERT(secp256k1_ec_pubkey_tweak_mul( detail::_get_context(), &secp_pubkey, (unsigned char*) my->_key.data() ));
+   FC_ASSERT(secp256k1_ec_pubkey_parse(detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data,
+                                       other.serialize().size()));
+   FC_ASSERT(secp256k1_ec_pubkey_tweak_mul(detail::_get_context(), &secp_pubkey, (unsigned char*)my->_key.data()));
    public_key_data serialized_result;
    size_t serialized_result_sz = sizeof(serialized_result);
    secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result.data, &serialized_result_sz,
@@ -208,8 +207,9 @@ private_key private_key::child(const fc::sha256& offset) const {
 
 std::string public_key::to_base58(const public_key_data& key) {
    uint32_t check = (uint32_t)sha256::hash(key.data, sizeof(key))._hash[0];
-   static_assert(sizeof(key) + sizeof(check) == 37, "");
    // hack around gcc bug: key.size() should be constexpr, but isn't
+   static_assert(sizeof(key) + sizeof(check) == 37, "");
+
    array<char, 37> data;
    memcpy(data.data, key.begin(), key.size());
    memcpy(data.begin() + key.size(), (const char*)&check, sizeof(check));
@@ -250,7 +250,7 @@ bool public_key::is_canonical(const compact_signature& c) {
 
    static_assert(sizeof(c.data) >= 65, "compact_signature must be 65 bytes");
 
-   // The S value is the 32 bytes starting at index 33.
+   // The S value is the 32 bytes starting at index 32.
    // We check if S <= half_order.
    // memcmp returns <= 0 if S is less than or equal to half_order.
    return memcmp(c.data + 32, half_order, 32) <= 0;
@@ -386,7 +386,7 @@ fc::ecc::compact_signature private_key::sign_compact_ex(const em::message_body_t
    // --- 1. Prepare the eth_sign prefixed hash (same as in recover) ---
    message_hash_type msg_digest;
    if (std::holds_alternative<fc::sha256>(digest)) {
-      auto msg_hash = std::get<fc::sha256>(digest);
+      auto& msg_hash = std::get<fc::sha256>(digest);
       std::copy_n(msg_hash.data(), msg_hash.data_size(), msg_digest.begin());
    } else {
       msg_digest = crypto::ethereum::hash_message(digest);

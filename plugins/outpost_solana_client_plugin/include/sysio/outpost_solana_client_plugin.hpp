@@ -23,8 +23,6 @@ public:
 
    virtual void plugin_shutdown();
 
-private:
-   // std::optional<boost::signals2::scoped_connection> _irreversible_block_connection{std::nullopt};
 };
 
 

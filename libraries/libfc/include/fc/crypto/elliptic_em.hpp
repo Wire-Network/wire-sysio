@@ -31,7 +31,6 @@ namespace fc {
     using public_key_data_uncompressed = fc::array<char,65>;
     using private_key_secret = fc::sha256;
 
-    //using signature = fc::array<char,72>;
     using compact_signature = fc::array<unsigned char,65>;
 
     /**
@@ -118,12 +117,12 @@ namespace fc {
            static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
 
 
-       /**
-        * @brief
-        * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
-        * @return public key
-        */
-       static private_key from_native_string( const std::string& priv_key_str );
+           /**
+            * @brief
+            * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
+            * @return public key
+            */
+           static private_key from_native_string( const std::string& priv_key_str );
 
            private_key_secret get_secret()const; // get the private key secret
 
@@ -137,8 +136,7 @@ namespace fc {
 
            compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
 
-           compact_signature sign_compact_ex(const message_body_type& digest,
-                                             bool                                       require_canonical) const;
+           compact_signature sign_compact_ex(const message_body_type& digest, bool require_canonical) const;
 
            public_key get_public_key()const;
 

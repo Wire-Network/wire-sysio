@@ -26,17 +26,6 @@ struct rlp_visitor {
 };
 }
 void append(bytes& out, std::vector<rlp_input_variant>& in_vars) {
-   // auto rlp_visitor = [&](this const auto& self, auto&& arg) {
-   //    using T = std::decay_t<decltype(arg)>;
-   //    if constexpr (std::is_same_v<T, rlp_input_data_items>) {
-   //       for (const auto& item : arg) {
-   //          std::visit(self, item); // Recurse
-   //       }
-   //    } else {
-   //       out.insert(out.end(), arg.begin(), arg.end());
-   //    }
-   // };
-
    rlp_visitor visitor{out};
    for (auto& in_var : in_vars) {
       std::visit(visitor, in_var);
@@ -62,15 +51,12 @@ bytes encode_length(std::size_t len,std::size_t offset) {
    return from_hex_no_prefix(enc_len_hex);
 }
 
-// bytes encode_bytes(std::span<std::uint8_t>& data) {
-//    return encode_bytes(static_cast<const std::span<std::uint8_t>&>(data));
-// }
 bytes encode_bytes(const std::span<std::uint8_t>& data) {
    return encode_bytes(data.data(), data.size());
 }
 bytes encode_bytes(const std::uint8_t* data, std::size_t len) {
 
-   bytes             out;
+   bytes out;
 
    if (len == 1 && data[0] < 0x80) {
       out.push_back(data[0]);
@@ -90,8 +76,7 @@ bytes encode_bytes(const std::uint8_t* data, std::size_t len) {
 }
 
 bytes encode_bytes(const bytes& b) {
-   bytes tmp = b;
-   return encode_bytes(std::span<std::uint8_t>(tmp.data(), tmp.size()));
+   return encode_bytes(std::span<std::uint8_t>(const_cast<std::uint8_t *>(b.data()), b.size()));
 }
 
 bytes encode_bytes(bytes32& b) {
@@ -99,8 +84,7 @@ bytes encode_bytes(bytes32& b) {
 }
 
 bytes encode_bytes(const bytes32& b) {
-   bytes32 tmp = b;
-   return encode_bytes(tmp);
+   return encode_bytes(const_cast<bytes32&>(b));
 }
 
 

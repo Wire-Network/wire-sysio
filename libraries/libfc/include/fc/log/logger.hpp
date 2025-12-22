@@ -134,7 +134,7 @@ namespace fc
 
 #define wlogf( FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::info ) ) \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::warn ) ) \
       (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( warn, FORMAT, __VA_ARGS__ ) ); \
   FC_MULTILINE_MACRO_END
 
@@ -146,7 +146,7 @@ namespace fc
 
 #define dlogf( FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::info ) ) \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::debug ) ) \
       (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( debug, FORMAT, __VA_ARGS__ ) ); \
   FC_MULTILINE_MACRO_END
 

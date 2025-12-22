@@ -27,11 +27,6 @@ class json_rpc_client {
 public:
    explicit json_rpc_client(fc::url                           url,
                             const std::optional<std::string>& user_agent = std::nullopt);
-   // json_rpc_client(std::string host,
-   //                  std::string port,
-   //                  std::string path = "/",
-   //                  const std::optional<std::string>& user_agent = std::nullopt);
-
    // Perform a JSON-RPC request and return the "result" member.
    // Throws json_rpc_error for JSON-RPC error and std::runtime_error for transport/protocol issues.
    fc::variant call(const std::string& method, const fc::variant& params = variants{});
@@ -51,9 +46,6 @@ public:
 
 private:
    asio::io_context _io_ctx{};
-   // std::string _host;
-   // std::string _port;
-   // std::string _path;
    fc::url      _url;
    std::string  _user_agent;
    std::int64_t _next_id;

@@ -5,6 +5,11 @@
 
 namespace fc::crypto::bls {
 
+size_t signature::get_hash() const {
+   auto raw_data = _affine_non_montgomery_le.data();
+   return *(size_t*)&raw_data[32-sizeof(size_t)] + *(size_t*)&raw_data[64-sizeof(size_t)];
+}
+
 bls12_381::g2 signature::to_jacobian_montgomery_le(const bls::signature_data::std_array_type & affine_non_montgomery_le) {
    auto g2 = bls12_381::g2::fromAffineBytesLE(affine_non_montgomery_le, {.check_valid = true, .to_mont = true});
    FC_ASSERT(g2, "Invalid bls_signature");
@@ -17,10 +22,9 @@ inline std::array<uint8_t, 192> from_span(std::span<const uint8_t, 192> affine_n
    return r;
 }
 
-signature::signature(const bls::signature_data& affine_non_montgomery_le) : _affine_non_montgomery_le(
-                                                                               affine_non_montgomery_le.to_std_array())
-                                                                            , _jacobian_montgomery_le(to_jacobian_montgomery_le(_affine_non_montgomery_le)) {
-}
+signature::signature(const bls::signature_data& affine_non_montgomery_le)
+   : _affine_non_montgomery_le(affine_non_montgomery_le.to_std_array())
+   , _jacobian_montgomery_le(to_jacobian_montgomery_le(_affine_non_montgomery_le)) {}
 
 signature::signature(std::span<const uint8_t, 192> affine_non_montgomery_le)
    : _affine_non_montgomery_le(from_span(affine_non_montgomery_le))

@@ -48,10 +48,9 @@ namespace fc
    * Convert a string to lowercase using the specified locale
    *
    * @param s String to convert to lowercase
-   * @param loc Locale to use for case conversion, defaults to system locale
    * @return A new string with all characters converted to lowercase
    */
-  std::string to_lower(std::string s);
+  std::string to_lower(const std::string& s);
 
   bool all_digits(const std::string_view& s);
   bool all_digits(const std::string& s);

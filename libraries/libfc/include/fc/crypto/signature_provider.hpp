@@ -45,7 +45,6 @@ using signature_provider_ptr = std::shared_ptr<signature_provider_t>;
  * @return A formatted specification string in the format "key_name:chain:key_type:public_key:private_key_spec"
  */
 std::string to_signature_provider_spec(const std::string& key_name, fc::crypto::chain_kind_t target_chain,
-                                       fc::crypto::chain_key_type_t key_type, std::string public_key_text,
-                                       std::string private_key_provider_spec);
-
+                                       fc::crypto::chain_key_type_t key_type, const std::string& public_key_text,
+                                       const std::string& private_key_provider_spec);
 }

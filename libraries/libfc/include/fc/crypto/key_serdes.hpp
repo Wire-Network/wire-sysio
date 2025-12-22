@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __CRYPTO_KEY_SERDES_HPP__
-#define __CRYPTO_KEY_SERDES_HPP__
 #include <ranges>
 
 #include <fc/crypto/crypto_utils.hpp>
@@ -146,8 +144,8 @@ struct to_native_string_from_signature_visitor : public fc::visitor<std::string>
    const fc::yield_function_t _yield;
 };
 
-template<fc::crypto::chain_key_type_t ChainKeyType>
-public_key::storage_type from_native_string_to_public_key_shim(const std::string & public_key_str) {
+template <fc::crypto::chain_key_type_t ChainKeyType>
+public_key::storage_type from_native_string_to_public_key_shim(const std::string& public_key_str) {
    if (public_key_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Public key string cannot be empty");
    }
@@ -165,13 +163,14 @@ public_key::storage_type from_native_string_to_public_key_shim(const std::string
 
    return fc::crypto::public_key::parse_base58(public_key_str);
 }
-template<fc::crypto::chain_key_type_t ChainKeyType>
-public_key from_native_string_to_public_key(const std::string & private_key_str) {
+
+template <fc::crypto::chain_key_type_t ChainKeyType>
+public_key from_native_string_to_public_key(const std::string& private_key_str) {
    return public_key{from_native_string_to_public_key_shim<ChainKeyType>(private_key_str)};
 }
 
-template<fc::crypto::chain_key_type_t ChainKeyType>
-private_key::storage_type from_native_string_to_private_key_shim(const std::string & private_key_str) {
+template <fc::crypto::chain_key_type_t ChainKeyType>
+private_key::storage_type from_native_string_to_private_key_shim(const std::string& private_key_str) {
    if (private_key_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
@@ -190,13 +189,13 @@ private_key::storage_type from_native_string_to_private_key_shim(const std::stri
    return fc::crypto::private_key::priv_parse_base58(private_key_str);
 }
 
-template<fc::crypto::chain_key_type_t ChainKeyType>
-private_key from_native_string_to_private_key(const std::string & private_key_str) {
+template <fc::crypto::chain_key_type_t ChainKeyType>
+private_key from_native_string_to_private_key(const std::string& private_key_str) {
    return private_key{from_native_string_to_private_key_shim<ChainKeyType>(private_key_str)};
 }
 
-template<fc::crypto::chain_key_type_t ChainKeyType>
-signature::storage_type from_native_string_to_signature_shim(const std::string & signature_str) {
+template <fc::crypto::chain_key_type_t ChainKeyType>
+signature::storage_type from_native_string_to_signature_shim(const std::string& signature_str) {
    if (signature_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
@@ -215,8 +214,8 @@ signature::storage_type from_native_string_to_signature_shim(const std::string &
    return fc::crypto::signature::sig_parse_base58(signature_str);
 }
 
-template<fc::crypto::chain_key_type_t ChainKeyType>
-signature from_native_string_to_signature(const std::string & private_key_str) {
+template <fc::crypto::chain_key_type_t ChainKeyType>
+signature from_native_string_to_signature(const std::string& private_key_str) {
    return signature{from_native_string_to_signature_shim<ChainKeyType>(private_key_str)};
 }
 
@@ -304,5 +303,3 @@ struct base58str_visitor : public fc::visitor<std::string> {
 
 
 }
-
-#endif
