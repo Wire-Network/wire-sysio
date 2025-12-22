@@ -229,32 +229,5 @@ BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
 
 }
 
-// BOOST_AUTO_TEST_CASE(test_signature_provider_manager_plugin_with_app) {
-//    test_wire_signature_provider_spec_options();
-//    test_ethereum_signature_provider_spec_options();
-//    test_create_provider_ethereum_key_spec();
-// }
-
-// BOOST_AUTO_TEST_CASE(create_provider_solana_key_spec) {
-//    // Generate a Solana keypair (ED25519)
-//    private_key_type priv = private_key_type::generate<fc::crypto::ed::private_key_shim>();
-//    const std::string spec = make_spec_from_keypair(priv);
-//
-//    auto tester = create_app();
-//    auto& mgr = tester.plugin.get();
-//
-//    auto& provider = mgr.create_provider(spec);
-//
-//    // Public key should match
-//    BOOST_CHECK_EQUAL(provider->public_key.to_string({}), priv.get_public_key().to_string({}));
-//
-//    // Provider should be retrievable
-//    BOOST_CHECK(mgr.has_provider(provider->public_key));
-//    auto& found = mgr.get_provider(provider->public_key);
-//    BOOST_CHECK_EQUAL(found.public_key.to_string({}), provider->public_key.to_string({}));
-//
-//    // Sign function should be set
-//    BOOST_CHECK(static_cast<bool>(provider->sign));
-// }
 
 BOOST_AUTO_TEST_SUITE_END()
