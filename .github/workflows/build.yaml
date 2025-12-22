@@ -71,7 +71,7 @@ jobs:
       - name: Setup wire-cdt and wire-system-contracts versions
         id: versions
         env:
-          GH_TOKEN_DEV: ${{secrets.GH_TOKEN_DEV}}
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
         run: |
           DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
           echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
