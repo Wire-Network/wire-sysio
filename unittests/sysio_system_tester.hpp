@@ -45,20 +45,20 @@ public:
          token_abi_ser.set_abi(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
       }
 
-      create_currency( "sysio.token"_n, sysio::chain::config::system_account_name, core_from_string("10000000000.0000") );
-      issue(sysio::chain::config::system_account_name,      core_from_string("1000000000.0000"));
+      create_currency( "sysio.token"_n, config::system_account_name, core_from_string("10000000000.0000") );
+      issue(config::system_account_name,      core_from_string("1000000000.0000"));
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"), get_balance( name("sysio") ) );
 
-      set_code( sysio::chain::config::system_account_name, test_contracts::sysio_system_wasm() );
-      set_abi( sysio::chain::config::system_account_name, test_contracts::sysio_system_abi() );
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
 
-      base_tester::push_action(sysio::chain::config::system_account_name, "init"_n,
-                            sysio::chain::config::system_account_name,  mutable_variant_object()
+      base_tester::push_action(config::system_account_name, "init"_n,
+                            config::system_account_name,  mutable_variant_object()
                             ("version", 0)
                             ("core", symbol(CORE_SYMBOL).to_string()));
 
       {
-         const auto* accnt = control->find_account_metadata( sysio::chain::config::system_account_name );
+         const auto* accnt = control->find_account_metadata( config::system_account_name );
          BOOST_REQUIRE(accnt != nullptr);
          abi_def abi;
          BOOST_REQUIRE_EQUAL(abi_serializer::to_abi(accnt->abi, abi), true);
@@ -67,9 +67,9 @@ public:
 
       produce_blocks();
 
-      create_account( "alice1111111"_n, sysio::chain::config::system_account_name, false, false, false, false );
-      create_account( "bob111111111"_n, sysio::chain::config::system_account_name, false, false, false, false );
-      create_account( "carol1111111"_n, sysio::chain::config::system_account_name, false, false, false, false );
+      create_account( "alice1111111"_n, config::system_account_name, false, false, false, false );
+      create_account( "bob111111111"_n, config::system_account_name, false, false, false, false );
+      create_account( "carol1111111"_n, config::system_account_name, false, false, false, false );
 
       BOOST_REQUIRE_EQUAL( core_from_string("1000000000.0000"),
             get_balance(name("sysio")) + get_balance(name("sysio.ramfee")) + get_balance(name("sysio.stake")) + get_balance(name("sysio.ram")) );
@@ -86,13 +86,13 @@ public:
    }
 
    transaction_trace_ptr setup_producer_accounts( const std::vector<account_name>& accounts ) {
-      account_name creator(sysio::chain::config::system_account_name);
+      account_name creator(config::system_account_name);
       signed_transaction trx;
       set_transaction_headers(trx);
 
       for (const auto& a: accounts) {
          authority owner_auth( get_public_key( a, "owner" ) );
-         trx.actions.emplace_back( vector<permission_level>{{creator,sysio::chain::config::active_name}},
+         trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
                                    newaccount{
                                          .creator  = creator,
                                          .name     = a,
@@ -111,7 +111,7 @@ public:
          string action_type_name = abi_ser.get_action_type(name);
 
          action act;
-         act.account = sysio::chain::config::system_account_name;
+         act.account = config::system_account_name;
          act.name = name;
          act.data = abi_ser.variant_to_binary( action_type_name, data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
 
@@ -163,7 +163,7 @@ public:
    }
 
    fc::variant get_producer_info( const account_name& act ) {
-      vector<char> data = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "producers"_n, act );
+      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "producers"_n, act );
       return abi_ser.binary_to_variant( "producer_info", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
    }
 
@@ -173,22 +173,22 @@ public:
          ("maximum_supply", maxsupply );
 
       base_tester::push_action(contract, "create"_n,
-         {permission_level(manager, config::sysio_payer_name), permission_level(contract, sysio::chain::config::active_name), permission_level(manager, sysio::chain::config::active_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(contract, config::active_name), permission_level(manager, config::active_name)},
          act );
    }
 
-   void issue( name to, const asset& amount, name manager = sysio::chain::config::system_account_name ) {
+   void issue( name to, const asset& amount, name manager = config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "issue"_n,
-         {permission_level(manager, config::sysio_payer_name), permission_level(manager, sysio::chain::config::active_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(manager, config::active_name)},
          mutable_variant_object()
                                 ("to",      to )
                                 ("quantity", amount )
                                 ("memo", "")
                                 );
    }
-   void transfer( name from, name to, const asset& amount, name manager = sysio::chain::config::system_account_name ) {
+   void transfer( name from, name to, const asset& amount, name manager = config::system_account_name ) {
       base_tester::push_action( "sysio.token"_n, "transfer"_n,
-         {permission_level(manager, config::sysio_payer_name), permission_level(manager, sysio::chain::config::active_name)},
+         {permission_level(manager, config::sysio_payer_name), permission_level(manager, config::active_name)},
          mutable_variant_object()
                                 ("from",    from)
                                 ("to",      to )
@@ -209,7 +209,7 @@ public:
    }
 
    fc::variant get_global_state() {
-      vector<char> data = get_row_by_account( sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "global"_n, "global"_n );
+      vector<char> data = get_row_by_account( config::system_account_name, config::system_account_name, "global"_n, "global"_n );
       if (data.empty()) std::cout << "\nData is empty\n" << std::endl;
       return data.empty() ? fc::variant() : abi_ser.binary_to_variant( "sysio_global_state", data, abi_serializer::create_yield_function( abi_serializer_max_time ) );
 
@@ -218,7 +218,7 @@ public:
    abi_serializer initialize_multisig() {
       abi_serializer msig_abi_ser;
       {
-         create_account( "sysio.msig"_n, sysio::chain::config::system_account_name, false, false, false, false );
+         create_account( "sysio.msig"_n, config::system_account_name, false, false, false, false );
          produce_block();
 
          set_privileged("sysio.msig"_n);

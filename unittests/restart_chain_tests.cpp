@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_restart_with_different_chain_id, T, testers 
    other.close();
    genesis_state genesis;
    genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:01.000");
-   genesis.initial_key       = sysio::testing::base_tester::get_public_key(sysio::chain::config::system_account_name, "active");
+   genesis.initial_key       = sysio::testing::base_tester::get_public_key(config::system_account_name, "active");
    std::optional<chain_id_type> chain_id = genesis.compute_chain_id();
    BOOST_REQUIRE_EXCEPTION(other.open(chain_id), chain_id_type_exception,
                            fc_exception_message_starts_with("chain ID in state "));
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_light_validation_restart_from_block_log, T, 
    trx.context_free_data.emplace_back(fc::raw::pack<uint32_t>(100)); // verify payload matches context free data
    // add a normal action along with cfa
    dummy_action da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
-   action       act1(vector<permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
+   action       act1(vector<permission_level>{{"testapi"_n, config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    // run normal passing case

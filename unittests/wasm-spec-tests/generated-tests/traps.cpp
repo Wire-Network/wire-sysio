@@ -14,7 +14,7 @@ BOOST_DATA_TEST_CASE(traps_0_check_throw, boost::unit_test::data::xrange(0,6), i
    action test;
    test.account = "wasmtest"_n;
    test.name = account_name((uint64_t)index);
-   test.authorization = {{"wasmtest"_n, sysio::chain::config::active_name}};
+   test.authorization = {{"wasmtest"_n, config::active_name}};
 
    BOOST_CHECK_THROW(push_action(tester, std::move(test), "wasmtest"_n.to_uint64_t()), wasm_execution_error);
    tester.produce_block();
@@ -34,7 +34,7 @@ BOOST_DATA_TEST_CASE(traps_1_check_throw, boost::unit_test::data::xrange(0,4), i
    action test;
    test.account = "wasmtest"_n;
    test.name = account_name((uint64_t)index);
-   test.authorization = {{"wasmtest"_n, sysio::chain::config::active_name}};
+   test.authorization = {{"wasmtest"_n, config::active_name}};
 
    BOOST_CHECK_THROW(push_action(tester, std::move(test), "wasmtest"_n.to_uint64_t()), wasm_execution_error);
    tester.produce_block();
@@ -54,7 +54,7 @@ BOOST_DATA_TEST_CASE(traps_2_check_throw, boost::unit_test::data::xrange(0,8), i
    action test;
    test.account = "wasmtest"_n;
    test.name = account_name((uint64_t)index);
-   test.authorization = {{"wasmtest"_n, sysio::chain::config::active_name}};
+   test.authorization = {{"wasmtest"_n, config::active_name}};
 
    BOOST_CHECK_THROW(push_action(tester, std::move(test), "wasmtest"_n.to_uint64_t()), wasm_execution_error);
    tester.produce_block();
@@ -74,7 +74,7 @@ BOOST_DATA_TEST_CASE(traps_3_check_throw, boost::unit_test::data::xrange(0,14), 
    action test;
    test.account = "wasmtest"_n;
    test.name = account_name((uint64_t)index);
-   test.authorization = {{"wasmtest"_n, sysio::chain::config::active_name}};
+   test.authorization = {{"wasmtest"_n, config::active_name}};
 
    BOOST_CHECK_THROW(push_action(tester, std::move(test), "wasmtest"_n.to_uint64_t()), wasm_execution_error);
    tester.produce_block();

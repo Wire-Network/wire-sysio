@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_abi_serializer, T, payloadless_testers ) {
             ("authorization", fc::variants({
                fc::mutable_variant_object()
                   ("actor", name("payloadless"_n))
-                  ("permission", name(sysio::chain::config::active_name))
+                  ("permission", name(config::active_name))
             }))
             ("data", fc::mutable_variant_object()
             )

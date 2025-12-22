@@ -36,7 +36,7 @@ struct limitauth_tester: sysio_system_tester {
 
    action_result limitauthchg(permission_level pl, const name& account, const std::vector<name>& allow_perms, const std::vector<name>& disallow_perms) {
       return push_action(
-         sysio::chain::config::system_account_name, "limitauthchg"_n, pl,
+         config::system_account_name, "limitauthchg"_n, pl,
          mvo()("account", account)("allow_perms", allow_perms)("disallow_perms", disallow_perms));
    }
 
@@ -67,22 +67,22 @@ struct limitauth_tester: sysio_system_tester {
 
    action_result updateauth(permission_level pl, name account, name permission, name parent, authority auth) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "updateauth"_n, pl, account, permission, parent, auth);
+         config::system_account_name, "updateauth"_n, pl, account, permission, parent, auth);
    }
 
    action_result deleteauth(permission_level pl, name account, name permission) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "deleteauth"_n, pl, account, permission);
+         config::system_account_name, "deleteauth"_n, pl, account, permission);
    }
 
    action_result linkauth(permission_level pl, name account, name code, name type, name requirement) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "linkauth"_n, pl, account, code, type, requirement);
+         config::system_account_name, "linkauth"_n, pl, account, code, type, requirement);
    }
 
    action_result unlinkauth(permission_level pl, name account, name code, name type) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "unlinkauth"_n, pl, account, code, type);
+         config::system_account_name, "unlinkauth"_n, pl, account, code, type);
    }
 
    /////////////
@@ -90,22 +90,22 @@ struct limitauth_tester: sysio_system_tester {
 
    action_result updateauth(permission_level pl, name account, name permission, name parent, authority auth, name authorized_by) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "updateauth"_n, pl, account, permission, parent, auth, authorized_by);
+         config::system_account_name, "updateauth"_n, pl, account, permission, parent, auth, authorized_by);
    }
 
    action_result deleteauth(permission_level pl, name account, name permission, name authorized_by) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "deleteauth"_n, pl, account, permission, authorized_by);
+         config::system_account_name, "deleteauth"_n, pl, account, permission, authorized_by);
    }
 
    action_result linkauth(permission_level pl, name account, name code, name type, name requirement, name authorized_by) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "linkauth"_n, pl, account, code, type, requirement, authorized_by);
+         config::system_account_name, "linkauth"_n, pl, account, code, type, requirement, authorized_by);
    }
 
    action_result unlinkauth(permission_level pl, name account, name code, name type, name authorized_by) {
       return push_action_raw(
-         sysio::chain::config::system_account_name, "unlinkauth"_n, pl, account, code, type, authorized_by);
+         config::system_account_name, "unlinkauth"_n, pl, account, code, type, authorized_by);
    }
 }; // limitauth_tester
 

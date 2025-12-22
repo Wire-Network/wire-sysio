@@ -55,12 +55,12 @@ transaction_trace_ptr push_dummy(base_tester& t, account_name from, const string
    fc::variant pretty_trx = fc::mutable_variant_object()
       ("actions", fc::variants({
          fc::mutable_variant_object()
-            ("account", name(sysio::chain::config::system_account_name))
+            ("account", name(config::system_account_name))
             ("name", "reqauth")
             ("authorization", fc::variants({
                fc::mutable_variant_object()
                   ("actor", from)
-                  ("permission", name(sysio::chain::config::active_name))
+                  ("permission", name(config::active_name))
             }))
             ("data", fc::mutable_variant_object()
                ("from", from)
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
       trx_digests.emplace_back( a.digest() );
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
    // Re-sign the block
-   copy_b->producer_signature = t.get_private_key(sysio::chain::config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signature = t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
 
    std::promise<bool> block_start_promise;
    std::future<bool> block_start_future = block_start_promise.get_future();
@@ -257,7 +257,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_max_trx_cpu_extended_test, T, tes
    }
    t.execute_setup_policy( setup_policy::full );
    t.produce_block();
-   t.create_account( "pause"_n, sysio::chain::config::system_account_name, false, false, false, false );
+   t.create_account( "pause"_n, config::system_account_name, false, false, false, false );
    t.set_code( "pause"_n, test_contracts::test_api_wasm() );
    t.produce_block();
 

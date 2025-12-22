@@ -59,7 +59,7 @@ struct test_pause_action {
 template<uint64_t NAME>
 struct test_chain_action {
    static account_name get_account() {
-      return account_name(sysio::chain::config::system_account_name);
+      return account_name(config::system_account_name);
    }
 
    static action_name get_name() {
@@ -76,7 +76,7 @@ void push_trx(Tester& test, T ac, uint32_t billed_cpu_time_us , uint32_t max_cpu
    act.account = ac.get_account();
    act.name = ac.get_name();
    if ( trx_type != transaction_metadata::trx_type::read_only ) {
-      auto pl = vector<permission_level>{{account, sysio::chain::config::active_name}};
+      auto pl = vector<permission_level>{{account, config::active_name}};
       act.authorization = pl;
    }
    act.data = payload;
@@ -121,10 +121,10 @@ transaction_trace_ptr CallAction(testing::validating_tester& test, T ac, const v
    signed_transaction trx;
 
 
-   auto pl = vector<permission_level>{{scope[0], sysio::chain::config::active_name}};
+   auto pl = vector<permission_level>{{scope[0], config::active_name}};
    if (scope.size() > 1)
       for (size_t i = 1; i < scope.size(); i++)
-         pl.push_back({scope[i], sysio::chain::config::active_name});
+         pl.push_back({scope[i], config::active_name});
 
    action act(pl, ac);
    trx.actions.push_back(act);
@@ -144,14 +144,14 @@ std::pair<transaction_trace_ptr, signed_block_ptr> _CallFunction(Tester& test, T
    {
       signed_transaction trx;
 
-      auto pl = vector<permission_level>{{scope[0], sysio::chain::config::active_name}};
+      auto pl = vector<permission_level>{{scope[0], config::active_name}};
       if (scope.size() > 1)
          for (unsigned int i = 1; i < scope.size(); i++)
-            pl.push_back({scope[i], sysio::chain::config::active_name});
+            pl.push_back({scope[i], config::active_name});
 
       action act(pl, ac);
       act.data = data;
-      act.authorization = {{"testapi"_n, sysio::chain::config::active_name}};
+      act.authorization = {{"testapi"_n, config::active_name}};
       trx.actions.push_back(act);
 
       test.set_transaction_headers(trx, test.DEFAULT_EXPIRATION_DELTA);
@@ -178,7 +178,7 @@ transaction_trace_ptr CallFunction(Tester& test, T ac, const vector<char>& data,
 
 #define CALL_TEST_FUNCTION(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA)
 #define CALL_TEST_FUNCTION_WITH_BLOCK(_TESTER, CLS, MTH, DATA) _CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA)
-#define CALL_TEST_FUNCTION_SYSTEM(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_chain_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, {sysio::chain::config::system_account_name} )
+#define CALL_TEST_FUNCTION_SYSTEM(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_chain_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, {config::system_account_name} )
 #define CALL_TEST_FUNCTION_SCOPE(_TESTER, CLS, MTH, DATA, ACCOUNT) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, ACCOUNT)
 #define CALL_TEST_FUNCTION_NO_THROW(_TESTER, CLS, MTH, DATA) CallFunction(_TESTER, test_api_action<WASM_TEST_ACTION(CLS, MTH)>{}, DATA, {"testapi"_n}, true)
 #define CALL_TEST_FUNCTION_AND_CHECK_EXCEPTION(_TESTER, CLS, MTH, DATA, EXC, EXC_MESSAGE) \

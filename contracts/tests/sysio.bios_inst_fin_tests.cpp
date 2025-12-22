@@ -27,8 +27,8 @@ public:
       set_abi( "iftester"_n, contracts::bios_abi().data() );
 
       // instant finality actions are privileged
-      base_tester::push_action(sysio::chain::config::system_account_name, "setpriv"_n,
-                               sysio::chain::config::system_account_name,  mutable_variant_object()
+      base_tester::push_action(config::system_account_name, "setpriv"_n,
+                               config::system_account_name,  mutable_variant_object()
                                ("account", "iftester")
                                ("is_priv", 1)
       );
