@@ -43,12 +43,6 @@ uint64_t to_uint64(const std::string& i) {
    }
    FC_CAPTURE_AND_RETHROW((i))
 }
-bool all_digits(std::string_view s) {
-    return std::ranges::all_of(
-        s,
-        [](unsigned char c) { return std::isdigit(c); }
-    );
-}
 
 double to_double(const std::string& i) {
    try {
@@ -110,27 +104,26 @@ std::vector<std::string> split(const std::string& str, char delim, std::size_t m
    return out;
 }
 
-std::string to_lower(std::string s) {
+std::string to_lower(const std::string& s) {
+   std::string new_str = s;
    std::ranges::transform(
-      s, s.begin(),
+      new_str, new_str.begin(),
       [](unsigned char c) {
          return std::tolower(c);
       }
       );
-   return s;
+   return new_str;
 }
 
-
-
 bool all_digits(const std::string_view& s) {
-   return all_digits(std::string{s.data(),  s.size()});
-};
-
-bool all_digits(const std::string& s) {
    return std::ranges::all_of(
        s,
        [](unsigned char c) { return std::isdigit(c); }
    );
+};
+
+bool all_digits(const std::string& s) {
+   return all_digits(std::string_view{s.data(), s.size()});
 }
 
 } // namespace fc

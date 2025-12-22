@@ -12,20 +12,6 @@ namespace sysio {
 
 using namespace appbase;
 
-// TODO: @jglanz retrofit/refactor BLS support
-// //      ///               public_key   spec_type    spec_data
-// /// Note: spec_data is private_key if spec_type is KEY
-// static std::tuple<std::string, std::string, std::string> parse_signature_provider_spec(const std::string& spec);
-//
-//
-// using signature_provider_type = std::function<chain::signature_type(chain::digest_type)>;
-//
-// // @return empty optional for BLS specs
-// std::optional<std::pair<chain::public_key_type,signature_provider_type>> signature_provider_for_specification(const std::string& spec) const;
-// signature_provider_type signature_provider_for_private_key(const chain::private_key_type& priv) const;
-//
-// // @return empty optional for non-BLS specs
-// std::optional<std::pair<fc::crypto::bls::public_key, fc::crypto::bls::private_key>> bls_public_key_for_specification(const std::string& spec) const;
 
 /**
  * Plugin responsible for managing signature providers.
@@ -143,20 +129,6 @@ public:
 
    void register_default_signature_providers(
       const std::vector<fc::crypto::chain_key_type_t>& key_types);
-
-   // TODO: Implement using LUT
-   // template <fc::crypto::chain_kind_t TargetChain>
-   // void register_default_signature_providers() {
-   //    auto key_types_tuple = std::get<TargetChain>(fc::crypto::chain_key_types);
-   //    std::vector<fc::crypto::chain_key_type_t> key_types;
-   //    std::apply([&](auto... args) {
-   //       ([&](fc::crypto::chain_key_type_t key_type) {
-   //          key_types.push_back(key_type);
-   //       }(args), ...);
-   //    }, key_types_tuple);
-   //
-   //    register_default_signature_providers(key_types);
-   // }
 
 private:
    std::unique_ptr<class signature_provider_manager_plugin_impl> my;

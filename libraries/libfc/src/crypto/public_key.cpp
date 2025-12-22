@@ -3,33 +3,32 @@
 #include <fc/crypto/common.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
-#include <ranges>
 #include <fc/crypto/key_serdes.hpp>
+#include <ranges>
+
 
 namespace fc { namespace crypto {
    namespace {
+      struct recovery_visitor : fc::visitor<public_key::storage_type> {
+         recovery_visitor(const sha256& digest, bool check_canonical)
+         :_digest(digest)
+         ,_check_canonical(check_canonical)
+         {}
 
+         template<typename SignatureType>
+         public_key::storage_type operator()(const SignatureType& s) const {
+            return public_key::storage_type(s.recover(_digest, _check_canonical));
+         }
+
+         public_key::storage_type operator()(const bls::signature_shim& s) const {
+            FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS Signatures dont support recovery");
+         }
+
+         const sha256& _digest;
+         bool _check_canonical;
+      };
 
    }
-   struct recovery_visitor : fc::visitor<public_key::storage_type> {
-      recovery_visitor(const sha256& digest, bool check_canonical)
-      :_digest(digest)
-      ,_check_canonical(check_canonical)
-      {}
-
-      template<typename SignatureType>
-      public_key::storage_type operator()(const SignatureType& s) const {
-         return public_key::storage_type(s.recover(_digest, _check_canonical));
-      }
-
-      public_key::storage_type operator()(const bls::signature_shim& s) const {
-         FC_THROW_EXCEPTION(fc::exception, "BLS Signatures dont support recovery");
-         //return public_key::storage_type(s.recover(_digest, _check_canonical));
-      }
-
-      const sha256& _digest;
-      bool _check_canonical;
-   };
 
    public_key::public_key( const signature& c, const sha256& digest, bool check_canonical )
    :_storage(std::visit(recovery_visitor(digest, check_canonical), c._storage))
@@ -87,18 +86,11 @@ namespace fc { namespace crypto {
    std::string public_key::to_string(const fc::yield_function_t& yield) const
    {
       auto which = _storage.index();
-      std::string data_str;
-      // if (which == 3) {
-      //
-      // } else {
-      //    data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
-      // }
-      data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
+      std::string data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::public_key_prefix, 0>(yield), _storage);
       if (which == 0) {
          return std::string(fc::crypto::constants::public_key_legacy_prefix) + data_str;
-      } else {
-         return std::string(fc::crypto::constants::public_key_base_prefix) + "_" + data_str;
       }
+      return std::string(fc::crypto::constants::public_key_base_prefix) + "_" + data_str;
    }
 
    std::string public_key::to_native_string(const fc::yield_function_t& yield) const {
@@ -108,14 +100,14 @@ namespace fc { namespace crypto {
    }
    chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var) {
       if (std::holds_alternative<public_key>(pub_key_var)) {
-         auto pub_key = std::get<public_key>(pub_key_var);
+         auto& pub_key = std::get<public_key>(pub_key_var);
          if (!pub_key.valid())
             return chain_key_type_unknown;
 
          return get_public_key_type(pub_key.to_string({}));
       }
 
-      auto pub_key_str = std::get<std::string>(pub_key_var);
+      auto& pub_key_str = std::get<std::string>(pub_key_var);
       auto pub_key_len = pub_key_str.length();
       public_key pub_key(pub_key_str);
 
@@ -136,11 +128,6 @@ namespace fc { namespace crypto {
       }
 
       return chain_key_type_unknown;
-
-
-
-
-
    }
 
    std::ostream& operator<<(std::ostream& s, const public_key& k) {

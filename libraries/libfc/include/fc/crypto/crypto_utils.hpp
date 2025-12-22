@@ -3,13 +3,13 @@
 #include <fc/crypto/ripemd160.hpp>
 
 namespace fc::crypto {
-template<typename DataType>
-   struct checksum_data {
+template <typename DataType>
+struct checksum_data {
    checksum_data() {}
-   uint32_t     check = 0;
-   DataType     data;
+   uint32_t check = 0;
+   DataType data;
 
-   static auto calculate_checksum(const DataType& data, const char *prefix = nullptr) {
+   static auto calculate_checksum(const DataType& data, const char* prefix = nullptr) {
       auto encoder = ripemd160::encoder();
       raw::pack(encoder, data);
 

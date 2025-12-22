@@ -13,7 +13,7 @@ namespace fc { namespace crypto {
       }
 
       size_t operator()(const bls::signature_shim& sig) const {
-         return sig.serialize().size();
+         return sig.unwrapped().get_hash();
       }
 
       size_t operator()(const webauthn::signature& sig) const {

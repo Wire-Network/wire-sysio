@@ -86,7 +86,7 @@ private:
 /**
  * @brief Shim class for BLS public key operations
  */
-struct public_key_shim : public fc::crypto::shim<public_key_data> {
+struct public_key_shim : fc::crypto::shim<public_key_data> {
    using fc::crypto::shim<public_key_data>::shim;
 
    /** @brief Checks if the public key is valid */
@@ -99,7 +99,7 @@ struct public_key_shim : public fc::crypto::shim<public_key_data> {
 /**
  * @brief Shim class for BLS signature operations
  */
-struct signature_shim : public crypto::shim<compact_signature> {
+struct signature_shim : crypto::shim<compact_signature> {
    /** @brief Indicates if signature is recoverable */
    static constexpr bool is_recoverable = false;
    /** @brief Type alias for public key shim */
@@ -134,7 +134,7 @@ struct signature_shim : public crypto::shim<compact_signature> {
 /**
  * @brief Shim class for BLS private key operations
  */
-struct private_key_shim : public crypto::shim<private_key_secret> {
+struct private_key_shim : crypto::shim<private_key_secret> {
    using crypto::shim<private_key_secret>::shim;
    /** @brief Type alias for signature shim */
    using signature_type = signature_shim;
@@ -174,9 +174,7 @@ struct private_key_shim : public crypto::shim<private_key_secret> {
     * @return The generated shared secret
     * @throws fc::unsupported_exception BLS does not support shared secrets
     */
-   sha512 generate_shared_secret(const public_key_type& pub_key) const {
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS does not support shared secrets");
-   }
+   sha512 generate_shared_secret(const public_key_type& pub_key) const;
 
    /**
     * @brief Converts the private key to string format
@@ -214,7 +212,6 @@ void from_variant(const variant& var, crypto::bls::private_key& vo);
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT(fc::crypto::bls::private_key, (_sk))
 
-// FC_REFLECT_TYPENAME( fc::crypto::bls::private_key )
 FC_REFLECT_TYPENAME(fc::crypto::bls::public_key)
 
 FC_REFLECT_DERIVED(fc::crypto::bls::public_key_shim, (fc::crypto::shim<fc::crypto::bls::public_key_data>),

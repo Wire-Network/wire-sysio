@@ -169,5 +169,7 @@ FC_REFLECT(fc::log_level, (value))
 #define FC_LOG_MESSAGE( LOG_LEVEL, FORMAT, ... ) \
    fc::log_message( FC_LOG_CONTEXT(LOG_LEVEL), FORMAT, fc::mutable_variant_object()__VA_ARGS__ )
 
-#define FC_LOG_MESSAGE_FMT( LOG_LEVEL, FORMAT, ... ) \
-   fc::log_message( FC_LOG_CONTEXT(LOG_LEVEL), std::format(FORMAT, __VA_ARGS__) )
+
+#define FC_LOG_MESSAGE_FMT(LOG_LEVEL, FORMAT, ...) \
+  fc::log_message(FC_LOG_CONTEXT(LOG_LEVEL), \
+  std::format(FORMAT, __VA_ARGS__))

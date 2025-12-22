@@ -91,7 +91,7 @@ std::string test_tx_01_result = "02f84e827a690d8477359400847737208083018c80945fb
 BOOST_AUTO_TEST_SUITE(rlp_encoder)
 
 BOOST_AUTO_TEST_CASE(can_encode_list_of_strings) try {
-   for (auto [input,expected] : test_str_pairs) {
+   for (auto& [input,expected] : test_str_pairs) {
       auto actual     = rlp::encode_list({rlp::encode_string(input)});
       auto actual_hex = rlp::to_hex(actual, false);
       BOOST_CHECK_EQUAL(actual_hex, expected);

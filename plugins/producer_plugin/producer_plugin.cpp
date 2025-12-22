@@ -1373,21 +1373,9 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
          auto finalizer_candidate_sig_providers = sig_plug.query_providers(
            std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
 
-         // auto default_bls_key = crypto::bls::private_key(fc::sha256::hash(std::string("wire")).to_uint8_span());
-         // auto default_bls_key_shim = crypto::bls::private_key_shim{default_bls_key.get_secret()};
-         // auto default_priv_key = crypto::private_key{default_bls_key_shim};
-
          for (auto& candidate : finalizer_candidate_sig_providers) {
-
             SYS_ASSERT(candidate->private_key.has_value(), plugin_config_exception, "ALL BLS keys must be provided via command line arguments or config file.");
-            // if (irreversible_mode() && candidate->private_key && candidate->private_key.value() == default_priv_key) {
-            //    dlog("Ignoring default bls key for irreversible mode");
-            //    continue;
-            // }
-            // TODO: @jglanz replace below once `{to,from}_string` is implemented properly
-            crypto::bls::public_key bls_pub_key = candidate->public_key.get<crypto::bls::public_key_shim>().unwrapped();
-            auto bls_pub_key_str = bls_pub_key.to_string();
-            _finalizer_keys.insert({bls_pub_key_str, candidate});
+            _finalizer_keys.insert({candidate->public_key.to_native_string({}), candidate});
          }
          chain.set_node_finalizer_keys(_finalizer_keys);
       }
@@ -2864,7 +2852,8 @@ void producer_plugin_impl::produce_block() {
 
    producer_authority::for_each_key(auth, [&](const public_key_type& key) {
       const auto& iter = _signature_providers.find(key);
-      if (iter != _signature_providers.end()) {
+      if (iter->second->key_type == crypto::chain_key_type_wire && iter != _signature_providers.end()) {
+
          relevant_providers.emplace_back(iter->second);
       }
    });

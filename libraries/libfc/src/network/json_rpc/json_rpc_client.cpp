@@ -37,7 +37,7 @@ json_rpc_client json_rpc_client::create(const std::variant<std::string, fc::url>
       url = std::get<fc::url>(source);
    }
    FC_ASSERT(url.proto() == "http" || url.proto() == "https");
-   //return json_rpc_client(url.host().value(), std::to_string(url.port().value_or(80)), url.path().value());
+
    return json_rpc_client(url);
 }
 
@@ -52,7 +52,7 @@ variant json_rpc_client::call(const std::string& method, const fc::variant& para
    const auto id = _next_id++;
 
    mutable_variant_object obj;
-   obj("jsonrpc", "2.0")("method", std::string{method})("params", std::move(params))("id", id);
+   obj("jsonrpc", "2.0")("method", std::string{method})("params", params)("id", id);
 
    variant response = send_json(variant(obj));
 
@@ -99,7 +99,7 @@ variant json_rpc_client::call(const std::string& method, const fc::variant& para
             data = eo["data"];
          }
       }
-      throw json_rpc_error(code, msg, std::move(data));
+      throw json_rpc_error(code, msg, data);
    }
 
    if (!ro.contains("result")) {
@@ -127,7 +127,6 @@ fc::variant json_rpc_client::call_batch(const std::vector<fc::variant>& requests
       if (!o.contains("jsonrpc")) {
 
          o("jsonrpc", "2.0");
-         // req = variant(mvo);
       }
 
       if (!o.contains("method")) {
@@ -177,11 +176,6 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
       // ---------------- HTTPS ----------------
 
       beast::ssl_stream<beast::tcp_stream> stream(ioc, ctx);
-      // auto                                 stream_cleaner = gsl_lite::finally([&stream] {
-      //    stream.shutdown();
-      //    // stream.socket().shutdown(tcp::socket::shutdown_both);
-      // });
-
 
       // SNI required for most servers
       if (!SSL_set_tlsext_host_name(stream.native_handle(), host.c_str())) {

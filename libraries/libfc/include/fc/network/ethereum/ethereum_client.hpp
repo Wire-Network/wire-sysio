@@ -28,9 +28,9 @@ public:
    const ethereum_client_ptr client;
    ethereum_contract_client() = delete;
    ethereum_contract_client(const ethereum_client_ptr& client, const address_compat_type& contract_address_compat):
-contract_address(ethereum::to_address(contract_address_compat)),
-contract_address_hex(fc::to_hex(contract_address)),
-client(client) {};
+   contract_address(ethereum::to_address(contract_address_compat)),
+   contract_address_hex(fc::to_hex(contract_address)),
+   client(client) {};
 
    virtual ~ethereum_contract_client() = default;
 protected:

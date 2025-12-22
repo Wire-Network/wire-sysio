@@ -406,7 +406,6 @@ void my_finalizers_t::set_keys(const std::map<std::string, fc::crypto::signature
       auto bls_priv_key = fc::crypto::bls::private_key(sig_prov->private_key.value().get<fc::crypto::bls::private_key_shim>().serialize());
 
       finalizers.emplace(bls_public_key.to_string(), finalizer{
-         // TODO: @jglanz, make sure that this conversion works
          bls_priv_key, fsi});
    }
 

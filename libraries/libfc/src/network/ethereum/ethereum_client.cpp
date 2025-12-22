@@ -75,7 +75,7 @@ fc::uint256 ethereum_client::get_chain_id() {
 
    fc::variants params; // empty array
    _chain_id = to_uint256(execute("eth_chainId", params));
-   // FC_ASSERT(_chain_id.has_value());
+
    return _chain_id.value();
 }
 

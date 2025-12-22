@@ -4,77 +4,40 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(BOOST_COMPONENTS
-        system
-        container
-        process
-        filesystem
-        iostreams
-        date_time
-        thread
-        chrono
-        context
-        coroutine
-        program_options
-        interprocess
-        unit_test_framework
-        dll
+        accumulators
+        asio
+        assign
+        atomic
         beast
         bimap
-        multi_index
-        signals2
-        multiprecision
-        hana
-        property_tree
-        lockfree
-        assign
-        accumulators
-        rational
+        chrono
+        container
+        context
+        coroutine
+        date_time
+        dll
+        filesystem
         format
-        asio
+        hana
         headers
+        interprocess
+        iostreams
+        lockfree
+        multi_index
+        multiprecision
+        process
+        program_options
+        property_tree
+        rational
         regex
-        atomic
+        signals2
+        system
+        thread
+        unit_test_framework
 )
 foreach (COMPONENT ${BOOST_COMPONENTS})
-#    list(APPEND BOOST_COMPONENTS_REQUIRED ${COMPONENT})
     find_package(boost_${COMPONENT} ${BOOST_VERSION} EXACT CONFIG REQUIRED)
 endforeach()
-#find_package(boost_container ${BOOST_VERSION} CONFIG REQUIRED)
-#find_package(Boost ${BOOST_VERSION} CONFIG REQUIRED
-#        COMPONENTS
-#        system
-#        container
-#        process
-#
-#    filesystem
-#    iostreams
-#    date_time
-#    thread
-#    chrono
-#    context
-#    coroutine
-#    program_options
-#    interprocess
-#
-#    unit_test_framework
-#    dll
-#    beast
-#    bimap
-#    multi_index
-#    signals2
-#    multiprecision
-#    hana
-#    property_tree
-#    lockfree
-#    assign
-#    accumulators
-#    rational
-#    format
-#    asio
-#    headers
-#    regex
-#    atomic
-#)
 
 # Keep uBLAS shim if code links Boost::numeric_ublas
 if (NOT TARGET boost_numeric_ublas)

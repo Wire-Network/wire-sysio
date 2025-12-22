@@ -8,7 +8,6 @@ namespace sysio {
     class outpost_client_plugin : public appbase::plugin<outpost_client_plugin> {
     public:
 
-      // APPBASE_PLUGIN_REQUIRES((chain_plugin))
       APPBASE_PLUGIN_REQUIRES((signature_provider_manager_plugin))
       outpost_client_plugin() = default;
       virtual ~outpost_client_plugin() = default;
@@ -20,8 +19,7 @@ namespace sysio {
       virtual void plugin_startup();
 
       virtual void plugin_shutdown();
-    private:
-      // std::optional<boost::signals2::scoped_connection> _irreversible_block_connection{std::nullopt};
+
   };
 
 

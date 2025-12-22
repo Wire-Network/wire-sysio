@@ -16,8 +16,8 @@ using uint256_t = uint256;
 
 
 
-fc::uint256 to_uint256(fc::variant v);
-fc::int256 to_int256(fc::variant v);
+fc::uint256 to_uint256(const fc::variant& v);
+fc::int256 to_int256(const fc::variant& v);
 
 #if __cplusplus >= 202002L
 

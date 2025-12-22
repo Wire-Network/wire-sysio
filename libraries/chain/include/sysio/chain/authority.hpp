@@ -16,8 +16,8 @@ struct shared_public_key {
    public_key_type to_public_key() const {
       fc::crypto::public_key::storage_type public_key_storage;
       std::visit(overloaded {
-         [&](const auto& k1r1em) {
-            public_key_storage = k1r1em;
+         [&](const auto& pubkey_shim) {
+            public_key_storage = pubkey_shim;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());

@@ -189,7 +189,7 @@ std::string ethereum_contract_call_encode(const std::variant<ethereum_contract_a
    // Obtain ABI struct
    ethereum_contract_abi a{};
    if (std::holds_alternative<std::string>(abi)) {
-      auto sig = std::get<std::string>(abi);
+      auto& sig = std::get<std::string>(abi);
       a        = parse_ethereum_contract_abi_signature(sig);
    } else {
       a = std::get<ethereum_contract_abi>(abi);

@@ -3,9 +3,9 @@
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 
 namespace sysio {
-static auto _batch_operator_plugin = application::register_plugin<batch_operator_plugin>();
-
 namespace {
+[[maybe_unused]] auto _batch_operator_plugin = application::register_plugin<batch_operator_plugin>();
+
 inline fc::logger &logger() {
   static fc::logger log{"batch_operator_plugin"};
   return log;

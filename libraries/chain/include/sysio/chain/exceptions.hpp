@@ -13,6 +13,9 @@
 #define SYS_THROW( exc_type, FORMAT, ... ) \
     throw exc_type( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) );
 
+#define SYS_THROW_FMT( exc_type, FORMAT, ... ) \
+    throw exc_type( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) );
+
 /**
  * Macro inspired from FC_RETHROW_EXCEPTIONS
  * The main difference here is that if the exception caught isn't of type "sysio::chain::chain_exception"
@@ -441,6 +444,8 @@ namespace sysio { namespace chain {
                                     3100011, "Variable length component of signature too large" )
       FC_DECLARE_DERIVED_EXCEPTION( pending_impl_exception,      misc_exception,
                                     3100012, "Pending implementation" )
+      FC_DECLARE_DERIVED_EXCEPTION( not_supported_exception,      misc_exception,
+                                    3100012, "Not supported function/capability" )
 
 
    FC_DECLARE_DERIVED_EXCEPTION( plugin_exception, chain_exception,

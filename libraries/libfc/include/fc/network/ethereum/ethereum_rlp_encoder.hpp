@@ -66,35 +66,12 @@ bytes encode_length(std::size_t len, std::size_t offset);
 
 bytes encode_bytes(const address& data);
 bytes encode_bytes(bytes32& b);
-// bytes encode_bytes(std::span<std::uint8_t> data);
-// bytes encode_bytes(std::span<std::uint8_t>& data);
 bytes encode_bytes(const std::span<std::uint8_t>& data);
 bytes encode_bytes(const bytes32& b);
 bytes encode_bytes(const bytes& b);
 bytes encode_bytes(const std::uint8_t* data, std::size_t len);
 
 bytes encode_string(std::string& s);
-
-// Ethereum-style uint (0 => empty byte string => 0x80)
-
-// inline rlp_input_data encode_uint(fc::uint256 value) {
-//    if (value == 0) {
-//       bytes empty;
-//       return encode_bytes(empty);
-//    }
-//
-//    bytes buf;
-//    bool started = false;
-//    auto size = value.backend().size();
-//    for (int shift = (size - 8); shift >= 0; shift -= 8) {
-//       std::uint8_t byte = static_cast<std::uint8_t>((value >> shift) & 0xff);
-//       if (byte == 0 && !started) continue;
-//       started = true;
-//       buf.push_back(byte);
-//    }
-//
-//    return encode_bytes(buf);
-// }
 
 // Ethereum-style uint (0 => empty byte string => 0x80)
 template <typename T>

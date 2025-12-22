@@ -65,6 +65,7 @@ namespace fc { namespace ecc {
                      if ( this != &pk ) {
                              _key = std::move(pk._key);
                      }
+                     return *this;
                 }
 
         };
@@ -135,7 +136,7 @@ namespace fc { namespace ecc {
         FC_ASSERT( my->_key != empty_pub );
         return my->_key;
     }
-    // TODO:  @jglanz OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
+    // TODO: WIRE-233:OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
     //   `EC_KEY` curve related implementations, but I need to investigate.
     //   this should likely be swapped out the same way that I resolved `fc::em::public_key`
     //   support, via `libsecp256k1`
