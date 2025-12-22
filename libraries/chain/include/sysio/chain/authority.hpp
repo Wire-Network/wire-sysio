@@ -136,13 +136,10 @@ struct shared_key_weight {
 
    shared_key_weight(const key_weight& k) : key(fc::ecc::public_key_shim()), weight(k.weight) {
       std::visit(overloaded {
-         [&]<class T>(const T& k1r1) {
-            key.pubkey.emplace<T>(k1r1);
+         [&]<class T>(const T& shim) {
+            key.pubkey.emplace<T>(shim);
          },
-         [&](const fc::crypto::bls::public_key_shim& blsa) {
-            // TODO: @heifner, not sure how this is used? Is it needed for BLS support?
-            //key.pubkey.emplace<fc::crypto::bls::public_key_shim>(blsa.unwrapped());
-         },
+
          [&](const fc::crypto::webauthn::public_key& wa) {
             size_t psz = fc::raw::pack_size(wa);
             // create a shared_string in the pubkey that we will write (using pack) directly into.
