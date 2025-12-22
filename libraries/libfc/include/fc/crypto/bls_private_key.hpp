@@ -39,8 +39,7 @@ public:
     * @param seed Byte span containing the seed data
     */
    explicit private_key(std::span<const uint8_t> seed) {
-      auto key_data = bls12_381::secret_key(seed);
-      _sk = private_key_secret(reinterpret_cast<const char*>(key_data.data()), sizeof(key_data));
+      _sk = bls12_381::secret_key(seed);
    }
 
    /**
@@ -49,19 +48,8 @@ public:
     */
    explicit private_key(const std::string& base64urlstr);
 
-   private_key& operator=(const private_key& pk) {
-      if (this != &pk) {
-         _sk = pk._sk;
-      }
-      return *this;
-   }
-
-   private_key& operator=(private_key&& pk) {
-      if (this != &pk) {
-         _sk = std::move(pk._sk);
-      }
-      return *this;
-   }
+   private_key& operator=(const private_key& pk) = default;
+   private_key& operator=(private_key&& pk) noexcept = default;
 
    private_key_secret get_secret() const { return _sk; };
    std::string to_string() const;
