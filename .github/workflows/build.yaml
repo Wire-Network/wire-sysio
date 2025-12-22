@@ -54,6 +54,8 @@ jobs:
     name: Run Build Workflow
     uses: ./.github/workflows/build_base.yaml
     needs: [platform-cache]
+    secrets:
+      GH_TOKEN_DEV: ${{ secrets.GH_TOKEN_DEV }}
     with:
       platforms: ${{needs.platform-cache.outputs.platforms}}
       platform-list: ${{needs.platform-cache.outputs.platform-list}}
@@ -69,7 +71,7 @@ jobs:
       - name: Setup wire-cdt and wire-system-contracts versions
         id: versions
         env:
-          GH_TOKEN: ${{secrets.GH_TOKEN}}
+          GH_TOKEN_DEV: ${{secrets.GH_TOKEN_DEV}}
         run: |
           DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
           echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
@@ -146,6 +148,9 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
       options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio

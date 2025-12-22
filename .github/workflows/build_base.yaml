@@ -11,6 +11,9 @@ on:
         description: "Array of platforms"
         type: string
         required: true
+    secrets:
+      GH_TOKEN_DEV:
+        required: true
 
 permissions:
   packages: read
@@ -28,7 +31,11 @@ jobs:
       matrix:
         platform: ${{fromJSON(inputs.platform-list)}}
     runs-on: ["self-hosted", "enf-x86-beefy"]
-    container: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
+    container:
+      image: ${{ fromJSON(inputs.platforms)[matrix.platform].image }}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
     steps:
         - name: Force & debug DNS in job container
           run: |
