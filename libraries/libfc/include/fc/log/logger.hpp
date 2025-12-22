@@ -128,7 +128,7 @@ namespace fc
 
 #define elogf( FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::info ) ) \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::error ) ) \
       (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) ); \
   FC_MULTILINE_MACRO_END
 
