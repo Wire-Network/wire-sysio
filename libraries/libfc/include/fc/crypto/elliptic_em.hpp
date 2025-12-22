@@ -29,7 +29,7 @@ namespace fc {
 
     using public_key_data = fc::array<char,33>;
     using public_key_data_uncompressed = fc::array<char,65>;
-    using private_key_secret = fc::sha256;
+    using private_key_secret = std::array<uint64_t, 4>;
 
     using compact_signature = fc::array<unsigned char,65>;
 
@@ -105,17 +105,7 @@ namespace fc {
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
-           static private_key regenerate( const fc::sha256& secret );
-
-           private_key child( const fc::sha256& offset )const;
-
-           /**
-            *  This method of generation enables creating a new private key in a deterministic manner relative to
-            *  an initial seed.   A public_key created from the seed can be multiplied by the offset to calculate
-            *  the new public key without having to know the private key.
-            */
-           static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
-
+           static private_key regenerate( const private_key_secret& secret );
 
            /**
             * @brief
@@ -125,8 +115,6 @@ namespace fc {
            static private_key from_native_string( const std::string& priv_key_str );
 
            private_key_secret get_secret()const; // get the private key secret
-
-           explicit operator private_key_secret ()const { return get_secret(); }
 
            /**
             *  Given a public key, calculatse a 512 bit shared secret between that
@@ -233,7 +221,7 @@ namespace fc {
       template<typename Stream>
       void unpack( Stream& s, em::private_key& pk)
       {
-          fc::sha256 sec;
+          fc::em::private_key_secret sec;
           unpack( s, sec );
           pk = em::private_key::regenerate(sec);
       }

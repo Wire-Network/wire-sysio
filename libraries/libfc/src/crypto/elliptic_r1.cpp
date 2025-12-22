@@ -215,121 +215,14 @@ namespace fc { namespace crypto { namespace r1 {
         return(ok);
     }
 
-/*
-    public_key::public_key()
-    :my( new detail::public_key_impl() )
-    {
-    }
-
-    public_key::public_key( fc::bigint pub_x, fc::bigint pub_y )
-    :my( new detail::public_key_impl() )
-    {
-    }
-
-    public_key::~public_key()
-    {
-    }
-    */
-
-    public_key public_key::mult( const fc::sha256& digest )
-    {
-        // get point from this public key
-        const EC_POINT* master_pub   = EC_KEY_get0_public_key( my->_key );
-        ec_group group(EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1));
-
-        ssl_bignum z;
-        BN_bin2bn((unsigned char*)&digest, sizeof(digest), z);
-
-        // multiply by digest
-        ssl_bignum one;
-        BN_one(one);
-        bn_ctx ctx(BN_CTX_new());
-
-        ec_point result(EC_POINT_new(group));
-        EC_POINT_mul(group, result, z, master_pub, one, ctx);
-
-        public_key rtn;
-        rtn.my->_key = EC_KEY_new_by_curve_name( NID_X9_62_prime256v1 );
-        EC_KEY_set_public_key(rtn.my->_key,result);
-
-        return rtn;
-    }
     bool       public_key::valid()const
     {
       return my->_key != nullptr;
     }
-    public_key public_key::add( const fc::sha256& digest )const
-    {
-      try {
-        ec_group group(EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1));
-        bn_ctx ctx(BN_CTX_new());
 
-        fc::bigint digest_bi( (char*)&digest, sizeof(digest) );
+   private_key::private_key() = default;
 
-        ssl_bignum order;
-        EC_GROUP_get_order(group, order, ctx);
-        if( digest_bi > fc::bigint(order) )
-        {
-          FC_THROW_EXCEPTION( exception, "digest > group order" );
-        }
-
-
-        public_key digest_key = private_key::regenerate(digest).get_public_key();
-        const EC_POINT* digest_point   = EC_KEY_get0_public_key( digest_key.my->_key );
-
-        // get point from this public key
-        const EC_POINT* master_pub   = EC_KEY_get0_public_key( my->_key );
-
-        ssl_bignum z;
-        BN_bin2bn((unsigned char*)&digest, sizeof(digest), z);
-
-        // multiply by digest
-        ssl_bignum one;
-        BN_one(one);
-
-        ec_point result(EC_POINT_new(group));
-        EC_POINT_add(group, result, digest_point, master_pub, ctx);
-
-        if (EC_POINT_is_at_infinity(group, result))
-        {
-          FC_THROW_EXCEPTION( exception, "point at  infinity" );
-        }
-
-
-        public_key rtn;
-        rtn.my->_key = EC_KEY_new_by_curve_name( NID_X9_62_prime256v1 );
-        EC_KEY_set_public_key(rtn.my->_key,result);
-        return rtn;
-      } FC_RETHROW_EXCEPTIONS( debug, "digest: ${digest}", ("digest",digest) );
-    }
-
-    private_key::private_key()
-    {}
-
-    private_key private_key::generate_from_seed( const fc::sha256& seed, const fc::sha256& offset )
-    {
-        ssl_bignum z;
-        BN_bin2bn((unsigned char*)&offset, sizeof(offset), z);
-
-        ec_group group(EC_GROUP_new_by_curve_name(NID_X9_62_prime256v1));
-        bn_ctx ctx(BN_CTX_new());
-        ssl_bignum order;
-        EC_GROUP_get_order(group, order, ctx);
-
-        // secexp = (seed + z) % order
-        ssl_bignum secexp;
-        BN_bin2bn((unsigned char*)&seed, sizeof(seed), secexp);
-        BN_add(secexp, secexp, z);
-        BN_mod(secexp, secexp, order, ctx);
-
-        fc::sha256 secret;
-        FC_ASSERT(BN_num_bytes(secexp) <= int64_t(sizeof(secret)));
-        auto shift = sizeof(secret) - BN_num_bytes(secexp);
-        BN_bn2bin(secexp, ((unsigned char*)&secret)+shift);
-        return regenerate( secret );
-    }
-
-    private_key private_key::regenerate( const fc::sha256& secret )
+    private_key private_key::regenerate( const private_key_secret& secret )
     {
        private_key self;
        self.my->_key = EC_KEY_new_by_curve_name( NID_X9_62_prime256v1 );
@@ -345,14 +238,14 @@ namespace fc { namespace crypto { namespace r1 {
        return self;
     }
 
-    fc::sha256 private_key::get_secret()const
+    private_key_secret private_key::get_secret()const
     {
        if( !my->_key )
        {
-          return fc::sha256();
+          return {};
        }
 
-       fc::sha256 sec;
+       private_key_secret sec;
        const BIGNUM* bn = EC_KEY_get0_private_key(my->_key);
        if( bn == NULL )
        {
@@ -427,12 +320,8 @@ namespace fc { namespace crypto { namespace r1 {
        */
     }
 
-    public_key::public_key()
-    {
-    }
-    public_key::~public_key()
-    {
-    }
+    public_key::public_key() = default;
+    public_key::~public_key() = default;
     public_key::public_key( const public_key_point_data& dat )
     {
       const char* front = &dat.data[0];
@@ -513,7 +402,6 @@ namespace fc { namespace crypto { namespace r1 {
         {
             EC_KEY_set_conv_form( my->_key, POINT_CONVERSION_COMPRESSED );
             nV -= 4;
-//            fprintf( stderr, "compressed\n" );
         }
 
         if (ECDSA_SIG_recover_key_GFp(my->_key, sig, (unsigned char*)&digest, sizeof(digest), nV - 27, 0) == 1)
@@ -545,24 +433,12 @@ namespace fc { namespace crypto { namespace r1 {
      pk.my->_key = nullptr;
      return *this;
    }
-   public_key::public_key( const public_key& pk )
-   :my(pk.my)
-   {
-   }
-   public_key::public_key( public_key&& pk )
-   :my( std::move( pk.my) )
-   {
-   }
-   private_key::private_key( const private_key& pk )
-   :my(pk.my)
-   {
-   }
-   private_key::private_key( private_key&& pk )
-   :my( std::move( pk.my) )
-   {
-   }
+   public_key::public_key( const public_key& pk ) = default;
+   public_key::public_key( public_key&& pk ) noexcept = default;
+   private_key::private_key( const private_key& pk ) = default;
+   private_key::private_key( private_key&& pk ) noexcept = default;
 
-   public_key& public_key::operator=( public_key&& pk )
+   public_key& public_key::operator=( public_key&& pk ) noexcept
    {
      if( my->_key )
      {

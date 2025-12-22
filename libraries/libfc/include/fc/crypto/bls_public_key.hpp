@@ -53,7 +53,7 @@ namespace fc::crypto::bls {
       // affine non-montgomery base64url with bls_public_key_prefix
       std::string to_string() const;
 
-      const bls12_381::g1&            jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
+      const bls12_381::g1&    jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
       const public_key_data&  affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
 
       bool equal(const public_key& pkey) const {
