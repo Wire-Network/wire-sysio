@@ -9,7 +9,7 @@ namespace sysio {
 namespace {
 constexpr auto option_name_client     = "outpost-ethereum-client";
 
-inline fc::logger& logger() {
+[[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
    return log;
 }
