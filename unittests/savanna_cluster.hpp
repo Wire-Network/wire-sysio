@@ -574,7 +574,7 @@ namespace savanna_cluster {
       bool                 _debug_mode{false};
 
       static constexpr fc::microseconds _block_interval_us =
-         fc::milliseconds(sysio::chain::config::block_interval_ms);
+         fc::milliseconds(config::block_interval_ms);
 
    private:
       peers_t    _peers;

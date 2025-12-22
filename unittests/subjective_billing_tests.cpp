@@ -271,11 +271,11 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    account_name user = "user"_n;
    account_name other = "other"_n;
    chain.create_accounts( {acc, user} );
-   chain.create_account( other, sysio::chain::config::system_account_name, false, false, false, true );
+   chain.create_account( other, config::system_account_name, false, false, false, true );
    chain.set_contract(acc, test_contracts::asserter_wasm(), test_contracts::asserter_abi());
    auto b = chain.produce_block();
 
-   chain.push_action( sysio::chain::config::system_account_name, "setalimits"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()
+   chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
          ("account", other)
          ("ram_bytes", base_tester::newaccount_ram)
          ("net_weight", 0) // no NET
@@ -285,13 +285,13 @@ BOOST_AUTO_TEST_CASE( subjective_billing_integration_test ) {
    // assertdef_v values of 1 indicate it does not assert, 0 means it asserts
    auto create_trx = [&](auto trx_max_ms, std::array<signed char, 4> assertdef_v) {
       signed_transaction trx;
-      trx.actions.emplace_back( vector<permission_level>{{acc, sysio::chain::config::active_name}}, // paid by contract
+      trx.actions.emplace_back( vector<permission_level>{{acc, config::active_name}}, // paid by contract
                                 assertdef {assertdef_v[0], std::to_string(assertdef_v[0])} );
-      trx.actions.emplace_back( vector<permission_level>{{user, sysio::chain::config::active_name}}, // also paid by contract
+      trx.actions.emplace_back( vector<permission_level>{{user, config::active_name}}, // also paid by contract
                                 assertdef {assertdef_v[1], std::to_string(assertdef_v[1])} );
-      trx.actions.emplace_back( vector<permission_level>{{user, config::sysio_payer_name},{user, sysio::chain::config::active_name}}, // paid by user
+      trx.actions.emplace_back( vector<permission_level>{{user, config::sysio_payer_name},{user, config::active_name}}, // paid by user
                                 assertdef {assertdef_v[2], std::to_string(assertdef_v[2])} );
-      trx.actions.emplace_back( vector<permission_level>{{other, sysio::chain::config::active_name}}, // paid by contract
+      trx.actions.emplace_back( vector<permission_level>{{other, config::active_name}}, // paid by contract
                                 assertdef {assertdef_v[3], std::to_string(assertdef_v[3])} );
       static int num_secs = 1;
       chain.set_transaction_headers( trx, ++num_secs ); // num_secs provides nonce

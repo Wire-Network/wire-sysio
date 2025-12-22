@@ -14,7 +14,7 @@ namespace {
 
 // Calculate expected producer given the schedule and slot number
 inline account_name get_expected_producer(const vector<producer_authority>& schedule, block_timestamp_type t) {
-   const auto& index = (t.slot % (schedule.size() * sysio::chain::config::producer_repetitions)) / sysio::chain::config::producer_repetitions;
+   const auto& index = (t.slot % (schedule.size() * config::producer_repetitions)) / config::producer_repetitions;
    return schedule.at(index).producer_name;
 };
 
@@ -34,8 +34,8 @@ BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, vali
                BOOST_TEST(head().block_num() == expected_block_num);
 
             // verify sysio.prods updated
-            const name usr = sysio::chain::config::producers_account_name;
-            const name active_permission = sysio::chain::config::active_name;
+            const name usr = config::producers_account_name;
+            const name active_permission = config::active_name;
             const auto* perm = control->db().template find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
             for (auto account : perm->auth.accounts) {
                auto act = account.permission.actor;
@@ -132,7 +132,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
       for( const auto& e: schedule ) {
          schedule_variant.emplace_back(e.get_abi_variant());
       }
-      push_action( sysio::chain::config::system_account_name, "setprods"_n, sysio::chain::config::system_account_name,
+      push_action( config::system_account_name, "setprods"_n, config::system_account_name,
                   fc::mutable_variant_object()("schedule", schedule_variant), DEFAULT_EXPIRATION_DELTA + (++unique));
    };
 
@@ -173,7 +173,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
                                };
 
    // start a round of production
-   produce_blocks(sysio::chain::config::producer_repetitions-1, true);
+   produce_blocks(config::producer_repetitions-1, true);
 
    // sch1 cannot become active before one round of production
    BOOST_CHECK_EQUAL( 0u, control->active_producers().version );
@@ -198,13 +198,13 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    verify_block_finality_ext_producer(b, 3u, "alice"_n);
 
    // another round
-   produce_blocks(sysio::chain::config::producer_repetitions-2, true); // -2, already produced tow of the round above
+   produce_blocks(config::producer_repetitions-2, true); // -2, already produced tow of the round above
 
    // sch1  must become active no later than 2 rounds but sch2 cannot become active yet
    BOOST_CHECK_EQUAL( control->active_producers().version, 1u );
    BOOST_CHECK_EQUAL( true, compare_schedules( alice_sch, control->active_producers() ) );
 
-   produce_blocks(sysio::chain::config::producer_repetitions, true);
+   produce_blocks(config::producer_repetitions, true);
 
    // sch3 becomes active, version should be 3 even though sch2 was replaced by sch3
    BOOST_CHECK_EQUAL( 3u, control->active_producers().version );
@@ -222,13 +222,13 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    std::optional<proposer_policy_diff> policy_diff = std::get<finality_extension>(*ext).new_proposer_policy_diff;
    BOOST_TEST_REQUIRE(!policy_diff); // no diff
 
-   produce_blocks(sysio::chain::config::producer_repetitions-1, true);
-   produce_blocks(sysio::chain::config::producer_repetitions, true);
+   produce_blocks(config::producer_repetitions-1, true);
+   produce_blocks(config::producer_repetitions, true);
    BOOST_CHECK_EQUAL( 3u, control->active_producers().version ); // should be 3 as not different so no change
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_alice_sch, control->active_producers() ) );
 
    // test no change to proposed schedule, only the first one will take affect
-   for (size_t i = 0; i < sysio::chain::config::producer_repetitions*2-1; ++i) {
+   for (size_t i = 0; i < config::producer_repetitions*2-1; ++i) {
       BOOST_CHECK_EQUAL( 3u, control->active_producers().version ); // should be 3 as not taken affect yet
       BOOST_CHECK_EQUAL( true, compare_schedules( bob_alice_sch, control->active_producers() ) );
       set_producers( {"bob"_n,"carol"_n} );
@@ -252,8 +252,8 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers_force({"bob"_n,"carol"_n} );
    b = produce_block();
    verify_block_finality_ext_producer(b, 6u, "carol"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-2, true);
-   produce_blocks(sysio::chain::config::producer_repetitions, true);
+   produce_blocks(config::producer_repetitions-2, true);
+   produce_blocks(config::producer_repetitions, true);
    BOOST_CHECK_EQUAL( 6u, control->active_producers().version ); // should be 6 now as bob,carol now active
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
 
@@ -261,8 +261,8 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers( {"bob"_n,"alice"_n} );
    set_producers_force({"bob"_n,"carol"_n} ); // put back, no change expected
    produce_block();
-   produce_blocks(sysio::chain::config::producer_repetitions-1, true);
-   produce_blocks(sysio::chain::config::producer_repetitions, true);
+   produce_blocks(config::producer_repetitions-1, true);
+   produce_blocks(config::producer_repetitions, true);
    BOOST_CHECK_EQUAL( 6u, control->active_producers().version ); // should be 6 now as bob,carol is still active
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
 
@@ -278,7 +278,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    produce_block();
    set_producers({"alice"_n}); // A2, P1
    produce_block();
-   produce_blocks(sysio::chain::config::producer_repetitions-2, true); // A12
+   produce_blocks(config::producer_repetitions-2, true); // A12
    produce_block();
    set_producers({"bob"_n,"carol"_n}); // B2
    b = produce_block();
@@ -286,11 +286,11 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers({"bob"_n, "alice"_n} ); // P3
    b = produce_block();
    verify_block_finality_ext_producer(b, 9u, "alice"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-3, true); // B12
+   produce_blocks(config::producer_repetitions-3, true); // B12
    produce_block(); // C1
    BOOST_CHECK_EQUAL( 7u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( alice_sch, control->active_producers() ) );
-   produce_blocks(sysio::chain::config::producer_repetitions, true); // D1
+   produce_blocks(config::producer_repetitions, true); // D1
    BOOST_CHECK_EQUAL( 9u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_alice_sch, control->active_producers() ) );
 
@@ -307,7 +307,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers({"bob"_n,"carol"_n}); // A2, P1
    b = produce_block();
    verify_block_finality_ext_producer(b, 10u, "carol"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-2, true); // A12
+   produce_blocks(config::producer_repetitions-2, true); // A12
    produce_block();
    set_producers({"alice"_n}); // B2
    b = produce_block();
@@ -315,11 +315,11 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers({"bob"_n,"carol"_n}); // P3 == P1
    b = produce_block();
    verify_block_finality_ext_producer(b, 12u, "bob"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-3, true); // B12
+   produce_blocks(config::producer_repetitions-3, true); // B12
    produce_block(); // C1
    BOOST_CHECK_EQUAL( 10u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
-   produce_blocks(sysio::chain::config::producer_repetitions, true); // D1
+   produce_blocks(config::producer_repetitions, true); // D1
    BOOST_CHECK_EQUAL( 12u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
 
@@ -345,7 +345,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers({"bob"_n,"carol"_n});
    b = produce_block();
    verify_block_finality_ext_producer(b, 17u, "bob"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-7, true);
+   produce_blocks(config::producer_repetitions-7, true);
    set_producers({"bob"_n});
    produce_block(); // 2
    set_producers({"bob"_n,"carol"_n});
@@ -359,10 +359,10 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    set_producers({"bob"_n,"carol"_n});
    b = produce_block();
    verify_block_finality_ext_producer(b, 22u, "bob"_n);
-   produce_blocks(sysio::chain::config::producer_repetitions-6, true); // B12
+   produce_blocks(config::producer_repetitions-6, true); // B12
    BOOST_CHECK_EQUAL( 17u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
-   produce_blocks(sysio::chain::config::producer_repetitions, true);
+   produce_blocks(config::producer_repetitions, true);
    BOOST_CHECK_EQUAL( 22u, control->active_producers().version );
    BOOST_CHECK_EQUAL( true, compare_schedules( bob_carol_sch, control->active_producers() ) );
 
@@ -386,10 +386,10 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_misc_tests, validating_tester ) try {
       set_producers( {"bob"_n} );
 
       auto b = produce_block();
-      auto index = b->timestamp.slot % sysio::chain::config::producer_repetitions;
-      produce_blocks(sysio::chain::config::producer_repetitions - index - 1); // until the last block of round 1
+      auto index = b->timestamp.slot % config::producer_repetitions;
+      produce_blocks(config::producer_repetitions - index - 1); // until the last block of round 1
 
-      produce_blocks(sysio::chain::config::producer_repetitions); // round 2
+      produce_blocks(config::producer_repetitions); // round 2
 
       produce_block(); // round 3
       vector<producer_authority> sch = {
@@ -443,10 +443,10 @@ BOOST_FIXTURE_TEST_CASE( proposed_and_pending_in_same_round_test, validating_tes
 
    create_accounts( {"alice"_n, "bob"_n} );
    auto b = produce_block();
-   auto index = b->timestamp.slot % sysio::chain::config::producer_repetitions; // current index in current round
+   auto index = b->timestamp.slot % config::producer_repetitions; // current index in current round
    // if no rooms in current round for 2 blocks, produce until the last block
-   if (index >= sysio::chain::config::producer_repetitions - 2) {
-      produce_blocks(sysio::chain::config::producer_repetitions -1);
+   if (index >= config::producer_repetitions - 2) {
+      produce_blocks(config::producer_repetitions -1);
    }
 
    // round 1: propose 2 policies
@@ -454,11 +454,11 @@ BOOST_FIXTURE_TEST_CASE( proposed_and_pending_in_same_round_test, validating_tes
    produce_block();
    set_producers( {"bob"_n} );
    b = produce_block();
-   index = b->timestamp.slot % sysio::chain::config::producer_repetitions;
-   produce_blocks(sysio::chain::config::producer_repetitions - index - 1); // until the last block of round 1
+   index = b->timestamp.slot % config::producer_repetitions;
+   produce_blocks(config::producer_repetitions - index - 1); // until the last block of round 1
 
    // round 2
-   produce_blocks(sysio::chain::config::producer_repetitions - 1);
+   produce_blocks(config::producer_repetitions - 1);
    b = produce_block();
    BOOST_CHECK_EQUAL(b->producer, "sysio"_n); // producer still original `sysio`
 
@@ -484,13 +484,13 @@ BOOST_FIXTURE_TEST_CASE( proposed_and_pending_in_different_rounds_test, validati
 
    // round 1: propose alice policy
    set_producers( {"alice"_n} );
-   produce_blocks(sysio::chain::config::producer_repetitions); // into somewhere in round 2
+   produce_blocks(config::producer_repetitions); // into somewhere in round 2
 
    // round 2: propose bob policy
    set_producers( {"bob"_n} );
    auto b = produce_block();
-   auto index = b->timestamp.slot % sysio::chain::config::producer_repetitions;
-   produce_blocks(sysio::chain::config::producer_repetitions - index - 1); // until the last block of round 1
+   auto index = b->timestamp.slot % config::producer_repetitions;
+   produce_blocks(config::producer_repetitions - index - 1); // until the last block of round 1
 
    // round 3: the latest pending policy (alice) becomes active because it was already proposed
    // 2 rounds before.
@@ -505,7 +505,7 @@ BOOST_FIXTURE_TEST_CASE( proposed_and_pending_in_different_rounds_test, validati
    BOOST_CHECK_EQUAL(b->producer, "alice"_n);
    BOOST_CHECK_EQUAL(control->active_producers().version, 1u);
    BOOST_CHECK_EQUAL(compare_schedules(alice_sch, control->active_producers()), true);
-   produce_blocks(sysio::chain::config::producer_repetitions - 1); // until the last block of round 2
+   produce_blocks(config::producer_repetitions - 1); // until the last block of round 2
 
    // round 4: the latest proposed policy (bob) becomes active because it was already proposed
    // 2 rounds before.
@@ -529,7 +529,7 @@ BOOST_FIXTURE_TEST_CASE( large_gap_test, validating_tester ) try {
 
    // round 1
    set_producers( {"alice"_n} );
-   produce_blocks(sysio::chain::config::producer_repetitions); // make sure to next round
+   produce_blocks(config::producer_repetitions); // make sure to next round
 
    // round 2
    set_producers( {"bob"_n} );
@@ -557,16 +557,16 @@ BOOST_FIXTURE_TEST_CASE( policy_transition_corner_case_test, validating_tester )
    create_accounts( {"alice"_n} );
    set_producers( {"alice"_n} );
    auto b = produce_block();
-   auto index = b->timestamp.slot % sysio::chain::config::producer_repetitions; // current index in current round
-   produce_blocks(sysio::chain::config::producer_repetitions - index - 1); // to end of the round
+   auto index = b->timestamp.slot % config::producer_repetitions; // current index in current round
+   produce_blocks(config::producer_repetitions - index - 1); // to end of the round
 
    // In round 2, the block in the last time slot of the round is not present.
-   produce_blocks(sysio::chain::config::producer_repetitions - 1);
+   produce_blocks(config::producer_repetitions - 1);
 
    // In round 3, there exists at least one block.
-   // We need 2*sysio::chain::config::block_interval_ms: one to skip to the last block
+   // We need 2*config::block_interval_ms: one to skip to the last block
    // of round 2, and another to skip to the first block of round 3
-   const auto time_to_skip = fc::milliseconds(2*sysio::chain::config::block_interval_ms);
+   const auto time_to_skip = fc::milliseconds(2*config::block_interval_ms);
    b = produce_block(time_to_skip);
    
    vector<producer_authority> alice_sch = {

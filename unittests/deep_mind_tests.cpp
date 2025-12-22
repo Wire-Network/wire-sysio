@@ -89,7 +89,7 @@ BOOST_FIXTURE_TEST_CASE(deep_mind, deep_mind_tester)
 {
    // We have already transitioned into Savanna
    create_account( "alice"_n );
-   push_action(sysio::chain::config::system_account_name, "updateauth"_n, "alice"_n, fc::mutable_variant_object()
+   push_action(config::system_account_name, "updateauth"_n, "alice"_n, fc::mutable_variant_object()
                ("account", "alice")
                ("permission", "test1")
                ("parent", "active")

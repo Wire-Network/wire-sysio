@@ -1,4 +1,7 @@
 #include "sysio.bios.hpp"
+
+#include <cstring>
+
 #include <sysio/instant_finality.hpp>
 #include <unordered_set>
 
@@ -55,7 +58,7 @@ void bios::setfinalizer( const finalizer_policy& finalizer_policy ) {
       check(f.description.size() <= max_finalizer_description_size, "Finalizer description greater than max allowed size");
 
       // basic key format checks
-      check(f.public_key.substr(0, pk_prefix.length()) == pk_prefix, "public key shoud start with PUB_BLS");
+      check(f.public_key.substr(0, pk_prefix.length()) == pk_prefix, "public key should start with PUB_BLS");
       check(f.pop.substr(0, sig_prefix.length()) == sig_prefix, "proof of possession signature should start with SIG_BLS");
 
       // check overflow

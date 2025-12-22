@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE( activate_protocol_feature ) try {
    c.set_bios_contract();
    c.produce_block();
 
-   BOOST_CHECK_EXCEPTION( c.push_action( sysio::chain::config::system_account_name, "reqactivated"_n, sysio::chain::config::system_account_name,
+   BOOST_CHECK_EXCEPTION( c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name,
                                           mutable_variant_object()("feature_digest",  *d) ),
                            sysio_assert_message_exception,
                            sysio_assert_message_is( "protocol feature is not activated" )
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE( activate_protocol_feature ) try {
 
    BOOST_CHECK( c.control->is_builtin_activated( builtin_protocol_feature_t::reserved_first_protocol_feature ) );
 
-   c.push_action( sysio::chain::config::system_account_name, "reqactivated"_n, sysio::chain::config::system_account_name, mutable_variant_object()
+   c.push_action( config::system_account_name, "reqactivated"_n, config::system_account_name, mutable_variant_object()
       ("feature_digest",  *d )
    );
 
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE( double_preactivation ) try {
    auto d = pfm.get_builtin_digest( builtin_protocol_feature_t::reserved_first_protocol_feature );
    BOOST_REQUIRE( d );
 
-   c.push_action( sysio::chain::config::system_account_name, "activate"_n, sysio::chain::config::system_account_name,
+   c.push_action( config::system_account_name, "activate"_n, config::system_account_name,
                   fc::mutable_variant_object()("feature_digest", *d), 10 );
 
    std::string expected_error_msg("protocol feature with digest '");
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( double_preactivation ) try {
       expected_error_msg += "' is already pre-activated";
    }
 
-   BOOST_CHECK_EXCEPTION(  c.push_action( sysio::chain::config::system_account_name, "activate"_n, sysio::chain::config::system_account_name,
+   BOOST_CHECK_EXCEPTION(  c.push_action( config::system_account_name, "activate"_n, config::system_account_name,
                                           fc::mutable_variant_object()("feature_digest", *d), 20 ),
                            protocol_feature_exception,
                            fc_exception_message_is( expected_error_msg )
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE( only_link_to_existing_permission_test ) try {
 
    c.create_accounts( {"alice"_n, "bob"_n, "charlie"_n} );
 
-   c.push_action( sysio::chain::config::system_account_name, "updateauth"_n, "alice"_n, fc::mutable_variant_object()
+   c.push_action( config::system_account_name, "updateauth"_n, "alice"_n, fc::mutable_variant_object()
       ("account", "alice")
       ("permission", "test")
       ("parent", "active")
@@ -201,9 +201,9 @@ BOOST_AUTO_TEST_CASE( only_link_to_existing_permission_test ) try {
    c.produce_block();
 
    // Verify the correct behavior after ONLY_LINK_TO_EXISTING_PERMISSION activation.
-   BOOST_CHECK_EXCEPTION(  c.push_action( sysio::chain::config::system_account_name, "linkauth"_n, "charlie"_n, fc::mutable_variant_object()
+   BOOST_CHECK_EXCEPTION(  c.push_action( config::system_account_name, "linkauth"_n, "charlie"_n, fc::mutable_variant_object()
                               ("account", "charlie")
-                              ("code", name(sysio::chain::config::system_account_name))
+                              ("code", name(config::system_account_name))
                               ("type", "")
                               ("requirement", "test" )
                            ), permission_query_exception,
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
    chain.create_account(tester_account);
    chain.produce_block();
 
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", name(tester_account).to_string())
            ("permission", "first")
            ("parent", "active")
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
 
    auto validate_disallow = [&] (const char *code, const char *type) {
       BOOST_REQUIRE_EXCEPTION(
-         chain.push_action(sysio::chain::config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
+         chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
                ("account", name(tester_account).to_string())
                ("code", code)
                ("type", type)
@@ -354,7 +354,7 @@ BOOST_AUTO_TEST_CASE( fix_linkauth_restriction ) { try {
    chain.produce_block();
 
    auto validate_allowed = [&] (const char *code, const char *type) {
-     chain.push_action(sysio::chain::config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
+     chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
             ("account", name(tester_account).to_string())
             ("code", code)
             ("type", type)
@@ -428,13 +428,13 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    chain.create_account(tester_account2);
    chain.set_contract(tester_account, test_contracts::noop_wasm(), test_contracts::noop_abi());
 
-   chain.push_action(sysio::chain::config::system_account_name, "setalimits"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
       ("account", name(tester_account).to_string())
       ("ram_bytes", 20000)
       ("net_weight", 1000)
       ("cpu_weight", 1000));
 
-   chain.push_action(sysio::chain::config::system_account_name, "setalimits"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
       ("account", name(tester_account2).to_string())
       ("ram_bytes", 10000)
       ("net_weight", 1000)
@@ -446,8 +446,8 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
 
    {
       auto auths = vector<permission_level>{
-         {tester_account, sysio::chain::config::active_name},
-         {tester_account2, sysio::chain::config::active_name}
+         {tester_account, config::active_name},
+         {tester_account2, config::active_name}
       };
 
       signed_transaction trx;
@@ -482,8 +482,8 @@ BOOST_AUTO_TEST_CASE( only_bill_to_first_authorizer ) { try {
    {
       auto auths = vector<permission_level>{
             {tester_account2, config::sysio_payer_name},
-            {tester_account, sysio::chain::config::active_name},
-            {tester_account2, sysio::chain::config::active_name}
+            {tester_account, config::active_name},
+            {tester_account2, config::active_name}
       };
 
       signed_transaction trx;
@@ -525,7 +525,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    // Deploy contract that rejects all actions dispatched to it with the following exceptions:
    //   * sysio::setcode to set code on the sysio is allowed (unless the rejectall account exists)
    //   * sysio::newaccount is allowed only if it creates the rejectall account.
-   c.set_code( sysio::chain::config::system_account_name, test_contracts::reject_all_wasm() );
+   c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
    c.set_bios_contract();
 
@@ -539,7 +539,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
    c.set_code( tester1_account, test_contracts::noop_wasm() );
    c.produce_block();
 
-   c.set_code( sysio::chain::config::system_account_name, test_contracts::reject_all_wasm() );
+   c.set_code( config::system_account_name, test_contracts::reject_all_wasm() );
    c.produce_block();
 
    // After reject_all_wasm, deploying a contract causes setcode to be dispatched to the WASM on sysio,
@@ -559,7 +559,7 @@ BOOST_AUTO_TEST_CASE( forward_setcode_test ) { try {
 
    // It will now not be possible to deploy the reject_all contract to the sysio account,
    // because after it is set by the native function, it is called immediately after which will reject the transaction.
-   BOOST_REQUIRE_EXCEPTION( c.set_code( sysio::chain::config::system_account_name, test_contracts::reject_all_wasm() ),
+   BOOST_REQUIRE_EXCEPTION( c.set_code( config::system_account_name, test_contracts::reject_all_wasm() ),
                             sysio_assert_message_exception,
                             sysio_assert_message_is( "rejecting all actions" ) );
 
@@ -638,7 +638,7 @@ BOOST_AUTO_TEST_CASE(move_my_ram) {
       c.produce_block();
 
       wlog("Adding data using alice");
-      vector<permission_level> levels = vector<permission_level>{{alice_account, config::sysio_payer_name},{alice_account, sysio::chain::config::active_name}};
+      vector<permission_level> levels = vector<permission_level>{{alice_account, config::sysio_payer_name},{alice_account, config::active_name}};
       c.push_action(tester1_account, "setdata"_n, levels, mutable_variant_object()
                     ("len1", 10)
                     ("len2", 0)
@@ -756,14 +756,14 @@ BOOST_AUTO_TEST_CASE(steal_contract_ram) {
       signed_transaction trx;
       c.set_transaction_headers(trx);
       trx.actions.emplace_back( c.get_action( tester1_account, "setdata"_n,
-         vector<permission_level>{{bob_account, sysio::chain::config::active_name}},
+         vector<permission_level>{{bob_account, config::active_name}},
          mutable_variant_object()
            ("len1", 0)
            ("len2", 20)
            ("payer", tester1_account)
       ) );
       trx.actions.emplace_back( c.get_action( tester2_account, "setdata"_n,
-         vector<permission_level>{{bob_account, sysio::chain::config::active_name}},
+         vector<permission_level>{{bob_account, config::active_name}},
          mutable_variant_object()
            ("len1", 0)
            ("len2", 20)
@@ -821,7 +821,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    c.produce_block();
 
    // Basic setup
-   auto alice_payer = vector<permission_level>{{alice_account, config::sysio_payer_name}, {alice_account, sysio::chain::config::active_name}};
+   auto alice_payer = vector<permission_level>{{alice_account, config::sysio_payer_name}, {alice_account, config::active_name}};
    c.push_action( tester1_account, "setdata"_n, alice_payer, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -830,7 +830,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_with_roa_test ) { try {
    wlog("A");
 
    // Cannot bill more RAM to another account that has not authorized the action.
-   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, sysio::chain::config::active_name}};
+   auto bob_payer = vector<permission_level>{{bob_account, config::sysio_payer_name}, {bob_account, config::active_name}};
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_payer, mutable_variant_object()
          ("len1", 20)
@@ -1015,7 +1015,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    // Basic setup
    vector<permission_level> alice_auths;
    alice_auths.push_back( permission_level{alice_account, config::sysio_payer_name} );
-   alice_auths.push_back( permission_level{alice_account, sysio::chain::config::active_name} );
+   alice_auths.push_back( permission_level{alice_account, config::active_name} );
    c.push_action( tester1_account, "setdata"_n, alice_auths, mutable_variant_object()
       ("len1", 10)
       ("len2", 0)
@@ -1025,7 +1025,7 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
    // Cannot bill more RAM to another account that has not authorized the action.
    vector<permission_level> bob_auths;
    bob_auths.push_back( permission_level{bob_account, config::sysio_payer_name} );
-   bob_auths.push_back( permission_level{bob_account, sysio::chain::config::active_name} );
+   bob_auths.push_back( permission_level{bob_account, config::active_name} );
    BOOST_REQUIRE_EXCEPTION(
       c.push_action( tester1_account, "setdata"_n, bob_auths, mutable_variant_object()
          ("len1", 20)
@@ -1157,7 +1157,7 @@ BOOST_AUTO_TEST_CASE( webauthn_producer ) { try {
 
    vector<legacy::producer_key> waprodsched = {{"waprod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
 
-   c.push_action(sysio::chain::config::system_account_name, "setprodkeys"_n, sysio::chain::config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
+   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
@@ -1167,16 +1167,16 @@ BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
    c.set_transaction_headers(trx);
    authority auth = authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s));
 
-   trx.actions.emplace_back(vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+   trx.actions.emplace_back(vector<permission_level>{{config::system_account_name,config::active_name}},
                               newaccount{
-                                 .creator  = sysio::chain::config::system_account_name,
+                                 .creator  = config::system_account_name,
                                  .name     = "waaccount"_n,
                                  .owner    = auth,
                                  .active   = auth,
                               });
 
    c.set_transaction_headers(trx);
-   trx.sign(get_private_key(sysio::chain::config::system_account_name, "active"), c.control->get_chain_id());
+   trx.sign(get_private_key(config::system_account_name, "active"), c.control->get_chain_id());
 
    c.produce_block();
    c.push_transaction(trx);
@@ -1188,7 +1188,7 @@ BOOST_AUTO_TEST_CASE( webauthn_update_account_auth ) { try {
    c.create_account("billy"_n);
    c.produce_block();
 
-   c.set_authority("billy"_n, sysio::chain::config::active_name, authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)));
+   c.set_authority("billy"_n, config::active_name, authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)));
 } FC_LOG_AND_RETHROW() }
 
 /*
@@ -1233,7 +1233,7 @@ BOOST_AUTO_TEST_CASE( webauthn_recover_key ) { try {
    action act;
    act.account = "bob"_n;
    act.name = ""_n;
-   act.authorization = vector<permission_level>{{"bob"_n,sysio::chain::config::active_name}};
+   act.authorization = vector<permission_level>{{"bob"_n,config::active_name}};
    trx.actions.push_back(act);
 
    c.set_transaction_headers(trx);
@@ -1273,7 +1273,7 @@ BOOST_AUTO_TEST_CASE( webauthn_assert_recover_key ) { try {
    action act;
    act.account = "bob"_n;
    act.name = ""_n;
-   act.authorization = vector<permission_level>{{"bob"_n,sysio::chain::config::active_name}};
+   act.authorization = vector<permission_level>{{"bob"_n,config::active_name}};
    trx.actions.push_back(act);
 
    c.set_transaction_headers(trx);
@@ -1435,17 +1435,17 @@ BOOST_AUTO_TEST_CASE( get_parameters_packed_test ) { try {
    c.produce_block();
 
    // ensure get_parameters_packed resolves
-   c.set_code( sysio::chain::config::system_account_name, import_get_parameters_packed_wast );
+   c.set_code( config::system_account_name, import_get_parameters_packed_wast );
 
    // ensure get_parameters_packed can be called
    auto action_priv = action( {//vector of permission_level
-                                 { sysio::chain::config::system_account_name,
+                                 { config::system_account_name,
                                     permission_name("active") }
                               },
-                              sysio::chain::config::system_account_name,
+                              config::system_account_name,
                               action_name(),
                               {} );
-   BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_priv), sysio::chain::config::system_account_name.to_uint64_t()), c.success());
+   BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_priv), config::system_account_name.to_uint64_t()), c.success());
 
    c.produce_block();
 
@@ -1486,17 +1486,17 @@ BOOST_AUTO_TEST_CASE( set_parameters_packed_test ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
    // ensure set_parameters_packed resolves
-   c.set_code( sysio::chain::config::system_account_name, import_set_parameters_packed_wast );
+   c.set_code( config::system_account_name, import_set_parameters_packed_wast );
 
    // ensure set_parameters_packed can be called
    auto action_priv = action( {//vector of permission_level
-                                 { sysio::chain::config::system_account_name,
+                                 { config::system_account_name,
                                     permission_name("active") }
                               },
-                              sysio::chain::config::system_account_name,
+                              config::system_account_name,
                               action_name(),
                               {} );
-   BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_priv), sysio::chain::config::system_account_name.to_uint64_t()), c.success());
+   BOOST_REQUIRE_EQUAL(c.push_action(std::move(action_priv), config::system_account_name.to_uint64_t()), c.success());
 
    c.produce_block();
 
@@ -1543,7 +1543,7 @@ BOOST_AUTO_TEST_CASE(set_finalizers_test) { try {
 
    // ensure set_finalizers resolves, forward setcode enabled so will call automatically
    // if able to call then will get error on unpacking field `threshold`, top message of: 'read datastream of length 4 over by -3'
-   BOOST_CHECK_EXCEPTION( c.set_code( sysio::chain::config::system_account_name, import_set_finalizers_wast ),
+   BOOST_CHECK_EXCEPTION( c.set_code( config::system_account_name, import_set_finalizers_wast ),
                           fc::out_of_range_exception,
                           fc_exception_message_contains( "read datastream of length 4 over by -3" ) );
 

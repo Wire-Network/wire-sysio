@@ -40,7 +40,7 @@ struct read_only_trx_tester : validating_tester {
       push_transaction( trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, false, transaction_metadata::trx_type::read_only );
    }
 
-   auto send_db_api_transaction( action_name name, bytes data, const vector<permission_level>& auth={{"alice"_n, sysio::chain::config::active_name}}, transaction_metadata::trx_type type=transaction_metadata::trx_type::input, uint32_t delay_sec=0 ) {
+   auto send_db_api_transaction( action_name name, bytes data, const vector<permission_level>& auth={{"alice"_n, config::active_name}}, transaction_metadata::trx_type type=transaction_metadata::trx_type::input, uint32_t delay_sec=0 ) {
       action act;
       signed_transaction trx;
 
@@ -78,7 +78,7 @@ BOOST_FIXTURE_TEST_CASE(newaccount_test, read_only_trx_tester) { try {
    action act = {
       {},
       newaccount{
-         .creator  = sysio::chain::config::system_account_name,
+         .creator  = config::system_account_name,
          .name     = "alice"_n,
          .owner    = authority( get_public_key( "alice"_n, "owner" ) ),
          .active   = authority( get_public_key( "alice"_n, "active" ) )
@@ -118,7 +118,7 @@ BOOST_FIXTURE_TEST_CASE(updateauth_test, read_only_trx_tester) { try {
 
    auto auth = authority( get_public_key( "alice"_n, "test" ) );
    action act = {
-      vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      vector<permission_level>{{config::system_account_name,config::active_name}},
       updateauth {
          .account = "alice"_n, .permission = "active"_n, .parent = "owner"_n, .auth  = auth
       }
@@ -134,7 +134,7 @@ BOOST_FIXTURE_TEST_CASE(deleteauth_test, read_only_trx_tester) { try {
    name account = "alice"_n;
    name permission = "active"_n;
    action act = {
-      vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      vector<permission_level>{{config::system_account_name,config::active_name}},
       deleteauth { account, permission }
    };
 
@@ -149,7 +149,7 @@ BOOST_FIXTURE_TEST_CASE(linkauth_test, read_only_trx_tester) { try {
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
-      vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      vector<permission_level>{{config::system_account_name,config::active_name}},
       linkauth { account, code, type, requirement }
    };
 
@@ -163,7 +163,7 @@ BOOST_FIXTURE_TEST_CASE(unlinkauth_test, read_only_trx_tester) { try {
    name code = "sysio_token"_n;
    name type = "transfer"_n;
    action act = {
-      vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      vector<permission_level>{{config::system_account_name,config::active_name}},
       unlinkauth { account, code, type }
    };
 
@@ -210,7 +210,7 @@ BOOST_FIXTURE_TEST_CASE(auth_test, read_only_trx_tester) { try {
    set_up_test_contract();
 
    // verify read-only transaction does not allow authorizations.
-   BOOST_CHECK_THROW(send_db_api_transaction("getage"_n, getage_data, {{"alice"_n, sysio::chain::config::active_name}}, transaction_metadata::trx_type::read_only), transaction_exception);
+   BOOST_CHECK_THROW(send_db_api_transaction("getage"_n, getage_data, {{"alice"_n, config::active_name}}, transaction_metadata::trx_type::read_only), transaction_exception);
 } FC_LOG_AND_RETHROW() }
 
 BOOST_FIXTURE_TEST_CASE(delay_sec_test, read_only_trx_tester) { try {

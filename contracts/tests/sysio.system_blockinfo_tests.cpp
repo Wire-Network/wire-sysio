@@ -56,7 +56,7 @@ private:
    std::optional<sysio::chain::table_id_object::id_type> get_blockinfo_table_id() const
    {
       const auto* table_id_itr = control->db().find<sysio::chain::table_id_object, sysio::chain::by_code_scope_table>(
-         boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::name{0}, blockinfo_table_name));
+         boost::make_tuple(config::system_account_name, sysio::chain::name{0}, blockinfo_table_name));
 
       if (!table_id_itr) {
          // No blockinfo table exists.
@@ -130,13 +130,13 @@ public:
          result;
 
       signed_transaction trx;
-      trx.actions.emplace_back(std::vector<permission_level>{{sysio::chain::config::system_account_name, sysio::chain::config::active_name}},
+      trx.actions.emplace_back(std::vector<permission_level>{{config::system_account_name, config::active_name}},
                                blockinfo_tester_account_name, "call"_n,
                                fc::raw::pack(blockinfo_tester::input_type{std::move(request)}));
       trx.actions.emplace_back(std::vector<permission_level>{}, blockinfo_tester_account_name, "abort"_n,
                                std::vector<char>{});
       set_transaction_headers(trx);
-      trx.sign(get_private_key(sysio::chain::config::system_account_name, "active"), control->get_chain_id());
+      trx.sign(get_private_key(config::system_account_name, "active"), control->get_chain_id());
 
       result.second =
          push_transaction(trx, fc::time_point::maximum(), DEFAULT_BILLED_CPU_TIME_US, true); // no_throw set to true
@@ -278,7 +278,7 @@ try {
 
    produce_blocks(rolling_window_size - 1);
 
-   auto block_time_delta = fc::milliseconds(sysio::chain::config::block_interval_ms);
+   auto block_time_delta = fc::milliseconds(config::block_interval_ms);
 
    uint32_t cur_block_height    = start_block_height + 1;
    auto     cur_block_timestamp = start_block_timestamp + block_time_delta;
@@ -319,7 +319,7 @@ try {
    static_assert(5 <= rolling_window_size && rolling_window_size <= 100000);
 
    // Deploy the blockinfo_tester contract.
-   create_account(blockinfo_tester_account_name, sysio::chain::config::system_account_name );
+   create_account(blockinfo_tester_account_name, config::system_account_name );
    set_code(blockinfo_tester_account_name, test_contracts::blockinfo_tester_wasm());
 
    auto latest_block_batch_info = [this](uint32_t batch_start_height_offset,
@@ -376,7 +376,7 @@ try {
    BOOST_REQUIRE(8 < start_block_height); // Test assumes it is safe to subtract 8 from start_block_height.
 
    auto block_time_delta = [](unsigned int num_blocks) -> fc::microseconds {
-      return fc::milliseconds(static_cast<int64_t>(num_blocks) * sysio::chain::config::block_interval_ms);
+      return fc::milliseconds(static_cast<int64_t>(num_blocks) * config::block_interval_ms);
    };
 
    // Get block info of latest recorded block.

@@ -50,7 +50,7 @@ struct reqactivated {
 };
 
 inline private_key_type get_private_key( name keyname, string role ) {
-   if (keyname == sysio::chain::config::system_account_name)
+   if (keyname == config::system_account_name)
       return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")).to_uint64_array());
 
    return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role).to_uint64_array());
@@ -132,7 +132,7 @@ inline transaction_trace_ptr create_account(appbase::scoped_app& app, sysio::cha
    authority owner_auth{ get_public_key( a, "owner" ) };
    authority active_auth{ get_public_key( a, "active" ) };
 
-   trx.actions.emplace_back( vector<permission_level>{{creator,sysio::chain::config::active_name}},
+   trx.actions.emplace_back( vector<permission_level>{{creator,config::active_name}},
                              chain::newaccount{
                                 .creator  = creator,
                                 .name     = a,
@@ -177,7 +177,7 @@ inline void activate_protocol_features_set_bios_contract(appbase::scoped_app& ap
    // Wait for next block
    std::this_thread::sleep_for( std::chrono::milliseconds(config::block_interval_ms) );
 
-   auto r = set_code(app, chain_plug->chain(), sysio::chain::config::system_account_name, testing::contracts::sysio_bios_wasm());
+   auto r = set_code(app, chain_plug->chain(), config::system_account_name, testing::contracts::sysio_bios_wasm());
    BOOST_CHECK(!!r->receipt);
 }
 

@@ -42,7 +42,7 @@ struct dry_run_trx_tester : T {
       T::push_transaction( trx, fc::time_point::maximum(), T::DEFAULT_BILLED_CPU_TIME_US, false, transaction_metadata::trx_type::dry_run );
    }
 
-   auto send_db_api_transaction(action_name name, bytes data, const vector<permission_level>& auth={{"alice"_n, sysio::chain::config::active_name}},
+   auto send_db_api_transaction(action_name name, bytes data, const vector<permission_level>& auth={{"alice"_n, config::active_name}},
                                 transaction_metadata::trx_type type=transaction_metadata::trx_type::input, uint32_t delay_sec=0) {
       action act;
       signed_transaction trx;
@@ -83,9 +83,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( require_authorization, T, dry_run_trx_testers ) {
    chain.produce_block();
 
    action act = {
-      {}, // no authorization provided: vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      {}, // no authorization provided: vector<permission_level>{{config::system_account_name,config::active_name}},
       newaccount{
-       .creator  = sysio::chain::config::system_account_name,
+       .creator  = config::system_account_name,
        .name     = "alice"_n,
        .owner    = authority( chain.get_public_key( "alice"_n, "owner" ) ),
        .active   = authority( chain.get_public_key( "alice"_n, "active" ) )
@@ -109,9 +109,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( newaccount_test, T, dry_run_trx_testers ) { try {
    chain.produce_block();
 
    action act = {
-      vector<permission_level>{{sysio::chain::config::system_account_name,sysio::chain::config::active_name}},
+      vector<permission_level>{{config::system_account_name,config::active_name}},
       newaccount{
-         .creator  = sysio::chain::config::system_account_name,
+         .creator  = config::system_account_name,
          .name     = "alice"_n,
          .owner    = authority( chain.get_public_key( "alice"_n, "owner" ) ),
          .active   = authority( chain.get_public_key( "alice"_n, "active" ) )
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( setcode_test, T, dry_run_trx_testers ) { try {
 
    auto wasm = test_contracts::no_auth_table_wasm();
    action act = {
-      vector<permission_level>{{"setcodetest"_n,sysio::chain::config::active_name}},
+      vector<permission_level>{{"setcodetest"_n,config::active_name}},
       setcode{
          .account    = "setcodetest"_n,
          .vmtype     = 0,
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( setabi_test, T, dry_run_trx_testers ) { try {
 
    auto abi = test_contracts::no_auth_table_abi();
    action act = {
-      vector<permission_level>{{"setabitest"_n,sysio::chain::config::active_name}},
+      vector<permission_level>{{"setabitest"_n,config::active_name}},
       setabi {
          .account = "setabitest"_n, .abi = bytes(abi.begin(), abi.end())
       }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( updateauth_test, T, dry_run_trx_testers ) { try {
 
    auto auth = authority( chain.get_public_key( "alice"_n, "test" ) );
    action act = {
-      vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}},
+      vector<permission_level>{{"alice"_n, config::active_name}},
       updateauth {
          .account = "alice"_n, .permission = "active"_n, .parent = "owner"_n, .auth  = auth
       }
@@ -197,7 +197,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( deleteauth_test, T, dry_run_trx_testers ) { try {
    chain.create_accounts( {"alice"_n} );
 
    // update auth
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
            ("account", "alice")
            ("permission", "first")
            ("parent", "active")
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( deleteauth_test, T, dry_run_trx_testers ) { try {
    name account = "alice"_n;
    name permission = "first"_n;
    action act = {
-      vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}},
+      vector<permission_level>{{"alice"_n, config::active_name}},
       deleteauth { account, permission }
    };
 
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_test, T, dry_run_trx_testers ) { try {
    chain.produce_block();
 
    // update auth
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
            ("account", "alice")
            ("permission", "first")
            ("parent", "active")
@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_test, T, dry_run_trx_testers ) { try {
    name type = "transfer"_n;
    name requirement = "first"_n;
    action act = {
-      vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}},
+      vector<permission_level>{{"alice"_n, config::active_name}},
       linkauth { account, code, type, requirement }
    };
 
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( unlinkauth_test, T, dry_run_trx_testers ) { try {
    chain.create_accounts( {"alice"_n} );
 
    // update auth
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), "alice"_n, fc::mutable_variant_object()
            ("account", "alice")
            ("permission", "first")
            ("parent", "active")
@@ -268,7 +268,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( unlinkauth_test, T, dry_run_trx_testers ) { try {
    );
 
    // link auth
-   chain.push_action(sysio::chain::config::system_account_name, linkauth::get_name(), "alice"_n, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, linkauth::get_name(), "alice"_n, fc::mutable_variant_object()
            ("account", "alice")
            ("code", "sysio.token")
            ("type", "transfer")
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( unlinkauth_test, T, dry_run_trx_testers ) { try {
    name code = "sysio_token"_n;
    name type = "transfer"_n;
    action act = {
-      vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}},
+      vector<permission_level>{{"alice"_n, config::active_name}},
       unlinkauth { account, code, type }
    };
 
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( db_insert_test, T, dry_run_trx_testers ) { try {
    chain.set_up_test_contract();
 
    // verify DB operation is allowed by dry-run transaction
-   chain.send_db_api_transaction("insert"_n, chain.insert_data, vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}}, transaction_metadata::trx_type::dry_run);
+   chain.send_db_api_transaction("insert"_n, chain.insert_data, vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::dry_run);
 
    // verify the dry-run insert was rolled back, use a read-only trx to query
    BOOST_CHECK_EXCEPTION(chain.send_db_api_transaction("getage"_n, chain.getage_data, {}, transaction_metadata::trx_type::read_only), fc::exception,
@@ -312,7 +312,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( db_insert_test, T, dry_run_trx_testers ) { try {
    chain.insert_a_record();
 
    // do a dry-run transaction and verify the return value (age) is the same as inserted
-   auto res = chain.send_db_api_transaction("getage"_n, chain.getage_data, vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}}, transaction_metadata::trx_type::dry_run);
+   auto res = chain.send_db_api_transaction("getage"_n, chain.getage_data, vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::dry_run);
    BOOST_CHECK(!!res->receipt);
    BOOST_CHECK_EQUAL(res->action_traces[0].return_value[0], 10);
    BOOST_CHECK_GT(res->net_usage, 0u);
@@ -347,7 +347,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( sequence_numbers_test, T, dry_run_trx_testers ) {
    prev_recv_sequence = receiver_account.recv_sequence;
    prev_auth_sequence = amo.auth_sequence;
 
-   chain.send_db_api_transaction("getage"_n, chain.getage_data, vector<permission_level>{{"alice"_n, sysio::chain::config::active_name}}, transaction_metadata::trx_type::dry_run);
+   chain.send_db_api_transaction("getage"_n, chain.getage_data, vector<permission_level>{{"alice"_n, config::active_name}}, transaction_metadata::trx_type::dry_run);
 
    BOOST_CHECK_EQUAL( prev_global_action_sequence, p.global_action_sequence );
    BOOST_CHECK_EQUAL( prev_recv_sequence, receiver_account.recv_sequence );

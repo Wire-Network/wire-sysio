@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE(chain_tests)
 BOOST_AUTO_TEST_CASE( replace_producer_keys ) try {
    validating_tester tester;
 
-   const auto new_key = get_public_key(name("newkey"), sysio::chain::config::active_name.to_string());
+   const auto new_key = get_public_key(name("newkey"), config::active_name.to_string());
 
    // make sure new keys is not used
    for(const auto& prod : tester.control->active_producers().producers) {
@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE( replace_producer_keys ) try {
 
 BOOST_AUTO_TEST_CASE_TEMPLATE( replace_account_keys, T, validating_testers ) try {
    T tester;
-   const name usr = sysio::chain::config::system_account_name;
-   const name active_permission = sysio::chain::config::active_name;
+   const name usr = config::system_account_name;
+   const name active_permission = config::active_name;
    const auto& rlm = tester.control->get_resource_limits_manager();
    const auto* perm = tester.control->db().template find<permission_object, by_owner>(boost::make_tuple(usr, active_permission));
    BOOST_REQUIRE(perm != NULL);
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_over_limit, T, testers ) try {
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    sysio::chain::action act1(
-       std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
+       std::vector<sysio::chain::permission_level>{{"testapi"_n, config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
@@ -108,7 +108,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_under_limit, T, testers ) try {
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    sysio::chain::action act1(
-       std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
+       std::vector<sysio::chain::permission_level>{{"testapi"_n, config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());

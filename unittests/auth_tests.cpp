@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( missing_sigs, TESTER, validating_testers ) { try 
    chain.create_accounts( {"alice"_n} );
    chain.produce_block();
 
-   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, {} ), unsatisfied_authorization );
+   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, {} ), unsatisfied_authorization );
    auto trace = chain.push_reqauth("alice"_n, "owner");
 
    chain.produce_block();
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( missing_multi_sigs, TESTER, validating_testers ) 
     TESTER chain;
 
     chain.produce_block();
-    chain.create_account("alice"_n, sysio::chain::config::system_account_name, true);
+    chain.create_account("alice"_n, config::system_account_name, true);
     chain.produce_block();
 
     BOOST_REQUIRE_THROW(chain.push_reqauth("alice"_n, "owner"), unsatisfied_authorization); // without multisig
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( missing_auths, TESTER, validating_testers ) { try
    chain.produce_block();
 
    /// action not provided from authority
-   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, {permission_level{"bob"_n, sysio::chain::config::active_name}}, { chain.get_private_key("bob"_n, "active") } ), missing_auth_exception);
+   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, {permission_level{"bob"_n, config::active_name}}, { chain.get_private_key("bob"_n, "active") } ), missing_auth_exception);
 
 } FC_LOG_AND_RETHROW() } /// transfer_test
 
@@ -70,10 +70,10 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
 
    auto delegated_auth = authority( 1, {},
                           {
-                            { .permission = {"bob"_n,sysio::chain::config::active_name}, .weight = 1}
+                            { .permission = {"bob"_n,config::active_name}, .weight = 1}
                           });
 
-   auto original_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, sysio::chain::config::active_name}).auth.to_authority();
+   auto original_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((original_auth));
 
    int64_t ram; int64_t net; int64_t cpu;
@@ -86,24 +86,24 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
    wdump((ram_usage));
    BOOST_TEST(ram_usage < base_tester::newaccount_ram); // ram used to create account
 
-   chain.set_authority( "alice"_n, sysio::chain::config::active_name,  delegated_auth );
+   chain.set_authority( "alice"_n, config::active_name,  delegated_auth );
    int64_t ram_usage_after = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
    wdump((ram_usage_after));
    BOOST_TEST(ram_usage_after < ram_usage); // ram for delegated auth is less than a public key
 
-   auto new_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, sysio::chain::config::active_name}).auth.to_authority();
+   auto new_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((new_auth));
    BOOST_CHECK_EQUAL((new_auth == delegated_auth), true);
 
    chain.produce_block();
    chain.produce_block();
 
-   auto auth = chain.control->get_authorization_manager().get_permission({"alice"_n, sysio::chain::config::active_name}).auth.to_authority();
+   auto auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
    wdump((auth));
    BOOST_CHECK_EQUAL((new_auth == auth), true);
 
    /// execute nonce from alice signed by bob
-   auto trace = chain.push_reqauth("alice"_n, {permission_level{"alice"_n, sysio::chain::config::active_name}}, { chain.get_private_key("bob"_n, "active") } );
+   auto trace = chain.push_reqauth("alice"_n, {permission_level{"alice"_n, config::active_name}}, { chain.get_private_key("bob"_n, "active") } );
 
    chain.produce_block();
 
@@ -439,8 +439,8 @@ try {
    account_name acc2 = "bill2"_n;
    account_name acc1a = "bill1a"_n;
 
-   chain.create_account(acc1, sysio::chain::config::system_account_name, false, false, false, false);
-   chain.create_account(acc1a, sysio::chain::config::system_account_name, false, false, false, false);
+   chain.create_account(acc1, config::system_account_name, false, false, false, false);
+   chain.create_account(acc1a, config::system_account_name, false, false, false, false);
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1, 1844, 50, 50, false); // just enough ram
    chain.control->get_mutable_resource_limits_manager().set_account_limits(acc1a, 50, 50, 50, false);
    chain.set_code(acc1, vector<uint8_t>{});
@@ -515,7 +515,7 @@ try {
       signed_transaction trx;
       chain.set_transaction_headers(trx);
 
-      authority invalid_auth = authority(threshold, {key_weight{chain.get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, sysio::chain::config::active_name}, 1}});
+      authority invalid_auth = authority(threshold, {key_weight{chain.get_public_key( a, "owner" ), 1}}, {permission_level_weight{{creator, config::active_name}, 1}});
 
       vector<permission_level> pls;
       pls.push_back({creator, name("active")});
@@ -560,7 +560,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_special, TESTER, validating_testers ) { 
    chain.create_account("tester2"_n);
    chain.produce_block();
 
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
@@ -569,7 +569,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( linkauth_special, TESTER, validating_testers ) { 
 
    auto validate_disallow = [&] (const char *type) {
       BOOST_REQUIRE_EXCEPTION(
-         chain.push_action(sysio::chain::config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
+         chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
                ("account", "tester")
                ("code", "sysio")
                ("type", type)
@@ -608,7 +608,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
 
    // can't delete auth because it doesn't exist
    BOOST_REQUIRE_EXCEPTION(
-   trace = chain.push_action(sysio::chain::config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
+   trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first")),
    permission_query_exception,
@@ -618,7 +618,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
    });
 
    // update auth
-   chain.push_action(sysio::chain::config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, updateauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first")
            ("parent", "active")
@@ -626,7 +626,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
    );
 
    // link auth
-   chain.push_action(sysio::chain::config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
+   chain.push_action(config::system_account_name, linkauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("code", "sysio.token")
            ("type", "transfer")
@@ -662,7 +662,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
    BOOST_REQUIRE_EQUAL(asset::from_string("100.0000 CUR"), liquid_balance);
 
    trace = chain.push_action("sysio.token"_n, name("transfer"),
-      vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, sysio::chain::config::active_name}},
+      vector<permission_level>{{"tester"_n, config::sysio_payer_name},{"tester"_n, config::active_name}},
       fc::mutable_variant_object()
        ("from", "tester")
        ("to", "tester2")
@@ -679,7 +679,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
 
    // can't delete auth because it's linked
    BOOST_REQUIRE_EXCEPTION(
-   trace = chain.push_action(sysio::chain::config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
+   trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first")),
    action_validate_exception,
@@ -689,13 +689,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delete_auth, TESTER, validating_testers ) { try {
    });
 
    // unlink auth
-   trace = chain.push_action(sysio::chain::config::system_account_name, unlinkauth::get_name(), tester_account, fc::mutable_variant_object()
+   trace = chain.push_action(config::system_account_name, unlinkauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("code", "sysio.token")
            ("type", "transfer"));
 
    // delete auth
-   trace = chain.push_action(sysio::chain::config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
+   trace = chain.push_action(config::system_account_name, deleteauth::get_name(), tester_account, fc::mutable_variant_object()
            ("account", "tester")
            ("permission", "first"));
 
