@@ -25,7 +25,7 @@ struct rlp_visitor {
    }
 };
 }
-void append(bytes& out, std::vector<rlp_input_variant>& in_vars) {
+void append(bytes& out, const std::vector<rlp_input_variant>& in_vars) {
    rlp_visitor visitor{out};
    for (auto& in_var : in_vars) {
       std::visit(visitor, in_var);
@@ -76,15 +76,12 @@ bytes encode_bytes(const std::uint8_t* data, std::size_t len) {
 }
 
 bytes encode_bytes(const bytes& b) {
-   return encode_bytes(std::span<std::uint8_t>(const_cast<std::uint8_t *>(b.data()), b.size()));
+   return encode_bytes(const_cast<std::uint8_t *>(b.data()), b.size());
 }
 
-bytes encode_bytes(bytes32& b) {
-   return encode_bytes(std::span<std::uint8_t>(b.data(), b.size()));
-}
 
 bytes encode_bytes(const bytes32& b) {
-   return encode_bytes(const_cast<bytes32&>(b));
+   return encode_bytes(b.data(), b.size());
 }
 
 
@@ -93,11 +90,10 @@ bytes encode_bytes(const address& data) {
 }
 
 bytes encode_string(std::string& s) {
-   return encode_bytes(std::span<std::uint8_t>(
-      reinterpret_cast<std::uint8_t*>(s.data()), s.size()));
+   return encode_bytes(reinterpret_cast<std::uint8_t*>(s.data()), s.size());
 }
 
-bytes encode_list(std::vector<rlp_input_variant> items) {
+bytes encode_list(const std::vector<rlp_input_variant>& items) {
    bytes payload;
    append(payload, items);
 
