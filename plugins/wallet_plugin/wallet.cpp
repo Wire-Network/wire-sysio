@@ -110,7 +110,7 @@ public:
    string get_wallet_filename() const { return _wallet_filename; }
 
 
-   void set_key_name(string current_key_name, string new_key_name) {
+   void set_key_name(const string& current_key_name, const string& new_key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(_key_by_name.contains(current_key_name), key_nonexistent_exception,
                  "Key name provided does not exist: ${keyName}", ("keyName", current_key_name));
@@ -120,7 +120,7 @@ public:
 
    }
 
-   void set_key_name(private_key_type private_key, string key_name) {
+   void set_key_name(const private_key_type& private_key, const string& key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(!_key_by_name.contains(key_name), key_exist_exception,
                  "Key name provided already exists (keyName=${keyName})", ("keyName", key_name));
@@ -137,7 +137,7 @@ public:
 
    }
 
-   void set_key_name(public_key_type public_key, string key_name) {
+   void set_key_name(const public_key_type& public_key, const string& key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(!_key_by_name.contains(key_name), key_exist_exception,
                  "Key name provided already exists (keyName=${keyName})", ("keyName", key_name));
@@ -152,7 +152,7 @@ public:
       _key_by_name[key_name] = public_key;
    }
 
-   string generate_key_name(string prefix = "", string suffix = "") {
+   string generate_key_name(const string& prefix = "", const string& suffix = "") {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to generate unique key name on a locked wallet");
       for (uint32_t i = 0; i < max_generate_attempts; ++i) {
          std::string attempt = std::format("my-key-{}", i);
@@ -191,7 +191,7 @@ public:
       return it->second.sign(digest);
    }
 
-   private_key_type get_private_key(string key_name) const {
+   private_key_type get_private_key(const string& key_name) const {
       auto has_key = try_get_private_key(key_name);
       SYS_ASSERT(has_key, chain::key_nonexistent_exception, "Key doesn't exist!");
       return *has_key;
@@ -203,27 +203,23 @@ public:
       return *has_key;
    }
 
-   bool import_key(string key_name, string wif_key) {
+   bool import_key(const string& key_name, const string& wif_key) {
       private_key_type              priv(wif_key);
       sysio::chain::public_key_type wif_pub_key = priv.get_public_key();
 
       SYS_ASSERT(!_keys.contains(wif_pub_key), chain::key_exist_exception, "Key already in wallet (pubKey=${pubKey})", ("pubKey", wif_pub_key));
       SYS_ASSERT(!_key_by_name.contains(key_name), chain::key_exist_exception, "Key already in wallet (keyName=${keyName})", ("keyName", key_name));
 
-
       _keys[wif_pub_key] = priv;
       _key_by_name[key_name] = wif_pub_key;
          return true;
-
-
-
    }
 
    // imports the private key into the wallet, and associate it in some way (?) with the
    // given account name.
    // @returns true if the key matches a current active/owner/memo key for the named
    //          account, false otherwise (but it is stored either way)
-   bool import_key(string wif_key) {
+   bool import_key(const string& wif_key) {
       return import_key(
          generate_key_name(),
          wif_key);
@@ -232,7 +228,7 @@ public:
    // Removes a key from the wallet (matching `key_name`)
    // @returns true if the key matches a current active/owner/memo key for the named
    //          account, false otherwise (but it is removed either way)
-   bool remove_key(string key_name) {
+   bool remove_key(const string& key_name) {
 
 
       auto count = std::erase_if(_key_by_name, [&](const auto& pair) {
@@ -251,7 +247,7 @@ public:
    // Removes a key from the wallet (matching `pub`)
    // @returns true if the key matches a current active/owner/memo key for the named
    //          account, false otherwise (but it is removed either way)
-   bool remove_key(public_key_type pub) {
+   bool remove_key(const public_key_type& pub) {
       std::erase_if(_key_by_name, [&](const auto& pair) {
          return pair.second == pub;
       });
@@ -264,7 +260,7 @@ public:
       SYS_THROW(chain::key_nonexistent_exception, "Key not in wallet");
    }
 
-   string create_key(string key_name, string key_type) {
+   string create_key(const string& key_name, string key_type) {
       if (key_type.empty())
          key_type = _default_key_type;
 
@@ -281,7 +277,7 @@ public:
       return priv_key.get_public_key().to_string({});
    }
 
-   string create_key(string key_type) {
+   string create_key(const string& key_type) {
       return create_key(generate_key_name(), key_type);
    }
 
@@ -468,22 +464,6 @@ void soft_wallet::unlock(string password) {
       auto         pw        = fc::sha512::hash(password.c_str(), password.size());
       vector<char> decrypted = fc::aes_decrypt(pw, my->_wallet.cipher_keys);
       switch (my->_wallet.version) {
-      case 0: {
-         auto pk = fc::raw::unpack<plain_keys_v0>(decrypted);
-         FC_ASSERT(pk.checksum == pw);
-         my->_keys     = std::move(pk.keys);
-         my->_checksum = pk.checksum;
-         my->_key_by_name.clear();
-
-         for (auto& pubkey : views::keys(my->_keys)) {
-            auto key_name              = generate_key_name();
-            my->_key_by_name[key_name] = pubkey;
-         }
-
-         my->_wallet.version = 1;
-         save_wallet_file();
-         return;
-      }
       case 1: {
          auto pk = fc::raw::unpack<plain_keys_v1>(decrypted);
          FC_ASSERT(pk.checksum == pw);
@@ -493,7 +473,7 @@ void soft_wallet::unlock(string password) {
          return;
       }
       default: {
-         FC_ASSERT(false, "Unknown wallet version");
+         FC_ASSERT(false, "Only new V1 of soft wallet is usable (version=${version}) is unsupported", ("version",my->_wallet.version));
       }
       }
 

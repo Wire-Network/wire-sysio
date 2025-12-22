@@ -104,8 +104,6 @@ BOOST_AUTO_TEST_CASE(test_em_recovery) try {
    BOOST_TEST(fc::em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
 
    auto recovered_pub = public_key(em::public_key_shim(sig.get<em::signature_shim>().recover_ex(payload, true)));
-   // TODO: @jglanz Debug in detail - above works, but using the facade doesn't
-   //   auto recovered_pub = fc::crypto::public_key(sig, digest);
 
    BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
    BOOST_CHECK_EQUAL(sig_str, fc::crypto::signature(sig_str).to_string({}));

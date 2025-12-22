@@ -125,15 +125,12 @@ class sha256 : public add_packhash_to_hash<sha256>
 
     uint64_t _hash[uint64_size];
 };
-  // TODO: @jglanz confirm that the general purpose
-  //   int256/uint256 introduced in `int256.hpp` works in place of this
-  // typedef sha256 uint256;
 
-  class variant;
-  void to_variant( const sha256& bi, variant& v );
-  void from_variant( const variant& v, sha256& bi );
+class variant;
+void to_variant( const sha256& bi, variant& v );
+void from_variant( const variant& v, sha256& bi );
 
-  uint64_t hash64(const char* buf, size_t len);    
+uint64_t hash64(const char* buf, size_t len);
 
 } // fc
 

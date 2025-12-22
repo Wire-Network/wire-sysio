@@ -77,6 +77,7 @@ namespace fc::crypto::bls {
          return ds;
       }
 
+      size_t get_hash() const;
       static bls12_381::g2 to_jacobian_montgomery_le(const bls::signature_data::std_array_type& affine_non_montgomery_le);
    private:
       bls::signature_data::std_array_type _affine_non_montgomery_le{};

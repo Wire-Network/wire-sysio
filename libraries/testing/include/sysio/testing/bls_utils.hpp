@@ -17,10 +17,10 @@ inline std::pair<fc::crypto::bls::private_key, fc::crypto::signature_provider_pt
    if (std::holds_alternative<fc::crypto::bls::private_key>(key_input_data)) {
       privkey = std::get<fc::crypto::bls::private_key>(key_input_data);
    } else if (std::holds_alternative<std::string>(key_input_data)) {
-      auto privkey_str = std::get<std::string>(key_input_data);
+      auto& privkey_str = std::get<std::string>(key_input_data);
       privkey = fc::crypto::bls::private_key(privkey_str);
    } else {
-      auto key_input_name = std::get<sysio::chain::name>(key_input_data);
+      auto& key_input_name = std::get<sysio::chain::name>(key_input_data);
       key_name = key_input_name.to_string();
       auto secret = fc::sha256::hash(key_name);
       std::vector<uint8_t> seed(secret.data_size());
