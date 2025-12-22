@@ -455,12 +455,14 @@ fc::int256 fc::variant::as_int256()const
       return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
       return fc::int256(as_string());
+   case string_type:
+      return fc::int256(as_string());
    case bool_type:
       return int256(*reinterpret_cast<const bool*>(this));
    case null_type:
       return 0;
    default:
-      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to int64", ("type", get_type()) );
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to int256", ("type", get_type()) );
    }
 }
 
@@ -476,12 +478,14 @@ fc::uint256 fc::variant::as_uint256()const
       return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
    case uint256_type:
       return fc::uint256(as_string());
+   case string_type:
+      return fc::uint256(as_string());
    case bool_type:
       return uint256(*reinterpret_cast<const bool*>(this));
    case null_type:
       return 0;
    default:
-      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint64", ("type",get_type()));
+      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint256", ("type",get_type()));
    }
 } FC_CAPTURE_AND_RETHROW( (*this) ) }
 

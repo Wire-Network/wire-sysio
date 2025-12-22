@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
    auto fixture_priv_key_bytes = fc::from_hex(fc::crypto::ethereum::trim(fixture.private_key));
 
    auto em_priv_key = fc::em::private_key::regenerate(
-      fc::sha256(reinterpret_cast<const char*>(fixture_priv_key_bytes.data()), fixture_priv_key_bytes.size()));
+      fc::sha256(reinterpret_cast<const char*>(fixture_priv_key_bytes.data()), fixture_priv_key_bytes.size()).to_uint64_array());
 
    auto em_sig_data = em_priv_key.sign_compact_ex(fixture.payload, false);
    auto em_sig      = fc::to_hex(reinterpret_cast<const char*>(em_sig_data.data), em_sig_data.size());
