@@ -14,7 +14,7 @@ namespace fc::crypto::bls {
    constexpr std::size_t signature_data_size = 192;
 
    using public_key_data = fc::array<std::uint8_t,public_key_data_size>;
-   using private_key_secret = fc::sha256;
+   using private_key_secret = std::array<uint64_t, 4>;
 
    using signature_data = fc::array<std::uint8_t,signature_data_size>;
    using compact_signature_data = signature_data;
