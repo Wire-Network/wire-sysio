@@ -81,8 +81,7 @@ struct to_native_string_from_private_key_visitor : public fc::visitor<std::strin
       : _yield(yield) {};
 
    std::string operator()(const em::private_key_shim& em_priv_key) const {
-      auto em_bytes = em_priv_key.serialize().to_uint8_array() | std::ranges::to<std::vector<std::uint8_t>>();
-      return to_hex(em_bytes, true);
+      return to_hex(em_priv_key.serialize(), true);
    }
 
    std::string operator()(const bls::private_key_shim& bls_priv_key_shim) const {

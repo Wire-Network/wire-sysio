@@ -53,4 +53,10 @@ constexpr auto find_mapped_type() {
    }
 }
 
+template<typename T, size_t N>
+requires (std::is_fundamental_v<T>)
+constexpr size_t data_size( const std::array<T,N>& ) {
+   return sizeof(T) * N;
+}
+
 } // namespace fc

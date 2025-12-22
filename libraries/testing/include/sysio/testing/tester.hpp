@@ -122,7 +122,7 @@ namespace sysio::testing {
          webauthn_private_key(webauthn_private_key&&) = default;
          webauthn_private_key(const webauthn_private_key&) = default;
 
-         static auto regenerate(const fc::sha256& secret) {
+         static auto regenerate(const r1::private_key_secret& secret) {
             return webauthn_private_key(r1::private_key::regenerate(secret));
          }
 
@@ -389,9 +389,9 @@ namespace sysio::testing {
          static auto get_private_key( name keyname, string role = "owner" ) {
             auto secret = fc::sha256::hash(keyname.to_string() + role);
             if constexpr (std::is_same_v<KeyType, mock::webauthn_private_key>) {
-               return mock::webauthn_private_key::regenerate(secret);
+               return mock::webauthn_private_key::regenerate(secret.to_uint64_array());
             } else {
-               return private_key_type::regenerate<KeyType>(secret);
+               return private_key_type::regenerate<KeyType>(secret.to_uint64_array());
             }
          }
 

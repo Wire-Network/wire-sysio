@@ -34,13 +34,6 @@ namespace sysio::wallet::detail {
  */
 constexpr std::uint32_t max_generate_attempts = 1000;
 
-private_key_type derive_private_key(const std::string& prefix_string,
-                                    int                sequence_number) {
-   std::string sequence_string = std::to_string(sequence_number);
-   fc::sha512  h               = fc::sha512::hash(prefix_string + " " + sequence_string);
-   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(h));
-}
-
 class soft_wallet_impl {
 private:
    void enable_umask_protection() {
