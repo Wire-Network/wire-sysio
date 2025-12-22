@@ -6,7 +6,7 @@ namespace sysio {
   static auto _outpost_solana_client_plugin = application::register_plugin<outpost_solana_client_plugin>();
 
   namespace {
-    inline fc::logger& logger() {
+    [[maybe_unused]] inline fc::logger& logger() {
       static fc::logger log{ "outpost_solana_client_plugin" };
       return log;
     }
