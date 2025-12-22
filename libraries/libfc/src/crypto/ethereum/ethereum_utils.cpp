@@ -1,7 +1,10 @@
 #include <fc/crypto/hex.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 
+#include <fc-lite/traits.hpp>
+
 #include <ethash/keccak.hpp>
+#include <algorithm>
 
 namespace fc::crypto::ethereum {
 
@@ -184,8 +187,11 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
 
 fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    auto privkey_bytes = fc::from_hex(fc::crypto::ethereum::trim(privkey_hex));
-   auto privkey_data  = fc::sha256(reinterpret_cast<const char*>(privkey_bytes.data()), privkey_bytes.size());
-   return fc::em::private_key::regenerate(privkey_data);
+   em::private_key_secret sk{};
+   FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected ${e}, received ${r}",
+             ("s", fc::data_size(sk))("r", privkey_bytes.size()));
+   std::copy_n(privkey_bytes.data(), privkey_bytes.size(), sk.data());
+   return fc::em::private_key::regenerate(sk);
 }
 
 fc::em::compact_signature to_em_signature(const std::string& signature_hex) {

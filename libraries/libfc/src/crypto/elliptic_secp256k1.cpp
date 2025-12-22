@@ -9,6 +9,8 @@
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 
+#include <fc-lite/traits.hpp>
+
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
@@ -84,7 +86,7 @@ namespace fc { namespace ecc {
 
     fc::sha512 private_key::get_shared_secret( const public_key& other )const
     {
-      static const private_key_secret empty_priv;
+      static const private_key_secret empty_priv{};
       FC_ASSERT( my->_key != empty_priv );
       FC_ASSERT( other.my->_key != empty_pub );
       secp256k1_pubkey secp_pubkey;
@@ -101,7 +103,7 @@ namespace fc { namespace ecc {
     {
        private_key ret;
        do {
-         rand_bytes(ret.my->_key.data(), ret.my->_key.data_size());
+         rand_bytes(reinterpret_cast<char*>(ret.my->_key.data()), fc::data_size(ret.my->_key));
        } while(!secp256k1_ec_seckey_verify(detail::_get_context(), (const uint8_t*)ret.my->_key.data()));
        return ret;
     }

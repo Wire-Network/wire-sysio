@@ -85,8 +85,12 @@ namespace fc { namespace crypto {
 
       FC_ASSERT(memcmp( (char*)&check, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 ||
                 memcmp( (char*)&check2, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 );
+      FC_ASSERT(key_bytes.size() == sizeof(typename Data::data_type), "Invalid key size for type ${t}",
+                ("t", typeid(Data).name()));
 
-      return Data(fc::variant(key_bytes).as<typename Data::data_type>());
+      Data d{};
+      memcpy(d._data.data(), key_bytes.data(), key_bytes.size());
+      return d;
    }
 
    private_key::storage_type private_key::priv_parse_base58(const std::string& base58str)
