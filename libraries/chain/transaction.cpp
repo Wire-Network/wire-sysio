@@ -89,7 +89,7 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
                using Shim = std::decay_t<decltype(shim)>;
 
                if constexpr ( std::is_same_v<Shim, fc::crypto::bls::signature_shim>) {
-                  SYS_THROW(not_supported_exception, "BLS signatures can not be used to recover public keys; however signature verification is supported");
+                  SYS_THROW(fc::unsupported_exception, "BLS signatures can not be used to recover public keys.");
                } else if constexpr( Shim::is_recoverable ) {
                   // If public key can be recovered from signature
                   auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
