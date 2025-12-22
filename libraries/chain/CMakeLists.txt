@@ -1,5 +1,4 @@
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/sysio/chain/core_symbol.hpp.in ${CMAKE_CURRENT_BINARY_DIR}/include/sysio/chain/core_symbol.hpp)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/genesis_state_root_key.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/genesis_state_root_key.cpp)
 
 file(GLOB HEADERS "include/sysio/chain/*.hpp"
                   "include/sysio/chain/webassembly/*.hpp"
@@ -97,7 +96,6 @@ add_library( sysio_chain
              chain_config.cpp
              chain_id_type.cpp
              genesis_state.cpp
-             ${CMAKE_CURRENT_BINARY_DIR}/genesis_state_root_key.cpp
 
               wast_to_wasm.cpp
               wasm_interface.cpp

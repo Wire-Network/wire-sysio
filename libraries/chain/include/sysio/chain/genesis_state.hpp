@@ -13,10 +13,9 @@
 namespace sysio { namespace chain {
 
 struct genesis_state {
-   genesis_state();
+   genesis_state() = default;
+   genesis_state(const fc::crypto::public_key& producer_key, const fc::crypto::public_key& finalizer_key);
 
-   static const string sysio_root_key;
-   static const string sysio_root_finalizer_key;
 
    chain_config_v0   initial_configuration = {
       .max_block_net_usage                  = config::default_max_block_net_usage,
