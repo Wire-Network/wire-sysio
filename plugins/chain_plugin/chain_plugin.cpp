@@ -28,6 +28,8 @@
 #include <fc/variant.hpp>
 #include <cstdlib>
 
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+
 
 const std::string deep_mind_logger_name("deep-mind");
 sysio::chain::deep_mind_handler _deep_mind_log;
@@ -489,15 +491,17 @@ chain_plugin_impl::do_hard_replay(const variables_map& options) {
 
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
    try {
-      ilog("initializing chain plugin");
+      constexpr std::array required_sig_provider_key_types = {crypto::chain_key_type_wire_bls, crypto::chain_key_type_wire};
 
-      try {
-         genesis_state gs; // Check if SYSIO_ROOT_KEY is bad
-      } catch ( const std::exception& ) {
-         elog( "SYSIO_ROOT_KEY ('${root_key}') is invalid. Recompile with a valid public key.",
-               ("root_key", genesis_state::sysio_root_key));
-         throw;
+      ilog("initializing chain plugin");
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto keys_exist = sig_plug.has_signature_providers(required_sig_provider_key_types);
+      if (!keys_exist) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls,crypto::chain_key_type_wire});
       }
+
+      auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).front();
+      auto finalizer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire_bls).front();
 
       chain_config = controller::config();
 
@@ -938,7 +942,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                );
 
                ilog( "Starting fresh blockchain state using default genesis state." );
-               genesis.emplace();
+               genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
                chain_id = genesis->compute_chain_id();
             }
          }
