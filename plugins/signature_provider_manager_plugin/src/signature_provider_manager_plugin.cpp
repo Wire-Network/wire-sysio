@@ -233,6 +233,7 @@ public:
          auto spec = item.value().as_string();
          auto key_type = fc::crypto::chain_key_type_reflector::from_string(key_type_str.c_str());
          _default_signature_provider_specs[key_type] = spec;
+         create_provider(spec);
       }
 
    }
