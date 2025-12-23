@@ -351,7 +351,9 @@ class PerformanceTestBasic:
             maximumClients=self.clusterConfig.maximumClients,
             extraNodeopArgs=str(self.clusterConfig.extraNodeopArgs),
             prodsEnableTraceApi=self.clusterConfig.prodsEnableTraceApi,
-            specificExtraNodeopArgs=self.clusterConfig.specificExtraNodeopArgs
+            specificExtraNodeopArgs=self.clusterConfig.specificExtraNodeopArgs,
+            activateIF=True,
+            biosFinalizer=False
             )
 
     def setupWalletAndAccounts(self, accountCnt: int=2, accountNames: list=None):

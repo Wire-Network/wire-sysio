@@ -14,6 +14,7 @@ if(SYSIO_ENABLE_DEVELOPER_OPTIONS)
 endif()
 
 target_link_libraries( chain_plugin producer_plugin sysio_chain custom_appbase appbase resource_monitor_plugin
+        signature_provider_manager_plugin
         Boost::bimap Boost::process
         Boost::dll
         Boost::multiprecision )
