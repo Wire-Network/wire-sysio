@@ -52,14 +52,14 @@ std::unique_ptr<sig_provider_tester> create_app(const std::vector<std::string>& 
    auto tester = std::make_unique<sig_provider_tester>();
 
    // Build argv as vector<char*> pointing to the underlying string buffers
-   std::vector<char*> argv;
+   std::vector<const char*> argv;
    argv.reserve(args.size() + 1);
    argv.push_back("test_signature_provider_manager_plugin"); // program name
    for (auto& s : args) {
-      argv.push_back(const_cast<char*>(s.c_str()));
+      argv.push_back(s.c_str());
    }
 
-   BOOST_CHECK(tester->app->initialize<sysio::signature_provider_manager_plugin>(argv.size(), argv.data()));
+   BOOST_CHECK(tester->app->initialize<sysio::signature_provider_manager_plugin>(argv.size(), const_cast<char**>(argv.data())));
 
    return tester;
 }
