@@ -19,7 +19,6 @@
 
 namespace sysio {
 namespace {
-constexpr auto option_name_provider = "signature-provider";
 constexpr auto option_name_kiod_timeout_us = "signature-provider-kiod-timeout-us";
 auto _signature_provider_manager_plugin = application::register_plugin<signature_provider_manager_plugin>();
 
