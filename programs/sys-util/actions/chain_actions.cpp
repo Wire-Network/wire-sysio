@@ -553,8 +553,8 @@ int chain_actions::run_subcommand_configure() {
     auto create_chain_account_detail = [&](const std::string& name) -> chain_account_detail& {
       // CREATE KEYs
       auto pk = private_key_type::generate();
-      auto privs = pk.to_string({});
-      auto pubs = pk.get_public_key().to_string({});
+      auto privs = pk.to_native_string({});
+      auto pubs = pk.get_public_key().to_native_string({});
       auto bls_priv = bls_private_key::generate();;
       auto bls_pub = bls_priv.get_public_key();
       auto bls_pop = bls_priv.proof_of_possession();
