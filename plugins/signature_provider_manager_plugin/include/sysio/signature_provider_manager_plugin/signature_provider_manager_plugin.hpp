@@ -29,6 +29,7 @@ using namespace appbase;
  */
 class signature_provider_manager_plugin : public appbase::plugin<signature_provider_manager_plugin> {
 public:
+   constexpr static auto option_name_provider = "signature-provider";
    signature_provider_manager_plugin();
    virtual ~signature_provider_manager_plugin();
 
