@@ -491,13 +491,13 @@ chain_plugin_impl::do_hard_replay(const variables_map& options) {
 
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
    try {
-      constexpr std::array required_sig_provider_key_types = {crypto::chain_key_type_wire_bls, crypto::chain_key_type_wire};
-
       ilog("initializing chain plugin");
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      auto keys_exist = sig_plug.has_signature_providers(required_sig_provider_key_types);
-      if (!keys_exist) {
-         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls,crypto::chain_key_type_wire});
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire});
+      }
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire_bls})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls});
       }
 
       auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).front();
