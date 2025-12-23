@@ -25,6 +25,8 @@
 
 #include <fc/time.hpp>
 
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+
 namespace fc { class variant; }
 
 namespace sysio {
@@ -942,7 +944,7 @@ public:
 
 class chain_plugin : public plugin<chain_plugin> {
 public:
-   APPBASE_PLUGIN_REQUIRES()
+   APPBASE_PLUGIN_REQUIRES((signature_provider_manager_plugin))
 
    chain_plugin();
    virtual ~chain_plugin();

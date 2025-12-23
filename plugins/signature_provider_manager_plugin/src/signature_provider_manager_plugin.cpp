@@ -247,6 +247,9 @@ public:
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
                    "Unsupported key type: ${keyType}", ("keyType", key_type));
+         if (_default_signature_provider_specs.contains(key_type) || query_providers(std::nullopt, std::nullopt, key_type).size())
+            continue;
+
          std::string spec;
          if (_default_signature_provider_specs.contains(key_type)) {
             spec = _default_signature_provider_specs.at(key_type);
@@ -388,33 +391,9 @@ signature_provider_manager_plugin::signature_provider_manager_plugin()
 signature_provider_manager_plugin::~signature_provider_manager_plugin() {}
 
 void signature_provider_manager_plugin::set_program_options(options_description&, options_description& cfg) {
-   // ("signature-provider", boost::program_options::value<vector<string>>()->composing()->multitoken()->default_value(
-   //       {default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}),
-   //        default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()},
-   //        default_priv_key.get_public_key().to_string({}) + "=KEY:" + default_priv_key.to_string({}) + ", " +
-   //        default_bls_priv_key.get_public_key().to_string() + "=KEY:" + default_bls_priv_key.to_string()),
-   //       app().get_plugin<signature_provider_manager_plugin>().signature_provider_help_text())
    cfg.add_options()(
       "signature-provider-kiod-timeout", boost::program_options::value<int32_t>()->default_value(5),
       "Limits the maximum time (in milliseconds) that is allowed for sending requests to a kiod provider for signing");
-
-   // auto default_priv_key = fc::crypto::private_key::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
-   // auto default_pub_key_str = default_priv_key.get_public_key().to_string({});
-   // auto default_spec = std::format("wire-1,wire,wire,{},KEY:{}", default_pub_key_str, default_priv_key.to_string({}));
-   //
-   // auto default_bls_priv_key = fc::crypto::bls::private_key(fc::sha256::hash(std::string("wire")).to_uint8_span());
-   // auto default_bls_pub_key = default_bls_priv_key.get_public_key().to_string();
-   // auto default_bls_spec = std::format("wire-bls-1,wire,wire_bls,{},KEY:{}", default_bls_pub_key, default_bls_priv_key.to_string());
-   // cfg.add_options()(
-   // "signature-provider", boost::program_options::value<std::vector<std::string>>()->composing()->multitoken()->default_value( {
-   //    default_bls_spec,
-   //    default_spec},
-   //    std::format("{}, {}",default_spec,default_bls_spec)),
-   //       "Signature provider spec formatted as (check docs for details): "
-   //       "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`");
-   // std::format("Default keys\n" "  producer: {}\n" "  finalizer: {}",default_spec,default_bls_spec)),
-   //    "Signature provider spec formatted as (check docs for details): "
-   //    "`<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>`");
    cfg.add_options()(
       "signature-provider", boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Signature provider spec formatted as (check docs for details): "
@@ -445,7 +424,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
          dlog("Registering signature provider from spec: ${spec}", ("spec", spec));
          auto provider = create_provider(spec);
          dlog("Registered signature provider (${name}): ${publicKey}",
-              ("name", provider->key_name)("publicKey", provider->public_key.to_string({})));
+              ("name", provider->key_name)("publicKey", provider->public_key.to_native_string({})));
       }
    }
 }
