@@ -203,7 +203,7 @@ public:
          vo(key_type_str, spec);
       }
 
-      auto file_content = fc::json::to_string(vo, {});
+      auto file_content = fc::json::to_string(vo, fc::time_point::maximum());
 
       {
          fc::cfile file(def_sig_prov_file, fc::cfile::truncate_rw_mode);
