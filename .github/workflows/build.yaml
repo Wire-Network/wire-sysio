@@ -6,6 +6,7 @@ on:
       - master
       - "release/*"
   pull_request:
+    types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - master
     paths:
@@ -33,6 +34,9 @@ on:
 permissions:
   packages: read
   contents: read
+
+env:
+  WORKFLOW_NAME: "Build & Test Workflow"
 
 defaults:
   run:
@@ -578,55 +582,13 @@ jobs:
     steps:
       - name: Send Notification
         if: always()
-        env:
-          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            BRANCH="${{ github.head_ref }}"
-          else
-            BRANCH="${{ github.ref_name }}"
-          fi
-          
-          # Determine overall status
-          if [[ "${{ needs.tests.result }}" == "success" && \
-                "${{ needs.np-tests.result }}" == "success" && \
-                "${{ needs.lr-tests.result }}" == "success" ]]; then
-            STATUS="✅ SUCCESS"
-            COLOR="#00FF00"
-          else
-            STATUS="❌ FAILURE"
-            COLOR="#FF0000"
-          fi
-          
-          # Build job status details
-          JOB_DETAILS=""
-          [[ "${{ needs.tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **Tests**: ❌ ${{ needs.tests.result }}"
-          [[ "${{ needs.np-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **NP Tests**: ❌ ${{ needs.np-tests.result }}"
-          [[ "${{ needs.lr-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **LR Tests**: ❌ ${{ needs.lr-tests.result }}"
-          
-          PR_INFO=""
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            PR_INFO="\n**PR**: [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
-          fi
-          
-          # Create message payload
-          PAYLOAD=$(cat <<EOF
-          {
-            "channel": "cicd-notifications",
-            "username": "GitHub Actions",
-            "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-            "attachments": [{
-              "color": "$COLOR",
-              "title": "$STATUS: Build & Test Workflow",
-              "text": "**Repository**: ${{ github.repository }}\n**Branch**: $BRANCH${PR_INFO}\n**Commit**: [\`${GITHUB_SHA::7}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by**: ${{ github.actor }}\n**Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})${JOB_DETAILS}"
-            }]
-          }
-          EOF
-          )
-          
-          curl -X POST "$WEBHOOK_URL" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD"
+        uses: Wire-Network/cicd-notifications/.github/workflows/notification.yaml@v1
+        with:
+          webhook-url: ${{ secrets.WEBHOOK_URL }}
+          notification-type: 1
+          workflow-name:
+          job-results: "tests:${{ needs.tests.result }} np-tests:${{ needs.np-tests.result }} lr-tests:${{ needs.lr-tests.result }}"
 
       - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.lr-tests.result != 'success'
         run: false
+
