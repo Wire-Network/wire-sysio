@@ -1,8 +1,6 @@
 set(TARGET_LIB_NAME outpost_ethereum_client_plugin)
 set(TARGET_TOOL_NAME outpost_ethereum_client_tool)
 
-
-
 plugin_target(
         ${TARGET_LIB_NAME}
         LIBRARIES
@@ -19,9 +17,6 @@ if (ENABLE_TESTS)
             ${TARGET_TOOL_NAME}
             PUBLIC
             ${TARGET_LIB_NAME}
-            signature_provider_manager_plugin
-            outpost_client_plugin
-            outpost_ethereum_client_plugin
             ${PLUGIN_DEFAULT_DEPENDENCIES}
 
     )

@@ -7,22 +7,6 @@ macro(chain_target TARGET)
 
     target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
-    if (UNIX)
-        if (APPLE)
-            set(whole_archive_flag "-force_load")
-            set(no_whole_archive_flag "")
-            set(build_id_flag "")
-        else ()
-            set(whole_archive_flag "--whole-archive")
-            set(no_whole_archive_flag "--no-whole-archive")
-            set(build_id_flag "--build-id")
-        endif ()
-    else ()
-        set(whole_archive_flag "--whole-archive")
-        set(no_whole_archive_flag "--no-whole-archive")
-        set(build_id_flag "")
-    endif ()
-
     target_link_libraries(${TARGET}
             PRIVATE
             -Wl,${whole_archive_flag}
@@ -41,11 +25,8 @@ macro(chain_target TARGET)
             trace_api_plugin
             chain_plugin
             appbase
-            boringssl::crypto
-            boringssl::decrepit
-            boringssl::ssl
-            ${PLUGIN_DEFAULT_DEPENDENCIES}
             -Wl,${no_whole_archive_flag}
+            ${PLUGIN_DEFAULT_DEPENDENCIES}
 
             http_client_plugin
             http_plugin
