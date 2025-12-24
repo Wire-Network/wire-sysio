@@ -7,11 +7,17 @@ macro(unittest_target TARGET)
 
   target_link_libraries(
     ${TARGET}
+    PUBLIC
+          -Wl,${whole_archive_flag}
+
+          ${PLUGIN_DEFAULT_DEPENDENCIES}
+          -Wl,${no_whole_archive_flag}
+#    ${PLUGIN_DEFAULT_DEPENDENCIES}
+
     sysio_chain_wrap
     state_history
     chainbase
     sysio_testing
-    fc
     custom_appbase
     libsodium::libsodium
   )
