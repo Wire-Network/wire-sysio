@@ -8,7 +8,7 @@
 #include <sysio/system.hpp>
 #include <sysio/time.hpp>
 #include <sysio/instant_finality.hpp>
-
+#include <sysio.system/emissions.hpp>
 #include <sysio.system/native.hpp>
 
 #include <deque>
@@ -504,6 +504,40 @@ namespace sysiosystem {
           */
          [[sysio::on_notify("auth.msg::onlinkauth")]]
          void onlinkauth(const name &user, const name &permission, const sysio::public_key &pub_key);
+
+         /**
+          * Sets the starting time for Node Owner distributions
+          *
+          * @param no_reward_init_time The starting timestamp
+          */
+         [[sysio::action]]
+         void setinittime(const sysio::time_point_sec &no_reward_init_time);
+
+         /**
+          * Called inline by sysio.roa when a Node Owner is registered adding them to the distribution table.
+          *
+          * @param account_name Account name of the registered Node Owner
+          * @param tier The tier of node owner they are: 1, 2, or 3.
+          */
+         [[sysio::action]]
+         void addnodeowner(const sysio::name &account_name, const uint8_t &tier);
+
+         /**
+          * Claim vested Node Owner distribution
+          *
+          * @param account_name Account name of Node Owner trying to claim
+          */
+         [[sysio::action]]
+         void claimnodedis(const sysio::name &account_name);
+
+         /**
+          * Read-only action to view claimable Node Owner distributions.
+          *
+          * @param account_name  Account name of the user whose rewards you want to view.
+          * @return (total_allocation)(claimed)(claimable)
+          */
+         [[sysio::action]]
+         emissions::node_claim_result viewnodedist(const sysio::name &account_name);
 
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = sysio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;

@@ -523,16 +523,11 @@ namespace sysio {
         check(status == 3 || status == 4, "Invalid status: Can only confirm (2) or reject (3)");
 
         if(status == 2){
-            
             regnodeowner(owner,nodereg_itr->tier);
 
             nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
                 row.status = 2;
             });
-
-            //TODO -> Add require_receipient(account_name) call to notify council contract 
-            // require_receipient("Council");
-
         } else {
             nodereg.modify(nodereg_itr,get_self(),[&](auto &row){
                 row.status = 3;
@@ -643,7 +638,15 @@ namespace sysio {
             row.network_gen = state.network_gen;
         });
         
-        // TODO: Notify Council contract if needed
+        // Add user to sysio.system node_owner_dist table
+        action(
+           {get_self(), "active"_n}, // auth used for this call
+           "sysio"_n,                                // contract account
+           "addnodeowner"_n,                         // action name
+           std::make_tuple(owner, tier)              // action data
+        ).send();
+
+        // TODO: Inline action to Council contract if needed
     };
 
 
