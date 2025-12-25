@@ -582,12 +582,16 @@ jobs:
     steps:
       - name: Send Notification
         if: always()
-        uses: Wire-Network/cicd-notifications/.github/workflows/notification.yaml@v1
+        uses: Wire-Network/notification-action@v1
         with:
           webhook-url: ${{ secrets.WEBHOOK_URL }}
           notification-type: 1
-          workflow-name:
-          job-results: "tests:${{ needs.tests.result }} np-tests:${{ needs.np-tests.result }} lr-tests:${{ needs.lr-tests.result }}"
+          workflow-name: "Build & Test Workflow"
+          job-results: |
+            tests:${{ needs.tests.result }}
+            np-tests:${{ needs.np-tests.result }}
+            lr-tests:${{ needs.lr-tests.result }}
+          github-context: ${{ toJSON(github) }}
 
       - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.lr-tests.result != 'success'
         run: false
