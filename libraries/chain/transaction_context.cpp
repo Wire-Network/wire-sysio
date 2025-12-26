@@ -700,11 +700,13 @@ namespace sysio::chain {
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
                  "Invalid CPU usage calculation ${tt} - ${tu}", ("tt", total_cpu_time_us)("tu", trace->total_cpu_usage_us));
+      account_subjective_cpu_bill_t authorizers_cpu;
       if (!billed_cpu_us.empty()) {
          assert(trace->action_traces.size() >= billed_cpu_us.size());
          // +1 so total is above min_transaction_cpu_usage
          int64_t delta_per_action = (( total_cpu_time_us - trace->total_cpu_usage_us ) / billed_cpu_us.size()) + 1;
          total_cpu_time_us = 0;
+         bool subjectively_bill_payer_disabled = control.get_subjective_billing().is_payer_billing_disabled();
          auto trx_first_authorizer = packed_trx.get_transaction().first_authorizer(); // use if no authorizer
          for (auto&& [i, b] : std::views::enumerate(billed_cpu_us)) {
             // if exception thrown, action_traces may not be the same size as billed_cpu_us
@@ -717,7 +719,7 @@ namespace sysio::chain {
             auto first_auth = act_trace.act.first_authorizer();
             if (first_auth.empty())
                first_auth = trx_first_authorizer;
-            if (first_auth != payer) // don't subjectively bill payer twice
+            if (first_auth != payer || subjectively_bill_payer_disabled) // don't subjectively bill payer twice if billing payer
                authorizers_cpu[first_auth] += fc::microseconds{b.value};
          }
       }
@@ -734,7 +736,7 @@ namespace sysio::chain {
          } else {
             // if producing then trx is in objective cpu account billing. Also no block will be received to remove the billing.
             if (!control.is_producing_block()) {
-               subjective_bill.subjective_bill(packed_trx.id(), packed_trx.expiration(), prev_accounts_billing, authorizers_cpu);
+               subjective_bill.subjective_bill(packed_trx.id(), packed_trx.expiration(), accounts_billing, authorizers_cpu);
             }
          }
       }

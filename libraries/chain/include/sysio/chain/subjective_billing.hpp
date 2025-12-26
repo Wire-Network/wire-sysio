@@ -51,6 +51,7 @@ private:
    using account_subjective_bill_cache = std::unordered_map<chain::account_name, subjective_billing_info>;
 
    bool                                      _disabled = false;
+   bool                                      _disabled_payer_billing = false;
    fc::microseconds                          _subjective_account_cpu_allowed{config::default_subjective_cpu_us};
    trx_cache_index                           _trx_cache_index;
    account_subjective_bill_cache             _account_subjective_bill_cache;
@@ -120,6 +121,8 @@ public:
    fc::microseconds get_subjective_account_cpu_allowed() const { return _subjective_account_cpu_allowed; }
    void set_disabled(bool disable) { _disabled = disable; }
    bool is_disabled() const { return _disabled; }
+   void disable_payer_billing(bool disable) { _disabled_payer_billing = disable; }
+   bool is_payer_billing_disabled() const { return _disabled_payer_billing; }
    void disable_account( chain::account_name a ) { _disabled_accounts.emplace( a ); }
    bool is_account_disabled(const account_name& a ) const { return _disabled || _disabled_accounts.contains( a ); }
    bool is_any_account_disabled(const action_payers_t& accounts ) const {
@@ -133,10 +136,12 @@ public:
       if (_disabled) return;
       if (_trx_cache_index.contains(id)) return;
       account_subjective_cpu_bill_t account_subjective_cpu_bill;
-      for (const auto& [a, b] : accounts_billing) {
-         if (!_disabled_accounts.contains(a)) {
-            account_subjective_cpu_bill[a] = fc::microseconds(b.cpu_usage_us);
-            _account_subjective_bill_cache[a].pending_cpu_us += b.cpu_usage_us;
+      if (!_disabled_payer_billing) {
+         for (const auto& [a, b] : accounts_billing) {
+            if (!_disabled_accounts.contains(a)) {
+               account_subjective_cpu_bill[a] = fc::microseconds(b.cpu_usage_us);
+               _account_subjective_bill_cache[a].pending_cpu_us += b.cpu_usage_us;
+            }
          }
       }
       for (const auto& [a, b] : auth_cpu) {
@@ -156,9 +161,11 @@ public:
    void subjective_bill_failure( const accounts_billing_t& accounts_billing, const account_subjective_cpu_bill_t& auth_cpu, const fc::time_point& now ) {
       if (_disabled) return;
       const auto time_ordinal = time_ordinal_for(now);
-      for (const auto& [a, b] : accounts_billing) {
-         if (!_disabled_accounts.contains(a)) {
-            _account_subjective_bill_cache[a].expired_accumulator.add(b.cpu_usage_us, time_ordinal, _expired_accumulator_average_window);
+      if (!_disabled_payer_billing) {
+         for (const auto& [a, b] : accounts_billing) {
+            if (!_disabled_accounts.contains(a)) {
+               _account_subjective_bill_cache[a].expired_accumulator.add(b.cpu_usage_us, time_ordinal, _expired_accumulator_average_window);
+            }
          }
       }
       for (const auto& [a, b] : auth_cpu) {
