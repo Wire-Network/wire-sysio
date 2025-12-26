@@ -3,7 +3,6 @@
 #include <fc/io/varint.hpp>
 #include <fc/exception/exception.hpp>
 #include <bls12-381/bls12-381.hpp>
-#include <fc/array.hpp>
 #include <fc/crypto/sha256.hpp>
 
 namespace fc::crypto::bls {
@@ -13,10 +12,10 @@ namespace fc::crypto::bls {
    constexpr std::size_t public_key_data_size = 96;
    constexpr std::size_t signature_data_size = 192;
 
-   using public_key_data = fc::array<std::uint8_t,public_key_data_size>;
+   using public_key_data = std::array<std::uint8_t,public_key_data_size>;
    using private_key_secret = std::array<uint64_t, 4>;
 
-   using signature_data = fc::array<std::uint8_t,signature_data_size>;
+   using signature_data = std::array<std::uint8_t,signature_data_size>;
    using compact_signature_data = signature_data;
    using compact_signature = signature_data;
 
@@ -71,7 +70,7 @@ namespace fc::crypto::bls {
       friend T& operator<<(T& ds, const public_key& sig) {
          // Serialization as variable length array when it is stored as a fixed length array. This makes for easier deserialization by external tools
          fc::raw::pack(ds, fc::unsigned_int(static_cast<uint32_t>(sizeof(sig._affine_non_montgomery_le))));
-         ds.write(reinterpret_cast<const char*>(sig._affine_non_montgomery_le.data), sizeof(sig._affine_non_montgomery_le));
+         ds.write(reinterpret_cast<const char*>(sig._affine_non_montgomery_le.data()), sizeof(sig._affine_non_montgomery_le));
          return ds;
       }
 
@@ -89,7 +88,7 @@ namespace fc::crypto::bls {
          fc::unsigned_int size;
          fc::raw::unpack( ds, size );
          FC_ASSERT(size.value == sizeof(sig._affine_non_montgomery_le));
-         ds.read(reinterpret_cast<char*>(sig._affine_non_montgomery_le.data), sizeof(sig._affine_non_montgomery_le));
+         ds.read(reinterpret_cast<char*>(sig._affine_non_montgomery_le.data()), sizeof(sig._affine_non_montgomery_le));
          sig._jacobian_montgomery_le = from_affine_bytes_le(sig._affine_non_montgomery_le);
          return ds;
       }

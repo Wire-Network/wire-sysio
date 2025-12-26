@@ -2,6 +2,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/crypto/k1_recover.hpp>
+#include <fc/crypto/base64.hpp>
 
 #include <benchmark.hpp>
 

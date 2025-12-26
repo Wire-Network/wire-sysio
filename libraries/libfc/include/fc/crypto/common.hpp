@@ -1,6 +1,5 @@
 #pragma once
 #include <fc/crypto/ripemd160.hpp>
-
 #include <fc/reflect/reflect.hpp>
 #include <fc/crypto/base58.hpp>
 #include <fc/crypto/crypto_utils.hpp>
@@ -8,11 +7,13 @@
 #include <fc/utility.hpp>
 #include <fc/static_variant.hpp>
 
+#include <concepts>
+#include <iterator>
+#include <ranges>
+#include <type_traits>
+#include <cstring>
+
 namespace fc { namespace crypto {
-
-
-
-
 
    template<typename T>
    struct eq_comparator {
@@ -42,10 +43,30 @@ namespace fc { namespace crypto {
       }
    };
 
+   // for specializations that do not meet SerializableForMemcmp concept
    template<typename T>
-   struct less_comparator {
+   struct less_comparator {};
+
+   template<typename T>
+   concept SerializableForMemcmp = requires(const T& obj) {
+      { obj.serialize() } -> std::ranges::forward_range;
+      { obj.serialize().data() } -> std::contiguous_iterator; // Ensures data is contiguous for memcmp
+      { obj.serialize().size() } -> std::convertible_to<std::size_t>;
+   } && std::is_trivially_copyable_v<std::ranges::range_value_t<decltype(std::declval<const T&>().serialize())>>;
+
+   template<SerializableForMemcmp T>
+   struct less_comparator<T> {
       static bool apply(const T& a, const T& b) {
-         return a.serialize() < b.serialize();
+         const auto& lhs = a.serialize();
+         const auto& rhs = b.serialize();
+
+         using V = std::ranges::range_value_t<decltype(lhs)>;
+
+         if (lhs.size() != rhs.size()) {
+            return lhs.size() < rhs.size();
+         }
+
+         return std::memcmp(lhs.data(), rhs.data(), lhs.size() * sizeof(V)) < 0;
       }
    };
 

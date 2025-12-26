@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
       fc::sha256(reinterpret_cast<const char*>(fixture_priv_key_bytes.data()), fixture_priv_key_bytes.size()).to_uint64_array());
 
    auto em_sig_data = em_priv_key.sign_compact_ex(fixture.payload, false);
-   auto em_sig      = fc::to_hex(reinterpret_cast<const char*>(em_sig_data.data), em_sig_data.size());
+   auto em_sig      = fc::to_hex(reinterpret_cast<const char*>(em_sig_data.data()), em_sig_data.size());
 
    // Compare generated signature against fixture
    auto fixture_sig = fc::crypto::ethereum::trim(fixture.signature);
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
       fc::em::signature_shim(em_sig_data).recover_ex(fixture.payload, false).unwrapped().serialize_uncompressed();
 
    auto em_pub_key_rec_hex =
-      fc::crypto::ethereum::trim_public_key(fc::to_hex(em_pub_key_rec_ser.data, em_pub_key_rec_ser.size()));
+      fc::crypto::ethereum::trim_public_key(fc::to_hex(em_pub_key_rec_ser.data(), em_pub_key_rec_ser.size()));
 
    auto fixture_pub_key_stripped = fc::crypto::ethereum::trim_public_key(fixture.public_key);
    BOOST_CHECK_EQUAL(em_pub_key_rec_hex, fixture_pub_key_stripped);
@@ -146,8 +146,8 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
    BOOST_CHECK(em_pub_key == em_pub_key_parsed);
 
    // Redundant, but checks the encoding of pub keys too
-   BOOST_CHECK(fc::to_hex(em_pub_key_data.data, em_pub_key_data.size()) ==
-      fc::to_hex(em_pub_key_parsed_data.data, em_pub_key_parsed_data.size()));
+   BOOST_CHECK(fc::to_hex(em_pub_key_data.data(), em_pub_key_data.size()) ==
+      fc::to_hex(em_pub_key_parsed_data.data(), em_pub_key_parsed_data.size()));
 }
 
 BOOST_AUTO_TEST_CASE(create_provider_ethereum_key_spec) {

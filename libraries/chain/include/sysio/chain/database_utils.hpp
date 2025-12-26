@@ -2,6 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/crypto/base64.hpp>
 #include <softfloat/softfloat.hpp>
 
 namespace sysio::chain {

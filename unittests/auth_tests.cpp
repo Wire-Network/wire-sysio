@@ -250,9 +250,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( update_auth_unknown_private_key, TESTER, validati
 
       // public key with no corresponding private key
       fc::ecc::public_key_data data;
-      data.data[0] = 0x80; // not necessary, 0 also works
+      data[0] = 0x80; // not necessary, 0 also works
       fc::sha256 hash = fc::sha256::hash("unknown key");
-      std::memcpy(&data.data[1], hash.data(), hash.data_size() );
+      std::memcpy(&data[1], hash.data(), hash.data_size() );
       fc::ecc::public_key_shim shim(data);
       fc::crypto::public_key new_owner_pub_key(std::move(shim));
 

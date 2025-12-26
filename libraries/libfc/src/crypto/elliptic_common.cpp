@@ -21,7 +21,7 @@
 namespace fc { namespace ecc {
 
     namespace detail {
-        typedef fc::array<char,37> chr37;
+        typedef std::array<char,37> chr37;
 
         fc::sha256 _left( const fc::sha512& v )
         {
@@ -119,10 +119,10 @@ namespace fc { namespace ecc {
     }
 
     bool public_key::is_canonical( const compact_signature& c ) {
-        return !(c.data[1] & 0x80)
-               && !(c.data[1] == 0 && !(c.data[2] & 0x80))
-               && !(c.data[33] & 0x80)
-               && !(c.data[33] == 0 && !(c.data[34] & 0x80));
+        return !(c[1] & 0x80)
+               && !(c[1] == 0 && !(c[2] & 0x80))
+               && !(c[33] & 0x80)
+               && !(c[33] == 0 && !(c[34] & 0x80));
     }
 
     private_key_secret private_key::get_secret( const EC_KEY * const k )

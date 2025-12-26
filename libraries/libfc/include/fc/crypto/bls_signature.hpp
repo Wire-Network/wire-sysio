@@ -40,7 +40,7 @@ namespace fc::crypto::bls {
       std::string to_string() const;
 
       const bls12_381::g2&            jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
-      const bls::signature_data::std_array_type& affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
+      const bls::signature_data&      affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
       
       signature_data serialize() const {
          return signature_data{_affine_non_montgomery_le};
@@ -78,9 +78,9 @@ namespace fc::crypto::bls {
       }
 
       size_t get_hash() const;
-      static bls12_381::g2 to_jacobian_montgomery_le(const bls::signature_data::std_array_type& affine_non_montgomery_le);
+      static bls12_381::g2 to_jacobian_montgomery_le(const bls::signature_data& affine_non_montgomery_le);
    private:
-      bls::signature_data::std_array_type _affine_non_montgomery_le{};
+      bls::signature_data      _affine_non_montgomery_le{};
       bls12_381::g2            _jacobian_montgomery_le; // cached g2
    };
 

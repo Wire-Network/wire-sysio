@@ -57,19 +57,19 @@ public:
 
 } // namespace detail
 
-static const public_key_data empty_pub;
+static const public_key_data empty_pub{};
 
 fc::sha512 private_key::get_shared_secret(const public_key& other) const {
    static const private_key_secret empty_priv{};
    FC_ASSERT(my->_key != empty_priv);
    FC_ASSERT(other.my->_key != empty_pub);
    secp256k1_pubkey secp_pubkey;
-   FC_ASSERT(secp256k1_ec_pubkey_parse(detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data,
+   FC_ASSERT(secp256k1_ec_pubkey_parse(detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data(),
                                        other.serialize().size()));
    FC_ASSERT(secp256k1_ec_pubkey_tweak_mul(detail::_get_context(), &secp_pubkey, (unsigned char*)my->_key.data()));
    public_key_data serialized_result;
    size_t serialized_result_sz = sizeof(serialized_result);
-   secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result.data, &serialized_result_sz,
+   secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result[0], &serialized_result_sz,
                                  &secp_pubkey, SECP256K1_EC_COMPRESSED);
    FC_ASSERT(serialized_result_sz == sizeof(serialized_result));
    return fc::sha512::hash(serialized_result.begin() + 1, serialized_result.size() - 1);
@@ -104,14 +104,14 @@ public_key_data_uncompressed public_key::serialize_uncompressed() const {
    FC_ASSERT(secp256k1_ec_pubkey_parse(
                 detail::_get_context(),
                 &pubkey,
-                reinterpret_cast<const unsigned char*>(my->_key.data),
+                reinterpret_cast<const unsigned char*>(my->_key.data()),
                 my->_key.size()
              ), "Invalid public key data");
 
    size_t pubkey_len = pubkey_data.size();
    FC_ASSERT(secp256k1_ec_pubkey_serialize(
                 detail::_get_context(),
-                reinterpret_cast<unsigned char*>(pubkey_data.data),
+                reinterpret_cast<unsigned char*>(pubkey_data.data()),
                 &pubkey_len,
                 &pubkey,
                 SECP256K1_EC_UNCOMPRESSED
@@ -121,7 +121,7 @@ public_key_data_uncompressed public_key::serialize_uncompressed() const {
 }
 
 public_key::public_key(const public_key_data_uncompressed& dat) {
-   const char* front = &dat.data[0];
+   const char* front = &dat[0];
    if (*front == 0) {
       return;
    }
@@ -130,14 +130,14 @@ public_key::public_key(const public_key_data_uncompressed& dat) {
    FC_ASSERT(secp256k1_ec_pubkey_parse(
                 detail::_get_context(),
                 &pubkey,
-                reinterpret_cast<const unsigned char*>(dat.data),
+                reinterpret_cast<const unsigned char*>(dat.data()),
                 dat.size()
              ), "Invalid public key data");
 
    size_t pubkey_len = my->_key.size();
    FC_ASSERT(secp256k1_ec_pubkey_serialize(
                 detail::_get_context(),
-                reinterpret_cast<unsigned char*>(my->_key.data),
+                reinterpret_cast<unsigned char*>(my->_key.data()),
                 &pubkey_len,
                 &pubkey,
                 SECP256K1_EC_COMPRESSED
@@ -155,7 +155,7 @@ public_key::public_key(const compact_signature& c, const fc::sha256& digest, boo
    c, crypto::ethereum::hash_message(digest).data(), check_canonical) {}
 
 public_key::public_key(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
-   int nV = c.data[c.size() - 1];
+   int nV = c[c.size() - 1];
    if (nV < 27 || nV >= 35) {
       FC_THROW_EXCEPTION(exception, "unable to reconstruct public key from signature");
    }
@@ -187,7 +187,7 @@ public_key::public_key(const compact_signature& c, const unsigned char* digest, 
    size_t serialized_result_sz = my->_key.size();
    secp256k1_ec_pubkey_serialize(
       detail::_get_context(),
-      (unsigned char*)&my->_key.data,
+      (unsigned char*)&my->_key[0],
       &serialized_result_sz,
       &secp_pub,
       SECP256K1_EC_COMPRESSED);
@@ -201,12 +201,12 @@ public_key public_key::from_key_data(const public_key_data& data) {
 }
 
 std::string public_key::to_base58(const public_key_data& key) {
-   uint32_t check = (uint32_t)sha256::hash(key.data, sizeof(key))._hash[0];
+   uint32_t check = (uint32_t)sha256::hash(key.data(), sizeof(key))._hash[0];
    // hack around gcc bug: key.size() should be constexpr, but isn't
    static_assert(sizeof(key) + sizeof(check) == 37, "");
 
-   array<char, 37> data;
-   memcpy(data.data, key.begin(), key.size());
+   std::array<char, 37> data;
+   memcpy(data.data(), key.begin(), key.size());
    memcpy(data.begin() + key.size(), (const char*)&check, sizeof(check));
    return fc::to_base58(data.begin(), data.size(), fc::yield_function_t());
 }
@@ -216,14 +216,14 @@ public_key public_key::from_native_string(const std::string& pub_key_str) {
 }
 
 public_key public_key::from_base58(const std::string& b58) {
-   array<char, 37> data;
+   std::array<char, 37> data;
    size_t s = fc::from_base58(b58, (char*)&data, sizeof(data));
    FC_ASSERT(s == sizeof(data));
 
    public_key_data key;
-   uint32_t check = (uint32_t)sha256::hash(data.data, sizeof(key))._hash[0];
-   FC_ASSERT(memcmp( (char*)&check, data.data + sizeof(key), sizeof(check) ) == 0);
-   memcpy((char*)key.data, data.data, sizeof(key));
+   uint32_t check = (uint32_t)sha256::hash(data.data(), sizeof(key))._hash[0];
+   FC_ASSERT(memcmp( &check, data.data() + sizeof(key), sizeof(check) ) == 0);
+   memcpy(key.data(), data.data(), sizeof(key));
    return from_key_data(key);
 }
 
@@ -243,12 +243,12 @@ bool public_key::is_canonical(const compact_signature& c) {
       0xDF, 0xE9, 0x2F, 0x46, 0x68, 0x1B, 0x20, 0xA0
    };
 
-   static_assert(sizeof(c.data) >= 65, "compact_signature must be 65 bytes");
+   static_assert(sizeof(c) >= 65, "compact_signature must be 65 bytes");
 
    // The S value is the 32 bytes starting at index 32.
    // We check if S <= half_order.
    // memcmp returns <= 0 if S is less than or equal to half_order.
-   return memcmp(c.data + 32, half_order, 32) <= 0;
+   return memcmp(c.data() + 32, half_order, 32) <= 0;
 }
 
 //
@@ -377,8 +377,8 @@ fc::ecc::compact_signature private_key::sign_compact_ex(const em::message_body_t
       );
 
    fc::ecc::compact_signature compact_sig;
-   compact_sig.data[64] = 27 + recovery_id; // V
-   memcpy(compact_sig.data, r_and_s, sizeof(r_and_s)); // R and S
+   compact_sig[64] = 27 + recovery_id; // V
+   memcpy(compact_sig.data(), r_and_s, sizeof(r_and_s)); // R and S
 
    return compact_sig;
 }

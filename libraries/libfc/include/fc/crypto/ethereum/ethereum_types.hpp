@@ -55,7 +55,7 @@ inline ethereum::address to_address(const address_compat_type& addr_var) {
    }
    // NOTE: Computing the public key hash requires starting at data[1], so
    //  The source data pointer is incremented by 1 as the size is decremented by 1
-   auto pub_key_hash = ethash::keccak256(reinterpret_cast<const uint8_t*>(pub_key_data.data + 1), pub_key_data.size() - 1);
+   auto pub_key_hash = ethash::keccak256(reinterpret_cast<const uint8_t*>(pub_key_data.data() + 1), pub_key_data.size() - 1);
 
    // Construct the address from the last 20 bytes of the public key hash
    ethereum::address addr;

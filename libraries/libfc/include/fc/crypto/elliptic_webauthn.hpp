@@ -5,7 +5,6 @@
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/openssl.hpp>
 #include <fc/fwd.hpp>
-#include <fc/array.hpp>
 #include <fc/io/raw_fwd.hpp>
 
 namespace fc { namespace crypto { namespace webauthn {
@@ -14,7 +13,7 @@ class signature;
 
 class public_key {
    public:
-      using public_key_data_type = fc::array<char, 33>;
+      using public_key_data_type = std::array<char, 33>;
 
       //Used for base58 de/serialization
       using data_type = public_key;
@@ -102,7 +101,7 @@ class signature {
 
       //for container usage
       size_t get_hash() const {
-         return *(size_t*)&compact_signature.data[32-sizeof(size_t)] + *(size_t*)&compact_signature.data[64-sizeof(size_t)];
+         return *(size_t*)&compact_signature[32-sizeof(size_t)] + *(size_t*)&compact_signature[64-sizeof(size_t)];
       }
 
       friend struct fc::reflector<signature>;

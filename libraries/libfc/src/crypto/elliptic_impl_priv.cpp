@@ -82,7 +82,7 @@ namespace fc { namespace ecc {
         do
         {
             FC_ASSERT( secp256k1_ecdsa_sign_recoverable( detail::_get_context(), &secp_sig, (unsigned char*) digest.data(), (unsigned char*) my->_key.data(), extended_nonce_function, &counter ));
-            secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data + 1, &recid, &secp_sig);
+            secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data() + 1, &recid, &secp_sig);
         } while( require_canonical && !public_key::is_canonical( result ) );
 
         result.begin()[0] = 27 + 4 + recid;

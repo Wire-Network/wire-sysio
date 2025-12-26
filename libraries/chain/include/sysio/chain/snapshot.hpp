@@ -473,13 +473,13 @@ namespace sysio { namespace chain { namespace detail {
 
    inline ostream_wrapper&
    operator<<(ostream_wrapper& ds, const fc::crypto::ed::public_key_shim& pk) {
-      ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+      ds.write(reinterpret_cast<const char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
       return ds;
    }
    
    inline ostream_wrapper&
    operator<<(ostream_wrapper& ds, const fc::crypto::ed::signature_shim& sig) {
-      ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
+      ds.write(reinterpret_cast<const char*>(sig._data.data()), crypto_sign_BYTES);
       return ds;
    }
    

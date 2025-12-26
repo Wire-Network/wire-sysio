@@ -5,7 +5,6 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha512.hpp>
 #include <fc/fwd.hpp>
-#include <fc/array.hpp>
 #include <fc/io/raw_fwd.hpp>
 #include <fc/crypto/elliptic.hpp>
 #include <fc/static_variant.hpp>
@@ -27,11 +26,11 @@ namespace fc {
     using message_hash_type = std::array<uint8_t,32>;
     using message_body_type = std::variant<std::string,fc::sha256,std::vector<uint8_t>>;
 
-    using public_key_data = fc::array<char,33>;
-    using public_key_data_uncompressed = fc::array<char,65>;
+    using public_key_data = std::array<char,33>;
+    using public_key_data_uncompressed = std::array<char,65>;
     using private_key_secret = std::array<uint64_t, 4>;
 
-    using compact_signature = fc::array<unsigned char,65>;
+    using compact_signature = std::array<unsigned char,65>;
 
     /**
      *  @class public_key
