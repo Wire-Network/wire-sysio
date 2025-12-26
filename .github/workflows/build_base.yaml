@@ -97,6 +97,7 @@ jobs:
             -DCMAKE_MAKE_PROGRAM=$CMAKE_MAKE_PROGRAM \
             -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake \
             -DCMAKE_BUILD_TYPE=Release \
+            -DENABLE_TESTS=ON \
             ${CMAKE_PREFIX_PATH:+-DCMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH}
 
 
