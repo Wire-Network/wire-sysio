@@ -86,6 +86,9 @@ try:
         Utils.Print("Wait for node ", nodeId)
         cluster.nodes[nodeId].waitForProducer("defproduceru", exitOnError=True, timeout=300)
 
+    # give time for connections to be established
+    cluster.nodes[0].waitForHeadToAdvance(blocksToAdvance=10)
+
     # retrieve the producer stable producer schedule
     scheduled_producers = []
     schedule = cluster.nodes[0].processUrllibRequest("chain", "get_producer_schedule")
