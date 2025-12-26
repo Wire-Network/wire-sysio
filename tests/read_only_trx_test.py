@@ -231,7 +231,7 @@ def sendReadOnlyForeverInfinite():
 def sendReadOnlySEGV():
     return sendTransaction('infinite', action='segv', data={}, auth=[], opts='--read')
 
-# Send read-only trxs from mutltiple threads to bump load
+# Send read-only trxs from multiple threads to bump load
 def sendReadOnlyTrxOnThread(startId, numTrxs):
     Print("start sendReadOnlyTrxOnThread")
 
@@ -465,7 +465,7 @@ def timeoutTest():
     threadList.append(threading.Thread(target = foreverTransactions))
     threadList.append(threading.Thread(target = infiniteTransactions))
     threadList.append(threading.Thread(target = foreverTransactions))
-    Print("Sending different speeds of read only transactions simutaneously")
+    Print("Sending different speeds of read only transactions simultaneously")
     for thr in threadList:
         thr.start()
     for thr in threadList:
