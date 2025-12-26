@@ -27,12 +27,16 @@ class public_key {
 
       bool valid() const { return rpid.size(); }
 
-      public_key() {}
+      public_key() = default;
+      public_key(const public_key&) = default;
+      public_key(public_key&&) noexcept = default;
       public_key(const public_key_data_type& p, const user_presence_t& t, const std::string& s) : 
          public_key_data(p), user_verification_type(t), rpid(s) {
             post_init();
          }
       public_key(const signature& c, const fc::sha256& digest, bool check_canonical = true);
+      public_key& operator=(const public_key&) = default;
+      public_key& operator=(public_key&&) noexcept  = default;
 
       bool operator==(const public_key& o) const {
          return        public_key_data == o.public_key_data        &&
@@ -63,7 +67,7 @@ class public_key {
       }
 
    private:
-      public_key_data_type public_key_data;
+      public_key_data_type public_key_data{};
       user_presence_t user_verification_type = user_presence_t::USER_PRESENCE_NONE;
       std::string rpid;
 
@@ -107,7 +111,7 @@ class signature {
       friend struct fc::reflector<signature>;
       friend class public_key;
    private:
-      fc::crypto::r1::compact_signature compact_signature;
+      fc::crypto::r1::compact_signature compact_signature{};
       std::vector<uint8_t>              auth_data;
       std::string                       client_json;
 };

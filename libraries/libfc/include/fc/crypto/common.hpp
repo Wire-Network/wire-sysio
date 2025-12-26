@@ -110,7 +110,7 @@ namespace fc { namespace crypto {
          return _data;
       }
 
-      data_type _data;
+      data_type _data{};
    };
 
 } }
