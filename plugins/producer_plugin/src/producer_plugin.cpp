@@ -1369,7 +1369,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
       for (auto& candidate : finalizer_candidate_sig_providers) {
          SYS_ASSERT(candidate->private_key.has_value(), plugin_config_exception, "ALL BLS keys must be provided via command line arguments or config file.");
-         wlog("setting fin key ${c}:${p}", ("c", candidate->public_key.to_native_string({}))("p", candidate->private_key->to_native_string({})));
+         ilog("Configured finalizer key: ${c}", ("c", candidate->public_key.to_native_string({})));
          _finalizer_keys.insert({candidate->public_key.to_native_string({}), candidate});
       }
       chain.set_node_finalizer_keys(_finalizer_keys);
