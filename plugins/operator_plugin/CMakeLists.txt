@@ -6,5 +6,4 @@ plugin_target(
         appbase
         chainbase
         chain_plugin
-        fc
         sysio_chain)
