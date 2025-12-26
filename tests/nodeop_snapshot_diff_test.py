@@ -184,7 +184,7 @@ try:
     nodeIrr.relaunch()
 
     Print("Wait for programmable node lib to advance")
-    waitForBlock(nodeProg, ret_head_block_num, blockType=BlockType.lib)
+    waitForBlock(nodeProg, ret_head_block_num+1, blockType=BlockType.lib)
 
     Print("Kill programmable node")
     nodeProg.kill(signal.SIGTERM)
