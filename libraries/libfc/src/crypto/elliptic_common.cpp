@@ -48,7 +48,7 @@ namespace fc { namespace ecc {
 
         static chr37 _derive_message( char first, const char* key32, int i )
         {
-            chr37 result;
+            chr37 result{};
             unsigned char* dest = (unsigned char*) result.begin();
             *dest++ = first;
             memcpy( dest, key32, 32 ); dest += 32;

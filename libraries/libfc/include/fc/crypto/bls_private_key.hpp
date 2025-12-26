@@ -63,7 +63,7 @@ public:
    static private_key generate();
 
 private:
-   private_key_secret _sk;
+   private_key_secret _sk{};
    friend bool operator==(const private_key& pk1, const private_key& pk2);
    friend struct reflector<private_key>;
 }; // private_key

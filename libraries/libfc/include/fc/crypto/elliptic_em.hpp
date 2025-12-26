@@ -206,7 +206,7 @@ namespace fc {
       template<typename Stream>
       void unpack( Stream& s, em::public_key& pk)
       {
-          em::public_key_data ser;
+          em::public_key_data ser{};
           fc::raw::unpack(s,ser);
           pk = em::public_key( ser );
       }
@@ -220,7 +220,7 @@ namespace fc {
       template<typename Stream>
       void unpack( Stream& s, em::private_key& pk)
       {
-          fc::em::private_key_secret sec;
+          fc::em::private_key_secret sec{};
           unpack( s, sec );
           pk = em::private_key::regenerate(sec);
       }

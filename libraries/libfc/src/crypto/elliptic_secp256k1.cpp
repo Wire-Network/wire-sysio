@@ -43,33 +43,16 @@ namespace fc { namespace ecc {
             return cc.ctx;
         }
 
-        class public_key_impl
-        {
-            public:
-                public_key_impl() BOOST_NOEXCEPT {}
+        class public_key_impl {
+        public:
+           public_key_impl() BOOST_NOEXCEPT = default;
+           public_key_impl(const public_key_impl& cpy) BOOST_NOEXCEPT = default;
+           public_key_impl(public_key_impl&& cpy) BOOST_NOEXCEPT = default;
 
-                public_key_impl( const public_key_impl& cpy ) BOOST_NOEXCEPT
-                    : _key( cpy._key ) {}
+           public_key_data _key{};
 
-                public_key_impl( public_key_impl&& cpy ) BOOST_NOEXCEPT
-                    : _key( std::move(cpy._key) ) {}
-
-                public_key_data _key;
-
-                public_key_impl& operator=( const public_key_impl& pk ) BOOST_NOEXCEPT {
-                     if ( this != &pk ) {
-                             _key = pk._key;
-                     }
-                     return *this;
-                }
-
-                public_key_impl& operator=( public_key_impl&& pk ) BOOST_NOEXCEPT {
-                     if ( this != &pk ) {
-                             _key = std::move(pk._key);
-                     }
-                     return *this;
-                }
-
+           public_key_impl& operator=(const public_key_impl& pk) BOOST_NOEXCEPT = default;
+           public_key_impl& operator=(public_key_impl&& pk) BOOST_NOEXCEPT = default;
         };
 
         typedef std::array<char,37> chr37;
@@ -89,10 +72,10 @@ namespace fc { namespace ecc {
       static const private_key_secret empty_priv{};
       FC_ASSERT( my->_key != empty_priv );
       FC_ASSERT( other.my->_key != empty_pub );
-      secp256k1_pubkey secp_pubkey;
+      secp256k1_pubkey secp_pubkey{};
       FC_ASSERT( secp256k1_ec_pubkey_parse( detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data(), other.serialize().size() ) );
       FC_ASSERT( secp256k1_ec_pubkey_tweak_mul( detail::_get_context(), &secp_pubkey, (unsigned char*) my->_key.data() ) );
-      public_key_data serialized_result;
+      public_key_data serialized_result{};
       size_t serialized_result_sz = sizeof(serialized_result);
       secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result[0], &serialized_result_sz, &secp_pubkey, SECP256K1_EC_COMPRESSED );
       FC_ASSERT( serialized_result_sz == sizeof(serialized_result) );
@@ -108,25 +91,13 @@ namespace fc { namespace ecc {
        return ret;
     }
 
-    public_key::public_key() {}
+    public_key::public_key() = default;
+    public_key::public_key( const public_key& pk ) = default;
+    public_key::public_key( public_key &&pk ) noexcept = default;
+    public_key::~public_key() = default;
 
-    public_key::public_key( const public_key &pk ) : my( pk.my ) {}
-
-    public_key::public_key( public_key &&pk ) : my( std::move( pk.my ) ) {}
-
-    public_key::~public_key() {}
-
-    public_key& public_key::operator=( const public_key& pk )
-    {
-        my = pk.my;
-        return *this;
-    }
-
-    public_key& public_key::operator=( public_key&& pk )
-    {
-        my = pk.my;
-        return *this;
-    }
+    public_key& public_key::operator=( const public_key& pk ) = default;
+    public_key& public_key::operator=( public_key&& pk ) noexcept = default;
 
     bool public_key::valid()const
     {
@@ -174,8 +145,8 @@ namespace fc { namespace ecc {
             FC_ASSERT( is_canonical( c ), "signature is not canonical" );
         }
 
-        secp256k1_pubkey secp_pub;
-        secp256k1_ecdsa_recoverable_signature secp_sig;
+        secp256k1_pubkey secp_pub{};
+        secp256k1_ecdsa_recoverable_signature secp_sig{};
 
         FC_ASSERT( secp256k1_ecdsa_recoverable_signature_parse_compact( detail::_get_context(), &secp_sig, (unsigned char*)c.begin() + 1, (*c.begin() - 27) & 3) );
         FC_ASSERT( secp256k1_ecdsa_recover( detail::_get_context(), &secp_pub, &secp_sig, (unsigned char*) digest.data() ) );

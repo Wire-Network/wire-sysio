@@ -22,12 +22,12 @@ namespace fc {
         if (recid<27 || recid>=35) return k1_recover_error::invalid_signature;
         recid = (recid - 27) & 3;
 
-        secp256k1_ecdsa_recoverable_signature sig;
+        secp256k1_ecdsa_recoverable_signature sig{};
         if (!secp256k1_ecdsa_recoverable_signature_parse_compact(context, &sig, (const unsigned char*)&signature[1], recid)) {
             return k1_recover_error::invalid_signature;
         }
 
-        secp256k1_pubkey pub_key;
+        secp256k1_pubkey pub_key{};
         if (!secp256k1_ecdsa_recover(context, &pub_key, &sig, (const unsigned char*)&digest[0])) {
             return k1_recover_error::recover_error;
         }

@@ -169,7 +169,7 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
    case 32:
       copy_to_offset = 1;
    case 33: {
-      em::public_key_data pubkey_data;
+      em::public_key_data pubkey_data{};
       std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data() + copy_to_offset);
       if (copy_to_offset) {
          pubkey_data[0] = 0x02;

@@ -148,7 +148,7 @@ namespace fc { namespace crypto { namespace r1 {
         if(BN_cmp(s, halforder) > 0)
            BN_sub(s, order, s);
 
-        compact_signature csig;
+        compact_signature csig{};
 
         int nBitsR = BN_num_bits(r);
         int nBitsS = BN_num_bits(s);
@@ -245,7 +245,7 @@ namespace fc { namespace crypto { namespace r1 {
           return {};
        }
 
-       private_key_secret sec;
+       private_key_secret sec{};
        const BIGNUM* bn = EC_KEY_get0_private_key(my->_key);
        if( bn == NULL )
        {
@@ -285,7 +285,7 @@ namespace fc { namespace crypto { namespace r1 {
     {
         unsigned int buf_len = ECDSA_size(my->_key);
 //        fprintf( stderr, "%d  %d\n", buf_len, sizeof(sha256) );
-        signature sig;
+        signature sig{};
         FC_ASSERT( buf_len == sizeof(sig) );
 
         if( !ECDSA_sign( 0,
@@ -305,7 +305,7 @@ namespace fc { namespace crypto { namespace r1 {
 
     public_key_data public_key::serialize()const
     {
-      public_key_data dat;
+      public_key_data dat{};
       if( !my->_key ) return dat;
       EC_KEY_set_conv_form( my->_key, POINT_CONVERSION_COMPRESSED );
       /*size_t nbytes = i2o_ECPublicKey( my->_key, nullptr ); */

@@ -50,8 +50,8 @@ namespace fc {
 
            bool valid()const;
 
-           public_key( public_key&& pk );
-           public_key& operator=( public_key&& pk );
+           public_key( public_key&& pk ) noexcept;
+           public_key& operator=( public_key&& pk ) noexcept;
            public_key& operator=( const public_key& pk );
 
            inline friend bool operator==( const public_key& a, const public_key& b )
