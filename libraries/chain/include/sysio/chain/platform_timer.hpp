@@ -18,7 +18,15 @@ struct platform_timer {
    void stop();
    //interrupt_timer() can be called from any thread
    void interrupt_timer();
-   //explicit set to expired
+
+   /* Explicitly force the timer into an "expired" state.
+      This is typically used by higher‑level code when a timeout has already been detected
+      (for example, when handling a timeout_exception in a SYS VM or similar context) and
+      the platform_timer needs to be updated to reflect that expiration.
+      Thread safety: like interrupt_timer(), this function is intended to be callable from
+      any thread and may be invoked even while the timer is running.
+      If the timer is not currently in the running state, calling set_expired() has no effect.
+   */
    void set_expired();
 
    /* Sets a callback for when timer expires. Be aware this could fire from a signal handling context and/or
