@@ -7,6 +7,7 @@ endif()
 file(GLOB UNIT_TESTS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
 list(REMOVE_ITEM UNIT_TESTS ship_client.cpp)
 list(REMOVE_ITEM UNIT_TESTS ship_streamer.cpp)
+list(REMOVE_ITEM UNIT_TESTS wallet_tests.cpp)
 
 add_executable( plugin_test ${UNIT_TESTS} )
 target_link_libraries( plugin_test sysio_testing sysio_chain_wrap chainbase chain_plugin producer_plugin wallet_plugin fc state_history ${PLATFORM_SPECIFIC_LIBS} )

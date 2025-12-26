@@ -120,6 +120,36 @@ namespace fc
 #define elog( FORMAT, ... ) \
    fc_elog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
 
+#define tlogf( FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::all ) ) \
+      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( all, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
+
+#define elogf( FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::error ) ) \
+      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
+
+#define wlogf( FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::warn ) ) \
+      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( warn, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
+
+#define ilogf( FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::info ) ) \
+      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( info, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
+
+#define dlogf( FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::debug ) ) \
+      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( debug, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
+
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/preprocessor/punctuation/paren.hpp>

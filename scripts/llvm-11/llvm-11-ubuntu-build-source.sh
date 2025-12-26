@@ -22,15 +22,16 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LLVM_SRC_DIR="${BASE_DIR}/llvm-project"
 BUILD_DIR="${BASE_DIR}/llvm-11-build"
 PREFIX="${LLVM_11_PREFIX:-${BASE_DIR}/llvm-11}"
-: "${CLANG_18_DIR:=/opt/clang/clang-18}"
 
-### ---------- Bootstrap Clang 18 if needed ----------
-if [[ ! -x "${CLANG_18_DIR}/bin/clang" ]]; then
-  echo "[+] Bootstrapping Clang 18 at ${CLANG_18_DIR}"
-  BASE_DIR="/opt/clang" CLANG_18_PREFIX="${CLANG_18_DIR}" \
-    /opt/clang/scripts/clang-18-ubuntu-build-source.sh
-else
-  echo "[+] Found existing Clang 18 at ${CLANG_18_DIR}"
+USE_CLANG_18_CUSTOM=1
+if [[ ! -v CLANG_18_DIR ]] || [[ -z "${CLANG_18_DIR}" ]]; then
+  # shellcheck disable=SC2046
+  CLANG_18_DIR=$(dirname $(dirname $(which clang-18)))
+  USE_CLANG_18_CUSTOM=0
+  if [[ -z "${CLANG_18_DIR}" ]] || [[ ! -d "${CLANG_18_DIR}" ]]; then
+    CLANG_18_DIR=/opt/clang/clang-18
+    USE_CLANG_18_CUSTOM=1
+  fi
 fi
 
 ### ---------- Config (overridable by flags) ----------
@@ -80,6 +81,7 @@ echo "    JOBS          = ${JOBS}"
 echo "    BRANCH        = ${BRANCH}"
 echo "    BASE_DIR      = ${BASE_DIR}"
 echo "    BUILD_DIR     = ${BUILD_DIR}"
+echo "    CLANG_18_DIR  = ${CLANG_18_DIR}"
 
 if [[ $(uname) != "Linux" ]]; then
   echo "[+] You must install dependencies manually on non-Linux"
@@ -113,14 +115,23 @@ fi
 
 rm -rf "${BUILD_DIR}"
 
+if [[ -e "${CLANG_18_DIR}/bin/clang-18" ]];then
+  export CC="${CLANG_18_DIR}/bin/clang-18"
+  export CXX="${CLANG_18_DIR}/bin/clang++-18"
+elif [[ -e "${CLANG_18_DIR}/bin/clang" ]];then
+  export CC="${CLANG_18_DIR}/bin/clang"
+  export CXX="${CLANG_18_DIR}/bin/clang++"
+else
+  echo "clang-18 not found"
+  exit 1
+fi
+
 # Base CMake flags
 declare -a CMAKE_FLAGS=(
   -G Ninja
   -DCMAKE_BUILD_TYPE=Release
   -DCMAKE_INSTALL_PREFIX="${PREFIX}"
 
-  -DLLVM_USE_LINKER=lld
-  -DCMAKE_LINKER="${CLANG_18_DIR}/bin/ld.lld"
   -DLLVM_INCLUDE_BENCHMARKS=OFF
   -DLLVM_ENABLE_BINDINGS=OFF
   -DLLVM_ENABLE_WERROR=OFF
@@ -129,16 +140,23 @@ declare -a CMAKE_FLAGS=(
   -DCMAKE_C_FLAGS="-Wno-unused-but-set-variable -Wno-bitwise-instead-of-logical"
   -DCMAKE_CXX_FLAGS="-Wno-unused-but-set-variable -Wno-bitwise-instead-of-logical"
 
-
   -DLLVM_TARGETS_TO_BUILD=host
   -DLLVM_BUILD_TOOLS=Off
   -DLLVM_ENABLE_RTTI=On
   -DLLVM_ENABLE_TERMINFO=Off
   -DLLVM_ENABLE_PIC=On
   -DCOMPILER_RT_BUILD_SANITIZERS=OFF
-  -DCMAKE_C_COMPILER="${CLANG_18_DIR}/bin/clang"
-  -DCMAKE_CXX_COMPILER="${CLANG_18_DIR}/bin/clang++"
+  -DCMAKE_C_COMPILER="${CC}"
+  -DCMAKE_CXX_COMPILER="${CXX}"
 )
+
+if [[ ${USE_CLANG_18_CUSTOM} -eq 1 ]]; then
+  CMAKE_FLAGS+=(
+    -DLLVM_USE_LINKER=lld
+    -DCMAKE_LINKER="${CLANG_18_DIR}/bin/ld.lld"
+  )
+fi
+
 
 # Build & Install (top-level)
 echo "[+] Configuring (top-level)…"

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <span>
 #include <compare>
 #include <fc/fwd.hpp>
@@ -14,8 +15,14 @@ namespace fc
 class sha256 : public add_packhash_to_hash<sha256>
 {
   public:
+    static constexpr size_t byte_size = 256 / (8 * sizeof(uint8_t));
+    static constexpr size_t uint64_size = 256 / (8 * sizeof(uint64_t));
+    using uint64_array_type = std::array<uint64_t, sha256::uint64_size>;
+    using hash_array_type = uint64_array_type;
+    using byte_array_type = std::array<uint8_t, sha256::byte_size>;
     sha256();
     explicit sha256( const std::string& hex_str );
+    explicit sha256( const hash_array_type& hash_arr  );
     explicit sha256( const char *data, size_t size );
 
     std::string str()const;
@@ -23,10 +30,22 @@ class sha256 : public add_packhash_to_hash<sha256>
 
     const char* data()const;
     char*       data();
-    size_t      data_size() const { return 256 / 8; }
+    constexpr size_t      data_size() const { return sha256::byte_size; }
 
     std::span<const uint8_t> to_uint8_span() const {
        return {reinterpret_cast<const uint8_t*>(data()),  reinterpret_cast<const uint8_t*>(data()) + data_size()};
+    }
+
+    byte_array_type to_uint8_array()  const {
+       byte_array_type arr{};
+       std::copy_n(reinterpret_cast<const uint8_t*>(data()), data_size(), arr.data()); 
+       return arr;
+    }
+
+    uint64_array_type to_uint64_array()  const {
+       uint64_array_type arr{};
+       std::copy_n(_hash, uint64_size, arr.data()); 
+       return arr;
     }
 
     bool empty()const {
@@ -104,16 +123,14 @@ class sha256 : public add_packhash_to_hash<sha256>
     void set_to_inverse_approx_log_32( uint32_t x );
     static double inverse_approx_log_32_double( uint32_t x );
 
-    uint64_t _hash[4];
+    uint64_t _hash[uint64_size];
 };
 
-  typedef sha256 uint256;
+class variant;
+void to_variant( const sha256& bi, variant& v );
+void from_variant( const variant& v, sha256& bi );
 
-  class variant;
-  void to_variant( const sha256& bi, variant& v );
-  void from_variant( const variant& v, sha256& bi );
-
-  uint64_t hash64(const char* buf, size_t len);    
+uint64_t hash64(const char* buf, size_t len);
 
 } // fc
 

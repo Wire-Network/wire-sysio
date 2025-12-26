@@ -9,8 +9,8 @@ namespace sysio::chain {
 
    inline fc::logger vote_logger{"vote"};
 
-   using bls_public_key          = fc::crypto::blslib::bls_public_key;
-   using bls_signature           = fc::crypto::blslib::bls_signature;
+   using bls_public_key          = fc::crypto::bls::public_key;
+   using bls_signature           = fc::crypto::bls::signature;
 
    struct vote_message {
       block_id_type       block_id;

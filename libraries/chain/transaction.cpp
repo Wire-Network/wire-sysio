@@ -74,7 +74,7 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
    }
 
    // Prepare index for public key extensions.
-   size_t pk_index = 0;
+   size_t pubkey_idx = 0;
 
    if ( !signatures.empty() ) {
       const digest_type digest = sig_digest(chain_id, cfd);
@@ -88,27 +88,29 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
             sig.visit([&](auto const& shim){
                using Shim = std::decay_t<decltype(shim)>;
 
-               if constexpr( Shim::is_recoverable ) {
+               if constexpr ( std::is_same_v<Shim, fc::crypto::bls::signature_shim>) {
+                  SYS_THROW(fc::unsupported_exception, "BLS signatures can not be used to recover public keys.");
+               } else if constexpr( Shim::is_recoverable ) {
                   // If public key can be recovered from signature
                   auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
                   SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key ${k}", ("k", *itr) );
                } else {
                   // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.
-                  SYS_ASSERT( pk_index < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{i}", ("i", pk_index) );
+                  SYS_ASSERT( pubkey_idx < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{i}", ("i", pubkey_idx) );
 
-                  const auto& pkvar   = ed_pubkeys[pk_index++];
-                  const auto& pubshim = pkvar.template get<typename Shim::public_key_type>();
+                  const auto& pubkey   = ed_pubkeys[pubkey_idx++];
+                  const auto& pubkey_shim = pubkey.template get<typename Shim::public_key_type>();
 
-                  SYS_ASSERT( shim.verify(digest, pubshim), unsatisfied_authorization, "non-recoverable signature #${i} failed", ("i", pk_index-1) );
+                  SYS_ASSERT( shim.verify(digest, pubkey_shim), unsatisfied_authorization, "non-recoverable signature #${i} failed", ("i", pubkey_idx-1) );
 
-                  recovered_pub_keys.emplace(pkvar);
+                  recovered_pub_keys.emplace(pubkey);
                }
             });
       }
    }
 
    // Ensure no extra ED pubkey extensions were provided
-   SYS_ASSERT( pk_index == ed_pubkeys.size(), unsatisfied_authorization, "got ${g} ED public-key extensions but only ${e} ED signatures", ("g", ed_pubkeys.size()) ("e", pk_index) );
+   SYS_ASSERT( pubkey_idx == ed_pubkeys.size(), unsatisfied_authorization, "got ${g} ED public-key extensions but only ${e} ED signatures", ("g", ed_pubkeys.size()) ("e", pubkey_idx) );
 
    return fc::time_point::now() - start;
 } FC_CAPTURE_AND_RETHROW() }

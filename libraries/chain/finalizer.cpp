@@ -1,6 +1,8 @@
+#include <fc/crypto/signature_provider.hpp>
 #include <sysio/chain/finalizer.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <fc/log/logger_config.hpp>
+#include <fc-lite/algorithm.hpp>
 
 namespace sysio::chain {
 
@@ -383,7 +385,7 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
 
 
 // ----------------------------------------------------------------------------------------
-void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finalizer_keys, bool enforce_startup_constraints) {
+void my_finalizers_t::set_keys(const std::map<std::string, fc::crypto::signature_provider_ptr>& finalizer_keys, bool enforce_startup_constraints) {
    if (finalizer_keys.empty())
       return;
 
@@ -396,11 +398,15 @@ void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finaliz
    }
 
    fsi_map safety_info = load_finalizer_safety_info();
-   for (const auto& [pub_key_str, priv_key_str] : finalizer_keys) {
-      auto public_key {bls_public_key{pub_key_str}};
-      auto it  = safety_info.find(public_key);
+   for (const auto& [pub_key_str, sig_prov] : finalizer_keys) {
+      assert(sig_prov->private_key);
+      fc::crypto::bls::public_key bls_public_key{sig_prov->public_key.get<fc::crypto::bls::public_key_shim>().serialize()};
+      auto it  = safety_info.find(bls_public_key);
       const auto& fsi = it != safety_info.end() ? it->second : default_fsi;
-      finalizers.emplace(public_key, finalizer{bls_private_key{priv_key_str}, fsi});
+      auto bls_priv_key = fc::crypto::bls::private_key(sig_prov->private_key.value().get<fc::crypto::bls::private_key_shim>().serialize());
+
+      finalizers.emplace(bls_public_key.to_string(), finalizer{
+         bls_priv_key, fsi});
    }
 
    // Now that we have updated the  finalizer_safety_info of our local finalizers,
@@ -411,8 +417,9 @@ void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finaliz
    // So for every vote but the first, we'll only have to write the safety_info for the configured
    // finalizers.
    // --------------------------------------------------------------------------------------------
-   for (const auto& [pub_key_str, priv_key_str] : finalizer_keys)
-      safety_info.erase(bls_public_key{pub_key_str});
+
+   erase_all_keys(safety_info,
+      finalizer_keys | std::views::keys | std::views::transform([] (auto& pub_key_str) { return bls_public_key{pub_key_str};}));
 
    // now only inactive finalizers remain in safety_info => move it to inactive_safety_info
    inactive_safety_info = std::move(safety_info);
@@ -430,7 +437,7 @@ void my_finalizers_t::set_keys(const std::map<std::string, std::string>& finaliz
 void my_finalizers_t::set_default_safety_information(const fsi_t& fsi) {
    std::lock_guard g(mtx);
 
-   for (auto& [pub_key, f] : finalizers) {
+   for (auto& f : finalizers | std::views::values) {
       // update only finalizers which are uninitialized
       if (!f.fsi.last_vote.empty() || !f.fsi.lock.empty())
          continue;

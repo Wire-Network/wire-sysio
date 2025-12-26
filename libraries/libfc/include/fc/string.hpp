@@ -2,11 +2,13 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <vector>
+#include <fc/int256.hpp>
 
 namespace fc
 {
-  int64_t  to_int64( const std::string& );
-  uint64_t to_uint64( const std::string& );
+  std::int64_t  to_int64( const std::string& );
+  std::uint64_t to_uint64( const std::string& );
   double   to_double( const std::string& );
 
   class variant_object;
@@ -30,4 +32,28 @@ namespace fc
   std::pair<std::string&, bool> escape_str( std::string& str, escape_control_chars escape_ctrl = escape_control_chars::on,
                                             std::size_t max_len = std::numeric_limits<std::size_t>::max(),
                                             std::string_view add_truncate_str = "..." );
+
+  /**
+   * Split a string by a provided delimiter
+   *
+   * @param str String to split
+   * @param delim delimiter
+   * @param max_split a maximum number of chunks allowed, the remainder are grouped as the final element, 0 denotes no limit
+   * @return vector of split strings
+   */
+  std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split = 0);
+
+
+  /**
+   * Convert a string to lowercase using the specified locale
+   *
+   * @param s String to convert to lowercase
+   * @return A new string with all characters converted to lowercase
+   */
+  std::string to_lower(const std::string& s);
+
+  bool all_digits(const std::string_view& s);
+  bool all_digits(const std::string& s);
 }
+
+

@@ -20,8 +20,8 @@ namespace fc {
     typedef fc::sha256                  blind_factor_type;
     typedef fc::array<char,33>          commitment_type;
     typedef fc::array<char,33>          public_key_data;
-    typedef fc::sha256                  private_key_secret;
-    typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
+    typedef std::array<uint64_t, 4>     private_key_secret;
+    typedef fc::array<unsigned char,65> public_key_point_data; ///< the full non-compressed version of the ECC point
     typedef fc::array<char,72>          signature;
     typedef fc::array<unsigned char,65> compact_signature;
     typedef fc::array<char,78>          extended_key_data;
@@ -81,28 +81,17 @@ namespace fc {
     {
         public:
            private_key();
-           private_key( private_key&& pk );
+           private_key( private_key&& pk ) noexcept;
            private_key( const private_key& pk );
            ~private_key();
 
-           private_key& operator=( private_key&& pk );
+           private_key& operator=( private_key&& pk ) noexcept;
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
-           static private_key regenerate( const fc::sha256& secret );
-
-           private_key child( const fc::sha256& offset )const;
-
-           /**
-            *  This method of generation enables creating a new private key in a deterministic manner relative to
-            *  an initial seed.   A public_key created from the seed can be multiplied by the offset to calculate
-            *  the new public key without having to know the private key.
-            */
-           static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
+           static private_key regenerate( const private_key_secret& secret );
 
            private_key_secret get_secret()const; // get the private key secret
-
-           operator private_key_secret ()const { return get_secret(); }
 
            /**
             *  Given a public key, calculatse a 512 bit shared secret between that
@@ -110,9 +99,7 @@ namespace fc {
             */
            fc::sha512 get_shared_secret( const public_key& pub )const;
 
-//           signature         sign( const fc::sha256& digest )const;
            compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
-//           bool              verify( const fc::sha256& digest, const signature& sig );
 
            public_key get_public_key()const;
 
@@ -128,7 +115,7 @@ namespace fc {
 
         private:
            private_key( EC_KEY* k );
-           static fc::sha256 get_secret( const EC_KEY * const k );
+           static private_key_secret get_secret( const EC_KEY * const k );
            fc::fwd<detail::private_key_impl,32> my;
     };
 

@@ -176,7 +176,7 @@ namespace sysio { namespace chain { namespace webassembly {
                   "Finalizer policy exceeds the maximum finalizer count for this chain" );
       SYS_ASSERT( finalizers.size() > 0, wasm_execution_error, "Finalizers cannot be empty" );
 
-      std::set<fc::crypto::blslib::bls_public_key> unique_finalizer_keys;
+      std::set<fc::crypto::bls::public_key> unique_finalizer_keys;
 
       uint64_t weight_sum = 0;
 
@@ -189,7 +189,7 @@ namespace sysio { namespace chain { namespace webassembly {
                     "sum of weights causes uint64_t overflow");
          weight_sum += f.weight;
          SYS_ASSERT(f.public_key.size() == 96, wasm_execution_error, "Invalid bls public key length");
-         fc::crypto::blslib::bls_public_key pk(std::span<const uint8_t,96>(f.public_key.data(), 96));
+         fc::crypto::bls::public_key pk(std::span<const uint8_t,96>(f.public_key.data(), 96));
          SYS_ASSERT( unique_finalizer_keys.insert(pk).second, wasm_execution_error,
                      "Duplicate public key: ${pk}", ("pk", pk.to_string()) );
          finpol.finalizers.push_back(chain::finalizer_authority{.description = std::move(f.description),

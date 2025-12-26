@@ -9,6 +9,8 @@
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 
+#include <fc-lite/traits.hpp>
+
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
@@ -49,7 +51,25 @@ namespace fc { namespace ecc {
                 public_key_impl( const public_key_impl& cpy ) BOOST_NOEXCEPT
                     : _key( cpy._key ) {}
 
+                public_key_impl( public_key_impl&& cpy ) BOOST_NOEXCEPT
+                    : _key( std::move(cpy._key) ) {}
+
                 public_key_data _key;
+
+                public_key_impl& operator=( const public_key_impl& pk ) BOOST_NOEXCEPT {
+                     if ( this != &pk ) {
+                             _key = pk._key;
+                     }
+                     return *this;
+                }
+
+                public_key_impl& operator=( public_key_impl&& pk ) BOOST_NOEXCEPT {
+                     if ( this != &pk ) {
+                             _key = std::move(pk._key);
+                     }
+                     return *this;
+                }
+
         };
 
         typedef fc::array<char,37> chr37;
@@ -66,7 +86,7 @@ namespace fc { namespace ecc {
 
     fc::sha512 private_key::get_shared_secret( const public_key& other )const
     {
-      static const private_key_secret empty_priv;
+      static const private_key_secret empty_priv{};
       FC_ASSERT( my->_key != empty_priv );
       FC_ASSERT( other.my->_key != empty_pub );
       secp256k1_pubkey secp_pubkey;
@@ -83,7 +103,7 @@ namespace fc { namespace ecc {
     {
        private_key ret;
        do {
-         rand_bytes(ret.my->_key.data(), ret.my->_key.data_size());
+         rand_bytes(reinterpret_cast<char*>(ret.my->_key.data()), fc::data_size(ret.my->_key));
        } while(!secp256k1_ec_seckey_verify(detail::_get_context(), (const uint8_t*)ret.my->_key.data()));
        return ret;
     }
@@ -118,15 +138,18 @@ namespace fc { namespace ecc {
         FC_ASSERT( my->_key != empty_pub );
         return my->_key;
     }
-
+    // TODO: WIRE-233:OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
+    //   `EC_KEY` curve related implementations, but I need to investigate.
+    //   this should likely be swapped out the same way that I resolved `fc::em::public_key`
+    //   support, via `libsecp256k1`
     public_key::public_key( const public_key_point_data& dat )
     {
-        const char* front = &dat.data[0];
+        auto front = dat.begin();
         if( *front == 0 ){}
         else
         {
             EC_KEY *key = EC_KEY_new_by_curve_name( NID_secp256k1 );
-            key = o2i_ECPublicKey( &key, (const unsigned char**)&front, sizeof(dat) );
+            key = o2i_ECPublicKey( &key, &front, static_cast<long>(dat.size()) );
             FC_ASSERT( key );
             EC_KEY_set_conv_form( key, POINT_CONVERSION_COMPRESSED );
             unsigned char* buffer = (unsigned char*) my->_key.begin();

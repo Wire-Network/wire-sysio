@@ -84,7 +84,7 @@ try:
     for nodeId in range(0, producerNodes):
         specificNodeopArgs[nodeId] = auto_bp_peer_arg
         producer_name = "defproducer" + chr(ord('a') + nodeId)
-        specificNodeopArgs[nodeId] += (f" --signature-provider {accounts[nodeId].activePublicKey}=KEY:{accounts[nodeId].activePrivateKey}")
+        specificNodeopArgs[nodeId] += (f" --signature-provider wire-{nodeId},wire,wire,{accounts[nodeId].activePublicKey},KEY:{accounts[nodeId].activePrivateKey}")
 
     specificNodeopArgs[5] = specificNodeopArgs[5] + ' --p2p-server-address ext-ip0:9999'
 

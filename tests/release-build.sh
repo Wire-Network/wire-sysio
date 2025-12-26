@@ -13,9 +13,12 @@ echo ''
 
 TDIR=$(mktemp -d || exit 1)
 NODEOP_DEBUG=$(programs/nodeop/nodeop --config-dir "${TDIR}" --data-dir "${TDIR}" --extract-build-info >(python3 -c 'import json,sys; print(str(json.load(sys.stdin)["debug"]).lower());') &> /dev/null)
-#avoiding an rm -rf out of paranoia, but with the tradeoff this could change somehow in the future
-rm "${TDIR}/config.ini" || exit 1
-rmdir "${TDIR}" || exit 1
+
+# cleanup
+if [[ -e "${TDIR}/config.ini" ]]; then
+  rm -Rf "${TDIR}" || exit 1
+fi
+
 if [[ "${NODEOP_DEBUG}" == 'false' ]]; then
     echo 'PASS: Debug flag is not set.'
     echo ''

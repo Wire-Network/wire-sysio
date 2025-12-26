@@ -37,7 +37,7 @@ std::vector<bls_private_key> bls_priv_keys{bls_priv_key_0, bls_priv_key_1, bls_p
 auto create_genesis_block_state() { // block 2
    auto block = signed_block::create_mutable_block({});
 
-   block->producer = sysio::chain::config::system_account_name;
+   block->producer = config::system_account_name;
    auto pub_key = sysio::testing::base_tester::get_public_key( block->producer, "active" );
 
    std::vector<finalizer_authority> finalizers;
@@ -67,7 +67,7 @@ auto create_test_block_state(const block_state_ptr& prev) {
    static block_timestamp_type timestamp;
    timestamp = timestamp.next(); // each test block state will be unique
    auto block = prev->block->clone();
-   block->producer = sysio::chain::config::system_account_name;
+   block->producer = config::system_account_name;
    block->previous = prev->id();
    block->timestamp = timestamp;
 

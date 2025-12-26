@@ -37,7 +37,8 @@ namespace fc
        aes_error_code                    = 18,
        overflow_code                     = 19,
        underflow_code                    = 20,
-       divide_by_zero_code               = 21
+       divide_by_zero_code               = 21,
+       unsupported_exception_code        = 22
    };
 
    /**
@@ -270,6 +271,7 @@ namespace fc
   FC_DECLARE_EXCEPTION( overflow_exception, overflow_code, "Integer Overflow" );
   FC_DECLARE_EXCEPTION( underflow_exception, underflow_code, "Integer Underflow" );
   FC_DECLARE_EXCEPTION( divide_by_zero_exception, divide_by_zero_code, "Integer Divide By Zero" );
+  FC_DECLARE_EXCEPTION( unsupported_exception, unsupported_exception_code, "Unsupported Operation" );
 
   std::string except_str();
 
@@ -323,6 +325,11 @@ namespace fc
     throw fc::exception( FC_INDIRECT_EXPAND(FC_LOG_MESSAGE, ( error, __VA_ARGS__ )) );  \
   FC_MULTILINE_MACRO_END
 
+#define FC_THROW_FMT(  ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+    throw fc::exception( FC_INDIRECT_EXPAND(FC_LOG_MESSAGE_FMT, ( error, __VA_ARGS__ )) );  \
+  FC_MULTILINE_MACRO_END
+
 #define FC_EXCEPTION( EXCEPTION_TYPE, FORMAT, ... ) \
     EXCEPTION_TYPE( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) )
 /**
@@ -335,6 +342,10 @@ namespace fc
     throw EXCEPTION( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) ); \
   FC_MULTILINE_MACRO_END
 
+#define FC_THROW_EXCEPTION_FMT( EXCEPTION, FORMAT, ... ) \
+  FC_MULTILINE_MACRO_BEGIN \
+    throw EXCEPTION( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) ); \
+  FC_MULTILINE_MACRO_END
 
 /**
  *  @def FC_RETHROW_EXCEPTION(ER,LOG_LEVEL,FORMAT,...)
