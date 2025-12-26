@@ -1,5 +1,6 @@
 
 add_executable( test_fc
+        crypto/ethereum/test_ethereum_client_and_rlp.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp
@@ -19,6 +20,7 @@ add_executable( test_fc
         variant/test_variant_dynamic_bitset.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
+        test_traits.cpp
         test_escape_str.cpp
         test_bls.cpp
         test_ordered_diff.cpp

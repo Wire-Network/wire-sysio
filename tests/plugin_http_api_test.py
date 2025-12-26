@@ -93,6 +93,7 @@ class PluginHttpTest(unittest.TestCase):
                         "http_plugin", "db_size_api_plugin", "prometheus_plugin"]
         nodeop_plugins = "--plugin sysio::" +  " --plugin sysio::".join(plugin_names)
         nodeop_flags = (" --data-dir=%s --config-dir=%s --trace-dir=%s --trace-no-abis --access-control-allow-origin=%s "
+                        "--signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 "
                         "--contracts-console --http-validate-host=%s --verbose-http-errors --max-transaction-time -1 --abi-serializer-max-time-ms 30000 --http-max-response-time-ms 30000 "
                         "--p2p-peer-address localhost:9011 --resource-monitor-not-shutdown-on-threshold-exceeded ") % (self.data_dir, self.config_dir, self.data_dir, "\'*\'", "false")
         nodeop_flags += category_config.nodeopArgs()

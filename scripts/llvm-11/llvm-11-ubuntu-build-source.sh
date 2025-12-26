@@ -24,15 +24,6 @@ BUILD_DIR="${BASE_DIR}/llvm-11-build"
 PREFIX="${LLVM_11_PREFIX:-${BASE_DIR}/llvm-11}"
 : "${CLANG_18_DIR:=/opt/clang/clang-18}"
 
-### ---------- Bootstrap Clang 18 if needed ----------
-if [[ ! -x "${CLANG_18_DIR}/bin/clang" ]]; then
-  echo "[+] Bootstrapping Clang 18 at ${CLANG_18_DIR}"
-  BASE_DIR="/opt/clang" CLANG_18_PREFIX="${CLANG_18_DIR}" \
-    /opt/clang/scripts/clang-18-ubuntu-build-source.sh
-else
-  echo "[+] Found existing Clang 18 at ${CLANG_18_DIR}"
-fi
-
 ### ---------- Config (overridable by flags) ----------
 
 if which nproc >/dev/null 2>&1; then

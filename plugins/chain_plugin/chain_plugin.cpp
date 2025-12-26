@@ -28,6 +28,8 @@
 #include <fc/variant.hpp>
 #include <cstdlib>
 
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+
 
 const std::string deep_mind_logger_name("deep-mind");
 sysio::chain::deep_mind_handler _deep_mind_log;
@@ -490,14 +492,16 @@ chain_plugin_impl::do_hard_replay(const variables_map& options) {
 void chain_plugin_impl::plugin_initialize(const variables_map& options) {
    try {
       ilog("initializing chain plugin");
-
-      try {
-         genesis_state gs; // Check if SYSIO_ROOT_KEY is bad
-      } catch ( const std::exception& ) {
-         elog( "SYSIO_ROOT_KEY ('${root_key}') is invalid. Recompile with a valid public key.",
-               ("root_key", genesis_state::sysio_root_key));
-         throw;
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire});
       }
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire_bls})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls});
+      }
+
+      auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).front();
+      auto finalizer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire_bls).front();
 
       chain_config = controller::config();
 
@@ -938,7 +942,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                );
 
                ilog( "Starting fresh blockchain state using default genesis state." );
-               genesis.emplace();
+               genesis.emplace(producer_sig_prov->public_key, finalizer_sig_prov->public_key);
                chain_id = genesis->compute_chain_id();
             }
          }
@@ -1734,7 +1738,7 @@ fc::variant get_global_row( const database& db, const abi_def& abi, const abi_se
    const auto table_type = get_table_type(abi, "global"_n);
    SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table global", ("type",table_type));
 
-   const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(config::system_account_name, config::system_account_name, "global"_n));
+   const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "global"_n));
    SYS_ASSERT(table_id, chain::contract_table_query_exception, "Missing table global");
 
    const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
@@ -1751,7 +1755,7 @@ read_only::get_finalizer_info_result read_only::get_finalizer_info( const read_o
 
    // Finalizer keys present in active_finalizer_policy and pending_finalizer_policy.
    // Use std::set for eliminating duplications.
-   std::set<fc::crypto::blslib::bls_public_key> finalizer_keys;
+   std::set<fc::crypto::bls::public_key> finalizer_keys;
 
    // Populate a particular finalizer policy
    auto add_policy_to_result = [&](const finalizer_policy_ptr& from_policy, fc::variant& to_policy) {

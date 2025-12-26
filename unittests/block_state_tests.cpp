@@ -10,7 +10,7 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace sysio::chain;
-using namespace fc::crypto::blslib;
+using namespace fc::crypto::bls;
 
 BOOST_AUTO_TEST_SUITE(block_state_tests)
 

@@ -34,7 +34,7 @@ namespace fc { namespace json_relaxed
             switch( c = in.peek() )
             {
                case '\\':
-                  token << parseEscape( in );
+                  token << parse_escape( in );
                   break;
                case '\t':
                case ' ':
@@ -140,7 +140,7 @@ namespace fc { namespace json_relaxed
                            FC_THROW_EXCEPTION( parse_error_exception, "unexpected EOF in string '${token}'",
                                       ("token", token.str() ) );
                        else if( allow_escape && (c == '\\') )
-                           token << parseEscape( in );
+                           token << parse_escape( in );
                        else
                        {
                            in.get();
@@ -167,7 +167,7 @@ namespace fc { namespace json_relaxed
                    FC_THROW_EXCEPTION( parse_error_exception, "unexpected EOF in string '${token}'",
                               ("token", token.str() ) );
                else if( allow_escape && (c == '\\') )
-                   token << parseEscape( in );
+                   token << parse_escape( in );
                else if( (c == '\r') | (c == '\n') )
                    FC_THROW_EXCEPTION( parse_error_exception, "unexpected EOL in string '${token}'",
                               ("token", token.str() ) );
@@ -742,7 +742,7 @@ namespace fc { namespace json_relaxed
               FC_THROW_EXCEPTION( eof_exception, "unexpected end of file" );
             default:
               FC_THROW_EXCEPTION( parse_error_exception, "Unexpected char '${c}' in \"${s}\"",
-                                 ("c", c)("s", stringFromToken(in)) );
+                                 ("c", c)("s", string_from_token(in)) );
          }
       }
 	  return variant();

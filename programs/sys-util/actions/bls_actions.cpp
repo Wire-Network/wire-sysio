@@ -6,7 +6,8 @@
 
 #include <boost/program_options.hpp>
 
-using namespace fc::crypto::blslib;
+using namespace fc::crypto;
+using namespace fc::crypto::bls;
 namespace bpo = boost::program_options;
 using bpo::options_description;
 
@@ -51,11 +52,11 @@ int bls_actions::create_key() {
    }
 
    // create a private key and get its corresponding public key
-   const bls_private_key private_key = bls_private_key::generate();
-   const bls_public_key public_key = private_key.get_public_key();
+   const bls::private_key private_key = bls::private_key::generate();
+   const bls::public_key public_key = private_key.get_public_key();
 
    // generate proof of possession
-   const bls_signature pop = private_key.proof_of_possession();
+   const bls::signature pop = private_key.proof_of_possession();
 
    // prepare output
    std::string out_str = "Private key: " + private_key.to_string() + "\n";
@@ -104,9 +105,9 @@ int bls_actions::create_pop() {
    }
 
    // create private key object using input private key string
-   const bls_private_key private_key = bls_private_key(private_key_str);
-   const bls_public_key public_key = private_key.get_public_key();
-   const bls_signature pop = private_key.proof_of_possession();
+   const bls::private_key private_key = bls::private_key(private_key_str);
+   const bls::public_key public_key = private_key.get_public_key();
+   const bls::signature pop = private_key.proof_of_possession();
 
    std::cout << "Proof of Possession: " << pop.to_string()<< "\n";
    std::cout << "Public key: " <<  public_key.to_string() << "\n";

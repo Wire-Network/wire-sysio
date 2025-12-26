@@ -50,7 +50,11 @@ struct deep_mind_log_fixture
 // We only test deep-mind in Savanna
 struct deep_mind_tester : deep_mind_log_fixture, savanna_validating_tester
 {
-   deep_mind_tester() : savanna_validating_tester({}, &deep_mind_logger, setup_policy::full) {}
+   // do not load roa, so test does not have to be updated everytime roa changes
+   deep_mind_tester() : savanna_validating_tester({}, &deep_mind_logger, setup_policy::preactivate_feature_only) {
+      set_bios_contract();
+      produce_block();
+   }
 };
 
 namespace {

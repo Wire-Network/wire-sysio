@@ -18,7 +18,7 @@ namespace sysio::chain_apis {
 
       // Cache to store last vote information for each known finalizer.
       // A map of finalizer public key --> vote info.
-      std::map<fc::crypto::blslib::bls_public_key, tracked_votes::vote_info> last_votes;
+      std::map<fc::crypto::bls::public_key, tracked_votes::vote_info> last_votes;
 
       // A handle to the controller.
       const chain::controller& controller;
@@ -86,7 +86,7 @@ namespace sysio::chain_apis {
       }
 
       // Returns last vote information by a given finalizer
-      std::optional<tracked_votes::vote_info> get_last_vote_info(const fc::crypto::blslib::bls_public_key& finalizer_pub_key) const {
+      std::optional<tracked_votes::vote_info> get_last_vote_info(const fc::crypto::bls::public_key& finalizer_pub_key) const {
          auto it = last_votes.find(finalizer_pub_key);
          if (it != last_votes.end()) {
              return it->second;
@@ -134,7 +134,7 @@ namespace sysio::chain_apis {
       _impl->on_accepted_block(block, id);
    }
 
-   std::optional<tracked_votes::vote_info> tracked_votes::get_last_vote_info(const fc::crypto::blslib::bls_public_key& finalizer_pub_key) const {
+   std::optional<tracked_votes::vote_info> tracked_votes::get_last_vote_info(const fc::crypto::bls::public_key& finalizer_pub_key) const {
       return _impl->get_last_vote_info(finalizer_pub_key);
    }
 

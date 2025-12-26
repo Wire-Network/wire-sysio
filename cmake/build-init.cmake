@@ -1,0 +1,1 @@
+file(TOUCH ${CMAKE_BINARY_DIR}/.wire-build-root)

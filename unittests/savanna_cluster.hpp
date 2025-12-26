@@ -39,7 +39,7 @@ namespace savanna_cluster {
             account_name name { std::string("finalizer") + (char)('a' + i/26) + (char)('a' + i%26) };
             key_names.push_back(name);
 
-            auto [privkey, pubkey, pop] = get_bls_key(name);
+            auto [privkey, pubkey, pop, _] = get_bls_key(name);
             pubkeys.push_back(pubkey);
             privkeys.push_back(privkey);
          }
@@ -320,7 +320,7 @@ namespace savanna_cluster {
       const fsi_t& get_fsi(size_t idx = 0) const {
          assert(control);
          assert(idx < _node_finalizers.size());
-         auto [privkey, pubkey, pop] = get_bls_key(_node_finalizers[idx]);
+         auto [privkey, pubkey, pop,_] = get_bls_key(_node_finalizers[idx]);
          return control->get_node_finalizers().get_fsi(pubkey);
       }
 
@@ -574,7 +574,7 @@ namespace savanna_cluster {
       bool                 _debug_mode{false};
 
       static constexpr fc::microseconds _block_interval_us =
-         fc::milliseconds(sysio::chain::config::block_interval_ms);
+         fc::milliseconds(config::block_interval_ms);
 
    private:
       peers_t    _peers;

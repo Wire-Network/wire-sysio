@@ -9,6 +9,7 @@
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
+#include <fc/int256.hpp>
 
 namespace fc
 {
@@ -77,6 +78,18 @@ variant::variant( int64_t val )
 {
    *reinterpret_cast<int64_t*>(this)  = val;
    set_variant_type( this, int64_type );
+}
+
+variant::variant( int256 val )
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   // *reinterpret_cast<int256*>(this)  = val;
+   set_variant_type( this, int256_type );
+}
+
+variant::variant(fc::uint256 val) {
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, uint256_type );
 }
 
 variant::variant( float val )
@@ -327,6 +340,15 @@ bool variant::is_uint64()const
 {
    return get_type() == uint64_type;
 }
+
+bool variant::is_int256() const {
+   return get_type() == int256_type;
+}
+
+bool variant::is_uint256() const {
+   return get_type() == uint256_type;
+}
+
 bool variant::is_int64()const
 {
    return get_type() == int64_type;
@@ -338,6 +360,8 @@ bool variant::is_integer()const
    {
       case int64_type:
       case uint64_type:
+      case int256_type:
+      case uint256_type:
       case bool_type:
          return true;
       default:
@@ -351,6 +375,8 @@ bool variant::is_numeric()const
    {
       case int64_type:
       case uint64_type:
+      case int256_type:
+      case uint256_type:
       case double_type:
       case bool_type:
          return true;
@@ -417,6 +443,53 @@ uint64_t variant::as_uint64()const
 } FC_CAPTURE_AND_RETHROW( (*this) ) }
 
 
+fc::int256 fc::variant::as_int256()const
+{
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::int256(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::int256(*reinterpret_cast<const uint64_t*>(this));
+   case int256_type:
+      return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint256_type:
+      return fc::int256(as_string());
+   case string_type:
+      return fc::int256(as_string());
+   case bool_type:
+      return int256(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to int256", ("type", get_type()) );
+   }
+}
+
+fc::uint256 fc::variant::as_uint256()const
+{ try {
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::uint256(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
+   case int256_type:
+      return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint256_type:
+      return fc::uint256(as_string());
+   case string_type:
+      return fc::uint256(as_string());
+   case bool_type:
+      return uint256(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint256", ("type",get_type()));
+   }
+} FC_CAPTURE_AND_RETHROW( (*this) ) }
+
+
 double  variant::as_double()const
 {
    switch( get_type() )
@@ -478,6 +551,8 @@ std::string variant::as_string()const
 {
    switch( get_type() )
    {
+      case uint256_type:
+      case int256_type:
       case string_type:
           return **reinterpret_cast<const const_string_ptr*>(this);
       case double_type:
@@ -711,6 +786,14 @@ void from_variant( const variant& var,  int64_t& vo )
 void from_variant( const variant& var,  uint64_t& vo )
 {
    vo = var.as_uint64();
+}
+
+void from_variant(const fc::variant& var, fc::int256& vo) {
+   vo = var.as_int256();
+}
+
+void from_variant(const fc::variant& var, fc::uint256& vo) {
+   vo = var.as_uint256();
 }
 
 void from_variant( const variant& var,  bool& vo )

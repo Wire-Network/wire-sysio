@@ -1,5 +1,6 @@
 #include <fc/crypto/signature.hpp>
 #include <fc/crypto/common.hpp>
+#include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
 
 namespace fc { namespace crypto {
@@ -11,14 +12,18 @@ namespace fc { namespace crypto {
          return *(size_t*)&sig._data.data[32-sizeof(size_t)] + *(size_t*)&sig._data.data[64-sizeof(size_t)];
       }
 
+      size_t operator()(const bls::signature_shim& sig) const {
+         return sig.unwrapped().get_hash();
+      }
+
       size_t operator()(const webauthn::signature& sig) const {
          return sig.get_hash();
       }
    };
 
-   static signature::storage_type sig_parse_base58(const std::string& base58str)
+   signature::storage_type signature::sig_parse_base58(const std::string& base58str)
    { try {
-      constexpr auto prefix = config::signature_base_prefix;
+      constexpr auto prefix = fc::crypto::constants::signature_base_prefix;
 
       const auto pivot = base58str.find('_');
       FC_ASSERT(pivot != std::string::npos, "No delimiter in string, cannot determine type: ${str}", ("str", base58str));
@@ -28,7 +33,7 @@ namespace fc { namespace crypto {
 
       auto data_str = base58str.substr(pivot + 1);
       FC_ASSERT(!data_str.empty(), "Signature has no data: ${str}", ("str", base58str));
-      return base58_str_parser<signature::storage_type, config::signature_prefix>::apply(data_str);
+      return base58_str_parser<signature::storage_type, fc::crypto::constants::signature_prefix>::apply(data_str);
    } FC_RETHROW_EXCEPTIONS( warn, "error parsing signature", ("str", base58str ) ) }
 
    signature::signature(const std::string& base58str)
@@ -53,11 +58,15 @@ namespace fc { namespace crypto {
       }, _storage);
    }
 
+   std::string signature::to_native_string(const fc::yield_function_t& yield) const {
+      return std::visit(to_native_string_from_signature_visitor<storage_type, fc::crypto::constants::signature_prefix>(yield), _storage);
+   }
+
    std::string signature::to_string(const fc::yield_function_t& yield) const
    {
-      auto data_str = std::visit(base58str_visitor<storage_type, config::signature_prefix>(yield), _storage);
+      auto data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::signature_prefix>(yield), _storage);
       yield();
-      return std::string(config::signature_base_prefix) + "_" + data_str;
+      return std::string(fc::crypto::constants::signature_base_prefix) + "_" + data_str;
    }
 
    std::ostream& operator<<(std::ostream& s, const signature& k) {

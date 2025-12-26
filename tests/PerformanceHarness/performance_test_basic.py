@@ -14,7 +14,7 @@ from pathlib import Path, PurePath
 sys.path.append(str(PurePath(PurePath(Path(__file__).absolute()).parent).parent))
 
 from .log_reader import blockData, trxData, chainData, scrapeTrxGenTrxSentDataLogs, JsonReportHandler, analyzeLogResults, TpsTestConfig, ArtifactPaths, LogAnalysis
-from .NodeopPluginArgs import ChainPluginArgs, HttpPluginArgs, NetPluginArgs, ProducerPluginArgs, ResourceMonitorPluginArgs, SignatureProviderPluginArgs, StateHistoryPluginArgs, TraceApiPluginArgs
+from .NodeopPluginArgs import ChainPluginArgs, HttpPluginArgs, NetPluginArgs, ProducerPluginArgs, ResourceMonitorPluginArgs, SignatureProviderManagerPluginArgs, StateHistoryPluginArgs, TraceApiPluginArgs
 from TestHarness import Account, Cluster, TestHelper, Utils, WalletMgr, TransactionGeneratorsLauncher, TpsTrxGensConfig
 from TestHarness.TestHelper import AppArgs
 from dataclasses import dataclass, asdict, field
@@ -78,7 +78,7 @@ class PerformanceTestBasic:
             netPluginArgs: NetPluginArgs = field(default_factory=NetPluginArgs)
             producerPluginArgs: ProducerPluginArgs = field(default_factory=ProducerPluginArgs)
             resourceMonitorPluginArgs: ResourceMonitorPluginArgs = field(default_factory=ResourceMonitorPluginArgs)
-            signatureProviderPluginArgs: SignatureProviderPluginArgs = field(default_factory=SignatureProviderPluginArgs)
+            signatureProviderManagerPluginArgs: SignatureProviderManagerPluginArgs = field(default_factory=SignatureProviderManagerPluginArgs)
             stateHistoryPluginArgs: StateHistoryPluginArgs = field(default_factory=StateHistoryPluginArgs)
             traceApiPluginArgs: TraceApiPluginArgs = field(default_factory=TraceApiPluginArgs)
 
@@ -351,7 +351,9 @@ class PerformanceTestBasic:
             maximumClients=self.clusterConfig.maximumClients,
             extraNodeopArgs=str(self.clusterConfig.extraNodeopArgs),
             prodsEnableTraceApi=self.clusterConfig.prodsEnableTraceApi,
-            specificExtraNodeopArgs=self.clusterConfig.specificExtraNodeopArgs
+            specificExtraNodeopArgs=self.clusterConfig.specificExtraNodeopArgs,
+            activateIF=True,
+            biosFinalizer=False
             )
 
     def setupWalletAndAccounts(self, accountCnt: int=2, accountNames: list=None):

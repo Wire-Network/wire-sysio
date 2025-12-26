@@ -107,7 +107,7 @@ void apply_context::exec_one()
             } else {
                // allow inline and notify to non-existing contracts
                // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
-               if (receiver != config::system_account_name && act->account == receiver && get_sender().empty()) {
+               if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
                   SYS_ASSERT(false, action_validate_exception,
                              "No contract for action ${a} on account ${r}", ("a", act->name)("r", receiver));
                }
@@ -195,9 +195,9 @@ void apply_context::validate_account_ram_deltas() {
       auto& payer = itr->account;
       auto& ram_delta = itr->delta;
       if (payer != receiver && ram_delta > 0) {
-         if (receiver.prefix() == config::system_account_name && is_privileged()) {
+         if (receiver.prefix() == sysio::chain::config::system_account_name && is_privileged()) {
             // sysio.* contracts allowed
-         } else if (payer == config::system_account_name && is_privileged()) {
+         } else if (payer == sysio::chain::config::system_account_name && is_privileged()) {
             // explicit sysio payer allowed when privileged
          } else {
             auto payer_found = false;
@@ -207,7 +207,7 @@ void apply_context::validate_account_ram_deltas() {
                   payer_found = true;
                   break;
                }
-               if ( auth.actor == config::system_account_name ) {
+               if ( auth.actor == sysio::chain::config::system_account_name ) {
                   // If the payer is the system account, we don't enforce explicit payer authorization.
                   // This avoids a lot of changes for tests and sysio should not be calling untrusted contracts
                   // or spending user's RAM unexpectedly.
@@ -829,7 +829,7 @@ uint64_t apply_context::next_auth_sequence( account_name actor ) {
 }
 
 bool is_system_account(const account_name& name) {
-   return (name == config::system_account_name) ||
+   return (name == sysio::chain::config::system_account_name) ||
           (name.to_string().size() > 5 && name.to_string().find("sysio.") == 0);
 }
 
@@ -852,7 +852,7 @@ action_name apply_context::get_sender() const {
 }
 
 bool apply_context::is_sys_vm_oc_whitelisted() const {
-   return receiver.prefix() == config::system_account_name || // "sysio"_n
+   return receiver.prefix() == sysio::chain::config::system_account_name || // "sysio"_n
           control.is_sys_vm_oc_whitelisted(receiver);
 }
 
