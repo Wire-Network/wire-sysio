@@ -8,7 +8,7 @@
 namespace sysio { namespace chain { namespace webassembly {
 
    void interface::__ashlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      fc::uint128 i(high, low);
+      fc::uint128 i = fc::to_uint128(high, low);
       i <<= shift;
       *ret = (unsigned __int128)i;
    }
@@ -22,13 +22,13 @@ namespace sysio { namespace chain { namespace webassembly {
    }
 
    void interface::__lshlti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      fc::uint128 i(high, low);
+      fc::uint128 i = fc::to_uint128(high, low);
       i <<= shift;
       *ret = (unsigned __int128)i;
    }
 
    void interface::__lshrti3(legacy_ptr<__int128> ret, uint64_t low, uint64_t high, uint32_t shift) const {
-      fc::uint128 i(high, low);
+      fc::uint128 i = fc::to_uint128(high, low);
       i >>= shift;
       *ret = (unsigned __int128)i;
    }
@@ -216,12 +216,12 @@ namespace sysio { namespace chain { namespace webassembly {
       *ret = ui64_to_f128( a );
    }
    double interface::__floattidf( uint64_t l, uint64_t h ) const {
-      fc::uint128 v(h, l);
+      fc::uint128 v = fc::to_uint128(h, l);
       unsigned __int128 val = (unsigned __int128)v;
       return ___floattidf( *(__int128*)&val );
    }
    double interface::__floatuntidf( uint64_t l, uint64_t h ) const {
-      fc::uint128 v(h, l);
+      fc::uint128 v = fc::to_uint128(h, l);
       return ___floatuntidf( (unsigned __int128)v );
    }
 
