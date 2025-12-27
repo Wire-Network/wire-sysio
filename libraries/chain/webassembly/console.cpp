@@ -52,7 +52,7 @@ namespace sysio { namespace chain { namespace webassembly {
 			else
 				val_magnitude = static_cast<unsigned __int128>(*val);
 
-			fc::uint128 v(val_magnitude>>64, static_cast<uint64_t>(val_magnitude) );
+			fc::uint128 v = fc::to_uint128(val_magnitude>>64, static_cast<uint64_t>(val_magnitude) );
 
 			string s;
 			if( is_negative ) {
@@ -67,7 +67,7 @@ namespace sysio { namespace chain { namespace webassembly {
    void interface::printui128(legacy_ptr<const unsigned __int128> val) {
 		predicated_print(context,
       [&]() {
-			fc::uint128 v(*val>>64, static_cast<uint64_t>(*val) );
+			fc::uint128 v = fc::to_uint128(*val>>64, static_cast<uint64_t>(*val) );
 			context.console_append(fc::variant(v).get_string());
       });
    }

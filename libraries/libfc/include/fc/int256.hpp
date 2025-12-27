@@ -14,8 +14,6 @@ using int256_t = int256;
 using uint256   = boost::multiprecision::uint256_t;
 using uint256_t = uint256;
 
-
-
 fc::uint256 to_uint256(const fc::variant& v);
 fc::int256 to_int256(const fc::variant& v);
 
