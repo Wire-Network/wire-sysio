@@ -26,7 +26,7 @@ namespace sysio::chain {
 
 
 uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   fc::uint128 _id(tid._hash[3], tid._hash[2]);
+   fc::uint128 _id = fc::to_uint128(tid._hash[3], tid._hash[2]);
    return (unsigned __int128)_id;
 }
 
