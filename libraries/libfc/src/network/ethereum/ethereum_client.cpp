@@ -47,7 +47,7 @@ fc::variant ethereum_client::execute_contract_tx(const eip1559_tx&   source_tx, 
       auto& tx_sig_data = tx_sig_shim.serialize();
       std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
       std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
-      tx.v       = tx_sig_data.data[64] - 27; // recovery id
+      tx.v       = tx_sig_data[64] - 27; // recovery id
       tx_encoded = rlp::encode_eip1559_signed_typed(tx);
    }
 

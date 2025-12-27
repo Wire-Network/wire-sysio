@@ -160,19 +160,19 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
       copy_to_offset = 1;
    case 65: {
       em::public_key_data_uncompressed pubkey_data;
-      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data + copy_to_offset);
+      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data() + copy_to_offset);
       if (copy_to_offset) {
-         pubkey_data.data[0] = 0x04;
+         pubkey_data[0] = 0x04;
       }
       return fc::em::public_key(pubkey_data);
    }
    case 32:
       copy_to_offset = 1;
    case 33: {
-      em::public_key_data pubkey_data;
-      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data + copy_to_offset);
+      em::public_key_data pubkey_data{};
+      std::copy_n(pubkey_bytes.data(), pubkey_bytes.size(), pubkey_data.data() + copy_to_offset);
       if (copy_to_offset) {
-         pubkey_data.data[0] = 0x02;
+         pubkey_data[0] = 0x02;
       }
       return fc::em::public_key(pubkey_data);
    }
@@ -196,9 +196,11 @@ fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
 
 fc::em::compact_signature to_em_signature(const std::string& signature_hex) {
    auto signature_bytes = fc::from_hex(fc::crypto::ethereum::trim(signature_hex));
-   FC_ASSERT(signature_bytes.size() == fc::em::compact_signature::value_count, "Invalid signature size, expected ${size} character hex string",("size",fc::em::compact_signature::value_count));
+   FC_ASSERT(signature_bytes.size() == std::tuple_size_v<fc::em::compact_signature>,
+             "Invalid signature size, expected ${s}, received ${r} character hex string",
+             ("s", std::tuple_size_v<fc::em::compact_signature>)("r", signature_bytes.size()));
    fc::em::compact_signature sig;
-   std::copy_n(signature_bytes.data(), signature_bytes.size(), sig.data);
+   std::copy_n(signature_bytes.data(), signature_bytes.size(), sig.data());
    return sig;
 }
 }

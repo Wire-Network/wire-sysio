@@ -300,19 +300,19 @@ namespace {
    // vslice_datastream support for Ed25519 shim types
    [[maybe_unused]] inline vslice_datastream&
    operator>>( vslice_datastream& ds, ::fc::crypto::ed::public_key_shim& pk ) {
-      ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+      ds.read(reinterpret_cast<char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
       return ds;
    }
 
    [[maybe_unused]] inline vslice_datastream&
    operator>>( vslice_datastream& ds, ::fc::crypto::ed::private_key_shim& sk ) {
-      ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+      ds.read(reinterpret_cast<char*>(sk._data.data()), crypto_sign_SECRETKEYBYTES);
       return ds;
    }
 
    inline vslice_datastream&
    operator>>( vslice_datastream& ds, ::fc::crypto::ed::signature_shim& sig ) {
-      ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
+      ds.read(reinterpret_cast<char*>(sig._data.data()), crypto_sign_BYTES);
       uint8_t pad = 0; // consume padding byte
       ds.read(reinterpret_cast<char*>(&pad), 1);
       return ds;

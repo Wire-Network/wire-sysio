@@ -148,7 +148,7 @@ namespace fc { namespace crypto { namespace r1 {
         if(BN_cmp(s, halforder) > 0)
            BN_sub(s, order, s);
 
-        compact_signature csig;
+        compact_signature csig{};
 
         int nBitsR = BN_num_bits(r);
         int nBitsS = BN_num_bits(s);
@@ -174,9 +174,9 @@ namespace fc { namespace crypto { namespace r1 {
         if (nRecId == -1)
           FC_THROW_EXCEPTION( exception, "unable to construct recoverable key");
 
-        csig.data[0] = nRecId+27+4;
-        BN_bn2bin(r,&csig.data[33-(nBitsR+7)/8]);
-        BN_bn2bin(s,&csig.data[65-(nBitsS+7)/8]);
+        csig[0] = nRecId+27+4;
+        BN_bn2bin(r,&csig[33-(nBitsR+7)/8]);
+        BN_bn2bin(s,&csig[65-(nBitsS+7)/8]);
 
         return csig;
     }
@@ -245,7 +245,7 @@ namespace fc { namespace crypto { namespace r1 {
           return {};
        }
 
-       private_key_secret sec;
+       private_key_secret sec{};
        const BIGNUM* bn = EC_KEY_get0_private_key(my->_key);
        if( bn == NULL )
        {
@@ -285,7 +285,7 @@ namespace fc { namespace crypto { namespace r1 {
     {
         unsigned int buf_len = ECDSA_size(my->_key);
 //        fprintf( stderr, "%d  %d\n", buf_len, sizeof(sha256) );
-        signature sig;
+        signature sig{};
         FC_ASSERT( buf_len == sizeof(sig) );
 
         if( !ECDSA_sign( 0,
@@ -305,12 +305,12 @@ namespace fc { namespace crypto { namespace r1 {
 
     public_key_data public_key::serialize()const
     {
-      public_key_data dat;
+      public_key_data dat{};
       if( !my->_key ) return dat;
       EC_KEY_set_conv_form( my->_key, POINT_CONVERSION_COMPRESSED );
       /*size_t nbytes = i2o_ECPublicKey( my->_key, nullptr ); */
       /*FC_ASSERT( nbytes == 33 )*/
-      char* front = &dat.data[0];
+      char* front = &dat[0];
       i2o_ECPublicKey( my->_key, (unsigned char**)&front  );
       return dat;
       /*
@@ -324,7 +324,7 @@ namespace fc { namespace crypto { namespace r1 {
     public_key::~public_key() = default;
     public_key::public_key( const public_key_point_data& dat )
     {
-      const char* front = &dat.data[0];
+      const char* front = &dat[0];
       if( *front == 0 ){}
       else
       {
@@ -337,7 +337,7 @@ namespace fc { namespace crypto { namespace r1 {
     }
     public_key::public_key( const public_key_data& dat )
     {
-      const char* front = &dat.data[0];
+      const char* front = &dat[0];
       if( *front == 0 ){}
       else
       {
@@ -379,14 +379,14 @@ namespace fc { namespace crypto { namespace r1 {
 
     public_key::public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical )
     {
-        int nV = c.data[0];
+        int nV = c[0];
         if (nV<27 || nV>=35)
             FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
 
         ecdsa_sig sig = ECDSA_SIG_new();
         BIGNUM *r = BN_new(), *s = BN_new();
-        BN_bin2bn(&c.data[1],32,r);
-        BN_bin2bn(&c.data[33],32,s);
+        BN_bin2bn(&c[1],32,r);
+        BN_bin2bn(&c[33],32,s);
         ECDSA_SIG_set0(sig, r, s);
 
         my->_key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);

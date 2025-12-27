@@ -34,7 +34,6 @@
 #include <string.h>  // for memcpy and memset
 #include <fc/crypto/city.hpp>
 #include <fc/uint128.hpp>
-#include <fc/array.hpp>
 
 #if defined(__SSE4_2__) && defined(__x86_64__)
 #include <nmmintrin.h>
@@ -650,9 +649,9 @@ void CityHashCrc256(const char *s, size_t len, uint64_t *result) {
   }
 }
 
-array<uint64_t,4> city_hash_crc_256(const char *s, size_t len)
+std::array<uint64_t,4> city_hash_crc_256(const char *s, size_t len)
 {
-   array<uint64_t,4> buf;
+   std::array<uint64_t,4> buf;
    CityHashCrc256( s, len, (uint64_t*)&buf );
    return buf;
 }

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <fc/int256.hpp>
+#include <fc/uint128.hpp>
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/exception/exception.hpp>
 

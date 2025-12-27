@@ -16,7 +16,7 @@ namespace fc { namespace crypto { namespace ed {
       sodium_init_guard();
       public_key_shim pub;
       // libsodium stores seed+pub in first half of SK, or you can derive:
-      if (crypto_sign_ed25519_sk_to_pk(pub._data.data, _data.data) != 0) {
+      if (crypto_sign_ed25519_sk_to_pk(pub._data.data(), _data.data()) != 0) {
          FC_THROW_EXCEPTION(exception, "ed25519: failed to derive public key");
       }
       return pub;
@@ -37,7 +37,7 @@ namespace fc { namespace crypto { namespace ed {
             sigbuf, &siglen,
             reinterpret_cast<const unsigned char*>(hex.data()),
             hex.size(),
-            _data.data
+            _data.data()
          ) != 0
          || siglen != crypto_sign_BYTES)
       {
@@ -47,8 +47,8 @@ namespace fc { namespace crypto { namespace ed {
       // 4) Pack into your signature_shim
       signature_shim out;
       // zero‑pad entire buffer then copy
-      memset(out._data.data, 0, out.size);
-      memcpy(out._data.data, sigbuf, crypto_sign_BYTES);
+      memset(out._data.data(), 0, out.size);
+      memcpy(out._data.data(), sigbuf, crypto_sign_BYTES);
       return out;
    }
 
@@ -61,10 +61,10 @@ namespace fc { namespace crypto { namespace ed {
 
       // 2) Verify signature on hex payload
       return crypto_sign_verify_detached(
-         _data.data,
+         _data.data(),
          reinterpret_cast<const unsigned char*>(hex.data()),
          hex.size(),
-         pub._data.data
+         pub._data.data()
       ) == 0; // returns 0 on success
    }
 

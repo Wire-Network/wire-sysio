@@ -64,7 +64,7 @@ namespace fc::crypto {
          const T& get() const { return std::get<T>(_storage); }
 
 
-         storage_type _storage;
+         storage_type _storage{};
 
       private:
          friend std::ostream& operator<<(std::ostream& s, const public_key& k);

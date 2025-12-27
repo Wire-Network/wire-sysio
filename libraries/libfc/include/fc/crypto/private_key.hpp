@@ -68,7 +68,7 @@ namespace fc { namespace crypto {
          std::string to_native_string(const fc::yield_function_t& yield) const;
 
       private:
-         storage_type _storage;
+         storage_type _storage{};
 
          friend bool operator==( const private_key& p1, const private_key& p2 );
          friend bool operator<( const private_key& p1, const private_key& p2 );

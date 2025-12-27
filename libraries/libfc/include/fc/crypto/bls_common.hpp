@@ -1,5 +1,6 @@
 #pragma once
 #include <fc/crypto/common.hpp>
+#include <fc/crypto/base64.hpp>
 
 namespace fc::crypto::bls {
 

@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    eip1559_tx test_tx_01_signed = test_tx_01;
    std::copy_n(sig_data.begin(), 32, test_tx_01_signed.r.begin());
    std::copy_n(sig_data.begin() + 32, 32, test_tx_01_signed.s.begin());
-   test_tx_01_signed.v = sig_data.data[64] - 27; // recovery id
+   test_tx_01_signed.v = sig_data[64] - 27; // recovery id
    BOOST_CHECK(rlp::to_hex(test_tx_01_signed.r, false) == test_tx_01_r);
    BOOST_CHECK(rlp::to_hex(test_tx_01_signed.s, false) == test_tx_01_s);
    BOOST_CHECK(test_tx_01_signed.v == test_tx_01_v);

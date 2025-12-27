@@ -73,7 +73,7 @@ public:
    }
 
 private:
-   storage_type _storage;
+   storage_type _storage{};
 
 
    friend bool operator ==(const signature& p1, const signature& p2);

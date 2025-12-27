@@ -598,6 +598,26 @@ namespace fc
    }
 
    /** @ingroup Serializable */
+   template<size_t N>
+   void to_variant( const std::array<char,N>& bi, variant& v )
+   {
+      v = std::vector<char>( static_cast<const char*>(bi.data()), static_cast<const char*>(bi.data()) + sizeof(bi) );
+   }
+
+   /** @ingroup Serializable */
+   template<size_t N>
+   void from_variant( const variant& v, std::array<char,N>& bi )
+   {
+      std::vector<char> ve = v.as< std::vector<char> >();
+      if( ve.size() )
+      {
+         memcpy(bi.begin(), ve.data(), fc::min<size_t>(ve.size(),sizeof(bi)) );
+      }
+      else
+         memset( bi.begin(), char(0), sizeof(bi) );
+   }
+
+   /** @ingroup Serializable */
    template<typename T, std::size_t S>
    void to_variant( const std::array<T,S>& t, fc::variant& v )
    {

@@ -3,7 +3,6 @@
 #include <cstring>               // for memset
 #include <ostream>               // for std::ostream
 #include <sodium.h>              // for ED25519 methods
-#include <fc/array.hpp>          // for fc::array
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/sha512.hpp>  // for generate_shared_secret return type
 #include <fc/io/raw.hpp>         // for fc::raw::pack/unpack
@@ -22,14 +21,14 @@ struct signature_shim;
  */
 struct public_key_shim {
    static constexpr size_t size = crypto_sign_PUBLICKEYBYTES;
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<unsigned char, size>;
+   data_type _data{};
 
-   public_key_shim() { memset(_data.data, 0, size); }
+   public_key_shim() = default;
    explicit public_key_shim(const data_type& d): _data(d) {}
 
    bool valid() const {
-      for(auto b : _data.data) if(b) return true;
+      for(auto b : _data) if(b) return true;
       return false;
    }
 
@@ -43,10 +42,10 @@ struct signature_shim {
    static constexpr size_t size = crypto_sign_BYTES + 1; // 65, 64 by default padded to 65 to match fc::signature
    static constexpr bool is_recoverable = false;
 
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<unsigned char, size>;
+   data_type _data{};
 
-   signature_shim() { memset(_data.data, 0, size); }
+   signature_shim() = default;
    explicit signature_shim(const data_type& d): _data(d) {}
 
    data_type serialize() const { return _data; }
@@ -64,10 +63,10 @@ struct signature_shim {
  */
 struct private_key_shim {
    static constexpr size_t size = crypto_sign_SECRETKEYBYTES;
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<unsigned char, size>;
+   data_type _data{};
 
-   private_key_shim() { memset(_data.data, 0, size); }
+   private_key_shim() = default;
    explicit private_key_shim(const data_type& d): _data(d) {}
 
    using public_key_type = public_key_shim;
@@ -132,39 +131,39 @@ namespace fc::crypto::ed {
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::public_key_shim& pk) {
-   ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+   ds.write(reinterpret_cast<const char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::public_key_shim& pk) {
-   ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+   ds.read(reinterpret_cast<char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::signature_shim& sig) {
-   ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
+   ds.write(reinterpret_cast<const char*>(sig._data.data()), crypto_sign_BYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::signature_shim& sig) {
-   ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
+   ds.read(reinterpret_cast<char*>(sig._data.data()), crypto_sign_BYTES);
    // pad the extra byte to zero so serialize() remains correct
-   sig._data.data[crypto_sign_BYTES] = 0;
+   sig._data[crypto_sign_BYTES] = 0;
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::private_key_shim& sk) {
-   ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+   ds.write(reinterpret_cast<const char*>(sk._data.data()), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::private_key_shim& sk) {
-   ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+   ds.read(reinterpret_cast<char*>(sk._data.data()), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 
