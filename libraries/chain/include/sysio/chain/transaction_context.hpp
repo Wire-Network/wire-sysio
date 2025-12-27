@@ -19,6 +19,7 @@ namespace sysio::chain {
 
          void start(fc::time_point tp);
          void stop();
+         void set_expired() { _timer.set_expired(); }
 
          platform_timer::state_t timer_state() const { return _timer.timer_state(); }
 

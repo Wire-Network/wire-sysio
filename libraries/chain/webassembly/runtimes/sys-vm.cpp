@@ -158,6 +158,10 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
             checktime_watchdog wd(context.trx_context.transaction_timer);
             _runtime->_bkend.timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
+            // timeout_exception is thrown when any of the threads timeout. It is possible for one of the thread timers
+            // to fire and cause another thread to arrive here before its timer has expired. Explicitly set expired
+            // so that checktime() will see the timeout.
+            context.trx_context.transaction_timer.set_expired();
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "access violation: ${d}", ("d", e.detail()));
@@ -199,6 +203,10 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
             checktime_watchdog wd(context.trx_context.transaction_timer);
             _instantiated_module->timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
+            // timeout_exception is thrown when any of the threads timeout. It is possible for one of the thread timers
+            // to fire and cause another thread to arrive here before its timer has expired. Explicitly set expired
+            // so that checktime() will see the timeout.
+            context.trx_context.transaction_timer.set_expired();
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "access violation");

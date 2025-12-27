@@ -1,0 +1,43 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "runforever",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "runslow",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "segv",
+            "base": "",
+            "fields": []
+        }
+    ],
+    "actions": [
+        {
+            "name": "runforever",
+            "type": "runforever",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "runslow",
+            "type": "runslow",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "segv",
+            "type": "segv",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
