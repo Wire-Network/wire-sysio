@@ -1,5 +1,5 @@
 #include <fc/crypto/city.hpp>
-#include <fc/uint128.hpp>
+#include <fc/int128.hpp>
 #include <fc/variant.hpp>
 
 namespace fc {
