@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
    wdump((cpu)(net)(ram));
    BOOST_TEST(cpu == 10);
    BOOST_TEST(net == 10);
-   BOOST_TEST(ram == 40000*104+base_tester::newaccount_ram); // provided by policy in create_account
+   BOOST_TEST(ram == 100000*104+base_tester::newaccount_ram); // provided by policy in create_account
    int64_t ram_usage = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
    wdump((ram_usage));
    BOOST_TEST(ram_usage < base_tester::newaccount_ram); // ram used to create account

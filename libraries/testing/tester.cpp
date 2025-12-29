@@ -675,7 +675,7 @@ namespace sysio::testing {
                                              ("issuer", NODE_DADDY)
                                              ("net_weight", "0.0010 SYS")
                                              ("cpu_weight", "0.0010 SYS")
-                                             ("ram_weight", "4.0000 SYS")
+                                             ("ram_weight", "10.0000 SYS")
                                              ("network_gen", 0)
                                              ("time_block", 0)
          ));
