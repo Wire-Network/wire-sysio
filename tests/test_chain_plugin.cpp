@@ -126,7 +126,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     // creates account with ROA policy values
     //   ("net_weight", "0.0010 SYS")
     //   ("cpu_weight", "0.0010 SYS")
-    //   ("ram_weight", "4.0000 SYS")
+    //   ("ram_weight", "10.0000 SYS")
     create_account("alice1111111"_n, config::system_account_name);
     transfer(name("sysio"), name("alice1111111"), core_from_string("650000000.0000"), name("sysio") );
 
@@ -134,7 +134,7 @@ BOOST_FIXTURE_TEST_CASE(account_results_total_resources_test, chain_plugin_teste
     BOOST_CHECK(results.total_resources.get_type() != fc::variant::type_id::null_type);
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["net_weight"].as<asset>());
     BOOST_CHECK_EQUAL(core_from_string("0.0010"), results.total_resources["cpu_weight"].as<asset>());
-    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 4161144); // 40000*104+newaccount_ram(1144)
+    BOOST_CHECK_EQUAL(results.total_resources["ram_bytes"].as_int64(), 10401144); // 100000*104+newaccount_ram(1144)
 
 } FC_LOG_AND_RETHROW() }
 
