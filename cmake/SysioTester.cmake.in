@@ -44,6 +44,7 @@ endif()
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
+find_package(ethash REQUIRED)
 find_library(SYSIO_TESTER_ATOMIC_LIB atomic)
 set(SYSIO_TESTER_ATOMIC_LINK "")
 if(SYSIO_TESTER_ATOMIC_LIB)
@@ -184,6 +185,7 @@ target_link_libraries(SysioChain INTERFACE
         Boost::asio
         Boost::signals2
         Boost::iostreams
+        ethash::keccak
 
         # Needed by Boost iostreams
         -lz
