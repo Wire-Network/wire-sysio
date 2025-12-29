@@ -7,6 +7,8 @@
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/rand.hpp>
 
+#include "../utils/scoped_boost_log_level.hpp"
+
 #ifdef __linux__
 #include <linux/fs.h>
 #endif
@@ -71,6 +73,7 @@ BOOST_AUTO_TEST_CASE(long_datastream) try {
 
    fc::sha256 hash_of_written_data;
    {
+      scoped_boost_log_level _{boost::unit_test::log_warnings};
       fc::random_access_file::write_datastream ds = f.write_ds(0);
       fc::sha256::encoder enc;
       for(unsigned i = 0; i < number_of_entries_to_do; ++i) { //each loop here writes 8+5=13 bytes
@@ -85,6 +88,7 @@ BOOST_AUTO_TEST_CASE(long_datastream) try {
 
    //try reading everything back via read_datastream
    {
+      scoped_boost_log_level _{boost::unit_test::log_warnings};
       fc::random_access_file::read_datastream ds = f.read_ds(0);
       fc::sha256::encoder enc;
 
@@ -102,12 +106,14 @@ BOOST_AUTO_TEST_CASE(long_datastream) try {
 
    //try reading back via random access
    {
+      scoped_boost_log_level _{boost::unit_test::log_warnings};
       for(uint64_t i = 0; i < number_of_entries_to_do; ++i)
          BOOST_REQUIRE_EQUAL(i, f.unpack_from<uint64_t>(i*13));
    }
 
    //load everything in to memory via a completely different impl
    {
+      scoped_boost_log_level _{boost::unit_test::log_warnings};
       std::string s;
       fc::read_file_contents(filepath, s);
       BOOST_REQUIRE_EQUAL(fc::sha256::hash(s.data(), s.size()), hash_of_written_data);
@@ -115,6 +121,7 @@ BOOST_AUTO_TEST_CASE(long_datastream) try {
 
    //load everything in to memory via device
    {
+      scoped_boost_log_level _{boost::unit_test::log_warnings};
       fc::random_access_file::device device = f.seekable_device();
       boost::beast::flat_buffer buff;
       const unsigned read_amount = 72*1024;
@@ -122,6 +129,7 @@ BOOST_AUTO_TEST_CASE(long_datastream) try {
       while((red = boost::iostreams::read(device, (char*)buff.prepare(read_amount).data(), read_amount)) != -1) {
          buff.commit(red);
       }
+
       BOOST_REQUIRE_EQUAL(fc::sha256::hash((char*)buff.cdata().data(), buff.size()), hash_of_written_data);
    }
 } FC_LOG_AND_RETHROW();
