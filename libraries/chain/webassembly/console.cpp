@@ -1,6 +1,7 @@
-#include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/apply_context.hpp>
-#include <fc/uint128.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+
+#include <fc/int128.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
 

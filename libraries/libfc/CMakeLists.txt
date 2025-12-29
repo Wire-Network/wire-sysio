@@ -1,6 +1,6 @@
 
 set(fc_sources
-  src/uint128.cpp
+  src/int128.cpp
   src/int256.cpp
   src/variant.cpp
   src/exception.cpp

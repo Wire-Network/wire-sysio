@@ -3,7 +3,7 @@
 #include <compiler_builtins.hpp>
 #include <softfloat/softfloat.hpp>
 
-#include <fc/uint128.hpp>
+#include <fc/int128.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
 

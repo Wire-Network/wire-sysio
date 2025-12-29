@@ -7,11 +7,6 @@
 
 #include <fc/exception/exception.hpp>
 
-#ifdef _MSC_VER
-  #pragma warning (push)
-  #pragma warning (disable : 4244)
-#endif //// _MSC_VER
-
 namespace fc
 {
 
@@ -40,9 +35,4 @@ namespace fc
     void unpack( Stream& s, uint128& u ) { s.read( (char*)&u, sizeof(u) ); }
   }
 
-
 } // namespace fc
-
-#ifdef _MSC_VER
-  #pragma warning (pop)
-#endif ///_MSC_VER

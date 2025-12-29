@@ -80,6 +80,18 @@ variant::variant( int64_t val )
    set_variant_type( this, int64_type );
 }
 
+variant::variant(fc::uint128 val)
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, uint128_type );
+}
+
+variant::variant(fc::int128 val)
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, int128_type );
+}
+
 variant::variant( int256 val )
 {
    *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
@@ -341,6 +353,14 @@ bool variant::is_uint64()const
    return get_type() == uint64_type;
 }
 
+bool variant::is_int128() const {
+   return get_type() == int128_type;
+}
+
+bool variant::is_uint128() const {
+   return get_type() == uint128_type;
+}
+
 bool variant::is_int256() const {
    return get_type() == int256_type;
 }
@@ -360,6 +380,8 @@ bool variant::is_integer()const
    {
       case int64_type:
       case uint64_type:
+      case int128_type:
+      case uint128_type:
       case int256_type:
       case uint256_type:
       case bool_type:
@@ -439,6 +461,52 @@ uint64_t variant::as_uint64()const
           return 0;
       default:
          FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint64", ("type",get_type()));
+   }
+} FC_CAPTURE_AND_RETHROW( (*this) ) }
+
+fc::int128 variant::as_int128() const
+{
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::int128(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::int128(*reinterpret_cast<const uint64_t*>(this));
+   case int128_type:
+      return fc::int128(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint128_type:
+      return fc::int128(as_string());
+   case string_type:
+      return fc::int128(as_string());
+   case bool_type:
+      return int128(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to int128", ("type", get_type()) );
+   }
+}
+
+fc::uint128 fc::variant::as_uint128()const
+{ try {
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::uint128(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::uint128(*reinterpret_cast<const uint64_t*>(this));
+   case int128_type:
+      return fc::uint128(as_string());//*reinterpret_cast<const int128*>(this);
+   case uint128_type:
+      return fc::uint128(as_string());
+   case string_type:
+      return fc::uint128(as_string());
+   case bool_type:
+      return uint128(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint128", ("type",get_type()));
    }
 } FC_CAPTURE_AND_RETHROW( (*this) ) }
 
