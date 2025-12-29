@@ -44,7 +44,7 @@
 #include <array>
 #include <cstdint>
 
-#include <fc/uint128.hpp>
+#include <fc/int128.hpp>
 
 namespace fc {
 

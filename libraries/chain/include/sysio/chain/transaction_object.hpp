@@ -1,11 +1,12 @@
 #pragma once
-#include <fc/io/raw.hpp>
-
-#include <sysio/chain/transaction.hpp>
-#include <fc/uint128.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
+
+#include <fc/int128.hpp>
+#include <fc/io/raw.hpp>
+
+#include <sysio/chain/transaction.hpp>
 
 #include "multi_index_includes.hpp"
 

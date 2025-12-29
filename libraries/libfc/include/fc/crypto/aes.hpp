@@ -1,9 +1,11 @@
 #pragma once
+#include <vector>
+
 #include <fc/crypto/sha512.hpp>
 #include <fc/crypto/sha256.hpp>
-#include <fc/uint128.hpp>
+
 #include <fc/fwd.hpp>
-#include <vector>
+#include <fc/int128.hpp>
 
 namespace fc {
 
