@@ -38,19 +38,32 @@ namespace sysio::chain {
 
    transaction_context::transaction_context( controller& c,
                                              const packed_transaction& t,
-                                             const transaction_id_type& trx_id,
                                              transaction_checktime_timer&& tmr,
                                              fc::time_point s,
-                                             transaction_metadata::trx_type type)
+                                             transaction_metadata::trx_type type,
+                                             const std::optional<fc::microseconds>& subjective_cpu_leeway,
+                                             const fc::time_point& block_deadline,
+                                             const fc::microseconds& max_transaction_time_subjective,
+                                             bool explicit_billed_cpu_time,
+                                             const accounts_billing_t& prev_accounts_billing,
+                                             const cpu_usage_t& billed_cpu_us
+                                             )
    :control(c)
    ,packed_trx(t)
-   ,id(trx_id)
    ,undo_session()
    ,trace(std::make_shared<transaction_trace>())
    ,start(s)
    ,executed_action_receipts()
    ,transaction_timer(std::move(tmr))
    ,trx_type(type)
+   ,leeway(subjective_cpu_leeway.value_or(fc::microseconds(config::default_subjective_cpu_leeway_us)))
+    // set maximum to a semi-valid deadline (six months) to allow for pause math and conversion to dates for logging
+   ,enforce_deadline(block_deadline != fc::time_point::maximum())
+   ,block_deadline(block_deadline == fc::time_point::maximum() ? s + fc::hours(24*7*26) : block_deadline)
+   ,max_transaction_time_subjective(max_transaction_time_subjective)
+   ,explicit_billed_cpu_time(explicit_billed_cpu_time)
+   ,prev_accounts_billing(prev_accounts_billing)
+   ,billed_cpu_us(billed_cpu_us)
    ,pseudo_start(s)
    {
       initialize();
@@ -62,7 +75,8 @@ namespace sysio::chain {
       *trace = transaction_trace{}; // reset trace
       trace->net_usage = net_usage;
       initialize();
-      billed_cpu_us.clear();
+      if (!explicit_billed_cpu_time)
+         billed_cpu_us.clear();
       trx_blk_context = trx_block_context{};
       transaction_timer.stop();
       if (paused_timer) {
@@ -81,7 +95,7 @@ namespace sysio::chain {
          undo_session.emplace(control.mutable_db().start_undo_session(true));
       }
 
-      trace->id = id;
+      trace->id = packed_trx.id();
       trace->block_num = control.head().block_num() + 1;
       trace->block_time = control.pending_block_time();
       trace->producer_block_id = control.pending_producer_block_id();
@@ -118,11 +132,6 @@ namespace sysio::chain {
       assert(!is_initialized);
 
       published = control.pending_block_time();
-
-      // set maximum to a semi-valid deadline to allow for pause math and conversion to dates for logging
-      const fc::time_point six_months = start + fc::hours(24*7*52);
-      if( block_deadline == fc::time_point::maximum() )
-         block_deadline = six_months; // half-year
 
       const auto& cfg = control.get_global_properties().configuration;
       auto& rl = control.get_mutable_resource_limits_manager();
@@ -255,12 +264,8 @@ namespace sysio::chain {
       if(control.skip_trx_checks()) {
          trx_deadline = block_deadline;
       }
-      if (trx_deadline >= six_months) {
-         enforce_deadline = false;
-         active_deadline = fc::time_point::maximum();
-      } else {
-         active_deadline = trx_deadline;
-      }
+
+      active_deadline = enforce_deadline ? trx_deadline : fc::time_point::maximum();
       transaction_timer.start( active_deadline );
       checktime(); // Fail early if deadline as already been exceeded
 
@@ -296,7 +301,7 @@ namespace sysio::chain {
 
       init();
       if ( !is_read_only() ) {
-         record_transaction( id, trx.expiration );
+         record_transaction( packed_trx.id(), trx.expiration );
       }
    }
    
