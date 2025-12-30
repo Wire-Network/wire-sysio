@@ -67,6 +67,10 @@ namespace sysio::chain {
    ,pseudo_start(s)
    {
       initialize();
+
+      if(auto dm_logger = control.get_deep_mind_logger(is_transient())) {
+         dm_logger->on_start_transaction();
+      }
    }
 
    void transaction_context::reset() {
@@ -100,8 +104,12 @@ namespace sysio::chain {
       trace->block_time = control.pending_block_time();
       trace->producer_block_id = control.pending_producer_block_id();
 
-      if(auto dm_logger = control.get_deep_mind_logger(is_transient())) {
-         dm_logger->on_start_transaction();
+      const transaction& trx = packed_trx.get_transaction();
+      if (explicit_billed_cpu_time) {
+         SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception, "No transaction receipt cpu usage");
+         trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
+      } else {
+         billed_cpu_us.reserve(trx.total_actions());
       }
    }
 
@@ -184,14 +192,8 @@ namespace sysio::chain {
 
       leeway_trx_net_limit = trx_net_limit; // no leeway for block, cfg.max_transaction_net_usage, or trx.max_net_usage_words
 
-      if ( !is_read_only() ) {
-         if (explicit_billed_cpu_time) {
-            SYS_ASSERT(billed_cpu_us.size() == trx.total_actions(), transaction_exception, "No transaction receipt cpu usage");
-            trace->total_cpu_usage_us = std::ranges::fold_left(billed_cpu_us, 0l, std::plus());
-            validate_trx_billed_cpu();
-         } else {
-            billed_cpu_us.reserve(trx.total_actions());
-         }
+      if ( !is_read_only() && explicit_billed_cpu_time ) {
+         validate_trx_billed_cpu();
       }
 
       std::array all_actions = {std::views::all(trx.context_free_actions), std::views::all(trx.actions)};
