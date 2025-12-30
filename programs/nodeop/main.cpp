@@ -13,6 +13,7 @@
 #include <fc/log/appender.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/scoped_exit.hpp>
+#include <fc/string.hpp>
 
 #include <boost/dll/runtime_symbol_info.hpp>
 #include <boost/exception/diagnostic_information.hpp>
@@ -21,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <numeric>
 
 #include "config.hpp"
 
@@ -28,14 +30,17 @@ using namespace appbase;
 using namespace sysio;
 
 namespace detail {
+using namespace std;
 
 void log_non_default_options(const std::vector<bpo::basic_option<char>>& options) {
    using namespace std::string_literals;
-   // TODO: @jglanz reimplement
-   // auto mask_private = [](const string& v) {
-   //    auto [pub_key_str, spec_type_str, spec_data] = signature_provider_manager_plugin::parse_signature_provider_spec(v);
-   //    return pub_key_str + "=" + spec_type_str + ":***";
-   // };
+   auto mask_private = [](const string& v) -> std::string {
+      if (auto parts = fc::split(v, ','); parts.size() > 1) {
+         return std::accumulate(std::next(parts.begin()), std::prev(parts.end()), parts[0],
+                                [](const string& acc, const string& part) { return acc + "," + part; }) + ",***";
+      }
+      return "***"s;
+   };
 
    string result;
    for (const auto& op : options) {
@@ -49,7 +54,7 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
          if (i != b)
             v += ", ";
          if (op.string_key == "signature-provider"s)
-            v += *i;// TODO @jglanz mask_private(*i);
+            v += mask_private(*i);
          else if (mask)
             v += "***";
          else
