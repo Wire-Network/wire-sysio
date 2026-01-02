@@ -529,5 +529,3 @@ namespace sysio::chain {
    }; // controller
 
 }  /// sysio::chain
-
-FC_REFLECT(sysio::chain::peerkeys_t, (producer_name)(peer_key))
