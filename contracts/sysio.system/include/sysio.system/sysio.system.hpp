@@ -11,6 +11,7 @@
 
 #include <sysio.system/native.hpp>
 
+#include <limits>
 #include <deque>
 #include <optional>
 #include <string>
@@ -114,6 +115,7 @@ namespace sysiosystem {
    struct [[sysio::table, sysio::contract("sysio.system")]] producer_info {
       name                                                     owner;
       sysio::public_key                                        producer_key; /// a packed public key object
+      uint32_t                                                 rank = std::numeric_limits<uint32_t>::max();
       bool                                                     is_active = true;
       std::string                                              url;
       uint32_t                                                 unpaid_blocks = 0;
@@ -122,6 +124,7 @@ namespace sysiosystem {
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
 
       uint64_t primary_key()const { return owner.value;                             }
+      uint64_t by_rank()const     { return rank; }
       bool     active()const      { return is_active;                               }
       void     deactivate()       { producer_key = public_key(); producer_authority = sysio::block_signing_authority{}; is_active = false; }
 
@@ -129,10 +132,12 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
    };
 
-   typedef sysio::multi_index< "producers"_n, producer_info > producers_table;
+   typedef sysio::multi_index< "producers"_n, producer_info,
+                               indexed_by<"prodrank"_n, const_mem_fun<producer_info, uint64_t, &producer_info::by_rank>>
+                             > producers_table;
 
    // finalizer_key_info stores information about a finalizer key.
    struct [[sysio::table("finkeys"), sysio::contract("sysio.system")]] finalizer_key_info {
