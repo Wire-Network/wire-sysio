@@ -2,6 +2,7 @@
 
 import copy
 import signal
+import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL, createAccountKeys
 
@@ -77,6 +78,7 @@ try:
         specificNodeopArgs[nodeId] = auto_bp_peer_arg
         producer_name = "defproducer" + chr(ord('a') + nodeId)
         specificNodeopArgs[nodeId] += (f" --signature-provider wire-{nodeId},wire,wire,{accounts[nodeId].activePublicKey},KEY:{accounts[nodeId].activePrivateKey}")
+        specificNodeopArgs[nodeId] += " --connection-cleanup-period 5 --net-threads 8"
 
     specificNodeopArgs[5] = specificNodeopArgs[5] + ' --p2p-server-address ext-ip0:9999'
 
@@ -230,10 +232,14 @@ try:
     assert(success)
 
     Print("Verify manual connection still connected")
-    connections = cluster.nodes[19].processUrllibRequest("net", "connections")
-    if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
-    found = connectedPeers(19, connections)
-    Print(f"Found connections of Node_19: {found}")
+    for i in range(3): # retry 3 times
+        connections = cluster.nodes[19].processUrllibRequest("net", "connections")
+        if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
+        found = connectedPeers(19, connections)
+        Print(f"Found connections of Node_19: {found}")
+        if "defproducere" in found and "defproducerh" not in found:
+            break
+        time.sleep(7)
     assert("defproducere" in found)     # still connected to manual connection
     assert("defproducerh" not in found) # not connected to new schedule
 
