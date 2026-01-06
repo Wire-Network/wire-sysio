@@ -4,6 +4,7 @@
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
+
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/log/logger_config.hpp>
 #include <sysio/outpost_client_plugin.hpp>
@@ -55,15 +56,22 @@ void initialize_logging() {
    app().set_sighup_callback(logging_conf_handler);
 }
 
+using namespace fc::network::ethereum;
+// constexpr std::string_view test_contract_abi_counter_json_file_01 = "ethereum-abi-counter-01.json";
+//
+// auto counter_abis = fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));
+
+
 struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
-   ethereum_contract_tx_fn<fc::uint256> set_number;
-   ethereum_contract_call_fn<> get_number;
+   ethereum_contract_tx_fn<fc::variant, fc::uint256> set_number;
+   ethereum_contract_call_fn<fc::variant> get_number;
    ethereum_contract_test_counter_client(const ethereum_client_ptr& client,
-                                         const address_compat_type& contract_address_compat)
-      : ethereum_contract_client(client, contract_address_compat),
-   set_number(create_tx<fc::uint256>("setNumber(uint256)")),
-   get_number(create_call("number()")) {
+                                         const address_compat_type& contract_address_compat,
+                                         const std::vector<fc::network::ethereum::abi::contract>& contracts)
+      : ethereum_contract_client(client, contract_address_compat, contracts),
+   set_number(create_tx<fc::variant, fc::uint256>(get_abi("setNumber"))),
+   get_number(create_call<fc::variant>(get_abi("number"))) {
 
    };
 };
@@ -113,6 +121,10 @@ int main(int argc, char* argv[]) {
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
       auto& eth_plug = app->get_plugin<sysio::outpost_ethereum_client_plugin>();
+      auto& eth_abi_files = eth_plug.get_abi_files();
+      FC_ASSERT(eth_abi_files.size() == 1, "1 ABI file is required (--ethereum-abi-file <json-array-file>)");
+      auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[0];
+      ilogf("Using ABI file contracts: {}", eth_abi_file.string());
 
       auto  client_entry = eth_plug.get_clients()[0];
       auto& client       = client_entry->client;

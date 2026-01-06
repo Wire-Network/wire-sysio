@@ -311,6 +311,19 @@ namespace fc
     FC_MULTILINE_MACRO_END \
   )
 
+#define FC_ASSERT_FMT( TEST, ... ) \
+  FC_EXPAND_MACRO( \
+    FC_MULTILINE_MACRO_BEGIN \
+      if( UNLIKELY(!(TEST)) ) \
+      {                                                                      \
+        if( fc::enable_record_assert_trip )                                  \
+           fc::record_assert_trip( __FILE__, __LINE__, #TEST );              \
+        FC_THROW_EXCEPTION_FMT( fc::assert_exception, #TEST ": "  __VA_ARGS__ ); \
+      }                                                                      \
+    FC_MULTILINE_MACRO_END \
+  )
+
+
 #define FC_CAPTURE_AND_THROW( EXCEPTION_TYPE, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
     throw EXCEPTION_TYPE( FC_LOG_MESSAGE( error, "", FC_FORMAT_ARG_PARAMS(__VA_ARGS__) ) ); \

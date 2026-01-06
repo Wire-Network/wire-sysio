@@ -244,6 +244,9 @@ template<> struct reflector<ENUM> { \
         } \
         return from_int(i); \
     } \
+    static ENUM from_string( const std::string& str ) { \
+        return from_string(str.c_str()); \
+    } \
     template< typename Visitor > \
     static void visit( Visitor& v ) \
     { \
@@ -335,6 +338,9 @@ template<> struct reflector<ENUM> { \
            fc::throw_bad_enum_cast( s, BOOST_PP_STRINGIZE(ENUM) ); \
         } \
         return from_int(i); \
+    } \
+    static ENUM from_string( const std::string& str, bool strip_base_enum = STRIP_BASE_ENUM_DEFAULT ) { \
+        return from_string(str.c_str(), strip_base_enum); \
     } \
     template< typename Visitor > \
     static void visit( Visitor& v ) \

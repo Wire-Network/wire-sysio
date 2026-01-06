@@ -12,18 +12,21 @@
 #include <format>
 #include <memory>
 #include <string>
-#include <sysio/chain/types.hpp>
-#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/testing/build_info.hpp>
-#include <sysio/testing/crypto_utils.hpp>
 #include <type_traits>
 #include <vector>
+
 #include <gsl-lite/gsl-lite.hpp>
+
+#include <sysio/chain/types.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+
+#include <fc-test/build_info.hpp>
+#include <fc-test/crypto_utils.hpp>
 
 using sysio::signature_provider_manager_plugin;
 using sysio::chain::private_key_type;
 using sysio::chain::public_key_type;
-using namespace sysio::testing;
+using namespace fc::test;
 
 namespace {
 
@@ -77,7 +80,7 @@ BOOST_AUTO_TEST_SUITE(signature_provider_manager_create_provider_specs)
 
 BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
    using namespace fc::crypto;
-   using namespace sysio::testing;
+
    auto priv = fc::crypto::private_key::generate();
    auto pub  = priv.get_public_key();
 
@@ -151,6 +154,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
 }
 
 BOOST_AUTO_TEST_CASE(create_provider_ethereum_key_spec) {
+   using namespace fc::test;
    using namespace fc::crypto;
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
@@ -182,6 +186,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_key_spec) {
 }
 
 BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
+   using namespace fc::test;
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
    });
@@ -207,11 +212,13 @@ BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
 }
 
 BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
+   using namespace fc::test;
+   using namespace fc::crypto;
+
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
    });
 
-   using namespace fc::crypto;
    // Load fixture
    keygen_result fixture1      = load_keygen_fixture("wire", 1);
    auto          fixture_spec1 = keygen_fixture_to_spec("wire", 1);

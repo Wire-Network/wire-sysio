@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 #pragma once
 
@@ -15,32 +16,44 @@ using namespace fc::network::json_rpc;
 class ethereum_client;
 using ethereum_client_ptr = std::shared_ptr<ethereum_client>;
 
-template<typename ... Args>
-using ethereum_contract_call_fn = std::function<fc::variant(
+template<typename RT, typename ... Args>
+using ethereum_contract_call_fn = std::function<RT(
    const std::string& block_tag,Args&...)>;
-template<typename ... Args>
-using ethereum_contract_tx_fn = std::function<fc::variant(Args&...)>;
+template<typename RT, typename ... Args>
+using ethereum_contract_tx_fn = std::function<RT(Args&...)>;
 
 class ethereum_contract_client : public std::enable_shared_from_this<ethereum_contract_client> {
+
 public:
    const address contract_address;
    const std::string contract_address_hex;
    const ethereum_client_ptr client;
    ethereum_contract_client() = delete;
-   ethereum_contract_client(const ethereum_client_ptr& client, const address_compat_type& contract_address_compat):
+   ethereum_contract_client(const ethereum_client_ptr& client, const address_compat_type& contract_address_compat, const std::vector<abi::contract>& contracts = {}):
    contract_address(ethereum::to_address(contract_address_compat)),
    contract_address_hex(fc::to_hex(contract_address)),
-   client(client) {};
+   client(client) {
+      std::scoped_lock lock(_abi_mutex);
+      for (const auto& contract : contracts) {
+         abi_map[contract.name] = contract;
+      }
+   };
 
    virtual ~ethereum_contract_client() = default;
+
+   bool has_abi(const std::string& contract_name);
+
+   abi::contract& get_abi(const std::string& contract_name);
+
+
 protected:
-   std::map<std::string, ethereum_contract_abi> abi_map{};
+   std::map<std::string, abi::contract> abi_map{};
 
-   template<typename ... Args>
-   ethereum_contract_call_fn<Args...> create_call(const std::string& abi_signature);
+   template<typename RT, typename ... Args>
+   ethereum_contract_call_fn<RT,Args...> create_call(const abi::contract& contract);
 
-   template<typename ... Args>
-   ethereum_contract_tx_fn<Args...> create_tx(const std::string& abi_signature);
+   template<typename RT, typename ... Args>
+   ethereum_contract_tx_fn<RT, Args...> create_tx(const abi::contract& contract);
 
 private:
    std::mutex _abi_mutex{};
@@ -76,16 +89,16 @@ public:
     */
    fc::variant execute(const std::string& method, const fc::variant& params);
 
-   fc::variant execute_contract_call(
+   fc::variant execute_contract_view_fn(
       const address& contract_address,
-      const ethereum_contract_abi & abi,
+      const abi::contract & abi,
       const std::string& block_tag,
-      const fc::variants& params);
+      const contract_invoke_data_items& params);
 
-   fc::variant execute_contract_tx(
+   fc::variant execute_contract_tx_fn(
       const eip1559_tx& tx,
-      const ethereum_contract_abi & abi,
-      const fc::variants& params = {},
+      const abi::contract & abi,
+      const contract_invoke_data_items& params = {},
       bool sign = true);
 
 
@@ -144,7 +157,7 @@ public:
 
    /**
     * @brief Retrieves the current gas price.
-    * @return The current gas price in hexadecimal format, or an empty std::optional if an error occurs.
+    * @return The current gas price in hexadecimal format, if an error occurs, it throws.
     */
    std::string get_gas_price();
 
@@ -208,11 +221,11 @@ public:
    eip1559_tx create_default_tx(const address_compat_type& to);
 
    template<typename C>
-   std::shared_ptr<C> get_contract(const address_compat_type& address_compat) {
+   std::shared_ptr<C> get_contract(const address_compat_type& address_compat, const std::vector<abi::contract>& contracts = {}) {
       std::scoped_lock<std::mutex> lock(_contracts_map_mutex);
       auto addr = ethereum::to_address(address_compat);
       if (!_contracts_map.contains(addr)) {
-         _contracts_map[addr] = std::make_shared<C>(shared_from_this(), addr);
+         _contracts_map[addr] = std::make_shared<C>(shared_from_this(), addr, contracts);
       }
       return std::dynamic_pointer_cast<C>(_contracts_map[addr]);
    }
@@ -226,32 +239,48 @@ private:
 };
 
 
-template <typename ... Args>
-ethereum_contract_call_fn<Args...> ethereum_contract_client::create_call(const std::string& abi_signature) {
-   std::scoped_lock<std::mutex> lock(_abi_mutex);
-   if (!abi_map.contains(abi_signature)) {
-      abi_map[abi_signature] = parse_ethereum_contract_abi_signature(abi_signature);
+template <typename RT, typename ... Args>
+ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(const abi::contract& contract) {
+   {
+      std::scoped_lock<std::mutex> lock(_abi_mutex);
+      if (!abi_map.contains(contract.name)) {
+         abi_map[contract.name] = contract;
+      }
    }
-   ethereum_contract_abi& abi = abi_map[abi_signature];
-   return [this, abi](const std::string& block_tag, Args&... args) -> fc::variant {
-      fc::variants params = {args...};
-      return client->execute_contract_call(contract_address, abi, block_tag,params);
+   abi::contract& abi = abi_map[contract.name];
+   return [this, &abi](const std::string& block_tag, Args&... args) -> RT {
+      contract_invoke_data_items params = {args...};
+      auto res_var = client->execute_contract_view_fn(contract_address, abi, block_tag,params);
 
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return res_var;
+      }
+
+      return res_var.as<RT>();
    };
 }
 
 
-template <typename ... Args>
-ethereum_contract_tx_fn<Args...> ethereum_contract_client::create_tx(const std::string& abi_signature) {
-   std::scoped_lock<std::mutex> lock(_abi_mutex);
-   if (!abi_map.contains(abi_signature)) {
-      abi_map[abi_signature] = parse_ethereum_contract_abi_signature(abi_signature);
+template <typename RT, typename ... Args>
+ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx(
+   const abi::contract& contract) {
+   {
+      std::scoped_lock<std::mutex> lock(_abi_mutex);
+      if (!abi_map.contains(contract.name)) {
+         abi_map[contract.name] = contract;
+      }
    }
-   ethereum_contract_abi& abi = abi_map[abi_signature];
-   return [this, abi](const Args&... args) -> fc::variant {
-      fc::variants params = {args...};
+   abi::contract& abi = abi_map[contract.name];
+   return [this, &abi](const Args&... args) -> RT {
+      contract_invoke_data_items params = {args...};
       auto tx = client->create_default_tx(contract_address);
-      return client->execute_contract_tx(tx, abi, params);
+      auto res_var = client->execute_contract_tx_fn(tx, abi, params);
+
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return res_var;
+      }
+
+      return res_var.as<RT>();
    };
 }
 
