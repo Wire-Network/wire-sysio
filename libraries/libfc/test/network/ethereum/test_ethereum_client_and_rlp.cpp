@@ -118,10 +118,10 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
       std::ranges::to<std::vector>();
 
    BOOST_CHECK(contract_abis.size() >= 2);
-   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[0]), "submitOrder(tuple(address,uint256,bytes32))");
-   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[1]), "submitOrderTx(tuple(address,uint256,bytes32))");
-   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[2]), "submitOrders(tuple(address,uint256,bytes32)[])");
-   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[3]), "submitTwoOrders(tuple(tuple(address,uint256,bytes32),string)[2])");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[0]), "submitOrder((address,uint256,bytes32))");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[1]), "submitOrderTx((address,uint256,bytes32))");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[2]), "submitOrders((address,uint256,bytes32)[])");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[3]), "submitTwoOrders(((address,uint256,bytes32),string)[2])");
 
    auto selector0 = eth::abi::to_contract_function_selector(contract_abis[0]);
    auto selector1 = eth::abi::to_contract_function_selector(contract_abis[1]);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
    BOOST_CHECK_EQUAL(fc::to_hex(selector3), "d83419b2ab28970bcf14860231bb111db7c2070fbdeaf26168d2e49f5b32cdc0");
 
    // Test to_contract_component_signature directly
-   BOOST_CHECK_EQUAL(eth::abi::to_contract_component_signature(contract_abis[0].inputs[0]), "tuple(address,uint256,bytes32)");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_component_signature(contract_abis[0].inputs[0]), "(address,uint256,bytes32)");
 
    // Test with a list (manual component creation)
    eth::abi::component_type list_comp;
@@ -144,6 +144,134 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
 
    list_comp.list_config.size = 10;
    BOOST_CHECK_EQUAL(eth::abi::to_contract_component_signature(list_comp), "uint256[10]");
+}
+FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
+
+   auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
+   auto contract_abis =
+      eth::abi::parse_contracts(fs::path(abi_filename.generic_string())) |
+      std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |
+      std::ranges::to<std::vector>();
+
+   BOOST_CHECK(contract_abis.size() >= 4);
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[0]), "submitOrder((address,uint256,bytes32))");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[1]), "submitOrderTx((address,uint256,bytes32))");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[2]), "submitOrders((address,uint256,bytes32)[])");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[3]), "submitTwoOrders(((address,uint256,bytes32),string)[2])");
+
+   // Test 1: submitOrder with a single tuple (address, uint256, bytes32)
+   // Order: maker=0x1234567890123456789012345678901234567890, amount=1000, salt=0xabcd...
+   {
+      fc::mutable_variant_object order;
+      order("maker", "0x1234567890123456789012345678901234567890");
+      order("amount", 1000);
+      order("salt", "0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd");
+
+      auto encoded = eth::contract_invoke_encode(contract_abis[0], {fc::variant(order)});
+
+      // Expected encoding:
+      // 4 bytes: function selector (first 4 bytes of keccak256("submitOrder((address,uint256,bytes32))"))
+      // 32 bytes: offset to tuple data (0x20 = 32)
+      // 32 bytes: address (left-padded)
+      // 32 bytes: amount (1000 = 0x3e8)
+      // 32 bytes: salt
+      std::string expected =
+         "6d8ea645"  // selector (first 4 bytes)
+         "0000000000000000000000001234567890123456789012345678901234567890"  // address
+         "00000000000000000000000000000000000000000000000000000000000003e8"  // amount = 1000
+         "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"; // salt
+
+      BOOST_CHECK_EQUAL(encoded, expected);
+   }
+
+   // Test 2: submitOrders with dynamic array of tuples
+   {
+      fc::mutable_variant_object order1;
+      order1("maker", "0x1111111111111111111111111111111111111111");
+      order1("amount", 100);
+      order1("salt", "0x1111111111111111111111111111111111111111111111111111111111111111");
+
+      fc::mutable_variant_object order2;
+      order2("maker", "0x2222222222222222222222222222222222222222");
+      order2("amount", 200);
+      order2("salt", "0x2222222222222222222222222222222222222222222222222222222222222222");
+
+      fc::variants orders = {fc::variant(order1), fc::variant(order2)};
+
+      auto encoded = eth::contract_invoke_encode(contract_abis[2], {fc::variant(orders)});
+
+      // Expected encoding for dynamic array:
+      // 4 bytes: function selector
+      // 32 bytes: offset to array data (0x20)
+      // 32 bytes: array length (2)
+      // 96 bytes: first tuple (address, amount, salt)
+      // 96 bytes: second tuple (address, amount, salt)
+      std::string expected =
+         "034918bd"  // selector
+         "0000000000000000000000000000000000000000000000000000000000000020"  // offset to array
+         "0000000000000000000000000000000000000000000000000000000000000002"  // array length = 2
+         "0000000000000000000000001111111111111111111111111111111111111111"  // order1.maker
+         "0000000000000000000000000000000000000000000000000000000000000064"  // order1.amount = 100
+         "1111111111111111111111111111111111111111111111111111111111111111"  // order1.salt
+         "0000000000000000000000002222222222222222222222222222222222222222"  // order2.maker
+         "00000000000000000000000000000000000000000000000000000000000000c8"  // order2.amount = 200
+         "2222222222222222222222222222222222222222222222222222222222222222"; // order2.salt
+
+      BOOST_CHECK_EQUAL(encoded, expected);
+   }
+
+   // Test 3: submitTwoOrders with fixed array[2] of tuples containing nested tuple and string
+   {
+      fc::mutable_variant_object inner_order1;
+      inner_order1("maker", "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      inner_order1("amount", 500);
+      inner_order1("salt", "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+      fc::mutable_variant_object order_ex1;
+      order_ex1("order", fc::variant(inner_order1));
+      order_ex1("tag", "first");
+
+      fc::mutable_variant_object inner_order2;
+      inner_order2("maker", "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+      inner_order2("amount", 600);
+      inner_order2("salt", "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+
+      fc::mutable_variant_object order_ex2;
+      order_ex2("order", fc::variant(inner_order2));
+      order_ex2("tag", "second");
+
+      fc::variants orders = {fc::variant(order_ex1), fc::variant(order_ex2)};
+
+      auto encoded = eth::contract_invoke_encode(contract_abis[3], {fc::variant(orders)});
+
+      // Fixed array[2] of dynamic tuples (due to string field)
+      // Each OrderEx contains: (address,uint256,bytes32) + string
+      // Since OrderEx contains a string (dynamic), each element needs head/tail encoding
+      std::string expected =
+         "790d4ee0"  // selector
+         "0000000000000000000000000000000000000000000000000000000000000020"  // offset to array
+         "0000000000000000000000000000000000000000000000000000000000000040"  // offset to first OrderEx
+         "0000000000000000000000000000000000000000000000000000000000000100"  // offset to second OrderEx
+         // First OrderEx
+         "000000000000000000000000aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  // order.maker
+         "00000000000000000000000000000000000000000000000000000000000001f4"  // order.amount = 500
+         "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"  // order.salt
+         "0000000000000000000000000000000000000000000000000000000000000080"  // offset to tag string
+         "0000000000000000000000000000000000000000000000000000000000000005"  // string length = 5
+         "6669727374000000000000000000000000000000000000000000000000000000"  // "first" padded
+         // Second OrderEx
+         "000000000000000000000000bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  // order.maker
+         "0000000000000000000000000000000000000000000000000000000000000258"  // order.amount = 600
+         "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"  // order.salt
+         "0000000000000000000000000000000000000000000000000000000000000080"  // offset to tag string
+         "0000000000000000000000000000000000000000000000000000000000000006"  // string length = 6
+         "7365636f6e640000000000000000000000000000000000000000000000000000"; // "second" padded
+
+      BOOST_CHECK_EQUAL(encoded, expected);
+   }
+
 }
 FC_LOG_AND_RETHROW();
 
