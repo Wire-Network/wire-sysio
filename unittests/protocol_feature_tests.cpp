@@ -1149,15 +1149,41 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE( webauthn_producer ) { try {
+BOOST_AUTO_TEST_CASE( producer_keys ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   c.create_account("waprod"_n);
+   c.create_account("prod"_n);
    c.produce_block();
 
-   vector<legacy::producer_key> waprodsched = {{"waprod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
+   { // webauthn key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // em key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type("PUB_EM_8exffEtJ8SsyG5kiwAPwACqLf29ygzbtxoqBFdWTrWB6qxCYGE"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // ed key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type("PUB_ED_2551RxVrAaMMudqPDMe9nAWZGeyCePM878qmFoyaPcvKp6kCc3"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // bls key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type(bls_public_key("PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA"s).serialize())}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
 
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {

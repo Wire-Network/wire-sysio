@@ -62,30 +62,30 @@ struct shared_public_key {
    }
 
    friend bool operator==(const shared_public_key& l, const public_key_type& r) {
-      if(l.pubkey.index() != r._storage.index())
+      if(l.pubkey.index() != r.which())
          return false;
 
       return std::visit(overloaded {
          [&](const fc::ecc::public_key_shim& k1) {
-            return k1._data == std::get<fc::ecc::public_key_shim>(r._storage)._data;
+            return k1._data == r.get<fc::ecc::public_key_shim>()._data;
          },
          [&](const fc::em::public_key_shim& em) {
-            return em._data == std::get<fc::em::public_key_shim>(r._storage)._data;
+            return em._data == r.get<fc::em::public_key_shim>()._data;
          },
          [&](const fc::crypto::r1::public_key_shim& r1) {
-            return r1._data == std::get<fc::crypto::r1::public_key_shim>(r._storage)._data;
+            return r1._data == r.get<fc::crypto::r1::public_key_shim>()._data;
          },
          [&](const fc::crypto::ed::public_key_shim& edkey) {
-            return edkey._data == std::get<fc::crypto::ed::public_key_shim>(r._storage)._data;
+            return edkey._data == r.get<fc::crypto::ed::public_key_shim>()._data;
          },
          [&](const fc::crypto::bls::public_key_shim& bls_pub_key_shim) {
-            return bls_pub_key_shim._data == std::get<fc::crypto::bls::public_key_shim>(r._storage)._data;
+            return bls_pub_key_shim._data == r.get<fc::crypto::bls::public_key_shim>()._data;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());
             fc::crypto::webauthn::public_key pub;
             fc::raw::unpack(ds, pub);
-            return pub == std::get<fc::crypto::webauthn::public_key>(r._storage);
+            return pub == r.get<fc::crypto::webauthn::public_key>();
          }
       }, l.pubkey);
    }
@@ -149,7 +149,7 @@ struct shared_key_weight {
             fc::datastream<char*> ds(s.mutable_data(), psz);
             fc::raw::pack(ds, wa);
          }
-      }, k.key._storage);
+      }, k.key.storage());
    }
 
    shared_public_key key;

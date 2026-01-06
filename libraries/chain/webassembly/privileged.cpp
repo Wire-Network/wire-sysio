@@ -43,26 +43,23 @@ namespace sysio { namespace chain { namespace webassembly {
       (void)legacy_ptr<int64_t>(std::move(cpu_weight));
    }
 
-   int64_t set_proposed_producers_common( apply_context& context, vector<producer_authority> && producers, bool validate_keys ) {
+   int64_t set_proposed_producers_common( apply_context& context, vector<producer_authority>&& producers ) {
       SYS_ASSERT(producers.size() <= config::max_producers, wasm_execution_error, "Producer schedule exceeds the maximum producer count for this chain");
       SYS_ASSERT( producers.size() > 0, wasm_execution_error, "Producer schedule cannot be empty" );
 
-      const size_t num_supported_key_types = context.db.get<protocol_state_object>().num_supported_key_types;
+      using key_type = fc::crypto::public_key::key_type;
 
       // check that producers are unique
       std::set<account_name> unique_producers;
       for (const auto& p: producers) {
          SYS_ASSERT( context.is_account(p.producer_name), wasm_execution_error, "producer schedule includes a nonexisting account" );
-         std::visit([&p, num_supported_key_types, validate_keys](const auto& a) {
+         std::visit([&p](const auto& a) {
             uint32_t sum_weights = 0;
             std::set<public_key_type> unique_keys;
             for (const auto& kw: a.keys ) {
-               SYS_ASSERT( kw.key.which() < num_supported_key_types, unactivated_key_type,
+               SYS_ASSERT( kw.key.contains_type(key_type::k1, key_type::r1), unactivated_key_type,
                            "Unactivated key type used in proposed producer schedule");
-
-               if( validate_keys ) {
-                  SYS_ASSERT( kw.key.valid(), wasm_execution_error, "producer schedule includes an invalid key" );
-               }
+               SYS_ASSERT( kw.key.valid(), wasm_execution_error, "producer schedule includes an invalid key" );
 
                if (std::numeric_limits<uint32_t>::max() - sum_weights <= kw.weight) {
                   sum_weights = std::numeric_limits<uint32_t>::max();
@@ -130,7 +127,7 @@ namespace sysio { namespace chain { namespace webassembly {
          producers.emplace_back( producer_authority{ p.producer_name, block_signing_authority_v0{ 1, {{p.block_signing_key, 1}} } } );
       }
 
-      return set_proposed_producers_common( context, std::move(producers), true );
+      return set_proposed_producers_common( context, std::move(producers) );
    }
 
    int64_t interface::set_proposed_producers_ex( uint64_t packed_producer_format, legacy_span<const char> packed_producer_schedule) {
@@ -142,7 +139,7 @@ namespace sysio { namespace chain { namespace webassembly {
          vector<producer_authority> producers;
 
          fc::raw::unpack(ds, producers);
-         return set_proposed_producers_common( context, std::move(producers), false);
+         return set_proposed_producers_common( context, std::move(producers) );
       } else {
          SYS_THROW(wasm_execution_error, "Producer schedule is in an unknown format!");
       }

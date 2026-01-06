@@ -3205,21 +3205,6 @@ namespace sysio {
       shared_ptr<signed_block> ptr = std::make_shared<signed_block>();
       fc::raw::unpack( ds, *ptr );
 
-      bool has_webauthn_sig = ptr->producer_signature.is_webauthn();
-
-      constexpr auto additional_sigs_eid = additional_block_signatures_extension::extension_id();
-      auto exts = ptr->validate_and_extract_extensions();
-      if( exts.count( additional_sigs_eid ) ) {
-         const auto &additional_sigs = std::get<additional_block_signatures_extension>(exts.lower_bound( additional_sigs_eid )->second).signatures;
-         has_webauthn_sig |= std::ranges::any_of(additional_sigs, [](const auto& sig) { return sig.is_webauthn(); });
-      }
-
-      if( has_webauthn_sig ) {
-         peer_dlog( p2p_blk_log, this, "WebAuthn signed block received, closing connection" );
-         close();
-         return false;
-      }
-
       handle_message( blk_id, std::move( ptr ) );
       return true;
    }
@@ -5011,11 +4996,15 @@ namespace sysio {
          }
       }
 
+      fc_dlog(p2p_conn_log, "Post to resolve ${p} - ${cid}", ("p", peer_address())("cid", connection_id));
       boost::asio::post(strand, [c, host, port]() {
+         fc_dlog(p2p_conn_log, "Create resolver ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
          auto resolver = std::make_shared<tcp::resolver>( my_impl->thread_pool.get_executor() );
+         fc_dlog(p2p_conn_log, "async_resolve ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
          resolver->async_resolve(host, port, boost::asio::bind_executor(c->strand,
             [resolver, c, host, port]
             ( const boost::system::error_code& err, const tcp::resolver::results_type& results ) {
+               fc_dlog(p2p_conn_log, "async_resolve callback ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
                c->set_heartbeat_timeout( my_impl->connections.get_heartbeat_timeout() );
                if( !err ) {
                   c->connect( results );
