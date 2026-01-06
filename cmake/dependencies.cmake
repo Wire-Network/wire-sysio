@@ -30,6 +30,7 @@ find_package(Threads REQUIRED)
 
 # OTHER DEPENDENCIES
 find_package(ZLIB REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
 find_package(boringssl-custom CONFIG REQUIRED)
 find_package(ethash CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)

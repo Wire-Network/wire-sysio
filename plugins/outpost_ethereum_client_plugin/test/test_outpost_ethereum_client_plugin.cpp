@@ -14,12 +14,13 @@
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
-#include <sysio/testing/build_info.hpp>
-#include <sysio/testing/crypto_utils.hpp>
+#include <fc-test/build_info.hpp>
+#include <fc-test/crypto_utils.hpp>
 
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
@@ -29,7 +30,7 @@ using namespace fc::crypto;
 using namespace fc::crypto::ethereum;
 using namespace fc::network::ethereum;
 
-using namespace sysio::testing;
+using namespace fc::test;
 
 using sysio::signature_provider_manager_plugin;
 
@@ -125,15 +126,20 @@ std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
    return create_app(args_vec);
 }
 
+constexpr std::string_view test_contract_abi_counter_json_file_01 = "ethereum-abi-counter-01.json";
+using namespace fc::network::ethereum;
+auto counter_abi_filename = fc::test::get_test_fixtures_path() / boost::filesystem::path(test_contract_abi_counter_json_file_01);
+auto counter_abis = fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));
+
 struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
-   ethereum_contract_tx_fn<fc::uint256> set_number;
-   ethereum_contract_call_fn<> get_number;
+   ethereum_contract_tx_fn<fc::variant, fc::uint256> set_number;
+   ethereum_contract_call_fn<fc::variant> get_number;
    ethereum_contract_test_counter_client(const ethereum_client_ptr& client,
                                          const address_compat_type& contract_address_compat)
-      : ethereum_contract_client(client, contract_address_compat),
-   set_number(create_tx<fc::uint256>("setNumber(uint256)")),
-   get_number(create_call("number()")) {
+      : ethereum_contract_client(client, contract_address_compat, counter_abis),
+   set_number(create_tx<fc::variant, fc::uint256>(get_abi("setNumber"))),
+   get_number(create_call<fc::variant>(get_abi("number"))) {
 
    };
 };

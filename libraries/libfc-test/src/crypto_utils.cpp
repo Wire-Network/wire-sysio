@@ -12,10 +12,10 @@
 #include <fc/crypto/signature_provider.hpp>
 #include <fc/io/fstream.hpp>
 #include <fc/io/json.hpp>
-#include <sysio/testing/build_info.hpp>
-#include <sysio/testing/crypto_utils.hpp>
+#include <fc-test/build_info.hpp>
+#include <fc-test/crypto_utils.hpp>
 
-namespace sysio::testing {
+namespace fc::test {
 namespace bfs = boost::filesystem;
 namespace bp = boost::process::v1;
 
