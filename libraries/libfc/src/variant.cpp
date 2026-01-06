@@ -303,6 +303,19 @@ void  variant::visit( const visitor& v )const
       case uint64_type:
          v.handle( *reinterpret_cast<const uint64_t*>(this) );
          return;
+      case int128_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case uint128_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case int256_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case uint256_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+
       case double_type:
          v.handle( *reinterpret_cast<const double*>(this) );
          return;
