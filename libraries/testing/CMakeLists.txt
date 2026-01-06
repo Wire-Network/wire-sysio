@@ -95,7 +95,7 @@ if(BUILD_TEST_CONTRACTS)
   )
 endif()
 
-target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc chainbase Logging IR WAST WASM)
+target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc-lite fc fc-test chainbase Logging IR WAST WASM)
 target_include_directories(sysio_testing
   PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"

@@ -15,6 +15,7 @@
     "ethash",
     "cryptopp",
     "gtest",
+    "magic-enum",
     {
       "name": "curl",
       "features": ["boringssl-custom"]

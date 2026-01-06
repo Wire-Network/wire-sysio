@@ -8,6 +8,7 @@ namespace sysio {
 
 namespace {
 constexpr auto option_name_client     = "outpost-ethereum-client";
+constexpr auto option_abi_file     = "ethereum-abi-file";
 
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
@@ -17,8 +18,26 @@ constexpr auto option_name_client     = "outpost-ethereum-client";
 
 class outpost_ethereum_client_plugin_impl {
    std::map<std::string, ethereum_client_entry_ptr> _clients{};
+   using file_abi_contracts_t = std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>;
+   std::vector<file_abi_contracts_t> _abi_files{};
 
 public:
+   std::vector<file_abi_contracts_t> load_abi_files(const std::vector<std::filesystem::path>& file_names) {
+      static std::mutex mutex;
+      std::scoped_lock lock(mutex);
+
+      for (auto& filename : file_names) {
+         auto file_path = std::filesystem::absolute(filename);
+         ilogf("Loading ABI file: {}", file_path.string());
+         if (!std::ranges::none_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
+            wlogf("Already registered ABI file: {}", file_path.string());
+            continue;
+         }
+         _abi_files.emplace_back(file_path, fc::network::ethereum::abi::parse_contracts(file_path));
+      }
+
+      return _abi_files;
+   }
    std::vector<ethereum_client_entry_ptr> get_clients() {
       return std::views::values(_clients) | std::ranges::to<std::vector>();
    }
@@ -32,11 +51,19 @@ public:
       FC_ASSERT(!_clients.contains(id), "Client with id ${id} already exists", ("id", id));
       _clients.emplace(id, client);
    }
+
+   const std::vector<file_abi_contracts_t>& get_abi_files() {
+      return _abi_files;
+   };
 };
 
 static auto _outpost_ethereum_client_plugin = application::register_plugin<outpost_ethereum_client_plugin>();
 
 void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& options) {
+   if (options.contains(option_abi_file)) {
+      auto& abi_files = options.at(option_abi_file).as<std::vector<std::filesystem::path>>();
+      my->load_abi_files(abi_files);
+   }
    FC_ASSERT(options.count(option_name_client), "At least one ethereum client argument is required ${name}", ("name", option_name_client));
    auto plug_sig = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
@@ -75,11 +102,17 @@ outpost_ethereum_client_plugin::outpost_ethereum_client_plugin() : my(
    std::make_unique<outpost_ethereum_client_plugin_impl>()) {}
 
 void outpost_ethereum_client_plugin::set_program_options(options_description& cli, options_description& cfg) {
+
+
    cfg.add_options()(
       option_name_client,
       boost::program_options::value<std::vector<std::string>>()->multitoken()->required(),
       "Outpost Ethereum Client spec, the plugin supports 1 to many clients in a given process"
-      "`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`");
+      "`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`")(
+      option_abi_file,
+      boost::program_options::value<std::vector<std::filesystem::path>>()->multitoken(),
+      "Ethereum contract ABI file(s).  Expects the file to have a JSON array of ABI complient contract definitions."
+      );
 }
 
 
@@ -94,4 +127,8 @@ std::vector<ethereum_client_entry_ptr> outpost_ethereum_client_plugin::get_clien
 ethereum_client_entry_ptr outpost_ethereum_client_plugin::get_client(const std::string& id) {
    return my->get_client(id);
 }
+
+const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& outpost_ethereum_client_plugin::get_abi_files() {
+   return my->get_abi_files();
 }
+} // namespace sysio
