@@ -117,15 +117,21 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
       std::views::filter([&](auto& contract) { return contract.type == eth::abi::invoke_target_type::function; }) |
       std::ranges::to<std::vector>();
 
-   BOOST_CHECK(contract_abis.size() == 2);
+   BOOST_CHECK(contract_abis.size() >= 2);
    BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[0]), "submitOrder(tuple(address,uint256,bytes32))");
    BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[1]), "submitOrderTx(tuple(address,uint256,bytes32))");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[2]), "submitOrders(tuple(address,uint256,bytes32)[])");
+   BOOST_CHECK_EQUAL(eth::abi::to_contract_function_signature(contract_abis[3]), "submitTwoOrders(tuple(tuple(address,uint256,bytes32),string)[2])");
 
    auto selector0 = eth::abi::to_contract_function_selector(contract_abis[0]);
    auto selector1 = eth::abi::to_contract_function_selector(contract_abis[1]);
+   auto selector2 = eth::abi::to_contract_function_selector(contract_abis[2]);
+   auto selector3 = eth::abi::to_contract_function_selector(contract_abis[3]);
 
    BOOST_CHECK_EQUAL(fc::to_hex(selector0), "176317fe708a2ee82852cd72f0bae46b2efb4f3d1f06ceb9169bf64abdc0b398");
    BOOST_CHECK_EQUAL(fc::to_hex(selector1), "c9650aefb6438dc48df4c7cd462d668dc043559e483f4c70577348edec2f4f6c");
+   BOOST_CHECK_EQUAL(fc::to_hex(selector2), "05279750cd397b00e39d501f419f92499ec33833455712d47d192e46dae11fdc");
+   BOOST_CHECK_EQUAL(fc::to_hex(selector3), "d83419b2ab28970bcf14860231bb111db7c2070fbdeaf26168d2e49f5b32cdc0");
 
    // Test to_contract_component_signature directly
    BOOST_CHECK_EQUAL(eth::abi::to_contract_component_signature(contract_abis[0].inputs[0]), "tuple(address,uint256,bytes32)");

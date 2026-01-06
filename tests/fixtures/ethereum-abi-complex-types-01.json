@@ -34,8 +34,8 @@
         "components": [
           {
             "name": "ok",
-            "type": "boolean",
-            "internalType": "boolean"
+            "type": "bool",
+            "internalType": "bool"
           },
           {
             "name": "filled",
@@ -87,6 +87,148 @@
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "submitOrders",
+    "inputs": [
+      {
+        "name": "o",
+        "type": "tuple[]",
+        "internalType": "struct StructDemo.Order[]",
+        "components": [
+          {
+            "name": "maker",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "salt",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "r",
+        "type": "tuple",
+        "internalType": "struct StructDemo.BatchResults",
+        "components": [
+          {
+            "name": "ok",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "results",
+            "type": "tuple[]",
+            "internalType": "struct StructDemo.Result[]",
+            "components": [
+              {
+                "name": "ok",
+                "type": "bool",
+                "internalType": "bool"
+              },
+              {
+                "name": "filled",
+                "type": "uint256",
+                "internalType": "uint256"
+              },
+              {
+                "name": "orderHash",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "submitTwoOrders",
+    "inputs": [
+      {
+        "name": "o",
+        "type": "tuple[2]",
+        "internalType": "struct StructDemo.OrderEx[2]",
+        "components": [
+          {
+            "name": "order",
+            "type": "tuple",
+            "internalType": "struct StructDemo.Order",
+            "components": [
+              {
+                "name": "maker",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "amount",
+                "type": "uint256",
+                "internalType": "uint256"
+              },
+              {
+                "name": "salt",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              }
+            ]
+          },
+          {
+            "name": "tag",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "r",
+        "type": "tuple",
+        "internalType": "struct StructDemo.BatchResults",
+        "components": [
+          {
+            "name": "ok",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "results",
+            "type": "tuple[]",
+            "internalType": "struct StructDemo.Result[]",
+            "components": [
+              {
+                "name": "ok",
+                "type": "bool",
+                "internalType": "bool"
+              },
+              {
+                "name": "filled",
+                "type": "uint256",
+                "internalType": "uint256"
+              },
+              {
+                "name": "orderHash",
+                "type": "bytes32",
+                "internalType": "bytes32"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "event",
