@@ -6,11 +6,13 @@
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/reflect/reflect.hpp>
-#include <fc/reflect/variant.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
+#include <fc/crypto/bls_private_key.hpp>
 
+#include <string>
+#include <variant>
 
 namespace fc::crypto {
    namespace constants {
@@ -32,7 +34,18 @@ namespace fc::crypto {
    class public_key
    {
       public:
-         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key, em::public_key_shim, ed::public_key_shim, bls::public_key_shim>;
+         using storage_type = std::variant<ecc::public_key_shim, r1::public_key_shim, webauthn::public_key,
+                                           em::public_key_shim, ed::public_key_shim, bls::public_key_shim>;
+         enum class key_type : uint8_t {
+            k1 = fc::get_index<storage_type, ecc::public_key_shim>(),
+            r1 = fc::get_index<storage_type, r1::public_key_shim>(),
+            wa = fc::get_index<storage_type, webauthn::public_key>(),
+            em = fc::get_index<storage_type, em::public_key_shim>(),
+            ed = fc::get_index<storage_type, ed::public_key_shim>(),
+            bls = fc::get_index<storage_type, bls::public_key_shim>(),
+            unknown
+         };
+         static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(key_type::unknown), "Missing public_key key_type");
 
          static public_key::storage_type parse_base58(const std::string& base58str);
 
@@ -50,6 +63,7 @@ namespace fc::crypto {
          bool valid()const;
 
          size_t which()const;
+         key_type type()const { return static_cast<key_type>(which()); }
 
          // serialize to/from string
          explicit public_key(const std::string& base58str);
@@ -57,16 +71,24 @@ namespace fc::crypto {
 
          std::string to_native_string(const fc::yield_function_t& yield) const;
 
-         template<typename T>
-         bool contains() const { return std::holds_alternative<T>(_storage); }
+         template<typename... Args>
+         bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }
+
+         template<typename... Args>
+         bool contains_type(Args... types) const {
+            static_assert((std::is_same_v<Args, key_type> && ...), "Args must be of type public_key::key_type");
+            auto current_index = _storage.index();
+            return ((current_index == static_cast<size_t>(types)) || ...);
+         }
 
          template<typename T>
          const T& get() const { return std::get<T>(_storage); }
 
-
-         storage_type _storage{};
+         const storage_type& storage() const { return _storage; }
 
       private:
+         storage_type _storage{};
+
          friend std::ostream& operator<<(std::ostream& s, const public_key& k);
          friend bool operator==( const public_key& p1, const public_key& p2);
          friend bool operator!=( const public_key& p1, const public_key& p2);
