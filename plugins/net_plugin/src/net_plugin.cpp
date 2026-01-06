@@ -4996,15 +4996,11 @@ namespace sysio {
          }
       }
 
-      fc_dlog(p2p_conn_log, "Post to resolve ${p} - ${cid}", ("p", peer_address())("cid", connection_id));
       boost::asio::post(strand, [c, host, port]() {
-         fc_dlog(p2p_conn_log, "Create resolver ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
          auto resolver = std::make_shared<tcp::resolver>( my_impl->thread_pool.get_executor() );
-         fc_dlog(p2p_conn_log, "async_resolve ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
          resolver->async_resolve(host, port, boost::asio::bind_executor(c->strand,
             [resolver, c, host, port]
             ( const boost::system::error_code& err, const tcp::resolver::results_type& results ) {
-               fc_dlog(p2p_conn_log, "async_resolve callback ${h}:${p} - ${cid}", ("h", host)("p", port)("cid", c->connection_id));
                c->set_heartbeat_timeout( my_impl->connections.get_heartbeat_timeout() );
                if( !err ) {
                   c->connect( results );
