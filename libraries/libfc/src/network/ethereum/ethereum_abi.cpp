@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cctype>
-#include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/io/json.hpp>
@@ -11,7 +10,6 @@
 #include <ranges>
 #include <regex>
 #include <sstream>
-#include <stdexcept>
 
 namespace fc::network::ethereum {
 
@@ -22,41 +20,13 @@ using boost::multiprecision::cpp_int;
 // Anonymous namespace for internal helpers (instead of marking them static)
 namespace {
 
-std::vector<std::string> split_types(const std::string& inside) {
-   std::vector<std::string> out;
-   std::string cur;
-   int depth = 0;
-   for (char c : inside) {
-      if (c == '(')
-         depth++;
-      if (c == ')')
-         depth--;
-      if (c == ',' && depth == 0) {
-         if (!cur.empty()) {
-            out.emplace_back(cur);
-            cur.clear();
-         }
-      } else {
-         cur.push_back(c);
-      }
-   }
-   if (!cur.empty())
-      out.emplace_back(cur);
-   // remove whitespace from each type using ranges
-   for (auto& s : out) {
-      std::string cleaned;
-      std::ranges::copy_if(s, std::back_inserter(cleaned), [](unsigned char ch) { return !std::isspace(ch); });
-      s = std::move(cleaned);
-   }
-   return out;
-}
 
 std::vector<uint8_t> be_pad_left_32(const std::vector<uint8_t>& in) {
    std::vector<uint8_t> out(32, 0);
    if (in.size() >= 32) {
-      std::copy(in.end() - 32, in.end(), out.begin());
+      std::ranges::copy(in.end() - 32, in.end(), out.begin());
    } else {
-      std::copy(in.begin(), in.end(), out.begin() + (32 - in.size()));
+      std::ranges::copy(in, out.begin() + (32 - in.size()));
    }
    return out;
 }
@@ -79,97 +49,252 @@ std::vector<uint8_t> be_uint_from_decimal(const std::string& dec) {
       tmp.push_back(b);
       v >>= 8;
    }
-   std::reverse(tmp.begin(), tmp.end());
+   std::ranges::reverse(tmp);
    return be_pad_left_32(tmp);
 }
 
-std::vector<uint8_t> encode_static_value(const std::string& type, const fc::variant& value) {
-   auto t = type;
-   // Normalize
-   std::ranges::transform(t, t.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+std::vector<uint8_t> encode_static_value(const abi::component_type& component, const fc::variant& value) {
+   using dt = abi::data_type;
+   const auto type = component.type;
 
-   if (t == "uint" || t.rfind("uint", 0) == 0) {
-      if (t == "uint256" || t == "int256") {
-         FC_ASSERT(value.is_string(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
+   // Numeric types (uint/int variants)
+   if (abi::is_data_type_numeric(type)) {
+      FC_ASSERT_FMT(value.is_numeric(), "Integer value expected for ABI encoding, got {}", value.as_string());
+      if (type == dt::uint256 || type == dt::int256 || type == dt::uint128 || type == dt::int128) {
          return be_uint_from_decimal(value.as_string());
       }
-      FC_ASSERT(value.is_numeric(), "Integer value expected for ABI encoding, got ${v}", ("v", value));
+
       return be_uint_from_decimal(value.as_uint256().str());
    }
-   if (t == "bool") {
-      return be_uint_from_decimal((value == "true" || value == "1") ? std::string("1") : std::string("0"));
-   }
-   if (t == "address") {
+
+   switch (type) {
+   case dt::boolean:
+      return be_uint_from_decimal((value == "true" || value == "1") ? "1" : "0");
+
+   case dt::address: {
       auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-      FC_ASSERT(bytes.size() == 20, "Address must be 20 bytes, got ${n}", ("n", bytes.size()));
+      FC_ASSERT_FMT(bytes.size() == 20, "Address must be 20 bytes, got {}", bytes.size());
       return be_pad_left_32(bytes);
    }
-   if (t == "bytes32") {
+
+   default:
+      break;
+   }
+
+   // Fixed-size bytes (bytes1..bytes32)
+   if (abi::is_data_type_bytes(type)) {
+      auto type_name = ethereum_abi_data_type_reflector::to_fc_string(type);
+      auto sz = std::stoul(type_name.substr(5));
       auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-      FC_ASSERT(bytes.size() <= 32, "bytes32 too long: ${n}", ("n", bytes.size()));
+      FC_ASSERT_FMT(bytes.size() == sz, "{} expects {} bytes, got {}", type_name, sz, bytes.size());
       std::vector<uint8_t> out(32, 0);
-      std::copy(bytes.begin(), bytes.end(), out.begin());
+      std::ranges::copy(bytes, out.begin());
       return out;
    }
-   // bytesN where 1<=N<=32
-   if (t.rfind("bytes", 0) == 0 && t.size() > 5) {
-      auto sz = std::stoul(t.substr(5));
-      if (sz >= 1 && sz <= 32) {
-         auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-         FC_ASSERT(bytes.size() == sz, "${t} expects ${sz} bytes, got ${n}", ("t", t)("sz", sz)("n", bytes.size()));
-         std::vector<uint8_t> out(32, 0);
-         std::copy(bytes.begin(), bytes.end(), out.begin());
-         return out;
-      }
-   }
-   FC_THROW_EXCEPTION(fc::exception, "Unsupported static type for ABI encoding: ${t}", ("t", t));
+
+   FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported static type for ABI encoding: {}",
+                          ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
-bool is_dynamic(const std::string& type) {
-   auto t = type;
-   std::ranges::transform(t, t.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
-   if (t == "string" || t == "bytes")
-      return true;
-   // arrays and dynamic bytes not implemented beyond simple types
-   return false;
-}
+std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, const fc::variant& value) {
+   using dt = abi::data_type;
+   const auto type = component.type;
 
-std::vector<uint8_t> encode_dynamic_data(const std::string& type, const fc::variant& value) {
-   auto t = type;
-   std::ranges::transform(t, t.begin(), [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
    std::vector<uint8_t> data;
-   if (t == "string") {
-      FC_ASSERT(value.is_string(), "String value expected for ABI encoding, got ${v}", ("v", value));
-      const auto& s = value.as_string();
-      data.assign(s.begin(), s.end());
-   } else if (t == "bytes") {
-      FC_ASSERT(value.is_string(), "Bytes value expected for ABI encoding, got ${v}", ("v", value));
+   switch (type) {
+   case dt::string:
+      FC_ASSERT_FMT(value.is_string(), "String value expected for ABI encoding, got {}", value.as_string());
+      {
+         const auto& s = value.as_string();
+         data.assign(s.begin(), s.end());
+      }
+      break;
+
+   case dt::bytes:
+      FC_ASSERT_FMT(value.is_string(), "Bytes value expected for ABI encoding, got {}", value.as_string());
       data = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-   } else {
-      FC_THROW_EXCEPTION(fc::exception, "Unsupported dynamic type for ABI encoding: ${t}", ("t", t));
+      break;
+
+   default:
+      FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported dynamic type for ABI encoding: {}",
+                             ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 
-   // length (32 bytes) + data + padding to 32-byte multiple
    std::vector<uint8_t> out;
-   // length as 32-byte big-endian
-   {
-      std::vector<uint8_t> len_be = be_uint_from_decimal(std::to_string(data.size()));
-      out.insert(out.end(), len_be.begin(), len_be.end());
-   }
-   // data
+   out.reserve(32 + data.size() + 32);
+
+   // Length prefix (32 bytes big-endian)
+   auto len_bytes = be_uint_from_decimal(std::to_string(data.size()));
+   out.insert(out.end(), len_bytes.begin(), len_bytes.end());
+
+   // Data
    out.insert(out.end(), data.begin(), data.end());
-   // padding
-   size_t pad = (32 - (data.size() % 32)) % 32;
-   out.insert(out.end(), pad, 0);
+
+   // Padding to 32-byte boundary
+   if (size_t pad = (32 - (data.size() % 32)) % 32; pad > 0) {
+      out.insert(out.end(), pad, 0);
+   }
+
    return out;
 }
 
+std::vector<uint8_t> encode_value(const abi::component_type& component, const fc::variant& value);
+
+std::vector<uint8_t> encode_list(const abi::component_type& component, const fc::variant& value) {
+   FC_ASSERT(value.is_array(), "Array value expected for list encoding");
+   const auto& arr = value.get_array();
+   const auto& lc = component.list_config;
+
+   if (lc.is_fixed_list()) {
+      FC_ASSERT_FMT(arr.size() == lc.size, "Fixed-size list expects {} elements, got {}", lc.size, arr.size());
+   }
+
+   // Create element component (same as parent but without list_config)
+   abi::component_type elem_comp = component;
+   elem_comp.list_config = {};
+
+   std::vector<uint8_t> out;
+
+   // Dynamic lists prepend length
+   if (lc.is_dynamic_list()) {
+      auto len_bytes = be_uint_from_decimal(std::to_string(arr.size()));
+      out.insert(out.end(), len_bytes.begin(), len_bytes.end());
+   }
+
+   // Check if elements are dynamic
+   bool elements_dynamic = elem_comp.is_dynamic();
+
+   if (elements_dynamic) {
+      // Encode with head/tail structure
+      std::vector<std::vector<uint8_t>> encoded_elements;
+      encoded_elements.reserve(arr.size());
+      for (const auto& elem : arr) {
+         encoded_elements.push_back(encode_value(elem_comp, elem));
+      }
+
+      size_t head_size = arr.size() * 32;
+      size_t offset = head_size;
+
+      for (const auto& enc : encoded_elements) {
+         auto off_bytes = be_uint_from_decimal(std::to_string(offset));
+         out.insert(out.end(), off_bytes.begin(), off_bytes.end());
+         offset += enc.size();
+      }
+      for (const auto& enc : encoded_elements) {
+         out.insert(out.end(), enc.begin(), enc.end());
+      }
+   } else {
+      // Static elements: encode sequentially
+      for (const auto& elem : arr) {
+         auto enc = encode_value(elem_comp, elem);
+         out.insert(out.end(), enc.begin(), enc.end());
+      }
+   }
+
+   return out;
+}
+
+std::vector<uint8_t> encode_tuple(const abi::component_type& component, const fc::variant& value) {
+   FC_ASSERT(value.is_array() || value.is_object(), "Tuple value must be array or object");
+
+   const auto& children = component.components;
+   std::vector<fc::variant> values;
+
+   if (value.is_array()) {
+      values = value.get_array();
+   } else {
+      const auto& obj = value.get_object();
+      for (const auto& child : children) {
+         FC_ASSERT_FMT(obj.contains(child.name.c_str()), "Missing tuple field: {}", child.name);
+         values.push_back(obj[child.name]);
+      }
+   }
+   FC_ASSERT(values.size() == children.size(), "Tuple size mismatch");
+
+   std::vector<std::vector<uint8_t>> heads, tails;
+   heads.reserve(children.size());
+   tails.reserve(children.size());
+
+   for (size_t i = 0; i < children.size(); ++i) {
+      const auto& child = children[i];
+      auto encoded = encode_value(child, values[i]);
+
+      // TODO: is needed? @jglanz
+      // || child.is_list()
+      if (child.is_dynamic()) {
+         heads.emplace_back(32, 0); // placeholder
+         tails.push_back(std::move(encoded));
+      } else {
+         heads.push_back(std::move(encoded));
+         tails.emplace_back();
+      }
+   }
+
+   std::vector<uint8_t> out;
+   auto head_sizes = heads | std::views::transform([](const auto& h) { return h.size(); });
+   size_t head_size =
+      std::ranges::fold_left(head_sizes, 0UL, std::plus<>{});
+   size_t offset = head_size;
+
+   for (size_t i = 0; i < heads.size(); ++i) {
+      if (!tails[i].empty()) {
+         auto off_bytes = be_uint_from_decimal(std::to_string(offset));
+         out.insert(out.end(), off_bytes.begin(), off_bytes.end());
+         offset += tails[i].size();
+      } else {
+         out.insert(out.end(), heads[i].begin(), heads[i].end());
+      }
+   }
+   for (const auto& tail : tails) {
+      out.insert(out.end(), tail.begin(), tail.end());
+   }
+
+   return out;
+}
+
+std::vector<uint8_t> encode_value(const abi::component_type& component, const fc::variant& value) {
+   if (component.is_list()) {
+      return encode_list(component, value);
+   }
+
+   if (component.is_container()) {
+      return encode_tuple(component, value);
+   }
+
+   if (component.is_dynamic()) {
+      return encode_dynamic_data(component, value);
+   }
+
+   return encode_static_value(component, value);
+}
+
+
 } // anonymous namespace
+
+// bool abi::is_data_type_numeric(data_type type) {
+//    std::string dts{magic_enum::enum_name(type)};
+//    for (auto& prefix : data_type_numeric_prefixes) {
+//       if (dts.starts_with(prefix))
+//          return true;
+//    }
+//    return false;
+// }
+
+// bool abi::is_data_type_numeric_signed(data_type type) {
+//    std::string dts{magic_enum::enum_name(type)};
+//    for (auto& prefix : data_type_numeric_signed_prefixes) {
+//       if (dts.starts_with(prefix))
+//          return true;
+//    }
+//    return false;
+// }
 
 std::string abi::to_contract_component_signature(const component_type& component) {
    std::stringstream ss;
-   auto dt_str = ethereum_abi_data_type_reflector::to_fc_string(component.type);
-   ss << dt_str;
+   if (!component.is_container()) {
+      auto dt_str = ethereum_abi_data_type_reflector::to_fc_string(component.type);
+      ss << dt_str;
+   }
    if (component.is_container()) {
       ss << '(';
 
@@ -188,7 +313,7 @@ std::string abi::to_contract_component_signature(const component_type& component
    if (component.is_list()) {
       auto& lc = component.list_config;
       ss << '[';
-      if (lc.is_fixed()) {
+      if (lc.is_fixed_list()) {
          FC_ASSERT(lc.size > 0, "Fixed-size list must have size > 0");
          ss << lc.size;
       }
@@ -233,81 +358,60 @@ abi::contract abi::parse_contract(const fc::variant& v) {
    return v.as<abi::contract>();
 }
 
-std::string contract_invoke_encode(const abi::contract& abi, const std::vector<fc::variant>& params) {
-   // Obtain ABI struct
-   // abi::contract a{};
-   // if (std::holds_alternative<std::string>(abi)) {
-   //    auto& sig = std::get<std::string>(abi);
-   //    a        = abi::parse_contract(sig);
-   // } else {
-   //    a = std::get<abi::contract>(abi);
-   //    if (a.signature.empty()) {
-   //       // Build signature from name and input types
-   //       std::ostringstream oss;
-   //       oss << a.name << '(';
-   //       for (size_t i = 0; i < a.inputs.size(); ++i) {
-   //          if (i) oss << ',';
-   //          oss << a.inputs[i].second;
-   //       }
-   //       oss << ')';
-   //       a.signature = oss.str();
-   //    }
-   // }
-   //
-   // FC_ASSERT(params.size() == a.inputs.size(), "Parameter count mismatch: expected ${e}, got ${g}",
-   //           ("e", a.inputs.size())("g", params.size()));
-   //
-   // // Function selector
-   // auto sig_bytes = std::vector<uint8_t>(a.signature.begin(), a.signature.end());
-   // auto h         = ethash::keccak256(sig_bytes.data(), sig_bytes.size());
-   // std::vector<uint8_t> out;
-   // out.insert(out.end(), h.bytes, h.bytes + 4);
-   //
-   // // Prepare head and tail for dynamic params
-   // std::vector<std::vector<uint8_t>> heads;
-   // std::vector<std::vector<uint8_t>> tails;
-   // heads.reserve(a.inputs.size());
-   // tails.reserve(a.inputs.size());
-   //
-   // // First pass: build heads placeholders and tails
-   // for (size_t i = 0; i < a.inputs.size(); ++i) {
-   //    const auto& type  = a.inputs[i].second;
-   //    const auto& value = params[i];
-   //    if (is_dynamic(type)) {
-   //       // placeholder for offset, will compute later
-   //       heads.emplace_back(32, 0);
-   //       tails.push_back(encode_dynamic_data(type, value));
-   //    } else {
-   //       heads.push_back(encode_static_value(type, value));
-   //       tails.emplace_back();
-   //    }
-   // }
-   //
-   // // Compute starting offset of tail (after selector + head section)
-   // size_t head_size = heads.size() * 32;
-   // size_t current_offset = head_size; // offsets are from start of head section (not counting 4-byte selector)
-   //
-   // // Append heads, computing offsets for dynamic
-   // for (size_t i = 0; i < heads.size(); ++i) {
-   //    if (!tails[i].empty()) {
-   //       // dynamic param: write offset
-   //       // offset from start of head
-   //       std::vector<uint8_t> off_be = be_uint_from_decimal(std::to_string(current_offset));
-   //       out.insert(out.end(), off_be.begin(), off_be.end());
-   //       current_offset += tails[i].size();
-   //    } else {
-   //       out.insert(out.end(), heads[i].begin(), heads[i].end());
-   //    }
-   // }
-   //
-   // // Append tails for dynamic params in order
-   // for (size_t i = 0; i < tails.size(); ++i) {
-   //    if (!tails[i].empty()) {
-   //       out.insert(out.end(), tails[i].begin(), tails[i].end());
-   //    }
-   // }
-   //
-   // return fc::to_hex(out);
+
+
+/**
+ * Encode passed parameters based on the inputs specified in the ABI contract
+ *
+ * @param contract the ABI contract describing the function
+ * @param params function parameters
+ * @return hex string of encoded call `data` field
+ */
+std::string contract_invoke_encode(const abi::contract& contract, const std::vector<fc::variant>& params) {
+   const auto& inputs = contract.inputs;
+   FC_ASSERT_FMT(inputs.size() == params.size(), "Parameter count mismatch (expected={}, provided={})", inputs.size(),
+                 params.size());
+
+   auto selector = abi::to_contract_function_selector(contract);
+
+   std::vector<uint8_t> out;
+   out.insert(out.end(), selector.begin(), selector.begin() + 4);
+
+   std::vector<std::vector<uint8_t>> heads, tails;
+   heads.reserve(inputs.size());
+   tails.reserve(inputs.size());
+
+   for (size_t i = 0; i < inputs.size(); ++i) {
+      const auto& comp = inputs[i];
+      auto encoded = encode_value(comp, params[i]);
+
+      if (comp.is_dynamic() || comp.is_list()) {
+         heads.emplace_back(32, 0);
+         tails.push_back(std::move(encoded));
+      } else {
+         heads.push_back(std::move(encoded));
+         tails.emplace_back();
+      }
+   }
+
+   size_t head_size = heads.size() * 32;
+   size_t offset = head_size;
+
+   for (size_t i = 0; i < heads.size(); ++i) {
+      if (!tails[i].empty()) {
+         auto off_bytes = be_uint_from_decimal(std::to_string(offset));
+         out.insert(out.end(), off_bytes.begin(), off_bytes.end());
+         offset += tails[i].size();
+      } else {
+         out.insert(out.end(), heads[i].begin(), heads[i].end());
+      }
+   }
+
+   for (const auto& tail : tails) {
+      out.insert(out.end(), tail.begin(), tail.end());
+   }
+
+   return fc::to_hex(out);
 }
 
 std::pair<abi::contract, std::vector<std::string>> contract_invoke_decode(const std::string& encoded_invoke_data) {

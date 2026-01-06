@@ -18,6 +18,7 @@ namespace fc::network::ethereum {
 
 namespace abi {
 enum class invoke_target_type { function, constructor, event, error };
+
 enum class data_type : int64_t {
    boolean,
    int8,
@@ -81,6 +82,37 @@ enum class data_type : int64_t {
    event,
    error
 };
+
+constexpr std::array data_type_numeric_prefixes{"uint", "int", "ufixed", "fixed"};
+constexpr std::array data_type_numeric_signed_prefixes{"int", "fixed"};
+constexpr std::string_view data_type_bytes_prefix{"bytes"};
+
+constexpr bool is_data_type_bytes(data_type type) {
+   return magic_enum::enum_name(type).starts_with(data_type_bytes_prefix);
+}
+
+constexpr bool is_data_type_numeric(data_type type) {
+   auto dts = magic_enum::enum_name(type);
+   for (auto& prefix : data_type_numeric_prefixes) {
+      if (dts.starts_with(prefix))
+         return true;
+   }
+   return false;
+}
+
+constexpr bool is_data_type_numeric_signed(data_type type) {
+   auto dts = magic_enum::enum_name(type);
+   for (auto& prefix : data_type_numeric_signed_prefixes) {
+      if (dts.starts_with(prefix))
+         return true;
+   }
+   return false;
+}
+
+// bool is_data_type_numeric(data_type type);
+
+// bool is_data_type_numeric_signed(data_type type);
+
 enum class padding_type { none, left, right };
 
 constexpr std::array data_dynamic_types{data_type::bytes, data_type::string};
@@ -100,8 +132,8 @@ struct component_type {
       bool is_list{false};
       std::size_t size{0};
 
-      bool is_fixed() const { return size > 0; }
-      bool is_dynamic() const { return !is_fixed(); }
+      bool is_fixed_list() const { return is_list && size > 0; }
+      bool is_dynamic_list() const { return is_list && !is_fixed_list(); }
    };
 
    std::string name{""};
@@ -109,7 +141,13 @@ struct component_type {
    std::string internal_type{""};
    list_config_type list_config{};
    std::vector<component_type> components{};
-   bool is_dynamic() const { return data_type_requires_dynamic_size(type) || list_config.is_dynamic(); };
+   bool is_dynamic() const {
+      // IF CONTAINER WITH DYNAMIC CHILD (AT ANY DEPTH)
+      if (is_container() && std::ranges::any_of(components, [](const auto& c) { return c.is_dynamic(); }))
+         return true;
+
+      return data_type_requires_dynamic_size(type) || list_config.is_dynamic_list();
+   };
 
    bool is_container() const {
       return type == data_type::error || type == data_type::event || type == data_type::tuple;
@@ -161,7 +199,7 @@ using contract_invoke_data_items = std::vector<contract_invoke_data>;
  * Encode a contract call
  * @return hex string of encoded call `data` field in RLP format
  */
-std::string contract_invoke_encode(const abi::contract& abi, const contract_invoke_data_items& params);
+std::string contract_invoke_encode(const abi::contract& contract, const contract_invoke_data_items& params);
 
 template <typename T>
 concept not_abi_data_params_t = !std::is_same_v<std::decay_t<T>, contract_invoke_data_items>;
