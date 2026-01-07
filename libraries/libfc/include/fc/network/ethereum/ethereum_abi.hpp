@@ -199,7 +199,7 @@ using contract_invoke_data_items = std::vector<contract_invoke_data>;
  * Encode a contract call
  * @return hex string of encoded call `data` field in RLP format
  */
-std::string contract_invoke_encode(const abi::contract& contract, const contract_invoke_data_items& params);
+std::string contract_encode_data(const abi::contract& contract, const contract_invoke_data_items& params);
 
 template <typename T>
 concept not_abi_data_params_t = !std::is_same_v<std::decay_t<T>, contract_invoke_data_items>;
@@ -208,16 +208,16 @@ template <typename... Args>
    requires(not_abi_data_params_t<std::tuple_element_t<0, std::tuple<Args...>>> &&
             !std::is_pointer_v<std::tuple_element_t<0, std::tuple<Args...>>>)
 
-std::string contract_invoke_encode(const abi::contract& abi, const Args&... args) {
+std::string contract_encode_data(const abi::contract& abi, const Args&... args) {
    contract_invoke_data_items params = {args...};
-   return contract_invoke_encode(abi, params);
+   return contract_encode_data(abi, params);
 }
 
 /**
  * Decode a contract call
  * @return decoded function name and parameters
  */
-std::pair<abi::contract, std::vector<std::string>> contract_invoke_decode(const std::string& encoded_invoke_data);
+fc::variant contract_decode_data(const abi::contract& contract, const std::string& encoded_invoke_data, bool use_inputs_instead_of_outputs = false);
 } // namespace fc::network::ethereum
 
 namespace fc {
