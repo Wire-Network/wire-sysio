@@ -1,3 +1,13 @@
+/**
+ * @file ethereum_abi.cpp
+ * @brief Implementation of Ethereum ABI encoding and decoding utilities
+ *
+ * This file provides functionality to encode and decode Ethereum smart contract calls
+ * according to the Ethereum ABI specification. It handles various data types including
+ * numeric types, addresses, bytes, strings, arrays, and tuples, supporting both static
+ * and dynamic encoding.
+ */
+
 #include <algorithm>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <cctype>
@@ -21,6 +31,12 @@ using boost::multiprecision::cpp_int;
 namespace {
 
 
+/**
+ * @brief Pads a byte vector to 32 bytes with leading zeros (big-endian)
+ *
+ * @param in Input byte vector to pad
+ * @return 32-byte vector with the input data right-aligned and zero-padded on the left
+ */
 std::vector<uint8_t> be_pad_left_32(const std::vector<uint8_t>& in) {
    std::vector<uint8_t> out(32, 0);
    if (in.size() >= 32) {
@@ -31,6 +47,13 @@ std::vector<uint8_t> be_pad_left_32(const std::vector<uint8_t>& in) {
    return out;
 }
 
+/**
+ * @brief Converts a decimal or hexadecimal string to a 32-byte big-endian representation
+ *
+ * @param dec Decimal string or hexadecimal string (with "0x" or "0X" prefix)
+ * @return 32-byte vector containing the big-endian representation of the number
+ * @throws fc::exception if the decimal string contains invalid characters
+ */
 std::vector<uint8_t> be_uint_from_decimal(const std::string& dec) {
    // Supports decimal or hex (starting with 0x)
    if (dec.rfind("0x", 0) == 0 || dec.rfind("0X", 0) == 0) {
@@ -53,6 +76,17 @@ std::vector<uint8_t> be_uint_from_decimal(const std::string& dec) {
    return be_pad_left_32(tmp);
 }
 
+/**
+ * @brief Encodes a static ABI value (fixed-size type) to 32-byte representation
+ *
+ * Handles encoding of numeric types (uint/int variants), booleans, addresses,
+ * and fixed-size bytes (bytes1..bytes32).
+ *
+ * @param component ABI component type descriptor
+ * @param value Variant containing the value to encode
+ * @return 32-byte encoded representation
+ * @throws fc::exception if the type is unsupported or value format is invalid
+ */
 std::vector<uint8_t> encode_static_value(const abi::component_type& component, const fc::variant& value) {
    using dt = abi::data_type;
    const auto type = component.type;
@@ -96,6 +130,17 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
                           ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
+/**
+ * @brief Encodes a dynamic ABI value (variable-size type) with length prefix and padding
+ *
+ * Handles encoding of strings and dynamic bytes. The output includes a 32-byte length
+ * prefix, followed by the data, padded to a 32-byte boundary.
+ *
+ * @param component ABI component type descriptor
+ * @param value Variant containing the value to encode
+ * @return Encoded byte vector with length prefix and padding
+ * @throws fc::exception if the type is unsupported or value format is invalid
+ */
 std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, const fc::variant& value) {
    using dt = abi::data_type;
    const auto type = component.type;
@@ -138,8 +183,27 @@ std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, c
    return out;
 }
 
+/**
+ * @brief Encodes an ABI value according to its component type (forward declaration)
+ *
+ * @param component ABI component type descriptor
+ * @param value Variant containing the value to encode
+ * @return Encoded byte vector
+ */
 std::vector<uint8_t> encode_value(const abi::component_type& component, const fc::variant& value);
 
+/**
+ * @brief Encodes an ABI array (fixed or dynamic) with proper head/tail structure
+ *
+ * For fixed-size arrays, validates element count. For dynamic arrays, prepends the
+ * array length. Handles both static and dynamic element types using offset encoding
+ * when elements are dynamic.
+ *
+ * @param component ABI component type descriptor with list configuration
+ * @param value Variant containing the array value
+ * @return Encoded byte vector with head/tail structure
+ * @throws fc::exception if array size mismatches or value is not an array
+ */
 std::vector<uint8_t> encode_list(const abi::component_type& component, const fc::variant& value) {
    FC_ASSERT(value.is_array(), "Array value expected for list encoding");
    const auto& arr = value.get_array();
@@ -194,6 +258,18 @@ std::vector<uint8_t> encode_list(const abi::component_type& component, const fc:
    return out;
 }
 
+/**
+ * @brief Encodes an ABI tuple (struct) with proper head/tail structure
+ *
+ * Accepts tuple data as either an array (positional) or an object (named fields).
+ * Static fields are encoded directly in the head, while dynamic fields use offset
+ * pointers to tail data.
+ *
+ * @param component ABI component type descriptor with nested components
+ * @param value Variant containing the tuple value (array or object)
+ * @return Encoded byte vector with head/tail structure
+ * @throws fc::exception if tuple structure mismatches or required fields are missing
+ */
 std::vector<uint8_t> encode_tuple(const abi::component_type& component, const fc::variant& value) {
    FC_ASSERT(value.is_array() || value.is_object(), "Tuple value must be array or object");
 
@@ -252,6 +328,16 @@ std::vector<uint8_t> encode_tuple(const abi::component_type& component, const fc
    return out;
 }
 
+/**
+ * @brief Main dispatcher for encoding an ABI value based on its component type
+ *
+ * Routes the encoding to the appropriate specialized function based on whether
+ * the component is a list, tuple, dynamic type, or static type.
+ *
+ * @param component ABI component type descriptor
+ * @param value Variant containing the value to encode
+ * @return Encoded byte vector
+ */
 std::vector<uint8_t> encode_value(const abi::component_type& component, const fc::variant& value) {
    if (component.is_list()) {
       return encode_list(component, value);
@@ -289,6 +375,15 @@ std::vector<uint8_t> encode_value(const abi::component_type& component, const fc
 //    return false;
 // }
 
+/**
+ * @brief Generates the canonical type signature string for an ABI component
+ *
+ * Recursively constructs the signature for tuples and arrays according to the
+ * Ethereum ABI specification format (e.g., "uint256", "(uint256,address)", "uint256[]").
+ *
+ * @param component ABI component type descriptor
+ * @return Canonical type signature string
+ */
 std::string abi::to_contract_component_signature(const component_type& component) {
    std::stringstream ss;
    if (!component.is_container()) {
@@ -323,6 +418,16 @@ std::string abi::to_contract_component_signature(const component_type& component
    return ss.str();
 }
 
+/**
+ * @brief Generates the full function signature string for an ABI contract
+ *
+ * Creates the canonical function signature used for computing the function selector,
+ * in the format "functionName(type1,type2,...)".
+ *
+ * @param contract ABI contract descriptor (must be of type function)
+ * @return Function signature string
+ * @throws fc::exception if contract is not a function type
+ */
 std::string abi::to_contract_function_signature(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    std::stringstream ss;
@@ -339,12 +444,32 @@ std::string abi::to_contract_function_signature(const contract& contract) {
    return ss.str();
 }
 
+/**
+ * @brief Computes the 4-byte function selector for an ABI contract
+ *
+ * Calculates the Keccak-256 hash of the function signature. The first 4 bytes
+ * of this hash serve as the function selector in Ethereum contract calls.
+ *
+ * @param contract ABI contract descriptor (must be of type function)
+ * @return 32-byte Keccak-256 hash (first 4 bytes used as selector)
+ * @throws fc::exception if contract is not a function type
+ */
 keccak256_hash_t abi::to_contract_function_selector(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    auto signature = abi::to_contract_function_signature(contract);
    return fc::crypto::ethereum::keccak256(signature);
 }
 
+/**
+ * @brief Parses multiple ABI contracts from a JSON file
+ *
+ * Reads and parses an Ethereum ABI JSON file containing an array of contract
+ * definitions (functions, events, etc.).
+ *
+ * @param json_abi_file Path to the JSON ABI file
+ * @return Vector of parsed ABI contract descriptors
+ * @throws fc::exception if file cannot be read or does not contain an array
+ */
 std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& json_abi_file) {
    auto json_var = fc::json::from_file(json_abi_file);
    FC_ASSERT(json_var.is_array(), "ABI file must contain an array of contracts");
@@ -354,6 +479,15 @@ std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& jso
    }
    return contracts;
 }
+
+/**
+ * @brief Parses a single ABI contract from a variant
+ *
+ * Converts a variant representation (typically from JSON) into an ABI contract structure.
+ *
+ * @param v Variant containing the contract definition
+ * @return Parsed ABI contract descriptor
+ */
 abi::contract abi::parse_contract(const fc::variant& v) {
    return v.as<abi::contract>();
 }
@@ -361,11 +495,16 @@ abi::contract abi::parse_contract(const fc::variant& v) {
 
 
 /**
- * Encode passed parameters based on the inputs specified in the ABI contract
+ * @brief Encodes function parameters for an Ethereum contract call
  *
- * @param contract the ABI contract describing the function
- * @param params function parameters
- * @return hex string of encoded call `data` field
+ * Encodes the provided parameters according to the ABI contract specification,
+ * prepending the 4-byte function selector. The result is formatted as a hex string
+ * suitable for use as the `data` field in an Ethereum transaction.
+ *
+ * @param contract ABI contract descriptor defining the function signature and inputs
+ * @param params Vector of parameter values to encode
+ * @return Hex string of encoded call data (selector + encoded parameters)
+ * @throws fc::exception if parameter count mismatches or encoding fails
  */
 std::string contract_invoke_encode(const abi::contract& contract, const std::vector<fc::variant>& params) {
    const auto& inputs = contract.inputs;
@@ -414,6 +553,17 @@ std::string contract_invoke_encode(const abi::contract& contract, const std::vec
    return fc::to_hex(out);
 }
 
+/**
+ * @brief Decodes encoded contract call data into selector and parameter words
+ *
+ * Performs minimal decoding by extracting the 4-byte function selector and splitting
+ * the remaining data into 32-byte words. Returns a contract structure with the selector
+ * as the name and a vector of hex-encoded parameter words.
+ *
+ * @param encoded_invoke_data Hex-encoded call data string
+ * @return Pair of ABI contract (with selector as name) and vector of hex-encoded parameter words
+ * @throws fc::exception if encoded data is too short (< 4 bytes)
+ */
 std::pair<abi::contract, std::vector<std::string>> contract_invoke_decode(const std::string& encoded_invoke_data) {
    // Minimal decoding: return selector as "0x...." in abi.name/signature and split payload into 32-byte words as hex
    auto bytes = fc::crypto::ethereum::hex_to_bytes(encoded_invoke_data);
@@ -444,6 +594,17 @@ std::pair<abi::contract, std::vector<std::string>> contract_invoke_decode(const 
 
 } // namespace fc::network::ethereum
 
+/**
+ * @brief Deserializes an ABI component type from a variant (typically JSON)
+ *
+ * Parses the variant object to extract component name, type, array dimensions,
+ * internal type, and nested components (for tuples). Supports both fixed and
+ * dynamic arrays through bracket notation (e.g., "uint256[]", "address[5]").
+ *
+ * @param var Variant containing the component definition
+ * @param vo Output component type structure to populate
+ * @throws fc::exception if variant format is invalid or required fields are missing
+ */
 void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::component_type& vo) {
    using namespace fc::network::ethereum;
    using namespace fc::network::ethereum::abi;
@@ -487,6 +648,17 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
    dlogf("name={},type={},internal_type={},components={}", vo.name, base_type_str, vo.internal_type,
          vo.components.size());
 }
+/**
+ * @brief Deserializes an ABI contract from a variant (typically JSON)
+ *
+ * Parses the variant object to extract contract name, type (function, event, etc.),
+ * and lists of input and output components. Supports optional fields that may not
+ * be present in all ABI entries.
+ *
+ * @param var Variant containing the contract definition
+ * @param vo Output contract structure to populate
+ * @throws fc::exception if variant format is invalid or required fields are missing
+ */
 void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contract& vo) {
    using namespace fc::network::ethereum;
    using namespace fc::network::ethereum::abi;
