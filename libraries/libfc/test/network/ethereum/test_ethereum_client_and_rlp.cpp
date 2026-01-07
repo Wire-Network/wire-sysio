@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
 }
 FC_LOG_AND_RETHROW();
 
-BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
+BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
 
    auto abi_filename = fc::test::get_test_fixtures_path() / bfs::path(test_contract_abi_json_file_01);
    auto contract_abis =
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
       order("amount", 1000);
       order("salt", "0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd");
 
-      auto encoded = eth::contract_invoke_encode(contract_abis[0], {fc::variant(order)});
+      auto encoded = eth::contract_encode_data(contract_abis[0], {fc::variant(order)});
 
       // Expected encoding:
       // 4 bytes: function selector (first 4 bytes of keccak256("submitOrder((address,uint256,bytes32))"))
@@ -179,6 +179,14 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
          "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"; // salt
 
       BOOST_CHECK_EQUAL(encoded, expected);
+
+      // Decode and verify
+      auto decoded = eth::contract_decode_data(contract_abis[0], encoded, true);
+      BOOST_REQUIRE(decoded.is_object());
+      auto decoded_obj = decoded.get_object();
+      BOOST_CHECK_EQUAL(decoded_obj["maker"].as_string(), "0x1234567890123456789012345678901234567890");
+      BOOST_CHECK_EQUAL(decoded_obj["amount"].as_string(), "1000");
+      BOOST_CHECK_EQUAL(decoded_obj["salt"].as_string(), "0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd");
    }
 
    // Test 2: submitOrders with dynamic array of tuples
@@ -195,7 +203,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
 
       fc::variants orders = {fc::variant(order1), fc::variant(order2)};
 
-      auto encoded = eth::contract_invoke_encode(contract_abis[2], {fc::variant(orders)});
+      auto encoded = eth::contract_encode_data(contract_abis[2], {fc::variant(orders)});
 
       // Expected encoding for dynamic array:
       // 4 bytes: function selector
@@ -215,6 +223,22 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
          "2222222222222222222222222222222222222222222222222222222222222222"; // order2.salt
 
       BOOST_CHECK_EQUAL(encoded, expected);
+
+      // Decode and verify
+      auto decoded = eth::contract_decode_data(contract_abis[2], encoded, true);
+      BOOST_REQUIRE(decoded.is_array());
+      auto decoded_arr = decoded.get_array();
+      BOOST_CHECK_EQUAL(decoded_arr.size(), 2);
+
+      auto decoded_order1 = decoded_arr[0].get_object();
+      BOOST_CHECK_EQUAL(decoded_order1["maker"].as_string(), "0x1111111111111111111111111111111111111111");
+      BOOST_CHECK_EQUAL(decoded_order1["amount"].as_string(), "100");
+      BOOST_CHECK_EQUAL(decoded_order1["salt"].as_string(), "0x1111111111111111111111111111111111111111111111111111111111111111");
+
+      auto decoded_order2 = decoded_arr[1].get_object();
+      BOOST_CHECK_EQUAL(decoded_order2["maker"].as_string(), "0x2222222222222222222222222222222222222222");
+      BOOST_CHECK_EQUAL(decoded_order2["amount"].as_string(), "200");
+      BOOST_CHECK_EQUAL(decoded_order2["salt"].as_string(), "0x2222222222222222222222222222222222222222222222222222222222222222");
    }
 
    // Test 3: submitTwoOrders with fixed array[2] of tuples containing nested tuple and string
@@ -239,7 +263,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
 
       fc::variants orders = {fc::variant(order_ex1), fc::variant(order_ex2)};
 
-      auto encoded = eth::contract_invoke_encode(contract_abis[3], {fc::variant(orders)});
+      auto encoded = eth::contract_encode_data(contract_abis[3], {fc::variant(orders)});
 
       // Fixed array[2] of dynamic tuples (due to string field)
       // Each OrderEx contains: (address,uint256,bytes32) + string
@@ -265,6 +289,26 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode) try {
          "7365636f6e640000000000000000000000000000000000000000000000000000"; // "second" padded
 
       BOOST_CHECK_EQUAL(encoded, expected);
+
+      // Decode and verify
+      auto decoded = eth::contract_decode_data(contract_abis[3], encoded, true);
+      BOOST_REQUIRE(decoded.is_array());
+      auto decoded_arr = decoded.get_array();
+      BOOST_CHECK_EQUAL(decoded_arr.size(), 2);
+
+      auto decoded_order_ex1 = decoded_arr[0].get_object();
+      BOOST_CHECK_EQUAL(decoded_order_ex1["tag"].as_string(), "first");
+      auto decoded_inner_order1 = decoded_order_ex1["order"].get_object();
+      BOOST_CHECK_EQUAL(decoded_inner_order1["maker"].as_string(), "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      BOOST_CHECK_EQUAL(decoded_inner_order1["amount"].as_string(), "500");
+      BOOST_CHECK_EQUAL(decoded_inner_order1["salt"].as_string(), "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+
+      auto decoded_order_ex2 = decoded_arr[1].get_object();
+      BOOST_CHECK_EQUAL(decoded_order_ex2["tag"].as_string(), "second");
+      auto decoded_inner_order2 = decoded_order_ex2["order"].get_object();
+      BOOST_CHECK_EQUAL(decoded_inner_order2["maker"].as_string(), "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+      BOOST_CHECK_EQUAL(decoded_inner_order2["amount"].as_string(), "600");
+      BOOST_CHECK_EQUAL(decoded_inner_order2["salt"].as_string(), "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
    }
 
 }

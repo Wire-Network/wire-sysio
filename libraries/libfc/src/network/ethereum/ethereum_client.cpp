@@ -35,7 +35,7 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 fc::variant ethereum_client::execute_contract_view_fn(const address& contract_address, const abi::contract& abi,
                                                    const std::string& block_tag,
                                                    const contract_invoke_data_items& params) {
-   auto abi_call_encoded = contract_invoke_encode(abi, params);
+   auto abi_call_encoded = contract_encode_data(abi, params);
    auto to_data_mvo = fc::mutable_variant_object("to", to_hex(contract_address, true))("data", abi_call_encoded);
    fc::variants rpc_params = {to_data_mvo, fc::variant(block_tag)};
    return execute("eth_call", rpc_params);
@@ -44,7 +44,7 @@ fc::variant ethereum_client::execute_contract_view_fn(const address& contract_ad
 fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx, const abi::contract& abi,
                                                  const contract_invoke_data_items& params, bool sign) {
    eip1559_tx tx = source_tx;
-   tx.data = from_hex(contract_invoke_encode(abi, params));
+   tx.data = from_hex(contract_encode_data(abi, params));
    auto tx_encoded = rlp::encode_eip1559_unsigned_typed(tx);
    if (sign) {
       // auto tx_encoded_unsigned     = rlp::encode_eip1559_unsigned_typed(tx);
