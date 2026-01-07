@@ -507,6 +507,10 @@
                     "type": "public_key"
                 },
                 {
+                    "name": "rank",
+                    "type": "uint32"
+                },
+                {
                     "name": "is_active",
                     "type": "bool"
                 },
