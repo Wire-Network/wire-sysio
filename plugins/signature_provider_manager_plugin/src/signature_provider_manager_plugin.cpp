@@ -271,12 +271,12 @@ public:
                                   ("kind", fc::crypto::chain_key_type_reflector::to_fc_string(key_type)));
             }
             }
-            auto pub_key_str = privkey.get_public_key().to_native_string({});
+            auto pub_key_str = privkey.get_public_key().to_string({});
             spec = fc::crypto::to_signature_provider_spec(key_name,
                                                           fc::crypto::chain_kind_wire,
                                                           key_type,
                                                           pub_key_str,
-                                                          std::format("KEY:{}", privkey.to_native_string({})));
+                                                          std::format("KEY:{}", privkey.to_string({})));
 
             _default_signature_provider_specs[key_type] = spec;
             changed = true;
@@ -424,7 +424,7 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
          dlog("Registering signature provider from spec: ${spec}", ("spec", spec));
          auto provider = create_provider(spec);
          dlog("Registered signature provider (${name}): ${publicKey}",
-              ("name", provider->key_name)("publicKey", provider->public_key.to_native_string({})));
+              ("name", provider->key_name)("publicKey", provider->public_key.to_string({})));
       }
    }
 }

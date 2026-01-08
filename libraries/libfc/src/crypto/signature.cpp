@@ -13,36 +13,13 @@ namespace fc { namespace crypto {
       }
 
       size_t operator()(const bls::signature_shim& sig) const {
-         return sig.unwrapped().get_hash();
+         return bls::signature::get_hash(sig._data);
       }
 
       size_t operator()(const webauthn::signature& sig) const {
          return sig.get_hash();
       }
    };
-
-   signature::storage_type signature::sig_parse_base58(const std::string& base58str)
-   { try {
-      constexpr auto prefix = fc::crypto::constants::signature_base_prefix;
-
-      const auto pivot = base58str.find('_');
-      FC_ASSERT(pivot != std::string::npos, "No delimiter in string, cannot determine type: ${str}", ("str", base58str));
-
-      const auto prefix_str = base58str.substr(0, pivot);
-      FC_ASSERT(prefix == prefix_str, "Signature Key has invalid prefix: ${str}", ("str", base58str)("prefix_str", prefix_str));
-
-      auto data_str = base58str.substr(pivot + 1);
-      FC_ASSERT(!data_str.empty(), "Signature has no data: ${str}", ("str", base58str));
-      return base58_str_parser<signature::storage_type, fc::crypto::constants::signature_prefix>::apply(data_str);
-   } FC_RETHROW_EXCEPTIONS( warn, "error parsing signature", ("str", base58str ) ) }
-
-   signature::signature(const std::string& base58str)
-      :_storage(sig_parse_base58(base58str))
-   {}
-
-   size_t signature::which() const {
-      return _storage.index();
-   }
 
    template<class... Ts> struct overloaded : Ts... { using Ts::operator()...; };
    template<class... Ts> overloaded(Ts...) -> overloaded<Ts...>;
@@ -58,19 +35,78 @@ namespace fc { namespace crypto {
       }, _storage);
    }
 
-   std::string signature::to_native_string(const fc::yield_function_t& yield) const {
-      return std::visit(to_native_string_from_signature_visitor<storage_type, fc::crypto::constants::signature_prefix>(yield), _storage);
+   signature signature::from_string(const std::string& str, sig_type type) {
+      switch (type) {
+      case sig_type::k1:
+      case sig_type::r1:
+      case sig_type::wa:
+      case sig_type::bls: {
+         signature s(parse_unknown_wire_signature_str(str));
+         FC_ASSERT( s.type() == type, "Parsed type ${pt} does not match specified type ${t} for ${k}",
+                    ("pt", s.type())("t", type)("k", str));
+         return s;
+      }
+      case sig_type::em: {
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         const auto& sig = base_prefix.empty() ? str : data_str;
+         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::em), "Invalid signature prefixes: ${k}", ("k", str));
+         return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(sig);
+      }
+      case sig_type::ed: {
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         const auto& sig = base_prefix.empty() ? str : data_str;
+         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::ed), "Invalid signature prefixes: ${k}", ("k", str));
+         return from_native_string_to_signature<chain_key_type_t::chain_key_type_solana>(sig);
+      }
+      case sig_type::unknown: {
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         FC_ASSERT(base_prefix == constants::signature_base_prefix, "Invalid prefix to parse signature type: ${k}", ("k", str));
+         if (type_prefix == sig_prefix(sig_type::em)) {
+            return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(data_str);
+         } else if (type_prefix == sig_prefix(sig_type::ed)) {
+            return from_native_string_to_signature<chain_key_type_t::chain_key_type_solana>(data_str);
+         }
+         return signature(parse_unknown_wire_signature_str(str));
+      }
+
+      default:
+         FC_ASSERT(false, "Unknown key type: ${type}", ("type", type));
+      };
    }
 
-   std::string signature::to_string(const fc::yield_function_t& yield) const
-   {
-      auto data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::signature_prefix>(yield), _storage);
-      yield();
-      return std::string(fc::crypto::constants::signature_base_prefix) + "_" + data_str;
+   std::string signature::to_string(const fc::yield_function_t& yield, bool include_prefix) const {
+      switch (type()) {
+      case sig_type::k1:
+      case sig_type::r1:
+      case sig_type::wa: {
+         auto data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::signature_prefix>(yield), _storage);
+         return std::string(fc::crypto::constants::signature_base_prefix) + "_" + data_str;
+      }
+      case sig_type::em: {
+         std::string prefix = include_prefix
+                                 ? std::string(constants::signature_base_prefix) + "_" + sig_prefix(sig_type::em) + "_"
+                                 : "";
+         return prefix + get<em::signature_shim>().to_string();
+      }
+      case sig_type::ed: {
+         std::string prefix = include_prefix
+                                 ? std::string(constants::signature_base_prefix) + "_" + sig_prefix(sig_type::ed) + "_"
+                                 : "";
+         FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
+      }
+      case sig_type::bls: {
+         // bls to string includes prefix
+         return get<bls::signature_shim>().to_string();
+      }
+      case sig_type::unknown:
+         break;
+      }
+
+      FC_ASSERT(false, "signature unknown sig type ${t}", ("t", type()));
    }
 
    std::ostream& operator<<(std::ostream& s, const signature& k) {
-      s << "signature(" << k.to_string() << ')';
+      s << "signature(" << k.to_string({}, true) << ')';
       return s;
    }
 
@@ -78,12 +114,7 @@ namespace fc { namespace crypto {
       return eq_comparator<signature::storage_type>::apply(p1._storage, p2._storage);
    }
 
-   bool operator != ( const signature& p1, const signature& p2) {
-      return !eq_comparator<signature::storage_type>::apply(p1._storage, p2._storage);
-   }
-
-   bool operator < ( const signature& p1, const signature& p2)
-   {
+   bool operator < ( const signature& p1, const signature& p2) {
       return less_comparator<signature::storage_type>::apply(p1._storage, p2._storage);
    }
 
@@ -101,6 +132,6 @@ namespace fc
 
    void from_variant(const fc::variant& var, fc::crypto::signature& vo)
    {
-      vo = fc::crypto::signature(var.as_string());
+      vo = fc::crypto::signature::from_string(var.as_string());
    }
 } // fc

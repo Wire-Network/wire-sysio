@@ -1,17 +1,24 @@
 #pragma once
+
 #include <fc-lite/crypto/chain_types.hpp>
 
 #include <fc/crypto/elliptic.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/signature.hpp>
-#include <fc/reflect/reflect.hpp>
-#include <fc/static_variant.hpp>
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/bls_private_key.hpp>
+#include <fc/crypto/sha256.hpp>
+#include <fc/reflect/reflect.hpp>
+#include <fc/static_variant.hpp>
+#include <fc/utility.hpp>
 
+#include <array>
+#include <ostream>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <variant>
 
 namespace fc::crypto {
@@ -46,8 +53,9 @@ namespace fc::crypto {
             unknown
          };
          static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(key_type::unknown), "Missing public_key key_type");
+         static_assert(std::size(constants::public_key_prefix) == static_cast<size_t>(key_type::unknown), "Missing public_key prefix");
 
-         static public_key::storage_type parse_base58(const std::string& base58str);
+         constexpr static const char* key_prefix(key_type t) { return constants::public_key_prefix[std::to_underlying(t)]; };
 
          public_key() = default;
          public_key( public_key&& ) = default;
@@ -62,14 +70,16 @@ namespace fc::crypto {
 
          bool valid()const;
 
-         size_t which()const;
+         size_t which()const { return _storage.index(); }
          key_type type()const { return static_cast<key_type>(which()); }
 
-         // serialize to/from string
-         explicit public_key(const std::string& base58str);
-         std::string to_string(const fc::yield_function_t& yield) const;
+         // If type is unknown, attempt to infer the key type from the string.
+         static public_key from_string(const std::string& str, key_type type = key_type::unknown);
 
-         std::string to_native_string(const fc::yield_function_t& yield) const;
+         // If include_prefix is true, the prefix will be included in the string representation.
+         // Note for Wire native types (k1, r1, wa, bls) the prefix is always included.
+         // For k1 if include_prefix is false, then the legacy prefix is used instead of PUB_K1_
+         std::string to_string(const fc::yield_function_t& yield, bool include_prefix = false) const;
 
          template<typename... Args>
          bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }
@@ -91,14 +101,10 @@ namespace fc::crypto {
 
          friend std::ostream& operator<<(std::ostream& s, const public_key& k);
          friend bool operator==( const public_key& p1, const public_key& p2);
-         friend bool operator!=( const public_key& p1, const public_key& p2);
          friend bool operator<( const public_key& p1, const public_key& p2);
          friend struct reflector<public_key>;
          friend class private_key;
    }; // public_key
-
-
-   chain_key_type_t get_public_key_type(const std::variant<std::string, public_key>& pub_key_var);
 
 } // fc::crypto
 
@@ -109,4 +115,4 @@ namespace fc {
 } // namespace fc
 
 FC_REFLECT(fc::crypto::public_key, (_storage) )
-
+FC_REFLECT_ENUM(fc::crypto::public_key::key_type, (k1)(r1)(wa)(em)(ed)(bls)(unknown))

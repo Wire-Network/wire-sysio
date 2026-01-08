@@ -154,7 +154,7 @@ void wallet_manager::set_key_name_with_public_key(const string& name, const stri
    if (w->is_locked())
       SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
    w->check_password(pw); //throws if bad password
-   w->set_key_name(public_key_type(pub_key_str), key_name);
+   w->set_key_name(public_key_type::from_string(pub_key_str), key_name);
 }
 
 void wallet_manager::set_key_name_with_private_key(const string& name, const string& pw, const string& key_name,
@@ -167,7 +167,7 @@ void wallet_manager::set_key_name_with_private_key(const string& name, const str
    if (w->is_locked())
       SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", name));
    w->check_password(pw); //throws if bad password
-   w->set_key_name(private_key_type(priv_key_str), key_name);
+   w->set_key_name(private_key_type::from_string(priv_key_str), key_name);
 }
 
 void wallet_manager::set_key_name(const string& name, const string& pw, const string& key_name,

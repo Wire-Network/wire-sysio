@@ -1,5 +1,4 @@
 #pragma once
-#include <ranges>
 
 #include <fc/crypto/crypto_utils.hpp>
 #include <fc/crypto/hex.hpp>
@@ -7,8 +6,19 @@
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/signature.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/crypto/bls_common.hpp>
+
+#include <ranges>
+#include <string>
+#include <string_view>
+#include <tuple>
 
 namespace fc::crypto {
+
+public_key::storage_type parse_unknown_wire_public_key_str(const std::string& str);
+private_key::storage_type parse_unknown_wire_private_key_str(const std::string& str);
+signature::storage_type parse_unknown_wire_signature_str(const std::string& str);
+
 template <typename KeyType>
 std::string storage_to_base58_str(const KeyType& key, const char* prefix_chars = nullptr,
                                   const fc::yield_function_t& yield = {}) {
@@ -29,40 +39,6 @@ std::string storage_to_base58_str(const KeyType& key, const char* prefix_chars =
 
    return data_str;
 }
-
-template <typename Storage, const char* const * Prefixes, int DefaultPosition = -1>
-struct to_native_string_from_public_key_visitor : public fc::visitor<std::string> {
-   explicit to_native_string_from_public_key_visitor(const fc::yield_function_t& yield)
-      : _yield(yield) {};
-
-   std::string operator()(const em::public_key_shim& em_pub_key) const {
-      auto em_bytes = em_pub_key.unwrapped().serialize_uncompressed() | std::ranges::to<std::vector<std::uint8_t>>();
-      return to_hex(em_bytes, true);
-   }
-
-   std::string operator()(const bls::public_key_shim& bls_pub_key_shim) const {
-      return bls_pub_key_shim.unwrapped().to_string();
-   }
-
-   std::string operator()(const ed::public_key_shim& ed_pub_key_shim) const {
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
-   }
-
-   template <typename KeyType>
-   std::string operator()(const KeyType& key) const {
-      constexpr int position = fc::get_index<Storage, KeyType>();
-      constexpr bool is_default = position == DefaultPosition;
-      constexpr const char* prefix_chars = !is_default ? Prefixes[position] : nullptr;
-      auto data_str = storage_to_base58_str(key, prefix_chars, _yield);
-      if (position == 0) {
-         return std::string(fc::crypto::constants::public_key_legacy_prefix) + data_str;
-      } else {
-         return std::string(fc::crypto::constants::public_key_base_prefix) + "_" + data_str;
-      }
-   }
-
-   const fc::yield_function_t _yield;
-};
 
 /**
  * @brief Private Key to Native Chain String Serializer
@@ -120,8 +96,7 @@ struct to_native_string_from_signature_visitor : public fc::visitor<std::string>
       : _yield(yield) {};
 
    std::string operator()(const em::signature_shim& em_sig) const {
-      auto em_bytes = em_sig.serialize() | std::ranges::to<std::vector<std::uint8_t>>();
-      return to_hex(em_bytes, true);
+      return em_sig.to_string();
    }
 
    std::string operator()(const bls::signature_shim& bls_sig_shim) const {
@@ -148,11 +123,9 @@ public_key::storage_type from_native_string_to_public_key_shim(const std::string
    if (public_key_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Public key string cannot be empty");
    }
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_wire_bls)
-      return bls::public_key_shim(bls::public_key(public_key_str).serialize());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
-      return em::public_key_shim(em::public_key::from_native_string(public_key_str).serialize());
+      return em::public_key_shim(em::public_key::from_string(public_key_str).serialize());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED support is not yet implemented");
@@ -160,7 +133,7 @@ public_key::storage_type from_native_string_to_public_key_shim(const std::string
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
-   return fc::crypto::public_key::parse_base58(public_key_str);
+   return parse_unknown_wire_public_key_str(public_key_str);
 }
 
 template <fc::crypto::chain_key_type_t ChainKeyType>
@@ -173,8 +146,6 @@ private_key::storage_type from_native_string_to_private_key_shim(const std::stri
    if (private_key_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_wire_bls)
-      return bls::private_key_shim(bls::private_key(private_key_str).get_secret());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
       return em::private_key_shim(em::private_key::from_native_string(private_key_str).get_secret());
@@ -185,7 +156,7 @@ private_key::storage_type from_native_string_to_private_key_shim(const std::stri
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
-   return fc::crypto::private_key::priv_parse_base58(private_key_str);
+   return parse_unknown_wire_private_key_str(private_key_str);
 }
 
 template <fc::crypto::chain_key_type_t ChainKeyType>
@@ -198,8 +169,6 @@ signature::storage_type from_native_string_to_signature_shim(const std::string& 
    if (signature_str.empty()) {
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_wire_bls)
-      return bls::signature_shim(bls::signature(signature_str).serialize());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
       return em::signature_shim(ethereum::to_em_signature(signature_str));
@@ -210,7 +179,7 @@ signature::storage_type from_native_string_to_signature_shim(const std::string& 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
-   return fc::crypto::signature::sig_parse_base58(signature_str);
+   return parse_unknown_wire_signature_str(signature_str);
 }
 
 template <fc::crypto::chain_key_type_t ChainKeyType>
@@ -300,5 +269,123 @@ struct base58str_visitor : public fc::visitor<std::string> {
    const fc::yield_function_t _yield;
 };
 
+template<typename Data>
+std::string to_wif( const Data& secret, const fc::yield_function_t& yield ) {
+   const size_t size_of_data_to_hash = sizeof(typename Data::data_type) + 1;
+   const size_t size_of_hash_bytes = 4;
+   char data[size_of_data_to_hash + size_of_hash_bytes];
+   data[0] = (char)0x80; // this is the Bitcoin MainNet code
+   memcpy(&data[1], (const char*)&secret.serialize(), sizeof(typename Data::data_type));
+   sha256 digest = sha256::hash(data, size_of_data_to_hash);
+   digest = sha256::hash(digest);
+   memcpy(data + size_of_data_to_hash, (char*)&digest, size_of_hash_bytes);
+   return to_base58(data, sizeof(data), yield);
+}
+
+template<typename Data>
+Data from_wif( const std::string& wif_key ) {
+   auto wif_bytes = from_base58(wif_key);
+   FC_ASSERT(wif_bytes.size() >= 5);
+   auto key_bytes = std::vector<char>(wif_bytes.begin() + 1, wif_bytes.end() - 4);
+   fc::sha256 check = fc::sha256::hash(wif_bytes.data(), wif_bytes.size() - 4);
+   fc::sha256 check2 = fc::sha256::hash(check);
+
+   FC_ASSERT(memcmp( (char*)&check, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 ||
+             memcmp( (char*)&check2, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 );
+   FC_ASSERT(key_bytes.size() == sizeof(typename Data::data_type), "Invalid key size for type ${t}",
+             ("t", typeid(Data).name()));
+
+   Data d{};
+   memcpy(d._data.data(), key_bytes.data(), key_bytes.size());
+   return d;
+}
+
+inline private_key::storage_type parse_unknown_wire_private_key_str(const std::string& str) {
+   const auto pivot = str.find('_');
+   if (pivot == std::string::npos) {
+      // wif import
+      using default_type = std::variant_alternative_t<0, private_key::storage_type>;
+      return private_key::storage_type(from_wif<default_type>(str));
+   }
+
+   constexpr auto prefix = fc::crypto::constants::private_key_base_prefix;
+   const auto prefix_str = str.substr(0, pivot);
+   FC_ASSERT(prefix == prefix_str, "Private Key has invalid prefix: ${str}", ("str", str)("prefix_str", prefix_str));
+
+   auto data_str = str.substr(pivot + 1);
+   FC_ASSERT(!data_str.empty(), "Private Key has no data: ${str}", ("str", str));
+   return base58_str_parser<private_key::storage_type, fc::crypto::constants::private_key_prefix>::apply(data_str);
+}
+
+inline bool is_legacy_public_key_str(const std::string& str) {
+   constexpr auto legacy_prefix = fc::crypto::constants::public_key_legacy_prefix;
+   return prefix_matches(legacy_prefix, str) && str.find('_') == std::string::npos;
+}
+
+// Given PUB_K1_xxx returns <'PUB','K1','xxx'>
+inline std::tuple<std::string, std::string, std::string> parse_base_prefixes(std::string_view str) {
+   const auto first = str.find('_');
+   if (first == std::string::npos)
+      return {};
+
+   const auto second = str.find('_', first + 1);
+   if (second == std::string::npos)
+      return {};
+
+   // Ensure there is data after the second one
+   if (second + 1 >= str.size())
+      return {};
+
+   return std::tuple<std::string, std::string, std::string>{
+      str.substr(0, first), str.substr(first + 1, second - first - 1), str.substr(second + 1)};
+}
+
+inline public_key::storage_type parse_unknown_wire_public_key_str(const std::string& str) {
+   if(is_legacy_public_key_str(str)) {
+      auto sub_str = str.substr(const_strlen(fc::crypto::constants::public_key_legacy_prefix));
+      using default_type = typename std::variant_alternative_t<0, public_key::storage_type>; //public_key::storage_type::template type_at<0>;
+      using data_type = default_type::data_type;
+      using wrapper = checksum_data<data_type>;
+      auto bin = fc::from_base58(sub_str);
+      FC_ASSERT(bin.size() == sizeof(data_type) + sizeof(uint32_t), "");
+      auto wrapped = fc::raw::unpack<wrapper>(bin);
+      FC_ASSERT(wrapper::calculate_checksum(wrapped.data) == wrapped.check);
+      return public_key::storage_type(default_type(wrapped.data));
+   }
+
+   constexpr auto prefix = fc::crypto::constants::public_key_base_prefix;
+   auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+   FC_ASSERT(!base_prefix.empty(), "Invalid public key prefixes: ${k}", ("k", str));
+   FC_ASSERT(prefix == base_prefix, "Public Key has invalid prefix: ${str}", ("str", str));
+   if (type_prefix == public_key::key_prefix(public_key::key_type::k1) ||
+      type_prefix == public_key::key_prefix(public_key::key_type::r1) ||
+      type_prefix == public_key::key_prefix(public_key::key_type::wa)) {
+      return base58_str_parser<public_key::storage_type, fc::crypto::constants::public_key_prefix>::apply(type_prefix + '_' + data_str);
+   }
+   if (type_prefix == public_key::key_prefix(public_key::key_type::bls)) {
+      return bls::deserialize_bls_base64url(str);
+   }
+   FC_ASSERT(false, "Unknown public key suite: ${s} in ${str}", ("s", type_prefix)("str", str));
+}
+
+inline signature::storage_type parse_unknown_wire_signature_str(const std::string& str) {
+   try {
+      constexpr auto prefix = fc::crypto::constants::signature_base_prefix;
+
+      const auto pivot = str.find('_');
+      FC_ASSERT(pivot != std::string::npos, "No delimiter in string, cannot determine type: ${str}", ("str", str));
+
+      const auto prefix_str = str.substr(0, pivot);
+      FC_ASSERT(prefix == prefix_str, "Signature Key has invalid prefix: ${str}", ("str", str)("prefix_str", prefix_str));
+
+      if (prefix_str == signature::sig_prefix(signature::sig_type::bls)) {
+         return bls::sig_parse_base64url(str);
+      }
+
+      auto data_str = str.substr(pivot + 1);
+      FC_ASSERT(!data_str.empty(), "Signature has no data: ${str}", ("str", str));
+      return base58_str_parser<signature::storage_type, fc::crypto::constants::signature_prefix>::apply(data_str);
+   } FC_RETHROW_EXCEPTIONS(warn, "error parsing signature", ("str", str ))
+}
 
 }

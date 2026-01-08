@@ -16,11 +16,13 @@ uint8_t from_hex(char c) {
 
 std::string to_hex(const char* d, uint32_t s, bool add_prefix) {
    std::string r;
+   r.reserve(s * 2 + (add_prefix ? 2 : 0));
+   if (add_prefix) r += "0x";
    auto to_hex = "0123456789abcdef";
-   auto        c      = reinterpret_cast<const uint8_t*>(d);
+   auto c = reinterpret_cast<const uint8_t*>(d);
    for (uint32_t i = 0; i < s; ++i)
       (r += to_hex[(c[i] >> 4)]) += to_hex[(c[i] & 0x0f)];
-   return add_prefix ? "0x" + r : r;
+   return r;
 }
 
 size_t from_hex(const std::string& hex_str, char* out_data, size_t out_data_len) {

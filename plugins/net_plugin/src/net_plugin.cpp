@@ -4668,7 +4668,7 @@ namespace sysio {
             for( const std::string& key_id_to_wif_pair_string : key_id_to_wif_pair_strings ) {
                auto key_id_to_wif_pair = dejsonify<std::pair<chain::public_key_type, std::string>>(
                      key_id_to_wif_pair_string );
-               private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key( key_id_to_wif_pair.second );
+               private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key::from_string( key_id_to_wif_pair.second );
             }
          }
 

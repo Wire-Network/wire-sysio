@@ -162,10 +162,17 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
        fc::crypto::public_key pubkey1(pk1);
        std::string pk1_str = pubkey1.to_string({});
        dlog("pk1_str = ${k}", ("k", pk1_str));
-       fc::crypto::public_key pubkey2(pk1_str);
+       fc::crypto::public_key pubkey2 = fc::crypto::public_key::from_string(pk1_str, fc::crypto::public_key::key_type::em);
        std::string pk2_str = pubkey2.to_string({});
        BOOST_TEST(pk1_str == pk2_str);
-       BOOST_TEST(pk1_str.starts_with("PUB_ED_"));
+       std::string pk3_str = pubkey2.to_string({}, true);
+       BOOST_TEST(pk3_str.starts_with("PUB_ED_"));
+       fc::crypto::public_key pubkey3 = fc::crypto::public_key::from_string(pk3_str);
+       BOOST_TEST(pubkey3.to_string({}) == pk2_str);
+
+       fc::crypto::private_key privkey1(sk1);
+       auto pub_key1 = privkey1.get_public_key();
+       BOOST_TEST(pub_key1.to_string({}) == pk1_str);
 
     } FC_LOG_AND_RETHROW()
 }

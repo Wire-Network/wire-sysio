@@ -7,8 +7,13 @@
 #include <algorithm>
 
 namespace fc::crypto::ethereum {
+using keccak256_hash_t = std::array<std::uint8_t, 32>;
 
 
+keccak256_hash_t keccak256(const uint8_t* data, size_t size) {
+   auto k256 = ethash::keccak256(data, size);
+   return std::bit_cast<keccak256_hash_t>(k256);
+}
 /**
  * Removes "0x" prefix if present and converts hex string to lowercase
  * @param hex The hex string to trim
@@ -190,7 +195,7 @@ fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    em::private_key_secret sk{};
    FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected ${e}, received ${r}",
              ("s", fc::data_size(sk))("r", privkey_bytes.size()));
-   std::copy_n(privkey_bytes.data(), privkey_bytes.size(), sk.data());
+   memcpy(sk.data(), privkey_bytes.data(), fc::data_size(sk));
    return fc::em::private_key::regenerate(sk);
 }
 
@@ -200,7 +205,7 @@ fc::em::compact_signature to_em_signature(const std::string& signature_hex) {
              "Invalid signature size, expected ${s}, received ${r} character hex string",
              ("s", std::tuple_size_v<fc::em::compact_signature>)("r", signature_bytes.size()));
    fc::em::compact_signature sig;
-   std::copy_n(signature_bytes.data(), signature_bytes.size(), sig.data());
+   memcpy(sig.data(), signature_bytes.data(), signature_bytes.size());
    return sig;
 }
 }

@@ -27,7 +27,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
 
    //fc::variant params = producer_parameters_example(1);
-   auto key =  fc::crypto::public_key( std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV") ); // cspell:disable-line
+   auto key =  fc::crypto::public_key::from_string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key )
@@ -51,11 +51,11 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    BOOST_REQUIRE_EQUAL( "http://wire", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 1, info["location"].as_int64() );
 
-   auto key2 =  fc::crypto::public_key( std::string("SYS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6") ); // cspell:disable-line
+   auto key2 =  fc::crypto::public_key::from_string( "SYS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6" ); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key2 )
@@ -65,7 +65,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 2, info["location"].as_int64() );
 
@@ -76,7 +76,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    //key should be empty
-   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    //everything else should stay the same
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
    BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );

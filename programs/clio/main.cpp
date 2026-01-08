@@ -265,7 +265,7 @@ public:
       if (!public_key_json.empty()) {
          if (is_public_key_str(public_key_json)) {
             try {
-               signing_keys.push_back(public_key_type(public_key_json));
+               signing_keys.push_back(public_key_type::from_string(public_key_json));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", public_key_json))
          } else {
             fc::variant json_keys;
@@ -879,7 +879,7 @@ authority parse_json_authority(const std::string& authorityJsonOrFile) {
 authority parse_json_authority_or_key(const std::string& authorityJsonOrFile) {
    if (is_public_key_str(authorityJsonOrFile)) {
       try {
-         return authority(public_key_type(authorityJsonOrFile));
+         return authority(public_key_type::from_string(authorityJsonOrFile));
       } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", authorityJsonOrFile))
    } else {
       auto result = parse_json_authority(authorityJsonOrFile);
@@ -1195,7 +1195,7 @@ struct register_producer_subcommand {
       register_producer->callback([this] {
          public_key_type producer_key;
          try {
-            producer_key = public_key_type(producer_key_str);
+            producer_key = public_key_type::from_string(producer_key_str);
          } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid producer public key: ${public_key}", ("public_key", producer_key_str))
 
          auto regprod_var = regproducer_variant(name(producer_str), producer_key, url, loc );
@@ -1237,7 +1237,7 @@ struct create_account_subcommand {
             } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid owner permission level: ${permission}", ("permission", owner_key_str))
          } else {
             try {
-               owner = authority(public_key_type(owner_key_str));
+               owner = authority(public_key_type::from_string(owner_key_str));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid owner public key: ${public_key}", ("public_key", owner_key_str));
          }
 
@@ -1253,7 +1253,7 @@ struct create_account_subcommand {
             } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid active permission level: ${permission}", ("permission", active_key_str))
          } else {
             try {
-               active = authority(public_key_type(active_key_str));
+               active = authority(public_key_type::from_string(active_key_str));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
          }
 
@@ -2786,7 +2786,7 @@ int main( int argc, char** argv ) {
 
          private_key_type wallet_key;
          try {
-            wallet_key = private_key_type( wallet_key_str );
+            wallet_key = private_key_type::from_string( wallet_key_str );
          } catch (...) {
             SYS_THROW(private_key_type_exception, "Invalid private key")
          }
@@ -2810,7 +2810,7 @@ int main( int argc, char** argv ) {
       remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
          prompt_for_wallet_password(wallet_pw, wallet_name);
          try {
-            public_key_type pubkey = public_key_type(wallet_rm_key_str);
+            public_key_type pubkey = public_key_type::from_string(wallet_rm_key_str);
          } catch (...) {
             SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
          }
@@ -2987,7 +2987,7 @@ int main( int argc, char** argv ) {
       if( str_public_key.size() > 0 ) {
          public_key_type pub_key;
          try {
-            pub_key = public_key_type(str_public_key);
+            pub_key = public_key_type::from_string(str_public_key);
          } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", str_public_key))
          fc::variant keys_var(flat_set<public_key_type>{ pub_key });
          sign_transaction(trx, keys_var, *chain_id);
@@ -3000,7 +3000,7 @@ int main( int argc, char** argv ) {
          }
          private_key_type priv_key;
          try {
-            priv_key = private_key_type(str_private_key);
+            priv_key = private_key_type::from_string(str_private_key);
          } SYS_RETHROW_EXCEPTIONS(private_key_type_exception, "Invalid private key")
          trx.sign(priv_key, *chain_id);
       }
@@ -3077,7 +3077,7 @@ int main( int argc, char** argv ) {
          abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver, abi_serializer::create_yield_function( abi_serializer_max_time ) );
       }
       for (const string& sig : extra_signatures) {
-         trx.signatures.push_back(fc::crypto::signature(sig));
+         trx.signatures.push_back(fc::crypto::signature::from_string(sig));
       }
       std::cout << fc::json::to_pretty_string( push_transaction( trx, signing_keys_opt.get_keys() )) << std::endl;
    });

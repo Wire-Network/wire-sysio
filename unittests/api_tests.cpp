@@ -1849,7 +1849,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
          .account    = "testapi"_n,
          .permission = "active"_n,
          .pubkeys    = {
-            public_key_type(string("SYS7GfRtyDWWgxV88a5TRaYY59XmHptyfjsFmHHfioGNJtPjpSmGX"))
+            public_key_type::from_string("SYS7GfRtyDWWgxV88a5TRaYY59XmHptyfjsFmHHfioGNJtPjpSmGX")
          }
       })
    );
@@ -1861,7 +1861,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(permission_tests, T, validating_testers) { try {
          .permission = "active"_n,
          .pubkeys    = {
             chain.get_public_key("testapi"_n, "active"),
-            public_key_type(string("SYS7GfRtyDWWgxV88a5TRaYY59XmHptyfjsFmHHfioGNJtPjpSmGX"))
+            public_key_type::from_string("SYS7GfRtyDWWgxV88a5TRaYY59XmHptyfjsFmHHfioGNJtPjpSmGX")
          }
       })
    );

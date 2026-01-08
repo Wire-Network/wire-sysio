@@ -6,9 +6,11 @@
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/chain_types_reflect.hpp>
+#include <fc/static_variant.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 
+#include <utility>
 #include <variant>
 #include <string>
 
@@ -18,7 +20,7 @@ namespace fc { namespace crypto {
       constexpr const char* private_key_base_prefix = "PVT";
       constexpr const char* private_key_prefix[] = {
          "K1",
-         "R1",
+         "R1", // Associated with r1::public_key and webauthn::public_key
          "EM",
          "ED",
          "BLS"
@@ -40,12 +42,20 @@ namespace fc { namespace crypto {
             unknown
          };
          static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(key_type::unknown), "Missing private_key key_type");
+         static_assert(std::size(constants::private_key_prefix) == static_cast<size_t>(key_type::unknown), "Missing private_key prefix");
 
-         static storage_type priv_parse_base58(const std::string& base58str);
+         constexpr static const char* key_prefix(key_type t) { return constants::private_key_prefix[std::to_underlying(t)]; };
+
          private_key() = default;
          private_key( private_key&& ) = default;
          private_key( const private_key& ) = default;
          private_key& operator=(const private_key& ) = default;
+
+         explicit private_key( storage_type&& other_storage )
+             :_storage(std::move(other_storage))
+         {}
+
+         key_type type()const { return static_cast<key_type>(_storage.index()); }
 
          public_key     get_public_key() const;
          signature      sign( const sha256& digest, bool require_canonical = true ) const;
@@ -66,12 +76,13 @@ namespace fc { namespace crypto {
             return private_key(storage_type(KeyType(data)));
          }
 
-         // serialize to/from string
-         explicit private_key(const std::string& base58str);
+         // If type is unknown, attempt to infer the key type from the string.
+         static private_key from_string(const std::string& str, key_type type = key_type::unknown);
 
-         explicit private_key( storage_type&& other_storage )
-             :_storage(std::move(other_storage))
-         {}
+         // If include_prefix is true, the prefix will be included in the string representation.
+         // Note for Wire native types (k1, r1, bls) the prefix is always included.
+         // For k1 if include_prefix is false, then the legacy wif format is used instead of PVT_K1_
+         std::string to_string(const fc::yield_function_t& yield, bool include_prefix = false) const;
 
          template<typename... Args>
          bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }
@@ -85,9 +96,6 @@ namespace fc { namespace crypto {
 
          template<typename T>
          const T& get() const { return std::get<T>(_storage); }
-
-         std::string to_string(const fc::yield_function_t& yield) const;
-         std::string to_native_string(const fc::yield_function_t& yield) const;
 
       private:
          storage_type _storage{};
@@ -106,4 +114,4 @@ namespace fc {
 } // namespace fc
 
 FC_REFLECT(fc::crypto::private_key, (_storage) )
-
+FC_REFLECT_ENUM(fc::crypto::private_key::key_type, (k1)(r1)(em)(ed)(bls)(unknown))

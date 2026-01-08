@@ -7,7 +7,6 @@
 
 namespace fc::crypto::bls {
 
-   const std::string bls_public_key_prefix = "PUB_BLS_";
    constexpr std::size_t private_key_data_size = 256;
    constexpr std::size_t public_key_data_size = 96;
    constexpr std::size_t signature_data_size = 192;
@@ -16,6 +15,7 @@ namespace fc::crypto::bls {
    using private_key_secret = std::array<uint64_t, 4>;
 
    using signature_data = std::array<std::uint8_t,signature_data_size>;
+   using signature_data_span = std::span<std::uint8_t,signature_data_size>;
    using compact_signature_data = signature_data;
    using compact_signature = signature_data;
 
@@ -48,9 +48,9 @@ namespace fc::crypto::bls {
 
       bool valid()const;
       public_key_data serialize()const;
-      explicit operator public_key_data()const { return serialize(); }
       // affine non-montgomery base64url with bls_public_key_prefix
       std::string to_string() const;
+      static std::string to_string(const public_key_data& key);
 
       const bls12_381::g1&    jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
       const public_key_data&  affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
@@ -95,7 +95,7 @@ namespace fc::crypto::bls {
 
       static bls12_381::g1 from_affine_bytes_le(const public_key_data& affine_non_montgomery_le);
    private:
-      public_key_data _affine_non_montgomery_le{};
+      public_key_data         _affine_non_montgomery_le{};
       bls12_381::g1           _jacobian_montgomery_le; // cached g1
    };
 
