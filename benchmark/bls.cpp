@@ -60,7 +60,7 @@ struct interface_in_benchmark {
                ("authorization", fc::variants({
                   fc::mutable_variant_object()
                      ("actor", name("payloadless"_n))
-                     ("permission", name(config::active_name))
+                     ("permission", name(sysio::chain::config::active_name))
                }))
                ("data", fc::mutable_variant_object()
                )
@@ -77,10 +77,17 @@ struct interface_in_benchmark {
       // build transaction context from the packed transaction
       timer = std::make_unique<platform_timer>();
       trx_timer = std::make_unique<transaction_checktime_timer>(*timer);
-      trx_ctx = std::make_unique<transaction_context>(*chain->control.get(), *ptrx, ptrx->id(), std::move(*trx_timer),
+      trx_ctx = std::make_unique<transaction_context>(*chain->control.get(),
+                                                      *ptrx,
+                                                      std::move(*trx_timer),
                                                       fc::time_point::now(),
-                                                      transaction_metadata::trx_type::input);
-      trx_ctx->max_transaction_time_subjective = fc::microseconds::maximum();
+                                                      transaction_metadata::trx_type::input,
+                                                      std::nullopt,
+                                                      fc::time_point::maximum(),
+                                                      fc::microseconds::maximum(),
+                                                      false,
+                                                      accounts_billing_t{},
+                                                      cpu_usage_t{});
       trx_ctx->init_for_input_trx();
       trx_ctx->exec(); // this is required to generate action traces to be used by apply_context constructor
 

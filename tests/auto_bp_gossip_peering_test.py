@@ -2,6 +2,7 @@
 
 import copy
 import signal
+import time
 
 from TestHarness import Cluster, TestHelper, Utils, WalletMgr, CORE_SYMBOL, createAccountKeys
 
@@ -68,14 +69,6 @@ try:
     accounts=createAccountKeys(21)
     if accounts is None:
         Utils.errorExit("FAILURE - create keys")
-    voteAccounts=createAccountKeys(5)
-    if voteAccounts is None:
-        Utils.errorExit("FAILURE - create keys")
-    voteAccounts[0].name="tester111111"
-    voteAccounts[1].name="tester222222"
-    voteAccounts[2].name="tester333333"
-    voteAccounts[3].name="tester444444"
-    voteAccounts[4].name="tester555555"
 
     if walletMgr.launch() is False:
         errorExit("Failed to stand up kiod.")
@@ -84,7 +77,8 @@ try:
     for nodeId in range(0, producerNodes):
         specificNodeopArgs[nodeId] = auto_bp_peer_arg
         producer_name = "defproducer" + chr(ord('a') + nodeId)
-        specificNodeopArgs[nodeId] += (f" --signature-provider {accounts[nodeId].activePublicKey}=KEY:{accounts[nodeId].activePrivateKey}")
+        specificNodeopArgs[nodeId] += (f" --signature-provider wire-{nodeId},wire,wire,{accounts[nodeId].activePublicKey},KEY:{accounts[nodeId].activePrivateKey}")
+        specificNodeopArgs[nodeId] += " --connection-cleanup-period 5 --net-threads 8"
 
     specificNodeopArgs[5] = specificNodeopArgs[5] + ' --p2p-server-address ext-ip0:9999'
 
@@ -108,29 +102,19 @@ try:
     Print("Creating wallet \"%s\"" % (testWalletName))
     walletAccounts=copy.deepcopy(cluster.defProducerAccounts)
     testWallet = walletMgr.create(testWalletName, walletAccounts.values())
-    walletMgr.importKeys(voteAccounts, testWallet)
     all_acc = accounts + list( cluster.defProducerAccounts.values() )
     for account in all_acc:
         Print("Importing keys for account %s into wallet %s." % (account.name, testWallet.name))
         if not walletMgr.importKey(account, testWallet):
             errorExit("Failed to import key for account %s" % (account.name))
 
+    Print("Register producers")
     for i in range(0, producerNodes):
         node=cluster.getNode(i)
         node.producers=Cluster.parseProducers(i)
         for prod in node.producers:
             trans=cluster.biosNode.regproducer(cluster.defProducerAccounts[prod], "http::/mysite.com", 0,
                                                waitForTransBlock=False, silentErrors=False)
-    Print("Create accounts")
-    # create accounts via sysio as otherwise a bid is needed
-    for account in voteAccounts:
-        Print("Create new account %s via %s" % (account.name, cluster.sysioAccount.name))
-        trans=cluster.biosNode.createInitializeAccount(account, cluster.sysioAccount, stakedDeposit=0, waitForTransBlock=False, stakeNet=1000, stakeCPU=1000, buyRAM=1000, exitOnError=True)
-        cluster.biosNode.waitForTransactionInBlock(trans['transaction_id'])
-        transferAmount="100000000.0000 {0}".format(CORE_SYMBOL)
-        Print("Transfer funds %s from account %s to %s" % (transferAmount, cluster.sysioAccount.name, account.name))
-        trans=cluster.biosNode.transferFunds(cluster.sysioAccount, account, transferAmount, "test transfer", waitForTransBlock=False)
-        cluster.biosNode.waitForTransactionInBlock(trans['transaction_id'])
 
     Print("regpeerkey for all the producers")
     for nodeId in range(0, producerNodes):
@@ -144,6 +128,15 @@ try:
     for nodeId in range(0, producerNodes):
         Utils.Print("Wait for last regpeerkey to be final on ", nodeId)
         cluster.getNode(nodeId).waitForTransFinalization(trans['transaction_id'])
+
+    # setProds needed becuase the producers set in bootstrap are not registered yet
+    Print("Set producers so rank is set")
+    assert cluster.setProds(["defproducera", "defproducerb", "defproducerc", "defproducerd", "defproducere", "defproducerf",
+                             "defproducerg", "defproducerh", "defproduceri", "defproducerj", "defproducerk", "defproducerl",
+                             "defproducerm", "defproducern", "defproducero", "defproducerp", "defproducerq", "defproducerr",
+                             "defproducers", "defproducert", "defproduceru"]), "setprods failed"
+    setProdsBlockNum = cluster.biosNode.getBlockNum()
+    assert cluster.biosNode.waitForBlock(setProdsBlockNum+12+12+1), "Block of new producers not reached"
 
     Print("relaunch with p2p-bp-gossip-endpoint to enable BP gossip")
     for nodeId in range(0, producerNodes):
@@ -222,13 +215,13 @@ try:
     success = verifyGossipConnections(scheduled_producers)
     assert(success)
 
-    Print("Manual connect node_03 defproducerd to node_04 defproducere")
-    cluster.nodes[3].processUrllibRequest("net", "connect", payload="localhost:9880", exitOnError=True)
+    Print("Manual connect node_19 defproducert to node_04 defproducere")
+    cluster.nodes[19].processUrllibRequest("net", "connect", payload="localhost:9880", exitOnError=True)
 
     Print("Set new producers b,h,m,r")
-    for account in voteAccounts:
-        trans=cluster.biosNode.vote(account, ["defproducerb", "defproducerh", "defproducerm", "defproducerr"], silentErrors=False, exitOnError=True)
-    cluster.biosNode.getNextCleanProductionCycle(trans)
+    assert cluster.setProds(["defproducerb", "defproducerh", "defproducerm", "defproducerr"]), "setprods failed"
+    setProdsBlockNum = cluster.biosNode.getBlockNum()
+    assert cluster.biosNode.waitForBlock(setProdsBlockNum+12+12+1), "Block of new producers not reached"
 
     Print("Verify new gossip connections")
     scheduled_producers = cluster.nodes[0].getProducerSchedule()
@@ -239,10 +232,14 @@ try:
     assert(success)
 
     Print("Verify manual connection still connected")
-    connections = cluster.nodes[3].processUrllibRequest("net", "connections")
-    if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
-    found = connectedPeers(3, connections)
-    Print(f"Found connections of Node_03: {found}")
+    for i in range(3): # retry 3 times
+        connections = cluster.nodes[19].processUrllibRequest("net", "connections")
+        if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
+        found = connectedPeers(19, connections)
+        Print(f"Found connections of Node_19: {found}")
+        if "defproducere" in found and "defproducerh" not in found:
+            break
+        time.sleep(7)
     assert("defproducere" in found)     # still connected to manual connection
     assert("defproducerh" not in found) # not connected to new schedule
 

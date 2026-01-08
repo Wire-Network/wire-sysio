@@ -1,11 +1,12 @@
 #pragma once
 #include <fc/crypto/common.hpp>
+#include <fc/crypto/base64.hpp>
 
-namespace fc::crypto::blslib {
+namespace fc::crypto::bls {
 
    template <typename Container>
-   static Container deserialize_base64url(const std::string& data_str) {
-      using wrapper = checksummed_data<Container>;
+   Container deserialize_base64url(const std::string& data_str) {
+      using wrapper = checksum_data<Container>;
       wrapper wrapped;
 
       auto bin = fc::base64url_decode(data_str);
@@ -19,8 +20,8 @@ namespace fc::crypto::blslib {
    }
 
    template <typename Container>
-   static std::string serialize_base64url(const Container& data) {
-      using wrapper = checksummed_data<Container>;
+   std::string serialize_base64url(const Container& data) {
+      using wrapper = checksum_data<Container>;
       wrapper wrapped;
 
       wrapped.data = data;
@@ -31,4 +32,4 @@ namespace fc::crypto::blslib {
       return data_str;
    }
 
-}  // fc::crypto::blslib
+}  // fc::crypto::bls

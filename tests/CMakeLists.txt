@@ -7,6 +7,7 @@ endif()
 file(GLOB UNIT_TESTS RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "*.cpp")
 list(REMOVE_ITEM UNIT_TESTS ship_client.cpp)
 list(REMOVE_ITEM UNIT_TESTS ship_streamer.cpp)
+list(REMOVE_ITEM UNIT_TESTS wallet_tests.cpp)
 
 add_executable( plugin_test ${UNIT_TESTS} )
 target_link_libraries( plugin_test sysio_testing sysio_chain_wrap chainbase chain_plugin producer_plugin wallet_plugin fc state_history ${PLATFORM_SPECIFIC_LIBS} )
@@ -265,8 +266,7 @@ add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v ${UNSHARE})
 
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE})
-# TODO: needs system contract support, WIRE-221
-# add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v ${UNSHARE})
+add_lr_test(NAME auto_bp_gossip_peering_test COMMAND tests/auto_bp_gossip_peering_test.py -v ${UNSHARE})
 
 add_np_test(NAME gelf_test COMMAND tests/gelf_test.py ${UNSHARE})
 

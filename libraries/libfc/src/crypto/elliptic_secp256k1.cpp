@@ -9,6 +9,8 @@
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 
+#include <fc-lite/traits.hpp>
+
 #include <secp256k1.h>
 #include <secp256k1_recovery.h>
 
@@ -41,18 +43,19 @@ namespace fc { namespace ecc {
             return cc.ctx;
         }
 
-        class public_key_impl
-        {
-            public:
-                public_key_impl() BOOST_NOEXCEPT {}
+        class public_key_impl {
+        public:
+           public_key_impl() BOOST_NOEXCEPT = default;
+           public_key_impl(const public_key_impl& cpy) BOOST_NOEXCEPT = default;
+           public_key_impl(public_key_impl&& cpy) BOOST_NOEXCEPT = default;
 
-                public_key_impl( const public_key_impl& cpy ) BOOST_NOEXCEPT
-                    : _key( cpy._key ) {}
+           public_key_data _key{};
 
-                public_key_data _key;
+           public_key_impl& operator=(const public_key_impl& pk) BOOST_NOEXCEPT = default;
+           public_key_impl& operator=(public_key_impl&& pk) BOOST_NOEXCEPT = default;
         };
 
-        typedef fc::array<char,37> chr37;
+        typedef std::array<char,37> chr37;
         chr37 _derive_message( const public_key_data& key, int i );
         fc::sha256 _left( const fc::sha512& v );
         fc::sha256 _right( const fc::sha512& v );
@@ -61,20 +64,20 @@ namespace fc { namespace ecc {
         const private_key_secret& get_half_curve_order();
     }
 
-    static const public_key_data empty_pub;
+    static const public_key_data empty_pub{};
     
 
     fc::sha512 private_key::get_shared_secret( const public_key& other )const
     {
-      static const private_key_secret empty_priv;
+      static const private_key_secret empty_priv{};
       FC_ASSERT( my->_key != empty_priv );
       FC_ASSERT( other.my->_key != empty_pub );
-      secp256k1_pubkey secp_pubkey;
-      FC_ASSERT( secp256k1_ec_pubkey_parse( detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data, other.serialize().size() ) );
+      secp256k1_pubkey secp_pubkey{};
+      FC_ASSERT( secp256k1_ec_pubkey_parse( detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data(), other.serialize().size() ) );
       FC_ASSERT( secp256k1_ec_pubkey_tweak_mul( detail::_get_context(), &secp_pubkey, (unsigned char*) my->_key.data() ) );
-      public_key_data serialized_result;
+      public_key_data serialized_result{};
       size_t serialized_result_sz = sizeof(serialized_result);
-      secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result.data, &serialized_result_sz, &secp_pubkey, SECP256K1_EC_COMPRESSED );
+      secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result[0], &serialized_result_sz, &secp_pubkey, SECP256K1_EC_COMPRESSED );
       FC_ASSERT( serialized_result_sz == sizeof(serialized_result) );
       return fc::sha512::hash( serialized_result.begin() + 1, serialized_result.size() - 1 );
     }
@@ -83,30 +86,18 @@ namespace fc { namespace ecc {
     {
        private_key ret;
        do {
-         rand_bytes(ret.my->_key.data(), ret.my->_key.data_size());
+         rand_bytes(reinterpret_cast<char*>(ret.my->_key.data()), fc::data_size(ret.my->_key));
        } while(!secp256k1_ec_seckey_verify(detail::_get_context(), (const uint8_t*)ret.my->_key.data()));
        return ret;
     }
 
-    public_key::public_key() {}
+    public_key::public_key() = default;
+    public_key::public_key( const public_key& pk ) = default;
+    public_key::public_key( public_key &&pk ) noexcept = default;
+    public_key::~public_key() = default;
 
-    public_key::public_key( const public_key &pk ) : my( pk.my ) {}
-
-    public_key::public_key( public_key &&pk ) : my( std::move( pk.my ) ) {}
-
-    public_key::~public_key() {}
-
-    public_key& public_key::operator=( const public_key& pk )
-    {
-        my = pk.my;
-        return *this;
-    }
-
-    public_key& public_key::operator=( public_key&& pk )
-    {
-        my = pk.my;
-        return *this;
-    }
+    public_key& public_key::operator=( const public_key& pk ) = default;
+    public_key& public_key::operator=( public_key&& pk ) noexcept = default;
 
     bool public_key::valid()const
     {
@@ -118,15 +109,18 @@ namespace fc { namespace ecc {
         FC_ASSERT( my->_key != empty_pub );
         return my->_key;
     }
-
+    // TODO: WIRE-233:OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
+    //   `EC_KEY` curve related implementations, but I need to investigate.
+    //   this should likely be swapped out the same way that I resolved `fc::em::public_key`
+    //   support, via `libsecp256k1`
     public_key::public_key( const public_key_point_data& dat )
     {
-        const char* front = &dat.data[0];
+        auto front = dat.begin();
         if( *front == 0 ){}
         else
         {
             EC_KEY *key = EC_KEY_new_by_curve_name( NID_secp256k1 );
-            key = o2i_ECPublicKey( &key, (const unsigned char**)&front, sizeof(dat) );
+            key = o2i_ECPublicKey( &key, &front, static_cast<long>(dat.size()) );
             FC_ASSERT( key );
             EC_KEY_set_conv_form( key, POINT_CONVERSION_COMPRESSED );
             unsigned char* buffer = (unsigned char*) my->_key.begin();
@@ -142,7 +136,7 @@ namespace fc { namespace ecc {
 
     public_key::public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical )
     {
-        int nV = c.data[0];
+        int nV = c[0];
         if (nV<27 || nV>=35)
             FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
 
@@ -151,14 +145,14 @@ namespace fc { namespace ecc {
             FC_ASSERT( is_canonical( c ), "signature is not canonical" );
         }
 
-        secp256k1_pubkey secp_pub;
-        secp256k1_ecdsa_recoverable_signature secp_sig;
+        secp256k1_pubkey secp_pub{};
+        secp256k1_ecdsa_recoverable_signature secp_sig{};
 
         FC_ASSERT( secp256k1_ecdsa_recoverable_signature_parse_compact( detail::_get_context(), &secp_sig, (unsigned char*)c.begin() + 1, (*c.begin() - 27) & 3) );
         FC_ASSERT( secp256k1_ecdsa_recover( detail::_get_context(), &secp_pub, &secp_sig, (unsigned char*) digest.data() ) );
 
         size_t serialized_result_sz = my->_key.size();
-        secp256k1_ec_pubkey_serialize( detail::_get_context(), (unsigned char*)&my->_key.data, &serialized_result_sz, &secp_pub, SECP256K1_EC_COMPRESSED );
+        secp256k1_ec_pubkey_serialize( detail::_get_context(), (unsigned char*)&my->_key[0], &serialized_result_sz, &secp_pub, SECP256K1_EC_COMPRESSED );
         FC_ASSERT( serialized_result_sz == my->_key.size() );
     }
 

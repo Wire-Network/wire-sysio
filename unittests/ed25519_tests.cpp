@@ -37,13 +37,13 @@ BOOST_AUTO_TEST_CASE(ed25519_phantom_test) {
         std::copy_n(
             reinterpret_cast<const unsigned char*>(decoded.data()),
             crypto_sign_PUBLICKEYBYTES,
-            pubkey._data.data
+            pubkey._data.data()
         );
         BOOST_REQUIRE_MESSAGE(
             pubkey.valid(),
             "public_key_shim.valid() returned false; key = "
             << fc::to_hex(
-                   reinterpret_cast<const char*>(pubkey._data.data),
+                   reinterpret_cast<const char*>(pubkey._data.data()),
                    crypto_sign_PUBLICKEYBYTES
                )
         );
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(ed25519_phantom_test) {
             signature_bytes.data(),
             raw_message.data(),
             raw_message.size(),
-            pubkey._data.data
+            pubkey._data.data()
         );
         BOOST_CHECK_MESSAGE(
             rc == 0,
@@ -78,9 +78,9 @@ BOOST_AUTO_TEST_CASE(hello_dynamic_key_signature_test) {
 
         // 3) Copy raw key bytes into our shim types
         private_key_shim sk;
-        std::copy_n(sk_raw, crypto_sign_SECRETKEYBYTES, sk._data.data);
+        std::copy_n(sk_raw, crypto_sign_SECRETKEYBYTES, sk._data.data());
         public_key_shim  pk;
-        std::copy_n(pk_raw, crypto_sign_PUBLICKEYBYTES, pk._data.data);
+        std::copy_n(pk_raw, crypto_sign_PUBLICKEYBYTES, pk._data.data());
         BOOST_CHECK_MESSAGE(pk.valid(), "Derived public_key_shim.valid() returned false");
 
         // 4) Hash the string "hello"
@@ -111,7 +111,7 @@ BOOST_AUTO_TEST_CASE(sign_verify_sha256_roundtrip) {
 
         // 3) Load into shim objects
         private_key_shim sk;
-        std::copy_n(sk_raw, crypto_sign_SECRETKEYBYTES, sk._data.data);
+        std::copy_n(sk_raw, crypto_sign_SECRETKEYBYTES, sk._data.data());
         public_key_shim pk = sk.get_public_key();
         BOOST_REQUIRE_MESSAGE(pk.valid(), "public_key_shim.valid() returned false");
 
@@ -147,10 +147,10 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
         // 3) Load into shim types
         private_key_shim sk1, sk2;
         public_key_shim  pk1, pk2;
-        std::copy_n(sk1_raw,crypto_sign_SECRETKEYBYTES,sk1._data.data);
-        std::copy_n(sk2_raw,crypto_sign_SECRETKEYBYTES,sk2._data.data);
-        std::copy_n(pk1_raw,crypto_sign_PUBLICKEYBYTES,pk1._data.data);
-        std::copy_n(pk2_raw,crypto_sign_PUBLICKEYBYTES,pk2._data.data);
+        std::copy_n(sk1_raw,crypto_sign_SECRETKEYBYTES,sk1._data.data());
+        std::copy_n(sk2_raw,crypto_sign_SECRETKEYBYTES,sk2._data.data());
+        std::copy_n(pk1_raw,crypto_sign_PUBLICKEYBYTES,pk1._data.data());
+        std::copy_n(pk2_raw,crypto_sign_PUBLICKEYBYTES,pk2._data.data());
 
         // 4) ED25519 shared-secret is currently unsupported → should throw
         BOOST_CHECK_THROW(
@@ -175,7 +175,6 @@ BOOST_AUTO_TEST_CASE(signature_recover_throws) {
     try {
         signature_shim sig;
         fc::sha256 dummy;
-        public_key_shim pub;
         // Recover is unsupported—should always throw
         BOOST_CHECK_THROW(sig.recover(dummy, true), fc::exception);
     } FC_LOG_AND_RETHROW()
@@ -186,7 +185,7 @@ BOOST_AUTO_TEST_CASE(pack_unpack_public_key) {
     try {
         // 1) Prepare a dummy public_key_shim (32 bytes of 0xAB)
         public_key_shim orig;
-        std::fill_n(orig._data.data, crypto_sign_PUBLICKEYBYTES, 0xAB);
+        std::fill_n(orig._data.data(), crypto_sign_PUBLICKEYBYTES, 0xAB);
 
         // 2) Pack to binary, then unpack
         auto blob = fc::raw::pack(orig);
@@ -194,7 +193,7 @@ BOOST_AUTO_TEST_CASE(pack_unpack_public_key) {
 
         // 3) Compare raw buffers
         BOOST_CHECK_MESSAGE(
-            memcmp(orig._data.data, got._data.data, crypto_sign_PUBLICKEYBYTES) == 0,
+            memcmp(orig._data.data(), got._data.data(), crypto_sign_PUBLICKEYBYTES) == 0,
             "public_key_shim pack/unpack mismatch"
         );
     } FC_LOG_AND_RETHROW()
@@ -205,8 +204,8 @@ BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
     try {
         // 1) Prepare dummy signature_shim (64x 0x5A + pad=0)
         signature_shim orig;
-        std::fill_n(orig._data.data, crypto_sign_BYTES, 0x5A);
-        orig._data.data[crypto_sign_BYTES] = 0;
+        std::fill_n(orig._data.data(), crypto_sign_BYTES, 0x5A);
+        orig._data[crypto_sign_BYTES] = 0;
 
         // 2) Pack: Use fc standard packing/unpacking
         auto blob = fc::raw::pack(orig);
@@ -221,11 +220,11 @@ BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
 
         // 4) Verify the 64 data bytes match
         BOOST_CHECK_MESSAGE(
-            memcmp(orig._data.data, got._data.data, crypto_sign_BYTES) == 0,
+            memcmp(orig._data.data(), got._data.data(), crypto_sign_BYTES) == 0,
             "signature bytes mismatch after unpack"
         );
         // 5) The implicit pad byte (index 64) should still be zero
-        BOOST_CHECK_EQUAL(got._data.data[crypto_sign_BYTES], 0u);
+        BOOST_CHECK_EQUAL(got._data[crypto_sign_BYTES], 0u);
     } FC_LOG_AND_RETHROW()
 }
 
@@ -234,8 +233,8 @@ BOOST_AUTO_TEST_CASE(signature_padding_persistence) {
     try {
         // 1) Prepare dummy signature_shim + pad=0
         signature_shim orig;
-        std::fill_n(orig._data.data, crypto_sign_BYTES, 0xA5);
-        orig._data.data[crypto_sign_BYTES] = 0;
+        std::fill_n(orig._data.data(), crypto_sign_BYTES, 0xA5);
+        orig._data[crypto_sign_BYTES] = 0;
 
         // 2) Pack/unpack twice
         auto b1 = fc::raw::pack(orig);
@@ -244,12 +243,12 @@ BOOST_AUTO_TEST_CASE(signature_padding_persistence) {
         auto u2 = fc::raw::unpack<signature_shim>(b2);
 
         // 3) Pad must remain zero each time
-        BOOST_CHECK_EQUAL(u1._data.data[crypto_sign_BYTES], 0u);
-        BOOST_CHECK_EQUAL(u2._data.data[crypto_sign_BYTES], 0u);
+        BOOST_CHECK_EQUAL(u1._data[crypto_sign_BYTES], 0u);
+        BOOST_CHECK_EQUAL(u2._data[crypto_sign_BYTES], 0u);
 
         // 4) Inner 64 bytes must remain unchanged
         BOOST_CHECK_MESSAGE(
-            memcmp(orig._data.data, u2._data.data, crypto_sign_BYTES) == 0,
+            memcmp(orig._data.data(), u2._data.data(), crypto_sign_BYTES) == 0,
             "signature bytes corrupted after pack/unpack loops"
         );
     } FC_LOG_AND_RETHROW()

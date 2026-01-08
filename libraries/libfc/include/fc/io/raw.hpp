@@ -4,7 +4,6 @@
 #include <fc/io/datastream.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/fwd.hpp>
-#include <fc/array.hpp>
 #include <fc/time.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/exception/exception.hpp>
@@ -144,36 +143,6 @@ namespace fc {
        s.read( (char*)&usec_as_int64, sizeof(usec_as_int64) );
        usec = fc::microseconds(usec_as_int64);
     } FC_RETHROW_EXCEPTIONS( warn, "" ) }
-
-    template<typename Stream, NotTrivialScalar T, size_t N>
-    inline void pack( Stream& s, const fc::array<T,N>& v)
-    {
-       static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
-       for (uint64_t i = 0; i < N; ++i)
-         fc::raw::pack(s, v.data[i]);
-    }
-
-    template<typename Stream, TrivialScalar T, size_t N>
-    inline void pack( Stream& s, const fc::array<T,N>& v)
-    {
-       static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
-       s.write((const char*)&v.data[0], N*sizeof(T));
-    }
-
-    template<typename Stream, NotTrivialScalar T, size_t N>
-    inline void unpack( Stream& s, fc::array<T,N>& v)
-    { try {
-       static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
-       for (uint64_t i = 0; i < N; ++i)
-          fc::raw::unpack(s, v.data[i]);
-    } FC_RETHROW_EXCEPTIONS( warn, "fc::array<${type},${length}>", ("type",fc::get_typename<T>::name())("length",N) ) }
-
-    template<typename Stream, TrivialScalar T, size_t N>
-    inline void unpack( Stream& s, fc::array<T,N>& v)
-    { try {
-       static_assert( N <= MAX_NUM_ARRAY_ELEMENTS, "number of elements in array is too large" );
-       s.read((char*)&v.data[0], N*sizeof(T));
-    } FC_RETHROW_EXCEPTIONS( warn, "fc::array<${type},${length}>", ("type",fc::get_typename<T>::name())("length",N) ) }
 
     template<typename Stream, typename T, size_t N>
     requires (!std::is_same_v<std::remove_cv_t<T>, char>)

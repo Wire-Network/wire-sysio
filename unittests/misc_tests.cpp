@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(variant_format_string_limited)
             const std::string key_name_str = permission.actor.to_string() + permission.permission.to_string();
             auto sig_digest = digest_type::hash(std::make_pair("1234", "abcd"));
             const fc::crypto::signature sig = private_key_type::regenerate<fc::ecc::private_key_shim>(
-                  fc::sha256::hash(key_name_str + "active")).sign(sig_digest);
+                  fc::sha256::hash(key_name_str + "active").to_uint64_array()).sign(sig_digest);
             provided_keys.insert(public_key_type{sig, fc::sha256{digest}, true});
          }
       };
@@ -385,9 +385,9 @@ struct permission_visitor {
 
 };
 
-BOOST_AUTO_TEST_CASE_TEMPLATE( authority_checker, T, validating_testers )
+BOOST_AUTO_TEST_CASE( authority_checker )
 { try {
-   T test;
+   validating_tester test;
    auto a = test.get_public_key(name("a"), "active");
    auto b = test.get_public_key(name("b"), "active");
    auto c = test.get_public_key(name("c"), "active");
@@ -1275,9 +1275,9 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    BOOST_CHECK_EQUAL(expected_public_key, sys_pk.to_string({}));
 
    fc::ecc::public_key_data data;
-   data.data[0] = 0x80; // not necessary, 0 also works
+   data[0] = 0x80; // not necessary, 0 also works
    fc::sha256 hash = fc::sha256::hash("unknown private key");
-   std::memcpy(&data.data[1], hash.data(), hash.data_size() );
+   std::memcpy(&data[1], hash.data(), hash.data_size() );
    fc::ecc::public_key_shim shim(data);
    fc::crypto::public_key sys_unknown_pk(std::move(shim));
    ilog( "public key with no known private key: ${k}", ("k", sys_unknown_pk) );

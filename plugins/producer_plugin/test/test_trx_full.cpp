@@ -42,25 +42,25 @@ auto make_unique_trx( const chain_id_type& chain_id ) {
    static uint64_t nextid = 0;
    ++nextid;
 
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
 
    signed_transaction trx;
    // if a transaction expires after it was aborted then it will not be included in a block
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds( nextid % 20 == 0 ? 0 : 60 )}; // fail some transactions via expired
    if( nextid % 15 == 0 ) { // fail some for invalid unlinkauth
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 unlinkauth{} );
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 testit{nextid} );
    } else {
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 testit{ nextid % 7 == 0 ? 0 : nextid} ); // fail some for duplicates
    }
    if( nextid % 13 == 0 ) { // fail some for invalid signature
-      auto bad_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("kevin")));
+      auto bad_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("kevin")).to_uint64_array());
       trx.sign( bad_priv_key, chain_id );
    } else {
-      auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
+      auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")).to_uint64_array());
       trx.sign( priv_key, chain_id );
    }
 

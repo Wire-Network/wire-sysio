@@ -2,7 +2,7 @@
 
 #include <sysio/operator_plugin/operator_plugin.hpp>
 
-namespace sysio::operator_plugin {
+namespace sysio {
   static auto _operator_plugin = application::register_plugin<operator_plugin>();
 
   namespace {

@@ -54,6 +54,8 @@ jobs:
     name: Run Build Workflow
     uses: ./.github/workflows/build_base.yaml
     needs: [platform-cache]
+    secrets:
+      GH_TOKEN_DEV: ${{ secrets.GH_TOKEN_DEV }}
     with:
       platforms: ${{needs.platform-cache.outputs.platforms}}
       platform-list: ${{needs.platform-cache.outputs.platform-list}}
@@ -69,7 +71,7 @@ jobs:
       - name: Setup wire-cdt and wire-system-contracts versions
         id: versions
         env:
-          GH_TOKEN: ${{secrets.GH_TOKEN}}
+          GH_TOKEN: ${{secrets.GH_TOKEN_DEV}}
         run: |
           DEFAULTS_JSON=$(curl -sSfL $(gh api https://api.github.com/repos/${{github.repository}}/contents/.cicd/defaults.json?ref=${{github.sha}} --jq .download_url))
           echo cdt-target=$(echo "$DEFAULTS_JSON" | jq -r '.wirecdt.target') >> $GITHUB_OUTPUT
@@ -105,7 +107,7 @@ jobs:
           name: ${{matrix.platform}}-build
       - name: Build packages
         run: |
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
           cd build
           cpack
           ../tools/tweak-deb.sh wire-sysio_*.deb
@@ -146,6 +148,9 @@ jobs:
     runs-on: ["self-hosted", "enf-x86-beefy"]
     container:
       image: ${{fromJSON(needs.platform-cache.outputs.platforms)[matrix.cfg.base].image}}
+      credentials:
+        username: dev-wire
+        password: ${{ secrets.GH_TOKEN_DEV }}
       options: --security-opt seccomp=unconfined --mount type=bind,source=/var/lib/systemd/coredump,target=/cores
       volumes:
       - ${{ github.workspace }}:/__w/wire-sysio/wire-sysio
@@ -229,7 +234,7 @@ jobs:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
           # https://github.com/actions/runner/issues/2033
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
           sudo chown -R $(id -u):$(id -g) $PWD
           cd build
           ctest --output-on-failure -j $(nproc) -LE "(nonparallelizable_tests|long_running_tests)" --timeout 1000
@@ -567,9 +572,61 @@ jobs:
 
   all-passing:
     name: All Required Tests Passed
-    needs: [tests, np-tests]
+    needs: [ tests, np-tests, lr-tests ]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success'
+      - name: Send Notification
+        if: always()
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            BRANCH="${{ github.head_ref }}"
+          else
+            BRANCH="${{ github.ref_name }}"
+          fi
+          
+          # Determine overall status
+          if [[ "${{ needs.tests.result }}" == "success" && \
+                "${{ needs.np-tests.result }}" == "success" && \
+                "${{ needs.lr-tests.result }}" == "success" ]]; then
+            STATUS="✅ SUCCESS"
+            COLOR="#00FF00"
+          else
+            STATUS="❌ FAILURE"
+            COLOR="#FF0000"
+          fi
+          
+          # Build job status details
+          JOB_DETAILS=""
+          [[ "${{ needs.tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **Tests**: ❌ ${{ needs.tests.result }}"
+          [[ "${{ needs.np-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **NP Tests**: ❌ ${{ needs.np-tests.result }}"
+          [[ "${{ needs.lr-tests.result }}" != "success" ]] && JOB_DETAILS="${JOB_DETAILS}\n- **LR Tests**: ❌ ${{ needs.lr-tests.result }}"
+          
+          PR_INFO=""
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            PR_INFO="\n**PR**: [#${{ github.event.pull_request.number }}](${{ github.event.pull_request.html_url }})"
+          fi
+          
+          # Create message payload
+          PAYLOAD=$(cat <<EOF
+          {
+            "channel": "cicd-notifications",
+            "username": "GitHub Actions",
+            "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+            "attachments": [{
+              "color": "$COLOR",
+              "title": "$STATUS: Build & Test Workflow",
+              "text": "**Repository**: ${{ github.repository }}\n**Branch**: $BRANCH${PR_INFO}\n**Commit**: [\`${GITHUB_SHA::7}\`](${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }})\n**Triggered by**: ${{ github.actor }}\n**Workflow Run**: [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})${JOB_DETAILS}"
+            }]
+          }
+          EOF
+          )
+          
+          curl -X POST "$WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+
+      - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.lr-tests.result != 'success'
         run: false

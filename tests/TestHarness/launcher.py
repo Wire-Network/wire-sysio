@@ -364,6 +364,7 @@ class cluster_generator:
         if not genesis_path.is_file():
             genesis = { 'initial_timestamp': datetime.datetime.now().isoformat(),
                         'initial_key': self.network.nodes['bios'].keys[0].pubkey,
+                        'initial_finalizer_key': self.network.nodes['bios'].keys[0].blspubkey,
                         'initial_configuration': {
                             'max_block_net_usage': 1048576,
                             'target_block_net_usage_pct': 10000,
@@ -522,16 +523,16 @@ class cluster_generator:
         sysdcmd.extend(peers)
         if len(instance.producers) > 0:
             a(a(sysdcmd, '--plugin'), 'sysio::producer_plugin')
-            producer_keys = list(sum([('--signature-provider', f'{key.pubkey}=KEY:{key.privkey}') for key in instance.keys], ()))
+            producer_keys = list(sum([('--signature-provider', f'wire-{key.pubkey},wire,wire,{key.pubkey},KEY:{key.privkey}') for key in instance.keys], ()))
             sysdcmd.extend(producer_keys)
-            finalizer_keys = list(sum([('--signature-provider', f'{key.blspubkey}=KEY:{key.blsprivkey}') for key in instance.keys if key.blspubkey is not None], ()))
+            finalizer_keys = list(sum([('--signature-provider', f'wire-bls-{key.blspubkey},wire,wire_bls,{key.blspubkey},KEY:{key.blsprivkey}') for key in instance.keys if key.blspubkey is not None], ()))
             sysdcmd.extend(finalizer_keys)
             producer_names = list(sum([('--producer-name', p) for p in instance.producers], ()))
             sysdcmd.extend(producer_names)
         else:
             a(a(sysdcmd, '--transaction-retry-max-storage-size-gb'), '100')
             if self.args.signature_provider:
-                finalizer_keys = list(sum([('--signature-provider', f'{key.blspubkey}=KEY:{key.blsprivkey}') for key in instance.keys if key.blspubkey is not None], ()))
+                finalizer_keys = list(sum([('--signature-provider', f'wire-bls-{key.blspubkey},wire,wire_bls,{key.blspubkey},KEY:{key.blsprivkey}') for key in instance.keys if key.blspubkey is not None], ()))
                 if finalizer_keys:
                     sysdcmd.extend(finalizer_keys)
         a(a(sysdcmd, '--plugin'), 'sysio::net_plugin')

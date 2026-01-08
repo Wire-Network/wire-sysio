@@ -26,7 +26,7 @@ namespace sysio::chain {
 
 
 uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   fc::uint128 _id(tid._hash[3], tid._hash[2]);
+   fc::uint128 _id = fc::to_uint128(tid._hash[3], tid._hash[2]);
    return (unsigned __int128)_id;
 }
 
@@ -38,7 +38,7 @@ void validate_authority_precondition( const apply_context& context, const author
                   ("account", a.permission.actor)
                 );
 
-      if( a.permission.permission == config::owner_name || a.permission.permission == config::active_name )
+      if( a.permission.permission == config::owner_name || a.permission.permission == sysio::chain::config::active_name )
          continue; // account was already checked to exist, so its owner and active permissions should exist
 
       if( a.permission.permission == config::sysio_code_name || a.permission.permission == config::sysio_payer_name )
@@ -103,7 +103,7 @@ void apply_sysio_newaccount(apply_context& context) {
 
       const auto& owner_permission  = authorization.create_permission( create.name, config::owner_name, 0,
                                                                        std::move(create.owner), context.trx_context.is_transient() );
-      const auto& active_permission = authorization.create_permission( create.name, config::active_name, owner_permission.id,
+      const auto& active_permission = authorization.create_permission( create.name, sysio::chain::config::active_name, owner_permission.id,
                                                                        std::move(create.active), context.trx_context.is_transient() );
 
       ram_delta += 2 * config::billable_size_v<permission_object>;
@@ -283,7 +283,7 @@ void apply_sysio_updateauth(apply_context& context) {
    db.get<account_object, by_name>(update.account);
    SYS_ASSERT(validate(update.auth), action_validate_exception,
               "Invalid authority: ${auth}", ("auth", update.auth));
-   if( update.permission == config::active_name )
+   if( update.permission == sysio::chain::config::active_name )
       SYS_ASSERT(update.parent == config::owner_name, action_validate_exception, "Cannot change active authority's parent from owner", ("update.parent", update.parent) );
    if (update.permission == config::owner_name)
       SYS_ASSERT(update.parent.empty(), action_validate_exception, "Cannot change owner authority's parent");
@@ -348,7 +348,7 @@ void apply_sysio_deleteauth(apply_context& context) {
    auto remove = context.get_action().data_as<deleteauth>();
    context.require_authorization(remove.account); // only here to mark the single authority on this action as used
 
-   SYS_ASSERT(remove.permission != config::active_name, action_validate_exception, "Cannot delete active authority");
+   SYS_ASSERT(remove.permission != sysio::chain::config::active_name, action_validate_exception, "Cannot delete active authority");
    SYS_ASSERT(remove.permission != config::owner_name, action_validate_exception, "Cannot delete owner authority");
 
    auto& authorization = context.control.get_mutable_authorization_manager();

@@ -5,7 +5,6 @@
 #include <fc/crypto/sha512.hpp>
 #include <fc/crypto/openssl.hpp>
 #include <fc/fwd.hpp>
-#include <fc/array.hpp>
 #include <fc/io/raw_fwd.hpp>
 
 namespace fc {
@@ -17,11 +16,11 @@ namespace fc {
       class private_key_impl;
     }
 
-    typedef fc::array<char,33>          public_key_data;
-    typedef fc::sha256                  private_key_secret;
-    typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
-    typedef fc::array<char,72>          signature;
-    typedef fc::array<unsigned char,65> compact_signature;
+    typedef std::array<char,33>          public_key_data;
+    typedef std::array<uint64_t, 4>      private_key_secret;
+    typedef std::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
+    typedef std::array<char,72>          signature;
+    typedef std::array<unsigned char,65> compact_signature;
 
     int ECDSA_SIG_recover_key_GFp(EC_KEY *eckey, ECDSA_SIG *ecsig, const unsigned char *msg, int msglen, int recid, int check);
 
@@ -34,23 +33,19 @@ namespace fc {
         public:
            public_key();
            public_key(const public_key& k);
+           public_key(public_key&& k) noexcept;
            ~public_key();
+
            bool verify( const fc::sha256& digest, const signature& sig );
            public_key_data serialize()const;
-
-           operator public_key_data()const { return serialize(); }
-
 
            public_key( const public_key_data& v );
            public_key( const public_key_point_data& v );
            public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
 
            bool valid()const;
-           public_key mult( const fc::sha256& offset );
-           public_key add( const fc::sha256& offset )const;
 
-           public_key( public_key&& pk );
-           public_key& operator=( public_key&& pk );
+           public_key& operator=( public_key&& pk ) noexcept;
            public_key& operator=( const public_key& pk );
 
            inline friend bool operator==( const public_key& a, const public_key& b )
@@ -76,7 +71,7 @@ namespace fc {
     {
         public:
            private_key();
-           private_key( private_key&& pk );
+           private_key( private_key&& pk ) noexcept;
            private_key( const private_key& pk );
            ~private_key();
 
@@ -84,18 +79,9 @@ namespace fc {
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
-           static private_key regenerate( const fc::sha256& secret );
-
-           /**
-            *  This method of generation enables creating a new private key in a deterministic manner relative to
-            *  an initial seed.   A public_key created from the seed can be multiplied by the offset to calculate
-            *  the new public key without having to know the private key.
-            */
-           static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
+           static private_key regenerate( const private_key_secret& secret );
 
            private_key_secret get_secret()const; // get the private key secret
-
-           operator private_key_secret ()const { return get_secret(); }
 
            /**
             *  Given a public key, calculatse a 512 bit shared secret between that

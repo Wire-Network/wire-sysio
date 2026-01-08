@@ -4,27 +4,30 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
 #include <fc/static_variant.hpp>
 
 namespace fc { namespace crypto {
 
-   namespace config {
+   namespace constants {
       constexpr const char* private_key_base_prefix = "PVT";
       constexpr const char* private_key_prefix[] = {
          "K1",
          "R1",
          "EM",
-         "ED"
+         "ED",
+         "BLS"
       };
    };
-
+   class public_key;
+   class signature;
    class private_key
    {
       public:
-         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim, em::private_key_shim, ed::private_key_shim>;
-
+         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim, em::private_key_shim, ed::private_key_shim, bls::private_key_shim>;
+         static storage_type priv_parse_base58(const std::string& base58str);
          private_key() = default;
          private_key( private_key&& ) = default;
          private_key( const private_key& ) = default;
@@ -51,14 +54,21 @@ namespace fc { namespace crypto {
 
          // serialize to/from string
          explicit private_key(const std::string& base58str);
+
+         explicit private_key( storage_type&& other_storage )
+             :_storage(std::move(other_storage))
+         {}
+
+         template<typename T>
+         bool contains() const { return std::holds_alternative<T>(_storage); }
+
+         template<typename T>
+         const T& get() const { return std::get<T>(_storage); }
          std::string to_string(const fc::yield_function_t& yield) const;
+         std::string to_native_string(const fc::yield_function_t& yield) const;
 
       private:
-         storage_type _storage;
-
-         private_key( storage_type&& other_storage )
-            :_storage(std::move(other_storage))
-         {}
+         storage_type _storage{};
 
          friend bool operator==( const private_key& p1, const private_key& p2 );
          friend bool operator<( const private_key& p1, const private_key& p2 );
@@ -74,3 +84,4 @@ namespace fc {
 } // namespace fc
 
 FC_REFLECT(fc::crypto::private_key, (_storage) )
+

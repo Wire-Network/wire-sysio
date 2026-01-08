@@ -1,5 +1,6 @@
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
+#include <fc/crypto/base64.hpp>
 #include <fc/crypto/openssl.hpp>
 
 #include <fc/fwd_impl.hpp>
@@ -251,13 +252,13 @@ public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
    fc::sha256 signed_digest = e.result();
 
    //quite a bit of this copied from elliptic_r1, can probably commonize
-   int nV = c.compact_signature.data[0];
+   int nV = c.compact_signature[0];
    if (nV<31 || nV>=35)
       FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
    ecdsa_sig sig = ECDSA_SIG_new();
    BIGNUM *r = BN_new(), *s = BN_new();
-   BN_bin2bn(&c.compact_signature.data[1],32,r);
-   BN_bin2bn(&c.compact_signature.data[33],32,s);
+   BN_bin2bn(&c.compact_signature[1],32,r);
+   BN_bin2bn(&c.compact_signature[33],32,s);
    ECDSA_SIG_set0(sig, r, s);
 
    fc::ec_key key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
@@ -266,7 +267,7 @@ public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
    if (r1::ECDSA_SIG_recover_key_GFp(key, sig, (uint8_t*)signed_digest.data(), signed_digest.data_size(), nV - 27, 0) == 1) {
       const EC_POINT* point = EC_KEY_get0_public_key(key);
       const EC_GROUP* group = EC_KEY_get0_group(key);
-      size_t sz = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, (uint8_t*)public_key_data.data, public_key_data.size(), NULL);
+      size_t sz = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, (uint8_t*)public_key_data.data(), public_key_data.size(), NULL);
       if(sz == public_key_data.size())
          return;
    }

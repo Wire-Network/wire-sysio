@@ -12,6 +12,13 @@
     "secp256k1-internal",
     "softfloat",
     "zlib",
+    "ethash",
+    "cryptopp",
+    "gtest",
+    {
+      "name": "curl",
+      "features": ["boringssl-custom"]
+    },
     {
       "name": "catch2",
       "features": [
@@ -46,35 +53,7 @@
       "name": "civetweb",
       "default-features": false
     },
-    "boost-asio",
-    "boost-beast",
-    "boost-system",
-    "boost-filesystem",
-    "boost-dll",
-    "boost-process",
-    "boost-program-options",
-    "boost-iostreams",
-    "boost-date-time",
-    "boost-thread",
-    "boost-chrono",
-    "boost-context",
-    "boost-coroutine",
-    "boost-crc",
-    "boost-interprocess",
-    "boost-test",
-    "boost-accumulators",
-    "boost-bimap",
-    "boost-multi-index",
-    "boost-signals2",
-    "boost-multiprecision",       
-    "boost-hana",
-    "boost-heap",
-    "boost-property-tree",
-    "boost-lockfree",
-    "boost-assign",
-    "boost-accumulators",
-    "boost-rational",
-    "boost-format"
+    "boost"
   ],
   "overrides": [
     {
@@ -91,7 +70,7 @@
     },
     {
       "name": "boringssl-custom",
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
     {
       "name": "catch2",
@@ -123,7 +102,7 @@
     },
     {
       "name": "wire-sys-vm",
-      "version": "1.0.1-rc1"
+      "version": "1.1.0"
     },
     {
       "name": "nlohmann-json",

@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(finality_misc_tests)
 
 BOOST_AUTO_TEST_CASE(qc_state_transitions) try {
    using namespace sysio::chain;
-   using namespace fc::crypto::blslib;
+   using namespace fc::crypto::bls;
    using state_t = aggregating_qc_sig_t::state_t;
 
    digest_type d(fc::sha256("0000000000000000000000000000001"));

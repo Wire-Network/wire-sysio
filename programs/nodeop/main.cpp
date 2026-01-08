@@ -4,7 +4,7 @@
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
-#include <sysio/signature_provider_plugin/signature_provider_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #include <sysio/version/version.hpp>
 
@@ -31,10 +31,11 @@ namespace detail {
 
 void log_non_default_options(const std::vector<bpo::basic_option<char>>& options) {
    using namespace std::string_literals;
-   auto mask_private = [](const string& v) {
-      auto [pub_key_str, spec_type_str, spec_data] = signature_provider_plugin::parse_signature_provider_spec(v);
-      return pub_key_str + "=" + spec_type_str + ":***";
-   };
+   // TODO: @jglanz reimplement
+   // auto mask_private = [](const string& v) {
+   //    auto [pub_key_str, spec_type_str, spec_data] = signature_provider_manager_plugin::parse_signature_provider_spec(v);
+   //    return pub_key_str + "=" + spec_type_str + ":***";
+   // };
 
    string result;
    for (const auto& op : options) {
@@ -48,7 +49,7 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
          if (i != b)
             v += ", ";
          if (op.string_key == "signature-provider"s)
-            v += mask_private(*i);
+            v += *i;// TODO @jglanz mask_private(*i);
          else if (mask)
             v += "***";
          else

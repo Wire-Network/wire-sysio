@@ -118,7 +118,7 @@ try:
     assert throttlingNode.verifyAlive(), "throttling node did not launch"
 
     # Throttling node was offline during block generation and once online receives blocks as fast as possible
-    assert throttlingNode.waitForBlock(endLargeBlocksHeadBlock), f'wait for block {endLargeBlocksHeadBlock}  on throttled node timed out'
+    assert throttlingNode.waitForBlock(endLargeBlocksHeadBlock, timeout=endLargeBlocksHeadBlock/2), f'wait for block {endLargeBlocksHeadBlock}  on throttled node timed out'
 
     throttledNode = cluster.unstartedNodes[0]
     throttledNode.cmd.append('--p2p-peer-address')

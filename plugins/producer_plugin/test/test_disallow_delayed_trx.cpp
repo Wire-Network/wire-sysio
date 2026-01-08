@@ -27,12 +27,12 @@ using namespace sysio::chain;
 using namespace sysio::test::detail;
 
 auto make_delayed_trx( const chain_id_type& chain_id ) {
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
 
    signed_transaction trx;
-   trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}}, testit{0} );
+   trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}}, testit{0} );
    trx.delay_sec = 10;
-   auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
+   auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")).to_uint64_array());
    trx.sign( priv_key, chain_id );
 
    return std::make_shared<packed_transaction>( std::move(trx) );

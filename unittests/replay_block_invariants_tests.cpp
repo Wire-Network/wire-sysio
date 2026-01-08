@@ -85,7 +85,7 @@ struct test_fixture {
       auto g2 = qc.active_policy_sig.sig.jacobian_montgomery_le();
       g2 = bls12_381::aggregate_signatures(std::array{g2, g2});
       auto affine = g2.toAffineBytesLE(bls12_381::from_mont::yes);
-      qc.active_policy_sig.sig = blslib::bls_aggregate_signature(blslib::bls_signature(affine));
+      qc.active_policy_sig.sig = bls::aggregate_signature(bls::signature(affine));
 
       // add the corrupted QC block extension back to the block
       emplace_extension(exts, qc_ext_id, fc::raw::pack(qc_ext));

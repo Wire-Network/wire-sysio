@@ -24,7 +24,7 @@ struct bls_keys_t {
 
    bls_keys_t(name n) {
       bls_signature pop;
-      std::tie(privkey, pubkey, pop)    = sysio::testing::get_bls_key(n);
+      std::tie(privkey, pubkey, pop, std::ignore) = sysio::testing::get_bls_key(n);
       std::tie(privkey_str, pubkey_str) = std::pair{ privkey.to_string(), pubkey.to_string() };
    }
 };
@@ -85,9 +85,10 @@ std::vector<bls_keys_t> create_keys(size_t count) {
 }
 
 template <size_t... I>
-bls_pub_priv_key_map_t create_local_finalizers(const std::vector<bls_keys_t>& keys) {
-   bls_pub_priv_key_map_t res;
-   ((res[keys[I].pubkey_str] = keys[I].privkey_str), ...);
+bls_pub_key_sig_provider_map_t create_local_finalizers(const std::vector<bls_keys_t>& keys) {
+   bls_pub_key_sig_provider_map_t res;
+
+   ((res[keys[I].pubkey_str] = get_bls_key_sig_provider(keys[I].privkey_str)), ...);
    return res;
 }
 
@@ -118,7 +119,7 @@ BOOST_AUTO_TEST_CASE( basic_finalizer_safety_file_io ) try {
                .other_branch_latest_time = block_timestamp_type{} };
 
    bls_keys_t k("alice"_n);
-   bls_pub_priv_key_map_t local_finalizers = { { k.pubkey_str, k.privkey_str } };
+   bls_pub_key_sig_provider_map_t local_finalizers = { { k.pubkey_str, get_bls_key_sig_provider(k.privkey_str) } };
 
    {
       my_finalizers_t fset{safety_file_path};
@@ -151,7 +152,7 @@ BOOST_AUTO_TEST_CASE( corrupt_finalizer_safety_file ) try {
                .other_branch_latest_time = block_timestamp_type{} };
 
    bls_keys_t k("alice"_n);
-   bls_pub_priv_key_map_t local_finalizers = { { k.pubkey_str, k.privkey_str } };
+   bls_pub_key_sig_provider_map_t local_finalizers = { { k.pubkey_str,get_bls_key_sig_provider(k.privkey_str) } };
 
    {
       my_finalizers_t fset{safety_file_path};
@@ -190,7 +191,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_io ) try {
 
    {
       my_finalizers_t fset{safety_file_path};
-      bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<1, 3, 5, 6>(keys);
+      bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<1, 3, 5, 6>(keys);
       fset.set_keys(local_finalizers);
 
       set_fsi<decltype(fsi), 1, 3, 5, 6>(fset, keys, fsi);
@@ -202,7 +203,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_io ) try {
 
    {
       my_finalizers_t fset{safety_file_path};
-      bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<3>(keys);
+      bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<3>(keys);
       fset.set_keys(local_finalizers);
 
       // make sure the safety info for our finalizer that we saved above is restored correctly
@@ -217,7 +218,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_io ) try {
 
    {
       my_finalizers_t fset{safety_file_path};
-      bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<3>(keys);
+      bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<3>(keys);
       fset.set_keys(local_finalizers);
 
       // make sure the safety info for our finalizer that we saved above is restored correctly
@@ -228,7 +229,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_io ) try {
    // make sure we have not lost the fsi that was set originally for these finalizers.
    {
       my_finalizers_t fset{safety_file_path};
-      bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<1, 5, 6>(keys);
+      bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<1, 5, 6>(keys);
       fset.set_keys(local_finalizers);
 
       // make sure the safety info for our previously inactive finalizer was preserved
@@ -245,7 +246,7 @@ void create_fsi_reference(my_finalizers_t& fset) {
    std::vector<bls_keys_t> keys = create_keys(3);
    std::vector<fsi_t> fsi = create_random_fsi<fsi_t>(3);
 
-   bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<0, 1, 2>(keys);
+   bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<0, 1, 2>(keys);
    fset.set_keys(local_finalizers);
    set_fsi<decltype(fsi), 0, 1, 2>(fset, keys, fsi);
 }
@@ -288,7 +289,7 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_versioning ) try {
       my_finalizers_t fset{safety_file_path};
       auto map = fset.load_finalizer_safety_info();
       if (save_after_load) {
-         bls_pub_priv_key_map_t local_finalizers = create_local_finalizers<0, 1, 2>(create_keys(3));
+         bls_pub_key_sig_provider_map_t local_finalizers = create_local_finalizers<0, 1, 2>(create_keys(3));
          fset.set_keys(local_finalizers);   // need to call set_keys otherwise inactive keys not saved.
          fset.save_finalizer_safety_info();
 
@@ -361,8 +362,8 @@ BOOST_AUTO_TEST_CASE( finalizer_safety_file_serialization_io ) try {
 
    // set finalizer, so that the file is overwritten. set the last one so that order is unchanged.
    std::vector<bls_keys_t> keys = create_keys(3);
-   bls_pub_priv_key_map_t local_finalizer_keys;
-   local_finalizer_keys[keys.back().pubkey_str] = keys.back().privkey_str;
+   bls_pub_key_sig_provider_map_t local_finalizer_keys;
+   local_finalizer_keys[keys.back().pubkey_str] = get_bls_key_sig_provider(keys.back().privkey_str);
    t.control->test_set_node_finalizer_keys(local_finalizer_keys);
 
    // Since we didn't vote, the file time should not have changed.

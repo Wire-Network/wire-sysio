@@ -24,36 +24,24 @@ namespace fc { namespace ecc {
         }
     }
 
-    static const private_key_secret empty_priv;
+    static const private_key_secret empty_priv{};
 
-    private_key::private_key() {}
+    private_key::private_key() = default;
+    private_key::private_key( const private_key& pk ) = default;
+    private_key::private_key( private_key&& pk ) noexcept = default;
+    private_key::~private_key() = default;
 
-    private_key::private_key( const private_key& pk ) : my( pk.my ) {}
+    private_key& private_key::operator=( private_key&& pk ) noexcept = default;
+    private_key& private_key::operator=( const private_key& pk ) = default;
 
-    private_key::private_key( private_key&& pk ) : my( std::move( pk.my ) ) {}
-
-    private_key::~private_key() {}
-
-    private_key& private_key::operator=( private_key&& pk )
-    {
-        my = std::move( pk.my );
-        return *this;
-    }
-
-    private_key& private_key::operator=( const private_key& pk )
-    {
-        my = pk.my;
-        return *this;
-    }
-
-    private_key private_key::regenerate( const fc::sha256& secret )
+    private_key private_key::regenerate( const private_key_secret& secret )
     {
        private_key self;
        self.my->_key = secret;
        return self;
     }
 
-    fc::sha256 private_key::get_secret()const
+    private_key_secret private_key::get_secret()const
     {
         return my->_key;
     }
@@ -94,7 +82,7 @@ namespace fc { namespace ecc {
         do
         {
             FC_ASSERT( secp256k1_ecdsa_sign_recoverable( detail::_get_context(), &secp_sig, (unsigned char*) digest.data(), (unsigned char*) my->_key.data(), extended_nonce_function, &counter ));
-            secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data + 1, &recid, &secp_sig);
+            secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data() + 1, &recid, &secp_sig);
         } while( require_canonical && !public_key::is_canonical( result ) );
 
         result.begin()[0] = 27 + 4 + recid;

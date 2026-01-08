@@ -4,6 +4,7 @@
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/signature.hpp>
+#include <fc/crypto/base64.hpp>
 #include <fc/utility.hpp>
 
 using namespace fc::crypto;

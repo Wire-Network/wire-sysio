@@ -56,7 +56,7 @@ private:
    std::optional<sysio::chain::table_id_object::id_type> get_blockinfo_table_id() const
    {
       const auto* table_id_itr = control->db().find<sysio::chain::table_id_object, sysio::chain::by_code_scope_table>(
-         boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::name{0}, blockinfo_table_name));
+         boost::make_tuple(config::system_account_name, sysio::chain::name{0}, blockinfo_table_name));
 
       if (!table_id_itr) {
          // No blockinfo table exists.
@@ -278,7 +278,7 @@ try {
 
    produce_blocks(rolling_window_size - 1);
 
-   auto block_time_delta = fc::milliseconds(sysio::chain::config::block_interval_ms);
+   auto block_time_delta = fc::milliseconds(config::block_interval_ms);
 
    uint32_t cur_block_height    = start_block_height + 1;
    auto     cur_block_timestamp = start_block_timestamp + block_time_delta;
@@ -376,7 +376,7 @@ try {
    BOOST_REQUIRE(8 < start_block_height); // Test assumes it is safe to subtract 8 from start_block_height.
 
    auto block_time_delta = [](unsigned int num_blocks) -> fc::microseconds {
-      return fc::milliseconds(static_cast<int64_t>(num_blocks) * sysio::chain::config::block_interval_ms);
+      return fc::milliseconds(static_cast<int64_t>(num_blocks) * config::block_interval_ms);
    };
 
    // Get block info of latest recorded block.

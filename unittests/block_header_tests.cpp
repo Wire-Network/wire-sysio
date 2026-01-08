@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(finality_extension_uniqueness_test)
                                                 std::optional<proposer_policy_diff>{}} )
    );
 
-   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::blslib::bls_public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
+   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::bls::public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
    auto fin_policy = std::make_shared<finalizer_policy>();
    finalizer_policy_diff new_finalizer_policy_diff = fin_policy->create_diff(finalizer_policy{.generation = 1, .threshold = 100, .finalizers = finalizers});
 
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(finality_extension_with_values_test)
    constexpr uint32_t last_qc_block_num {10};
    constexpr bool     is_strong_qc {true};
    
-   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::blslib::bls_public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
+   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::bls::public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
    auto fin_policy = std::make_shared<finalizer_policy>();
    finalizer_policy_diff new_finalizer_policy_diff = fin_policy->create_diff(finalizer_policy{.generation = 1, .threshold = 100, .finalizers = finalizers});
 

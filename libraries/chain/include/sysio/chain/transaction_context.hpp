@@ -19,6 +19,7 @@ namespace sysio::chain {
 
          void start(fc::time_point tp);
          void stop();
+         void set_expired() { _timer.set_expired(); }
 
          platform_timer::state_t timer_state() const { return _timer.timer_state(); }
 
@@ -87,10 +88,15 @@ namespace sysio::chain {
 
          transaction_context( controller& c,
                               const packed_transaction& t,
-                              const transaction_id_type& trx_id, // trx_id diff than t.id() before replace_deferred
                               transaction_checktime_timer&& timer,
                               fc::time_point start,
-                              transaction_metadata::trx_type type);
+                              transaction_metadata::trx_type type,
+                              const std::optional<fc::microseconds>& subjective_cpu_leeway,
+                              const fc::time_point& block_deadline,
+                              const fc::microseconds& max_transaction_time_subjective,
+                              bool explicit_billed_cpu_time,
+                              const accounts_billing_t& prev_accounts_billing,
+                              const cpu_usage_t& billed_cpu_us );
          ~transaction_context();
 
          void init_for_implicit_trx();
@@ -183,7 +189,6 @@ namespace sysio::chain {
 
          controller&                                 control;
          const packed_transaction&                   packed_trx;
-         const transaction_id_type&                  id;
          std::optional<chainbase::database::session> undo_session;
          transaction_trace_ptr                       trace;
          fc::time_point                              start;
@@ -200,20 +205,19 @@ namespace sysio::chain {
          bool                          is_input           = false;
          bool                          enforce_whiteblacklist = true;
 
-         fc::time_point                block_deadline = fc::time_point::maximum();
-         fc::microseconds              leeway = fc::microseconds( config::default_subjective_cpu_leeway_us );
-         cpu_usage_t                   billed_cpu_us;
-         accounts_billing_t            prev_accounts_billing;
-         account_subjective_cpu_bill_t authorizers_cpu;
-         bool                          explicit_billed_cpu_time = false;
-
          transaction_checktime_timer   transaction_timer;
 
    private:
-         bool                          enforce_deadline = true;
          bool                          is_initialized = false;
          bool                          is_cpu_updated = false;
-         transaction_metadata::trx_type trx_type;
+         const transaction_metadata::trx_type trx_type;
+         const fc::microseconds        leeway;
+         const bool                    enforce_deadline;
+         const fc::time_point          block_deadline;
+         const fc::microseconds        max_transaction_time_subjective;
+         const bool                    explicit_billed_cpu_time;
+         const accounts_billing_t&     prev_accounts_billing;
+         cpu_usage_t                   billed_cpu_us;
 
          uint64_t                      trx_net_limit = 0;
          bool                          net_limit_due_to_block = true;
@@ -222,7 +226,6 @@ namespace sysio::chain {
          bool                          cpu_limit_due_to_greylist = false;
          fc::microseconds              subjective_cpu_bill;
 
-         fc::microseconds              max_transaction_time_subjective;
          fc::time_point                paused_time;
          fc::microseconds              objective_duration_limit;
          fc::time_point                trx_deadline = fc::time_point::maximum(); // calculated deadline

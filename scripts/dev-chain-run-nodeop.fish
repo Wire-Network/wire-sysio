@@ -16,6 +16,7 @@ end
 set CMAKE_BUILD_ROOT $argv[1]
 set TARGET_ROOT $argv[2]
 set CONFIG_ROOT $TARGET_ROOT/config
+set CONFIG_BO_ROOT $TARGET_ROOT/config-bo
 set LOGS_ROOT $TARGET_ROOT/logs
 
 set GENERATE_RUN 0
@@ -64,6 +65,7 @@ set SYS_PRIVATE_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep Private | gre
 set SYS_BLS_PUBLIC_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep 'BLS Pub key' | grep -Eo '(PUB_BLS_.*)')
 set SYS_BLS_PRIVATE_KEY (cat $TARGET_ROOT/secrets/sysio_key.txt | grep 'BLS Priv key' | grep -Eo '(PVT_BLS_.*)')
 
+# GENERATE CLION RUN CONFIGURATIONS IF REQUESTED
 if test $GENERATE_RUN -eq 1
     # Generate CLion run configuration XMLs under .run/
     set RUN_DIR ".run"
@@ -71,6 +73,7 @@ if test $GENERATE_RUN -eq 1
 
     set CLIO_NAME "$RUN_PREFIX-clio-unlock-wallet"
     set NODEOP_NAME "$RUN_PREFIX-nodeop-producer"
+    set BO_NAME "$RUN_PREFIX-nodeop-bo"
 
     # Active CLion profile name (from workspace context); adjust if needed
     set CLION_PROFILE ""
@@ -78,7 +81,7 @@ if test $GENERATE_RUN -eq 1
     set PROJECT_NAME "wire-sysio"
 
     # Construct PROGRAM_PARAMS for both configs
-    set CLIO_PARAMS "wallet unlock --name default --password $WALLET_PW"
+    set CLIO_PARAMS "--wallet-dir $TARGET_ROOT/wallet wallet unlock --name default --password $WALLET_PW"
 
     set NODEOP_PARAMS "--config-dir $CONFIG_ROOT --data-dir $TARGET_ROOT/data --genesis-json $CONFIG_ROOT/genesis.json --contracts-console --signature-provider '$SYS_PUBLIC_KEY=KEY:$SYS_PRIVATE_KEY'"
 
@@ -104,10 +107,43 @@ if test $GENERATE_RUN -eq 1
     printf '    </method>\n' >> $NODEOP_FILE
     printf '  </configuration>\n' >> $NODEOP_FILE
     printf '</component>\n' >> $NODEOP_FILE
-
     echo "Generated run configurations:" >&2
     echo "  $CLIO_FILE" >&2
     echo "  $NODEOP_FILE" >&2
+
+		if test -d $CONFIG_BO_ROOT
+			set BO_PUBLIC_KEY  ""
+      set BO_PRIVATE_KEY ""
+
+      set BO_KEY_FILE "$TARGET_ROOT/secrets/sysio.bo.nn1_key.txt"
+      if not test -f $BO_KEY_FILE
+        echo "Warning: Batch Operator config directory exists but BO key file not found at $BO_KEY_FILE"
+      else
+	      set BO_PUBLIC_KEY (cat $BO_KEY_FILE | grep Public | grep -Eo '(SYS.*)')
+	      set BO_PRIVATE_KEY (cat $BO_KEY_FILE | grep Private | grep -oP 'Private\skey:\s\K([a-zA-Z0-9]+)$')
+
+				if test -z $BO_PRIVATE_KEY -o -z $BO_PUBLIC_KEY
+					echo "Warning: BO keys not found but BO config directory exists."
+				else
+					mkdir -p $TARGET_ROOT/data-bo
+					set BO_PARAMS "--config-dir $CONFIG_BO_ROOT --data-dir $TARGET_ROOT/data-bo  --genesis-json $CONFIG_ROOT/genesis.json --signature-provider '$BO_PUBLIC_KEY=KEY:$BO_PRIVATE_KEY'"
+					# Write nodeop run config, attempting to add a before-run task to run the clio config
+		      set BO_FILE "$RUN_DIR/$BO_NAME.run.xml"
+		      printf '<component name="ProjectRunConfigurationManager">\n' > $BO_FILE
+		      printf '  <configuration default="false" name="%s" type="CMakeRunConfiguration" folderName="chains" factoryName="Application" PROGRAM_PARAMS="%s" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="true" WORKING_DIR="file://$ProjectFileDir$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="%s" TARGET_NAME="nodeop" CONFIG_NAME="%s" RUN_TARGET_PROJECT_NAME="%s" RUN_TARGET_NAME="nodeop">\n' $BO_NAME $BO_PARAMS $PROJECT_NAME $CLION_PROFILE $PROJECT_NAME >> $BO_FILE
+		      printf '    <method v="2">\n' >> $BO_FILE
+		      # Build before run
+		      printf '      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />\n' >> $BO_FILE
+		      # Attempt to reference the other run configuration before run
+		      printf '      <option name="RunConfigurationTask" enabled="true" run_configuration_name="%s" run_configuration_type="CMakeRunConfiguration"/>\n' $CLIO_NAME >> $BO_FILE
+		      printf '    </method>\n' >> $BO_FILE
+		      printf '  </configuration>\n' >> $BO_FILE
+		      printf '</component>\n' >> $BO_FILE
+		      echo "  $BO_FILE" >&2
+	      end
+      end
+		end
+
     exit 0
 end
 

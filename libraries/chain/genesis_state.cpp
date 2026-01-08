@@ -4,10 +4,10 @@
 
 namespace sysio { namespace chain {
 
-genesis_state::genesis_state() {
+genesis_state::genesis_state(const fc::crypto::public_key& producer_key, const fc::crypto::public_key& finalizer_key) {
    initial_timestamp = fc::time_point::from_iso_string( "2025-01-01T12:00:00" );
-   initial_key = fc::variant(sysio_root_key).as<public_key_type>();
-   initial_finalizer_key = fc::variant(sysio_root_finalizer_key).as<fc::crypto::blslib::bls_public_key>();
+   initial_key = producer_key;
+   initial_finalizer_key = finalizer_key.get<fc::crypto::bls::public_key_shim>().unwrapped();
 }
 
 chain::chain_id_type genesis_state::compute_chain_id() const {

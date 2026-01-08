@@ -2021,6 +2021,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    ptrx = create_trx(0);
    // no limits, verify trace values
    trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
+   BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
    BOOST_TEST(trace->net_usage == 340u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
@@ -2071,6 +2072,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    cpu_usage_t cpu_usage{321, 4242, 123};
    auto total_cpu = std::ranges::fold_left(cpu_usage, 0ul, std::plus());
    trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true );
+   BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
    BOOST_TEST(trace->net_usage == 340u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);

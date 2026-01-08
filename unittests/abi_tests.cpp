@@ -1654,7 +1654,7 @@ void verify_action_equal(const chain::action& exp, const chain::action& act)
 }
 
 private_key_type get_private_key( name keyname, string role ) {
-   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role));
+   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role).to_uint64_array());
 }
 
 public_key_type  get_public_key( name keyname, string role ) {
@@ -2591,7 +2591,7 @@ BOOST_AUTO_TEST_CASE(abi_large_signature)
     )=====";
 
       std::string big_json(1 << 18, 'a');
-      signature_type::storage_type webauth_sig = fc::crypto::webauthn::signature(fc::crypto::r1::compact_signature(), {}, big_json);
+      signature_type::storage_type webauth_sig = fc::crypto::webauthn::signature(fc::crypto::r1::compact_signature{}, {}, big_json);
       signature_type sig;
 
       // signature( storage_type&& other_storage ) is private, pack/unpack as a way to convert from webauthn sig

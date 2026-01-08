@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
    wdump((cpu)(net)(ram));
    BOOST_TEST(cpu == 10);
    BOOST_TEST(net == 10);
-   BOOST_TEST(ram == 40000*104+base_tester::newaccount_ram); // provided by policy in create_account
+   BOOST_TEST(ram == 100000*104+base_tester::newaccount_ram); // provided by policy in create_account
    int64_t ram_usage = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
    wdump((ram_usage));
    BOOST_TEST(ram_usage < base_tester::newaccount_ram); // ram used to create account
@@ -250,9 +250,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( update_auth_unknown_private_key, TESTER, validati
 
       // public key with no corresponding private key
       fc::ecc::public_key_data data;
-      data.data[0] = 0x80; // not necessary, 0 also works
+      data[0] = 0x80; // not necessary, 0 also works
       fc::sha256 hash = fc::sha256::hash("unknown key");
-      std::memcpy(&data.data[1], hash.data(), hash.data_size() );
+      std::memcpy(&data[1], hash.data(), hash.data_size() );
       fc::ecc::public_key_shim shim(data);
       fc::crypto::public_key new_owner_pub_key(std::move(shim));
 

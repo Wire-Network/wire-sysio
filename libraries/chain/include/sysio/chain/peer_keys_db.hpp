@@ -73,3 +73,4 @@ private:
 
 } // namespace sysio::chain
 
+FC_REFLECT(sysio::chain::peerkeys_t, (producer_name)(peer_key))
