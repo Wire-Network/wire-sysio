@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
       order2("amount", 200);
       order2("salt", "0x2222222222222222222222222222222222222222222222222222222222222222");
 
-      fc::variants orders = {fc::variant(order1), fc::variant(order2)};
+      fc::variants orders = {order1, order2};
 
       auto encoded = eth::contract_encode_data(contract_abis[2], {fc::variant(orders)});
 

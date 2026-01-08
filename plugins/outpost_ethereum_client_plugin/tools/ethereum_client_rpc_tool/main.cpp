@@ -57,10 +57,6 @@ void initialize_logging() {
 }
 
 using namespace fc::network::ethereum;
-// constexpr std::string_view test_contract_abi_counter_json_file_01 = "ethereum-abi-counter-01.json";
-//
-// auto counter_abis = fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));
-
 
 struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
@@ -93,13 +89,6 @@ struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_c
 int main(int argc, char* argv[]) {
    using namespace fc::crypto::ethereum;
    try {
-      // auto                priv_key_byes = hex_to_bytes("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
-      // fc::sha256          priv_key_hash(reinterpret_cast<const char*>(priv_key_byes.data()), priv_key_byes.size());
-      // auto                priv_key     = fc::em::private_key::regenerate(priv_key_hash);
-      // auto                pub_key      = priv_key.get_public_key();
-      // auto                pub_key_data = pub_key.serialize_uncompressed();
-      // auto                pub_key_hex  = fc::to_hex(pub_key_data.data, pub_key_data.size(), true);
-      // ilogf("Public key: {}", pub_key_hex);
       appbase::scoped_app app;
 
       app->set_version_string(sysio::version::version_client());
@@ -144,7 +133,7 @@ int main(int argc, char* argv[]) {
       auto block_number = client->get_block_number();
       ilogf("Current Block Number: {}", block_number.str());
 
-      auto counter_contract = client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3");
+      auto counter_contract = client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3",eth_abi_contracts);
       auto counter_contract_num_res = counter_contract->get_number("pending");
       auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
       ilogf("Current counter value: {}", counter_contract_num.str());
