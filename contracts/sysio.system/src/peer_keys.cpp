@@ -1,8 +1,9 @@
-#include <cstdint>
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/peer_keys.hpp>
 
 #include <sysio/sysio.hpp>
+#include <cassert>
+#include <cstdint>
 
 namespace sysiosystem {
 
@@ -42,11 +43,10 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
    peer_keys_table  peer_keys_table(get_self(), get_self().value);
    producers_table  producers(get_self(), get_self().value);
    constexpr size_t max_return = 50;
+   constexpr uint32_t max_rank = 30;
 
    getpeerkeys_res_t resp;
    resp.reserve(max_return);
-
-   double vote_threshold = 0; // vote_threshold will always be >= 0
 
    auto add_peer = [&](auto it) {
       auto peers_itr = peer_keys_table.find(it->owner.value);
@@ -54,53 +54,16 @@ peer_keys::getpeerkeys_res_t peer_keys::getpeerkeys() {
          resp.push_back(peerkeys_t{it->owner, {}});
       else
          resp.push_back(peerkeys_t{it->owner, peers_itr->get_public_key()});
-
-      // once 21 producers have been selected, we will only consider producers
-      // that have more than 50% of the votes of the 21st selected producer.
-      // ---------------------------------------------------------------------
-      if (resp.size() == 21)
-         vote_threshold = it->total_votes * 0.5;
    };
 
-   // TODO update for Wire with no voting
-/*
-   auto idx = producers.get_index<"prototalvote"_n>();
+   auto idx = producers.get_index<"prodrank"_n>();
 
-   auto it  = idx.cbegin();
-   auto rit = idx.cend();
-   if (it == rit)
-      return resp;
-   else
-      --rit;
-
-   // 1. Consider both active and non-active producers. as a non-active producer can be
-   //    reactivated at any time.
-   // 2. Once we have selected 21 producers, the threshold of votes required to be selected
-   //    increases from `> 0` to `> 50% of the votes that the 21st selected producer has`.
-   // 3. We iterate from both ends, as non-active producers are indexed at the end (their
-   //    vote total is negated for the index computation). As a consequence, the highest 
-   //    voted non-active producer will be the last entry of our index.
-   // --------------------------------------------------------------------------------------
-   bool last_one = false;
-   do  {
-      // at this point, `it` and `rit` both point to a valid `producer_info` (possibly the same)
-      assert(it <= rit);
-      assert(vote_threshold >= 0);
-      assert(it->total_votes >= 0 && rit->total_votes >= 0);
-      last_one = (it == rit);
-      if (rit->total_votes > std::max(vote_threshold, it->total_votes)) {
-         add_peer(rit);
-         assert(it != rit); // Should always be satisfied since `rit->total_votes > it->total_votes`
-         --rit;             // safe because `rit` cannot point to the first entry of the index.
-      } else if (it->total_votes > vote_threshold) {
-         add_peer(it);
-         ++it;
-      } else {
-         // `total_votes <= threshold` on both ends of the index, exit the loop.
+   for (auto i = idx.cbegin(); i != idx.cend() && resp.size() < max_return; ++i) {
+      if (i->rank > max_rank)
          break;
-      }
-   } while (!last_one && resp.size() < max_return);
-*/
+      add_peer(i);
+   }
+
    return resp;
 }
 

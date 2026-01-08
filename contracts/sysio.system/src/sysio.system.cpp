@@ -180,11 +180,63 @@ namespace sysiosystem {
 
    void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
       require_auth( get_self() );
+      uint32_t rank = 0;
+      auto idx = _producers.get_index<"prodrank"_n>();
+      std::set<name> rm_sched_prods;
+      for (auto i = idx.cbegin(); i != idx.cend(); ++i) {
+         if (i->rank > 21)
+            break;
+         rm_sched_prods.insert(i->owner);
+      }
+      for (const auto& prod : schedule) {
+         ++rank;
+         auto i = _producers.find(prod.producer_name.value);
+         if (i != _producers.end()) {
+            _producers.modify(i, same_payer, [&](auto& p) {
+               p.rank = rank;
+            });
+         }
+         rm_sched_prods.erase(prod.producer_name);
+      }
+      for (const auto& prod : rm_sched_prods) {
+         auto i = _producers.find(prod.value);
+         if (i != _producers.end()) {
+            _producers.modify(i, same_payer, [&](auto& p) {
+               p.rank = p.rank + 21;
+            });
+         }
+      }
       set_proposed_producers( schedule );
    }
 
    void system_contract::setprodkeys( const std::vector<sysio::producer_key>& schedule ) {
       require_auth( get_self() );
+      uint32_t rank = 0;
+      auto idx = _producers.get_index<"prodrank"_n>();
+      std::set<name> rm_sched_prods;
+      for (auto i = idx.cbegin(); i != idx.cend(); ++i) {
+         if (i->rank > 21)
+            break;
+         rm_sched_prods.insert(i->owner);
+      }
+      for (const auto& prod : schedule) {
+         ++rank;
+         auto i = _producers.find(prod.producer_name.value);
+         if (i != _producers.end()) {
+            _producers.modify(i, same_payer, [&](auto& p) {
+               p.rank = rank;
+            });
+         }
+         rm_sched_prods.erase(prod.producer_name);
+      }
+      for (const auto& prod : rm_sched_prods) {
+         auto i = _producers.find(prod.value);
+         if (i != _producers.end()) {
+            _producers.modify(i, same_payer, [&](auto& p) {
+               p.rank = p.rank + 21;
+            });
+         }
+      }
       set_proposed_producers( schedule );
    }
 
