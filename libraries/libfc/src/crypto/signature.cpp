@@ -131,7 +131,7 @@ namespace fc
 {
    void to_variant(const fc::crypto::signature& var, fc::variant& vo, const fc::yield_function_t& yield)
    {
-      vo = var.to_string(yield);
+      vo = var.to_string(yield, true);
    }
 
    void from_variant(const fc::variant& var, fc::crypto::signature& vo)
