@@ -1170,8 +1170,7 @@ BOOST_AUTO_TEST_CASE( producer_keys ) { try {
       );
    }
    { // ed key
-      // TODO: update key
-      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("PUB_ED_2551RxVrAaMMudqPDMe9nAWZGeyCePM878qmFoyaPcvKp6kCc3"s)}};
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("PUB_ED_7mHKCLbBMeMF7ew5C7teVeCrk8HvZafdAvmzfoecosrk"s)}};
       BOOST_CHECK_THROW(
          c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
          sysio::chain::unactivated_key_type
