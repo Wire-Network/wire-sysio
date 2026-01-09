@@ -15,10 +15,10 @@ expected_results = [
         "file": "unittests/snapshots/snap_v1.bin.gz",
         "result": {
             "version": 1,
-            "chain_id": "70b972fe45a55e057d342b84a059d29eba3628954f3a04164765ab0d2d48a8dd",
-            "head_block_id": "0000001df8c4ce22e9505e991f002696cd1c0961706110805b4f562deba3c862",
+            "chain_id": "d1488a193dbe280acd006ed80a7feb568419bcc91c27e966c8ddba05315d4e17",
+            "head_block_id": "0000001d7df961a64ed6417c7c6cd399da4ada5ff9e3fdb89a5f9f2e975ac2e2",
             "head_block_num": 29,
-            "head_block_time": "2020-01-01T00:00:14.000"
+            "head_block_time": "2025-01-01T00:00:14.000"
         }
     }
 ]

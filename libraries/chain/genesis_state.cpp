@@ -5,7 +5,7 @@
 namespace sysio { namespace chain {
 
 genesis_state::genesis_state(const fc::crypto::public_key& producer_key, const fc::crypto::public_key& finalizer_key) {
-   initial_timestamp = fc::time_point::from_iso_string( "2018-06-01T12:00:00" );
+   initial_timestamp = fc::time_point::from_iso_string( "2025-01-01T12:00:00" );
    initial_key = producer_key;
    initial_finalizer_key = finalizer_key.get<fc::crypto::bls::public_key_shim>().unwrapped();
 }
