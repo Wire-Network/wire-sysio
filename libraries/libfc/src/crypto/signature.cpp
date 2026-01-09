@@ -16,6 +16,10 @@ namespace fc { namespace crypto {
          return bls::signature::get_hash(sig._data);
       }
 
+      size_t operator()(const ed::signature_shim& sig) const {
+         return sig.get_hash();
+      }
+
       size_t operator()(const webauthn::signature& sig) const {
          return sig.get_hash();
       }
@@ -92,7 +96,7 @@ namespace fc { namespace crypto {
          std::string prefix = include_prefix
                                  ? std::string(constants::signature_base_prefix) + "_" + sig_prefix(sig_type::ed) + "_"
                                  : "";
-         FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
+         return prefix + get<ed::signature_shim>().to_string(yield);
       }
       case sig_type::bls: {
          // bls to string includes prefix

@@ -107,7 +107,7 @@ namespace fc { namespace crypto {
          std::string prefix = include_prefix
                                  ? std::string(constants::public_key_base_prefix) + "_" + key_prefix(key_type::ed) + "_"
                                  : "";
-         FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
+         return prefix + get<ed::public_key_shim>().to_string(yield);
       }
       case key_type::bls: {
          // bls to string includes prefix

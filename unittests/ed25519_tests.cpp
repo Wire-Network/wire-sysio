@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
        fc::crypto::public_key pubkey1(pk1);
        std::string pk1_str = pubkey1.to_string({});
        dlog("pk1_str = ${k}", ("k", pk1_str));
-       fc::crypto::public_key pubkey2 = fc::crypto::public_key::from_string(pk1_str, fc::crypto::public_key::key_type::em);
+       fc::crypto::public_key pubkey2 = fc::crypto::public_key::from_string(pk1_str, fc::crypto::public_key::key_type::ed);
        std::string pk2_str = pubkey2.to_string({});
        BOOST_TEST(pk1_str == pk2_str);
        std::string pk3_str = pubkey2.to_string({}, true);
@@ -212,7 +212,6 @@ BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
         // 1) Prepare dummy signature_shim (64x 0x5A + pad=0)
         signature_shim orig;
         std::fill_n(orig._data.data(), crypto_sign_BYTES, 0x5A);
-        orig._data[crypto_sign_BYTES] = 0;
 
         // 2) Pack: Use fc standard packing/unpacking
         auto blob = fc::raw::pack(orig);
@@ -230,30 +229,23 @@ BOOST_AUTO_TEST_CASE(pack_unpack_signature) {
             memcmp(orig._data.data(), got._data.data(), crypto_sign_BYTES) == 0,
             "signature bytes mismatch after unpack"
         );
-        // 5) The implicit pad byte (index 64) should still be zero
-        BOOST_CHECK_EQUAL(got._data[crypto_sign_BYTES], 0u);
     } FC_LOG_AND_RETHROW()
 }
 
 // Test 7: padding persistence through multiple pack/unpack loops
 BOOST_AUTO_TEST_CASE(signature_padding_persistence) {
     try {
-        // 1) Prepare dummy signature_shim + pad=0
+        // Prepare dummy signature_shim
         signature_shim orig;
         std::fill_n(orig._data.data(), crypto_sign_BYTES, 0xA5);
-        orig._data[crypto_sign_BYTES] = 0;
 
-        // 2) Pack/unpack twice
+        // Pack/unpack twice
         auto b1 = fc::raw::pack(orig);
         auto u1 = fc::raw::unpack<signature_shim>(b1);
         auto b2 = fc::raw::pack(u1);
         auto u2 = fc::raw::unpack<signature_shim>(b2);
 
-        // 3) Pad must remain zero each time
-        BOOST_CHECK_EQUAL(u1._data[crypto_sign_BYTES], 0u);
-        BOOST_CHECK_EQUAL(u2._data[crypto_sign_BYTES], 0u);
-
-        // 4) Inner 64 bytes must remain unchanged
+        // Inner 64 bytes must remain unchanged
         BOOST_CHECK_MESSAGE(
             memcmp(orig._data.data(), u2._data.data(), crypto_sign_BYTES) == 0,
             "signature bytes corrupted after pack/unpack loops"

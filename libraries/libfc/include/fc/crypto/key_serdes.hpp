@@ -65,7 +65,7 @@ struct to_native_string_from_private_key_visitor : public fc::visitor<std::strin
    }
 
    std::string operator()(const ed::private_key_shim& ed_priv_key_shim) const {
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
+      return ed_priv_key_shim.to_string(_yield);
    }
 
    template <typename KeyType>
@@ -104,7 +104,7 @@ struct to_native_string_from_signature_visitor : public fc::visitor<std::string>
    }
 
    std::string operator()(const ed::signature_shim& ed_sig_shim) const {
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED keys are not implemented yet");
+      return ed_sig_shim.to_string(_yield);
    }
 
    template <typename SigType>
@@ -128,7 +128,7 @@ public_key::storage_type from_native_string_to_public_key_shim(const std::string
       return em::public_key_shim(em::public_key::from_string(public_key_str).serialize());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED support is not yet implemented");
+      return ed::public_key_shim::from_string(public_key_str);
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
@@ -151,7 +151,7 @@ private_key::storage_type from_native_string_to_private_key_shim(const std::stri
       return em::private_key_shim(em::private_key::from_native_string(private_key_str).get_secret());
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED support is not yet implemented");
+      return ed::private_key_shim::from_string(private_key_str);
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
@@ -174,7 +174,7 @@ signature::storage_type from_native_string_to_signature_shim(const std::string& 
       return em::signature_shim(ethereum::to_em_signature(signature_str));
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
-      FC_THROW_EXCEPTION(fc::unsupported_exception, "Solana ED support is not yet implemented");
+      return ed::signature_shim::from_string(signature_str);
 
    if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");

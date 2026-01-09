@@ -171,4 +171,34 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
 } FC_LOG_AND_RETHROW();
 
+BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
+   auto pub_str = "5oNDL3swdJJF1g9DzJiZ4ynHXgszjAEpUkxVYejchzrY";
+   auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::ed);
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}));
+   BOOST_TEST(pub_key.to_string({}, true).starts_with("PUB_ED_"));
+   BOOST_TEST(pub_key.to_string({}, true).ends_with(pub_str));
+   auto pub_key2 = fc::crypto::public_key::from_string(pub_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), pub_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_ed_priv_str) try {
+   auto priv_str = "4YFq9y5f5hi77Bq8kDCE6VgqoAqKGSQN87yW9YeGybpNfqKUG4WxnwhboHGUeXjY7g8262mhL1kCCM9yy8uGvdj7";
+   auto priv_key = fc::crypto::private_key::from_string(priv_str, private_key::key_type::ed);
+   BOOST_CHECK_EQUAL(priv_str, priv_key.to_string({}));
+   BOOST_TEST(priv_key.to_string({}, true).starts_with("PVT_ED_"));
+   BOOST_TEST(priv_key.to_string({}, true).ends_with(priv_str));
+   auto priv_key2 = fc::crypto::private_key::from_string(priv_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), priv_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
+   auto sig_str = "4cdd1oX7cfVALfr26tP52BZ6cSzrgnNGtYD7BFhm6FFeZV5sPTnRvg6NRn8yC6DbEikXcrNChBM5vVJnTgKhGhVu";
+   auto sig = fc::crypto::signature::from_string(sig_str, signature::sig_type::ed);
+   BOOST_CHECK_EQUAL(sig_str, sig.to_string({}));
+   BOOST_TEST(sig.to_string({}, true).starts_with("SIG_ED_"));
+   BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
+   auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_SUITE_END()
