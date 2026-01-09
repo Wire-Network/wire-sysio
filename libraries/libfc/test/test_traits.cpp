@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(lut_create_type) try {
    auto val1 = make_type_enum_value<type_1>();
    val1.str  = "123";
 
-   auto val2 = make_type_enum_value<type_2>();
+   [[maybe_unused]] auto val2 = make_type_enum_value<type_2>();
    val2.size = 42;
 }
 FC_LOG_AND_RETHROW();
