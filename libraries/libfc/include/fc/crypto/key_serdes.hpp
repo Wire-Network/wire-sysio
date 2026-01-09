@@ -300,28 +300,6 @@ Data from_wif( const std::string& wif_key ) {
    return d;
 }
 
-inline private_key::storage_type parse_unknown_wire_private_key_str(const std::string& str) {
-   const auto pivot = str.find('_');
-   if (pivot == std::string::npos) {
-      // wif import
-      using default_type = std::variant_alternative_t<0, private_key::storage_type>;
-      return private_key::storage_type(from_wif<default_type>(str));
-   }
-
-   constexpr auto prefix = fc::crypto::constants::private_key_base_prefix;
-   const auto prefix_str = str.substr(0, pivot);
-   FC_ASSERT(prefix == prefix_str, "Private Key has invalid prefix: ${str}", ("str", str)("prefix_str", prefix_str));
-
-   auto data_str = str.substr(pivot + 1);
-   FC_ASSERT(!data_str.empty(), "Private Key has no data: ${str}", ("str", str));
-   return base58_str_parser<private_key::storage_type, fc::crypto::constants::private_key_prefix>::apply(data_str);
-}
-
-inline bool is_legacy_public_key_str(const std::string& str) {
-   constexpr auto legacy_prefix = fc::crypto::constants::public_key_legacy_prefix;
-   return prefix_matches(legacy_prefix, str) && str.find('_') == std::string::npos;
-}
-
 // Given PUB_K1_xxx returns <'PUB','K1','xxx'>
 inline std::tuple<std::string, std::string, std::string> parse_base_prefixes(std::string_view str) {
    const auto first = str.find('_');
@@ -338,6 +316,34 @@ inline std::tuple<std::string, std::string, std::string> parse_base_prefixes(std
 
    return std::tuple<std::string, std::string, std::string>{
       str.substr(0, first), str.substr(first + 1, second - first - 1), str.substr(second + 1)};
+}
+
+inline private_key::storage_type parse_unknown_wire_private_key_str(const std::string& str) {
+   FC_ASSERT(!str.empty(), "Empty private key string");
+   const auto pivot = str.find('_');
+   if (pivot == std::string::npos) {
+      // wif import
+      using default_type = std::variant_alternative_t<0, private_key::storage_type>;
+      return private_key::storage_type(from_wif<default_type>(str));
+   }
+
+   constexpr auto prefix = fc::crypto::constants::private_key_base_prefix;
+   auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+   FC_ASSERT(!base_prefix.empty(), "Invalid private key prefixes: ${k}", ("k", str.substr(0, 10) + "..."));
+   FC_ASSERT(prefix == base_prefix, "Private Key has invalid prefix: ${s}", ("s", base_prefix));
+   if (type_prefix == private_key::key_prefix(private_key::key_type::k1) ||
+      type_prefix == private_key::key_prefix(private_key::key_type::r1)) {
+      return base58_str_parser<private_key::storage_type, fc::crypto::constants::private_key_prefix>::apply(type_prefix + '_' + data_str);
+   }
+   if (type_prefix == private_key::key_prefix(private_key::key_type::bls)) {
+      return bls::private_key_shim(bls::private_key(str).get_secret());
+   }
+   FC_ASSERT(false, "Unknown private key suite: ${s} in private_key", ("s", type_prefix));
+}
+
+inline bool is_legacy_public_key_str(const std::string& str) {
+   constexpr auto legacy_prefix = fc::crypto::constants::public_key_legacy_prefix;
+   return prefix_matches(legacy_prefix, str) && str.find('_') == std::string::npos;
 }
 
 inline public_key::storage_type parse_unknown_wire_public_key_str(const std::string& str) {
@@ -371,20 +377,19 @@ inline public_key::storage_type parse_unknown_wire_public_key_str(const std::str
 inline signature::storage_type parse_unknown_wire_signature_str(const std::string& str) {
    try {
       constexpr auto prefix = fc::crypto::constants::signature_base_prefix;
+      auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+      FC_ASSERT(!base_prefix.empty(), "Invalid signature prefixes: ${k}", ("k", str));
+      FC_ASSERT(prefix == base_prefix, "Signature has invalid prefix: ${str}", ("str", str));
 
-      const auto pivot = str.find('_');
-      FC_ASSERT(pivot != std::string::npos, "No delimiter in string, cannot determine type: ${str}", ("str", str));
-
-      const auto prefix_str = str.substr(0, pivot);
-      FC_ASSERT(prefix == prefix_str, "Signature Key has invalid prefix: ${str}", ("str", str)("prefix_str", prefix_str));
-
-      if (prefix_str == signature::sig_prefix(signature::sig_type::bls)) {
+      if (type_prefix == signature::sig_prefix(signature::sig_type::k1) ||
+         type_prefix == signature::sig_prefix(signature::sig_type::r1) ||
+         type_prefix == signature::sig_prefix(signature::sig_type::wa)) {
+         return base58_str_parser<signature::storage_type, fc::crypto::constants::signature_prefix>::apply(type_prefix + '_' + data_str);
+      }
+      if (type_prefix == signature::sig_prefix(signature::sig_type::bls)) {
          return bls::sig_parse_base64url(str);
       }
-
-      auto data_str = str.substr(pivot + 1);
-      FC_ASSERT(!data_str.empty(), "Signature has no data: ${str}", ("str", str));
-      return base58_str_parser<signature::storage_type, fc::crypto::constants::signature_prefix>::apply(data_str);
+      FC_ASSERT(false, "Unknown signture suite: ${s} in ${str}", ("s", type_prefix)("str", str));
    } FC_RETHROW_EXCEPTIONS(warn, "error parsing signature", ("str", str ))
 }
 

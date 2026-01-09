@@ -237,6 +237,9 @@ BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
    BOOST_TEST(pub_key.to_string({}, true).ends_with(pub_str));
    auto pub_key2 = fc::crypto::public_key::from_string(pub_key.to_string({}, true));
    BOOST_CHECK_EQUAL(pub_key.to_string({}), pub_key2.to_string({}));
+   fc::variant test_pubkey_variant{pub_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), test_public_key2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_ed_priv_str) try {
@@ -247,6 +250,9 @@ BOOST_AUTO_TEST_CASE(test_ed_priv_str) try {
    BOOST_TEST(priv_key.to_string({}, true).ends_with(priv_str));
    auto priv_key2 = fc::crypto::private_key::from_string(priv_key.to_string({}, true));
    BOOST_CHECK_EQUAL(priv_key.to_string({}), priv_key2.to_string({}));
+   fc::variant test_privkey_variant{priv_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), test_private_key2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
@@ -257,6 +263,48 @@ BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
    BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
    auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
    BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   fc::variant test_sig_variant{sig};
+   signature test_sig2 = test_sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_pub_str) try {
+   auto pub_str = "PUB_BLS_no1gZTuy-0iL_FVrc6q4ow5KtTtdv6ZQ3Cq73Jwl32qRNC9AEQaWsESaoN4Y9NAVRmRGnbEekzgo6YlwbztPeoWhWzvHiOALTFKegRXlRxVbM4naOg33cZOSdS25i_MXywteRA";
+   auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::bls);
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}));
+   BOOST_TEST(pub_key.to_string({}, true).starts_with("PUB_BLS_"));
+   BOOST_TEST(pub_key.to_string({}, true).ends_with(pub_str));
+   auto pub_key2 = fc::crypto::public_key::from_string(pub_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), pub_key2.to_string({}));
+   fc::variant test_pubkey_variant{pub_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), test_public_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_priv_str) try {
+   auto priv_str = "PVT_BLS_y_iMu9QYlZXK_Cdb-NEfSOQfJeWzm1-f-7p6V5MsiwsL1SQr";
+   auto priv_key = fc::crypto::private_key::from_string(priv_str, private_key::key_type::bls);
+   BOOST_CHECK_EQUAL(priv_str, priv_key.to_string({}));
+   BOOST_TEST(priv_key.to_string({}, true).starts_with("PVT_BLS_"));
+   BOOST_TEST(priv_key.to_string({}, true).ends_with(priv_str));
+   auto priv_key2 = fc::crypto::private_key::from_string(priv_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), priv_key2.to_string({}));
+   fc::variant test_privkey_variant{priv_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), test_private_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_sig_str) try {
+   auto sig_str = "SIG_BLS_Mo64VWr_Wxg6E1Tfsh0X_gTlBRce4P8qezw7-ylE6ydXDTzlzd8tmrKUMIEIN8YD2D0C68Fs0KrNuV_NVCDKn_lhnYuO6-X0WnwX6eIcQRdESO106gyTe-HPg13kAgUAV4sWdsR7ZNyEPft48-KWoTyyhpnhI0RPoy9ddooXob2jUAvICmQwwPpu_fTuJo8OQ02rBQdgux6jEw9b9TkVZCTrL3kznQvhbrbQxjhv3L-IPx6tthhiRKxgYKM8vFoF4aO-QQ";
+   auto sig = fc::crypto::signature::from_string(sig_str, signature::sig_type::bls);
+   BOOST_CHECK_EQUAL(sig_str, sig.to_string({}));
+   BOOST_TEST(sig.to_string({}, true).starts_with("SIG_BLS_"));
+   BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
+   auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   fc::variant test_sig_variant{sig};
+   signature test_sig2 = test_sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()
