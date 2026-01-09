@@ -1876,18 +1876,19 @@ int main( int argc, char** argv ) {
    create_cmd->require_subcommand();
 
    bool r1 = false;
+   bool k1 = false;
    string key_file;
    bool print_console = false;
    // create key
-   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &key_file, &print_console](){
+   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &key_file, &print_console](){
       if (key_file.empty() && !print_console) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
 
       auto pk    = r1 ? private_key_type::generate_r1() : private_key_type::generate();
-      auto privs = pk.to_string({});
-      auto pubs  = pk.get_public_key().to_string({});
+      auto privs = pk.to_string({}, k1);
+      auto pubs  = pk.get_public_key().to_string({}, k1);
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key",  privs) ) << std::endl;
          std::cout << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
@@ -1898,6 +1899,7 @@ int main( int argc, char** argv ) {
          out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       }
    });
+   create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
    create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
    create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    create_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
