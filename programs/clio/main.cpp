@@ -2017,6 +2017,49 @@ int main( int argc, char** argv ) {
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
    });
 
+   string k1_private_key;
+   auto k1_private_key_cmd = convert_cmd->add_subcommand("k1_private_key", localized("Generate all forms of K1 key"));
+   k1_private_key_cmd->add_option("--private-key", k1_private_key, localized("Private key in to import, prompts if not provided"))->expected(0, 1);
+   k1_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
+   k1_private_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
+   k1_private_key_cmd->callback([&k1_private_key, &key_file, &print_console] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (k1_private_key.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, k1_private_key, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk = fc::crypto::private_key::from_string(k1_private_key, fc::crypto::private_key::key_type::k1);
+      auto pubk  = privk.get_public_key();
+      if (print_console) {
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({})) ) << std::endl;
+         std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${key}", ("key", privk.to_string({})) ) << std::endl;
+         out << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         out << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+      }
+   });
+
+   string k1_public_key;
+   auto k1_public_key_cmd = convert_cmd->add_subcommand("k1_public_key", localized("Generate both forms of K1 public key"));
+   k1_public_key_cmd->add_option("public-key", k1_public_key, localized("Public key in to convert"))->required();
+   k1_public_key_cmd->callback([&k1_public_key] {
+      auto pubk = fc::crypto::public_key::from_string(k1_public_key, fc::crypto::public_key::key_type::k1);
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+   });
+
    // pack hex
    using try_types = std::tuple<signed_block, transaction_trace, action_trace, transaction_receipt,
                                 packed_transaction, signed_transaction, transaction, abi_def, action>;
