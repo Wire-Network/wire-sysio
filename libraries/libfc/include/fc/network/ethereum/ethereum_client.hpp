@@ -113,7 +113,6 @@ public:
       : contract_address(ethereum::to_address(contract_address_compat))
       , contract_address_hex(fc::to_hex(contract_address))
       , client(client) {
-      std::scoped_lock lock(_abi_mutex);
       for (const auto& contract : contracts) {
          abi_map[contract.name] = contract;
       }

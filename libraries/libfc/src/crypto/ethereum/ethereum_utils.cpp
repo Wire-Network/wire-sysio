@@ -11,11 +11,8 @@ namespace fc::crypto::ethereum {
 
 
 keccak256_hash_t keccak256(const uint8_t* data, size_t size) {
-   // TODO: Find a way of avoiding copying the result
    auto k256 = ethash::keccak256(data, size);
-   keccak256_hash_t hash;
-   std::copy_n(k256.bytes, sizeof(k256.bytes), hash.data());
-   return hash;
+   return std::bit_cast<keccak256_hash_t>(k256);
 }
 
 keccak256_hash_t keccak256(const std::string& digest) {
@@ -202,7 +199,7 @@ fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    em::private_key_secret sk{};
    FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected ${e}, received ${r}",
              ("s", fc::data_size(sk))("r", privkey_bytes.size()));
-   std::copy_n(privkey_bytes.data(), privkey_bytes.size(), reinterpret_cast<std::uint8_t*>(sk.data()));
+   std::memcpy(sk.data(), privkey_bytes.data(), fc::data_size(sk));
    return fc::em::private_key::regenerate(sk);
 }
 

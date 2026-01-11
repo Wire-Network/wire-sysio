@@ -1,8 +1,5 @@
 
 #include <atomic>
-#include <boost/dll.hpp>
-#include <boost/process/v1/io.hpp>
-#include <boost/process/v1/spawn.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <fc-test/build_info.hpp>
@@ -25,13 +22,6 @@
 #include <thread>
 #include <type_traits>
 #include <vector>
-
-
-namespace sysio {
-class signature_provider_manager_plugin;
-}
-
-
 
 namespace {
 using namespace std::literals;
@@ -164,7 +154,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
       order("amount", 1000);
       order("salt", "0xabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd");
 
-      auto encoded = eth::contract_encode_data(contract_abis[0], {fc::variant(order)});
+      auto encoded = eth::contract_encode_data(contract_abis[0], std::vector{fc::variant(order)});
 
       // Expected encoding:
       // 4 bytes: function selector (first 4 bytes of keccak256("submitOrder((address,uint256,bytes32))"))
@@ -203,7 +193,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
 
       fc::variants orders = {order1, order2};
 
-      auto encoded = eth::contract_encode_data(contract_abis[2], {fc::variant(orders)});
+      auto encoded = eth::contract_encode_data(contract_abis[2], std::vector{fc::variant(orders)});
 
       // Expected encoding for dynamic array:
       // 4 bytes: function selector
@@ -263,7 +253,7 @@ BOOST_AUTO_TEST_CASE(validate_contract_invoke_encode_decode) try {
 
       fc::variants orders = {fc::variant(order_ex1), fc::variant(order_ex2)};
 
-      auto encoded = eth::contract_encode_data(contract_abis[3], {fc::variant(orders)});
+      auto encoded = eth::contract_encode_data(contract_abis[3], std::vector{fc::variant(orders)});
 
       // Fixed array[2] of dynamic tuples (due to string field)
       // Each OrderEx contains: (address,uint256,bytes32) + string

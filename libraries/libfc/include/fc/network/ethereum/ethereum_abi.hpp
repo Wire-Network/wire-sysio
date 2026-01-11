@@ -244,13 +244,17 @@ struct reflector<fc::network::ethereum::abi::data_type> {
          }
       }
 
-            return nullptr;
+      return data_type_name_map[elem].data();
    }
-   static const char* to_string(int64_t i) { return to_string(fc::network::ethereum::abi::data_type(i)); }
+
+   static const char* to_string(int64_t i) {
+      return to_string(magic_enum::enum_cast<fc::network::ethereum::abi::data_type>(i).value());
+   }
+
    static std::string to_fc_string(fc::network::ethereum::abi::data_type elem) {
       switch (elem) {
       case fc::network::ethereum::abi::data_type::boolean:
-         return "bool";
+         return std::string{"bool"};
       default:
          return std::string{magic_enum::enum_name(elem)};
       }

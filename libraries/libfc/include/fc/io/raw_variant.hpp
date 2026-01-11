@@ -28,11 +28,11 @@ namespace fc { namespace raw {
          {
             fc::raw::pack( s, v.str() );
          }
-       virtual void handle( const fc::int256& v )const
+         virtual void handle( const fc::int256& v )const
          {
             fc::raw::pack( s, v.str() );
          }
-       virtual void handle( const fc::uint256& v )const
+         virtual void handle( const fc::uint256& v )const
          {
             fc::raw::pack( s, v.str() );
          }
@@ -102,7 +102,7 @@ namespace fc { namespace raw {
          {
             std::string val;
             raw::unpack(s,val);
-            v = val;
+            v = std::move(val);
             return;
          }
          case variant::double_type:

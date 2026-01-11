@@ -958,10 +958,11 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
    }
 
    if (obj.contains("components")) {
+      vo.components.clear();
+
       auto& vo_components_var = obj["components"];
       FC_ASSERT(vo_components_var.is_array(), "ABI components must be an array if specified");
       auto& vo_comp_list = vo_components_var.get_array();
-      vo.components.reserve(vo_comp_list.size());
       for (auto& comp_var : vo_comp_list) {
          FC_ASSERT_FMT(comp_var.is_object(), "ABI component {} must be an object", vo.name);
          auto comp = comp_var.as<component_type>();
