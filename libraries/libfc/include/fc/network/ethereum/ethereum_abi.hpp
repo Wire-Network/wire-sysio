@@ -259,9 +259,9 @@ struct reflector<fc::network::ethereum::abi::data_type> {
          return std::string{magic_enum::enum_name(elem)};
       }
    }
-   static std::string to_fc_string(int64_t i) { return to_fc_string(fc::network::ethereum::abi::data_type(i)); }
+   static std::string to_fc_string(int64_t i) { return to_fc_string(magic_enum::enum_cast<fc::network::ethereum::abi::data_type>(i).value()); }
    static fc::network::ethereum::abi::data_type from_int(int64_t i) {
-      fc::network::ethereum::abi::data_type e = fc::network::ethereum::abi::data_type(i);
+      fc::network::ethereum::abi::data_type e = magic_enum::enum_cast<fc::network::ethereum::abi::data_type>(i).value();
       switch (e) {
          BOOST_PP_SEQ_FOR_EACH(
             FC_REFLECT_ENUM_FROM_STRING_CASE, fc::network::ethereum::abi::data_type,

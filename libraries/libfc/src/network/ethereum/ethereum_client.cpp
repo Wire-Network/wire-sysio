@@ -20,7 +20,7 @@ using namespace fc::network::json_rpc;
  * @return true if ABI exists, false otherwise
  */
 bool ethereum_contract_client::has_abi(const std::string& contract_name) {
-   return abi_map.contains(contract_name);
+   return _abi_map.readable().contains(contract_name);
 }
 
 /**
@@ -30,8 +30,8 @@ bool ethereum_contract_client::has_abi(const std::string& contract_name) {
  * @return Reference to the ABI contract definition
  * @throws std::out_of_range if contract_name not found
  */
-abi::contract& ethereum_contract_client::get_abi(const std::string& contract_name) {
-   return abi_map.at(contract_name);
+const abi::contract& ethereum_contract_client::get_abi(const std::string& contract_name) {
+   return _abi_map.readable().at(contract_name);
 }
 
 /**

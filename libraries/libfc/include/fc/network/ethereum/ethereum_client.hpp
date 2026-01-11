@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <fc-lite/threadsafe_map.hpp>
+
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/signature_provider.hpp>
 #include <fc/int256.hpp>
@@ -113,6 +115,7 @@ public:
       : contract_address(ethereum::to_address(contract_address_compat))
       , contract_address_hex(fc::to_hex(contract_address))
       , client(client) {
+      auto abi_map = _abi_map.writeable();
       for (const auto& contract : contracts) {
          abi_map[contract.name] = contract;
       }
@@ -135,14 +138,11 @@ public:
     * @return Reference to the ABI contract definition
     * @throws std::out_of_range if contract_name not found
     */
-   abi::contract& get_abi(const std::string& contract_name);
+   const abi::contract& get_abi(const std::string& contract_name);
 
 
 protected:
-   /**
-    * @brief Map of contract names to their ABI definitions
-    */
-   std::map<std::string, abi::contract> abi_map{};
+
 
    /**
     * @brief Creates a typed contract call function (view/pure function)
@@ -174,9 +174,10 @@ protected:
 
 private:
    /**
-    * @brief Mutex for thread-safe access to abi_map
+    * @brief Map of contract names to their ABI definitions
     */
-   std::mutex _abi_mutex{};
+   // std::map<std::string, abi::contract> abi_map{};
+   fc::threadsafe_map<std::string, abi::contract> _abi_map{};
 };
 
 
@@ -227,25 +228,11 @@ public:
    fc::variant execute_contract_tx_fn(const eip1559_tx& tx, const abi::contract& abi,
                                       const contract_invoke_data_items& params = {}, bool sign = true);
 
-
-   /**
-    * @brief Parses the response from the Ethereum node.
-    * @param response The raw response from the Ethereum node.
-    * @return The parsed JSON response, or an empty std::optional in case of failure.
-    */
-   fc::variant parse_json_response(const std::string& response) = delete;
-
-   /**
-    * @brief Processes the parsed JSON response and outputs relevant information.
-    * @param result_json The parsed JSON response from the node.
-    */
-   void process_result(const fc::variant& result_json) = delete;
-
    // Ethereum RPC Methods
 
    /**
     * @brief Retrieves the latest block number.
-    * @return The block number as a string in hexadecimal format, or an empty std::optional if an error occurs.
+    * @return The block number as a string in hexadecimal format.
     */
    fc::uint256 get_block_number();
 
@@ -253,7 +240,7 @@ public:
     * @brief Retrieves block information by block number.
     * @param block_number_or_tag block # or tag (e.g., "latest", "pending").
     * @param full_transaction_data Flag to determine whether to fetch full transaction data.
-    * @return The block data in JSON format, or an empty std::optional if an error occurs.
+    * @return The block data in JSON format.
     */
    fc::variant_object get_block_by_number(const block_tag_t& block_number_or_tag = block_tag_latest,
                                           bool full_transaction_data = false);
@@ -262,14 +249,14 @@ public:
     * @brief Retrieves block information by block hash.
     * @param block_hash The block hash (hexadecimal).
     * @param full_transaction_data Flag to determine whether to fetch full transaction data.
-    * @return The block data in JSON format, or an empty std::optional if an error occurs.
+    * @return The block data in JSON format.
     */
    fc::variant_object get_block_by_hash(const std::string& block_hash, bool full_transaction_data = false);
 
    /**
     * @brief Retrieves transaction information by transaction hash.
     * @param tx_hash The transaction hash.
-    * @return The transaction data in JSON format, or an empty std::optional if an error occurs.
+    * @return The transaction data in JSON format.
     */
    fc::variant get_transaction_by_hash(const std::string& tx_hash);
 
@@ -278,14 +265,22 @@ public:
    fc::uint256 get_max_priority_fee_per_gas();
 
    /**
+    * Gas configuration based on latest block and chain data
+    *
+    * @return Gas configuration based on latest block and chain data
+    */
+   gas_config_t get_gas_config();
+
+   /**
     * @brief Estimates the gas required for a transaction.
     * @param to The recipient address.
-    * @param value The value to be sent (in hexadecimal).
-    * @return The estimated gas (in hexadecimal), or an empty std::optional if an error occurs.
+    * @param value the value to be sent.
+    * @param gas_config
+    * @return The estimated gas.
     */
-   fc::uint256 estimate_gas(const address_compat_type& to, const std::optional<fc::uint256>& value = {0}, const std::optional<gas_config_t>& gas_config = std::nullopt);
+   fc::uint256 estimate_gas(const address_compat_type& to,
+      const std::optional<fc::uint256>& value = {0}, const std::optional<gas_config_t>& gas_config = std::nullopt);
 
-   gas_config_t get_gas_config();
    fc::uint256 estimate_gas(const address_compat_type& to, const abi::contract& contract, const data_or_params_t& params, const std::optional<gas_config_t>& gas_config = std::nullopt);
 
    /**
@@ -297,7 +292,7 @@ public:
    /**
     * @brief Sends an encoded transaction.
     * @param raw_tx_data The raw transaction data.
-    * @return The transaction hash (if successful), or an empty std::optional if an error occurs.
+    * @return The transaction hash (if successful).
     */
    std::string send_transaction(const std::string& raw_tx_data);
 
@@ -312,14 +307,14 @@ public:
    /**
     * @brief Retrieves logs based on filter parameters.
     * @param params The filter parameters for fetching logs.
-    * @return The logs in JSON format, or an empty std::optional if an error occurs.
+    * @return The logs in JSON format.
     */
    fc::variant get_logs(const fc::variant& params);
 
    /**
     * @brief Retrieves the transaction receipt by transaction hash.
     * @param tx_hash The transaction hash.
-    * @return The transaction receipt data in JSON format, or an empty std::optional if an error occurs.
+    * @return The transaction receipt data in JSON format.
     */
    fc::variant get_transaction_receipt(const std::string& tx_hash);
 
@@ -328,25 +323,26 @@ public:
    /**
     * @brief Retrieves the transaction count (nonce) for an address.
     * @param address The address for which to fetch the transaction count.
-    * @return The transaction count (nonce) as a string, or an empty std::optional if an error occurs.
+    * @param block_tag
+    * @return The transaction count (nonce).
     */
    fc::uint256 get_transaction_count(const address_compat_type& address, const std::string& block_tag = "pending");
 
    /**
     * @brief Retrieves the chain ID of the connected Ethereum network.
-    * @return The chain ID as a string, or an empty std::optional if an error occurs.
+    * @return The chain ID.
     */
    fc::uint256 get_chain_id();
 
    /**
     * @brief Retrieves the version of the connected Ethereum network.
-    * @return The network version as a string, or an empty std::optional if an error occurs.
+    * @return The network version.
     */
    fc::uint256 get_network_version();
 
    /**
     * @brief Checks if the Ethereum node is syncing.
-    * @return Syncing status in JSON format, or an empty std::optional if an error occurs.
+    * @return Syncing status in JSON format.
     */
    fc::variant get_syncing_status();
 
@@ -445,12 +441,11 @@ std::string to_data_from_params(const abi::contract& contract, const data_or_par
 
 template <typename RT, typename... Args>
 ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(const abi::contract& contract) {
-   {
-      std::scoped_lock<std::mutex> lock(_abi_mutex);
-      if (!abi_map.contains(contract.name)) {
-         abi_map[contract.name] = contract;
-      }
+   auto abi_map = _abi_map.writeable();
+   if (!abi_map.contains(contract.name)) {
+      abi_map[contract.name] = contract;
    }
+
    abi::contract& abi = abi_map[contract.name];
    return [this, &abi](const std::string& block_tag, Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
@@ -467,12 +462,11 @@ ethereum_contract_call_fn<RT, Args...> ethereum_contract_client::create_call(con
 
 template <typename RT, typename... Args>
 ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx(const abi::contract& contract) {
-   {
-      std::scoped_lock<std::mutex> lock(_abi_mutex);
-      if (!abi_map.contains(contract.name)) {
-         abi_map[contract.name] = contract;
-      }
+   auto abi_map = _abi_map.writeable();
+   if (!abi_map.contains(contract.name)) {
+      abi_map[contract.name] = contract;
    }
+
    abi::contract& abi = abi_map[contract.name];
    return [this, &abi](const Args&... args) -> RT {
       contract_invoke_data_items params = {args...};
