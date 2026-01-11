@@ -126,7 +126,7 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
       return out;
    }
 
-   FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported static type for ABI encoding: {}",
+   FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported static type for ABI encoding: {}",
                           ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
@@ -161,7 +161,7 @@ std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, c
       break;
 
    default:
-      FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported dynamic type for ABI encoding: {}",
+      FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported dynamic type for ABI encoding: {}",
                              ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 
@@ -295,8 +295,6 @@ std::vector<uint8_t> encode_tuple(const abi::component_type& component, const fc
       const auto& child = children[i];
       auto encoded = encode_value(child, values[i]);
 
-      // TODO: is needed? @jglanz
-      // || child.is_list()
       if (child.is_dynamic()) {
          heads.emplace_back(32, 0); // placeholder
          tails.push_back(std::move(encoded));
@@ -449,7 +447,7 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
       return fc::variant("0x" + fc::to_hex(bytes_data));
    }
 
-   FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported static type for ABI decoding: {}",
+   FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
                           ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
@@ -492,7 +490,7 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
    }
 
    default:
-      FC_THROW_EXCEPTION_FMT(fc::exception, "Unsupported dynamic type for ABI decoding: {}",
+      FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported dynamic type for ABI decoding: {}",
                              ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 }
@@ -561,7 +559,7 @@ fc::variant decode_list(const abi::component_type& component, const uint8_t* dat
       }
    }
 
-   return fc::variant(result);
+   return fc::variant(std::move(result));
 }
 
 /**
@@ -604,7 +602,7 @@ fc::variant decode_tuple(const abi::component_type& component, const uint8_t* da
       result[name] = decode_value(*it, data, data_size, temp_offset);
    }
 
-   return fc::variant(result);
+   return fc::variant(std::move(result));
 }
 
 /**
@@ -633,24 +631,6 @@ fc::variant decode_value(const abi::component_type& component, const uint8_t* da
 }
 
 } // anonymous namespace
-
-// bool abi::is_data_type_numeric(data_type type) {
-//    std::string dts{magic_enum::enum_name(type)};
-//    for (auto& prefix : data_type_numeric_prefixes) {
-//       if (dts.starts_with(prefix))
-//          return true;
-//    }
-//    return false;
-// }
-
-// bool abi::is_data_type_numeric_signed(data_type type) {
-//    std::string dts{magic_enum::enum_name(type)};
-//    for (auto& prefix : data_type_numeric_signed_prefixes) {
-//       if (dts.starts_with(prefix))
-//          return true;
-//    }
-//    return false;
-// }
 
 /**
  * @brief Generates the canonical type signature string for an ABI component
@@ -913,7 +893,7 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
       }
    }
    
-   return fc::variant(results);
+   return fc::variant(std::move(results));
 }
 
 } // namespace fc::network::ethereum
