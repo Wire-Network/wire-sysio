@@ -40,7 +40,7 @@ struct public_key_shim {
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
-   static public_key_shim from_string(const std::string& str) {
+   static public_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 44;
       FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length ${s}", ("s", str.size()));
       auto bytes = from_base58(str);
@@ -84,7 +84,7 @@ struct signature_shim {
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
-   static signature_shim from_string(const std::string& str) {
+   static signature_shim from_base58_string(const std::string& str) {
       constexpr size_t max_sig_len = 88;
       FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length ${s}", ("s", str.size()));
       auto bytes = from_base58(str);
@@ -120,7 +120,7 @@ struct private_key_shim {
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
-   static private_key_shim from_string(const std::string& str) {
+   static private_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 88;
       FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length ${s}", ("s", str.size()));
       auto bytes = from_base58(str);

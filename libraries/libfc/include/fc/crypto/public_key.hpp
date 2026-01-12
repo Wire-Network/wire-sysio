@@ -73,12 +73,16 @@ namespace fc::crypto {
          size_t which()const { return _storage.index(); }
          key_type type()const { return static_cast<key_type>(which()); }
 
-         // If type is unknown, attempt to infer the key type from the string.
+         /**
+          * If type is unknown, attempt to infer the key type from the string.
+          */
          static public_key from_string(const std::string& str, key_type type = key_type::unknown);
 
-         // If include_prefix is true, the prefix will be included in the string representation.
-         // Note for Wire native types (k1, r1, wa, bls) the prefix is always included.
-         // For k1 if include_prefix is false, then the legacy prefix is used instead of PUB_K1_
+         /**
+          * If include_prefix is true, the prefix will be included in the string representation.
+          * Note for Wire native types (k1, r1, wa, bls) the prefix is always included.
+          * For k1 if include_prefix is false, then the legacy prefix is used instead of PUB_K1_
+          */
          std::string to_string(const fc::yield_function_t& yield, bool include_prefix = false) const;
 
          template<typename... Args>

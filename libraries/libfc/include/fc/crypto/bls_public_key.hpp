@@ -95,8 +95,8 @@ namespace fc::crypto::bls {
 
       static bls12_381::g1 from_affine_bytes_le(const public_key_data& affine_non_montgomery_le);
    private:
-      public_key_data         _affine_non_montgomery_le{};
-      bls12_381::g1           _jacobian_montgomery_le; // cached g1
+      public_key_data  _affine_non_montgomery_le{};
+      bls12_381::g1    _jacobian_montgomery_le; // cached g1
    };
 
 }  // fc::crypto::bls
