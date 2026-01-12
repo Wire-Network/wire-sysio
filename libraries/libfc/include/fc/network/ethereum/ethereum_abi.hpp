@@ -109,10 +109,6 @@ constexpr bool is_data_type_numeric_signed(data_type type) {
    return false;
 }
 
-// bool is_data_type_numeric(data_type type);
-
-// bool is_data_type_numeric_signed(data_type type);
-
 enum class padding_type { none, left, right };
 
 constexpr std::array data_dynamic_types{data_type::bytes, data_type::string};
@@ -173,11 +169,7 @@ struct component_type {
 struct contract {
    std::string name;
    abi::invoke_target_type type;
-
-   // [ { name: "param1", type: "uint256" }, { name: "param2", type: "string" }
    std::vector<component_type> inputs;
-
-   // [ { name: "return1", type: "uint256" }, { name: "return2", type: "string" }]
    std::vector<component_type> outputs;
 };
 

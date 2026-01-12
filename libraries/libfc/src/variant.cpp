@@ -632,6 +632,8 @@ std::string variant::as_string()const
 {
    switch( get_type() )
    {
+      case uint128_type:
+      case int128_type:
       case uint256_type:
       case int256_type:
       case string_type:
