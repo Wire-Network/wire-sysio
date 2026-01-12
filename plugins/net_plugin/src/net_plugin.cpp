@@ -3207,21 +3207,6 @@ namespace sysio {
       shared_ptr<signed_block> ptr = std::make_shared<signed_block>();
       fc::raw::unpack( ds, *ptr );
 
-      bool has_webauthn_sig = ptr->producer_signature.is_webauthn();
-
-      constexpr auto additional_sigs_eid = additional_block_signatures_extension::extension_id();
-      auto exts = ptr->validate_and_extract_extensions();
-      if( exts.count( additional_sigs_eid ) ) {
-         const auto &additional_sigs = std::get<additional_block_signatures_extension>(exts.lower_bound( additional_sigs_eid )->second).signatures;
-         has_webauthn_sig |= std::ranges::any_of(additional_sigs, [](const auto& sig) { return sig.is_webauthn(); });
-      }
-
-      if( has_webauthn_sig ) {
-         peer_dlog( p2p_blk_log, this, "WebAuthn signed block received, closing connection" );
-         close();
-         return false;
-      }
-
       handle_message( blk_id, std::move( ptr ) );
       return true;
    }

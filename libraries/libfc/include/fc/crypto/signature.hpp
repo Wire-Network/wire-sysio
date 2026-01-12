@@ -25,8 +25,19 @@ constexpr const char* signature_prefix[] = {
 
 class signature {
 public:
-   using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature, em::signature_shim,
-                                     ed::signature_shim, bls::signature_shim>;
+   using storage_type = std::variant<ecc::signature_shim, r1::signature_shim, webauthn::signature,
+                                     em::signature_shim, ed::signature_shim, bls::signature_shim>;
+   enum class sig_type : uint8_t {
+      k1 = fc::get_index<storage_type, ecc::signature_shim>(),
+      r1 = fc::get_index<storage_type, r1::signature_shim>(),
+      wa = fc::get_index<storage_type, webauthn::signature>(),
+      em = fc::get_index<storage_type, em::signature_shim>(),
+      ed = fc::get_index<storage_type, ed::signature_shim>(),
+      bls = fc::get_index<storage_type, bls::signature_shim>(),
+      unknown
+   };
+   static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(sig_type::unknown), "Missing signature sig_type");
+
    static signature::storage_type sig_parse_base58(const std::string& base58str);
    signature() = default;
    signature(signature&&) = default;
@@ -48,11 +59,19 @@ public:
    constexpr bool is_webauthn() const { return _storage.index() == fc::get_index<storage_type, webauthn::signature>(); }
 
    size_t which() const;
+   sig_type type()const { return static_cast<sig_type>(which()); }
 
    size_t variable_size() const;
 
-   template <typename T>
-   bool contains() const { return std::holds_alternative<T>(_storage); }
+   template<typename... Args>
+   bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }
+
+   template<typename... Args>
+   bool contains_type(Args... types) const {
+      static_assert((std::is_same_v<Args, sig_type> && ...), "Args must be of type signature::sig_type");
+      auto current_index = _storage.index();
+      return ((current_index == static_cast<size_t>(types)) || ...);
+   }
 
    template <typename T>
    const T& get() const { return std::get<T>(_storage); }

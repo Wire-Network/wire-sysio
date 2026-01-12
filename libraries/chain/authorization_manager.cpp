@@ -123,9 +123,11 @@ namespace sysio { namespace chain {
                                                                       time_point initial_creation_time
                                                                     )
    {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when creating permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when creating permission");
+      }
 
       auto creation_time = initial_creation_time;
       if( creation_time == time_point() ) {
@@ -154,9 +156,11 @@ namespace sysio { namespace chain {
                                                                       time_point initial_creation_time
                                                                     )
    {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when creating permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when creating permission");
+      }
 
       auto creation_time = initial_creation_time;
       if( creation_time == time_point() ) {
@@ -178,9 +182,11 @@ namespace sysio { namespace chain {
    }
 
    void authorization_manager::modify_permission( const permission_object& permission, const authority& auth, bool is_trx_transient ) {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when modifying permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when modifying permission");
+      }
 
       _db.modify( permission, [&](permission_object& po) {
          auto dm_logger = _control.get_deep_mind_logger(is_trx_transient);
