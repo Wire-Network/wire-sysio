@@ -59,7 +59,7 @@ namespace sysio { namespace chain { namespace webassembly {
 			if( is_negative ) {
 				s += '-';
 			}
-			s += fc::variant(v).get_string();
+			s += fc::variant(v).as_string();
 
 			context.console_append( s );
       });
@@ -69,7 +69,7 @@ namespace sysio { namespace chain { namespace webassembly {
 		predicated_print(context,
       [&]() {
 			fc::uint128 v = fc::to_uint128(*val>>64, static_cast<uint64_t>(*val) );
-			context.console_append(fc::variant(v).get_string());
+			context.console_append(fc::variant(v).as_string());
       });
    }
 
