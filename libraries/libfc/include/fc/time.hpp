@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <ctime>
 #include <string>
 #include <limits>
 
@@ -9,6 +10,8 @@
 #endif //// _MSC_VER
 
 namespace fc {
+  std::tm to_utc_tm(std::time_t tt);
+
   class microseconds {
     public:
         constexpr explicit microseconds( int64_t c = 0) :_count(c){}
