@@ -1283,6 +1283,11 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    ilog( "public key with no known private key: ${k}", ("k", sys_unknown_pk) );
 }
 
+BOOST_AUTO_TEST_CASE(atomic_shared_ptr) {
+   std::atomic<std::shared_ptr<action>> ptr = std::make_shared<action>(action{vector<permission_level>{}, "test"_n, "action"_n, bytes{}});
+   BOOST_CHECK_EQUAL(ptr.load()->account, "test"_n);
+}
+
 BOOST_AUTO_TEST_SUITE_END()
 
 } // namespace sysio
