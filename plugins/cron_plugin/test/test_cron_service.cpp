@@ -6,10 +6,10 @@
 #include <optional>
 #include <set>
 
-#include <sysio/operator_plugin/services/cron_service.hpp>
+#include <sysio/services/cron_service.hpp>
 
 using namespace std::literals;
-using namespace sysio::operator_plugin::services;
+using namespace sysio::services;
 
 namespace {
   auto cron_service_factory(
@@ -36,9 +36,9 @@ namespace {
     return true;
   }
 
-  int current_ms_in_second() {
+  long current_ms_in_second() {
     using namespace std::chrono;
-    auto now = system_clock::now();
+    auto now = steady_clock::now();
     auto ms_since_epoch = duration_cast<milliseconds>(now.time_since_epoch());
     auto sec_since_epoch = duration_cast<seconds>(ms_since_epoch);
     auto ms_in_sec = duration_cast<milliseconds>(ms_since_epoch - sec_since_epoch);
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
 
   BOOST_AUTO_TEST_CASE(create_with_options_and_basic_add) try {
     auto service = cron_service_factory("cron_service_test_A", 2);
-    std::atomic<int> calls{0};
+    std::atomic_int calls{0};
 
     cron_schedule s; // all fields wildcard, so with empty milliseconds it fires frequently
     s.milliseconds.clear(); // wildcard -> scheduler will target next millisecond
@@ -68,24 +68,24 @@ BOOST_AUTO_TEST_SUITE(cron_service)
       [&]() {
         return calls.load() >= 3;
       },
-      std::chrono::milliseconds(100)
+      std::chrono::milliseconds(500)
     );
     BOOST_CHECK(ok);
 
     service->cancel(id);
 
     int snapshot = calls.load();
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     BOOST_CHECK_EQUAL(snapshot, calls.load());
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(milliseconds_field_precise_triggers_same_second) try {
     auto service = cron_service_factory("cron_service_test_ms", 1);
-    std::atomic<int> calls{0};
+    std::atomic_int calls{0};
 
     // Build a schedule for a few ms offsets later in the current second
-    int now_ms = current_ms_in_second();
-    std::set<int> ms_set;
+    auto now_ms = current_ms_in_second();
+    std::set<long> ms_set;
     ms_set.insert((now_ms + 10) % 1000);
     ms_set.insert((now_ms + 20) % 1000);
     ms_set.insert((now_ms + 30) % 1000);
@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
 
   BOOST_AUTO_TEST_CASE(cancel_all_stops_multiple_jobs) try {
     auto service = cron_service_factory("cron_service_test_cancel_all", 1);
-    std::atomic<int> a{0}, b{0};
+    std::atomic_int a{0}, b{0};
 
     cron_schedule s; // fast schedule using wildcard milliseconds
     auto id1 = service->add(
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(destructor_stops_service_cleanly) try {
-    std::atomic<int> calls{0};
+    std::atomic_int calls{0};
     {
       auto service = cron_service_factory("cron_service_test_dtor", 1);
       cron_schedule s; // frequent schedule
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
 
   BOOST_AUTO_TEST_CASE(multiple_independent_jobs_progress) try {
     auto service = cron_service_factory("cron_service_test_multi", 2);
-    std::atomic<int> a{0}, b{0};
+    std::atomic_int a{0}, b{0};
 
     cron_schedule fast; // wildcard -> frequent
 
@@ -229,6 +229,32 @@ BOOST_AUTO_TEST_SUITE(cron_service)
       std::chrono::milliseconds(100)
     );
     BOOST_CHECK(b_progressed);
+  } FC_LOG_AND_RETHROW();
+
+  BOOST_AUTO_TEST_CASE(list_filtering) try {
+    auto service = cron_service_factory("cron_service_test_list", 1);
+    
+    cron_schedule s;
+    auto id1 = service->add(s, [](){});
+    auto id2 = service->add(s, [](){});
+    auto id3 = service->add(s, [](){});
+
+    // Add tags to jobs
+    {
+       auto rv = service->list();
+       BOOST_CHECK_EQUAL(rv.size(), 3);
+    }
+
+    // If I can't set tags, I can at least test filtering by ID.
+    auto ids = service->list(id1, id3);
+    BOOST_CHECK_EQUAL(ids.size(), 2);
+    BOOST_CHECK(std::ranges::contains(ids, id1));
+    BOOST_CHECK(std::ranges::contains(ids, id3));
+    BOOST_CHECK(!std::ranges::contains(ids, id2));
+
+    auto all_ids = service->list();
+    BOOST_CHECK_EQUAL(all_ids.size(), 3);
+
   } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

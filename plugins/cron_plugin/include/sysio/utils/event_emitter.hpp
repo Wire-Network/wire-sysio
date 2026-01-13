@@ -114,4 +114,4 @@ namespace sysio::utils {
       std::optional<on_subscribe_change_fn> _on_unsubscribe{};
   };
 
-} // namespace sysio::operator_plugin::utils
+} // namespace sysio::cron_plugin::utils
