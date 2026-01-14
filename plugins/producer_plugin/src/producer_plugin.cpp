@@ -1,6 +1,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -712,6 +713,7 @@ public:
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
+   trx_priority_db                                   _trx_priority_db;
    fc::microseconds                                  _max_irreversible_block_age_us;
    block_num_type                                    _max_reversible_blocks{3600}; // pause production when reached (30 minutes)
    // produce-block-offset is in terms of the complete round, internally use calculated value for each block of round
@@ -875,6 +877,7 @@ public:
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+      _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
 
    // called from multiple non-main threads
@@ -1029,9 +1032,11 @@ public:
 
                  chain::controller& chain = chain_plug->chain();
                  transaction_metadata_ptr trx_meta;
+                 int priority = priority::low;
                  try {
                     trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type,
                                                                   chain.configured_subjective_signature_length_limit());
+                    priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
                     // use read_write when read is likely fine; maintains previous behavior of next() always being called from the main thread
                     app().executor().post(
@@ -1053,8 +1058,7 @@ public:
                  }
 
                  // key recovery complete, continue execution on the main thread
-                 app().executor().post(
-                         priority::low, exec_queue::read_write,
+                 app().executor().post( priority, exec_queue::read_write,
                          [this, trx_meta{std::move(trx_meta)}, is_transient, next{std::move(next)}, api_trx, return_failure_traces]() {
                             auto start       = fc::time_point::now();
                             auto idle_time   = _time_tracker.add_idle_time(start);
