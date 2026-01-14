@@ -84,11 +84,6 @@ block_timestamp_type get_last_trx_priority_update(const controller& control) {
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void copy_inline_row(const chain::key_value_object& obj, vector<char>& data) {
-   data.resize( obj.value.size() );
-   memcpy( data.data(), obj.value.data(), obj.value.size() );
-}
-
 void trx_priority_db::load_trx_priority_map(const controller& control, trx_priority_map_t& m) {
    try {
       const fc::time_point deadline = fc::time_point::now() + serializer_max_time;
@@ -134,7 +129,6 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
 }
 
 // -----------------------------------------------------------------------------------------------------------------
-
 
 void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const controller& chain) {
    if (lib->block_num() % trx_priority_refresh_interval != 0)
