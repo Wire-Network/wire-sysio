@@ -17,18 +17,34 @@ constexpr auto wire_build_root_file = ".wire-build-root";
 namespace {
 namespace bp       = boost::process;
 namespace bfs = boost::filesystem;
-auto exe_path      = boost::dll::program_location().parent_path();
 }
+
+bfs::path get_exe_path() {
+   static std::mutex mutex;
+   static std::optional<bfs::path> exe_path;
+   std::scoped_lock lock(mutex);
+
+   if (exe_path.has_value()) {
+      return exe_path.value();
+   }
+
+   auto p  = boost::dll::program_location();
+   FC_ASSERT(!p.string().empty(), "exe_path is empty");
+   exe_path = p;
+   return exe_path.value();
+}
+
 bfs::path get_build_root_path() {
    static std::mutex mutex;
    static std::optional<bfs::path> build_root_path;
-   std::lock_guard lock(mutex);
+   std::scoped_lock lock(mutex);
 
    if (build_root_path.has_value()) {
       return build_root_path.value();
    }
 
-   bfs::path current_path = exe_path;
+   auto exe_path = get_exe_path();
+   bfs::path current_path = exe_path.parent_path();
    while (current_path != current_path.root_path()) {
       if (bfs::exists(current_path / wire_build_root_file)) {
          build_root_path = current_path;
@@ -36,13 +52,13 @@ bfs::path get_build_root_path() {
       }
       current_path = current_path.parent_path();
    }
-   FC_THROW_EXCEPTION(fc::exception, "Unable to find build directory");
+   FC_THROW_EXCEPTION_FMT(fc::exception, "Unable to find build directory (exe_path={},dll_program_path={})", exe_path.string(), boost::dll::program_location().string());
 }
 
 bfs::path get_source_root_path() {
    static std::mutex mutex;
    static std::optional<bfs::path> source_root_path;
-   std::lock_guard lock(mutex);
+   std::scoped_lock lock(mutex);
 
    if (source_root_path.has_value()) {
       return source_root_path.value();
