@@ -57,8 +57,6 @@ public:
    };
 };
 
-static auto _outpost_ethereum_client_plugin = application::register_plugin<outpost_ethereum_client_plugin>();
-
 void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& options) {
    if (options.contains(option_abi_file)) {
       auto& abi_files = options.at(option_abi_file).as<std::vector<std::filesystem::path>>();
