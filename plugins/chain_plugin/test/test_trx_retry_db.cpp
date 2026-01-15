@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       }
 
       // control time by using set_now, call before spawning any threads
-      auto pnow = boost::posix_time::time_from_string("2022-04-04 4:44:44.000");
+      auto pnow = boost::posix_time::time_from_string("2025-04-04 4:44:44.000");
       fc::mock_time_traits::set_now(pnow);
 
       // run app() so that channels::transaction_ack work

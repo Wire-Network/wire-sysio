@@ -110,7 +110,7 @@ macro(plugin_target TARGET_NAME)
             )
             add_test(
                     NAME ${TEST_TARGET_NAME}
-                    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/test/${TEST_TARGET_NAME}
+                    COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST_TARGET_NAME}
                     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             )
         endif ()

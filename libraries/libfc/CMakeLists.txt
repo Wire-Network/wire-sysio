@@ -1,6 +1,6 @@
 
 set(fc_sources
-  src/uint128.cpp
+  src/int128.cpp
   src/int256.cpp
   src/variant.cpp
   src/exception.cpp
@@ -110,6 +110,7 @@ target_link_libraries(
   secp256k1::secp256k1-internal
   bls12-381::bls12-381
   bn256::bn256
+  magic_enum::magic_enum
   ${PLATFORM_SPECIFIC_LIBS}
   ${CMAKE_DL_LIBS}
 )

@@ -126,7 +126,7 @@ std::string set_now(const char* date, const char* time) {
 BOOST_AUTO_TEST_SUITE(trx_finality_status_processing_test)
 
 BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
-   const auto pre_block_20_time = set_now("2022-04-04", "04:44:44.450");
+   const auto pre_block_20_time = set_now("2025-04-04", "04:44:44.450");
    fc::microseconds max_success_duration = fc::seconds(25);
    fc::microseconds max_failure_duration = fc::seconds(45);
    trx_finality_status_processing status(10'000, max_success_duration, max_failure_duration);
@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    }
 
    // and 2 new transactions
-   const auto block_20_time = set_now("2022-04-04", "04:44:44.500");
+   const auto block_20_time = set_now("2025-04-04", "04:44:44.500");
    add(trx_pairs_20, b_20);
    add(trx_pairs_20, b_20);
    status.signal_accepted_block(b_20, b_20->calculate_id());
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
 
    // send block 21
-   const auto block_21_time = set_now("2022-04-04", "04:44:45.000");
+   const auto block_21_time = set_now("2025-04-04", "04:44:45.000");
    trx_deque trx_pairs_21;
    bn = 21;
    const auto b_21 = make_block(bn);
@@ -344,7 +344,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
 
    // send block 22
-   const auto block_22_time = set_now("2022-04-04", "04:44:45.500");
+   const auto block_22_time = set_now("2025-04-04", "04:44:45.500");
    trx_deque trx_pairs_22;
    bn = 22;
 
@@ -419,7 +419,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK_EQUAL(ts->status, "IN_BLOCK");
 
    // send block 22
-   const auto block_22_alt_time = set_now("2022-04-04", "04:44:46.000");
+   const auto block_22_alt_time = set_now("2025-04-04", "04:44:46.000");
    trx_deque trx_pairs_22_alt;
    bn = 22;
 
@@ -504,7 +504,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
    // send block 19 (forking out previous blocks.)
    // Testing that code handles getting blocks before when it started
-   const auto block_19_time = set_now("2022-04-04", "04:44:47.000");
+   const auto block_19_time = set_now("2025-04-04", "04:44:47.000");
    trx_deque trx_pairs_19;
    bn = 19;
 
@@ -596,7 +596,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
 
 
    // send block 19 alternate
-   const auto block_19_alt_time = set_now("2022-04-04", "04:44:44.000");
+   const auto block_19_alt_time = set_now("2025-04-04", "04:44:44.000");
    trx_deque trx_pairs_19_alt;
    bn = 19;
    trx_pairs_19_alt.push_back(trx_pairs_19[0]);
@@ -809,7 +809,7 @@ namespace {
       block_frame(trx_finality_status_processing& finality_status, const char* block_time, uint32_t block_num = 0)
       : status(finality_status),
         bn(block_num == 0 ? block_frame::last_used_block_num + 1 : block_num),
-        time(set_now("2022-04-04", block_time)) {
+        time(set_now("2025-04-04", block_time)) {
          block_frame::last_used_block_num = bn;
          for (uint32_t i = 0; i < block_frame::num; ++i) {
             auto trx = make_unique_trx(fc::seconds(30));
@@ -903,7 +903,7 @@ namespace {
 }
 
 BOOST_AUTO_TEST_CASE(trx_finality_status_storage_reduction) { try {
-   set_now("2022-04-04", "04:44:44.450");
+   set_now("2025-04-04", "04:44:44.450");
    fc::microseconds max_success_duration = fc::seconds(25);
    fc::microseconds max_failure_duration = fc::seconds(45);
    const uint64_t max_storage = 10'000;
@@ -1068,7 +1068,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_storage_reduction) { try {
 
 
 BOOST_AUTO_TEST_CASE(trx_finality_status_lifespan) { try {
-   set_now("2022-04-04", "04:44:44.450");
+   set_now("2025-04-04", "04:44:44.450");
    fc::microseconds max_success_duration = fc::seconds(25);
    fc::microseconds max_failure_duration = fc::seconds(35);
    const uint64_t max_storage = 10'000;

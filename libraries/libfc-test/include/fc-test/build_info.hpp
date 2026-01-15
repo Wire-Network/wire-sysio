@@ -2,7 +2,7 @@
 
 #include <boost/filesystem.hpp>
 
-namespace sysio::testing {
+namespace fc::test {
 namespace bfs = boost::filesystem;
 constexpr auto wire_build_root_file = ".wire-build-root";
 bfs::path      get_build_root_path();

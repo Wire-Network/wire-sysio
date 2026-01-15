@@ -3,7 +3,7 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
 
-namespace sysio::testing {
+namespace fc::test {
 using namespace fc::crypto;
 
 constexpr auto keygen_ethereum_script = "keygen_ethereum.py";
@@ -18,11 +18,11 @@ constexpr std::array<std::string_view, 3> keygen_scripts = {keygen_ethereum_scri
 constexpr std::array<std::string_view, 3> keygen_names = {keygen_ethereum_name, keygen_solana_name, keygen_wire_name};
 
 constexpr bool is_keygen_name(const std::string_view& name) {
-   return std::find(keygen_names.begin(), keygen_names.end(), name) != keygen_names.end();
+   return std::ranges::find(keygen_names, name) != keygen_names.end();
 }
 
 constexpr bool is_keygen_script(const std::string_view& script) {
-   return std::find(keygen_scripts.begin(), keygen_scripts.end(), script) != keygen_scripts.end();
+   return std::ranges::find(keygen_scripts, script) != keygen_scripts.end();
 }
 
 struct keygen_result {
@@ -51,4 +51,4 @@ std::string keygen_fixture_to_spec(const std::string& keygen_name, std::uint32_t
 std::vector<std::string> keygen_fixtures_to_specs(const std::string& keygen_name);
 }
 
-FC_REFLECT(sysio::testing::keygen_result, (key_name)(account_name)(chain_type)(chain_key_type)(public_key)(private_key)(address)(signature)(payload))
+FC_REFLECT(fc::test::keygen_result, (key_name)(account_name)(chain_type)(chain_key_type)(public_key)(private_key)(address)(signature)(payload))

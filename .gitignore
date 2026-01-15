@@ -107,3 +107,4 @@ package-lock.json
 cliff.toml
 !cmake/build-options.cmake
 !/scripts/package-lock.json
+/config-dir/config.ini
