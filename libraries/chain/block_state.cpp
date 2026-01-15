@@ -23,19 +23,18 @@ namespace detail {
                  ("num_block_signatures", 1 + additional_signatures.size())("num_keys", num_keys_in_authority)
                  ("authority", valid_block_signing_authority));
 
+      using key_type = fc::crypto::public_key::key_type;
       std::set<public_key_type> keys;
-      keys.emplace(fc::crypto::public_key(producer_signature, block_id, true));
+      auto [iter, _] = keys.emplace(fc::crypto::public_key(producer_signature, block_id, true));
+      SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
 
       for (const auto& s : additional_signatures) {
-         auto res = keys.emplace(s, block_id, true);
-         SYS_ASSERT(res.second, wrong_signing_key, "block signed by same key twice: ${key}", ("key", *res.first));
+         auto [iter, inserted] = keys.emplace(s, block_id, true);
+         SYS_ASSERT(inserted, wrong_signing_key, "block signed by same key twice: ${key}", ("key", *iter));
+         SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
       }
 
-      bool is_satisfied = false;
-      size_t relevant_sig_count = 0;
-
-      std::tie(is_satisfied, relevant_sig_count) = producer_authority::keys_satisfy_and_relevant(
-         keys, valid_block_signing_authority);
+      auto [is_satisfied, relevant_sig_count] = producer_authority::keys_satisfy_and_relevant(keys, valid_block_signing_authority);
 
       SYS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
                  "block signed by unexpected key: ${signing_keys}, expected: ${authority}. ${c} != ${s}",

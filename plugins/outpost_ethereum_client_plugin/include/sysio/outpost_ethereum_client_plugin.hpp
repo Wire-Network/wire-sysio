@@ -2,6 +2,7 @@
 
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
+#include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 
 namespace sysio {
@@ -33,7 +34,7 @@ public:
 
    std::vector<ethereum_client_entry_ptr> get_clients();
    ethereum_client_entry_ptr get_client(const std::string& id);
-
+   const std::vector<std::pair<std::filesystem::path, std::vector<fc::network::ethereum::abi::contract>>>& get_abi_files();
 private:
    std::unique_ptr<class outpost_ethereum_client_plugin_impl> my;
 };

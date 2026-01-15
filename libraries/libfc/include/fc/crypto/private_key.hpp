@@ -4,10 +4,13 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/chain_types_reflect.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/reflect/variant.hpp>
-#include <fc/static_variant.hpp>
+
+#include <variant>
+#include <string>
 
 namespace fc { namespace crypto {
 
@@ -26,7 +29,18 @@ namespace fc { namespace crypto {
    class private_key
    {
       public:
-         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim, em::private_key_shim, ed::private_key_shim, bls::private_key_shim>;
+         using storage_type = std::variant<ecc::private_key_shim, r1::private_key_shim,
+                                           em::private_key_shim, ed::private_key_shim, bls::private_key_shim>;
+         enum class key_type : uint8_t {
+            k1 = fc::get_index<storage_type, ecc::private_key_shim>(),
+            r1 = fc::get_index<storage_type, r1::private_key_shim>(),
+            em = fc::get_index<storage_type, em::private_key_shim>(),
+            ed = fc::get_index<storage_type, ed::private_key_shim>(),
+            bls = fc::get_index<storage_type, bls::private_key_shim>(),
+            unknown
+         };
+         static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(key_type::unknown), "Missing private_key key_type");
+
          static storage_type priv_parse_base58(const std::string& base58str);
          private_key() = default;
          private_key( private_key&& ) = default;
@@ -59,11 +73,19 @@ namespace fc { namespace crypto {
              :_storage(std::move(other_storage))
          {}
 
-         template<typename T>
-         bool contains() const { return std::holds_alternative<T>(_storage); }
+         template<typename... Args>
+         bool contains() const { return (std::holds_alternative<Args>(_storage) || ...); }
+
+         template<typename... Args>
+         bool contains_type(Args... types) const {
+            static_assert((std::is_same_v<Args, key_type> && ...), "Args must be of type private_key::key_type");
+            auto current_index = _storage.index();
+            return ((current_index == static_cast<size_t>(types)) || ...);
+         }
 
          template<typename T>
          const T& get() const { return std::get<T>(_storage); }
+
          std::string to_string(const fc::yield_function_t& yield) const;
          std::string to_native_string(const fc::yield_function_t& yield) const;
 

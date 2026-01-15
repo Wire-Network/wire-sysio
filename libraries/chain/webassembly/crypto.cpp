@@ -43,10 +43,13 @@ namespace sysio::chain::webassembly {
       fc::raw::unpack( ds, s );
       fc::raw::unpack( pubds, p );
 
-      SYS_ASSERT(s.which() < context.db.get<protocol_state_object>().num_supported_key_types, unactivated_signature_type,
-        "Unactivated signature type used during assert_recover_key");
-      SYS_ASSERT(p.which() < context.db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-        "Unactivated key type used when creating assert_recover_key");
+      using sig_type = fc::crypto::signature::sig_type;
+      using key_type = fc::crypto::public_key::key_type;
+
+      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em, sig_type::ed), unactivated_signature_type,
+                 "Unactivated signature type used during assert_recover_key");
+      SYS_ASSERT(p.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                 "Unactivated key type used when creating assert_recover_key");
       SYS_ASSERT(p.which() == s.which(), crypto_api_exception,
                  "Public key type does not match signature type");
 
@@ -90,29 +93,27 @@ namespace sysio::chain::webassembly {
       fc::datastream<const char*> ds( sig.data(), sig.size() );
       fc::raw::unpack(ds, s);
 
-      SYS_ASSERT(s.which() < context.db.get<protocol_state_object>().num_supported_key_types, unactivated_signature_type,
+      using sig_type = fc::crypto::signature::sig_type;
+      SYS_ASSERT(s.contains_type(sig_type::k1, sig_type::r1, sig_type::wa, sig_type::em), unactivated_signature_type,
                  "Unactivated signature type used during recover_key");
 
       if(context.control.is_speculative_block())
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
 
-
       auto recovered = fc::crypto::public_key(s, *digest, false);
 
-      // the key types newer than the first 2 may be variable in length
-      if (s.which() >= config::k1_r1_num_supported_key_types ) {
-         SYS_ASSERT(pub.size() >= 33, wasm_execution_error,
-                    "destination buffer must at least be able to hold an ECC public key");
+      // For variable length key types use a memcpy and return length
+      if (!s.contains_type(sig_type::k1, sig_type::r1, sig_type::em)) {
          auto packed_pubkey = fc::raw::pack(recovered);
          auto copy_size = std::min<size_t>(pub.size(), packed_pubkey.size());
          std::memcpy(pub.data(), packed_pubkey.data(), copy_size);
          return packed_pubkey.size();
       } else {
-         // legacy behavior, key types 0 and 1 always pack to 33 bytes.
-         // this will do one less copy for those keys while maintaining the rules of
-         //    [0..33) dest sizes: assert (asserts in fc::raw::pack)
-         //    [33..inf) dest sizes: return packed size (always 33)
+         // For fixed size length key types avoid the copy.
+         // This will do one less copy for those keys while maintaining the rules of
+         //    [0..size) dest sizes: assert (asserts in fc::raw::pack)
+         //    [size..inf) dest sizes: return packed size (always fixed size)
          fc::datastream<char*> out_ds( pub.data(), pub.size() );
          fc::raw::pack(out_ds, recovered);
          return out_ds.tellp();

@@ -1,6 +1,8 @@
 #include <fc/crypto/city.hpp>
-#include <fc/uint128.hpp>
+#include <fc/int128.hpp>
 #include <fc/variant.hpp>
+#include <fc/log/logger.hpp>
+#include <fc/exception/exception.hpp>
 
 namespace fc {
 fc::uint128 to_uint128(std::uint64_t hi, uint64_t lo) {

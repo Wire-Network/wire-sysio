@@ -20,6 +20,22 @@ namespace fc { namespace raw {
          {
             fc::raw::pack( s, v );
          }
+         virtual void handle( const fc::int128& v )const
+         {
+            fc::raw::pack( s, v.str() );
+         }
+         virtual void handle( const fc::uint128& v )const
+         {
+            fc::raw::pack( s, v.str() );
+         }
+         virtual void handle( const fc::int256& v )const
+         {
+            fc::raw::pack( s, v.str() );
+         }
+         virtual void handle( const fc::uint256& v )const
+         {
+            fc::raw::pack( s, v.str() );
+         }
          virtual void handle( const double& v )const 
          {
             fc::raw::pack( s, v );
@@ -77,6 +93,16 @@ namespace fc { namespace raw {
             uint64_t val;
             raw::unpack(s,val);
             v = val;
+            return;
+         }
+         case variant::uint128_type:
+         case variant::int128_type:
+         case variant::uint256_type:
+         case variant::int256_type:
+         {
+            std::string val;
+            raw::unpack(s,val);
+            v = std::move(val);
             return;
          }
          case variant::double_type:

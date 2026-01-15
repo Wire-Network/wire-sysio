@@ -1,5 +1,5 @@
 #pragma once
-#include <fc/uint128.hpp>
+#include <fc/int128.hpp>
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/block_timestamp.hpp>

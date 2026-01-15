@@ -4,8 +4,6 @@
 #include <vector>
 
 #include <fc/crypto/public_key.hpp>
-#include <fc/crypto/sha256.hpp>
-#include <fc/utility.hpp>
 
 // Forward declarations in the case of circular dependencies
 namespace fc::em {
@@ -18,6 +16,25 @@ namespace fc::em {
  */
 namespace fc::crypto::ethereum {
 
+/**
+ * Keccak-256 hash type used for Ethereum cryptography storage
+ */
+using keccak256_hash_t = std::array<std::uint8_t, 32>;
+
+/**
+ * Create a 32-byte keccak256 hash
+ *
+ * @param data to digest
+ * @param size number of bytes to digest
+ * @return 32 byte keccak256 hash
+ */
+keccak256_hash_t keccak256(const uint8_t* data, size_t size);
+
+keccak256_hash_t keccak256(const std::string& digest);
+
+/**
+ * Public key lengths
+ */
 constexpr std::array public_key_string_lengths = {64,66,128,130};
 
 /**

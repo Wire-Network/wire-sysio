@@ -1,6 +1,5 @@
 
 add_executable( test_fc
-        crypto/ethereum/test_ethereum_client_and_rlp.cpp
         crypto/test_blake2.cpp
         crypto/test_bls.cpp
         crypto/test_cypher_suites.cpp
@@ -13,6 +12,7 @@ add_executable( test_fc
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_tracked_storage.cpp
+        network/ethereum/test_ethereum_client_and_rlp.cpp
         network/test_message_buffer.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
@@ -26,6 +26,6 @@ add_executable( test_fc
         test_ordered_diff.cpp
         main.cpp
         )
-target_link_libraries( test_fc fc )
+target_link_libraries( test_fc fc fc-test )
 
 add_test(NAME test_fc COMMAND test_fc WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

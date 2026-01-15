@@ -1830,7 +1830,6 @@ struct controller_impl {
       });
 
       db.create<protocol_state_object>([&](auto& pso ){
-         pso.num_supported_key_types = config::genesis_num_supported_key_types;
          for( const auto& i : genesis_intrinsics ) {
             add_intrinsic_to_whitelist( pso.whitelisted_intrinsics, i );
          }
@@ -1951,16 +1950,18 @@ struct controller_impl {
 
          const signed_transaction& trn = trx->packed_trx()->get_signed_transaction();
          transaction_checktime_timer trx_timer(timer);
-         transaction_context trx_context(self, *trx->packed_trx(), trx->id(), std::move(trx_timer),
-                                         start, trx->get_trx_type());
-         if ((bool)subjective_cpu_leeway && is_speculative_block()) {
-            trx_context.leeway = *subjective_cpu_leeway;
-         }
-         trx_context.block_deadline = block_deadline;
-         trx_context.max_transaction_time_subjective = max_transaction_time;
-         trx_context.explicit_billed_cpu_time = explicit_billed_cpu_time;
-         trx_context.billed_cpu_us = billed_cpu_us;
-         trx_context.prev_accounts_billing = trx->prev_accounts_billing;
+         transaction_context trx_context(self,
+                                         *trx->packed_trx(),
+                                         std::move(trx_timer),
+                                         start,
+                                         trx->get_trx_type(),
+                                         subjective_cpu_leeway,
+                                         block_deadline,
+                                         max_transaction_time,
+                                         explicit_billed_cpu_time,
+                                         trx->prev_accounts_billing,
+                                         billed_cpu_us
+                                         );
          trace = trx_context.trace;
 
          auto handle_exception =[&](const auto& e)

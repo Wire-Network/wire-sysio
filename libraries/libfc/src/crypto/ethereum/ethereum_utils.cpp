@@ -9,6 +9,15 @@
 namespace fc::crypto::ethereum {
 
 
+
+keccak256_hash_t keccak256(const uint8_t* data, size_t size) {
+   auto k256 = ethash::keccak256(data, size);
+   return std::bit_cast<keccak256_hash_t>(k256);
+}
+
+keccak256_hash_t keccak256(const std::string& digest) {
+   return keccak256(reinterpret_cast<const uint8_t*>(digest.data()), digest.size());
+}
 /**
  * Removes "0x" prefix if present and converts hex string to lowercase
  * @param hex The hex string to trim
@@ -17,7 +26,7 @@ namespace fc::crypto::ethereum {
 std::string trim(const std::string& hex) {
 
    std::string result = hex.starts_with("0x") ? hex.substr(2) : hex;
-   std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+   std::ranges::transform(result, result.begin(), ::tolower);
    return result;
 }
 
@@ -76,7 +85,7 @@ em::message_hash_type hash_message(const em::message_body_type& payload) {
       auto& payload_str = std::get<std::string>(payload);
 
       eth_message.resize(payload_str.size());
-      std::copy(payload_str.begin(), payload_str.end(), eth_message.begin());
+      std::ranges::copy(payload_str, eth_message.begin());
    } else {
       auto& payload_hash     = std::get<fc::sha256>(payload);
       auto eth_message_size = payload_hash.data_size();
@@ -190,7 +199,7 @@ fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    em::private_key_secret sk{};
    FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected ${e}, received ${r}",
              ("s", fc::data_size(sk))("r", privkey_bytes.size()));
-   std::copy_n(privkey_bytes.data(), privkey_bytes.size(), sk.data());
+   std::memcpy(sk.data(), privkey_bytes.data(), fc::data_size(sk));
    return fc::em::private_key::regenerate(sk);
 }
 

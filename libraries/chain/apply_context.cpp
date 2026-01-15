@@ -230,7 +230,7 @@ void apply_context::finalize_trace( action_trace& trace, const fc::time_point& s
    trace.console = std::move( _pending_console_output );
    _pending_console_output.clear();
 
-   trace.elapsed = fc::time_point::now() - start;
+   trace.elapsed = std::max(fc::time_point::now() - start, fc::microseconds{1});
 }
 
 void apply_context::exec()
