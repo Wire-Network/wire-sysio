@@ -34,7 +34,7 @@ platform_timer::platform_timer() {
       checktime_thread = std::thread([&p]() {
          fc::set_thread_name("checktime");
          checktime_ios = std::make_unique<boost::asio::io_context>();
-         boost::asio::io_context::work work(*checktime_ios);
+         auto work = boost::asio::make_work_guard(*checktime_ios);
          p.set_value();
 
          checktime_ios->run();
