@@ -88,7 +88,7 @@ std::pair<std::string&, bool> escape_str(std::string& str, escape_control_chars 
    return std::make_pair(std::ref(str), modified);
 }
 
-std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split) {
+std::vector<std::string> split(std::string_view str, char delim, std::size_t max_split) {
    std::vector<std::string> out;
    std::string delim_str{&delim, 1};
    for (auto&& token : std::views::split(str, delim)) {

@@ -13,14 +13,6 @@
 namespace fc::crypto::bls {
 
 /**
- * @brief Constants used in BLS private key operations
- */
-namespace constants {
-/** @brief Prefix used for BLS private key string representation */
-const std::string bls_private_key_prefix = "PVT_BLS_";
-};
-
-/**
  * @brief Class representing a BLS private key
  */
 class private_key {
@@ -82,6 +74,8 @@ struct public_key_shim : fc::crypto::shim<public_key_data> {
 
    /** @brief Unwraps the public key data into a public_key object */
    public_key unwrapped() const { return public_key(_data); }
+
+   std::string to_string() const { return public_key::to_string(_data); }
 };
 
 /**
@@ -115,7 +109,7 @@ struct signature_shim : crypto::shim<compact_signature> {
     * @return String representation of the signature
     */
    std::string to_string() const {
-      return unwrapped().to_string();
+      return bls::signature::to_string(_data);
    }
 };
 

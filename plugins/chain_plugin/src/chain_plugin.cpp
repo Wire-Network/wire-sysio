@@ -561,7 +561,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          const std::vector<std::string>& keys = options["key-blacklist"].as<std::vector<std::string>>();
          auto& list = chain_config->key_blacklist;
          for( const auto& key_str : keys ) {
-            list.emplace( key_str );
+            list.emplace( public_key_type::from_string(key_str) );
          }
       }
 

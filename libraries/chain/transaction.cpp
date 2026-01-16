@@ -69,7 +69,8 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
       flat_set<public_key_type> seen;
       for( auto& pk : ed_pubkeys ) {
          auto [it, inserted] = seen.emplace(pk);
-         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key ${k}", ("k", pk) );
+         auto to_pk_str = [&](){ try { return pk.to_string([&]() {FC_CHECK_DEADLINE(deadline); }); } catch (...) { return std::string("unknown"); } };
+         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key ${k}", ("k", to_pk_str()) );
       }
    }
 

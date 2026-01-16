@@ -265,7 +265,7 @@ public:
       if (!public_key_json.empty()) {
          if (is_public_key_str(public_key_json)) {
             try {
-               signing_keys.push_back(public_key_type(public_key_json));
+               signing_keys.push_back(public_key_type::from_string(public_key_json));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", public_key_json))
          } else {
             fc::variant json_keys;
@@ -879,7 +879,7 @@ authority parse_json_authority(const std::string& authorityJsonOrFile) {
 authority parse_json_authority_or_key(const std::string& authorityJsonOrFile) {
    if (is_public_key_str(authorityJsonOrFile)) {
       try {
-         return authority(public_key_type(authorityJsonOrFile));
+         return authority(public_key_type::from_string(authorityJsonOrFile));
       } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", authorityJsonOrFile))
    } else {
       auto result = parse_json_authority(authorityJsonOrFile);
@@ -1195,7 +1195,7 @@ struct register_producer_subcommand {
       register_producer->callback([this] {
          public_key_type producer_key;
          try {
-            producer_key = public_key_type(producer_key_str);
+            producer_key = public_key_type::from_string(producer_key_str);
          } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid producer public key: ${public_key}", ("public_key", producer_key_str))
 
          auto regprod_var = regproducer_variant(name(producer_str), producer_key, url, loc );
@@ -1237,7 +1237,7 @@ struct create_account_subcommand {
             } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid owner permission level: ${permission}", ("permission", owner_key_str))
          } else {
             try {
-               owner = authority(public_key_type(owner_key_str));
+               owner = authority(public_key_type::from_string(owner_key_str));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid owner public key: ${public_key}", ("public_key", owner_key_str));
          }
 
@@ -1253,7 +1253,7 @@ struct create_account_subcommand {
             } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid active permission level: ${permission}", ("permission", active_key_str))
          } else {
             try {
-               active = authority(public_key_type(active_key_str));
+               active = authority(public_key_type::from_string(active_key_str));
             } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
          }
 
@@ -1876,18 +1876,19 @@ int main( int argc, char** argv ) {
    create_cmd->require_subcommand();
 
    bool r1 = false;
+   bool k1 = false;
    string key_file;
    bool print_console = false;
    // create key
-   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &key_file, &print_console](){
+   auto create_key_cmd = create_cmd->add_subcommand("key", localized("Create a new keypair and print the public and private keys"))->callback( [&r1, &k1, &key_file, &print_console](){
       if (key_file.empty() && !print_console) {
          std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
          return;
       }
 
       auto pk    = r1 ? private_key_type::generate_r1() : private_key_type::generate();
-      auto privs = pk.to_string({});
-      auto pubs  = pk.get_public_key().to_string({});
+      auto privs = pk.to_string({}, k1);
+      auto pubs  = pk.get_public_key().to_string({}, k1);
       if (print_console) {
          std::cout << localized("Private key: ${key}", ("key",  privs) ) << std::endl;
          std::cout << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
@@ -1898,6 +1899,7 @@ int main( int argc, char** argv ) {
          out << localized("Public key: ${key}", ("key", pubs ) ) << std::endl;
       }
    });
+   create_key_cmd->add_flag( "--k1", k1, "Generate a key using the K1 curve (Bitcoin) with PUB_K1_ & PVT_K1_ prefix instead of legacy"  );
    create_key_cmd->add_flag( "--r1", r1, "Generate a key using the R1 curve (iPhone), instead of the K1 curve (Bitcoin)"  );
    create_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
    create_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
@@ -2013,6 +2015,49 @@ int main( int argc, char** argv ) {
       }
       auto wasm_hash = fc::sha256::hash(wasm_str.data(), wasm_str.size());
       std::cout << "WASM hash: " << wasm_hash.str() << std::endl;
+   });
+
+   string k1_private_key;
+   auto k1_private_key_cmd = convert_cmd->add_subcommand("k1_private_key", localized("Generate all forms of K1 key"));
+   k1_private_key_cmd->add_option("--private-key", k1_private_key, localized("Private key in to import, prompts if not provided"))->expected(0, 1);
+   k1_private_key_cmd->add_option("-f,--file", key_file, localized("Name of file to write private/public key output to. (Must be set, unless \"--to-console\" is passed"));
+   k1_private_key_cmd->add_flag( "--to-console", print_console, localized("Print private/public keys to console."));
+   k1_private_key_cmd->callback([&k1_private_key, &key_file, &print_console] {
+      if (key_file.empty() && !print_console) {
+         std::cerr << "ERROR: Either indicate a file using \"--file\" or pass \"--to-console\"" << std::endl;
+         return;
+      }
+      if (k1_private_key.empty()) {
+         std::cout << localized("private key: ");
+         fc::set_console_echo(false);
+         std::getline(std::cin, k1_private_key, '\n');
+         fc::set_console_echo(true);
+         std::cout << std::endl;
+      }
+      auto privk = fc::crypto::private_key::from_string(k1_private_key, fc::crypto::private_key::key_type::k1);
+      auto pubk  = privk.get_public_key();
+      if (print_console) {
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({})) ) << std::endl;
+         std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+         std::cout << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+      } else {
+         std::cerr << localized("saving keys to ${filename}", ("filename", key_file)) << std::endl;
+         std::ofstream out( key_file.c_str() );
+         out << localized("Private key: ${key}", ("key", privk.to_string({})) ) << std::endl;
+         out << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+         out << localized("Private key: ${key}", ("key", privk.to_string({}, true)) ) << std::endl;
+         out << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
+      }
+   });
+
+   string k1_public_key;
+   auto k1_public_key_cmd = convert_cmd->add_subcommand("k1_public_key", localized("Generate both forms of K1 public key"));
+   k1_public_key_cmd->add_option("public-key", k1_public_key, localized("Public key in to convert"))->required();
+   k1_public_key_cmd->callback([&k1_public_key] {
+      auto pubk = fc::crypto::public_key::from_string(k1_public_key, fc::crypto::public_key::key_type::k1);
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}) ) ) << std::endl;
+      std::cout << localized("Public key: ${key}", ("key", pubk.to_string({}, true) ) ) << std::endl;
    });
 
    // pack hex
@@ -2786,7 +2831,7 @@ int main( int argc, char** argv ) {
 
          private_key_type wallet_key;
          try {
-            wallet_key = private_key_type( wallet_key_str );
+            wallet_key = private_key_type::from_string( wallet_key_str );
          } catch (...) {
             SYS_THROW(private_key_type_exception, "Invalid private key")
          }
@@ -2810,7 +2855,7 @@ int main( int argc, char** argv ) {
       remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
          prompt_for_wallet_password(wallet_pw, wallet_name);
          try {
-            public_key_type pubkey = public_key_type(wallet_rm_key_str);
+            public_key_type pubkey = public_key_type::from_string(wallet_rm_key_str);
          } catch (...) {
             SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
          }
@@ -2987,7 +3032,7 @@ int main( int argc, char** argv ) {
       if( str_public_key.size() > 0 ) {
          public_key_type pub_key;
          try {
-            pub_key = public_key_type(str_public_key);
+            pub_key = public_key_type::from_string(str_public_key);
          } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", str_public_key))
          fc::variant keys_var(flat_set<public_key_type>{ pub_key });
          sign_transaction(trx, keys_var, *chain_id);
@@ -3000,7 +3045,7 @@ int main( int argc, char** argv ) {
          }
          private_key_type priv_key;
          try {
-            priv_key = private_key_type(str_private_key);
+            priv_key = private_key_type::from_string(str_private_key);
          } SYS_RETHROW_EXCEPTIONS(private_key_type_exception, "Invalid private key")
          trx.sign(priv_key, *chain_id);
       }
@@ -3077,7 +3122,7 @@ int main( int argc, char** argv ) {
          abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver, abi_serializer::create_yield_function( abi_serializer_max_time ) );
       }
       for (const string& sig : extra_signatures) {
-         trx.signatures.push_back(fc::crypto::signature(sig));
+         trx.signatures.push_back(fc::crypto::signature::from_string(sig));
       }
       std::cout << fc::json::to_pretty_string( push_transaction( trx, signing_keys_opt.get_keys() )) << std::endl;
    });

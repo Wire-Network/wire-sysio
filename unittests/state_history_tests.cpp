@@ -228,9 +228,9 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
    chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
    chain.produce_block();
    public_key_type keys[] = {
-         public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s), // Test for correct serialization of WA key, see issue #9087
-         public_key_type("PUB_K1_12wkBET2rRgE8pahuaczxKbmv7ciehqsne57F9gtzf1PVb7Rf7o"s),
-         public_key_type("PUB_R1_6FPFZqw5ahYrR9jD96yDbbDNTdKtNqRbze6oTDLntrsANgQKZu"s)};
+         public_key_type::from_string("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s), // Test for correct serialization of WA key, see issue #9087
+         public_key_type::from_string("PUB_K1_12wkBET2rRgE8pahuaczxKbmv7ciehqsne57F9gtzf1PVb7Rf7o"s),
+         public_key_type::from_string("PUB_R1_6FPFZqw5ahYrR9jD96yDbbDNTdKtNqRbze6oTDLntrsANgQKZu"s)};
 
    for(auto &key: keys) {
       // Modify the permission authority
@@ -246,7 +246,7 @@ BOOST_AUTO_TEST_CASE(test_deltas_account_permission_modification) {
       BOOST_REQUIRE_EQUAL(accounts_permissions[0]["owner"].get_string(), "newacc");
       BOOST_REQUIRE_EQUAL(accounts_permissions[0]["name"].get_string(), "active");
       BOOST_REQUIRE_EQUAL(accounts_permissions[0]["auth"]["keys"].size(), 1u);
-      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["auth"]["keys"][0ul]["key"].get_string(), key.to_string({}));
+      BOOST_REQUIRE_EQUAL(accounts_permissions[0]["auth"]["keys"][0ul]["key"].get_string(), key.to_string({}, true));
 
       chain.produce_block();
    }
