@@ -49,8 +49,8 @@ namespace {
 BOOST_AUTO_TEST_SUITE(cron_service)
 
   BOOST_AUTO_TEST_CASE(create_with_options_and_basic_add) try {
-    auto service = cron_service_factory("cron_service_test_A", 2);
     std::atomic_int calls{0};
+    auto service = cron_service_factory("cron_service_test_A", 2);
 
     cron_schedule s; // all fields wildcard, so with empty milliseconds it fires frequently
     s.milliseconds.clear(); // wildcard -> scheduler will target next millisecond
@@ -80,8 +80,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(milliseconds_field_precise_triggers_same_second) try {
-    auto service = cron_service_factory("cron_service_test_ms", 1);
     std::atomic_int calls{0};
+    auto service = cron_service_factory("cron_service_test_ms", 1);
 
     // Build a schedule for a few ms offsets later in the current second
     auto now_ms = current_ms_in_second();
@@ -117,8 +117,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(cancel_all_stops_multiple_jobs) try {
-    auto service = cron_service_factory("cron_service_test_cancel_all", 1);
     std::atomic_int a{0}, b{0};
+    auto service = cron_service_factory("cron_service_test_cancel_all", 1);
 
     cron_schedule s; // fast schedule using wildcard milliseconds
     auto id1 = service->add(
@@ -182,8 +182,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(multiple_independent_jobs_progress) try {
-    auto service = cron_service_factory("cron_service_test_multi", 2);
     std::atomic_int a{0}, b{0};
+    auto service = cron_service_factory("cron_service_test_multi", 2);
 
     cron_schedule fast; // wildcard -> frequent
 
