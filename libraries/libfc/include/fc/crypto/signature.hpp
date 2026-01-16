@@ -37,15 +37,14 @@ public:
       unknown
    };
    static_assert(std::variant_size_v<storage_type> == static_cast<uint8_t>(sig_type::unknown), "Missing signature sig_type");
+   static_assert(std::size(constants::signature_prefix) == static_cast<size_t>(sig_type::unknown), "Missing signature_prefix prefix");
 
-   static signature::storage_type sig_parse_base58(const std::string& base58str);
+   constexpr static const char* sig_prefix(sig_type t) { return constants::signature_prefix[std::to_underlying(t)]; };
+
    signature() = default;
    signature(signature&&) = default;
    signature(const signature&) = default;
    signature& operator=(const signature&) = default;
-
-   // serialize to/from string
-   explicit signature(const std::string& base58str);
 
    explicit signature(const storage_type& other_storage)
       : _storage(other_storage) {}
@@ -53,12 +52,16 @@ public:
    explicit signature(storage_type&& other_storage)
       : _storage(std::move(other_storage)) {}
 
-   std::string to_native_string(const fc::yield_function_t& yield = fc::yield_function_t()) const;
-   std::string to_string(const fc::yield_function_t& yield = fc::yield_function_t()) const;
+   // If type is unknown, attempt to infer the type from the string.
+   static signature from_string(const std::string& str, sig_type type = sig_type::unknown);
+
+   // If include_prefix is true, the prefix will be included in the string representation.
+   // Note for Wire native types (k1, r1, wa, bls) the prefix is always included.
+   std::string to_string(const fc::yield_function_t& yield = {}, bool include_prefix = false) const;
 
    constexpr bool is_webauthn() const { return _storage.index() == fc::get_index<storage_type, webauthn::signature>(); }
 
-   size_t which() const;
+   size_t which() const { return _storage.index(); }
    sig_type type()const { return static_cast<sig_type>(which()); }
 
    size_t variable_size() const;
@@ -96,7 +99,6 @@ private:
 
 
    friend bool operator ==(const signature& p1, const signature& p2);
-   friend bool operator !=(const signature& p1, const signature& p2);
    friend bool operator <(const signature& p1, const signature& p2);
    friend std::size_t hash_value(const signature& b); //not cryptographic; for containers
    friend struct reflector<signature>;
@@ -123,3 +125,4 @@ struct std::hash<fc::crypto::signature> {
 }; // std
 
 FC_REFLECT(fc::crypto::signature, (_storage))
+FC_REFLECT_ENUM(fc::crypto::signature::sig_type, (k1)(r1)(wa)(em)(ed)(bls)(unknown))

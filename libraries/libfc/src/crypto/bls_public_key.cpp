@@ -8,14 +8,6 @@ namespace fc::crypto::bls {
    namespace {
       const public_key_data empty_pub{};
 
-      template<typename T, size_t N>
-      std::array<T, N> deserialize_base64url_local(const std::string& base64urlstr) {
-         auto res = std::mismatch(bls_public_key_prefix.begin(), bls_public_key_prefix.end(), base64urlstr.begin());
-         FC_ASSERT(res.first == bls_public_key_prefix.end(), "BLS Public Key has invalid format : ${str}", ("str", base64urlstr));
-         auto data_str = base64urlstr.substr(bls_public_key_prefix.size());
-         return fc::crypto::bls::deserialize_base64url<std::array<T, N>>(data_str);
-      }
-
       public_key_data from_span(const std::span<const public_key_data::value_type, std::tuple_size_v<public_key_data>>& affine_non_montgomery_le) {
          public_key_data r;
          std::copy_n(affine_non_montgomery_le.data(), public_key_data_size, r.data());
@@ -40,7 +32,7 @@ namespace fc::crypto::bls {
    }
 
    public_key::public_key(const std::string& base64urlstr)
-      : _affine_non_montgomery_le(deserialize_base64url_local<uint8_t,96>(base64urlstr))
+      : _affine_non_montgomery_le(deserialize_bls_base64url(base64urlstr))
       , _jacobian_montgomery_le(from_affine_bytes_le(_affine_non_montgomery_le)) {
    }
 
@@ -60,9 +52,13 @@ namespace fc::crypto::bls {
       return _affine_non_montgomery_le;
    }
 
+   std::string public_key::to_string(const public_key_data& key) {
+      std::string data_str = fc::crypto::bls::serialize_base64url(key);
+      return constants::bls_public_key_prefix + data_str;
+   }
+
    std::string public_key::to_string() const {
-      std::string data_str = fc::crypto::bls::serialize_base64url(_affine_non_montgomery_le);
-      return bls_public_key_prefix + data_str;
+      return to_string(_affine_non_montgomery_le);
    }
 
 } // fc::crypto::bls

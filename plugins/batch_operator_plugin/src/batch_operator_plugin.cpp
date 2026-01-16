@@ -19,7 +19,7 @@ void batch_operator_plugin::plugin_initialize(const variables_map &options) {}
 
 void batch_operator_plugin::plugin_startup() {
   ilog("Starting batch operator plugin");
-  auto &op = app().get_plugin<cron_plugin>();
+  // auto &op = app().get_plugin<cron_plugin>();
   // op.events.irreversible_block.subscribe(
   //     [&](const chain::block_signal_params &bsp) {
   //       ilog("irreversible block");

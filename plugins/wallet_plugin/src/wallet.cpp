@@ -197,7 +197,7 @@ public:
    }
 
    bool import_key(const string& key_name, const string& wif_key) {
-      private_key_type              priv(wif_key);
+      private_key_type              priv = private_key_type::from_string(wif_key);
       sysio::chain::public_key_type wif_pub_key = priv.get_public_key();
 
       SYS_ASSERT(!_keys.contains(wif_pub_key), chain::key_exist_exception, "Key already in wallet (pubKey=${pubKey})", ("pubKey", wif_pub_key));

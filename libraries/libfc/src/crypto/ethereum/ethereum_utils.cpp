@@ -7,7 +7,7 @@
 #include <algorithm>
 
 namespace fc::crypto::ethereum {
-
+using keccak256_hash_t = std::array<std::uint8_t, 32>;
 
 
 keccak256_hash_t keccak256(const uint8_t* data, size_t size) {
@@ -18,6 +18,7 @@ keccak256_hash_t keccak256(const uint8_t* data, size_t size) {
 keccak256_hash_t keccak256(const std::string& digest) {
    return keccak256(reinterpret_cast<const uint8_t*>(digest.data()), digest.size());
 }
+
 /**
  * Removes "0x" prefix if present and converts hex string to lowercase
  * @param hex The hex string to trim
@@ -209,7 +210,7 @@ fc::em::compact_signature to_em_signature(const std::string& signature_hex) {
              "Invalid signature size, expected ${s}, received ${r} character hex string",
              ("s", std::tuple_size_v<fc::em::compact_signature>)("r", signature_bytes.size()));
    fc::em::compact_signature sig;
-   std::copy_n(signature_bytes.data(), signature_bytes.size(), sig.data());
+   std::memcpy(sig.data(), signature_bytes.data(), signature_bytes.size());
    return sig;
 }
 }

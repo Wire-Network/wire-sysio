@@ -138,8 +138,8 @@ int main(int argc, char** argv) {
          return INITIALIZE_FAIL;
       } else if (!p_keys.empty() && !private_keys_str_vector.empty()) {
          for(const std::string& private_key: private_keys_str_vector) {
-            ilog("Initializing private keys. Attempt to create private_key for ${key} : gen key ${newKey}", ("key", private_key)("newKey", fc::crypto::private_key(private_key)));
-            accts_config._priv_keys_vec.emplace_back(private_key);
+            ilog("Initializing private keys. Attempt to create private_key for ${key} : gen key ${newKey}", ("key", private_key)("newKey", fc::crypto::private_key::from_string(private_key)));
+            accts_config._priv_keys_vec.emplace_back(fc::crypto::private_key::from_string(private_key));
          }
       }
 

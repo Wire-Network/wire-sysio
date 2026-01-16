@@ -264,7 +264,7 @@ namespace sysio::testing {
 
       ilog("Setting up transaction signer.");
       fc::crypto::private_key signer_key;
-      signer_key = fc::crypto::private_key(unpacked_actions_auths_data_json.get_object()[_unpacked_actions.at(0)["actionAuthAcct"].as_string()].as_string());
+      signer_key = fc::crypto::private_key::from_string(unpacked_actions_auths_data_json.get_object()[_unpacked_actions.at(0)["actionAuthAcct"].as_string()].as_string());
 
       ilog("Setting up initial transaction actions.");
       auto actions = generate_actions();

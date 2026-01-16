@@ -164,7 +164,6 @@ std::chrono::steady_clock::time_point cron_service::next_fire_time(const cron_sc
    // Helper to check all non-ms fields for a given whole-second time_point
    auto matches_non_ms = [&](const clock::time_point& t) -> bool {
       auto ms_epoch = duration_cast<milliseconds>(t.time_since_epoch());
-      auto ms = ms_epoch.count() % 1000;
       auto sec = duration_cast<seconds>(ms_epoch).count() % 60;
       auto min = duration_cast<minutes>(ms_epoch).count() % 60;
       auto hour = duration_cast<hours>(ms_epoch).count() % 24;
@@ -225,7 +224,7 @@ void cron_service::schedule_next(std::shared_ptr<job> job_ref, std::chrono::stea
 
    job_ref->timer->expires_after(delay);
    auto job_id = job_ref->id;
-   job_ref->timer->async_wait([this, job_id](const boost::system::error_code& ec) {
+   job_ref->timer->async_wait([this, job_id, job_ref](const boost::system::error_code& ec) {
       auto jobs = _jobs.readable();
       if (!jobs.contains(job_id)) {
          ilogf("Job id ({}) is no longer valid", job_id);
