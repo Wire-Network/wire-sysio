@@ -1,4 +1,4 @@
-set(TARGET_NAME operator_plugin)
+set(TARGET_NAME cron_plugin)
 
 plugin_target(
         ${TARGET_NAME}

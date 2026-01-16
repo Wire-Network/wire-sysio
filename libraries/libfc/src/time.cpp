@@ -10,6 +10,15 @@
 namespace fc {
 
   namespace bch = boost::chrono;
+  std::tm to_utc_tm(std::time_t tt) {
+     std::tm out{};
+#if defined(_WIN32)
+     gmtime_s(&out, &tt);
+#else
+     gmtime_r(&tt, &out);
+#endif
+      return out;
+  }
 
   time_point time_point::now()
   {

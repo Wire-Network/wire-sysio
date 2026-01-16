@@ -1,7 +1,7 @@
 #pragma once
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/operator_plugin/operator_plugin.hpp>
+#include <sysio/cron_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 
@@ -10,7 +10,7 @@ namespace sysio {
   class batch_operator_plugin : public appbase::plugin<batch_operator_plugin> {
     public:
 
-      APPBASE_PLUGIN_REQUIRES((chain_plugin)(operator_plugin)(signature_provider_manager_plugin))
+      APPBASE_PLUGIN_REQUIRES((chain_plugin)(cron_plugin)(signature_provider_manager_plugin))
 
       virtual ~batch_operator_plugin() = default;
 

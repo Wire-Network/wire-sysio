@@ -11,6 +11,10 @@ target_include_directories(fc-lite
     $<INSTALL_INTERFACE:include>
 )
 
+if (ENABLE_TESTS)
+    add_subdirectory(test)
+endif ()
+
 # Installation: headers to include/fc-lite
 install(
   DIRECTORY include/fc-lite
