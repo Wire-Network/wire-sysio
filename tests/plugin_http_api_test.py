@@ -1098,12 +1098,12 @@ class PluginHttpTest(unittest.TestCase):
         # get_unapplied_transactions with empty parameter
         command = "get_unapplied_transactions"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertIn("size", ret_json["payload"])
         self.assertIn("unapplied_size", ret_json["payload"])
+        self.assertIn("queued_size", ret_json["payload"])
         # get_unapplied_transactions with empty content parameter
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertIn("size", ret_json["payload"])
         self.assertIn("unapplied_size", ret_json["payload"])
+        self.assertIn("queued_size", ret_json["payload"])
         # get_unapplied_transactions with invalid parameter
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
