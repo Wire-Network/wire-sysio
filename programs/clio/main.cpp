@@ -395,6 +395,7 @@ void prompt_for_wallet_password(string& pw, const string& name) {
       fc::set_console_echo(false);
       std::getline( std::cin, pw, '\n' );
       fc::set_console_echo(true);
+      std::cout << std::endl;
    }
 }
 
@@ -2846,11 +2847,9 @@ int main( int argc, char** argv ) {
    // remove keys from wallet
    {
       string wallet_rm_key_str;
-      auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove key from wallet"));
+      auto remove_key_wallet_cmd = wallet_cmd->add_subcommand("remove_key", localized("Remove public_key and associated private_key from wallet"));
       remove_key_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key from"));
-
-      // TODO: As a nice to have convert `key` option to 1 of 3 (pubkey, privkey, key_name)
-      remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key in WIF format to remove"))->required();
+      remove_key_wallet_cmd->add_option("key", wallet_rm_key_str, localized("Public key to remove"))->required();
       remove_key_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
       remove_key_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_key_str] {
          prompt_for_wallet_password(wallet_pw, wallet_name);
@@ -2862,6 +2861,20 @@ int main( int argc, char** argv ) {
          fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw), fc::variant(wallet_rm_key_str)};
          call(wallet_url, wallet_remove_key, vs);
          std::cout << localized("removed private key for: ${pubkey}", ("pubkey", wallet_rm_key_str)) << std::endl;
+      });
+   }
+
+   {
+      string wallet_rm_name;
+      auto remove_name_wallet_cmd = wallet_cmd->add_subcommand("remove_name", localized("Remove named key set from wallet"));
+      remove_name_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to remove key set from"));
+      remove_name_wallet_cmd->add_option("name", wallet_rm_name, localized("The named set to remove"))->required();
+      remove_name_wallet_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
+      remove_name_wallet_cmd->callback([&wallet_name, &wallet_pw, &wallet_rm_name] {
+         prompt_for_wallet_password(wallet_pw, wallet_name);
+         fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw), fc::variant(wallet_rm_name)};
+         call(wallet_url, wallet_remove_name, vs);
+         std::cout << localized("removed: ${n}", ("n", wallet_rm_name)) << std::endl;
       });
    }
 
@@ -2900,7 +2913,7 @@ int main( int argc, char** argv ) {
 
    // list keys by name
    {
-      auto list_keys_by_name_cmd = wallet_cmd->add_subcommand("keys-by-name", localized("List of public keys from all unlocked wallets."));
+      auto list_keys_by_name_cmd = wallet_cmd->add_subcommand("keys_by_name", localized("List of public keys from all unlocked wallets."));
       list_keys_by_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
       list_keys_by_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
       list_keys_by_name_cmd->callback([&] {
@@ -2923,7 +2936,7 @@ int main( int argc, char** argv ) {
          std::string value;
       };
 
-      auto set_key_name_cmd = wallet_cmd->add_subcommand("set-key-name", localized("Set a key name."));
+      auto set_key_name_cmd = wallet_cmd->add_subcommand("set_key_name", localized("Set a key name."));
       set_key_name_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
       set_key_name_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
       set_key_name_cmd->add_option("--public-key", pub_key_str, localized("Public key mapped to desired name"));
@@ -2951,12 +2964,13 @@ int main( int argc, char** argv ) {
             fc::variant(new_key_name),
             fc::variant(criteria.value),
          };
-         const auto& v = call(wallet_url, criteria.uri_path, vs);
-         std::cout << fc::json::to_pretty_string(v) << std::endl;
+         call(wallet_url, criteria.uri_path, vs);
+         std::cout << localized("Set name to ${n}", ("n", new_key_name)) << std::endl;
       });
    }
+
    // list private keys
-   auto list_priv_keys_cmd = wallet_cmd->add_subcommand("private_keys", localized("List of private keys from an unlocked wallet in wif or PVT_R1 format."));
+   auto list_priv_keys_cmd = wallet_cmd->add_subcommand("private_keys", localized("List of private keys from an unlocked wallet."));
    list_priv_keys_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to list keys from"))->capture_default_str();
    list_priv_keys_cmd->add_option("--password", wallet_pw, localized("The password returned by wallet create"))->expected(0, 1);
    list_priv_keys_cmd->callback([&] {
