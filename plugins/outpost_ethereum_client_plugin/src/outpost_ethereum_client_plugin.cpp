@@ -10,6 +10,8 @@ namespace {
 constexpr auto option_name_client     = "outpost-ethereum-client";
 constexpr auto option_abi_file     = "ethereum-abi-file";
 
+auto _register_outpost_ethereum_client_plugin = application::register_plugin<outpost_ethereum_client_plugin>();
+
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
    return log;
@@ -27,6 +29,7 @@ public:
       std::scoped_lock lock(mutex);
 
       for (auto& filename : file_names) {
+         FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);
          ilogf("Loading ABI file: {}", file_path.string());
          if (!std::ranges::none_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
@@ -102,7 +105,7 @@ outpost_ethereum_client_plugin::outpost_ethereum_client_plugin() : my(
 void outpost_ethereum_client_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()(
       option_name_client,
-      boost::program_options::value<std::vector<std::string>>()->multitoken()->required(),
+      boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Ethereum Client spec, the plugin supports 1 to many clients in a given process"
       "`<eth-client-id>,<sig-provider-id>,<eth-node-url>[,<eth-chain-id>]`")(
       option_abi_file,
