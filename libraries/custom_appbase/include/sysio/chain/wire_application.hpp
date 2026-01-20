@@ -207,7 +207,7 @@ public:
 
          if (cfg_.enable_resource_monitor) {
             if (auto resmon_plugin = app_->find_plugin<resource_monitor_plugin>()) {
-               resmon_plugin->plugin_initialize(app_->get_options());
+               resmon_plugin->initialize(app_->get_options());
                resmon_plugin->monitor_directory(app_->data_dir());
             } else {
                elog("resource_monitor_plugin failed to initialize");
@@ -222,7 +222,7 @@ public:
          ilogf("{} data directory is {}", exe_name_, app_->data_dir().string());
          detail::log_non_default_options(app_->get_parsed_options());
       } catch (...) {
-         return handle_exeception();
+         return handle_exception();
       }
       return SUCCESS;
    }
@@ -244,20 +244,23 @@ public:
          app_->set_thread_priority_max();
          app_->exec();
       } catch (...) {
-         return handle_exeception();
+         return handle_exception();
       }
       return SUCCESS;
    }
 
-private:
-   return_codes handle_exeception() {
+   return_codes handle_exception() {
       try {
+         last_result_ = OTHER_FAIL;
          throw;
       } catch (const fc::exception& e) {
          if (e.code() == fc::std_exception_code) {
             if (e.top_message().find("atabase dirty flag set") != std::string::npos) {
                elog("database dirty flag set (likely due to unclean shutdown): replay required");
                last_result_ = DATABASE_DIRTY;
+            } else {
+               elogf("{}", e.to_detail_string());
+               last_result_ = OTHER_FAIL;
             }
          } else if (e.code() == interrupt_exception::code_value) {
             ilog("Interrupted, successfully exiting");
