@@ -258,6 +258,19 @@ void wallet_manager::remove_key(const std::string& name, const std::string& pass
    w->remove_key(key);
 }
 
+void wallet_manager::remove_name(const std::string& wallet_name, const std::string& password, const std::string& name) {
+   check_timeout();
+   if (wallets.count(wallet_name) == 0) {
+      SYS_THROW(chain::wallet_nonexistent_exception, "Wallet not found: ${w}", ("w", wallet_name));
+   }
+   auto& w = wallets.at(wallet_name);
+   if (w->is_locked()) {
+      SYS_THROW(chain::wallet_locked_exception, "Wallet is locked: ${w}", ("w", wallet_name));
+   }
+   w->check_password(password); //throws if bad password
+   w->remove_name(name);
+}
+
 string wallet_manager::create_key(const std::string& name, const std::string& key_type) {
    check_timeout();
    if (wallets.count(name) == 0) {
