@@ -273,7 +273,7 @@ struct reflector<fc::network::ethereum::abi::data_type> {
 
       auto e = magic_enum::enum_cast<fc::network::ethereum::abi::data_type>(s);
       if (e.has_value()) return e.value();
-      FC_THROW_EXCEPTION_FMT(fc::invalid_arg_exception, "Invalid Ethereum ABI data type: {}", std::string(s));
+      FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Invalid Ethereum ABI data type: {}", s);
    }
    static fc::network::ethereum::abi::data_type from_string(const std::string& str) {
       return from_string(str.c_str());

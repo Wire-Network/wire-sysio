@@ -12,12 +12,11 @@
 
 namespace fc {
 
-    inline static logger the_default_logger;
+   inline static logger the_default_logger;
 
-    constexpr const char* DEFAULT_PATTERN = "%^%-5l %Y-%m-%dT%T.%f %-9!k %20!s:%-5# %-20!! ] %v%$";
+   constexpr const char* DEFAULT_PATTERN = "%^%-5l %Y-%m-%dT%T.%f %-9!k %20!s:%-5# %-20!! ] %v%$";
 
-   class thread_name_formatter_flag : public spdlog::custom_flag_formatter
-   {
+   class thread_name_formatter_flag : public spdlog::custom_flag_formatter {
       public:
          void format(const spdlog::details::log_msg&, const std::tm&, spdlog::memory_buf_t& dest) override {
             const std::string& some_txt = fc::get_thread_name();
@@ -35,8 +34,7 @@ namespace fc {
    class logger::impl {
       public:
          impl( std::unique_ptr<spdlog::logger> agent_logger = nullptr)
-         :_parent(nullptr), _enabled(true), _level(log_level::info)
-         {
+         :_parent(nullptr), _enabled(true), _level(log_level::info) {
             if (!agent_logger) {
                auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_st>();
                sink->set_color(spdlog::level::debug, sink->green);
@@ -104,11 +102,6 @@ namespace fc {
        return my->_enabled && e >= my->_level;
     }
 
-    void logger::log( log_message m ) {
-       std::unique_lock g( log_config::get().log_mutex );
-       m.get_context().append_context( my->_name );
-    }
-
     void logger::set_name( const std::string& n ) { my->_name = n; }
     std::string logger::get_name()const { return my->_name; }
 
@@ -171,7 +164,6 @@ namespace fc {
        return my->_sinks;
     }
 
-   bool configure_logging( const logging_config& cfg );
-   bool do_default_config      = configure_logging( logging_config::default_config() );
+   bool do_default_config = configure_logging( logging_config::default_config() );
 
 } // namespace fc

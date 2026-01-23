@@ -153,7 +153,7 @@ namespace sysio::chain {
 
       for( auto& td : abi.types ) {
          SYS_ASSERT(!_is_type(td.new_type_name, ctx), duplicate_abi_type_def_exception,
-                    "type {} already exists", impl::limit_size(td.new_type_name));
+                    "type already exists '{}'", impl::limit_size(td.new_type_name));
          typedefs[std::move(td.new_type_name)] = std::move(td.type);
       }
 

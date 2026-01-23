@@ -447,8 +447,8 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
       return fc::variant("0x" + fc::to_hex(bytes_data));
    }
 
-   FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
-                          ethereum_abi_data_type_reflector::to_fc_string(type));
+   FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
+                      ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
 /**
@@ -490,8 +490,8 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
    }
 
    default:
-      FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported dynamic type for ABI decoding: {}",
-                             ethereum_abi_data_type_reflector::to_fc_string(type));
+      FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported dynamic type for ABI decoding: {}",
+                         ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 }
 

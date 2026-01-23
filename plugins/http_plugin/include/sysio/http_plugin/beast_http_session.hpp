@@ -159,8 +159,7 @@ class beast_http_session : public detail::abstract_conn,
          // look for the URL handler to handle this resource
          auto handler_itr = plugin_state_->url_handlers.find(resource);
          if(handler_itr != plugin_state_->url_handlers.end() && categories_.contains(handler_itr->second.category)) {
-            if(plugin_state_->get_logger().is_enabled(fc::log_level::all))
-               plugin_state_->get_logger().log(FC_LOG_MESSAGE(all, "resource: {}", resource));
+            fc_tlog(plugin_state_->get_logger(), "resource: {}", resource);
             std::string body = req.body();
             auto content_type = handler_itr->second.content_type;
             set_content_type_header(content_type);
@@ -273,10 +272,10 @@ public:
       if(plugin_state_->get_logger().is_enabled(fc::log_level::all)) {
          auto session_time = steady_clock::now() - session_begin_;
          auto session_time_us = std::chrono::duration_cast<std::chrono::microseconds>(session_time).count();
-         plugin_state_->get_logger().log(FC_LOG_MESSAGE(all, "session time    {}", session_time_us));
-         plugin_state_->get_logger().log(FC_LOG_MESSAGE(all, "        read    {}", read_time_us_));
-         plugin_state_->get_logger().log(FC_LOG_MESSAGE(all, "        handle  {}", handle_time_us_));
-         plugin_state_->get_logger().log(FC_LOG_MESSAGE(all, "        write   {}", write_time_us_));
+         fc_tlog(plugin_state_->get_logger(), "session time    {}", session_time_us);
+         fc_tlog(plugin_state_->get_logger(), "        read    {}", read_time_us_);
+         fc_tlog(plugin_state_->get_logger(), "        handle  {}", handle_time_us_);
+         fc_tlog(plugin_state_->get_logger(), "        write   {}", write_time_us_);
       }
    }
 

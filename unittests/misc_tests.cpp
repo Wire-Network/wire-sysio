@@ -1247,7 +1247,8 @@ BOOST_AUTO_TEST_CASE(named_thread_pool_test) {
          FC_ASSERT( false, "oops throw in thread pool" );
       });
       BOOST_TEST( (ef.wait_for( 100ms ) == std::future_status::ready) );
-      BOOST_TEST( ef.get().to_detail_string().find("oops throw in thread pool") != std::string::npos );
+      auto r = ef.get().to_detail_string();
+      BOOST_TEST( r.find("oops throw in thread pool") != std::string::npos );
 
       // we can restart, after a stop
       BOOST_REQUIRE_THROW( thread_pool.start( 5, [&ep](const fc::exception& e) { ep.set_value(e); } ), fc::assert_exception );

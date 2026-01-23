@@ -182,24 +182,8 @@ FC_REFLECT(fc::log_level, (value))
 #define FC_LOG_CONTEXT(LOG_LEVEL) \
    fc::log_context( fc::log_level::LOG_LEVEL, __FILE__, __LINE__, __func__ )
 
-#define FC_ADD_FMT_ARGS_EXT(r, unused, i, arg) \
-   BOOST_PP_COMMA() BOOST_PP_STRINGIZE(arg) BOOST_PP_COMMA() fc::variant(arg)
-
-#define FC_ADD_FMT_ARGS( ... ) \
-   BOOST_PP_IF( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), \
-      BOOST_PP_SEQ_FOR_EACH_I( FC_ADD_FMT_ARGS_EXT, unused, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__) ), \
-      BOOST_PP_EMPTY() \
-   )
-
 #define FC_FMT(FORMAT, ...) \
    fmt::format( FORMAT, ##__VA_ARGS__ )
 
-#define FC_LOG_MESSAGE( LOG_LEVEL, FORMAT, ... ) \
-   BOOST_PP_IF( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), \
-      fc::get_log_message( FC_LOG_CONTEXT(LOG_LEVEL), FMT_STRING(FORMAT), __VA_ARGS__ ), \
-      fc::get_log_message( FC_LOG_CONTEXT(LOG_LEVEL), FMT_STRING(FORMAT) ) \
-   )
-
-#define FC_LOG_MESSAGE_FMT(LOG_LEVEL, FORMAT, ...) \
-  fc::log_message(FC_LOG_CONTEXT(LOG_LEVEL), \
-  std::format(FORMAT, __VA_ARGS__))
+#define FC_LOG_MESSAGE(LOG_LEVEL, FORMAT, ...) \
+  fc::get_log_message( FC_LOG_CONTEXT(LOG_LEVEL), FMT_STRING(FORMAT) __VA_OPT__(,) __VA_ARGS__ )

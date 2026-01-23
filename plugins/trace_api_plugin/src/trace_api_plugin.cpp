@@ -43,9 +43,10 @@ namespace {
 
    void log_exception( const exception_with_context& e, fc::log_level level ) {
       if( _log.is_enabled( level ) ) {
-         auto detail_string = to_detail_string(std::get<0>(e));
-         auto context = fc::log_context( level, std::get<1>(e), std::get<2>(e), std::get<3>(e) );
-         _log.log(fc::log_message( context, detail_string ));
+         const auto&[ex_ptr, file, line, func] = e;
+         auto detail_string = to_detail_string(ex_ptr);
+         auto& logger = _log.get_agent_logger();
+         logger->log(spdlog::source_loc{file, static_cast<int>(line), func}, logger->level(), FC_FMT( "{}", detail_string ));
       }
    }
 

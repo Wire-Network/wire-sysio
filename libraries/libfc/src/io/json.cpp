@@ -445,9 +445,9 @@ namespace fc
           case parse_type::relaxed_parser:
               return json_relaxed::variant_from_stream<stream_t, false>( in, max_depth );
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
-   } FC_RETHROW_EXCEPTIONS( warn, "", ("str",utf8_str) ) }
+   } FC_RETHROW_EXCEPTIONS( warn, "{}", utf8_str ) }
 
    /**
     *  Convert '\t', '\r', '\n', '\\' and '"'  to "\t\r\n\\\"" if escape_control_chars == true
@@ -776,7 +776,7 @@ namespace fc
           case json::parse_type::relaxed_parser:
               return json_relaxed::variant_from_stream<std::ifstream, false>( bi, max_depth );
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
    }
    /*
@@ -817,7 +817,7 @@ namespace fc
              json_relaxed::variant_from_stream<std::stringstream, false>( in, max_depth );
               break;
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
       try { in.peek(); } catch ( const eof_exception& e ) { return true; }
       return false;

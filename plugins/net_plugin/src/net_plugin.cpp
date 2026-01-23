@@ -63,6 +63,39 @@ namespace boost
 }
 
 namespace sysio {
+
+struct peer_sync_state {
+   enum class sync_t {
+      peer_sync,    // sync_request_message, syncing
+      peer_catchup, // head catchup, syncing request_message:catch_up
+      block_nack    // sync due to block nack (block_notice_message) request_message:normal
+   };
+   peer_sync_state(uint32_t start, uint32_t end, uint32_t last_acted, sync_t sync_type)
+      :start_block( start ), end_block( end ), last( last_acted ), sync_type( sync_type )
+   {}
+
+   bool valid() const;
+
+   uint32_t     start_block;
+   uint32_t     end_block;
+   uint32_t     last; ///< last sent or received
+   sync_t       sync_type;
+};
+
+bool peer_sync_state::valid() const {
+   bool valid = start_block > 0 && end_block >= start_block && last >= start_block-1 && last <= end_block;
+   if (sync_type == sync_t::block_nack && valid) {
+      // block nack should only be used for "current" blocks, limit size to something reasonable
+      const auto size = end_block - start_block;
+      valid = size < 100;
+   }
+   return valid;
+}
+
+} // namespace sysio
+FC_REFLECT_ENUM( sysio::peer_sync_state::sync_t, (peer_sync)(peer_catchup)(block_nack) )
+
+namespace sysio {
    static auto _net_plugin = application::register_plugin<net_plugin>();
 
    using std::vector;
@@ -561,34 +594,6 @@ namespace sysio {
    }
 
    static net_plugin_impl *my_impl;
-
-   struct peer_sync_state {
-      enum class sync_t {
-         peer_sync,    // sync_request_message, syncing
-         peer_catchup, // head catchup, syncing request_message:catch_up
-         block_nack    // sync due to block nack (block_notice_message) request_message:normal
-      };
-      peer_sync_state(uint32_t start, uint32_t end, uint32_t last_acted, sync_t sync_type)
-         :start_block( start ), end_block( end ), last( last_acted ), sync_type( sync_type )
-      {}
-
-      bool valid() const;
-
-      uint32_t     start_block;
-      uint32_t     end_block;
-      uint32_t     last; ///< last sent or received
-      sync_t       sync_type;
-   };
-
-   bool peer_sync_state::valid() const {
-      bool valid = start_block > 0 && end_block >= start_block && last >= start_block-1 && last <= end_block;
-      if (sync_type == sync_t::block_nack && valid) {
-         // block nack should only be used for "current" blocks, limit size to something reasonable
-         const auto size = end_block - start_block;
-         valid = size < 100;
-      }
-      return valid;
-   }
 
    // thread safe
    class queued_buffer : boost::noncopyable {
@@ -5277,5 +5282,3 @@ namespace sysio {
       start_conn_timer( connector_period, {}, timer_type::stats );
    }
 } // namespace sysio
-
-FC_REFLECT_ENUM( sysio::peer_sync_state::sync_t, (peer_sync)(peer_catchup)(block_nack) )

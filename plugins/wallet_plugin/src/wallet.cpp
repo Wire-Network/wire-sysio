@@ -499,7 +499,7 @@ void soft_wallet::check_password(string password) {
          return;
       }
       default: {
-         FC_ASSERT(false, "Unknown wallet version: ${v}", ("v", my->_wallet.version));
+         FC_ASSERT(false, "Unknown wallet version: {}", my->_wallet.version);
       }
       }
 

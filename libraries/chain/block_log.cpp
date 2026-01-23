@@ -1238,9 +1238,8 @@ namespace sysio { namespace chain {
             first_block_number = prune_to_num;
             block_file.flush();
 
-            if (auto l = fc::logger::get(); l.is_enabled(loglevel))
-               l.log(fc::log_message(fc::log_context(loglevel, __FILE__, __LINE__, __func__),
-                                     fmt::format("blocks.log pruned to blocks {}-{}", first_block_number, head_num)));
+            if (fc::logger::default_logger().is_enabled(loglevel))
+               ilog("blocks.log pruned to blocks {}-{}", first_block_number, head_num);
             return prune_config.prune_blocks;
          }
       };

@@ -21,9 +21,8 @@ namespace fc
 
    /**
     @code
-      void my_class::func() 
-      {
-         fc_dlog( my_class_logger, "Format four: ${arg}  five: ${five}", ("arg",4)("five",5) );
+      void my_class::func() {
+         fc_dlog( my_class_logger, "Format four: {}  five: {}", 4, 5 );
       }
     @endcode
     */
@@ -59,7 +58,6 @@ namespace fc
          void set_enabled( bool e );
          bool is_enabled( log_level e )const;
          bool is_enabled()const;
-         void log( log_message m );
 
       private:
          friend struct log_config;
