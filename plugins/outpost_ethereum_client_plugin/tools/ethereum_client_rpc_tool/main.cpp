@@ -43,7 +43,6 @@ void logging_conf_handler() {
       ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
    }
    configure_logging(config_path);
-//todo   fc::log_config::initialize_appenders();
 }
 
 

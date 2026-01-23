@@ -9,7 +9,7 @@
 namespace fc {
 
    dmlog_sink_mt::dmlog_sink_mt(const std::string& file) {
-      if (file == "-" || file == "-stdout") {
+      if (file.empty() || file == "-" || file == "-stdout") {
          out = stdout;
       } else if (file == "-stderr") {
          out = stderr;

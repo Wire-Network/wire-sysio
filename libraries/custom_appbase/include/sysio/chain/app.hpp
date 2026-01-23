@@ -19,7 +19,6 @@ namespace sysio::chain {
 
 struct application_config {
    bool enable_logging_config = true;
-   bool enable_deep_mind_logging = false;
    bool enable_resource_monitor = true;
    bool sighup_loads_logging_config = true;
    uint16_t default_http_port = 8888;
@@ -83,59 +82,38 @@ void log_non_default_options(const std::vector<bpo::basic_option<char>>& options
          result += v;
       }
    }
-   ilog("Non-default options: ${v}", ("v", result));
+   ilog("Non-default options: {}", result);
 }
 
-fc::logging_config& add_deep_mind_logger(fc::logging_config& config) {
-   config.appenders.push_back(fc::appender_config("deep-mind", "dmlog"));
-
-   fc::logger_config dmlc;
-   dmlc.name = "deep-mind";
-   dmlc.level = fc::log_level::debug;
-   dmlc.enabled = true;
-   dmlc.appenders.push_back("deep-mind");
-
-   config.loggers.push_back(dmlc);
-   return config;
-}
-
-void configure_logging(const std::filesystem::path& config_path, bool enable_deep_mind) {
+void configure_logging(const std::filesystem::path& config_path) {
    try {
-      try {
-         if (std::filesystem::exists(config_path)) {
-            fc::configure_logging(config_path);
-         } else {
-            auto cfg = fc::logging_config::default_config();
-
-            if (enable_deep_mind)
-               fc::configure_logging(add_deep_mind_logger(cfg));
-         }
-      } catch (...) {
-         elog("Error reloading logging.json");
-         throw;
+      if (std::filesystem::exists(config_path)) {
+         fc::configure_logging(config_path);
+      } else {
+         auto cfg = fc::logging_config::default_config();
+         fc::configure_logging(cfg);
       }
    } catch (const fc::exception& e) {
-      elogf("{}", e.to_detail_string());
+      std::cerr << "\nError reloading logging.json: " << e.to_detail_string() << std::endl;
    } catch (const boost::exception& e) {
-      elogf("{}", boost::diagnostic_information(e));
+      std::cerr << "\nError reloading logging.json: " << boost::diagnostic_information(e) << std::endl;
    } catch (const std::exception& e) {
-      elogf("{}", e.what());
+      std::cerr << "\nError reloading logging.json: " << e.what() << std::endl;
    } catch (...) {
-      // empty
+      std::cerr << "\nError reloading logging.json: unknown" << std::endl;
    }
 }
 
 } // namespace detail
 
-void logging_conf_handler(bool enable_deep_mind_logging) {
+void logging_conf_handler() {
    auto config_path = appbase::app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
    } else {
-      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
    }
-   detail::configure_logging(config_path, enable_deep_mind_logging);
-   fc::log_config::initialize_appenders();
+   detail::configure_logging(config_path);
 }
 
 void initialize_logging(const application_config& cfg) {
@@ -147,21 +125,19 @@ void initialize_logging(const application_config& cfg) {
    auto config_path = appbase::app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
       fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-   } else if (cfg.enable_deep_mind_logging) {
+   } else {
       auto cfg = fc::logging_config::default_config();
-      fc::configure_logging(detail::add_deep_mind_logger(cfg));
+      fc::configure_logging(cfg);
    }
 
-   fc::log_config::initialize_appenders();
-   auto sighup_cb = [cfg]() { logging_conf_handler(cfg.enable_deep_mind_logging); };
-   appbase::app().set_sighup_callback(sighup_cb);
+   appbase::app().set_sighup_callback(logging_conf_handler);
 }
 
 class application {
 public:
    explicit application(const application_config& cfg) : cfg_(cfg) {
       exe_name_ = fc::program_name();
-      ilogf("{} started", exe_name_);
+      ilog("{} started", exe_name_);
 
       uint32_t short_hash = 0;
       fc::from_hex(sysio::version::version_hash(), reinterpret_cast<char*>(&short_hash), sizeof(short_hash));
@@ -187,8 +163,8 @@ public:
       if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();
-         ilogf("{} version {} {}", exe_name_, app_->version_string(), full_ver);
-         ilogf("{} successfully exiting", exe_name_);
+         ilog("{} version {} {}", exe_name_, app_->version_string(), full_ver);
+         ilog("{} successfully exiting", exe_name_);
       }
    }
 
@@ -219,10 +195,10 @@ public:
             }
          }
 
-         ilogf("{} version {} {}", exe_name_, app_->version_string(),
-               app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string());
-         ilogf("{} using configuration file {}", exe_name_, app_->full_config_file_path().string());
-         ilogf("{} data directory is {}", exe_name_, app_->data_dir().string());
+         ilog("{} version {} {}", exe_name_, app_->version_string(),
+              app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string());
+         ilog("{} using configuration file {}", exe_name_, app_->full_config_file_path().string());
+         ilog("{} data directory is {}", exe_name_, app_->data_dir().string());
          detail::log_non_default_options(app_->get_parsed_options());
       } catch (...) {
          return handle_exception();
@@ -262,32 +238,32 @@ public:
                elog("database dirty flag set (likely due to unclean shutdown): replay required");
                last_result_ = exit_code::DATABASE_DIRTY;
             } else {
-               elogf("{}", e.to_detail_string());
+               elog("{}", e.to_detail_string());
                last_result_ = exit_code::OTHER_FAIL;
             }
          } else if (e.code() == interrupt_exception::code_value) {
             ilog("Interrupted, successfully exiting");
             last_result_ = exit_code::SUCCESS;
          } else {
-            elogf("{}", e.to_detail_string());
+            elog("{}", e.to_detail_string());
             last_result_ = exit_code::OTHER_FAIL;
          }
       } catch (const boost::interprocess::bad_alloc& e) {
          elog("bad alloc");
          last_result_ = exit_code::BAD_ALLOC;
       } catch (const boost::exception& e) {
-         elogf("{}", boost::diagnostic_information(e));
+         elog("{}", boost::diagnostic_information(e));
          last_result_ = exit_code::OTHER_FAIL;
       } catch (const std::runtime_error& e) {
          if (std::string(e.what()).find("atabase dirty flag set") != std::string::npos) {
             elog("database dirty flag set (likely due to unclean shutdown): replay required");
             last_result_ = exit_code::DATABASE_DIRTY;
          } else {
-            elogf("{}", e.what());
+            elog("{}", e.what());
             last_result_ = exit_code::OTHER_FAIL;
          }
       } catch (const std::exception& e) {
-         elogf("{}", e.what());
+         elog("{}", e.what());
          last_result_ = exit_code::OTHER_FAIL;
       } catch (...) {
          elog("unknown exception");

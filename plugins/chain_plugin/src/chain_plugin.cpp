@@ -18,6 +18,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/block_header_state_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <chainbase/environment.hpp>
 
 #include <boost/signals2/connection.hpp>
@@ -28,10 +29,8 @@
 #include <fc/variant.hpp>
 #include <cstdlib>
 
-#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
-
-const std::string deep_mind_logger_name("deep-mind");
+const std::string deep_mind_logger_name("dmlog");
 sysio::chain::deep_mind_handler _deep_mind_log;
 
 namespace std {
@@ -1010,7 +1009,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       // initialize deep mind logging
       if ( options.at( "deep-mind" ).as<bool>() ) {
-         // The actual `fc::dmlog_appender` implementation that is currently used by deep mind
+         // The actual `fc::dmlog_sink` implementation that is currently used by deep mind
          // logger is using `stdout` to prints it's log line out. Deep mind logging outputs
          // massive amount of data out of the process, which can lead under pressure to some
          // of the system calls (i.e. `fwrite`) to fail abruptly without fully writing the
@@ -1027,7 +1026,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          // Changing the standard `stdout` behavior from buffered to unbuffered can is disruptive
          // and can lead to weird scenarios in the logging process if `stdout` is used there too.
          //
-         // In a future version, the `fc::dmlog_appender` implementation will switch to a `FIFO` file
+         // In a future version, the `fc::dmlog_sink` implementation will switch to a `FIFO` file
          // approach, which will remove the dependency on `stdout` and hence this call.
          //
          // For the time being, when `deep-mind = true` is activated, we set `stdout` here to
@@ -1041,6 +1040,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          SYS_ASSERT( options.at("p2p-accept-transactions").as<bool>() == false, plugin_config_exception,
             "p2p-accept-transactions must be set to false in order to enable deep-mind logging.");
 
+         _deep_mind_log.update_logger( deep_mind_logger_name );
          chain->enable_deep_mind( &_deep_mind_log );
       }
 

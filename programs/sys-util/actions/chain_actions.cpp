@@ -223,7 +223,6 @@ namespace {
   void logging_conf_handler() {
     auto config_path = app().get_logging_conf();
     configure_logging(config_path);
-//todo    fc::log_config::initialize_appenders();
   }
 
   void initialize_logging() {
@@ -231,7 +230,6 @@ namespace {
     if (std::filesystem::exists(config_path))
       fc::configure_logging(config_path);
 
-//todo    fc::log_config::initialize_appenders();
     app().set_sighup_callback(logging_conf_handler);
   }
 

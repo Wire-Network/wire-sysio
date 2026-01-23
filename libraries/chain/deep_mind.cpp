@@ -44,7 +44,8 @@ namespace sysio::chain {
       const auto& idx = db.get_index<account_metadata_index>();
       for (auto& row : idx.indices()) {
          if (row.abi.size() != 0) {
-            fc_dlog(_logger, "ABIDUMP ABI {} {}", row.name, row.abi);
+            std::string abi_str = fc::format_string("${data}", fc::mutable_variant_object("data", fc::variant(row.abi)));
+            fc_dlog(_logger, "ABIDUMP ABI {} {}", row.name, abi_str);
          }
       }
       fc_dlog(_logger, "ABIDUMP END");
