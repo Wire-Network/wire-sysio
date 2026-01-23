@@ -120,10 +120,11 @@ public:
    };
 
    struct get_unapplied_transactions_result {
-      size_t                     size = 0;
-      size_t                     incoming_size = 0;
-      std::vector<unapplied_trx> trxs;
-      string                     more; ///< fill lower_bound with trx id to fetch next set of transactions
+      size_t                     unapplied_size = 0;
+      size_t                     queued_size = 0;
+      std::vector<unapplied_trx> unapplied_trxs;
+      std::vector<unapplied_trx> queued_trxs; ///< returned in priority order
+      string                     more; ///< fill lower_bound with trx id to fetch next set of unapplied trxs
    };
 
    get_unapplied_transactions_result get_unapplied_transactions( const get_unapplied_transactions_params& params, const fc::time_point& deadline ) const;
@@ -161,5 +162,5 @@ FC_REFLECT(sysio::producer_plugin::scheduled_protocol_feature_activations, (prot
 FC_REFLECT(sysio::producer_plugin::get_supported_protocol_features_params, (exclude_disabled)(exclude_unactivatable))
 FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_params, (lower_bound)(limit)(time_limit_ms))
 FC_REFLECT(sysio::producer_plugin::unapplied_trx, (trx_id)(expiration)(trx_type)(first_auth)(first_receiver)(first_action)(total_actions)(accounts_billing)(size))
-FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_result, (size)(incoming_size)(trxs)(more))
+FC_REFLECT(sysio::producer_plugin::get_unapplied_transactions_result, (unapplied_size)(queued_size)(unapplied_trxs)(queued_trxs)(more))
 FC_REFLECT(sysio::producer_plugin::pause_at_block_params, (block_num));
