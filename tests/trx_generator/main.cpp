@@ -125,7 +125,7 @@ int main(int argc, char** argv) {
          return INITIALIZE_FAIL;
       } else if (!accts.empty() && !account_str_vector.empty()) {
          for(const std::string& account_name: account_str_vector) {
-            ilog("Initializing accounts. Attempt to create name for ${acct}", ("acct", account_name));
+            ilog("Initializing accounts. Attempt to create name for {}", account_name);
             accts_config._acct_name_vec.emplace_back(account_name);
          }
       }
@@ -138,19 +138,20 @@ int main(int argc, char** argv) {
          return INITIALIZE_FAIL;
       } else if (!p_keys.empty() && !private_keys_str_vector.empty()) {
          for(const std::string& private_key: private_keys_str_vector) {
-            ilog("Initializing private keys. Attempt to create private_key for ${key} : gen key ${newKey}", ("key", private_key)("newKey", fc::crypto::private_key::from_string(private_key)));
+            ilog("Initializing private keys. Attempt to create private_key for {} : gen key {}",
+                 private_key, fc::json::to_log_string(fc::crypto::private_key::from_string(private_key)));
             accts_config._priv_keys_vec.emplace_back(fc::crypto::private_key::from_string(private_key));
          }
       }
 
       if(trx_gen_base_config._generator_id > generator_id_max) {
-         ilog("Initialization error: Exceeded max value for generator id. Value must be less than ${max}.", ("max", generator_id_max));
+         ilog("Initialization error: Exceeded max value for generator id. Value must be less than {}.", generator_id_max);
          cli.print(std::cerr);
          return INITIALIZE_FAIL;
       }
 
       if(trx_expr > trx_expiration_max) {
-         ilog("Initialization error: Exceeded max value for transaction expiration. Value must be less than ${max}.", ("max", trx_expiration_max));
+         ilog("Initialization error: Exceeded max value for transaction expiration. Value must be less than {}.", trx_expiration_max);
          cli.print(std::cerr);
          return INITIALIZE_FAIL;
       } else {
@@ -186,13 +187,13 @@ int main(int argc, char** argv) {
       return INITIALIZE_FAIL;
    }
 
-   ilog("Initial Trx Generator config: ${config}", ("config", trx_gen_base_config.to_string()));
-   ilog("Initial Provider config: ${config}", ("config", provider_config.to_string()));
-   ilog("Initial Accounts config: ${config}", ("config", accts_config.to_string()));
-   ilog("Transaction TPS Tester config: ${config}", ("config", tester_config.to_string()));
+   ilog("Initial Trx Generator config: {}", trx_gen_base_config.to_string());
+   ilog("Initial Provider config: {}", provider_config.to_string());
+   ilog("Initial Accounts config: {}", accts_config.to_string());
+   ilog("Transaction TPS Tester config: {}", tester_config.to_string());
 
    if (transaction_specified) {
-      ilog("User Transaction Specified: ${config}", ("config", user_trx_config.to_string()));
+      ilog("User Transaction Specified: {}", user_trx_config.to_string());
    }
 
    std::shared_ptr<et::tps_performance_monitor> monitor;

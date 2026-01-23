@@ -37,9 +37,9 @@ auto catch_and_log(F f) {
    try {
       return f();
    } catch(const fc::exception& e) {
-      fc_elog(_log, "${e}", ("e", e.to_detail_string()));
+      fc_elog(_log, "{}", e.to_detail_string());
    } catch(const std::exception& e) {
-      fc_elog(_log, "${e}", ("e", e.what()));
+      fc_elog(_log, "{}", e.what());
    } catch(...) {
       fc_elog(_log, "unknown exception");
    }
@@ -153,7 +153,7 @@ public:
          store_chain_state(id, block->previous, block->block_num());
          store_finality_data(id, block->previous);
       } catch(const fc::exception& e) {
-         fc_elog(_log, "fc::exception: ${details}", ("details", e.to_detail_string()));
+         fc_elog(_log, "fc::exception: {}", e.to_detail_string());
          // Both app().quit() and exception throwing are required. Without app().quit(),
          // the exception would be caught and drop before reaching main(). The exception is
          // to ensure the block won't be committed.
@@ -191,7 +191,7 @@ public:
          return;
       bool fresh = chain_state_log->empty();
       if(fresh)
-         fc_ilog(_log, "Placing initial state in block ${n}", ("n", block_num));
+         fc_ilog(_log, "Placing initial state in block {}", block_num);
 
       chain_state_log->pack_and_write_entry(id, previous_id, [this, fresh](bio::filtering_ostreambuf& buf) {
          pack_deltas(buf, chain_plug->chain().db(), fresh);
@@ -368,10 +368,10 @@ void state_history_plugin_impl::plugin_startup() {
       if( first_state_block > 0 )
          first_available_block = std::min( first_available_block, first_state_block );
    }
-   fc_ilog(_log, "First available block for SHiP ${b}", ("b", first_available_block));
+   fc_ilog(_log, "First available block for SHiP {}", first_available_block);
    listen();
    thread_pool.start(1, [](const fc::exception& e) {
-      fc_elog( _log, "Exception in SHiP thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+      fc_elog( _log, "Exception in SHiP thread pool, exiting: {}", e.to_detail_string() );
       app().quit();
    });
 }

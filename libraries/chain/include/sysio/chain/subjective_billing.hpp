@@ -80,7 +80,7 @@ private:
          if( aitr != _account_subjective_bill_cache.end() ) {
             aitr->second.pending_cpu_us -= subjective_cpu_bill.count();
             SYS_ASSERT( aitr->second.pending_cpu_us >= 0, chain::tx_resource_exhaustion,
-                        "Logic error in subjective account billing ${a}", ("a", account) );
+                        "Logic error in subjective account billing {}", account );
             if( aitr->second.empty(time_ordinal, _expired_accumulator_average_window) ) _account_subjective_bill_cache.erase( aitr );
          }
       }
@@ -208,8 +208,8 @@ public:
       const auto orig_count = _account_subjective_bill_cache.size();
       remove_subjective_billing( block, time_ordinal );
       if (orig_count > 0) {
-         fc_dlog( log, "Subjective billed accounts ${n} removed ${r}",
-                  ("n", orig_count)("r", orig_count - _account_subjective_bill_cache.size()) );
+         fc_dlog( log, "Subjective billed accounts {} removed {}",
+                  orig_count, orig_count - _account_subjective_bill_cache.size() );
       }
    }
 
@@ -234,8 +234,8 @@ public:
             num_expired++;
          }
 
-         fc_dlog( log, "Processed ${n} subjective billed transactions, Expired ${expired}",
-                  ("n", orig_count)( "expired", num_expired ) );
+         fc_dlog( log, "Processed {} subjective billed transactions, Expired {}",
+                  orig_count, num_expired );
       }
       return std::make_pair(!exhausted, num_expired);
    }

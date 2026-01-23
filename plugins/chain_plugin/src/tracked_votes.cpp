@@ -41,9 +41,9 @@ namespace sysio::chain_apis {
                if (chain::vote_logger.is_enabled(fc::log_level::info)) {
                   std::optional<chain::block_header_extension> fin_ext = block->extract_header_extension(chain::finality_extension::extension_id());
                   chain::qc_claim_t claim = fin_ext ? std::get<chain::finality_extension>(*fin_ext).qc_claim : chain::qc_claim_t{};
-                  fc_ilog(chain::vote_logger, "Block ${id}... #${n} @ ${t} produced by ${p}, latency: ${l}ms has no qc, claim: ${c}",
-                          ("id", id.str().substr(8, 16))("n", block->block_num())("t", block->timestamp)("p", block->producer)
-                          ("l", (now - block->timestamp).count() / 1000)("c", claim));
+                  fc_ilog(chain::vote_logger, "Block {}... #{} @ {} produced by {}, latency: {}ms has no qc, claim: {}",
+                          id.str().substr(8, 16), block->block_num(), block->timestamp, block->producer,
+                          (now - block->timestamp).count() / 1000, claim);
                }
                return;
             }
@@ -82,7 +82,7 @@ namespace sysio::chain_apis {
                log_missing_votes(block, id, missing, qc_ext.qc.block_num);
             }
 
-         } FC_LOG_AND_DROP(("tracked_votes_impl on_accepted_block ERROR"));
+         } FC_LOG_AND_DROP("tracked_votes_impl on_accepted_block ERROR");
       }
 
       // Returns last vote information by a given finalizer
@@ -106,17 +106,17 @@ namespace sysio::chain_apis {
             std::string not_voted;
             for (const auto& f : missing_votes) {
                if (controller.is_node_finalizer_key(f.fin_auth->public_key)) {
-                  fc_wlog(chain::vote_logger, "Local finalizer ${f} did not vote in block ${n} : ${id} for block ${m_n}",
-                          ("f", f.fin_auth->description)("n", block->block_num())("id", id.str().substr(8,16))("m_n", missed_block_num));
+                  fc_wlog(chain::vote_logger, "Local finalizer {} did not vote in block {} : {} for block {}",
+                          f.fin_auth->description, block->block_num(), id.str().substr(8,16), missed_block_num);
                }
                not_voted += f.fin_auth->description;
                not_voted += ',';
             }
             if (!not_voted.empty()) {
                not_voted.resize(not_voted.size() - 1); // remove ','
-               fc_ilog(chain::vote_logger, "Block ${id}... #${n} @ ${t} produced by ${p}, latency: ${l}ms has no votes for block #${m_n} from finalizers: ${v}",
-                    ("id", id.str().substr(8, 16))("n", block->block_num())("t", block->timestamp)("p", block->producer)
-                    ("l", (fc::time_point::now() - block->timestamp).count() / 1000)("v", not_voted)("m_n", missed_block_num));
+               fc_ilog(chain::vote_logger, "Block {}... #{} @ {} produced by {}, latency: {}ms has no votes for block #{} from finalizers: {}",
+                    id.str().substr(8, 16), block->block_num(), block->timestamp, block->producer,
+                    (fc::time_point::now() - block->timestamp).count() / 1000, missed_block_num, not_voted);
             }
          }
       }

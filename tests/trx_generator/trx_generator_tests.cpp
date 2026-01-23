@@ -18,7 +18,7 @@ struct echo_server_impl : rest::simple_server<echo_server_impl> {
    std::string server_header() const { return "/"; }
 
    void log_error(char const* what, const std::string& message) {
-      elog("${what}: ${message}", ("what", what)("message", message));
+      elog("{}: {}", what, message);
    }
 
    bool allow_method(http::verb method) const { return method == http::verb::post; }
@@ -46,7 +46,7 @@ struct echo_server_impl : rest::simple_server<echo_server_impl> {
    void start(boost::asio::ip::tcp::endpoint endpoint) {
       run(_trx_gen_server_thread_pool.get_executor(), endpoint);
       _trx_gen_server_thread_pool.start(
-          1, [](const fc::exception& e) { elog("Trx gen http server exception ${e}", ("e", e)); });
+          1, [](const fc::exception& e) { elog("Trx gen http server exception {}", e.to_detail_string()); });
    }
 
    void shutdown() {
@@ -142,8 +142,8 @@ BOOST_AUTO_TEST_CASE(tps_short_run_high_tps)
    BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
 
    if (runtime_us.count() > maximum_runtime_us) {
-      ilog("couldn't sustain transaction rate.  ran ${rt}us vs expected max ${mx}us",
-           ("rt", runtime_us.count())("mx", maximum_runtime_us));
+      ilog("couldn't sustain transaction rate.  ran {}us vs expected max {}us",
+           runtime_us.count(), maximum_runtime_us);
       BOOST_REQUIRE_LT(monitor->_calls.back().time_to_next_trx_us, 0);
    }
 }
@@ -174,8 +174,8 @@ BOOST_AUTO_TEST_CASE(tps_short_run_med_tps_med_delay)
    BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
 
    if (runtime_us.count() > maximum_runtime_us) {
-      ilog("couldn't sustain transaction rate.  ran ${rt}us vs expected max ${mx}us",
-           ("rt", runtime_us.count())("mx", maximum_runtime_us));
+      ilog("couldn't sustain transaction rate.  ran {}us vs expected max {}us",
+           runtime_us.count(), maximum_runtime_us);
       BOOST_REQUIRE_LT(monitor->_calls.back().time_to_next_trx_us, 0);
    }
 }
@@ -206,8 +206,8 @@ BOOST_AUTO_TEST_CASE(tps_med_run_med_tps_med_delay)
    BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
 
    if (runtime_us.count() > maximum_runtime_us) {
-      ilog("couldn't sustain transaction rate.  ran ${rt}us vs expected max ${mx}us",
-           ("rt", runtime_us.count())("mx", maximum_runtime_us));
+      ilog("couldn't sustain transaction rate.  ran {}us vs expected max {}us",
+           runtime_us.count(), maximum_runtime_us);
       BOOST_REQUIRE_LT(monitor->_calls.back().time_to_next_trx_us, 0);
    }
 }
@@ -238,8 +238,8 @@ BOOST_AUTO_TEST_CASE(tps_cant_keep_up)
    BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
 
    if (runtime_us.count() > maximum_runtime_us) {
-      ilog("couldn't sustain transaction rate.  ran ${rt}us vs expected max ${mx}us",
-           ("rt", runtime_us.count())("mx", maximum_runtime_us));
+      ilog("couldn't sustain transaction rate.  ran {}us vs expected max {}us",
+           runtime_us.count(), maximum_runtime_us);
       BOOST_REQUIRE_LT(monitor->_calls.back().time_to_next_trx_us, 0);
    }
 }
@@ -270,8 +270,8 @@ BOOST_AUTO_TEST_CASE(tps_med_run_med_tps_30us_delay)
    BOOST_REQUIRE_GT(runtime_us.count(), minimum_runtime_us);
 
    if (runtime_us.count() > maximum_runtime_us) {
-      ilog("couldn't sustain transaction rate.  ran ${rt}us vs expected max ${mx}us",
-           ("rt", runtime_us.count())("mx", maximum_runtime_us));
+      ilog("couldn't sustain transaction rate.  ran {}us vs expected max {}us",
+           runtime_us.count(), maximum_runtime_us);
       BOOST_REQUIRE_LT(monitor->_calls.back().time_to_next_trx_us, 0);
    }
 }

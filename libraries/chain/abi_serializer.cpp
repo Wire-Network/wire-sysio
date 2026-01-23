@@ -153,7 +153,7 @@ namespace sysio::chain {
 
       for( auto& td : abi.types ) {
          SYS_ASSERT(!_is_type(td.new_type_name, ctx), duplicate_abi_type_def_exception,
-                    "type already exists", ("new_type_name",impl::limit_size(td.new_type_name)));
+                    "type {} already exists", impl::limit_size(td.new_type_name));
          typedefs[std::move(td.new_type_name)] = std::move(td.type);
       }
 
@@ -200,8 +200,8 @@ namespace sysio::chain {
    }
 
    int abi_serializer::get_integer_size(const std::string_view& type) const {
-      SYS_ASSERT( is_integer(type), invalid_type_inside_abi, "${type} is not an integer type",
-                  ("type",impl::limit_size(type)));
+      SYS_ASSERT( is_integer(type), invalid_type_inside_abi, "{} is not an integer type",
+                  impl::limit_size(type));
       if( type.starts_with("uint") ) {
          return boost::lexical_cast<int>(type.substr(4));
       } else {
@@ -280,7 +280,7 @@ namespace sysio::chain {
 
    const struct_def& abi_serializer::get_struct(const std::string_view& type)const {
       auto itr = structs.find(resolve_type(type) );
-      SYS_ASSERT( itr != structs.end(), invalid_type_inside_abi, "Unknown struct ${type}", ("type",impl::limit_size(type)) );
+      SYS_ASSERT( itr != structs.end(), invalid_type_inside_abi, "Unknown struct {}", impl::limit_size(type) );
       return itr->second;
    }
 
@@ -291,14 +291,14 @@ namespace sysio::chain {
          while( itr != typedefs.end() ) {
             ctx.check_deadline();
             SYS_ASSERT( find(types_seen.begin(), types_seen.end(), itr->second) == types_seen.end(), abi_circular_def_exception,
-                        "Circular reference in type ${type}", ("type", impl::limit_size(t.first)) );
+                        "Circular reference in type {}", impl::limit_size(t.first) );
             types_seen.emplace_back(itr->second);
             itr = typedefs.find(itr->second);
          }
-      } FC_CAPTURE_AND_RETHROW( (t) ) }
+      } FC_CAPTURE_AND_RETHROW( "t: {}", t ) }
       for( const auto& t : typedefs ) { try {
-         SYS_ASSERT(_is_type(t.second, ctx), invalid_type_inside_abi, "${type}", ("type",impl::limit_size(t.second)) );
-      } FC_CAPTURE_AND_RETHROW( (t) ) }
+         SYS_ASSERT(_is_type(t.second, ctx), invalid_type_inside_abi, "{}", impl::limit_size(t.second) );
+      } FC_CAPTURE_AND_RETHROW( "t: {}", t ) }
       for( const auto& s : structs ) { try {
          if( s.second.base != type_name() ) {
             const struct_def* current = &s.second;
@@ -307,7 +307,7 @@ namespace sysio::chain {
                ctx.check_deadline();
                const struct_def& base = get_struct(current->base); //<-- force struct to inherit from another struct
                SYS_ASSERT( find(types_seen.begin(), types_seen.end(), base.name) == types_seen.end(), abi_circular_def_exception,
-                           "Circular reference in struct ${type}", ("type",impl::limit_size(s.second.name)) );
+                           "Circular reference in struct {}", impl::limit_size(s.second.name) );
                types_seen.emplace_back(base.name);
                current = &base;
             }
@@ -315,29 +315,29 @@ namespace sysio::chain {
          for( const auto& field : s.second.fields ) { try {
             ctx.check_deadline();
             SYS_ASSERT(_is_type(_remove_bin_extension(field.type), ctx), invalid_type_inside_abi,
-                       "${type}", ("type",impl::limit_size(field.type)) );
-         } FC_CAPTURE_AND_RETHROW( (field) ) }
-      } FC_CAPTURE_AND_RETHROW( (s) ) }
+                       "{}", impl::limit_size(field.type) );
+         } FC_CAPTURE_AND_RETHROW( "field: {}", field ) }
+      } FC_CAPTURE_AND_RETHROW( "s: {}", s ) }
       for( const auto& s : variants ) { try {
          for( const auto& type : s.second.types ) { try {
             ctx.check_deadline();
-            SYS_ASSERT(_is_type(type, ctx), invalid_type_inside_abi, "${type}", ("type",impl::limit_size(type)) );
-         } FC_CAPTURE_AND_RETHROW( (type) ) }
-      } FC_CAPTURE_AND_RETHROW( (s) ) }
+            SYS_ASSERT(_is_type(type, ctx), invalid_type_inside_abi, "{}", impl::limit_size(type) );
+         } FC_CAPTURE_AND_RETHROW( "type: {}", type ) }
+      } FC_CAPTURE_AND_RETHROW( "s: {}", s ) }
       for( const auto& a : actions ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(_is_type(a.second, ctx), invalid_type_inside_abi, "${type}", ("type",impl::limit_size(a.second)) );
-      } FC_CAPTURE_AND_RETHROW( (a)  ) }
+        SYS_ASSERT(_is_type(a.second, ctx), invalid_type_inside_abi, "{}", impl::limit_size(a.second) );
+      } FC_CAPTURE_AND_RETHROW( "a: {}", a  ) }
 
       for( const auto& t : tables ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(_is_type(t.second, ctx), invalid_type_inside_abi, "${type}", ("type",impl::limit_size(t.second)) );
-      } FC_CAPTURE_AND_RETHROW( (t)  ) }
+        SYS_ASSERT(_is_type(t.second, ctx), invalid_type_inside_abi, "{}", impl::limit_size(t.second) );
+      } FC_CAPTURE_AND_RETHROW( "t: {}", t  ) }
 
       for( const auto& r : action_results ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(_is_type(r.second, ctx), invalid_type_inside_abi, "${type}", ("type",impl::limit_size(r.second)) );
-      } FC_CAPTURE_AND_RETHROW( (r)  ) }
+        SYS_ASSERT(_is_type(r.second, ctx), invalid_type_inside_abi, "{}", impl::limit_size(r.second) );
+      } FC_CAPTURE_AND_RETHROW( "r: {}", r  ) }
    }
 
    std::string_view abi_serializer::resolve_type(const std::string_view& type)const {
@@ -357,7 +357,7 @@ namespace sysio::chain {
    {
       auto h = ctx.enter_scope();
       auto s_itr = structs.find(type);
-      SYS_ASSERT( s_itr != structs.end(), invalid_type_inside_abi, "Unknown type ${type}", ("type",ctx.maybe_shorten(type)) );
+      SYS_ASSERT( s_itr != structs.end(), invalid_type_inside_abi, "Unknown type {}", ctx.maybe_shorten(type) );
       ctx.hint_struct_type_if_in_array( s_itr );
       const auto& st = s_itr->second;
       if( st.base != type_name() ) {
@@ -373,11 +373,11 @@ namespace sysio::chain {
                continue;
             }
             if( encountered_extension ) {
-               SYS_THROW( abi_exception, "Encountered field '${f}' without binary extension designation while processing struct '${p}'",
-                          ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
+               SYS_THROW( abi_exception, "Encountered field '{}' without binary extension designation while processing struct '{}'",
+                          ctx.maybe_shorten(field.name), ctx.get_path_string() );
             }
-            SYS_THROW( unpack_exception, "Stream unexpectedly ended; unable to unpack field '${f}' of struct '${p}'",
-                       ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
+            SYS_THROW( unpack_exception, "Stream unexpectedly ended; unable to unpack field '{}' of struct '{}'",
+                       ctx.maybe_shorten(field.name), ctx.get_path_string() );
 
          }
          auto h1 = ctx.push_to_path( impl::field_path_item{ .parent_struct_itr = s_itr, .field_ordinal = i } );
@@ -427,21 +427,21 @@ namespace sysio::chain {
       } else if( auto btype = built_in_types.find(ftype ); btype != built_in_types.end() ) {
          try {
             return btype->second.first(stream, is_array(rtype), is_optional(rtype), ctx.get_yield_function());
-         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack ${class} type '${type}' while processing '${p}'",
-                                   ("class", is_array(rtype) ? "array of built-in" : is_optional(rtype) ? "optional of built-in" : "built-in")
-                                   ("type", impl::limit_size(ftype))("p", ctx.get_path_string()) )
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack {} type '{}' while processing '{}'",
+                                   is_array(rtype) ? "array of built-in" : is_optional(rtype) ? "optional of built-in" : "built-in",
+                                   impl::limit_size(ftype), ctx.get_path_string() )
       }
       if ( is_array(rtype) ) {
          fc::unsigned_int size;
          try {
             fc::raw::unpack(stream, size);
-         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack size of array '${p}'", ("p", ctx.get_path_string()) )
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack size of array '{}'", ctx.get_path_string() )
          return read_array(size.value);
       } else if ( is_optional(rtype) ) {
          char flag;
          try {
             fc::raw::unpack(stream, flag);
-         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '${p}'", ("p", ctx.get_path_string()) )
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack presence flag of optional '{}'", ctx.get_path_string() )
          return flag ? _binary_to_variant(ftype, stream, ctx) : fc::variant();
       } else {
          auto v_itr = variants.find(rtype);
@@ -450,9 +450,9 @@ namespace sysio::chain {
             fc::unsigned_int select;
             try {
                fc::raw::unpack(stream, select);
-            } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack tag of variant '${p}'", ("p", ctx.get_path_string()) )
+            } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack tag of variant '{}'", ctx.get_path_string() )
             SYS_ASSERT( (size_t)select < v_itr->second.types.size(), unpack_exception,
-                        "Unpacked invalid tag (${select}) for variant '${p}'", ("select", select.value)("p",ctx.get_path_string()) );
+                        "Unpacked invalid tag ({}) for variant '{}'", select.value, ctx.get_path_string() );
             auto h1 = ctx.push_to_path( impl::variant_path_item{ .variant_itr = v_itr, .variant_ordinal = static_cast<uint32_t>(select) } );
             return fc::variants{v_itr->second.types[select], _binary_to_variant(v_itr->second.types[select], stream, ctx)};
          }
@@ -461,7 +461,7 @@ namespace sysio::chain {
       fc::mutable_variant_object mvo;
       _binary_to_variant(rtype, stream, mvo, ctx);
       // QUESTION: Is this assert actually desired? It disallows unpacking empty structs from datastream.
-      SYS_ASSERT( mvo.size() > 0, unpack_exception, "Unable to unpack '${p}' from stream", ("p", ctx.get_path_string()) );
+      SYS_ASSERT( mvo.size() > 0, unpack_exception, "Unable to unpack '{}' from stream", ctx.get_path_string() );
       return fc::variant( std::move(mvo) );
    }
 
@@ -521,7 +521,7 @@ namespace sysio::chain {
          ctx.hint_array_type_if_in_array();
          const vector<fc::variant>& vars = var.get_array();
          SYS_ASSERT( vars.size() == sz, pack_exception,
-                     "Incorrect number of values provided (${a}) for fixed-size (${b}) array type", ("a", sz)("b", vars.size()));
+                     "Incorrect number of values provided ({}) for fixed-size ({}) array type", sz, vars.size());
          pack_array(vars);
       } else if( auto btype = built_in_types.find(fundamental_type(rtype)); btype != built_in_types.end() ) {
          btype->second.second(var, ds, is_array(rtype), is_optional(rtype), ctx.get_yield_function());
@@ -540,14 +540,14 @@ namespace sysio::chain {
          ctx.hint_variant_type_if_in_array( v_itr );
          auto& v = v_itr->second;
          SYS_ASSERT( var.is_array() && var.size() == 2, pack_exception,
-                    "Expected input to be an array of two items while processing variant '${p}'", ("p", ctx.get_path_string()) );
+                    "Expected input to be an array of two items while processing variant '{}'", ctx.get_path_string() );
          SYS_ASSERT( var[size_t(0)].is_string(), pack_exception,
-                    "Encountered non-string as first item of input array while processing variant '${p}'", ("p", ctx.get_path_string()) );
+                    "Encountered non-string as first item of input array while processing variant '{}'", ctx.get_path_string() );
          auto variant_type_str = var[size_t(0)].get_string();
          auto it = find(v.types.begin(), v.types.end(), variant_type_str);
          SYS_ASSERT( it != v.types.end(), pack_exception,
-                     "Specified type '${t}' in input array is not valid within the variant '${p}'",
-                     ("t", ctx.maybe_shorten(variant_type_str))("p", ctx.get_path_string()) );
+                     "Specified type '{}' in input array is not valid within the variant '{}'",
+                     ctx.maybe_shorten(variant_type_str), ctx.get_path_string() );
          fc::raw::pack(ds, fc::unsigned_int(it - v.types.begin()));
          auto h1 = ctx.push_to_path( impl::variant_path_item{ .variant_itr = v_itr, .variant_ordinal = static_cast<uint32_t>(it - v.types.begin()) } );
          _variant_to_binary( *it, var[size_t(1)], ds, ctx );
@@ -568,8 +568,8 @@ namespace sysio::chain {
                bool present = vo.contains(string(field.name).c_str());
                if( present || is_optional(field.type) ) {
                   if( disallow_additional_fields )
-                     SYS_THROW( pack_exception, "Unexpected field '${f}' found in input object while processing struct '${p}'",
-                                ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
+                     SYS_THROW( pack_exception, "Unexpected field '{}' found in input object while processing struct '{}'",
+                                ctx.maybe_shorten(field.name), ctx.get_path_string() );
                   {
                      auto h1 = ctx.push_to_path( impl::field_path_item{ .parent_struct_itr = s_itr, .field_ordinal = i } );
                      auto h2 = ctx.disallow_extensions_unless( &field == &st.fields.back() );
@@ -578,18 +578,18 @@ namespace sysio::chain {
                } else if( field.type.ends_with("$") && ctx.extensions_allowed() ) {
                   disallow_additional_fields = true;
                } else if( disallow_additional_fields ) {
-                  SYS_THROW( abi_exception, "Encountered field '${f}' without binary extension designation while processing struct '${p}'",
-                             ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
+                  SYS_THROW( abi_exception, "Encountered field '{}' without binary extension designation while processing struct '{}'",
+                             ctx.maybe_shorten(field.name), ctx.get_path_string() );
                } else {
-                  SYS_THROW( pack_exception, "Missing field '${f}' in input object while processing struct '${p}'",
-                             ("f", ctx.maybe_shorten(field.name))("p", ctx.get_path_string()) );
+                  SYS_THROW( pack_exception, "Missing field '{}' in input object while processing struct '{}'",
+                             ctx.maybe_shorten(field.name), ctx.get_path_string() );
                }
             }
          } else if( var.is_array() ) {
             const auto& va = var.get_array();
             SYS_ASSERT( st.base == type_name(), invalid_type_inside_abi,
-                        "Using input array to specify the fields of the derived struct '${p}'; input arrays are currently only allowed for structs without a base",
-                        ("p",ctx.get_path_string()) );
+                        "Using input array to specify the fields of the derived struct '{}'; input arrays are currently only allowed for structs without a base",
+                        ctx.get_path_string() );
             for( uint32_t i = 0; i < st.fields.size(); ++i ) {
                const auto& field = st.fields[i];
                if( va.size() > i ) {
@@ -599,17 +599,17 @@ namespace sysio::chain {
                } else if( field.type.ends_with("$") && ctx.extensions_allowed() ) {
                   break;
                } else {
-                  SYS_THROW( pack_exception, "Early end to input array specifying the fields of struct '${p}'; require input for field '${f}'",
-                             ("p", ctx.get_path_string())("f", ctx.maybe_shorten(field.name)) );
+                  SYS_THROW( pack_exception, "Early end to input array specifying the fields of struct '{}'; require input for field '{}'",
+                             ctx.get_path_string(), ctx.maybe_shorten(field.name) );
                }
             }
          } else {
-            SYS_THROW( pack_exception, "Unexpected input encountered while processing struct '${p}'", ("p",ctx.get_path_string()) );
+            SYS_THROW( pack_exception, "Unexpected input encountered while processing struct '{}'", ctx.get_path_string() );
          }
       } else {
-         SYS_THROW( invalid_type_inside_abi, "Unknown type ${type}", ("type",ctx.maybe_shorten(type)) );
+         SYS_THROW( invalid_type_inside_abi, "Unknown type {}", ctx.maybe_shorten(type) );
       }
-   } FC_CAPTURE_AND_RETHROW() }
+   } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::_variant_to_binary( const std::string_view& type, const fc::variant& var, impl::variant_to_binary_context& ctx )const
    { try {
@@ -623,7 +623,7 @@ namespace sysio::chain {
       _variant_to_binary(type, var, ds, ctx);
       temp.resize(ds.tellp());
       return temp;
-   } FC_CAPTURE_AND_RETHROW() }
+   } FC_CAPTURE_AND_RETHROW("") }
 
    bytes abi_serializer::variant_to_binary( const std::string_view& type, const fc::variant& var, const yield_function_t& yield, bool short_path )const {
       impl::variant_to_binary_context ctx(*this, yield, fc::microseconds{}, type);

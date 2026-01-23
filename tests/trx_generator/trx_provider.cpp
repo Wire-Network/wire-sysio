@@ -2,7 +2,6 @@
 #include <http_client_async.hpp>
 
 #include <fc/io/raw.hpp>
-#include <fc/log/appender.hpp>
 #include <fc/io/json.hpp>
 
 #include <boost/asio.hpp>
@@ -37,7 +36,7 @@ namespace sysio::testing {
    void provider_connection::init_and_connect() {
       _connection_thread_pool.start(1,
                                     [&](const fc::exception &e) {
-                                       wlog("Exception in connection_thread: ${e}", ("e", e.to_detail_string()));
+                                       wlog("Exception in connection_thread: {}", e.to_detail_string());
                                     });
       connect();
    };
@@ -54,8 +53,7 @@ namespace sysio::testing {
       if (search != _trxs_ack_time_map.end()) {
          time_acked = search->second;
       } else {
-         elog("get_trx_ack_time - Transaction acknowledge time not found for transaction with id: ${id}",
-              ("id", trx_id));
+         elog("get_trx_ack_time - Transaction acknowledge time not found for transaction with id: {}", trx_id);
          time_acked = fc::time_point::min();
       }
       return time_acked;
@@ -68,11 +66,11 @@ namespace sysio::testing {
    }
 
    void p2p_connection::connect() {
-      ilog("Attempting P2P connection to ${ip}:${port}.", ("ip", _config._peer_endpoint)("port", _config._port));
+      ilog("Attempting P2P connection to {}:{}.", _config._peer_endpoint, _config._port);
       tcp::resolver r(_connection_thread_pool.get_executor());
       auto i = r.resolve(tcp::v4(), _config._peer_endpoint, std::to_string(_config._port));
       boost::asio::connect(_p2p_socket, i);
-      ilog("Connected to ${ip}:${port}.", ("ip", _config._peer_endpoint)("port", _config._port));
+      ilog("Connected to {}:{}.", _config._peer_endpoint, _config._port);
    }
 
    void p2p_connection::disconnect() {
@@ -81,14 +79,14 @@ namespace sysio::testing {
       for (uint64_t sent = _sent.load(), sent_callback_num = _sent_callback_num.load();
            sent != sent_callback_num && waited < max;
            sent = _sent.load(), sent_callback_num = _sent_callback_num.load()) {
-         ilog("disconnect waiting on ack - sent ${s} | acked ${a} | waited ${w}",
-              ("s", sent)("a", sent_callback_num)("w", waited));
+         ilog("disconnect waiting on ack - sent {} | acked {} | waited {}",
+              sent, sent_callback_num, waited);
          sleep(1);
          ++waited;
       }
       if (waited == max) {
-         elog("disconnect failed to receive all acks in time - sent ${s} | acked ${a} | waited ${w}",
-              ("s", _sent.load())("a", _sent_callback_num.load())("w", waited));
+         elog("disconnect failed to receive all acks in time - sent {} | acked {} | waited {}",
+              _sent.load(), _sent_callback_num.load(), waited);
       }
    }
 
@@ -115,17 +113,17 @@ namespace sysio::testing {
       for (uint64_t sent = _sent.load(), acknowledged = _acknowledged.load();
            sent != acknowledged && waited < max;
            sent = _sent.load(), acknowledged = _acknowledged.load()) {
-         ilog("disconnect waiting on ack - sent ${s} | acked ${a} | waited ${w}",
-              ("s", sent)("a", acknowledged)("w", waited));
+         ilog("disconnect waiting on ack - sent {} | acked {} | waited {}",
+              sent, acknowledged, waited);
          sleep(1);
          ++waited;
       }
       if (waited == max) {
-         elog("disconnect failed to receive all acks in time - sent ${s} | acked ${a} | waited ${w}",
-               ("s", _sent.load())("a", _acknowledged.load())("w", waited));
+         elog("disconnect failed to receive all acks in time - sent {} | acked {} | waited {}",
+              _sent.load(), _acknowledged.load(), waited);
       }
       if (_errors.load()) {
-         elog("${n} errors reported during http calls, see logs", ("n", _errors.load()));
+         elog("{} errors reported during http calls, see logs", _errors.load());
       }
    }
 
@@ -158,7 +156,7 @@ namespace sysio::testing {
                                     boost::beast::http::response<boost::beast::http::string_body> response) {
              trx_acknowledged(trx_id, fc::time_point::now());
              if (ec) {
-                elog("http error: ${c}: ${m}", ("c", ec.value())("m", ec.message()));
+                elog("http error: {}: {}", ec.value(), ec.message());
                 ++_errors;
                 return;
              }
@@ -166,7 +164,7 @@ namespace sysio::testing {
              if (this->needs_response_trace_info() && response.result() == boost::beast::http::status::ok) {
                 bool exception = false;
                 auto exception_handler = [this, &response, &exception](const fc::exception_ptr& ex) {
-                   elog("Fail to parse JSON from string: ${string}", ("string", response.body()));
+                   elog("Fail to parse JSON from string: {}", response.body());
                    ++_errors;
                    exception = true;
                 };
@@ -190,16 +188,13 @@ namespace sysio::testing {
                          if (executed) {
                             record_trx_info(trx_id, block_num, this->is_read_only_transaction() ? elapsed_time : cpu, net, block_time);
                          } else {
-                            elog("async_http_request Transaction receipt status not executed: ${string}",
-                                 ("string", response.body()));
+                            elog("async_http_request Transaction receipt status not executed: {}", response.body());
                          }
                       } else {
-                         elog("async_http_request Transaction failed, no receipt: ${string}",
-                              ("string", response.body()));
+                         elog("async_http_request Transaction failed, no receipt: {}", response.body());
                       }
                    } else {
-                      elog("async_http_request Transaction failed, transaction not processed: ${string}",
-                           ("string", response.body()));
+                      elog("async_http_request Transaction failed, transaction not processed: {}", response.body());
                    }
                 } CATCH_AND_CALL(exception_handler)
                 if (exception)
@@ -208,8 +203,8 @@ namespace sysio::testing {
 
              if (!(response.result() == boost::beast::http::status::accepted ||
                    response.result() == boost::beast::http::status::ok)) {
-                elog("async_http_request Failed with response http status code: ${s}, response: ${r}",
-                     ("s", response.result_int())("r", response.body()));
+                elog("async_http_request Failed with response http status code: {}, response: {}",
+                     response.result_int(), response.body());
              }
              ++this->_acknowledged;
           });
@@ -230,7 +225,7 @@ namespace sysio::testing {
       if (search != _acked_trx_trace_info_map.end()) {
          info = search->second;
       } else {
-         elog("get_acked_trx_trace_info - Acknowledged transaction trace info not found for transaction with id: ${id}", ("id", trx_id));
+         elog("get_acked_trx_trace_info - Acknowledged transaction trace info not found for transaction with id: {}", trx_id);
       }
       return info;
    }
@@ -302,11 +297,8 @@ namespace sysio::testing {
            auto lag_duration_us = stats.last_run - _violation_start_time.value();
            if (lag_duration_us > _max_lag_duration_us) {
                elog("Target tps lagging outside of defined limits. Terminating test");
-               elog("Expected=${expected}, Sent=${sent}, Percent off=${per_off}, Violation start=${vstart} ",
-                    ("expected",  stats.expected_sent)
-                    ("sent", stats.trxs_sent)
-                    ("per_off", per_off)
-                    ("vstart", _violation_start_time));
+               elog("Expected={}, Sent={}, Percent off={}, Violation start={} ",
+                    stats.expected_sent, stats.trxs_sent, per_off, *_violation_start_time);
                _terminated_early = true;
                return false;
            }

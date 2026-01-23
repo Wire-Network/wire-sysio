@@ -29,10 +29,10 @@ int main(int argc, char** argv) {
       [&]() {
          auto now = std::chrono::utc_clock::now();
          auto now_str = std::format("{:%H:%M:%S}", now);
-         ilogf("{}: Getting ethereum gas price", now_str);
+         ilog("{}: Getting ethereum gas price", now_str);
 
          auto current_price = eth_client->client->get_gas_price();
-         ilogf("{}: Current Price> {}WEI", now_str, current_price.str());
+         ilog("{}: Current Price> {}WEI", now_str, current_price.str());
       },
       cron_service::job_metadata_t{
          .one_at_a_time = true, .tags = {"ethereum", "gas"}, .label = "cron_5s_heartbeat"});

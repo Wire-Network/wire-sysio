@@ -78,9 +78,7 @@ public:
          ++suffix;
          dest_path = destination_filename + "-" + std::to_string(suffix) + _wallet_filename_extension;
       }
-      wlog("backing up wallet ${src} to ${dest}",
-           ("src", src_path)
-           ("dest", dest_path));
+      wlog("backing up wallet {} to {}", src_path.generic_string(), dest_path.generic_string());
 
       std::filesystem::path dest_parent = std::filesystem::absolute(dest_path).parent_path();
       try {
@@ -106,7 +104,7 @@ public:
    void set_key_name(const string& current_key_name, const string& new_key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(_key_by_name.contains(current_key_name), key_nonexistent_exception,
-                 "Key name provided does not exist: ${keyName}", ("keyName", current_key_name));
+                 "Key name provided does not exist: {}", current_key_name);
       _key_by_name[new_key_name] = _key_by_name[current_key_name];
       _key_by_name.erase(current_key_name);
    }
@@ -114,11 +112,11 @@ public:
    void set_key_name(const private_key_type& private_key, const string& key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(!_key_by_name.contains(key_name), key_exist_exception,
-                 "Key name provided already exists (keyName=${keyName})", ("keyName", key_name));
+                 "Key name provided already exists (keyName={})", key_name);
 
       auto pub_key = private_key.get_public_key();
-      SYS_ASSERT(_keys.contains(pub_key), key_nonexistent_exception, "Key provided does not exist (pubkey=${pubkey})",
-                 ("pubkey", pub_key));
+      SYS_ASSERT(_keys.contains(pub_key), key_nonexistent_exception, "Key provided does not exist (pubkey={})",
+                 fc::json::to_log_string(pub_key));
 
       std::erase_if(_key_by_name, [&](const auto& pair) {
          return pair.second == pub_key;
@@ -130,10 +128,10 @@ public:
    void set_key_name(const public_key_type& public_key, const string& key_name) {
       SYS_ASSERT(!is_locked(), wallet_locked_exception, "Unable to set key name on a locked wallet");
       SYS_ASSERT(!_key_by_name.contains(key_name), key_exist_exception,
-                 "Key name provided already exists (keyName=${keyName})", ("keyName", key_name));
+                 "Key name provided already exists (keyName={})", key_name);
 
-      SYS_ASSERT(_keys.contains(public_key), key_nonexistent_exception, "Key provided does not exist (pubkey=${pubkey})",
-                 ("pubkey", public_key));
+      SYS_ASSERT(_keys.contains(public_key), key_nonexistent_exception, "Key provided does not exist (pubkey={})",
+                 fc::json::to_log_string(public_key));
 
       std::erase_if(_key_by_name, [&](const auto& pair) {
          return pair.second == public_key;
@@ -197,8 +195,8 @@ public:
       private_key_type              priv = private_key_type::from_string(key_str);
       sysio::chain::public_key_type pub_key = priv.get_public_key();
 
-      SYS_ASSERT(!_keys.contains(pub_key), chain::key_exist_exception, "Key already in wallet (pubKey=${pubKey})", ("pubKey", pub_key));
-      SYS_ASSERT(!_key_by_name.contains(key_name), chain::key_exist_exception, "Key already in wallet (keyName=${keyName})", ("keyName", key_name));
+      SYS_ASSERT(!_keys.contains(pub_key), chain::key_exist_exception, "Key already in wallet (pubKey={})", fc::json::to_log_string(pub_key));
+      SYS_ASSERT(!_key_by_name.contains(key_name), chain::key_exist_exception, "Key already in wallet (keyName={})", key_name);
 
       _keys[pub_key] = priv;
       _key_by_name[key_name] = pub_key;
@@ -273,8 +271,7 @@ public:
       else if (key_type == "R1")
          priv_key = fc::crypto::private_key::generate<fc::crypto::r1::private_key_shim>();
       else
-         SYS_THROW(chain::unsupported_key_type_exception, "Key type \"${kt}\" not supported by software wallet",
-                ("kt", key_type));
+         SYS_THROW(chain::unsupported_key_type_exception, "Key type \"{}\" not supported by software wallet", key_type);
 
       import_key(key_name, priv_key.to_string({}, true));
       return priv_key.get_public_key().to_string({}, true);
@@ -309,7 +306,7 @@ public:
       if (wallet_filename == "")
          wallet_filename = _wallet_filename;
 
-      wlog("saving wallet to file ${fn}", ("fn", wallet_filename));
+      wlog("saving wallet to file {}", wallet_filename);
 
       string data = fc::json::to_pretty_string(_wallet);
       try {
@@ -322,8 +319,8 @@ public:
          //
          ofstream outfile{wallet_filename};
          if (!outfile) {
-            elog("Unable to open file: ${fn}", ("fn", wallet_filename));
-            SYS_THROW(wallet_exception, "Unable to open file: ${fn}", ("fn", wallet_filename));
+            elog("Unable to open file: {}", wallet_filename);
+            SYS_THROW(wallet_exception, "Unable to open file: {}", wallet_filename);
          }
          outfile.write(data.c_str(), data.length());
          outfile.flush();
@@ -464,7 +461,7 @@ void soft_wallet::lock() {
       my->_keys.clear();
       my->_key_by_name.clear();
       my->_checksum = fc::sha512();
-   } FC_CAPTURE_AND_RETHROW()
+   } FC_CAPTURE_AND_RETHROW("")
 }
 
 void soft_wallet::unlock(string password) {
@@ -482,12 +479,12 @@ void soft_wallet::unlock(string password) {
          return;
       }
       default: {
-         FC_ASSERT(false, "Only new V1 of soft wallet is usable (version=${version}) is unsupported", ("version",my->_wallet.version));
+         FC_ASSERT(false, "Only new V1 of soft wallet is usable (version={}) is unsupported", my->_wallet.version);
       }
       }
 
    } SYS_RETHROW_EXCEPTIONS(chain::wallet_invalid_password_exception,
-                            "Invalid password for wallet: \"${wallet_name}\"", ("wallet_name", get_wallet_filename()))
+                            "Invalid password for wallet: \"{}\"", get_wallet_filename())
 }
 
 void soft_wallet::check_password(string password) {
@@ -507,7 +504,7 @@ void soft_wallet::check_password(string password) {
       }
 
    } SYS_RETHROW_EXCEPTIONS(chain::wallet_invalid_password_exception,
-                            "Invalid password for wallet: \"${wallet_name}\"", ("wallet_name", get_wallet_filename()))
+                            "Invalid password for wallet: \"{}\"", get_wallet_filename())
 }
 
 void soft_wallet::set_password(string password) {

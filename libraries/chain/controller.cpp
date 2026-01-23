@@ -422,8 +422,8 @@ struct building_block {
       for( auto it = branch.begin(); it != branch.end(); ++it ) {
          if( auto qc = (*it)->get_best_qc(); qc ) {
             SYS_ASSERT( qc->block_num <= block_header::num_from_id(parent.id()), block_validate_exception,
-                        "most recent ancestor QC block number (${a}) cannot be greater than parent's block number (${p})",
-                        ("a", qc->block_num)("p", block_header::num_from_id(parent.id())) );
+                        "most recent ancestor QC block number ({}) cannot be greater than parent's block number ({})",
+                        qc->block_num, block_header::num_from_id(parent.id()) );
             auto qc_claim = qc->to_qc_claim();
             if( parent.is_needed(qc_claim) ) {
                return qc_data_t{ *qc, qc_claim };
@@ -630,22 +630,22 @@ struct controller_impl {
       try {
          s( std::forward<Arg>( a ));
       } catch (std::bad_alloc& e) {
-         wlog( "${f}:${l} std::bad_alloc: ${w}", ("f", file)("l", line)("w", e.what()) );
+         wlog( "{}:{} std::bad_alloc: {}", file, line, e.what() );
          throw e;
       } catch (boost::interprocess::bad_alloc& e) {
-         wlog( "${f}:${l} boost::interprocess::bad alloc: ${w}", ("f", file)("l", line)("w", e.what()) );
+         wlog( "{}:{} boost::interprocess::bad alloc: {}", file, line, e.what() );
          throw e;
       } catch ( controller_emit_signal_exception& e ) {
-         wlog( "${f}:${l} controller_emit_signal_exception: ${details}", ("f", file)("l", line)("details", e.to_detail_string()) );
+         wlog( "{}:{} controller_emit_signal_exception: {}", file, line, e.to_detail_string() );
          wlog( "Shutting down due to controller_emit_signal_exception" );
          shutdown();
          throw e;
       } catch ( fc::exception& e ) {
-         wlog( "${f}:${l} fc::exception: ${details}", ("f", file)("l", line)("details", e.to_detail_string()) );
+         wlog( "{}:{} fc::exception: {}", file, line, e.to_detail_string() );
       } catch ( std::exception& e ) {
-         wlog( "std::exception: ${details}", ("f", file)("l", line)("details", e.what()) );
+         wlog( "{}:{} std::exception: {}", file, line, e.what() );
       } catch ( ... ) {
-         wlog( "${f}:${l} signal handler threw exception", ("f", file)("l", line) );
+         wlog( "{}:{} signal handler threw exception", file, line );
       }
    }
 
@@ -750,7 +750,7 @@ struct controller_impl {
    }
 
    void replace_producer_keys( const public_key_type& key ) {
-      ilog("Replace producer keys with ${k}", ("k", key));
+      ilog("Replace producer keys with {}", fc::json::to_log_string(key));
 
       // TODO IF: add instant-finality implementation, will need to replace finalizers as well
    }
@@ -952,11 +952,11 @@ struct controller_impl {
    {
       assert(cfg.chain_thread_pool_size > 0);
       thread_pool.start( cfg.chain_thread_pool_size, [this]( const fc::exception& e ) {
-         elog( "Exception in chain thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+         elog( "Exception in chain thread pool, exiting: {}", e.to_detail_string() );
          if( shutdown ) shutdown();
       } );
       vote_processor.start(cfg.vote_thread_pool_size, [this]( const fc::exception& e ) {
-         elog( "Exception in vote thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+         elog( "Exception in vote thread pool, exiting: {}", e.to_detail_string() );
          if( shutdown ) shutdown();
       } );
 
@@ -1012,11 +1012,11 @@ struct controller_impl {
 
       if( valid_log_head ) {
          SYS_ASSERT( root_id == log_head_id, fork_database_exception,
-                     "fork database root ${rid} does not match block log head ${hid}", ("rid", root_id)("hid", log_head_id) );
+                     "fork database root {} does not match block log head {}", root_id, *log_head_id );
       } else {
          SYS_ASSERT( fork_db_root_block_num() == lib_num, fork_database_exception,
-                     "The first block ${lib_num} when starting with an empty block log should be the block after fork database root ${bn}.",
-                     ("lib_num", lib_num)("bn", fork_db_root_block_num()) );
+                     "The first block {} when starting with an empty block log should be the block after fork database root {}.",
+                     lib_num, fork_db_root_block_num() );
       }
 
       auto pending_lib_id = fork_db_.pending_savanna_lib_id();
@@ -1081,17 +1081,17 @@ struct controller_impl {
                }
             }
          }
-      } FC_CAPTURE_AND_RETHROW() } catch ( const fc::exception& e ) {
+      } FC_CAPTURE_AND_RETHROW("") } catch ( const fc::exception& e ) {
          try {
             if (e.code() != interrupt_exception::code_value)
-               elog("Caught exception while logging irreversible: ${e}", ("e", e.to_detail_string()));
+               elog("Caught exception while logging irreversible: {}", e.to_detail_string());
             if (root_id != fork_db_.root()->id()) {
                fork_db_.advance_root(root_id);
             }
          } catch( const fc::exception& e2 ) {
-            elog("Caught exception ${e2}, while processing exception ${e}", ("e2", e2.to_detail_string())("e", e.what()));
+            elog("Caught exception {}, while processing exception {}", e2.to_detail_string(), e.what());
          } catch( const std::exception& e2 ) {
-            elog("Caught exception ${e2}, while processing exception ${e}", ("e2", e2.what())("e", e.what()));
+            elog("Caught exception {}, while processing exception {}", e2.what(), e.what());
          }
          throw;
       }
@@ -1147,7 +1147,7 @@ struct controller_impl {
       assert(start_block_num <= blog_head->block_num());
 
       std::exception_ptr except_ptr;
-      ilog( "existing block log, attempting to replay from ${s} to ${n} blocks", ("s", start_block_num)("n", blog_head->block_num()) );
+      ilog( "existing block log, attempting to replay from {} to {} blocks", start_block_num, blog_head->block_num() );
       try {
          while( auto next = blog.read_block_by_num( chain_head.block_num() + 1 ) ) {
             replay_irreversible_block( next );
@@ -1156,24 +1156,24 @@ struct controller_impl {
                break;
             }
             if( next->block_num() % 500 == 0 ) {
-               ilog( "${n} of ${head}", ("n", next->block_num())("head", blog_head->block_num()) );
+               ilog( "{} of {}", next->block_num(), blog_head->block_num() );
             }
          }
       } catch( const std::exception& e ) {
-         wlog("Exception caught while replaying block log: ${e}", ("e", e.what()));
+         wlog("Exception caught while replaying block log: {}", e.what());
          except_ptr = std::current_exception();
       }
       auto end = fc::time_point::now();
-      ilog( "${n} irreversible blocks replayed from block log, chain head ${bn}",
-            ("n", 1 + chain_head.block_num() - start_block_num)("bn", chain_head.block_num()) );
-      ilog( "replayed ${n} blocks in ${duration} seconds, ${mspb} ms/block",
-            ("n", chain_head.block_num() + 1 - start_block_num)("duration", (end-start).count()/1000000)
-            ("mspb", ((end-start).count()/1000.0)/(chain_head.block_num()-start_block_num)) );
+      ilog( "{} irreversible blocks replayed from block log, chain head {}",
+            1 + chain_head.block_num() - start_block_num, chain_head.block_num() );
+      ilog( "replayed {} blocks in {} seconds, {} ms/block",
+            chain_head.block_num() + 1 - start_block_num, (end-start).count()/1000000,
+            ((end-start).count()/1000.0)/(chain_head.block_num()-start_block_num) );
 
       // if the irreverible log is played without undo sessions enabled, we need to sync the
       // revision ordinal to the appropriate expected value here.
       if( skip_db_sessions( controller::block_status::irreversible ) ) {
-         ilog( "Setting chainbase revision to ${n}", ("n", chain_head.block_num()) );
+         ilog( "Setting chainbase revision to {}", chain_head.block_num() );
          db.set_revision( chain_head.block_num() );
       }
 
@@ -1199,7 +1199,7 @@ struct controller_impl {
       try {
          open_fork_db();
       } catch (const fc::exception& e) {
-         elog( "Unable to open fork database, continuing without reversible blocks: ${e}", ("e", e));
+         elog( "Unable to open fork database, continuing without reversible blocks: {}", e.to_string());
       }
 
       if (startup == startup_t::existing_state) {
@@ -1211,10 +1211,8 @@ struct controller_impl {
             if(blog_head) {
                SYS_ASSERT( first_block_num <= lib_num && lib_num <= blog_head->block_num(),
                            block_log_exception,
-                           "block log (ranging from ${block_log_first_num} to ${block_log_last_num}) does not contain the last irreversible block (${fork_db_lib})",
-                           ("block_log_first_num", first_block_num)
-                           ("block_log_last_num", blog_head->block_num())
-                           ("fork_db_lib", lib_num)
+                           "block log (ranging from {} to {}) does not contain the last irreversible block ({})",
+                           first_block_num, blog_head->block_num(), lib_num
                );
                lib_num = blog_head->block_num();
             } else {
@@ -1256,25 +1254,22 @@ struct controller_impl {
       auto pending_head = fork_db_.head();
       auto root = fork_db_.root();
       if( pending_head ) {
-         ilog("fork database size ${s} head ${hn} : ${h}, root ${rn} : ${r}",
-              ("s", fork_db_.size())("hn", pending_head->block_num())("h", pending_head->id())
-              ("rn", root->block_num())("r", root->id()));
+         ilog("fork database size {} head {} : {}, root {} : {}",
+              fork_db_.size(), pending_head->block_num(), pending_head->id(), root->block_num(), root->id());
       } else if (root) {
-         ilog("fork database has no pending blocks root ${rn} : ${r}",
-              ("rn", root->block_num())("r", root->id()));
+         ilog("fork database has no pending blocks root {} : {}", root->block_num(), root->id());
       } else {
          ilog("fork database empty, no pending or root");
       }
       if( pending_head && blog_head && start_block_num <= blog_head->block_num() ) {
          if( pending_head->block_num() < chain_head.block_num() || chain_head.block_num() < fork_db_.root()->block_num() ) {
-            ilog( "resetting fork database with new last irreversible block as the new root: ${id}", ("id", chain_head.id()) );
+            ilog( "resetting fork database with new last irreversible block as the new root: {}", chain_head.id() );
             fork_db_reset_root_to_chain_head();
          } else if( chain_head.block_num() != fork_db_.root()->block_num() ) {
             auto new_root = fork_db_.search_on_branch( pending_head->id(), chain_head.block_num() );
             SYS_ASSERT( new_root, fork_database_exception,
                         "unexpected error: could not find new LIB in fork database" );
-            ilog( "advancing fork database root to new last irreversible block within existing fork database: ${id}",
-                  ("id", new_root->id()) );
+            ilog( "advancing fork database root to new last irreversible block within existing fork database: {}", new_root->id() );
             new_root->set_valid(true);
             fork_db_.advance_root( new_root->id() );
          }
@@ -1285,8 +1280,8 @@ struct controller_impl {
          fork_db_reset_root_to_chain_head();
       } else if( !check_shutdown() && !irreversible_mode() ) {
          if (auto fork_db_head = fork_db_.head()) {
-            ilog("fork database contains ${n} blocks after head from ${ch} to ${fh}",
-                 ("n", fork_db_head->block_num() - chain_head.block_num())("ch", chain_head.block_num())("fh", fork_db_head->block_num()));
+            ilog("fork database contains {} blocks after head from {} to {}",
+                 fork_db_head->block_num() - chain_head.block_num(), chain_head.block_num(), fork_db_head->block_num());
          }
       }
 
@@ -1305,8 +1300,8 @@ struct controller_impl {
          auto snapshot_load_start_time = fc::time_point::now();
          snapshot->validate();
          if( auto blog_head = blog.head() ) {
-            ilog( "Starting initialization from snapshot and block log ${b}-${e}, this may take a significant amount of time",
-                  ("b", blog.first_block_num())("e", blog_head->block_num()) );
+            ilog( "Starting initialization from snapshot and block log {}-{}, this may take a significant amount of time",
+                   blog.first_block_num(), blog_head->block_num() );
             read_from_snapshot( snapshot, blog.first_block_num(), blog_head->block_num() );
          } else {
             SYS_ASSERT( !fork_db_.file_exists(), fork_database_exception,
@@ -1318,14 +1313,14 @@ struct controller_impl {
                         "Snapshot is invalid." );
             blog.reset( chain_id, chain_head.block_num() + 1 );
          }
-         ilog( "Snapshot loaded, head: ${h} : ${id}", ("h", chain_head.block_num())("id", chain_head.id()) );
+         ilog( "Snapshot loaded, head: {} : {}", chain_head.block_num(), chain_head.id() );
 
          init(startup_t::snapshot);
          auto snapshot_load_time = (fc::time_point::now() - snapshot_load_start_time).to_seconds();
          auto db_size = db.get_segment_manager()->get_size();
          auto db_free_size = db.get_segment_manager()->get_free_memory();
-         ilog( "Finished initialization from snapshot (snapshot load time was ${t}s), db total size ${dbs}, db free size ${dfs}, db used size ${dus}",
-             ("t", snapshot_load_time)("dbs", db_size)("dfs", db_free_size)("dus", db_size - db_free_size) );
+         ilog( "Finished initialization from snapshot (snapshot load time was {}s), db total size {}, db free size {}, db used size {}",
+               snapshot_load_time, db_size, db_free_size, db_size - db_free_size );
       } catch (boost::interprocess::bad_alloc& e) {
          elog( "Failed initialization from snapshot - db storage not configured to have enough storage for the provided snapshot, please increase and retry snapshot" );
          shutdown();
@@ -1336,8 +1331,8 @@ struct controller_impl {
       SYS_ASSERT( db.revision() < 1, database_exception, "This version of controller::startup only works with a fresh state database." );
       const auto& genesis_chain_id = genesis.compute_chain_id();
       SYS_ASSERT( genesis_chain_id == chain_id, chain_id_type_exception,
-                  "genesis state provided to startup corresponds to a chain ID (${genesis_chain_id}) that does not match the chain ID that controller was constructed with (${controller_chain_id})",
-                  ("genesis_chain_id", genesis_chain_id)("controller_chain_id", chain_id)
+                  "genesis state provided to startup corresponds to a chain ID ({}) that does not match the chain ID that controller was constructed with ({})",
+                   genesis_chain_id, chain_id
       );
 
       this->shutdown = std::move(shutdown);
@@ -1369,8 +1364,8 @@ struct controller_impl {
       SYS_ASSERT( valid, database_exception, "No existing chain_head.dat file");
 
       SYS_ASSERT(db.revision() == chain_head.block_num(), database_exception,
-                 "chain_head block num ${bn} does not match chainbase revision ${r}",
-                 ("bn", chain_head.block_num())("r", db.revision()));
+                 "chain_head block num {} does not match chainbase revision {}",
+                 chain_head.block_num(), db.revision());
 
       init(startup_t::existing_state);
    }
@@ -1395,8 +1390,8 @@ struct controller_impl {
       {
          const auto& state_chain_id = db.get<global_property_object>().chain_id;
          SYS_ASSERT( state_chain_id == chain_id, chain_id_type_exception,
-                     "chain ID in state (${state_chain_id}) does not match the chain ID that controller was constructed with (${controller_chain_id})",
-                     ("state_chain_id", state_chain_id)("controller_chain_id", chain_id)
+                     "chain ID in state ({}) does not match the chain ID that controller was constructed with ({})",
+                     state_chain_id, chain_id
          );
       }
 
@@ -1409,21 +1404,21 @@ struct controller_impl {
 
       // At this point chain_head != nullptr
       SYS_ASSERT( db.revision() >= chain_head.block_num(), fork_database_exception,
-                  "chain head (${head}) is inconsistent with state (${db})",
-                  ("db", db.revision())("head", chain_head.block_num()) );
+                  "chain head ({}) is inconsistent with state ({})",
+                  chain_head.block_num(), db.revision() );
 
       if( db.revision() > chain_head.block_num() ) {
-         wlog( "database revision (${db}) is greater than head block number (${head}), "
+         wlog( "database revision ({}) is greater than head block number ({}), "
                "attempting to undo pending changes",
-               ("db", db.revision())("head", chain_head.block_num()) );
+               db.revision(), chain_head.block_num() );
       }
       while( db.revision() > chain_head.block_num() ) {
          db.undo();
       }
 
       SYS_ASSERT(conf.terminate_at_block == 0 || conf.terminate_at_block > chain_head.block_num(),
-                 plugin_config_exception, "--terminate-at-block ${t} not greater than chain head ${h}",
-                 ("t", conf.terminate_at_block)("h", chain_head.block_num()));
+                 plugin_config_exception, "--terminate-at-block {} not greater than chain head {}",
+                 conf.terminate_at_block, chain_head.block_num());
 
       protocol_features.init( db );
 
@@ -1433,7 +1428,7 @@ struct controller_impl {
       }
 
       if( conf.integrity_hash_on_start )
-         ilog( "chain database started with hash: ${hash}", ("hash", calculate_integrity_hash()) );
+         ilog( "chain database started with hash: {}", calculate_integrity_hash() );
       okay_to_print_integrity_hash_on_stop = true;
 
       replaying = true;
@@ -1465,8 +1460,8 @@ struct controller_impl {
       if (conf.truncate_at_block > 0 && chain_head.is_valid()) {
          if (chain_head.block_num() == conf.truncate_at_block && fork_db_has_root()) {
             if (auto head = fork_db_.head(); head && head->block_num() > conf.truncate_at_block) {
-               ilog("Removing blocks past truncate-at-block ${t} from fork database with head at ${h}",
-                     ("t", conf.truncate_at_block)("h", head->block_num()));
+               ilog("Removing blocks past truncate-at-block {} from fork database with head at {}",
+                     conf.truncate_at_block, head->block_num());
                fork_db_.remove(conf.truncate_at_block + 1);
             }
          }
@@ -1474,7 +1469,7 @@ struct controller_impl {
 
       //only log this not just if configured to, but also if initialization made it to the point we'd log the startup too
       if(okay_to_print_integrity_hash_on_stop && conf.integrity_hash_on_stop)
-         ilog( "chain database stopped with hash: ${hash}", ("hash", calculate_integrity_hash()) );
+         ilog( "chain database stopped with hash: {}", calculate_integrity_hash() );
    }
 
    void add_indices() {
@@ -1673,16 +1668,14 @@ struct controller_impl {
             SYS_THROW(snapshot_exception, "Unsupported block_state version");
          }
       } else {
-         SYS_THROW(snapshot_exception, "Unsupported block_header_state version ${v}", ("v", header.version));
+         SYS_THROW(snapshot_exception, "Unsupported block_header_state version {}", header.version);
       }
 
       snapshot_head_block = chain_head.block_num();
       SYS_ASSERT( blog_start <= (snapshot_head_block + 1) && snapshot_head_block <= blog_end,
                   block_log_exception,
-                  "Block log is provided with snapshot but does not contain the head block from the snapshot nor a block right after it",
-                  ("snapshot_head_block", snapshot_head_block)
-                  ("block_log_first_num", blog_start)
-                  ("block_log_last_num", blog_end)
+                  "Block log is provided with snapshot {} but does not contain the head block {} from the snapshot nor a block right after it {}",
+                  snapshot_head_block, blog_start, blog_end
       );
 
       sync_threaded_work<struct snapload> snapshot_load_workqueue;
@@ -1734,7 +1727,7 @@ struct controller_impl {
       const unsigned snapshot_load_threads = snapshot->supports_threading() ? max_snapshot_load_threads : 1;
 
       snapshot_load_workqueue.run(snapshot_load_threads, std::chrono::seconds(5), [&]() {
-         ilog("Snapshot initialization ${pct}% complete", ("pct",(unsigned)(((double)rows_loaded/total_snapshot_rows)*100)));
+         ilog("Snapshot initialization {}% complete", (unsigned)(((double)rows_loaded/total_snapshot_rows)*100));
       });
 
       db.set_revision( chain_head.block_num() );
@@ -1744,8 +1737,8 @@ struct controller_impl {
 
       const auto& gpo = db.get<global_property_object>();
       SYS_ASSERT( gpo.chain_id == chain_id, chain_id_type_exception,
-                  "chain ID in snapshot (${snapshot_chain_id}) does not match the chain ID that controller was constructed with (${controller_chain_id})",
-                  ("snapshot_chain_id", gpo.chain_id)("controller_chain_id", chain_id)
+                  "chain ID in snapshot ({}) does not match the chain ID that controller was constructed with ({})",
+                  gpo.chain_id, chain_id
       );
 
       return result;
@@ -2050,7 +2043,7 @@ struct controller_impl {
          } catch ( const boost::interprocess::bad_alloc& ) {
             throw;
          } catch ( const controller_emit_signal_exception& e ) {
-            wlog( "on block transaction failed due to controller_emit_signal_exception: ${e}", ("e", e.to_detail_string()) );
+            wlog( "on block transaction failed due to controller_emit_signal_exception: {}", e.to_detail_string() );
             throw;
          } catch (const fc::exception& e) {
             handle_exception(e);
@@ -2071,7 +2064,7 @@ struct controller_impl {
          }
 
          return trace;
-      } FC_CAPTURE_AND_RETHROW((trace))
+      } FC_CAPTURE_AND_RETHROW("trace: {}", trace->id)
    } /// push_transaction
 
    transaction_trace_ptr start_block( block_timestamp_type when,
@@ -2096,8 +2089,8 @@ struct controller_impl {
       });
 
       SYS_ASSERT( skip_db_sessions(s) || db.revision() == chain_head.block_num(), database_exception,
-                  "db revision is not on par with head block",
-                  ("db.revision()", db.revision())("controller_head_block", chain_head.block_num())("fork_db_head_block", fork_db_head().block_num()) );
+                  "db revision {} is not on par with head block {}, fork db head {}",
+                  db.revision(), chain_head.block_num(), fork_db_head().block_num() );
 
       maybe_session        session = skip_db_sessions(s) ? maybe_session() : maybe_session(db);
       building_block_input bbi{chain_head.id(), chain_head.timestamp(), when, chain_head.internal()->get_producer_for_block_at(when).producer_name,
@@ -2142,13 +2135,13 @@ struct controller_impl {
                if( res.second ) {
                   // feature_digest was not preactivated
                   SYS_ASSERT( !f.preactivation_required, protocol_feature_exception,
-                              "attempted to activate protocol feature without prior required preactivation: ${digest}",
-                              ("digest", feature_digest)
+                              "attempted to activate protocol feature without prior required preactivation: {}",
+                              feature_digest
                   );
                } else {
                   SYS_ASSERT( !res.first->second, block_validate_exception,
-                              "attempted duplicate activation within a single block: ${digest}",
-                              ("digest", feature_digest)
+                              "attempted duplicate activation within a single block: {}",
+                              feature_digest
                   );
                   // feature_digest was preactivated
                   res.first->second = true;
@@ -2196,11 +2189,10 @@ struct controller_impl {
                                               cpu_usage_t{{gpo.configuration.min_transaction_cpu_usage}}, true );
             if( onblock_trace->except ) {
                if (onblock_trace->except->code() == interrupt_exception::code_value) {
-                  ilog("Interrupt of onblock ${bn}", ("bn", chain_head.block_num() + 1));
+                  ilog("Interrupt of onblock {}", chain_head.block_num() + 1);
                   throw *onblock_trace->except;
                }
-               wlog("onblock ${block_num} is REJECTING: ${entire_trace}",
-                    ("block_num", chain_head.block_num() + 1)("entire_trace", onblock_trace));
+               wlog("onblock {} is REJECTING: {}", chain_head.block_num() + 1, fc::json::to_log_string(*onblock_trace));
             }
          } catch( const std::bad_alloc& e ) {
             elog( "on block transaction failed due to a std::bad_alloc" );
@@ -2209,16 +2201,14 @@ struct controller_impl {
             elog( "on block transaction failed due to a bad allocation" );
             throw;
          } catch ( const controller_emit_signal_exception& e ) {
-            wlog( "on block transaction failed due to controller_emit_signal_exception: ${e}", ("e", e.to_detail_string()) );
+            wlog( "on block transaction failed due to controller_emit_signal_exception: {}", e.to_detail_string() );
             throw;
          } catch( const fc::exception& e ) {
             if (e.code() == interrupt_exception::code_value)
                throw;
-            wlog( "on block transaction failed due to unexpected fc::exception" );
-            edump((e.to_detail_string()));
+            wlog( "on block transaction failed due to unexpected fc::exception: {}", e.to_detail_string() );
          } catch( const std::exception& e ) {
-            wlog( "on block transaction failed due to unexpected std::exception" );
-            edump((e.what()));
+            wlog( "on block transaction failed due to unexpected std::exception: {}", e.what() );
          } catch( ... ) {
             elog( "on block transaction failed due to unknown exception" );
          }
@@ -2287,8 +2277,8 @@ struct controller_impl {
                new_proposer_policy->proposal_time     = bb.bb.timestamp;
                new_proposer_policy->proposer_schedule = std::move(bb.bb.trx_blk_context.proposed_schedule);
                new_proposer_policy->proposer_schedule.version = *version;
-               ilog("Scheduling proposer schedule ${s}, proposed at: ${t}",
-                    ("s", new_proposer_policy->proposer_schedule)("t", new_proposer_policy->proposal_time));
+               ilog("Scheduling proposer schedule {}, proposed at: {}",
+                    fc::json::to_log_string(new_proposer_policy->proposer_schedule), new_proposer_policy->proposal_time);
             }
          }
 
@@ -2304,7 +2294,7 @@ struct controller_impl {
 
          pending->_block_stage = std::move(assembled_block);
       }
-      FC_CAPTURE_AND_RETHROW()
+      FC_CAPTURE_AND_RETHROW("")
    }
 
    /**
@@ -2391,12 +2381,11 @@ struct controller_impl {
       const auto& br = pending->_block_report;
       if (s == controller::block_status::incomplete) {
          const auto& new_b = chain_head.block();
-         ilog("Produced block ${id}... #${n} @ ${t} signed by ${p} "
-              "[trxs: ${count}, lib: ${lib}, net: ${net}, cpu: ${cpu} us, elapsed: ${et} us, producing time: ${tt} us]",
-              ("id", chain_head.id().str().substr(8, 16))("n", new_b->block_num())("p", new_b->producer)("t", new_b->timestamp)
-              ("count", new_b->transactions.size())("lib", chain_head.irreversible_blocknum())
-              ("net", br.total_net_usage)("cpu", br.total_cpu_usage_us)("et", br.total_elapsed_time)
-              ("tt", now - br.start_time));
+         ilog("Produced block {}... #{} @ {} signed by {} "
+              "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, producing time: {} us]",
+              chain_head.id().str().substr(8, 16), new_b->block_num(), new_b->timestamp, new_b->producer,
+              new_b->transactions.size(), chain_head.irreversible_blocknum(),
+              br.total_net_usage, br.total_cpu_usage_us, br.total_elapsed_time, now - br.start_time);
 
          if (_update_produced_block_metrics) {
             produced_block_metrics metrics;
@@ -2414,12 +2403,12 @@ struct controller_impl {
          return;
       }
 
-      ilog("Received block ${id}... #${n} @ ${t} signed by ${p} " // "Received" instead of "Applied" so it matches existing log output
-           "[trxs: ${count}, lib: ${lib}, net: ${net}, cpu: ${cpu} us, elapsed: ${elapsed} us, applying time: ${time} us, latency: ${latency} ms]",
-           ("p", chain_head.producer())("id", chain_head.id().str().substr(8, 16))("n", chain_head.block_num())("t", chain_head.timestamp())
-           ("count", chain_head.block()->transactions.size())("lib", chain_head.irreversible_blocknum())
-           ("net", br.total_net_usage)("cpu", br.total_cpu_usage_us)
-           ("elapsed", br.total_elapsed_time)("time", now - br.start_time)("latency", (now - chain_head.timestamp()).count() / 1000));
+      ilog("Received block {}... #{} @ {} signed by {} " // "Received" instead of "Applied" so it matches existing log output
+           "[trxs: {}, lib: {}, net: {}, cpu: {} us, elapsed: {} us, applying time: {} us, latency: {} ms]",
+           chain_head.id().str().substr(8, 16), chain_head.block_num(), chain_head.timestamp(), chain_head.producer(),
+           chain_head.block()->transactions.size(), chain_head.irreversible_blocknum(),
+           br.total_net_usage, br.total_cpu_usage_us,
+           br.total_elapsed_time, now - br.start_time, (now - chain_head.timestamp()).count() / 1000);
 
       if (_update_incoming_block_metrics) {
          _update_incoming_block_metrics({.trxs_incoming_total   = chain_head.block()->transactions.size(),
@@ -2465,15 +2454,16 @@ struct controller_impl {
          switch( status ) {
             case protocol_feature_set::recognized_t::unrecognized:
                SYS_THROW( protocol_feature_exception,
-                          "protocol feature with digest '${digest}' is unrecognized", ("digest", f) );
+                          "protocol feature with digest '{}' is unrecognized", f );
             break;
             case protocol_feature_set::recognized_t::disabled:
                SYS_THROW( protocol_feature_exception,
-                          "protocol feature with digest '${digest}' is disabled", ("digest", f) );
+                          "protocol feature with digest '{}' is disabled", f );
             break;
             case protocol_feature_set::recognized_t::too_early:
                SYS_THROW( protocol_feature_exception,
-                          "${timestamp} is too early for the earliest allowed activation time of the protocol feature with digest '${digest}'", ("digest", f)("timestamp", timestamp) );
+                          "{} is too early for the earliest allowed activation time of the protocol feature with digest '{}'",
+                          timestamp, f );
             break;
             case protocol_feature_set::recognized_t::ready:
             break;
@@ -2484,8 +2474,7 @@ struct controller_impl {
 
          SYS_ASSERT( currently_activated_protocol_features.find( f ) == currently_activated_protocol_features.end(),
                      protocol_feature_exception,
-                     "protocol feature with digest '${digest}' has already been activated",
-                     ("digest", f)
+                     "protocol feature with digest '{}' has already been activated", f
          );
 
          auto dependency_checker = [&currently_activated_protocol_features, &new_protocol_features, &itr]
@@ -2498,8 +2487,7 @@ struct controller_impl {
          };
 
          SYS_ASSERT( pfs.validate_dependencies( f, dependency_checker ), protocol_feature_exception,
-                     "not all dependencies of protocol feature with digest '${digest}' have been activated",
-                     ("digest", f)
+                     "not all dependencies of protocol feature with digest '{}' have been activated", f
          );
       }
    }
@@ -2508,7 +2496,7 @@ struct controller_impl {
 
 #define SYS_REPORT(DESC,A,B) \
       if( A != B ) {                                                    \
-         elog("${desc}: ${bv} != ${abv}", ("desc", DESC)("bv", A)("abv", B)); \
+         elog("{}: {} != {}", DESC, A, B); \
       }
 
       SYS_REPORT( "timestamp", b.timestamp, ab.timestamp )
@@ -2518,19 +2506,19 @@ struct controller_impl {
       SYS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
       SYS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
       SYS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
-      SYS_REPORT( "not_used", b.not_used, ab.not_used )
-      SYS_REPORT( "header_extensions", b.header_extensions, ab.header_extensions )
+      SYS_REPORT( "not_used", fc::json::to_log_string(b.not_used), fc::json::to_log_string(ab.not_used) )
+      SYS_REPORT( "header_extensions", fc::json::to_log_string(b.header_extensions), fc::json::to_log_string(ab.header_extensions) )
 
       if (b.header_extensions != ab.header_extensions) {
          header_extension_multimap bheader_exts = b.validate_and_extract_header_extensions();
          if (auto it = bheader_exts.find(finality_extension::extension_id()); it != bheader_exts.end()) {
             const auto& f_ext = std::get<finality_extension>(it->second);
-            elog("b  if: ${i}", ("i", f_ext));
+            elog("b  if: {}", fc::json::to_log_string(f_ext));
          }
          header_extension_multimap abheader_exts = ab.validate_and_extract_header_extensions();
          if (auto it = abheader_exts.find(finality_extension::extension_id()); it != abheader_exts.end()) {
             const auto& f_ext = std::get<finality_extension>(it->second);
-            elog("ab if: ${i}", ("i", f_ext));
+            elog("ab if: {}", fc::json::to_log_string(f_ext));
          }
       }
 
@@ -2643,23 +2631,23 @@ struct controller_impl {
                bool transaction_failed = trace && trace->except;
                if( transaction_failed) {
                   if (trace->except->code() == interrupt_exception::code_value) {
-                     ilog("Interrupt of trx id: ${id}", ("id", trace->id));
+                     ilog("Interrupt of trx id: {}", trace->id);
                   } else {
-                     edump((*trace));
+                     elog("{}", fc::json::to_log_string(*trace));
                   }
                   throw *trace->except;
                }
 
                SYS_ASSERT(trx_receipts.size() > 0, block_validate_exception,
-                          "expected a receipt, block_num ${bn}, block_id ${id}, receipt ${e}",
-                          ("bn", b->block_num())("id", producer_block_id)("e", receipt));
+                          "expected a receipt, block_num {}, block_id {}, receipt {}",
+                          b->block_num(), producer_block_id, fc::json::to_log_string(receipt));
                SYS_ASSERT(trx_receipts.size() == num_pending_receipts + 1, block_validate_exception,
-                          "expected receipt was not added, block_num ${bn}, block_id ${id}, receipt ${e}",
-                          ("bn", b->block_num())("id", producer_block_id)("e", receipt));
+                          "expected receipt was not added, block_num {}, block_id {}, receipt {}",
+                          b->block_num(), producer_block_id, fc::json::to_log_string(receipt));
                const transaction_receipt_header& r = trx_receipts.back();
                SYS_ASSERT(r == static_cast<const transaction_receipt_header&>(receipt), block_validate_exception,
-                          "receipt does not match, ${lhs} != ${rhs}",
-                          ("lhs", r)("rhs", static_cast<const transaction_receipt_header&>(receipt)));
+                          "receipt does not match, {} != {}",
+                          fc::json::to_log_string(r), fc::json::to_log_string(static_cast<const transaction_receipt_header&>(receipt)));
             }
 
             // assemble_block will mutate bsp by setting the valid structure
@@ -2676,8 +2664,8 @@ struct controller_impl {
             }
 
             SYS_ASSERT(bsp->finality_mroot() == actual_finality_mroot, block_validate_exception,
-               "finality_mroot does not match, received finality_mroot: ${r} != actual_finality_mroot: ${a} for block ${bn} ${id}",
-               ("r", bsp->finality_mroot())("a", actual_finality_mroot)("bn", bsp->block_num())("id", bsp->id()));
+               "finality_mroot does not match, received finality_mroot: {} != actual_finality_mroot: {} for block {} {}",
+               bsp->finality_mroot(), actual_finality_mroot, bsp->block_num(), bsp->id());
 
             auto& ab = std::get<assembled_block>(pending->_block_stage);
 
@@ -2687,8 +2675,8 @@ struct controller_impl {
                report_block_header_diff(*b, ab.header());
 
                // this implicitly asserts that all header fields (less the signature) are identical
-               SYS_ASSERT(producer_block_id == ab.id(), block_validate_exception, "Block ID does not match, ${producer_block_id} != ${validator_block_id}",
-                          ("producer_block_id", producer_block_id)("validator_block_id", ab.id()));
+               SYS_ASSERT(producer_block_id == ab.id(), block_validate_exception, "Block ID does not match, {} != {}",
+                          producer_block_id, ab.id());
             }
 
             if( are_multiple_state_roots_supported() ) {
@@ -2718,15 +2706,15 @@ struct controller_impl {
                   rcvd = rcvd_it != b->header_extensions.end();
                   crtd = crtd_it != ab.header().header_extensions.end();
                   SYS_ASSERT( rcvd == crtd, block_validate_exception,
-                              "The received block did${neg1} have $(count) root header extensions, but the locally constructed one did${neg2}",
-                              ("neg1", (rcvd ? "" : " not"))("count", count)("neg2", (crtd ? "" : " not")) );
+                              "The received block did{} have {} root header extensions, but the locally constructed one did{}",
+                              (rcvd ? "" : " not"), count, (crtd ? "" : " not") );
                   if( rcvd && rcvd_it->second != crtd_it->second ) {
                      s_header rcvd_s_header = fc::raw::unpack<s_header>(rcvd_it->second);
                      s_header crtd_s_header = fc::raw::unpack<s_header>(crtd_it->second);
                      SYS_THROW( block_validate_exception,
-                                "The received block root header extension, at slot number ${count}: ${rcvd}; and the locally "
-                                "constructed one: ${crdt}; don't match!",
-                                ("count", count)("rcvd", rcvd_s_header.to_string())("crdt", crtd_s_header.to_string()) );
+                                "The received block root header extension, at slot number {}: {}; and the locally "
+                                "constructed one: {}; don't match!",
+                                count, rcvd_s_header.to_string(), crtd_s_header.to_string() );
                   }
                }
             }
@@ -2746,15 +2734,15 @@ struct controller_impl {
             throw;
          } catch ( const fc::exception& e ) {
             if (e.code() != interrupt_exception::code_value)
-               edump((e.to_detail_string()));
+               elog("{}", e.to_detail_string());
             abort_block();
             throw;
          } catch ( const std::exception& e ) {
-            edump((e.what()));
+            elog("{}", e.what());
             abort_block();
             throw;
          }
-      } FC_CAPTURE_AND_RETHROW();
+      } FC_CAPTURE_AND_RETHROW("")
    } /// apply_block
 
 
@@ -2843,19 +2831,18 @@ struct controller_impl {
       // This function is called only in Savanna. Finality block header
       // extension must exist
       SYS_ASSERT( finality_ext, block_validate_exception,
-                  "Proper Savanna block #${b} does not have a finality header extension",
-                  ("b", block_num) );
+                  "Proper Savanna block #{} does not have a finality header extension", block_num );
 
       assert(finality_ext);
       const auto& f_ext        = std::get<finality_extension>(*finality_ext);
       const auto  new_qc_claim = f_ext.qc_claim;
 
-      if (!replaying && fc::logger::get(DEFAULT_LOGGER).is_enabled(fc::log_level::debug)) {
+      if (!replaying && fc::logger::default_logger().is_enabled(fc::log_level::debug)) {
          fc::time_point now = fc::time_point::now();
          if (now - b->timestamp < fc::minutes(5) || (b->block_num() % 1000 == 0)) {
-            dlog("received block: #${bn} ${t} ${prod} ${id}, qc claim: ${qc_claim}, qc ${qc}, previous: ${p}",
-              ("bn", b->block_num())("t", b->timestamp)("prod", b->producer)("id", id)
-              ("qc_claim", new_qc_claim)("qc", qc_extension_present ? "present" : "not present")("p", b->previous));
+            dlog("received block: #{} {} {} {}, qc claim: {}, qc {}, previous: {}",
+                 b->block_num(), b->timestamp, b->producer, id, new_qc_claim,
+                 qc_extension_present ? "present" : "not present", b->previous);
          }
       }
 
@@ -2865,8 +2852,7 @@ struct controller_impl {
       // on Transition blocks, previous block may not be a Legacy block
       // -------------------------------------------------------------------------------------------------
       SYS_ASSERT( !prev.header.is_legacy_block(), block_validate_exception,
-                  "Proper Savanna block #${b} may not have previous block that is a Legacy block",
-                  ("b", block_num) );
+                  "Proper Savanna block #{} may not have previous block that is a Legacy block", block_num );
 
       assert(prev_finality_ext);
       const auto& prev_qc_claim = prev_finality_ext->qc_claim;
@@ -2876,20 +2862,20 @@ struct controller_impl {
       // new claimed QC block number cannot be less than previous block's
       // claimed QC block number
       SYS_ASSERT( new_qc_claim.block_num >= prev_qc_claim.block_num, invalid_qc_claim,
-                  "Block #${b} claims a block_num (${n1}) less than the previous block's (${n2})",
-                  ("n1", new_qc_claim.block_num)("n2", prev_qc_claim.block_num)("b", block_num) );
+                  "Block #{} claims a block_num ({}) less than the previous block's ({})",
+                  block_num, new_qc_claim.block_num, prev_qc_claim.block_num );
 
       // new claimed QC block number cannot be greater than previous block number
       SYS_ASSERT( new_qc_claim.block_num <= prev.block_num(), invalid_qc_claim,
-                  "Block #${b} claims a block_num (${n1}) that is greater than the previous block number (${n2})",
-                  ("n1", new_qc_claim.block_num)("n2", prev.block_num())("b", block_num) );
+                  "Block #{} claims a block_num ({}) that is greater than the previous block number ({})",
+                  block_num, new_qc_claim.block_num, prev.block_num() );
 
       if( new_qc_claim.block_num == prev_qc_claim.block_num ) {
          if( new_qc_claim.is_strong_qc == prev_qc_claim.is_strong_qc ) {
             // QC block extension is redundant
             SYS_ASSERT( !qc_extension_present, invalid_qc_claim,
-                        "Block #${b} should not provide a QC block extension since its QC claim is the same as the previous block's",
-                        ("b", block_num) );
+                        "Block #{} should not provide a QC block extension since its QC claim is the same as the previous block's",
+                        block_num );
 
             // if previous block's header extension has the same claim, just return
             // (previous block already validated the claim)
@@ -2898,13 +2884,13 @@ struct controller_impl {
 
          // new claimed QC must be stronger than previous if the claimed block number is the same
          SYS_ASSERT( new_qc_claim.is_strong_qc, invalid_qc_claim,
-                     "claimed QC (${s1}) must be stricter than previous block's (${s2}) if block number is the same. Block number: ${b}",
-                     ("s1", new_qc_claim.is_strong_qc)("s2", prev_qc_claim.is_strong_qc)("b", block_num) );
+                     "claimed QC ({}) must be stricter than previous block's ({}) if block number is the same. Block number: {}",
+                     new_qc_claim.is_strong_qc, prev_qc_claim.is_strong_qc, block_num );
       }
 
       // At this point, we are making a new claim in this block, so it must include a QC to justify this claim.
       SYS_ASSERT( qc_extension_present, block_validate_exception,
-                  "Block #${b} is making a new finality claim, but doesn't include a qc to justify this claim", ("b", block_num) );
+                  "Block #{} is making a new finality claim, but doesn't include a qc to justify this claim", block_num );
 
       assert(qc_ext_itr != block_exts.end() );
       const auto& qc_ext   = std::get<quorum_certificate_extension>(qc_ext_itr->second);
@@ -2912,13 +2898,13 @@ struct controller_impl {
 
       // Check QC information in header extension and block extension match
       SYS_ASSERT( qc_proof.block_num == new_qc_claim.block_num, block_validate_exception,
-                  "Block #${b}: Mismatch between qc.block_num (${n1}) in block extension and block_num (${n2}) in header extension",
-                  ("n1", qc_proof.block_num)("n2", new_qc_claim.block_num)("b", block_num) );
+                  "Block #{}: Mismatch between qc.block_num ({}) in block extension and block_num ({}) in header extension",
+                  block_num, qc_proof.block_num, new_qc_claim.block_num );
 
       // Verify claimed strength is the same as in proof
       SYS_ASSERT( qc_proof.is_strong() == new_qc_claim.is_strong_qc, block_validate_exception,
-                  "QC is_strong (${s1}) in block extension does not match is_strong_qc (${s2}) in header extension. Block number: ${b}",
-                  ("s1", qc_proof.is_strong())("s2", new_qc_claim.is_strong_qc)("b", block_num) );
+                  "QC is_strong ({}) in block extension does not match is_strong_qc ({}) in header extension. Block number: {}",
+                  qc_proof.is_strong(), new_qc_claim.is_strong_qc, block_num );
 
       // `valid` structure can be modified while this function is running on net thread.
       // Use is_valid() instead. It uses atomic `validated` and when it is true, `valid`
@@ -2930,8 +2916,8 @@ struct controller_impl {
          auto        computed_finality_mroot = prev.get_finality_mroot_claim(new_qc_claim);
          const auto& supplied_finality_mroot  = b->action_mroot;
          SYS_ASSERT( computed_finality_mroot == supplied_finality_mroot, block_validate_exception,
-                     "computed finality mroot (${computed}) does not match supplied finality mroot ${supplied} by header extension. Block number: ${b}, block id: ${id}",
-                     ("computed", computed_finality_mroot)("supplied", supplied_finality_mroot)("b", block_num)("id", id) );
+                     "computed finality mroot ({}) does not match supplied finality mroot {} by header extension. Block number: {}, block id: {}",
+                     computed_finality_mroot, supplied_finality_mroot, block_num, id );
       }
 
       return std::optional{qc_proof};
@@ -2940,8 +2926,8 @@ struct controller_impl {
    // verify basic_block invariants
    std::optional<qc_t> verify_basic_block_invariants(const block_id_type& id, const signed_block_ptr& b, const block_state& prev) {
       SYS_ASSERT( b->is_proper_svnn_block(), block_validate_exception,
-                  "create_block_state_i cannot be called on block #${b} which is not a Proper Savanna block.",
-                  ("b", b->block_num()) );
+                  "create_block_state_i cannot be called on block #{} which is not a Proper Savanna block.",
+                  b->block_num() );
       return verify_basic_proper_block_invariants(id, b, prev);
    }
 
@@ -2960,7 +2946,7 @@ struct controller_impl {
       auto trx_mroot = calculate_trx_merkle( b->transactions );
       SYS_ASSERT( b->transaction_mroot == trx_mroot,
                   block_validate_exception,
-                  "invalid block transaction merkle root ${b} != ${c}", ("b", b->transaction_mroot)("c", trx_mroot) );
+                  "invalid block transaction merkle root {} != {}", b->transaction_mroot, trx_mroot );
 
       const bool skip_validate_signee = false;
       auto bsp = std::make_shared<block_state>(
@@ -2975,7 +2961,7 @@ struct controller_impl {
       );
 
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
-                  "provided id ${id} does not match block id ${bid}", ("id", id)("bid", bsp->id()) );
+                  "provided id {} does not match block id {}", id, bsp->id() );
 
       assert(!!qc == verify_qc_future.valid());
       if (qc) {
@@ -3025,20 +3011,20 @@ struct controller_impl {
 
       block_state_ptr claimed_bsp = fork_db_fetch_bsp_on_branch_by_num( bsp_in->previous(), qc_ext.qc.block_num );
       if( !claimed_bsp ) {
-         dlog("block state of claimed qc not found in fork_db, qc: ${qc} for block ${bn} ${id}, previous ${p}",
-              ("qc", qc_ext.qc.to_qc_claim())("bn", bsp_in->block_num())("id", bsp_in->id())("p", bsp_in->previous()));
+         dlog("block state of claimed qc not found in fork_db, qc: {} for block {} {}, previous {}",
+              qc_ext.qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id(), bsp_in->previous());
          return;
       }
 
       // Don't save the QC from block extension if the claimed block has a better or same received_qc
       if (claimed_bsp->set_received_qc(received_qc)) {
-         dlog("set received qc: ${rqc} into claimed block ${bn} ${id}", ("rqc", qc_ext.qc.to_qc_claim())
-              ("bn", claimed_bsp->block_num())("id", claimed_bsp->id()));
+         dlog("set received qc: {} into claimed block {} {}",
+               qc_ext.qc.to_qc_claim(), claimed_bsp->block_num(), claimed_bsp->id());
       } else {
-         dlog("qc not better, claimed->received: ${qbn} ${qid}, strong=${s}, received: ${rqc}, for block ${bn} ${id}",
-              ("qbn", claimed_bsp->block_num())("qid", claimed_bsp->id())
-              ("s", !received_qc.is_weak()) // use is_weak() to avoid mutex on received_qc_is_strong()
-              ("rqc", qc_ext.qc.to_qc_claim())("bn", bsp_in->block_num())("id", bsp_in->id()));
+         dlog("qc not better, claimed->received: {} {}, strong={}, received: {}, for block {} {}",
+              claimed_bsp->block_num(), claimed_bsp->id(),
+              !received_qc.is_weak(), // use is_weak() to avoid mutex on received_qc_is_strong()
+              qc_ext.qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id());
       }
 
       if (received_qc.is_strong()) {
@@ -3126,7 +3112,7 @@ struct controller_impl {
          return result;
       } catch (fc::exception& e) {
          if (e.code() != interrupt_exception::code_value) {
-            wlog("${d}", ("d",e.to_detail_string()));
+            wlog("{}", e.to_detail_string());
             FC_RETHROW_EXCEPTION(e, warn, "rethrow");
          }
          throw;
@@ -3146,12 +3132,12 @@ struct controller_impl {
       bool switch_fork = !old_head_branch.empty();
       if( switch_fork ) {
          auto head_fork_comp_str = log_fork_comparison(*chain_head.internal());
-         ilog("switching forks from ${chid} (block number ${chn} ${cp}) ${c} to ${nhid} (block number ${nhn} ${np}) ${n}",
-              ("chid", chain_head.id())("chn", chain_head.block_num())("cp", chain_head.producer())
-              ("nhid", new_head->id())("nhn", new_head->block_num())("np", new_head->producer())
-              ("c", head_fork_comp_str)("n", log_fork_comparison(*new_head)));
+         ilog("switching forks from {} (block number {} {}) {} to {} (block number {} {}) {}",
+              chain_head.id(), chain_head.block_num(), chain_head.producer(), head_fork_comp_str,
+              new_head->id(), new_head->block_num(), new_head->producer(),
+              log_fork_comparison(*new_head));
          if (chain_head.block_num() == new_head->block_num() && chain_head.producer() == new_head->producer()) {
-            wlog("${p} double produced block ${n}", ("p", new_head->producer())("n", new_head->block_num()));
+            wlog("{} double produced block {}", new_head->producer(), new_head->block_num());
          }
 
          // not possible to log transaction specific info when switching forks
@@ -3176,9 +3162,9 @@ struct controller_impl {
          }
       } else if (!new_head_branch.empty()) {
          if (fc::time_point::now() - new_head->timestamp() < fc::minutes(5)) {
-            dlog("applying ${n} fork db blocks from ${cbn}:${cbid} to ${nbn}:${nbid}",
-                 ("n", new_head_branch.size())("cbid", (*new_head_branch.rbegin())->id())("cbn", (*new_head_branch.rbegin())->block_num())
-                 ("nbid", new_head->id())("nbn", new_head->block_num()));
+            dlog("applying {} fork db blocks from {}:{} to {}:{}",
+                 new_head_branch.size(), (*new_head_branch.rbegin())->block_num(), (*new_head_branch.rbegin())->id(),
+                 new_head->block_num(), new_head->id());
          }
       }
 
@@ -3219,16 +3205,16 @@ struct controller_impl {
          } catch (const fc::exception& e) {
             if (e.code() == interrupt_exception::code_value) {
                // do not want to remove block from fork_db if interrupted
-               ilog("interrupt while applying block ${bn} : ${id}", ("bn", bsp->block_num())("id", bsp->id()));
+               ilog("interrupt while applying block {} : {}", bsp->block_num(), bsp->id());
                throw;
             } else {
-               elog("exception thrown while applying block ${bn} : ${id}, previous ${p}, error: ${e}",
-                    ("bn", bsp->block_num())("id", bsp->id())("p", bsp->previous())("e", e.to_detail_string()));
+               elog("exception thrown while applying block {} : {}, previous {}, error: {}",
+                    bsp->block_num(), bsp->id(), bsp->previous(), e.to_detail_string());
             }
             except = std::current_exception();
          } catch (const std::exception& e) {
-            elog("exception thrown while applying block ${bn} : ${id}, previous ${p}, error: ${e}",
-                 ("bn", bsp->block_num())("id", bsp->id())("p", bsp->previous())("e", e.what()));
+            elog("exception thrown while applying block {} : {}, previous {}, error: {}",
+                 bsp->block_num(), bsp->id(), bsp->previous(), e.what());
             except = std::current_exception();
          }
 
@@ -3256,7 +3242,7 @@ struct controller_impl {
          } // end if exception
       } /// end for each block in branch
 
-      if (switch_fork && fc::logger::get(DEFAULT_LOGGER).is_enabled(fc::log_level::info)) {
+      if (switch_fork && fc::logger::default_logger().is_enabled(fc::log_level::info)) {
          auto get_ids = [&](auto& container)->std::string {
             std::string ids;
             for(auto ritr = container.rbegin(), e = container.rend(); ritr != e; ++ritr) {
@@ -3265,8 +3251,8 @@ struct controller_impl {
             if (!ids.empty()) ids.resize(ids.size()-1);
             return ids;
          };
-         ilog("successfully switched fork to new head ${new_head_id}, removed {${rm_ids}}, applied {${new_ids}}",
-              ("new_head_id", new_head->id())("rm_ids", get_ids(old_head_branch))("new_ids", get_ids(new_head_branch)));
+         ilog("successfully switched fork to new head {}, removed {{}}, applied {{}}",
+              new_head->id(), get_ids(old_head_branch), get_ids(new_head_branch));
       }
 
       // irreversible can change even if block not applied to head, integrated qc can move LIB
@@ -3378,8 +3364,8 @@ struct controller_impl {
          }
       }
       if (!replaying && total > 0) {
-         dlog("removed ${n} expired transactions of the ${t} input dedup list, pending block time ${pt}",
-              ("n", num_removed)("t", total)("pt", now));
+         dlog("removed {} expired transactions of the {} input dedup list, pending block time {}",
+              num_removed, total, now);
       }
    }
 
@@ -3432,8 +3418,8 @@ struct controller_impl {
          };
 
          SYS_ASSERT( is_subset,  actor_whitelist_exception,
-                     "authorizing actor(s) in transaction are not on the actor whitelist: ${actors}",
-                     ("actors", generate_missing_actors(actors, whitelist))
+                     "authorizing actor(s) in transaction are not on the actor whitelist: {}",
+                     generate_missing_actors(actors, whitelist)
                    );
       } else if( conf.actor_blacklist.size() > 0 ) {
          // throw if actors intersects blacklist
@@ -3472,8 +3458,8 @@ struct controller_impl {
          };
 
          SYS_ASSERT( !intersects, actor_blacklist_exception,
-                     "authorizing actor(s) in transaction are on the actor blacklist: ${actors}",
-                     ("actors", generate_blacklisted_actors(actors, blacklist))
+                     "authorizing actor(s) in transaction are on the actor blacklist: {}",
+                     generate_blacklisted_actors(actors, blacklist)
                    );
       }
    }
@@ -3482,12 +3468,12 @@ struct controller_impl {
       if( conf.contract_whitelist.size() > 0 ) {
          SYS_ASSERT( conf.contract_whitelist.find( code ) != conf.contract_whitelist.end(),
                      contract_whitelist_exception,
-                     "account '${code}' is not on the contract whitelist", ("code", code)
+                     "account '{}' is not on the contract whitelist", code
                    );
       } else if( conf.contract_blacklist.size() > 0 ) {
          SYS_ASSERT( conf.contract_blacklist.find( code ) == conf.contract_blacklist.end(),
                      contract_blacklist_exception,
-                     "account '${code}' is on the contract blacklist", ("code", code)
+                     "account '{}' is on the contract blacklist", code
                    );
       }
    }
@@ -3496,9 +3482,7 @@ struct controller_impl {
       if( conf.action_blacklist.size() > 0 ) {
          SYS_ASSERT( conf.action_blacklist.find( std::make_pair(code, action) ) == conf.action_blacklist.end(),
                      action_blacklist_exception,
-                     "action '${code}::${action}' is on the action blacklist",
-                     ("code", code)("action", action)
-                   );
+                     "action '{}::{}' is on the action blacklist", code, action );
       }
    }
 
@@ -3506,8 +3490,7 @@ struct controller_impl {
       if( conf.key_blacklist.size() > 0 ) {
          SYS_ASSERT( conf.key_blacklist.find( key ) == conf.key_blacklist.end(),
                      key_blacklist_exception,
-                     "public key '${key}' is on the key blacklist",
-                     ("key", key)
+                     "public key '{}' is on the key blacklist", fc::json::to_log_string(key)
                    );
       }
    }
@@ -3643,8 +3626,8 @@ struct controller_impl {
    bool should_terminate(block_num_type reversible_block_num) const {
       assert(reversible_block_num > 0);
       if (conf.terminate_at_block > 0 && conf.terminate_at_block <= reversible_block_num) {
-         ilog("Block ${n} reached configured maximum block ${num}; terminating",
-              ("n", reversible_block_num)("num", conf.terminate_at_block) );
+         ilog("Block {} reached configured maximum block {}; terminating",
+              reversible_block_num, conf.terminate_at_block);
          return true;
       }
       return false;
@@ -3660,7 +3643,7 @@ struct controller_impl {
          static fc::time_point log_time;
          fc::time_point now = fc::time_point::now();
          if (log_time < now - fc::seconds(1)) {
-            ilog("Pausing at block #${b}", ("b", pause_at_block_num));
+            ilog("Pausing at block #{}", pause_at_block_num);
             log_time = now;
          }
          return true;
@@ -3710,7 +3693,7 @@ struct controller_impl {
    void validate_db_available_size() const {
       const auto free = db.get_free_memory();
       const auto guard = conf.state_guard_size;
-      SYS_ASSERT(free >= guard, database_guard_exception, "database free: ${f}, guard size: ${g}", ("f", free)("g",guard));
+      SYS_ASSERT(free >= guard, database_guard_exception, "database free: {}, guard size: {}", free, guard);
    }
 
    const producer_authority_schedule& active_producers()const {
@@ -3835,28 +3818,30 @@ void controller::preactivate_feature( const digest_type& feature_digest, bool is
       case protocol_feature_set::recognized_t::unrecognized:
          if( is_speculative_block() ) {
             SYS_THROW( subjective_block_production_exception,
-                       "protocol feature with digest '${digest}' is unrecognized", ("digest", feature_digest) );
+                       "protocol feature with digest '{}' is unrecognized", feature_digest );
          } else {
             SYS_THROW( protocol_feature_bad_block_exception,
-                       "protocol feature with digest '${digest}' is unrecognized", ("digest", feature_digest) );
+                       "protocol feature with digest '{}' is unrecognized", feature_digest );
          }
       break;
       case protocol_feature_set::recognized_t::disabled:
          if( is_speculative_block() ) {
             SYS_THROW( subjective_block_production_exception,
-                       "protocol feature with digest '${digest}' is disabled", ("digest", feature_digest) );
+                       "protocol feature with digest '{}' is disabled", feature_digest );
          } else {
             SYS_THROW( protocol_feature_bad_block_exception,
-                       "protocol feature with digest '${digest}' is disabled", ("digest", feature_digest) );
+                       "protocol feature with digest '{}' is disabled", feature_digest );
          }
       break;
       case protocol_feature_set::recognized_t::too_early:
          if( is_speculative_block() ) {
             SYS_THROW( subjective_block_production_exception,
-                       "${timestamp} is too early for the earliest allowed activation time of the protocol feature with digest '${digest}'", ("digest", feature_digest)("timestamp", cur_time) );
+                       "{} is too early for the earliest allowed activation time of the protocol feature with digest '{}'",
+                       cur_time, feature_digest );
          } else {
             SYS_THROW( protocol_feature_bad_block_exception,
-                       "${timestamp} is too early for the earliest allowed activation time of the protocol feature with digest '${digest}'", ("digest", feature_digest)("timestamp", cur_time) );
+                       "{} is too early for the earliest allowed activation time of the protocol feature with digest '{}'",
+                       cur_time, feature_digest );
          }
       break;
       case protocol_feature_set::recognized_t::ready:
@@ -3893,8 +3878,8 @@ void controller::preactivate_feature( const digest_type& feature_digest, bool is
 
    SYS_ASSERT( !is_protocol_feature_activated( feature_digest ),
                protocol_feature_exception,
-               "protocol feature with digest '${digest}' is already activated",
-               ("digest", feature_digest)
+               "protocol feature with digest '{}' is already activated",
+               feature_digest
    );
 
    const auto& pso = my->db.get<protocol_state_object>();
@@ -3904,8 +3889,8 @@ void controller::preactivate_feature( const digest_type& feature_digest, bool is
                           feature_digest
                ) == pso.preactivated_protocol_features.end(),
                protocol_feature_exception,
-               "protocol feature with digest '${digest}' is already pre-activated",
-               ("digest", feature_digest)
+               "protocol feature with digest '{}' is already pre-activated",
+               feature_digest
    );
 
    auto dependency_checker = [&]( const digest_type& d ) -> bool
@@ -3919,8 +3904,8 @@ void controller::preactivate_feature( const digest_type& feature_digest, bool is
 
    SYS_ASSERT( pfs.validate_dependencies( feature_digest, dependency_checker ),
                protocol_feature_exception,
-               "not all dependencies of protocol feature with digest '${digest}' have been activated or pre-activated",
-               ("digest", feature_digest)
+               "not all dependencies of protocol feature with digest '{}' have been activated or pre-activated",
+               feature_digest
    );
 
    if (auto dm_logger = get_deep_mind_logger(is_trx_transient)) {
@@ -4248,7 +4233,7 @@ signed_block_ptr controller::fetch_block_by_number( uint32_t block_num )const  {
       return b;
 
    return my->blog.read_block_by_num(block_num);
-} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
 std::vector<char> controller::fetch_serialized_block_by_number( uint32_t block_num)const  { try {
    if (signed_block_ptr b = my->fork_db_fetch_block_on_best_branch_by_num(block_num)) {
@@ -4256,7 +4241,7 @@ std::vector<char> controller::fetch_serialized_block_by_number( uint32_t block_n
    }
 
    return my->blog.read_serialized_block_by_num(block_num);
-} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
 std::optional<signed_block_header> controller::fetch_block_header_by_number( uint32_t block_num )const  { try {
    auto b = my->fork_db_fetch_block_on_best_branch_by_num(block_num);
@@ -4264,21 +4249,21 @@ std::optional<signed_block_header> controller::fetch_block_header_by_number( uin
       return std::optional<signed_block_header>{*b};
 
    return my->blog.read_block_header_by_num(block_num);
-} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
 
 std::optional<block_id_type> controller::fork_block_id_for_num( uint32_t block_num )const { try {
    if (std::optional<block_id_type> id = my->fork_db_fetch_block_id_on_best_branch_by_num(block_num))
       return id;
    return my->blog.read_block_id_by_num(block_num);
-} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
 // not thread-safe
 std::optional<block_id_type> controller::chain_block_id_for_num( uint32_t block_num )const { try {
    if (std::optional<block_id_type> id = my->fork_db_fetch_block_id_on_chain_head_branch_by_num(block_num))
       return id;
    return my->blog.read_block_id_by_num(block_num);
-} FC_CAPTURE_AND_RETHROW( (block_num) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
 digest_type controller::get_strong_digest_by_id( const block_id_type& id ) const {
    return my->get_strong_digest_by_id(id);
@@ -4445,17 +4430,17 @@ wasm_interface& controller::get_wasm_interface() {
 const account_object& controller::get_account( account_name name )const
 { try {
    return my->db.get<account_object, by_name>(name);
-} FC_CAPTURE_AND_RETHROW( (name) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", name ) }
 
 const account_object* controller::find_account( account_name name )const
 { try {
    return my->db.find<account_object, by_name>(name);
-} FC_CAPTURE_AND_RETHROW( (name) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", name ) }
 
 const account_metadata_object* controller::find_account_metadata( account_name name )const
 { try {
    return my->db.find<account_metadata_object, by_name>(name);
-} FC_CAPTURE_AND_RETHROW( (name) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", name ) }
 
 bool controller::sender_avoids_whitelist_blacklist_enforcement( account_name sender )const {
    return my->sender_avoids_whitelist_blacklist_enforcement( sender );
@@ -4498,25 +4483,23 @@ void controller::validate_expiration( const transaction& trx )const { try {
 
    SYS_ASSERT( trx.expiration.to_time_point() >= pending_block_time(),
                expired_tx_exception,
-               "transaction has expired, "
-               "expiration is ${trx.expiration} and pending block time is ${pending_block_time}",
-               ("trx.expiration",trx.expiration)("pending_block_time",pending_block_time()));
+               "transaction has expired, expiration is {} and pending block time is {}",
+               trx.expiration, pending_block_time() );
    SYS_ASSERT( trx.expiration.to_time_point() <= pending_block_time() + fc::seconds(chain_configuration.max_transaction_lifetime),
                tx_exp_too_far_exception,
-               "Transaction expiration is too far in the future relative to the reference time of ${reference_time}, "
-               "expiration is ${trx.expiration} and the maximum transaction lifetime is ${max_til_exp} seconds",
-               ("trx.expiration",trx.expiration)("reference_time",pending_block_time())
-               ("max_til_exp",chain_configuration.max_transaction_lifetime) );
-} FC_CAPTURE_AND_RETHROW((trx)) }
+               "Transaction expiration is too far in the future relative to the reference time of {}, "
+               "expiration is {} and the maximum transaction lifetime is {} seconds",
+               pending_block_time(), trx.expiration, chain_configuration.max_transaction_lifetime );
+} FC_CAPTURE_AND_RETHROW("{}", trx.id()) }
 
 void controller::validate_tapos( const transaction& trx )const { try {
    const auto& tapos_block_summary = db().get<block_summary_object>((uint16_t)trx.ref_block_num);
 
    //Verify TaPoS block summary has correct ID prefix, and that this block's time is not past the expiration
    SYS_ASSERT(trx.verify_reference_block(tapos_block_summary.block_id), invalid_ref_block_exception,
-              "Transaction's reference block ${rb} did not match ${bs}. Is this transaction from a different fork?",
-              ("rb", trx.ref_block_num)("bs", tapos_block_summary.block_id));
-} FC_CAPTURE_AND_RETHROW() }
+              "Transaction's reference block {} did not match {}. Is this transaction from a different fork?",
+              trx.ref_block_num, tapos_block_summary.block_id);
+} FC_CAPTURE_AND_RETHROW("") }
 
 void controller::validate_db_available_size() const {
    return my->validate_db_available_size();
@@ -4549,9 +4532,8 @@ std::optional<fc::microseconds> controller::get_subjective_cpu_leeway() const {
 void controller::set_greylist_limit( uint32_t limit ) {
    SYS_ASSERT( 0 < limit && limit <= chain::config::maximum_elastic_resource_multiplier,
                misc_exception,
-               "Invalid limit (${limit}) passed into set_greylist_limit. "
-               "Must be between 1 and ${max}.",
-               ("limit", limit)("max", chain::config::maximum_elastic_resource_multiplier)
+               "Invalid limit ({}) passed into set_greylist_limit. Must be between 1 and {}.",
+               limit, chain::config::maximum_elastic_resource_multiplier
    );
    my->conf.greylist_limit = limit;
 }
@@ -4660,7 +4642,7 @@ std::optional<chain_id_type> controller::extract_chain_id_from_db( const path& s
 }
 
 void controller::replace_producer_keys( const public_key_type& key ) {
-   ilog("Replace producer keys with ${k}", ("k", key));
+   ilog("Replace producer keys with {}", fc::json::to_log_string(key));
    my->replace_producer_keys(key);
 }
 

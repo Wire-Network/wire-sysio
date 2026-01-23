@@ -74,7 +74,7 @@ namespace sysio { namespace client { namespace http {
 
       if (!initialized) {
          auto res = curl_global_init(CURL_GLOBAL_DEFAULT);
-         SYS_ASSERT(res == CURLE_OK, chain::http_exception, curl_easy_strerror(res));
+         SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
          initialized = true;
       }
 
@@ -128,8 +128,8 @@ namespace sysio { namespace client { namespace http {
 
       auto res = curl_easy_perform(curl);
       if (res == CURLE_COULDNT_CONNECT || res == CURLE_URL_MALFORMAT)
-         SYS_THROW(connection_exception, curl_easy_strerror(res));
-      SYS_ASSERT(res == CURLE_OK, chain::http_exception, curl_easy_strerror(res));
+         SYS_THROW(connection_exception, "{}", curl_easy_strerror(res));
+      SYS_ASSERT(res == CURLE_OK, chain::http_exception, "{}", curl_easy_strerror(res));
 
       long http_code = 0;
       curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);

@@ -25,11 +25,11 @@ void configure_logging(const std::filesystem::path& config_path) {
          throw;
       }
    } catch (const fc::exception& e) { //
-      elog("${e}", ("e", e.to_detail_string()));
+      elog("{}", e.to_detail_string());
    } catch (const boost::exception& e) {
-      elog("${e}", ("e", boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
    } catch (const std::exception& e) { //
-      elog("${e}", ("e", e.what()));
+      elog("{}", e.what());
    } catch (...) {
       // empty
    }
@@ -38,19 +38,17 @@ void configure_logging(const std::filesystem::path& config_path) {
 void logging_conf_handler() {
    auto config_path = app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
    } else {
-      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
    }
    configure_logging(config_path);
-   fc::log_config::initialize_appenders();
 }
 
 void initialize_logging() {
    auto config_path = app().get_logging_conf();
    if (std::filesystem::exists(config_path))
       fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-   fc::log_config::initialize_appenders();
 
    app().set_sighup_callback(logging_conf_handler);
 }
@@ -117,11 +115,11 @@ int main(int argc, char** argv)
       app->startup();
       app->exec();
    } catch (const fc::exception& e) {
-      elog("${e}", ("e",e.to_detail_string()));
+      elog("{}", e.to_detail_string());
    } catch (const boost::exception& e) {
-      elog("${e}", ("e",boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
    } catch (const std::exception& e) {
-      elog("${e}", ("e",e.what()));
+      elog("{}", e.what());
    } catch (...) {
       elog("unknown exception");
    }

@@ -18,16 +18,15 @@ namespace sysio { namespace chain {
             break;
          case match_type::suffix:
             SYS_ASSERT(contract_match_name == contract_match_name.suffix(), chain::producer_exception,
-                       "contract_match_name must be the desired suffix and should not contain any '.'.",
-                       ("contract_match_name", contract_match_name.to_string()));
+                       "contract_match_name {} must be the desired suffix and should not contain any '.'.",
+                       contract_match_name.to_string());
             contract_matcher = [contract_match_name](const name& n) { return n.suffix() == contract_match_name; };
             break;
          case match_type::any:
             [[fallthrough]];
          default:
             SYS_THROW(chain::producer_exception,
-                      "contract_action_match does not support the given type: ${type}",
-                      ("type",static_cast<int64_t>(type)));
+                      "contract_action_match does not support the given type: {}", static_cast<int64_t>(type));
        }
    }
 
@@ -43,8 +42,8 @@ namespace sysio { namespace chain {
             break;
          case match_type::suffix:
             SYS_ASSERT(action_name == action_name.suffix(), chain::producer_exception,
-                       "action_name must be the desired suffix and should not contain any '.'.",
-                       ("action_name", action_name.to_string()));
+                       "action_name {} must be the desired suffix and should not contain any '.'.",
+                       action_name.to_string());
             action_matchers.push_back([action_name](const name& n) { return n.suffix() == action_name; });
             break;
          case match_type::any:
@@ -52,8 +51,7 @@ namespace sysio { namespace chain {
             break;
          default:
             SYS_THROW(chain::producer_exception,
-                      "contract_action_match::add_action does not support the given type: ${type}",
-                      ("type",static_cast<int64_t>(type)));
+                      "contract_action_match::add_action does not support the given type: {}", static_cast<int64_t>(type));
       }
    }
 

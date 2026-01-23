@@ -158,7 +158,7 @@ BOOST_FIXTURE_TEST_CASE(replay_stop_multiple, blog_replay_fixture) try {
    stop_and_resume_replay(last_head_block_num - 3);
 } FC_LOG_AND_RETHROW()
 
-void currupt_blocks_log(path block_dir, block_num_type block_num) {
+void currupt_blocks_log(std::filesystem::path block_dir, block_num_type block_num) {
    fc::datastream<fc::cfile> index_file;
    index_file.set_file_path(block_dir / "blocks.index");
    index_file.open(fc::cfile::update_rw_mode);

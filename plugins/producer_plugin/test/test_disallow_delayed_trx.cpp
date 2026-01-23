@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
             transaction_metadata::trx_type::input,
             return_failure_traces,
             [ptrx] (const next_function_variant<transaction_trace_ptr>& result) {
-               elog( "trace with except ${e}", ("e", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) )) );
+               elog( "trace with except {}", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) ) );
             }
          ),
          fc::exception,

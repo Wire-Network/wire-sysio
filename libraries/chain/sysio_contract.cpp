@@ -34,8 +34,8 @@ void validate_authority_precondition( const apply_context& context, const author
    for(const auto& a : auth.accounts) {
       auto* acct = context.db.find<account_object, by_name>(a.permission.actor);
       SYS_ASSERT( acct != nullptr, action_validate_exception,
-                  "account '${account}' does not exist",
-                  ("account", a.permission.actor)
+                  "account '{}' does not exist",
+                  a.permission.actor
                 );
 
       if( a.permission.permission == config::owner_name || a.permission.permission == sysio::chain::config::active_name )
@@ -48,8 +48,8 @@ void validate_authority_precondition( const apply_context& context, const author
          context.control.get_authorization_manager().get_permission({a.permission.actor, a.permission.permission});
       } catch( const permission_query_exception& ) {
          SYS_THROW( action_validate_exception,
-                    "permission '${perm}' does not exist",
-                    ("perm", a.permission)
+                    "permission '{}' does not exist",
+                    a.permission
                   );
       }
    }
@@ -87,8 +87,8 @@ void apply_sysio_newaccount(apply_context& context) {
 
       auto existing_account = db.find<account_object, by_name>(create.name);
       SYS_ASSERT(existing_account == nullptr, account_name_exists_exception,
-                 "Cannot create account named ${name}, as that name is already taken",
-                 ("name", create.name));
+                 "Cannot create account named {}, as that name is already taken",
+                 create.name);
 
       int ram_delta = 0;
       db.create<account_object>([&](auto& a) {
@@ -118,7 +118,7 @@ void apply_sysio_newaccount(apply_context& context) {
 
       context.add_ram_usage(create.name, ram_delta);
 
-} FC_CAPTURE_AND_RETHROW( (create) ) }
+} FC_CAPTURE_AND_RETHROW( "create {}", fc::json::to_log_string(create) ) }
 
 void apply_sysio_setcode(apply_context& context) {
    SYS_ASSERT( !context.trx_context.is_read_only(), action_validate_exception, "setcode not allowed in read-only transaction" );
@@ -141,7 +141,7 @@ void apply_sysio_setcode(apply_context& context) {
    int64_t old_size  = 0;
    int64_t new_size  = code_size * config::setcode_ram_bytes_multiplier;
 
-   SYS_ASSERT( context.control.find_account(act.account) != nullptr, account_query_exception, "Account not found ${a}", ("a", act.account));
+   SYS_ASSERT( context.control.find_account(act.account) != nullptr, account_query_exception, "Account not found {}", act.account );
    const auto* account_metadata = db.find<account_metadata_object,by_name>(act.account);
    int64_t metadata_ram_delta  = 0;
    if(account_metadata == nullptr){
@@ -282,9 +282,10 @@ void apply_sysio_updateauth(apply_context& context) {
    SYS_ASSERT(update.permission != update.parent, action_validate_exception, "Cannot set an authority as its own parent");
    db.get<account_object, by_name>(update.account);
    SYS_ASSERT(validate(update.auth), action_validate_exception,
-              "Invalid authority: ${auth}", ("auth", update.auth));
+              "Invalid authority: {}", fc::json::to_log_string(update.auth));
    if( update.permission == sysio::chain::config::active_name )
-      SYS_ASSERT(update.parent == config::owner_name, action_validate_exception, "Cannot change active authority's parent from owner", ("update.parent", update.parent) );
+      SYS_ASSERT(update.parent == config::owner_name, action_validate_exception,
+                 "Cannot change active authority's parent from owner, update: {}", update.parent );
    if (update.permission == config::owner_name)
       SYS_ASSERT(update.parent.empty(), action_validate_exception, "Cannot change owner authority's parent");
    else
@@ -293,8 +294,8 @@ void apply_sysio_updateauth(apply_context& context) {
    if( update.auth.waits.size() > 0 ) {
       auto max_delay = context.control.get_global_properties().configuration.max_transaction_delay;
       SYS_ASSERT( update.auth.waits.back().wait_sec <= max_delay, action_validate_exception,
-                  "Cannot set delay longer than max_transacton_delay, which is ${max_delay} seconds",
-                  ("max_delay", max_delay) );
+                  "Cannot set delay longer than max_transacton_delay, which is {} seconds",
+                  max_delay );
    }
 
    validate_authority_precondition(context, update.auth);
@@ -358,8 +359,8 @@ void apply_sysio_deleteauth(apply_context& context) {
       const auto& index = db.get_index<permission_link_index, by_permission_name>();
       auto range = index.equal_range(boost::make_tuple(remove.account, remove.permission));
       SYS_ASSERT(range.first == range.second, action_validate_exception,
-                 "Cannot delete a linked authority. Unlink the authority first. This authority is linked to ${code}::${type}.",
-                 ("code", range.first->code)("type", range.first->message_type));
+                 "Cannot delete a linked authority. Unlink the authority first. This authority is linked to {}::{}.",
+                 range.first->code, range.first->message_type);
    }
 
    const auto& permission = authorization.get_permission({remove.account, remove.permission});
@@ -389,10 +390,10 @@ void apply_sysio_linkauth(apply_context& context) {
       auto& db = context.db;
       const auto *account = db.find<account_object, by_name>(requirement.account);
       SYS_ASSERT(account != nullptr, account_query_exception,
-                 "Failed to retrieve account: ${account}", ("account", requirement.account)); // Redundant?
+                 "Failed to retrieve account: {}", requirement.account); // Redundant?
       const auto *code = db.find<account_object, by_name>(requirement.code);
       SYS_ASSERT(code != nullptr, account_query_exception,
-                 "Failed to retrieve code for account: ${account}", ("account", requirement.code));
+                 "Failed to retrieve code for account: {}", requirement.code);
       if( requirement.requirement != config::sysio_any_name ) {
          const permission_object* permission = nullptr;
          permission = db.find<permission_object, by_owner>(
@@ -400,7 +401,7 @@ void apply_sysio_linkauth(apply_context& context) {
                       );
 
          SYS_ASSERT(permission != nullptr, permission_query_exception,
-                    "Failed to retrieve permission: ${permission}", ("permission", requirement.requirement));
+                    "Failed to retrieve permission: {}", requirement.requirement);
       }
 
       auto link_key = boost::make_tuple(requirement.account, requirement.code, requirement.type);
@@ -430,7 +431,7 @@ void apply_sysio_linkauth(apply_context& context) {
          );
       }
 
-  } FC_CAPTURE_AND_RETHROW((requirement))
+  } FC_CAPTURE_AND_RETHROW("requirement {}", fc::json::to_log_string(requirement))
 }
 
 void apply_sysio_unlinkauth(apply_context& context) {

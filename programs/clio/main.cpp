@@ -266,17 +266,17 @@ public:
          if (is_public_key_str(public_key_json)) {
             try {
                signing_keys.push_back(public_key_type::from_string(public_key_json));
-            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", public_key_json))
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: {}", public_key_json)
          } else {
             fc::variant json_keys;
             try {
                json_keys = fc::json::from_string(public_key_json, fc::json::parse_type::relaxed_parser);
-            } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", public_key_json));
+            } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", public_key_json);
             try {
                std::vector<public_key_type> keys = json_keys.template as<std::vector<public_key_type>>();
                signing_keys = std::move(keys);
-            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key array format '${data}'",
-                                     ("data", fc::json::to_string(json_keys, fc::time_point::maximum())))
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key array format '{}'",
+                                     fc::json::to_string(json_keys, fc::time_point::maximum()))
          }
       }
       return signing_keys;
@@ -446,7 +446,7 @@ fc::variant push_transaction( signed_transaction& trx, const std::vector<public_
             ref_block = call(get_block_func, fc::mutable_variant_object("block_num_or_id", tx_ref_block_num_or_id));
             ref_block_id = ref_block["id"].as<block_id_type>();
          }
-      } SYS_RETHROW_EXCEPTIONS(invalid_ref_block_exception, "Invalid reference block num or id: ${block_num_or_id}", ("block_num_or_id", tx_ref_block_num_or_id));
+      } SYS_RETHROW_EXCEPTIONS(invalid_ref_block_exception, "Invalid reference block num or id: {}", tx_ref_block_num_or_id);
       trx.set_reference_block(ref_block_id);
 
       trx.max_cpu_usage_ms = tx_max_cpu_usage;
@@ -605,19 +605,19 @@ void print_action( const fc::variant& at ) {
 
 bytes variant_to_bin( const account_name& account, const action_name& action, const fc::variant& action_args_var ) {
    auto abis = abi_serializer_resolver( account );
-   FC_ASSERT( abis, "No ABI found for ${contract}", ("contract", account));
+   FC_ASSERT( abis, "No ABI found for {}", account);
 
    auto action_type = abis->get_action_type( action );
-   FC_ASSERT( !action_type.empty(), "Unknown action ${action} in contract ${contract}", ("action", action)( "contract", account ));
+   FC_ASSERT( !action_type.empty(), "Unknown action {} in contract {}", action, account );
    return abis->variant_to_binary( action_type, action_args_var, abi_serializer::create_yield_function( abi_serializer_max_time ) );
 }
 
 fc::variant bin_to_variant( const account_name& account, const action_name& action, const bytes& action_args) {
    auto abis = abi_serializer_resolver( account );
-   FC_ASSERT( abis, "No ABI found for ${contract}", ("contract", account));
+   FC_ASSERT( abis, "No ABI found for {}", account);
 
    auto action_type = abis->get_action_type( action );
-   FC_ASSERT( !action_type.empty(), "Unknown action ${action} in contract ${contract}", ("action", action)( "contract", account ));
+   FC_ASSERT( !action_type.empty(), "Unknown action {} in contract {}", action, account );
    return abis->binary_to_variant( action_type, action_args, abi_serializer::create_yield_function( abi_serializer_max_time ) );
 }
 
@@ -629,12 +629,12 @@ fc::variant json_from_file_or_string(const string& file_or_str, fc::json::parse_
    if ( !looks_like_json && std::filesystem::is_regular_file(file_or_str, ec) ) {
       try {
          return fc::json::from_file(file_or_str, ptype);
-      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", file_or_str));
+      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from file: {}", file_or_str);
 
    } else if (looks_like_json) {
       try {
          return fc::json::from_string(file_or_str, ptype);
-      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", file_or_str));
+      } SYS_RETHROW_EXCEPTIONS(json_parse_exception, "Fail to parse JSON from string: {}", ("string", file_or_str));
    } else {
       return file_or_str;
    }
@@ -731,7 +731,7 @@ void print_result( const fc::variant& result ) { try {
          if( status == "failed" ) {
             auto soft_except = processed["except"].as<std::optional<fc::exception>>();
             if( soft_except ) {
-               edump((soft_except->to_detail_string()));
+               elog("{}", soft_except->to_detail_string());
             }
          } else {
             const auto& actions = processed["action_traces"].get_array();
@@ -744,14 +744,14 @@ void print_result( const fc::variant& result ) { try {
       } else {
          cerr << fc::json::to_pretty_string( result ) << endl;
       }
-} FC_CAPTURE_AND_RETHROW( (result) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(result) ) }
 
 using std::cout;
 void send_actions(std::vector<chain::action>&& actions, const std::vector<public_key_type>& signing_keys = std::vector<public_key_type>() ) {
    std::ofstream out;
    if (tx_json_save_file.length()) {
       out.open(tx_json_save_file);
-      SYSC_ASSERT(!out.fail(), "ERROR: Failed to create file \"${p}\"", ("p", tx_json_save_file));
+      FC_ASSERT(!out.fail(), "ERROR: Failed to create file \"{}\"", tx_json_save_file);
    }
    auto result = push_actions( std::move(actions), signing_keys);
 
@@ -873,15 +873,15 @@ authority parse_json_authority(const std::string& authorityJsonOrFile) {
    fc::variant authority_var = json_from_file_or_string(authorityJsonOrFile);
    try {
       return authority_var.as<authority>();
-   } SYS_RETHROW_EXCEPTIONS(authority_type_exception, "Invalid authority format '${data}'",
-                            ("data", fc::json::to_string(authority_var, fc::time_point::maximum())))
+   } SYS_RETHROW_EXCEPTIONS(authority_type_exception, "Invalid authority format '{}'",
+                            fc::json::to_string(authority_var, fc::time_point::maximum()))
 }
 
 authority parse_json_authority_or_key(const std::string& authorityJsonOrFile) {
    if (is_public_key_str(authorityJsonOrFile)) {
       try {
          return authority(public_key_type::from_string(authorityJsonOrFile));
-      } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", authorityJsonOrFile))
+      } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: {}", authorityJsonOrFile)
    } else {
       auto result = parse_json_authority(authorityJsonOrFile);
       result.sort_fields();
@@ -908,7 +908,7 @@ asset to_asset( account_name code, const string& s ) {
          auto p = cache.emplace( make_pair( code, sym ), result.max_supply.get_symbol() );
          it = p.first;
       } else {
-         SYS_THROW(symbol_type_exception, "Symbol ${s} is not supported by token contract ${c}", ("s", sym_str)("c", code));
+         SYS_THROW(symbol_type_exception, "Symbol {} is not supported by token contract {}", sym_str, code);
       }
    }
    auto expected_symbol = it->second;
@@ -916,7 +916,7 @@ asset to_asset( account_name code, const string& s ) {
       auto factor = expected_symbol.precision() / a.precision();
       a = asset( a.get_amount() * factor, expected_symbol );
    } else if ( a.decimals() > expected_symbol.decimals() ) {
-      SYS_THROW(symbol_type_exception, "Too many decimal digits in ${a}, only ${d} supported", ("a", a)("d", expected_symbol.decimals()));
+      SYS_THROW(symbol_type_exception, "Too many decimal digits in {}, only {} supported", fc::json::to_log_string(a), expected_symbol.decimals());
    } // else precision matches
    return a;
 }
@@ -1106,7 +1106,7 @@ void try_local_port(uint32_t duration) {
    while ( !local_port_used()) {
       if (duration_cast<std::chrono::milliseconds>( system_clock::now().time_since_epoch()).count() - start_time > duration ) {
          std::cerr << "Unable to connect to " << key_store_executable_name << ", if " << key_store_executable_name << " is running please kill the process and try again.\n";
-         throw connection_exception(fc::log_messages{FC_LOG_MESSAGE(error, "Unable to connect to ${k}", ("k", key_store_executable_name))});
+         throw connection_exception(fc::log_messages{FC_LOG_MESSAGE(error, "Unable to connect to {}", key_store_executable_name)});
       }
    }
 }
@@ -1197,7 +1197,7 @@ struct register_producer_subcommand {
          public_key_type producer_key;
          try {
             producer_key = public_key_type::from_string(producer_key_str);
-         } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid producer public key: ${public_key}", ("public_key", producer_key_str))
+         } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid producer public key: {}", producer_key_str)
 
          auto regprod_var = regproducer_variant(name(producer_str), producer_key, url, loc );
          auto accountPermissions = get_account_permissions(tx_permission, {name(producer_str), sysio::chain::config::active_name});
@@ -1231,15 +1231,15 @@ struct create_account_subcommand {
             if( owner_key_str.find('{') != string::npos ) {
                try{
                   owner = parse_json_authority_or_key(owner_key_str);
-               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid owner authority: ${authority}", ("authority", owner_key_str) )
+               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid owner authority: {}", owner_key_str )
             } else if( owner_key_str.find('@') != string::npos ) {
                try {
                   owner = authority(to_permission_level(owner_key_str));
-            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid owner permission level: ${permission}", ("permission", owner_key_str))
+            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid owner permission level: {}", owner_key_str)
          } else {
             try {
                owner = authority(public_key_type::from_string(owner_key_str));
-            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid owner public key: ${public_key}", ("public_key", owner_key_str));
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid owner public key: {}", owner_key_str);
          }
 
          if (active_key_str.empty()) {
@@ -1247,15 +1247,15 @@ struct create_account_subcommand {
          } else if (active_key_str.find('{') != string::npos) {
             try{
                active = parse_json_authority_or_key(active_key_str);
-               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid active authority: ${authority}", ("authority", owner_key_str) )
+               } SYS_RETHROW_EXCEPTIONS( explained_exception, "Invalid active authority: {}", owner_key_str )
             }else if( active_key_str.find('@') != string::npos ) {
                try {
                   active = authority(to_permission_level(active_key_str));
-            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid active permission level: ${permission}", ("permission", active_key_str))
+            } SYS_RETHROW_EXCEPTIONS(explained_exception, "Invalid active permission level: {}", active_key_str)
          } else {
             try {
                active = authority(public_key_type::from_string(active_key_str));
-            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: ${public_key}", ("public_key", active_key_str));
+            } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid active public key: {}", active_key_str);
          }
 
          auto create = create_newaccount(name(creator), name(account_name), owner, active);
@@ -1423,7 +1423,7 @@ struct get_transaction_id_subcommand {
             } else {
                std::cerr << "file/string does not represent a transaction" << std::endl;
             }
-         } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Fail to parse transaction JSON '${data}'", ("data",trx_to_check))
+         } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Fail to parse transaction JSON '{}'", trx_to_check)
       });
    }
 };
@@ -1924,8 +1924,8 @@ int main( int argc, char** argv ) {
          signed_transaction trx;
          try {
             abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver, abi_serializer::create_yield_function( abi_serializer_max_time ) );
-         } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid transaction format: '${data}'",
-                                   ("data", fc::json::to_string(trx_var, fc::time_point::maximum())))
+         } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid transaction format: '{}'",
+                                   fc::json::to_string(trx_var, fc::time_point::maximum()))
          std::cout << fc::json::to_pretty_string( packed_transaction( trx, packed_transaction::compression_type::none )) << std::endl;
       } else {
          try {
@@ -1946,8 +1946,8 @@ int main( int argc, char** argv ) {
       packed_transaction packed_trx;
       try {
          fc::from_variant<packed_transaction>( packed_trx_var, packed_trx );
-      } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '${data}'",
-                                ("data", fc::json::to_string(packed_trx_var, fc::time_point::maximum())))
+      } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
+                                fc::json::to_string(packed_trx_var, fc::time_point::maximum()))
       signed_transaction strx = packed_trx.get_signed_transaction();
       fc::variant trx_var;
       if( unpack_action_data_flag ) {
@@ -1995,7 +1995,7 @@ int main( int argc, char** argv ) {
    auto abi_to_hash_cmd = convert_cmd->add_subcommand("abi_to_hash", localized("From abi file to hash"));
    abi_to_hash_cmd->add_option("abi-file", abi_file_name, localized("The ABI file name"))->required();
    abi_to_hash_cmd->callback([&] {
-      SYS_ASSERT( std::filesystem::exists( abi_file_name ), abi_file_not_found, "ABI file not found: ${f}", ("f", abi_file_name)  );
+      SYS_ASSERT( std::filesystem::exists( abi_file_name ), abi_file_not_found, "ABI file not found: {}", abi_file_name  );
       auto abi_bytes = fc::raw::pack(fc::json::from_file(abi_file_name).as<abi_def>());
       auto abi_hash = fc::sha256::hash( abi_bytes.data(), abi_bytes.size() );
       std::cout << "ABI hash: " << abi_hash.str() << std::endl;
@@ -2005,10 +2005,10 @@ int main( int argc, char** argv ) {
    auto wasm_to_hash_cmd = convert_cmd->add_subcommand("wasm_to_hash", localized("From WASM file to hash"));
    wasm_to_hash_cmd->add_option("wasm-file", wasm_file_name, localized("The WASM file name"))->required();
    wasm_to_hash_cmd->callback([&] {
-      SYS_ASSERT( std::filesystem::exists( wasm_file_name ), wasm_file_not_found, "WASM file not found: ${f}", ("f", wasm_file_name)  );
+      SYS_ASSERT( std::filesystem::exists( wasm_file_name ), wasm_file_not_found, "WASM file not found: {}", wasm_file_name );
       std::string wasm_str;
       fc::read_file_contents(wasm_file_name, wasm_str);
-      SYS_ASSERT( !wasm_str.empty(), wasm_file_not_found, "Empty WASM file: ${f}", ("f", wasm_file_name) );
+      SYS_ASSERT( !wasm_str.empty(), wasm_file_not_found, "Empty WASM file: {}", wasm_file_name );
       const string binary_wasm_header("\x00\x61\x73\x6d\x01\x00\x00\x00", 8);
       if(wasm_str.compare(0, 8, binary_wasm_header)) {
          std::cerr << localized("WARNING: ") << wasm_file_name << localized(" doesn't look like a binary WASM file. Is it something else, like WAST?") << std::endl;
@@ -2171,13 +2171,13 @@ int main( int argc, char** argv ) {
       signed_transaction trx;
       try {
         abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver_empty, abi_serializer::create_yield_function( abi_serializer_max_time ) );
-      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '${data}'",
-                               ("data", fc::json::to_string(trx_var, fc::time_point::maximum())))
+      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '{}'",
+                               fc::json::to_string(trx_var, fc::time_point::maximum()))
 
       std::optional<chain_id_type> chain_id;
 
       if( str_chain_id.size() == 0 ) {
-         ilog( "grabbing chain_id from ${n}", ("n", node_executable_name) );
+         ilog( "grabbing chain_id from {}", node_executable_name );
          auto info = get_info();
          chain_id = info.chain_id;
       } else {
@@ -2341,7 +2341,7 @@ int main( int argc, char** argv ) {
               std::cout << abi << "\n";
           }
       } else {
-        FC_THROW_EXCEPTION(key_not_found_exception, "Key ${key}", ("key", "abi"));
+        FC_THROW_EXCEPTION(key_not_found_exception, "Key {}", accountName);
       }
    });
 
@@ -2569,7 +2569,7 @@ int main( int argc, char** argv ) {
 
         std::cerr << localized(("Reading WASM from " + wasmPath + "...").c_str()) << std::endl;
         fc::read_file_contents(wasmPath, wasm);
-        SYS_ASSERT( !wasm.empty(), wasm_file_not_found, "no wasm file found ${f}", ("f", wasmPath) );
+        SYS_ASSERT( !wasm.empty(), wasm_file_not_found, "no wasm file found {}", wasmPath );
 
         const string binary_wasm_header("\x00\x61\x73\x6d\x01\x00\x00\x00", 8);
         if(wasm.compare(0, 8, binary_wasm_header))
@@ -2628,7 +2628,7 @@ int main( int argc, char** argv ) {
            }
         }
 
-        SYS_ASSERT( std::filesystem::exists( abiPath ), abi_file_not_found, "no abi file found ${f}", ("f", abiPath)  );
+        SYS_ASSERT( std::filesystem::exists( abiPath ), abi_file_not_found, "no abi file found {}", abiPath );
 
         abi_bytes = fc::raw::pack(fc::json::from_file(abiPath).as<abi_def>());
       } else {
@@ -2658,7 +2658,7 @@ int main( int argc, char** argv ) {
    add_standard_transaction_options_plus_signing(code_cmd, "account@active");
    add_standard_transaction_options_plus_signing(abi_cmd, "account@active");
    contract_cmd->callback([&] {
-      if(!contract_clear) SYS_ASSERT( !contractPath.empty(), contract_exception, " contract-dir is null ", ("f", contractPath) );
+      if(!contract_clear) SYS_ASSERT( !contractPath.empty(), contract_exception, " contract-dir {} is null ", contractPath );
       shouldSend = false;
       set_code_callback();
       set_abi_callback();
@@ -2856,7 +2856,7 @@ int main( int argc, char** argv ) {
          try {
             public_key_type pubkey = public_key_type::from_string(wallet_rm_key_str);
          } catch (...) {
-            SYS_THROW(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", wallet_rm_key_str))
+            SYS_THROW(public_key_type_exception, "Invalid public key: {}", wallet_rm_key_str)
          }
          fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_pw), fc::variant(wallet_rm_key_str)};
          call(wallet_url, wallet_remove_key, vs);
@@ -3019,8 +3019,8 @@ int main( int argc, char** argv ) {
             packed_transaction packed_trx;
             try {
               fc::from_variant<packed_transaction>( trx_var, packed_trx );
-            } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '${data}'",
-                                ("data", fc::json::to_string(trx_var, fc::time_point::maximum())))
+            } SYS_RETHROW_EXCEPTIONS( transaction_type_exception, "Invalid packed transaction format: '{}'",
+                                      fc::json::to_string(trx_var, fc::time_point::maximum()))
            const signed_transaction& strx = packed_trx.get_signed_transaction();
            trx_var = strx;
            was_packed_trx = true;
@@ -3030,13 +3030,13 @@ int main( int argc, char** argv ) {
       signed_transaction trx;
       try {
         abi_serializer::from_variant( trx_var, trx, abi_serializer_resolver_empty, abi_serializer::create_yield_function( abi_serializer_max_time ) );
-      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '${data}'",
-                               ("data", fc::json::to_string(trx_var, fc::time_point::maximum())))
+      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '{}'",
+                               fc::json::to_string(trx_var, fc::time_point::maximum()))
 
       std::optional<chain_id_type> chain_id;
 
       if( str_chain_id.size() == 0 ) {
-         ilog( "grabbing chain_id from ${n}", ("n", node_executable_name) );
+         ilog( "grabbing chain_id from {}", node_executable_name );
          auto info = get_info();
          chain_id = info.chain_id;
       } else {
@@ -3047,7 +3047,7 @@ int main( int argc, char** argv ) {
          public_key_type pub_key;
          try {
             pub_key = public_key_type::from_string(str_public_key);
-         } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: ${public_key}", ("public_key", str_public_key))
+         } SYS_RETHROW_EXCEPTIONS(public_key_type_exception, "Invalid public key: {}", str_public_key)
          fc::variant keys_var(flat_set<public_key_type>{ pub_key });
          sign_transaction(trx, keys_var, *chain_id);
       } else {
@@ -3193,19 +3193,19 @@ int main( int argc, char** argv ) {
       transaction proposed_trx;
       try {
          proposed_trx = trx_var.as<transaction>();
-      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '${data}'",
-                               ("data", fc::json::to_string(trx_var, fc::time_point::maximum())))
+      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Invalid transaction format: '{}'",
+                               fc::json::to_string(trx_var, fc::time_point::maximum()))
       bytes proposed_trx_serialized = variant_to_bin( name(proposed_contract), name(proposed_action), trx_var );
 
       vector<permission_level> reqperm;
       try {
          reqperm = requested_perm_var.as<vector<permission_level>>();
-      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong requested permissions format: '${data}'", ("data",requested_perm_var));
+      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong requested permissions format: '{}'", fc::json::to_log_string(requested_perm_var));
 
       vector<permission_level> trxperm;
       try {
          trxperm = transaction_perm_var.as<vector<permission_level>>();
-      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong transaction permissions format: '${data}'", ("data",transaction_perm_var));
+      } SYS_RETHROW_EXCEPTIONS(transaction_type_exception, "Wrong transaction permissions format: '{}'", fc::json::to_log_string(transaction_perm_var));
 
       auto accountPermissions = get_account_permissions(tx_permission);
       if (accountPermissions.empty()) {
@@ -3623,7 +3623,7 @@ int main( int argc, char** argv ) {
       if (!print_recognized_errors(e, verbose)) {
          // Error is not recognized
          if (!print_help_text(e) || verbose) {
-            elog("Failed with error: ${e}", ("e", verbose ? e.to_detail_string() : e.to_string()));
+            elog("Failed with error: {}", verbose ? e.to_detail_string() : e.to_string());
          }
       }
       return 1;
@@ -3637,7 +3637,7 @@ int main( int argc, char** argv ) {
       return 1;
    } catch (connection_exception& e) {
       if (verbose) {
-         elog("connect error: ${e}", ("e", e.to_detail_string()));
+         elog("connect error: {}", e.to_detail_string());
       }
       return 1;
    } catch ( const std::bad_alloc& ) {

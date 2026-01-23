@@ -3,7 +3,7 @@
 #include <sysio/chain/finality_extension.hpp>
 #include <sysio/chain/proposer_policy.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <limits>
+#include <fc/io/json.hpp>
 
 namespace sysio::chain {
 
@@ -73,7 +73,7 @@ digest_type block_header_state::compute_finality_digest() const {
 // returns scheduled active proposer policy for a given block at timestamp `t`
 const proposer_policy_ptr& block_header_state::get_active_proposer_policy_for_block_at(block_timestamp_type next_block_timestamp) const {
    SYS_ASSERT(next_block_timestamp > timestamp(), block_too_old_exception,
-              "next block timestamp ${n} must be greater than current timestamp ${c}", ("n", next_block_timestamp)("c", timestamp()));
+              "next block timestamp {} must be greater than current timestamp {}", next_block_timestamp, timestamp());
 
    // if the block is in the same round of current block, use current active_proposer_policy
    if (detail::in_same_round(next_block_timestamp, timestamp())) {
@@ -380,7 +380,8 @@ void finish_next(const block_header_state& prev,
       // Add this new proposal to the `proposed_finalizer_policies` which tracks the in-flight proposals.
       // ------------------------------------------------------------------------------------------------
       SYS_ASSERT(new_finalizer_policy.generation > prev.finalizer_policy_generation, invalid_block_header_extension,
-                 "new finalizer policy generation ${n} not greater than previous ${p}", ("n", new_finalizer_policy.generation)("p", prev.finalizer_policy_generation));
+                 "new finalizer policy generation {} not greater than previous {}",
+                 new_finalizer_policy.generation, prev.finalizer_policy_generation);
       next_header_state.finalizer_policy_generation = new_finalizer_policy.generation;
       next_header_state.proposed_finalizer_policies.emplace_back(
          std::make_pair(next_header_state.block_num(), std::make_shared<finalizer_policy>(new_finalizer_policy)));
@@ -414,24 +415,24 @@ void finish_next(const block_header_state& prev,
       // Now that we have the block id of the new block, log what changed.
       // -----------------------------------------------------------------
       if (f_ext.new_finalizer_policy_diff) {
-         dlog("New finalizer policy proposed in block ${n}:${id}: ${pol}",
-               ("n",block_header::num_from_id(id))("id", id)("pol", new_finalizer_policy));
+         dlog("New finalizer policy proposed in block {}:{}: {}",
+               block_header::num_from_id(id), id, fc::json::to_log_string(new_finalizer_policy));
       }
 
       if (next_header_state.active_finalizer_policy != prev.active_finalizer_policy) {
          const auto& act = next_header_state.active_finalizer_policy;
-         ilog("Finalizer policy generation change: ${old_gen} -> ${new_gen}",
-              ("old_gen", prev.active_finalizer_policy->generation)("new_gen",act->generation));
-         ilog("New finalizer policy becoming active in block ${n}:${id}: ${pol}",
-              ("n",block_header::num_from_id(id))("id", id)("pol", *act));
+         ilog("Finalizer policy generation change: {} -> {}",
+              prev.active_finalizer_policy->generation, act->generation);
+         ilog("New finalizer policy becoming active in block $n:{}: {}",
+              block_header::num_from_id(id), id, fc::json::to_log_string(*act));
       }
 
       if (next_header_state.active_proposer_policy->proposer_schedule.version != prev.active_proposer_policy->proposer_schedule.version) {
          const auto& act = next_header_state.active_proposer_policy;
-         dlog("Proposer policy version change: ${old_ver} -> ${new_ver}",
-              ("old_ver", prev.active_proposer_policy->proposer_schedule.version)("new_ver",act->proposer_schedule.version));
-         dlog("New proposer policy becoming active in block ${n}:${id}: ${pol}",
-              ("n",block_header::num_from_id(id))("id", id)("pol", *act));
+         dlog("Proposer policy version change: {} -> {}",
+              prev.active_proposer_policy->proposer_schedule.version, act->proposer_schedule.version);
+         dlog("New proposer policy becoming active in block {}:{}: {}",
+              block_header::num_from_id(id), id, fc::json::to_log_string(*act));
       }
    }
 }
@@ -503,7 +504,7 @@ block_header_state block_header_state::next(const signed_block_header& h, valida
    auto producer = get_producer_for_block_at(h.timestamp).producer_name;
    
    SYS_ASSERT( h.previous == block_id, unlinkable_block_exception,
-               "previous mismatch ${p} != ${id}", ("p", h.previous)("id", block_id) );
+               "previous mismatch {} != {}", h.previous, block_id );
    SYS_ASSERT( h.producer == producer, wrong_producer, "wrong producer specified" );
    SYS_ASSERT( !h.not_used, producer_schedule_exception,
                "Block header contains legacy producer schedule, required to be empty on wire.network" );
@@ -538,9 +539,9 @@ block_header_state block_header_state::next(const signed_block_header& h, valida
 
       SYS_ASSERT(no_finality_tree_associated == h.action_mroot.empty(), block_validate_exception,
                  "No Finality Tree Root associated with the block, does not match with empty action_mroot: "
-                 "(${n}), action_mroot empty (${e}), latest_qc_claim_block_num (${f})",
-                 ("n", no_finality_tree_associated)("e", h.action_mroot.empty())
-                 ("f", next_core_metadata.latest_qc_claim_block_num));
+                 "({}), action_mroot empty ({}), latest_qc_claim_block_num ({})",
+                 no_finality_tree_associated, h.action_mroot.empty(),
+                 next_core_metadata.latest_qc_claim_block_num);
    };
 
    finish_next(*this, next_header_state, std::move(new_protocol_feature_activations), f_ext, false);

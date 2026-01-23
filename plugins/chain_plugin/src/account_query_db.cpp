@@ -150,7 +150,7 @@ namespace sysio::chain_apis {
 
          for (uint32_t block_num = fork_db_root_num + 1; block_num <= head_num; block_num++) {
             const auto block_p = controller.fetch_block_by_number(block_num);
-            SYS_ASSERT(block_p, chain::plugin_exception, "cannot fetch reversible block ${block_num}, required for account_db initialization", ("block_num", block_num));
+            SYS_ASSERT(block_p, chain::plugin_exception, "cannot fetch reversible block {}, required for account_db initialization", block_num);
             time_to_block_num.emplace(block_p->timestamp.to_time_point(), block_num);
          }
 
@@ -160,7 +160,7 @@ namespace sysio::chain_apis {
             add_to_bimaps(*pi, po);
          }
          auto duration = fc::time_point::now() - start;
-         ilog("Finished building account query DB in ${sec}", ("sec", (duration.count() / 1'000'000.0 )));
+         ilog("Finished building account query DB in {}", (duration.count() / 1'000'000.0 ));
       }
 
       /**
@@ -219,7 +219,7 @@ namespace sysio::chain_apis {
          uint32_t last_updated_height = fork_db_root_num;
          if (last_updated > fork_db_root_time) {
             const auto iter = time_to_block_num.find(last_updated);
-            SYS_ASSERT(iter != time_to_block_num.end(), chain::plugin_exception, "invalid block time encountered in on-chain accounts ${time}", ("time", last_updated));
+            SYS_ASSERT(iter != time_to_block_num.end(), chain::plugin_exception, "invalid block time encountered in on-chain accounts {}", last_updated);
             last_updated_height = iter->second;
          }
 
@@ -506,13 +506,13 @@ namespace sysio::chain_apis {
    void account_query_db::cache_transaction_trace( const chain::transaction_trace_ptr& trace ) {
       try {
          _impl->cache_transaction_trace(trace);
-      } FC_LOG_AND_DROP(("ACCOUNT DB cache_transaction_trace ERROR"));
+      } FC_LOG_AND_DROP("ACCOUNT DB cache_transaction_trace ERROR");
    }
 
    void account_query_db::commit_block( const chain::signed_block_ptr& block ) {
       try {
          _impl->commit_block(block);
-      } FC_LOG_AND_DROP(("ACCOUNT DB commit_block ERROR"));
+      } FC_LOG_AND_DROP("ACCOUNT DB commit_block ERROR");
    }
 
    account_query_db::get_accounts_by_authorizers_result account_query_db::get_accounts_by_authorizers( const account_query_db::get_accounts_by_authorizers_params& args) const {

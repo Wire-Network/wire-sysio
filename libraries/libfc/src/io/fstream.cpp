@@ -31,14 +31,14 @@ namespace fs = std::filesystem;
 
 std::vector<unsigned char> read_file_contents(const std::filesystem::path& filename) {
    auto file_path = fs::absolute(filename);
-   FC_ASSERT(fs::exists(file_path), "${file_path} does not exist", ("file_path", file_path.string()));
+   FC_ASSERT(fs::exists(file_path), "{} does not exist", file_path.string());
    auto                       file_size = fs::file_size(file_path);
    std::vector<unsigned char> file_contents(file_size);
    auto                       buf = file_contents.data();
 
    {
       auto file = std::fopen(file_path.c_str(), "rb");
-      FC_ASSERT(file, "Failed to open file: ${file_path}", ("file_path", file_path.string()));
+      FC_ASSERT(file, "Failed to open file: {}", file_path.string());
 
       auto   cleanup    = FILE_RESOURCE_DISPOSER(file);
       size_t read_total = 0;
@@ -52,8 +52,8 @@ std::vector<unsigned char> read_file_contents(const std::filesystem::path& filen
       }
 
       FC_ASSERT(read_total == file_size,
-                "Failed to read entire file (file_path=${file_path},read=${read},expected=${expected})",
-                ("file_path", file_path.string())("read", read_total)("expected",file_size)
+                "Failed to read entire file (file_path={},read={},expected={})",
+                file_path.string(), read_total, file_size
          );
 
    }
@@ -63,11 +63,11 @@ std::vector<unsigned char> read_file_contents(const std::filesystem::path& filen
 
 void read_file_contents(const std::filesystem::path& filename, std::string& result) {
    std::ifstream f(filename.string(), std::ios::in | std::ios::binary);
-   FC_ASSERT(f, "Failed to open ${filename}", ("filename", filename.string()));
+   FC_ASSERT(f, "Failed to open {}", filename.string());
    // don't use fc::stringstream here as we need something with override for << rdbuf()
    std::stringstream ss;
    ss << f.rdbuf();
-   FC_ASSERT(f, "Failed reading ${filename}", ("filename", filename.string()));
+   FC_ASSERT(f, "Failed reading {}", filename.string());
    result = ss.str();
 }
 

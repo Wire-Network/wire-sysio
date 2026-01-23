@@ -77,7 +77,7 @@ asset asset::from_string(const string& from)
 
       return asset(amount.value, sym);
    }
-   FC_CAPTURE_LOG_AND_RETHROW( (from) )
+   FC_CAPTURE_LOG_AND_RETHROW( "{}", from )
 }
 
 } }  // sysio::types

@@ -110,8 +110,8 @@ public:
                sr.push_back(ssi);
             }
          } catch(std::ifstream::failure& e) {
-            elog("unable to restore snapshots schedule from filesystem ${jsonpath}, details: ${details}",
-                 ("jsonpath", get_json_path().string())("details", e.what()));
+            elog("unable to restore snapshots schedule from filesystem {}, details: {}",
+                 get_json_path().string(), e.what());
          }
 
          return *this;
@@ -138,8 +138,8 @@ public:
             file.exceptions(std::istream::failbit | std::istream::eofbit);
             boost::property_tree::write_json(file, root);
          } catch(std::ofstream::failure& e) {
-            elog("unable to store snapshots schedule to filesystem to ${jsonpath}, details: ${details}",
-                 ("jsonpath", get_json_path().string())("details", e.what()));
+            elog("unable to store snapshots schedule to filesystem to {}, details: {}",
+                 get_json_path().string(), e.what());
          }
 
          return *this;

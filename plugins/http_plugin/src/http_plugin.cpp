@@ -202,7 +202,7 @@ namespace sysio {
             tcp::resolver             resolver(plugin_state->thread_pool.get_executor());
             auto endpoints = resolver.resolve(host, port, boost::asio::ip::tcp::resolver::passive, ec);
             if (ec) {
-               fc_wlog(logger(), "Cannot resolve address ${addr}: ${msg}", ("addr", address)("msg", ec.message()));
+               fc_wlog(logger(), "Cannot resolve address {}: {}", address, ec.message());
                return false;
             }
             return std::all_of(endpoints.begin(), endpoints.end(), [](const auto& ep) {
@@ -247,11 +247,11 @@ namespace sysio {
                   create_listener<tcp>(address, categories);
                }
             } catch (const fc::exception& e) {
-               fc_elog(logger(), "http service failed to start for ${addr}: ${e}",
-                       ("addr", address)("e", e.to_detail_string()));
+               fc_elog(logger(), "http service failed to start for {}: {}",
+                       address, e.to_detail_string());
                throw;
             } catch (const std::exception& e) {
-               fc_elog(logger(), "http service failed to start for ${addr}: ${e}", ("addr", address)("e", e.what()));
+               fc_elog(logger(), "http service failed to start for {}: {}", address, e.what());
                throw;
             } catch (...) {
                fc_elog(logger(), "error thrown from http io service");
@@ -328,22 +328,22 @@ namespace sysio {
       cfg.add_options()
             ("access-control-allow-origin", bpo::value<string>()->notifier([this](const string& v) {
                 my->plugin_state->access_control_allow_origin = v;
-                fc_ilog( logger(), "configured http with Access-Control-Allow-Origin: ${o}",
-                         ("o", my->plugin_state->access_control_allow_origin) );
+                fc_ilog( logger(), "configured http with Access-Control-Allow-Origin: {}",
+                         my->plugin_state->access_control_allow_origin );
              }),
              "Specify the Access-Control-Allow-Origin to be returned on each request")
 
             ("access-control-allow-headers", bpo::value<string>()->notifier([this](const string& v) {
                 my->plugin_state->access_control_allow_headers = v;
-                fc_ilog( logger(), "configured http with Access-Control-Allow-Headers : ${o}",
-                         ("o", my->plugin_state->access_control_allow_headers) );
+                fc_ilog( logger(), "configured http with Access-Control-Allow-Headers : {}",
+                         my->plugin_state->access_control_allow_headers );
              }),
              "Specify the Access-Control-Allow-Headers to be returned on each request")
 
             ("access-control-max-age", bpo::value<string>()->notifier([this](const string& v) {
                 my->plugin_state->access_control_max_age = v;
-                fc_ilog( logger(), "configured http with Access-Control-Max-Age : ${o}",
-                         ("o", my->plugin_state->access_control_max_age) );
+                fc_ilog( logger(), "configured http with Access-Control-Max-Age : {}",
+                         my->plugin_state->access_control_max_age );
              }),
              "Specify the Access-Control-Max-Age to be returned on each request.")
 
@@ -382,11 +382,12 @@ namespace sysio {
 
          my->plugin_state->thread_pool_size = options.at( "http-threads" ).as<uint16_t>();
          SYS_ASSERT( my->plugin_state->thread_pool_size > 0, chain::plugin_config_exception,
-                     "http-threads ${num} must be greater than 0", ("num", my->plugin_state->thread_pool_size));
+                     "http-threads {} must be greater than 0", my->plugin_state->thread_pool_size);
 
          auto max_bytes_mb = options.at( "http-max-bytes-in-flight-mb" ).as<int64_t>();
          SYS_ASSERT( (max_bytes_mb >= -1 && max_bytes_mb < std::numeric_limits<int64_t>::max() / (1024 * 1024)), chain::plugin_config_exception,
-                     "http-max-bytes-in-flight-mb (${max_bytes_mb}) must be equal to or greater than -1 and less than ${max}", ("max_bytes_mb", max_bytes_mb) ("max", std::numeric_limits<int64_t>::max() / (1024 * 1024)) );
+                     "http-max-bytes-in-flight-mb ({}) must be equal to or greater than -1 and less than {}",
+                     max_bytes_mb, std::numeric_limits<int64_t>::max() / (1024 * 1024) );
          if ( max_bytes_mb == -1 ) {
             my->plugin_state->max_bytes_in_flight = std::numeric_limits<size_t>::max();
          } else {
@@ -395,7 +396,7 @@ namespace sysio {
          my->plugin_state->max_requests_in_flight = options.at( "http-max-in-flight-requests" ).as<int32_t>();
          int64_t max_reponse_time_ms = options.at("http-max-response-time-ms").as<int64_t>();
          SYS_ASSERT( max_reponse_time_ms == -1 || max_reponse_time_ms >= 0, chain::plugin_config_exception,
-                     "http-max-response-time-ms must be -1, or non-negative: ${m}", ("m", max_reponse_time_ms) );
+                     "http-max-response-time-ms must be -1, or non-negative: {}", max_reponse_time_ms );
          my->plugin_state->max_response_time = max_reponse_time_ms == -1 ?
                fc::microseconds::maximum() : fc::microseconds( max_reponse_time_ms * 1000 );
 
@@ -442,17 +443,17 @@ namespace sysio {
             for (const auto& spec : addresses) {
                auto comma_pos = spec.find(',');
                SYS_ASSERT(comma_pos > 0 && comma_pos != std::string_view::npos, chain::plugin_config_exception,
-                          "http-category-address '${spec}' does not contain a required comma to separate the category and address",
-                          ("spec", spec));
+                          "http-category-address '{}' does not contain a required comma to separate the category and address",
+                          spec);
                auto category_name = spec.substr(0, comma_pos);
                auto category = to_category(category_name);
 
                SYS_ASSERT(category != api_category::unknown, chain::plugin_config_exception, 
-                  "invalid category name `${name}` for http_category_address", ("name", std::string(category_name)));
+                          "invalid category name `{}` for http_category_address", category_name);
 
                SYS_ASSERT(has_plugin(category_plugin_name(category)), chain::plugin_config_exception, 
-                  "--plugin=${plugin_name} is required for --http-category-address=${spec}",
-                  ("plugin_name", category_plugin_name(category))("spec", spec));
+                  "--plugin={} is required for --http-category-address={}",
+                  category_plugin_name(category), spec);
 
                auto address = spec.substr(comma_pos+1);
 
@@ -460,8 +461,8 @@ namespace sysio {
                if (port.size()) {
                   auto [itr, inserted] = hostnames.try_emplace(port, host);
                   SYS_ASSERT(inserted || host == itr->second, chain::plugin_config_exception,
-                             "unable to listen to port ${port} for both ${host} and ${prev}",
-                             ("port", port)("host", host)("prev", itr->second));
+                             "unable to listen to port {} for both {} and {}",
+                             port, host, itr->second);
                }
                my->categories_by_address[address].insert(category);
             }
@@ -481,7 +482,7 @@ namespace sysio {
       app().executor().post(appbase::priority::high, exec_queue::read_write, [this]() {
          try {
             my->plugin_state->thread_pool.start( my->plugin_state->thread_pool_size, [](const fc::exception& e) {
-               fc_elog( logger(), "Exception in http thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+               fc_elog( logger(), "Exception in http thread pool, exiting: {}", e.to_detail_string() );
                app().quit();
             } );
 
@@ -491,10 +492,10 @@ namespace sysio {
 
             my->listening.store(true);
          } catch(fc::exception& e) {
-            fc_elog(logger(), "http_plugin startup fails for ${e}", ("e", e.to_detail_string()));
+            fc_elog(logger(), "http_plugin startup fails for {}", e.to_detail_string());
             throw; // allow application exec() to exit with error
          } catch(std::exception& e) {
-            fc_elog(logger(), "http_plugin startup fails for ${e}", ("e", e.what()));
+            fc_elog(logger(), "http_plugin startup fails for {}", e.what());
             throw; // allow application exec() to exit with error
          } catch (...) {
             fc_elog(logger(), "http_plugin startup fails, shutting down");
@@ -519,22 +520,22 @@ namespace sysio {
          addrs = "on " + addrs;
       else
          addrs = "disabled for category address not configured";
-      fc_ilog(logger(), "add ${category} api url: ${c} ${addrs}",
-              ("category", from_category(entry.category))("c", entry.path)("addrs", addrs));
+      fc_ilog(logger(), "add {} api url: {} {}",
+              from_category(entry.category), entry.path, addrs);
    }
 
    void http_plugin::add_handler(api_entry&& entry, appbase::exec_queue q, int priority, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_app_thread_url_handler(std::move(entry), q, priority, content_type));
-      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
+      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
    void http_plugin::add_async_handler(api_entry&& entry, http_content_type content_type) {
       log_add_handler(my.get(), entry);
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
-      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url ${u} is not unique", ("u", path) );
+      SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
    }
 
    void http_plugin::post_http_thread_pool(std::function<void()> f) {
@@ -547,48 +548,48 @@ namespace sysio {
          try {
             throw;
          } catch (chain::unknown_block_exception& e) {
-            fc_dlog( logger(), "Unknown block while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Unknown block while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{400, "Unknown Block", error_results::error_info(e, verbose_http_errors)};
             cb( 400, fc::variant( results ));
          } catch (chain::invalid_http_request& e) {
-            fc_dlog( logger(), "Invalid http request while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Invalid http request while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{400, "Invalid Request", error_results::error_info(e, verbose_http_errors)};
             cb( 400, fc::variant( results ));
          } catch (chain::account_query_exception& e) {
-            fc_dlog( logger(), "Account query exception while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Account query exception while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{400, "Account lookup", error_results::error_info(e, verbose_http_errors)};
             cb( 400, fc::variant( results ));
          } catch (chain::unsatisfied_authorization& e) {
-            fc_dlog( logger(), "Auth error while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Auth error while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{401, "UnAuthorized", error_results::error_info(e, verbose_http_errors)};
             cb( 401, fc::variant( results ));
          } catch (chain::tx_duplicate& e) {
-            fc_dlog( logger(), "Duplicate trx while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Duplicate trx while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{409, "Conflict", error_results::error_info(e, verbose_http_errors)};
             cb( 409, fc::variant( results ));
          } catch (fc::eof_exception& e) {
-            fc_elog( logger(), "Unable to parse arguments to ${api}.${call}", ("api", api_name)( "call", call_name ) );
-            fc_dlog( logger(), "Bad arguments: ${args}", ("args", body) );
+            fc_elog( logger(), "Unable to parse arguments to {}.{}", api_name, call_name );
+            fc_dlog( logger(), "Bad arguments: {}", body );
             error_results results{422, "Unprocessable Entity", error_results::error_info(e, verbose_http_errors)};
             cb( 422, fc::variant( results ));
          } catch (fc::exception& e) {
-            fc_dlog( logger(), "Exception while processing ${api}.${call}: ${e}",
-                     ("api", api_name)( "call", call_name )("e", e.to_detail_string()) );
+            fc_dlog( logger(), "Exception while processing {}.{}: {}",
+                     api_name, call_name, e.to_detail_string() );
             error_results results{500, "Internal Service Error", error_results::error_info(e, verbose_http_errors)};
             cb( 500, fc::variant( results ));
          } catch (std::exception& e) {
-            fc_dlog( logger(), "STD Exception encountered while processing ${api}.${call}: ${e}",
-                     ("api", api_name)("call", call_name)("e", e.what()) );
-            error_results results{500, "Internal Service Error", error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, e.what())), verbose_http_errors)};
+            fc_dlog( logger(), "STD Exception encountered while processing {}.{}: {}",
+                     api_name, call_name, e.what() );
+            error_results results{500, "Internal Service Error", error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "{}", e.what())), verbose_http_errors)};
             cb( 500, fc::variant( results ));
          } catch (...) {
-            fc_elog( logger(), "Unknown Exception encountered while processing ${api}.${call}",
-                     ("api", api_name)( "call", call_name ) );
+            fc_elog( logger(), "Unknown Exception encountered while processing {}.{}",
+                     api_name, call_name );
             error_results results{500, "Internal Service Error",
                error_results::error_info(fc::exception( FC_LOG_MESSAGE( error, "Unknown Exception" )), verbose_http_errors)};
             cb( 500, fc::variant( results ));

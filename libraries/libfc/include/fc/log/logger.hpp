@@ -1,18 +1,25 @@
 #pragma once
 #include <fc/time.hpp>
 #include <fc/log/log_message.hpp>
-#include <string>
 
-inline const std::string DEFAULT_LOGGER = "default";
+// define `SPDLOG_ACTIVE_LEVEL` before including spdlog.h as per https://github.com/gabime/spdlog/issues/1268
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "crit", "off" }
+
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/sink.h>
+#include <spdlog/fmt/fmt.h>
+
+#include <cstddef>
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace fc
 {
-
-   class appender;
+   constexpr std::string DEFAULT_LOGGER = "default";
 
    /**
-    *
-    *
     @code
       void my_class::func() 
       {
@@ -43,6 +50,9 @@ namespace fc
          logger&    set_parent( const logger& l );
          logger     get_parent()const;
 
+         std::unique_ptr<spdlog::logger>& get_agent_logger()const;
+         void update_agent_logger(std::unique_ptr<spdlog::logger>&& al);
+
          void  set_name( const std::string& n );
          std::string get_name()const;
 
@@ -53,7 +63,8 @@ namespace fc
 
       private:
          friend struct log_config;
-         void add_appender( const std::shared_ptr<appender>& a );
+         void add_sink(const std::shared_ptr<spdlog::sinks::sink>& s);
+         std::vector<std::shared_ptr<spdlog::sinks::sink>>& get_sinks() const;
 
       private:
          class impl;
@@ -78,95 +89,63 @@ namespace fc
 #define fc_tlog( LOGGER, FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
    if( (LOGGER).is_enabled( fc::log_level::all ) ) \
-      (LOGGER).log( FC_LOG_MESSAGE( all, FORMAT, __VA_ARGS__ ) ); \
+      SPDLOG_LOGGER_TRACE((LOGGER).get_agent_logger(), FC_FMT( FORMAT, ##__VA_ARGS__ )); \
   FC_MULTILINE_MACRO_END
 
 #define fc_dlog( LOGGER, FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
    if( (LOGGER).is_enabled( fc::log_level::debug ) ) \
-      (LOGGER).log( FC_LOG_MESSAGE( debug, FORMAT, __VA_ARGS__ ) ); \
+      SPDLOG_LOGGER_DEBUG((LOGGER).get_agent_logger(), FC_FMT( FORMAT, ##__VA_ARGS__ )); \
   FC_MULTILINE_MACRO_END
 
 #define fc_ilog( LOGGER, FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
    if( (LOGGER).is_enabled( fc::log_level::info ) ) \
-      (LOGGER).log( FC_LOG_MESSAGE( info, FORMAT, __VA_ARGS__ ) ); \
+      SPDLOG_LOGGER_INFO((LOGGER).get_agent_logger(), FC_FMT( FORMAT, ##__VA_ARGS__ )); \
   FC_MULTILINE_MACRO_END
 
 #define fc_wlog( LOGGER, FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
    if( (LOGGER).is_enabled( fc::log_level::warn ) ) \
-      (LOGGER).log( FC_LOG_MESSAGE( warn, FORMAT, __VA_ARGS__ ) ); \
+      SPDLOG_LOGGER_WARN((LOGGER).get_agent_logger(), FC_FMT( FORMAT, ##__VA_ARGS__ )); \
   FC_MULTILINE_MACRO_END
 
 #define fc_elog( LOGGER, FORMAT, ... ) \
   FC_MULTILINE_MACRO_BEGIN \
    if( (LOGGER).is_enabled( fc::log_level::error ) ) \
-      (LOGGER).log( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) ); \
+      SPDLOG_LOGGER_ERROR((LOGGER).get_agent_logger(), FC_FMT( FORMAT, ##__VA_ARGS__ )); \
   FC_MULTILINE_MACRO_END
 
 #define tlog( FORMAT, ... ) \
-   fc_tlog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
+   fc_tlog( fc::logger::default_logger(), FORMAT, ##__VA_ARGS__)
 
 #define dlog( FORMAT, ... ) \
-   fc_dlog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
+   fc_dlog( fc::logger::default_logger(), FORMAT, ##__VA_ARGS__)
 
 #define ilog( FORMAT, ... ) \
-   fc_ilog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
+   fc_ilog( fc::logger::default_logger(), FORMAT, ##__VA_ARGS__)
 
 #define wlog( FORMAT, ... ) \
-   fc_wlog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
+   fc_wlog( fc::logger::default_logger(), FORMAT, ##__VA_ARGS__)
 
 #define elog( FORMAT, ... ) \
-   fc_elog( fc::logger::default_logger(), FORMAT, __VA_ARGS__)
-
-#define tlogf( FORMAT, ... ) \
-  FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::all ) ) \
-      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( all, FORMAT, __VA_ARGS__ ) ); \
-  FC_MULTILINE_MACRO_END
-
-#define elogf( FORMAT, ... ) \
-  FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::error ) ) \
-      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) ); \
-  FC_MULTILINE_MACRO_END
-
-#define wlogf( FORMAT, ... ) \
-  FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::warn ) ) \
-      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( warn, FORMAT, __VA_ARGS__ ) ); \
-  FC_MULTILINE_MACRO_END
-
-#define ilogf( FORMAT, ... ) \
-  FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::info ) ) \
-      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( info, FORMAT, __VA_ARGS__ ) ); \
-  FC_MULTILINE_MACRO_END
-
-#define dlogf( FORMAT, ... ) \
-  FC_MULTILINE_MACRO_BEGIN \
-   if( (fc::logger::get(DEFAULT_LOGGER)).is_enabled( fc::log_level::debug ) ) \
-      (fc::logger::get(DEFAULT_LOGGER)).log( FC_LOG_MESSAGE_FMT( debug, FORMAT, __VA_ARGS__ ) ); \
-  FC_MULTILINE_MACRO_END
+   fc_elog( fc::logger::default_logger(), FORMAT, ##__VA_ARGS__)
 
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/stringize.hpp>
-#include <boost/preprocessor/punctuation/paren.hpp>
+#include <boost/preprocessor/punctuation/comma_if.hpp>
 
 #define FC_FORMAT_ARG(r, unused, base) \
-  BOOST_PP_STRINGIZE(base) ": ${" BOOST_PP_STRINGIZE( base ) "} "
+  BOOST_PP_STRINGIZE(base) ": {} "
 
-#define FC_FORMAT_ARGS(r, unused, base) \
-  BOOST_PP_LPAREN() BOOST_PP_STRINGIZE(base),fc::variant(base) BOOST_PP_RPAREN()
+#define FC_FORMAT_ARG_PARAM(r, unused, i, base) \
+  BOOST_PP_COMMA_IF(i) base
 
 #define FC_FORMAT( SEQ )\
     BOOST_PP_SEQ_FOR_EACH( FC_FORMAT_ARG, v, SEQ ) 
 
-// takes a ... instead of a SEQ arg because it can be called with an empty SEQ 
-// from FC_CAPTURE_AND_THROW()
-#define FC_FORMAT_ARG_PARAMS( ... )\
-    BOOST_PP_SEQ_FOR_EACH( FC_FORMAT_ARGS, v, __VA_ARGS__ ) 
+#define FC_FORMAT_ARG_PARAMS( SEQ )\
+    BOOST_PP_SEQ_FOR_EACH_I( FC_FORMAT_ARG_PARAM, _, SEQ )
 
 #define idump( SEQ ) \
     ilog( FC_FORMAT(SEQ), FC_FORMAT_ARG_PARAMS(SEQ) )  

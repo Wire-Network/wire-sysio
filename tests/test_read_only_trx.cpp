@@ -149,13 +149,12 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
                   (const next_function_variant<transaction_trace_ptr>& result) {
                      if( !std::holds_alternative<fc::exception_ptr>( result ) && !std::get<chain::transaction_trace_ptr>( result )->except ) {
                         if( std::get<chain::transaction_trace_ptr>( result )->id != ptrx->id() ) {
-                           elog( "trace not for trx ${id}: ${t}",
-                                 ("id", ptrx->id())("t", fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result))) );
+                           elog( "trace not for trx {}: {}",
+                                 ptrx->id(), fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result)) );
                            trx_match = false;
                         }
                      } else if( !return_failure_traces && !std::holds_alternative<fc::exception_ptr>( result ) && std::get<chain::transaction_trace_ptr>( result )->except ) {
-                        elog( "trace with except ${e}",
-                              ("e", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) )) );
+                        elog( "trace with except {}", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) ) );
                         ++trace_with_except;
                      }
                      ++next_calls;

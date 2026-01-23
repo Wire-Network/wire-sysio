@@ -142,8 +142,8 @@ class datastream<Container, typename std::enable_if_t<(std::is_same_v<std::vecto
    size_t read(char* s, size_t n) {
       if (cur + n > _container.size()) {
          FC_THROW_EXCEPTION(out_of_range_exception,
-                            "read datastream<std::vector<char>> of length ${len} over by ${over}",
-                            ("len", _container.size())("over", _container.size() - n));
+                            "read datastream<std::vector<char>> of length {} over by {}",
+                            _container.size(), _container.size() - n);
       }
       std::copy_n(_container.begin() + cur, n, s);
       cur += n;

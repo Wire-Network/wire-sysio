@@ -629,7 +629,7 @@ namespace sysio {
          const bool ready = !async_write_in_progress && _write_queue_size != 0;
          g.unlock();
          if (async_write_in_progress) {
-            fc_dlog(p2p_conn_log, "Connection - ${id} not ready to send data, async write in progress", ("id", connection_id));
+            fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
          }
          return ready;
       }
@@ -1074,6 +1074,10 @@ namespace sysio {
          return mvo;
       }
 
+      std::string get_peer_logger_string() const {
+         return fc::format_string(peer_log_format, get_logger_variant());
+      }
+
       bool incoming() const { return peer_address().empty(); } // thread safe because of peer_address
       bool incoming_and_handshake_received() const {
          if (!incoming()) return false;
@@ -1138,19 +1142,19 @@ namespace sysio {
 
       void operator()( const block_nack_message& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_blk_log, c, "handle block_nack_message #${bn}:${id}", ("bn", block_header::num_from_id(msg.id))("id", msg.id) );
+         peer_dlog( p2p_blk_log, c, "handle block_nack_message #{}:{}", block_header::num_from_id(msg.id), msg.id );
          c->handle_message( msg );
       }
 
       void operator()( const block_notice_message& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_blk_log, c, "handle block_notice_message #${bn}:${id}", ("bn", block_header::num_from_id(msg.id))("id", msg.id) );
+         peer_dlog( p2p_blk_log, c, "handle block_notice_message #{}:{}", block_header::num_from_id(msg.id), msg.id );
          c->handle_message( msg );
       }
 
       void operator()( gossip_bp_peers_message& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle gossip_bp_peers_message ${m}", ("m", msg) );
+         peer_dlog( p2p_msg_log, c, "handle gossip_bp_peers_message {}", fc::json::to_log_string(msg) );
          c->handle_message( msg );
       }
    };
@@ -1240,7 +1244,7 @@ namespace sysio {
       listen_address = host + ":" + port; // do not include type in listen_address to avoid peer setting type on connection
       set_connection_type( peer_address() );
       my_impl->mark_configured_bp_connection(this);
-      fc_ilog( p2p_conn_log, "created connection - ${c} to ${n}", ("c", connection_id)("n", endpoint) );
+      fc_ilog( p2p_conn_log, "created connection - {} to {}", connection_id, endpoint );
    }
 
    connection::connection(tcp::socket&& s, const string& listen_address, size_t block_sync_rate_limit)
@@ -1254,8 +1258,8 @@ namespace sysio {
         last_handshake_recv(),
         last_handshake_sent()
    {
-      fc_dlog( p2p_conn_log, "new connection - ${c} object created for peer ${address}:${port} from listener ${addr}",
-               ("c", connection_id)("address", log_remote_endpoint_ip)("port", log_remote_endpoint_port)("addr", listen_address) );
+      fc_dlog( p2p_conn_log, "new connection - {} object created for peer {}:{} from listener {}",
+               connection_id, log_remote_endpoint_ip, log_remote_endpoint_port, listen_address );
    }
 
    void connection::update_endpoints(const tcp::endpoint& endpoint) {
@@ -1279,7 +1283,7 @@ namespace sysio {
          }
       }
       else {
-         fc_dlog( p2p_conn_log, "unable to retrieve remote endpoint for local ${address}:${port}", ("address", local_endpoint_ip)("port", local_endpoint_port));
+         fc_dlog( p2p_conn_log, "unable to retrieve remote endpoint for local {}:{}", local_endpoint_ip, local_endpoint_port);
          remote_endpoint_ip_array = boost::asio::ip::address_v6().to_bytes();
       }
    }
@@ -1288,18 +1292,18 @@ namespace sysio {
    void connection::set_connection_type( const std::string& peer_add ) {
       auto [host, port, type] = net_utils::split_host_port_type(peer_add);
       if (host.empty()) {
-         fc_dlog( p2p_conn_log, "Invalid address: ${a}", ("a", peer_add));
+         fc_dlog( p2p_conn_log, "Invalid address: {}", peer_add);
       } else if( type.empty() ) {
-         fc_dlog( p2p_conn_log, "Setting connection - ${c} type for: ${peer} to both transactions and blocks", ("c", connection_id)("peer", peer_add) );
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to both transactions and blocks", connection_id, peer_add );
          connection_type = both;
       } else if( type == "trx" ) {
-         fc_dlog( p2p_conn_log, "Setting connection - ${c} type for: ${peer} to transactions only", ("c", connection_id)("peer", peer_add) );
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to transactions only", connection_id, peer_add );
          connection_type = transactions_only;
       } else if( type == "blk" ) {
-         fc_dlog( p2p_conn_log, "Setting connection - ${c} type for: ${peer} to blocks only", ("c", connection_id)("peer", peer_add) );
+         fc_dlog( p2p_conn_log, "Setting connection - {} type for: {} to blocks only", connection_id, peer_add );
          connection_type = blocks_only;
       } else {
-         fc_wlog( p2p_conn_log, "Unknown connection - ${c} type: ${t}, for ${peer}", ("c", connection_id)("t", type)("peer", peer_add) );
+         fc_wlog( p2p_conn_log, "Unknown connection - {} type: {}, for {}", connection_id, type, peer_add );
       }
    }
 
@@ -1308,21 +1312,21 @@ namespace sysio {
       // peer p2p-listen-endpoint received via handshake may indicate they do not want trx or blocks
       auto [host, port, type] = net_utils::split_host_port_type(peer_add);
       if (host.empty()) {
-         fc_dlog( p2p_conn_log, "Invalid peer address: ${a}", ("a", peer_add));
+         fc_dlog( p2p_conn_log, "Invalid peer address: {}", peer_add);
       } else if( type.empty() ) {
          // peer asked for both, continue with p2p-peer-address type
       } else if( type == "trx" ) {
          if (connection_type == both) { // only switch to trx if p2p-peer-address didn't specify a connection type
-            fc_dlog( p2p_conn_log, "Setting peer connection - ${c} type for: ${peer} to transactions only", ("c", connection_id)("peer", peer_add) );
+            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to transactions only", connection_id, peer_add );
             connection_type = transactions_only;
          }
       } else if( type == "blk" ) {
          if (connection_type == both) { // only switch to blocks if p2p-peer-address didn't specify a connection type
-            fc_dlog( p2p_conn_log, "Setting peer connection - ${c} type for: ${peer} to blocks only", ("c", connection_id)("peer", peer_add) );
+            fc_dlog( p2p_conn_log, "Setting peer connection - {} type for: {} to blocks only", connection_id, peer_add );
             connection_type = blocks_only;
          }
       } else {
-         fc_dlog( p2p_conn_log, "Unknown peer connection - ${c} type: ${t}, for ${peer}", ("c", connection_id)("t", type)("peer", peer_add) );
+         fc_dlog( p2p_conn_log, "Unknown peer connection - {} type: {}, for {}", connection_id, type, peer_add );
       }
    }
 
@@ -1346,7 +1350,7 @@ namespace sysio {
          return;
       if (s == connection_state::connected && curr != connection_state::connecting)
          return;
-      fc_dlog(p2p_conn_log, "old connection - ${c} state ${os} becoming ${ns}", ("c", connection_id)("os", state_str(curr))("ns", state_str(s)));
+      fc_dlog(p2p_conn_log, "old connection - {} state {} becoming {}", connection_id, state_str(curr), state_str(s));
 
       conn_state = s;
    }
@@ -1380,7 +1384,7 @@ namespace sysio {
       if (!ec) socket->set_option(boost::asio::socket_base::send_buffer_size{1024*1024}, ec);
       if (!ec) socket->set_option(boost::asio::socket_base::receive_buffer_size{1024*1024}, ec);
       if( ec ) {
-         peer_wlog( p2p_conn_log, this, "connection failed (set_option): ${e}", ( "e", ec.message() ) );
+         peer_wlog( p2p_conn_log, this, "connection failed (set_option): {}", ec.message() );
          close();
          return false;
       } else {
@@ -1410,10 +1414,10 @@ namespace sysio {
 
    // thread safe
    bool connection::should_sync_from(uint32_t sync_next_expected_num, uint32_t sync_known_fork_db_root_num, uint32_t sync_fetch_span) const {
-      fc_dlog(p2p_conn_log, "id: ${id} blocks conn: ${t} current: ${c} socket_open: ${so} syncing from us: ${s} state: ${con} peer_start_block: ${sb} peer_fhead: ${h} ping: ${p}us no_retry: ${g}",
-              ("id", connection_id)("t", is_blocks_connection())
-              ("c", current())("so", socket_is_open())("s", peer_syncing_from_us.load())("con", state_str(state()))
-              ("sb", peer_start_block_num.load())("h", peer_fork_db_head_block_num.load())("p", get_peer_ping_time_ns()/1000)("g", reason_str(no_retry)));
+      fc_dlog(p2p_conn_log, "id: {} blocks conn: {} current: {} socket_open: {} syncing from us: {} state: {} peer_start_block: {} peer_fhead: {} ping: {}us no_retry: {}",
+              connection_id, is_blocks_connection(),
+              current(), socket_is_open(), peer_syncing_from_us.load(), state_str(state()),
+              peer_start_block_num.load(), peer_fork_db_head_block_num.load(), get_peer_ping_time_ns()/1000, reason_str(no_retry));
       if (is_blocks_connection() && current()) {
          if (no_retry == go_away_reason::no_reason) {
             if (peer_start_block_num <= sync_next_expected_num) { // has blocks we want
@@ -1496,7 +1500,7 @@ namespace sysio {
    void connection::blk_send_branch( const block_id_type& msg_head_id ) {
       uint32_t head_num = my_impl->get_chain_head_num();
 
-      peer_dlog(p2p_blk_log, this, "head_num = ${h}",("h",head_num));
+      peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
          notice_message note;
          note.known_blocks.mode = normal;
@@ -1508,8 +1512,8 @@ namespace sysio {
       if( p2p_blk_log.is_enabled( fc::log_level::debug ) ) {
          fc::unique_lock g_conn( conn_mtx );
          if( last_handshake_recv.generation >= 1 ) {
-            peer_dlog( p2p_blk_log, this, "maybe truncating branch at = ${h}:${id}",
-                       ("h", block_header::num_from_id(last_handshake_recv.fork_db_head_id))("id", last_handshake_recv.fork_db_head_id) );
+            peer_dlog( p2p_blk_log, this, "maybe truncating branch at = {}:{}",
+                       block_header::num_from_id(last_handshake_recv.fork_db_head_id), last_handshake_recv.fork_db_head_id );
          }
       }
       const auto fork_db_root_num = peer_fork_db_root_num;
@@ -1523,7 +1527,7 @@ namespace sysio {
 
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
       if( unknown_block ) {
-         peer_ilog( p2p_blk_log, this, "Peer asked for unknown block ${mn}, sending: benign_other go away", ("mn", msg_head_num) );
+         peer_ilog( p2p_blk_log, this, "Peer asked for unknown block {}, sending: benign_other go away", msg_head_num );
          no_retry = go_away_reason::benign_other;
          enqueue( go_away_message{ go_away_reason::benign_other } );
       } else {
@@ -1564,8 +1568,8 @@ namespace sysio {
          peer_requested = peer_sync_state( last+1, end, last, sync_type );
       }
       if( peer_requested->valid() ) {
-         peer_ilog( p2p_blk_log, this, "enqueue ${t} ${s} - ${e}",
-                    ("t", sync_type)("s", peer_requested->start_block)("e", peer_requested->end_block) );
+         peer_ilog( p2p_blk_log, this, "enqueue {} {} - {}",
+                    sync_type, peer_requested->start_block, peer_requested->end_block );
          enqueue_sync_block();
       } else {
          peer_ilog( p2p_blk_log, this, "nothing to enqueue" );
@@ -1584,10 +1588,10 @@ namespace sysio {
             c->last_handshake_sent.generation = ++c->sent_handshake_count;
             auto last_handshake = c->last_handshake_sent;
             g_conn.unlock();
-            peer_dlog( p2p_msg_log, c, "Sending handshake generation ${g}, froot ${r}, fhead ${h}, id ${id}",
-                       ("g", last_handshake.generation)
-                       ("r", last_handshake.fork_db_root_num)
-                       ("h", last_handshake.fork_db_head_num)("id", last_handshake.fork_db_head_id.str().substr(8,16)) );
+            peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
+                       last_handshake.generation,
+                       last_handshake.fork_db_root_num,
+                       last_handshake.fork_db_head_num, last_handshake.fork_db_head_id.str().substr(8,16) );
             c->enqueue( last_handshake );
          }
       });
@@ -1632,7 +1636,7 @@ namespace sysio {
             .rec = 0,
             .xmt = org.count(),
             .dst = 0 };
-         peer_dlog(p2p_msg_log, this, "send init time_message: ${t}", ("t", xpkt));
+         peer_dlog(p2p_msg_log, this, "send init time_message: {}", xpkt);
          enqueue(xpkt);
       }
    }
@@ -1644,7 +1648,7 @@ namespace sysio {
          .rec = msg.dst,
          .xmt = get_time().count(),
          .dst = 0 };
-      peer_dlog( p2p_msg_log, this, "send time_message: ${t}, org: ${o}", ("t", xpkt)("o", org.count()) );
+      peer_dlog( p2p_msg_log, this, "send time_message: {}, org: {}", xpkt, org.count() );
       enqueue(xpkt);
    }
 
@@ -1657,7 +1661,7 @@ namespace sysio {
       boost::asio::socket_base::send_buffer_size max_send_buffer_size{};
       socket->get_option(max_send_buffer_size, ec);
       if (ec) {
-         peer_dlog(p2p_conn_log, this, "Error getting bytes in send buffer: ${e}", ("e", ec.what()));
+         peer_dlog(p2p_conn_log, this, "Error getting bytes in send buffer: {}", ec.what());
          return;
       }
 
@@ -1665,16 +1669,16 @@ namespace sysio {
       auto sockfd = socket->native_handle();
       int bytes_in_send_buffer;
       if (ioctl(sockfd, TIOCOUTQ, &bytes_in_send_buffer) == -1) {
-         peer_dlog(p2p_conn_log, this, "Error getting bytes in send buffer: ${e}", ("e", strerror(errno)));
+         peer_dlog(p2p_conn_log, this, "Error getting bytes in send buffer: {}", strerror(errno));
       } else {
          // bytes_in_send_buffer now holds the number of bytes currently in the send buffer
          // to get available space, subtract this from the send_buffer_size (SO_SNDBUF) value
          auto available_send_buffer_space = max_send_buffer_size.value() - bytes_in_send_buffer;
-         peer_dlog(p2p_conn_log, this, "send buffer: ${b} bytes, max send buffer: ${m} bytes, available: ${a} bytes",
-                   ("b", bytes_in_send_buffer)("m", max_send_buffer_size.value())("a", available_send_buffer_space));
+         peer_dlog(p2p_conn_log, this, "send buffer: {} bytes, max send buffer: {} bytes, available: {} bytes",
+                   bytes_in_send_buffer, max_send_buffer_size.value(), available_send_buffer_space);
       }
 #else
-      peer_dlog(p2p_conn_log, this, "max send buffer: ${m} bytes", ("m", max_send_buffer_size.value()));
+      peer_dlog(p2p_conn_log, this, "max send buffer: {} bytes", max_send_buffer_size.value());
 #endif
    }
 
@@ -1685,7 +1689,7 @@ namespace sysio {
                                 const send_buffer_type& buff,
                                 std::function<void(boost::system::error_code, std::size_t)> callback) {
       if( !buffer_queue.add_write_queue( net_msg, queue, buff, std::move(callback) )) {
-         peer_wlog( p2p_conn_log, this, "write_queue full ${s} bytes, giving up on connection", ("s", buffer_queue.write_queue_size()) );
+         peer_wlog( p2p_conn_log, this, "write_queue full {} bytes, giving up on connection", buffer_queue.write_queue_size() );
          close();
          return;
       }
@@ -1696,7 +1700,7 @@ namespace sysio {
    void connection::do_queue_write(std::optional<block_num_type> block_num) {
       if( !buffer_queue.ready_to_send(connection_id) ) {
          if (block_num) {
-            peer_dlog(p2p_conn_log, this, "connection currently sending, queueing block ${n}", ("n", *block_num) );
+            peer_dlog(p2p_conn_log, this, "connection currently sending, queueing block {}", *block_num);
          }
          return;
       }
@@ -1732,7 +1736,7 @@ namespace sysio {
 
             if( ec ) {
                if( ec.value() != boost::asio::error::eof ) {
-                  peer_wlog( p2p_conn_log, c, "Error sending to peer: ${i}", ( "i", ec.message() ) );
+                  peer_wlog( p2p_conn_log, c, "Error sending to peer: {}", ec.message() );
                } else {
                   peer_wlog( p2p_conn_log, c, "connection closure detected on write" );
                }
@@ -1751,9 +1755,9 @@ namespace sysio {
          } catch ( const boost::interprocess::bad_alloc& ) {
            throw;
          } catch( const fc::exception& ex ) {
-            peer_elog( p2p_conn_log, c, "fc::exception in do_queue_write: ${s}", ("s", ex.to_string()) );
+            peer_elog( p2p_conn_log, c, "fc::exception in do_queue_write: {}", ex.to_string() );
          } catch( const std::exception& ex ) {
-            peer_elog( p2p_conn_log, c, "std::exception in do_queue_write: ${s}", ("s", ex.what()) );
+            peer_elog( p2p_conn_log, c, "std::exception in do_queue_write: {}", ex.what() );
          } catch( ... ) {
             peer_elog( p2p_conn_log, c, "Unknown exception in do_queue_write" );
          }
@@ -1762,7 +1766,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::cancel_sync() {
-      peer_dlog( p2p_blk_log, this, "cancel sync_wait, write queue size ${o} bytes", ("o", buffer_queue.write_queue_size()) );
+      peer_dlog( p2p_blk_log, this, "cancel sync_wait, write queue size {} bytes", buffer_queue.write_queue_size() );
       cancel_sync_wait();
       sync_last_requested_block = 0;
       flush_queues();
@@ -1775,7 +1779,7 @@ namespace sysio {
       if( !peer_requested ) {
          return false;
       } else {
-         peer_dlog( p2p_blk_log, this, "enqueue sync block ${num}", ("num", peer_requested->last + 1) );
+         peer_dlog( p2p_blk_log, this, "enqueue sync block {}", peer_requested->last + 1 );
       }
       uint32_t num = peer_requested->last + 1;
 
@@ -1794,11 +1798,11 @@ namespace sysio {
             auto now = get_time();
             auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
             double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000; // convert from bytes/us => bytes/sec
-            peer_dlog(p2p_blk_log, this, "start enqueue block time ${st}, now ${t}, elapsed ${e}, rate ${r}, limit ${l}",
-                      ("st", block_sync_send_start.count())("t", now.count())("e", elapsed_us.count())("r", current_rate_sec)("l", block_sync_rate_limit));
+            peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
+                      block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
             if( current_rate_sec >= block_sync_rate_limit ) {
                block_sync_throttling = true;
-               peer_dlog( p2p_blk_log, this, "throttling block sync to peer ${host}:${port}", ("host", log_remote_endpoint_ip)("port", log_remote_endpoint_port));
+               peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
                std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
                throttle_timer->expires_after(std::chrono::milliseconds(100));
                throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
@@ -1817,17 +1821,17 @@ namespace sysio {
             peer_requested.reset();
             block_sync_send_start = 0ns;
             block_sync_frame_bytes_sent = 0;
-            peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block ${num}", ("num", num) );
+            peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", num );
          }
       } else if (peer_requested->sync_type == peer_sync_state::sync_t::peer_catchup || peer_requested->sync_type == peer_sync_state::sync_t::block_nack) {
          // Do not have the block, likely because in the middle of a fork-switch. A fork-switch will send out
          // block_notice_message for the new blocks. Ignore, similar to the ignore in blk_send_branch().
-         peer_ilog( p2p_blk_log, this, "enqueue block sync, unable to fetch block ${num}, resetting peer request", ("num", num) );
+         peer_ilog( p2p_blk_log, this, "enqueue block sync, unable to fetch block {}, resetting peer request", num );
          peer_requested.reset(); // unable to provide requested blocks
          block_sync_send_start = 0ns;
          block_sync_frame_bytes_sent = 0;
       } else {
-         peer_ilog( p2p_blk_log, this, "enqueue peer sync, unable to fetch block ${num}, sending benign_other go away", ("num", num) );
+         peer_ilog( p2p_blk_log, this, "enqueue peer sync, unable to fetch block {}, sending benign_other go away", num );
          peer_requested.reset(); // unable to provide requested blocks
          block_sync_send_start = 0ns;
          block_sync_frame_bytes_sent = 0;
@@ -1854,7 +1858,7 @@ namespace sysio {
 
    // called from connection strand
    size_t connection::enqueue_block( const std::vector<char>& b, uint32_t block_num, queued_buffer::queue_t queue ) {
-      peer_dlog( p2p_blk_log, this, "enqueue block ${num}", ("num", block_num) );
+      peer_dlog( p2p_blk_log, this, "enqueue block {}", block_num );
       verify_strand_in_this_thread( strand, __func__, __LINE__ );
 
       block_buffer_factory buff_factory;
@@ -1876,15 +1880,15 @@ namespace sysio {
             [conn{std::move(self)}, close_after_send, net_msg, block_num](boost::system::error_code ec, std::size_t s) {
                         if (ec) {
                            if (ec != boost::asio::error::operation_aborted && ec != boost::asio::error::connection_reset && conn->socket_is_open()) {
-                              fc_elog(p2p_conn_log, "Connection - ${cid} - send failed with: ${e}", ("cid", conn->connection_id)("e", ec.message()));
+                              fc_elog(p2p_conn_log, "Connection - {} - send failed with: {}", conn->connection_id, ec.message());
                            }
                            return;
                         }
                         if (net_msg == msg_type_t::signed_block && block_num)
-                           fc_dlog(p2p_conn_log, "Connection - ${cid} - done sending block ${bn}", ("cid", conn->connection_id)("bn", *block_num));
+                           fc_dlog(p2p_conn_log, "Connection - {} - done sending block {}", conn->connection_id, *block_num);
                         if (close_after_send != go_away_reason::no_reason) {
-                           fc_ilog( p2p_conn_log, "sent a go away message: ${r}, closing connection ${cid}",
-                                    ("r", reason_str(close_after_send))("cid", conn->connection_id) );
+                           fc_ilog( p2p_conn_log, "sent a go away message: {}, closing connection {}",
+                                    reason_str(close_after_send), conn->connection_id );
                            conn->close();
                            return;
                         }
@@ -1914,7 +1918,7 @@ namespace sysio {
       sync_last_requested_block = end;
       sync_request_message srm = {start,end};
       enqueue( net_message(srm) );
-      peer_dlog(p2p_blk_log, this, "calling sync_wait, sync_request_message ${s} - ${e}", ("s", start)("e", end));
+      peer_dlog(p2p_blk_log, this, "calling sync_wait, sync_request_message {} - {}", start, end);
       sync_wait();
    }
 
@@ -1970,7 +1974,7 @@ namespace sysio {
       if( sync_state == newstate ) {
          return false;
       }
-      fc_ilog( p2p_blk_log, "old state ${os} becoming ${ns}", ("os", stage_str( sync_state ))( "ns", stage_str( newstate ) ) );
+      fc_ilog( p2p_blk_log, "old state {} becoming {}", stage_str( sync_state ), stage_str( newstate ) );
       sync_state = newstate;
       return true;
    }
@@ -2011,8 +2015,8 @@ namespace sysio {
    }
 
    connection_ptr sync_manager::find_next_sync_node() REQUIRES(sync_mtx) {
-      fc_dlog(p2p_blk_log, "Number connections ${s}, sync_next_expected_num: ${e}, sync_known_fork_db_root_num: ${l}",
-              ("s", my_impl->connections.number_connections())("e", sync_next_expected_num)("l", sync_known_fork_db_root_num));
+      fc_dlog(p2p_blk_log, "Number connections {}, sync_next_expected_num: {}, sync_known_fork_db_root_num: {}",
+              my_impl->connections.number_connections(), sync_next_expected_num, sync_known_fork_db_root_num);
       deque<connection_ptr> conns;
       my_impl->connections.for_each_block_connection([sync_next_expected_num = sync_next_expected_num,
                                                       sync_known_froot_num = sync_known_fork_db_root_num,
@@ -2029,14 +2033,14 @@ namespace sysio {
          conns.resize(sync_peer_limit);
       }
 
-      fc_dlog(p2p_blk_log, "Valid sync peers ${s}, sync_ordinal ${so}", ("s", conns.size())("so", sync_ordinal.load()));
+      fc_dlog(p2p_blk_log, "Valid sync peers {}, sync_ordinal {}", conns.size(), sync_ordinal.load());
 
       if (conns.empty()) {
          return {};
       }
       if (conns.size() == 1) { // only one available
          ++sync_ordinal;
-         fc_dlog(p2p_blk_log, "sync from ${c}", ("c", conns.front()->connection_id));
+         fc_dlog(p2p_blk_log, "sync from {}", conns.front()->connection_id);
          conns.front()->sync_ordinal = sync_ordinal.load();
          return conns.front();
       }
@@ -2049,14 +2053,14 @@ namespace sysio {
       uint32_t lowest_ordinal = std::numeric_limits<uint32_t>::max();
       for (size_t i = 0; i < conns.size() && lowest_ordinal != 0; ++i) {
          uint32_t sync_ord = conns[i]->sync_ordinal;
-         fc_dlog(p2p_blk_log, "compare sync ords, conn: ${lcid}, ord: ${l} < ${r}, ping: ${p}us",
-                 ("lcid", conns[i]->connection_id)("l", sync_ord)("r", lowest_ordinal)("p", conns[i]->get_peer_ping_time_ns()/1000));
+         fc_dlog(p2p_blk_log, "compare sync ords, conn: {}, ord: {} < {}, ping: {}us",
+                 conns[i]->connection_id, sync_ord, lowest_ordinal, conns[i]->get_peer_ping_time_ns()/1000);
          if (sync_ord < lowest_ordinal) {
             the_one = i;
             lowest_ordinal = sync_ord;
          }
       }
-      fc_dlog(p2p_blk_log, "sync from ${c}", ("c", conns[the_one]->connection_id));
+      fc_dlog(p2p_blk_log, "sync from {}", conns[the_one]->connection_id);
       conns[the_one]->sync_ordinal = sync_ordinal.load();
       return conns[the_one];
    }
@@ -2065,13 +2069,13 @@ namespace sysio {
    void sync_manager::request_next_chunk( const connection_ptr& conn ) REQUIRES(sync_mtx) {
       auto chain_info = my_impl->get_chain_info();
 
-      fc_dlog( p2p_blk_log, "sync_last_requested_num: ${r}, sync_next_expected_num: ${e}, sync_known_fork_db_root_num: ${k}, sync-fetch-span: ${s}, fhead: ${h}, froot: ${fr}",
-               ("r", sync_last_requested_num)("e", sync_next_expected_num)("k", sync_known_fork_db_root_num)("s", sync_fetch_span)("h", chain_info.fork_db_head_num)("fr", chain_info.fork_db_root_num) );
+      fc_dlog( p2p_blk_log, "sync_last_requested_num: {}, sync_next_expected_num: {}, sync_known_fork_db_root_num: {}, sync-fetch-span: {}, fhead: {}, froot: {}",
+               sync_last_requested_num, sync_next_expected_num, sync_known_fork_db_root_num, sync_fetch_span, chain_info.fork_db_head_num, chain_info.fork_db_root_num );
 
       if (conn) {
          // p2p_high_latency_test.py test depends on this exact log statement.
-         peer_ilog(p2p_blk_log, conn, "Catching up with chain, our last req is ${cc}, theirs is ${t}, next expected ${n}, fhead ${h}",
-                   ("cc", sync_last_requested_num)("t", sync_known_fork_db_root_num)("n", sync_next_expected_num)("h", chain_info.fork_db_head_num));
+         peer_ilog(p2p_blk_log, conn, "Catching up with chain, our last req is {}, theirs is {}, next expected {}, fhead {}",
+                   sync_last_requested_num, sync_known_fork_db_root_num, sync_next_expected_num, chain_info.fork_db_head_num);
       }
 
       /* ----------
@@ -2110,7 +2114,7 @@ namespace sysio {
             request_sent = true;
             sync_active_time = std::chrono::steady_clock::now();
             boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, fork_db_head_num=chain_info.fork_db_head_num, fork_db_root_num=chain_info.fork_db_root_num]() {
-               peer_ilog( p2p_blk_log, new_sync_source, "requesting range ${s} to ${e}, fhead ${h}, froot ${r}", ("s", start)("e", end)("h", fork_db_head_num)("r", fork_db_root_num) );
+               peer_ilog( p2p_blk_log, new_sync_source, "requesting range {} to {}, fhead {}, froot {}", start, end, fork_db_head_num, fork_db_root_num );
                new_sync_source->request_sync_blocks( start, end );
             } );
          }
@@ -2142,9 +2146,8 @@ namespace sysio {
    }
 
    bool sync_manager::is_sync_required( uint32_t fork_db_head_block_num ) const REQUIRES(sync_mtx) {
-      fc_dlog( p2p_blk_log, "last req = ${req}, last recv = ${recv} known = ${known} our fhead = ${h}",
-               ("req", sync_last_requested_num)( "recv", sync_next_expected_num-1 )( "known", sync_known_fork_db_root_num )
-               ("h", fork_db_head_block_num ) );
+      fc_dlog( p2p_blk_log, "last req = {}, last recv = {}, known = {} our fhead = {}",
+               sync_last_requested_num, sync_next_expected_num-1, sync_known_fork_db_root_num, fork_db_head_block_num );
 
       return( sync_last_requested_num < sync_known_fork_db_root_num ||
               sync_next_expected_num < sync_last_requested_num );
@@ -2158,8 +2161,8 @@ namespace sysio {
          uint32_t head_num = my_impl->get_chain_head_num();
          block_num_type num_blocks_not_applied = blk_num > head_num ? blk_num - head_num : 0;
          if (num_blocks_not_applied < sync_fetch_span) {
-            fc_dlog(p2p_blk_log, "sync ahead allowed past sync-fetch-span ${sp}, block ${bn} head ${h}, fork_db size ${s}",
-                    ("bn", blk_num)("sp", sync_fetch_span)("h", head_num)("s", my_impl->chain_plug->chain().fork_db_size()));
+            fc_dlog(p2p_blk_log, "sync ahead allowed past sync-fetch-span {}, block {} head {} fork_db size {}",
+                    sync_fetch_span, blk_num, head_num, my_impl->chain_plug->chain().fork_db_size());
             return true;
          }
 
@@ -2172,23 +2175,23 @@ namespace sysio {
             num_blocks_that_can_be_applied += blk_num > fork_db_head.block_num() ? blk_num - fork_db_head.block_num() : 0;
             if (num_blocks_that_can_be_applied < sync_fetch_span) {
                if (head_num )
-                  fc_ilog(p2p_blk_log, "sync ahead allowed past sync-fetch-span ${sp}, block ${bn} for paused lib ${l}, head ${h}, fork_db size ${s}",
-                          ("bn", blk_num)("sp", sync_fetch_span)("l", calculated_lib)("h", head_num)("s", cc.fork_db_size()));
+                  fc_ilog(p2p_blk_log, "sync ahead allowed past sync-fetch-span {}, block {} for paused lib {}, head {}, fork_db size {}",
+                          sync_fetch_span, blk_num, calculated_lib, head_num, cc.fork_db_size());
                return true;
             }
          }
 
-         fc_dlog(p2p_blk_log, "sync ahead not allowed. block ${bn}, head ${h}, fhead ${fh}, fhead->lib ${fl}, sync-fetch-span ${sp}, fork_db size ${s}",
-                 ("bn", blk_num)("h", head_num)("fh", cc.fork_db_head().block_num())("fl", cc.fork_db_head().irreversible_blocknum())
-                 ("sp", sync_fetch_span)("s", cc.fork_db_size()));
+         fc_dlog(p2p_blk_log, "sync ahead not allowed. block {}, head {}, fhead {}, fhead->lib {}, sync-fetch-span {}, fork_db size {}",
+                 blk_num, head_num, cc.fork_db_head().block_num(), cc.fork_db_head().irreversible_blocknum(),
+                 sync_fetch_span, cc.fork_db_size());
 
          // make sure controller is processing blocks, might have been interrupted and need a kick
-         fc_dlog(p2p_blk_log, "sync post process_incoming_block to app thread, block ${n}", ("n", blk_num));
+         fc_dlog(p2p_blk_log, "sync post process_incoming_block to app thread, block {}", blk_num);
          my_impl->producer_plug->process_blocks();
       }
 
-      fc_dlog(p2p_blk_log, "sync ahead not allowed. block ${bn}, sync_last_requested_num ${lrn}, sync-fetch-span ${s}",
-              ("bn", blk_num)("lrn", sync_last_requested_num)("s", sync_fetch_span));
+      fc_dlog(p2p_blk_log, "sync ahead not allowed. block {}, sync_last_requested_num {}, sync-fetch-span {}",
+              blk_num, sync_last_requested_num, sync_fetch_span);
       return false;
    }
 
@@ -2201,16 +2204,16 @@ namespace sysio {
 
       auto chain_info = my_impl->get_chain_info();
       if( !is_sync_required( chain_info.fork_db_head_num ) || target <= chain_info.fork_db_root_num ) {
-         peer_dlog( p2p_blk_log, c, "We are already caught up, my irr = ${b}, fhead = ${h}, target = ${t}",
-                  ("b", chain_info.fork_db_root_num)( "h", chain_info.fork_db_head_num )( "t", target ) );
+         peer_dlog( p2p_blk_log, c, "We are already caught up, my irr = {}, fhead = {}, target = {}",
+                  chain_info.fork_db_root_num, chain_info.fork_db_head_num, target );
          c->send_handshake(); // let peer know it is not syncing from us
          return;
       }
 
       stages current_sync_state = sync_state;
       if( current_sync_state != lib_catchup || !sync_recently_active()) {
-         peer_dlog(p2p_blk_log, c, "requesting next chuck, set to lib_catchup and request_next_chunk, sync_state ${s}, sync_next_expected_num ${nen}",
-                   ("s", stage_str(current_sync_state))("nen", sync_next_expected_num));
+         peer_dlog(p2p_blk_log, c, "requesting next chuck, set to lib_catchup and request_next_chunk, sync_state {}, sync_next_expected_num {}",
+                   stage_str(current_sync_state), sync_next_expected_num);
          set_state( lib_catchup );
          sync_last_requested_num = 0;
          sync_next_expected_num = chain_info.fork_db_root_num + 1;
@@ -2228,8 +2231,8 @@ namespace sysio {
       auto time_since_active = std::chrono::steady_clock::now() - sync_active_time.load();
       bool active = time_since_active < my_impl->resp_expected_period;
       if (!active) {
-         fc_dlog(p2p_blk_log, "sync not recently active, time since last sync block ${t}ms",
-                 ("t", std::chrono::duration_cast<std::chrono::milliseconds>(time_since_active).count()));
+         fc_dlog(p2p_blk_log, "sync not recently active, time since last sync block {}ms",
+                 std::chrono::duration_cast<std::chrono::milliseconds>(time_since_active).count());
       }
       return active;
    }
@@ -2237,7 +2240,7 @@ namespace sysio {
    // called from connection strand
    void sync_manager::sync_wait(const connection_ptr& c) {
       ++sync_timers_active;
-      peer_dlog(p2p_blk_log, c, "sync wait, active_timers ${t}", ("t", sync_timers_active.load()));
+      peer_dlog(p2p_blk_log, c, "sync wait, active_timers {}", sync_timers_active.load());
    }
 
    // called from connection strand
@@ -2247,18 +2250,18 @@ namespace sysio {
          sync_reassign_fetch( c );
          c->close(true);
       } else if( ec != boost::asio::error::operation_aborted ) { // don't log on operation_aborted, called on destroy
-         peer_elog( p2p_blk_log, c, "setting timer for sync request got error ${ec}", ("ec", ec.message()) );
+         peer_elog( p2p_blk_log, c, "setting timer for sync request got error {}", ec.message() );
       }
       --sync_timers_active;
-      peer_dlog(p2p_blk_log, c, "sync active_timers ${t}", ("t", sync_timers_active.load()));
+      peer_dlog(p2p_blk_log, c, "sync active_timers {}", sync_timers_active.load());
    }
 
    // called from connection strand
    void sync_manager::sync_reassign_fetch(const connection_ptr& c) {
       fc::unique_lock g( sync_mtx );
       if( c == sync_source ) {
-         peer_ilog(p2p_blk_log, c, "reassign_fetch, our last req is ${cc}, next expected is ${ne}",
-                   ("cc", sync_last_requested_num)("ne", sync_next_expected_num));
+         peer_ilog(p2p_blk_log, c, "reassign_fetch, our last req is {}, next expected is {}",
+                   sync_last_requested_num, sync_next_expected_num);
          c->cancel_sync();
          auto fork_db_root_num = my_impl->get_fork_db_root_num();
          sync_last_requested_num = 0;
@@ -2299,16 +2302,16 @@ namespace sysio {
       //-----------------------------
 
       if (chain_info.fork_db_head_id == msg.fork_db_head_id) {
-         peer_dlog( p2p_blk_log, c, "handshake msg.froot ${fr}, msg.fhead ${fh}, msg.id ${id}.. sync 0, fhead ${h}, froot ${r}",
-                    ("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num)("id", msg.fork_db_head_id.str().substr(8,16))
-                    ("h", chain_info.fork_db_head_num)("r", chain_info.fork_db_root_num) );
+         peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 0, fhead {}, froot {}",
+                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          return;
       }
       if (chain_info.fork_db_head_num < msg.fork_db_root_num) {
-         peer_dlog( p2p_blk_log, c, "handshake msg.froot ${fr}, msg.fhead ${fh}, msg.id ${id}.. sync 1, fhead ${h}, froot ${r}",
-                    ("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num)("id", msg.fork_db_head_id.str().substr(8,16))
-                    ("h", chain_info.fork_db_head_num)("r", chain_info.fork_db_root_num) );
+         peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 1, fhead {}, froot {}",
+                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          if (c->sent_handshake_count > 0) {
             c->send_handshake();
@@ -2316,9 +2319,9 @@ namespace sysio {
          return;
       }
       if (chain_info.fork_db_root_num > msg.fork_db_head_num + nblk_combined_latency + min_blocks_distance) {
-         peer_dlog( p2p_blk_log, c, "handshake msg.froot ${fr}, msg.fhead ${fh}, msg.id ${id}.. sync 2, fhead ${h}, froot ${r}",
-                    ("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num)("id", msg.fork_db_head_id.str().substr(8,16))
-                    ("h", chain_info.fork_db_head_num)("r", chain_info.fork_db_root_num) );
+         peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 2, fhead {}, froot {}",
+                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          if (msg.generation > 1 || c->protocol_version > proto_version_t::base) {
             controller& cc = my_impl->chain_plug->chain();
             notice_message note;
@@ -2338,16 +2341,16 @@ namespace sysio {
       }
 
       if (chain_info.fork_db_head_num + nblk_combined_latency < msg.fork_db_head_num ) {
-         peer_dlog( p2p_blk_log, c, "handshake msg.froot ${fr}, msg.fhead ${fh}, msg.id ${id}.. sync 3, fhead ${h}, froot ${r}",
-                    ("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num)("id", msg.fork_db_head_id.str().substr(8,16))
-                    ("h", chain_info.fork_db_head_num)("r", chain_info.fork_db_root_num) );
+         peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 3, fhead {}, froot {}",
+                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          verify_catchup(c, msg.fork_db_head_num, msg.fork_db_head_id);
          return;
       } else if(chain_info.fork_db_head_num >= msg.fork_db_head_num + nblk_combined_latency) {
-         peer_dlog( p2p_blk_log, c, "handshake msg.froot ${fr}, msg.fhead ${fh}, msg.id ${id}.. sync 4, fhead ${h}, froot ${r}",
-                    ("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num)("id", msg.fork_db_head_id.str().substr(8,16))
-                    ("h", chain_info.fork_db_head_num)("r", chain_info.fork_db_root_num) );
+         peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 4, fhead {}, froot {}",
+                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          if (msg.generation > 1 ||  c->protocol_version > proto_version_t::base) {
             controller& cc = my_impl->chain_plug->chain();
             notice_message note;
@@ -2365,7 +2368,7 @@ namespace sysio {
          try {
             auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_head_id); // thread safe
             if (on_fork) { // possible for fork_db_root to move and fork_db_head_num not be found if running with no block-log
-               peer_dlog(p2p_msg_log, c, "Sending catch_up request_message sync 4, msg.fhead ${mfh} on fork", ("mfh", msg.fork_db_head_id));
+               peer_dlog(p2p_msg_log, c, "Sending catch_up request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
                request_message req;
                req.req_blocks.mode = catch_up;
                req.req_trx.mode = none;
@@ -2397,10 +2400,10 @@ namespace sysio {
       if( req.req_blocks.mode == catch_up ) {
          {
             fc::lock_guard g( sync_mtx );
-            peer_ilog( p2p_blk_log, c, "catch_up while in ${s}, fhead = ${hn} "
-                          "target froot = ${fr} next_expected = ${ne}, id ${id}...",
-                     ("s", stage_str( sync_state ))("hn", num)("fr", sync_known_fork_db_root_num)
-                     ("ne", sync_next_expected_num)("id", id.str().substr( 8, 16 )) );
+            peer_ilog( p2p_blk_log, c, "catch_up while in {}, fhead = {} "
+                          "target froot = {} next_expected = {}, id {}...",
+                      stage_str( sync_state ), num, sync_known_fork_db_root_num,
+                      sync_next_expected_num, id.str().substr( 8, 16 ) );
          }
          auto chain_info = my_impl->get_chain_info();
          if( sync_state == lib_catchup || num < chain_info.fork_db_root_num ) {
@@ -2416,8 +2419,8 @@ namespace sysio {
 
          req.req_blocks.ids.emplace_back( chain_info.fork_db_head_id );
       } else {
-         peer_ilog( p2p_blk_log, c, "none notice while in ${s}, fhead = ${hn}, id ${id}...",
-                  ("s", stage_str( sync_state ))("hn", num)("id", id.str().substr(8,16)) );
+         peer_ilog( p2p_blk_log, c, "none notice while in {}, fhead = {}, id {}...",
+                  stage_str( sync_state ), num, id.str().substr(8,16) );
          fc::lock_guard g_conn( c->conn_mtx );
          c->conn_fork_db_head = block_id_type();
          c->conn_fork_db_head_num = 0;
@@ -2429,7 +2432,7 @@ namespace sysio {
 
    // called from c's connection strand
    void sync_manager::sync_recv_notice( const connection_ptr& c, const notice_message& msg) {
-      peer_dlog( p2p_blk_log, c, "sync_manager got ${m} block notice", ("m", modes_str( msg.known_blocks.mode )) );
+      peer_dlog( p2p_blk_log, c, "sync_manager got {} block notice", modes_str( msg.known_blocks.mode ) );
       SYS_ASSERT( msg.known_blocks.mode == catch_up || msg.known_blocks.mode == last_irr_catch_up, plugin_exception,
                   "sync_recv_notice only called on catch_up" );
       if (msg.known_blocks.mode == catch_up) {
@@ -2437,8 +2440,8 @@ namespace sysio {
             peer_wlog( p2p_blk_log, c, "got a catch up with ids size = 0" );
          } else {
             const block_id_type& id = msg.known_blocks.ids.front();
-            peer_ilog( p2p_blk_log, c, "notice_message, pending ${p}, blk_num ${n}, id ${id}...",
-                     ("p", msg.known_blocks.pending)("n", block_header::num_from_id(id))("id",id.str().substr(8,16)) );
+            peer_ilog( p2p_blk_log, c, "notice_message, pending {}, blk_num {}, id {}...",
+                     msg.known_blocks.pending, block_header::num_from_id(id), id.str().substr(8,16) );
             if( !my_impl->dispatcher.have_block( id ) ) {
                verify_catchup( c, msg.known_blocks.pending, id );
             } else {
@@ -2470,11 +2473,11 @@ namespace sysio {
          }
       }
       if( mode == closing_mode::immediately || c->block_status_monitor_.max_events_violated()) {
-         peer_wlog(p2p_blk_log, c, "block ${bn} not accepted, closing connection ${d}",
-                   ("d", mode == closing_mode::immediately ? "immediately" : "max violations reached")("bn", blk_num));
+         peer_wlog(p2p_blk_log, c, "block {} not accepted, closing connection {}",
+                   blk_num, mode == closing_mode::immediately ? "immediately" : "max violations reached");
          c->close(mode != closing_mode::immediately);
       } else {
-         peer_dlog(p2p_blk_log, c, "rejected block ${bn}, sending handshake", ("bn", blk_num));
+         peer_dlog(p2p_blk_log, c, "rejected block {}, sending handshake", blk_num);
          c->send_handshake();
       }
    }
@@ -2487,11 +2490,11 @@ namespace sysio {
       const bool blk_applied = !c;
 
       if (c) {
-         peer_dlog(p2p_blk_log, c, "got block ${bn}:${id}.. latency ${l}ms",
-                   ("bn", blk_num)("id", blk_id.str().substr(8,16))("l", blk_latency.count()/1000) );
+         peer_dlog(p2p_blk_log, c, "got block {}:{}.. latency {}ms",
+                   blk_num, blk_id.str().substr(8,16), blk_latency.count()/1000);
       } else {
-         fc_dlog(p2p_blk_log, "applied block ${bn}:${id}.. latency ${l}ms",
-                 ("bn", blk_num)("id", blk_id.str().substr(8,16))("l", blk_latency.count()/1000) );
+         fc_dlog(p2p_blk_log, "applied block {}:{}.. latency {}ms",
+                 blk_num, blk_id.str().substr(8,16), blk_latency.count()/1000);
       }
       if( app().is_quiting() ) {
          if (c)
@@ -2509,7 +2512,7 @@ namespace sysio {
          sync_active_time = std::chrono::steady_clock::now();
       }
       stages state = sync_state;
-      fc_dlog(p2p_blk_log, "sync_state ${s}", ("s", stage_str(state)));
+      fc_dlog(p2p_blk_log, "sync_state {}", stage_str(state));
       if( state == head_catchup ) {
          fc_dlog(p2p_blk_log, "sync_manager in head_catchup state");
          fc::unique_lock g_sync( sync_mtx );
@@ -2549,43 +2552,42 @@ namespace sysio {
       } else if( state == lib_catchup ) {
          fc::unique_lock g_sync( sync_mtx );
          if( blk_applied && blk_num >= sync_known_fork_db_root_num ) {
-            fc_dlog(p2p_blk_log, "All caught up ${b} with last known froot ${r} resending handshake",
-                    ("b", blk_num)("r", sync_known_fork_db_root_num));
+            fc_dlog(p2p_blk_log, "All caught up {} with last known froot {} resending handshake",
+                    blk_num, sync_known_fork_db_root_num);
             set_state( head_catchup );
             g_sync.unlock();
             send_handshakes();
          } else {
             if (!blk_applied) {
                if (blk_num >= c->sync_last_requested_block) {
-                  peer_dlog(p2p_blk_log, c, "calling cancel_sync_wait, block ${b}, sync_last_requested_block ${lrb}",
-                            ("b", blk_num)("lrb", c->sync_last_requested_block));
+                  peer_dlog(p2p_blk_log, c, "calling cancel_sync_wait, block {}, sync_last_requested_block {}",
+                            blk_num, c->sync_last_requested_block);
                   sync_source.reset();
                   c->cancel_sync_wait();
                } else {
-                  peer_dlog(p2p_blk_log, c, "calling sync_wait, block ${b}", ("b", blk_num));
+                  peer_dlog(p2p_blk_log, c, "calling sync_wait, block {}", blk_num);
                   c->sync_wait();
                }
 
                if (sync_last_requested_num == 0) { // block was rejected
                   sync_next_expected_num = my_impl->get_fork_db_root_num() + 1;
-                  peer_dlog(p2p_blk_log, c, "Reset sync_next_expected_num to ${n}", ("n", sync_next_expected_num));
+                  peer_dlog(p2p_blk_log, c, "Reset sync_next_expected_num to {}", sync_next_expected_num);
                } else {
                   if (blk_num == sync_next_expected_num) {
                      ++sync_next_expected_num;
                   }
                }
                if (blk_num >= sync_known_fork_db_root_num) {
-                  peer_dlog(p2p_blk_log, c, "received non-applied block ${bn} >= ${kn}, will send handshakes when caught up",
-                            ("bn", blk_num)("kn", sync_known_fork_db_root_num));
+                  peer_dlog(p2p_blk_log, c, "received non-applied block {} >= {}, will send handshakes when caught up",
+                            blk_num, sync_known_fork_db_root_num);
                   send_handshakes_when_synced = true;
                } else {
                   if (is_sync_request_ahead_allowed(blk_num)) {
                      // block was not applied, possibly because we already have the block
-                     fc_dlog(p2p_blk_log, "Requesting ${fs} blocks ahead, head: ${h} fhead ${fh} blk_num: ${bn} sync_next_expected_num ${nen} "
-                                          "sync_last_requested_num: ${lrn}, sync_last_requested_block: ${lrb}",
-                             ("fs", sync_fetch_span)("h", my_impl->get_chain_head_num())("fh", my_impl->get_fork_db_head_num())
-                             ("bn", blk_num)("nen", sync_next_expected_num)
-                             ("lrn", sync_last_requested_num)("lrb", c->sync_last_requested_block));
+                     fc_dlog(p2p_blk_log, "Requesting {} blocks ahead, head: {} fhead {} blk_num: {} sync_next_expected_num {} "
+                                          "sync_last_requested_num: {} sync_last_requested_block: {}",
+                             sync_fetch_span, my_impl->get_chain_head_num(), my_impl->get_fork_db_head_num(),
+                             blk_num, sync_next_expected_num, sync_last_requested_num, c->sync_last_requested_block);
                      request_next_chunk();
                   }
                }
@@ -2597,10 +2599,10 @@ namespace sysio {
                   blk_num = sync_next_expected_num-1;
                }
                if (is_sync_request_ahead_allowed(blk_num)) {
-                  fc_dlog(p2p_blk_log, "Requesting blocks, head: ${h} fhead ${fh} blk_num: ${bn} sync_next_expected_num ${nen} "
-                                       "sync_last_requested_num: ${lrn}",
-                          ("h", my_impl->get_chain_head_num())("fh", my_impl->get_fork_db_head_num())
-                          ("bn", blk_num)("nen", sync_next_expected_num)("lrn", sync_last_requested_num));
+                  fc_dlog(p2p_blk_log, "Requesting blocks, head: {} fhead {} blk_num: {} sync_next_expected_num {} "
+                                       "sync_last_requested_num: {}",
+                          my_impl->get_chain_head_num(), my_impl->get_fork_db_head_num(),
+                          blk_num, sync_next_expected_num, sync_last_requested_num);
                   request_next_chunk();
                }
             }
@@ -2653,7 +2655,7 @@ namespace sysio {
 
    void dispatch_manager::rm_block( const block_id_type& blkid ) {
       block_num_type block_num = block_header::num_from_id(blkid);
-      fc_dlog( p2p_blk_log, "rm_block ${n}, id: ${id}", ("n", block_num)("id", blkid));
+      fc_dlog( p2p_blk_log, "rm_block {}, id: {}", block_num, blkid);
       fc::lock_guard g(blk_state_mtx);
       auto& index = blk_state.get<by_connection_id>();
       auto p = index.equal_range( std::forward_as_tuple(block_num, blkid) );
@@ -2751,7 +2753,7 @@ namespace sysio {
          end_size = local_txns.size();
       }
 
-      fc_dlog( p2p_trx_log, "expire_local_txns size ${s} removed ${r} in ${t}us", ("s", start_size)("r", start_size - end_size)("t", fc::time_point::now() - now) );
+      fc_dlog( p2p_trx_log, "expire_local_txns size {} removed {} in {}us", start_size, start_size - end_size, fc::time_point::now() - now );
    }
 
    void dispatch_manager::expire_blocks( uint32_t fork_db_root_num ) {
@@ -2762,7 +2764,7 @@ namespace sysio {
 
    // thread safe
    void dispatch_manager::bcast_block(const signed_block_ptr& b, const block_id_type& id) {
-      fc_dlog( p2p_blk_log, "bcast block ${b}:${id}", ("b", b->block_num())("id", id.str().substr(8,16)) );
+      fc_dlog( p2p_blk_log, "bcast block {}:{}", b->block_num(), id.str().substr(8,16) );
 
       if(my_impl->sync_master->syncing_from_peer() ) return;
 
@@ -2770,12 +2772,12 @@ namespace sysio {
       buffer_factory block_notice_buff_factory;
       const auto bnum = b->block_num();
       my_impl->connections.for_each_block_connection( [this, &id, &bnum, &b, &buff_factory, &block_notice_buff_factory]( auto& cp ) {
-         fc_dlog( p2p_blk_log, "socket_is_open ${s}, state ${c}, syncing ${ss}, connection - ${cid}",
-                  ("s", cp->socket_is_open())("c", connection::state_str(cp->state()))("ss", cp->peer_syncing_from_us.load())("cid", cp->connection_id) );
+         fc_dlog( p2p_blk_log, "socket_is_open {}, state {}, syncing {}, connection - {}",
+                  cp->socket_is_open(), connection::state_str(cp->state()), cp->peer_syncing_from_us.load(), cp->connection_id );
          if( !cp->current() ) return;
 
          if( !add_peer_block( id, cp->connection_id ) ) {
-            fc_dlog( p2p_blk_log, "not bcast block ${b} to connection - ${cid}", ("b", bnum)("cid", cp->connection_id) );
+            fc_dlog( p2p_blk_log, "not bcast block {} to connection - {}", bnum, cp->connection_id );
             return;
          }
 
@@ -2786,7 +2788,7 @@ namespace sysio {
                   const auto& send_buffer = block_notice_buff_factory.get_send_buffer( block_notice_message{b->previous, id} );
                   boost::asio::post(cp->strand, [cp, send_buffer, bnum]() {
                      cp->latest_blk_time = std::chrono::steady_clock::now();
-                     peer_dlog( p2p_blk_log, cp, "bcast block_notice ${b}", ("b", bnum) );
+                     peer_dlog( p2p_blk_log, cp, "bcast block_notice {}", bnum );
                      cp->enqueue_buffer( msg_type_t::block_notice_message, std::nullopt, queued_buffer::queue_t::general, send_buffer, go_away_reason::no_reason );
                   });
                   return;
@@ -2800,7 +2802,7 @@ namespace sysio {
             cp->latest_blk_time = std::chrono::steady_clock::now();
             bool has_block = cp->peer_fork_db_root_num >= bnum;
             if( !has_block ) {
-               peer_dlog( p2p_blk_log, cp, "bcast block ${b}", ("b", bnum) );
+               peer_dlog( p2p_blk_log, cp, "bcast block {}", bnum );
                cp->enqueue_buffer( msg_type_t::signed_block, bnum, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
             }
          });
@@ -2835,7 +2837,7 @@ namespace sysio {
          }
 
          const send_buffer_type& sb = buff_factory.get_send_buffer( trx );
-         fc_dlog( p2p_trx_log, "sending trx: ${id}, to connection - ${cid}, size ${s}", ("id", trx->id())("cid", cp->connection_id)("s", sb->size()) );
+         fc_dlog( p2p_trx_log, "sending trx: {}, to connection - {}, size {}", trx->id(), cp->connection_id, sb->size() );
          boost::asio::post(cp->strand, [cp, sb]() {
             cp->enqueue_buffer( msg_type_t::packed_transaction, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
          } );
@@ -2851,7 +2853,7 @@ namespace sysio {
          }
 
          const send_buffer_type& sb = buff_factory.get_notice_send_buffer( trx );
-         fc_dlog( p2p_trx_log, "sending trx notice: ${id}, to connection - ${cid}", ("id", trx->id())("cid", cp->connection_id) );
+         fc_dlog( p2p_trx_log, "sending trx notice: {}, to connection - {}", trx->id(), cp->connection_id );
          boost::asio::post(cp->strand, [cp, sb]() {
             cp->enqueue_buffer( msg_type_t::transaction_notice_message, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
          } );
@@ -2860,7 +2862,7 @@ namespace sysio {
 
    // called from any thread
    void dispatch_manager::rejected_transaction(const packed_transaction_ptr& trx) {
-      fc_dlog( p2p_trx_log, "not sending rejected transaction ${tid}", ("tid", trx->id()) );
+      fc_dlog( p2p_trx_log, "not sending rejected transaction {}", trx->id() );
       // keep rejected transaction around for awhile so we don't broadcast it, don't remove from local_txns
    }
 
@@ -2896,7 +2898,7 @@ namespace sysio {
                   c->send_time();
                }
             } else {
-               fc_ilog( p2p_conn_log, "connection failed to ${a}, ${error}", ("a", c->peer_address())( "error", err.message()));
+               fc_ilog( p2p_conn_log, "connection failed to {}, {}", c->peer_address(), err.message() );
                c->close( false );
                if (my_impl->increment_failed_p2p_connections) {
                   my_impl->increment_failed_p2p_connections();
@@ -2915,7 +2917,7 @@ namespace sysio {
       boost::system::error_code rec;
       const auto&               rend = socket.remote_endpoint(rec);
       if (rec) {
-         fc_ilog(p2p_conn_log, "Unable to get remote endpoint: ${m}", ("m", rec.message()));
+         fc_ilog(p2p_conn_log, "Unable to get remote endpoint: {}", rec.message());
       } else {
          uint32_t                  visitors  = 0;
          uint32_t                  from_addr = 0;
@@ -2937,12 +2939,12 @@ namespace sysio {
          if (from_addr < max_nodes_per_host &&
                (auto_bp_peering_enabled() || connections.get_max_client_count() == 0 ||
                visitors < connections.get_max_client_count())) {
-            fc_ilog(p2p_conn_log, "Accepted new connection: " + paddr_str);
+            fc_ilog(p2p_conn_log, "Accepted new connection: {}", paddr_str);
 
             connections.any_of_supplied_peers([&listen_address, &paddr_str, &paddr_desc, &limit](const string& peer_addr) {
                if (auto [host, port, type] = net_utils::split_host_port_type(peer_addr); host == paddr_str) {
                   if (limit > 0) {
-                     fc_dlog(p2p_conn_log, "Connection inbound to ${la} from ${a} is a configured p2p-peer-address and will not be throttled", ("la", listen_address)("a", paddr_desc));
+                     fc_dlog(p2p_conn_log, "Connection inbound to {} from {} is a configured p2p-peer-address and will not be throttled", listen_address, paddr_desc);
                   }
                   limit = 0;
                   return true;
@@ -2959,10 +2961,10 @@ namespace sysio {
 
          } else {
             if (from_addr >= max_nodes_per_host) {
-               fc_dlog(p2p_conn_log, "Number of connections (${n}) from ${ra} exceeds limit ${l}, closing",
-                        ("n", from_addr + 1)("ra", paddr_desc)("l", max_nodes_per_host));
+               fc_dlog(p2p_conn_log, "Number of connections ({}) from {} exceeds limit {}, closing",
+                        from_addr + 1, paddr_desc, max_nodes_per_host);
             } else {
-               fc_dlog(p2p_conn_log, "max_client_count ${m} exceeded, closing: ${ra}", ("m", connections.get_max_client_count())("ra", paddr_desc));
+               fc_dlog(p2p_conn_log, "max_client_count {} exceeded, closing: {}", connections.get_max_client_count(), paddr_desc);
             }
             // new_connection never added to connections and start_session not called, lifetime will end
             boost::system::error_code ec;
@@ -2985,7 +2987,7 @@ namespace sysio {
             boost::system::error_code ec;
             socket->set_option( read_watermark_opt, ec );
             if( ec ) {
-               peer_elog( p2p_conn_log, this, "unable to set read watermark: ${e1}", ("e1", ec.message()) );
+               peer_elog( p2p_conn_log, this, "unable to set read watermark: {}", ec.message() );
             }
          }
 
@@ -2999,7 +3001,7 @@ namespace sysio {
 
          uint32_t write_queue_size = buffer_queue.write_queue_size();
          if( write_queue_size > def_max_write_queue_size ) {
-            peer_elog( p2p_conn_log, this, "write queue full ${s} bytes, giving up on connection, closing", ("s", write_queue_size) );
+            peer_elog( p2p_conn_log, this, "write queue full {} bytes, giving up on connection, closing", write_queue_size );
             close( false );
             return;
          }
@@ -3026,8 +3028,8 @@ namespace sysio {
                try {
                   if( !ec ) {
                      if (bytes_transferred > conn->pending_message_buffer.bytes_to_write()) {
-                        peer_elog( p2p_conn_log, conn, "async_read_some callback: bytes_transfered = ${bt}, buffer.bytes_to_write = ${btw}",
-                                   ("bt",bytes_transferred)("btw",conn->pending_message_buffer.bytes_to_write()) );
+                        peer_elog( p2p_conn_log, conn, "async_read_some callback: bytes_transfered = {}, buffer.bytes_to_write = {}",
+                                   bytes_transferred, conn->pending_message_buffer.bytes_to_write() );
                      }
                      SYS_ASSERT(bytes_transferred <= conn->pending_message_buffer.bytes_to_write(), plugin_exception, "");
                      conn->pending_message_buffer.advance_write_ptr(bytes_transferred);
@@ -3042,7 +3044,7 @@ namespace sysio {
                            auto index = conn->pending_message_buffer.read_index();
                            conn->pending_message_buffer.peek(&message_length, sizeof(message_length), index);
                            if(message_length > def_send_buffer_size*2 || message_length == 0) {
-                              peer_elog( p2p_conn_log, conn, "incoming message length unexpected (${i})", ("i", message_length) );
+                              peer_elog( p2p_conn_log, conn, "incoming message length unexpected ({})", message_length);
                               close_connection = true;
                               break;
                            }
@@ -3070,7 +3072,7 @@ namespace sysio {
                      if( !close_connection ) conn->start_read_message();
                   } else {
                      if (ec.value() != boost::asio::error::eof) {
-                        peer_elog( p2p_conn_log, conn, "Error reading message: ${m}", ( "m", ec.message() ) );
+                        peer_elog( p2p_conn_log, conn, "Error reading message: {}", ec.message() );
                      } else {
                         peer_ilog( p2p_conn_log, conn, "Peer closed connection" );
                      }
@@ -3087,11 +3089,11 @@ namespace sysio {
                }
                catch(const fc::exception &ex)
                {
-                  peer_elog( p2p_conn_log, conn, "Exception in handling read data ${s}", ("s",ex.to_string()) );
+                  peer_elog( p2p_conn_log, conn, "Exception in handling read data {}", ex.to_string() );
                   close_connection = true;
                }
                catch(const std::exception &ex) {
-                  peer_elog( p2p_conn_log, conn, "Exception in handling read data: ${s}", ("s",ex.what()) );
+                  peer_elog( p2p_conn_log, conn, "Exception in handling read data: {}", ex.what() );
                   close_connection = true;
                }
                catch (...) {
@@ -3142,7 +3144,7 @@ namespace sysio {
          }
 
       } catch( const fc::exception& e ) {
-         peer_wlog( p2p_msg_log, this, "Exception in handling message: ${s}", ("s", e.to_detail_string()) );
+         peer_wlog( p2p_msg_log, this, "Exception in handling message: {}", e.to_detail_string() );
          close();
          return false;
       }
@@ -3168,20 +3170,20 @@ namespace sysio {
          my_impl->dispatcher.add_peer_block(blk_id, connection_id);
          send_block_nack(blk_id);
 
-         peer_dlog( p2p_blk_log, this, "already received block ${num}, id ${id}..., latency ${l}ms",
-                    ("num", blk_num)("id", blk_id.str().substr(8,16))("l", age.count()/1000) );
+         peer_dlog( p2p_blk_log, this, "already received block {}, id {}..., latency {}ms",
+                    blk_num, blk_id.str().substr(8,16), age.count()/1000 );
          my_impl->sync_master->sync_recv_block( shared_from_this(), blk_id, blk_num, age );
 
          return true;
       }
-      peer_dlog( p2p_blk_log, this, "received block ${num}, id ${id}..., latency: ${l}ms, head ${h}, fhead ${f}",
-                 ("num", bh.block_num())("id", blk_id.str().substr(8,16))("l", age.count()/1000)
-                 ("h", my_impl->get_chain_head_num())("f", my_impl->get_fork_db_head_num()));
+      peer_dlog( p2p_blk_log, this, "received block {}, id {}..., latency: {}ms, head {}, fhead {}",
+                 bh.block_num(), blk_id.str().substr(8,16), age.count()/1000,
+                 my_impl->get_chain_head_num(), my_impl->get_fork_db_head_num());
       if( !my_impl->sync_master->syncing_from_peer() ) { // guard against peer thinking it needs to send us old blocks
          block_num_type fork_db_root_num = my_impl->get_fork_db_root_num();
          if( blk_num <= fork_db_root_num ) {
             pending_message_buffer.advance_read_ptr( message_length ); // advance before any send
-            peer_dlog( p2p_blk_log, this, "received block ${n} less than froot ${fr}", ("n", blk_num)("fr", fork_db_root_num) );
+            peer_dlog( p2p_blk_log, this, "received block {} less than froot {}", blk_num, fork_db_root_num );
             send_block_nack(blk_id);
             cancel_sync_wait();
 
@@ -3192,7 +3194,7 @@ namespace sysio {
          uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
          const bool block_le_lib = blk_num <= fork_db_root_num;
          if (block_le_lib) {
-            peer_dlog( p2p_blk_log, this, "received block ${n} less than froot ${fr} while syncing", ("n", blk_num)("fr", fork_db_root_num) );
+            peer_dlog( p2p_blk_log, this, "received block {} less than froot {} while syncing", blk_num, fork_db_root_num );
             pending_message_buffer.advance_read_ptr( message_length ); // advance before any send
          }
          my_impl->sync_master->sync_recv_block(shared_from_this(), blk_id, blk_num, age);
@@ -3239,7 +3241,7 @@ namespace sysio {
          my_impl->producer_plug->log_failed_transaction(ptr->id(), ptr, reason);
          if (now - fc::seconds(1) >= last_dropped_trx_msg_time) {
             last_dropped_trx_msg_time = now;
-            peer_wlog(p2p_trx_log, this, reason);
+            peer_wlog(p2p_trx_log, this, "{}", reason);
          }
          if (my_impl->increment_dropped_trxs) {
             my_impl->increment_dropped_trxs();
@@ -3249,7 +3251,7 @@ namespace sysio {
 
       auto[trx_entries_sz, have_trx] = my_impl->dispatcher.add_peer_txn( ptr->id(), ptr->expiration(), *this );
       if (trx_entries_sz > def_max_trx_entries_per_conn_size) {
-         peer_wlog(p2p_conn_log, this, "Max tracked trx reached ${c}, closing", ("c", trx_entries_sz));
+         peer_wlog(p2p_conn_log, this, "Max tracked trx reached {}, closing", trx_entries_sz);
          close();
          return true;
       }
@@ -3260,13 +3262,13 @@ namespace sysio {
       }
 
       const auto& tid = ptr->id();
-      peer_dlog( p2p_trx_log, this, "received packed_transaction ${id}", ("id", tid) );
+      peer_dlog( p2p_trx_log, this, "received packed_transaction {}", tid );
 
       if (message_length < def_trx_notice_min_size) {
          // transfer packed transaction is ~170 bytes, transaction notice is 41 bytes
-         fc_dlog( p2p_trx_log, "trx notice not sent, trx size ${s}", ("s", message_length));
+         fc_dlog( p2p_trx_log, "trx notice not sent, trx size {}", message_length);
       } else {
-         fc_dlog( p2p_trx_log, "send trx notice, trx size ${s}", ("s", message_length));
+         fc_dlog( p2p_trx_log, "send trx notice, trx size {}", message_length);
          my_impl->dispatcher.bcast_transaction_notify(ptr);
       }
 
@@ -3295,7 +3297,7 @@ namespace sysio {
 
       size_t trx_entries_sz = my_impl->dispatcher.add_peer_txn_notice( msg.id, *this );
       if (trx_entries_sz > def_max_trx_entries_per_conn_size) {
-         peer_wlog(p2p_conn_log, this, "Max tracked trx reached ${c}, closing", ("c", trx_entries_sz));
+         peer_wlog(p2p_conn_log, this, "Max tracked trx reached {}, closing", trx_entries_sz);
          close();
       }
 
@@ -3331,7 +3333,7 @@ namespace sysio {
       if (my_impl->sync_master->syncing_from_peer())
          return;
 
-      peer_dlog(p2p_blk_log, this, "Sending nack ${n}", ("n", block_header::num_from_id(block_id)));
+      peer_dlog(p2p_blk_log, this, "Sending nack {}", block_header::num_from_id(block_id));
 
       buffer_factory buff_factory;
       const auto& send_buffer = buff_factory.get_send_buffer( block_nack_message{block_id} );
@@ -3358,7 +3360,7 @@ namespace sysio {
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
       head_block_time = head.block_time();
-      fc_dlog( p2p_log, "updating chain info froot ${fr} head ${h} fhead ${f}", ("fr", fork_db_root_num)("h", head_num)("f", fork_db_head_num) );
+      fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
 
    // call only from main application thread
@@ -3377,7 +3379,7 @@ namespace sysio {
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
       head_block_time = head.block_time();
-      fc_dlog( p2p_log, "updating chain info froot ${fr} head ${h} fhead ${f}", ("fr", fork_db_root_num)("h", head_num)("f", fork_db_head_num) );
+      fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
 
    net_plugin_impl::chain_info_t net_plugin_impl::get_chain_info() const {
@@ -3406,8 +3408,8 @@ namespace sysio {
       // affecting state.
       bool valid = true;
       if (msg.fork_db_root_num > msg.fork_db_head_num) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: last irreversible (${i}) is greater than fhead (${h})",
-                  ("i", msg.fork_db_root_num)("h", msg.fork_db_head_num) );
+         peer_wlog( p2p_msg_log, this, "Handshake message validation: last irreversible ({}) is greater than fhead ({})",
+                  msg.fork_db_root_num, msg.fork_db_head_num );
          valid = false;
       }
       if (msg.p2p_address.empty()) {
@@ -3415,21 +3417,21 @@ namespace sysio {
          valid = false;
       } else if( msg.p2p_address.length() > net_utils::max_handshake_str_length ) {
          // see max_handshake_str_length comment in protocol.hpp
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address too large: ${p}",
-                    ("p", msg.p2p_address.substr(0, net_utils::max_handshake_str_length) + "...") );
+         peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address too large: {}",
+                    msg.p2p_address.substr(0, net_utils::max_handshake_str_length) + "..." );
          valid = false;
       }
       if (msg.os.empty()) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: os field is null string" );
          valid = false;
       } else if( msg.os.length() > net_utils::max_handshake_str_length ) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: os field too large: ${p}",
-                    ("p", msg.os.substr(0, net_utils::max_handshake_str_length) + "...") );
+         peer_wlog( p2p_msg_log, this, "Handshake message validation: os field too large: {}",
+                    msg.os.substr(0, net_utils::max_handshake_str_length) + "..." );
          valid = false;
       }
       if( msg.agent.length() > net_utils::max_handshake_str_length ) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: agent field too large: ${p}",
-                  ("p", msg.agent.substr(0, net_utils::max_handshake_str_length) + "...") );
+         peer_wlog( p2p_msg_log, this, "Handshake message validation: agent field too large: {}",
+                    msg.agent.substr(0, net_utils::max_handshake_str_length) + "..." );
          valid = false;
       }
       if ((msg.sig != chain::signature_type() || msg.token != sha256()) && (msg.token != fc::sha256::hash(msg.time))) {
@@ -3451,8 +3453,8 @@ namespace sysio {
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
       }
-      peer_dlog( p2p_msg_log, this, "received handshake gen ${g}, froot ${fr}, fhead ${fh}",
-                 ("g", msg.generation)("fr", msg.fork_db_root_num)("fh", msg.fork_db_head_num) );
+      peer_dlog( p2p_msg_log, this, "received handshake gen {}, froot {}, fhead {}",
+                 msg.generation, msg.fork_db_root_num, msg.fork_db_head_num );
 
       peer_fork_db_root_num = msg.fork_db_root_num;
       peer_fork_db_head_block_num = msg.fork_db_head_num;
@@ -3463,7 +3465,7 @@ namespace sysio {
       set_state(connection_state::connected);
       if (msg.generation == 1) {
          if( msg.node_id == my_impl->node_id) {
-            peer_ilog( p2p_conn_log, this, "Self connection detected node_id ${id}. Closing connection", ("id", msg.node_id) );
+            peer_ilog( p2p_conn_log, this, "Self connection detected node_id {}. Closing connection", msg.node_id);
             no_retry = go_away_reason::self;
             enqueue( go_away_message( go_away_reason::self ) );
             return;
@@ -3483,7 +3485,7 @@ namespace sysio {
             // from, but it would be different from the address it is listening. The only way to make sure is when the
             // first handshake message is received with the p2p_address information in the message. Thus the connection
             // limit checking has to be here when auto bp peering is enabled.
-            fc_dlog(p2p_conn_log, "max_client_count ${m} exceeded", ("m", my_impl->connections.get_max_client_count()));
+            fc_dlog(p2p_conn_log, "max_client_count {} exceeded", my_impl->connections.get_max_client_count());
             my_impl->connections.disconnect(peer_address());
             return;
          }
@@ -3492,7 +3494,7 @@ namespace sysio {
             if (auto [host, port, type] = net_utils::split_host_port_type(msg.p2p_address); !host.empty())
                set_connection_type( msg.p2p_address);
             else
-               peer_dlog(p2p_msg_log, this, "Invalid handshake p2p_address ${p}", ("p", msg.p2p_address));
+               peer_dlog(p2p_msg_log, this, "Invalid handshake p2p_address {}", msg.p2p_address);
          } else {
             // peer p2p_address may contain trx or blk only request, honor requested connection type
             set_peer_connection_type(msg.p2p_address);
@@ -3503,12 +3505,12 @@ namespace sysio {
             if(check.get() == this)
                return false;
             fc::unique_lock g_check_conn( check->conn_mtx );
-            fc_dlog( p2p_conn_log, "dup check: connected ${c}, ${l} =? ${r}",
-                     ("c", check->connected())("l", check->last_handshake_recv.node_id)("r", msg.node_id) );
+            fc_dlog( p2p_conn_log, "dup check: connected {}, {} =? {}",
+                     check->connected(), check->last_handshake_recv.node_id, msg.node_id );
             if(check->connected() && check->last_handshake_recv.node_id == msg.node_id) {
                if (my_impl->node_id < msg.node_id) {
-                  fc_dlog( p2p_conn_log, "not duplicate, my_impl->node_id '${lhs}' < msg.node_id '${rhs}'",
-                           ("lhs", my_impl->node_id)("rhs", msg.node_id) );
+                  fc_dlog( p2p_conn_log, "not duplicate, my_impl->node_id '{}' < msg.node_id '{}'",
+                           my_impl->node_id, msg.node_id );
                   // only the connection from lower node_id to higher node_id will be considered as a duplicate,
                   // so there is no chance for both connections to be closed
                   return false;
@@ -3518,7 +3520,7 @@ namespace sysio {
             return false;
          };
          if (my_impl->connections.any_of_connections(is_duplicate)) {
-            peer_dlog( p2p_conn_log, this, "sending go_away duplicate, msg.p2p_address: ${add}", ("add", msg.p2p_address) );
+            peer_dlog( p2p_conn_log, this, "sending go_away duplicate, msg.p2p_address: {}", msg.p2p_address );
             enqueue(go_away_message{go_away_reason::duplicate, conn_node_id});
             no_retry = go_away_reason::duplicate;
             return;
@@ -3532,10 +3534,10 @@ namespace sysio {
          }
          protocol_version = net_plugin_impl::to_protocol_version(msg.network_version);
          if( protocol_version != net_version ) {
-            peer_ilog( p2p_conn_log, this, "Local network version different: ${nv} Remote version: ${mnv}",
-                       ("nv", static_cast<uint16_t>(net_version))("mnv", static_cast<uint16_t>(protocol_version.load())) );
+            peer_ilog( p2p_conn_log, this, "Local network version different: {} Remote version: {}",
+                       static_cast<uint16_t>(net_version), static_cast<uint16_t>(protocol_version.load()) );
          } else {
-            peer_dlog( p2p_conn_log, this, "Local network version: ${nv}", ("nv", static_cast<uint16_t>(net_version)) );
+            peer_dlog( p2p_conn_log, this, "Local network version: {}", static_cast<uint16_t>(net_version) );
          }
 
          conn_node_id = msg.node_id;
@@ -3551,21 +3553,21 @@ namespace sysio {
          uint32_t peer_fork_db_root_num = msg.fork_db_root_num;
          uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
 
-         peer_dlog( p2p_blk_log, this, "handshake check froot ${n}, peer_froot ${pn}", ("n", fork_db_root_num)("pn", peer_fork_db_root_num) );
+         peer_dlog( p2p_blk_log, this, "handshake check froot {}, peer_froot {}", fork_db_root_num, peer_fork_db_root_num );
 
          if( peer_fork_db_root_num <= fork_db_root_num && peer_fork_db_root_num > 0 ) {
             try {
                auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_root_id); // thread safe
                if (unknown_block) {
                   // can be not found if running with a truncated block log
-                  peer_dlog( p2p_blk_log, this, "peer froot block ${n} is unknown", ("n", peer_fork_db_root_num) );
+                  peer_dlog( p2p_blk_log, this, "peer froot block {} is unknown", peer_fork_db_root_num );
                } else if (on_fork) {
                   peer_wlog( p2p_conn_log, this, "Peer chain is forked, sending: forked go away" );
                   no_retry = go_away_reason::forked;
                   enqueue( go_away_message( go_away_reason::forked ) );
                }
             } catch( ... ) {
-               peer_wlog( p2p_blk_log, this, "caught an exception getting block id for ${pl}", ("pl", peer_fork_db_root_num) );
+               peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_fork_db_root_num );
             }
          }
 
@@ -3597,14 +3599,14 @@ namespace sysio {
          // peer_ping_time_ns includes time there and back, include round trip time as the block latency is used to compensate for communication back
          nblk_combined_latency = nblk_behind_by_net_latency;
          // message in the log below is used in p2p_high_latency_test.py test
-         peer_dlog(p2p_conn_log, this, "Network latency is ${lat}ms, ${num} blocks discrepancy by network latency, ${tot_num} blocks discrepancy expected once message received",
-                   ("lat", peer_ping_time_ns / 2 / 1000000)("num", nblk_behind_by_net_latency)("tot_num", nblk_combined_latency));
+         peer_dlog(p2p_conn_log, this, "Network latency is {}ms, {} blocks discrepancy by network latency, {} blocks discrepancy expected once message received",
+                   peer_ping_time_ns / 2 / 1000000, nblk_behind_by_net_latency, nblk_combined_latency);
       }
       return nblk_combined_latency;
    }
 
    void connection::handle_message( const go_away_message& msg ) {
-      peer_wlog( p2p_conn_log, this, "received go_away_message, reason = ${r}", ("r", reason_str( msg.reason )) );
+      peer_wlog( p2p_conn_log, this, "received go_away_message, reason = {}", reason_str( msg.reason ) );
 
       bool retry = no_retry == go_away_reason::no_reason; // if no previous go away message
       no_retry = msg.reason;
@@ -3642,7 +3644,7 @@ namespace sysio {
    }
 
    void connection::handle_message( const time_message& msg ) {
-      peer_dlog( p2p_msg_log, this, "received time_message: ${t}, org: ${o}", ("t", msg)("o", org.count()) );
+      peer_dlog( p2p_msg_log, this, "received time_message: {}, org: {}", msg, org.count() );
 
       // If the transmit timestamp is zero, the peer is horribly broken.
       if(msg.xmt == 0)
@@ -3654,7 +3656,7 @@ namespace sysio {
       if (msg.org != 0) {
          if (msg.org == org.count()) {
             auto ping = msg.dst - msg.org;
-            peer_dlog(p2p_msg_log, this, "send_time ping ${p}us", ("p", ping / 1000));
+            peer_dlog(p2p_msg_log, this, "send_time ping {}us", ping / 1000);
             peer_ping_time_ns = ping;
          } else {
             // a diff time loop is in progress, ignore this message as it is not the one we want
@@ -3678,8 +3680,8 @@ namespace sysio {
          int64_t offset = (double((rec - org).count()) + double(msg_xmt.count() - msg.dst)) / 2.0;
 
          if (std::abs(offset) > block_interval_ns) {
-            peer_wlog(p2p_msg_log, this, "Clock offset is ${of}us, calculation: (rec ${r} - org ${o} + xmt ${x} - dst ${d})/2",
-                      ("of", offset / 1000)("r", rec.count())("o", org.count())("x", msg_xmt.count())("d", msg.dst));
+            peer_wlog(p2p_msg_log, this, "Clock offset is {}us, calculation: (rec {} - org {} + xmt {} - dst {})/2",
+                      offset / 1000, rec.count(), org.count(), msg_xmt.count(), msg.dst);
          }
       }
       org = std::chrono::nanoseconds{0};
@@ -3702,17 +3704,17 @@ namespace sysio {
       //
       set_state(connection_state::connected);
       if( msg.known_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_msg_log, this, "Invalid notice_message, known_blocks.ids.size ${s}, closing connection",
-                    ("s", msg.known_blocks.ids.size()) );
+         peer_wlog( p2p_msg_log, this, "Invalid notice_message, known_blocks.ids.size {}, closing connection",
+                    msg.known_blocks.ids.size() );
          close( false );
          return;
       }
       if( msg.known_trx.mode != none ) {
          if( p2p_msg_log.is_enabled( fc::log_level::debug ) ) {
             const block_id_type& blkid = msg.known_blocks.ids.empty() ? block_id_type{} : msg.known_blocks.ids.front();
-            peer_dlog( p2p_msg_log, this, "this is a ${m} notice with ${n} pending blocks: ${num} ${id}...",
-                       ("m", modes_str( msg.known_blocks.mode ))("n", msg.known_blocks.pending)
-                       ("num", block_header::num_from_id( blkid ))("id", blkid.str().substr( 8, 16 )) );
+            peer_dlog( p2p_msg_log, this, "this is a {} notice with {} pending blocks: {} {}...",
+                       modes_str(msg.known_blocks.mode), msg.known_blocks.pending,
+                       block_header::num_from_id( blkid ), blkid.str().substr( 8, 16 ) );
          }
       }
       switch (msg.known_trx.mode) {
@@ -3731,8 +3733,8 @@ namespace sysio {
       }
 
       if( msg.known_blocks.mode != none ) {
-         peer_dlog( p2p_msg_log, this, "this is a ${m} notice with ${n} blocks",
-                    ("m", modes_str( msg.known_blocks.mode ))( "n", msg.known_blocks.pending ) );
+         peer_dlog( p2p_msg_log, this, "this is a {} notice with {} blocks",
+                    modes_str( msg.known_blocks.mode ), msg.known_blocks.pending );
       }
       switch (msg.known_blocks.mode) {
       case none : {
@@ -3754,16 +3756,16 @@ namespace sysio {
          break;
       }
       default: {
-         peer_wlog( p2p_msg_log, this, "bad notice_message : invalid known_blocks.mode ${m}",
-                    ("m", static_cast<uint32_t>(msg.known_blocks.mode)) );
+         peer_wlog( p2p_msg_log, this, "bad notice_message : invalid known_blocks.mode {}",
+                    static_cast<uint32_t>(msg.known_blocks.mode) );
       }
       }
    }
 
    void connection::handle_message( const request_message& msg ) {
       if( msg.req_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.ids.size ${s}, closing",
-                    ("s", msg.req_blocks.ids.size()) );
+         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.ids.size {}, closing",
+                    msg.req_blocks.ids.size() );
          close();
          return;
       }
@@ -3771,8 +3773,8 @@ namespace sysio {
       switch (msg.req_blocks.mode) {
       case catch_up : {
          const block_id_type& id = msg.req_blocks.ids.empty() ? block_id_type() : msg.req_blocks.ids.back();
-         peer_dlog( p2p_blk_log, this, "${d} request_message:catch_up #${bn}:${id}",
-                    ("d", is_blocks_connection() ? "received" : "ignoring")("bn", block_header::num_from_id(id))("id",id) );
+         peer_dlog( p2p_blk_log, this, "{} request_message:catch_up #{}:{}",
+                    is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(id), id );
          if (!is_blocks_connection())
             return;
          blk_send_branch( id );
@@ -3782,8 +3784,8 @@ namespace sysio {
          if (protocol_version >= proto_version_t::block_nack) {
             if (msg.req_blocks.ids.size() == 2 && msg.req_trx.ids.empty()) {
                const block_id_type& req_id = msg.req_blocks.ids[0]; // 0 - req_id, 1 - peer_head_id
-               peer_dlog( p2p_blk_log, this, "${d} request_message:normal #${bn}:${id}",
-                          ("d", is_blocks_connection() ? "received" : "ignoring")("bn", block_header::num_from_id(req_id))("id",req_id) );
+               peer_dlog( p2p_blk_log, this, "{} request_message:normal #{}:{}",
+                          is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(req_id), req_id );
                if (!is_blocks_connection())
                   return;
                const block_id_type& peer_head_id = msg.req_blocks.ids[1];
@@ -3807,7 +3809,7 @@ namespace sysio {
             peer_syncing_from_us = false;
          }
          if( !msg.req_trx.ids.empty() ) {
-            peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=none, req_trx.ids.size ${s}", ("s", msg.req_trx.ids.size()) );
+            peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=none, req_trx.ids.size {}", msg.req_trx.ids.size() );
             close();
          }
          break;
@@ -3820,13 +3822,13 @@ namespace sysio {
    }
 
    void connection::handle_message( const sync_request_message& msg ) {
-      peer_dlog( p2p_blk_log, this, "peer requested ${start} to ${end}", ("start", msg.start_block)("end", msg.end_block) );
+      peer_dlog( p2p_blk_log, this, "peer requested {} to {}", msg.start_block, msg.end_block );
       if( msg.end_block == 0 ) {
          peer_requested.reset();
          flush_queues();
       } else {
          if (!is_blocks_connection()) {
-            peer_dlog(p2p_conn_log, this, "received sync_request_message ${m} on transaction only connection, ignoring", ("m", msg));
+            peer_dlog(p2p_conn_log, this, "received sync_request_message {} on transaction only connection, ignoring", msg);
             return;
          }
 
@@ -3846,9 +3848,9 @@ namespace sysio {
    // called from connection strand
    void connection::handle_message( const vote_message_ptr& msg ) {
       last_vote_received = fc::time_point::now();
-      peer_dlog(vote_logger, this, "received vote: block #${bn}:${id}.., ${v}, key ${k}..",
-                ("bn", block_header::num_from_id(msg->block_id))("id", msg->block_id.str().substr(8,16))
-                ("v", msg->strong ? "strong" : "weak")("k", msg->finalizer_key.to_string().substr(8, 16)));
+      peer_dlog(vote_logger, this, "received vote: block #{}:{}.., {}, key {}..",
+                block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
+                msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8, 16));
       controller& cc = my_impl->chain_plug->chain();
       cc.process_vote_message(connection_id, msg);
    }
@@ -3880,13 +3882,13 @@ namespace sysio {
       }
       last_block_nack = msg.id;
 
-      peer_dlog(p2p_blk_log, this, "received block nack #${bn}:${id}, consecutive ${c}", ("bn", block_num)("id", msg.id)("c", consecutive_blocks_nacks));
+      peer_dlog(p2p_blk_log, this, "received block nack #{}:{}, consecutive {}", block_num, msg.id, consecutive_blocks_nacks);
    }
 
    // called from connection strand
    void connection::handle_message( const block_notice_message& msg ) {
       if (block_header::num_from_id(msg.id)-1 != block_header::num_from_id(msg.previous)) {
-         peer_dlog(p2p_blk_log, this, "Invalid block_notice_message ${id}, closing", ("id", msg.id));
+         peer_dlog(p2p_blk_log, this, "Invalid block_notice_message {}, closing", msg.id);
          close();
          return;
       }
@@ -3908,8 +3910,8 @@ namespace sysio {
             return c->last_block_nack_request_message_id == req.req_blocks.ids[0];
          });
          if (!already_requested) {
-            peer_ilog(p2p_blk_log, this, "Received unknown block notice, requesting blocks from ${bn}",
-                      ("bn", block_header::num_from_id(msg.previous)));
+            peer_ilog(p2p_blk_log, this, "Received unknown block notice, requesting blocks from {}",
+                      block_header::num_from_id(msg.previous));
             block_id_type head_id = my_impl->get_chain_info().head_id;
             req.req_blocks.ids.push_back(head_id);
             send_block_nack({});
@@ -3924,7 +3926,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::handle_message( const transaction_notice_message& msg ) {
-      peer_dlog( p2p_trx_log, this, "received transaction_notice_message ${id}", ("id", msg.id) );
+      peer_dlog( p2p_trx_log, this, "received transaction_notice_message {}", msg.id );
    }
 
    digest_type gossip_bp_peers_message::bp_peer::digest(const chain_id_type& chain_id) const {
@@ -4027,8 +4029,8 @@ namespace sysio {
       my_impl->chain_plug->accept_transaction( trx,
          [weak = weak_from_this(), trx_size](const next_function_variant<transaction_trace_ptr>& result) mutable {
          auto log_failed = [&](const fc::exception& e) {
-            fc_dlog( p2p_trx_log, "bad packed_transaction : ${m}",
-                     ("m", e.code() == tx_duplicate::code_value ? e.to_string() : e.what()) );
+            fc_dlog( p2p_trx_log, "bad packed_transaction : {}",
+                     e.code() == tx_duplicate::code_value ? e.to_string() : e.what() );
          };
          // next (this lambda) called from application thread
          if (std::holds_alternative<fc::exception_ptr>(result)) {
@@ -4036,7 +4038,7 @@ namespace sysio {
          } else {
             const transaction_trace_ptr& trace = std::get<transaction_trace_ptr>(result);
             if( !trace->except ) {
-               fc_dlog( p2p_trx_log, "chain accepted transaction, bcast ${id}", ("id", trace->id) );
+               fc_dlog( p2p_trx_log, "chain accepted transaction, bcast {}", trace->id );
             } else {
                log_failed(*trace->except);
             }
@@ -4051,7 +4053,7 @@ namespace sysio {
    // called from connection strand
    void connection::handle_message( const block_id_type& id, signed_block_ptr ptr ) {
       // post to dispatcher strand so that we don't have multiple threads validating the block header
-      peer_dlog(p2p_blk_log, this, "posting block ${n} to dispatcher strand", ("n", ptr->block_num()));
+      peer_dlog(p2p_blk_log, this, "posting block {} to dispatcher strand", ptr->block_num());
       boost::asio::dispatch(my_impl->dispatcher.strand, [id, c{shared_from_this()}, ptr{std::move(ptr)}, cid=connection_id]() mutable {
          if (app().is_quiting()) // large sync span can have many of these queued up, exit quickly
             return;
@@ -4072,7 +4074,7 @@ namespace sysio {
          try {
             if (cc.is_producer_node()) {
                SYS_ASSERT(ptr->timestamp < (fc::time_point::now() + def_allowed_clock_skew), block_from_the_future,
-                          "received a block from the future, rejecting it: ${id}", ("id", id));
+                          "received a block from the future, rejecting it: {}", id);
             }
             // this will return empty optional<block_handle> if block is not linkable
             controller::accepted_block_result abh = cc.accept_block( id, ptr );
@@ -4082,25 +4084,25 @@ namespace sysio {
             close_mode = sync_manager::closing_mode::handshake;
          } catch( const invalid_qc_claim& ex) {
             exception = true;
-            fc_wlog( p2p_blk_log, "invalid QC claim exception, connection - ${cid}: #${n} ${id}...: ${m}",
-                     ("cid", cid)("n", ptr->block_num())("id", id.str().substr(8,16))("m",ex.to_string()));
+            fc_wlog( p2p_blk_log, "invalid QC claim exception, connection - {}: #{} {}...: {}",
+                     cid, ptr->block_num(), id.str().substr(8,16), ex.to_string());
          } catch( const fc::exception& ex ) {
             exception = true;
-            fc_ilog( p2p_blk_log, "bad block exception connection - ${cid}: #${n} ${id}...: ${m}",
-                     ("cid", cid)("n", ptr->block_num())("id", id.str().substr(8,16))("m",ex.to_string()));
+            fc_ilog( p2p_blk_log, "bad block exception connection - {}: #{} {}...: {}",
+                     cid, ptr->block_num(), id.str().substr(8,16), ex.to_string());
          } catch( ... ) {
             exception = true;
-            fc_wlog( p2p_blk_log, "bad block connection - ${cid}: #${n} ${id}...: unknown exception",
-                     ("cid", cid)("n", ptr->block_num())("id", id.str().substr(8,16)));
+            fc_wlog( p2p_blk_log, "bad block connection - {}: #{} {}...: unknown exception",
+                     cid, ptr->block_num(), id.str().substr(8,16));
          }
          if( exception || unlinkable) {
             const bool first_proper_svnn_block = !proper_svnn_block_seen && ptr->is_proper_svnn_block();
             if (unlinkable && !first_proper_svnn_block) {
-               fc_dlog(p2p_blk_log, "unlinkable_block ${bn} : ${id}, previous ${pn} : ${pid}",
-                       ("bn", ptr->block_num())("id", id)("pn", block_header::num_from_id(ptr->previous))("pid", ptr->previous));
+               fc_dlog(p2p_blk_log, "unlinkable_block {} : {}, previous {} : {}",
+                       ptr->block_num(), id, block_header::num_from_id(ptr->previous), ptr->previous);
             }
             boost::asio::post(c->strand, [c, id, blk_num=ptr->block_num(), close_mode]() {
-               peer_dlog( p2p_blk_log, c, "rejected block ${bn} ${id}", ("bn", blk_num)("id", id) );
+               peer_dlog( p2p_blk_log, c, "rejected block {} {}", blk_num, id );
                my_impl->sync_master->rejected_block( c, blk_num, close_mode );
             });
             return;
@@ -4110,8 +4112,8 @@ namespace sysio {
          uint32_t block_num = obh->block_num();
          proper_svnn_block_seen = obh->header().is_proper_svnn_block();
 
-         fc_dlog( p2p_blk_log, "validated block header, forkdb add ${bt}, broadcasting immediately, connection - ${cid}, blk num = ${num}, id = ${id}",
-                  ("bt", fork_db_add_result)("cid", cid)("num", block_num)("id", obh->id()) );
+         fc_dlog( p2p_blk_log, "validated block header, forkdb add {}, broadcasting immediately, connection - {}, blk num = {}, id = {}",
+                  fork_db_add_result, cid, block_num, obh->id() );
          my_impl->dispatcher.add_peer_block( obh->id(), cid ); // no need to send back to sender
          c->block_status_monitor_.accepted();
 
@@ -4128,7 +4130,7 @@ namespace sysio {
             // call before process_blocks to avoid interrupting process_blocks
             my_impl->producer_plug->received_block(block_num, fork_db_add_result);
 
-            fc_dlog(p2p_blk_log, "post process_incoming_block to app thread, block ${n}", ("n", ptr->block_num()));
+            fc_dlog(p2p_blk_log, "post process_incoming_block to app thread, block {}", ptr->block_num());
             my_impl->producer_plug->process_blocks();
          }
          my_impl->dispatcher.bcast_block( obh->block(), obh->id() );
@@ -4181,24 +4183,24 @@ namespace sysio {
          update_bp_producer_peers();
          connection::send_gossip_bp_peers_message_to_bp_peers();
       }
-      fc_dlog( p2p_log, "expire run time ${n}us", ("n", time_point::now() - now) );
+      fc_dlog( p2p_log, "expire run time {}us", time_point::now() - now );
 
       start_expire_timer();
    }
 
    // called from application thread
    void net_plugin_impl::on_accepted_block_header(const signed_block_ptr& block, const block_id_type& id) {
-      fc_dlog(p2p_blk_log, "on_accepted_block_header ${bn} ${id}", ("bn", block->block_num())("id", id));
+      fc_dlog(p2p_blk_log, "on_accepted_block_header {} {}", block->block_num(), id);
       update_chain_info();
 
       boost::asio::post( thread_pool.get_executor(), [block, id, this]() {
-         fc_dlog(p2p_blk_log, "signaled accepted_block_header, blk num = ${num}, id = ${id}", ("num", block->block_num())("id", id));
+         fc_dlog(p2p_blk_log, "signaled accepted_block_header, blk num = {}, id = {}", block->block_num(), id);
          dispatcher.bcast_block(block, id);
       });
    }
 
    void net_plugin_impl::on_accepted_block( const signed_block_ptr& block, const block_id_type& id) {
-      fc_dlog(p2p_blk_log, "on_accepted_block ${bn} ${id}", ("bn", block->block_num())("id", id));
+      fc_dlog(p2p_blk_log, "on_accepted_block {} {}", block->block_num(), id);
       update_chain_info();
 
       if (chain_plug->chain().get_read_mode() != db_read_mode::IRREVERSIBLE) {
@@ -4224,7 +4226,7 @@ namespace sysio {
                my_impl->connect_to_active_bp_peers();
                connection::send_gossip_bp_peers_message_to_bp_peers();
             } catch (fc::exception& e) {
-               fc_elog( p2p_log, "Unable to update bp producer peers, error: ${e}", ("e", e.to_detail_string()));
+               fc_elog( p2p_log, "Unable to update bp producer peers, error: {}", e.to_detail_string());
             }
          });
       }
@@ -4232,7 +4234,7 @@ namespace sysio {
 
    // called from application thread
    void net_plugin_impl::on_irreversible_block( const signed_block_ptr& block, const block_id_type& id ) {
-      fc_dlog( p2p_blk_log, "on_irreversible_block, blk num = ${num}, id = ${id}", ("num", block->block_num())("id", id) );
+      fc_dlog( p2p_blk_log, "on_irreversible_block, blk num = {}, id = {}", block->block_num(), id);
       update_chain_info(id);
 
       chain::controller& cc = chain_plug->chain();
@@ -4258,10 +4260,10 @@ namespace sysio {
          return std::string{"unknown"};
       };
 
-      fc_dlog(vote_logger, "connection - ${c} on voted signal: ${s} block #${bn} ${id}.., ${t}, ${d}, key ${k}..",
-                ("c", connection_id)("s", status)("bn", block_header::num_from_id(msg->block_id))
-                ("id", msg->block_id.str().substr(8,16))("t", msg->strong ? "strong" : "weak")
-                ("d", get_desc())("k", msg->finalizer_key.to_string().substr(8, 16)));
+      fc_dlog(vote_logger, "connection - {} on voted signal: {} block #{} {}.., {}, {}, key {}..",
+              connection_id, status, block_header::num_from_id(msg->block_id),
+              msg->block_id.str().substr(8,16), msg->strong ? "strong" : "weak",
+              get_desc(), msg->finalizer_key.to_string().substr(8, 16));
 
       switch( status ) {
       case vote_result_t::success:
@@ -4270,7 +4272,7 @@ namespace sysio {
       case vote_result_t::unknown_public_key:
       case vote_result_t::invalid_signature:
       case vote_result_t::max_exceeded:  // close peer immediately
-         fc_elog(vote_logger, "Invalid vote(s), closing connection - ${c}", ("c", connection_id));
+         fc_elog(vote_logger, "Invalid vote(s), closing connection - {}", connection_id);
          connections.any_of_connections([connection_id](const connection_ptr& c) {
             if (c->connection_id == connection_id) {
                c->close( false );
@@ -4280,8 +4282,8 @@ namespace sysio {
          });
          break;
       case vote_result_t::unknown_block: // track the failure
-         fc_dlog(vote_logger, "connection - ${c} vote unknown block #${bn}:${id}..",
-                 ("c", connection_id)("bn", block_header::num_from_id(msg->block_id))("id", msg->block_id.str().substr(8,16)));
+         fc_dlog(vote_logger, "connection - {} vote unknown block #{}:{}..",
+                 connection_id, block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16));
          connections.any_of_connections([connection_id](const connection_ptr& c) {
             if (c->connection_id == connection_id) {
                boost::asio::post(c->strand, [c]() {
@@ -4303,9 +4305,9 @@ namespace sysio {
       if (sync_master->syncing_from_peer())
          return;
 
-      fc_dlog(vote_logger, "bcast ${t} vote: block #${bn} ${id}.., ${v}, key ${k}..",
-                ("t", exclude_peer ? "received" : "our")("bn", block_header::num_from_id(msg->block_id))("id", msg->block_id.str().substr(8,16))
-                ("v", msg->strong ? "strong" : "weak")("k", msg->finalizer_key.to_string().substr(8,16)));
+      fc_dlog(vote_logger, "bcast {} vote: block #{} {}.., {}, key {}..",
+              exclude_peer ? "received" : "our", block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
+              msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8,16));
 
       boost::asio::post( thread_pool.get_executor(), [exclude_peer, msg, this]() mutable {
             buffer_factory buff_factory;
@@ -4320,11 +4322,11 @@ namespace sysio {
       boost::asio::post( thread_pool.get_executor(), [this, results]() {
          const auto& id = results.second->id();
          if (results.first) {
-            fc_dlog( p2p_trx_log, "signaled NACK, trx-id = ${id} : ${why}",
-                     ("id", id)("why", results.first->code() == tx_duplicate::code_value ? results.first->to_string() : results.first->to_detail_string()) );
+            fc_dlog( p2p_trx_log, "signaled NACK, trx-id = {} : {}",
+                     id, results.first->code() == tx_duplicate::code_value ? results.first->to_string() : results.first->to_detail_string() );
             dispatcher.rejected_transaction(results.second);
          } else {
-            fc_dlog( p2p_trx_log, "signaled ACK, trx-id = ${id}", ("id", id) );
+            fc_dlog( p2p_trx_log, "signaled ACK, trx-id = {}", id );
             dispatcher.bcast_transaction(results.second);
          }
       });
@@ -4344,8 +4346,8 @@ namespace sysio {
          if(producer_plug != nullptr)
             found_producer_key = producer_plug->is_producer_key(msg.key);
          if( allowed_it == allowed_peers.end() && private_it == private_keys.end() && !found_producer_key) {
-            fc_wlog( p2p_conn_log, "Peer ${peer} sent a handshake with an unauthorized key: ${key}.",
-                     ("peer", msg.p2p_address)("key", msg.key) );
+            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unauthorized key: {}.",
+                     msg.p2p_address, fc::json::to_log_string(msg.key));
             return false;
          }
       }
@@ -4353,7 +4355,7 @@ namespace sysio {
       if(msg.sig != chain::signature_type() && msg.token != sha256()) {
          sha256 hash = fc::sha256::hash(msg.time);
          if(hash != msg.token) {
-            fc_wlog( p2p_conn_log, "Peer ${peer} sent a handshake with an invalid token.", ("peer", msg.p2p_address) );
+            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an invalid token.", msg.p2p_address);
             return false;
          }
          chain::public_key_type peer_key;
@@ -4361,11 +4363,11 @@ namespace sysio {
             peer_key = crypto::public_key(msg.sig, msg.token, true);
          }
          catch (const std::exception& /*e*/) {
-            fc_wlog( p2p_conn_log, "Peer ${peer} sent a handshake with an unrecoverable key.", ("peer", msg.p2p_address) );
+            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);
             return false;
          }
          if((allowed_connections & (Producers | Specified)) && peer_key != msg.key) {
-            fc_wlog( p2p_conn_log, "Peer ${peer} sent a handshake with an unauthenticated key.", ("peer", msg.p2p_address) );
+            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unauthenticated key.", msg.p2p_address);
             return false;
          }
       }
@@ -4423,7 +4425,7 @@ namespace sysio {
             if (hello.p2p_address.find(":blk") == std::string::npos)
                hello.p2p_address += ":blk";
          if( !is_blocks_only_connection() && !my_impl->p2p_accept_transactions ) {
-            peer_dlog( p2p_msg_log, this, "p2p-accept-transactions=false inform peer blocks only connection ${a}", ("a", hello.p2p_address) );
+            peer_dlog( p2p_msg_log, this, "p2p-accept-transactions=false inform peer blocks only connection {}", hello.p2p_address );
          }
       }
       hello.p2p_address += " - " + hello.node_id.str().substr(0,7);
@@ -4584,15 +4586,15 @@ namespace sysio {
                auto last = std::unique(p2p_addresses.begin(), p2p_addresses.end());
                p2p_addresses.erase(last, p2p_addresses.end());
                if( size_t addr_diff = addr_count - p2p_addresses.size(); addr_diff != 0) {
-                  fc_wlog( p2p_conn_log, "Removed ${count} duplicate p2p-listen-endpoint entries", ("count", addr_diff));
+                  fc_wlog( p2p_conn_log, "Removed {} duplicate p2p-listen-endpoint entries", addr_diff);
                }
                for( const auto& addr : p2p_addresses ) {
                   SYS_ASSERT( addr.length() <= net_utils::max_p2p_address_length, chain::plugin_config_exception,
-                              "p2p-listen-endpoint ${a} too long, must be less than ${m}",
-                              ("a", addr)("m", net_utils::max_p2p_address_length) );
+                              "p2p-listen-endpoint {} too long, must be less than {}",
+                              addr, net_utils::max_p2p_address_length);
                   const auto& [host, port, type] = net_utils::split_host_port_type(addr);
                   SYS_ASSERT( !host.empty() && !port.empty(), chain::plugin_config_exception,
-                              "Invalid p2p-listen-endpoint ${p}, syntax host:port:[trx|blk]", ("p", addr));
+                              "Invalid p2p-listen-endpoint {}, syntax host:port:[trx|blk]", addr);
                }
             }
          }
@@ -4602,18 +4604,18 @@ namespace sysio {
                         "p2p-server-address may not be specified more times than p2p-listen-endpoint" );
             for( const auto& addr: p2p_server_addresses ) {
                SYS_ASSERT( addr.length() <= net_utils::max_p2p_address_length, chain::plugin_config_exception,
-                           "p2p-server-address ${a} too long, must be less than ${m}",
-                           ("a", addr)("m", net_utils::max_p2p_address_length) );
+                           "p2p-server-address {} too long, must be less than {}",
+                           addr, net_utils::max_p2p_address_length );
                const auto& [host, port, type] = net_utils::split_host_port_type(addr);
                SYS_ASSERT( !host.empty() && !port.empty(), chain::plugin_config_exception,
-                           "Invalid p2p-server-address ${p}, syntax host:port:[trx|blk]", ("p", addr));
+                           "Invalid p2p-server-address {}, syntax host:port:[trx|blk]", addr);
             }
          }
          p2p_server_addresses.resize(p2p_addresses.size()); // extend with empty entries as needed
 
          thread_pool_size = options.at( "net-threads" ).as<uint16_t>();
          SYS_ASSERT( thread_pool_size > 0, chain::plugin_config_exception,
-                     "net-threads ${num} must be greater than 0", ("num", thread_pool_size) );
+                     "net-threads {} must be greater than 0", thread_pool_size );
 
          std::vector<std::string> peers;
          if( options.count( "p2p-peer-address" )) {
@@ -4621,14 +4623,14 @@ namespace sysio {
             for (const auto& peer : peers) {
                const auto& [host, port, type] = net_utils::split_host_port_type(peer);
                SYS_ASSERT( !host.empty() && !port.empty(), chain::plugin_config_exception,
-                           "Invalid p2p-peer-address ${p}, syntax host:port:[trx|blk]", ("p", peer));
+                           "Invalid p2p-peer-address {}, syntax host:port:[trx|blk]", peer);
             }
             connections.add_supplied_peers(peers);
          }
          if( options.count( "agent-name" )) {
             user_agent_name = options.at( "agent-name" ).as<string>();
             SYS_ASSERT( user_agent_name.length() <= net_utils::max_handshake_str_length, chain::plugin_config_exception,
-                        "agent-name too long, must be less than ${m}", ("m", net_utils::max_handshake_str_length) );
+                        "agent-name too long, must be less than {}", net_utils::max_handshake_str_length );
          }
 
          if (options.count( "p2p-auto-bp-peer")) {
@@ -4688,13 +4690,13 @@ namespace sysio {
    }
 
    void net_plugin_impl::plugin_startup() {
-      fc_ilog( p2p_conn_log, "my node_id is ${id}", ("id", node_id ));
+      fc_ilog( p2p_conn_log, "my node_id is {}", node_id );
 
       producer_plug = app().find_plugin<producer_plugin>();
       assert(producer_plug);
 
       thread_pool.start( thread_pool_size, []( const fc::exception& e ) {
-         elog("Exception in net thread, exiting: ${e}", ("e", e.to_detail_string()));
+         elog("Exception in net thread, exiting: {}", e.to_detail_string());
          app().quit();
       } );
 
@@ -4724,7 +4726,7 @@ namespace sysio {
             if( ec.value() != boost::system::errc::success ) {
 
                FC_THROW_EXCEPTION( fc::invalid_arg_exception,
-                                    "Unable to retrieve host_name. ${msg}", ("msg", ec.message()));
+                                    "Unable to retrieve host_name. {}", ec.message());
 
             }
             return hostname + ":" + port + (type.empty() ? "" : ":" + type);
@@ -4775,23 +4777,23 @@ namespace sysio {
          const auto& p2p_addr = *p2p_iter;
          try {
             auto [listen_addr, block_sync_rate_limit] = net_utils::parse_listen_address(address);
-            fc_ilog( p2p_conn_log, "setting block_sync_rate_limit to ${limit} megabytes per second", ("limit", double(block_sync_rate_limit)/1000000));
+            fc_ilog( p2p_conn_log, "setting block_sync_rate_limit to {} megabytes per second", double(block_sync_rate_limit)/1000000);
 
             fc::create_listener<tcp>(
                   thread_pool.get_executor(), p2p_conn_log, accept_timeout, listen_addr, extra_listening_log_info,
                   [this](const auto&) { return boost::asio::make_strand(thread_pool.get_executor()); },
                   [this, addr = p2p_addr, block_sync_rate_limit = block_sync_rate_limit](tcp::socket&& socket) {
-                     fc_dlog( p2p_conn_log, "start listening on ${addr} with peer sync throttle ${limit}",
-                              ("addr", addr)("limit", block_sync_rate_limit));
+                     fc_dlog( p2p_conn_log, "start listening on {} with peer sync throttle {}",
+                              addr, block_sync_rate_limit);
                      create_session(std::move(socket), std::move(addr), block_sync_rate_limit);
                   });
          } catch (const fc::exception& e) {
-            fc_elog(p2p_conn_log, "net_plugin::plugin_startup failed to listen on ${a}, ${w}",
-                    ("a", address)("w", e.to_detail_string()));
+            fc_elog(p2p_conn_log, "net_plugin::plugin_startup failed to listen on {}, {}",
+                    address, e.to_detail_string());
             throw;
          } catch (const std::exception& e) {
-            fc_elog(p2p_conn_log, "net_plugin::plugin_startup failed to listen on ${a}, ${w}",
-                    ("a", address)("w", e.what()));
+            fc_elog(p2p_conn_log, "net_plugin::plugin_startup failed to listen on {}, {}",
+                    address, e.what());
             throw;
          }
       }
@@ -4880,7 +4882,7 @@ namespace sysio {
    }
 
    void net_plugin::broadcast_block(const signed_block_ptr& b, const block_id_type& id) {
-      fc_dlog(p2p_blk_log, "broadcasting block ${n} ${id}", ("n", b->block_num())("id", id));
+      fc_dlog(p2p_blk_log, "broadcasting block {} {}", b->block_num(), id);
       my->dispatcher.bcast_block(b, id);
    }
 
@@ -4948,7 +4950,7 @@ namespace sysio {
       std::unique_lock g( connections_mtx );
       supplied_peers.insert(host);
       g.unlock();
-      fc_dlog(p2p_conn_log, "API connect '${h}'", ("h", host));
+      fc_dlog(p2p_conn_log, "API connect '{}'", host);
       return resolve_and_connect( host, p2p_address );
    }
 
@@ -4967,7 +4969,7 @@ namespace sysio {
       connection_ptr c = std::make_shared<connection>( peer_address, listen_address );
       if (c->resolve_and_connect()) {
          add(std::move(c));
-         fc_dlog( p2p_conn_log, "Adding connection to ${p}", ("p", peer_address));
+         fc_dlog( p2p_conn_log, "Adding connection to {}", peer_address);
          return "added connection";
       }
 
@@ -4983,13 +4985,13 @@ namespace sysio {
          case go_away_reason::duplicate: // attempt reconnect in case connection has been dropped, should quickly disconnect if duplicate
             break;
          default:
-            fc_dlog( p2p_conn_log, "Skipping connect due to go_away reason ${r}",("r", reason_str( no_retry )));
+            fc_dlog( p2p_conn_log, "Skipping connect due to go_away reason {}", reason_str( no_retry ));
             return false;
       }
 
       auto [host, port, type] = net_utils::split_host_port_type(peer_address());
       if (host.empty()) {
-         fc_elog( p2p_conn_log, "Unexpected invalid peer address ${p}", ("p", peer_address()));
+         fc_elog( p2p_conn_log, "Unexpected invalid peer address {}", peer_address());
          return false;
       }
 
@@ -4997,8 +4999,8 @@ namespace sysio {
 
       if (no_retry == go_away_reason::duplicate) {
          if (auto other = my_impl->connections.is_other_connected(peer_address(), c); !!other) {
-            fc_dlog( p2p_conn_log, "Skipping connect to ${p} - ${pid} due to existing connection ${o} - ${oid}",
-                     ("p", peer_address())("pid", connection_id)("o", other->peer_address())("oid", other->connection_id));
+            fc_dlog( p2p_conn_log, "Skipping connect to {} - {} due to existing connection {} - {}",
+                     peer_address(), connection_id, other->peer_address(), other->connection_id);
             return true; // don't remvoe from valid connections
          }
       }
@@ -5009,7 +5011,7 @@ namespace sysio {
          if( last_close == fc::time_point() || last_close > fc::time_point::now() - connector_period ) {
             fc::time_point lclose = last_close;
             g.unlock();
-            fc_dlog( p2p_conn_log, "Skipping connect due to last_close ${t}", ("t", lclose));
+            fc_dlog( p2p_conn_log, "Skipping connect due to last_close {}", lclose);
             return true; // true so doesn't remove from valid connections
          }
       }
@@ -5023,8 +5025,8 @@ namespace sysio {
                if( !err ) {
                   c->connect( results );
                } else {
-                  fc_wlog( p2p_conn_log, "Unable to resolve ${host}:${port} ${error}",
-                           ("host", host)("port", port)( "error", err.message() ) );
+                  fc_wlog( p2p_conn_log, "Unable to resolve {}:{} {}",
+                           host, port, err.message() );
                   c->set_state(connection::connection_state::closed);
                   ++c->consecutive_immediate_connection_close;
                }
@@ -5041,7 +5043,7 @@ namespace sysio {
          return;
       auto& index = connections.get<by_host>();
       if( auto i = index.find( host ); i != index.end() ) {
-         fc_ilog( p2p_conn_log, "disconnecting: '${h}' - ${cid}", ("h", host)("cid", i->c->connection_id) );
+         fc_ilog( p2p_conn_log, "disconnecting: '{}' - {}", host, i->c->connection_id );
          i->c->close();
          connections.erase(i);
       }
@@ -5052,7 +5054,7 @@ namespace sysio {
       std::lock_guard g( connections_mtx );
       auto& index = connections.get<by_host>();
       if( auto i = index.find( host ); i != index.end() ) {
-         fc_ilog( p2p_conn_log, "disconnecting: '${h}' - ${cid}", ("h", host)("cid", i->c->connection_id) );
+         fc_ilog( p2p_conn_log, "disconnecting: '{}' - {}", host, i->c->connection_id );
          i->c->close();
          connections.erase(i);
          supplied_peers.erase(host);
@@ -5064,9 +5066,9 @@ namespace sysio {
    void connections_manager::close_all() {
       std::lock_guard g( connections_mtx );
       auto& index = connections.get<by_host>();
-      fc_ilog( p2p_conn_log, "close all ${s} connections", ("s", index.size()) );
+      fc_ilog( p2p_conn_log, "close all {} connections", index.size() );
       for( const connection_detail& cd : index ) {
-         fc_dlog( p2p_conn_log, "close: ${cid}", ("cid", cd.c->connection_id) );
+         fc_dlog( p2p_conn_log, "close: {}", cd.c->connection_id );
          cd.c->close( false, true );
       }
       connections.clear();
@@ -5178,9 +5180,9 @@ namespace sysio {
             connection_wptr wit = (*it).c;
             g.unlock();
             cleanup(std::move(reconnecting), std::move(removing));
-            fc_dlog( p2p_conn_log, "Exiting connection monitor early, ran out of time: ${t}", ("t", max_time - fc::time_point::now()) );
-            fc_ilog( p2p_conn_log, "p2p client connections: ${num}/${max}, peer connections: ${pnum}/${pmax}",
-                    ("num", num_clients)("max", max_client_count)("pnum", num_peers)("pmax", supplied_peers.size()) );
+            fc_dlog( p2p_conn_log, "Exiting connection monitor early, ran out of time: {}", max_time - fc::time_point::now() );
+            fc_ilog( p2p_conn_log, "p2p client connections: {}/{}, peer connections: {}/{}",
+                    num_clients, max_client_count, num_peers, supplied_peers.size() );
             start_conn_timer( std::chrono::milliseconds( 1 ), wit, timer_type::check ); // avoid exhausting
             return;
          }
@@ -5209,10 +5211,10 @@ namespace sysio {
       cleanup(std::move(reconnecting), std::move(removing));
 
       if( num_clients > 0 || num_peers > 0 ) {
-         fc_ilog(p2p_conn_log, "p2p client connections: ${num}/${max}, peer connections: ${pnum}/${pmax}, block producer peers: ${num_bp_peers}",
-                 ("num", num_clients)("max", max_client_count)("pnum", num_peers)("pmax", supplied_peers.size())("num_bp_peers", num_bp_peers));
+         fc_ilog(p2p_conn_log, "p2p client connections: {}/{}, peer connections: {}/{} block producer peers: {}",
+                 num_clients, max_client_count, num_peers, supplied_peers.size(), num_bp_peers);
       }
-      fc_dlog( p2p_conn_log, "connection monitor, removed ${n} connections", ("n", num_rm) );
+      fc_dlog( p2p_conn_log, "connection monitor, removed {} connections", num_rm );
       start_conn_timer( connector_period, {}, timer_type::check );
    }
 

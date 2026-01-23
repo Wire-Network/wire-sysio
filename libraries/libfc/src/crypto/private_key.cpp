@@ -30,20 +30,20 @@ namespace fc { namespace crypto {
       case key_type::r1:
       case key_type::bls: {
          private_key k(parse_unknown_wire_private_key_str(str));
-         FC_ASSERT( k.type() == type, "Parsed type ${pt} does not match specified type ${t} for ${k}",
-                    ("pt", k.type())("t", type)("k", str));
+         FC_ASSERT( k.type() == type, "Parsed type {} does not match specified type {} for {}",
+                    k.type(), type, str.substr(0, 10) + "..." );
          return k;
       }
       case key_type::em: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid private key prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
          return from_native_string_to_private_key<chain_key_type_t::chain_key_type_ethereum>(key);
       }
       case key_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid private key prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
          return from_native_string_to_private_key<chain_key_type_t::chain_key_type_solana>(key);
       }
       case key_type::unknown: {
@@ -51,7 +51,7 @@ namespace fc { namespace crypto {
             return private_key(parse_unknown_wire_private_key_str(str));
 
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-         FC_ASSERT(base_prefix == constants::private_key_base_prefix, "Invalid prefix to parse key type: ${k}", ("k", str));
+         FC_ASSERT(base_prefix == constants::private_key_base_prefix, "Invalid prefix to parse key type: {}", str.substr(0, 10) + "...");
          if (type_prefix == key_prefix(key_type::em)) {
             return from_native_string_to_private_key<chain_key_type_t::chain_key_type_ethereum>(data_str);
          } else if (type_prefix == key_prefix(key_type::ed)) {
@@ -61,7 +61,7 @@ namespace fc { namespace crypto {
       }
 
       default:
-         FC_ASSERT(false, "Unknown key type: ${type}", ("type", type));
+         FC_ASSERT(false, "Unknown key type: {}", type);
       };
 
    }
@@ -96,7 +96,7 @@ namespace fc { namespace crypto {
          break;
       }
 
-      FC_ASSERT(false, "private_key unknown key type ${t}", ("t", type()));
+      FC_ASSERT(false, "private_key unknown key type {}", type());
    }
 
    bool operator==( const private_key& p1, const private_key& p2 ) {

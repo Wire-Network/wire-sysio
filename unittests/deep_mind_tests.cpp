@@ -22,16 +22,16 @@ struct deep_mind_log_fixture
       auto cfg = fc::logging_config::default_config();
       tmp.file().close();
 
-      cfg.appenders.push_back(
-         appender_config( "deep-mind", "dmlog",
-            mutable_variant_object()
-               ( "file", tmp.file().get_file_path().c_str())
-         ) );
+      // cfg.appenders.push_back(
+      //    appender_config( "deep-mind", "dmlog",
+      //       mutable_variant_object()
+      //          ( "file", tmp.file().get_file_path().c_str())
+      //    ) );
 
       fc::logger_config lc;
       lc.name = "deep-mind";
       lc.level = fc::log_level::all;
-      lc.appenders.push_back("deep-mind");
+      // lc.appenders.push_back("deep-mind");
       cfg.loggers.push_back( lc );
 
       fc::configure_logging(cfg);

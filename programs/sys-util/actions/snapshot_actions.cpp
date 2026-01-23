@@ -111,7 +111,7 @@ int snapshot_actions::run_tojson() {
       control->startup(shutdown, check_shutdown, reader);
       infile.close();
 
-      ilog("Writing snapshot: ${s}", ("s", json_path));
+      ilog("Writing snapshot: {}", json_path.string());
       auto snap_out = std::ofstream(json_path.generic_string(), (std::ios::out));
       auto writer = std::make_shared<ostream_json_snapshot_writer>(snap_out);
       control->write_snapshot(writer);
@@ -124,6 +124,6 @@ int snapshot_actions::run_tojson() {
       throw;
    }
 
-   ilog("Completed writing snapshot: ${s}", ("s", json_path));
+   ilog("Completed writing snapshot: {}", json_path.string());
    return 0;
 }

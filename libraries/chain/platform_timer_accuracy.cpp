@@ -55,12 +55,9 @@ void compute_and_print_timer_accuracy(platform_timer& timer) {
       }
    }
 
-   #define TIMER_STATS_FORMAT "min:${min}us max:${max}us mean:${mean}us stddev:${stddev}us"
-   #define TIMER_STATS \
-      ("min", bacc::min(samples))("max", bacc::max(samples)) \
-      ("mean", (int)bacc::mean(samples))("stddev", (int)sqrt(bacc::variance(samples)))
+   ilog("Checktime timer accuracy: min:{}us max:{}us mean:{}us stddev:{}us",
+        bacc::min(samples), bacc::max(samples), (int)bacc::mean(samples), (int)sqrt(bacc::variance(samples)));
 
-   ilog("Checktime timer accuracy: " TIMER_STATS_FORMAT, TIMER_STATS);
    if(bacc::mean(samples) + sqrt(bacc::variance(samples))*2 > 250)
       wlog("Checktime timer accuracy on this platform and hardware combination is poor; accuracy of subjective transaction deadline enforcement will suffer");
 

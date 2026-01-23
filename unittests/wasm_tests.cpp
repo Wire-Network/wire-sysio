@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( abi_from_variant, T, validating_testers ) try {
             }
          }
          return std::optional<abi_serializer>();
-      } FC_RETHROW_EXCEPTIONS(error, "Failed to find or parse ABI for ${name}", ("name", name))
+      } FC_RETHROW_EXCEPTIONS(error, "Failed to find or parse ABI for {}", name)
    };
 
    fc::variant pretty_trx = mutable_variant_object()

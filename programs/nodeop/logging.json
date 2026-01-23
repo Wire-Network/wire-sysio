@@ -1,105 +1,92 @@
 {
   "includes": [],
-  "appenders": [{
-      "name": "stderr",
-      "type": "console",
-      "args": {
-        "stream": "std_error",
-        "level_colors": [{
-            "level": "debug",
-            "color": "green"
-          },{
-            "level": "warn",
-            "color": "brown"
-          },{
-            "level": "error",
-            "color": "red"
-          },{
-            "level": "info",
-            "color": "console_default"
-          }
-        ],
-        "flush": true
+  "sinks": [{
+    "name": "stderr_color",
+    "type": "stderr_color_sink",
+    "args": {
+      "level_colors": [{
+        "level": "debug",
+        "color": "green"
+      },{
+        "level": "info",
+        "color": "reset"
+      },{
+        "level": "warn",
+        "color": "yellow"
+      },{
+        "level": "error",
+        "color": "red"
       }
-    },{
-      "name": "stdout",
-      "type": "console",
-      "args": {
-        "stream": "std_out",
-        "level_colors": [{
-            "level": "debug",
-            "color": "blue"
-          },{
-            "level": "warn",
-            "color": "magenta"
-          },{
-            "level": "error",
-            "color": "cyan"
-          },{
-            "level": "info",
-            "color": "white"
-          }
-        ],
-        "flush": false
-      }
-    },{
-      "name": "net",
-      "type": "gelf",
-      "args": {
-        "endpoint": "my_server.example.invalid:12201",
-        "host": "host_name",
-        "_network": "jungle"
-      }
+      ]
     }
+  },{
+    "name": "daily_file",
+    "type": "daily_file_sink",
+    "args": {
+      "base_filename": "./logs/daily.log",
+      "rotation_hour": 0,
+      "rotation_minute": 0,
+      "truncate": false,
+      "max_files": 0
+    }
+  },{
+    "name": "rotate_file",
+    "type": "rotating_file_sink",
+    "args": {
+      "base_filename": "./logs/rotate.log",
+      "max_size": 10,
+      "max_file": 10
+    }
+  }
   ],
   "loggers": [{
       "name": "default",
       "level": "debug",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "net_plugin_impl",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "p2p_log",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "p2p_trx",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "p2p_block",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "p2p_message",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "p2p_connection",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "http_plugin",
@@ -112,79 +99,78 @@
       "name": "producer_plugin",
       "level": "debug",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_success_tracing",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_failure_tracing",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr",
-        "net"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "trace_api",
       "level": "debug",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_trace_success",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_trace_failure",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transient_trx_success_tracing",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transient_trx_failure_tracing",
       "level": "debug",
       "enabled": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
     "name": "state_history",
     "level": "info",
     "enabled": true,
-    "appenders": [
-      "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
     "name": "vote",
     "level": "info",
     "enabled": true,
-    "appenders": [
-      "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction",
       "level": "info",
       "enabled": true,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     }
   ]

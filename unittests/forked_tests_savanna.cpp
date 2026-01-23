@@ -22,9 +22,8 @@ namespace sysio::chain {
 
    void print_core(const block_handle& h) {
       auto core = block_handle_accessor::core_info(h);
-      ilog("block ${bn} finality_core: last_final=${lfbn}, last_qc=${lqc}, timestamp=${t}\n",
-           ("bn",h.block_num())("lfbn",core->last_final_block_num)
-           ("lqc",core->last_qc_block_num)("t",core->timestamp));
+      ilog("block {} finality_core: last_final={}, last_qc={}, timestamp={}\n",
+           h.block_num(), core->last_final_block_num, core->last_qc_block_num, core->timestamp);
    }
 
 }
@@ -404,7 +403,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_2, savanna_cluster::cluster_t
    _nodes[0].produce_blocks(3);
    auto hbn1 = _nodes[0].head().block_num(); // common block before network partitioned
    [[maybe_unused]] auto lib1 = _nodes[0].last_irreversible_block_num();
-   dlog("lib1 = ${lib1}", ("lib1", lib1)); // 36
+   dlog("lib1 = {}", lib1); // 36
 
 
    // partition node3. lib will not advance on node3 anymore, but will advance on the other 3 nodes
@@ -413,14 +412,14 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_2, savanna_cluster::cluster_t
    // produce blocks on _nodes[3], creating account "bob"_n. Finality will not advance
    // --------------------------------------------------------------------------------
    auto fork_first_block_id = _nodes[3].produce_block(_block_interval_us * 10)->calculate_id();
-   dlog( "fork_first_block_id = ${w}", ("w", fork_first_block_id));
+   dlog( "fork_first_block_id = {}", fork_first_block_id);
    _nodes[3].create_accounts( {"bob"_n} );
    _nodes[3].produce_blocks(4);
    BOOST_CHECK_EQUAL( does_account_exist( _nodes[3], "bob"_n ), true );
 
    auto hbn3 = _nodes[3].head().block_num();
    auto lib3 = _nodes[3].last_irreversible_block_num();
-   dlog("lib3 = ${lib3}", ("lib3", lib3)); // 37
+   dlog("lib3 = {}", lib3); // 37
 
    // produce blocks on _nodes[0], creating account "carol"_n. Finality will  advance
    // --------------------------------------------------------------------------------
@@ -433,7 +432,7 @@ BOOST_FIXTURE_TEST_CASE( irreversible_mode_savanna_2, savanna_cluster::cluster_t
    BOOST_CHECK_EQUAL( does_account_exist( _nodes[0], "dave"_n ), true );
    auto hbn0 = _nodes[0].head().block_num();
    auto lib0 = _nodes[0].last_irreversible_block_num();
-   dlog("lib0 = ${lib0}", ("lib0", lib0)); // 41
+   dlog("lib0 = {}", lib0); // 41
 
    BOOST_CHECK_GT(lib0, lib3);
 
@@ -498,7 +497,7 @@ BOOST_FIXTURE_TEST_CASE( split_and_rejoin, savanna_cluster::cluster_t ) try {
    _nodes[0].create_accounts( {"alice"_n} );
    _nodes[0].produce_blocks(12);
    auto lib0 = _nodes[0].last_irreversible_block_num();
-   dlog("lib0 = ${lib0}", ("lib0", lib0)); // 45
+   dlog("lib0 = {}", lib0); // 45
 
    // split the network
    set_partition( {&C, &D} );       // simulate 2 disconnected partitions:  nodes {0, 1} and node {2, 3}
@@ -530,7 +529,7 @@ BOOST_FIXTURE_TEST_CASE( split_and_rejoin, savanna_cluster::cluster_t ) try {
    _nodes[0].produce_blocks(6);
    auto lib2 = _nodes[0].last_irreversible_block_num();
    BOOST_CHECK_EQUAL(lib2, lib0 + 12 + 7 );   // 12 when network was split, 7 just above (6 + 1)
-   dlog("lib2 = ${lib2}", ("lib2", lib2)); // 65
+   dlog("lib2 = {}", lib2); // 65
 
 } FC_LOG_AND_RETHROW()
 
@@ -547,7 +546,7 @@ BOOST_FIXTURE_TEST_CASE( push_block_returns_forked_transactions_savanna, savanna
    auto lib0           = _nodes[0].last_irreversible_block_num();
    auto fork_block_num = _nodes[0].head().block_num();
 
-   dlog("lib0 = ${lib0}, fork_block_num = ${fbn}", ("lib0", lib0)("fbn", fork_block_num));
+   dlog("lib0 = {}, fork_block_num = {}", lib0, fork_block_num);
 
    signed_block_ptr cb;
 

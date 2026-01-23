@@ -1030,10 +1030,6 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
 
                 int64_t duration_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count();
 
-                //ilog("(${base})^(${exp}) % ${mod} = ${result} [took ${duration} ns]", 
-                //     ("base", base)("exp", exponent)("mod", modulus)("result", std::get<bytes>(res))("duration", duration_ns)
-                //    );
-
                 min_duration_ns = std::min(min_duration_ns, duration_ns);
                 max_duration_ns = std::max(max_duration_ns, duration_ns);
                 total_duration_ns += duration_ns;
@@ -1049,12 +1045,12 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
 
             const auto& stat = stats.back();
 
-            ilog("Completed random runs of mod_exp with ${bit_width}-bit width base and modulus values and "
-                 "${exp_bit_width}-bit width exponent values. "
-                 "Min time: ${min} ns; Average time: ${avg} ns; Max time: ${max} ns.",
-                ("bit_width", stat.modulus_bit_size)("exp_bit_width", stat.exponent_bit_size)
-                ("min", stat.min_time_ns)("avg", stat.avg_time_ns)("max", stat.max_time_ns)
-                );
+            ilog("Completed random runs of mod_exp with {}-bit width base and modulus values and "
+                 "{}-bit width exponent values. "
+                 "Min time: {} ns; Average time: {} ns; Max time: {} ns.",
+                 stat.modulus_bit_size, stat.exponent_bit_size,
+                 stat.min_time_ns, stat.avg_time_ns, stat.max_time_ns
+                 );
 
         }
     }
@@ -1070,7 +1066,7 @@ BOOST_AUTO_TEST_CASE(modexp_benchmarking) try {
         stats_output += '\n';
     }
 
-    ilog(stats_output);
+    ilog("{}", stats_output);
 
     // Running the above benchmark (using commented values for num_trials and bit_calc_limit) with a release build on 
     // an AMD 3.4 GHz CPU provides average durations for executing mod_exp for varying bit sizes for the values 

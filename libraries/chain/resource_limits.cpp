@@ -179,11 +179,11 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
 
          SYS_ASSERT( cpu_used_in_window <= max_user_use_in_window,
                      tx_cpu_usage_exceeded,
-                     "authorizing account '${n}' has insufficient objective cpu resources for this transaction,"
-                     " used in window ${cpu_used_in_window}us, allowed in window ${max_user_use_in_window}us",
-                     ("n", a)
-                     ("cpu_used_in_window",cpu_used_in_window)
-                     ("max_user_use_in_window",max_user_use_in_window) );
+                     "authorizing account '{}' has insufficient objective cpu resources for this transaction,"
+                     " used in window {}us, allowed in window {}us",
+                     a,
+                     cpu_used_in_window,
+                     max_user_use_in_window );
       }
 
       if( net_weight >= 0 && state.total_net_weight > 0) {
@@ -199,11 +199,11 @@ void resource_limits_manager::add_transaction_usage(const accounts_billing_t& ac
 
          SYS_ASSERT( net_used_in_window <= max_user_use_in_window,
                      tx_net_usage_exceeded,
-                     "authorizing account '${n}' has insufficient net resources for this transaction,"
-                     " used in window ${net_used_in_window}, allowed in window ${max_user_use_in_window}",
-                     ("n", a)
-                     ("net_used_in_window",net_used_in_window)
-                     ("max_user_use_in_window",max_user_use_in_window) );
+                     "authorizing account '{}' has insufficient net resources for this transaction,"
+                     " used in window {}, allowed in window {}",
+                     a,
+                     net_used_in_window,
+                     max_user_use_in_window );
 
       }
    }
@@ -222,7 +222,6 @@ void resource_limits_manager::add_pending_ram_usage( const account_name account,
    if (ram_delta == 0) {
       return;
    }
-   // wlog("Adding pending RAM usage of ${ram_delta} to account ${account}", ("ram_delta", ram_delta)("account", account));
 
    const auto& usage  = _db.get<resource_object,by_owner>( account );
 
@@ -247,8 +246,8 @@ void resource_limits_manager::verify_account_ram_usage( const account_name accou
 
    if( ram_bytes >= 0 ) {
       SYS_ASSERT( usage.ram_usage <= static_cast<uint64_t>(ram_bytes), ram_usage_exceeded,
-                  "account ${account} has insufficient ram; needs ${needs} bytes has ${available} bytes",
-                  ("account", account)("needs",usage.ram_usage)("available",ram_bytes)              );
+                  "account {} has insufficient ram; needs {} bytes has {} bytes",
+                  account, usage.ram_usage, ram_bytes );
    }
 }
 
@@ -337,12 +336,14 @@ void resource_limits_manager::process_account_limit_updates() {
    // convenience local lambda to reduce clutter
    auto update_state_and_value = [](uint64_t &total, int64_t &value, int64_t pending_value, const char* debug_which) -> void {
       if (value > 0) {
-         SYS_ASSERT(total >= static_cast<uint64_t>(value), rate_limiting_state_inconsistent, "underflow when reverting old value to ${which}", ("which", debug_which));
+         SYS_ASSERT(total >= static_cast<uint64_t>(value),
+                    rate_limiting_state_inconsistent, "underflow when reverting old value to {}", debug_which);
          total -= value;
       }
 
       if (pending_value > 0) {
-         SYS_ASSERT(UINT64_MAX - total >= static_cast<uint64_t>(pending_value), rate_limiting_state_inconsistent, "overflow when applying new value to ${which}", ("which", debug_which));
+         SYS_ASSERT(UINT64_MAX - total >= static_cast<uint64_t>(pending_value), rate_limiting_state_inconsistent,
+                    "overflow when applying new value to {}", debug_which);
          total += pending_value;
       }
 

@@ -65,7 +65,7 @@ namespace sysio::testing {
 
       void setPrefix(int generator_id) {
          if (generator_id > prefix_max) {
-            elog("Account Name Generator Prefix above allowable ${max}", ("max", prefix_max));
+            elog("Account Name Generator Prefix above allowable {}", prefix_max);
             return;
          }
          _name_index_vec[0] = 0;

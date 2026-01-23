@@ -5,13 +5,17 @@
  */
 #include <fc/time.hpp>
 #include <fc/variant_object.hpp>
+#include <spdlog/fmt/fmt.h>
+#include <fmt/ranges.h>
 
-#include <format>
 #include <memory>
+#include <vector>
+#include <string>
+#include <concepts>
 
 namespace fc
 {
-   namespace detail 
+   namespace detail
    { 
        class log_context_impl; 
        class log_message_impl; 
@@ -111,7 +115,7 @@ namespace fc
          /**
           *  @param ctx - generally provided using the FC_LOG_CONTEXT(LEVEL) macro 
           */
-         log_message( log_context ctx, std::string format, variant_object args = variant_object() );
+         log_message( log_context ctx, std::string msg );
          ~log_message();
 
          log_message( const variant& v );
@@ -125,8 +129,6 @@ namespace fc
          std::string    get_limited_message()const;
                               
          log_context    get_context()const;
-         std::string    get_format()const;
-         variant_object get_data()const;
 
       private:
          std::shared_ptr<detail::log_message_impl> my;
@@ -137,6 +139,29 @@ namespace fc
 
    typedef std::vector<log_message> log_messages;
 
+   template<typename S, typename... T>
+   auto format_runtime( const S& form, T&&... args ) {
+      try {
+         return fmt::format(fmt::runtime(form), std::forward<T>(args)...);
+      } catch (...) {
+         return std::string("Unable to format: ") + std::string(form);
+      }
+   }
+
+   // compile time enforcement of fmt::format form
+   template<typename S, typename... T>
+   fc::log_message get_log_message(fc::log_context ctx, const S& form, T&&... args ) {
+      if (sizeof...(args) > 0) {
+         try {
+            return fc::log_message( std::move(ctx), fmt::format(form, std::forward<T>(args)...) );
+         } catch (...) {
+            fmt::string_view vform{form};
+            return fc::log_message( std::move(ctx), std::string("Unable to format: ") + std::string(vform.data(), vform.size()) );
+         }
+      }
+      fmt::string_view vform{form};
+      return fc::log_message( std::move(ctx), std::string(vform.data(), vform.size()) );
+   }
 
 } // namespace fc
 
@@ -156,19 +181,24 @@ FC_REFLECT(fc::log_level, (value))
  */
 #define FC_LOG_CONTEXT(LOG_LEVEL) \
    fc::log_context( fc::log_level::LOG_LEVEL, __FILE__, __LINE__, __func__ )
-   
-/**
- * @def FC_LOG_MESSAGE(LOG_LEVEL,FORMAT,...)
- *
- * @brief A helper method for generating log messages.
- *
- * @param LOG_LEVEL a valid log_level::Enum name to be passed to the log_context
- * @param FORMAT A const char* string containing zero or more references to keys as "${key}"
- * @param ...  A set of key/value pairs denoted as ("key",val)("key2",val2)...
- */
-#define FC_LOG_MESSAGE( LOG_LEVEL, FORMAT, ... ) \
-   fc::log_message( FC_LOG_CONTEXT(LOG_LEVEL), FORMAT, fc::mutable_variant_object()__VA_ARGS__ )
 
+#define FC_ADD_FMT_ARGS_EXT(r, unused, i, arg) \
+   BOOST_PP_COMMA() BOOST_PP_STRINGIZE(arg) BOOST_PP_COMMA() fc::variant(arg)
+
+#define FC_ADD_FMT_ARGS( ... ) \
+   BOOST_PP_IF( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), \
+      BOOST_PP_SEQ_FOR_EACH_I( FC_ADD_FMT_ARGS_EXT, unused, BOOST_PP_VARIADIC_TO_SEQ(__VA_ARGS__) ), \
+      BOOST_PP_EMPTY() \
+   )
+
+#define FC_FMT(FORMAT, ...) \
+   fmt::format( FORMAT, ##__VA_ARGS__ )
+
+#define FC_LOG_MESSAGE( LOG_LEVEL, FORMAT, ... ) \
+   BOOST_PP_IF( BOOST_PP_VARIADIC_SIZE(__VA_ARGS__), \
+      fc::get_log_message( FC_LOG_CONTEXT(LOG_LEVEL), FMT_STRING(FORMAT), __VA_ARGS__ ), \
+      fc::get_log_message( FC_LOG_CONTEXT(LOG_LEVEL), FMT_STRING(FORMAT) ) \
+   )
 
 #define FC_LOG_MESSAGE_FMT(LOG_LEVEL, FORMAT, ...) \
   fc::log_message(FC_LOG_CONTEXT(LOG_LEVEL), \

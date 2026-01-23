@@ -35,8 +35,7 @@ std::string trim_public_key(const std::string& hex) {
    auto clean_hex = trim(hex);
    auto len       = clean_hex.length();
 
-   FC_ASSERT(std::ranges::contains(public_key_string_lengths, len), "Invalid public key length(${len}): ${hex}",
-             ("len", len)("hex", hex));
+   FC_ASSERT(std::ranges::contains(public_key_string_lengths, len), "Invalid public key length({}): {}", len, hex);
 
    // If len mod 64 remainder is > 0, that means that the
    // first two bytes denote the type and will be truncated
@@ -198,8 +197,8 @@ fc::em::public_key to_em_public_key(const std::string& pubkey_hex) {
 fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
    auto privkey_bytes = fc::from_hex(fc::crypto::ethereum::trim(privkey_hex));
    em::private_key_secret sk{};
-   FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected ${e}, received ${r}",
-             ("s", fc::data_size(sk))("r", privkey_bytes.size()));
+   FC_ASSERT(privkey_bytes.size() == fc::data_size(sk), "Invalid private key size, expected {}, received {}",
+             fc::data_size(sk), privkey_bytes.size());
    std::memcpy(sk.data(), privkey_bytes.data(), fc::data_size(sk));
    return fc::em::private_key::regenerate(sk);
 }
@@ -207,8 +206,8 @@ fc::em::private_key to_em_private_key(const std::string& privkey_hex) {
 fc::em::compact_signature to_em_signature(const std::string& signature_hex) {
    auto signature_bytes = fc::from_hex(fc::crypto::ethereum::trim(signature_hex));
    FC_ASSERT(signature_bytes.size() == std::tuple_size_v<fc::em::compact_signature>,
-             "Invalid signature size, expected ${s}, received ${r} character hex string",
-             ("s", std::tuple_size_v<fc::em::compact_signature>)("r", signature_bytes.size()));
+             "Invalid signature size, expected {}, received {} character hex string",
+             std::tuple_size_v<fc::em::compact_signature>, signature_bytes.size());
    fc::em::compact_signature sig;
    std::memcpy(sig.data(), signature_bytes.data(), signature_bytes.size());
    return sig;

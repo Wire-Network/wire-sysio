@@ -73,20 +73,20 @@ namespace sysio::testing {
       for (size_t i = 0; i < _accts_config._acct_name_vec.size(); ++i) {
          for (size_t j = i + 1; j < _accts_config._acct_name_vec.size(); ++j) {
             //create the actions here
-            ilog("create_initial_transfer_actions: creating transfer from ${acctA} to ${acctB}",
-                 ("acctA", _accts_config._acct_name_vec.at(i))("acctB", _accts_config._acct_name_vec.at(j)));
+            ilog("create_initial_transfer_actions: creating transfer from {} to {}",
+                 _accts_config._acct_name_vec.at(i), _accts_config._acct_name_vec.at(j));
             chain::action act_a_to_b = make_transfer_action(_config._contract_owner_account, _accts_config._acct_name_vec.at(i), _accts_config._acct_name_vec.at(j),
                                                             chain::asset::from_string("1.0000 CUR"), salt);
 
-            ilog("create_initial_transfer_actions: creating transfer from ${acctB} to ${acctA}",
-                 ("acctB", _accts_config._acct_name_vec.at(j))("acctA", _accts_config._acct_name_vec.at(i)));
+            ilog("create_initial_transfer_actions: creating transfer from {} to {}",
+                 _accts_config._acct_name_vec.at(j), _accts_config._acct_name_vec.at(i));
             chain::action act_b_to_a = make_transfer_action(_config._contract_owner_account, _accts_config._acct_name_vec.at(j), _accts_config._acct_name_vec.at(i),
                                                             chain::asset::from_string("1.0000 CUR"), salt);
 
             _action_pairs_vector.emplace_back(act_a_to_b, act_b_to_a, _accts_config._priv_keys_vec.at(i), _accts_config._priv_keys_vec.at(j));
          }
       }
-      ilog("create_initial_transfer_actions: total action pairs created: ${pairs}", ("pairs", _action_pairs_vector.size()));
+      ilog("create_initial_transfer_actions: total action pairs created: {}", _action_pairs_vector.size());
    }
 
    trx_generator_base::trx_generator_base(const trx_generator_base_config& trx_gen_base_config, const provider_base_config& provider_config)
@@ -124,12 +124,12 @@ namespace sysio::testing {
       if ( !regex_search(file_or_str, r) && std::filesystem::is_regular_file(file_or_str) ) {
          try {
             return fc::json::from_file(file_or_str, ptype);
-         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", file_or_str));
+         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: {}", file_or_str);
 
       } else {
          try {
             return fc::json::from_string(file_or_str, ptype);
-         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from string: ${string}", ("string", file_or_str));
+         } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from string: {}", file_or_str);
       }
    }
 
@@ -210,7 +210,7 @@ namespace sysio::testing {
                         chain::bytes packed_action_data;
                         try {
                            auto action_type = _abi.get_action_type(action_name);
-                           FC_ASSERT(!action_type.empty(), "Unknown action ${action} in contract ${contract}", ("action", action_name)("contract", action_auth_acct));
+                           FC_ASSERT(!action_type.empty(), "Unknown action {} in contract {}", action_name, action_auth_acct);
                            packed_action_data = _abi.variant_to_binary(action_type, action_mvo["actionData"], chain::abi_serializer::create_yield_function(abi_serializer_max_time));
                         }
                         SYS_RETHROW_EXCEPTIONS(chain::transaction_type_exception, "Fail to parse unpacked action data JSON")
@@ -240,8 +240,8 @@ namespace sysio::testing {
       _abi = chain::abi_serializer(fc::json::from_file(_usr_trx_config._abi_data_file_path).as<chain::abi_def>(), chain::abi_serializer::create_yield_function( abi_serializer_max_time ));
       fc::variant unpacked_actions_data_json = json_from_file_or_string(_usr_trx_config._actions_data_json_file_or_str);
       fc::variant unpacked_actions_auths_data_json = json_from_file_or_string(_usr_trx_config._actions_auths_json_file_or_str);
-      ilog("Loaded actions data: ${data}", ("data", fc::json::to_pretty_string(unpacked_actions_data_json)));
-      ilog("Loaded actions auths data: ${auths}", ("auths", fc::json::to_pretty_string(unpacked_actions_auths_data_json)));
+      ilog("Loaded actions data: {}", fc::json::to_pretty_string(unpacked_actions_data_json));
+      ilog("Loaded actions auths data: {}", fc::json::to_pretty_string(unpacked_actions_auths_data_json));
 
       const std::string gen_acct_name_per_trx("ACCT_PER_TRX");
 
@@ -256,7 +256,7 @@ namespace sysio::testing {
       if (!_acct_gen_fields.empty()) {
          ilog("Located the following account names that need to be generated and populated in each transaction:");
          for (const auto& e: _acct_gen_fields) {
-            ilog("acct_gen_fields entry: ${value}", ("value", e));
+            ilog("acct_gen_fields entry: {}", e);
          }
          ilog("Priming name generator for trx generator prefix.");
          _acct_name_generator.setPrefix(_config._generator_id);
@@ -268,10 +268,10 @@ namespace sysio::testing {
 
       ilog("Setting up initial transaction actions.");
       auto actions = generate_actions();
-      ilog("Initial actions (${count}):", ("count", _unpacked_actions.size()));
+      ilog("Initial actions ({}):", _unpacked_actions.size());
       for (size_t i = 0; i < _unpacked_actions.size(); ++i) {
-         ilog("Initial action ${index}: ${act}", ("index", i)("act", fc::json::to_pretty_string(_unpacked_actions.at(i))));
-         ilog("Initial action packed data ${index}: ${packed_data}", ("index", i)("packed_data", fc::to_hex(actions.at(i).data.data(), actions.at(i).data.size())));
+         ilog("Initial action {}: {}", i, fc::json::to_pretty_string(_unpacked_actions.at(i)));
+         ilog("Initial action packed data {}: {}", i, fc::to_hex(actions.at(i).data.data(), actions.at(i).data.size()));
       }
 
       ilog("Populate initial transaction.");
@@ -291,7 +291,7 @@ namespace sysio::testing {
       _provider.teardown();
       _provider.log_trxs(_config._log_dir);
 
-      ilog("Sent transactions: ${cnt}", ("cnt", _txcount));
+      ilog("Sent transactions: {}", _txcount);
       ilog("Tear down p2p transaction provider");
 
       //Stop & Cleanup
@@ -312,10 +312,10 @@ namespace sysio::testing {
             return false;
          }
       } catch (const fc::exception& e) {
-         elog("${e}", ("e", e.to_detail_string()));
+         elog("{}", e.to_detail_string());
          return false;
       } catch (const std::exception& e) {
-         elog("${e}", ("e", e.what()));
+         elog("{}", e.what());
          return false;
       } catch (...) {
          elog("unknown exception");
@@ -347,7 +347,7 @@ namespace sysio::testing {
       ilog("Stopping transaction generation");
 
       if (_txcount) {
-         ilog("${d} transactions executed, ${t}us / transaction", ("d", _txcount)("t", _total_us / (double) _txcount));
+         ilog("{} transactions executed, {}us / transaction", _txcount, _total_us / (double) _txcount);
          _txcount = _total_us = 0;
       }
    }

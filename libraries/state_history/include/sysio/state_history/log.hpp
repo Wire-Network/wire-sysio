@@ -218,23 +218,26 @@ private:
       const uint32_t block_num = chain::block_header::num_from_id(header.block_id);
 
       if(!empty())
-         SYS_ASSERT(block_num <= _end_block, chain::plugin_exception, "block ${b} skips over block ${e} in ${name}", ("b", block_num)("e", _end_block)("name", log.display_path()));
-      SYS_ASSERT(block_num >= _index_begin_block, chain::plugin_exception, "block ${b} is before start block ${s} of ${name}", ("b", block_num)("s", _begin_block)("name", log.display_path()));
+         SYS_ASSERT(block_num <= _end_block, chain::plugin_exception, "block {} skips over block {} in {}",
+                    block_num, _end_block, log.display_path().string());
+      SYS_ASSERT(block_num >= _index_begin_block, chain::plugin_exception, "block {} is before start block {} of {}",
+                 block_num, _begin_block, log.display_path().string());
       if(block_num == _end_block) //appending at the end of known blocks; can shortcut some checks since we have last_block_id readily available
-         SYS_ASSERT(prev_id == last_block_id, chain::plugin_exception, "missed a fork change in ${name}", ("name", log.display_path()));
+         SYS_ASSERT(prev_id == last_block_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
       else {                      //seeing a block num we've seen before OR first block in the log; prepare some extra checks
          //find the previous block id as a sanity check. This might not be in our log due to log splitting. It also might not be present at all if this is the first
          // block written, so don't require this lookup to succeed, just require the id to match if the lookup succeeded.
          if(std::optional<chain::block_id_type> local_id_found = get_block_id(block_num-1))
-            SYS_ASSERT(local_id_found == prev_id, chain::plugin_exception, "missed a fork change in ${name}", ("name", log.display_path()));
+            SYS_ASSERT(local_id_found == prev_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
          else if(std::optional<chain::block_id_type> non_local_id_found = non_local_get_block_id(block_num-1))
-            SYS_ASSERT(non_local_id_found == prev_id, chain::plugin_exception, "missed a fork change in ${name}", ("name", log.display_path()));
+            SYS_ASSERT(non_local_id_found == prev_id, chain::plugin_exception, "missed a fork change in {}", log.display_path().string());
          //we don't want to re-write blocks that we already have, so check if the existing block_id recorded in the log matches and if so, bail
          if(get_block_id(block_num) == id)
             return;
          //but if it doesn't match, and log isn't empty, ensure not writing a new genesis block to guard against accidental rewinding of the entire ship log
          if(!empty())
-            SYS_ASSERT(block_num > 2u, chain::plugin_exception, "existing ship log with ${eb} blocks when starting from genesis block ${b}", ("eb", _end_block-_begin_block)("b", block_num));
+            SYS_ASSERT(block_num > 2u, chain::plugin_exception, "existing ship log with {} blocks when starting from genesis block {}",
+                       _end_block-_begin_block, block_num);
       }
 
       ssize_t log_insert_pos = log.size();
@@ -301,7 +304,7 @@ private:
       log.punch_hole(fc::raw::pack_size(log_header()), prune_to_pos);
 
       _begin_block = prune_to_num;
-      ilog("${name} pruned to blocks ${b}-${e}", ("name", log.display_path())("b", _begin_block)("e", _end_block - 1));
+      ilog("{} pruned to blocks {}-{}", log.display_path().string(), _begin_block, _end_block - 1);
    }
 
    bool discover_and_check_last_block_ok(bool is_pruned) {
@@ -312,13 +315,14 @@ private:
          FC_ASSERT(is_ship(last_header.magic) && is_ship_supported_version(last_header.magic), "Unexpected header magic on last block");
          _end_block    = chain::block_header::num_from_id(last_header.block_id) + 1;
          last_block_id = last_header.block_id;
-         FC_ASSERT(_begin_block < _end_block, "Block number ${hbn} from head and block number ${tbn} from tail of log are not expected", ("hbn", _begin_block)("tbn", _end_block-1));
+         FC_ASSERT(_begin_block < _end_block, "Block number {} from head and block number {} from tail of log are not expected",
+                   _begin_block, _end_block-1);
       }
       catch(const std::bad_alloc&) {
          throw;
       }
       catch(const std::exception& e) {
-         ilog("Failure while checking ${name}: ${m}", ("name", log.display_path())("m", e.what()));
+         ilog("Failure while checking {}: {}", log.display_path().string(), e.what());
          return false;
       }
       return true;
@@ -340,7 +344,7 @@ private:
          if(!is_ship(header.magic) || !is_ship_supported_version(header.magic) || header.payload_size > size ||
              pos + header_size + header.payload_size + sizeof(suffix) > size) {
             SYS_ASSERT(!is_ship(header.magic) || is_ship_supported_version(header.magic), chain::plugin_exception,
-                       "${name} has an unsupported version", ("name", log.display_path()));
+                       "{} has an unsupported version", log.display_path().string());
             break;
          }
          suffix = log.unpack_from<decltype(suffix)>(pos + header_size + header.payload_size);
@@ -348,10 +352,10 @@ private:
             break;
          pos += header_size + header.payload_size + sizeof(suffix);
          if(!(++num_found % 10000)) {
-            ilog("${num_found} blocks found, log pos = ${pos}", ("num_found", num_found)("pos", pos));
+            ilog("{} blocks found, log pos = {}", num_found, pos);
          }
       }
-      ilog("recovery of ${fn} complete, ${b} blocks found in ${bytes} bytes", ("fn", log.display_path())("b", num_found)("bytes", pos));
+      ilog("recovery of {} complete, {} blocks found in {} bytes", log.display_path().string(), num_found, pos);
       log.resize(pos);
    }
 
@@ -372,14 +376,14 @@ private:
 
          if(!discover_and_check_last_block_ok(!!pruned_count)) {
             FC_ASSERT(!is_ship_log_pruned(first_header.magic), "Pruned log is corrupted");
-            ilog("Attempting to recover ${n}", ("n", log.display_path()));
+            ilog("Attempting to recover {}", log.display_path().string());
             recover_blocks();
             FC_ASSERT(discover_and_check_last_block_ok(!!pruned_count), "Failed to recover blocks");
          }
 
          if(pruned_count)
             _begin_block = _end_block - *pruned_count;
-      } SYS_RETHROW_EXCEPTIONS(chain::plugin_exception, "${name} is corrupted and cannot be repaired", ("name", log.display_path()));
+      } SYS_RETHROW_EXCEPTIONS(chain::plugin_exception, "{} is corrupted and cannot be repaired", log.display_path().string());
    }
 
    void check_index_on_init() {
@@ -387,7 +391,7 @@ private:
       if(index.size() == expected_index_size)
          return;
 
-      ilog("Regenerate ${name}", ("name", index.display_path()));
+      ilog("Regenerate {}", index.display_path().string());
       index.resize(0);
 
       if(log.size()) {
@@ -401,7 +405,8 @@ private:
          do {
             const uint64_t logpos = log.unpack_from<uint64_t>(next_logpos);
             header = log.unpack_from<decltype(header)>(logpos);
-            SYS_ASSERT(is_ship(header.magic) && is_ship_supported_version(header.magic), chain::plugin_exception, "corrupt ${name}, unknown header magic", ("name", log.display_path()));
+            SYS_ASSERT(is_ship(header.magic) && is_ship_supported_version(header.magic), chain::plugin_exception,
+                       "corrupt {}, unknown header magic", log.display_path().string());
 
             const uint32_t read_block_num = chain::block_header::num_from_id(header.block_id);
             //may need to skip blocks if log was closed when a shorter fork has been applied; ex: log contains 2345675 (begin=2, end=6, but we see block 7 and 6 when reading)
@@ -413,11 +418,11 @@ private:
 
             next_logpos = logpos - sizeof(uint64_t);
             if (!(chain::block_header::num_from_id(header.block_id) % 10000))
-               ilog("${r} blocks remaining, log pos = ${pos}", ("r", chain::block_header::num_from_id(header.block_id) - _begin_block)("pos", logpos));
+               ilog("{} blocks remaining, log pos = {}", chain::block_header::num_from_id(header.block_id) - _begin_block, logpos);
          } while(chain::block_header::num_from_id(header.block_id) != _begin_block);
       }
 
-      ilog("${name} regeneration complete", ("name", index.display_path()));
+      ilog("{} regeneration complete", index.display_path().string());
    }
 
    void check_log_and_index_on_init() {
@@ -433,8 +438,9 @@ private:
          const uint64_t last_header_pos = log.unpack_from<std::decay_t<decltype(last_header_pos)>>(log.size() - sizeof(uint64_t) - (is_pruned ? sizeof(uint32_t) : 0));
          //verify last index position matches last log entry
          const uint64_t index_pos = get_pos(_end_block-1);
-         FC_ASSERT(index_pos == last_header_pos, "Last index position ${ip} does not match last entry in log ${lp}", ("ip", index_pos)("lp", last_header_pos));
-      } SYS_RETHROW_EXCEPTIONS(chain::plugin_exception, "${name} is corrupted and cannot be repaired, will be automatically regenerated if removed.", ("name", index.display_path()));
+         FC_ASSERT(index_pos == last_header_pos, "Last index position {} does not match last entry in log {}",
+                   index_pos, last_header_pos);
+      } SYS_RETHROW_EXCEPTIONS(chain::plugin_exception, "{} is corrupted and cannot be repaired, will be automatically regenerated if removed.", index.display_path().string());
    }
 
    uint64_t get_pos(uint32_t block_num) {
@@ -469,7 +475,7 @@ private:
          return;
       }
 
-      ilog("Vacuuming pruned log ${n}", ("n", log.display_path()));
+      ilog("Vacuuming pruned log {}", log.display_path().string());
 
       size_t copy_from_pos = get_pos(_begin_block);
       size_t copy_to_pos = 0;
@@ -498,7 +504,7 @@ private:
 
          const auto tock = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
          if(tick < tock - std::chrono::seconds(5)) {
-            ilog("Vacuuming pruned log ${n}, ${b} bytes remaining", ("b", copy_sz)("n", log.display_path()));
+            ilog("Vacuuming pruned log {}, {} bytes remaining", log.display_path().string(), copy_sz);
             tick = tock;
          }
       }
@@ -521,7 +527,7 @@ private:
       index.resize(num_blocks_in_log*sizeof(uint64_t));
 
       _index_begin_block = _begin_block;
-      ilog("Vacuum of pruned log ${n} complete",("n", log.display_path()));
+      ilog("Vacuum of pruned log {} complete", log.display_path().string());
    }
 };
 

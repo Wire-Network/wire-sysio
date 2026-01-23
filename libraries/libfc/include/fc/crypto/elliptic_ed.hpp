@@ -42,9 +42,9 @@ struct public_key_shim {
 
    static public_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 44;
-      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 public key bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 public key bytes length {}", bytes.size());
       public_key_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
@@ -86,9 +86,9 @@ struct signature_shim {
 
    static signature_shim from_base58_string(const std::string& str) {
       constexpr size_t max_sig_len = 88;
-      FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length {}", bytes.size());
       signature_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
@@ -122,9 +122,9 @@ struct private_key_shim {
 
    static private_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 88;
-      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 private key bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 private key bytes length {}", bytes.size());
       private_key_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
