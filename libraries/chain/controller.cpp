@@ -2064,7 +2064,7 @@ struct controller_impl {
          }
 
          return trace;
-      } FC_CAPTURE_AND_RETHROW("trace: {}", trace->id)
+      } FC_CAPTURE_AND_RETHROW("trace: {}", trace ? trace->id.str() : "null")
    } /// push_transaction
 
    transaction_trace_ptr start_block( block_timestamp_type when,

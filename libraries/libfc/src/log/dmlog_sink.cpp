@@ -39,7 +39,7 @@ namespace fc {
       // spdlog::sinks::base_sink<Mutex>::formatter_->format(msg, formatted);
       // std::cout << fmt::to_string(formatted);
 
-      std::string message = fmt::to_string(msg.payload) + "\n";
+      std::string message = "DMLOG " + fmt::to_string(msg.payload) + "\n";
 
       auto remaining_size = message.size();
       auto message_ptr = message.c_str();

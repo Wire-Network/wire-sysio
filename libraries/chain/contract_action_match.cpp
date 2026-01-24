@@ -18,7 +18,7 @@ namespace sysio { namespace chain {
             break;
          case match_type::suffix:
             SYS_ASSERT(contract_match_name == contract_match_name.suffix(), chain::producer_exception,
-                       "contract_match_name {} must be the desired suffix and should not contain any '.'.",
+                       "contract_match_name '{}' must be the desired suffix and should not contain any '.'.",
                        contract_match_name.to_string());
             contract_matcher = [contract_match_name](const name& n) { return n.suffix() == contract_match_name; };
             break;
