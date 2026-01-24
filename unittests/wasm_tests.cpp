@@ -1938,8 +1938,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
-                                                             fc_exception_message_contains contains_subjective("with a subjective cpu of");
-                                                             return starts(e) && contains_reached(e) && !contains_subjective(e); } );
+                                                             fc_exception_message_contains contains_subjective("with a subjective cpu of (0 us)");
+                                                             return starts(e) && contains_reached(e) && contains_subjective(e); } );
 
    // Test when cpu limit is 0
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()

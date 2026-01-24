@@ -129,7 +129,7 @@ std::unique_ptr<sig_provider_tester> create_app(Args&&... extra_args) {
 constexpr std::string_view test_contract_abi_counter_json_file_01 = "ethereum-abi-counter-01.json";
 using namespace fc::network::ethereum;
 auto counter_abi_filename = fc::test::get_test_fixtures_path() / boost::filesystem::path(test_contract_abi_counter_json_file_01);
-auto counter_abis = fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));
+auto counter_abis = [](){return fc::network::ethereum::abi::parse_contracts(std::filesystem::path(counter_abi_filename.generic_string()));};
 
 struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_contract_client {
 
@@ -137,7 +137,7 @@ struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_c
    ethereum_contract_call_fn<fc::variant> get_number;
    ethereum_contract_test_counter_client(const ethereum_client_ptr& client,
                                          const address_compat_type& contract_address_compat)
-      : ethereum_contract_client(client, contract_address_compat, counter_abis),
+      : ethereum_contract_client(client, contract_address_compat, counter_abis()),
    set_number(create_tx<fc::variant, fc::uint256>(get_abi("setNumber"))),
    get_number(create_call<fc::variant>(get_abi("number"))) {
 
