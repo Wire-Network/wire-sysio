@@ -13,6 +13,7 @@ add_executable( test_fc
         io/test_raw.cpp
         io/test_tracked_storage.cpp
         network/ethereum/test_ethereum_client_and_rlp.cpp
+        network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp

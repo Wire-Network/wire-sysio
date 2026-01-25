@@ -59,6 +59,11 @@ set(fc_sources
         src/network/ethereum/ethereum_rlp_encoder.cpp
         src/network/http/http_client.cpp
         src/network/json_rpc/json_rpc_client.cpp
+        src/network/solana/solana_types.cpp
+        src/network/solana/solana_borsh.cpp
+        src/network/solana/solana_idl.cpp
+        src/network/solana/solana_system_programs.cpp
+        src/network/solana/solana_client.cpp
         src/compress/zlib.cpp
 )
 
