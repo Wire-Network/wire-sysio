@@ -1,6 +1,6 @@
 #pragma once
 
-#include <sysio/chain/application.hpp>
+#include <sysio/chain/priority_queue_executor.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/version/version.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
@@ -154,9 +154,9 @@ void initialize_logging(const wire_application_config& cfg) {
    appbase::app().set_sighup_callback(sighup_cb);
 }
 
-class wire_application {
+class application {
 public:
-   explicit wire_application(const wire_application_config& cfg) : cfg_(cfg) {
+   explicit application(const wire_application_config& cfg) : cfg_(cfg) {
       exe_name_ = fc::program_name();
       ilogf("{} started", exe_name_);
 
@@ -176,11 +176,11 @@ public:
          .server_header = exe_name_ + "/" + app_->version_string()
       });
    }
-   wire_application(const wire_application&) = delete;
-   wire_application& operator=(const wire_application&) = delete;
-   wire_application(wire_application&&) = delete;
-   wire_application& operator=(wire_application&&) = delete;
-   ~wire_application() {
+   application(const application&) = delete;
+   application& operator=(const application&) = delete;
+   application(application&&) = delete;
+   application& operator=(application&&) = delete;
+   ~application() {
       if (last_result_ != NODE_MANAGEMENT_SUCCESS) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();

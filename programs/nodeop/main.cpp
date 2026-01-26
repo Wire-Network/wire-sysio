@@ -1,16 +1,15 @@
-#include <sysio/chain/wire_application.hpp>
+#include <sysio/chain/app.hpp>
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/net_plugin/net_plugin.hpp>
 #include <sysio/producer_plugin/producer_plugin.hpp>
-#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
 using namespace appbase;
 using namespace sysio;
 
 int main(int argc, char** argv)
 {
-   wire_application exe{wire_application_config{.enable_deep_mind_logging = true}};
+   chain::application exe{wire_application_config{.enable_deep_mind_logging = true}};
 
    auto r = exe.init<chain_plugin, net_plugin, producer_plugin>(argc, argv);
    if (r != SUCCESS)

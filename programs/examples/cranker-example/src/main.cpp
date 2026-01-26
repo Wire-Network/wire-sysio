@@ -1,5 +1,5 @@
 
-#include <sysio/chain/wire_application.hpp>
+#include <sysio/chain/app.hpp>
 #include <sysio/cron_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
 
@@ -9,7 +9,7 @@ using namespace sysio::chain;
 
 int main(int argc, char** argv) {
 
-   wire_application exe{wire_application_config{}};
+   chain::application exe{wire_application_config{}};
 
    auto r = exe.init<outpost_ethereum_client_plugin, cron_plugin>(argc, argv);
    if (r != SUCCESS)
