@@ -17,7 +17,7 @@
 */
 namespace sysio::chain {
 
-struct wire_application_config {
+struct application_config {
    bool enable_logging_config = true;
    bool enable_deep_mind_logging = false;
    bool enable_resource_monitor = true;
@@ -25,15 +25,18 @@ struct wire_application_config {
    uint16_t default_http_port = 8888;
 };
 
-enum return_codes {
-   OTHER_FAIL = -2,
-   INITIALIZE_FAIL = -1,
-   SUCCESS = 0,
-   BAD_ALLOC = 1,
-   DATABASE_DIRTY = 2,
-   FIXED_REVERSIBLE = SUCCESS,
-   EXTRACTED_GENESIS = SUCCESS,
-   NODE_MANAGEMENT_SUCCESS = 5
+// use namespace exit_code instead of enum class to allow simple conversion to int in main return statements
+namespace exit_code {
+   enum exit_code {
+      OTHER_FAIL = -2,
+      INITIALIZE_FAIL = -1,
+      SUCCESS = 0,
+      BAD_ALLOC = 1,
+      DATABASE_DIRTY = 2,
+      FIXED_REVERSIBLE = SUCCESS,
+      EXTRACTED_GENESIS = SUCCESS,
+      NODE_MANAGEMENT_SUCCESS = 5
+   };
 };
 
 namespace detail {
@@ -135,7 +138,7 @@ void logging_conf_handler(bool enable_deep_mind_logging) {
    fc::log_config::initialize_appenders();
 }
 
-void initialize_logging(const wire_application_config& cfg) {
+void initialize_logging(const application_config& cfg) {
    if (!cfg.enable_logging_config) {
       appbase::app().set_sighup_callback([]{});
       return;
@@ -156,7 +159,7 @@ void initialize_logging(const wire_application_config& cfg) {
 
 class application {
 public:
-   explicit application(const wire_application_config& cfg) : cfg_(cfg) {
+   explicit application(const application_config& cfg) : cfg_(cfg) {
       exe_name_ = fc::program_name();
       ilogf("{} started", exe_name_);
 
@@ -181,7 +184,7 @@ public:
    application(application&&) = delete;
    application& operator=(application&&) = delete;
    ~application() {
-      if (last_result_ != NODE_MANAGEMENT_SUCCESS) {
+      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();
          ilogf("{} version {} {}", exe_name_, app_->version_string(), full_ver);
@@ -190,15 +193,15 @@ public:
    }
 
    template <typename... Plugin>
-   return_codes init(int argc, char** argv) {
+   exit_code::exit_code init(int argc, char** argv) {
       try {
          auto init_logging = [cfg=cfg_]() { initialize_logging(cfg); };
          if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {
-               last_result_ = NODE_MANAGEMENT_SUCCESS;
+               last_result_ = exit_code::NODE_MANAGEMENT_SUCCESS;
             } else {
-               last_result_ = INITIALIZE_FAIL;
+               last_result_ = exit_code::INITIALIZE_FAIL;
             }
             return last_result_;
          }
@@ -211,7 +214,7 @@ public:
                resmon_plugin->monitor_directory(app_->data_dir());
             } else {
                elog("resource_monitor_plugin failed to initialize");
-               last_result_ = INITIALIZE_FAIL;
+               last_result_ = exit_code::INITIALIZE_FAIL;
                return last_result_;
             }
          }
@@ -224,7 +227,7 @@ public:
       } catch (...) {
          return handle_exception();
       }
-      return SUCCESS;
+      return exit_code::SUCCESS;
    }
 
    // Must call after init
@@ -238,7 +241,7 @@ public:
       app_->set_stop_executor_cb(cb);
    }
 
-   return_codes exec() {
+   exit_code::exit_code exec() {
       try {
          app_->startup();
          app_->set_thread_priority_max();
@@ -246,49 +249,49 @@ public:
       } catch (...) {
          return handle_exception();
       }
-      return SUCCESS;
+      return exit_code::SUCCESS;
    }
 
-   return_codes handle_exception() {
+   exit_code::exit_code handle_exception() {
       try {
-         last_result_ = OTHER_FAIL;
+         last_result_ = exit_code::OTHER_FAIL;
          throw;
       } catch (const fc::exception& e) {
          if (e.code() == fc::std_exception_code) {
             if (e.top_message().find("atabase dirty flag set") != std::string::npos) {
                elog("database dirty flag set (likely due to unclean shutdown): replay required");
-               last_result_ = DATABASE_DIRTY;
+               last_result_ = exit_code::DATABASE_DIRTY;
             } else {
                elogf("{}", e.to_detail_string());
-               last_result_ = OTHER_FAIL;
+               last_result_ = exit_code::OTHER_FAIL;
             }
          } else if (e.code() == interrupt_exception::code_value) {
             ilog("Interrupted, successfully exiting");
-            last_result_ = SUCCESS;
+            last_result_ = exit_code::SUCCESS;
          } else {
             elogf("{}", e.to_detail_string());
-            last_result_ = OTHER_FAIL;
+            last_result_ = exit_code::OTHER_FAIL;
          }
       } catch (const boost::interprocess::bad_alloc& e) {
          elog("bad alloc");
-         last_result_ = BAD_ALLOC;
+         last_result_ = exit_code::BAD_ALLOC;
       } catch (const boost::exception& e) {
          elogf("{}", boost::diagnostic_information(e));
-         last_result_ = OTHER_FAIL;
+         last_result_ = exit_code::OTHER_FAIL;
       } catch (const std::runtime_error& e) {
          if (std::string(e.what()).find("atabase dirty flag set") != std::string::npos) {
             elog("database dirty flag set (likely due to unclean shutdown): replay required");
-            last_result_ = DATABASE_DIRTY;
+            last_result_ = exit_code::DATABASE_DIRTY;
          } else {
             elogf("{}", e.what());
-            last_result_ = OTHER_FAIL;
+            last_result_ = exit_code::OTHER_FAIL;
          }
       } catch (const std::exception& e) {
          elogf("{}", e.what());
-         last_result_ = OTHER_FAIL;
+         last_result_ = exit_code::OTHER_FAIL;
       } catch (...) {
          elog("unknown exception");
-         last_result_ = OTHER_FAIL;
+         last_result_ = exit_code::OTHER_FAIL;
       }
       return last_result_;
    }
@@ -296,8 +299,8 @@ public:
 private:
    appbase::scoped_app app_;
    std::string exe_name_;
-   wire_application_config cfg_;
-   return_codes last_result_ = SUCCESS;
+   application_config cfg_;
+   exit_code::exit_code last_result_ = exit_code::SUCCESS;
 };
 
 } // namespace sysio::chain

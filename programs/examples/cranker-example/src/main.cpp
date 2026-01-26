@@ -9,11 +9,11 @@ using namespace sysio::chain;
 
 int main(int argc, char** argv) {
 
-   chain::application exe{wire_application_config{}};
+   chain::application exe{application_config{}};
 
    auto r = exe.init<outpost_ethereum_client_plugin, cron_plugin>(argc, argv);
-   if (r != SUCCESS)
-      return r == NODE_MANAGEMENT_SUCCESS ? SUCCESS : r;
+   if (r != exit_code::SUCCESS)
+      return r == exit_code::NODE_MANAGEMENT_SUCCESS ? exit_code::SUCCESS : r;
 
    auto& cron_plug = app().get_plugin<cron_plugin>();
    auto& eth_plug = app().get_plugin<outpost_ethereum_client_plugin>();
