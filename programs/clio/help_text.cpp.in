@@ -2,6 +2,7 @@
 #include "localize.hpp"
 #include <regex>
 #include <fc/io/json.hpp>
+#include <fc/variant_object.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 using namespace sysio::client::localize;
