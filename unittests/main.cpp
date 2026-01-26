@@ -24,6 +24,7 @@ void setup_test_logging() {
       fc::logger::update(sysio::chain::vote_logger.get_name(), sysio::chain::vote_logger);
    } else {
       fc::logger::default_logger().set_log_level(fc::log_level::off);
+      sysio::chain::vote_logger.set_log_level(fc::log_level::off);
    }
 }
 

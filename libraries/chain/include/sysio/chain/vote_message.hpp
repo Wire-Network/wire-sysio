@@ -2,6 +2,7 @@
 
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/block_header.hpp>
+#include <fc/log/logger.hpp>
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 
