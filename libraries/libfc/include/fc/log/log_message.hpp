@@ -3,10 +3,15 @@
  * @file log_message.hpp
  * @brief Defines types and helper macros necessary for generating log messages.
  */
-#include <fc/time.hpp>
-#include <fc/variant_object.hpp>
+
+// define `SPDLOG_ACTIVE_LEVEL` before including spdlog.h as per https://github.com/gabime/spdlog/issues/1268
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "crit", "off" }
+#include <spdlog/spdlog.h>
 #include <spdlog/fmt/fmt.h>
-#include <fmt/ranges.h>
+#include <spdlog/fmt/ranges.h>
+
+#include <fc/time.hpp>
 
 #include <memory>
 #include <vector>

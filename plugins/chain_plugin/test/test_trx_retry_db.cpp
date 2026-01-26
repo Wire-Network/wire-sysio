@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
 
    try {
       appbase::scoped_app app;
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+      fc::logger::default_logger().set_log_level(fc::log_level::debug);
 
       // just need a controller for trx_retry_db, doesn't actually have to do anything
       std::optional<controller> chain;

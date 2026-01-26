@@ -32,7 +32,7 @@ namespace sysio::benchmark {
 struct interface_in_benchmark {
    interface_in_benchmark() {
       // prevent logging from interwined with output benchmark results
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::off);
+      fc::logger::default_logger().set_log_level(fc::log_level::off);
 
       // create a chain
       fc::temp_directory tempdir;

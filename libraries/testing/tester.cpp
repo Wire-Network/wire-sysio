@@ -26,7 +26,7 @@ using bls_public_key = fc::crypto::bls::public_key;
 
 namespace sysio::testing {
 
-   fc::logger test_logger = fc::logger::get();
+   fc::logger test_logger = fc::logger::default_logger();
 
    // required by boost::unit_test::data
    std::ostream& operator<<(std::ostream& os, setup_policy p) {

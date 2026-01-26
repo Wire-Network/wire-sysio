@@ -151,10 +151,10 @@ int blocklog_actions::make_index() {
    if(!opt->output_file.empty()) out_file = opt->output_file;
 
    report_time rt("making index");
-   const auto log_level = fc::logger::get(DEFAULT_LOGGER).get_log_level();
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   const auto log_level = fc::logger::default_logger().get_log_level();
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    block_log::construct_index(block_file.generic_string(), out_file.generic_string());
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(log_level);
+   fc::logger::default_logger().set_log_level(log_level);
    rt.report();
 
    return 0;

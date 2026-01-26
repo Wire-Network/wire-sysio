@@ -1,6 +1,7 @@
 #include <fc/log/log_message.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 #include <fc/time.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/io/json.hpp>

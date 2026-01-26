@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       std::future<std::tuple<producer_plugin*, chain_plugin*>> plugin_fut = plugin_promise.get_future();
       std::thread app_thread( [&]() {
          try {
-            fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+            fc::logger::default_logger().set_log_level(fc::log_level::debug);
             std::vector<const char*> argv =
                   {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
                    "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <filesystem>
 #include <fc/log/logger.hpp>
-#include <spdlog/spdlog.h>
+#include <fc/variant.hpp>
+#include <filesystem>
 #include <mutex>
 #include <string>
 #include <unordered_map>

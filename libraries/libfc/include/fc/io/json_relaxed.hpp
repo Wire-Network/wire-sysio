@@ -5,15 +5,8 @@
 
 #include <fc/io/json.hpp>
 #include <fc/exception/exception.hpp>
-//#include <fc/io/iostream.hpp>
-//#include <fc/io/buffered_iostream.hpp>
-//#include <fc/io/fstream.hpp>
-//#include <fc/io/sstream.hpp>
 #include <fc/log/logger.hpp>
-#include <fc/string.hpp>
-//#include <utfcpp/utf8.h>
-#include <iostream>
-#include <fstream>
+#include <fc/variant_object.hpp>
 #include <sstream>
 
 namespace fc { namespace json_relaxed

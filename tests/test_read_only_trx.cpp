@@ -53,7 +53,7 @@ void test_configs_common(std::vector<const char*>& specific_args, app_init_statu
    appbase::scoped_app app;
    auto temp_dir_str = temp.path().string();
    
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    std::vector<const char*> argv =
       {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str()};
    argv.insert( argv.end(), specific_args.begin(), specific_args.end() );
@@ -101,7 +101,7 @@ void test_trxs_common(std::vector<const char*>& specific_args) {
          std::future<std::tuple<producer_plugin*, chain_plugin*>> plugin_fut = plugin_promise.get_future();
          std::thread app_thread( [&]() {
             try {
-               fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+               fc::logger::default_logger().set_log_level(fc::log_level::debug);
                std::vector<const char*> argv = {
                   "test",  // dummy executible name
                   "-p", "sysio", "-e", // actual arguments follow

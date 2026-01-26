@@ -1,14 +1,14 @@
 #include <fc/log/logger.hpp>
 #include <fc/log/log_message.hpp>
-#include <fc/exception/exception.hpp>
-#include <fc/filesystem.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc/log/dmlog_sink.hpp>
-#include <spdlog/sinks/stdout_sinks.h>
+#include <spdlog/sinks/sink.h>
+#include <spdlog/pattern_formatter.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/daily_file_sink.h>
-#include <spdlog/sinks/rotating_file_sink.h>
-#include <unordered_map>
+
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace fc {
 
@@ -31,83 +31,35 @@ namespace fc {
          }
    };
 
-   class logger::impl {
-      public:
-         impl( std::unique_ptr<spdlog::logger> agent_logger = nullptr)
-         :_parent(nullptr), _enabled(true), _level(log_level::info) {
-            if (!agent_logger) {
-               auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_st>();
-               sink->set_color(spdlog::level::debug, sink->green);
-               sink->set_color(spdlog::level::info, sink->reset);
-               sink->set_color(spdlog::level::warn, sink->yellow);
-               sink->set_color(spdlog::level::err, sink->red);
-               _agent_logger = std::make_unique<spdlog::logger>( "", sink );
-            } else {
-               _agent_logger = std::move(agent_logger);
-            }
+   logger::impl::impl() :_parent(nullptr) {
+      auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_st>();
+      sink->set_color(spdlog::level::debug, sink->green);
+      sink->set_color(spdlog::level::info, sink->reset);
+      sink->set_color(spdlog::level::warn, sink->yellow);
+      sink->set_color(spdlog::level::err, sink->red);
+      _agent_logger = std::make_unique<spdlog::logger>( "", sink );
 
-            auto formatter = std::make_unique<spdlog::pattern_formatter>(spdlog::pattern_time_type::utc);
-            formatter->add_flag<thread_name_formatter_flag>('k').set_pattern(DEFAULT_PATTERN);
-            _agent_logger->set_formatter(std::move(formatter));
+      auto formatter = std::make_unique<spdlog::pattern_formatter>(spdlog::pattern_time_type::utc);
+      formatter->add_flag<thread_name_formatter_flag>('k').set_pattern(DEFAULT_PATTERN);
+      _agent_logger->set_formatter(std::move(formatter));
 
-            _agent_logger->set_level(spdlog::level::info);
-         }
-
-         std::string      _name;
-         logger           _parent;
-         bool             _enabled;
-         log_level        _level;
-         std::unique_ptr<spdlog::logger> _agent_logger;
-         std::vector<std::shared_ptr<spdlog::sinks::sink>> _sinks;
-   };
+      _agent_logger->set_level(spdlog::level::info);
+   }
 
     logger::logger()
     :my( new impl() ){}
 
-    logger::logger(nullptr_t){}
-
     logger::logger( const std::string& name, const logger& parent )
-    :my( new impl() )
-    {
+    :my( new impl() ) {
        my->_name = name;
-       my->_parent = parent;
+       my->_parent = parent.my;
     }
 
-    logger::logger( const logger& l )
-    :my(l.my){}
-
-    logger::logger( logger&& l ) noexcept
-    :my(std::move(l.my)){}
-
-    logger::~logger(){}
-
-    logger& logger::operator=( const logger& l ){
-       my = l.my;
-       return *this;
-    }
-    logger& logger::operator=( logger&& l ) noexcept {
-       fc_swap(my,l.my);
-       return *this;
-    }
     bool operator==( const logger& l, std::nullptr_t ) { return !l.my; }
     bool operator!=( const logger& l, std::nullptr_t ) { return !!l.my;  }
 
-    void logger::set_enabled( bool e ) {
-       my->_enabled = e;
-    }
-    bool logger::is_enabled()const {
-       return my->_enabled;
-    }
-    bool logger::is_enabled( log_level e )const {
-       return my->_enabled && e >= my->_level;
-    }
-
     void logger::set_name( const std::string& n ) { my->_name = n; }
     std::string logger::get_name()const { return my->_name; }
-
-    logger logger::get( const std::string& s ) {
-       return log_config::get_logger( s );
-    }
 
     logger& logger::default_logger() {
        return the_default_logger;
@@ -117,10 +69,9 @@ namespace fc {
        log_config::update_logger( name, log );
     }
 
-    logger  logger::get_parent()const { return my->_parent; }
-    logger& logger::set_parent(const logger& p) { my->_parent = p; return *this; }
+    logger  logger::get_parent()const { return logger{my->_parent}; }
+    logger& logger::set_parent(const logger& p) { my->_parent = p.my; return *this; }
 
-    log_level logger::get_log_level()const { return my->_level; }
     logger& logger::set_log_level(log_level ll) {
        my->_level = ll;
        switch (ll) {

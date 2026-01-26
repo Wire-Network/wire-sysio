@@ -1,5 +1,6 @@
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
 #include <iostream>

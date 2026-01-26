@@ -1,28 +1,23 @@
 #pragma once
-#include <fc/time.hpp>
+
 #include <fc/log/log_message.hpp>
-
-// define `SPDLOG_ACTIVE_LEVEL` before including spdlog.h as per https://github.com/gabime/spdlog/issues/1268
-#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
-#define SPDLOG_LEVEL_NAMES { "trace", "debug", "info", "warn", "error", "crit", "off" }
-
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/sink.h>
-#include <spdlog/fmt/fmt.h>
+#include <fc/time.hpp>
 
 #include <cstddef>
 #include <string>
 #include <vector>
 #include <memory>
 
+namespace spdlog::sinks {
+class sink;
+}
+
 namespace fc
 {
-   constexpr std::string DEFAULT_LOGGER = "default";
-
    /**
     @code
       void my_class::func() {
-         fc_dlog( my_class_logger, "Format four: {}  five: {}", 4, 5 );
+         fc_dlog( my_class_logger, "Format four: {} five: {}", 4, 5 );
       }
     @endcode
     */
@@ -30,22 +25,21 @@ namespace fc
    {
       public:
          static logger& default_logger();
-         static logger get( const std::string& name = DEFAULT_LOGGER );
          static void update( const std::string& name, logger& log );
 
          logger();
-         logger( const std::string& name, const logger& parent = nullptr );
-         logger( std::nullptr_t );
-         logger( const logger& c );
-         logger( logger&& c ) noexcept;
-         ~logger();
-         logger& operator=(const logger&);
-         logger& operator=(logger&&) noexcept;
+         explicit logger( const std::string& name, const logger& parent = logger{nullptr} );
+         explicit logger( std::nullptr_t ) {}
+         logger( const logger& c ) = default;
+         logger( logger&& c ) noexcept = default;
+         ~logger() = default;
+         logger& operator=(const logger&) = default;
+         logger& operator=(logger&&) noexcept = default;
          friend bool operator==( const logger&, nullptr_t );
          friend bool operator!=( const logger&, nullptr_t );
 
          logger&    set_log_level( log_level e );
-         log_level  get_log_level()const;
+         log_level  get_log_level()const { return my->_level; }
          logger&    set_parent( const logger& l );
          logger     get_parent()const;
 
@@ -55,17 +49,30 @@ namespace fc
          void  set_name( const std::string& n );
          std::string get_name()const;
 
-         void set_enabled( bool e );
-         bool is_enabled( log_level e )const;
-         bool is_enabled()const;
+         void set_enabled( bool e ) { my->_enabled = e; }
+         bool is_enabled( log_level e )const { return my->_enabled && e >= my->_level; }
+         bool is_enabled()const { return my->_enabled; }
 
       private:
          friend struct log_config;
          void add_sink(const std::shared_ptr<spdlog::sinks::sink>& s);
          std::vector<std::shared_ptr<spdlog::sinks::sink>>& get_sinks() const;
 
+         class impl {
+         public:
+            impl();
+
+            std::string                     _name;
+            bool                            _enabled = true;
+            log_level                       _level = log_level::info;
+            std::shared_ptr<impl>           _parent;
+            std::unique_ptr<spdlog::logger> _agent_logger;
+            std::vector<std::shared_ptr<spdlog::sinks::sink>> _sinks;
+         };
+
+         explicit logger( std::shared_ptr<impl> impl ) : my( std::move( impl ) ) {}
+
       private:
-         class impl;
          std::shared_ptr<impl> my;
    };
 
