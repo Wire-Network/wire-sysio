@@ -12,7 +12,6 @@
 #include <sysio.system/native.hpp>
 
 #include <limits>
-#include <deque>
 #include <optional>
 #include <string>
 #include <type_traits>
@@ -74,17 +73,6 @@ namespace sysiosystem {
    using blockchain_parameters_t = sysio::blockchain_parameters;
 #endif
 
-  /**
-   * The `sysio.system` smart contract; it defines the structures and actions needed for blockchain's core functionality.
-   * 
-   * Just like in the `sysio.bios` sample contract implementation, there are a few actions which are not implemented at the contract level (`newaccount`, `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, ``setabi`, `setcode`), they are just declared in the contract so they will show in the contract's ABI and users will be able to push those actions to the chain via the account holding the `sysio.system` contract, but the implementation is at the SYSIO core level. They are referred to as SYSIO native actions.
-   * 
-   * - Users can stake tokens for CPU and Network bandwidth, and then vote for producers or
-   *    delegate their vote to a proxy.
-   * - Producers register in order to be voted for, and can claim per-block and per-vote rewards.
-   * - Users can buy and sell RAM at a market-determined price.
-   */
-  
    // Defines new global state parameters.
    struct [[sysio::table("global"), sysio::contract("sysio.system")]] sysio_global_state : sysio::blockchain_parameters {
       uint64_t free_ram()const { return max_ram_size - total_ram_bytes_reserved; }
@@ -220,14 +208,15 @@ namespace sysiosystem {
    typedef sysio::singleton< "global"_n, sysio_global_state >   global_state_singleton;
 
    /**
-    * The `sysio.system` smart contract is provided by `block.one` as a sample system contract, and it defines the structures and actions needed for blockchain's core functionality.
+    * The `sysio.system` smart contract is provided by `Wire.Network` as a sample system contract, and it defines the
+    * structures and actions needed for blockchain's core functionality.
     *
-    * Just like in the `sysio.bios` sample contract implementation, there are a few actions which are not implemented at the contract level (`newaccount`, `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, `setabi`, `setcode`), they are just declared in the contract so they will show in the contract's ABI and users will be able to push those actions to the chain via the account holding the `sysio.system` contract, but the implementation is at the SYSIO core level. They are referred to as SYSIO native actions.
+    * Just like in the `sysio.bios` sample contract implementation, there are a few actions which are not implemented
+    * at the contract level (`newaccount`, `updateauth`, `deleteauth`, `linkauth`, `unlinkauth`, `setabi`, `setcode`),
+    * they are just declared in the contract so they will show in the contract's ABI and users will be able to push
+    * those actions to the chain via the account holding the `sysio.system` contract, but the implementation is at the
+    * SYSIO core level. They are referred to as SYSIO native actions.
     *
-    * - Users can stake tokens for CPU and Network bandwidth, and then vote for producers or
-    *    delegate their vote to a proxy.
-    * - Producers register in order to be voted for, and can claim per-block and per-vote rewards.
-    * - Users can buy and sell RAM at a market-determined price.
     */
    class [[sysio::contract("sysio.system")]] system_contract : public native {
 
@@ -268,8 +257,7 @@ namespace sysiosystem {
           * On block action. This special action is triggered when a block is applied by the given producer
           * and cannot be generated from any other source. It is used to pay producers and calculate
           * missed blocks of other producers. Producer pay is deposited into the producer's stake
-          * balance and can be withdrawn over time. Once a minute, it may update the active producer config from the
-          * producer votes. The action also populates the blockinfo table.
+          * balance and can be withdrawn over time. The action also populates the blockinfo table.
           *
           * @param header - the block header produced.
           */
