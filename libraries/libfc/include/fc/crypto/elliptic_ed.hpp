@@ -111,6 +111,17 @@ struct private_key_shim {
    public_key_shim get_public_key() const;
    
    signature_shim  sign(const sha256& digest, bool require_canonical) const;
+
+   /**
+    * Sign raw bytes directly without any transformation (no hex encoding).
+    * This is required for Solana transaction signing where ED25519 signs
+    * the raw serialized message bytes.
+    * @param data Pointer to the data to sign
+    * @param len Length of the data
+    * @return ED25519 signature
+    */
+   signature_shim  sign_raw(const unsigned char* data, size_t len) const;
+
    sha512          generate_shared_secret(const public_key_shim&) const;
 
    data_type serialize() const { return _data; }

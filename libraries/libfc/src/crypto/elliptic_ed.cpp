@@ -68,6 +68,29 @@ namespace fc { namespace crypto { namespace ed {
       ) == 0; // returns 0 on success
    }
 
+   // Sign raw bytes directly (for Solana transaction signing)
+   signature_shim private_key_shim::sign_raw(const unsigned char* data, size_t len) const {
+      sodium_init_guard();
+
+      unsigned char sigbuf[crypto_sign_BYTES];
+      unsigned long long siglen = 0;
+      if (crypto_sign_detached(
+            sigbuf, &siglen,
+            data,
+            len,
+            _data.data()
+         ) != 0
+         || siglen != crypto_sign_BYTES)
+      {
+         FC_THROW_EXCEPTION(exception, "Failed to create ED25519 signature");
+      }
+
+      signature_shim out;
+      memset(out._data.data(), 0, out.size);
+      memcpy(out._data.data(), sigbuf, crypto_sign_BYTES);
+      return out;
+   }
+
    // stub out ECDH for the visitor
    sha512 private_key_shim::generate_shared_secret(const public_key_shim&) const {
       FC_THROW_EXCEPTION(exception, "ED25519 shared_secret not supported");

@@ -11,6 +11,7 @@
 #include <fc/io/json.hpp>
 #include <format>
 #include <memory>
+#include <sodium.h>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -236,5 +237,102 @@ BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
 
 }
 
+BOOST_AUTO_TEST_CASE(create_provider_solana_fixture_pub_priv_sig_interoperable) {
+   using namespace fc::crypto;
+
+   // Load fixture - all keys are base58 encoded
+   keygen_result fixture = load_keygen_fixture("solana", 1);
+
+   // The fixture private key is 64-byte (seed + pubkey) in base58
+   // Parse the private key from base58
+   ed::private_key_shim ed_priv_key = ed::private_key_shim::from_base58_string(fixture.private_key);
+
+   // Parse the public key from base58
+   ed::public_key_shim ed_pub_key = ed::public_key_shim::from_base58_string(fixture.public_key);
+
+   // Verify the derived public key matches the fixture public key
+   auto derived_pub = ed_priv_key.get_public_key();
+   BOOST_CHECK(derived_pub.serialize() == ed_pub_key.serialize());
+
+   // Verify the base58 address encoding matches
+   auto ed_pub_key_base58 = ed_pub_key.to_string({});
+   BOOST_CHECK_EQUAL(ed_pub_key_base58, fixture.address);
+   BOOST_CHECK_EQUAL(ed_pub_key_base58, fixture.public_key);
+
+   // Parse the fixture signature from base58
+   ed::signature_shim fixture_sig = ed::signature_shim::from_base58_string(fixture.signature);
+
+   // The Python keygen signs the raw payload bytes (not a hash)
+   // But our C++ implementation signs a SHA256 hash, so we verify
+   // that the fixture signature verifies against the raw payload
+   // by using libsodium directly
+   int verify_result = crypto_sign_verify_detached(
+      fixture_sig._data.data(),
+      reinterpret_cast<const unsigned char*>(fixture.payload.data()),
+      fixture.payload.size(),
+      ed_pub_key._data.data());
+   BOOST_CHECK_EQUAL(verify_result, 0);  // 0 means valid signature
+}
+
+BOOST_AUTO_TEST_CASE(create_provider_solana_key_spec) {
+   using namespace fc::test;
+   using namespace fc::crypto;
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+
+   // Load fixture
+   keygen_result fixture          = load_keygen_fixture("solana", 1);
+   auto          fixture_spec     = keygen_fixture_to_spec("solana", 1);
+   auto          private_key_spec = to_private_key_spec(fixture.private_key);
+
+   // Verify chain type string conversion
+   auto key_type_sol_str = chain_key_type_reflector::to_fc_string(chain_key_type_solana);
+   BOOST_CHECK_EQUAL(key_type_sol_str, "solana");
+
+   auto  tester = create_app();
+   auto& mgr    = tester->plugin();
+
+   auto provider =
+      mgr.create_provider(fixture.key_name, chain_kind_solana, chain_key_type_solana, fixture.public_key,
+                          private_key_spec);
+
+   // Provider should be retrievable
+   BOOST_CHECK(mgr.has_provider(provider->public_key));
+   auto found = mgr.get_provider(provider->public_key);
+   BOOST_CHECK_EQUAL(found->public_key.to_string({}), provider->public_key.to_string({}));
+   BOOST_CHECK_EQUAL(found->key_type, chain_key_type_solana);
+
+   // Sign function should be set
+   BOOST_CHECK(static_cast<bool>(provider->sign));
+}
+
+BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
+   using namespace fc::test;
+   auto clean_app = gsl_lite::finally([]() {
+      appbase::application::reset_app_singleton();
+   });
+   using namespace fc::crypto;
+
+   // Load fixture
+   keygen_result fixture1      = load_keygen_fixture("solana", 1);
+   auto          fixture_spec1 = keygen_fixture_to_spec("solana", 1);
+
+   std::vector<std::string> args = {
+      "--signature-provider", fixture_spec1};
+   auto  tester = create_app(args);
+   auto& mgr    = tester->plugin();
+
+   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_solana);
+   BOOST_CHECK(all_providers.size() >= 1);
+
+   // Provider 1 should be retrievable
+   BOOST_CHECK(!mgr.query_providers(fixture1.key_name).empty());
+
+   // Verify the provider has correct key type
+   auto providers = mgr.query_providers(fixture1.key_name);
+   BOOST_REQUIRE(!providers.empty());
+   BOOST_CHECK_EQUAL(providers[0]->key_type, chain_key_type_solana);
+}
 
 BOOST_AUTO_TEST_SUITE_END()
