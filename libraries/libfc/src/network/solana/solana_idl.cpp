@@ -29,14 +29,10 @@ std::optional<primitive_type> primitive_type_from_string(std::string_view s) {
 }
 
 std::string_view primitive_type_to_string(primitive_type t) {
-   switch (t) {
-      case primitive_type::bool_t:
-         return "bool";
-      case primitive_type::pubkey:
-         return "pubkey";  // Use lowercase version
-      default:
-         return magic_enum::enum_name(t);
-   }
+   // Handle special cases where we want different output than the enum name
+   if (t == primitive_type::bool_t)
+      return "bool";
+   return magic_enum::enum_name(t);
 }
 
 //=============================================================================
@@ -97,32 +93,30 @@ const std::string& idl_type::get_defined_name() const {
 }
 
 std::string idl_type::to_string() const {
-   switch (kind) {
-      case type_kind::primitive:
-         return std::string(primitive_type_to_string(*primitive));
-      case type_kind::defined:
-         return *defined_name;
-      case type_kind::option:
-         return "Option<" + option_inner->to_string() + ">";
-      case type_kind::vec:
-         return "Vec<" + vec_element->to_string() + ">";
-      case type_kind::array:
-         return "[" + array_element->to_string() + "; " + std::to_string(*array_len) + "]";
-      case type_kind::tuple: {
-         std::string result = "(";
-         bool first = true;
-         for (const auto& elem : *tuple_elements) {
-            if (!first)
-               result += ", ";
-            result += elem.to_string();
-            first = false;
-         }
-         result += ")";
-         return result;
+   if (kind == type_kind::primitive)
+      return std::string(primitive_type_to_string(*primitive));
+   if (kind == type_kind::defined)
+      return *defined_name;
+   if (kind == type_kind::option)
+      return "Option<" + option_inner->to_string() + ">";
+   if (kind == type_kind::vec)
+      return "Vec<" + vec_element->to_string() + ">";
+   if (kind == type_kind::array)
+      return "[" + array_element->to_string() + "; " + std::to_string(*array_len) + "]";
+   if (kind == type_kind::tuple) {
+      std::string result = "(";
+      bool first = true;
+      for (const auto& elem : *tuple_elements) {
+         if (!first)
+            result += ", ";
+         result += elem.to_string();
+         first = false;
       }
-      default:
-         return "unknown";
+      result += ")";
+      return result;
    }
+
+   return std::string(magic_enum::enum_name(kind));
 }
 
 idl_type idl_type::from_variant(const fc::variant& v) {
