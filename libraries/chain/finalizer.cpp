@@ -1,5 +1,7 @@
 #include <fc/crypto/signature_provider.hpp>
 #include <sysio/chain/finalizer.hpp>
+
+#include <fc/io/json.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <fc/log/logger_config.hpp>
 #include <fc-lite/algorithm.hpp>
@@ -18,9 +20,9 @@ finalizer::vote_result finalizer::decide_vote(const block_state_ptr& bsp) {
       assert(!fsi.last_vote.empty()); // otherwise `res.monotony_check` would be true.
       if (vote_logger.is_enabled(fc::log_level::debug)) {
          if (bsp->id() != fsi.last_vote.block_id) { // we may have already voted when we received the block
-            fc_dlog(vote_logger, "monotony check failed, block ${bn} ${p}, cannot vote, ${t} <= ${lt}, fsi.last_vote ${lbn} ${lid}",
-                    ("bn", bsp->block_num())("p", bsp->id())("t", bsp->timestamp())("lt", fsi.last_vote.timestamp)
-                    ("lbn", fsi.last_vote.block_num())("lid", fsi.last_vote.block_id));
+            fc_dlog(vote_logger, "monotony check failed, block {} {}, cannot vote, {} <= {}, fsi.last_vote {} {}",
+                    bsp->block_num(), bsp->id(), bsp->timestamp(), fsi.last_vote.timestamp,
+                    fsi.last_vote.block_num(), fsi.last_vote.block_id);
          }
       }
       return res;
@@ -36,24 +38,24 @@ finalizer::vote_result finalizer::decide_vote(const block_state_ptr& bsp) {
       res.liveness_check = bsp->core.latest_qc_block_timestamp() > fsi.lock.timestamp;
 
       if (!res.liveness_check) {
-         fc_dlog(vote_logger, "liveness check failed, block ${bn} ${id}: ${c} <= ${l}, fsi.lock ${lbn} ${lid}, latest_qc_claim: ${qc}",
-                 ("bn", bsp->block_num())("id", bsp->id())("c", bsp->core.latest_qc_block_timestamp())("l", fsi.lock.timestamp)
-                 ("lbn", fsi.lock.block_num())("lid", fsi.lock.block_id)
-                 ("qc", bsp->core.latest_qc_claim()));
+         fc_dlog(vote_logger, "liveness check failed, block {} {}: {} <= {}, fsi.lock {} {}, latest_qc_claim: {}",
+                 bsp->block_num(), bsp->id(), bsp->core.latest_qc_block_timestamp(), fsi.lock.timestamp,
+                 fsi.lock.block_num(), fsi.lock.block_id,
+                 fc::json::to_log_string(bsp->core.latest_qc_claim()));
 
          // Safety check : check if this proposal extends the proposal we're locked on
          res.safety_check = bsp->core.extends(fsi.lock.block_id);
          if (!res.safety_check) {
-            fc_dlog(vote_logger, "safety check failed, block ${bn} ${id} did not extend fsi.lock ${lbn} ${lid}",
-                    ("bn", bsp->block_num())("id", bsp->id())("lbn", fsi.lock.block_num())("lid", fsi.lock.block_id));
+            fc_dlog(vote_logger, "safety check failed, block {} {} did not extend fsi.lock {} {}",
+                    bsp->block_num(), bsp->id(), fsi.lock.block_num(), fsi.lock.block_id);
          }
       }
    } else {
       // Safety and Liveness both fail if `fsi.lock` is empty. It should not happen.
       // `fsi.lock` is initially set to `lib` when switching to IF or starting from a snapshot.
       // -------------------------------------------------------------------------------------
-      fc_wlog(vote_logger, "liveness check & safety check failed, block ${bn} ${id}, fsi.lock is empty",
-              ("bn", bsp->block_num())("id", bsp->id()));
+      fc_wlog(vote_logger, "liveness check & safety check failed, block {} {}, fsi.lock is empty",
+              bsp->block_num(), bsp->id());
       res.liveness_check = false;
       res.safety_check   = false;
    }
@@ -98,19 +100,19 @@ finalizer::vote_result finalizer::decide_vote(const block_state_ptr& bsp) {
    }
 
    if (res.liveness_check) {
-      fc_dlog(vote_logger, "block=${bn} ${id}, liveness=${l}, can vote=${cn}, voting=${v}, locked=${lbn} ${lid}",
-              ("bn", bsp->block_num())("id", bsp->id())("l",res.liveness_check)
-              ("cn",can_vote)("v", res.decision)("lbn", fsi.lock.block_num())("lid", fsi.lock.block_id));
+      fc_dlog(vote_logger, "block={} {}, liveness={}, can vote={}, voting={}, locked={} {}",
+              bsp->block_num(), bsp->id(), res.liveness_check,
+              can_vote, res.decision, fsi.lock.block_num(), fsi.lock.block_id);
    } else if (can_vote) {
-      fc_dlog(vote_logger, "block=${bn} ${id}, liveness=${l}, safety=${s}, can vote=${cn}, voting=${v}, locked=${lbn} ${lid}",
-              ("bn", bsp->block_num())("id", bsp->id())("l",res.liveness_check)("s",res.safety_check)
-              ("cn",can_vote)("v", res.decision)("lbn", fsi.lock.block_num())("lid", fsi.lock.block_id));
+      fc_dlog(vote_logger, "block={} {}, liveness={}, safety={}, can vote={}, voting={}, locked={} {}",
+              bsp->block_num(), bsp->id(), res.liveness_check, res.safety_check,
+              can_vote, res.decision, fsi.lock.block_num(), fsi.lock.block_id);
    } else {
-      fc_ilog(vote_logger, "block=${bn} ${id}, liveness=${l}, safety=${s}, can vote=${cn}, voting=${v}, "
-                           "${ct} <= ${lt}, locked=${lbn} ${lid}, latest_qc_claim: ${qc}",
-              ("bn", bsp->block_num())("id", bsp->id())("l",res.liveness_check)("s",res.safety_check)
-              ("cn",can_vote)("v", res.decision)("ct", bsp->core.latest_qc_block_timestamp())("lt", fsi.lock.timestamp)
-              ("lbn", fsi.lock.block_num())("lid", fsi.lock.block_id)("qc", bsp->core.latest_qc_claim()));
+      fc_ilog(vote_logger, "block={} {}, liveness={}, safety={}, can vote={}, voting={}, "
+                           "{} <= {}, locked={} {}, latest_qc_claim: {}",
+              bsp->block_num(), bsp->id(), res.liveness_check, res.safety_check,
+              can_vote, res.decision, bsp->core.latest_qc_block_timestamp(), fsi.lock.timestamp,
+              fsi.lock.block_num(), fsi.lock.block_id, bsp->core.latest_qc_claim());
    }
    return res;
 }
@@ -172,7 +174,7 @@ void my_finalizers_t::maybe_update_fsi(const block_state_ptr& bsp, const qc_t& r
    assert(bsp->active_finalizer_policy);
    // qc should have already been verified via verify_qc, this SYS_ASSERT should never fire
    SYS_ASSERT(!bsp->pending_finalizer_policy || received_qc.pending_policy_sig, invalid_qc_claim,
-              "qc ${bn} expected to have a pending policy signature", ("bn", received_qc.block_num));
+              "qc {} expected to have a pending policy signature", received_qc.block_num);
 
 
    // see comment on possible optimization in maybe_vote
@@ -313,14 +315,14 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
    SYS_ASSERT(!persist_file_path.empty(), finalizer_safety_exception,
               "path for storing finalizer safety persistence file not specified");
    SYS_ASSERT(!cfile_ds.is_open(), finalizer_safety_exception,
-              "Trying to read an already open finalizer safety persistence file: ${p}",
-              ("p", persist_file_path));
+              "Trying to read an already open finalizer safety persistence file: {}",
+              persist_file_path.generic_string());
 
    if (!std::filesystem::exists(persist_file_path)) {
       if (!std::filesystem::exists(persist_file_path.parent_path()))
          std::filesystem::create_directories(persist_file_path.parent_path());
-      fc_ilog(vote_logger, "finalizer safety persistence file ${p} does not exist (which is expected on the first use of a BLS finalizer key)",
-              ("p", persist_file_path));
+      fc_ilog(vote_logger, "finalizer safety persistence file {} does not exist (which is expected on the first use of a BLS finalizer key)",
+              persist_file_path.generic_string());
       return res;
    }
 
@@ -329,7 +331,7 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
    try {
       // if we can't open the finalizer safety file on startup, throw exception so producer_plugin startup fails
       cfile_ds.open(fc::cfile::update_rw_mode);
-   } FC_RETHROW_EXCEPTIONS(log_level::error, "unable to open finalizer safety persistence file ${p}", ("p", persist_file_path))
+   } FC_RETHROW_EXCEPTIONS(log_level::error, "unable to open finalizer safety persistence file {}", persist_file_path.generic_string())
 
    try {
       persist_file.seekp(0);
@@ -339,14 +341,14 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
       uint64_t magic = 0;
       fc::raw::unpack(persist_file, magic);
       SYS_ASSERT(magic == fsi_t::magic, finalizer_safety_exception,
-                 "bad magic number in finalizer safety persistence file: ${p}", ("p", persist_file_path));
+                 "bad magic number in finalizer safety persistence file: {}", persist_file_path.generic_string());
 
       // We can load files with older, but not files with a version higher that the running nodeop understands.
       // -----------------------------------------------------------------------------------------------------
       uint64_t file_version = 0; // current file version
       fc::raw::unpack(persist_file, file_version);
       SYS_ASSERT(file_version <= current_safety_file_version, finalizer_safety_exception,
-                 "Incorrect version number in finalizer safety persistence file: ${p}", ("p", persist_file_path));
+                 "Incorrect version number in finalizer safety persistence file: {}", persist_file_path.generic_string());
 
       // finally read the `finalizer_safety_information` info
       // ----------------------------------------------------
@@ -369,12 +371,12 @@ my_finalizers_t::fsi_map my_finalizers_t::load_finalizer_safety_info() {
          uint32_t cs = 0;
          fc::raw::unpack(persist_file, cs);
          SYS_ASSERT(cs == calculated_checksum, finalizer_safety_exception,
-                    "bad checksum reading finalizer safety persistence file: ${p}", ("p", persist_file_path));
+                    "bad checksum reading finalizer safety persistence file: {}", persist_file_path.generic_string());
       }
 
       // close file after write
       cfile_ds.close();
-   } FC_RETHROW_EXCEPTIONS(log_level::error, "corrupted finalizer safety persistence file ${p}", ("p", persist_file_path))
+   } FC_RETHROW_EXCEPTIONS(log_level::error, "corrupted finalizer safety persistence file {}", persist_file_path.generic_string())
    // don't remove file we can't load
    return res;
 }

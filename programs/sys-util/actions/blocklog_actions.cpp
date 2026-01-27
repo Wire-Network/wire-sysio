@@ -35,7 +35,7 @@ struct report_time {
 
    void report() {
       const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - _start).count() / 1000;
-      ilog("sys-util - ${desc} took ${t} msec", ("desc", _desc)("t", duration));
+      ilog("sys-util - {} took {} msec", _desc, duration);
    }
 
    const std::chrono::high_resolution_clock::time_point _start;
@@ -151,10 +151,10 @@ int blocklog_actions::make_index() {
    if(!opt->output_file.empty()) out_file = opt->output_file;
 
    report_time rt("making index");
-   const auto log_level = fc::logger::get(DEFAULT_LOGGER).get_log_level();
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   const auto log_level = fc::logger::default_logger().get_log_level();
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    block_log::construct_index(block_file.generic_string(), out_file.generic_string());
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(log_level);
+   fc::logger::default_logger().set_log_level(log_level);
    rt.report();
 
    return 0;
@@ -312,8 +312,8 @@ int blocklog_actions::read_log() {
       SYS_ASSERT(end, block_log_exception, "No blocks found in block log");
       SYS_ASSERT(end->block_num() > 1, block_log_exception, "Only one block found in block log");
 
-      ilog("existing block log contains block num ${first} through block num ${n}",
-           ("first", block_logger.first_block_num())("n", end->block_num()));
+      ilog("existing block log contains block num {} through block num {}",
+           block_logger.first_block_num(), end->block_num());
       
       block_num = std::max(block_num, block_logger.first_block_num());
 
@@ -342,8 +342,8 @@ int blocklog_actions::read_log() {
          } else {
             auto first = fork_db_branch.rbegin();
             auto last  = fork_db_branch.rend() - 1;
-            ilog("existing reversible fork_db block num ${first} through block num ${last} ",
-                 ("first", (*first)->block_num())("last", (*last)->block_num()));
+            ilog("existing reversible fork_db block num {} through block num {} ",
+                 (*first)->block_num(), (*last)->block_num());
             if (print_log) {
                SYS_ASSERT(end->block_num() + 1 == (*first)->block_num(), block_log_exception,
                           "fork_db does not start at end of block log");

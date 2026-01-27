@@ -142,22 +142,22 @@ public:
          try {
             auto comma_pos = entry.find(',');
             SYS_ASSERT(comma_pos != std::string::npos, chain::plugin_config_exception,
-                       "p2p-auto-bp-peer ${e} must consist of an account name and server address separated by a comma", ("e", entry));
+                       "p2p-auto-bp-peer {} must consist of an account name and server address separated by a comma", entry);
             auto addr = entry.substr(comma_pos + 1);
             aname = entry.substr(0, comma_pos);
             account_name account(aname);
             const auto& [host, port, type] = net_utils::split_host_port_type(addr);
             SYS_ASSERT( !host.empty() && !port.empty(), chain::plugin_config_exception,
-                        "Invalid p2p-auto-bp-peer ${p}, syntax host:port:[trx|blk]", ("p", addr));
+                        "Invalid p2p-auto-bp-peer {}, syntax host:port:[trx|blk]", addr);
             net_utils::endpoint e{host, port};
             SYS_ASSERT(std::find(peers.begin(), peers.end(), addr) == peers.end(), chain::plugin_config_exception,
-                       "\"${a}\" should only appear in either p2p-peer-address or p2p-auto-bp-peer option, not both.", ("a",addr));
-            fc_dlog(p2p_log, "Setting p2p-auto-bp-peer ${a} -> ${d}", ("a", account)("d", addr));
+                       "\"{}\" should only appear in either p2p-peer-address or p2p-auto-bp-peer option, not both.", addr);
+            fc_dlog(p2p_log, "Setting p2p-auto-bp-peer {} -> {}", account, addr);
             config.auto_bp_accounts[e]        = account;
             config.auto_bp_addresses[account] = std::move(e);
          } catch (chain::name_type_exception&) {
             SYS_ASSERT(false, chain::plugin_config_exception,
-                       "The account ${a} supplied by --p2p-auto-bp-peer option is invalid", ("a", aname));
+                       "The account {} supplied by --p2p-auto-bp-peer option is invalid", aname);
          }
       }
    }
@@ -171,23 +171,23 @@ public:
          try {
             auto comma_pos = entry.find(',');
             SYS_ASSERT(comma_pos != std::string::npos, chain::plugin_config_exception,
-                       "p2p-bp-gossip-endpoint ${e} must consist of bp-account-name,inbound-server-endpoint,outbound-ip-address separated by commas", ("e", entry));
+                       "p2p-bp-gossip-endpoint {} must consist of bp-account-name,inbound-server-endpoint,outbound-ip-address separated by commas", entry);
             aname = entry.substr(0, comma_pos);
             account_name account(aname);
             auto rest = entry.substr(comma_pos + 1);
             comma_pos = rest.find(',');
             SYS_ASSERT(comma_pos != std::string::npos, chain::plugin_config_exception,
-                       "p2p-bp-gossip-endpoint ${e} must consist of bp-account-name,inbound-server-endpoint,outbound-ip-address separated by commas, second comma is missing", ("e", entry));
+                       "p2p-bp-gossip-endpoint {} must consist of bp-account-name,inbound-server-endpoint,outbound-ip-address separated by commas, second comma is missing", entry);
             auto inbound_server_endpoint = rest.substr(0, comma_pos);
             boost::trim(inbound_server_endpoint);
             const auto& [host, port, type] = net_utils::split_host_port_type(inbound_server_endpoint);
             SYS_ASSERT( !host.empty() && !port.empty() && type.empty(), chain::plugin_config_exception,
-                        "Invalid p2p-bp-gossip-endpoint inbound server endpoint ${p}, syntax host:port", ("p", inbound_server_endpoint));
+                        "Invalid p2p-bp-gossip-endpoint inbound server endpoint {}, syntax host:port", inbound_server_endpoint);
             auto outbound_ip_address = rest.substr(comma_pos + 1);
             boost::trim(outbound_ip_address);
             SYS_ASSERT( outbound_ip_address.length() <= net_utils::max_p2p_address_length, chain::plugin_config_exception,
-                        "p2p-bp-gossip-endpoint outbound-ip-address ${a} too long, must be less than ${m}",
-                        ("a", outbound_ip_address)("m", net_utils::max_p2p_address_length) );
+                        "p2p-bp-gossip-endpoint outbound-ip-address {} too long, must be less than {}",
+                        outbound_ip_address, net_utils::max_p2p_address_length );
             auto is_valid_ip_address = [](const std::string& ip_str) {
                try {
                   boost::asio::ip::make_address(ip_str);
@@ -197,19 +197,19 @@ public:
                return true;
             };
             SYS_ASSERT( is_valid_ip_address(outbound_ip_address), chain::plugin_config_exception,
-                        "Invalid p2p-bp-gossip-endpoint outbound ip address ${p}, syntax ip-address", ("p", outbound_ip_address));
+                        "Invalid p2p-bp-gossip-endpoint outbound ip address {}, syntax ip-address", outbound_ip_address);
 
-            fc_dlog(p2p_log, "Setting p2p-bp-gossip-endpoint ${a} -> ${i},${o}", ("a", account)("i", inbound_server_endpoint)("o", outbound_ip_address));
+            fc_dlog(p2p_log, "Setting p2p-bp-gossip-endpoint {} -> {},{}", account, inbound_server_endpoint, outbound_ip_address);
             SYS_ASSERT(std::ranges::find_if(config.my_bp_gossip_accounts[account],
                                             [&](const auto& e) { return e.outbound_ip_address == outbound_ip_address; }) == config.my_bp_gossip_accounts[account].end(),
-                       chain::plugin_config_exception, "Duplicate p2p-bp-gossip-endpoint for: ${a}, outbound ip address: ${i}",
-                       ("a", account)("i", outbound_ip_address));
+                       chain::plugin_config_exception, "Duplicate p2p-bp-gossip-endpoint for: {}, outbound ip address: {}",
+                       account, outbound_ip_address);
             config.my_bp_gossip_accounts[account].emplace_back(inbound_server_endpoint, outbound_ip_address);
             SYS_ASSERT(config.my_bp_gossip_accounts[account].size() <= max_bp_gossip_peers_per_producer, chain::plugin_config_exception,
-                       "Too many p2p-bp-gossip-endpoint for ${a}, max ${m}", ("a", account)("m", max_bp_gossip_peers_per_producer));
+                       "Too many p2p-bp-gossip-endpoint for {}, max {}", account, max_bp_gossip_peers_per_producer);
          } catch (chain::name_type_exception&) {
             SYS_ASSERT(false, chain::plugin_config_exception,
-                       "The account ${a} supplied by --p2p-bp-gossip-endpoint option is invalid", ("a", aname));
+                       "The account {} supplied by --p2p-bp-gossip-endpoint option is invalid", aname);
          }
       }
    }
@@ -224,19 +224,19 @@ public:
       // normally only one bp peer account except in testing scenarios or test chains
       const controller& cc = self()->chain_plug->chain();
       block_timestamp_type expire = self()->head_block_time.load() + bp_gossip_peer_expiration;
-      fc_dlog(p2p_log, "Updating BP gossip_bp_peers_message with expiration ${e}", ("e", expire));
+      fc_dlog(p2p_log, "Updating BP gossip_bp_peers_message with expiration {}", expire);
       for (const auto& my_bp_account : config.my_bp_gossip_accounts) { // my_bp_gossip_accounts not modified after plugin startup
          const auto& bp_account = my_bp_account.first;
          std::optional<peer_info_t> peer_info = cc.get_peer_info(bp_account);
          if (peer_info && peer_info->key) {
             for (const auto& le : my_bp_account.second) {
-               fc_dlog(p2p_log, "Updating BP gossip_bp_peers_message for ${a} address ${s}", ("a", bp_account)("s", le.server_endpoint));
+               fc_dlog(p2p_log, "Updating BP gossip_bp_peers_message for {} address {}", bp_account, le.server_endpoint);
                if (!initial_updated) {
                   // update initial so always an active one
                   gossip_bp_peers_message::signed_bp_peer signed_empty{{.producer_name = bp_account}}; // .server_endpoint not set for initial message
                   signed_empty.sig = self()->sign_compact(*peer_info->key, signed_empty.digest(self()->chain_id));
                   SYS_ASSERT(signed_empty.sig != signature_type{}, chain::plugin_config_exception,
-                             "Unable to sign empty gossip bp peer of ${a}, private key not found for ${k}", ("a", bp_account)("k", peer_info->key->to_string({})));
+                             "Unable to sign empty gossip bp peer of {}, private key not found for {}", bp_account, peer_info->key->to_string({}));
                   initial_gossip_msg_factory.set_initial_send_buffer(signed_empty);
                   initial_updated = true;
                }
@@ -246,8 +246,9 @@ public:
                peer.cached_bp_peer_info.emplace(le.server_endpoint, le.outbound_ip_address, expire);
                peer.bp_peer_info = fc::raw::pack<gossip_bp_peers_message::bp_peer_info_v1>(*peer.cached_bp_peer_info);
                peer.sig = self()->sign_compact(*peer_info->key, peer.digest(self()->chain_id));
-               SYS_ASSERT(peer.sig != signature_type{}, chain::plugin_config_exception, "Unable to sign bp peer ${p}, private key not found for ${k}",
-                          ("p", peer.producer_name)("k", peer_info->key->to_string({})));
+               SYS_ASSERT(peer.sig != signature_type{}, chain::plugin_config_exception,
+                          "Unable to sign bp peer {}, private key not found for {}",
+                          peer.producer_name, peer_info->key->to_string({}));
                if (auto i = prod_idx.find(std::forward_as_tuple(bp_account, le.server_endpoint, le.outbound_ip_address)); i != prod_idx.end()) {
                   gossip_bps.index.modify(i, [&peer](auto& v) {
                      v.bp_peer_info        = peer.bp_peer_info;
@@ -260,7 +261,7 @@ public:
             }
          } else {
             connect_bp_gossip_peers = false;
-            fc_wlog(p2p_log, "On-chain peer-key not found for configured BP ${a}", ("a", bp_account));
+            fc_wlog(p2p_log, "On-chain peer-key not found for configured BP {}", bp_account);
          }
       }
    }
@@ -352,7 +353,7 @@ public:
                prev = &peer;
             }
          } catch ( fc::exception& e ) {
-            fc_dlog(p2p_msg_log, "Exception unpacking gossip_bp_peers_message::signed_bp_peer, error: ${e}", ("e", e.to_detail_string()));
+            fc_dlog(p2p_msg_log, "Exception unpacking gossip_bp_peers_message::signed_bp_peer, error: {}", e.to_detail_string());
             return false;
          }
       }
@@ -362,7 +363,7 @@ public:
       auto is_peer_key_valid = [&](const gossip_bp_peers_message::signed_bp_peer& peer) -> bool {
          try {
             if (peer.sig.is_webauthn()) {
-               fc_dlog(p2p_msg_log, "Peer ${p} signature is webauthn, not allowed.", ("p", peer.producer_name));
+               fc_dlog(p2p_msg_log, "Peer {} signature is webauthn, not allowed.", peer.producer_name);
                invalid_message = true;
                return false;
             }
@@ -371,17 +372,17 @@ public:
                constexpr bool check_canonical = false;
                public_key_type pk(peer.sig, peer.digest(self()->chain_id), check_canonical);
                if (pk != *peer_info->key) {
-                  fc_dlog(p2p_msg_log, "Recovered peer key did not match on-chain ${p}, recovered: ${pk} != expected: ${k}",
-                          ("p", peer.producer_name)("pk", pk)("k", *peer_info->key));
+                  fc_dlog(p2p_msg_log, "Recovered peer key did not match on-chain {}, recovered: {} != expected: {}",
+                          peer.producer_name, fc::json::to_log_string(pk), fc::json::to_log_string(*peer_info->key));
                   return false;
                }
             } else { // unknown key
                // ok, might have just been deleted or dropped out of top ranking
-               fc_dlog(p2p_msg_log, "Failed to find peer key ${p}", ("p", peer.producer_name));
+               fc_dlog(p2p_msg_log, "Failed to find peer key {}", peer.producer_name);
                return false;
             }
          } catch (fc::exception& e) {
-            fc_dlog(p2p_msg_log, "Exception recovering peer key ${p}, error: ${e}", ("p", peer.producer_name)("e", e.to_detail_string()));
+            fc_dlog(p2p_msg_log, "Exception recovering peer key {}, error: {}", peer.producer_name, e.to_detail_string());
             invalid_message = true;
             return false; // invalid key
          }
@@ -485,12 +486,12 @@ public:
       const auto& prod_idx = gossip_bps.index.get<by_producer>();
       for (const auto& account : accounts) {
          if (auto i = config.auto_bp_addresses.find(account); i != config.auto_bp_addresses.end()) {
-            fc_dlog(p2p_conn_log, "${d} manual bp peer ${p}", ("d", desc)("p", i->second));
+            fc_dlog(p2p_conn_log, "{} manual bp peer {}", desc, i->second.address());
             addresses.insert(i->second.address());
          }
          auto r = prod_idx.equal_range(account);
          for (auto i = r.first; i != r.second; ++i) {
-            fc_dlog(p2p_conn_log, "${d} gossip bp peer ${p}", ("d", desc)("p", i->server_endpoint()));
+            fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i->server_endpoint());
             addresses.insert(i->server_endpoint());
          }
       }
@@ -502,7 +503,7 @@ public:
       fc::lock_guard g(gossip_bps.mtx);
       const auto& prod_idx = gossip_bps.index.get<by_producer>();
       for (auto& i : prod_idx) {
-         fc_dlog(p2p_conn_log, "${d} gossip bp peer ${p}", ("d", desc)("p", i.server_endpoint()));
+         fc_dlog(p2p_conn_log, "{} gossip bp peer {}", desc, i.server_endpoint());
          addresses.insert(i.server_endpoint());
       }
       return addresses;
@@ -521,10 +522,10 @@ public:
       {
          fc::lock_guard gm(mtx);
          active_bps = active_bp_accounts(active_schedule);
-         fc_dlog(p2p_conn_log, "active_bps: ${a}", ("a", to_string(active_bps)));
+         fc_dlog(p2p_conn_log, "active_bps: {}", to_string(active_bps));
 
          addresses = find_gossip_bp_addresses(active_bps, "connect");
-         fc_dlog(p2p_conn_log, "active addresses: ${a}", ("a", to_string(addresses)));
+         fc_dlog(p2p_conn_log, "active addresses: {}", to_string(addresses));
       }
 
       for (const auto& add : addresses) {
@@ -539,12 +540,12 @@ public:
             if (pending_schedule_version != schedule.version) {
                /// establish connection to our configured BPs, resolve_and_connect ignored if already connected
 
-               fc_dlog(p2p_conn_log, "pending producer schedule switches from version ${old} to ${new}",
-                       ("old", pending_schedule_version)("new", schedule.version));
+               fc_dlog(p2p_conn_log, "pending producer schedule switches from version {} to {}",
+                  pending_schedule_version, schedule.version);
 
                auto pending_connections = active_bp_accounts(schedule.producers);
 
-               fc_dlog(p2p_conn_log, "pending_connections: ${c}", ("c", to_string(pending_connections)));
+               fc_dlog(p2p_conn_log, "pending_connections: {}", to_string(pending_connections));
 
                if (!pending_connections.empty()) {
                   connect_bp_gossip_peers = true;
@@ -562,7 +563,7 @@ public:
                pending_schedule_version = schedule.version;
             }
          } else {
-            fc_dlog(p2p_conn_log, "pending producer schedule version ${v} is being cleared", ("v", schedule.version));
+            fc_dlog(p2p_conn_log, "pending producer schedule version {} is being cleared", schedule.version);
             pending_bps.clear();
          }
       }
@@ -572,8 +573,8 @@ public:
    void on_active_schedule(const chain::producer_authority_schedule& schedule) {
       if (auto_bp_peering_enabled() && active_schedule_version != schedule.version && !self()->is_lib_catchup()) {
          /// drops any BP connection which is no longer within our scheduling proximity
-         fc_dlog(p2p_conn_log, "active producer schedule switches from version ${old} to ${new}",
-                 ("old", active_schedule_version)("new", schedule.version));
+         fc_dlog(p2p_conn_log, "active producer schedule switches from version {} to {}",
+                 active_schedule_version, schedule.version);
 
          fc::unique_lock gm(mtx);
          auto old_bps = std::move(active_bps);
@@ -587,19 +588,19 @@ public:
 
          active_bps = active_bp_accounts(schedule.producers);
 
-         fc_dlog(p2p_conn_log, "active_bps: ${a}", ("a", to_string(active_bps)));
+         fc_dlog(p2p_conn_log, "active_bps: {}", to_string(active_bps));
 
          name_set_t peers_to_stay;
          std::set_union(active_bps.begin(), active_bps.end(), pending_bps.begin(), pending_bps.end(),
                         std::inserter(peers_to_stay, peers_to_stay.begin()));
          gm.unlock();
 
-         fc_dlog(p2p_conn_log, "peers_to_stay: ${p}", ("p", to_string(peers_to_stay)));
+         fc_dlog(p2p_conn_log, "peers_to_stay: {}", to_string(peers_to_stay));
 
          name_set_t peers_to_drop;
          std::set_difference(old_bps.begin(), old_bps.end(), peers_to_stay.begin(), peers_to_stay.end(),
                              std::inserter(peers_to_drop, peers_to_drop.end()));
-         fc_dlog(p2p_conn_log, "peers to drop: ${p}", ("p", to_string(peers_to_drop)));
+         fc_dlog(p2p_conn_log, "peers to drop: {}", to_string(peers_to_drop));
 
          // if we dropped out of active schedule then disconnect from all
          bool disconnect_from_all = !config.my_bp_gossip_accounts.empty() &&

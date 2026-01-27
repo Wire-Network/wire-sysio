@@ -19,7 +19,7 @@ void block_handle::write(const std::filesystem::path& state_file) {
    if (!is_valid())
       return;
 
-   ilog("Writing chain_head block ${bn} ${id}", ("bn", block_num())("id", id()));
+   ilog("Writing chain_head block {} {}", block_num(), id());
 
    fc::datastream<fc::cfile> f;
    f.set_file_path(state_file);
@@ -50,8 +50,8 @@ bool block_handle::read(const std::filesystem::path& state_file) {
                  "The best course of action might be to restart from a snapshot" );
 
       fc::raw::unpack(f, *this);
-      ilog("Loading chain_head block ${bn} ${id}", ("bn", block_num())("id", id()));
-   } FC_CAPTURE_AND_RETHROW( (state_file) );
+      ilog("Loading chain_head block {} {}", block_num(), id());
+   } FC_CAPTURE_AND_RETHROW( "{}", state_file.generic_string() );
 
    // remove the `chain_head.dat` file only if we were able to successfully load it.
    std::filesystem::remove(state_file);

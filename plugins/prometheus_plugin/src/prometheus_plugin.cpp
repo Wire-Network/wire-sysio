@@ -62,7 +62,7 @@ namespace sysio {
 
    void prometheus_plugin::plugin_startup() {
       my->_prometheus_thread_pool.start(1, [](const fc::exception& e) { 
-         elog("Prometheus exception ${e}", ("e", e)); }
+         elog("Prometheus exception {}", e.to_detail_string()); }
       );
 
       my->_catalog.update_prometheus_info();

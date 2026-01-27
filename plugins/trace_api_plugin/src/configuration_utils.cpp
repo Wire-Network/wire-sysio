@@ -15,10 +15,11 @@ namespace sysio::trace_api::configuration_utils {
          abi_path = data_dir / abi_path;
       }
 
-      SYS_ASSERT(std::filesystem::exists(abi_path) && !std::filesystem::is_directory(abi_path), chain::plugin_config_exception, "${path} does not exist or is not a file", ("path", abi_path));
+      SYS_ASSERT(std::filesystem::exists(abi_path) && !std::filesystem::is_directory(abi_path), chain::plugin_config_exception,
+                 "{} does not exist or is not a file", abi_path.string());
       try {
          abi_variant = fc::json::from_file(abi_path);
-      } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: ${file}", ("file", abi_path));
+      } SYS_RETHROW_EXCEPTIONS(chain::json_parse_exception, "Fail to parse JSON from file: {}", abi_path.string());
 
       chain::abi_def result;
       fc::from_variant(abi_variant, result);

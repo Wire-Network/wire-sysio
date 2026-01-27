@@ -224,7 +224,7 @@ variant json_rpc_client::send_json(const variant& payload, bool expect_json_body
 
    // Check HTTP status
    if (res.result() != http::status::ok) {
-      FC_THROW_FMT("HTTP ERROR ({}): {}", static_cast<unsigned>(res.result()), std::string(res.reason()));
+      FC_THROW("HTTP ERROR ({}): {}", static_cast<unsigned>(res.result()), res.reason());
    }
 
    if (!expect_json_body) {

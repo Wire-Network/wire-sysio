@@ -109,7 +109,7 @@ namespace sysio { namespace chain {
          if (fut.valid()) {
             try {
                fut.get();
-            } FC_LOG_AND_DROP()
+            } FC_LOG_AND_DROP("future get")
          }
       };
    };
@@ -135,8 +135,7 @@ namespace sysio { namespace chain {
     * Example: named_thread_pool<struct net> thread_pool;
     *      or: struct net{}; named_thread_pool<net> thread_pool;
     * @param NamePrefixTag is a type name appended with -## of thread.
-    *                    A short NamePrefixTag type name (6 chars or under) is recommended as console_appender uses
-    *                    9 chars for the thread name.
+    *                    A short NamePrefixTag type name is recommended as logger uses 9 chars for the thread name.
     */
    template<typename NamePrefixTag>
    class named_thread_pool {
@@ -195,20 +194,20 @@ namespace sysio { namespace chain {
       /// not thread safe, expected to only be called from thread that called start()
       void stop() {
          if (_thread_pool.size() > 0) {
-            tlog("stoping ${i}", ("i", boost::core::demangle(typeid(this).name())));
+            tlog("stopping {}", boost::core::demangle(typeid(this).name()));
             _ioc_work.reset();
             _ioc.stop();
             for( auto& t : _thread_pool ) {
                t.join();
             }
             _thread_pool.clear();
-            tlog("stopped ${i}", ("i", boost::core::demangle(typeid(this).name())));
+            tlog("stopped {}", boost::core::demangle(typeid(this).name()));
          }
       }
 
       on_except_t make_on_except_abort() {
          return [tn=thread_name_base_from_typeinfo(typeid(this))](const fc::exception& e) {
-            elog("Unexpected exception in a ${n} thread, aborting: ${e}", ("n", tn)("e", e.to_detail_string()));
+            elog("Unexpected exception in a {} thread, aborting: {}", tn, e.to_detail_string());
             abort();
          };
       }
@@ -250,16 +249,16 @@ namespace sysio { namespace chain {
             if( on_except ) {
                on_except( e );
             } else {
-               elog( "Exiting thread ${t} on exception: ${e}", ("t", tn)("e", e.to_detail_string()) );
+               elog( "Exiting thread {} on exception: {}", tn, e.to_detail_string() );
                throw;
             }
          } catch( const std::exception& e ) {
-            fc::std_exception_wrapper se( FC_LOG_MESSAGE( warn, "${what}: ", ("what", e.what()) ),
+            fc::std_exception_wrapper se( FC_LOG_MESSAGE( warn, "{}: ", e.what() ),
                                           std::current_exception(), BOOST_CORE_TYPEID( e ).name(), e.what() );
             if( on_except ) {
                on_except( se );
             } else {
-               elog( "Exiting thread ${t} on exception: ${e}", ("t", tn)("e", se.to_detail_string()) );
+               elog( "Exiting thread {} on exception: {}", tn, se.to_detail_string() );
                throw;
             }
          } catch( ... ) {
@@ -267,7 +266,7 @@ namespace sysio { namespace chain {
                fc::unhandled_exception ue( FC_LOG_MESSAGE( warn, "unknown exception" ), std::current_exception() );
                on_except( ue );
             } else {
-               elog( "Exiting thread ${t} on unknown exception", ("t", tn) );
+               elog( "Exiting thread {} on unknown exception", tn );
                throw;
             }
          }

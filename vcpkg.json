@@ -15,6 +15,7 @@
     "ethash",
     "cryptopp",
     "gtest",
+    "spdlog",
     "magic-enum",
     {
       "name": "curl",

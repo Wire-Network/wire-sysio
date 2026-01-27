@@ -260,7 +260,7 @@ namespace sysio::trace_api {
       if (trace_found != index_found) {
          const std::string trace_status = trace_found ? "existing" : "new";
          const std::string index_status = index_found ? "existing" : "new";
-         elog("Trace file is ${ts}, but it's metadata file is ${is}. This means the files are not consistent.", ("ts", trace_status)("is", index_status));
+         elog("Trace file is {}, but it's metadata file is {}. This means the files are not consistent.", trace_status, index_status);
       }
    }
 

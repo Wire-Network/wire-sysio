@@ -77,14 +77,12 @@ class currency_tester : public T {
                  ("can_recall", 0)
                  ("can_whitelist", 0)
          );
-         wdump((result));
 
          result = push_action("sysio.token"_n, "issue"_n, mutable_variant_object()
                  ("to",       sysio_token)
                  ("quantity", "1000000.0000 CUR")
                  ("memo", "gggggggggggg")
          );
-         wdump((result));
          T::produce_block();
       }
 

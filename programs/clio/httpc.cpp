@@ -63,11 +63,11 @@ fc::variant do_http_call(const config_t& config, const std::string& base_uri, co
       } else if( status_code == 404 ) {
          // Unknown endpoint
          if (path.compare(0, chain_func_base.size(), chain_func_base) == 0) {
-            throw chain::missing_chain_api_plugin_exception(FC_LOG_MESSAGE(error, "Chain API plugin is not enabled on endpoint: ${e}", ("e", base_uri)));
+            throw chain::missing_chain_api_plugin_exception(FC_LOG_MESSAGE(error, "Chain API plugin is not enabled on endpoint: {}", base_uri));
          } else if (path.compare(0, wallet_func_base.size(), wallet_func_base) == 0) {
-            throw chain::missing_wallet_api_plugin_exception(FC_LOG_MESSAGE(error, "Wallet is not available on endpoint: ${e}", ("e", base_uri)));
+            throw chain::missing_wallet_api_plugin_exception(FC_LOG_MESSAGE(error, "Wallet is not available on endpoint: {}", base_uri));
          } else if (path.compare(0, net_func_base.size(), net_func_base) == 0) {
-            throw chain::missing_net_api_plugin_exception(FC_LOG_MESSAGE(error, "Net API plugin is not enabled on endpoint: ${e}", ("e", base_uri)));
+            throw chain::missing_net_api_plugin_exception(FC_LOG_MESSAGE(error, "Net API plugin is not enabled on endpoint: {}", base_uri));
          }
       } else {
          auto &&error_info = response_result.as<sysio::error_results>().error;
@@ -85,7 +85,7 @@ fc::variant do_http_call(const config_t& config, const std::string& base_uri, co
    }
 
    SYS_ASSERT( status_code == 200 && !response_result.is_null(), http_request_fail,
-               "Error code ${c}\n: ${msg}\n", ("c", status_code)("msg", re) );
+               "Error code {}\n: {}\n", status_code, re );
    return response_result;
    }
 }}}

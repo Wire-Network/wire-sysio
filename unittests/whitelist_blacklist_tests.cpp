@@ -33,7 +33,6 @@ class whitelist_blacklist_tester {
             cfg.contract_blacklist = contract_blacklist;
             cfg.action_blacklist = action_blacklist;
          }, !shutdown_called);
-         wdump((last_produced_block));
          chain->set_last_produced_block_map( last_produced_block );
 
          if( !bootstrap ) return;
@@ -60,7 +59,6 @@ class whitelist_blacklist_tester {
       void shutdown() {
          FC_ASSERT( chain, "chain is not up" );
          last_produced_block = chain->get_last_produced_block_map();
-         wdump((last_produced_block));
          chain.reset();
          shutdown_called = true;
       }
@@ -366,11 +364,11 @@ BOOST_AUTO_TEST_CASE( actor_blacklist_inline ) { try {
       if( act.account == "sysio"_n && act.name == "onblock"_n ) return;
 
       if( t->receipt ) {
-         wlog( "trx ${id} executed (first action is ${code}::${action})",
-              ("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx {} executed (first action is {}::{})",
+              t->id, act.account, act.name );
       } else {
-         wlog( "trx ${id} failed (first action is ${code}::${action})",
-               ("id", t->id)("code", act.account)("action", act.name) );
+         wlog( "trx {} failed (first action is {}::{})",
+               t->id, act.account, act.name );
       }
    };
 
@@ -477,7 +475,6 @@ BOOST_AUTO_TEST_CASE( greylist_limit_tests ) { try {
 
    BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() > (3*cfg.max_block_net_usage) );
    BOOST_TEST_REQUIRE( rm.get_virtual_block_net_limit() < (6*cfg.max_block_net_usage) );
-   wdump((rm.get_account_net_limit_ex(user_account)));
    BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max > 3*reqauth_net_charge );
    BOOST_TEST_REQUIRE( rm.get_account_net_limit_ex(user_account).first.max < 5*reqauth_net_charge );
 

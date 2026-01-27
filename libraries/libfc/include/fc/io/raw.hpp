@@ -157,10 +157,10 @@ namespace fc {
     inline void unpack( Stream& s, T (&v)[N])
     { try {
       unsigned_int size; fc::raw::unpack( s, size );
-      FC_ASSERT( size.value == N );
+      FC_ASSERT( size.value == N, "Expected array of length {}, but got {}", N, size.value );
       for (uint64_t i = 0; i < N; ++i)
          fc::raw::unpack(s, v[i]);
-    } FC_RETHROW_EXCEPTIONS( warn, "${type} (&v)[${length}]", ("type",fc::get_typename<T>::name())("length",N) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "{} (&v)[{}]", fc::get_typename<T>::name(), N ) }
 
     template<typename Stream, typename T>
     inline void pack( Stream& s, const std::shared_ptr<T>& v)
@@ -179,7 +179,7 @@ namespace fc {
          fc::raw::unpack( s, *tmp );
          v = std::move(tmp);
       } else { v.reset(); }
-    } FC_RETHROW_EXCEPTIONS( warn, "std::shared_ptr<T>", ("type",fc::get_typename<T>::name()) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "std::shared_ptr<{}>", fc::get_typename<T>::name() ) }
 
     template<typename Stream> inline void pack( Stream& s, const signed_int& v ) {
       uint32_t val = (v.value<<1) ^ (v.value>>31);              //apply zigzag encoding
@@ -257,7 +257,7 @@ namespace fc {
       bool b; fc::raw::unpack( s, b );
       if( b ) { v = T(); fc::raw::unpack( s, *v ); }
       else { v.reset(); } // in case v has already has a value
-    } FC_RETHROW_EXCEPTIONS( warn, "optional<${type}>", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "optional<{}>", fc::get_typename<T>::name() ) }
 
     // std::vector<char>
     template<typename Stream> inline void pack( Stream& s, const std::vector<char>& value ) {
@@ -326,7 +326,7 @@ namespace fc {
           // interfaces, we have to create the object first and then populate the members.
           // -------------------------------------------------------------------------------------
           fc::raw::unpack( s, const_cast<std::remove_const_t<T>&>(this->obj.*p) );
-        } FC_RETHROW_EXCEPTIONS( warn, "Error unpacking field ${field}", ("field",name) ) }
+        } FC_RETHROW_EXCEPTIONS( warn, "Error unpacking field {}", name ) }
 
         private:
           Stream& s;
@@ -680,7 +680,7 @@ namespace fc {
     inline void unpack( Stream& s, T& v )
     { try {
       fc::raw::detail::if_reflected< typename fc::reflector<T>::is_defined >::unpack(s,v);
-    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking ${type}", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking {}", fc::get_typename<T>::name() ) }
 
     template<typename T>
     inline size_t pack_size(  const T& v )
@@ -724,14 +724,14 @@ namespace fc {
       datastream<const char*>  ds( s.data(), size_t(s.size()) );
       fc::raw::unpack(ds,tmp);
       return tmp;
-    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking ${type}", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking {}", fc::get_typename<T>::name() ) }
 
     template<typename T>
     inline void unpack( const std::vector<char>& s, T& tmp )
     { try  {
       datastream<const char*>  ds( s.data(), size_t(s.size()) );
       fc::raw::unpack(ds,tmp);
-    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking ${type}", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking {}", fc::get_typename<T>::name() ) }
 
     template<typename T>
     inline void pack( char* d, uint32_t s, const T& v ) {
@@ -746,14 +746,14 @@ namespace fc {
       datastream<const char*>  ds( d, s );
       fc::raw::unpack(ds,v);
       return v;
-    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking ${type}", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking {}", fc::get_typename<T>::name() ) }
 
     template<typename T>
     inline void unpack( const char* d, uint32_t s, T& v )
     { try {
       datastream<const char*>  ds( d, s );
       fc::raw::unpack(ds,v);
-    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking ${type}", ("type",fc::get_typename<T>::name() ) ) }
+    } FC_RETHROW_EXCEPTIONS( warn, "error unpacking {}", fc::get_typename<T>::name() ) }
 
    template<typename Stream>
    struct pack_static_variant

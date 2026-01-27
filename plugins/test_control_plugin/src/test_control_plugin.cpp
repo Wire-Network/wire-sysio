@@ -88,12 +88,12 @@ void test_control_plugin_impl::connect() {
 
 void test_control_plugin_impl::throw_exception() {
    if (_throw_options.exception == "controller_emit_signal_exception") {
-      ilog("throwing controller_emit_signal_exception for signal ${s}", ("s", _throw_options.signal));
+      ilog("throwing controller_emit_signal_exception for signal {}", _throw_options.signal);
       reset_throw(); // throw only once
       SYS_ASSERT(false, chain::controller_emit_signal_exception, "");
    }
 
-   ilog("throwing misc_exception for signal ${s}", ("s", _throw_options.signal));
+   ilog("throwing misc_exception for signal {}", _throw_options.signal);
    reset_throw(); // throw only once
    SYS_ASSERT(false, chain::misc_exception, "");
 }
@@ -153,8 +153,8 @@ void test_control_plugin_impl::swap_action_in_block(const chain::signed_block_pt
 
    // will be processed on the next start_block if is_new_best_head
    const auto&[add_result, bh] = _chain.accept_block(copy_b_signed->calculate_id(), copy_b_signed);
-   ilog("Swapped action ${f} to ${t}, add_result ${a}, block ${bn}",
-        ("f", _swap_on_options.from)("t", _swap_on_options.to)("a", add_result)("bn", bh ? bh->block_num() : 0));
+   ilog("Swapped action {} to {}, add_result {}, block {}",
+        _swap_on_options.from, _swap_on_options.to, add_result, bh ? bh->block_num() : 0);
    app().find_plugin<net_plugin>()->broadcast_block(copy_b_signed, copy_b_signed->calculate_id());
    if (_swap_on_options.shutdown)
       app().quit();
@@ -213,11 +213,11 @@ void test_control_plugin_impl::process_next_block_state(const chain::block_id_ty
    if (_kill_options._producer != account_name()) {
       if( _kill_options._producer != producer_name ) _kill_options._clean_producer_sequence = true;
       if( _kill_options._clean_producer_sequence ) {
-         ilog( "producer ${cprod} slot ${pslot}, looking for ${lprod} slot ${slot}",
-               ("cprod", producer_name)("pslot", slot)("lprod", _kill_options._producer)("slot", _kill_options._where_in_sequence) );
+         ilog( "producer {} slot {}, looking for {} slot {}",
+               producer_name, slot, _kill_options._producer, _kill_options._where_in_sequence );
       } else {
-         ilog( "producer ${cprod} slot ${pslot}, looking for start of ${lprod} production round",
-               ("cprod", producer_name)("pslot", slot)("lprod", _kill_options._producer) );
+         ilog( "producer {} slot {}, looking for start of {} production round",
+               producer_name, slot, _kill_options._producer );
       }
    }
 
@@ -225,7 +225,7 @@ void test_control_plugin_impl::process_next_block_state(const chain::block_id_ty
    if( _kill_options._clean_producer_sequence && (producer_name == _kill_options._producer || _kill_options._started_production_round) ) {
       _kill_options._started_production_round = true;
       const auto current_slot = chain::block_timestamp_type( block_time ).slot % chain::config::producer_repetitions;
-      ilog( "producer ${prod} slot: ${slot}", ("prod", producer_name)("slot", slot) );
+      ilog( "producer {} slot: {}", producer_name, slot );
 
       if( current_slot >= _kill_options._where_in_sequence || producer_name != _kill_options._producer ) {
          ilog("shutting down");
@@ -283,23 +283,23 @@ namespace test_control_apis {
 read_write::kill_node_on_producer_results read_write::kill_node_on_producer(const read_write::kill_node_on_producer_params& params) const {
 
    if (params.based_on_lib) {
-      ilog("kill on lib for producer: ${p} at their ${s} slot in sequence", ("p", params.producer.to_string())("s", params.where_in_sequence));
+      ilog("kill on lib for producer: {} at their {} slot in sequence", params.producer.to_string(), params.where_in_sequence);
       my->kill_on_lib(params.producer, params.where_in_sequence);
    } else {
-      ilog("kill on head for producer: ${p} at their ${s} slot in sequence", ("p", params.producer.to_string())("s", params.where_in_sequence));
+      ilog("kill on head for producer: {} at their {} slot in sequence", params.producer.to_string(), params.where_in_sequence);
       my->kill_on_head(params.producer, params.where_in_sequence);
    }
    return read_write::kill_node_on_producer_results{};
 }
 
 empty read_write::throw_on(const read_write::throw_on_params& params) const {
-   ilog("received throw on: ${p}", ("p", params));
+   ilog("received throw on: {}", fc::json::to_log_string(params));
    my->set_throw_on_options(params);
    return {};
 }
 
 empty read_write::swap_action(const read_write::swap_action_params& params) const {
-   ilog("received swap_action: ${p}", ("p", params));
+   ilog("received swap_action: {}", fc::json::to_log_string(params));
    my->set_swap_action_options(params);
    return {};
 }

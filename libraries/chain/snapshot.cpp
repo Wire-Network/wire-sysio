@@ -65,8 +65,8 @@ void variant_snapshot_reader::validate() {
          "Variant snapshot version is not an integer");
 
    SYS_ASSERT(version.as_uint64() == (uint64_t)current_snapshot_version, snapshot_validation_exception,
-         "Variant snapshot is an unsupported version.  Expected : ${expected}, Got: ${actual}",
-         ("expected", current_snapshot_version)("actual",o["version"].as_uint64()));
+         "Variant snapshot is an unsupported version.  Expected : {}, Got: {}",
+         current_snapshot_version, o["version"].as_uint64());
 
    SYS_ASSERT(o.contains("sections"), snapshot_validation_exception,
          "Variant snapshot has no sections");
@@ -102,7 +102,7 @@ void variant_snapshot_reader::set_section( const string& section_name ) {
       }
    }
 
-   SYS_THROW(snapshot_exception, "Variant snapshot has no section named ${n}", ("n", section_name));
+   SYS_THROW(snapshot_exception, "Variant snapshot has no section named {}", section_name);
 }
 
 bool variant_snapshot_reader::read_row( detail::abstract_snapshot_row_reader& row_reader ) {
@@ -270,8 +270,8 @@ void istream_snapshot_reader::validate() {
       decltype(expected_version) actual_version;
       snapshot.read((char*)&actual_version, sizeof(actual_version));
       SYS_ASSERT(actual_version == expected_version, snapshot_exception,
-                 "Binary snapshot is an unsupported version.  Expected : ${expected}, Got: ${actual}",
-                 ("expected", expected_version)("actual", actual_version));
+                 "Binary snapshot is an unsupported version.  Expected : {}, Got: {}",
+                 expected_version, actual_version);
 
       while (validate_section()) {}
    } FC_LOG_AND_RETHROW()
@@ -332,7 +332,7 @@ void istream_snapshot_reader::set_section( const string& section_name ) {
       }
    }
 
-   SYS_THROW(snapshot_exception, "Binary snapshot has no section named ${n}", ("n", section_name));
+   SYS_THROW(snapshot_exception, "Binary snapshot has no section named {}", section_name);
 }
 
 bool istream_snapshot_reader::read_row( detail::abstract_snapshot_row_reader& row_reader ) {
@@ -395,7 +395,7 @@ istream_json_snapshot_reader::istream_json_snapshot_reader(const std::filesystem
    : impl{new istream_json_snapshot_reader_impl{0, 0, {}, {}}}
 {
    FILE* fp = fopen(p.string().c_str(), "rb");
-   SYS_ASSERT(fp, snapshot_exception, "Failed to open JSON snapshot: ${file}", ("file", p));
+   SYS_ASSERT(fp, snapshot_exception, "Failed to open JSON snapshot: {}", p.generic_string());
    auto close = fc::make_scoped_exit( [&fp]() { fclose( fp ); } );
    char readBuffer[65536];
    sysio_rapidjson::FileReadStream is(fp, readBuffer, sizeof(readBuffer));
@@ -415,11 +415,11 @@ void istream_json_snapshot_reader::validate() {
       SYS_ASSERT(impl->doc.HasMember("version"), snapshot_exception, "version section not found" );
       auto actual_version = impl->doc["version"].GetUint();
       SYS_ASSERT( actual_version == expected_version, snapshot_exception,
-                  "JSON snapshot is an unsupported version.  Expected : ${expected}, Got: ${actual}",
-                  ("expected", expected_version)( "actual", actual_version ) );
+                  "JSON snapshot is an unsupported version.  Expected : {}, Got: {}",
+                  expected_version, actual_version );
 
    } catch( const std::exception& e ) {  \
-      snapshot_exception fce(FC_LOG_MESSAGE( warn, "JSON snapshot validation threw IO exception (${what})",("what",e.what())));
+      snapshot_exception fce(FC_LOG_MESSAGE( warn, "JSON snapshot validation threw IO exception ({})", e.what()));
       throw fce;
    }
 }
@@ -429,19 +429,19 @@ bool istream_json_snapshot_reader::validate_section() const {
 }
 
 void istream_json_snapshot_reader::set_section( const string& section_name ) {
-   SYS_ASSERT( impl->doc.HasMember( section_name.c_str() ), snapshot_exception, "JSON snapshot has no section ${sec}", ("sec", section_name) );
-   SYS_ASSERT( impl->doc[section_name.c_str()].HasMember( "num_rows" ), snapshot_exception, "JSON snapshot ${sec} num_rows not found", ("sec", section_name) );
-   SYS_ASSERT( impl->doc[section_name.c_str()].HasMember( "rows" ), snapshot_exception, "JSON snapshot ${sec} rows not found", ("sec", section_name) );
-   SYS_ASSERT( impl->doc[section_name.c_str()]["rows"].IsArray(), snapshot_exception, "JSON snapshot ${sec} rows is not an array", ("sec_name", section_name) );
+   SYS_ASSERT( impl->doc.HasMember( section_name.c_str() ), snapshot_exception, "JSON snapshot has no section {}", section_name );
+   SYS_ASSERT( impl->doc[section_name.c_str()].HasMember( "num_rows" ), snapshot_exception, "JSON snapshot {} num_rows not found", section_name );
+   SYS_ASSERT( impl->doc[section_name.c_str()].HasMember( "rows" ), snapshot_exception, "JSON snapshot {} rows not found", section_name );
+   SYS_ASSERT( impl->doc[section_name.c_str()]["rows"].IsArray(), snapshot_exception, "JSON snapshot {} rows is not an array", section_name );
 
    impl->sec_name = section_name;
    impl->num_rows = impl->doc[section_name.c_str()]["num_rows"].GetInt();
-   ilog( "reading ${section_name}, num_rows: ${num_rows}", ("section_name", section_name)( "num_rows", impl->num_rows ) );
+   ilog( "reading {}, num_rows: {}", section_name, impl->num_rows );
 }
 
 bool istream_json_snapshot_reader::read_row( detail::abstract_snapshot_row_reader& row_reader ) {
-   SYS_ASSERT( impl->cur_row < impl->num_rows, snapshot_exception, "JSON snapshot ${sect}'s cur_row ${cur_row} >= num_rows ${num_rows}",
-               ("sect_name", impl->sec_name)( "cur_row", impl->cur_row )( "num_rows", impl->num_rows ) );
+   SYS_ASSERT( impl->cur_row < impl->num_rows, snapshot_exception, "JSON snapshot {}'s cur_row {} >= num_rows {}",
+               impl->sec_name, impl->cur_row, impl->num_rows );
 
    const sysio_rapidjson::Value& rows = impl->doc[impl->sec_name.c_str()]["rows"];
    sysio_rapidjson::StringBuffer buffer;
@@ -490,8 +490,9 @@ void threaded_snapshot_reader::validate() {
       SYS_ASSERT(snapshot_file.unpack_from<magic_number_t>(0) == ostream_snapshot_writer::magic_number, snapshot_exception, "Binary snapshot has unexpected magic number!");
 
       const version_t actual_version = snapshot_file.unpack_from<version_t>(sizeof(magic_number_t));
-      SYS_ASSERT(actual_version == current_snapshot_version, snapshot_exception, "Binary snapshot is an unsuppored version.  Expected : ${expected}, Got: ${actual}",
-                                                                                 ("expected", current_snapshot_version)("actual", actual_version));
+      SYS_ASSERT(actual_version == current_snapshot_version, snapshot_exception,
+                 "Binary snapshot is an unsuppored version.  Expected : {}, Got: {}",
+                 current_snapshot_version, actual_version);
 
       uint64_t next_section_offs = sizeof(magic_number_t) + sizeof(version_t);
       while(true) {
@@ -527,7 +528,7 @@ void threaded_snapshot_reader::set_section(const string& section_name) {
       next_section_offs += sizeof(this_section_size) + this_section_size;
    }
 
-   SYS_THROW(snapshot_exception, "Binary snapshot has no section named ${n}", ("n", section_name));
+   SYS_THROW(snapshot_exception, "Binary snapshot has no section named {}",  section_name);
 }
 
 bool threaded_snapshot_reader::read_row(detail::abstract_snapshot_row_reader& row_reader) {
@@ -603,7 +604,7 @@ fc::variant snapshot_info(snapshot_reader& snapshot) {
       section.read_row(header);
    });
    if(header.version < chain_snapshot_header::minimum_compatible_version || header.version > chain_snapshot_header::current_version)
-      wlog("Snapshot version ${v} is not supported by this version of sys-util, trying to parse anyways...");
+      wlog("Snapshot version {} is not supported by this version of sys-util, trying to parse anyways...", header.version);
 
    chain_id_type chain_id = chain_id_type::empty_chain_id();
    if(header.version <= 1) {

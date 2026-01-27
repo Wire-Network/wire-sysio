@@ -1,5 +1,7 @@
 #include <sysio/chain/block.hpp>
 
+#include <fc/io/json.hpp>
+
 namespace sysio::chain {
    void additional_block_signatures_extension::reflector_init() {
       static_assert( fc::raw::has_feature_reflector_init_on_unpacked_reflected_types,
@@ -14,8 +16,8 @@ namespace sysio::chain {
       for( const auto& s : signatures ) {
          auto res = unique_sigs.insert( s );
          SYS_ASSERT( res.second, ill_formed_additional_block_signatures_extension,
-                     "Signature ${s} was repeated in the additional block signatures extension",
-                     ("s", s)
+                     "Signature {} was repeated in the additional block signatures extension",
+                     fc::json::to_log_string(s)
          );
       }
    }
@@ -47,14 +49,14 @@ namespace sysio::chain {
 
          auto match = decompose_t::extract<block_extension>( id, e.second, iter->second );
          SYS_ASSERT( match, invalid_block_extension,
-                     "Block extension with id type ${id} is not supported",
-                     ("id", id)
+                     "Block extension with id type {} is not supported",
+                     id
          );
 
          if( match->enforce_unique ) {
             SYS_ASSERT( i == 0 || id > id_type_lower_bound, invalid_block_header_extension,
-                        "Block extension with id type ${id} is not allowed to repeat",
-                        ("id", id)
+                        "Block extension with id type {} is not allowed to repeat",
+                        id
             );
          }
 
@@ -85,8 +87,8 @@ namespace sysio::chain {
 
          auto match = decompose_t::extract<block_extension>( id, e.second, *ext );
          SYS_ASSERT( match, invalid_block_extension,
-                     "Block extension with id type ${id} is not supported",
-                     ("id", id)
+                     "Block extension with id type {} is not supported",
+                     id
          );
 
          return ext;

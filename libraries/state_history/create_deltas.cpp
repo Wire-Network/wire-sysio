@@ -63,7 +63,7 @@ void pack_deltas(boost::iostreams::filtering_ostreambuf& obuf, const chainbase::
       if (obj)
          return *obj;
       auto it = removed_table_id.find(tid);
-      SYS_ASSERT(it != removed_table_id.end(), chain::plugin_exception, "can not found table id ${tid}", ("tid", tid));
+      SYS_ASSERT(it != removed_table_id.end(), chain::plugin_exception, "can not found table id {}", tid);
       return *it->second;
    };
 

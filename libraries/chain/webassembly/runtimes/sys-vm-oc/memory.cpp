@@ -4,6 +4,7 @@
 #include <sysio/chain/webassembly/sys-vm-oc/memfd_helpers.hpp>
 
 #include <fc/scoped_exit.hpp>
+#include <fc/exception/exception.hpp>
 
 #include <unistd.h>
 #include <sys/mman.h>

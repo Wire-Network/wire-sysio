@@ -31,9 +31,9 @@ public:
       for (auto& filename : file_names) {
          FC_ASSERT_FMT(exists(filename), "File does not exist: {}", filename.string());
          auto file_path = std::filesystem::absolute(filename);
-         ilogf("Loading ABI file: {}", file_path.string());
+         ilog("Loading ABI file: {}", file_path.string());
          if (!std::ranges::none_of(_abi_files, [&](const auto& f) { return f.first == file_path; })) {
-            wlogf("Already registered ABI file: {}", file_path.string());
+            wlog("Already registered ABI file: {}", file_path.string());
             continue;
          }
          _abi_files.emplace_back(file_path, fc::network::ethereum::abi::parse_contracts(file_path));
@@ -51,7 +51,7 @@ public:
 
    void add_client(const std::string& id, ethereum_client_entry_ptr client) {
       FC_ASSERT(client, "Client cannot be null");
-      FC_ASSERT(!_clients.contains(id), "Client with id ${id} already exists", ("id", id));
+      FC_ASSERT(!_clients.contains(id), "Client with id {} already exists", id);
       _clients.emplace(id, client);
    }
 
@@ -65,13 +65,13 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
       auto& abi_files = options.at(option_abi_file).as<std::vector<std::filesystem::path>>();
       my->load_abi_files(abi_files);
    }
-   FC_ASSERT(options.count(option_name_client), "At least one ethereum client argument is required ${name}", ("name", option_name_client));
+   FC_ASSERT(options.count(option_name_client), "At least one ethereum client argument is required {}", option_name_client);
    auto plug_sig = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs    = options.at(option_name_client).as<std::vector<std::string>>();
    for (auto& client_spec : client_specs) {
-      dlog("Adding ethereum client with spec: ${spec}", ("spec", client_spec));
+      dlog("Adding ethereum client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 3 || parts.size() == 4, "Invalid spec ${spec}", ("spec", client_spec));
+      FC_ASSERT(parts.size() == 3 || parts.size() == 4, "Invalid spec {}", client_spec);
       auto& id           = parts[0];
       auto& url          = parts[2];
       auto& sig_id       = parts[1];
@@ -89,8 +89,8 @@ void outpost_ethereum_client_plugin::plugin_initialize(const variables_map& opti
                         std::make_shared<ethereum_client>(sig_provider, url,
                            chain_id)));
 
-      ilogf("Added ethereum client (id={},sig_id={},chainId={},url={})",
-         id,sig_id,url,chain_id_str.value_or("none"));
+      ilog("Added ethereum client (id={},sig_id={},chainId={},url={})",
+           id,sig_id,url,chain_id_str.value_or("none"));
    }
 }
 

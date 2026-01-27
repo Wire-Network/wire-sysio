@@ -40,17 +40,12 @@ namespace sysio::chain {
       // FIXME: We should probably feed that from CMake directly somehow ...
       fc_dlog(_logger, "DEEP_MIND_VERSION wire_sysio 1 0");
 
-      fc_dlog(_logger, "ABIDUMP START ${block_num} ${global_sequence_num}",
-         ("block_num", head_block_num)
-         ("global_sequence_num", db.get<dynamic_global_property_object>().global_action_sequence)
-      );
+      fc_dlog(_logger, "ABIDUMP START {} {}", head_block_num, db.get<dynamic_global_property_object>().global_action_sequence);
       const auto& idx = db.get_index<account_metadata_index>();
       for (auto& row : idx.indices()) {
          if (row.abi.size() != 0) {
-            fc_dlog(_logger, "ABIDUMP ABI ${contract} ${abi}",
-               ("contract", row.name)
-               ("abi", row.abi)
-            );
+            std::string abi_str = fc::format_string("${data}", fc::mutable_variant_object("data", fc::variant(row.abi)));
+            fc_dlog(_logger, "ABIDUMP ABI {} {}", row.name, abi_str);
          }
       }
       fc_dlog(_logger, "ABIDUMP END");
@@ -58,7 +53,7 @@ namespace sysio::chain {
 
    void deep_mind_handler::on_start_block(uint32_t block_num)
    {
-      fc_dlog(_logger, "START_BLOCK ${block_num}", ("block_num", block_num));
+      fc_dlog(_logger, "START_BLOCK {}", block_num);
    }
 
    void deep_mind_handler::on_accepted_block_v2(const block_id_type& id, block_num_type lib,
@@ -73,33 +68,27 @@ namespace sysio::chain {
       auto packed_proposer_policy = fc::raw::pack(*active_proposer_policy);
       auto packed_finalizer_policy = fc::raw::pack(active_finalizer_policy);
 
-      fc_dlog(_logger, "ACCEPTED_BLOCK_V2 ${id} ${num} ${lib} ${blk} ${fd} ${pp} ${fp}",
-         ("id", id)
-         ("num", b->block_num())
-         ("lib", lib)
-         ("blk", fc::to_hex(b->packed_signed_block()))
-         ("fd", fc::to_hex(finality_data))
-         ("pp", fc::to_hex(packed_proposer_policy))
-         ("fp", fc::to_hex(packed_finalizer_policy))
+      fc_dlog(_logger, "ACCEPTED_BLOCK_V2 {} {} {} {} {} {} {}",
+         id,
+         b->block_num(),
+         lib,
+         fc::to_hex(b->packed_signed_block()),
+         fc::to_hex(finality_data),
+         fc::to_hex(packed_proposer_policy),
+         fc::to_hex(packed_finalizer_policy)
       );
    }
 
    void deep_mind_handler::on_switch_forks(const block_id_type& old_head, const block_id_type& new_head)
    {
-      fc_dlog(_logger, "SWITCH_FORK ${from_id} ${to_id}",
-         ("from_id", old_head)
-         ("to_id", new_head)
-      );
+      fc_dlog(_logger, "SWITCH_FORK {} {}", old_head, new_head);
    }
 
    void deep_mind_handler::on_onblock(const signed_transaction& trx)
    {
       auto packed_trx = fc::raw::pack(trx);
 
-      fc_dlog(_logger, "TRX_OP CREATE onblock ${id} ${trx}",
-         ("id", trx.id())
-         ("trx", fc::to_hex(packed_trx))
-      );
+      fc_dlog(_logger, "TRX_OP CREATE onblock {} {}", trx.id(), fc::to_hex(packed_trx));
    }
 
    void deep_mind_handler::on_start_transaction()
@@ -125,34 +114,26 @@ namespace sysio::chain {
          packed_trace = fc::raw::pack(*trace);
       }
 
-      fc_dlog(_logger, "APPLIED_TRANSACTION ${block} ${traces}",
-         ("block", block_num)
-         ("traces", fc::to_hex(packed_trace))
-      );
+      fc_dlog(_logger, "APPLIED_TRANSACTION {} {}", block_num, fc::to_hex(packed_trace) );
    }
 
    void deep_mind_handler::on_preactivate_feature(const protocol_feature& feature)
    {
-      fc_dlog(_logger, "FEATURE_OP PRE_ACTIVATE ${action_id} ${feature_digest} ${feature}",
-         ("action_id", _action_id)
-         ("feature_digest", feature.feature_digest)
-         ("feature", feature.to_variant())
-      );
+      std::string f_str = fc::format_string("${data}", fc::mutable_variant_object("data", feature.to_variant()));
+      fc_dlog(_logger, "FEATURE_OP PRE_ACTIVATE {} {} {}",
+              _action_id, feature.feature_digest, std::move(f_str) );
    }
 
    void deep_mind_handler::on_activate_feature(const protocol_feature& feature)
    {
-      fc_dlog(_logger, "FEATURE_OP ACTIVATE ${feature_digest} ${feature}",
-         ("feature_digest", feature.feature_digest)
-         ("feature", feature.to_variant())
-      );
+      std::string f_str = fc::format_string("${data}", fc::mutable_variant_object("data", feature.to_variant()));
+      fc_dlog(_logger, "FEATURE_OP ACTIVATE {} {}",
+              feature.feature_digest, std::move(f_str) );
    }
 
    void deep_mind_handler::on_input_action()
    {
-      fc_dlog(_logger, "CREATION_OP ROOT ${action_id}",
-         ("action_id", _action_id)
-      );
+      fc_dlog(_logger, "CREATION_OP ROOT {}", _action_id);
    }
    void deep_mind_handler::on_end_action()
    {
@@ -160,99 +141,97 @@ namespace sysio::chain {
    }
    void deep_mind_handler::on_require_recipient()
    {
-      fc_dlog(_logger, "CREATION_OP NOTIFY ${action_id}",
-         ("action_id", _action_id)
-      );
+      fc_dlog(_logger, "CREATION_OP NOTIFY {}", _action_id);
    }
    void deep_mind_handler::on_send_inline()
    {
-      fc_dlog(_logger, "CREATION_OP INLINE ${action_id}",
-         ("action_id", _action_id)
-      );
+      fc_dlog(_logger, "CREATION_OP INLINE {}", _action_id);
    }
    void deep_mind_handler::on_send_context_free_inline()
    {
-      fc_dlog(_logger, "CREATION_OP CFA_INLINE ${action_id}",
-         ("action_id", _action_id)
-      );
+      fc_dlog(_logger, "CREATION_OP CFA_INLINE {}", _action_id);
    }
    void deep_mind_handler::on_create_table(const table_id_object& tid)
    {
-      fc_dlog(_logger, "TBL_OP INS ${action_id} ${code} ${scope} ${table} ${payer}",
-         ("action_id", _action_id)
-         ("code", tid.code)
-         ("scope", tid.scope)
-         ("table", tid.table)
-         ("payer", tid.payer)
+      fc_dlog(_logger, "TBL_OP INS {} {} {} {} {}",
+         _action_id,
+         tid.code,
+         tid.scope,
+         tid.table,
+         tid.payer
       );
    }
    void deep_mind_handler::on_remove_table(const table_id_object& tid)
    {
-      fc_dlog(_logger, "TBL_OP REM ${action_id} ${code} ${scope} ${table} ${payer}",
-         ("action_id", _action_id)
-         ("code", tid.code)
-         ("scope", tid.scope)
-         ("table", tid.table)
-         ("payer", tid.payer)
+      fc_dlog(_logger, "TBL_OP REM {} {} {} {} {}",
+         _action_id,
+         tid.code,
+         tid.scope,
+         tid.table,
+         tid.payer
       );
    }
    void deep_mind_handler::on_db_store_i64(const table_id_object& tid, const key_value_object& kvo)
    {
-      fc_dlog(_logger, "DB_OP INS ${action_id} ${payer} ${table_code} ${scope} ${table_name} ${primkey} ${ndata}",
-         ("action_id", _action_id)
-         ("payer", kvo.payer)
-         ("table_code", tid.code)
-         ("scope", tid.scope)
-         ("table_name", tid.table)
-         ("primkey", name(kvo.primary_key))
-         ("ndata", fc::to_hex(kvo.value.data(), kvo.value.size()))
+      fc_dlog(_logger, "DB_OP INS {} {} {} {} {} {} {}",
+         _action_id,
+         kvo.payer,
+         tid.code,
+         tid.scope,
+         tid.table,
+         name(kvo.primary_key),
+         fc::to_hex(kvo.value.data(), kvo.value.size())
       );
    }
    void deep_mind_handler::on_db_update_i64(const table_id_object& tid, const key_value_object& kvo, account_name payer, const char* buffer, std::size_t buffer_size)
    {
-      fc_dlog(_logger, "DB_OP UPD ${action_id} ${opayer}:${npayer} ${table_code} ${scope} ${table_name} ${primkey} ${odata}:${ndata}",
-         ("action_id", _action_id)
-         ("opayer", kvo.payer)
-         ("npayer", payer)
-         ("table_code", tid.code)
-         ("scope", tid.scope)
-         ("table_name", tid.table)
-         ("primkey", name(kvo.primary_key))
-         ("odata", fc::to_hex(kvo.value.data(),kvo.value.size()))
-         ("ndata", fc::to_hex(buffer, buffer_size))
+      fc_dlog(_logger, "DB_OP UPD {} {}:{} {} {} {} {} {}:{}",
+         _action_id,
+         kvo.payer,
+         payer,
+         tid.code,
+         tid.scope,
+         tid.table,
+         name(kvo.primary_key),
+         fc::to_hex(kvo.value.data(),kvo.value.size()),
+         fc::to_hex(buffer, buffer_size)
       );
    }
    void deep_mind_handler::on_db_remove_i64(const table_id_object& tid, const key_value_object& kvo)
    {
-      fc_dlog(_logger, "DB_OP REM ${action_id} ${payer} ${table_code} ${scope} ${table_name} ${primkey} ${odata}",
-         ("action_id", _action_id)
-         ("payer", kvo.payer)
-         ("table_code", tid.code)
-         ("scope", tid.scope)
-         ("table_name", tid.table)
-         ("primkey", name(kvo.primary_key))
-         ("odata", fc::to_hex(kvo.value.data(), kvo.value.size()))
+      fc_dlog(_logger, "DB_OP REM {} {} {} {} {} {} {}",
+         _action_id,
+         kvo.payer,
+         tid.code,
+         tid.scope,
+         tid.table,
+         name(kvo.primary_key),
+         fc::to_hex(kvo.value.data(), kvo.value.size())
       );
    }
    void deep_mind_handler::on_init_resource_limits(const resource_limits::resource_limits_config_object& config, const resource_limits::resource_limits_state_object& state)
    {
-      fc_dlog(_logger, "RLIMIT_OP CONFIG INS ${data}",
-         ("data", config)
+      std::string config_str = fc::format_string("${data}", fc::mutable_variant_object("data", config));
+      std::string state_str = fc::format_string("${data}", fc::mutable_variant_object("data", state));
+      fc_dlog(_logger, "RLIMIT_OP CONFIG INS {}",
+         std::move(config_str)
       );
-      fc_dlog(_logger, "RLIMIT_OP STATE INS ${data}",
-         ("data", state)
+      fc_dlog(_logger, "RLIMIT_OP STATE INS {}",
+         std::move(state_str)
       );
    }
    void deep_mind_handler::on_update_resource_limits_config(const resource_limits::resource_limits_config_object& config)
    {
-      fc_dlog(_logger, "RLIMIT_OP CONFIG UPD ${data}",
-         ("data", config)
+      std::string config_str = fc::format_string("${data}", fc::mutable_variant_object("data", config));
+      fc_dlog(_logger, "RLIMIT_OP CONFIG UPD {}",
+         std::move(config_str)
       );
    }
    void deep_mind_handler::on_update_resource_limits_state(const resource_limits::resource_limits_state_object& state)
    {
-      fc_dlog(_logger, "RLIMIT_OP STATE UPD ${data}",
-         ("data", state)
+      std::string state_str = fc::format_string("${data}", fc::mutable_variant_object("data", state));
+      fc_dlog(_logger, "RLIMIT_OP STATE UPD {}",
+         std::move(state_str)
       );
    }
 
@@ -280,8 +259,9 @@ namespace sysio::chain {
          .cpu_weight = obj.cpu_weight,
          .ram_bytes = obj.ram_bytes,
       };
-      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS INS ${data}",
-         ("data", limits)
+      std::string limits_str = fc::format_string("${data}", fc::mutable_variant_object("data", limits));
+      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS INS {}",
+         std::move(limits_str)
       );
       resource_usage_object usage{
          .owner = obj.owner,
@@ -289,8 +269,9 @@ namespace sysio::chain {
          .cpu_usage = obj.cpu_usage,
          .ram_usage = obj.ram_usage,
       };
-      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE INS ${data}",
-         ("data", usage)
+      std::string usage_str = fc::format_string("${data}", fc::mutable_variant_object("data", usage));
+      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE INS {}",
+         std::move(usage_str)
       );
    }
    void deep_mind_handler::on_update_account_usage(const resource_limits::resource_object& obj)
@@ -301,14 +282,16 @@ namespace sysio::chain {
          .cpu_usage = obj.cpu_usage,
          .ram_usage = obj.ram_usage,
       };
-      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE UPD ${data}",
-         ("data", usage)
+      std::string usage_str = fc::format_string("${data}", fc::mutable_variant_object("data", usage));
+      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_USAGE UPD {}",
+         std::move(usage_str)
       );
    }
    void deep_mind_handler::on_set_account_limits(const resource_limits::resource_pending_object& limits)
    {
-      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS UPD ${data}",
-         ("data", limits)
+      std::string limits_str = fc::format_string("${data}", fc::mutable_variant_object("data", limits));
+      fc_dlog(_logger, "RLIMIT_OP ACCOUNT_LIMITS UPD {}",
+         std::move(limits_str)
       );
    }
    void deep_mind_handler::on_ram_trace(std::string&& event_id, const char* family, const char* operation, const char* legacy_tag)
@@ -317,44 +300,46 @@ namespace sysio::chain {
    }
    void deep_mind_handler::on_ram_event(account_name account, uint64_t new_usage, int64_t delta)
    {
-      fc_dlog(_logger, "RAM_OP ${action_id} ${event_id} ${family} ${operation} ${legacy_tag} ${payer} ${new_usage} ${delta}",
-         ("action_id", _action_id)
-         ("event_id", _ram_trace.event_id)
-         ("family", _ram_trace.family)
-         ("operation", _ram_trace.operation)
-         ("legacy_tag", _ram_trace.legacy_tag)
-         ("payer", account)
-         ("new_usage", new_usage)
-         ("delta", delta)
+      fc_dlog(_logger, "RAM_OP {} {} {} {} {} {} {} {}",
+         _action_id,
+         _ram_trace.event_id,
+         _ram_trace.family,
+         _ram_trace.operation,
+         _ram_trace.legacy_tag,
+         account,
+         new_usage,
+         delta
       );
       _ram_trace = ram_trace();
    }
 
    void deep_mind_handler::on_create_permission(const permission_object& p)
    {
-      fc_dlog(_logger, "PERM_OP INS ${action_id} ${permission_id} ${data}",
-         ("action_id", _action_id)
-         ("permission_id", p.id)
-         ("data", p)
+      std::string p_str = fc::format_string("${data}", fc::mutable_variant_object("data", p));
+      fc_dlog(_logger, "PERM_OP INS {} {} {}",
+         _action_id,
+         p.id,
+         p_str
       );
    }
    void deep_mind_handler::on_modify_permission(const permission_object& old_permission, const permission_object& new_permission)
    {
-      fc_dlog(_logger, "PERM_OP UPD ${action_id} ${permission_id} ${data}",
-         ("action_id", _action_id)
-         ("permission_id", new_permission.id)
-         ("data", fc::mutable_variant_object()
-            ("old", old_permission)
-            ("new", new_permission)
-         )
+      std::string p_str = fc::format_string("${data}", fc::mutable_variant_object()
+                                                          ("old", old_permission)
+                                                          ("new", new_permission));
+      fc_dlog(_logger, "PERM_OP UPD {} {} {}",
+         _action_id,
+         new_permission.id,
+         p_str
       );
    }
    void deep_mind_handler::on_remove_permission(const permission_object& permission)
    {
-      fc_dlog(_logger, "PERM_OP REM ${action_id} ${permission_id} ${data}",
-        ("action_id", _action_id)
-        ("permission_id", permission.id)
-        ("data", permission)
+      std::string p_str = fc::format_string("${data}", fc::mutable_variant_object("data", permission));
+      fc_dlog(_logger, "PERM_OP REM {} {} {}",
+        _action_id,
+        permission.id,
+        p_str
       );
    }
 

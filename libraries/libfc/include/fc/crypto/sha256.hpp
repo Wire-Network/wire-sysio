@@ -132,6 +132,10 @@ void from_variant( const variant& v, sha256& bi );
 
 uint64_t hash64(const char* buf, size_t len);
 
+constexpr auto format_as(const fc::sha256& h) {
+   return h.str();
+}
+
 } // fc
 
 namespace std

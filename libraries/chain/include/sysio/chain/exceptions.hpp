@@ -7,14 +7,14 @@
 #define SYS_ASSERT( expr, exc_type, FORMAT, ... )                \
    FC_MULTILINE_MACRO_BEGIN                                           \
    if( !(expr) )                                                      \
-      FC_THROW_EXCEPTION( exc_type, FORMAT, __VA_ARGS__ );            \
+      FC_THROW_EXCEPTION( exc_type, FORMAT, ##__VA_ARGS__ );            \
    FC_MULTILINE_MACRO_END
 
 #define SYS_THROW( exc_type, FORMAT, ... ) \
-    throw exc_type( FC_LOG_MESSAGE( error, FORMAT, __VA_ARGS__ ) );
+    throw exc_type( FC_LOG_MESSAGE( error, FORMAT, ##__VA_ARGS__ ) );
 
-#define SYS_THROW_FMT( exc_type, FORMAT, ... ) \
-    throw exc_type( FC_LOG_MESSAGE_FMT( error, FORMAT, __VA_ARGS__ ) );
+#define SYS_THROW_RUNTIME_FORMAT( exc_type, FORMAT, ... ) \
+    throw exc_type( fc::log_message( FC_LOG_CONTEXT(error), fc::format_runtime(FORMAT, ##__VA_ARGS__) ) );
 
 /**
  * Macro inspired from FC_RETHROW_EXCEPTIONS
@@ -27,46 +27,19 @@
    } catch( const boost::interprocess::bad_alloc& ) {\
       throw;\
    } catch (sysio::chain::chain_exception& e) { \
-      FC_RETHROW_EXCEPTION( e, warn, FORMAT, __VA_ARGS__ ); \
+      FC_RETHROW_EXCEPTION( e, warn, FORMAT, ##__VA_ARGS__ ); \
    } catch (fc::exception& e) { \
-      exception_type new_exception(FC_LOG_MESSAGE( warn, FORMAT, __VA_ARGS__ )); \
+      exception_type new_exception(FC_LOG_MESSAGE( warn, FORMAT, ##__VA_ARGS__ )); \
       for (const auto& log: e.get_log()) { \
          new_exception.append_log(log); \
       } \
       throw new_exception; \
    } catch( const std::exception& e ) {  \
-      exception_type fce(FC_LOG_MESSAGE( warn, FORMAT" (${what})" ,__VA_ARGS__("what",e.what()))); \
+      exception_type fce(FC_LOG_MESSAGE( warn, FORMAT " ({})", ##__VA_ARGS__, e.what())); \
       throw fce;\
    } catch( ... ) {  \
       throw fc::unhandled_exception( \
                 FC_LOG_MESSAGE( warn, FORMAT,__VA_ARGS__), \
-                std::current_exception() ); \
-   }
-
-/**
- * Macro inspired from FC_CAPTURE_AND_RETHROW
- * The main difference here is that if the exception caught isn't of type "sysio::chain::chain_exception"
- * This macro will rethrow the exception as the specified "exception_type"
- */
-#define SYS_CAPTURE_AND_RETHROW( exception_type, ... ) \
-   catch( const std::bad_alloc& ) {\
-      throw;\
-   } catch( const boost::interprocess::bad_alloc& ) {\
-      throw;\
-   } catch (sysio::chain::chain_exception& e) { \
-      FC_RETHROW_EXCEPTION( e, warn, "", FC_FORMAT_ARG_PARAMS(__VA_ARGS__) ); \
-   } catch (fc::exception& e) { \
-      exception_type new_exception(e.get_log()); \
-      throw new_exception; \
-   } catch( const std::exception& e ) {  \
-      exception_type fce( \
-                FC_LOG_MESSAGE( warn, "${what}: ",FC_FORMAT_ARG_PARAMS(__VA_ARGS__)("what",e.what())), \
-                fc::std_exception_code,\
-                BOOST_CORE_TYPEID(decltype(e)).name(), \
-                e.what() ) ; throw fce;\
-   } catch( ... ) {  \
-      throw fc::unhandled_exception( \
-                FC_LOG_MESSAGE( warn, "",FC_FORMAT_ARG_PARAMS(__VA_ARGS__)), \
                 std::current_exception() ); \
    }
 
@@ -78,7 +51,7 @@
       NEXT(err.dynamic_copy_exception());\
    } catch ( const std::exception& e ) {\
       fc::exception fce( \
-         FC_LOG_MESSAGE( warn, "rethrow ${what}: ", ("what",e.what())),\
+         FC_LOG_MESSAGE( warn, "rethrow: {}", e.what()),\
          fc::std_exception_code,\
          BOOST_CORE_TYPEID(e).name(),\
          e.what() ) ;\
@@ -98,7 +71,7 @@
       return return_type(err.dynamic_copy_exception());\
    } catch ( const std::exception& e ) {\
       fc::exception fce( \
-         FC_LOG_MESSAGE( warn, "rethrow ${what}: ", ("what",e.what())),\
+         FC_LOG_MESSAGE( warn, "rethrow: {}", e.what()),\
          fc::std_exception_code,\
          BOOST_CORE_TYPEID(e).name(),\
          e.what() ) ;\

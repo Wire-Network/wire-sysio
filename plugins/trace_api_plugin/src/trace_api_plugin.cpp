@@ -28,7 +28,7 @@ namespace {
          return er.to_detail_string();
       } catch (const std::exception& e) {
          fc::exception fce(
-               FC_LOG_MESSAGE(warn, "std::exception: ${what}: ", ("what", e.what())),
+               FC_LOG_MESSAGE(warn, "std::exception: {}: ", e.what()),
                fc::std_exception_code,
                BOOST_CORE_TYPEID(e).name(),
                e.what());
@@ -43,9 +43,10 @@ namespace {
 
    void log_exception( const exception_with_context& e, fc::log_level level ) {
       if( _log.is_enabled( level ) ) {
-         auto detail_string = to_detail_string(std::get<0>(e));
-         auto context = fc::log_context( level, std::get<1>(e), std::get<2>(e), std::get<3>(e) );
-         _log.log(fc::log_message( context, detail_string ));
+         const auto&[ex_ptr, file, line, func] = e;
+         auto detail_string = to_detail_string(ex_ptr);
+         auto& logger = _log.get_agent_logger();
+         logger->log(spdlog::source_loc{file, static_cast<int>(line), func}, logger->level(), FC_FMT( "{}", detail_string ));
       }
    }
 
@@ -152,7 +153,7 @@ struct trace_api_common_impl {
 
    void plugin_startup() {
       store->start_maintenance_thread([](const std::string& msg ){
-         fc_dlog( _log, msg );
+         fc_dlog( _log, "{}", msg );
       });
    }
 
@@ -218,7 +219,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
                auto abi = abi_def_from_file(kv.second, app().data_dir());
                data_handler->add_abi(account, std::move(abi));
             } catch (...) {
-               elog("Malformed trace-rpc-abi provider: \"${val}\"", ("val", entry));
+               elog("Malformed trace-rpc-abi provider: \"{}\"", entry);
                throw;
             }
          }
@@ -231,7 +232,7 @@ struct trace_api_rpc_plugin_impl : public std::enable_shared_from_this<trace_api
          shared_store_provider<store_provider>(common->store),
          abi_data_handler::shared_provider(data_handler),
          [](const std::string& msg ) {
-            fc_dlog( _log, msg );
+            fc_dlog( _log, "{}", msg );
          }
       );
    }

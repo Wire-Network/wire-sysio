@@ -125,7 +125,7 @@ std::tuple<size_t, size_t> code_cache_async::consume_compile_thread_queue() {
                _cache_index.push_front(cd);
             },
             [&](const compilation_result_unknownfailure&) {
-               wlog("code ${c} failed to tier-up with SYS VM OC", ("c", result.code.code_id));
+               wlog("code {} failed to tier-up with SYS VM OC", result.code.code_id);
                _blacklist.emplace(result.code.code_id);
             },
             [&](const compilation_result_toofull&) {
@@ -353,7 +353,8 @@ code_cache_base::code_cache_base(const std::filesystem::path& data_dir, const sy
       }
       allocator->deallocate(code_mapping + cache_header.serialized_descriptor_index);
 
-      ilog("SYS VM Optimized Compiler code cache loaded with ${c} entries; ${f} of ${t} bytes free", ("c", number_entries)("f", allocator->get_free_memory())("t", allocator->get_size()));
+      ilog("SYS VM Optimized Compiler code cache loaded with {} entries; {} of {} bytes free",
+           number_entries, allocator->get_free_memory(), allocator->get_size());
    }
    munmap(code_mapping, sysvmoc_config.cache_size);
 

@@ -114,7 +114,7 @@ public:
     }
 
     void set_code_abi(const account_name& account, const vector<uint8_t>& wasm, const std::string& abi, const private_key_type* signer = nullptr) {
-       wdump((account));
+       wlog("account {}", account);
         set_code(account, wasm, signer);
         set_abi(account, abi, signer);
         if (account == config::system_account_name) {

@@ -46,8 +46,7 @@ static fc::sha256::uint64_array_type priv_parse_base64url(const std::string& bas
    auto res = std::mismatch(bls::constants::bls_private_key_prefix.begin(),
                             bls::constants::bls_private_key_prefix.end(),
                             base64urlstr.begin());
-   FC_ASSERT(res.first == bls::constants::bls_private_key_prefix.end(), "BLS Private Key has invalid format : ${str}",
-             ("str", base64urlstr));
+   FC_ASSERT(res.first == bls::constants::bls_private_key_prefix.end(), "BLS Private Key has invalid format : {}", base64urlstr);
 
    auto data_str = base64urlstr.substr(bls::constants::bls_private_key_prefix.size());
 

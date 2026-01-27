@@ -72,10 +72,9 @@ namespace sysio { namespace chain {
          ds.read((char*)&ver, sizeof(ver));
          SYS_ASSERT(version() > 0, block_log_exception, "Block log was not setup properly");
          SYS_ASSERT(block_log::is_supported_version(version()), block_log_unsupported_version,
-                    "Unsupported version of block log. Block log version is ${version} while code supports version(s) "
-                    "[${min},${max}], log file: ${log}",
-                    ("version", version())("min", block_log::min_supported_version)(
-                          "max", block_log::max_supported_version)("log", log_path));
+                    "Unsupported version of block log. Block log version is {} while code supports version(s) "
+                    "[{},{}], log file: {}",
+                    version(), block_log::min_supported_version, block_log::max_supported_version, log_path.generic_string());
 
          first_block_num = 1;
          if (version() != initial_version) {
@@ -90,9 +89,8 @@ namespace sysio { namespace chain {
             ds >> std::get<chain_id_type>(chain_context);
          } else {
             SYS_THROW(block_log_exception,
-                      "Block log is not supported. version: ${ver} and first_block_num: ${fbn} does not contain "
-                      "a genesis_state nor a chain_id.",
-                      ("ver", version())("fbn", first_block_num));
+                      "Block log is not supported. version: {} and first_block_num: {} does not contain "
+                      "a genesis_state nor a chain_id.", version(), first_block_num);
          }
 
          if (version() != initial_version) {
@@ -101,10 +99,8 @@ namespace sysio { namespace chain {
             ds.read((char*)&actual_totem, sizeof(actual_totem));
 
             SYS_ASSERT(actual_totem == expected_totem, block_log_exception,
-                       "Expected separator between block log header and blocks was not found( expected: ${e}, actual: "
-                       "${a} )",
-                       ("e", fc::to_hex((char*)&expected_totem, sizeof(expected_totem)))(
-                             "a", fc::to_hex((char*)&actual_totem, sizeof(actual_totem))));
+                       "Expected separator between block log header and blocks was not found( expected: {}, actual: {} )",
+                       fc::to_hex((char*)&expected_totem, sizeof(expected_totem)), fc::to_hex((char*)&actual_totem, sizeof(actual_totem)));
          }
       }
 
@@ -201,8 +197,8 @@ namespace sysio { namespace chain {
          fc::raw::unpack(ds, bh);
 
          SYS_ASSERT(bh.block_num() == expect_block_num, block_log_exception,
-                    "Wrong block header was read from block log.",
-                    ("returned", bh.block_num())("expected", expect_block_num));
+                    "Wrong block header was read from block log, returned {}, expected {}",
+                    bh.block_num(), expect_block_num);
 
          return bh;
       }
@@ -259,8 +255,8 @@ namespace sysio { namespace chain {
             int blknum_offset = 14;
 
             SYS_ASSERT(position + blknum_offset + sizeof(uint32_t) <= size(), block_log_exception,
-                       "Read outside of file: position ${position}, blknum_offset ${o}, file size ${s}",
-                       ("position", position)("o", blknum_offset)("s", size()));
+                       "Read outside of file: position {}, blknum_offset {}, file size {}",
+                       position, blknum_offset, size());
 
             uint32_t prev_block_num = read_data_at<uint32_t>(file, position + blknum_offset);
             return fc::endian_reverse_u32(prev_block_num) + 1;
@@ -279,8 +275,8 @@ namespace sysio { namespace chain {
             const uint32_t actual_block_num = block_num_at(pos);
 
             SYS_ASSERT(actual_block_num == expected_block_num, block_log_exception,
-                       "At position ${pos} expected to find block number ${exp_bnum} but found ${act_bnum}",
-                       ("pos", pos)("exp_bnum", expected_block_num)("act_bnum", actual_block_num));
+                       "At position {} expected to find block number {} but found {}",
+                       pos, expected_block_num, actual_block_num);
          }
 
          /**
@@ -303,14 +299,14 @@ namespace sysio { namespace chain {
             auto block_num = block_header::num_from_id(id);
 
             if (block_num != previous_block_num + 1) {
-               elog("Block ${num} (${id}) skips blocks. Previous block in block log is block ${prev_num} (${previous})",
-                    ("num", block_num)("id", id)("prev_num", previous_block_num)("previous", previous_block_id));
+               elog("Block {} ({}) skips blocks. Previous block in block log is block {} ({})",
+                    block_num, id, previous_block_num, previous_block_id);
             }
 
             if (!previous_block_id.empty() && previous_block_id != header.previous) {
-               elog("Block ${num} (${id}) does not link back to previous block. "
-                    "Expected previous: ${expected}. Actual previous: ${actual}.",
-                    ("num", block_num)("id", id)("expected", previous_block_id)("actual", header.previous));
+               elog("Block {} ({}) does not link back to previous block. "
+                    "Expected previous: {}. Actual previous: {}.",
+                    block_num, id, previous_block_id, header.previous);
             }
 
             uint64_t tmp_pos = std::numeric_limits<uint64_t>::max();
@@ -320,8 +316,7 @@ namespace sysio { namespace chain {
             }
 
             SYS_ASSERT(pos == tmp_pos, block_log_exception,
-                       "the block position for block ${num} at the end of a block entry is incorrect",
-                       ("num", block_num));
+                       "the block position for block {} at the end of a block entry is incorrect", block_num);
             return std::make_tuple(block_num, id);
          }
 
@@ -362,10 +357,8 @@ namespace sysio { namespace chain {
 
             SYS_ASSERT(
                   log_num_blocks == index_num_blocks, block_log_exception,
-                  "${block_file_name} says it has ${log_num_blocks} blocks which disagrees with ${index_num_blocks} "
-                  "indicated by ${index_file_name}",
-                  ("block_file_name", block_file_name)("log_num_blocks", log_num_blocks)(
-                        "index_num_blocks", index_num_blocks)("index_file_name", index_file_name));
+                  "{} says it has {} blocks which disagrees with {} indicated by {}",
+                  block_file_name.generic_string(), log_num_blocks, index_num_blocks, index_file_name.generic_string());
          }
       };
 
@@ -379,9 +372,9 @@ namespace sysio { namespace chain {
          uint64_t get_value() {
             SYS_ASSERT(
                   current_position > first_block_pos && current_position <= end_of_block_pos, block_log_exception,
-                  "Block log file formatting is incorrect, it contains a block position value: ${pos}, which is not "
-                  "in the range of (${begin_pos},${last_pos})",
-                  ("pos", current_position)("begin_pos", first_block_pos)("last_pos", end_of_block_pos));
+                  "Block log file formatting is incorrect, it contains a block position value: {}, which is not "
+                  "in the range of ({},{})",
+                  current_position, first_block_pos, end_of_block_pos);
 
             uint64_t value;
             file.seek(current_position - sizeof(uint64_t));
@@ -426,19 +419,17 @@ namespace sysio { namespace chain {
       }
 
       void block_log_data::construct_index(const std::filesystem::path& index_file_path) {
-         std::string index_file_name = index_file_path.generic_string();
-         ilog("Will write new blocks.index file ${file}", ("file", index_file_name));
+         ilog("Will write new blocks.index file {}", index_file_path.generic_string());
 
          const uint32_t num_blocks = number_of_blocks();
 
-         ilog("block log version= ${version}, number of blocks ${n}", ("version", this->version())("n", num_blocks));
+         ilog("block log version= {}, number of blocks {}", this->version(), num_blocks);
 
          if (num_blocks == 0) {
             return;
          }
 
-         ilog("first block= ${first}         last block= ${last}",
-              ("first", this->first_block_num())("last", (this->last_block_num())));
+         ilog("first block= {}         last block= {}", this->first_block_num(), (this->last_block_num()));
 
          index_writer index(index_file_path, num_blocks);
          uint32_t     blocks_remaining = this->num_blocks();
@@ -448,8 +439,7 @@ namespace sysio { namespace chain {
             auto pos = iter.get_value_then_advance();
             index.write(pos);
             if ((blocks_remaining & 0xfffff) == 0)
-               ilog("blocks remaining to index: ${blocks_left}      position in log file: ${pos}",
-                    ("blocks_left", blocks_remaining)("pos", pos));
+               ilog("blocks remaining to index: {}      position in log file: {}", blocks_remaining, pos);
          }
       }
 
@@ -463,7 +453,7 @@ namespace sysio { namespace chain {
             chain_id = log.chain_id();
          } else {
             SYS_ASSERT(chain_id == log.chain_id(), block_log_exception,
-                       "block log file ${path} has a different chain id", ("path", log_path));
+                       "block log file {} has a different chain id", log_path.generic_string());
          }
       }
    };
@@ -597,9 +587,8 @@ namespace sysio { namespace chain {
                uint64_t pos = block_file.tellp();
 
                SYS_ASSERT(index_file.tellp() == sizeof(uint64_t) * (b->block_num() - preamble.first_block_num),
-                          block_log_append_fail, "Append to index file occurring at wrong position.",
-                          ("position", (uint64_t)index_file.tellp())(
-                                "expected", (b->block_num() - preamble.first_block_num) * sizeof(uint64_t)));
+                          block_log_append_fail, "Append to index file occurring at wrong position {}, expected {}.",
+                          index_file.tellp(), (b->block_num() - preamble.first_block_num) * sizeof(uint64_t));
                block_file.write(packed_block.data(), packed_block.size());
                block_file.write((char*)&pos, sizeof(pos));
                index_file.write((char*)&pos, sizeof(pos));
@@ -632,8 +621,8 @@ namespace sysio { namespace chain {
             assert(head);
             uint32_t last_block_num = block_header::num_from_id(head->id);
             SYS_ASSERT(block_num <= last_block_num, block_log_exception,
-                       "block_num ${bn} should not be greater than last_block_num ${lbn}",
-                       ("bn", block_num)("lbn", last_block_num));
+                       "block_num {} should not be greater than last_block_num {}",
+                       block_num, last_block_num);
 
             uint64_t block_size = 0;
             constexpr uint32_t block_pos_size = sizeof(uint64_t); // size of block position field in the block log file
@@ -643,8 +632,8 @@ namespace sysio { namespace chain {
                uint64_t next_block_pos = get_block_pos(block_num + 1);
 
                SYS_ASSERT(next_block_pos > pos + block_pos_size, block_log_exception,
-                          "next block position ${np} should be greater than current block position ${p} plus block position field size ${bps}",
-                          ("np", next_block_pos)("p", pos)("bps", block_pos_size));
+                          "next block position {} should be greater than current block position {} plus block position field size {}",
+                          next_block_pos, pos, block_pos_size);
 
                block_size = next_block_pos - pos - block_pos_size;
             } else {
@@ -653,8 +642,8 @@ namespace sysio { namespace chain {
                block_file.seek_end(0);
                auto file_size = block_file.tellp();
                SYS_ASSERT(file_size > pos + block_pos_size, block_log_exception,
-                          "block log file size ${fs} should be greater than current block position ${p} plus block position field size ${bps}",
-                          ("fs", file_size)("p", pos)("bps", block_pos_size));
+                          "block log file size {} should be greater than current block position {} plus block position field size {}",
+                          file_size, pos, block_pos_size);
 
                block_size = file_size - pos - block_pos_size;
             }
@@ -739,14 +728,14 @@ namespace sysio { namespace chain {
                genesis_written_to_block_log = true; // Assume it was constructed properly.
 
                uint32_t number_of_blocks = log_data.number_of_blocks();
-               ilog("Log has ${n} blocks", ("n", number_of_blocks));
+               ilog("Log has {} blocks", number_of_blocks);
 
                SYS_ASSERT(index_size || number_of_blocks == 0, block_log_exception,
-                          "${index_file} file is empty, please use sys-util to fix the problem.",
-                          ("index_file", index_file.get_file_path().string()));
+                          "{} file is empty, please use sys-util to fix the problem.",
+                          index_file.get_file_path().string());
                SYS_ASSERT(index_size % sizeof(uint64_t) == 0, block_log_exception,
-                          "${index_file} file is invalid, please use sys-util to reconstruct the index.",
-                          ("index_file", index_file.get_file_path().string()));
+                          "{} file is invalid, please use sys-util to reconstruct the index.",
+                          index_file.get_file_path().string());
 
                if (index_size) {
                   block_log_index index(index_file.get_file_path());
@@ -754,12 +743,12 @@ namespace sysio { namespace chain {
                   auto last_index_pos = index.back();
 
                   SYS_ASSERT(last_block_pos == last_index_pos, block_log_exception,
-                             "The last block position from ${block_file} is at ${block_pos} "
-                             "which does not match the last block postion ${index_pos} from ${index_file}, please use "
+                             "The last block position from {} is at {} "
+                             "which does not match the last block postion {} from {}, please use "
                              "sys-util to fix the inconsistency.",
-                             ("block_pos", last_block_pos)("index_pos", last_index_pos)
-                             ("block_file", block_file.get_file_path().string())
-                             ("index_file", index_file.get_file_path().string()));
+                             block_file.get_file_path().string(),
+                             last_block_pos, last_index_pos,
+                             index_file.get_file_path().string());
                }
                log_data.close();
 
@@ -811,7 +800,7 @@ namespace sysio { namespace chain {
          void reset(const chain_id_type& chain_id, uint32_t first_block_num) override {
             SYS_ASSERT(
                   first_block_num > 1, block_log_exception,
-                  "Block log version ${ver} needs to be created with a genesis state if starting from block number 1.");
+                  "Block log needs to be created with a genesis state if starting from block number 1.");
 
             this->reset(first_block_num, chain_id, block_log::max_supported_version);
             this->head.reset();
@@ -901,7 +890,7 @@ namespace sysio { namespace chain {
 
                const auto tock = std::chrono::time_point_cast<std::chrono::seconds>(std::chrono::system_clock::now());
                if (tick < tock - std::chrono::seconds(5)) {
-                  ilog("Vacuuming pruned block log, ${b} bytes remaining", ("b", copy_sz));
+                  ilog("Vacuuming pruned block log, {} bytes remaining", copy_sz);
                   tick = tock;
                }
             }
@@ -979,9 +968,8 @@ namespace sysio { namespace chain {
             tail.open(fc::cfile::create_or_update_rw_mode);
             copy_file_content(strm, tail);
 
-            ilog("Data at tail end of block log which should contain the (incomplete) serialization of block ${num} "
-                 "has been written out to '${tail_path}'.",
-                 ("num", block_num + 1)("tail_path", tail_path));
+            ilog("Data at tail end of block log which should contain the (incomplete) serialization of block {} "
+                 "has been written out to '{}'.", block_num + 1, tail_path.generic_string());
          }
 
          bool recover_from_incomplete_block_head(block_log_data& log_data, block_log_index& index) {
@@ -1033,8 +1021,8 @@ namespace sysio { namespace chain {
                update_head(read_block_by_num(catalog.last_block_num()));
             } else {
                SYS_ASSERT(catalog.verifier.chain_id.empty() || catalog.verifier.chain_id == preamble.chain_id(),
-                          block_log_exception, "block log file ${path} has a different chain id",
-                          ("path", block_file.get_file_path()));
+                          block_log_exception, "block log file {} has a different chain id",
+                          block_file.get_file_path().generic_string());
             }
          }
 
@@ -1250,10 +1238,8 @@ namespace sysio { namespace chain {
             first_block_number = prune_to_num;
             block_file.flush();
 
-            if (auto l = fc::logger::get(); l.is_enabled(loglevel))
-               l.log(fc::log_message(fc::log_context(loglevel, __FILE__, __LINE__, __func__),
-                                     "blocks.log pruned to blocks ${b}-${e}",
-                                     fc::mutable_variant_object()("b", first_block_number)("e", head_num)));
+            if (fc::logger::default_logger().is_enabled(loglevel))
+               ilog("blocks.log pruned to blocks {}-{}", first_block_number, head_num);
             return prune_config.prune_blocks;
          }
       };
@@ -1362,8 +1348,8 @@ namespace sysio { namespace chain {
    // static
    void block_log::construct_index(const std::filesystem::path& block_file_name, const std::filesystem::path& index_file_name) {
 
-      ilog("Will read existing blocks.log file ${file}", ("file", block_file_name));
-      ilog("Will write new blocks.index file ${file}", ("file", index_file_name));
+      ilog("Will read existing blocks.log file {}", block_file_name.generic_string());
+      ilog("Will write new blocks.index file {}", index_file_name.generic_string());
 
       block_log_data log_data(block_file_name);
       log_data.construct_index(index_file_name);
@@ -1384,7 +1370,7 @@ namespace sysio { namespace chain {
             while (remaining() > 0 && block_num < last_block_num) {
                std::tie(block_num, block_id) = full_validate_block_entry(block_num, block_id, entry);
                if (block_num % 1000 == 0)
-                  ilog("Verified block ${num}", ("num", block_num));
+                  ilog("Verified block {}", block_num);
                pos = file.tellp();
             }
          } catch (const bad_block_exception& e) {
@@ -1407,7 +1393,7 @@ namespace sysio { namespace chain {
                                   const char* reversible_block_dir_name) {
       ilog("Recovering Block Log...");
       SYS_ASSERT(std::filesystem::is_directory(data_dir) && std::filesystem::is_regular_file(data_dir / "blocks.log"), block_log_not_found,
-                 "Block log not found in '${blocks_dir}'", ("blocks_dir", data_dir));
+                 "Block log not found in '{}'", data_dir.generic_string());
 
       if (truncate_at_block == 0)
          truncate_at_block = UINT32_MAX;
@@ -1419,8 +1405,8 @@ namespace sysio { namespace chain {
       auto backup_dir      = blocks_dir.parent_path() / blocks_dir_name.generic_string().append("-").append(now.to_iso_string());
 
       SYS_ASSERT(!std::filesystem::exists(backup_dir), block_log_backup_dir_exist,
-                 "Cannot move existing blocks directory to already existing directory '${new_blocks_dir}'",
-                 ("new_blocks_dir", backup_dir));
+                 "Cannot move existing blocks directory to already existing directory '{}'",
+                 backup_dir.generic_string());
 
       std::filesystem::create_directories(backup_dir);
       std::filesystem::rename(blocks_dir / "blocks.log", backup_dir / "blocks.log");
@@ -1430,14 +1416,14 @@ namespace sysio { namespace chain {
       if (strlen(reversible_block_dir_name) && std::filesystem::is_directory(blocks_dir / reversible_block_dir_name)) {
          std::filesystem::rename(blocks_dir / reversible_block_dir_name, backup_dir / reversible_block_dir_name);
       }
-      ilog("Moved existing blocks directory to backup location: '${new_blocks_dir}'", ("new_blocks_dir", backup_dir));
+      ilog("Moved existing blocks directory to backup location: '{}'", backup_dir.generic_string());
 
       const auto block_log_path  = blocks_dir / "blocks.log";
       const auto block_index_path = blocks_dir / "blocks.index";
       const auto block_file_name = block_log_path.generic_string();
       const auto block_index_file_name = block_index_path.generic_string();
 
-      ilog("Reconstructing '${new_block_log}' from backed up block log", ("new_block_log", block_file_name));
+      ilog("Reconstructing '{}' from backed up block log", block_file_name);
 
       block_log_data log_data;
       log_data.open(backup_dir / "blocks.log");
@@ -1454,14 +1440,13 @@ namespace sysio { namespace chain {
       construct_index(block_log_path, block_index_path);
 
       if (error_msg.size()) {
-         ilog("Recovered only up to block number ${num}. "
-              "The block ${next_num} could not be deserialized from the block log due to error:\n${error_msg}",
-              ("num", block_num)("next_num", block_num + 1)("error_msg", error_msg));
+         ilog("Recovered only up to block number {}. "
+              "The block {} could not be deserialized from the block log due to error:\n{}",
+              block_num, block_num + 1, error_msg);
       } else if (block_num == truncate_at_block && pos < log_data.size()) {
-         ilog("Stopped recovery of block log early at specified block number: ${stop}.", ("stop", truncate_at_block));
+         ilog("Stopped recovery of block log early at specified block number: {}.", truncate_at_block);
       } else {
-         ilog("Existing block log was undamaged. Recovered all irreversible blocks up to block number ${num}.",
-              ("num", block_num));
+         ilog("Existing block log was undamaged. Recovered all irreversible blocks up to block number {}.", block_num);
       }
       return backup_dir;
    }
@@ -1624,18 +1609,18 @@ namespace sysio { namespace chain {
                                        uint32_t truncate_at_block) {
       SYS_ASSERT(block_dir != temp_dir, block_log_exception, "block_dir and temp_dir need to be different directories");
 
-      ilog("In directory ${dir} will trim all blocks before block ${n} from blocks.log and blocks.index.",
-           ("dir", block_dir)("n", truncate_at_block));
+      ilog("In directory {} will trim all blocks before block {} from blocks.log and blocks.index.",
+           block_dir.generic_string(), truncate_at_block);
 
       block_log_bundle log_bundle(block_dir);
 
       if (truncate_at_block <= log_bundle.log_data.first_block_num()) {
-         dlog("There are no blocks before block ${n} so do nothing.", ("n", truncate_at_block));
+         dlog("There are no blocks before block {} so do nothing.", truncate_at_block);
          return false;
       }
       if (truncate_at_block > log_bundle.log_data.last_block_num()) {
-         dlog("All blocks are before block ${n} so do nothing (trim front would delete entire blocks.log).",
-              ("n", truncate_at_block));
+         dlog("All blocks are before block {} so do nothing (trim front would delete entire blocks.log).",
+              truncate_at_block);
          return false;
       }
 
@@ -1662,16 +1647,15 @@ namespace sysio { namespace chain {
 
       block_log_bundle log_bundle(block_dir);
 
-      ilog("In directory ${block_dir} will trim all blocks after block ${n} from ${block_file} and ${index_file}",
-           ("block_dir", block_dir)("n", n)("block_file", log_bundle.block_file_name)(
-                 "index_file", log_bundle.index_file_name));
+      ilog("In directory {} will trim all blocks after block {} from {} and {}",
+           block_dir.string(), n, log_bundle.block_file_name.string(), log_bundle.index_file_name.string());
 
       if (n < log_bundle.log_data.first_block_num()) {
-         dlog("All blocks are after block ${n} so do nothing (trim_end would delete entire blocks.log)", ("n", n));
+         dlog("All blocks are after block {} so do nothing (trim_end would delete entire blocks.log)", n);
          return 1;
       }
       if (n > log_bundle.log_data.last_block_num()) {
-         dlog("There are no blocks after block ${n} so do nothing", ("n", n));
+         dlog("There are no blocks after block {} so do nothing", n);
          return 2;
       }
       if (n == log_bundle.log_data.last_block_num())
@@ -1683,7 +1667,7 @@ namespace sysio { namespace chain {
 
       std::filesystem::resize_file(log_bundle.block_file_name, to_trim_block_position);
       std::filesystem::resize_file(log_bundle.index_file_name, index_file_size);
-      ilog("blocks.index has been trimmed to ${index_file_size} bytes", ("index_file_size", index_file_size));
+      ilog("blocks.index has been trimmed to {} bytes", index_file_size);
       return 0;
    }
 
@@ -1692,9 +1676,9 @@ namespace sysio { namespace chain {
 
       block_log_bundle log_bundle(block_dir, false);
 
-      ilog("block log version= ${version}",("version", log_bundle.log_data.version()));
-      ilog("first block= ${first}",("first", log_bundle.log_data.first_block_num()));
-      ilog("last block= ${last}",("last", log_bundle.log_data.last_block_num()));
+      ilog("block log version= {}", log_bundle.log_data.version());
+      ilog("first block= {}", log_bundle.log_data.first_block_num());
+      ilog("last block= {}", log_bundle.log_data.last_block_num());
 
       log_bundle.validate_index();
 
@@ -1729,8 +1713,8 @@ namespace sysio { namespace chain {
       block_log_bundle log_bundle(block_dir);
 
       SYS_ASSERT(start_block_num >= log_bundle.log_data.first_block_num(), block_log_exception,
-                 "The first available block is block ${first_block}.",
-                 ("first_block", log_bundle.log_data.first_block_num()));
+                 "The first available block is block {}.",
+                 log_bundle.log_data.first_block_num());
 
       if (!std::filesystem::exists(dest_dir))
          std::filesystem::create_directories(dest_dir);
@@ -1786,7 +1770,7 @@ namespace sysio { namespace chain {
 
       catalog.open("", blocks_dir, "", "blocks");
       if (catalog.collection.size() <= 1) {
-         wlog("There's no more than one blocklog files in ${blocks_dir}, skip merge.", ("blocks_dir", blocks_dir));
+         wlog("There's no more than one blocklog files in {}, skip merge.", blocks_dir.generic_string());
          return;
       }
 
@@ -1820,9 +1804,8 @@ namespace sysio { namespace chain {
                continue;
 
             } else
-               wlog("${file}.log cannot be merged with previous block log file because of the discontinuity of blocks, "
-                    "skip merging.",
-                    ("file", val.filename_base));
+               wlog("{}.log cannot be merged with previous block log file because of the discontinuity of blocks, skip merging.",
+                    val.filename_base.generic_string());
             // there is a version or block number gap between the stride files
             move_blocklog_files(temp_path, dest_dir, start_block, end_block);
          }

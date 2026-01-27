@@ -24,12 +24,12 @@ void configure_logging(const std::filesystem::path& config_path) {
       }
    } catch (const fc::exception& e) {
       //
-      elog("${e}", ("e", e.to_detail_string()));
+      elog("{}", e.to_detail_string());
    } catch (const boost::exception& e) {
-      elog("${e}", ("e", boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
    } catch (const std::exception& e) {
       //
-      elog("${e}", ("e", e.what()));
+      elog("{}", e.what());
    } catch (...) {
       // empty
    }
@@ -38,12 +38,11 @@ void configure_logging(const std::filesystem::path& config_path) {
 void logging_conf_handler() {
    auto config_path = app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
    } else {
-      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
    }
    configure_logging(config_path);
-   fc::log_config::initialize_appenders();
 }
 
 
@@ -51,7 +50,7 @@ void initialize_logging() {
    auto config_path = app().get_logging_conf();
    // if (std::filesystem::exists(config_path))
    //    fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-   fc::log_config::initialize_appenders();
+   //fc::log_config::initialize_appenders();
 
    app().set_sighup_callback(logging_conf_handler);
 }
@@ -113,7 +112,7 @@ int main(int argc, char* argv[]) {
       auto& eth_abi_files = eth_plug.get_abi_files();
       FC_ASSERT(eth_abi_files.size() == 1, "1 ABI file is required (--ethereum-abi-file <json-array-file>)");
       auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[0];
-      ilogf("Using ABI file contracts: {}", eth_abi_file.string());
+      ilog("Using ABI file contracts: {}", eth_abi_file.string());
 
       auto  client_entry = eth_plug.get_clients()[0];
       auto& client       = client_entry->client;
@@ -121,7 +120,7 @@ int main(int argc, char* argv[]) {
       auto chain_id = client->get_chain_id();
 
 
-      ilogf("Current chain id: {}", chain_id.str());
+      ilog("Current chain id: {}", chain_id.str());
 
       // Example 1: Get the current block number
       /**
@@ -131,21 +130,21 @@ int main(int argc, char* argv[]) {
        * number. The block number is returned as a string, which is printed to the console.
        */
       auto block_number = client->get_block_number();
-      ilogf("Current Block Number: {}", block_number.str());
+      ilog("Current Block Number: {}", block_number.str());
 
       auto counter_contract = client->get_contract<ethereum_contract_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3",eth_abi_contracts);
       auto counter_contract_num_res = counter_contract->get_number("pending");
       auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
-      ilogf("Current counter value: {}", counter_contract_num.str());
+      ilog("Current counter value: {}", counter_contract_num.str());
 
       fc::uint256 new_num = counter_contract_num + 1;
-      ilogf("Setting New counter value: {}", new_num.str());
+      ilog("Setting New counter value: {}", new_num.str());
       auto counter_contract_set_num_receipt = counter_contract->set_number(new_num);
-      ilogf("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
+      ilog("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
 
       counter_contract_num_res = counter_contract->get_number("pending");
       counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
-      ilogf("New counter value: {}", counter_contract_num.str());
+      ilog("New counter value: {}", counter_contract_num.str());
 
       // Example 2: Get block information by block number
       /**
@@ -180,13 +179,13 @@ int main(int argc, char* argv[]) {
        * It returns the network version as a string.
        */
       auto protocol_version = client->get_network_version();
-      ilogf("Ethereum Protocol Version: {}", protocol_version.str());
+      ilog("Ethereum Protocol Version: {}", protocol_version.str());
    } catch (const fc::exception& e) {
-      elog("${e}", ("e",e.to_detail_string()));
+      elog("{}", e.to_detail_string());
    } catch (const boost::exception& e) {
-      elog("${e}", ("e",boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
    } catch (const std::exception& e) {
-      elog("${e}", ("e",e.what()));
+      elog("{}", e.what());
    } catch (...) {
       elog("unknown exception");
    }

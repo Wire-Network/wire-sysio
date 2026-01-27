@@ -9,7 +9,7 @@ using namespace sysio;
 
 int main(int argc, char** argv)
 {
-   chain::application exe{application_config{.enable_deep_mind_logging = true}};
+   chain::application exe{application_config{}};
 
    auto r = exe.init<chain_plugin, net_plugin, producer_plugin>(argc, argv);
    if (r != exit_code::SUCCESS)

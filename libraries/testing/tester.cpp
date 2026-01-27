@@ -26,7 +26,7 @@ using bls_public_key = fc::crypto::bls::public_key;
 
 namespace sysio::testing {
 
-   fc::logger test_logger = fc::logger::get();
+   fc::logger test_logger = fc::logger::default_logger();
 
    // required by boost::unit_test::data
    std::ostream& operator<<(std::ostream& os, setup_policy p) {
@@ -403,7 +403,7 @@ namespace sysio::testing {
       auto block_id = b->calculate_id();
       auto [best_fork, obh] = control->accept_block(block_id, b);
       unapplied_transactions.add_aborted( control->abort_block() );
-      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", b->calculate_id()));
+      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}:{}", b->block_num(), b->calculate_id());
       const block_handle& bh = *obh;
       control->apply_blocks( [this]( const transaction_metadata_ptr& trx ) {
          unapplied_transactions.add_forked( trx );
@@ -693,7 +693,7 @@ namespace sysio::testing {
       signed_transaction trx;
       set_transaction_headers(trx);
 
-      wlog("Registering node owner: ${owner} with tier: ${tier}", ("owner", owner)("tier", tier));
+      wlog("Registering node owner: {} with tier: {}", owner, tier);
 
       trx.actions.emplace_back(get_action(config::roa_account_name, "forcereg"_n,
                                           vector<permission_level>{{config::roa_account_name, sysio::chain::config::active_name}},
@@ -792,7 +792,7 @@ namespace sysio::testing {
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except ) throw *r->except;
       return r;
-   } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: ${header}", ("header", transaction_header(trx.get_transaction()) )) }
+   } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: {}", fc::json::to_log_string(transaction_header(trx.get_transaction())) ) }
 
    transaction_trace_ptr base_tester::push_transaction( signed_transaction& trx,
                                                         fc::time_point deadline,
@@ -827,8 +827,8 @@ namespace sysio::testing {
       if( r->except_ptr ) std::rethrow_exception( r->except_ptr );
       if( r->except)  throw *r->except;
       return r;
-   } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: ${header}, billed_cpu_time_us: ${billed}",
-                            ("header", transaction_header(trx) ) ("billed", billed_cpu_time_us))
+   } FC_RETHROW_EXCEPTIONS( warn, "transaction_header: {}, billed_cpu_time_us: {}",
+                            fc::json::to_log_string(transaction_header(trx)), billed_cpu_time_us )
    }
 
    typename base_tester::action_result base_tester::push_action(action&& act, uint64_t authorizer) {
@@ -847,7 +847,7 @@ namespace sysio::testing {
       try {
          push_transaction(trx);
       } catch (const fc::exception& ex) {
-         edump((ex.to_detail_string()));
+         elog("{}", ex.to_detail_string());
          return error(ex.top_message()); // top_message() is assumed by many tests; otherwise they fail
          //return error(ex.to_detail_string());
       }
@@ -870,7 +870,7 @@ namespace sysio::testing {
       try {
          push_transaction(trx);
       } catch (const fc::exception& ex) {
-         edump((ex.to_detail_string()));
+         elog("{}", ex.to_detail_string());
          return error(ex.top_message()); // top_message() is assumed by many tests; otherwise they fail
          //return error(ex.to_detail_string());
       }
@@ -926,7 +926,7 @@ namespace sysio::testing {
       }
 
       return push_transaction( trx );
-   } FC_CAPTURE_AND_RETHROW( (code)(acttype)(auths)(data)(expiration) ) }
+   } FC_CAPTURE_AND_RETHROW( "code {}, acttype {}, auths {}, data {}, expiration {}", code, acttype, auths, fc::json::to_log_string(data), expiration ) }
 
    action base_tester::get_action( account_name code, action_name acttype, vector<permission_level> auths,
                                    const variant_object& data )const { try {
@@ -936,13 +936,13 @@ namespace sysio::testing {
       chain::abi_serializer abis(std::move(abi), abi_serializer::create_yield_function( abi_serializer_max_time ));
 
       string action_type_name = abis.get_action_type(acttype);
-      FC_ASSERT( action_type_name != string(), "unknown action type ${a}", ("a",acttype) );
+      FC_ASSERT( action_type_name != string(), "unknown action type {}", acttype );
 
       action act(std::move(auths), code, acttype,
                  abis.variant_to_binary(action_type_name, data,
                                         abi_serializer::create_yield_function(abi_serializer_max_time)));
       return act;
-   } FC_CAPTURE_AND_RETHROW() }
+   } FC_CAPTURE_AND_RETHROW("") }
 
    transaction_trace_ptr base_tester::push_reqauth( account_name from, const vector<permission_level>& auths, const vector<private_key_type>& keys ) {
       fc::variant pretty_trx = fc::mutable_variant_object()
@@ -1085,7 +1085,7 @@ namespace sysio::testing {
       }
 
       push_transaction( trx );
-   } FC_CAPTURE_AND_RETHROW( (account)(perm)(auth)(parent) ) }
+   } FC_CAPTURE_AND_RETHROW( "account {} perm {} auth {} parent {}", account, perm, fc::json::to_log_string(auth), parent ) }
 
 
    void base_tester::set_authority( account_name account,
@@ -1111,7 +1111,7 @@ namespace sysio::testing {
          }
 
          push_transaction( trx );
-      } FC_CAPTURE_AND_RETHROW( (account)(perm) ) }
+      } FC_CAPTURE_AND_RETHROW( "account {} perm {}", account, perm ) }
 
 
    void base_tester::delete_authority( account_name account,
@@ -1143,7 +1143,7 @@ namespace sysio::testing {
 
    void base_tester::set_code( account_name account, const char* wast, const private_key_type* signer  ) try {
       set_code(account, wast_to_wasm(wast), signer);
-   } FC_CAPTURE_AND_RETHROW( (account) )
+   } FC_CAPTURE_AND_RETHROW( "account {}", account )
 
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
@@ -1163,7 +1163,7 @@ namespace sysio::testing {
          trx.sign( get_private_key( account, "active" ), control->get_chain_id()  );
       }
       push_transaction( trx );
-   } FC_CAPTURE_AND_RETHROW( (account) )
+   } FC_CAPTURE_AND_RETHROW( "account {}", account )
 
 
    void base_tester::set_abi( account_name account, const std::string& abi_json, const private_key_type* signer ) {
@@ -1299,7 +1299,7 @@ namespace sysio::testing {
                auto id = block->calculate_id();
                auto [best_head, obh] = b.control->accept_block( id, block );
                b.control->abort_block();
-               SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", id));
+               SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}", id);
                b.control->apply_blocks({}, trx_meta_cache_lookup{});
             }
          }

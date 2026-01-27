@@ -174,6 +174,10 @@ namespace sysio::chain {
 #endif
    } // namespace literals
 
+   constexpr auto format_as(const name& n) {
+      return n.to_string();
+   }
+
 } // sysio::chain
 
 namespace std {

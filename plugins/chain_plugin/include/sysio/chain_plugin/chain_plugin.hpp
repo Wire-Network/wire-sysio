@@ -99,7 +99,7 @@ template<typename Type>
 Type convert_to_type(const string& str, const string& desc) {
    try {
       return fc::variant(str).as<Type>();
-   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert ${desc} string '${str}' to key type.", ("desc", desc)("str",str) )
+   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert {} string '{}' to key type.", desc, str )
 }
 
 uint64_t convert_to_type(const sysio::name &n, const string &desc);
@@ -608,7 +608,7 @@ public:
                   SecKeyType lv = convert_to_type(name{p.lower_bound}, "lower_bound name");
                   std::get<1>(lower_bound_lookup_tuple) = conv(lv);
                } else {
-                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name ${nm} for lower bound", ("nm", p.lower_bound));
+                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name {} for lower bound", p.lower_bound);
                }
             } else {
                SecKeyType lv = convert_to_type<SecKeyType>( p.lower_bound, "lower_bound" );
@@ -622,7 +622,7 @@ public:
                   SecKeyType uv = convert_to_type(name{p.upper_bound}, "upper_bound name");
                   std::get<1>(upper_bound_lookup_tuple) = conv(uv);
                } else {
-                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name ${nm} for upper bound", ("nm", p.upper_bound));
+                  SYS_ASSERT(false, chain::contract_table_query_exception, "Invalid key type of sysio::name {} for upper bound", p.upper_bound);
                }
             } else {
                SecKeyType uv = convert_to_type<SecKeyType>( p.upper_bound, "upper_bound" );

@@ -127,14 +127,6 @@ namespace sysio::chain {
              && control.get_deep_mind_logger(is_transient()) == nullptr;
    }
 
-   void transaction_context::disallow_transaction_extensions( const char* error_msg )const {
-      if( control.is_speculative_block() ) {
-         SYS_THROW( subjective_block_production_exception, error_msg );
-      } else {
-         SYS_THROW( disallowed_transaction_extensions_bad_block_exception, error_msg );
-      }
-   }
-
    void transaction_context::init()
    {
       assert(!is_initialized);
@@ -464,13 +456,9 @@ namespace sysio::chain {
       if (is_input && !control.skip_trx_checks()) {
          if( BOOST_UNLIKELY(trace->net_usage > trx_net_limit) ) {
             if ( net_limit_due_to_block ) {
-               SYS_THROW( block_net_usage_exceeded,
-                          "not enough space left in block: ${net_usage} > ${net_limit}",
-                          ("net_usage", trace->net_usage)("net_limit", trx_net_limit) );
+               SYS_THROW( block_net_usage_exceeded, "not enough space left in block: {} > {}", trace->net_usage, trx_net_limit );
             } else {
-               SYS_THROW( tx_net_usage_exceeded,
-                          "transaction net usage is too high: ${net_usage} > ${net_limit}",
-                          ("net_usage", trace->net_usage)("net_limit", trx_net_limit) );
+               SYS_THROW( tx_net_usage_exceeded, "transaction net usage is too high: {} > {}", trace->net_usage, trx_net_limit );
             }
          }
       }
@@ -480,21 +468,21 @@ namespace sysio::chain {
       switch( tx_cpu_usage_reason ) {
          case tx_cpu_usage_exceeded_reason::account_cpu_limit:
             limit = objective_duration_limit;
-            return " reached account cpu limit ${limit}us";
+            return " reached account cpu limit {}us";
          case tx_cpu_usage_exceeded_reason::on_chain_consensus_max_transaction_cpu_usage:
             limit = objective_duration_limit;
-            return " reached on chain max_transaction_cpu_usage ${limit}us";
+            return " reached on chain max_transaction_cpu_usage {}us";
          case tx_cpu_usage_exceeded_reason::user_specified_trx_max_cpu_usage_ms:
             limit = objective_duration_limit;
-            return " reached trx specified max_cpu_usage_ms ${limit}us";
+            return " reached trx specified max_cpu_usage_ms {}us";
          case tx_cpu_usage_exceeded_reason::node_configured_max_transaction_time:
             limit = max_transaction_time_subjective;
-            return " reached node configured max-transaction-time ${limit}us";
+            return " reached node configured max-transaction-time {}us";
          case tx_cpu_usage_exceeded_reason::speculative_executed_adjusted_max_transaction_time:
             limit = max_transaction_time_subjective;
-            return " reached speculative executed adjusted trx max time ${limit}us";
+            return " reached speculative executed adjusted trx max time {}us";
       }
-      return "unknown tx_cpu_usage_exceeded";
+      return "unknown tx_cpu_usage_exceeded {}us";
    }
 
    void transaction_context::checktime()const {
@@ -504,32 +492,27 @@ namespace sysio::chain {
 
       auto now = fc::time_point::now();
       if (expired == platform_timer::state_t::interrupted) {
-         SYS_THROW( interrupt_exception, "interrupt signaled, ran ${bt}us, start ${s}",
-                    ("bt", now - pseudo_start)("s", start) );
+         SYS_THROW( interrupt_exception, "interrupt signaled, ran {}us, start {}", now - pseudo_start, start );
       } else if( explicit_billed_cpu_time || deadline_exception_code == deadline_exception::code_value ) {
-         SYS_THROW( deadline_exception, "deadline exceeded ${billing_timer}us",
-                    ("billing_timer", now - pseudo_start)("now", now)("deadline", active_deadline)("start", start) );
+         SYS_THROW( deadline_exception, "deadline {} exceeded {}us, start {}",
+                    active_deadline, now - pseudo_start, start );
       } else if( deadline_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_THROW( block_cpu_usage_exceeded,
-                     "not enough time left in block to complete executing transaction ${billing_timer}us",
-                     ("now", now)("deadline", active_deadline)("start", start)("billing_timer", now - pseudo_start) );
+                     "not enough time left in block {} to complete executing transaction {}us, start {}",
+                     active_deadline, now - pseudo_start, start );
       } else if( deadline_exception_code == tx_cpu_usage_exceeded::code_value ) {
-         std::string assert_msg = "transaction ${id} was executing for too long ${billing_timer}us";
-         if (subjective_cpu_bill.count() > 0) {
-            assert_msg += " with a subjective cpu of (${subjective} us)";
-         }
+         std::string assert_msg = "transaction {} was executing for too long {}us";
+         assert_msg += " with a subjective cpu of ({} us)";
          fc::microseconds limit;
          assert_msg += get_tx_cpu_usage_exceeded_reason_msg(limit);
          if (cpu_limit_due_to_greylist) {
             assert_msg = "greylisted " + assert_msg;
-            SYS_THROW( greylist_cpu_usage_exceeded, assert_msg, ("id", packed_trx.id())
-                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill)("limit", limit) );
+            SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, assert_msg, packed_trx.id(), now - pseudo_start, subjective_cpu_bill, limit );
          } else {
-            SYS_THROW( tx_cpu_usage_exceeded, assert_msg, ("id", packed_trx.id())
-                     ("billing_timer", now - pseudo_start)("subjective", subjective_cpu_bill)("limit", limit) );
+            SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, assert_msg, packed_trx.id(), now - pseudo_start, subjective_cpu_bill, limit );
          }
       }
-      SYS_ASSERT( false,  transaction_exception, "unexpected deadline exception code ${code}", ("code", deadline_exception_code) );
+      SYS_ASSERT( false,  transaction_exception, "unexpected deadline exception code {}", deadline_exception_code );
    }
 
    void transaction_context::pause_billing_timer() {
@@ -577,8 +560,8 @@ namespace sysio::chain {
          return;
       const auto& cfg = control.get_global_properties().configuration;
       SYS_ASSERT( trace->total_cpu_usage_us >= cfg.min_transaction_cpu_usage, transaction_exception,
-                  "cannot bill CPU time ${b} less than the minimum of ${m} us",
-                  ("b", trace->total_cpu_usage_us)("m", cfg.min_transaction_cpu_usage) );
+                  "cannot bill CPU time {} less than the minimum of {} us",
+                  trace->total_cpu_usage_us, cfg.min_transaction_cpu_usage );
    }
 
    void transaction_context::validate_trx_billed_cpu() const {
@@ -589,8 +572,8 @@ namespace sysio::chain {
       if( billing_timer_exception_code == block_cpu_usage_exceeded::code_value ) {
          SYS_ASSERT( trace->total_cpu_usage_us <= objective_duration_limit.count(),
                      block_cpu_usage_exceeded,
-                     "billed CPU time (${billed} us) is greater than the billable CPU time left in the block (${billable} us)",
-                     ("billed", trace->total_cpu_usage_us)( "billable", objective_duration_limit.count() )
+                     "billed CPU time ({} us) is greater than the billable CPU time left in the block ({} us)",
+                     trace->total_cpu_usage_us, objective_duration_limit.count()
          );
       } else {
          // exceeds trx.max_cpu_usage_ms or cfg.max_transaction_cpu_usage if objective_duration_limit is greater
@@ -599,13 +582,13 @@ namespace sysio::chain {
          if( trace->total_cpu_usage_us > limit ) {
             fc::microseconds tx_limit;
             std::string assert_msg;
-            assert_msg.reserve(1024);
-            assert_msg += "billed CPU time (${billed} us) is greater than the maximum";
-            assert_msg += " billable CPU time for the transaction (${billable} us)";
+            assert_msg.reserve(256);
+            assert_msg += "billed CPU time ({} us) is greater than the maximum";
+            assert_msg += " billable CPU time for the transaction ({} us)";
             assert_msg += get_tx_cpu_usage_exceeded_reason_msg( tx_limit );
 
-            FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                ("billed", trace->total_cpu_usage_us)("billable", limit)("limit", tx_limit) );
+            SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                      trace->total_cpu_usage_us, limit, tx_limit );
          }
       }
    }
@@ -626,8 +609,8 @@ namespace sysio::chain {
             return result;
          }();
          SYS_ASSERT( total_cpu_us < objective_duration_limit.count(), block_cpu_usage_exceeded,
-                     "estimated CPU time (${ec} us) is not less than the billable CPU time left in the block (${bb} us)",
-                     ("ec", total_cpu_us)("bb", objective_duration_limit.count()) );
+                     "estimated CPU time ({} us) is not less than the billable CPU time left in the block ({} us)",
+                     total_cpu_us, objective_duration_limit.count() );
       }
 
       auto& subjective_billing = control.get_subjective_billing();
@@ -646,21 +629,20 @@ namespace sysio::chain {
          if( prev_cpu_usage_us >= validate_account_cpu_limit ) { // if none available
             std::string assert_msg;
             assert_msg.reserve(1024);
-            assert_msg += "estimated CPU time (${pb} us) is not less than the maximum";
+            assert_msg += "estimated CPU time ({} us) is not less than the maximum";
             if (b.cpu_greylisted)
                assert_msg += " greylisted";
-            assert_msg += " billable CPU time for the account ${a} (${b} us)";
-            if (subjective_cpu_usage_us > 0)
-               assert_msg += " with a subjective cpu of (${s} us)";
-            assert_msg += " reached account cpu limit ${l}us";
+            assert_msg += " billable CPU time for the account {} ({} us)";
+            assert_msg += " with a subjective cpu of ({} us)";
+            assert_msg += " reached account cpu limit {} us";
             if( b.cpu_greylisted ) {
-               FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                   ("pb", prev_cpu_usage_us)("a", a)("b", validate_account_cpu_limit)
-                                   ("s", subjective_cpu_usage_us)("l", validate_account_cpu_limit) );
+               SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                         prev_cpu_usage_us, a, validate_account_cpu_limit,
+                                         subjective_cpu_usage_us, validate_account_cpu_limit );
             } else {
-               FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                   ("pb", prev_cpu_usage_us)("a", a)("b", validate_account_cpu_limit)
-                                   ("s", subjective_cpu_usage_us)("l", validate_account_cpu_limit) );
+               SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                         prev_cpu_usage_us, a, validate_account_cpu_limit,
+                                         subjective_cpu_usage_us, validate_account_cpu_limit );
             }
          }
       }
@@ -674,24 +656,22 @@ namespace sysio::chain {
       if( billed_us > account_limit ) {
          std::string assert_msg;
          assert_msg.reserve(1024);
-         assert_msg += "billed CPU time (${b} us) exceeded the maximum";
+         assert_msg += "billed CPU time ({} us) exceeded the maximum";
          if (greylisted)
             assert_msg += " greylisted";
-         assert_msg += " billable CPU time for the account ${a} (${l} us)";
+         assert_msg += " billable CPU time for the account {} ({} us)";
 
          if( greylisted ) {
-            FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                ("b", billed_us)("a", account)("l", account_limit) );
+            SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                      billed_us, account, account_limit );
          } else {
-            FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                ("b", billed_us)("a", account)("l", account_limit) );
+            SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                      billed_us, account, account_limit );
          }
       }
    }
 
    void transaction_context::add_ram_usage( account_name account, int64_t ram_delta ) {
-      // wlog("Calling add_ram_usage with account: ${account}, ram_delta: ${ram_delta}",
-      //      ("account", account)("ram_delta", ram_delta));
       auto& rl = control.get_mutable_resource_limits_manager();
       rl.add_pending_ram_usage( account, ram_delta );
       if( ram_delta > 0 ) {
@@ -706,7 +686,7 @@ namespace sysio::chain {
       const auto& cfg = control.get_global_properties().configuration;
       int64_t total_cpu_time_us = std::max( (now - pseudo_start).count(), static_cast<int64_t>(cfg.min_transaction_cpu_usage) );
       SYS_ASSERT(total_cpu_time_us - trace->total_cpu_usage_us >= 0, tx_cpu_usage_exceeded,
-                 "Invalid CPU usage calculation ${tt} - ${tu}", ("tt", total_cpu_time_us)("tu", trace->total_cpu_usage_us));
+                 "Invalid CPU usage calculation {} - {}", total_cpu_time_us, trace->total_cpu_usage_us);
       account_subjective_cpu_bill_t authorizers_cpu;
       if (!billed_cpu_us.empty()) {
          assert(trace->action_traces.size() >= billed_cpu_us.size());
@@ -773,17 +753,17 @@ namespace sysio::chain {
                if (available <= 0) {
                   std::string assert_msg;
                   assert_msg.reserve(256);
-                  assert_msg += "Subjectively terminated trx ${id}. Authorized";
+                  assert_msg += "Subjectively terminated trx {}. Authorized";
                   if (greylisted)
                      assert_msg += " greylisted";
-                  assert_msg += " account ${a} exceeded subjective CPU limit ${sl}us by ${d}us"
-                                " with an objective cpu limit of ${ol}us.";
+                  assert_msg += " account {} exceeded subjective CPU limit {}us by {}us"
+                                " with an objective cpu limit of {}us.";
                   if( greylisted ) {
-                     FC_THROW_EXCEPTION( greylist_cpu_usage_exceeded, std::move(assert_msg),
-                                         ("id", packed_trx.id())("a", a)("sl", subjective_cpu_allowed)("d", -available)("ol", cpu_limit) );
+                     SYS_THROW_RUNTIME_FORMAT( greylist_cpu_usage_exceeded, std::move(assert_msg),
+                                               packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
                   } else {
-                     FC_THROW_EXCEPTION( tx_cpu_usage_exceeded, std::move(assert_msg),
-                                         ("id", packed_trx.id())("a", a)("sl", subjective_cpu_allowed)("d", -available)("ol", cpu_limit) );
+                     SYS_THROW_RUNTIME_FORMAT( tx_cpu_usage_exceeded, std::move(assert_msg),
+                                               packed_trx.id(), a, subjective_cpu_allowed, -available, cpu_limit );
                   }
 
                }
@@ -848,11 +828,11 @@ namespace sysio::chain {
       const auto leeway_net_limit = account_net_limit + net_usage_leeway;
       if (net_usage > leeway_net_limit) {
          if (greylisted_net) {
-            SYS_THROW( greylist_net_usage_exceeded, "greylisted account ${a} net usage is too high: ${nu} > ${nl}",
-                       ("a", a)("nu", net_usage)("nl", leeway_net_limit) );
+            SYS_THROW( greylist_net_usage_exceeded, "greylisted account {} net usage is too high: {} > {}",
+                       a, net_usage, leeway_net_limit );
          } else {
-            SYS_THROW( tx_net_usage_exceeded, "account ${a} net usage is too high: ${nu} > ${nl}",
-                       ("a", a)("nu", net_usage)("nl", leeway_net_limit) );
+            SYS_THROW( tx_net_usage_exceeded, "account {} net usage is too high: {} > {}",
+                       a, net_usage, leeway_net_limit );
          }
       }
    }
@@ -860,8 +840,8 @@ namespace sysio::chain {
    action_trace& transaction_context::get_action_trace( uint32_t action_ordinal ) {
       SYS_ASSERT( 0 < action_ordinal && action_ordinal <= trace->action_traces.size() ,
                   transaction_exception,
-                  "action_ordinal ${ordinal} is outside allowed range [1,${max}]",
-                  ("ordinal", action_ordinal)("max", trace->action_traces.size())
+                  "action_ordinal {} is outside allowed range [1,{}]",
+                  action_ordinal, trace->action_traces.size()
       );
       return trace->action_traces[action_ordinal-1];
    }
@@ -869,8 +849,8 @@ namespace sysio::chain {
    const action_trace& transaction_context::get_action_trace( uint32_t action_ordinal )const {
       SYS_ASSERT( 0 < action_ordinal && action_ordinal <= trace->action_traces.size() ,
                   transaction_exception,
-                  "action_ordinal ${ordinal} is outside allowed range [1,${max}]",
-                  ("ordinal", action_ordinal)("max", trace->action_traces.size())
+                  "action_ordinal {} is outside allowed range [1,{}]",
+                  action_ordinal, trace->action_traces.size()
       );
       return trace->action_traces[action_ordinal-1];
    }
@@ -942,8 +922,7 @@ namespace sysio::chain {
       } catch( const boost::interprocess::bad_alloc& ) {
          throw;
       } catch ( ... ) {
-          SYS_ASSERT( false, tx_duplicate,
-                     "duplicate transaction ${id}", ("id", id ) );
+          SYS_ASSERT( false, tx_duplicate, "duplicate transaction {}", id );
       }
    } /// record_transaction
 
@@ -955,7 +934,7 @@ namespace sysio::chain {
          for( const auto& a : trx.context_free_actions ) {
             auto* code = db.find<account_object, by_name>( a.account );
             SYS_ASSERT( code != nullptr, transaction_exception,
-                        "action's code account '${account}' does not exist", ("account", a.account) );
+                        "action's code account '{}' does not exist", a.account );
             auto verify_auth = [&]() -> bool {
                if (a.authorization.size() == 0)
                   return true;
@@ -988,10 +967,10 @@ namespace sysio::chain {
       for( const auto& a : trx.actions ) {
          auto* code = db.find<account_object, by_name>(a.account);
          SYS_ASSERT( code != nullptr, transaction_exception,
-                     "action's code account '${account}' does not exist", ("account", a.account) );
+                     "action's code account '{}' does not exist", a.account );
          if ( is_read_only() ) {
             SYS_ASSERT( a.authorization.size() == 0, transaction_exception,
-                       "read-only action '${name}' cannot have authorizations", ("name", a.name) );
+                       "read-only action '{}' cannot have authorizations", a.name );
          }
          name payer;
          for (const auto &auth: a.authorization) {
@@ -1001,16 +980,16 @@ namespace sysio::chain {
 
                auto *actor = db.find<account_object, by_name>(auth.actor);
                SYS_ASSERT(actor != nullptr, transaction_exception,
-                          "action's paying actor '${account}' does not exist", ("account", auth.actor));
+                          "action's paying actor '{}' does not exist", auth.actor);
                payer = auth.actor;
             } else {
                one_auth = true;
                auto *actor = db.find<account_object, by_name>(auth.actor);
                SYS_ASSERT(actor != nullptr, transaction_exception,
-                          "action's authorizing actor '${account}' does not exist", ("account", auth.actor));
+                          "action's authorizing actor '{}' does not exist", auth.actor);
                SYS_ASSERT(auth_manager.find_permission(auth) != nullptr, transaction_exception,
-                          "action's authorizations include a non-existent permission: ${permission}",
-                          ("permission", auth));
+                          "action's authorizations include a non-existent permission: {}",
+                          auth);
                if (enforce_actor_whitelist_blacklist)
                   actors.insert(auth.actor);
             }
@@ -1026,8 +1005,7 @@ namespace sysio::chain {
                   break;
                }
             }
-            SYS_ASSERT(authPayer, transaction_exception,
-                       "Payer '${account}' did not authorize this action", ("account", payer));
+            SYS_ASSERT(authPayer, transaction_exception, "Payer '{}' did not authorize this action", payer);
          }
       }
       SYS_ASSERT(one_auth || is_read_only(), tx_no_auths, "transaction must have at least one authorization" );

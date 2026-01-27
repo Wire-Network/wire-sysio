@@ -36,7 +36,7 @@ namespace sysio::chain_apis {
             if (get_info_enabled && controller.get_read_mode() != db_read_mode::IRREVERSIBLE) {
                store_info();
             }
-         } FC_LOG_AND_DROP(("get_info_db_impl on_accepted_block ERROR"));
+         } FC_LOG_AND_DROP("get_info_db_impl on_accepted_block ERROR");
       }
 
       // Called on irreversible_block signal.
@@ -45,7 +45,7 @@ namespace sysio::chain_apis {
             if (get_info_enabled) {
                store_info(block, id);
             }
-         } FC_LOG_AND_DROP(("get_info_db_impl on_irreversible_block ERROR"));
+         } FC_LOG_AND_DROP("get_info_db_impl on_irreversible_block ERROR");
       }
 
       // Returns cached get_info results

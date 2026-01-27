@@ -194,7 +194,7 @@ namespace {
         result += v;
       }
     }
-    ilog("Non-default options: ${v}", ("v", result));
+    ilog("Non-default options: {}", result);
   }
 
 
@@ -210,11 +210,11 @@ namespace {
         throw;
       }
     } catch (const fc::exception& e) {
-      elog("${e}", ("e",e.to_detail_string()));
+      elog("{}", e.to_detail_string());
     } catch (const boost::exception& e) {
-      elog("${e}", ("e",boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
     } catch (const std::exception& e) {
-      elog("${e}", ("e",e.what()));
+      elog("{}", e.what());
     } catch (...) {
       // empty
     }
@@ -223,7 +223,6 @@ namespace {
   void logging_conf_handler() {
     auto config_path = app().get_logging_conf();
     configure_logging(config_path);
-    fc::log_config::initialize_appenders();
   }
 
   void initialize_logging() {
@@ -231,7 +230,6 @@ namespace {
     if (std::filesystem::exists(config_path))
       fc::configure_logging(config_path);
 
-    fc::log_config::initialize_appenders();
     app().set_sighup_callback(logging_conf_handler);
   }
 
@@ -707,10 +705,9 @@ int chain_actions::run_subcommand_configure() {
         auto exe_name = boost::dll::program_location().filename().generic_string();
 
         fc::scoped_exit<std::function<void()>> on_exit = [&]() {
-          ilog(
-            "${name} version ${ver} ${fv}",
-            ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string()
-              ? "" : app->full_version_string())
+          ilog("{} version {} {}",
+               exe_name, app->version_string(),
+               app->version_string() == app->full_version_string() ? "" : app->full_version_string()
           );
           log_non_default_options(app->get_parsed_options());
         };
@@ -723,7 +720,7 @@ int chain_actions::run_subcommand_configure() {
           }
         );
 
-        ilog("Starting kiod: ${dir}", ("dir", wallet_dir.generic_string()));
+        ilog("Starting kiod: {}", wallet_dir.generic_string());
         start_kiod(wallet_dir);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
@@ -788,13 +785,12 @@ int chain_actions::run_subcommand_configure() {
           on_app_init(1);
           return 1;
         }
-        ilog(
-          "${name} version ${ver} ${fv}",
-          ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string() ?
-            "" : app->full_version_string())
+        ilog("{} version {} {}",
+             exe_name, app->version_string(),
+             app->version_string() == app->full_version_string() ? "" : app->full_version_string()
         );
-        ilog("${name} using configuration file ${c}", ("name", exe_name)("c", app->full_config_file_path().string()));
-        ilog("${name} data directory is ${d}", ("name", exe_name)("d", app->data_dir().string()));
+        ilog("{} using configuration file {}", exe_name, app->full_config_file_path().string());
+        ilog("{} data directory is {}", exe_name, app->data_dir().string());
         log_non_default_options(app->get_parsed_options());
         app->startup();
         app->set_thread_priority_max();
@@ -829,7 +825,7 @@ int chain_actions::run_subcommand_configure() {
     auto chain = app->find_plugin<chain_plugin>();
 
 
-    ilog("Got chain with id: ${chainId}", ("chainId",chain->get_chain_id()));
+    ilog("Got chain with id: {}", chain->get_chain_id());
 
     auto set_contract = [&](const std::string& contract_name, const std::string& contract_path_str) {
       auto rc = run_clio("set", "contract", contract_name, contract_path_str);

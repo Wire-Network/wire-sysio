@@ -80,6 +80,10 @@ namespace sysio {
     mutable int64_t  dst{0};       //!< destination timestamp, in nanoseconds
   };
 
+  constexpr auto format_as( const time_message& tm ) {
+    return fmt::format("time_message(org={}, rec={}, xmt={}, dst={})", tm.org, tm.rec, tm.xmt, tm.dst);
+  }
+
   enum id_list_modes {
     none,
     catch_up,
@@ -126,6 +130,10 @@ namespace sysio {
       uint32_t start_block{0};
       uint32_t end_block{0};
    };
+
+   constexpr auto format_as( const sync_request_message& r ) {
+      return fmt::format("sync_request_message(start={}, end={})", r.start_block, r.end_block);
+    }
 
    struct block_nack_message {
       block_id_type id;
@@ -208,7 +216,7 @@ namespace sysio {
 
    constexpr msg_type_t to_msg_type_t(size_t v) {
       static_assert( std::variant_size_v<net_message> == static_cast<size_t>(msg_type_t::unknown));
-      SYS_ASSERT(v < to_index(msg_type_t::unknown), plugin_exception, "Invalid net_message index: ${v}", ("v", v));
+      SYS_ASSERT(v < to_index(msg_type_t::unknown), plugin_exception, "Invalid net_message index: {}", v);
       return static_cast<msg_type_t>(v);
    }
 

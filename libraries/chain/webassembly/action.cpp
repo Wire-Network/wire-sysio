@@ -26,7 +26,7 @@ namespace sysio { namespace chain { namespace webassembly {
       if( !context.trx_context.is_read_only() )
          SYS_ASSERT(packed_blob.size() <= max_action_return_value_size,
                     action_return_value_exception,
-                    "action return value size must be less or equal to ${s} bytes", ("s", max_action_return_value_size));
+                    "action return value size must be less or equal to {} bytes", max_action_return_value_size);
       context.action_return_value.assign( packed_blob.data(), packed_blob.data() + packed_blob.size() );
    }
 }}} // ns sysio::chain::webassembly

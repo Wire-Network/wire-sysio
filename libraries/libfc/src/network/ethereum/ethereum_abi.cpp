@@ -62,7 +62,7 @@ std::vector<uint8_t> be_uint_from_decimal(const std::string& dec) {
    }
    cpp_int v = 0;
    for (char c : dec) {
-      FC_ASSERT(::isdigit(static_cast<unsigned char>(c)), "Invalid decimal number: ${n}", ("n", dec));
+      FC_ASSERT(::isdigit(static_cast<unsigned char>(c)), "Invalid decimal number: {}", dec);
       v *= 10;
       v += static_cast<unsigned>(c - '0');
    }
@@ -93,7 +93,7 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
 
    // Numeric types (uint/int variants)
    if (abi::is_data_type_numeric(type)) {
-      FC_ASSERT_FMT(value.is_numeric(), "Integer value expected for ABI encoding, got {}", value.as_string());
+      FC_ASSERT(value.is_numeric(), "Integer value expected for ABI encoding, got {}", value.as_string());
       if (type == dt::uint256 || type == dt::int256 || type == dt::uint128 || type == dt::int128) {
          return be_uint_from_decimal(value.as_string());
       }
@@ -107,7 +107,7 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
 
    case dt::address: {
       auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-      FC_ASSERT_FMT(bytes.size() == 20, "Address must be 20 bytes, got {}", bytes.size());
+      FC_ASSERT(bytes.size() == 20, "Address must be 20 bytes, got {}", bytes.size());
       return be_pad_left_32(bytes);
    }
 
@@ -120,14 +120,14 @@ std::vector<uint8_t> encode_static_value(const abi::component_type& component, c
       auto type_name = ethereum_abi_data_type_reflector::to_fc_string(type);
       auto sz = std::stoul(type_name.substr(5));
       auto bytes = fc::crypto::ethereum::hex_to_bytes(value.as_string());
-      FC_ASSERT_FMT(bytes.size() == sz, "{} expects {} bytes, got {}", type_name, sz, bytes.size());
+      FC_ASSERT(bytes.size() == sz, "{} expects {} bytes, got {}", type_name, sz, bytes.size());
       std::vector<uint8_t> out(32, 0);
       std::ranges::copy(bytes, out.begin());
       return out;
    }
 
-   FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported static type for ABI encoding: {}",
-                          ethereum_abi_data_type_reflector::to_fc_string(type));
+   FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported static type for ABI encoding: {}",
+                      ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
 /**
@@ -148,7 +148,7 @@ std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, c
    std::vector<uint8_t> data;
    switch (type) {
    case dt::string:
-      FC_ASSERT_FMT(value.is_string(), "String value expected for ABI encoding, got {}", value.as_string());
+      FC_ASSERT(value.is_string(), "String value expected for ABI encoding, got {}", value.as_string());
       {
          const auto& s = value.as_string();
          data.assign(s.begin(), s.end());
@@ -156,13 +156,13 @@ std::vector<uint8_t> encode_dynamic_data(const abi::component_type& component, c
       break;
 
    case dt::bytes:
-      FC_ASSERT_FMT(value.is_string(), "Bytes value expected for ABI encoding, got {}", value.as_string());
+      FC_ASSERT(value.is_string(), "Bytes value expected for ABI encoding, got {}", value.as_string());
       data = fc::crypto::ethereum::hex_to_bytes(value.as_string());
       break;
 
    default:
-      FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported dynamic type for ABI encoding: {}",
-                             ethereum_abi_data_type_reflector::to_fc_string(type));
+      FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported dynamic type for ABI encoding: {}",
+                         ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 
    std::vector<uint8_t> out;
@@ -210,7 +210,7 @@ std::vector<uint8_t> encode_list(const abi::component_type& component, const fc:
    const auto& lc = component.list_config;
 
    if (lc.is_fixed_list()) {
-      FC_ASSERT_FMT(arr.size() == lc.size, "Fixed-size list expects {} elements, got {}", lc.size, arr.size());
+      FC_ASSERT(arr.size() == lc.size, "Fixed-size list expects {} elements, got {}", lc.size, arr.size());
    }
 
    // Create element component (same as parent but without list_config)
@@ -447,8 +447,8 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
       return fc::variant("0x" + fc::to_hex(bytes_data));
    }
 
-   FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
-                          ethereum_abi_data_type_reflector::to_fc_string(type));
+   FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported static type for ABI decoding: {}",
+                      ethereum_abi_data_type_reflector::to_fc_string(type));
 }
 
 /**
@@ -490,8 +490,8 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
    }
 
    default:
-      FC_THROW_EXCEPTION_FMT(fc::unsupported_exception, "Unsupported dynamic type for ABI decoding: {}",
-                             ethereum_abi_data_type_reflector::to_fc_string(type));
+      FC_THROW_EXCEPTION(fc::unsupported_exception, "Unsupported dynamic type for ABI decoding: {}",
+                         ethereum_abi_data_type_reflector::to_fc_string(type));
    }
 }
 
@@ -919,8 +919,7 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
 
    std::regex data_type_regex(R"(([a-zA-Z0-9_]+)(\[(\d*)\])?)");
    std::smatch data_type_match;
-   FC_ASSERT(std::regex_match(data_type_str, data_type_match, data_type_regex), "Invalid type format: ${t}",
-             ("t", data_type_str));
+   FC_ASSERT(std::regex_match(data_type_str, data_type_match, data_type_regex), "Invalid type format: {}", data_type_str);
 
    auto base_type_str = data_type_match[1].str();
    vo.name = obj["name"].as_string();
@@ -950,8 +949,8 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
       }
    }
 
-   dlogf("name={},type={},internal_type={},components={}", vo.name, base_type_str, vo.internal_type,
-         vo.components.size());
+   dlog("name={},type={},internal_type={},components={}", vo.name, base_type_str, vo.internal_type,
+        vo.components.size());
 }
 /**
  * @brief Deserializes an ABI contract from a variant (typically JSON)
@@ -977,8 +976,8 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::contra
    auto parse_components = [&](std::vector<component_type>& vo_list, const std::string& list_name) {
       auto list_prop_exists = obj.contains(list_name.c_str());
       if (!list_prop_exists || !obj[list_name].is_array()) {
-         dlogf("ABI property is not set or not array (name={},exists={},is_array={})", list_name, list_prop_exists,
-               obj[list_name].is_array(), "ABI contract inputs must be an array");
+         dlog("ABI property is not set or not array (name={},exists={},is_array={})", list_name, list_prop_exists,
+              obj[list_name].is_array(), "ABI contract inputs must be an array");
          return;
       }
 

@@ -18,6 +18,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/block_header_state_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <chainbase/environment.hpp>
 
 #include <boost/signals2/connection.hpp>
@@ -28,10 +29,8 @@
 #include <fc/variant.hpp>
 #include <cstdlib>
 
-#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 
-
-const std::string deep_mind_logger_name("deep-mind");
+const std::string deep_mind_logger_name("dmlog");
 sysio::chain::deep_mind_handler _deep_mind_log;
 
 namespace std {
@@ -440,10 +439,10 @@ fc::time_point calculate_genesis_timestamp( string tstr ) {
    if (diff_us > 0) {
       auto delay_us = (config::block_interval_us - diff_us);
       genesis_timestamp += fc::microseconds(delay_us);
-      dlog("pausing ${us} microseconds to the next interval",("us",delay_us));
+      dlog("pausing {} microseconds to the next interval", delay_us);
    }
 
-   ilog( "Adjusting genesis timestamp to ${timestamp}", ("timestamp", genesis_timestamp) );
+   ilog( "Adjusting genesis timestamp to {}", genesis_timestamp );
    return genesis_timestamp;
 }
 
@@ -507,7 +506,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       if( options.at( "print-build-info" ).as<bool>() || options.contains( "extract-build-info") ) {
          if( options.at( "print-build-info" ).as<bool>() ) {
-            ilog( "Build environment JSON:\n${e}", ("e", json::to_pretty_string( chainbase::environment() )) );
+            ilog( "Build environment JSON:\n{}", json::to_pretty_string( chainbase::environment() ) );
          }
          if( options.contains( "extract-build-info") ) {
             auto p = options.at( "extract-build-info" ).as<std::filesystem::path>();
@@ -517,11 +516,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             }
 
             SYS_ASSERT( fc::json::save_to_file( chainbase::environment(), p, true ), misc_exception,
-                        "Error occurred while writing build info JSON to '${path}'",
-                        ("path", p)
+                        "Error occurred while writing build info JSON to '{}'",
+                        p.string()
             );
 
-            ilog( "Saved build info JSON to '${path}'", ("path", p) );
+            ilog( "Saved build info JSON to '{}'", p.string() );
          }
 
          SYS_THROW( node_management_success, "reported build environment information" );
@@ -543,14 +542,14 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                                          [](std::string a, account_name b) -> std::string {
                                             return std::move(a) + ", " + b.to_string();
                                          });
-         ilog("sys-vm-oc-whitelist accounts: ${a}", ("a", s));
+         ilog("sys-vm-oc-whitelist accounts: {}", s);
       }
       if( options.count( "action-blacklist" )) {
          const std::vector<std::string>& acts = options["action-blacklist"].as<std::vector<std::string>>();
          auto& list = chain_config->action_blacklist;
          for( const auto& a : acts ) {
             auto pos = a.find( "::" );
-            SYS_ASSERT( pos != std::string::npos, plugin_config_exception, "Invalid entry in action-blacklist: '${a}'", ("a", a));
+            SYS_ASSERT( pos != std::string::npos, plugin_config_exception, "Invalid entry in action-blacklist: '{}'", a);
             account_name code( a.substr( 0, pos ));
             action_name act( a.substr( pos + 2 ));
             list.emplace( code, act );
@@ -610,8 +609,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             if( itr != loaded_checkpoints.end() ) {
                SYS_ASSERT( itr->second == item.second,
                            plugin_config_exception,
-                          "redefining existing checkpoint at block number ${num}: original: ${orig} new: ${new}",
-                          ("num", item.first)("orig", itr->second)("new", item.second)
+                          "redefining existing checkpoint at block number {}: original: {} new: {}",
+                          item.first, itr->second, item.second
                );
             } else {
                loaded_checkpoints[item.first] = item.second;
@@ -658,21 +657,21 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if( options.count( "chain-threads" )) {
          chain_config->chain_thread_pool_size = options.at( "chain-threads" ).as<uint16_t>();
          SYS_ASSERT( chain_config->chain_thread_pool_size > 0, plugin_config_exception,
-                     "chain-threads ${num} must be greater than 0", ("num", chain_config->chain_thread_pool_size) );
+                     "chain-threads {} must be greater than 0", chain_config->chain_thread_pool_size );
       }
 
       if (options.count("producer-name") || options.count("vote-threads")) {
          chain_config->vote_thread_pool_size = options.count("vote-threads") ? options.at("vote-threads").as<uint16_t>() : 0;
          if (chain_config->vote_thread_pool_size == 0 && options.count("producer-name")) {
             chain_config->vote_thread_pool_size = config::default_vote_thread_pool_size;
-            ilog("Setting vote-threads to ${n} on producing node", ("n", chain_config->vote_thread_pool_size));
+            ilog("Setting vote-threads to {} on producing node", chain_config->vote_thread_pool_size);
          }
          accept_votes = chain_config->vote_thread_pool_size > 0;
       }
 
       chain_config->sig_cpu_bill_pct = options.at("signature-cpu-billable-pct").as<uint32_t>();
       SYS_ASSERT( chain_config->sig_cpu_bill_pct >= 0 && chain_config->sig_cpu_bill_pct <= 100, plugin_config_exception,
-                  "signature-cpu-billable-pct must be 0 - 100, ${pct}", ("pct", chain_config->sig_cpu_bill_pct) );
+                  "signature-cpu-billable-pct must be 0 - 100, {}", chain_config->sig_cpu_bill_pct );
       chain_config->sig_cpu_bill_pct *= config::percent_1;
 
       if( wasm_runtime )
@@ -737,13 +736,13 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          gs = block_log::extract_genesis_state( blocks_dir, retained_dir );
          SYS_ASSERT( gs,
                      plugin_config_exception,
-                     "Block log at '${path}' does not contain a genesis state, it only has the chain-id.",
-                     ("path", (blocks_dir / "blocks.log").generic_string())
+                     "Block log at '{}' does not contain a genesis state, it only has the chain-id.",
+                     (blocks_dir / "blocks.log").generic_string()
          );
 
 
          if( options.at( "print-genesis-json" ).as<bool>()) {
-            ilog( "Genesis JSON:\n${genesis}", ("genesis", json::to_pretty_string( *gs )));
+            ilog( "Genesis JSON:\n{}", json::to_pretty_string( *gs ) );
          }
 
          if( options.contains( "extract-genesis-json" )) {
@@ -755,11 +754,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
             SYS_ASSERT( fc::json::save_to_file( *gs, p, true ),
                         misc_exception,
-                        "Error occurred while writing genesis JSON to '${path}'",
-                        ("path", p.generic_string())
+                        "Error occurred while writing genesis JSON to '{}'",
+                        p.generic_string()
             );
 
-            ilog( "Saved genesis JSON to '${path}'", ("path", p.generic_string()) );
+            ilog( "Saved genesis JSON to '{}'", p.generic_string() );
          }
 
          SYS_THROW( extract_genesis_state_exception, "extracted genesis state from blocks.log" );
@@ -769,8 +768,8 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       uint32_t terminate_at_block = options.at( "terminate-at-block" ).as<uint32_t>();
       if (truncate_at_block > 0 && terminate_at_block > 0) {
          SYS_ASSERT(truncate_at_block == terminate_at_block, plugin_config_exception,
-                    "truncate-at-block ${a} must match terminate-at-block ${b}",
-                    ("a", truncate_at_block)("b", terminate_at_block));
+                    "truncate-at-block {} must match terminate-at-block {}",
+                    truncate_at_block, terminate_at_block);
       } else if (truncate_at_block > 0 && !options.at( "hard-replay-blockchain" ).as<bool>()) {
          wlog("truncate-at-block only applicable to --hard-replay-blockchain unless specified with --terminate-at-block");
       }
@@ -786,7 +785,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          if (!options.count( "snapshot" )) {
             auto first_block = block_log::extract_first_block_num(blocks_dir, retained_dir);
             SYS_ASSERT(first_block == 1, plugin_config_exception,
-                       "replay-blockchain without snapshot requested without a full block log, first block: ${n}", ("n", first_block));
+                       "replay-blockchain without snapshot requested without a full block log, first block: {}", first_block);
          }
          clear_directory_contents( chain_config->state_dir );
       }
@@ -795,7 +794,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       if (options.contains( "snapshot" )) {
          snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
          SYS_ASSERT( std::filesystem::exists(*snapshot_path), plugin_config_exception,
-                     "Cannot load snapshot, ${name} does not exist", ("name", snapshot_path->generic_string()) );
+                     "Cannot load snapshot, {} does not exist", snapshot_path->generic_string() );
 
          // recover genesis information from the snapshot
          // used for validation code below
@@ -819,17 +818,17 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          SYS_ASSERT(!std::filesystem::is_regular_file(shared_mem_path) &&
                     !std::filesystem::is_regular_file(chain_head_path),
                     plugin_config_exception,
-                    "Snapshot can only be used to initialize an empty database, remove directory: ${d}",
-                    ("d", chain_config->state_dir.generic_string()));
+                    "Snapshot can only be used to initialize an empty database, remove directory: {}",
+                    chain_config->state_dir.generic_string());
 
          auto block_log_chain_id = block_log::extract_chain_id(blocks_dir, retained_dir);
 
          if (block_log_chain_id) {
             SYS_ASSERT( *chain_id == *block_log_chain_id,
                            plugin_config_exception,
-                           "snapshot chain ID (${snapshot_chain_id}) does not match the chain ID (${block_log_chain_id}) in the block log",
-                           ("snapshot_chain_id",  *chain_id)
-                           ("block_log_chain_id", *block_log_chain_id)
+                           "snapshot chain ID ({}) does not match the chain ID ({}) in the block log",
+                           *chain_id,
+                           *block_log_chain_id
                );
          }
 
@@ -854,10 +853,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
             if( chain_id ) {
                SYS_ASSERT( *block_log_chain_id == *chain_id, block_log_exception,
-                           "Chain ID in blocks.log (${block_log_chain_id}) does not match the existing "
-                           " chain ID in state (${state_chain_id}).",
-                           ("block_log_chain_id", *block_log_chain_id)
-                           ("state_chain_id", *chain_id)
+                           "Chain ID in blocks.log ({}) does not match the existing "
+                           " chain ID in state ({}).",
+                           *block_log_chain_id,
+                           *chain_id
                );
             } else if (block_log_genesis) {
                ilog( "Starting fresh blockchain state using genesis state extracted from blocks.log." );
@@ -875,18 +874,17 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
             SYS_ASSERT( std::filesystem::is_regular_file( genesis_file ),
                         plugin_config_exception,
-                       "Specified genesis file '${genesis}' does not exist.",
-                       ("genesis", genesis_file));
+                       "Specified genesis file '{}' does not exist.",
+                       genesis_file.string());
 
             genesis_state provided_genesis = fc::json::from_file( genesis_file ).as<genesis_state>();
 
             if( options.contains( "genesis-timestamp" ) ) {
                provided_genesis.initial_timestamp = calculate_genesis_timestamp( options.at( "genesis-timestamp" ).as<string>() );
 
-               ilog( "Using genesis state provided in '${genesis}' but with adjusted genesis timestamp",
-                     ("genesis", genesis_file) );
+               ilog( "Using genesis state provided in '{}' but with adjusted genesis timestamp", genesis_file.string() );
             } else {
-               ilog( "Using genesis state provided in '${genesis}'", ("genesis", genesis_file));
+               ilog( "Using genesis state provided in '{}'", genesis_file.string() );
             }
 
             if( block_log_genesis ) {
@@ -899,19 +897,19 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                const auto& provided_genesis_chain_id = provided_genesis.compute_chain_id();
                if( chain_id ) {
                   SYS_ASSERT( provided_genesis_chain_id == *chain_id, plugin_config_exception,
-                              "Genesis state, provided via command line arguments, has a chain ID (${provided_genesis_chain_id}) "
-                              "that does not match the existing chain ID in the database state (${state_chain_id}). "
+                              "Genesis state, provided via command line arguments, has a chain ID ({}) "
+                              "that does not match the existing chain ID in the database state ({}). "
                               "It is not necessary to provide genesis state arguments when an initialized database state already exists.",
-                              ("provided_genesis_chain_id", provided_genesis_chain_id)
-                              ("state_chain_id", *chain_id)
+                              provided_genesis_chain_id,
+                              *chain_id
                   );
                } else {
                   if( block_log_chain_id ) {
                      SYS_ASSERT( provided_genesis_chain_id == *block_log_chain_id, plugin_config_exception,
-                                 "Genesis state, provided via command line arguments, has a chain ID (${provided_genesis_chain_id}) "
-                                 "that does not match the existing chain ID in blocks.log (${block_log_chain_id}).",
-                                 ("provided_genesis_chain_id", provided_genesis_chain_id)
-                                 ("block_log_chain_id", *block_log_chain_id)
+                                 "Genesis state, provided via command line arguments, has a chain ID ({}) "
+                                 "that does not match the existing chain ID in blocks.log ({}).",
+                                 provided_genesis_chain_id,
+                                 *block_log_chain_id
                      );
                   }
 
@@ -987,11 +985,11 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             const uint32_t trx_retry_interval = options.at( "transaction-retry-interval-sec" ).as<uint32_t>();
             const uint32_t trx_retry_max_expire = options.at( "transaction-retry-max-expiration-sec" ).as<uint32_t>();
             SYS_ASSERT( trx_retry_interval >= 2 * p2p_dedup_time_s, plugin_config_exception,
-                        "transaction-retry-interval-sec ${ri} must be greater than 2 times p2p-dedup-cache-expire-time-sec ${dd}",
-                        ("ri", trx_retry_interval)("dd", p2p_dedup_time_s) );
+                        "transaction-retry-interval-sec {} must be greater than 2 times p2p-dedup-cache-expire-time-sec {}",
+                        trx_retry_interval, p2p_dedup_time_s );
             SYS_ASSERT( trx_retry_max_expire > trx_retry_interval, plugin_config_exception,
-                        "transaction-retry-max-expiration-sec ${m} should be configured larger than transaction-retry-interval-sec ${i}",
-                        ("m", trx_retry_max_expire)("i", trx_retry_interval) );
+                        "transaction-retry-max-expiration-sec {} should be configured larger than transaction-retry-interval-sec {}",
+                        trx_retry_max_expire, trx_retry_interval );
             _trx_retry_db.emplace( *chain, max_storage_size,
                                        fc::seconds(trx_retry_interval), fc::seconds(trx_retry_max_expire),
                                        abi_serializer_max_time_us );
@@ -1011,7 +1009,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
       // initialize deep mind logging
       if ( options.at( "deep-mind" ).as<bool>() ) {
-         // The actual `fc::dmlog_appender` implementation that is currently used by deep mind
+         // The actual `fc::dmlog_sink` implementation that is currently used by deep mind
          // logger is using `stdout` to prints it's log line out. Deep mind logging outputs
          // massive amount of data out of the process, which can lead under pressure to some
          // of the system calls (i.e. `fwrite`) to fail abruptly without fully writing the
@@ -1022,13 +1020,13 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          // underlying `libc` implementation nor the operation system.
          //
          // To ensure good functionalities of deep mind tracer, the `stdout` is made unbuffered
-         // and the actual `fc::dmlog_appender` deals with retry when facing error, enabling a much
+         // and the actual `fc::dmlog_sink` deals with retry when facing error, enabling a much
          // more robust deep mind output.
          //
          // Changing the standard `stdout` behavior from buffered to unbuffered can is disruptive
          // and can lead to weird scenarios in the logging process if `stdout` is used there too.
          //
-         // In a future version, the `fc::dmlog_appender` implementation will switch to a `FIFO` file
+         // In a future version, the `fc::dmlog_sink` implementation will switch to a `FIFO` file
          // approach, which will remove the dependency on `stdout` and hence this call.
          //
          // For the time being, when `deep-mind = true` is activated, we set `stdout` here to
@@ -1042,6 +1040,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          SYS_ASSERT( options.at("p2p-accept-transactions").as<bool>() == false, plugin_config_exception,
             "p2p-accept-transactions must be set to false in order to enable deep-mind logging.");
 
+         _deep_mind_log.update_logger( deep_mind_logger_name );
          chain->enable_deep_mind( &_deep_mind_log );
       }
 
@@ -1179,11 +1178,11 @@ void chain_plugin_impl::plugin_startup()
    }
 
    if (genesis) {
-      ilog("Blockchain started; head block is #${num}, genesis timestamp is ${ts}",
-           ("num", chain->head().block_num())("ts", genesis->initial_timestamp));
+      ilog("Blockchain started; head block is #{}, genesis timestamp is {}",
+           chain->head().block_num(), genesis->initial_timestamp);
    }
    else {
-      ilog("Blockchain started; head block is #${num}", ("num", chain->head().block_num()));
+      ilog("Blockchain started; head block is #{}", chain->head().block_num());
    }
 
    chain_config.reset();
@@ -1193,10 +1192,10 @@ void chain_plugin_impl::plugin_startup()
       try {
          _account_query_db.emplace(*chain);
          account_queries_enabled = true;
-      } FC_LOG_AND_DROP(("Unable to enable account queries"));
+      } FC_LOG_AND_DROP("Unable to enable account queries");
    }
 
-} FC_CAPTURE_AND_RETHROW() }
+} FC_CAPTURE_AND_RETHROW("") }
 
 void chain_plugin::plugin_startup() {
    my->plugin_startup();
@@ -1279,7 +1278,7 @@ void chain_plugin_impl::log_guard_exception(const chain::guard_exception&e ) {
            "Please increase the value set for \"chain-state-db-size-mb\" and restart the process!");
    }
 
-   dlog("Details: ${details}", ("details", e.to_detail_string()));
+   dlog("Details: {}", e.to_detail_string());
 }
 
 void chain_plugin_impl::handle_guard_exception(const chain::guard_exception& e) {
@@ -1418,7 +1417,7 @@ uint64_t read_only::get_table_index_name(const read_only::get_table_rows_params&
    // see multi_index packing of index name
    const uint64_t table = p.table.to_uint64_t();
    uint64_t index = table & 0xFFFFFFFFFFFFFFF0ULL;
-   SYS_ASSERT( index == table, chain::contract_table_query_exception, "Unsupported table name: ${n}", ("n", p.table) );
+   SYS_ASSERT( index == table, chain::contract_table_query_exception, "Unsupported table name: {}", p.table );
 
    primary = false;
    uint64_t pos = 0;
@@ -1445,7 +1444,7 @@ uint64_t read_only::get_table_index_name(const read_only::get_table_rows_params&
       try {
          pos = fc::to_uint64( p.index_position );
       } catch(...) {
-         SYS_ASSERT( false, chain::contract_table_query_exception, "Invalid index_position: ${p}", ("p", p.index_position));
+         SYS_ASSERT( false, chain::contract_table_query_exception, "Invalid index_position: {}", p.index_position);
       }
       if (pos < 2) {
          primary = true;
@@ -1486,9 +1485,9 @@ uint64_t convert_to_type(const string& str, const string& desc) {
    try {
       return ( sysio::chain::string_to_symbol( 0, str.c_str() ) >> 8 );
    } catch( ... ) {
-      SYS_ASSERT( false, chain_type_exception, "Could not convert ${desc} string '${str}' to any of the following: "
+      SYS_ASSERT( false, chain_type_exception, "Could not convert {} string '{}' to any of the following: "
                         "uint64_t, valid name, or valid symbol (with or without the precision)",
-                  ("desc", desc)("str", str));
+                  desc, str);
    }
 }
 
@@ -1497,10 +1496,10 @@ double convert_to_type(const string& str, const string& desc) {
    double val{};
    try {
       val = fc::variant(str).as<double>();
-   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert ${desc} string '${str}' to key type.", ("desc", desc)("str",str) )
+   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert {} string '{}' to key type.", desc, str )
 
    SYS_ASSERT( !std::isnan(val), chain::contract_table_query_exception,
-               "Converted ${desc} string '${str}' to NaN which is not a permitted value for the key type", ("desc", desc)("str",str) );
+               "Converted {} string '{}' to NaN which is not a permitted value for the key type", desc, str );
 
    return val;
 }
@@ -1509,7 +1508,7 @@ template<typename Type>
 string convert_to_string(const Type& source, const string& key_type, const string& encode_type, const string& desc) {
    try {
       return fc::variant(source).as<string>();
-   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert ${desc} from '${source}' to string.", ("desc", desc)("source",source) )
+   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert {} from '{}' to string.", desc, fc::json::to_log_string(source) )
 }
 
 template<>
@@ -1531,7 +1530,7 @@ string convert_to_string(const chain::key256_t& source, const string& key_type, 
       }
       SYS_ASSERT( false, chain_type_exception, "Incompatible key_type and encode_type for key256_t next_key" );
 
-   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert ${desc} source '${source}' to string.", ("desc", desc)("source",source) )
+   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert {} source '{}' to string.", desc, source )
 }
 
 template<>
@@ -1539,12 +1538,12 @@ string convert_to_string(const float128_t& source, const string& key_type, const
    try {
       float64_t f = f128_to_f64(source);
       return fc::variant(f).as<string>();
-   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert ${desc} from '${source}' to string.", ("desc", desc)("source",source) )
+   } FC_RETHROW_EXCEPTIONS(warn, "Could not convert {} from '{}' to string.", desc, fc::json::to_log_string(source) )
 }
 
 abi_def get_abi( const controller& db, const name& account ) {
    const auto* accnt = db.find_account(account);
-   SYS_ASSERT(accnt != nullptr, chain::account_query_exception, "Fail to retrieve account for ${account}", ("account", account) );
+   SYS_ASSERT(accnt != nullptr, chain::account_query_exception, "Fail to retrieve account for {}", account );
    const account_metadata_object* code_accnt = db.find_account_metadata(account);
    abi_def abi;
    if (code_accnt)
@@ -1558,7 +1557,7 @@ string get_table_type( const abi_def& abi, const name& table_name ) {
          return t.index_type;
       }
    }
-   SYS_ASSERT( false, chain::contract_table_query_exception, "Table ${table} is not specified in the ABI", ("table",table_name) );
+   SYS_ASSERT( false, chain::contract_table_query_exception, "Table {} is not specified in the ABI", table_name );
 }
 
 read_only::get_table_rows_return_t
@@ -1567,12 +1566,12 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
    bool primary = false;
    auto table_with_index = get_table_index_name( p, primary );
    if( primary ) {
-      SYS_ASSERT( p.table == table_with_index, chain::contract_table_query_exception, "Invalid table name ${t}", ( "t", p.table ));
+      SYS_ASSERT( p.table == table_with_index, chain::contract_table_query_exception, "Invalid table name {}", p.table );
       auto table_type = get_table_type( abi, p.table );
       if( table_type == KEYi64 || p.key_type == "i64" || p.key_type == "name" ) {
          return get_table_rows_ex<key_value_index>(p,std::move(abi),deadline);
       }
-      SYS_ASSERT( false, chain::contract_table_query_exception,  "Invalid table type ${type}", ("type",table_type)("abi",abi));
+      SYS_ASSERT( false, chain::contract_table_query_exception,  "Invalid table type {}", table_type );
    } else {
       SYS_ASSERT( !p.key_type.empty(), chain::contract_table_query_exception, "key type required for non-primary index" );
 
@@ -1625,7 +1624,7 @@ read_only::get_table_rows( const read_only::get_table_rows_params& p, const fc::
          using  conv = keytype_converter<chain_apis::ripemd160,chain_apis::hex>;
          return get_table_rows_by_seckey<conv::index_type, conv::input_type>(p, std::move(abi), deadline, conv::function());
       }
-      SYS_ASSERT(false, chain::contract_table_query_exception,  "Unsupported secondary index type: ${t}", ("t", p.key_type));
+      SYS_ASSERT(false, chain::contract_table_query_exception,  "Unsupported secondary index type: {}", p.key_type);
    }
 }
 
@@ -1736,7 +1735,7 @@ fc::variant read_only::get_currency_stats( const read_only::get_currency_stats_p
 
 fc::variant get_global_row( const database& db, const abi_def& abi, const abi_serializer& abis, const fc::microseconds& abi_serializer_max_time_us, bool shorten_abi_errors ) {
    const auto table_type = get_table_type(abi, "global"_n);
-   SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type ${type} for table global", ("type",table_type));
+   SYS_ASSERT(table_type == read_only::KEYi64, chain::contract_table_query_exception, "Invalid table type {} for table global", table_type);
 
    const auto* const table_id = db.find<chain::table_id_object, chain::by_code_scope_table>(boost::make_tuple(sysio::chain::config::system_account_name, sysio::chain::config::system_account_name, "global"_n));
    SYS_ASSERT(table_id, chain::contract_table_query_exception, "Missing table global");
@@ -1840,10 +1839,10 @@ chain::signed_block_ptr read_only::get_raw_block(const read_only::get_raw_block_
    } else {
       try {
          block = db.fetch_block_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
    }
 
-   SYS_ASSERT( block, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num_or_id));
+   SYS_ASSERT( block, unknown_block_exception, "Could not find block: {}", params.block_num_or_id);
 
    return block;
 }
@@ -1881,9 +1880,9 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
       } else {
          try {
             header = db.fetch_block_header_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
-      SYS_ASSERT( header, unknown_block_exception, "Could not find block header: ${block}", ("block", params.block_num_or_id));
+      SYS_ASSERT( header, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
       return { header->calculate_id(), fc::variant{*header}, {}};
    } else {
       signed_block_ptr block;
@@ -1892,9 +1891,9 @@ read_only::get_block_header_result read_only::get_block_header(const read_only::
       } else {
          try {
             block = db.fetch_block_by_id( fc::variant(params.block_num_or_id).as<block_id_type>() );
-         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+         } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
       }
-      SYS_ASSERT( block, unknown_block_exception, "Could not find block header: ${block}", ("block", params.block_num_or_id));
+      SYS_ASSERT( block, unknown_block_exception, "Could not find block header: {}", params.block_num_or_id);
       return { block->calculate_id(), fc::variant{static_cast<signed_block_header>(*block)}, block->block_extensions};
    }
 }
@@ -1926,7 +1925,7 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
       // assert below will handle the invalid block num
    }
 
-   SYS_ASSERT( block, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num));
+   SYS_ASSERT( block, unknown_block_exception, "Could not find block: {}", params.block_num);
 
    const auto id = block->calculate_id();
    const uint32_t ref_block_prefix = id._hash[1];
@@ -1959,10 +1958,10 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
    } else {
       try {
          sbp = db.fetch_block_by_id(block_id_type(params.block_num_or_id));
-      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: ${block_num_or_id}", ("block_num_or_id", params.block_num_or_id))
+      } SYS_RETHROW_EXCEPTIONS(chain::block_id_type_exception, "Invalid block ID: {}", params.block_num_or_id)
    }
 
-   SYS_ASSERT( sbp, unknown_block_exception, "Could not find block: ${block}", ("block", params.block_num_or_id));
+   SYS_ASSERT( sbp, unknown_block_exception, "Could not find block: {}", params.block_num_or_id );
 
    fc::mutable_variant_object result;
    result
@@ -1979,7 +1978,7 @@ void read_write::push_block(read_write::push_block_params&& params, next_functio
       auto b = std::make_shared<signed_block>( std::move(params) );
       block_id_type id = b->calculate_id();
       auto [best_head, obh] = db.accept_block( id, b );
-      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", id));
+      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}", id);
       app().get_method<incoming::methods::block_sync>()(b, id, *obh);
    } catch ( boost::interprocess::bad_alloc& ) {
       handle_db_exhaustion();
@@ -2131,8 +2130,8 @@ void api_base::send_transaction_gen(API &api, send_transaction_params_t params, 
 
          SYS_ASSERT( !retry || api.trx_retry.has_value(), unsupported_feature, "Transaction retry not enabled on node. transaction-retry-max-storage-size-gb is 0" );
          SYS_ASSERT( !retry || (ptrx->expiration() <= api.trx_retry->get_max_expiration_time()), tx_exp_too_far_exception,
-                     "retry transaction expiration ${e} larger than allowed ${m}",
-                     ("e", ptrx->expiration())("m", api.trx_retry->get_max_expiration_time()) );
+                     "retry transaction expiration {} larger than allowed {}",
+                     ptrx->expiration(), api.trx_retry->get_max_expiration_time() );
       }
 
       app().get_method<incoming::methods::transaction_async>()(ptrx, true, params.trx_type, params.return_failure_trace,
@@ -2213,7 +2212,7 @@ read_only::get_abi_results read_only::get_abi( const get_abi_params& params, con
       get_abi_results result;
       result.account_name = params.account_name;
       const auto* accnt = db.find_account(params.account_name);
-      SYS_ASSERT(accnt != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+      SYS_ASSERT(accnt != nullptr, account_query_exception, "Account {} not found", params.account_name);
 
       if (const auto* accnt_metadata = db.find_account_metadata(params.account_name); accnt_metadata != nullptr) {
          if (abi_def abi; abi_serializer::to_abi(accnt_metadata->abi, abi)) {
@@ -2231,7 +2230,7 @@ read_only::get_code_results read_only::get_code( const get_code_params& params, 
    get_code_results result;
    result.account_name = params.account_name;
    const auto* accnt_obj          = db.find_account( params.account_name );
-   SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+   SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account {} not found", params.account_name);
    const auto* accnt_metadata_obj = db.find_account_metadata( params.account_name );
 
    if (accnt_metadata_obj != nullptr) {
@@ -2255,7 +2254,7 @@ read_only::get_code_hash_results read_only::get_code_hash( const get_code_hash_p
       get_code_hash_results result;
       result.account_name   = params.account_name;
       const auto* accnt_obj = db.find_account(params.account_name);
-      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account {} not found", params.account_name);
       const auto* accnt_metadata_obj = db.find_account_metadata(params.account_name);
 
       if (accnt_metadata_obj != nullptr && accnt_metadata_obj->code_hash != digest_type())
@@ -2271,7 +2270,7 @@ read_only::get_raw_code_and_abi_results read_only::get_raw_code_and_abi( const g
 
       result.account_name   = params.account_name;
       const auto* accnt_obj = db.find_account(params.account_name);
-      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account {} not found", params.account_name);
       const auto* accnt_metadata_obj = db.find_account_metadata(params.account_name);
 
       if (accnt_metadata_obj != nullptr) {
@@ -2293,7 +2292,7 @@ read_only::get_raw_abi_results read_only::get_raw_abi( const get_raw_abi_params&
       result.account_name = params.account_name;
 
       const auto* accnt_obj = db.find_account(params.account_name);
-      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+      SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account {} not found", params.account_name);
       const auto* accnt_metadata_obj = db.find_account_metadata(params.account_name);
 
       if (accnt_metadata_obj != nullptr) {
@@ -2320,7 +2319,7 @@ read_only::get_account_return_t read_only::get_account( const get_account_params
    result.head_block_time = db.head().block_time();
 
    const auto* accnt_obj = db.find_account(params.account_name);
-   SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account ${account_name} not found", ("account_name", params.account_name));
+   SYS_ASSERT(accnt_obj != nullptr, account_query_exception, "Account {} not found", params.account_name);
    const auto* accnt_metadata_obj = db.find_account_metadata(params.account_name);
 
    // Get baseline resource limits from the resource manager

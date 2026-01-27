@@ -230,8 +230,8 @@ public:
             // drop, too many from this connection to process, consider connection invalid
             // don't clear num_messages[connection_id] so we keep reporting max_exceeded until index is drained
 
-            ilog("Exceeded max votes per connection ${n} > ${max} for ${c}",
-                 ("n", num_msgs)("max", max_votes_per_connection)("c", connection_id));
+            ilog("Exceeded max votes per connection {} > {} for {}",
+                 num_msgs, max_votes_per_connection, connection_id);
             emit(connection_id, vote_result_t::max_exceeded, msg, {}, {});
          } else {
             block_state_ptr bsp = get_block(msg->block_id, g);

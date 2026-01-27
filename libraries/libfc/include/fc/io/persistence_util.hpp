@@ -35,9 +35,9 @@ namespace persistence_util {
       fc::raw::unpack( ds, totem );
       if( totem != magic_number) {
          FC_THROW_EXCEPTION(fc::parse_error_exception,
-                            "File has unexpected magic number: ${actual_totem}. Expected ${expected_totem}",
-                            ("actual_totem", totem)
-                            ("expected_totem", magic_number));
+                            "File has unexpected magic number: {}. Expected {}",
+                            totem,
+                            magic_number);
       }
 
       // validate version
@@ -46,10 +46,8 @@ namespace persistence_util {
       if( version < min_supported_version || version > max_supported_version) {
          FC_THROW_EXCEPTION(fc::parse_error_exception,
                             "Unsupported version for file. "
-                            "Version is ${version} while code supports version(s) [${min},${max}]",
-                            ("version", version)
-                            ("min", min_supported_version)
-                            ("max", max_supported_version));
+                            "Version is {} while code supports version(s) [{}-{}]",
+                            version, min_supported_version, max_supported_version);
       }
 
       return version;

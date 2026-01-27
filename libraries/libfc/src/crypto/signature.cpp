@@ -46,25 +46,24 @@ namespace fc { namespace crypto {
       case sig_type::wa:
       case sig_type::bls: {
          signature s(parse_unknown_wire_signature_str(str));
-         FC_ASSERT( s.type() == type, "Parsed type ${pt} does not match specified type ${t} for ${k}",
-                    ("pt", s.type())("t", type)("k", str));
+         FC_ASSERT( s.type() == type, "Parsed type {} does not match specified type {} for {}", s.type(), type, str );
          return s;
       }
       case sig_type::em: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& sig = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::em), "Invalid signature prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::em), "Invalid signature prefixes: {}", str);
          return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(sig);
       }
       case sig_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& sig = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::ed), "Invalid signature prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::ed), "Invalid signature prefixes: {}", str);
          return from_native_string_to_signature<chain_key_type_t::chain_key_type_solana>(sig);
       }
       case sig_type::unknown: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-         FC_ASSERT(base_prefix == constants::signature_base_prefix, "Invalid prefix to parse signature type: ${k}", ("k", str));
+         FC_ASSERT(base_prefix == constants::signature_base_prefix, "Invalid prefix to parse signature type: {}", str);
          if (type_prefix == sig_prefix(sig_type::em)) {
             return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(data_str);
          } else if (type_prefix == sig_prefix(sig_type::ed)) {
@@ -74,7 +73,7 @@ namespace fc { namespace crypto {
       }
 
       default:
-         FC_ASSERT(false, "Unknown key type: ${type}", ("type", type));
+         FC_ASSERT(false, "Unknown key type: {}", type);
       };
    }
 
@@ -106,7 +105,7 @@ namespace fc { namespace crypto {
          break;
       }
 
-      FC_ASSERT(false, "signature unknown sig type ${t}", ("t", type()));
+      FC_ASSERT(false, "signature unknown sig type {}", type());
    }
 
    std::ostream& operator<<(std::ostream& s, const signature& k) {

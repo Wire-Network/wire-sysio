@@ -78,6 +78,11 @@ namespace chainbase {
          int64_t _id = 0;
    };
 
+   template<typename T>
+   constexpr auto format_as(const oid<T>& id) {
+      return id._id;
+   }
+
    template<uint16_t TypeNumber, typename Derived>
    struct object
    {

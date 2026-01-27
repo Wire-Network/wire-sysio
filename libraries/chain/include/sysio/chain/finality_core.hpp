@@ -56,6 +56,10 @@ struct qc_claim_t
    auto operator<=>(const qc_claim_t&) const = default;
 };
 
+constexpr auto format_as(const qc_claim_t& qc_claim) {
+   return fmt::format("qc_claim_t({}, {})", qc_claim.block_num, qc_claim.is_strong_qc ? "strong" : "weak");
+}
+
 struct core_metadata
 {
    block_num_type  last_final_block_num {0};

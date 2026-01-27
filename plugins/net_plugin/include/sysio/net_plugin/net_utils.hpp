@@ -30,7 +30,7 @@ namespace detail {
       std::istringstream in(limit_str);
       double limit{0};
       in >> limit;
-      SYS_ASSERT(limit >= 0.0, chain::plugin_config_exception, "block sync rate limit must not be negative: ${limit}", ("limit", limit_str));
+      SYS_ASSERT(limit >= 0.0, chain::plugin_config_exception, "block sync rate limit must not be negative: {}", limit_str);
       size_t block_sync_rate_limit = 0;
       if( limit > 0.0 ) {
          std::string units;
@@ -39,11 +39,11 @@ namespace detail {
          std::smatch units_match;
          std::regex_match(units, units_match, units_regex);
          if( units.length() > 0 ) {
-            SYS_ASSERT(units_match.size() == 2, chain::plugin_config_exception, "invalid block sync rate limit specification: ${limit}", ("limit", units));
+            SYS_ASSERT(units_match.size() == 2, chain::plugin_config_exception, "invalid block sync rate limit specification: {}", units);
             try {
                block_sync_rate_limit = boost::numeric_cast<size_t>(limit * prefix_multipliers.at(units_match[1].str()));
             } catch (boost::numeric::bad_numeric_cast&) {
-               SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: ${limit}", ("limit", limit_str));
+               SYS_THROW(chain::plugin_config_exception, "block sync rate limit specification overflowed: {}", limit_str);
             }
          }
       }
@@ -70,28 +70,28 @@ namespace detail {
          end_bracket = endpoint.find(']');
          if (end_bracket == string::npos) {
             SYS_ASSERT(!should_throw, chain::plugin_config_exception,
-                       "Invalid address specification ${a}, IPv6 no closing square bracket", ("a", endpoint) );
+                       "Invalid address specification {}, IPv6 no closing square bracket", endpoint);
             return {};
          }
       } else if (colon_count >= 7) {
          SYS_ASSERT(!should_throw, chain::plugin_config_exception,
-                    "Invalid address specification ${a}; IPv6 addresses must be enclosed in square brackets.", ("a", endpoint));
+                    "Invalid address specification {}; IPv6 addresses must be enclosed in square brackets.", endpoint);
          return {};
 
       } else if (colon_count < 1 || colon_count > 3) {
          SYS_ASSERT(!should_throw, chain::plugin_config_exception,
-                    "Invalid address specification ${a}; unexpected number of colons.", ("a", endpoint));
+                    "Invalid address specification {}; unexpected number of colons.", endpoint);
          return {};
       }
       string::size_type colon = endpoint.find(':', end_bracket+1);
       if (colon == string::npos) {
          SYS_ASSERT(!should_throw, chain::plugin_config_exception,
-                    "Invalid address specification ${a}; missing port specification.", ("a", endpoint));
+                    "Invalid address specification {}; missing port specification.", endpoint);
          return {};
       }
       if (end_bracket != 0 && end_bracket+1 != colon) {
          SYS_ASSERT(!should_throw, chain::plugin_config_exception,
-                    "Invalid address specification ${a}; unexpected character after ']'.", ("a", endpoint));
+                    "Invalid address specification {}; unexpected character after ']'.", endpoint);
          return {};
       }
       string::size_type colon2 = endpoint.find(':', colon + 1);
@@ -145,7 +145,7 @@ namespace detail {
       constexpr bool should_throw = true;
       auto [host, port, remainder] = detail::split_host_port_remainder(address, should_throw);
       SYS_ASSERT(!host.empty() && !port.empty(), chain::plugin_config_exception,
-                 "Invalid address specification ${a}; host or port missing.", ("a", address));
+                 "Invalid address specification {}; host or port missing.", address);
       auto listen_addr = host + ":" + port;
       auto limit = remainder;
       auto last_colon_location = remainder.rfind(':');

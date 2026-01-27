@@ -92,17 +92,17 @@ public:
          }
          case chain_key_type_sui:
          case chain_key_type_solana: {
-            FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: ${type}",
-                               ("type", chain_key_type_reflector::to_string(key_type)));
+            FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
+                               chain_key_type_reflector::to_string(key_type));
          }
          default: {
-            FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: ${kind}",
-                               ("kind", chain_key_type_reflector::to_fc_string(key_type)));
+            FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
+                               chain_key_type_reflector::to_fc_string(key_type));
          }
          }
 
-         FC_ASSERT(public_key == privkey.get_public_key(), "Private key does not match given public key for ${pub}",
-                   ("pub", public_key));
+         FC_ASSERT(public_key == privkey.get_public_key(), "Private key does not match given public key for {}",
+                   fc::json::to_log_string(public_key));
          return {make_key_signature_provider(privkey), privkey};
       }
 
@@ -110,7 +110,7 @@ public:
          return {make_kiod_signature_provider(spec_data, public_key), std::nullopt};
       }
 
-      SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"${t}\"", ("t", spec_type_str));
+      SYS_THROW(chain::plugin_config_exception, "Unsupported key provider type \"{}\"", spec_type_str);
    }
 
    /**
@@ -130,8 +130,8 @@ public:
       SYS_ASSERT(!_signing_providers_by_pubkey.contains(provider->public_key) &&
                  !_signing_providers_by_name.contains(provider->key_name),
                  chain::plugin_config_exception,
-                 "A signature provider with key_name \"${keyName}\" or public_key \"${pubKey}\" already exists",
-                 ("keyName", provider->key_name)("pubKey", provider->public_key));
+                 "A signature provider with key_name \"{}\" or public_key \"{}\" already exists",
+                 provider->key_name, fc::json::to_log_string(provider->public_key));
 
       _signing_providers_by_pubkey.insert_or_assign(provider->public_key, provider);
 
@@ -154,14 +154,14 @@ public:
       if (holds_alternative<std::string>(key)) {
          auto& keyName = std::get<std::string>(key);
          SYS_ASSERT(_signing_providers_by_name.contains(keyName), chain::plugin_config_exception,
-                    "No signature provider exists with name \"${keyName}\"", ("keyName", keyName));
+                    "No signature provider exists with name \"{}\"", keyName);
 
          return _signing_providers_by_name.at(keyName);
       }
 
       auto& pub_key = std::get<chain::public_key_type>(key);
       SYS_ASSERT(_signing_providers_by_pubkey.contains(pub_key), chain::plugin_config_exception,
-                 "No signature provider exists with public key \"${pubKey}\"", ("pubKey", pub_key));
+                 "No signature provider exists with public key \"{}\"", fc::json::to_log_string(pub_key));
 
       return _signing_providers_by_pubkey.at(pub_key);
    }
@@ -246,7 +246,7 @@ public:
       bool changed = false;
       for (const auto& key_type : key_types) {
          FC_ASSERT(fc::contains(supported_key_types, key_type),
-                   "Unsupported key type: ${keyType}", ("keyType", key_type));
+                   "Unsupported key type: {}", key_type);
          if (_default_signature_provider_specs.contains(key_type) || query_providers(std::nullopt, std::nullopt, key_type).size())
             continue;
 
@@ -267,8 +267,8 @@ public:
                break;
             }
             default: {
-               FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: ${kind}",
-                                  ("kind", fc::crypto::chain_key_type_reflector::to_fc_string(key_type)));
+               FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
+                                  fc::crypto::chain_key_type_reflector::to_fc_string(key_type));
             }
             }
             auto pub_key_str = privkey.get_public_key().to_string({});
@@ -282,8 +282,8 @@ public:
             changed = true;
          }
 
-         dlogf("Registering default signature provider spec (type={})",
-               fc::crypto::chain_key_type_reflector::to_string(key_type));
+         dlog("Registering default signature provider spec (type={})",
+              fc::crypto::chain_key_type_reflector::to_string(key_type));
          create_provider(spec);
       }
 
@@ -299,8 +299,7 @@ public:
       //<name>,<chain-kind>,<key-type>,<public-key>,<private-key-provider-spec>
       auto spec_parts = fc::split(spec, ',', 5);
       auto num_parts = spec_parts.size();
-      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: ${spec}",
-                 ("spec", spec));
+      SYS_ASSERT(num_parts == 5 || num_parts == 4, chain::plugin_config_exception, "Invalid key spec: {}", spec);
       std::string key_name;
       std::size_t target_chain_idx = 1;
       if (num_parts == 4) {
@@ -347,12 +346,12 @@ public:
       }
       case chain_key_type_sui:
       case chain_key_type_solana: {
-         FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: ${type}",
-                            ("type", chain_key_type_reflector::to_string(key_type)));
+         FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
+                            chain_key_type_reflector::to_string(key_type));
       }
       default: {
-         FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: ${kind}",
-                            ("kind", static_cast<uint8_t>(target_chain)));
+         FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "Unknown or Unsupported chain kind: {}",
+                            static_cast<uint8_t>(target_chain));
       }
       }
 
@@ -421,10 +420,10 @@ void signature_provider_manager_plugin::plugin_initialize(const variables_map& o
    if (options.contains(option_name_provider)) {
       auto specs = options.at(option_name_provider).as<std::vector<std::string>>();
       for (const auto& spec : specs) {
-         dlog("Registering signature provider from spec: ${spec}", ("spec", spec));
+         dlog("Registering signature provider from spec: {}", spec);
          auto provider = create_provider(spec);
-         dlog("Registered signature provider (${name}): ${publicKey}",
-              ("name", provider->key_name)("publicKey", provider->public_key.to_string({})));
+         dlog("Registered signature provider ({}): {}",
+              provider->key_name, provider->public_key.to_string({}));
       }
    }
 }
@@ -480,8 +479,8 @@ fc::crypto::signature_provider_ptr get_signature_provider(const fc::crypto::sign
    auto& plug = app().get_plugin<signature_provider_manager_plugin>();
    auto providers = plug.query_providers(id, target_chain);
 
-   FC_ASSERT(providers.size() == 1, "Expected exactly one provider for query \"${id}\", found ${found}",
-             ("id", id)("found", providers.size()));
+   FC_ASSERT(providers.size() == 1, "Expected exactly one provider for query \"{}\", found {}",
+             fc::json::to_log_string(id), providers.size());
    return providers[0];
 }
 
