@@ -1,0 +1,11 @@
+#compdef clio
+_clio() {
+  local -a completions
+  local cur="${words[CURRENT]}"
+  local -a args
+  args=("${words[@]:2}")
+  completions=(${(f)"$(clio ${args[@]} --_autocomplete=${(q)cur})"})
+  compadd -U -a completions
+}
+
+compdef _clio clio

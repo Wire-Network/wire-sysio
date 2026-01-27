@@ -277,8 +277,7 @@ else()
   # The `make package` installation of symlinks happens via the `postinst` script installed in cmake.package via the line below
 endif()
 
-# Note: CLI11 bash completion files are no longer available since moving to vcpkg
-# The completions would need to be created separately or copied from the original CLI11 repository
+# Note: clio shell completion files are installed from scripts/completions
 
 # Add the boost submodule we used to build to our install package, so headers can be found for libtester
 # install(DIRECTORY "${CMAKE_SOURCE_DIR}/libraries/boost/"
