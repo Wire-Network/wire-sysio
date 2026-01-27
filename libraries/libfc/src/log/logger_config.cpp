@@ -77,15 +77,27 @@ namespace fc {
                      sink->set_color(spdlog::level::from_str(it.level), sink->reset);
                }
             };
-            if (cfg.sinks[i].type == "stderr_color_sink") {
-               auto config = cfg.sinks[i].args.as<sink::stderr_color_sink_config>();
-               auto sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
-               config_colors(sink, config.level_colors);
-               log_config::get().sink_map[cfg.sinks[i].name] = sink;
-            } else if (cfg.sinks[i].type == "stdout_color_sink") {
-               auto config = cfg.sinks[i].args.as<sink::stdout_color_sink_config>();
-               auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-               config_colors(sink, config.level_colors);
+            std::shared_ptr<spdlog::sinks::sink> sink;
+            if (cfg.sinks[i].type == "console_sink") {
+               auto config = cfg.sinks[i].args.as<sink::console_sink_config>();
+               if (config.color) {
+                  if (config.output_type == sink::output_t::stderr) {
+                     auto color_sink = std::make_shared<spdlog::sinks::stderr_color_sink_mt>();
+                     config_colors(color_sink, config.level_colors);
+                     sink = color_sink;
+                  } else {
+                     auto color_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+                     config_colors(color_sink, config.level_colors);
+                     sink = color_sink;
+                  }
+               } else {
+                  if (config.output_type == sink::output_t::stderr) {
+                     sink = std::make_shared<spdlog::sinks::stderr_sink_mt>();
+                  } else {
+                     sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+                  }
+               }
+               assert(!!sink);
                log_config::get().sink_map[cfg.sinks[i].name] = sink;
             } else if (cfg.sinks[i].type == "daily_file_sink") {
                auto config = cfg.sinks[i].args.as<sink::daily_file_sink_config>();

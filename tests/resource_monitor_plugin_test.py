@@ -30,8 +30,10 @@ logging="""{
   "includes": [],
   "sinks": [{
     "name": "stderr_color",
-    "type": "stderr_color_sink",
+    "type": "console_sink",
     "args": {
+      "output_type": "stderr",
+      "color": true,
       "level_colors": [{
         "level": "debug",
         "color": "green"

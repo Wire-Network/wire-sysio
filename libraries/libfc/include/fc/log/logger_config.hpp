@@ -11,7 +11,7 @@
 namespace fc {
    class path;
    struct sink_config {
-       sink_config(const std::string& name = "", const std::string& type = "", variant args = variant())
+       explicit sink_config(const std::string& name = "", const std::string& type = "", variant args = variant())
           : name(name), type(type), args(fc::move(args)), enabled(true) {}
        std::string name;
        std::string type;
@@ -21,19 +21,19 @@ namespace fc {
 
    namespace sink {
       struct level_color {
-          level_color ( std::string l = "trace", std::string c = "yellow")
-                  : level(l), color(c) {}
+          explicit level_color ( std::string l = "trace", std::string c = "yellow")
+                  : level(std::move(l)), color(std::move(c)) {}
 
           std::string  level;
           std::string  color;
       };
 
-      struct stderr_color_sink_config {
-          std::vector<level_color>      level_colors;
-      };
+      enum class output_t { stderr, stdout };
 
-      struct stdout_color_sink_config {
-         std::vector<level_color>      level_colors;
+      struct console_sink_config {
+         output_t                      output_type = output_t::stderr;
+         bool                          color = true;
+         std::vector<level_color>      level_colors; // ignored if color = false
       };
 
       struct daily_file_sink_config {
@@ -99,8 +99,8 @@ namespace fc {
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT( fc::sink_config, (name)(type)(args)(enabled) )
 FC_REFLECT( fc::sink::level_color, (level)(color) )
-FC_REFLECT( fc::sink::stderr_color_sink_config, (level_colors) )
-FC_REFLECT( fc::sink::stdout_color_sink_config, (level_colors) )
+FC_REFLECT_ENUM( fc::sink::output_t, (stderr)(stdout) )
+FC_REFLECT( fc::sink::console_sink_config, (color)(level_colors)(output_type) )
 FC_REFLECT( fc::sink::daily_file_sink_config, (base_filename)(rotation_hour)(rotation_minute)(truncate)(max_files) )
 FC_REFLECT( fc::sink::rotating_file_sink_config, (base_filename)(max_size)(max_files) )
 FC_REFLECT( fc::sink::dmlog_sink_config, (file) )
