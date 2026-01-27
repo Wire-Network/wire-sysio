@@ -1020,7 +1020,7 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          // underlying `libc` implementation nor the operation system.
          //
          // To ensure good functionalities of deep mind tracer, the `stdout` is made unbuffered
-         // and the actual `fc::dmlog_appender` deals with retry when facing error, enabling a much
+         // and the actual `fc::dmlog_sink` deals with retry when facing error, enabling a much
          // more robust deep mind output.
          //
          // Changing the standard `stdout` behavior from buffered to unbuffered can is disruptive
