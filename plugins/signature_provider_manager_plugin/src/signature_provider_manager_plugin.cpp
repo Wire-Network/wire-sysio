@@ -90,8 +90,11 @@ public:
             privkey = from_native_string_to_private_key<chain_key_type_ethereum>(spec_data);
             break;
          }
-         case chain_key_type_sui:
          case chain_key_type_solana: {
+            privkey = from_native_string_to_private_key<chain_key_type_solana>(spec_data);
+            break;
+         }
+         case chain_key_type_sui: {
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
                                chain_key_type_reflector::to_string(key_type));
          }
@@ -344,8 +347,11 @@ public:
          pubkey = from_native_string_to_public_key<chain_key_type_ethereum>(public_key_text);
          break;
       }
-      case chain_key_type_sui:
       case chain_key_type_solana: {
+         pubkey = from_native_string_to_public_key<chain_key_type_solana>(public_key_text);
+         break;
+      }
+      case chain_key_type_sui: {
          FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
                             chain_key_type_reflector::to_string(key_type));
       }
