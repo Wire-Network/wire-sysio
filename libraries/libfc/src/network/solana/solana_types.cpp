@@ -5,6 +5,8 @@
 #include <cstring>
 #include <stdexcept>
 
+#include <magic_enum/magic_enum.hpp>
+
 namespace fc::network::solana {
 
 //=============================================================================
@@ -65,7 +67,7 @@ signature signature::from_base58(const std::string& str) {
 signature signature::from_ed_signature(const fc::crypto::ed::signature_shim& sig) {
    signature result;
    static_assert(sizeof(sig._data) == SIZE, "ED25519 signature size mismatch");
-   std::copy(sig._data.begin(), sig._data.end(), result.data.begin());
+   std::ranges::copy(sig._data, result.data.begin());
    return result;
 }
 
@@ -74,16 +76,7 @@ signature signature::from_ed_signature(const fc::crypto::ed::signature_shim& sig
 //=============================================================================
 
 std::string to_string(commitment_t commitment) {
-   switch (commitment) {
-      case commitment_t::processed:
-         return "processed";
-      case commitment_t::confirmed:
-         return "confirmed";
-      case commitment_t::finalized:
-         return "finalized";
-      default:
-         FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Unknown commitment level");
-   }
+   return std::string(magic_enum::enum_name(commitment));
 }
 
 //=============================================================================

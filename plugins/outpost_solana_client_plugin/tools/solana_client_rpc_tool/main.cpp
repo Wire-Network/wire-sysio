@@ -1,3 +1,4 @@
+// CLAUDE: everything is file is stubbed, it's your job to write the implementation
 #include <print>
 #include <sysio/chain/application.hpp>
 #include <fc/network/solana/solana_client.hpp>
@@ -56,17 +57,31 @@ void initialize_logging() {
 
 using namespace fc::network::solana;
 
-struct solana_program_test_counter_client : fc::network::solana::solana_program_client {
 
-   solana_program_tx_fn<fc::variant, fc::uint256> set_number;
-   solana_program_call_fn<fc::variant> get_number;
-   solana_program_test_counter_client(const solana_client_ptr& client, const pubkey& program_id,
-                         const std::vector<idl::program>& idls = {})
-      : solana_program_client(client, program_id, idls),
-   set_number(create_tx<fc::variant, fc::uint256>(get_idl("setNumber"))),
-   get_number(create_call<fc::variant>(get_idl("number"))) {
+struct solana_program_test_counter_data_client : fc::network::solana::solana_program_data_client {
+   // CLAUDE: Implement the a client for the counter program referenced in the design doc.
+   // solana_program_tx_fn<fc::variant, fc::uint256> set_number;
+   // solana_program_call_fn<fc::variant> get_number;
+   // solana_program_test_counter_client(const solana_client_ptr& client, const pubkey& program_id,
+   //                       const std::vector<idl::program>& idls = {})
+   //    : solana_program_client(client, program_id, idls),
+   // set_number(create_tx<fc::variant, fc::uint256>(get_idl("setNumber"))),
+   // get_number(create_call<fc::variant>(get_idl("number"))) {
+   //
+   // };
+};
 
-   };
+struct solana_program_test_counter_anchor_client : fc::network::solana::solana_program_client {
+   // CLAUDE: Implement the a client for the counter program referenced in the design doc.
+   // solana_program_tx_fn<fc::variant, fc::uint256> set_number;
+   // solana_program_call_fn<fc::variant> get_number;
+   // solana_program_test_counter_client(const solana_client_ptr& client, const pubkey& program_id,
+   //                       const std::vector<idl::program>& idls = {})
+   //    : solana_program_client(client, program_id, idls),
+   // set_number(create_tx<fc::variant, fc::uint256>(get_idl("setNumber"))),
+   // get_number(create_call<fc::variant>(get_idl("number"))) {
+   //
+   // };
 };
 
 /**
@@ -79,7 +94,7 @@ struct solana_program_test_counter_client : fc::network::solana::solana_program_
  * @return int Exit code of the program.
  */
 int main(int argc, char* argv[]) {
-   using namespace fc::crypto::solana;
+   // using namespace fc::crypto::ed;
    try {
       appbase::scoped_app app;
 
@@ -101,78 +116,9 @@ int main(int argc, char* argv[]) {
       }
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
-      auto& eth_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
-      auto& eth_abi_files = eth_plug.get_abi_files();
-      FC_ASSERT(eth_abi_files.size() == 1, "1 ABI file is required (--solana-abi-file <json-array-file>)");
-      auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[0];
-      ilogf("Using ABI file contracts: {}", eth_abi_file.string());
-
-      auto  client_entry = eth_plug.get_clients()[0];
-      auto& client       = client_entry->client;
-
-      auto chain_id = client->get_chain_id();
+      auto& sol_plug = app->get_plugin<sysio::outpost_solana_client_plugin>();
 
 
-      ilogf("Current chain id: {}", chain_id.str());
-
-      // Example 1: Get the current block number
-      /**
-       * @brief Get the current block number using the `eth_blockNumber` method.
-       *
-       * The `getBlockNumber` method sends a request to the Solana node to retrieve the current block
-       * number. The block number is returned as a string, which is printed to the console.
-       */
-      auto block_number = client->get_block_number();
-      ilogf("Current Block Number: {}", block_number.str());
-
-      auto counter_contract = client->get_contract<solana_program_test_counter_client>("0x5FbDB2315678afecb367f032d93F642f64180aa3",eth_abi_contracts);
-      auto counter_contract_num_res = counter_contract->get_number("pending");
-      auto counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
-      ilogf("Current counter value: {}", counter_contract_num.str());
-
-      fc::uint256 new_num = counter_contract_num + 1;
-      ilogf("Setting New counter value: {}", new_num.str());
-      auto counter_contract_set_num_receipt = counter_contract->set_number(new_num);
-      ilogf("Counter set number receipt: {}", counter_contract_set_num_receipt.as_string());
-
-      counter_contract_num_res = counter_contract->get_number("pending");
-      counter_contract_num = fc::hex_to_number<fc::uint256>(counter_contract_num_res.as_string());
-      ilogf("New counter value: {}", counter_contract_num.str());
-
-      // Example 2: Get block information by block number
-      /**
-       * @brief Get block data by block number using the `eth_getBlockByNumber` method.
-       *
-       * The `getBlockByNumber` method sends a request to the Solana node to retrieve the block data
-       * corresponding to a given block number (in hexadecimal format). It fetches the block's transactions
-       * if `fullTransactionData` is true.
-       */
-      // std::string block_number_str = "0x5d5f"; ///< Example block number in hexadecimal format.
-      // auto        block_data       = client->get_block_by_number(block_number_str, true); // Fetch full transaction data
-      // std::println("Block Data: {}", fc::json::to_string(block_data, fc::time_point::maximum()));
-
-      // Example 3: Estimate gas for a transaction
-      /**
-       * @brief Estimate the gas required for a transaction using the `eth_estimateGas` method.
-       *
-       * The `estimateGas` method estimates the gas required to send a transaction from one address to
-       * another, with a specified value (in hexadecimal format). It returns the estimated gas as a string.
-       */
-      // std::string from         = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "from" address.
-      // std::string to           = "0x7960f1b90b257bff29d5164d16bca4c8030b7f6d"; ///< Example "to" address.
-      // std::string value        = "0x9184e72a"; ///< Example value in hexadecimal.
-      // auto        gas_estimate = client->estimate_gas(from, to, value);
-      // std::println("Estimated Gas: {}", gas_estimate);
-
-      // Example 4: Get Solana network version
-      /**
-       * @brief Get the Solana network version using the `net_version` method.
-       *
-       * The `getNetworkVersion` method retrieves the version of the Solana network the node is connected to.
-       * It returns the network version as a string.
-       */
-      auto protocol_version = client->get_network_version();
-      ilogf("Solana Protocol Version: {}", protocol_version.str());
    } catch (const fc::exception& e) {
       elog("${e}", ("e",e.to_detail_string()));
    } catch (const boost::exception& e) {
