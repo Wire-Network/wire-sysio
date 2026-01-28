@@ -244,6 +244,9 @@ struct instruction {
    // Required accounts
    std::vector<instruction_account> accounts;
 
+   // Return type (optional - for view functions that return data)
+   std::optional<idl_type> returns;
+
    // Documentation
    std::optional<std::string> docs;
 
@@ -412,7 +415,7 @@ FC_REFLECT(fc::network::solana::idl::idl_type, (kind)(primitive)(defined_name)(a
 FC_REFLECT(fc::network::solana::idl::instruction_arg, (name)(type))
 FC_REFLECT(fc::network::solana::idl::instruction_account,
            (name)(is_mut)(is_signer)(is_optional)(address)(pda_seeds)(docs))
-FC_REFLECT(fc::network::solana::idl::instruction, (name)(discriminator)(args)(accounts)(docs))
+FC_REFLECT(fc::network::solana::idl::instruction, (name)(discriminator)(args)(accounts)(returns)(docs))
 FC_REFLECT(fc::network::solana::idl::field, (name)(type))
 FC_REFLECT(fc::network::solana::idl::account, (name)(discriminator)(fields))
 FC_REFLECT(fc::network::solana::idl::event, (name)(fields))

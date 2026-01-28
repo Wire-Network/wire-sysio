@@ -10,6 +10,7 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 
+#include <map>
 #include <memory>
 #include <optional>
 #include <string>
@@ -38,13 +39,13 @@ using program_invoke_data_items = std::vector<fc::variant>;
  * @brief Function type for Solana program read-only calls
  */
 template <typename RT, typename... Args>
-using solana_program_call_fn = std::function<RT(commitment_t, Args&...)>;
+using solana_program_call_fn = std::function<RT(commitment_t, Args...)>;
 
 /**
  * @brief Function type for Solana program transaction calls
  */
 template <typename RT, typename... Args>
-using solana_program_tx_fn = std::function<RT(Args&...)>;
+using solana_program_tx_fn = std::function<RT(Args...)>;
 
 /**
  * @brief Function type for raw data program read-only calls
@@ -141,11 +142,22 @@ protected:
 };
 
 /**
+ * @brief Map of account name to pubkey for account overrides
+ */
+using account_overrides_t = std::map<std::string, pubkey>;
+
+/**
  * @class solana_program_client
- * @brief Base class for interacting with Solana programs
+ * @brief Base class for interacting with Solana programs using IDL
  *
  * Provides functionality to create typed program call and transaction functions
- * based on IDL definitions.
+ * based on IDL definitions. Similar to ethereum_contract_client pattern.
+ *
+ * The client automatically resolves accounts based on IDL definitions:
+ * - Signer accounts: uses the client's payer key
+ * - PDA accounts: derives address from seeds defined in IDL
+ * - Fixed address accounts: uses the address specified in IDL (e.g., system_program)
+ * - Other accounts: must be provided via account_overrides
  */
 class solana_program_client : public std::enable_shared_from_this<solana_program_client> {
 public:
@@ -177,7 +189,12 @@ public:
    const idl::instruction& get_idl(const std::string& instruction_name);
 
    /**
-    * @brief Execute a program call via simulation
+    * @brief Gets the full IDL program definition (for type lookups)
+    */
+   const idl::program* get_program() const { return _program.get(); }
+
+   /**
+    * @brief Execute a program call via simulation with manual account specification
     *
     * @param instr IDL instruction definition
     * @param accounts Account metadata for the instruction
@@ -189,7 +206,7 @@ public:
                             const program_invoke_data_items& params, commitment_t commitment = commitment_t::finalized);
 
    /**
-    * @brief Execute a program transaction
+    * @brief Execute a program transaction with manual account specification
     *
     * @param instr IDL instruction definition
     * @param accounts Account metadata for the instruction
@@ -198,6 +215,20 @@ public:
     */
    std::string execute_tx(const idl::instruction& instr, const std::vector<account_meta>& accounts,
                           const program_invoke_data_items& params = {});
+
+   /**
+    * @brief Resolve accounts for an instruction based on IDL
+    *
+    * Resolves account pubkeys and builds account_meta list from IDL definition.
+    *
+    * @param instr IDL instruction definition
+    * @param params Instruction parameters (used for arg-based PDA seeds)
+    * @param account_overrides Map of account name -> pubkey for explicit accounts
+    * @return Vector of resolved account_meta
+    */
+   std::vector<account_meta> resolve_accounts(const idl::instruction& instr,
+                                              const program_invoke_data_items& params = {},
+                                              const account_overrides_t& account_overrides = {});
 
 protected:
    /**
@@ -245,8 +276,76 @@ protected:
    instruction build_instruction(const idl::instruction& instr, const std::vector<account_meta>& accounts,
                                  const program_invoke_data_items& params);
 
+   /**
+    * @brief Derive a PDA from seeds defined in the IDL
+    *
+    * @param pda_seeds Seeds from IDL instruction_account
+    * @param params Instruction parameters for arg-type seeds
+    * @return Pair of (pubkey, bump)
+    */
+   std::pair<pubkey, uint8_t> derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
+                                          const program_invoke_data_items& params = {});
+
+   /**
+    * @brief Decode a value from Borsh-encoded data using IDL type information
+    *
+    * Decodes a single value in-place from the decoder according to the IDL type.
+    *
+    * @param decoder Borsh decoder (position advances as data is read)
+    * @param type IDL type definition
+    * @return Decoded value as fc::variant
+    */
+   fc::variant decode_type(borsh::decoder& decoder, const idl::idl_type& type);
+
+   /**
+    * @brief Decode a list of fields from Borsh-encoded data
+    *
+    * @param decoder Borsh decoder (position advances as data is read)
+    * @param fields List of field definitions
+    * @return Decoded fields as variant object
+    */
+   fc::variant decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields);
+
+   /**
+    * @brief Decode account data using IDL account definition
+    *
+    * Decodes Borsh-encoded account data according to the IDL account type.
+    * Verifies the 8-byte Anchor discriminator and decodes all fields.
+    *
+    * @param data Raw account data bytes (including discriminator)
+    * @param account_name Name of the account type in IDL
+    * @return Decoded account data as fc::variant object
+    */
+   fc::variant decode_account_data(const std::vector<uint8_t>& data, const std::string& account_name);
+
+   /**
+    * @brief Extract return data from simulation result
+    *
+    * @param sim_result Raw simulation result from RPC
+    * @return Decoded return data bytes, or empty vector if none
+    */
+   std::vector<uint8_t> extract_return_data(const fc::variant& sim_result);
+
+public:
+   /**
+    * @brief Fetch and decode account data using IDL
+    *
+    * Fetches account info from the network and decodes the data according to
+    * the IDL account type definition. Similar to Ethereum's contract view pattern.
+    *
+    * @tparam RT Return type for the decoded data
+    * @param account_name Name of the account type in IDL
+    * @param address Account address to fetch
+    * @param commitment Commitment level for the query
+    * @return Decoded account data as RT
+    */
+   template <typename RT>
+   RT get_account_data(const std::string& account_name, const pubkey& address,
+                       commitment_t commitment = commitment_t::finalized);
+
 private:
    fc::threadsafe_map<std::string, idl::instruction> _idl_map{};
+   std::shared_ptr<idl::program> _program;
 };
 
 /**
@@ -675,23 +774,18 @@ solana_program_call_fn<RT, Args...> solana_program_client::create_call(const idl
    }
 
    idl::instruction& idl = idl_map[instr.name];
-   return [this, &idl](commitment_t commitment, Args&... args) -> RT {
+   return [this, &idl](commitment_t commitment, Args... args) -> RT {
       program_invoke_data_items params = {fc::variant(args)...};
 
-      auto res_var = execute_call(idl, {}, params, commitment);
+      // Execute call - this uses IDL to decode return data
+      auto res_var = execute_call(idl, resolve_accounts(idl, params), params, commitment);
 
+      // Return the result, converting as needed (matches Ethereum pattern)
       if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
          return res_var;
-      } else if constexpr (std::is_same_v<std::decay_t<RT>, std::vector<uint8_t>>) {
-         // Return raw data buffer
-         if (res_var.is_blob()) {
-            auto blob = res_var.as_blob();
-            return std::vector<uint8_t>(blob.data.begin(), blob.data.end());
-         }
-         return std::vector<uint8_t>{};
-      } else {
-         return res_var.as<RT>();
       }
+
+      return res_var.as<RT>();
    };
 }
 
@@ -703,19 +797,42 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx(const idl::in
    }
 
    idl::instruction& idl = idl_map[instr.name];
-   return [this, &idl](Args&... args) -> RT {
+   return [this, &idl](Args... args) -> RT {
       program_invoke_data_items params = {fc::variant(args)...};
 
-      auto res = execute_tx(idl, {}, params);
+      // Execute transaction - returns signature as string
+      std::string signature = execute_tx(idl, resolve_accounts(idl, params), params);
 
-      if constexpr (std::is_same_v<std::decay_t<RT>, std::string>) {
-         return res;
-      } else if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
-         return fc::variant(res);
+      // Return the result, converting as needed (matches Ethereum pattern)
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return fc::variant(signature);
+      } else if constexpr (std::is_same_v<std::decay_t<RT>, std::string>) {
+         return signature;
       } else {
-         return RT{res};
+         // For other types, convert via variant
+         fc::variant res_var(signature);
+         return res_var.as<RT>();
       }
    };
+}
+
+template <typename RT>
+RT solana_program_client::get_account_data(const std::string& account_name, const pubkey& address,
+                                            commitment_t commitment) {
+   // Fetch account info from the network
+   auto account_info = client->get_account_info(address, commitment);
+   FC_ASSERT(account_info.has_value(), "Account not found: ${addr}", ("addr", address.to_base58()));
+   FC_ASSERT(!account_info->data.empty(), "Account has no data: ${addr}", ("addr", address.to_base58()));
+
+   // Decode using IDL
+   auto res_var = decode_account_data(account_info->data, account_name);
+
+   // Return the result, converting as needed (matches Ethereum pattern)
+   if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+      return res_var;
+   }
+
+   return res_var.as<RT>();
 }
 
 }  // namespace fc::network::solana

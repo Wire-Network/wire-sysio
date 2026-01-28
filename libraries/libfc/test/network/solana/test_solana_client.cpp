@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 #include <boost/test/unit_test.hpp>
 
+#include <fc/crypto/sha256.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
 #include <fc/network/solana/solana_idl.hpp>
@@ -524,6 +525,273 @@ BOOST_AUTO_TEST_CASE(test_commitment_to_string) {
    BOOST_CHECK_EQUAL(to_string(commitment_t::processed), "processed");
    BOOST_CHECK_EQUAL(to_string(commitment_t::confirmed), "confirmed");
    BOOST_CHECK_EQUAL(to_string(commitment_t::finalized), "finalized");
+}
+
+//=============================================================================
+// PDA Derivation Tests
+//=============================================================================
+
+BOOST_AUTO_TEST_CASE(test_base58_roundtrip) {
+   // "1" in base58 should decode to a single zero byte
+   auto one_bytes = fc::from_base58("1");
+   BOOST_CHECK_EQUAL(one_bytes.size(), 1u);
+   BOOST_CHECK_EQUAL((uint8_t)one_bytes[0], 0u);
+
+   // "11111111111111111111111111111111" (32 ones) should be 32 zero bytes
+   auto system_bytes = fc::from_base58("11111111111111111111111111111111");
+   BOOST_CHECK_EQUAL(system_bytes.size(), 32u);
+   for (size_t i = 0; i < 32; ++i) {
+      BOOST_CHECK_EQUAL((uint8_t)system_bytes[i], 0u);
+   }
+
+   // "2" in base58 should be value 1
+   auto two_bytes = fc::from_base58("2");
+   BOOST_CHECK_EQUAL(two_bytes.size(), 1u);
+   BOOST_CHECK_EQUAL((uint8_t)two_bytes[0], 1u);
+
+   // Test roundtrip for a Solana pubkey
+   std::string test_str = "8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb";
+   auto bytes = fc::from_base58(test_str);
+   BOOST_CHECK_EQUAL(bytes.size(), 32u);
+   std::string encoded = fc::to_base58(bytes.data(), bytes.size(), fc::yield_function_t{});
+   BOOST_CHECK_EQUAL(encoded, test_str);
+}
+
+BOOST_AUTO_TEST_CASE(test_is_on_curve) {
+   // Test that the is_on_curve check matches Solana's behavior
+   // For program ID 8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb with seed "counter":
+   // - bump=255: ON curve (invalid PDA)
+   // - bump=254: ON curve (invalid PDA)
+   // - bump=253: NOT on curve (valid PDA)
+   // - bump=252: ON curve (invalid PDA)
+
+   pubkey program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+   const char* seed = "counter";
+   const std::string PDA_MARKER = "ProgramDerivedAddress";
+
+   auto compute_pda = [&](uint8_t bump) -> pubkey {
+      fc::sha256::encoder enc;
+      enc.write(seed, strlen(seed));
+      enc.write(reinterpret_cast<const char*>(&bump), 1);
+      enc.write(reinterpret_cast<const char*>(program_id.data.data()), 32);
+      enc.write(PDA_MARKER.data(), PDA_MARKER.size());
+      fc::sha256 hash = enc.result();
+      pubkey result;
+      std::memcpy(result.data.data(), hash.data(), 32);
+      return result;
+   };
+
+   // Verify is_on_curve matches expected Solana behavior
+   BOOST_CHECK(system::is_on_curve(compute_pda(255)));   // ON curve
+   BOOST_CHECK(system::is_on_curve(compute_pda(254)));   // ON curve
+   BOOST_CHECK(!system::is_on_curve(compute_pda(253)));  // NOT on curve - valid PDA
+   BOOST_CHECK(system::is_on_curve(compute_pda(252)));   // ON curve
+}
+
+BOOST_AUTO_TEST_CASE(test_pda_derivation_anchor_counter) {
+   // Test PDA derivation for the Anchor counter program
+   // TypeScript derives: DVDTX63BkbTYe8G3RQQqS9E1sHKxeEEoixJxBEvvvzEU with bump 253
+
+   pubkey program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+
+   // Verify program ID bytes match expected (from TypeScript bs58.decode)
+   std::vector<uint8_t> expected_program_bytes = {
+      116, 104, 234, 67, 104, 141, 80, 211, 141, 205, 110, 212, 191, 45, 73, 99,
+      216, 29, 196, 127, 3, 231, 129, 49, 107, 18, 230, 248, 146, 52, 147, 132};
+   for (size_t i = 0; i < 32; ++i) {
+      BOOST_CHECK_EQUAL(program_id.data[i], expected_program_bytes[i]);
+   }
+
+   // Derive PDA with seed "counter"
+   const char* COUNTER_SEED = "counter";
+   std::vector<std::vector<uint8_t>> seeds = {
+      std::vector<uint8_t>(COUNTER_SEED, COUNTER_SEED + strlen(COUNTER_SEED))};
+
+   auto [pda, bump] = system::find_program_address(seeds, program_id);
+
+   // Verify PDA matches TypeScript result
+   BOOST_CHECK_EQUAL(pda.to_base58(), "DVDTX63BkbTYe8G3RQQqS9E1sHKxeEEoixJxBEvvvzEU");
+   BOOST_CHECK_EQUAL(bump, 253);
+}
+
+//=============================================================================
+// IDL Instruction Return Type Tests
+//=============================================================================
+
+BOOST_AUTO_TEST_CASE(test_idl_instruction_with_returns) {
+   // Test parsing an IDL instruction that has a returns field
+   std::string idl_json = R"({
+      "name": "getCounter",
+      "discriminator": [0, 1, 2, 3, 4, 5, 6, 7],
+      "args": [],
+      "accounts": [],
+      "returns": "u64"
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   idl::program prog;
+
+   // Parse instruction directly using from_variant pattern
+   auto obj = v.get_object();
+   idl::instruction instr;
+   instr.name = obj["name"].as_string();
+
+   // Parse returns
+   if (obj.contains("returns") && !obj["returns"].is_null()) {
+      instr.returns = idl::idl_type::from_variant(obj["returns"]);
+   }
+
+   BOOST_CHECK_EQUAL(instr.name, "getCounter");
+   BOOST_CHECK(instr.returns.has_value());
+   BOOST_CHECK(instr.returns->is_primitive());
+   BOOST_CHECK(instr.returns->get_primitive() == idl::primitive_type::u64);
+}
+
+BOOST_AUTO_TEST_CASE(test_idl_instruction_returns_option) {
+   // Test parsing an IDL instruction with Option<pubkey> return type
+   std::string idl_json = R"({
+      "name": "getOwner",
+      "discriminator": [0, 1, 2, 3, 4, 5, 6, 7],
+      "args": [],
+      "accounts": [],
+      "returns": {"option": "pubkey"}
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto obj = v.get_object();
+
+   idl::instruction instr;
+   instr.name = obj["name"].as_string();
+   if (obj.contains("returns") && !obj["returns"].is_null()) {
+      instr.returns = idl::idl_type::from_variant(obj["returns"]);
+   }
+
+   BOOST_CHECK(instr.returns.has_value());
+   BOOST_CHECK(instr.returns->is_option());
+   BOOST_CHECK(instr.returns->option_inner->is_primitive());
+   BOOST_CHECK(instr.returns->option_inner->get_primitive() == idl::primitive_type::pubkey);
+   BOOST_CHECK_EQUAL(instr.returns->to_string(), "Option<pubkey>");
+}
+
+//=============================================================================
+// Borsh Decode Type Tests
+//=============================================================================
+
+BOOST_AUTO_TEST_CASE(test_borsh_decode_primitives) {
+   // Test decoding primitive types from Borsh-encoded data
+   borsh::encoder enc;
+   enc.write_u64(12345678901234567890ULL);
+   enc.write_u8(42);
+   enc.write_bool(true);
+   enc.write_string("hello");
+
+   auto data = enc.finish();
+   borsh::decoder dec(data);
+
+   // Decode u64
+   auto t_u64 = idl::idl_type::make_primitive(idl::primitive_type::u64);
+   BOOST_CHECK_EQUAL(dec.read_u64(), 12345678901234567890ULL);
+
+   // Decode u8
+   BOOST_CHECK_EQUAL(dec.read_u8(), 42);
+
+   // Decode bool
+   BOOST_CHECK_EQUAL(dec.read_bool(), true);
+
+   // Decode string
+   BOOST_CHECK_EQUAL(dec.read_string(), "hello");
+}
+
+BOOST_AUTO_TEST_CASE(test_idl_account_discriminator) {
+   // Test that account discriminator is computed correctly
+   // For "Counter" account, discriminator is first 8 bytes of sha256("account:Counter")
+   idl::account acct;
+   acct.name = "Counter";
+   acct.compute_discriminator();
+
+   // Verify discriminator is non-zero
+   bool all_zero = true;
+   for (auto b : acct.discriminator) {
+      if (b != 0) all_zero = false;
+   }
+   BOOST_CHECK(!all_zero);
+
+   // Compute expected discriminator manually
+   auto expected = borsh::compute_account_discriminator("Counter");
+   for (size_t i = 0; i < 8; ++i) {
+      BOOST_CHECK_EQUAL(acct.discriminator[i], expected[i]);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_idl_parse_anchor_counter_program) {
+   // Test parsing a complete Anchor counter program IDL
+   std::string idl_json = R"({
+      "name": "anchor_counter",
+      "version": "0.1.0",
+      "instructions": [
+         {
+            "name": "initialize",
+            "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
+            "accounts": [
+               {"name": "payer", "writable": true, "signer": true},
+               {"name": "counter", "writable": true, "pda": {"seeds": [{"kind": "const", "value": [99, 111, 117, 110, 116, 101, 114]}]}},
+               {"name": "systemProgram", "address": "11111111111111111111111111111111"}
+            ],
+            "args": []
+         },
+         {
+            "name": "increment",
+            "discriminator": [11, 18, 104, 9, 104, 174, 59, 33],
+            "accounts": [
+               {"name": "counter", "writable": true, "pda": {"seeds": [{"kind": "const", "value": [99, 111, 117, 110, 116, 101, 114]}]}}
+            ],
+            "args": [{"name": "amount", "type": "u64"}]
+         }
+      ],
+      "accounts": [
+         {
+            "name": "Counter",
+            "discriminator": [255, 176, 4, 245, 188, 253, 124, 25],
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "count", "type": "u64"},
+                  {"name": "bump", "type": "u8"}
+               ]
+            }
+         }
+      ]
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto prog = idl::parse_idl(v);
+
+   BOOST_CHECK_EQUAL(prog.name, "anchor_counter");
+   BOOST_CHECK_EQUAL(prog.version, "0.1.0");
+
+   // Check instructions
+   BOOST_CHECK_EQUAL(prog.instructions.size(), 2u);
+   BOOST_CHECK_EQUAL(prog.instructions[0].name, "initialize");
+   BOOST_CHECK_EQUAL(prog.instructions[1].name, "increment");
+   BOOST_CHECK_EQUAL(prog.instructions[1].args.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.instructions[1].args[0].name, "amount");
+   BOOST_CHECK(prog.instructions[1].args[0].type.is_primitive());
+   BOOST_CHECK(prog.instructions[1].args[0].type.get_primitive() == idl::primitive_type::u64);
+
+   // Check accounts
+   BOOST_CHECK_EQUAL(prog.accounts.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.accounts[0].name, "Counter");
+   BOOST_CHECK_EQUAL(prog.accounts[0].fields.size(), 2u);
+   BOOST_CHECK_EQUAL(prog.accounts[0].fields[0].name, "count");
+   BOOST_CHECK(prog.accounts[0].fields[0].type.get_primitive() == idl::primitive_type::u64);
+   BOOST_CHECK_EQUAL(prog.accounts[0].fields[1].name, "bump");
+   BOOST_CHECK(prog.accounts[0].fields[1].type.get_primitive() == idl::primitive_type::u8);
+
+   // Verify discriminator was parsed correctly
+   std::array<uint8_t, 8> expected_disc = {255, 176, 4, 245, 188, 253, 124, 25};
+   for (size_t i = 0; i < 8; ++i) {
+      BOOST_CHECK_EQUAL(prog.accounts[0].discriminator[i], expected_disc[i]);
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()

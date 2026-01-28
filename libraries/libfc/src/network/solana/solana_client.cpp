@@ -103,6 +103,10 @@ solana_program_client::solana_program_client(const solana_client_ptr& client, co
    : program_id(program_id), client(client) {
    auto idl_map = _idl_map.writeable();
    for (const auto& idl : idls) {
+      // Store the first IDL as the program reference for type lookups
+      if (!_program) {
+         _program = std::make_shared<idl::program>(idl);
+      }
       for (const auto& instr : idl.instructions) {
          idl_map[instr.name] = instr;
       }
@@ -282,6 +286,167 @@ instruction solana_program_client::build_instruction(const idl::instruction& ins
    return result;
 }
 
+std::vector<uint8_t> solana_program_client::extract_return_data(const fc::variant& sim_result) {
+   if (!sim_result.is_object())
+      return {};
+
+   auto result_obj = sim_result.get_object();
+   if (!result_obj.contains("value") || result_obj["value"].is_null())
+      return {};
+
+   auto value_obj = result_obj["value"].get_object();
+
+   // Check for simulation error
+   if (value_obj.contains("err") && !value_obj["err"].is_null()) {
+      FC_THROW("Transaction simulation failed: ${err}",
+               ("err", fc::json::to_string(value_obj["err"], fc::json::yield_function_t{})));
+   }
+
+   // Extract return data if present
+   if (value_obj.contains("returnData") && !value_obj["returnData"].is_null()) {
+      auto return_data_obj = value_obj["returnData"].get_object();
+      if (return_data_obj.contains("data") && !return_data_obj["data"].is_null()) {
+         auto data_arr = return_data_obj["data"].get_array();
+         if (!data_arr.empty() && data_arr[0].is_string()) {
+            std::string data_b64 = data_arr[0].as_string();
+            if (!data_b64.empty()) {
+               auto decoded = fc::base64_decode(data_b64);
+               return std::vector<uint8_t>(reinterpret_cast<const uint8_t*>(decoded.data()),
+                                           reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
+            }
+         }
+      }
+   }
+
+   return {};
+}
+
+fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type) {
+   if (type.is_primitive()) {
+      switch (type.get_primitive()) {
+         case idl::primitive_type::bool_t:
+            return fc::variant(decoder.read_bool());
+         case idl::primitive_type::u8:
+            return fc::variant(static_cast<uint64_t>(decoder.read_u8()));
+         case idl::primitive_type::u16:
+            return fc::variant(static_cast<uint64_t>(decoder.read_u16()));
+         case idl::primitive_type::u32:
+            return fc::variant(static_cast<uint64_t>(decoder.read_u32()));
+         case idl::primitive_type::u64:
+            return fc::variant(decoder.read_u64());
+         case idl::primitive_type::u128:
+            return fc::variant(decoder.read_u128().str());
+         case idl::primitive_type::i8:
+            return fc::variant(static_cast<int64_t>(decoder.read_i8()));
+         case idl::primitive_type::i16:
+            return fc::variant(static_cast<int64_t>(decoder.read_i16()));
+         case idl::primitive_type::i32:
+            return fc::variant(static_cast<int64_t>(decoder.read_i32()));
+         case idl::primitive_type::i64:
+            return fc::variant(decoder.read_i64());
+         case idl::primitive_type::i128:
+            return fc::variant(decoder.read_i128().str());
+         case idl::primitive_type::f32:
+            return fc::variant(static_cast<double>(decoder.read_f32()));
+         case idl::primitive_type::f64:
+            return fc::variant(decoder.read_f64());
+         case idl::primitive_type::string:
+            return fc::variant(decoder.read_string());
+         case idl::primitive_type::bytes: {
+            auto bytes = decoder.read_bytes();
+            return fc::variant(fc::base64_encode(reinterpret_cast<const char*>(bytes.data()),
+                                                  static_cast<unsigned int>(bytes.size())));
+         }
+         case idl::primitive_type::pubkey:
+            return fc::variant(decoder.read_pubkey().to_base58());
+         default:
+            FC_THROW("Unsupported primitive type: ${t}", ("t", static_cast<int>(type.get_primitive())));
+      }
+   } else if (type.is_option()) {
+      uint8_t has_value = decoder.read_u8();
+      if (has_value == 0) {
+         return fc::variant();  // null
+      }
+      FC_ASSERT(has_value == 1, "Invalid option discriminator: ${v}", ("v", has_value));
+      // Recursively decode the inner type
+      return decode_type(decoder, *type.option_inner);
+   } else if (type.is_vec()) {
+      uint32_t len = decoder.read_u32();
+      fc::variants arr;
+      arr.reserve(len);
+
+      // Decode each element
+      for (uint32_t i = 0; i < len; ++i) {
+         arr.push_back(decode_type(decoder, *type.vec_element));
+      }
+      return fc::variant(arr);
+   } else if (type.is_array()) {
+      fc::variants arr;
+      arr.reserve(*type.array_len);
+
+      // Decode each element (no length prefix for fixed arrays)
+      for (size_t i = 0; i < *type.array_len; ++i) {
+         arr.push_back(decode_type(decoder, *type.array_element));
+      }
+      return fc::variant(arr);
+   } else if (type.is_defined() && _program) {
+      // Look up the type definition and decode
+      const idl::type_def* type_def = _program->find_type(type.get_defined_name());
+      if (type_def && type_def->is_struct() && type_def->struct_fields) {
+         return decode_fields(decoder, *type_def->struct_fields);
+      } else if (type_def && type_def->is_enum() && type_def->enum_variants) {
+         // Decode enum variant index
+         uint8_t variant_idx = decoder.read_u8();
+         FC_ASSERT(variant_idx < type_def->enum_variants->size(), "Invalid enum variant index: ${idx}",
+                   ("idx", variant_idx));
+
+         const auto& variant = (*type_def->enum_variants)[variant_idx];
+         fc::mutable_variant_object obj;
+         obj("variant", variant.name);
+
+         // Decode variant fields if present
+         if (variant.fields && !variant.fields->empty()) {
+            obj("fields", decode_fields(decoder, *variant.fields));
+         }
+         return fc::variant(obj);
+      }
+   }
+
+   FC_THROW("Cannot decode type: ${t}", ("t", type.to_string()));
+}
+
+fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields) {
+   fc::mutable_variant_object obj;
+   for (const auto& field : fields) {
+      obj(field.name, decode_type(decoder, field.type));
+   }
+   return fc::variant(obj);
+}
+
+fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t>& data,
+                                                        const std::string& account_name) {
+   FC_ASSERT(_program, "No IDL program loaded");
+
+   const idl::account* account = _program->find_account(account_name);
+   FC_ASSERT(account, "Account type '${name}' not found in IDL", ("name", account_name));
+
+   // Verify minimum size (8-byte discriminator + at least some data)
+   FC_ASSERT(data.size() >= 8, "Account data too small: ${size} bytes", ("size", data.size()));
+
+   // Verify discriminator
+   for (size_t i = 0; i < 8; ++i) {
+      FC_ASSERT(data[i] == account->discriminator[i],
+                "Account discriminator mismatch at byte ${i}: expected ${exp}, got ${got}",
+                ("i", i)("exp", static_cast<int>(account->discriminator[i]))("got", static_cast<int>(data[i])));
+   }
+
+   // Create decoder starting after discriminator
+   borsh::decoder decoder(data.data() + 8, data.size() - 8);
+
+   // Decode all fields
+   return decode_fields(decoder, account->fields);
+}
+
 fc::variant solana_program_client::execute_call(const idl::instruction& instr,
                                                 const std::vector<account_meta>& accounts,
                                                 const program_invoke_data_items& params, commitment_t commitment) {
@@ -291,22 +456,23 @@ fc::variant solana_program_client::execute_call(const idl::instruction& instr,
    // Simulate the transaction
    auto sim_result = client->simulate_transaction(tx, commitment);
 
-   // Extract and return result
-   auto result_obj = sim_result.get_object();
-   if (result_obj.contains("value") && !result_obj["value"].is_null()) {
-      auto value_obj = result_obj["value"].get_object();
+   // Extract return data
+   auto return_data = extract_return_data(sim_result);
 
-      // Check for simulation error
-      if (value_obj.contains("err") && !value_obj["err"].is_null()) {
-         FC_THROW("Transaction simulation failed: ${err}",
-                  ("err", fc::json::to_string(value_obj["err"], fc::json::yield_function_t{})));
-      }
-
-      // Return the full simulation result for further processing
-      return sim_result;
+   // If instruction has a return type, decode the data using IDL
+   if (instr.returns.has_value() && !return_data.empty()) {
+      borsh::decoder decoder(return_data);
+      return decode_type(decoder, *instr.returns);
    }
 
-   return sim_result;
+   // If no return type specified but we have data, return as raw bytes (base64)
+   if (!return_data.empty()) {
+      return fc::variant(fc::base64_encode(reinterpret_cast<const char*>(return_data.data()),
+                                            static_cast<unsigned int>(return_data.size())));
+   }
+
+   // No return data - return empty variant
+   return fc::variant();
 }
 
 std::string solana_program_client::execute_tx(const idl::instruction& instr, const std::vector<account_meta>& accounts,
@@ -315,6 +481,111 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
    auto tx = client->create_transaction({instruction}, client->get_pubkey());
    client->sign_transaction(tx);
    return client->send_transaction(tx);
+}
+
+std::pair<pubkey, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
+                                                              const program_invoke_data_items& params) {
+   std::vector<std::vector<uint8_t>> seeds;
+
+   for (const auto& seed : pda_seeds) {
+      switch (seed.kind) {
+         case idl::pda_seed_kind::const_value: {
+            // Parse the JSON value array into bytes
+            auto value = fc::json::from_string(seed.path);
+            if (value.is_array()) {
+               std::vector<uint8_t> bytes;
+               for (const auto& b : value.get_array()) {
+                  bytes.push_back(static_cast<uint8_t>(b.as_uint64()));
+               }
+               seeds.push_back(std::move(bytes));
+            } else if (value.is_string()) {
+               // String constant
+               auto str = value.as_string();
+               seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
+            }
+            break;
+         }
+         case idl::pda_seed_kind::arg: {
+            // Use instruction argument as seed
+            // path is the argument name or index
+            // For now, try to match by index if numeric, otherwise search by name
+            try {
+               size_t idx = std::stoull(seed.path);
+               if (idx < params.size()) {
+                  auto& param = params[idx];
+                  if (param.is_string()) {
+                     auto str = param.as_string();
+                     seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
+                  } else if (param.is_uint64()) {
+                     // Encode as little-endian bytes
+                     uint64_t val = param.as_uint64();
+                     std::vector<uint8_t> bytes(8);
+                     std::memcpy(bytes.data(), &val, 8);
+                     seeds.push_back(std::move(bytes));
+                  }
+               }
+            } catch (...) {
+               // path is not an index, skip for now
+               FC_THROW("Arg-based PDA seeds by name not yet supported: ${path}", ("path", seed.path));
+            }
+            break;
+         }
+         case idl::pda_seed_kind::account: {
+            // Account-based seed - requires account resolution first
+            FC_THROW("Account-based PDA seeds not yet supported: ${path}", ("path", seed.path));
+         }
+      }
+   }
+
+   return system::find_program_address(seeds, program_id);
+}
+
+std::vector<account_meta> solana_program_client::resolve_accounts(const idl::instruction& instr,
+                                                                   const program_invoke_data_items& params,
+                                                                   const account_overrides_t& account_overrides) {
+   std::vector<account_meta> accounts;
+   accounts.reserve(instr.accounts.size());
+
+   for (const auto& acct : instr.accounts) {
+      pubkey pk;
+      bool resolved = false;
+
+      // Check for explicit override first
+      if (account_overrides.contains(acct.name)) {
+         pk = account_overrides.at(acct.name);
+         resolved = true;
+      }
+      // Check for fixed address in IDL
+      else if (acct.address.has_value()) {
+         pk = *acct.address;
+         resolved = true;
+      }
+      // Derive PDA if seeds are provided
+      else if (!acct.pda_seeds.empty()) {
+         auto [pda, bump] = derive_pda(acct.pda_seeds, params);
+         pk = pda;
+         resolved = true;
+      }
+      // Signer accounts use the client's payer
+      else if (acct.is_signer) {
+         pk = client->get_pubkey();
+         resolved = true;
+      }
+
+      FC_ASSERT(resolved, "Could not resolve account '${name}' - provide it in account_overrides",
+                ("name", acct.name));
+
+      // Create account_meta with correct flags
+      if (acct.is_signer) {
+         accounts.push_back(account_meta::signer(pk, acct.is_mut));
+      } else if (acct.is_mut) {
+         accounts.push_back(account_meta::writable(pk, false));
+      } else {
+         accounts.push_back(account_meta::readonly(pk, false));
+      }
+   }
+
+   return accounts;
 }
 
 //=============================================================================

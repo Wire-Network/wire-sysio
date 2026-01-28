@@ -126,49 +126,48 @@ struct solana_program_test_counter_data_client : fc::network::solana::solana_pro
  *
  * Program ID: 8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb
  * PDA Seed: "counter"
+ *
+ * This client demonstrates the solana_program_client API using create_tx
+ * to create typed callable functions that automatically resolve accounts
+ * from IDL definitions - similar to ethereum_contract_client pattern.
  */
 struct solana_program_test_counter_anchor_client : fc::network::solana::solana_program_client {
    static constexpr const char* COUNTER_SEED = "counter";
 
-   // Derived counter PDA
+   // Derived counter PDA (for reading account data)
    pubkey counter_pda;
    uint8_t counter_bump;
 
-   // Instruction function wrappers
-   std::function<std::string()> initialize_fn;
-   std::function<std::string(uint64_t)> increment_fn;
+   /**
+    * @brief Initialize the counter account (creates the PDA)
+    *
+    * Uses create_tx which automatically resolves accounts from IDL:
+    * - payer: resolved as signer (client's key)
+    * - counter: resolved as PDA from seeds in IDL
+    * - system_program: resolved from fixed address in IDL
+    */
+   solana_program_tx_fn<std::string> initialize;
+
+   /**
+    * @brief Increment the counter by the specified amount
+    *
+    * Uses create_tx which automatically resolves accounts from IDL:
+    * - counter: resolved as PDA from seeds in IDL
+    */
+   solana_program_tx_fn<std::string, uint64_t> increment;
 
    solana_program_test_counter_anchor_client(const solana_client_ptr& client, const pubkey& program_id,
                                               const std::vector<idl::program>& idls = {})
       : solana_program_client(client, program_id, idls) {
-      // Derive the counter PDA
+      // Derive the counter PDA for account data reads
       std::vector<std::vector<uint8_t>> seeds = {
          std::vector<uint8_t>(COUNTER_SEED, COUNTER_SEED + strlen(COUNTER_SEED))
       };
       std::tie(counter_pda, counter_bump) = system::find_program_address(seeds, program_id);
 
-      // Create instruction wrappers using IDL if available
-      if (has_idl("initialize")) {
-         auto& init_idl = get_idl("initialize");
-         initialize_fn = [this, &init_idl]() -> std::string {
-            std::vector<account_meta> accounts = {
-               account_meta::signer(this->client->get_pubkey(), true),  // payer
-               account_meta::writable(this->counter_pda, false),         // counter
-               account_meta::readonly(system::program_ids::SYSTEM_PROGRAM, false)  // system_program
-            };
-            return execute_tx(init_idl, accounts, {});
-         };
-      }
-
-      if (has_idl("increment")) {
-         auto& incr_idl = get_idl("increment");
-         increment_fn = [this, &incr_idl](uint64_t amount) -> std::string {
-            std::vector<account_meta> accounts = {
-               account_meta::writable(this->counter_pda, false)  // counter
-            };
-            return execute_tx(incr_idl, accounts, {fc::variant(amount)});
-         };
-      }
+      // Create typed transaction functions from IDL (Ethereum contract client pattern)
+      initialize = create_tx<std::string>(get_idl("initialize"));
+      increment = create_tx<std::string, uint64_t>(get_idl("increment"));
    }
 
    /**
@@ -180,73 +179,33 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
    }
 
    /**
-    * @brief Get the current counter value
+    * @brief Get the current counter value using IDL-based decoding
     *
-    * Counter struct layout (with 8-byte Anchor discriminator):
-    *   [0..8]: Anchor account discriminator
-    *   [8..16]: count (u64)
-    *   [16]: bump (u8)
+    * Uses get_account_data to fetch and decode the Counter account
+    * according to the IDL definition. The Counter struct has:
+    *   - count: u64
+    *   - bump: u8
     */
    uint64_t get_counter_value() {
-      auto account_info = client->get_account_info(counter_pda);
-      if (!account_info.has_value() || account_info->data.size() < 16) {
-         return 0;  // Account doesn't exist or too small
+      if (!is_initialized()) {
+         return 0;
       }
-      // Skip 8-byte discriminator, read u64 count
-      uint64_t value = 0;
-      std::memcpy(&value, account_info->data.data() + 8, sizeof(uint64_t));
-      return value;
+
+      // Use get_account_data to decode using IDL (similar to Ethereum pattern)
+      auto counter_data = get_account_data<fc::variant>("Counter", counter_pda);
+      return counter_data["count"].as_uint64();
    }
 
    /**
-    * @brief Initialize the counter account (creates the PDA)
+    * @brief Get the full counter account data as variant (for debugging)
+    *
+    * Returns the complete decoded account including all fields.
     */
-   std::string initialize() {
-      if (initialize_fn) {
-         return initialize_fn();
+   fc::variant get_counter_data() {
+      if (!is_initialized()) {
+         return fc::variant();
       }
-
-      // Manual initialization without IDL
-      // Build instruction data with Anchor discriminator for "initialize"
-      auto discriminator = idl::compute_instruction_discriminator("initialize");
-      std::vector<uint8_t> data(discriminator.begin(), discriminator.end());
-
-      std::vector<account_meta> accounts = {
-         account_meta::signer(client->get_pubkey(), true),  // payer
-         account_meta::writable(counter_pda, false),         // counter
-         account_meta::readonly(system::program_ids::SYSTEM_PROGRAM, false)  // system_program
-      };
-
-      instruction instr(program_id, accounts, data);
-      auto tx = client->create_transaction({instr}, client->get_pubkey());
-      client->sign_transaction(tx);
-      return client->send_and_confirm_transaction(tx);
-   }
-
-   /**
-    * @brief Increment the counter by the specified amount
-    */
-   std::string increment(uint64_t amount) {
-      if (increment_fn) {
-         return increment_fn(amount);
-      }
-
-      // Manual increment without IDL
-      // Build instruction data: discriminator + u64 amount
-      auto discriminator = idl::compute_instruction_discriminator("increment");
-      borsh::encoder enc;
-      enc.write_fixed_bytes(discriminator.data(), 8);
-      enc.write_u64(amount);
-      auto data = enc.finish();
-
-      std::vector<account_meta> accounts = {
-         account_meta::writable(counter_pda, false)  // counter
-      };
-
-      instruction instr(program_id, accounts, data);
-      auto tx = client->create_transaction({instr}, client->get_pubkey());
-      client->sign_transaction(tx);
-      return client->send_and_confirm_transaction(tx);
+      return get_account_data<fc::variant>("Counter", counter_pda);
    }
 };
 
@@ -317,64 +276,64 @@ int main(int argc, char* argv[]) {
       }
 
       // Test the raw counter program (non-Anchor)
-      const pubkey counter_program_id = pubkey::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
-      ilog("");
-      ilog("=== Testing Raw Counter Program ===");
-      ilogf("Program ID: {}", counter_program_id.to_base58());
-
-      auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
-      ilogf("Counter PDA: {}", raw_counter->counter_pda.to_base58());
-
-      uint64_t current_value = raw_counter->get_counter_value();
-      ilogf("Current counter value: {}", current_value);
-
-      // Increment the counter by 1
-      ilog("Incrementing raw counter by 1...");
-      try {
-         auto sig = raw_counter->increment(1);
-         ilogf("Transaction signature: {}", sig);
-
-         uint64_t new_value = raw_counter->get_counter_value();
-         ilogf("New counter value: {}", new_value);
-      } catch (const fc::exception& e) {
-         wlogf("Failed to increment raw counter: {}", e.to_detail_string());
-      }
-
-      // Test the Anchor counter program
-      // const pubkey anchor_counter_program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+      // const pubkey counter_program_id = pubkey::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
       // ilog("");
-      // ilog("=== Testing Anchor Counter Program ===");
-      // ilogf("Program ID: {}", anchor_counter_program_id.to_base58());
-
-      // auto anchor_counter = client->get_program<solana_program_test_counter_anchor_client>(
-      //    anchor_counter_program_id, all_idls);
-      // ilogf("Counter PDA: {}", anchor_counter->counter_pda.to_base58());
+      // ilog("=== Testing Raw Counter Program ===");
+      // ilogf("Program ID: {}", counter_program_id.to_base58());
       //
-      // // Check if initialized
-      // bool is_init = anchor_counter->is_initialized();
-      // ilogf("Counter initialized: {}", is_init ? "yes" : "no");
+      // auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
+      // ilogf("Counter PDA: {}", raw_counter->counter_pda.to_base58());
       //
-      // if (!is_init) {
-      //    ilog("Initializing anchor counter...");
-      //    try {
-      //       auto sig = anchor_counter->initialize();
-      //       ilogf("Initialize transaction signature: {}", sig);
-      //    } catch (const fc::exception& e) {
-      //       wlogf("Failed to initialize anchor counter: {}", e.to_detail_string());
-      //    }
-      // }
+      // uint64_t current_value = raw_counter->get_counter_value();
+      // ilogf("Current counter value: {}", current_value);
       //
-      // uint64_t anchor_value = anchor_counter->get_counter_value();
-      // ilogf("Current anchor counter value: {}", anchor_value);
-      //
-      // // Increment the anchor counter by 5
-      // ilog("Incrementing anchor counter by 5...");
+      // // Increment the counter by 1
+      // ilog("Incrementing raw counter by 1...");
       // try {
-      //    auto sig = anchor_counter->increment(5);
+      //    auto sig = raw_counter->increment(1);
       //    ilogf("Transaction signature: {}", sig);
       //
-      //    uint64_t new_anchor_value = anchor_counter->get_counter_value();
-      //    ilogf("New anchor counter value: {}", new_anchor_value);
+      //    uint64_t new_value = raw_counter->get_counter_value();
+      //    ilogf("New counter value: {}", new_value);
+      // } catch (const fc::exception& e) {
+      //    wlogf("Failed to increment raw counter: {}", e.to_detail_string());
+      // }
+
+      // Test the Anchor counter program
+      const pubkey anchor_counter_program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+      ilog("");
+      ilog("=== Testing Anchor Counter Program ===");
+      ilogf("Program ID: {}", anchor_counter_program_id.to_base58());
+
+      auto anchor_counter = client->get_program<solana_program_test_counter_anchor_client>(
+         anchor_counter_program_id, all_idls);
+      ilogf("Counter PDA: {}", anchor_counter->counter_pda.to_base58());
+
+      // Check if initialized
+      bool is_init = anchor_counter->is_initialized();
+      ilogf("Counter initialized: {}", is_init ? "yes" : "no");
+
+      if (!is_init) {
+         ilog("Initializing anchor counter...");
+         try {
+            auto sig = anchor_counter->initialize();
+            ilogf("Initialize transaction signature: {}", sig);
+         } catch (const fc::exception& e) {
+            wlogf("Failed to initialize anchor counter: {}", e.to_detail_string());
+         }
+      }
+
+      uint64_t anchor_value = anchor_counter->get_counter_value();
+      ilogf("Current anchor counter value: {}", anchor_value);
+
+      // Increment the anchor counter by 5
+      ilog("Incrementing anchor counter by 5...");
+
+      auto sig = anchor_counter->increment(5);
+      ilogf("Transaction signature: {}", sig);
+
+      uint64_t new_anchor_value = anchor_counter->get_counter_value();
+      ilogf("New anchor counter value: {}", new_anchor_value);
       // } catch (const fc::exception& e) {
       //    wlogf("Failed to increment anchor counter: {}", e.to_detail_string());
       // }
