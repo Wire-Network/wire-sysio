@@ -149,9 +149,9 @@ public:
       app_->set_version_string(sysio::version::version_client());
       app_->set_full_version_string(sysio::version::version_full());
 
-      auto root = fc::app_path();
-      app_->set_default_data_dir(root / "sysio" / exe_name_ / "data");
-      app_->set_default_config_dir(root / "sysio" / exe_name_ / "config");
+      auto home = fc::home_path();
+      app_->set_default_data_dir(home / ".config" / "wire" / exe_name_ / "data");
+      app_->set_default_config_dir(home / ".config" / "wire" / exe_name_ / "config");
       http_plugin::set_defaults({
          .default_unix_socket_path = "",
          .default_http_port = cfg_.default_http_port,

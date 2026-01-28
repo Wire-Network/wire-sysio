@@ -323,8 +323,8 @@ int chain_actions::run_subcommand_sstate() {
 
   // default state dir, if none specified
   if (opt->sstate_state_dir.empty()) {
-    auto root = fc::app_path();
-    auto default_data_dir = root / "sysio" / "nodeop" / "data";
+    auto home = fc::home_path();
+    auto default_data_dir = home / ".config" / "wire" / "nodeop" / "data";
     state_dir = default_data_dir / config::default_state_dir_name;
   } else {
     // adjust if path relative
