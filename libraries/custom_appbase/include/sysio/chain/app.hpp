@@ -21,6 +21,7 @@ struct application_config {
    bool enable_logging_config = true;
    bool enable_resource_monitor = true;
    bool sighup_loads_logging_config = true;
+   bool log_on_exit = true;
    uint16_t default_http_port = 8888;
 };
 
@@ -160,7 +161,7 @@ public:
    application(application&&) = delete;
    application& operator=(application&&) = delete;
    ~application() {
-      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS) {
+      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS && cfg_.log_on_exit) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();
          ilog("{} version {} {}", exe_name_, app_->version_string(), full_ver);
