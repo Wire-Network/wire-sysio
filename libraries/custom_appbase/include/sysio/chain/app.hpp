@@ -4,7 +4,9 @@
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/version/version.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
+#if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#endif
 #include <fc/filesystem.hpp>
 #include <fc/process.hpp>
 #include <fc/crypto/hex.hpp>
@@ -186,6 +188,7 @@ public:
          set_stop_executor_cb([]{});
 
          if (cfg_.enable_resource_monitor) {
+#if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
             if (auto resmon_plugin = app_->find_plugin<resource_monitor_plugin>()) {
                resmon_plugin->initialize(app_->get_options());
                resmon_plugin->monitor_directory(app_->data_dir());
@@ -194,6 +197,9 @@ public:
                last_result_ = exit_code::INITIALIZE_FAIL;
                return last_result_;
             }
+#else
+            elog("resource_monitor_plugin not included");
+#endif
          }
 
          ilog("{} version {} {}", exe_name_, app_->version_string(),
