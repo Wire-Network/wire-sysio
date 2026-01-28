@@ -526,7 +526,7 @@ program parse_idl(const fc::variant& json) {
 
 program parse_idl_file(const std::string& path) {
    std::ifstream file(path);
-   FC_ASSERT(file.is_open(), "Failed to open IDL file: ${path}", ("path", path));
+   FC_ASSERT(file.is_open(), "Failed to open IDL file: {}", path);
 
    std::stringstream buffer;
    buffer << file.rdbuf();

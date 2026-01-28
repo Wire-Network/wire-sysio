@@ -23,11 +23,11 @@ void configure_logging(const std::filesystem::path& config_path) {
          throw;
       }
    } catch (const fc::exception& e) {
-      elog("${e}", ("e", e.to_detail_string()));
+      elog("{}", e.to_detail_string());
    } catch (const boost::exception& e) {
-      elog("${e}", ("e", boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
    } catch (const std::exception& e) {
-      elog("${e}", ("e", e.what()));
+      elog("{}", e.what());
    } catch (...) {
       // empty
    }
@@ -36,17 +36,17 @@ void configure_logging(const std::filesystem::path& config_path) {
 void logging_conf_handler() {
    auto config_path = app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from ${p}.", ("p", config_path.string()));
+      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
    } else {
-      ilog("Received HUP.  No log config found at ${p}, setting to default.", ("p", config_path.string()));
+      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
    }
    configure_logging(config_path);
-   fc::log_config::initialize_appenders();
+   // fc::log_config::initialize_appenders(); // Removed - no longer needed
 }
 
 void initialize_logging() {
    auto config_path = app().get_logging_conf();
-   fc::log_config::initialize_appenders();
+   // fc::log_config::initialize_appenders(); // Removed - no longer needed
    app().set_sighup_callback(logging_conf_handler);
 }
 
@@ -253,30 +253,30 @@ int main(int argc, char* argv[]) {
       auto client_entry = clients[0];
       auto& client = client_entry->client;
 
-      ilogf("Connected to Solana RPC: {}", client_entry->url);
-      ilogf("Signer public key: {}", client->get_pubkey().to_base58());
+      ilog("Connected to Solana RPC: {}", client_entry->url);
+      ilog("Signer public key: {}", client->get_pubkey().to_base58());
 
       // Query basic chain information
       auto slot = client->get_slot();
-      ilogf("Current slot: {}", slot);
+      ilog("Current slot: {}", slot);
 
       auto block_height = client->get_block_height();
-      ilogf("Current block height: {}", block_height);
+      ilog("Current block height: {}", block_height);
 
       auto balance = client->get_balance(client->get_pubkey());
-      ilogf("Signer balance: {} lamports ({:.9f} SOL)",
+      ilog("Signer balance: {} lamports ({:.9f} SOL)",
             balance, static_cast<double>(balance) / 1e9);
 
       auto version = client->get_version();
-      ilogf("Node version: {}", fc::json::to_string(version, fc::time_point::maximum()));
+      ilog("Node version: {}", fc::json::to_string(version, fc::time_point::maximum()));
 
       // Get IDL files if provided
       auto& idl_files = sol_plug.get_idl_files();
       std::vector<idl::program> all_idls;
       for (auto& [file_path, programs] : idl_files) {
-         ilogf("Loaded IDL from: {}", file_path.string());
+         ilog("Loaded IDL from: {}", file_path.string());
          for (auto& prog : programs) {
-            ilogf("  Program: {} v{}", prog.name, prog.version);
+            ilog("  Program: {} v{}", prog.name, prog.version);
             all_idls.push_back(prog);
          }
       }
@@ -285,76 +285,76 @@ int main(int argc, char* argv[]) {
       // const pubkey counter_program_id = pubkey::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
       // ilog("");
       // ilog("=== Testing Raw Counter Program ===");
-      // ilogf("Program ID: {}", counter_program_id.to_base58());
+      // ilog("Program ID: {}", counter_program_id.to_base58());
       //
       // auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
-      // ilogf("Counter PDA: {}", raw_counter->counter_pda.to_base58());
+      // ilog("Counter PDA: {}", raw_counter->counter_pda.to_base58());
       //
       // uint64_t current_value = raw_counter->get_counter_value();
-      // ilogf("Current counter value: {}", current_value);
+      // ilog("Current counter value: {}", current_value);
       //
       // // Increment the counter by 1
       // ilog("Incrementing raw counter by 1...");
       // try {
       //    auto sig = raw_counter->increment(1);
-      //    ilogf("Transaction signature: {}", sig);
+      //    ilog("Transaction signature: {}", sig);
       //
       //    uint64_t new_value = raw_counter->get_counter_value();
-      //    ilogf("New counter value: {}", new_value);
+      //    ilog("New counter value: {}", new_value);
       // } catch (const fc::exception& e) {
-      //    wlogf("Failed to increment raw counter: {}", e.to_detail_string());
+      //    wlog("Failed to increment raw counter: {}", e.to_detail_string());
       // }
 
       // Test the Anchor counter program
       const pubkey anchor_counter_program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
       ilog("");
       ilog("=== Testing Anchor Counter Program ===");
-      ilogf("Program ID: {}", anchor_counter_program_id.to_base58());
+      ilog("Program ID: {}", anchor_counter_program_id.to_base58());
 
       auto anchor_counter = client->get_program<solana_program_test_counter_anchor_client>(
          anchor_counter_program_id, all_idls);
-      ilogf("Counter PDA: {}", anchor_counter->counter_pda.to_base58());
+      ilog("Counter PDA: {}", anchor_counter->counter_pda.to_base58());
 
       // Check if initialized
       bool is_init = anchor_counter->is_initialized();
-      ilogf("Counter initialized: {}", is_init ? "yes" : "no");
+      ilog("Counter initialized: {}", is_init ? "yes" : "no");
 
       if (!is_init) {
          ilog("Initializing anchor counter...");
          try {
             auto sig = anchor_counter->initialize();
-            ilogf("Initialize transaction signature: {}", sig);
+            ilog("Initialize transaction signature: {}", sig);
          } catch (const fc::exception& e) {
-            wlogf("Failed to initialize anchor counter: {}", e.to_detail_string());
+            wlog("Failed to initialize anchor counter: {}", e.to_detail_string());
          }
       }
 
       uint64_t anchor_value = anchor_counter->get_counter_value();
-      ilogf("Current anchor counter value: {}", anchor_value);
+      ilog("Current anchor counter value: {}", anchor_value);
 
       // Increment the anchor counter by 5
       ilog("Incrementing anchor counter by 5...");
 
       auto sig = anchor_counter->increment(5);
-      ilogf("Transaction signature: {}", sig);
+      ilog("Transaction signature: {}", sig);
 
       uint64_t new_anchor_value = anchor_counter->get_counter_value();
-      ilogf("New anchor counter value: {}", new_anchor_value);
+      ilog("New anchor counter value: {}", new_anchor_value);
       // } catch (const fc::exception& e) {
-      //    wlogf("Failed to increment anchor counter: {}", e.to_detail_string());
+      //    wlog("Failed to increment anchor counter: {}", e.to_detail_string());
       // }
 
       ilog("");
       ilog("Solana client tool completed successfully.");
 
    } catch (const fc::exception& e) {
-      elog("${e}", ("e", e.to_detail_string()));
+      elog("{}", e.to_detail_string());
       return 1;
    } catch (const boost::exception& e) {
-      elog("${e}", ("e", boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
       return 1;
    } catch (const std::exception& e) {
-      elog("${e}", ("e", e.what()));
+      elog("{}", e.what());
       return 1;
    } catch (...) {
       elog("unknown exception");

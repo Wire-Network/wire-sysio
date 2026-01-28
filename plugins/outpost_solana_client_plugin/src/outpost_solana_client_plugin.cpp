@@ -29,9 +29,9 @@ public:
 
       for (auto& filename : file_names) {
          auto file_path = std::filesystem::absolute(filename);
-         ilogf("Loading IDL file: {}", file_path.string());
+         ilog("Loading IDL file: {}", file_path.string());
          if (!std::ranges::none_of(_idl_files, [&](const auto& f) { return f.first == file_path; })) {
-            wlogf("Already registered IDL file: {}", file_path.string());
+            wlog("Already registered IDL file: {}", file_path.string());
             continue;
          }
          // Parse each IDL file as a single program definition
@@ -52,7 +52,7 @@ public:
 
    void add_client(const std::string& id, solana_client_entry_ptr client) {
       FC_ASSERT(client, "Client cannot be null");
-      FC_ASSERT(!_clients.contains(id), "Client with id ${id} already exists", ("id", id));
+      FC_ASSERT(!_clients.contains(id), "Client with id {} already exists", id);
       _clients.emplace(id, client);
    }
 
@@ -70,17 +70,17 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
       my->load_idl_files(idl_files);
    }
    FC_ASSERT(options.count(option_name_client),
-             "At least one solana client argument is required ${name}",
-             ("name", option_name_client));
+             "At least one solana client argument is required {}",
+             option_name_client);
 
    auto plug_sig      = app().find_plugin<signature_provider_manager_plugin>();
    auto client_specs  = options.at(option_name_client).as<std::vector<std::string>>();
 
    for (auto& client_spec : client_specs) {
-      dlog("Adding solana client with spec: ${spec}", ("spec", client_spec));
+      dlog("Adding solana client with spec: {}", client_spec);
       auto parts = fc::split(client_spec, ',');
-      FC_ASSERT(parts.size() == 3, "Invalid spec ${spec} (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
-                ("spec", client_spec));
+      FC_ASSERT(parts.size() == 3, "Invalid spec {} (expected: <client-id>,<sig-provider-id>,<rpc-url>)",
+                client_spec);
 
       auto& id     = parts[0];
       auto& sig_id = parts[1];
@@ -94,7 +94,7 @@ void outpost_solana_client_plugin::plugin_initialize(const variables_map& option
                         sig_provider,
                         std::make_shared<solana_client>(sig_provider, url)));
 
-      ilogf("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
+      ilog("Added solana client (id={},sig_id={},url={})", id, sig_id, url);
    }
 }
 

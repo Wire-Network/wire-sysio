@@ -19,8 +19,7 @@ std::string pubkey::to_base58() const {
 
 pubkey pubkey::from_base58(const std::string& str) {
    auto bytes = fc::from_base58(str);
-   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana pubkey length: expected ${e}, got ${g}",
-             ("e", SIZE)("g", bytes.size()));
+   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana pubkey length: expected {}, got {}", SIZE, bytes.size());
    pubkey result;
    std::memcpy(result.data.data(), bytes.data(), SIZE);
    return result;
@@ -57,8 +56,7 @@ std::string signature::to_base58() const {
 
 signature signature::from_base58(const std::string& str) {
    auto bytes = fc::from_base58(str);
-   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana signature length: expected ${e}, got ${g}",
-             ("e", SIZE)("g", bytes.size()));
+   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana signature length: expected {}, got {}", SIZE, bytes.size());
    signature result;
    std::memcpy(result.data.data(), bytes.data(), SIZE);
    return result;
