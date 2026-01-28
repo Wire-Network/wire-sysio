@@ -13,6 +13,20 @@ Features & Capabilities
 - Program Instruction encode/decode supports both RAW data and Anchor Borsche encoding
   - IDL Parser
   - Borsche encoder/decoder
-  - Use the same approach for solana program access as was implemented for etherum contract support; an example is `ethereum_contract_test_counter_client` in `plugins/outpost_ethereum_client_plugin/tools/ethereum_client_rpc_tool/main.cpp`
+  - Use the same approach for `solana_program_client` as was implemented for `etherum_contract_client` support; an example is `ethereum_contract_test_counter_client` in `plugins/outpost_ethereum_client_plugin/tools/ethereum_client_rpc_tool/main.cpp`
+  - Functions to create and sign transactions should be similar to the `ethereum_contract_client`, there should be generic functions to `ethereum_contract_client::create_tx` and `ethereum_contract_client::create_call`, which in solana terms is something like `create_idl_tx` and `create_account_info_call`
+    - The goal is reduce the complexity of IDL program clients and simply use the `fc::variant` series of types and classes to create the functional clients; look at `ethereum_contract_client::create_tx` and `ethereum_contract_test_counter_client` in file `plugins/outpost_ethereum_client_plugin/tools/ethereum_client_rpc_tool/main.cpp`.
 - Support multiple account keys, on custom programs
 - Support all system programs and SYSVARS (Use the typescript repo for guidance if needed, https://github.com/solana-foundation/solana-web3.js)
+
+
+## Complex IDL types for Anchor programs
+
+In addition to support `fc::variant` via `fc::variant_object`, `fc::variant_array`, etc.  Any
+user defined `struct` or `class` that supports `fc::reflector` should be supported. This basically
+means that anny type with a `from_variant<T>` or `to_variant<T>` function should be supported.
+
+This support applies to the following methods/templates (but is not limited to; any additional methods that make sense should be added to this list):
+- `solana_program_client::get_account_data`
+- `solana_program_client::create_tx`
+- `solana_program_client::create_call`

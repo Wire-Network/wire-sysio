@@ -236,12 +236,21 @@ instruction_account parse_instruction_account(const fc::variant& v) {
 
    acct.name = obj["name"].as_string();
 
+   // Handle both old format (isMut/isSigner) and new Anchor 0.30+ format (writable/signer)
    if (obj.contains("isMut"))
       acct.is_mut = obj["isMut"].as_bool();
+   else if (obj.contains("writable"))
+      acct.is_mut = obj["writable"].as_bool();
+
    if (obj.contains("isSigner"))
       acct.is_signer = obj["isSigner"].as_bool();
+   else if (obj.contains("signer"))
+      acct.is_signer = obj["signer"].as_bool();
+
    if (obj.contains("isOptional"))
       acct.is_optional = obj["isOptional"].as_bool();
+   else if (obj.contains("optional"))
+      acct.is_optional = obj["optional"].as_bool();
    if (obj.contains("docs") && !obj["docs"].is_null()) {
       auto docs_arr = obj["docs"].get_array();
       if (!docs_arr.empty()) {
@@ -311,6 +320,11 @@ instruction parse_instruction(const fc::variant& v) {
       for (const auto& acct : obj["accounts"].get_array()) {
          instr.accounts.push_back(parse_instruction_account(acct));
       }
+   }
+
+   // Parse returns (return type for view functions)
+   if (obj.contains("returns") && !obj["returns"].is_null()) {
+      instr.returns = idl_type::from_variant(obj["returns"]);
    }
 
    // Parse docs
