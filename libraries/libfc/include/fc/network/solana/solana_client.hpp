@@ -48,6 +48,14 @@ template <typename RT, typename... Args>
 using solana_program_tx_fn = std::function<RT(Args...)>;
 
 /**
+ * @brief Function type for account data getter
+ *
+ * Takes optional commitment and returns decoded account data.
+ */
+template <typename RT>
+using solana_program_account_data_fn = std::function<RT(commitment_t)>;
+
+/**
  * @brief Function type for raw data program read-only calls
  */
 using solana_program_data_call_fn =
@@ -258,6 +266,45 @@ protected:
     */
    template <typename RT, typename... Args>
    solana_program_tx_fn<RT, Args...> create_tx(const idl::instruction& instr);
+
+   /**
+    * @brief Creates a typed account data getter function
+    *
+    * Generates a callable function object that fetches account data from the network
+    * and decodes it using the IDL type definition. This is useful for creating
+    * reusable getter functions for PDA accounts.
+    *
+    * @tparam RT Return type for the decoded account data (e.g., fc::variant or user struct)
+    * @param idl_type_name Name of the type in the IDL (e.g., "Counter")
+    * @param pda The PDA address to read from
+    * @return Callable function object that fetches and decodes the account data
+    */
+   template <typename RT>
+   solana_program_account_data_fn<RT> create_account_data_get(const std::string& idl_type_name, const pubkey& pda);
+
+   /**
+    * @brief Encode a value to Borsh format using IDL type information
+    *
+    * Encodes a single value to the encoder according to the IDL type.
+    * Supports all IDL types including primitives, options, vecs, arrays,
+    * and user-defined structs/enums.
+    *
+    * @param encoder Borsh encoder to write to
+    * @param value Value to encode (fc::variant)
+    * @param type IDL type definition
+    */
+   void encode_type(borsh::encoder& encoder, const fc::variant& value, const idl::idl_type& type);
+
+   /**
+    * @brief Encode a list of fields to Borsh format
+    *
+    * Encodes struct fields from an fc::variant_object according to IDL field definitions.
+    *
+    * @param encoder Borsh encoder to write to
+    * @param value Value containing the fields (fc::variant_object)
+    * @param fields List of field definitions
+    */
+   void encode_fields(borsh::encoder& encoder, const fc::variant& value, const std::vector<idl::field>& fields);
 
    /**
     * @brief Build instruction data from IDL and parameters
@@ -827,12 +874,37 @@ RT solana_program_client::get_account_data(const std::string& account_name, cons
    // Decode using IDL
    auto res_var = decode_account_data(account_info->data, account_name);
 
-   // Return the result, converting as needed (matches Ethereum pattern)
+   // Return the result, converting as needed (matches Ethereum Contract Client pattern)
    if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
       return res_var;
    }
 
    return res_var.as<RT>();
+}
+
+template <typename RT>
+solana_program_account_data_fn<RT> solana_program_client::create_account_data_get(const std::string& idl_type_name,
+                                                                                    const pubkey& pda) {
+   // Capture type name and address by value for the lambda
+   std::string type_name = idl_type_name;
+   pubkey address = pda;
+
+   return [this, type_name, address](commitment_t commitment = commitment_t::finalized) -> RT {
+      // Fetch account info from the network
+      auto account_info = client->get_account_info(address, commitment);
+      FC_ASSERT(account_info.has_value(), "Account not found: ${addr}", ("addr", address.to_base58()));
+      FC_ASSERT(!account_info->data.empty(), "Account has no data: ${addr}", ("addr", address.to_base58()));
+
+      // Decode using IDL
+      auto res_var = decode_account_data(account_info->data, type_name);
+
+      // Return the result, converting as needed (matches create_call/create_tx pattern)
+      if constexpr (std::is_same_v<std::decay_t<RT>, fc::variant>) {
+         return res_var;
+      }
+
+      return res_var.as<RT>();
+   };
 }
 
 }  // namespace fc::network::solana

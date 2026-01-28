@@ -156,6 +156,14 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
     */
    solana_program_tx_fn<std::string, uint64_t> increment;
 
+   /**
+    * @brief Get the counter account data
+    *
+    * Uses create_account_data_get which creates a reusable getter function
+    * that fetches and decodes account data using the IDL.
+    */
+   solana_program_account_data_fn<fc::variant> get_counter;
+
    solana_program_test_counter_anchor_client(const solana_client_ptr& client, const pubkey& program_id,
                                               const std::vector<idl::program>& idls = {})
       : solana_program_client(client, program_id, idls) {
@@ -168,6 +176,9 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
       // Create typed transaction functions from IDL (Ethereum contract client pattern)
       initialize = create_tx<std::string>(get_idl("initialize"));
       increment = create_tx<std::string, uint64_t>(get_idl("increment"));
+
+      // Create account data getter (similar to create_tx/create_call pattern)
+      get_counter = create_account_data_get<fc::variant>("Counter", counter_pda);
    }
 
    /**
@@ -179,21 +190,16 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
    }
 
    /**
-    * @brief Get the current counter value using IDL-based decoding
+    * @brief Get the current counter value using the getter function
     *
-    * Uses get_account_data to fetch and decode the Counter account
-    * according to the IDL definition. The Counter struct has:
-    *   - count: u64
-    *   - bump: u8
+    * Uses get_counter (created via create_account_data_get) to fetch and decode
+    * the Counter account according to the IDL definition.
     */
    uint64_t get_counter_value() {
       if (!is_initialized()) {
          return 0;
       }
-
-      // Use get_account_data to decode using IDL (similar to Ethereum pattern)
-      auto counter_data = get_account_data<fc::variant>("Counter", counter_pda);
-      return counter_data["count"].as_uint64();
+      return get_counter(commitment_t::finalized)["count"].as_uint64();
    }
 
    /**
