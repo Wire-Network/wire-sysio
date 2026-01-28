@@ -38,9 +38,6 @@ macro(chain_target TARGET)
             sysio_chain
             sysio_chain_wrap
             version
-            wallet_api_plugin
-            wallet_plugin
-
 
             gsl-lite::gsl-lite
             CLI11::CLI11
