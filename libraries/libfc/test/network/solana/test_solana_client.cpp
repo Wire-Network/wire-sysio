@@ -794,4 +794,357 @@ BOOST_AUTO_TEST_CASE(test_idl_parse_anchor_counter_program) {
    }
 }
 
+//=============================================================================
+// Complex Type Encode/Decode Tests
+//=============================================================================
+
+BOOST_AUTO_TEST_CASE(test_idl_complex_type_with_nested_structs) {
+   // Test parsing IDL with nested struct types
+   std::string idl_json = R"({
+      "name": "complex_program",
+      "version": "0.1.0",
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "UserProfile",
+            "discriminator": [1, 2, 3, 4, 5, 6, 7, 8],
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "owner", "type": "pubkey"},
+                  {"name": "name", "type": "string"},
+                  {"name": "metadata", "type": {"defined": "Metadata"}},
+                  {"name": "scores", "type": {"vec": "u64"}},
+                  {"name": "optional_data", "type": {"option": "u32"}}
+               ]
+            }
+         }
+      ],
+      "types": [
+         {
+            "name": "Metadata",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "created_at", "type": "i64"},
+                  {"name": "updated_at", "type": "i64"},
+                  {"name": "version", "type": "u8"}
+               ]
+            }
+         }
+      ]
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto prog = idl::parse_idl(v);
+
+   BOOST_CHECK_EQUAL(prog.name, "complex_program");
+
+   // Check account definition
+   BOOST_CHECK_EQUAL(prog.accounts.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.accounts[0].name, "UserProfile");
+   BOOST_CHECK_EQUAL(prog.accounts[0].fields.size(), 5u);
+
+   // Check nested type reference
+   BOOST_CHECK(prog.accounts[0].fields[2].type.is_defined());
+   BOOST_CHECK_EQUAL(prog.accounts[0].fields[2].type.get_defined_name(), "Metadata");
+
+   // Check vec type
+   BOOST_CHECK(prog.accounts[0].fields[3].type.is_vec());
+   BOOST_CHECK(prog.accounts[0].fields[3].type.vec_element->is_primitive());
+   BOOST_CHECK(prog.accounts[0].fields[3].type.vec_element->get_primitive() == idl::primitive_type::u64);
+
+   // Check option type
+   BOOST_CHECK(prog.accounts[0].fields[4].type.is_option());
+   BOOST_CHECK(prog.accounts[0].fields[4].type.option_inner->get_primitive() == idl::primitive_type::u32);
+
+   // Check type definition
+   BOOST_CHECK_EQUAL(prog.types.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.types[0].name, "Metadata");
+   BOOST_CHECK(prog.types[0].is_struct());
+   BOOST_CHECK_EQUAL(prog.types[0].struct_fields->size(), 3u);
+}
+
+BOOST_AUTO_TEST_CASE(test_idl_enum_type_parsing) {
+   // Test parsing IDL with enum types
+   std::string idl_json = R"({
+      "name": "enum_program",
+      "version": "0.1.0",
+      "instructions": [],
+      "accounts": [],
+      "types": [
+         {
+            "name": "Status",
+            "type": {
+               "kind": "enum",
+               "variants": [
+                  {"name": "Pending"},
+                  {"name": "Active"},
+                  {"name": "Completed"},
+                  {"name": "Failed", "fields": [{"name": "error_code", "type": "u32"}]}
+               ]
+            }
+         }
+      ]
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto prog = idl::parse_idl(v);
+
+   BOOST_CHECK_EQUAL(prog.types.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.types[0].name, "Status");
+   BOOST_CHECK(prog.types[0].is_enum());
+   BOOST_CHECK_EQUAL(prog.types[0].enum_variants->size(), 4u);
+
+   // Check unit variants
+   BOOST_CHECK_EQUAL((*prog.types[0].enum_variants)[0].name, "Pending");
+   BOOST_CHECK(!(*prog.types[0].enum_variants)[0].fields.has_value());
+
+   // Check variant with fields
+   BOOST_CHECK_EQUAL((*prog.types[0].enum_variants)[3].name, "Failed");
+   BOOST_CHECK((*prog.types[0].enum_variants)[3].fields.has_value());
+   BOOST_CHECK_EQUAL((*prog.types[0].enum_variants)[3].fields->size(), 1u);
+   BOOST_CHECK_EQUAL((*(*prog.types[0].enum_variants)[3].fields)[0].name, "error_code");
+}
+
+BOOST_AUTO_TEST_CASE(test_borsh_encode_decode_struct_roundtrip) {
+   // Test encoding and decoding a struct with the IDL
+   std::string idl_json = R"({
+      "name": "test_program",
+      "version": "0.1.0",
+      "instructions": [],
+      "accounts": [],
+      "types": [
+         {
+            "name": "TestStruct",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "value_u64", "type": "u64"},
+                  {"name": "value_bool", "type": "bool"},
+                  {"name": "value_string", "type": "string"},
+                  {"name": "value_pubkey", "type": "pubkey"}
+               ]
+            }
+         }
+      ]
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto prog = idl::parse_idl(v);
+
+   // Create test data
+   fc::mutable_variant_object test_obj;
+   test_obj("value_u64", 12345678901234567890ULL);
+   test_obj("value_bool", true);
+   test_obj("value_string", "hello world");
+   test_obj("value_pubkey", "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+
+   // Create the IDL type for TestStruct
+   idl::idl_type struct_type = idl::idl_type::make_defined("TestStruct");
+
+   // Encode
+   borsh::encoder enc;
+
+   // We need a program client to access encode_type, but we can test the roundtrip
+   // by manually encoding and decoding using the borsh encoder/decoder directly
+
+   // Manually encode the struct fields
+   enc.write_u64(12345678901234567890ULL);
+   enc.write_bool(true);
+   enc.write_string("hello world");
+   enc.write_pubkey(pubkey::from_base58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"));
+
+   auto encoded = enc.finish();
+
+   // Decode manually
+   borsh::decoder dec(encoded);
+   BOOST_CHECK_EQUAL(dec.read_u64(), 12345678901234567890ULL);
+   BOOST_CHECK_EQUAL(dec.read_bool(), true);
+   BOOST_CHECK_EQUAL(dec.read_string(), "hello world");
+   BOOST_CHECK_EQUAL(dec.read_pubkey().to_base58(), "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+}
+
+BOOST_AUTO_TEST_CASE(test_borsh_encode_decode_vec_and_option) {
+   // Test encoding and decoding vectors and options
+   borsh::encoder enc;
+
+   // Encode Option<u64> with Some value
+   enc.write_u8(1);  // Some
+   enc.write_u64(42);
+
+   // Encode Option<u64> with None
+   enc.write_u8(0);  // None
+
+   // Encode Vec<u32>
+   std::vector<uint32_t> values = {1, 2, 3, 4, 5};
+   enc.write_u32(static_cast<uint32_t>(values.size()));
+   for (auto v : values) {
+      enc.write_u32(v);
+   }
+
+   auto encoded = enc.finish();
+
+   // Decode and verify
+   borsh::decoder dec(encoded);
+
+   // Decode Option<u64> Some
+   BOOST_CHECK_EQUAL(dec.read_u8(), 1);
+   BOOST_CHECK_EQUAL(dec.read_u64(), 42);
+
+   // Decode Option<u64> None
+   BOOST_CHECK_EQUAL(dec.read_u8(), 0);
+
+   // Decode Vec<u32>
+   uint32_t len = dec.read_u32();
+   BOOST_CHECK_EQUAL(len, 5u);
+   for (uint32_t i = 0; i < len; ++i) {
+      BOOST_CHECK_EQUAL(dec.read_u32(), i + 1);
+   }
+}
+
+BOOST_AUTO_TEST_CASE(test_idl_tuple_type) {
+   // Test parsing and handling tuple types
+   fc::mutable_variant_object tuple_type_obj;
+   fc::variants tuple_types;
+   tuple_types.push_back("u64");
+   tuple_types.push_back("bool");
+   tuple_types.push_back("string");
+   tuple_type_obj("tuple", tuple_types);
+
+   auto t = idl::idl_type::from_variant(fc::variant(tuple_type_obj));
+
+   BOOST_CHECK(t.is_tuple());
+   BOOST_CHECK(t.tuple_elements.has_value());
+   BOOST_CHECK_EQUAL(t.tuple_elements->size(), 3u);
+   BOOST_CHECK((*t.tuple_elements)[0].get_primitive() == idl::primitive_type::u64);
+   BOOST_CHECK((*t.tuple_elements)[1].get_primitive() == idl::primitive_type::bool_t);
+   BOOST_CHECK((*t.tuple_elements)[2].get_primitive() == idl::primitive_type::string);
+   BOOST_CHECK_EQUAL(t.to_string(), "(u64, bool, string)");
+}
+
+BOOST_AUTO_TEST_CASE(test_borsh_u256_i256_encode_decode) {
+   // Test encoding and decoding u256 and i256 types
+   borsh::encoder enc;
+
+   // Test u256 values
+   fc::uint256 u256_zero = 0;
+   fc::uint256 u256_one = 1;
+   fc::uint256 u256_large = fc::uint256("115792089237316195423570985008687907853269984665640564039457584007913129639935");
+
+   enc.write_u256(u256_zero);
+   enc.write_u256(u256_one);
+   enc.write_u256(u256_large);
+
+   // Test i256 values
+   fc::int256 i256_zero = 0;
+   fc::int256 i256_pos = fc::int256("12345678901234567890");
+   fc::int256 i256_neg = fc::int256("-12345678901234567890");
+
+   enc.write_i256(i256_zero);
+   enc.write_i256(i256_pos);
+   enc.write_i256(i256_neg);
+
+   auto encoded = enc.finish();
+
+   // Decode and verify
+   borsh::decoder dec(encoded);
+
+   // Verify u256 values
+   BOOST_CHECK_EQUAL(dec.read_u256(), u256_zero);
+   BOOST_CHECK_EQUAL(dec.read_u256(), u256_one);
+   BOOST_CHECK_EQUAL(dec.read_u256(), u256_large);
+
+   // Verify i256 values
+   BOOST_CHECK_EQUAL(dec.read_i256(), i256_zero);
+   BOOST_CHECK_EQUAL(dec.read_i256(), i256_pos);
+   BOOST_CHECK_EQUAL(dec.read_i256(), i256_neg);
+}
+
+BOOST_AUTO_TEST_CASE(test_anchor_idl_account_fields_in_types_section) {
+   // Test the new Anchor IDL format where account definitions only have
+   // name and discriminator, while the actual struct fields are in the types section
+   std::string idl_json = R"({
+      "address": "8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb",
+      "metadata": {
+         "name": "counter_anchor",
+         "version": "0.1.0",
+         "spec": "0.1.0"
+      },
+      "instructions": [],
+      "accounts": [
+         {
+            "name": "Counter",
+            "discriminator": [255, 176, 4, 245, 188, 253, 124, 25]
+         }
+      ],
+      "types": [
+         {
+            "name": "Counter",
+            "type": {
+               "kind": "struct",
+               "fields": [
+                  {"name": "count", "type": "u64"},
+                  {"name": "bump", "type": "u8"}
+               ]
+            }
+         }
+      ]
+   })";
+
+   fc::variant v = fc::json::from_string(idl_json);
+   auto prog = idl::parse_idl(v);
+
+   // Verify account was parsed (with empty fields since they're in types section)
+   BOOST_CHECK_EQUAL(prog.accounts.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.accounts[0].name, "Counter");
+   BOOST_CHECK(prog.accounts[0].fields.empty());  // Fields are NOT inline in new Anchor format
+
+   // Verify type was parsed with fields
+   BOOST_CHECK_EQUAL(prog.types.size(), 1u);
+   BOOST_CHECK_EQUAL(prog.types[0].name, "Counter");
+   BOOST_CHECK(prog.types[0].is_struct());
+   BOOST_CHECK_EQUAL(prog.types[0].struct_fields->size(), 2u);
+   BOOST_CHECK_EQUAL((*prog.types[0].struct_fields)[0].name, "count");
+   BOOST_CHECK((*prog.types[0].struct_fields)[0].type.get_primitive() == idl::primitive_type::u64);
+   BOOST_CHECK_EQUAL((*prog.types[0].struct_fields)[1].name, "bump");
+   BOOST_CHECK((*prog.types[0].struct_fields)[1].type.get_primitive() == idl::primitive_type::u8);
+
+   // Verify we can look up the type by account name
+   const idl::type_def* type_def = prog.find_type("Counter");
+   BOOST_CHECK(type_def != nullptr);
+   BOOST_CHECK(type_def->is_struct());
+   BOOST_CHECK_EQUAL(type_def->struct_fields->size(), 2u);
+
+   // Test decoding the account data using the type fields directly
+   // This simulates what decode_account_data does internally
+   std::vector<uint8_t> account_data;
+   // Discriminator
+   account_data.insert(account_data.end(), {255, 176, 4, 245, 188, 253, 124, 25});
+   // count: u64 = 42 (little-endian)
+   uint64_t count = 42;
+   for (size_t i = 0; i < 8; ++i) {
+      account_data.push_back(static_cast<uint8_t>((count >> (i * 8)) & 0xFF));
+   }
+   // bump: u8 = 253
+   account_data.push_back(253);
+
+   // Decode using borsh decoder with the type's fields
+   borsh::decoder decoder(account_data.data() + 8, account_data.size() - 8);
+
+   // Manually decode using the struct_fields from type_def
+   fc::mutable_variant_object result;
+   for (const auto& field : *type_def->struct_fields) {
+      if (field.type.get_primitive() == idl::primitive_type::u64) {
+         result(field.name, decoder.read_u64());
+      } else if (field.type.get_primitive() == idl::primitive_type::u8) {
+         result(field.name, decoder.read_u8());
+      }
+   }
+
+   // Verify decoded values
+   BOOST_CHECK_EQUAL(result["count"].as_uint64(), 42u);
+   BOOST_CHECK_EQUAL(result["bump"].as_uint64(), 253u);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

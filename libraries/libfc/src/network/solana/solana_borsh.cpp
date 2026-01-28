@@ -25,6 +25,16 @@ void encoder::write_u128(const fc::uint128& v) {
    write_u64(static_cast<uint64_t>(v >> 64));
 }
 
+void encoder::write_u256(const fc::uint256& v) {
+   // Write as little-endian: 4 x 64-bit chunks, lowest first
+   // Extract 64-bit chunks using boost multiprecision
+   fc::uint256 mask64 = std::numeric_limits<uint64_t>::max();
+   write_u64(static_cast<uint64_t>(v & mask64));
+   write_u64(static_cast<uint64_t>((v >> 64) & mask64));
+   write_u64(static_cast<uint64_t>((v >> 128) & mask64));
+   write_u64(static_cast<uint64_t>((v >> 192) & mask64));
+}
+
 void encoder::write_i8(int8_t v) { _buffer.push_back(static_cast<uint8_t>(v)); }
 
 void encoder::write_i16(int16_t v) { write_primitive(v); }
@@ -39,6 +49,24 @@ void encoder::write_i128(const fc::int128& v) {
    uint64_t high = static_cast<uint64_t>(v >> 64);
    write_u64(low);
    write_u64(high);
+}
+
+void encoder::write_i256(const fc::int256& v) {
+   // Write as little-endian using two's complement: 4 x 64-bit chunks
+   // Convert to unsigned for bit manipulation, preserving two's complement representation
+   fc::uint256 uv;
+   if (v >= 0) {
+      uv = fc::uint256(v);
+   } else {
+      // For negative values, we need the two's complement representation
+      // boost::multiprecision handles this correctly when casting
+      uv = fc::uint256(v);
+   }
+   fc::uint256 mask64 = std::numeric_limits<uint64_t>::max();
+   write_u64(static_cast<uint64_t>(uv & mask64));
+   write_u64(static_cast<uint64_t>((uv >> 64) & mask64));
+   write_u64(static_cast<uint64_t>((uv >> 128) & mask64));
+   write_u64(static_cast<uint64_t>((uv >> 192) & mask64));
 }
 
 void encoder::write_f32(float v) { write_primitive(v); }
@@ -86,6 +114,19 @@ fc::uint128 decoder::read_u128() {
    return (fc::uint128(high) << 64) | fc::uint128(low);
 }
 
+fc::uint256 decoder::read_u256() {
+   // Read 4 x 64-bit chunks in little-endian order
+   uint64_t chunk0 = read_u64();
+   uint64_t chunk1 = read_u64();
+   uint64_t chunk2 = read_u64();
+   uint64_t chunk3 = read_u64();
+   fc::uint256 result = fc::uint256(chunk3);
+   result = (result << 64) | fc::uint256(chunk2);
+   result = (result << 64) | fc::uint256(chunk1);
+   result = (result << 64) | fc::uint256(chunk0);
+   return result;
+}
+
 int8_t decoder::read_i8() {
    ensure_remaining(1);
    return static_cast<int8_t>(_data[_pos++]);
@@ -102,6 +143,22 @@ fc::int128 decoder::read_i128() {
    uint64_t high = read_u64();
    // Reconstruct two's complement signed value
    fc::int128 result = (fc::int128(static_cast<int64_t>(high)) << 64) | fc::int128(low);
+   return result;
+}
+
+fc::int256 decoder::read_i256() {
+   // Read 4 x 64-bit chunks in little-endian order
+   uint64_t chunk0 = read_u64();
+   uint64_t chunk1 = read_u64();
+   uint64_t chunk2 = read_u64();
+   uint64_t chunk3 = read_u64();
+
+   // Reconstruct the value, treating the highest chunk as signed for sign extension
+   // Similar to how read_i128 handles sign via int64_t cast of high bits
+   fc::int256 result = fc::int256(static_cast<int64_t>(chunk3));
+   result = (result << 64) | fc::int256(chunk2);
+   result = (result << 64) | fc::int256(chunk1);
+   result = (result << 64) | fc::int256(chunk0);
    return result;
 }
 

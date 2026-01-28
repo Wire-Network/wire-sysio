@@ -2,6 +2,7 @@
 #include <fc/network/solana/solana_client.hpp>
 
 #include <fc/crypto/base64.hpp>
+#include <fc/int256.hpp>
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
@@ -121,6 +122,203 @@ const idl::instruction& solana_program_client::get_idl(const std::string& instru
    return _idl_map.readable().at(instruction_name);
 }
 
+void solana_program_client::encode_type(borsh::encoder& encoder, const fc::variant& value,
+                                         const idl::idl_type& type) {
+   if (type.is_primitive()) {
+      switch (type.get_primitive()) {
+         case idl::primitive_type::bool_t:
+            encoder.write_bool(value.as_bool());
+            break;
+         case idl::primitive_type::u8:
+            encoder.write_u8(static_cast<uint8_t>(value.as_uint64()));
+            break;
+         case idl::primitive_type::u16:
+            encoder.write_u16(static_cast<uint16_t>(value.as_uint64()));
+            break;
+         case idl::primitive_type::u32:
+            encoder.write_u32(static_cast<uint32_t>(value.as_uint64()));
+            break;
+         case idl::primitive_type::u64:
+            encoder.write_u64(value.as_uint64());
+            break;
+         case idl::primitive_type::u128:
+            encoder.write_u128(fc::uint128(value.as_string()));
+            break;
+         case idl::primitive_type::u256:
+            encoder.write_u256(fc::to_uint256(value));
+            break;
+         case idl::primitive_type::i8:
+            encoder.write_i8(static_cast<int8_t>(value.as_int64()));
+            break;
+         case idl::primitive_type::i16:
+            encoder.write_i16(static_cast<int16_t>(value.as_int64()));
+            break;
+         case idl::primitive_type::i32:
+            encoder.write_i32(static_cast<int32_t>(value.as_int64()));
+            break;
+         case idl::primitive_type::i64:
+            encoder.write_i64(value.as_int64());
+            break;
+         case idl::primitive_type::i128:
+            encoder.write_i128(fc::int128(value.as_string()));
+            break;
+         case idl::primitive_type::i256:
+            encoder.write_i256(fc::to_int256(value));
+            break;
+         case idl::primitive_type::f32:
+            encoder.write_f32(static_cast<float>(value.as_double()));
+            break;
+         case idl::primitive_type::f64:
+            encoder.write_f64(value.as_double());
+            break;
+         case idl::primitive_type::string:
+            encoder.write_string(value.as_string());
+            break;
+         case idl::primitive_type::bytes: {
+            if (value.is_blob()) {
+               auto blob = value.as_blob();
+               std::vector<uint8_t> bytes(blob.data.begin(), blob.data.end());
+               encoder.write_bytes(bytes);
+            } else if (value.is_array()) {
+               // Array of u8 values
+               auto arr = value.get_array();
+               std::vector<uint8_t> bytes;
+               bytes.reserve(arr.size());
+               for (const auto& elem : arr) {
+                  bytes.push_back(static_cast<uint8_t>(elem.as_uint64()));
+               }
+               encoder.write_bytes(bytes);
+            } else {
+               // Assume base64 encoded string
+               auto decoded = fc::base64_decode(value.as_string());
+               std::vector<uint8_t> bytes(reinterpret_cast<const uint8_t*>(decoded.data()),
+                                          reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
+               encoder.write_bytes(bytes);
+            }
+            break;
+         }
+         case idl::primitive_type::pubkey: {
+            // Handle pubkey as base58 string or as object with data field
+            if (value.is_string()) {
+               encoder.write_pubkey(pubkey::from_base58(value.as_string()));
+            } else if (value.is_object()) {
+               auto obj = value.get_object();
+               if (obj.contains("data")) {
+                  // pubkey struct with data array
+                  auto data_arr = obj["data"].get_array();
+                  pubkey pk;
+                  for (size_t i = 0; i < 32 && i < data_arr.size(); ++i) {
+                     pk.data[i] = static_cast<uint8_t>(data_arr[i].as_uint64());
+                  }
+                  encoder.write_pubkey(pk);
+               } else {
+                  FC_THROW("Invalid pubkey object format");
+               }
+            } else {
+               FC_THROW("Invalid pubkey value type");
+            }
+            break;
+         }
+         default:
+            FC_THROW("Unsupported primitive type: ${t}", ("t", static_cast<int>(type.get_primitive())));
+      }
+   } else if (type.is_option()) {
+      if (value.is_null()) {
+         encoder.write_u8(0);  // None
+      } else {
+         encoder.write_u8(1);  // Some
+         encode_type(encoder, value, *type.option_inner);
+      }
+   } else if (type.is_vec()) {
+      FC_ASSERT(value.is_array(), "Expected array for Vec type");
+      auto arr = value.get_array();
+      encoder.write_u32(static_cast<uint32_t>(arr.size()));
+      for (const auto& elem : arr) {
+         encode_type(encoder, elem, *type.vec_element);
+      }
+   } else if (type.is_array()) {
+      FC_ASSERT(value.is_array(), "Expected array for fixed array type");
+      auto arr = value.get_array();
+      FC_ASSERT(arr.size() == *type.array_len,
+                "Array size mismatch: expected ${expected}, got ${actual}",
+                ("expected", *type.array_len)("actual", arr.size()));
+      for (const auto& elem : arr) {
+         encode_type(encoder, elem, *type.array_element);
+      }
+   } else if (type.is_tuple()) {
+      FC_ASSERT(value.is_array(), "Expected array for tuple type");
+      auto arr = value.get_array();
+      FC_ASSERT(arr.size() == type.tuple_elements->size(),
+                "Tuple size mismatch: expected ${expected}, got ${actual}",
+                ("expected", type.tuple_elements->size())("actual", arr.size()));
+      for (size_t i = 0; i < arr.size(); ++i) {
+         encode_type(encoder, arr[i], (*type.tuple_elements)[i]);
+      }
+   } else if (type.is_defined() && _program) {
+      // Look up the type definition
+      const idl::type_def* type_def = _program->find_type(type.get_defined_name());
+      FC_ASSERT(type_def, "Type '${name}' not found in IDL", ("name", type.get_defined_name()));
+
+      if (type_def->is_struct() && type_def->struct_fields) {
+         encode_fields(encoder, value, *type_def->struct_fields);
+      } else if (type_def->is_enum() && type_def->enum_variants) {
+         // For enums, expect either:
+         // 1. {"variant": "VariantName", "fields": {...}} format
+         // 2. Just the variant name as string for unit variants
+         if (value.is_string()) {
+            // Find variant index by name
+            std::string variant_name = value.as_string();
+            for (size_t i = 0; i < type_def->enum_variants->size(); ++i) {
+               if ((*type_def->enum_variants)[i].name == variant_name) {
+                  encoder.write_u8(static_cast<uint8_t>(i));
+                  return;
+               }
+            }
+            FC_THROW("Unknown enum variant: ${name}", ("name", variant_name));
+         } else if (value.is_object()) {
+            auto obj = value.get_object();
+            FC_ASSERT(obj.contains("variant"), "Enum object must have 'variant' field");
+            std::string variant_name = obj["variant"].as_string();
+
+            for (size_t i = 0; i < type_def->enum_variants->size(); ++i) {
+               if ((*type_def->enum_variants)[i].name == variant_name) {
+                  encoder.write_u8(static_cast<uint8_t>(i));
+                  // Encode variant fields if present
+                  const auto& variant = (*type_def->enum_variants)[i];
+                  if (variant.fields && !variant.fields->empty()) {
+                     FC_ASSERT(obj.contains("fields"), "Enum variant '${name}' requires fields",
+                               ("name", variant_name));
+                     encode_fields(encoder, obj["fields"], *variant.fields);
+                  }
+                  return;
+               }
+            }
+            FC_THROW("Unknown enum variant: ${name}", ("name", variant_name));
+         } else {
+            FC_THROW("Invalid enum value format");
+         }
+      } else {
+         FC_THROW("Type '${name}' is not a struct or enum", ("name", type.get_defined_name()));
+      }
+   } else if (type.is_defined()) {
+      FC_THROW("Cannot encode defined type '${name}' without IDL program loaded",
+               ("name", type.get_defined_name()));
+   } else {
+      FC_THROW("Cannot encode type: ${t}", ("t", type.to_string()));
+   }
+}
+
+void solana_program_client::encode_fields(borsh::encoder& encoder, const fc::variant& value,
+                                           const std::vector<idl::field>& fields) {
+   FC_ASSERT(value.is_object(), "Expected object for struct/fields encoding");
+   auto obj = value.get_object();
+
+   for (auto& field : fields) {
+      FC_ASSERT(obj.contains(field.name), "Missing required field: ${name}", ("name", field.name));
+      encode_type(encoder, obj[field.name], field.type);
+   }
+}
+
 std::vector<uint8_t> solana_program_client::build_instruction_data(const idl::instruction& instr,
                                                                    const program_invoke_data_items& params) {
    borsh::encoder encoder;
@@ -134,143 +332,7 @@ std::vector<uint8_t> solana_program_client::build_instruction_data(const idl::in
              ("expected", instr.args.size())("actual", params.size()));
 
    for (size_t i = 0; i < params.size(); ++i) {
-      const auto& arg = instr.args[i];
-      const auto& param = params[i];
-
-      // Encode based on IDL type
-      if (arg.type.is_primitive()) {
-         switch (arg.type.get_primitive()) {
-            case idl::primitive_type::bool_t:
-               encoder.write_bool(param.as_bool());
-               break;
-            case idl::primitive_type::u8:
-               encoder.write_u8(param.as_uint64());
-               break;
-            case idl::primitive_type::u16:
-               encoder.write_u16(param.as_uint64());
-               break;
-            case idl::primitive_type::u32:
-               encoder.write_u32(param.as_uint64());
-               break;
-            case idl::primitive_type::u64:
-               encoder.write_u64(param.as_uint64());
-               break;
-            case idl::primitive_type::u128:
-               encoder.write_u128(fc::uint128(param.as_string()));
-               break;
-            case idl::primitive_type::i8:
-               encoder.write_i8(param.as_int64());
-               break;
-            case idl::primitive_type::i16:
-               encoder.write_i16(param.as_int64());
-               break;
-            case idl::primitive_type::i32:
-               encoder.write_i32(param.as_int64());
-               break;
-            case idl::primitive_type::i64:
-               encoder.write_i64(param.as_int64());
-               break;
-            case idl::primitive_type::i128:
-               encoder.write_i128(fc::int128(param.as_string()));
-               break;
-            case idl::primitive_type::f32:
-               encoder.write_f32(static_cast<float>(param.as_double()));
-               break;
-            case idl::primitive_type::f64:
-               encoder.write_f64(param.as_double());
-               break;
-            case idl::primitive_type::string:
-               encoder.write_string(param.as_string());
-               break;
-            case idl::primitive_type::bytes: {
-               if (param.is_blob()) {
-                  auto blob = param.as_blob();
-                  std::vector<uint8_t> bytes(blob.data.begin(), blob.data.end());
-                  encoder.write_bytes(bytes);
-               } else {
-                  // Assume base64 encoded string
-                  auto decoded = fc::base64_decode(param.as_string());
-                  std::vector<uint8_t> bytes(reinterpret_cast<const uint8_t*>(decoded.data()),
-                                             reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
-                  encoder.write_bytes(bytes);
-               }
-               break;
-            }
-            case idl::primitive_type::pubkey: {
-               pubkey pk = pubkey::from_base58(param.as_string());
-               encoder.write_pubkey(pk);
-               break;
-            }
-            default:
-               FC_THROW("Unsupported primitive type in IDL: ${type}", ("type", static_cast<int>(arg.type.get_primitive())));
-         }
-      } else if (arg.type.is_vec()) {
-         // Handle vector types - write length prefix then elements
-         auto arr = param.get_array();
-         encoder.write_u32(static_cast<uint32_t>(arr.size()));
-
-         // For simplicity, handle common vector element types
-         if (arg.type.vec_element && arg.type.vec_element->is_primitive()) {
-            switch (arg.type.vec_element->get_primitive()) {
-               case idl::primitive_type::u8:
-                  for (const auto& elem : arr) {
-                     encoder.write_u8(elem.as_uint64());
-                  }
-                  break;
-               case idl::primitive_type::u64:
-                  for (const auto& elem : arr) {
-                     encoder.write_u64(elem.as_uint64());
-                  }
-                  break;
-               case idl::primitive_type::pubkey:
-                  for (const auto& elem : arr) {
-                     encoder.write_pubkey(pubkey::from_base58(elem.as_string()));
-                  }
-                  break;
-               default:
-                  FC_THROW("Unsupported vector element type");
-            }
-         }
-      } else if (arg.type.is_option()) {
-         // Handle option types
-         if (param.is_null()) {
-            encoder.write_u8(0);  // None
-         } else {
-            encoder.write_u8(1);  // Some
-            // Encode the inner value
-            if (arg.type.option_inner && arg.type.option_inner->is_primitive()) {
-               switch (arg.type.option_inner->get_primitive()) {
-                  case idl::primitive_type::u64:
-                     encoder.write_u64(param.as_uint64());
-                     break;
-                  case idl::primitive_type::pubkey:
-                     encoder.write_pubkey(pubkey::from_base58(param.as_string()));
-                     break;
-                  default:
-                     FC_THROW("Unsupported option inner type");
-               }
-            }
-         }
-      } else if (arg.type.is_array()) {
-         // Handle fixed-size arrays
-         auto arr = param.get_array();
-         FC_ASSERT(arr.size() == *arg.type.array_len, "Array size mismatch: expected ${expected}, got ${actual}",
-                   ("expected", *arg.type.array_len)("actual", arr.size()));
-
-         if (arg.type.array_element && arg.type.array_element->is_primitive()) {
-            switch (arg.type.array_element->get_primitive()) {
-               case idl::primitive_type::u8:
-                  for (const auto& elem : arr) {
-                     encoder.write_u8(elem.as_uint64());
-                  }
-                  break;
-               default:
-                  FC_THROW("Unsupported array element type");
-            }
-         }
-      } else {
-         FC_THROW("Unsupported IDL type kind for argument: ${name}", ("name", arg.name));
-      }
+      encode_type(encoder, params[i], instr.args[i].type);
    }
 
    return encoder.finish();
@@ -336,6 +398,8 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
             return fc::variant(decoder.read_u64());
          case idl::primitive_type::u128:
             return fc::variant(decoder.read_u128().str());
+         case idl::primitive_type::u256:
+            return fc::variant(decoder.read_u256().str());
          case idl::primitive_type::i8:
             return fc::variant(static_cast<int64_t>(decoder.read_i8()));
          case idl::primitive_type::i16:
@@ -346,6 +410,8 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
             return fc::variant(decoder.read_i64());
          case idl::primitive_type::i128:
             return fc::variant(decoder.read_i128().str());
+         case idl::primitive_type::i256:
+            return fc::variant(decoder.read_i256().str());
          case idl::primitive_type::f32:
             return fc::variant(static_cast<double>(decoder.read_f32()));
          case idl::primitive_type::f64:
@@ -389,16 +455,31 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
          arr.push_back(decode_type(decoder, *type.array_element));
       }
       return fc::variant(arr);
-   } else if (type.is_defined() && _program) {
+   } else if (type.is_tuple() && type.tuple_elements) {
+      fc::variants arr;
+      arr.reserve(type.tuple_elements->size());
+
+      // Decode each tuple element
+      for (const auto& elem_type : *type.tuple_elements) {
+         arr.push_back(decode_type(decoder, elem_type));
+      }
+      return fc::variant(arr);
+   } else if (type.is_defined()) {
+      FC_ASSERT(_program, "Cannot decode defined type '${name}' without IDL program loaded",
+                ("name", type.get_defined_name()));
+
       // Look up the type definition and decode
       const idl::type_def* type_def = _program->find_type(type.get_defined_name());
-      if (type_def && type_def->is_struct() && type_def->struct_fields) {
+      FC_ASSERT(type_def, "Type '${name}' not found in IDL", ("name", type.get_defined_name()));
+
+      if (type_def->is_struct() && type_def->struct_fields) {
          return decode_fields(decoder, *type_def->struct_fields);
-      } else if (type_def && type_def->is_enum() && type_def->enum_variants) {
+      } else if (type_def->is_enum() && type_def->enum_variants) {
          // Decode enum variant index
          uint8_t variant_idx = decoder.read_u8();
-         FC_ASSERT(variant_idx < type_def->enum_variants->size(), "Invalid enum variant index: ${idx}",
-                   ("idx", variant_idx));
+         FC_ASSERT(variant_idx < type_def->enum_variants->size(),
+                   "Invalid enum variant index ${idx} for type '${name}' (max: ${max})",
+                   ("idx", variant_idx)("name", type.get_defined_name())("max", type_def->enum_variants->size() - 1));
 
          const auto& variant = (*type_def->enum_variants)[variant_idx];
          fc::mutable_variant_object obj;
@@ -409,6 +490,8 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
             obj("fields", decode_fields(decoder, *variant.fields));
          }
          return fc::variant(obj);
+      } else {
+         FC_THROW("Type '${name}' is neither a struct nor an enum", ("name", type.get_defined_name()));
       }
    }
 
@@ -443,8 +526,20 @@ fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t
    // Create decoder starting after discriminator
    borsh::decoder decoder(data.data() + 8, data.size() - 8);
 
+   // Get fields - either from account definition or from corresponding type definition
+   // In Anchor IDL format, the accounts section only has name/discriminator,
+   // while the actual struct fields are defined in the types section with the same name
+   const std::vector<idl::field>* fields = &account->fields;
+   if (fields->empty()) {
+      const idl::type_def* type_def = _program->find_type(account_name);
+      FC_ASSERT(type_def, "Type definition '${name}' not found in IDL for account with no inline fields",
+                ("name", account_name));
+      FC_ASSERT(type_def->is_struct(), "Type '${name}' is not a struct", ("name", account_name));
+      fields = &(*type_def->struct_fields);
+   }
+
    // Decode all fields
-   return decode_fields(decoder, account->fields);
+   return decode_fields(decoder, *fields);
 }
 
 fc::variant solana_program_client::execute_call(const idl::instruction& instr,

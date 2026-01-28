@@ -238,7 +238,10 @@ namespace fc
       return end();
    }
 
-   bool   mutable_variant_object::contains( const char* key )  { return find(key) != end(); };
+   bool   mutable_variant_object::contains( const char* key )  { return find(key) != end(); }
+   bool mutable_variant_object::contains(const std::string& key) {
+      return contains(key.c_str());
+   };
 
    const variant& mutable_variant_object::operator[]( const std::string& key )const
    {

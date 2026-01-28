@@ -11,6 +11,7 @@
 
 #include <fc/exception/exception.hpp>
 #include <fc/int128.hpp>
+#include <fc/int256.hpp>
 #include <fc/variant.hpp>
 
 namespace fc::network::solana::borsh {
@@ -33,6 +34,7 @@ public:
    void write_u32(uint32_t v);
    void write_u64(uint64_t v);
    void write_u128(const fc::uint128& v);
+   void write_u256(const fc::uint256& v);
 
    // Signed integers (little-endian, two's complement)
    void write_i8(int8_t v);
@@ -40,6 +42,7 @@ public:
    void write_i32(int32_t v);
    void write_i64(int64_t v);
    void write_i128(const fc::int128& v);
+   void write_i256(const fc::int256& v);
 
    // Floating point (IEEE 754, little-endian)
    void write_f32(float v);
@@ -116,6 +119,7 @@ public:
    uint32_t read_u32();
    uint64_t read_u64();
    fc::uint128 read_u128();
+   fc::uint256 read_u256();
 
    // Signed integers
    int8_t read_i8();
@@ -123,6 +127,7 @@ public:
    int32_t read_i32();
    int64_t read_i64();
    fc::int128 read_i128();
+   fc::int256 read_i256();
 
    // Floating point
    float read_f32();
