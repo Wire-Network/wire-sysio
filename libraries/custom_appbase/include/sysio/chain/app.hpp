@@ -3,7 +3,9 @@
 #include <sysio/chain/priority_queue_executor.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/version/version.hpp>
+#if __has_include(<sysio/http_plugin/http_plugin.hpp>)
 #include <sysio/http_plugin/http_plugin.hpp>
+#endif
 #if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #endif
@@ -152,11 +154,13 @@ public:
       auto home = fc::home_path();
       app_->set_default_data_dir(home / ".config" / "wire" / exe_name_ / "data");
       app_->set_default_config_dir(home / ".config" / "wire" / exe_name_ / "config");
+#if __has_include(<sysio/http_plugin/http_plugin.hpp>)
       http_plugin::set_defaults({
          .default_unix_socket_path = "",
          .default_http_port = cfg_.default_http_port,
          .server_header = exe_name_ + "/" + app_->version_string()
       });
+#endif
    }
    application(const application&) = delete;
    application& operator=(const application&) = delete;
@@ -175,6 +179,13 @@ public:
    exit_code::exit_code init(int argc, char** argv) {
       try {
          auto init_logging = [cfg=cfg_]() { initialize_logging(cfg); };
+         (
+            [] {
+               if (app().find_plugin<Plugin>() == nullptr) {
+                  appbase::application::register_plugin<Plugin>();
+               }
+            }(), ...
+         );
          if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {
