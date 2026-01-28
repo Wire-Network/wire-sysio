@@ -168,7 +168,7 @@ double decoder::read_f64() { return read_primitive<double>(); }
 
 bool decoder::read_bool() {
    uint8_t v = read_u8();
-   FC_ASSERT(v <= 1, "Invalid boolean value: ${v}", ("v", v));
+   FC_ASSERT(v <= 1, "Invalid boolean value: {}", v);
    return v != 0;
 }
 

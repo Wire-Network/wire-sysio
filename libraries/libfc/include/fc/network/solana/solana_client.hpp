@@ -868,8 +868,8 @@ RT solana_program_client::get_account_data(const std::string& account_name, cons
                                             commitment_t commitment) {
    // Fetch account info from the network
    auto account_info = client->get_account_info(address, commitment);
-   FC_ASSERT(account_info.has_value(), "Account not found: ${addr}", ("addr", address.to_base58()));
-   FC_ASSERT(!account_info->data.empty(), "Account has no data: ${addr}", ("addr", address.to_base58()));
+   FC_ASSERT(account_info.has_value(), "Account not found: {}", address.to_base58());
+   FC_ASSERT(!account_info->data.empty(), "Account has no data: {}", address.to_base58());
 
    // Decode using IDL
    auto res_var = decode_account_data(account_info->data, account_name);
@@ -892,8 +892,8 @@ solana_program_account_data_fn<RT> solana_program_client::create_account_data_ge
    return [this, type_name, address](commitment_t commitment = commitment_t::finalized) -> RT {
       // Fetch account info from the network
       auto account_info = client->get_account_info(address, commitment);
-      FC_ASSERT(account_info.has_value(), "Account not found: ${addr}", ("addr", address.to_base58()));
-      FC_ASSERT(!account_info->data.empty(), "Account has no data: ${addr}", ("addr", address.to_base58()));
+      FC_ASSERT(account_info.has_value(), "Account not found: {}", address.to_base58());
+      FC_ASSERT(!account_info->data.empty(), "Account has no data: {}", address.to_base58());
 
       // Decode using IDL
       auto res_var = decode_account_data(account_info->data, type_name);

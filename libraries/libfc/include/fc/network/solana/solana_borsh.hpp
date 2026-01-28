@@ -193,8 +193,7 @@ private:
    size_t _pos;
 
    void ensure_remaining(size_t n) const {
-      FC_ASSERT(_pos + n <= _size, "Borsh decoder: not enough data, need ${n} bytes, have ${r}",
-                ("n", n)("r", remaining()));
+      FC_ASSERT(_pos + n <= _size, "Borsh decoder: not enough data, need {} bytes, have {}", n, remaining());
    }
 
    // Helper to read primitive type
@@ -318,7 +317,7 @@ std::optional<T> decoder::read_option() {
    if (has_value == 0) {
       return std::nullopt;
    }
-   FC_ASSERT(has_value == 1, "Invalid option discriminator: ${v}", ("v", has_value));
+   FC_ASSERT(has_value == 1, "Invalid option discriminator: {}", has_value);
 
    if constexpr (std::is_same_v<T, uint8_t>) {
       return read_u8();

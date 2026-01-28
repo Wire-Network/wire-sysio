@@ -43,8 +43,8 @@ std::vector<uint8_t> solana_program_data_client::call(const instruction_data_t& 
 
       // Check for simulation error
       if (value_obj.contains("err") && !value_obj["err"].is_null()) {
-         FC_THROW("Transaction simulation failed: ${err}",
-                  ("err", fc::json::to_string(value_obj["err"], fc::json::yield_function_t{})));
+         FC_THROW("Transaction simulation failed: {}",
+                  fc::json::to_string(value_obj["err"], fc::json::yield_function_t{}));
       }
 
       // Extract return data if present
@@ -220,7 +220,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
             break;
          }
          default:
-            FC_THROW("Unsupported primitive type: ${t}", ("t", static_cast<int>(type.get_primitive())));
+            FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
       }
    } else if (type.is_option()) {
       if (value.is_null()) {
@@ -240,8 +240,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
       FC_ASSERT(value.is_array(), "Expected array for fixed array type");
       auto arr = value.get_array();
       FC_ASSERT(arr.size() == *type.array_len,
-                "Array size mismatch: expected ${expected}, got ${actual}",
-                ("expected", *type.array_len)("actual", arr.size()));
+                "Array size mismatch: expected {}, got {}", *type.array_len, arr.size());
       for (const auto& elem : arr) {
          encode_type(encoder, elem, *type.array_element);
       }
@@ -249,15 +248,14 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
       FC_ASSERT(value.is_array(), "Expected array for tuple type");
       auto arr = value.get_array();
       FC_ASSERT(arr.size() == type.tuple_elements->size(),
-                "Tuple size mismatch: expected ${expected}, got ${actual}",
-                ("expected", type.tuple_elements->size())("actual", arr.size()));
+                "Tuple size mismatch: expected {}, got {}", type.tuple_elements->size(), arr.size());
       for (size_t i = 0; i < arr.size(); ++i) {
          encode_type(encoder, arr[i], (*type.tuple_elements)[i]);
       }
    } else if (type.is_defined() && _program) {
       // Look up the type definition
       const idl::type_def* type_def = _program->find_type(type.get_defined_name());
-      FC_ASSERT(type_def, "Type '${name}' not found in IDL", ("name", type.get_defined_name()));
+      FC_ASSERT(type_def, "Type '{}' not found in IDL", type.get_defined_name());
 
       if (type_def->is_struct() && type_def->struct_fields) {
          encode_fields(encoder, value, *type_def->struct_fields);
@@ -274,7 +272,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
                   return;
                }
             }
-            FC_THROW("Unknown enum variant: ${name}", ("name", variant_name));
+            FC_THROW("Unknown enum variant: {}", variant_name);
          } else if (value.is_object()) {
             auto obj = value.get_object();
             FC_ASSERT(obj.contains("variant"), "Enum object must have 'variant' field");
@@ -286,25 +284,23 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
                   // Encode variant fields if present
                   const auto& variant = (*type_def->enum_variants)[i];
                   if (variant.fields && !variant.fields->empty()) {
-                     FC_ASSERT(obj.contains("fields"), "Enum variant '${name}' requires fields",
-                               ("name", variant_name));
+                     FC_ASSERT(obj.contains("fields"), "Enum variant '{}' requires fields", variant_name);
                      encode_fields(encoder, obj["fields"], *variant.fields);
                   }
                   return;
                }
             }
-            FC_THROW("Unknown enum variant: ${name}", ("name", variant_name));
+            FC_THROW("Unknown enum variant: {}", variant_name);
          } else {
             FC_THROW("Invalid enum value format");
          }
       } else {
-         FC_THROW("Type '${name}' is not a struct or enum", ("name", type.get_defined_name()));
+         FC_THROW("Type '{}' is not a struct or enum", type.get_defined_name());
       }
    } else if (type.is_defined()) {
-      FC_THROW("Cannot encode defined type '${name}' without IDL program loaded",
-               ("name", type.get_defined_name()));
+      FC_THROW("Cannot encode defined type '{}' without IDL program loaded", type.get_defined_name());
    } else {
-      FC_THROW("Cannot encode type: ${t}", ("t", type.to_string()));
+      FC_THROW("Cannot encode type: {}", type.to_string());
    }
 }
 
@@ -314,7 +310,7 @@ void solana_program_client::encode_fields(borsh::encoder& encoder, const fc::var
    auto obj = value.get_object();
 
    for (auto& field : fields) {
-      FC_ASSERT(obj.contains(field.name), "Missing required field: ${name}", ("name", field.name));
+      FC_ASSERT(obj.contains(field.name), "Missing required field: {}", field.name);
       encode_type(encoder, obj[field.name], field.type);
    }
 }
@@ -328,8 +324,7 @@ std::vector<uint8_t> solana_program_client::build_instruction_data(const idl::in
 
    // Encode parameters based on IDL argument types
    FC_ASSERT(params.size() <= instr.args.size(),
-             "Too many parameters: expected at most ${expected}, got ${actual}",
-             ("expected", instr.args.size())("actual", params.size()));
+             "Too many parameters: expected at most {}, got {}", instr.args.size(), params.size());
 
    for (size_t i = 0; i < params.size(); ++i) {
       encode_type(encoder, params[i], instr.args[i].type);
@@ -360,8 +355,8 @@ std::vector<uint8_t> solana_program_client::extract_return_data(const fc::varian
 
    // Check for simulation error
    if (value_obj.contains("err") && !value_obj["err"].is_null()) {
-      FC_THROW("Transaction simulation failed: ${err}",
-               ("err", fc::json::to_string(value_obj["err"], fc::json::yield_function_t{})));
+      FC_THROW("Transaction simulation failed: {}",
+               fc::json::to_string(value_obj["err"], fc::json::yield_function_t{}));
    }
 
    // Extract return data if present
@@ -426,14 +421,14 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
          case idl::primitive_type::pubkey:
             return fc::variant(decoder.read_pubkey().to_base58());
          default:
-            FC_THROW("Unsupported primitive type: ${t}", ("t", static_cast<int>(type.get_primitive())));
+            FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
       }
    } else if (type.is_option()) {
       uint8_t has_value = decoder.read_u8();
       if (has_value == 0) {
          return fc::variant();  // null
       }
-      FC_ASSERT(has_value == 1, "Invalid option discriminator: ${v}", ("v", has_value));
+      FC_ASSERT(has_value == 1, "Invalid option discriminator: {}", has_value);
       // Recursively decode the inner type
       return decode_type(decoder, *type.option_inner);
    } else if (type.is_vec()) {
@@ -465,12 +460,12 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       }
       return fc::variant(arr);
    } else if (type.is_defined()) {
-      FC_ASSERT(_program, "Cannot decode defined type '${name}' without IDL program loaded",
-                ("name", type.get_defined_name()));
+      FC_ASSERT(_program, "Cannot decode defined type '{}' without IDL program loaded",
+                type.get_defined_name());
 
       // Look up the type definition and decode
       const idl::type_def* type_def = _program->find_type(type.get_defined_name());
-      FC_ASSERT(type_def, "Type '${name}' not found in IDL", ("name", type.get_defined_name()));
+      FC_ASSERT(type_def, "Type '{}' not found in IDL", type.get_defined_name());
 
       if (type_def->is_struct() && type_def->struct_fields) {
          return decode_fields(decoder, *type_def->struct_fields);
@@ -478,8 +473,8 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
          // Decode enum variant index
          uint8_t variant_idx = decoder.read_u8();
          FC_ASSERT(variant_idx < type_def->enum_variants->size(),
-                   "Invalid enum variant index ${idx} for type '${name}' (max: ${max})",
-                   ("idx", variant_idx)("name", type.get_defined_name())("max", type_def->enum_variants->size() - 1));
+                   "Invalid enum variant index {} for type '{}' (max: {})",
+                   variant_idx, type.get_defined_name(), type_def->enum_variants->size() - 1);
 
          const auto& variant = (*type_def->enum_variants)[variant_idx];
          fc::mutable_variant_object obj;
@@ -491,11 +486,11 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
          }
          return fc::variant(obj);
       } else {
-         FC_THROW("Type '${name}' is neither a struct nor an enum", ("name", type.get_defined_name()));
+         FC_THROW("Type '{}' is neither a struct nor an enum", type.get_defined_name());
       }
    }
 
-   FC_THROW("Cannot decode type: ${t}", ("t", type.to_string()));
+   FC_THROW("Cannot decode type: {}", type.to_string());
 }
 
 fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const std::vector<idl::field>& fields) {
@@ -511,16 +506,16 @@ fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t
    FC_ASSERT(_program, "No IDL program loaded");
 
    const idl::account* account = _program->find_account(account_name);
-   FC_ASSERT(account, "Account type '${name}' not found in IDL", ("name", account_name));
+   FC_ASSERT(account, "Account type '{}' not found in IDL", account_name);
 
    // Verify minimum size (8-byte discriminator + at least some data)
-   FC_ASSERT(data.size() >= 8, "Account data too small: ${size} bytes", ("size", data.size()));
+   FC_ASSERT(data.size() >= 8, "Account data too small: {} bytes", data.size());
 
    // Verify discriminator
    for (size_t i = 0; i < 8; ++i) {
       FC_ASSERT(data[i] == account->discriminator[i],
-                "Account discriminator mismatch at byte ${i}: expected ${exp}, got ${got}",
-                ("i", i)("exp", static_cast<int>(account->discriminator[i]))("got", static_cast<int>(data[i])));
+                "Account discriminator mismatch at byte {}: expected {}, got {}",
+                i, static_cast<int>(account->discriminator[i]), static_cast<int>(data[i]));
    }
 
    // Create decoder starting after discriminator
@@ -532,9 +527,9 @@ fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t
    const std::vector<idl::field>* fields = &account->fields;
    if (fields->empty()) {
       const idl::type_def* type_def = _program->find_type(account_name);
-      FC_ASSERT(type_def, "Type definition '${name}' not found in IDL for account with no inline fields",
-                ("name", account_name));
-      FC_ASSERT(type_def->is_struct(), "Type '${name}' is not a struct", ("name", account_name));
+      FC_ASSERT(type_def, "Type definition '{}' not found in IDL for account with no inline fields",
+                account_name);
+      FC_ASSERT(type_def->is_struct(), "Type '{}' is not a struct", account_name);
       fields = &(*type_def->struct_fields);
    }
 
@@ -621,13 +616,13 @@ std::pair<pubkey, uint8_t> solana_program_client::derive_pda(const std::vector<i
                }
             } catch (...) {
                // path is not an index, skip for now
-               FC_THROW("Arg-based PDA seeds by name not yet supported: ${path}", ("path", seed.path));
+               FC_THROW("Arg-based PDA seeds by name not yet supported: {}", seed.path);
             }
             break;
          }
          case idl::pda_seed_kind::account: {
             // Account-based seed - requires account resolution first
-            FC_THROW("Account-based PDA seeds not yet supported: ${path}", ("path", seed.path));
+            FC_THROW("Account-based PDA seeds not yet supported: {}", seed.path);
          }
       }
    }
@@ -667,8 +662,7 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
          resolved = true;
       }
 
-      FC_ASSERT(resolved, "Could not resolve account '${name}' - provide it in account_overrides",
-                ("name", acct.name));
+      FC_ASSERT(resolved, "Could not resolve account '{}' - provide it in account_overrides", acct.name);
 
       // Create account_meta with correct flags
       if (acct.is_signer) {
@@ -1452,7 +1446,7 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
 
          // Check for error
          if (status.err.has_value()) {
-            FC_THROW("Transaction failed: ${err}", ("err", *status.err));
+            FC_THROW("Transaction failed: {}", *status.err);
          }
 
          // Check if confirmed at requested level
