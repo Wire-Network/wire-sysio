@@ -584,7 +584,7 @@ BOOST_AUTO_TEST_CASE(test_is_on_curve) {
    // Verify is_on_curve matches expected Solana behavior
    BOOST_CHECK(is_on_curve(compute_pda(255))); // ON curve
    BOOST_CHECK(is_on_curve(compute_pda(254))); // ON curve
-   BOOST_CHECK(is_on_curve(compute_pda(253))); // NOT on curve - valid PDA
+   BOOST_CHECK(!is_on_curve(compute_pda(253))); // NOT on curve - valid PDA
    BOOST_CHECK(is_on_curve(compute_pda(252))); // ON curve
 }
 
