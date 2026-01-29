@@ -4,6 +4,7 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/io/json.hpp>
+#include <fc/reflect/reflect.hpp>
 #include <fc/time.hpp>
 
 #include <fc/log/logger_config.hpp>
@@ -199,7 +200,7 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
       if (!is_initialized()) {
          return 0;
       }
-      return get_counter(commitment_t::finalized)["count"].as_uint64();
+      return get_counter(commitment_t::confirmed)["count"].as_uint64();
    }
 
    /**
@@ -212,6 +213,60 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
          return fc::variant();
       }
       return get_account_data<fc::variant>("Counter", counter_pda);
+   }
+};
+
+/**
+ * @brief Typed account data struct matching the Anchor IDL Counter type
+ *
+ * Fields correspond to types["Counter"] in the IDL:
+ *   { "name": "count", "type": "u64" }
+ *   { "name": "bump",  "type": "u8"  }
+ */
+struct account_counter_data {
+   uint64_t count = 0;
+   uint8_t bump = 0;
+};
+FC_REFLECT(account_counter_data, (count)(bump))
+
+/**
+ * @brief Typed client for the Anchor-based counter program
+ *
+ * Same as solana_program_test_counter_anchor_client but uses a strongly-typed
+ * account_counter_data struct instead of fc::variant for get_counter.
+ */
+struct solana_program_test_counter_anchor_typed_client : fc::network::solana::solana_program_client {
+   static constexpr const char* COUNTER_SEED = "counter";
+
+   solana_public_key counter_pda;
+   uint8_t counter_bump;
+
+   solana_program_tx_fn<std::string> initialize;
+   solana_program_tx_fn<std::string, uint64_t> increment;
+   solana_program_account_data_fn<account_counter_data> get_counter;
+
+   solana_program_test_counter_anchor_typed_client(const solana_client_ptr& client,
+                                                    const solana_public_key& program_id,
+                                                    const std::vector<idl::program>& idls = {})
+      : solana_program_client(client, program_id, idls) {
+      std::vector<std::vector<uint8_t>> seeds = {
+         std::vector<uint8_t>(COUNTER_SEED, COUNTER_SEED + strlen(COUNTER_SEED))};
+      std::tie(counter_pda, counter_bump) = system::find_program_address(seeds, program_id);
+
+      initialize = create_tx<std::string>(get_idl("initialize"));
+      increment = create_tx<std::string, uint64_t>(get_idl("increment"));
+      get_counter = create_account_data_get<account_counter_data>("Counter", counter_pda);
+   }
+
+   bool is_initialized() {
+      auto account_info = client->get_account_info(counter_pda);
+      return account_info.has_value() && !account_info->data.empty();
+   }
+
+   uint64_t get_counter_value() {
+      if (!is_initialized())
+         return 0;
+      return get_counter(commitment_t::confirmed).count;
    }
 };
 
@@ -282,28 +337,28 @@ int main(int argc, char* argv[]) {
       }
 
       // Test the raw counter program (non-Anchor)
-      // const pubkey counter_program_id = pubkey::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
-      // ilog("");
-      // ilog("=== Testing Raw Counter Program ===");
-      // ilog("Program ID: {}", counter_program_id.to_base58());
-      //
-      // auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
-      // ilog("Counter PDA: {}", raw_counter->counter_pda.to_base58());
-      //
-      // uint64_t current_value = raw_counter->get_counter_value();
-      // ilog("Current counter value: {}", current_value);
-      //
-      // // Increment the counter by 1
-      // ilog("Incrementing raw counter by 1...");
-      // try {
-      //    auto sig = raw_counter->increment(1);
-      //    ilog("Transaction signature: {}", sig);
-      //
-      //    uint64_t new_value = raw_counter->get_counter_value();
-      //    ilog("New counter value: {}", new_value);
-      // } catch (const fc::exception& e) {
-      //    wlog("Failed to increment raw counter: {}", e.to_detail_string());
-      // }
+      const solana_public_key counter_program_id = solana_public_key::from_base58("Cdea2BCiWYBPTQJQq2oWjn5vCkfgENSHNG4GVnWqSvyw");
+      ilog("");
+      ilog("=== Testing Raw Counter Program ===");
+      ilog("Program ID: {}", counter_program_id.to_base58());
+
+      auto raw_counter = client->get_data_program<solana_program_test_counter_data_client>(counter_program_id);
+      ilog("Counter PDA: {}", raw_counter->counter_pda.to_base58());
+
+      uint64_t current_value = raw_counter->get_counter_value();
+      ilog("Current counter value: {}", current_value);
+
+      // Increment the counter by 1
+      ilog("Incrementing raw counter by 1...");
+      try {
+         auto sig = raw_counter->increment(1);
+         ilog("Transaction signature: {}", sig);
+
+         uint64_t new_value = raw_counter->get_counter_value();
+         ilog("New counter value: {}", new_value);
+      } catch (const fc::exception& e) {
+         wlog("Failed to increment raw counter: {}", e.to_detail_string());
+      }
 
       // Test the Anchor counter program
       const solana_public_key anchor_counter_program_id = solana_public_key::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
@@ -340,9 +395,38 @@ int main(int argc, char* argv[]) {
 
       uint64_t new_anchor_value = anchor_counter->get_counter_value();
       ilog("New anchor counter value: {}", new_anchor_value);
-      // } catch (const fc::exception& e) {
-      //    wlog("Failed to increment anchor counter: {}", e.to_detail_string());
-      // }
+
+      // Test the typed Anchor counter client (strongly-typed account data)
+      ilog("");
+      ilog("=== Testing Anchor Counter Program (Typed Client) ===");
+      ilog("Program ID: {}", anchor_counter_program_id.to_base58());
+
+      auto typed_counter = client->get_program<solana_program_test_counter_anchor_typed_client>(
+         anchor_counter_program_id, all_idls);
+      ilog("Counter PDA: {}", typed_counter->counter_pda.to_base58());
+
+      bool typed_is_init = typed_counter->is_initialized();
+      ilog("Counter initialized: {}", typed_is_init ? "yes" : "no");
+
+      if (!typed_is_init) {
+         ilog("Initializing anchor counter (typed)...");
+         try {
+            auto typed_sig = typed_counter->initialize();
+            ilog("Initialize transaction signature: {}", typed_sig);
+         } catch (const fc::exception& e) {
+            wlog("Failed to initialize anchor counter (typed): {}", e.to_detail_string());
+         }
+      }
+
+      uint64_t typed_value = typed_counter->get_counter_value();
+      ilog("Current typed counter value: {}", typed_value);
+
+      ilog("Incrementing typed counter by 3...");
+      auto typed_sig = typed_counter->increment(3);
+      ilog("Transaction signature: {}", typed_sig);
+
+      uint64_t new_typed_value = typed_counter->get_counter_value();
+      ilog("New typed counter value: {}", new_typed_value);
 
       ilog("");
       ilog("Solana client tool completed successfully.");

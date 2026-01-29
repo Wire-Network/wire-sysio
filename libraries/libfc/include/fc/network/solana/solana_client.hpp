@@ -10,10 +10,12 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 
+#include <boost/core/demangle.hpp>
 #include <map>
 #include <memory>
 #include <optional>
 #include <string>
+#include <typeinfo>
 #include <variant>
 #include <vector>
 
@@ -103,7 +105,7 @@ public:
     * @return Raw return data from the simulated transaction
     */
    std::vector<uint8_t> call(const instruction_data_t& data, const std::vector<account_meta>& accounts,
-                             commitment_t commitment = commitment_t::finalized);
+                             commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Execute a program instruction as a transaction
@@ -126,7 +128,7 @@ public:
     * @return Transaction signature
     */
    std::string send_and_confirm_tx(const instruction_data_t& data, const std::vector<account_meta>& accounts,
-                                   commitment_t commitment = commitment_t::finalized);
+                                   commitment_t commitment = commitment_t::confirmed);
 
 protected:
    /**
@@ -211,7 +213,7 @@ public:
     * @return Simulation result as variant
     */
    fc::variant execute_call(const idl::instruction& instr, const std::vector<account_meta>& accounts,
-                            const program_invoke_data_items& params, commitment_t commitment = commitment_t::finalized);
+                            const program_invoke_data_items& params, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Execute a program transaction with manual account specification
@@ -388,7 +390,7 @@ public:
     */
    template <typename RT>
    RT get_account_data(const std::string& account_name, const solana_public_key& address,
-                       commitment_t commitment = commitment_t::finalized);
+                       commitment_t commitment = commitment_t::confirmed);
 
 private:
    fc::threadsafe_map<std::string, idl::instruction> _idl_map{};
@@ -436,18 +438,18 @@ public:
     * @return Account info or nullopt if account doesn't exist
     */
    std::optional<account_info> get_account_info(const pubkey_compat_t& address,
-                                                 commitment_t commitment = commitment_t::finalized);
+                                                 commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get account balance in lamports
     */
-   uint64_t get_balance(const pubkey_compat_t& address, commitment_t commitment = commitment_t::finalized);
+   uint64_t get_balance(const pubkey_compat_t& address, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get multiple accounts in a single request
     */
    std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<solana_public_key>& addresses,
-                                                                   commitment_t commitment = commitment_t::finalized);
+                                                                   commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Block Methods
@@ -456,12 +458,12 @@ public:
    /**
     * @brief Get the current block height
     */
-   uint64_t get_block_height(commitment_t commitment = commitment_t::finalized);
+   uint64_t get_block_height(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get block information by slot
     */
-   fc::variant get_block(uint64_t slot, commitment_t commitment = commitment_t::finalized);
+   fc::variant get_block(uint64_t slot, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get block commitment information
@@ -490,12 +492,12 @@ public:
    /**
     * @brief Get the latest blockhash
     */
-   blockhash_info get_latest_blockhash(commitment_t commitment = commitment_t::finalized);
+   blockhash_info get_latest_blockhash(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Check if a blockhash is still valid
     */
-   bool is_blockhash_valid(const std::string& blockhash, commitment_t commitment = commitment_t::finalized);
+   bool is_blockhash_valid(const std::string& blockhash, commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Cluster Methods
@@ -534,12 +536,12 @@ public:
    /**
     * @brief Get current slot
     */
-   uint64_t get_slot(commitment_t commitment = commitment_t::finalized);
+   uint64_t get_slot(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get current slot leader
     */
-   std::string get_slot_leader(commitment_t commitment = commitment_t::finalized);
+   std::string get_slot_leader(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get slot leaders for a range
@@ -558,7 +560,7 @@ public:
    /**
     * @brief Get epoch information
     */
-   fc::variant get_epoch_info(commitment_t commitment = commitment_t::finalized);
+   fc::variant get_epoch_info(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get epoch schedule
@@ -577,7 +579,7 @@ public:
     * @return Fee in lamports or nullopt if blockhash expired
     */
    std::optional<uint64_t> get_fee_for_message(const std::string& message_base64,
-                                                commitment_t commitment = commitment_t::finalized);
+                                                commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get recent prioritization fees
@@ -588,7 +590,7 @@ public:
    // Inflation Methods
    //=========================================================================
 
-   fc::variant get_inflation_governor(commitment_t commitment = commitment_t::finalized);
+   fc::variant get_inflation_governor(commitment_t commitment = commitment_t::confirmed);
    fc::variant get_inflation_rate();
    fc::variant get_inflation_reward(const std::vector<solana_public_key>& addresses, std::optional<uint64_t> epoch = std::nullopt);
 
@@ -596,28 +598,28 @@ public:
    // Supply Methods
    //=========================================================================
 
-   fc::variant get_supply(commitment_t commitment = commitment_t::finalized);
-   fc::variant get_largest_accounts(commitment_t commitment = commitment_t::finalized);
+   fc::variant get_supply(commitment_t commitment = commitment_t::confirmed);
+   fc::variant get_largest_accounts(commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Stake Methods
    //=========================================================================
 
-   uint64_t get_stake_minimum_delegation(commitment_t commitment = commitment_t::finalized);
+   uint64_t get_stake_minimum_delegation(commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Token Methods
    //=========================================================================
 
    fc::variant get_token_account_balance(const pubkey_compat_t& token_account,
-                                          commitment_t commitment = commitment_t::finalized);
+                                          commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_accounts_by_delegate(const pubkey_compat_t& delegate, const fc::variant& filter,
-                                               commitment_t commitment = commitment_t::finalized);
+                                               commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_accounts_by_owner(const pubkey_compat_t& owner, const fc::variant& filter,
-                                            commitment_t commitment = commitment_t::finalized);
+                                            commitment_t commitment = commitment_t::confirmed);
    fc::variant get_token_largest_accounts(const pubkey_compat_t& mint,
-                                           commitment_t commitment = commitment_t::finalized);
-   fc::variant get_token_supply(const pubkey_compat_t& mint, commitment_t commitment = commitment_t::finalized);
+                                           commitment_t commitment = commitment_t::confirmed);
+   fc::variant get_token_supply(const pubkey_compat_t& mint, commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Transaction Methods
@@ -626,12 +628,12 @@ public:
    /**
     * @brief Get transaction information by signature
     */
-   fc::variant get_transaction(const std::string& signature, commitment_t commitment = commitment_t::finalized);
+   fc::variant get_transaction(const std::string& signature, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get total transaction count
     */
-   uint64_t get_transaction_count(commitment_t commitment = commitment_t::finalized);
+   uint64_t get_transaction_count(commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Get signatures for an address
@@ -660,24 +662,24 @@ public:
     * @return Transaction signature
     */
    std::string send_transaction(const transaction& tx, bool skip_preflight = false,
-                                commitment_t preflight_commitment = commitment_t::finalized);
+                                commitment_t preflight_commitment = commitment_t::confirmed);
 
    /**
     * @brief Send a base64-encoded transaction
     */
    std::string send_transaction(const std::string& tx_base64, bool skip_preflight = false,
-                                commitment_t preflight_commitment = commitment_t::finalized);
+                                commitment_t preflight_commitment = commitment_t::confirmed);
 
    /**
     * @brief Simulate a transaction
     */
-   fc::variant simulate_transaction(const transaction& tx, commitment_t commitment = commitment_t::finalized);
+   fc::variant simulate_transaction(const transaction& tx, commitment_t commitment = commitment_t::confirmed);
 
    /**
     * @brief Request an airdrop (devnet/testnet only)
     */
    std::string request_airdrop(const pubkey_compat_t& address, uint64_t lamports,
-                               commitment_t commitment = commitment_t::finalized);
+                               commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Program Methods
@@ -687,13 +689,13 @@ public:
     * @brief Get all accounts owned by a program
     */
    fc::variant get_program_accounts(const pubkey_compat_t& program_id, const std::vector<fc::variant>& filters = {},
-                                    commitment_t commitment = commitment_t::finalized);
+                                    commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Vote Methods
    //=========================================================================
 
-   fc::variant get_vote_accounts(commitment_t commitment = commitment_t::finalized);
+   fc::variant get_vote_accounts(commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Rent Methods
@@ -702,7 +704,7 @@ public:
    /**
     * @brief Get minimum balance for rent exemption
     */
-   uint64_t get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment = commitment_t::finalized);
+   uint64_t get_minimum_balance_for_rent_exemption(size_t data_length, commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Performance Methods
@@ -762,7 +764,7 @@ public:
     * @return Transaction signature
     */
    std::string send_and_confirm_transaction(const transaction& tx,
-                                             commitment_t commitment = commitment_t::finalized);
+                                             commitment_t commitment = commitment_t::confirmed);
 
    //=========================================================================
    // Program Client Support
@@ -773,11 +775,12 @@ public:
     */
    template <typename C>
    std::shared_ptr<C> get_program(const solana_public_key& program_id, const std::vector<idl::program>& idls = {}) {
+      auto key = program_key_t{program_id, boost::core::demangle(typeid(C).name())};
       auto programs = _programs_map.writeable();
-      if (!programs.contains(program_id)) {
-         programs[program_id] = std::make_shared<C>(shared_from_this(), program_id, idls);
+      if (!programs.contains(key)) {
+         programs[key] = std::make_shared<C>(shared_from_this(), program_id, idls);
       }
-      return std::dynamic_pointer_cast<C>(programs[program_id]);
+      return std::dynamic_pointer_cast<C>(programs[key]);
    }
 
    /**
@@ -788,11 +791,12 @@ public:
     */
    template <typename C = solana_program_data_client>
    std::shared_ptr<C> get_data_program(const solana_public_key& program_id) {
+      auto key = program_key_t{program_id, boost::core::demangle(typeid(C).name())};
       auto data_programs = _data_programs_map.writeable();
-      if (!data_programs.contains(program_id)) {
-         data_programs[program_id] = std::make_shared<C>(shared_from_this(), program_id);
+      if (!data_programs.contains(key)) {
+         data_programs[key] = std::make_shared<C>(shared_from_this(), program_id);
       }
-      return std::dynamic_pointer_cast<C>(data_programs[program_id]);
+      return std::dynamic_pointer_cast<C>(data_programs[key]);
    }
 
 private:
@@ -800,8 +804,9 @@ private:
    const solana_public_key _pubkey;
    json_rpc_client _client;
 
-   fc::threadsafe_map<solana_public_key, std::shared_ptr<solana_program_client>> _programs_map{};
-   fc::threadsafe_map<solana_public_key, std::shared_ptr<solana_program_data_client>> _data_programs_map{};
+   using program_key_t = std::pair<solana_public_key, std::string>;
+   fc::threadsafe_map<program_key_t, std::shared_ptr<solana_program_client>> _programs_map{};
+   fc::threadsafe_map<program_key_t, std::shared_ptr<solana_program_data_client>> _data_programs_map{};
 
    /**
     * @brief Build config object for RPC calls
@@ -889,7 +894,7 @@ solana_program_account_data_fn<RT> solana_program_client::create_account_data_ge
    std::string type_name = idl_type_name;
    solana_public_key address = pda;
 
-   return [this, type_name, address](commitment_t commitment = commitment_t::finalized) -> RT {
+   return [this, type_name, address](commitment_t commitment = commitment_t::confirmed) -> RT {
       // Fetch account info from the network
       auto account_info = client->get_account_info(address, commitment);
       FC_ASSERT(account_info.has_value(), "Account not found: {}", address.to_base58());
