@@ -69,10 +69,10 @@ struct solana_program_test_counter_data_client : fc::network::solana::solana_pro
    static constexpr const char* COUNTER_SEED = "counter";
 
    // Derive the counter PDA address
-   pubkey counter_pda;
+   solana_public_key counter_pda;
    uint8_t counter_bump;
 
-   solana_program_test_counter_data_client(const solana_client_ptr& client, const pubkey& program_id)
+   solana_program_test_counter_data_client(const solana_client_ptr& client, const solana_public_key& program_id)
       : solana_program_data_client(client, program_id) {
       // Derive the counter PDA
       std::vector<std::vector<uint8_t>> seeds = {
@@ -135,7 +135,7 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
    static constexpr const char* COUNTER_SEED = "counter";
 
    // Derived counter PDA (for reading account data)
-   pubkey counter_pda;
+   solana_public_key counter_pda;
    uint8_t counter_bump;
 
    /**
@@ -164,7 +164,7 @@ struct solana_program_test_counter_anchor_client : fc::network::solana::solana_p
     */
    solana_program_account_data_fn<fc::variant> get_counter;
 
-   solana_program_test_counter_anchor_client(const solana_client_ptr& client, const pubkey& program_id,
+   solana_program_test_counter_anchor_client(const solana_client_ptr& client, const solana_public_key& program_id,
                                               const std::vector<idl::program>& idls = {})
       : solana_program_client(client, program_id, idls) {
       // Derive the counter PDA for account data reads
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
       // }
 
       // Test the Anchor counter program
-      const pubkey anchor_counter_program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+      const solana_public_key anchor_counter_program_id = solana_public_key::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
       ilog("");
       ilog("=== Testing Anchor Counter Program ===");
       ilog("Program ID: {}", anchor_counter_program_id.to_base58());

@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
-#include <fc/network/solana/solana_client.hpp>
-
 #include <fc/crypto/base64.hpp>
 #include <fc/int256.hpp>
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
-
+#include <fc/network/solana/solana_client.hpp>
 #include <thread>
 
 namespace fc::network::solana {
@@ -15,8 +13,10 @@ namespace fc::network::solana {
 // solana_program_data_client implementation
 //=============================================================================
 
-solana_program_data_client::solana_program_data_client(const solana_client_ptr& client, const pubkey& program_id)
-   : program_id(program_id), client(client) {}
+solana_program_data_client::solana_program_data_client(const solana_client_ptr& client,
+                                                       const solana_public_key& program_id)
+   : program_id(program_id)
+   , client(client) {}
 
 instruction solana_program_data_client::build_instruction(const instruction_data_t& data,
                                                           const std::vector<account_meta>& accounts) {
@@ -99,9 +99,10 @@ solana_program_data_tx_fn solana_program_data_client::create_tx() {
 // solana_program_client implementation
 //=============================================================================
 
-solana_program_client::solana_program_client(const solana_client_ptr& client, const pubkey& program_id,
+solana_program_client::solana_program_client(const solana_client_ptr& client, const solana_public_key& program_id,
                                              const std::vector<idl::program>& idls)
-   : program_id(program_id), client(client) {
+   : program_id(program_id)
+   , client(client) {
    auto idl_map = _idl_map.writeable();
    for (const auto& idl : idls) {
       // Store the first IDL as the program reference for type lookups
@@ -122,111 +123,110 @@ const idl::instruction& solana_program_client::get_idl(const std::string& instru
    return _idl_map.readable().at(instruction_name);
 }
 
-void solana_program_client::encode_type(borsh::encoder& encoder, const fc::variant& value,
-                                         const idl::idl_type& type) {
+void solana_program_client::encode_type(borsh::encoder& encoder, const fc::variant& value, const idl::idl_type& type) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
-         case idl::primitive_type::bool_t:
-            encoder.write_bool(value.as_bool());
-            break;
-         case idl::primitive_type::u8:
-            encoder.write_u8(static_cast<uint8_t>(value.as_uint64()));
-            break;
-         case idl::primitive_type::u16:
-            encoder.write_u16(static_cast<uint16_t>(value.as_uint64()));
-            break;
-         case idl::primitive_type::u32:
-            encoder.write_u32(static_cast<uint32_t>(value.as_uint64()));
-            break;
-         case idl::primitive_type::u64:
-            encoder.write_u64(value.as_uint64());
-            break;
-         case idl::primitive_type::u128:
-            encoder.write_u128(fc::uint128(value.as_string()));
-            break;
-         case idl::primitive_type::u256:
-            encoder.write_u256(fc::to_uint256(value));
-            break;
-         case idl::primitive_type::i8:
-            encoder.write_i8(static_cast<int8_t>(value.as_int64()));
-            break;
-         case idl::primitive_type::i16:
-            encoder.write_i16(static_cast<int16_t>(value.as_int64()));
-            break;
-         case idl::primitive_type::i32:
-            encoder.write_i32(static_cast<int32_t>(value.as_int64()));
-            break;
-         case idl::primitive_type::i64:
-            encoder.write_i64(value.as_int64());
-            break;
-         case idl::primitive_type::i128:
-            encoder.write_i128(fc::int128(value.as_string()));
-            break;
-         case idl::primitive_type::i256:
-            encoder.write_i256(fc::to_int256(value));
-            break;
-         case idl::primitive_type::f32:
-            encoder.write_f32(static_cast<float>(value.as_double()));
-            break;
-         case idl::primitive_type::f64:
-            encoder.write_f64(value.as_double());
-            break;
-         case idl::primitive_type::string:
-            encoder.write_string(value.as_string());
-            break;
-         case idl::primitive_type::bytes: {
-            if (value.is_blob()) {
-               auto blob = value.as_blob();
-               std::vector<uint8_t> bytes(blob.data.begin(), blob.data.end());
-               encoder.write_bytes(bytes);
-            } else if (value.is_array()) {
-               // Array of u8 values
-               auto arr = value.get_array();
-               std::vector<uint8_t> bytes;
-               bytes.reserve(arr.size());
-               for (const auto& elem : arr) {
-                  bytes.push_back(static_cast<uint8_t>(elem.as_uint64()));
-               }
-               encoder.write_bytes(bytes);
-            } else {
-               // Assume base64 encoded string
-               auto decoded = fc::base64_decode(value.as_string());
-               std::vector<uint8_t> bytes(reinterpret_cast<const uint8_t*>(decoded.data()),
-                                          reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
-               encoder.write_bytes(bytes);
+      case idl::primitive_type::bool_t:
+         encoder.write_bool(value.as_bool());
+         break;
+      case idl::primitive_type::u8:
+         encoder.write_u8(static_cast<uint8_t>(value.as_uint64()));
+         break;
+      case idl::primitive_type::u16:
+         encoder.write_u16(static_cast<uint16_t>(value.as_uint64()));
+         break;
+      case idl::primitive_type::u32:
+         encoder.write_u32(static_cast<uint32_t>(value.as_uint64()));
+         break;
+      case idl::primitive_type::u64:
+         encoder.write_u64(value.as_uint64());
+         break;
+      case idl::primitive_type::u128:
+         encoder.write_u128(fc::uint128(value.as_string()));
+         break;
+      case idl::primitive_type::u256:
+         encoder.write_u256(fc::to_uint256(value));
+         break;
+      case idl::primitive_type::i8:
+         encoder.write_i8(static_cast<int8_t>(value.as_int64()));
+         break;
+      case idl::primitive_type::i16:
+         encoder.write_i16(static_cast<int16_t>(value.as_int64()));
+         break;
+      case idl::primitive_type::i32:
+         encoder.write_i32(static_cast<int32_t>(value.as_int64()));
+         break;
+      case idl::primitive_type::i64:
+         encoder.write_i64(value.as_int64());
+         break;
+      case idl::primitive_type::i128:
+         encoder.write_i128(fc::int128(value.as_string()));
+         break;
+      case idl::primitive_type::i256:
+         encoder.write_i256(fc::to_int256(value));
+         break;
+      case idl::primitive_type::f32:
+         encoder.write_f32(static_cast<float>(value.as_double()));
+         break;
+      case idl::primitive_type::f64:
+         encoder.write_f64(value.as_double());
+         break;
+      case idl::primitive_type::string:
+         encoder.write_string(value.as_string());
+         break;
+      case idl::primitive_type::bytes: {
+         if (value.is_blob()) {
+            auto blob = value.as_blob();
+            std::vector<uint8_t> bytes(blob.data.begin(), blob.data.end());
+            encoder.write_bytes(bytes);
+         } else if (value.is_array()) {
+            // Array of u8 values
+            auto arr = value.get_array();
+            std::vector<uint8_t> bytes;
+            bytes.reserve(arr.size());
+            for (const auto& elem : arr) {
+               bytes.push_back(static_cast<uint8_t>(elem.as_uint64()));
             }
-            break;
+            encoder.write_bytes(bytes);
+         } else {
+            // Assume base64 encoded string
+            auto decoded = fc::base64_decode(value.as_string());
+            std::vector<uint8_t> bytes(reinterpret_cast<const uint8_t*>(decoded.data()),
+                                       reinterpret_cast<const uint8_t*>(decoded.data()) + decoded.size());
+            encoder.write_bytes(bytes);
          }
-         case idl::primitive_type::pubkey: {
-            // Handle pubkey as base58 string or as object with data field
-            if (value.is_string()) {
-               encoder.write_pubkey(pubkey::from_base58(value.as_string()));
-            } else if (value.is_object()) {
-               auto obj = value.get_object();
-               if (obj.contains("data")) {
-                  // pubkey struct with data array
-                  auto data_arr = obj["data"].get_array();
-                  pubkey pk;
-                  for (size_t i = 0; i < 32 && i < data_arr.size(); ++i) {
-                     pk.data[i] = static_cast<uint8_t>(data_arr[i].as_uint64());
-                  }
-                  encoder.write_pubkey(pk);
-               } else {
-                  FC_THROW("Invalid pubkey object format");
+         break;
+      }
+      case idl::primitive_type::pubkey: {
+         // Handle pubkey as base58 string or as object with data field
+         if (value.is_string()) {
+            encoder.write_pubkey(solana_public_key::from_base58(value.as_string()));
+         } else if (value.is_object()) {
+            auto obj = value.get_object();
+            if (obj.contains("data")) {
+               // pubkey struct with data array
+               auto data_arr = obj["data"].get_array();
+               solana_public_key pk;
+               for (size_t i = 0; i < 32 && i < data_arr.size(); ++i) {
+                  pk.data[i] = static_cast<uint8_t>(data_arr[i].as_uint64());
                }
+               encoder.write_pubkey(pk);
             } else {
-               FC_THROW("Invalid pubkey value type");
+               FC_THROW("Invalid pubkey object format");
             }
-            break;
+         } else {
+            FC_THROW("Invalid pubkey value type");
          }
-         default:
-            FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
+         break;
+      }
+      default:
+         FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
       }
    } else if (type.is_option()) {
       if (value.is_null()) {
-         encoder.write_u8(0);  // None
+         encoder.write_u8(0); // None
       } else {
-         encoder.write_u8(1);  // Some
+         encoder.write_u8(1); // Some
          encode_type(encoder, value, *type.option_inner);
       }
    } else if (type.is_vec()) {
@@ -239,16 +239,15 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
    } else if (type.is_array()) {
       FC_ASSERT(value.is_array(), "Expected array for fixed array type");
       auto arr = value.get_array();
-      FC_ASSERT(arr.size() == *type.array_len,
-                "Array size mismatch: expected {}, got {}", *type.array_len, arr.size());
+      FC_ASSERT(arr.size() == *type.array_len, "Array size mismatch: expected {}, got {}", *type.array_len, arr.size());
       for (const auto& elem : arr) {
          encode_type(encoder, elem, *type.array_element);
       }
    } else if (type.is_tuple()) {
       FC_ASSERT(value.is_array(), "Expected array for tuple type");
       auto arr = value.get_array();
-      FC_ASSERT(arr.size() == type.tuple_elements->size(),
-                "Tuple size mismatch: expected {}, got {}", type.tuple_elements->size(), arr.size());
+      FC_ASSERT(arr.size() == type.tuple_elements->size(), "Tuple size mismatch: expected {}, got {}",
+                type.tuple_elements->size(), arr.size());
       for (size_t i = 0; i < arr.size(); ++i) {
          encode_type(encoder, arr[i], (*type.tuple_elements)[i]);
       }
@@ -305,7 +304,7 @@ void solana_program_client::encode_type(borsh::encoder& encoder, const fc::varia
 }
 
 void solana_program_client::encode_fields(borsh::encoder& encoder, const fc::variant& value,
-                                           const std::vector<idl::field>& fields) {
+                                          const std::vector<idl::field>& fields) {
    FC_ASSERT(value.is_object(), "Expected object for struct/fields encoding");
    auto obj = value.get_object();
 
@@ -323,8 +322,8 @@ std::vector<uint8_t> solana_program_client::build_instruction_data(const idl::in
    encoder.write_fixed_bytes(instr.discriminator.data(), instr.discriminator.size());
 
    // Encode parameters based on IDL argument types
-   FC_ASSERT(params.size() <= instr.args.size(),
-             "Too many parameters: expected at most {}, got {}", instr.args.size(), params.size());
+   FC_ASSERT(params.size() <= instr.args.size(), "Too many parameters: expected at most {}, got {}", instr.args.size(),
+             params.size());
 
    for (size_t i = 0; i < params.size(); ++i) {
       encode_type(encoder, params[i], instr.args[i].type);
@@ -381,52 +380,52 @@ std::vector<uint8_t> solana_program_client::extract_return_data(const fc::varian
 fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const idl::idl_type& type) {
    if (type.is_primitive()) {
       switch (type.get_primitive()) {
-         case idl::primitive_type::bool_t:
-            return fc::variant(decoder.read_bool());
-         case idl::primitive_type::u8:
-            return fc::variant(static_cast<uint64_t>(decoder.read_u8()));
-         case idl::primitive_type::u16:
-            return fc::variant(static_cast<uint64_t>(decoder.read_u16()));
-         case idl::primitive_type::u32:
-            return fc::variant(static_cast<uint64_t>(decoder.read_u32()));
-         case idl::primitive_type::u64:
-            return fc::variant(decoder.read_u64());
-         case idl::primitive_type::u128:
-            return fc::variant(decoder.read_u128().str());
-         case idl::primitive_type::u256:
-            return fc::variant(decoder.read_u256().str());
-         case idl::primitive_type::i8:
-            return fc::variant(static_cast<int64_t>(decoder.read_i8()));
-         case idl::primitive_type::i16:
-            return fc::variant(static_cast<int64_t>(decoder.read_i16()));
-         case idl::primitive_type::i32:
-            return fc::variant(static_cast<int64_t>(decoder.read_i32()));
-         case idl::primitive_type::i64:
-            return fc::variant(decoder.read_i64());
-         case idl::primitive_type::i128:
-            return fc::variant(decoder.read_i128().str());
-         case idl::primitive_type::i256:
-            return fc::variant(decoder.read_i256().str());
-         case idl::primitive_type::f32:
-            return fc::variant(static_cast<double>(decoder.read_f32()));
-         case idl::primitive_type::f64:
-            return fc::variant(decoder.read_f64());
-         case idl::primitive_type::string:
-            return fc::variant(decoder.read_string());
-         case idl::primitive_type::bytes: {
-            auto bytes = decoder.read_bytes();
-            return fc::variant(fc::base64_encode(reinterpret_cast<const char*>(bytes.data()),
-                                                  static_cast<unsigned int>(bytes.size())));
-         }
-         case idl::primitive_type::pubkey:
-            return fc::variant(decoder.read_pubkey().to_base58());
-         default:
-            FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
+      case idl::primitive_type::bool_t:
+         return fc::variant(decoder.read_bool());
+      case idl::primitive_type::u8:
+         return fc::variant(static_cast<uint64_t>(decoder.read_u8()));
+      case idl::primitive_type::u16:
+         return fc::variant(static_cast<uint64_t>(decoder.read_u16()));
+      case idl::primitive_type::u32:
+         return fc::variant(static_cast<uint64_t>(decoder.read_u32()));
+      case idl::primitive_type::u64:
+         return fc::variant(decoder.read_u64());
+      case idl::primitive_type::u128:
+         return fc::variant(decoder.read_u128().str());
+      case idl::primitive_type::u256:
+         return fc::variant(decoder.read_u256().str());
+      case idl::primitive_type::i8:
+         return fc::variant(static_cast<int64_t>(decoder.read_i8()));
+      case idl::primitive_type::i16:
+         return fc::variant(static_cast<int64_t>(decoder.read_i16()));
+      case idl::primitive_type::i32:
+         return fc::variant(static_cast<int64_t>(decoder.read_i32()));
+      case idl::primitive_type::i64:
+         return fc::variant(decoder.read_i64());
+      case idl::primitive_type::i128:
+         return fc::variant(decoder.read_i128().str());
+      case idl::primitive_type::i256:
+         return fc::variant(decoder.read_i256().str());
+      case idl::primitive_type::f32:
+         return fc::variant(static_cast<double>(decoder.read_f32()));
+      case idl::primitive_type::f64:
+         return fc::variant(decoder.read_f64());
+      case idl::primitive_type::string:
+         return fc::variant(decoder.read_string());
+      case idl::primitive_type::bytes: {
+         auto bytes = decoder.read_bytes();
+         return fc::variant(
+            fc::base64_encode(reinterpret_cast<const char*>(bytes.data()), static_cast<unsigned int>(bytes.size())));
+      }
+      case idl::primitive_type::pubkey:
+         return fc::variant(decoder.read_pubkey().to_base58());
+      default:
+         FC_THROW("Unsupported primitive type: {}", static_cast<int>(type.get_primitive()));
       }
    } else if (type.is_option()) {
       uint8_t has_value = decoder.read_u8();
       if (has_value == 0) {
-         return fc::variant();  // null
+         return fc::variant(); // null
       }
       FC_ASSERT(has_value == 1, "Invalid option discriminator: {}", has_value);
       // Recursively decode the inner type
@@ -460,8 +459,7 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
       }
       return fc::variant(arr);
    } else if (type.is_defined()) {
-      FC_ASSERT(_program, "Cannot decode defined type '{}' without IDL program loaded",
-                type.get_defined_name());
+      FC_ASSERT(_program, "Cannot decode defined type '{}' without IDL program loaded", type.get_defined_name());
 
       // Look up the type definition and decode
       const idl::type_def* type_def = _program->find_type(type.get_defined_name());
@@ -473,8 +471,8 @@ fc::variant solana_program_client::decode_type(borsh::decoder& decoder, const id
          // Decode enum variant index
          uint8_t variant_idx = decoder.read_u8();
          FC_ASSERT(variant_idx < type_def->enum_variants->size(),
-                   "Invalid enum variant index {} for type '{}' (max: {})",
-                   variant_idx, type.get_defined_name(), type_def->enum_variants->size() - 1);
+                   "Invalid enum variant index {} for type '{}' (max: {})", variant_idx, type.get_defined_name(),
+                   type_def->enum_variants->size() - 1);
 
          const auto& variant = (*type_def->enum_variants)[variant_idx];
          fc::mutable_variant_object obj;
@@ -502,7 +500,7 @@ fc::variant solana_program_client::decode_fields(borsh::decoder& decoder, const 
 }
 
 fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t>& data,
-                                                        const std::string& account_name) {
+                                                       const std::string& account_name) {
    FC_ASSERT(_program, "No IDL program loaded");
 
    const idl::account* account = _program->find_account(account_name);
@@ -513,8 +511,7 @@ fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t
 
    // Verify discriminator
    for (size_t i = 0; i < 8; ++i) {
-      FC_ASSERT(data[i] == account->discriminator[i],
-                "Account discriminator mismatch at byte {}: expected {}, got {}",
+      FC_ASSERT(data[i] == account->discriminator[i], "Account discriminator mismatch at byte {}: expected {}, got {}",
                 i, static_cast<int>(account->discriminator[i]), static_cast<int>(data[i]));
    }
 
@@ -527,8 +524,7 @@ fc::variant solana_program_client::decode_account_data(const std::vector<uint8_t
    const std::vector<idl::field>* fields = &account->fields;
    if (fields->empty()) {
       const idl::type_def* type_def = _program->find_type(account_name);
-      FC_ASSERT(type_def, "Type definition '{}' not found in IDL for account with no inline fields",
-                account_name);
+      FC_ASSERT(type_def, "Type definition '{}' not found in IDL for account with no inline fields", account_name);
       FC_ASSERT(type_def->is_struct(), "Type '{}' is not a struct", account_name);
       fields = &(*type_def->struct_fields);
    }
@@ -558,7 +554,7 @@ fc::variant solana_program_client::execute_call(const idl::instruction& instr,
    // If no return type specified but we have data, return as raw bytes (base64)
    if (!return_data.empty()) {
       return fc::variant(fc::base64_encode(reinterpret_cast<const char*>(return_data.data()),
-                                            static_cast<unsigned int>(return_data.size())));
+                                           static_cast<unsigned int>(return_data.size())));
    }
 
    // No return data - return empty variant
@@ -573,57 +569,57 @@ std::string solana_program_client::execute_tx(const idl::instruction& instr, con
    return client->send_transaction(tx);
 }
 
-std::pair<pubkey, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
-                                                              const program_invoke_data_items& params) {
+std::pair<solana_public_key, uint8_t> solana_program_client::derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
+                                                                        const program_invoke_data_items& params) {
    std::vector<std::vector<uint8_t>> seeds;
 
    for (const auto& seed : pda_seeds) {
       switch (seed.kind) {
-         case idl::pda_seed_kind::const_value: {
-            // Parse the JSON value array into bytes
-            auto value = fc::json::from_string(seed.path);
-            if (value.is_array()) {
-               std::vector<uint8_t> bytes;
-               for (const auto& b : value.get_array()) {
-                  bytes.push_back(static_cast<uint8_t>(b.as_uint64()));
-               }
-               seeds.push_back(std::move(bytes));
-            } else if (value.is_string()) {
-               // String constant
-               auto str = value.as_string();
-               seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
+      case idl::pda_seed_kind::const_value: {
+         // Parse the JSON value array into bytes
+         auto value = fc::json::from_string(seed.path);
+         if (value.is_array()) {
+            std::vector<uint8_t> bytes;
+            for (const auto& b : value.get_array()) {
+               bytes.push_back(static_cast<uint8_t>(b.as_uint64()));
             }
-            break;
+            seeds.push_back(std::move(bytes));
+         } else if (value.is_string()) {
+            // String constant
+            auto str = value.as_string();
+            seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
          }
-         case idl::pda_seed_kind::arg: {
-            // Use instruction argument as seed
-            // path is the argument name or index
-            // For now, try to match by index if numeric, otherwise search by name
-            try {
-               size_t idx = std::stoull(seed.path);
-               if (idx < params.size()) {
-                  auto& param = params[idx];
-                  if (param.is_string()) {
-                     auto str = param.as_string();
-                     seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
-                  } else if (param.is_uint64()) {
-                     // Encode as little-endian bytes
-                     uint64_t val = param.as_uint64();
-                     std::vector<uint8_t> bytes(8);
-                     std::memcpy(bytes.data(), &val, 8);
-                     seeds.push_back(std::move(bytes));
-                  }
+         break;
+      }
+      case idl::pda_seed_kind::arg: {
+         // Use instruction argument as seed
+         // path is the argument name or index
+         // For now, try to match by index if numeric, otherwise search by name
+         try {
+            size_t idx = std::stoull(seed.path);
+            if (idx < params.size()) {
+               auto& param = params[idx];
+               if (param.is_string()) {
+                  auto str = param.as_string();
+                  seeds.push_back(std::vector<uint8_t>(str.begin(), str.end()));
+               } else if (param.is_uint64()) {
+                  // Encode as little-endian bytes
+                  uint64_t val = param.as_uint64();
+                  std::vector<uint8_t> bytes(8);
+                  std::memcpy(bytes.data(), &val, 8);
+                  seeds.push_back(std::move(bytes));
                }
-            } catch (...) {
-               // path is not an index, skip for now
-               FC_THROW("Arg-based PDA seeds by name not yet supported: {}", seed.path);
             }
-            break;
+         } catch (...) {
+            // path is not an index, skip for now
+            FC_THROW("Arg-based PDA seeds by name not yet supported: {}", seed.path);
          }
-         case idl::pda_seed_kind::account: {
-            // Account-based seed - requires account resolution first
-            FC_THROW("Account-based PDA seeds not yet supported: {}", seed.path);
-         }
+         break;
+      }
+      case idl::pda_seed_kind::account: {
+         // Account-based seed - requires account resolution first
+         FC_THROW("Account-based PDA seeds not yet supported: {}", seed.path);
+      }
       }
    }
 
@@ -631,13 +627,13 @@ std::pair<pubkey, uint8_t> solana_program_client::derive_pda(const std::vector<i
 }
 
 std::vector<account_meta> solana_program_client::resolve_accounts(const idl::instruction& instr,
-                                                                   const program_invoke_data_items& params,
-                                                                   const account_overrides_t& account_overrides) {
+                                                                  const program_invoke_data_items& params,
+                                                                  const account_overrides_t& account_overrides) {
    std::vector<account_meta> accounts;
    accounts.reserve(instr.accounts.size());
 
    for (const auto& acct : instr.accounts) {
-      pubkey pk;
+      solana_public_key pk;
       bool resolved = false;
 
       // Check for explicit override first
@@ -684,7 +680,7 @@ std::vector<account_meta> solana_program_client::resolve_accounts(const idl::ins
 solana_client::solana_client(const signature_provider_ptr& sig_provider,
                              const std::variant<std::string, fc::url>& url_source)
    : _signature_provider(sig_provider)
-   , _pubkey(pubkey::from_public_key(_signature_provider->public_key))
+   , _pubkey(solana_public_key::from_public_key(_signature_provider->public_key))
    , _client(json_rpc_client::create(url_source)) {}
 
 fc::variant solana_client::execute(const std::string& method, const fc::variant& params) {
@@ -706,8 +702,7 @@ fc::variant solana_client::build_config(commitment_t commitment, const std::opti
 // Account Methods
 //=============================================================================
 
-std::optional<account_info> solana_client::get_account_info(const pubkey_compat_t& address,
-                                                             commitment_t commitment) {
+std::optional<account_info> solana_client::get_account_info(const pubkey_compat_t& address, commitment_t commitment) {
    auto addr = to_pubkey(address);
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -726,7 +721,7 @@ std::optional<account_info> solana_client::get_account_info(const pubkey_compat_
    auto value = obj["value"].get_object();
    account_info info;
    info.lamports = value["lamports"].as_uint64();
-   info.owner = pubkey::from_base58(value["owner"].as_string());
+   info.owner = solana_public_key::from_base58(value["owner"].as_string());
    info.executable = value["executable"].as_bool();
    info.rent_epoch = value["rentEpoch"].as_uint64();
 
@@ -754,7 +749,7 @@ uint64_t solana_client::get_balance(const pubkey_compat_t& address, commitment_t
 }
 
 std::vector<std::optional<account_info>>
-solana_client::get_multiple_accounts(const std::vector<pubkey>& addresses, commitment_t commitment) {
+solana_client::get_multiple_accounts(const std::vector<solana_public_key>& addresses, commitment_t commitment) {
    fc::variants addr_list;
    for (const auto& addr : addresses) {
       addr_list.push_back(addr.to_base58());
@@ -779,7 +774,7 @@ solana_client::get_multiple_accounts(const std::vector<pubkey>& addresses, commi
       auto value = v.get_object();
       account_info info;
       info.lamports = value["lamports"].as_uint64();
-      info.owner = pubkey::from_base58(value["owner"].as_string());
+      info.owner = solana_public_key::from_base58(value["owner"].as_string());
       info.executable = value["executable"].as_bool();
       info.rent_epoch = value["rentEpoch"].as_uint64();
 
@@ -958,8 +953,7 @@ fc::variant solana_client::get_epoch_schedule() {
 // Fee Methods
 //=============================================================================
 
-std::optional<uint64_t> solana_client::get_fee_for_message(const std::string& message_base64,
-                                                            commitment_t commitment) {
+std::optional<uint64_t> solana_client::get_fee_for_message(const std::string& message_base64, commitment_t commitment) {
    fc::variants params{message_base64, build_config(commitment)};
    auto result = execute("getFeeForMessage", params);
 
@@ -969,7 +963,7 @@ std::optional<uint64_t> solana_client::get_fee_for_message(const std::string& me
    return value.as_uint64();
 }
 
-std::vector<fc::variant> solana_client::get_recent_prioritization_fees(const std::vector<pubkey>& accounts) {
+std::vector<fc::variant> solana_client::get_recent_prioritization_fees(const std::vector<solana_public_key>& accounts) {
    fc::variants addr_list;
    for (const auto& addr : accounts) {
       addr_list.push_back(addr.to_base58());
@@ -997,8 +991,8 @@ fc::variant solana_client::get_inflation_rate() {
    return execute("getInflationRate", params);
 }
 
-fc::variant solana_client::get_inflation_reward(const std::vector<pubkey>& addresses,
-                                                 std::optional<uint64_t> epoch) {
+fc::variant solana_client::get_inflation_reward(const std::vector<solana_public_key>& addresses,
+                                                std::optional<uint64_t> epoch) {
    fc::variants addr_list;
    for (const auto& addr : addresses) {
       addr_list.push_back(addr.to_base58());
@@ -1049,8 +1043,8 @@ fc::variant solana_client::get_token_account_balance(const pubkey_compat_t& toke
    return execute("getTokenAccountBalance", params);
 }
 
-fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t& delegate,
-                                                           const fc::variant& filter, commitment_t commitment) {
+fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t& delegate, const fc::variant& filter,
+                                                          commitment_t commitment) {
    auto addr = to_pubkey(delegate);
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -1061,7 +1055,7 @@ fc::variant solana_client::get_token_accounts_by_delegate(const pubkey_compat_t&
 }
 
 fc::variant solana_client::get_token_accounts_by_owner(const pubkey_compat_t& owner, const fc::variant& filter,
-                                                        commitment_t commitment) {
+                                                       commitment_t commitment) {
    auto addr = to_pubkey(owner);
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -1102,8 +1096,8 @@ uint64_t solana_client::get_transaction_count(commitment_t commitment) {
 }
 
 std::vector<fc::variant> solana_client::get_signatures_for_address(const pubkey_compat_t& address,
-                                                                    std::optional<std::string> before,
-                                                                    std::optional<std::string> until, size_t limit) {
+                                                                   std::optional<std::string> before,
+                                                                   std::optional<std::string> until, size_t limit) {
    auto addr = to_pubkey(address);
    fc::mutable_variant_object config;
    config("limit", limit);
@@ -1117,8 +1111,7 @@ std::vector<fc::variant> solana_client::get_signatures_for_address(const pubkey_
 }
 
 rpc_response<std::vector<std::optional<signature_status>>>
-solana_client::get_signature_statuses(const std::vector<std::string>& signatures,
-                                       bool search_transaction_history) {
+solana_client::get_signature_statuses(const std::vector<std::string>& signatures, bool search_transaction_history) {
    fc::variants sig_list;
    for (const auto& sig : signatures) {
       sig_list.push_back(sig);
@@ -1167,15 +1160,15 @@ solana_client::get_signature_statuses(const std::vector<std::string>& signatures
 //=============================================================================
 
 std::string solana_client::send_transaction(const transaction& tx, bool skip_preflight,
-                                             commitment_t preflight_commitment) {
+                                            commitment_t preflight_commitment) {
    auto tx_bytes = tx.serialize();
-   std::string tx_base64 = fc::base64_encode(reinterpret_cast<const char*>(tx_bytes.data()),
-                                              static_cast<unsigned int>(tx_bytes.size()));
+   std::string tx_base64 =
+      fc::base64_encode(reinterpret_cast<const char*>(tx_bytes.data()), static_cast<unsigned int>(tx_bytes.size()));
    return send_transaction(tx_base64, skip_preflight, preflight_commitment);
 }
 
 std::string solana_client::send_transaction(const std::string& tx_base64, bool skip_preflight,
-                                             commitment_t preflight_commitment) {
+                                            commitment_t preflight_commitment) {
    fc::mutable_variant_object config;
    config("encoding", "base64");
    config("skipPreflight", skip_preflight);
@@ -1187,8 +1180,8 @@ std::string solana_client::send_transaction(const std::string& tx_base64, bool s
 
 fc::variant solana_client::simulate_transaction(const transaction& tx, commitment_t commitment) {
    auto tx_bytes = tx.serialize();
-   std::string tx_base64 = fc::base64_encode(reinterpret_cast<const char*>(tx_bytes.data()),
-                                              static_cast<unsigned int>(tx_bytes.size()));
+   std::string tx_base64 =
+      fc::base64_encode(reinterpret_cast<const char*>(tx_bytes.data()), static_cast<unsigned int>(tx_bytes.size()));
 
    fc::mutable_variant_object config;
    config("encoding", "base64");
@@ -1199,8 +1192,7 @@ fc::variant solana_client::simulate_transaction(const transaction& tx, commitmen
    return execute("simulateTransaction", params);
 }
 
-std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint64_t lamports,
-                                            commitment_t commitment) {
+std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint64_t lamports, commitment_t commitment) {
    auto addr = to_pubkey(address);
    fc::variants params{addr.to_base58(), lamports, build_config(commitment)};
    return execute("requestAirdrop", params).as_string();
@@ -1211,7 +1203,7 @@ std::string solana_client::request_airdrop(const pubkey_compat_t& address, uint6
 //=============================================================================
 
 fc::variant solana_client::get_program_accounts(const pubkey_compat_t& program_id,
-                                                 const std::vector<fc::variant>& filters, commitment_t commitment) {
+                                                const std::vector<fc::variant>& filters, commitment_t commitment) {
    auto addr = to_pubkey(program_id);
    fc::mutable_variant_object config;
    config("commitment", to_string(commitment));
@@ -1280,8 +1272,7 @@ uint64_t solana_client::get_max_shred_insert_slot() {
 // Block Production
 //=============================================================================
 
-fc::variant solana_client::get_block_production(std::optional<uint64_t> first_slot,
-                                                 std::optional<uint64_t> last_slot) {
+fc::variant solana_client::get_block_production(std::optional<uint64_t> first_slot, std::optional<uint64_t> last_slot) {
    fc::mutable_variant_object config;
    if (first_slot || last_slot) {
       fc::mutable_variant_object range;
@@ -1303,12 +1294,13 @@ fc::variant solana_client::get_block_production(std::optional<uint64_t> first_sl
 // Transaction Building Helpers
 //=============================================================================
 
-transaction solana_client::create_transaction(const std::vector<instruction>& instructions, const pubkey& fee_payer) {
+transaction solana_client::create_transaction(const std::vector<instruction>& instructions,
+                                              const solana_public_key& fee_payer) {
    transaction tx;
 
    // Get a fresh blockhash
    auto bh_info = get_latest_blockhash();
-   tx.msg.recent_blockhash = pubkey::from_base58(bh_info.blockhash);
+   tx.msg.recent_blockhash = solana_public_key::from_base58(bh_info.blockhash);
 
    // Collect all unique accounts
    std::vector<account_meta> all_accounts;
@@ -1385,7 +1377,7 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
    tx.msg.header.num_readonly_unsigned_accounts = readonly_non_signers.size();
 
    // Build account key index map
-   std::map<pubkey, uint8_t> key_index_map;
+   std::map<solana_public_key, uint8_t> key_index_map;
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
       key_index_map[tx.msg.account_keys[i]] = static_cast<uint8_t>(i);
    }
@@ -1425,7 +1417,7 @@ transaction solana_client::sign_transaction(transaction& tx) {
    // Find the fee payer's position (should be index 0)
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {
       if (tx.msg.account_keys[i] == _pubkey) {
-         tx.signatures[i] = signature::from_ed_signature(ed_sig);
+         tx.signatures[i] = solana_signature::from_ed_signature(ed_sig);
          break;
       }
    }
@@ -1438,7 +1430,7 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
    std::string sig = send_transaction(tx, false, commitment);
 
    // Poll for confirmation
-   const int max_retries = 60;  // 60 seconds max
+   const int max_retries = 60; // 60 seconds max
    for (int i = 0; i < max_retries; ++i) {
       auto statuses = get_signature_statuses({sig}, false);
       if (!statuses.value.empty() && statuses.value[0].has_value()) {
@@ -1469,4 +1461,4 @@ std::string solana_client::send_and_confirm_transaction(const transaction& tx, c
    FC_THROW("Transaction confirmation timeout");
 }
 
-}  // namespace fc::network::solana
+} // namespace fc::network::solana

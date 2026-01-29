@@ -10,66 +10,6 @@
 namespace fc::network::solana {
 
 //=============================================================================
-// pubkey implementation
-//=============================================================================
-
-std::string pubkey::to_base58() const {
-   return fc::to_base58(reinterpret_cast<const char*>(data.data()), data.size(), fc::yield_function_t{});
-}
-
-pubkey pubkey::from_base58(const std::string& str) {
-   auto bytes = fc::from_base58(str);
-   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana pubkey length: expected {}, got {}", SIZE, bytes.size());
-   pubkey result;
-   std::memcpy(result.data.data(), bytes.data(), SIZE);
-   return result;
-}
-
-pubkey pubkey::from_public_key(const fc::crypto::public_key& pk) {
-   FC_ASSERT(pk.contains<fc::crypto::ed::public_key_shim>(),
-             "Public key must be ED25519 type for Solana");
-   return from_ed_public_key(pk.get<fc::crypto::ed::public_key_shim>());
-}
-
-pubkey pubkey::from_ed_public_key(const fc::crypto::ed::public_key_shim& pk) {
-   pubkey result;
-   static_assert(sizeof(pk._data) == SIZE, "ED25519 public key size mismatch");
-   std::copy(pk._data.begin(), pk._data.end(), result.data.begin());
-   return result;
-}
-
-bool pubkey::is_zero() const {
-   for (auto b : data) {
-      if (b != 0)
-         return false;
-   }
-   return true;
-}
-
-//=============================================================================
-// signature implementation
-//=============================================================================
-
-std::string signature::to_base58() const {
-   return fc::to_base58(reinterpret_cast<const char*>(data.data()), data.size(), fc::yield_function_t{});
-}
-
-signature signature::from_base58(const std::string& str) {
-   auto bytes = fc::from_base58(str);
-   FC_ASSERT(bytes.size() == SIZE, "Invalid Solana signature length: expected {}, got {}", SIZE, bytes.size());
-   signature result;
-   std::memcpy(result.data.data(), bytes.data(), SIZE);
-   return result;
-}
-
-signature signature::from_ed_signature(const fc::crypto::ed::signature_shim& sig) {
-   signature result;
-   static_assert(sizeof(sig._data) == SIZE, "ED25519 signature size mismatch");
-   std::ranges::copy(sig._data, result.data.begin());
-   return result;
-}
-
-//=============================================================================
 // commitment_t implementation
 //=============================================================================
 
@@ -196,19 +136,19 @@ message message::deserialize(const uint8_t* data, size_t len) {
    auto [num_keys, key_len_bytes] = compact_u16::decode(data + offset, len - offset);
    offset += key_len_bytes;
 
-   FC_ASSERT(offset + num_keys * pubkey::SIZE <= len, "Message too short for account keys");
+   FC_ASSERT(offset + num_keys * solana_public_key::SIZE <= len, "Message too short for account keys");
    msg.account_keys.reserve(num_keys);
    for (uint16_t i = 0; i < num_keys; ++i) {
-      pubkey key;
-      std::memcpy(key.data.data(), data + offset, pubkey::SIZE);
+      solana_public_key key;
+      std::memcpy(key.data.data(), data + offset, solana_public_key::SIZE);
       msg.account_keys.push_back(key);
-      offset += pubkey::SIZE;
+      offset += solana_public_key::SIZE;
    }
 
    // Recent blockhash
-   FC_ASSERT(offset + pubkey::SIZE <= len, "Message too short for blockhash");
-   std::memcpy(msg.recent_blockhash.data.data(), data + offset, pubkey::SIZE);
-   offset += pubkey::SIZE;
+   FC_ASSERT(offset + solana_public_key::SIZE <= len, "Message too short for blockhash");
+   std::memcpy(msg.recent_blockhash.data.data(), data + offset, solana_public_key::SIZE);
+   offset += solana_public_key::SIZE;
 
    // Instructions
    auto [num_instructions, instr_len_bytes] = compact_u16::decode(data + offset, len - offset);
@@ -346,13 +286,13 @@ transaction transaction::deserialize(const uint8_t* data, size_t len) {
    auto [num_sigs, sig_len_bytes] = compact_u16::decode(data + offset, len - offset);
    offset += sig_len_bytes;
 
-   FC_ASSERT(offset + num_sigs * signature::SIZE <= len, "Transaction too short for signatures");
+   FC_ASSERT(offset + num_sigs * solana_signature::SIZE <= len, "Transaction too short for signatures");
    tx.signatures.reserve(num_sigs);
    for (uint16_t i = 0; i < num_sigs; ++i) {
-      signature sig;
-      std::memcpy(sig.data.data(), data + offset, signature::SIZE);
+      solana_signature sig;
+      std::memcpy(sig.data.data(), data + offset, solana_signature::SIZE);
       tx.signatures.push_back(sig);
-      offset += signature::SIZE;
+      offset += solana_signature::SIZE;
    }
 
    // Message
@@ -387,11 +327,11 @@ std::vector<uint8_t> versioned_transaction::serialize() const {
 // pubkey_compat_t implementation
 //=============================================================================
 
-pubkey to_pubkey(const pubkey_compat_t& pk) {
-   if (std::holds_alternative<pubkey>(pk)) {
-      return std::get<pubkey>(pk);
+solana_public_key to_pubkey(const pubkey_compat_t& pk) {
+   if (std::holds_alternative<solana_public_key>(pk)) {
+      return std::get<solana_public_key>(pk);
    }
-   return pubkey::from_base58(std::get<std::string>(pk));
+   return solana_public_key::from_base58(std::get<std::string>(pk));
 }
 
 }  // namespace fc::network::solana
