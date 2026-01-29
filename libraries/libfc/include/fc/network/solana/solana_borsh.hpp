@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
-#include <fc/network/solana/solana_types.hpp>
-
 #include <cstdint>
 #include <cstring>
-#include <optional>
-#include <string>
-#include <vector>
-
 #include <fc/exception/exception.hpp>
 #include <fc/int128.hpp>
 #include <fc/int256.hpp>
+#include <fc/network/solana/solana_types.hpp>
 #include <fc/variant.hpp>
+#include <optional>
+#include <string>
+#include <vector>
 
 namespace fc::network::solana::borsh {
 
@@ -62,7 +60,7 @@ public:
    void write_fixed_bytes(const std::vector<uint8_t>& v) { write_fixed_bytes(v.data(), v.size()); }
 
    // Solana pubkey (32 bytes, no length prefix)
-   void write_pubkey(const pubkey& pk);
+   void write_pubkey(const solana_public_key& pk);
 
    /**
     * @brief Write Option<T> - 0 byte for None, 1 byte + value for Some
@@ -110,8 +108,14 @@ private:
  */
 class decoder {
 public:
-   explicit decoder(const std::vector<uint8_t>& data) : _data(data.data()), _size(data.size()), _pos(0) {}
-   decoder(const uint8_t* data, size_t len) : _data(data), _size(len), _pos(0) {}
+   explicit decoder(const std::vector<uint8_t>& data)
+      : _data(data.data())
+      , _size(data.size())
+      , _pos(0) {}
+   decoder(const uint8_t* data, size_t len)
+      : _data(data)
+      , _size(len)
+      , _pos(0) {}
 
    // Unsigned integers
    uint8_t read_u8();
@@ -147,7 +151,7 @@ public:
    std::vector<uint8_t> read_fixed_bytes(size_t len);
 
    // Solana pubkey
-   pubkey read_pubkey();
+   solana_public_key read_pubkey();
 
    /**
     * @brief Read Option<T>
@@ -238,7 +242,7 @@ void encoder::write_option(const std::optional<T>& v) {
          write_bool(*v);
       } else if constexpr (std::is_same_v<T, std::string>) {
          write_string(*v);
-      } else if constexpr (std::is_same_v<T, pubkey>) {
+      } else if constexpr (std::is_same_v<T, solana_public_key>) {
          write_pubkey(*v);
       } else {
          static_assert(sizeof(T) == 0, "Unsupported type for write_option");
@@ -270,7 +274,7 @@ void encoder::write_vec(const std::vector<T>& v) {
          write_bool(elem);
       } else if constexpr (std::is_same_v<T, std::string>) {
          write_string(elem);
-      } else if constexpr (std::is_same_v<T, pubkey>) {
+      } else if constexpr (std::is_same_v<T, solana_public_key>) {
          write_pubkey(elem);
       } else {
          static_assert(sizeof(T) == 0, "Unsupported type for write_vec");
@@ -289,7 +293,7 @@ void encoder::write_array(const std::array<T, N>& v) {
          write_u32(elem);
       } else if constexpr (std::is_same_v<T, uint64_t>) {
          write_u64(elem);
-      } else if constexpr (std::is_same_v<T, pubkey>) {
+      } else if constexpr (std::is_same_v<T, solana_public_key>) {
          write_pubkey(elem);
       } else {
          static_assert(sizeof(T) == 0, "Unsupported type for write_array");
@@ -339,7 +343,7 @@ std::optional<T> decoder::read_option() {
       return read_bool();
    } else if constexpr (std::is_same_v<T, std::string>) {
       return read_string();
-   } else if constexpr (std::is_same_v<T, pubkey>) {
+   } else if constexpr (std::is_same_v<T, solana_public_key>) {
       return read_pubkey();
    } else {
       static_assert(sizeof(T) == 0, "Unsupported type for read_option");
@@ -373,7 +377,7 @@ std::vector<T> decoder::read_vec() {
          result.push_back(read_bool());
       } else if constexpr (std::is_same_v<T, std::string>) {
          result.push_back(read_string());
-      } else if constexpr (std::is_same_v<T, pubkey>) {
+      } else if constexpr (std::is_same_v<T, solana_public_key>) {
          result.push_back(read_pubkey());
       } else {
          static_assert(sizeof(T) == 0, "Unsupported type for read_vec");
@@ -396,7 +400,7 @@ std::array<T, N> decoder::read_array() {
          result[i] = read_u32();
       } else if constexpr (std::is_same_v<T, uint64_t>) {
          result[i] = read_u64();
-      } else if constexpr (std::is_same_v<T, pubkey>) {
+      } else if constexpr (std::is_same_v<T, solana_public_key>) {
          result[i] = read_pubkey();
       } else {
          static_assert(sizeof(T) == 0, "Unsupported type for read_array");
@@ -425,4 +429,4 @@ std::array<uint8_t, 8> compute_discriminator(const std::string& namespace_prefix
  */
 std::array<uint8_t, 8> compute_account_discriminator(const std::string& name);
 
-}  // namespace fc::network::solana::borsh
+} // namespace fc::network::solana::borsh

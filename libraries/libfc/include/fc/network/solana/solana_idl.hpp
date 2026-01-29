@@ -220,7 +220,7 @@ struct instruction_account {
    bool is_optional = false;
 
    // For known addresses (like system program)
-   std::optional<pubkey> address;
+   std::optional<solana_public_key> address;
 
    // PDA seed components for derivation
    std::vector<pda_seed> pda_seeds;

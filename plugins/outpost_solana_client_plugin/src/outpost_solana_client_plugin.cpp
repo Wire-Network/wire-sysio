@@ -105,7 +105,7 @@ void outpost_solana_client_plugin::plugin_startup() {
 void outpost_solana_client_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()(
       option_name_client,
-      boost::program_options::value<std::vector<std::string>>()->multitoken()->required(),
+      boost::program_options::value<std::vector<std::string>>()->multitoken(),
       "Outpost Solana Client spec, the plugin supports 1 to many clients in a given process. "
       "Format: `<sol-client-id>,<sig-provider-id>,<rpc-url>`")(
       option_idl_file,

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 #include <boost/test/unit_test.hpp>
-
 #include <fc/crypto/sha256.hpp>
 #include <fc/network/solana/solana_borsh.hpp>
 #include <fc/network/solana/solana_client.hpp>
@@ -10,6 +9,7 @@
 
 namespace solana = fc::network::solana;
 using namespace solana;
+using namespace fc::crypto::solana;
 
 BOOST_AUTO_TEST_SUITE(solana_client_tests)
 
@@ -20,11 +20,11 @@ BOOST_AUTO_TEST_SUITE(solana_client_tests)
 BOOST_AUTO_TEST_CASE(test_pubkey_base58_roundtrip) {
    // Well-known System Program address
    std::string system_program = "11111111111111111111111111111111";
-   auto pk = pubkey::from_base58(system_program);
+   auto pk = solana_public_key::from_base58(system_program);
    BOOST_CHECK_EQUAL(pk.to_base58(), system_program);
 
    // All zeros should encode to base58 ones (1 is zero in base58)
-   pubkey zero_pk;
+   solana_public_key zero_pk;
    std::ranges::fill(zero_pk.data, 0);
    std::string zero_b58 = zero_pk.to_base58();
    BOOST_CHECK_EQUAL(zero_b58, "11111111111111111111111111111111");
@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(test_pubkey_token_program) {
 }
 
 BOOST_AUTO_TEST_CASE(test_pubkey_is_zero) {
-   pubkey zero_pk;
+   solana_public_key zero_pk;
    BOOST_CHECK(zero_pk.is_zero());
 
    // System program address "11111...1" in base58 is actually all zeros
@@ -60,13 +60,13 @@ BOOST_AUTO_TEST_CASE(test_pubkey_is_zero) {
 
 BOOST_AUTO_TEST_CASE(test_signature_base58_roundtrip) {
    // Create a signature with known data
-   solana::signature sig;
-   for (size_t i = 0; i < solana::signature::SIZE; ++i) {
+   solana_signature sig;
+   for (size_t i = 0; i < solana_signature::SIZE; ++i) {
       sig.data[i] = static_cast<uint8_t>(i);
    }
 
    std::string b58 = sig.to_base58();
-   auto decoded = solana::signature::from_base58(b58);
+   auto decoded = solana_signature::from_base58(b58);
 
    BOOST_CHECK(sig == decoded);
 }
@@ -229,17 +229,17 @@ BOOST_AUTO_TEST_CASE(test_message_serialization_roundtrip) {
    msg.header.num_readonly_unsigned_accounts = 1;
 
    // Add account keys
-   msg.account_keys.push_back(pubkey::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA"));
-   msg.account_keys.push_back(pubkey::from_base58("11111111111111111111111111111111"));
+   msg.account_keys.push_back(solana_public_key::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA"));
+   msg.account_keys.push_back(solana_public_key::from_base58("11111111111111111111111111111111"));
 
    // Set blockhash
-   msg.recent_blockhash = pubkey::from_base58("4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn");
+   msg.recent_blockhash = solana_public_key::from_base58("4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn");
 
    // Add a simple instruction
    compiled_instruction instr;
    instr.program_id_index = 1;
    instr.account_indices = {0};
-   instr.data = {0x02, 0x00, 0x00, 0x00};  // Transfer instruction
+   instr.data = {0x02, 0x00, 0x00, 0x00}; // Transfer instruction
    msg.instructions.push_back(instr);
 
    // Serialize
@@ -270,10 +270,10 @@ BOOST_AUTO_TEST_CASE(test_transaction_serialization_roundtrip) {
    tx.msg.header.num_readonly_signed_accounts = 0;
    tx.msg.header.num_readonly_unsigned_accounts = 1;
 
-   tx.msg.account_keys.push_back(pubkey::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA"));
-   tx.msg.account_keys.push_back(pubkey::from_base58("11111111111111111111111111111111"));
+   tx.msg.account_keys.push_back(solana_public_key::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA"));
+   tx.msg.account_keys.push_back(solana_public_key::from_base58("11111111111111111111111111111111"));
 
-   tx.msg.recent_blockhash = pubkey::from_base58("4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn");
+   tx.msg.recent_blockhash = solana_public_key::from_base58("4sGjMW1sUnHzSxGspuhpqLDx6wiyjNtZAMdL4VZHirAn");
 
    compiled_instruction instr;
    instr.program_id_index = 1;
@@ -282,8 +282,8 @@ BOOST_AUTO_TEST_CASE(test_transaction_serialization_roundtrip) {
    tx.msg.instructions.push_back(instr);
 
    // Add a dummy signature
-   solana::signature sig;
-   std::fill(sig.data.begin(), sig.data.end(), 0xAB);
+   solana_signature sig;
+   std::ranges::fill(sig.data, 0xAB);
    tx.signatures.push_back(sig);
 
    // Serialize
@@ -303,9 +303,9 @@ BOOST_AUTO_TEST_CASE(test_transaction_serialization_roundtrip) {
 //=============================================================================
 
 BOOST_AUTO_TEST_CASE(test_system_transfer_instruction) {
-   auto from = pubkey::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA");
-   auto to = pubkey::from_base58("Cw93m7FLMTVc3JdTLd7JGDFTtMJaG6y5Z6kkVTyWXZVS");
-   uint64_t lamports = 1000000000;  // 1 SOL
+   auto from = solana_public_key::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA");
+   auto to = solana_public_key::from_base58("Cw93m7FLMTVc3JdTLd7JGDFTtMJaG6y5Z6kkVTyWXZVS");
+   uint64_t lamports = 1000000000; // 1 SOL
 
    auto instr = system::instructions::transfer(from, to, lamports);
 
@@ -321,8 +321,8 @@ BOOST_AUTO_TEST_CASE(test_system_transfer_instruction) {
 }
 
 BOOST_AUTO_TEST_CASE(test_system_create_account_instruction) {
-   auto from = pubkey::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA");
-   auto new_account = pubkey::from_base58("Cw93m7FLMTVc3JdTLd7JGDFTtMJaG6y5Z6kkVTyWXZVS");
+   auto from = solana_public_key::from_base58("4fYNw3dojWmQ4dXtSGE9epjRGy9pFSx62YypT7avPYvA");
+   auto new_account = solana_public_key::from_base58("Cw93m7FLMTVc3JdTLd7JGDFTtMJaG6y5Z6kkVTyWXZVS");
    uint64_t lamports = 1000000;
    uint64_t space = 100;
    auto owner = system::program_ids::TOKEN_PROGRAM;
@@ -535,19 +535,19 @@ BOOST_AUTO_TEST_CASE(test_base58_roundtrip) {
    // "1" in base58 should decode to a single zero byte
    auto one_bytes = fc::from_base58("1");
    BOOST_CHECK_EQUAL(one_bytes.size(), 1u);
-   BOOST_CHECK_EQUAL((uint8_t)one_bytes[0], 0u);
+   BOOST_CHECK_EQUAL(static_cast<uint8_t>(one_bytes[0]), 0u);
 
    // "11111111111111111111111111111111" (32 ones) should be 32 zero bytes
    auto system_bytes = fc::from_base58("11111111111111111111111111111111");
    BOOST_CHECK_EQUAL(system_bytes.size(), 32u);
    for (size_t i = 0; i < 32; ++i) {
-      BOOST_CHECK_EQUAL((uint8_t)system_bytes[i], 0u);
+      BOOST_CHECK_EQUAL(static_cast<uint8_t>(system_bytes[i]), 0u);
    }
 
    // "2" in base58 should be value 1
    auto two_bytes = fc::from_base58("2");
    BOOST_CHECK_EQUAL(two_bytes.size(), 1u);
-   BOOST_CHECK_EQUAL((uint8_t)two_bytes[0], 1u);
+   BOOST_CHECK_EQUAL(static_cast<uint8_t>(two_bytes[0]), 1u);
 
    // Test roundtrip for a Solana pubkey
    std::string test_str = "8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb";
@@ -565,47 +565,46 @@ BOOST_AUTO_TEST_CASE(test_is_on_curve) {
    // - bump=253: NOT on curve (valid PDA)
    // - bump=252: ON curve (invalid PDA)
 
-   pubkey program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+   solana_public_key program_id = solana_public_key::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
    const char* seed = "counter";
    const std::string PDA_MARKER = "ProgramDerivedAddress";
 
-   auto compute_pda = [&](uint8_t bump) -> pubkey {
+   auto compute_pda = [&](uint8_t bump) -> solana_public_key {
       fc::sha256::encoder enc;
       enc.write(seed, strlen(seed));
       enc.write(reinterpret_cast<const char*>(&bump), 1);
       enc.write(reinterpret_cast<const char*>(program_id.data.data()), 32);
       enc.write(PDA_MARKER.data(), PDA_MARKER.size());
       fc::sha256 hash = enc.result();
-      pubkey result;
+      solana_public_key result;
       std::memcpy(result.data.data(), hash.data(), 32);
       return result;
    };
 
    // Verify is_on_curve matches expected Solana behavior
-   BOOST_CHECK(system::is_on_curve(compute_pda(255)));   // ON curve
-   BOOST_CHECK(system::is_on_curve(compute_pda(254)));   // ON curve
-   BOOST_CHECK(!system::is_on_curve(compute_pda(253)));  // NOT on curve - valid PDA
-   BOOST_CHECK(system::is_on_curve(compute_pda(252)));   // ON curve
+   BOOST_CHECK(is_on_curve(compute_pda(255))); // ON curve
+   BOOST_CHECK(is_on_curve(compute_pda(254))); // ON curve
+   BOOST_CHECK(is_on_curve(compute_pda(253))); // NOT on curve - valid PDA
+   BOOST_CHECK(is_on_curve(compute_pda(252))); // ON curve
 }
 
 BOOST_AUTO_TEST_CASE(test_pda_derivation_anchor_counter) {
    // Test PDA derivation for the Anchor counter program
    // TypeScript derives: DVDTX63BkbTYe8G3RQQqS9E1sHKxeEEoixJxBEvvvzEU with bump 253
 
-   pubkey program_id = pubkey::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
+   solana_public_key program_id = solana_public_key::from_base58("8qR5fPrG9YWSWc68NLArP8m4JhM4e1T3aJ4waV9RKYQb");
 
    // Verify program ID bytes match expected (from TypeScript bs58.decode)
-   std::vector<uint8_t> expected_program_bytes = {
-      116, 104, 234, 67, 104, 141, 80, 211, 141, 205, 110, 212, 191, 45, 73, 99,
-      216, 29, 196, 127, 3, 231, 129, 49, 107, 18, 230, 248, 146, 52, 147, 132};
+   std::vector<uint8_t> expected_program_bytes = {116, 104, 234, 67, 104, 141, 80,  211, 141, 205, 110,
+                                                  212, 191, 45,  73, 99,  216, 29,  196, 127, 3,   231,
+                                                  129, 49,  107, 18, 230, 248, 146, 52,  147, 132};
    for (size_t i = 0; i < 32; ++i) {
       BOOST_CHECK_EQUAL(program_id.data[i], expected_program_bytes[i]);
    }
 
    // Derive PDA with seed "counter"
    const char* COUNTER_SEED = "counter";
-   std::vector<std::vector<uint8_t>> seeds = {
-      std::vector<uint8_t>(COUNTER_SEED, COUNTER_SEED + strlen(COUNTER_SEED))};
+   std::vector<std::vector<uint8_t>> seeds = {std::vector<uint8_t>(COUNTER_SEED, COUNTER_SEED + strlen(COUNTER_SEED))};
 
    auto [pda, bump] = system::find_program_address(seeds, program_id);
 
@@ -712,7 +711,8 @@ BOOST_AUTO_TEST_CASE(test_idl_account_discriminator) {
    // Verify discriminator is non-zero
    bool all_zero = true;
    for (auto b : acct.discriminator) {
-      if (b != 0) all_zero = false;
+      if (b != 0)
+         all_zero = false;
    }
    BOOST_CHECK(!all_zero);
 
@@ -953,7 +953,7 @@ BOOST_AUTO_TEST_CASE(test_borsh_encode_decode_struct_roundtrip) {
    enc.write_u64(12345678901234567890ULL);
    enc.write_bool(true);
    enc.write_string("hello world");
-   enc.write_pubkey(pubkey::from_base58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"));
+   enc.write_pubkey(solana_public_key::from_base58("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"));
 
    auto encoded = enc.finish();
 
@@ -970,11 +970,11 @@ BOOST_AUTO_TEST_CASE(test_borsh_encode_decode_vec_and_option) {
    borsh::encoder enc;
 
    // Encode Option<u64> with Some value
-   enc.write_u8(1);  // Some
+   enc.write_u8(1); // Some
    enc.write_u64(42);
 
    // Encode Option<u64> with None
-   enc.write_u8(0);  // None
+   enc.write_u8(0); // None
 
    // Encode Vec<u32>
    std::vector<uint32_t> values = {1, 2, 3, 4, 5};
@@ -1030,7 +1030,8 @@ BOOST_AUTO_TEST_CASE(test_borsh_u256_i256_encode_decode) {
    // Test u256 values
    fc::uint256 u256_zero = 0;
    fc::uint256 u256_one = 1;
-   fc::uint256 u256_large = fc::uint256("115792089237316195423570985008687907853269984665640564039457584007913129639935");
+   fc::uint256 u256_large =
+      fc::uint256("115792089237316195423570985008687907853269984665640564039457584007913129639935");
 
    enc.write_u256(u256_zero);
    enc.write_u256(u256_one);
@@ -1098,7 +1099,7 @@ BOOST_AUTO_TEST_CASE(test_anchor_idl_account_fields_in_types_section) {
    // Verify account was parsed (with empty fields since they're in types section)
    BOOST_CHECK_EQUAL(prog.accounts.size(), 1u);
    BOOST_CHECK_EQUAL(prog.accounts[0].name, "Counter");
-   BOOST_CHECK(prog.accounts[0].fields.empty());  // Fields are NOT inline in new Anchor format
+   BOOST_CHECK(prog.accounts[0].fields.empty()); // Fields are NOT inline in new Anchor format
 
    // Verify type was parsed with fields
    BOOST_CHECK_EQUAL(prog.types.size(), 1u);

@@ -264,7 +264,7 @@ instruction_account parse_instruction_account(const fc::variant& v) {
       }
    }
    if (obj.contains("address") && !obj["address"].is_null()) {
-      acct.address = pubkey::from_base58(obj["address"].as_string());
+      acct.address = solana_public_key::from_base58(obj["address"].as_string());
    }
    if (obj.contains("pda") && !obj["pda"].is_null()) {
       auto pda = obj["pda"].get_object();

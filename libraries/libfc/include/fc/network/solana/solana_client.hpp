@@ -76,7 +76,7 @@ using solana_program_data_tx_fn =
  */
 class solana_program_data_client : public std::enable_shared_from_this<solana_program_data_client> {
 public:
-   const pubkey program_id;
+   const solana_public_key program_id;
    const solana_client_ptr client;
 
    solana_program_data_client() = delete;
@@ -87,7 +87,7 @@ public:
     * @param client Shared pointer to the solana_client for RPC communication
     * @param program_id Program address
     */
-   solana_program_data_client(const solana_client_ptr& client, const pubkey& program_id);
+   solana_program_data_client(const solana_client_ptr& client, const solana_public_key& program_id);
 
    virtual ~solana_program_data_client() = default;
 
@@ -152,7 +152,7 @@ protected:
 /**
  * @brief Map of account name to pubkey for account overrides
  */
-using account_overrides_t = std::map<std::string, pubkey>;
+using account_overrides_t = std::map<std::string, solana_public_key>;
 
 /**
  * @class solana_program_client
@@ -169,7 +169,7 @@ using account_overrides_t = std::map<std::string, pubkey>;
  */
 class solana_program_client : public std::enable_shared_from_this<solana_program_client> {
 public:
-   const pubkey program_id;
+   const solana_public_key program_id;
    const solana_client_ptr client;
 
    solana_program_client() = delete;
@@ -181,7 +181,7 @@ public:
     * @param program_id Program address
     * @param idls Optional vector of IDL program definitions to preload
     */
-   solana_program_client(const solana_client_ptr& client, const pubkey& program_id,
+   solana_program_client(const solana_client_ptr& client, const solana_public_key& program_id,
                          const std::vector<idl::program>& idls = {});
 
    virtual ~solana_program_client() = default;
@@ -280,7 +280,7 @@ protected:
     * @return Callable function object that fetches and decodes the account data
     */
    template <typename RT>
-   solana_program_account_data_fn<RT> create_account_data_get(const std::string& idl_type_name, const pubkey& pda);
+   solana_program_account_data_fn<RT> create_account_data_get(const std::string& idl_type_name, const solana_public_key& pda);
 
    /**
     * @brief Encode a value to Borsh format using IDL type information
@@ -330,7 +330,7 @@ protected:
     * @param params Instruction parameters for arg-type seeds
     * @return Pair of (pubkey, bump)
     */
-   std::pair<pubkey, uint8_t> derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
+   std::pair<solana_public_key, uint8_t> derive_pda(const std::vector<idl::pda_seed>& pda_seeds,
                                           const program_invoke_data_items& params = {});
 
    /**
@@ -387,7 +387,7 @@ public:
     * @return Decoded account data as RT
     */
    template <typename RT>
-   RT get_account_data(const std::string& account_name, const pubkey& address,
+   RT get_account_data(const std::string& account_name, const solana_public_key& address,
                        commitment_t commitment = commitment_t::finalized);
 
 private:
@@ -422,7 +422,7 @@ public:
    /**
     * @brief Get the signer's public key
     */
-   pubkey get_pubkey() const { return _pubkey; }
+   solana_public_key get_pubkey() const { return _pubkey; }
 
    //=========================================================================
    // Account Methods
@@ -446,7 +446,7 @@ public:
    /**
     * @brief Get multiple accounts in a single request
     */
-   std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<pubkey>& addresses,
+   std::vector<std::optional<account_info>> get_multiple_accounts(const std::vector<solana_public_key>& addresses,
                                                                    commitment_t commitment = commitment_t::finalized);
 
    //=========================================================================
@@ -582,7 +582,7 @@ public:
    /**
     * @brief Get recent prioritization fees
     */
-   std::vector<fc::variant> get_recent_prioritization_fees(const std::vector<pubkey>& accounts = {});
+   std::vector<fc::variant> get_recent_prioritization_fees(const std::vector<solana_public_key>& accounts = {});
 
    //=========================================================================
    // Inflation Methods
@@ -590,7 +590,7 @@ public:
 
    fc::variant get_inflation_governor(commitment_t commitment = commitment_t::finalized);
    fc::variant get_inflation_rate();
-   fc::variant get_inflation_reward(const std::vector<pubkey>& addresses, std::optional<uint64_t> epoch = std::nullopt);
+   fc::variant get_inflation_reward(const std::vector<solana_public_key>& addresses, std::optional<uint64_t> epoch = std::nullopt);
 
    //=========================================================================
    // Supply Methods
@@ -740,7 +740,7 @@ public:
     * @param fee_payer Fee payer account
     * @return Unsigned transaction
     */
-   transaction create_transaction(const std::vector<instruction>& instructions, const pubkey& fee_payer);
+   transaction create_transaction(const std::vector<instruction>& instructions, const solana_public_key& fee_payer);
 
    /**
     * @brief Sign a transaction
@@ -772,7 +772,7 @@ public:
     * @brief Get or create a typed program client
     */
    template <typename C>
-   std::shared_ptr<C> get_program(const pubkey& program_id, const std::vector<idl::program>& idls = {}) {
+   std::shared_ptr<C> get_program(const solana_public_key& program_id, const std::vector<idl::program>& idls = {}) {
       auto programs = _programs_map.writeable();
       if (!programs.contains(program_id)) {
          programs[program_id] = std::make_shared<C>(shared_from_this(), program_id, idls);
@@ -787,7 +787,7 @@ public:
     * without IDL support.
     */
    template <typename C = solana_program_data_client>
-   std::shared_ptr<C> get_data_program(const pubkey& program_id) {
+   std::shared_ptr<C> get_data_program(const solana_public_key& program_id) {
       auto data_programs = _data_programs_map.writeable();
       if (!data_programs.contains(program_id)) {
          data_programs[program_id] = std::make_shared<C>(shared_from_this(), program_id);
@@ -797,11 +797,11 @@ public:
 
 private:
    const signature_provider_ptr _signature_provider;
-   const pubkey _pubkey;
+   const solana_public_key _pubkey;
    json_rpc_client _client;
 
-   fc::threadsafe_map<pubkey, std::shared_ptr<solana_program_client>> _programs_map{};
-   fc::threadsafe_map<pubkey, std::shared_ptr<solana_program_data_client>> _data_programs_map{};
+   fc::threadsafe_map<solana_public_key, std::shared_ptr<solana_program_client>> _programs_map{};
+   fc::threadsafe_map<solana_public_key, std::shared_ptr<solana_program_data_client>> _data_programs_map{};
 
    /**
     * @brief Build config object for RPC calls
@@ -864,7 +864,7 @@ solana_program_tx_fn<RT, Args...> solana_program_client::create_tx(const idl::in
 }
 
 template <typename RT>
-RT solana_program_client::get_account_data(const std::string& account_name, const pubkey& address,
+RT solana_program_client::get_account_data(const std::string& account_name, const solana_public_key& address,
                                             commitment_t commitment) {
    // Fetch account info from the network
    auto account_info = client->get_account_info(address, commitment);
@@ -884,10 +884,10 @@ RT solana_program_client::get_account_data(const std::string& account_name, cons
 
 template <typename RT>
 solana_program_account_data_fn<RT> solana_program_client::create_account_data_get(const std::string& idl_type_name,
-                                                                                    const pubkey& pda) {
+                                                                                    const solana_public_key& pda) {
    // Capture type name and address by value for the lambda
    std::string type_name = idl_type_name;
-   pubkey address = pda;
+   solana_public_key address = pda;
 
    return [this, type_name, address](commitment_t commitment = commitment_t::finalized) -> RT {
       // Fetch account info from the network

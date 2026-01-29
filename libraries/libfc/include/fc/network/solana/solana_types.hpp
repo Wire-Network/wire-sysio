@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <fc/crypto/base58.hpp>
+#include <fc/crypto/solana/solana_crypto_utils.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/sha256.hpp>
@@ -17,81 +18,7 @@
 #include <fc/variant.hpp>
 
 namespace fc::network::solana {
-
-// Forward declarations
-struct pubkey;
-struct signature;
-
-/**
- * @brief 32-byte Solana public key (base58 encoded in Solana)
- */
-struct pubkey {
-   static constexpr size_t SIZE = 32;
-   std::array<uint8_t, SIZE> data{};
-
-   pubkey() = default;
-   explicit pubkey(const std::array<uint8_t, SIZE>& d) : data(d) {}
-   explicit pubkey(const uint8_t* d) { std::copy_n(d, SIZE, data.begin()); }
-
-   /**
-    * @brief Convert public key to base58 string
-    */
-   std::string to_base58() const;
-
-   /**
-    * @brief Create public key from base58 string
-    */
-   static pubkey from_base58(const std::string& str);
-
-   /**
-    * @brief Create public key from fc::crypto::public_key (ED25519)
-    */
-   static pubkey from_public_key(const fc::crypto::public_key& pk);
-
-   /**
-    * @brief Create public key from ED25519 public key shim
-    */
-   static pubkey from_ed_public_key(const fc::crypto::ed::public_key_shim& pk);
-
-   /**
-    * @brief Check if the public key is all zeros (default/uninitialized)
-    */
-   bool is_zero() const;
-
-   bool operator==(const pubkey& other) const { return data == other.data; }
-   bool operator!=(const pubkey& other) const { return data != other.data; }
-   bool operator<(const pubkey& other) const { return data < other.data; }
-};
-
-/**
- * @brief 64-byte Solana signature
- */
-struct signature {
-   static constexpr size_t SIZE = 64;
-   std::array<uint8_t, SIZE> data{};
-
-   signature() = default;
-   explicit signature(const std::array<uint8_t, SIZE>& d) : data(d) {}
-   explicit signature(const uint8_t* d) { std::copy_n(d, SIZE, data.begin()); }
-
-   /**
-    * @brief Convert signature to base58 string
-    */
-   std::string to_base58() const;
-
-   /**
-    * @brief Create signature from base58 string
-    */
-   static signature from_base58(const std::string& str);
-
-   /**
-    * @brief Create signature from ED25519 signature shim
-    */
-   static signature from_ed_signature(const fc::crypto::ed::signature_shim& sig);
-
-   bool operator==(const signature& other) const { return data == other.data; }
-   bool operator!=(const signature& other) const { return data != other.data; }
-};
+using namespace fc::crypto::solana;
 
 /**
  * @brief Commitment levels for RPC queries
@@ -111,23 +38,23 @@ std::string to_string(commitment_t commitment);
  * @brief Account metadata for instructions
  */
 struct account_meta {
-   pubkey key;
+   solana_public_key key;
    bool is_signer = false;
    bool is_writable = false;
 
    account_meta() = default;
-   account_meta(const pubkey& k, bool signer, bool writable)
+   account_meta(const solana_public_key& k, bool signer, bool writable)
       : key(k), is_signer(signer), is_writable(writable) {}
 
-   static account_meta readonly(const pubkey& k, bool signer = false) {
+   static account_meta readonly(const solana_public_key& k, bool signer = false) {
       return account_meta(k, signer, false);
    }
 
-   static account_meta writable(const pubkey& k, bool signer = false) {
+   static account_meta writable(const solana_public_key& k, bool signer = false) {
       return account_meta(k, signer, true);
    }
 
-   static account_meta signer(const pubkey& k, bool writable = true) {
+   static account_meta signer(const solana_public_key& k, bool writable = true) {
       return account_meta(k, true, writable);
    }
 };
@@ -136,12 +63,12 @@ struct account_meta {
  * @brief Single instruction to be executed by a program
  */
 struct instruction {
-   pubkey program_id;
+   solana_public_key program_id;
    std::vector<account_meta> accounts;
    std::vector<uint8_t> data;
 
    instruction() = default;
-   instruction(const pubkey& prog_id, std::vector<account_meta> accts, std::vector<uint8_t> d)
+   instruction(const solana_public_key& prog_id, std::vector<account_meta> accts, std::vector<uint8_t> d)
       : program_id(prog_id), accounts(std::move(accts)), data(std::move(d)) {}
 };
 
@@ -168,8 +95,8 @@ struct message_header {
  */
 struct message {
    message_header header;
-   std::vector<pubkey> account_keys;
-   pubkey recent_blockhash;
+   std::vector<solana_public_key> account_keys;
+   solana_public_key recent_blockhash;
    std::vector<compiled_instruction> instructions;
 
    /**
@@ -190,7 +117,7 @@ struct message {
  * @brief Address lookup table entry for v0 transactions
  */
 struct address_lookup_table {
-   pubkey key;
+   solana_public_key key;
    std::vector<uint8_t> writable_indices;
    std::vector<uint8_t> readonly_indices;
 };
@@ -203,8 +130,8 @@ struct versioned_message {
 
    uint8_t version = 0;  // 0 for v0 transactions
    message_header header;
-   std::vector<pubkey> static_account_keys;
-   pubkey recent_blockhash;
+   std::vector<solana_public_key> static_account_keys;
+   solana_public_key recent_blockhash;
    std::vector<compiled_instruction> instructions;
    std::vector<address_lookup_table> address_table_lookups;
 
@@ -223,7 +150,7 @@ struct versioned_message {
  * @brief Full transaction with signatures (legacy format)
  */
 struct transaction {
-   std::vector<signature> signatures;
+   std::vector<solana_signature> signatures;
    message msg;
 
    /**
@@ -258,7 +185,7 @@ struct transaction {
  * @brief Versioned transaction with signatures
  */
 struct versioned_transaction {
-   std::vector<signature> signatures;
+   std::vector<solana_signature> signatures;
    versioned_message msg;
 
    /**
@@ -272,7 +199,7 @@ struct versioned_transaction {
  */
 struct account_info {
    uint64_t lamports = 0;
-   pubkey owner;
+   solana_public_key owner;
    std::vector<uint8_t> data;
    bool executable = false;
    uint64_t rent_epoch = 0;
@@ -322,12 +249,12 @@ struct transaction_error {
 };
 
 // Variant type for pubkey or string (for API compatibility)
-using pubkey_compat_t = std::variant<pubkey, std::string>;
+using pubkey_compat_t = std::variant<solana_public_key, std::string>;
 
 /**
  * @brief Convert pubkey_compat_t to pubkey
  */
-pubkey to_pubkey(const pubkey_compat_t& pk);
+solana_public_key to_pubkey(const pubkey_compat_t& pk);
 
 /**
  * @brief Compact-u16 encoding/decoding helpers
@@ -349,8 +276,8 @@ namespace compact_u16 {
 
 // Reflection macros for serialization
 FC_REFLECT_ENUM(fc::network::solana::commitment_t, (processed)(confirmed)(finalized))
-FC_REFLECT(fc::network::solana::pubkey, (data))
-FC_REFLECT(fc::network::solana::signature, (data))
+FC_REFLECT(fc::network::solana::solana_public_key, (data))
+FC_REFLECT(fc::network::solana::solana_signature, (data))
 FC_REFLECT(fc::network::solana::account_meta, (key)(is_signer)(is_writable))
 FC_REFLECT(fc::network::solana::instruction, (program_id)(accounts)(data))
 FC_REFLECT(fc::network::solana::compiled_instruction, (program_id_index)(account_indices)(data))
