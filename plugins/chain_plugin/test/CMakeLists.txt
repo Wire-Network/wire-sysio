@@ -5,5 +5,5 @@ add_executable( test_chain_plugin
         plugin_config_test.cpp
         main.cpp
         )
-target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap )
+target_link_libraries( test_chain_plugin chain_plugin sysio_testing sysio_chain_wrap version )
 add_p_test(NAME test_chain_plugin COMMAND plugins/chain_plugin/test/test_chain_plugin)
