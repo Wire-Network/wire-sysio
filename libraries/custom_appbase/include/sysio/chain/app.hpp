@@ -21,6 +21,20 @@
 */
 namespace sysio::chain {
 
+constexpr std::string_view platform_name{"wire"};
+
+inline std::filesystem::path default_program_path() {
+   return fc::home_path() / ".config" / platform_name / fc::program_name();
+}
+
+inline std::filesystem::path default_data_path() {
+   return default_program_path() / "data";
+}
+
+inline std::filesystem::path default_config_path() {
+   return default_program_path() / "config";
+}
+
 struct application_config {
    bool enable_logging_config = true;
    bool enable_resource_monitor = true;
@@ -109,8 +123,6 @@ void configure_logging(const std::filesystem::path& config_path) {
    }
 }
 
-} // namespace detail
-
 void logging_conf_handler() {
    auto config_path = appbase::app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
@@ -138,6 +150,8 @@ void initialize_logging(const application_config& cfg) {
    appbase::app().set_sighup_callback(logging_conf_handler);
 }
 
+} // namespace detail
+
 class application {
 public:
    explicit application(const application_config& cfg) : cfg_(cfg) {
@@ -151,9 +165,8 @@ public:
       app_->set_version_string(sysio::version::version_client());
       app_->set_full_version_string(sysio::version::version_full());
 
-      auto home = fc::home_path();
-      app_->set_default_data_dir(home / ".config" / "wire" / exe_name_ / "data");
-      app_->set_default_config_dir(home / ".config" / "wire" / exe_name_ / "config");
+      app_->set_default_data_dir(default_data_path());
+      app_->set_default_config_dir(default_config_path());
 #if __has_include(<sysio/http_plugin/http_plugin.hpp>)
       http_plugin::set_defaults({
          .default_unix_socket_path = "",
@@ -178,7 +191,7 @@ public:
    template <typename... Plugin>
    exit_code::exit_code init(int argc, char** argv) {
       try {
-         auto init_logging = [cfg=cfg_]() { initialize_logging(cfg); };
+         auto init_logging = [cfg=cfg_]() { detail::initialize_logging(cfg); };
          (
             [] {
                if (app().find_plugin<Plugin>() == nullptr) {
