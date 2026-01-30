@@ -106,6 +106,7 @@ Options:
 #include "localize.hpp"
 #include "config.hpp"
 #include "httpc.hpp"
+#include "generate_shell_completion.hpp"
 
 #include <ranges>
 
@@ -1860,6 +1861,18 @@ int main( int argc, char** argv ) {
    app.add_flag("--print-response", http_config.print_response, localized("Print HTTP response to STDERR"));
    app.add_flag("--http-verbose", http_config.verbose, localized("Print HTTP verbose information to STDERR"));
    app.add_flag("--http-trace", http_config.trace, localized("Print HTTP debug trace information to STDERR"));
+
+   { // generate-completion subcommand
+      auto completion_cmd = app.add_subcommand("generate-completion", localized("Generate shell completion script"));
+      completion_cmd->require_subcommand();
+
+      auto gen_bash = [&]() { no_auto_kiod = true; generate_bash_completion(app); };
+      completion_cmd->add_subcommand("bash", localized("Generate bash completion script. clio generate-completion bash > ~/.local/share/bash-completion/completions/clio"))->callback(gen_bash);
+      auto gen_zsh = [&]() { no_auto_kiod = true; generate_zsh_completion(app); };
+      completion_cmd->add_subcommand("zsh", localized("Generate zsh completion script. clio generate-completion zsh > ~/.config/zsh/completions/_clio"))->callback(gen_zsh);
+      auto gen_fish = [&]() { no_auto_kiod = true; generate_fish_completion(app); };
+      completion_cmd->add_subcommand("fish", localized("Generate fish completion script. clio generate-completion fish > ~/.config/fish/completions/clio.fish"))->callback(gen_fish);
+   }
 
    auto version_cmd = app.add_subcommand("version", localized("Retrieve version information"));
    version_cmd->require_subcommand();
