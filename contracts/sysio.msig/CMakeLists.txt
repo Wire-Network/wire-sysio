@@ -1,7 +1,15 @@
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.wasm COPYONLY )
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.abi  COPYONLY )
-
 if(BUILD_SYSTEM_CONTRACTS)
+  # When building from source, copy pre-built contracts only if they don't exist (bootstrap)
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.wasm)
+    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.wasm COPYONLY )
+  endif()
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.abi)
+    configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.abi  COPYONLY )
+  endif()
   add_contract( sysio.msig sysio.msig sysio.msig.cpp )
+else()
+  # When not building from source, always copy pre-built contracts (ensures fresh copy on branch switch)
+  configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.wasm COPYONLY )
+  configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/sysio.msig.abi  ${CMAKE_CURRENT_BINARY_DIR}/sysio.msig.abi  COPYONLY )
 endif()
 

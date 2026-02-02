@@ -1,7 +1,11 @@
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi COPYONLY)
-
 if(BUILD_SYSTEM_CONTRACTS)
+  # When building from source, copy pre-built contracts only if they don't exist (bootstrap)
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm COPYONLY)
+  endif()
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi COPYONLY)
+  endif()
   add_contract(
     sysio.system
     sysio.system
@@ -18,5 +22,9 @@ if(BUILD_SYSTEM_CONTRACTS)
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../)
+else()
+  # When not building from source, always copy pre-built contracts (ensures fresh copy on branch switch)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.wasm COPYONLY)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.system.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.system.abi COPYONLY)
 endif()
 
