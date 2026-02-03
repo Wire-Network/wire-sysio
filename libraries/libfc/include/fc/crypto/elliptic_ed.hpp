@@ -22,7 +22,7 @@ struct signature_shim;
  */
 struct public_key_shim {
    static constexpr size_t size = crypto_sign_PUBLICKEYBYTES;
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    public_key_shim() = default;
@@ -36,7 +36,7 @@ struct public_key_shim {
    data_type serialize() const { return _data; }
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
@@ -58,7 +58,7 @@ struct signature_shim {
    static constexpr size_t size = crypto_sign_BYTES;
    static constexpr bool is_recoverable = false;
 
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    signature_shim() = default;
@@ -80,7 +80,7 @@ struct signature_shim {
    bool verify(const sha256& digest, const public_key_shim& pub) const;
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
@@ -100,7 +100,7 @@ struct signature_shim {
  */
 struct private_key_shim {
    static constexpr size_t size = crypto_sign_SECRETKEYBYTES;
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    private_key_shim() = default;
@@ -120,14 +120,14 @@ struct private_key_shim {
     * @param len Length of the data
     * @return ED25519 signature
     */
-   signature_shim  sign_raw(const unsigned char* data, size_t len) const;
+   signature_shim  sign_raw(const uint8_t* data, size_t len) const;
 
    sha512          generate_shared_secret(const public_key_shim&) const;
 
    data_type serialize() const { return _data; }
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 

@@ -13,7 +13,7 @@ namespace fc { namespace crypto {
       }
 
       size_t operator()(const bls::signature_shim& sig) const {
-         return bls::signature::get_hash(sig._data);
+         return bls::signature::get_hash(sig.shim_ptr->_data);
       }
 
       size_t operator()(const ed::signature_shim& sig) const {
