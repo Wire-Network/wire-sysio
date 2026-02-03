@@ -1,59 +1,17 @@
 #include <print>
-#include <sysio/chain/application.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/io/json.hpp>
 #include <fc/time.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
 
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
-#include <fc/log/logger_config.hpp>
 #include <sysio/outpost_client_plugin.hpp>
 #include <sysio/outpost_ethereum_client_plugin.hpp>
-#include <sysio/version/version.hpp>
+#include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
+#include <sysio/chain/app.hpp>
 
 using namespace appbase;
 using namespace sysio;
-
-void configure_logging(const std::filesystem::path& config_path) {
-   try {
-      try {
-         fc::configure_logging(config_path);
-      } catch (...) {
-         elog("Error reloading logging.json");
-         throw;
-      }
-   } catch (const fc::exception& e) {
-      //
-      elog("{}", e.to_detail_string());
-   } catch (const boost::exception& e) {
-      elog("{}", boost::diagnostic_information(e));
-   } catch (const std::exception& e) {
-      //
-      elog("{}", e.what());
-   } catch (...) {
-      // empty
-   }
-}
-
-void logging_conf_handler() {
-   auto config_path = app().get_logging_conf();
-   if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
-   } else {
-      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
-   }
-   configure_logging(config_path);
-}
-
-
-void initialize_logging() {
-   auto config_path = app().get_logging_conf();
-   // if (std::filesystem::exists(config_path))
-   //    fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-   //fc::log_config::initialize_appenders();
-
-   app().set_sighup_callback(logging_conf_handler);
-}
 
 using namespace fc::network::ethereum;
 
@@ -86,29 +44,20 @@ struct ethereum_contract_test_counter_client : fc::network::ethereum::ethereum_c
  * @return int Exit code of the program.
  */
 int main(int argc, char* argv[]) {
+   using namespace sysio::chain;
    using namespace fc::crypto::ethereum;
+
+   // since exe.exec() is not called, resource_monitor shutdown is a no-op.
+   chain::application exe{application_config{.enable_resource_monitor = false, .log_on_exit = false}};
+
+   auto r = exe.init<signature_provider_manager_plugin, outpost_client_plugin, outpost_ethereum_client_plugin>(argc, argv);
+   if (r != exit_code::SUCCESS)
+      return r == exit_code::NODE_MANAGEMENT_SUCCESS ? exit_code::SUCCESS : r;
+
    try {
-      appbase::scoped_app app;
-
-      app->set_version_string(sysio::version::version_client());
-      app->set_full_version_string(sysio::version::version_full());
-
-      application::register_plugin<signature_provider_manager_plugin>();
-      application::register_plugin<outpost_client_plugin>();
-      application::register_plugin<outpost_ethereum_client_plugin>();
-
-      if (!app->initialize<signature_provider_manager_plugin, outpost_client_plugin, outpost_ethereum_client_plugin>(
-         argc, argv, initialize_logging)) {
-         const auto& opts = app->get_options();
-         if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") ||
-             opts.contains("print-default-config")) {
-            return 0;
-         }
-         return 1;
-      }
 
       // auto& sig_plug = app->get_plugin<sysio::signature_provider_manager_plugin>();
-      auto& eth_plug = app->get_plugin<sysio::outpost_ethereum_client_plugin>();
+      auto& eth_plug = app().get_plugin<sysio::outpost_ethereum_client_plugin>();
       auto& eth_abi_files = eth_plug.get_abi_files();
       FC_ASSERT(eth_abi_files.size() == 1, "1 ABI file is required (--ethereum-abi-file <json-array-file>)");
       auto& [eth_abi_file, eth_abi_contracts] = eth_abi_files[0];
@@ -189,5 +138,7 @@ int main(int argc, char* argv[]) {
    } catch (...) {
       elog("unknown exception");
    }
-   return 0; ///< Return 0 if the program executed successfully.
+
+   // exe.exec() not called
+   return exit_code::SUCCESS;
 }

@@ -3,8 +3,12 @@
 #include <sysio/chain/priority_queue_executor.hpp>
 #include <sysio/chain/exceptions.hpp>
 #include <sysio/version/version.hpp>
+#if __has_include(<sysio/http_plugin/http_plugin.hpp>)
 #include <sysio/http_plugin/http_plugin.hpp>
+#endif
+#if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#endif
 #include <fc/filesystem.hpp>
 #include <fc/process.hpp>
 #include <fc/crypto/hex.hpp>
@@ -17,10 +21,25 @@
 */
 namespace sysio::chain {
 
+constexpr std::string_view platform_name{"wire"};
+
+inline std::filesystem::path default_program_path() {
+   return fc::home_path() / ".config" / platform_name / fc::program_name();
+}
+
+inline std::filesystem::path default_data_path() {
+   return default_program_path() / "data";
+}
+
+inline std::filesystem::path default_config_path() {
+   return default_program_path() / "config";
+}
+
 struct application_config {
    bool enable_logging_config = true;
    bool enable_resource_monitor = true;
    bool sighup_loads_logging_config = true;
+   bool log_on_exit = true;
    uint16_t default_http_port = 8888;
 };
 
@@ -104,8 +123,6 @@ void configure_logging(const std::filesystem::path& config_path) {
    }
 }
 
-} // namespace detail
-
 void logging_conf_handler() {
    auto config_path = appbase::app().get_logging_conf();
    if (std::filesystem::exists(config_path)) {
@@ -133,6 +150,8 @@ void initialize_logging(const application_config& cfg) {
    appbase::app().set_sighup_callback(logging_conf_handler);
 }
 
+} // namespace detail
+
 class application {
 public:
    explicit application(const application_config& cfg) : cfg_(cfg) {
@@ -146,21 +165,22 @@ public:
       app_->set_version_string(sysio::version::version_client());
       app_->set_full_version_string(sysio::version::version_full());
 
-      auto root = fc::app_path();
-      app_->set_default_data_dir(root / "sysio" / exe_name_ / "data");
-      app_->set_default_config_dir(root / "sysio" / exe_name_ / "config");
+      app_->set_default_data_dir(default_data_path());
+      app_->set_default_config_dir(default_config_path());
+#if __has_include(<sysio/http_plugin/http_plugin.hpp>)
       http_plugin::set_defaults({
          .default_unix_socket_path = "",
          .default_http_port = cfg_.default_http_port,
          .server_header = exe_name_ + "/" + app_->version_string()
       });
+#endif
    }
    application(const application&) = delete;
    application& operator=(const application&) = delete;
    application(application&&) = delete;
    application& operator=(application&&) = delete;
    ~application() {
-      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS) {
+      if (last_result_ != exit_code::NODE_MANAGEMENT_SUCCESS && cfg_.log_on_exit) {
          detail::log_non_default_options(app_->get_parsed_options());
          auto full_ver = app_->version_string() == app_->full_version_string() ? "" : app_->full_version_string();
          ilog("{} version {} {}", exe_name_, app_->version_string(), full_ver);
@@ -171,7 +191,14 @@ public:
    template <typename... Plugin>
    exit_code::exit_code init(int argc, char** argv) {
       try {
-         auto init_logging = [cfg=cfg_]() { initialize_logging(cfg); };
+         auto init_logging = [cfg=cfg_]() { detail::initialize_logging(cfg); };
+         (
+            [] {
+               if (app().find_plugin<Plugin>() == nullptr) {
+                  appbase::application::register_plugin<Plugin>();
+               }
+            }(), ...
+         );
          if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {
@@ -185,6 +212,7 @@ public:
          set_stop_executor_cb([]{});
 
          if (cfg_.enable_resource_monitor) {
+#if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
             if (auto resmon_plugin = app_->find_plugin<resource_monitor_plugin>()) {
                resmon_plugin->initialize(app_->get_options());
                resmon_plugin->monitor_directory(app_->data_dir());
@@ -193,6 +221,9 @@ public:
                last_result_ = exit_code::INITIALIZE_FAIL;
                return last_result_;
             }
+#else
+            elog("resource_monitor_plugin not included");
+#endif
          }
 
          ilog("{} version {} {}", exe_name_, app_->version_string(),

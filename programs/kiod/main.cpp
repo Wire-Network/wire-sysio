@@ -1,127 +1,40 @@
-#include <sysio/chain/application.hpp>
+#include <sysio/chain/app.hpp>
 
 #include <sysio/http_plugin/http_plugin.hpp>
 #include <sysio/wallet_plugin/wallet_plugin.hpp>
 #include <sysio/wallet_api_plugin/wallet_api_plugin.hpp>
 #include <sysio/version/version.hpp>
 
-#include <fc/log/logger_config.hpp>
-#include <fc/exception/exception.hpp>
-
-#include <boost/exception/diagnostic_information.hpp>
-
-#include <pwd.h>
 #include "config.hpp"
 
-using namespace appbase;
 using namespace sysio;
-
-void configure_logging(const std::filesystem::path& config_path) {
-   try {
-      try {
-         fc::configure_logging(config_path);
-      } catch (...) {
-         elog("Error reloading logging.json");
-         throw;
-      }
-   } catch (const fc::exception& e) { //
-      elog("{}", e.to_detail_string());
-   } catch (const boost::exception& e) {
-      elog("{}", boost::diagnostic_information(e));
-   } catch (const std::exception& e) { //
-      elog("{}", e.what());
-   } catch (...) {
-      // empty
-   }
-}
-
-void logging_conf_handler() {
-   auto config_path = app().get_logging_conf();
-   if (std::filesystem::exists(config_path)) {
-      ilog("Received HUP.  Reloading logging configuration from {}.", config_path.string());
-   } else {
-      ilog("Received HUP.  No log config found at {}, setting to default.", config_path.string());
-   }
-   configure_logging(config_path);
-}
-
-void initialize_logging() {
-   auto config_path = app().get_logging_conf();
-   if (std::filesystem::exists(config_path))
-      fc::configure_logging(config_path); // intentionally allowing exceptions to escape
-
-   app().set_sighup_callback(logging_conf_handler);
-}
-
-
-std::filesystem::path determine_home_directory()
-{
-   std::filesystem::path home;
-   struct passwd* pwd = getpwuid(getuid());
-   if(pwd) {
-      home = pwd->pw_dir;
-   }
-   else {
-      home = getenv("HOME");
-   }
-   if(home.empty())
-      home = "./";
-   return home;
-}
-
-enum return_codes {
-   OTHER_FAIL        = -2,
-   INITIALIZE_FAIL   = -1,
-   SUCCESS           = 0,
-   BAD_ALLOC         = 1,
-   DATABASE_DIRTY    = 2,
-   FIXED_REVERSIBLE  = SUCCESS,
-   EXTRACTED_GENESIS = SUCCESS,
-   NODE_MANAGEMENT_SUCCESS = 5
-};
+using namespace sysio::chain;
 
 int main(int argc, char** argv)
 {
-   try {
-      appbase::scoped_app app;
+   chain::application exe{application_config{.enable_resource_monitor = false}};
 
-      app->set_version_string(sysio::version::version_client());
-      app->set_full_version_string(sysio::version::version_full());
-      std::filesystem::path home = determine_home_directory();
-      app->set_default_data_dir(home / "sysio-wallet");
-      app->set_default_config_dir(home / "sysio-wallet");
-      http_plugin::set_defaults({
-         .default_unix_socket_path = kiod::config::key_store_executable_name + ".sock",
-         .default_http_port = 0,
-         .server_header = kiod::config::key_store_executable_name + "/" + app->version_string(),
-         .support_categories = false
-      });
-      application::register_plugin<wallet_api_plugin>();
-      if(!app->initialize<wallet_plugin, wallet_api_plugin, http_plugin>(argc, argv, initialize_logging)) {
-         const auto &opts = app->get_options();
-         if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") ||
-             opts.contains("print-default-config")) {
-            return 0;
-         }
-         return INITIALIZE_FAIL;
-      }
-      auto& http = app->get_plugin<http_plugin>();
-      http.add_handler({"/v1/" + kiod::config::key_store_executable_name + "/stop",
-                       api_category::node,
-                       [&a=app](string, string, url_response_callback cb) {
-         cb(200, fc::variant(fc::variant_object()));
-         a->quit();
-      }}, appbase::exec_queue::read_write );
-      app->startup();
-      app->exec();
-   } catch (const fc::exception& e) {
-      elog("{}", e.to_detail_string());
-   } catch (const boost::exception& e) {
-      elog("{}", boost::diagnostic_information(e));
-   } catch (const std::exception& e) {
-      elog("{}", e.what());
-   } catch (...) {
-      elog("unknown exception");
-   }
-   return 0;
+   std::filesystem::path home = fc::home_path();
+   app().set_default_data_dir(home / "sysio-wallet");
+   app().set_default_config_dir(home / "sysio-wallet");
+   http_plugin::set_defaults({
+      .default_unix_socket_path = kiod::config::key_store_executable_name + ".sock",
+      .default_http_port = 0,
+      .server_header = kiod::config::key_store_executable_name + "/" + app().version_string(),
+      .support_categories = false
+   });
+
+   auto r = exe.init<wallet_plugin, wallet_api_plugin, http_plugin>(argc, argv);
+   if (r != exit_code::SUCCESS)
+      return r == exit_code::NODE_MANAGEMENT_SUCCESS ? exit_code::SUCCESS : r;
+
+   auto& http = app().get_plugin<http_plugin>();
+   http.add_handler({"/v1/" + kiod::config::key_store_executable_name + "/stop",
+                    api_category::node,
+                    [](string, string, url_response_callback cb) {
+      cb(200, fc::variant(fc::variant_object()));
+      app().quit();
+   }}, appbase::exec_queue::read_write );
+
+   return exe.exec();
 }

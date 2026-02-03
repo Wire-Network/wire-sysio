@@ -25,6 +25,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
 #include <chainbase/environment.hpp>
+#include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
@@ -323,9 +324,8 @@ int chain_actions::run_subcommand_sstate() {
 
   // default state dir, if none specified
   if (opt->sstate_state_dir.empty()) {
-    auto root = fc::app_path();
-    auto default_data_dir = root / "sysio" / "nodeop" / "data";
-    state_dir = default_data_dir / config::default_state_dir_name;
+    auto home = fc::home_path();
+    state_dir = default_data_path() / config::default_state_dir_name;
   } else {
     // adjust if path relative
     state_dir = opt->sstate_state_dir;
@@ -688,9 +688,9 @@ int chain_actions::run_subcommand_configure() {
     std::atomic_int app_thread_status{-1};
     std::mutex app_thread_mutex;
     std::condition_variable app_thread_cond;
-    if (!application::null_app_singleton()) {
-      application::instance().quit();
-      application::reset_app_singleton();
+    if (!appbase::application::null_app_singleton()) {
+      appbase::application::instance().quit();
+      appbase::application::reset_app_singleton();
     }
     appbase::scoped_app app;
 

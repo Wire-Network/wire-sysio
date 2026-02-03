@@ -2,6 +2,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/filesystem.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
