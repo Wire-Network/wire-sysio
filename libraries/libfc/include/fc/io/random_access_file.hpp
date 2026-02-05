@@ -78,7 +78,7 @@ struct random_access_file_context {
       flags |= O_APPEND;
 #endif
       fd = open(path.c_str(), flags, DEFFILEMODE);
-      FC_ASSERT(fd != -1, "Failed to open ${fn}: ${e}", ("fn", display_path)("e", strerror(errno)));
+      FC_ASSERT(fd != -1, "Failed to open {}: {}", display_path.generic_string(), strerror(errno));
 #if !defined(O_CLOEXEC)
       //just swallow errors on this paranoia
       flags = fcntl(fd, F_GETFD);
@@ -105,7 +105,7 @@ struct random_access_file_context {
       do {
          red = preadv(fd, iov, i, offs);
       } while(red == -1 && errno == EINTR);
-      FC_ASSERT(red != -1, "read failure on file ${fn}: ${e}", ("fn", display_path)("e", strerror(errno)));
+      FC_ASSERT(red != -1, "read failure on file {}: {}", display_path.generic_string(), strerror(errno));
       return red;
    }
 
@@ -136,7 +136,7 @@ struct random_access_file_context {
                wrote = pwritev(fd, iov, i, offs);
             }
          } while(wrote == -1 && errno == EINTR);
-         FC_ASSERT(wrote != -1, "write failure on file ${fn}: ${e}", ("fn", display_path)("e", strerror(errno)));
+         FC_ASSERT(wrote != -1, "write failure on file {}: {}", display_path.generic_string(), strerror(errno));
 
          bs_left.consume(wrote);
          if(offs != append_t)
@@ -147,7 +147,7 @@ struct random_access_file_context {
    size_t size() const {
       struct stat st;
       int r = fstat(fd, &st);
-      FC_ASSERT(r == 0, "fstat failure on file ${fn}: ${e}", ("fn", display_path)("e", strerror(errno)));
+      FC_ASSERT(r == 0, "fstat failure on file {}: {}", display_path.generic_string(), strerror(errno));
       return st.st_size;
    }
 
@@ -156,7 +156,7 @@ struct random_access_file_context {
       do {
          r = ftruncate(fd, static_cast<off_t>(size));
       } while(r == -1 && errno == EINTR);
-      FC_ASSERT(r == 0, "failed to resize file ${fn} to ${sz} bytes: ${e}", ("fn", display_path)("sz", size)("e", strerror(errno)));
+      FC_ASSERT(r == 0, "failed to resize file {} to {} bytes: {}", display_path.generic_string(), size, strerror(errno));
    }
 
    void punch_hole(size_t begin, size_t end) {
@@ -173,7 +173,7 @@ struct random_access_file_context {
       errno = ENOTSUP;
 #endif
       if(ret == -1 && !one_hole_punch_warning_is_enough.test_and_set())
-         wlog("Failed to punch hole in file ${fn}: ${e}", ("fn", display_path)("e", strerror(errno)));
+         wlog("Failed to punch hole in file {}: {}", display_path.generic_string(), strerror(errno));
    }
 
    native_handle_type native_handle() const {
@@ -243,13 +243,13 @@ struct random_access_file_context {
    void punch_hole(size_t begin, size_t end) {
       if(DeviceIoControl(native_handle(), FSCTL_SET_SPARSE, nullptr, 0, nullptr, 0, nullptr, nullptr) == FALSE) {
          if(!one_hole_punch_warning_is_enough.test_and_set())
-            wlog("Failed to enable sparseness on file ${fn}", ("fn", display_path));
+            wlog("Failed to enable sparseness on file {}", display_path.string());
          return;
       }
       FILE_ZERO_DATA_INFORMATION holeinfo = {begin, end};
       if(DeviceIoControl(native_handle(), FSCTL_SET_ZERO_DATA, &holeinfo, sizeof(holeinfo), nullptr, 0, nullptr, 0) == FALSE) {
          if(!one_hole_punch_warning_is_enough.test_and_set())
-            wlog("Failed to punch hole on file ${fn}", ("fn", display_path));
+            wlog("Failed to punch hole on file {}", display_path.string());
    }
 
    native_handle_type native_handle() {
@@ -286,7 +286,7 @@ public:
          while(buffer.size() < size) {
             ssize_t red = ctx->read_from(buffer.prepare(64*1024), next_pos);
             if(red == 0)
-               FC_THROW_EXCEPTION(out_of_range_exception, "unexpected end of file ${fn}", ("fn", ctx->display_path));
+               FC_THROW_EXCEPTION(out_of_range_exception, "unexpected end of file {}", ctx->display_path.generic_string());
             buffer.commit(red);
             next_pos += red;
          }
@@ -372,7 +372,7 @@ public:
          try {
             if(ctx)
                do_write();
-         } FC_LOG_AND_DROP(("write failure ignored"));
+         } FC_LOG_AND_DROP("write failure ignored");
       }
 
    private:
@@ -476,13 +476,13 @@ public:
    }
 
    void resize(size_t size) {
-      FC_ASSERT(size <= std::numeric_limits<off_t>::max(), "setting file ${fn} too large", ("fn", ctx->display_path));
+      FC_ASSERT(size <= std::numeric_limits<off_t>::max(), "setting file {} too large", ctx->display_path.generic_string());
       ctx->resize(size);
    }
 
    void punch_hole(size_t begin, size_t end) {
-      FC_ASSERT(begin <= std::numeric_limits<off_t>::max(), "start of hole punch out of range for ${fn}", ("fn", ctx->display_path));
-      FC_ASSERT(end <= std::numeric_limits<off_t>::max(), "end of hole punch out of range for ${fn}", ("fn", ctx->display_path));
+      FC_ASSERT(begin <= std::numeric_limits<off_t>::max(), "start of hole punch out of range for {}", ctx->display_path.generic_string());
+      FC_ASSERT(end <= std::numeric_limits<off_t>::max(), "end of hole punch out of range for {}", ctx->display_path.generic_string());
 
       //some OS really want the hole punching to be aligned to FS block size
       if(begin % ctx->file_block_size) {

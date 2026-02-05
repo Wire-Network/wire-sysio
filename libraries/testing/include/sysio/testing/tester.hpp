@@ -446,7 +446,7 @@ namespace sysio::testing {
                      }
                   }
                   return std::optional<abi_serializer>();
-               } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for ${name}", ("name", name))
+               } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for {}", name )
             };
          }
 
@@ -726,7 +726,7 @@ namespace sysio::testing {
             if (!skip_validate && std::uncaught_exceptions() == 0)
                BOOST_CHECK_EQUAL( validate(), true );
          } catch( const fc::exception& e ) {
-            wdump((e.to_detail_string()));
+            wlog("{}", e.to_detail_string());
          }
       }
       controller::config vcfg;
@@ -801,7 +801,7 @@ namespace sysio::testing {
 
       void validate_push_block(const signed_block_ptr& sb) {
          auto [best_head, obh] = validating_node->accept_block( sb->calculate_id(), sb );
-         SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", sb->calculate_id()));
+         SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}:{}", sb->block_num(), sb->calculate_id());
          validating_node->apply_blocks( {}, trx_meta_cache_lookup{} );
          _check_for_vote_if_needed(*validating_node, *obh);
       }

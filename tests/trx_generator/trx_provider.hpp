@@ -200,7 +200,7 @@ namespace sysio::testing {
 
       bool run() {
          if ((_config._target_tps) < 1 || (_config._gen_duration_seconds < 1)) {
-            elog("target tps (${tps}) and duration (${dur}) must both be 1+", ("tps", _config._target_tps)("dur", _config._gen_duration_seconds));
+            elog("target tps ({}) and duration ({}) must both be 1+", _config._target_tps, _config._gen_duration_seconds);
             return false;
          }
 

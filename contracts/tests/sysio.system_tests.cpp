@@ -113,7 +113,6 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    block_signing_private_keys.emplace(get_public_key("alice1111111"_n, "bs1"), get_private_key("alice1111111"_n, "bs1"));
 
    auto alice_prod_info = get_producer_info( "alice1111111"_n );
-   wdump((alice_prod_info));
    BOOST_REQUIRE_EQUAL( alice_prod_info["is_active"], true );
 
    produce_block();

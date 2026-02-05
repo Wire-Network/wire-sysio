@@ -40,8 +40,8 @@ inline void verify_dual_finalizers_votes(const finalizer_policies_t& policies,
          if (active_fin.public_key == pending_fin.public_key) {
             SYS_ASSERT(active_policy_sig.vote_same_at(pending_policy_sig, active_vote_index, pending_vote_index),
                        invalid_qc,
-                       "qc ${bn} contains a dual finalizer ${k} which does not vote the same on active and pending policies",
-                       ("bn", block_num)("k", active_fin.public_key));
+                       "qc {} contains a dual finalizer {} which does not vote the same on active and pending policies",
+                       block_num, active_fin.public_key.to_string());
             break;
          }
          ++pending_vote_index;
@@ -58,7 +58,7 @@ void qc_t::verify_signatures(const finalizer_policies_t& policies) const {
 
    if (pending_policy_sig) {
       SYS_ASSERT(policies.pending_finalizer_policy, invalid_qc,
-                 "qc ${bn} contains pending policy signature for nonexistent pending finalizer policy", ("bn", block_num));
+                 "qc {} contains pending policy signature for nonexistent pending finalizer policy", block_num);
       pending_policy_sig->verify_signatures(policies.pending_finalizer_policy, strong_digest, weak_digest);
    }
 }
@@ -69,7 +69,7 @@ void qc_t::verify_basic(const finalizer_policies_t& policies) const {
 
    if (pending_policy_sig) {
       SYS_ASSERT(policies.pending_finalizer_policy, invalid_qc,
-                 "qc ${bn} contains pending policy signature for nonexistent pending finalizer policy", ("bn", block_num));
+                 "qc {} contains pending policy signature for nonexistent pending finalizer policy", block_num);
 
       // verify that every finalizer included in both policies voted the same
       verify_dual_finalizers_votes(policies, active_policy_sig, *pending_policy_sig, block_num);
@@ -78,7 +78,7 @@ void qc_t::verify_basic(const finalizer_policies_t& policies) const {
       pending_policy_sig->verify_weights(policies.pending_finalizer_policy);
    } else {
       SYS_ASSERT(!policies.pending_finalizer_policy, invalid_qc,
-                 "qc ${bn} does not contain pending policy signature for pending finalizer policy", ("bn", block_num));
+                 "qc {} does not contain pending policy signature for pending finalizer policy", block_num);
    }
 }
 
@@ -104,21 +104,21 @@ void qc_sig_t::verify_vote_format(const finalizer_policy_ptr& fin_policy) const 
    auto num_finalizers = finalizers.size();
 
    SYS_ASSERT( strong_votes || weak_votes, invalid_qc,
-               "Neither strong_votes nor weak_votes present for finalizer policy, generation ${n}",
-               ("n", fin_policy->generation) );
+               "Neither strong_votes nor weak_votes present for finalizer policy, generation {}",
+               fin_policy->generation );
 
    // verify number of finalizers matches with vote bitset size
    if (strong_votes) {
       SYS_ASSERT( num_finalizers == strong_votes->size(), invalid_qc,
                   "vote bitset size is not the same as the number of finalizers for the policy it refers to, "
-                  "vote bitset size: ${s}, num of finalizers for the policy: ${n}",
-                  ("s", strong_votes->size())("n", num_finalizers) );
+                  "vote bitset size: {}, num of finalizers for the policy: {}",
+                  strong_votes->size(), num_finalizers );
    }
    if (weak_votes) {
       SYS_ASSERT( num_finalizers == weak_votes->size(), invalid_qc,
                   "vote bitset size is not the same as the number of finalizers for the policy it refers to, "
-                  "vote bitset size: ${s}, num of finalizers for the policy: ${n}",
-                  ("s", weak_votes->size())("n", num_finalizers) );
+                  "vote bitset size: {}, num of finalizers for the policy: {}",
+                  weak_votes->size(), num_finalizers );
    }
 
    // verify a finalizer cannot vote both strong and weak
@@ -126,8 +126,7 @@ void qc_sig_t::verify_vote_format(const finalizer_policy_ptr& fin_policy) const 
       for (size_t i=0; i<strong_votes->size(); ++i) {
          // at most one is true
          SYS_ASSERT( !((*strong_votes)[i] && (*weak_votes)[i]), invalid_qc,
-                     "finalizer (bit index ${i}) voted both strong and weak",
-                     ("i", i) );
+                     "finalizer (bit index {}) voted both strong and weak", i );
 
       }
    }
@@ -156,12 +155,12 @@ void qc_sig_t::verify_weights(const finalizer_policy_ptr& fin_policy) const {
    // verfify quorum is met
    if( is_strong() ) {
       SYS_ASSERT( strong_weights >= fin_policy->threshold, invalid_qc,
-                  "strong quorum is not met, strong_weights: ${s}, threshold: ${t}",
-                  ("s", strong_weights)("t", fin_policy->threshold) );
+                  "strong quorum is not met, strong_weights: {}, threshold: {}",
+                  strong_weights, fin_policy->threshold );
    } else {
       SYS_ASSERT( strong_weights + weak_weights >= fin_policy->threshold, invalid_qc,
-                  "weak quorum is not met, strong_weights: ${s}, weak_weights: ${w}, threshold: ${t}",
-                  ("s", strong_weights)("w", weak_weights)("t", fin_policy->threshold) );
+                  "weak quorum is not met, strong_weights: {}, weak_weights: {}, threshold: {}",
+                  strong_weights, weak_weights, fin_policy->threshold );
    }
 }
 
@@ -339,8 +338,8 @@ vote_result_t aggregating_qc_sig_t::add_vote(uint32_t connection_id, block_num_t
    state_t post_state = aggregating_state;
    g.unlock();
 
-   fc_dlog(vote_logger, "connection - ${c} block_num: ${bn}, index: ${i}, vote strong: ${sv}, status: ${s}, pre-state: ${pre}, post-state: ${state}, quorum_met: ${q}",
-           ("c", connection_id)("bn", block_num)("i", index)("sv", strong)("s", s)("pre", pre_state)("state", post_state)("q", is_quorum_met(post_state)));
+   fc_dlog(vote_logger, "connection - {} block_num: {}, index: {}, vote strong: {}, status: {}, pre-state: {}, post-state: {}, quorum_met: {}",
+           connection_id, block_num, index, strong, s, pre_state, post_state, is_quorum_met(post_state));
    return s;
 }
 
@@ -424,7 +423,7 @@ std::optional<qc_t> aggregating_qc_t::get_best_qc(block_num_type block_num) cons
 bool aggregating_qc_t::set_received_qc(const qc_t& qc) {
    // qc should have already been verified via verify_qc, this SYS_ASSERT should never fire
    SYS_ASSERT(!pending_policy_sig || qc.pending_policy_sig, invalid_qc,
-              "qc ${bn} expected to have a pending policy signature", ("bn", qc.block_num));
+              "qc {} expected to have a pending policy signature", qc.block_num);
    bool active_better = active_policy_sig.set_received_qc_sig(qc.active_policy_sig);
    bool pending_better = false;
    if (pending_policy_sig) {
@@ -449,8 +448,8 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
    bool verified_sig = false;
    auto verify_sig = [&]() -> vote_result_t {
       if (!verified_sig && !fc::crypto::bls::verify(vote.finalizer_key, finalizer_digest, vote.sig)) {
-         fc_wlog(vote_logger, "connection - ${c} block_num: ${bn} block_id: ${id}, signature from finalizer ${k}.. cannot be verified, vote strong: ${sv}",
-                 ("c", connection_id)("bn", block_num)("id", block_id)("k", vote.finalizer_key.to_string().substr(8,16))("sv", vote.strong));
+         fc_wlog(vote_logger, "connection - {} block_num: {} block_id: {}, signature from finalizer {}.. cannot be verified, vote strong: {}",
+                 connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16), vote.strong);
          return vote_result_t::invalid_signature;
       }
       verified_sig = true;
@@ -465,8 +464,8 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
          auth = finalizer_authority_ptr{finalizer_policy, &(*itr)}; // use aliasing shared_ptr constructor
          auto index = std::distance(finalizers.begin(), itr);
          if (agg_qc_sig.has_voted(index)) {
-            fc_tlog(vote_logger, "connection - ${c} block_num: ${bn} block_id: ${id}, duplicate finalizer ${k}..",
-                    ("c", connection_id)("bn", block_num)("id", block_id)("k", vote.finalizer_key.to_string().substr(8,16)));
+            fc_tlog(vote_logger, "connection - {} block_num: {} block_id: {}, duplicate finalizer {}..",
+                    connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16));
             return vote_result_t::duplicate;
          }
          if (vote_result_t vs = verify_sig(); vs != vote_result_t::success)
@@ -493,8 +492,8 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
    }
 
    if (r.result == vote_result_t::unknown_public_key) {
-      fc_wlog(vote_logger, "connection - ${c} finalizer_key ${k} in vote is not in finalizer policies",
-              ("c", connection_id)("k", vote.finalizer_key.to_string().substr(8,16)));
+      fc_wlog(vote_logger, "connection - {} finalizer_key {} in vote is not in finalizer policies",
+              connection_id, vote.finalizer_key.to_string().substr(8,16));
    }
    return r;
 }

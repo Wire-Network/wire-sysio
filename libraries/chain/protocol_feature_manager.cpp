@@ -45,8 +45,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
    const char* builtin_protocol_feature_codename( builtin_protocol_feature_t codename ) {
       auto itr = builtin_protocol_feature_codenames.find( codename );
       SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
-                  "Unsupported builtin_protocol_feature_t passed to builtin_protocol_feature_codename: ${codename}",
-                  ("codename", static_cast<uint32_t>(codename)) );
+                  "Unsupported builtin_protocol_feature_t passed to builtin_protocol_feature_codename: {}",
+                  static_cast<uint32_t>(codename) );
 
       return itr->second.codename;
    }
@@ -67,8 +67,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
          default:
          {
             SYS_THROW( protocol_feature_validation_exception,
-                       "Unsupported protocol_feature_t passed to constructor: ${type}",
-                       ("type", static_cast<uint32_t>(feature_type)) );
+                       "Unsupported protocol_feature_t passed to constructor: {}",
+                       static_cast<uint32_t>(feature_type) );
          }
          break;
       }
@@ -82,7 +82,7 @@ Example protocol feature. No functionality is triggered by this protocol feature
          _type = protocol_feature_t::builtin;
       } else {
          SYS_THROW( protocol_feature_validation_exception,
-                    "Unsupported protocol feature type: ${type}", ("type", protocol_feature_type) );
+                    "Unsupported protocol feature type: {}", protocol_feature_type );
       }
    }
 
@@ -97,8 +97,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
    {
       auto itr = builtin_protocol_feature_codenames.find( codename );
       SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
-                  "Unsupported builtin_protocol_feature_t passed to constructor: ${codename}",
-                  ("codename", static_cast<uint32_t>(codename)) );
+                  "Unsupported builtin_protocol_feature_t passed to constructor: {}",
+                  static_cast<uint32_t>(codename) );
 
       builtin_feature_codename = itr->second.codename;
    }
@@ -114,8 +114,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
       }
 
       SYS_THROW( protocol_feature_validation_exception,
-                 "Unsupported builtin protocol feature codename: ${codename}",
-                 ("codename", builtin_feature_codename) );
+                 "Unsupported builtin protocol feature codename: {}",
+                 builtin_feature_codename );
    }
 
 
@@ -213,8 +213,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
       auto itr = _recognized_protocol_features.find( feature_digest );
 
       SYS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
-                  "unrecognized protocol feature with digest: ${digest}",
-                  ("digest", feature_digest)
+                  "unrecognized protocol feature with digest: {}",
+                  feature_digest
       );
 
       return *itr;
@@ -243,8 +243,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
       auto itr = builtin_protocol_feature_codenames.find( codename );
 
       SYS_ASSERT( itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
-                  "Unsupported builtin_protocol_feature_t: ${codename}",
-                  ("codename", static_cast<uint32_t>(codename)) );
+                  "Unsupported builtin_protocol_feature_t: {}",
+                  static_cast<uint32_t>(codename) );
 
       flat_set<digest_type> dependencies;
       dependencies.reserve( itr->second.builtin_dependencies.size() );
@@ -259,16 +259,16 @@ Example protocol feature. No functionality is triggered by this protocol feature
    const protocol_feature& protocol_feature_set::add_feature( const builtin_protocol_feature& f ) {
       auto builtin_itr = builtin_protocol_feature_codenames.find( f._codename );
       SYS_ASSERT( builtin_itr != builtin_protocol_feature_codenames.end(), protocol_feature_validation_exception,
-                  "Builtin protocol feature has unsupported builtin_protocol_feature_t: ${codename}",
-                  ("codename", static_cast<uint32_t>( f._codename )) );
+                  "Builtin protocol feature has unsupported builtin_protocol_feature_t: {}",
+                  static_cast<uint32_t>( f._codename ) );
 
       uint32_t indx = static_cast<uint32_t>( f._codename );
 
       if( indx < _recognized_builtin_protocol_features.size() ) {
          SYS_ASSERT( _recognized_builtin_protocol_features[indx] == _recognized_protocol_features.end(),
                      protocol_feature_exception,
-                     "builtin protocol feature with codename '${codename}' already added",
-                     ("codename", f.builtin_feature_codename) );
+                     "builtin protocol feature with codename '{}' already added",
+                     f.builtin_feature_codename );
       }
 
       auto feature_digest = f.digest();
@@ -280,10 +280,10 @@ Example protocol feature. No functionality is triggered by this protocol feature
       for( const auto& d : f.dependencies ) {
          auto itr = _recognized_protocol_features.find( d );
          SYS_ASSERT( itr != _recognized_protocol_features.end(), protocol_feature_exception,
-            "builtin protocol feature with codename '${codename}' and digest of ${digest} has a dependency on a protocol feature with digest ${dependency_digest} that is not recognized",
-            ("codename", f.builtin_feature_codename)
-            ("digest",  feature_digest)
-            ("dependency_digest", d )
+            "builtin protocol feature with codename '{}' and digest of {} has a dependency on a protocol feature with digest {} that is not recognized",
+            f.builtin_feature_codename,
+            feature_digest,
+            d
          );
 
          if( itr->builtin_feature
@@ -314,8 +314,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
          }
 
          SYS_THROW(  protocol_feature_validation_exception,
-                     "Not all the builtin dependencies of the builtin protocol feature with codename '${codename}' and digest of ${digest} were satisfied. Missing dependencies: ${missing_dependencies}",
-                     ("codename", f.builtin_feature_codename)("digest",feature_digest)("missing_dependencies", missing_builtins_with_names)
+                     "Not all the builtin dependencies of the builtin protocol feature with codename '{}' and digest of {} were satisfied. Missing dependencies: {}",
+                     f.builtin_feature_codename, feature_digest, missing_builtins_with_names
          );
       }
 
@@ -330,8 +330,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
       } );
 
       SYS_ASSERT( res.second, protocol_feature_exception,
-                  "builtin protocol feature with codename '${codename}' has a digest of ${digest} but another protocol feature with the same digest has already been added",
-                  ("codename", f.builtin_feature_codename)("digest", feature_digest) );
+                  "builtin protocol feature with codename '{}' has a digest of {} but another protocol feature with the same digest has already been added",
+                  f.builtin_feature_codename, feature_digest );
 
       if( indx >= _recognized_builtin_protocol_features.size() ) {
          for( auto i =_recognized_builtin_protocol_features.size(); i <= indx; ++i ) {
@@ -494,17 +494,17 @@ Example protocol feature. No functionality is triggered by this protocol feature
       auto itr = _protocol_feature_set.find( feature_digest );
 
       SYS_ASSERT( itr != _protocol_feature_set.end(), protocol_feature_exception,
-                  "unrecognized protocol feature digest: ${digest}", ("digest", feature_digest) );
+                  "unrecognized protocol feature digest: {}", feature_digest );
 
       if( _activated_protocol_features.size() > 0 ) {
          const auto& last = _activated_protocol_features.back();
          SYS_ASSERT( last.activation_block_num <= current_block_num,
                      protocol_feature_exception,
-                     "last protocol feature activation block num is ${last_activation_block_num} yet "
-                     "attempting to activate protocol feature with a current block num of ${current_block_num}"
-                     "protocol features is ${last_activation_block_num}",
-                     ("current_block_num", current_block_num)
-                     ("last_activation_block_num", last.activation_block_num)
+                     "last protocol feature activation block num is {0} yet "
+                     "attempting to activate protocol feature with a current block num of {1}"
+                     "protocol features is {0}",
+                     last.activation_block_num,
+                     current_block_num
          );
       }
 
@@ -516,16 +516,16 @@ Example protocol feature. No functionality is triggered by this protocol feature
       uint32_t indx = static_cast<uint32_t>( *itr->builtin_feature );
 
       SYS_ASSERT( indx < _builtin_protocol_features.size(), protocol_feature_exception,
-                  "invariant failure while trying to activate feature with digest '${digest}': "
-                  "unsupported builtin_protocol_feature_t ${codename}",
-                  ("digest", feature_digest)
-                  ("codename", indx)
+                  "invariant failure while trying to activate feature with digest '{}': "
+                  "unsupported builtin_protocol_feature_t {}",
+                  feature_digest,
+                  indx
       );
 
       SYS_ASSERT( _builtin_protocol_features[indx].activation_block_num == builtin_protocol_feature_entry::not_active,
                   protocol_feature_exception,
-                  "cannot activate already activated builtin feature with digest: ${digest}",
-                  ("digest", feature_digest)
+                  "cannot activate already activated builtin feature with digest: {}",
+                  feature_digest
       );
 
       // activate_feature is called by init. no transaction specific logging is possible
@@ -562,11 +562,9 @@ Example protocol feature. No functionality is triggered by this protocol feature
       try {
          return fc::json::from_file<builtin_protocol_feature>( p );
       } catch( const fc::exception& e ) {
-         wlog( "problem encountered while reading '${path}':\n${details}",
-               ("path", p)("details",e.to_detail_string()) );
+         wlog( "problem encountered while reading '{}':\n{}", p.string(), e.to_detail_string() );
       } catch( ... ) {
-         dlog( "unknown problem encountered while reading '${path}'",
-               ("path", p) );
+         dlog( "unknown problem encountered while reading '{}'", p.string() );
       }
       return {};
    }
@@ -580,8 +578,8 @@ Example protocol feature. No functionality is triggered by this protocol feature
 
       if( std::filesystem::exists( p ) ) {
          SYS_ASSERT( std::filesystem::is_directory( p ), plugin_exception,
-                     "Path to protocol-features is not a directory: ${path}",
-                     ("path", p)
+                     "Path to protocol-features is not a directory: {}",
+                     p.string()
          );
       } else {
          if( populate_missing_builtins )
@@ -594,35 +592,35 @@ Example protocol feature. No functionality is triggered by this protocol feature
          if( f.subjective_restrictions.enabled ) {
             if( f.subjective_restrictions.preactivation_required ) {
                if( f.subjective_restrictions.earliest_allowed_activation_time == time_point{} ) {
-                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled with preactivation required",
-                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                              ("digest", feature_digest)
+                  ilog( "Support for builtin protocol feature '{}' (with digest of '{}') is enabled with preactivation required",
+                        builtin_protocol_feature_codename(f.get_codename()),
+                        feature_digest
                   );
                } else {
-                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled with preactivation required and with an earliest allowed activation time of ${earliest_time}",
-                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                              ("digest", feature_digest)
-                              ("earliest_time", f.subjective_restrictions.earliest_allowed_activation_time)
+                  ilog( "Support for builtin protocol feature '{}' (with digest of '{}') is enabled with preactivation required and with an earliest allowed activation time of {}",
+                        builtin_protocol_feature_codename(f.get_codename()),
+                        feature_digest,
+                        f.subjective_restrictions.earliest_allowed_activation_time
                   );
                }
             } else {
                if( f.subjective_restrictions.earliest_allowed_activation_time == time_point{} ) {
-                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled without activation restrictions",
-                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                              ("digest", feature_digest)
+                  ilog( "Support for builtin protocol feature '{}' (with digest of '{}') is enabled without activation restrictions",
+                        builtin_protocol_feature_codename(f.get_codename()),
+                        feature_digest
                   );
                } else {
-                  ilog( "Support for builtin protocol feature '${codename}' (with digest of '${digest}') is enabled without preactivation required but with an earliest allowed activation time of ${earliest_time}",
-                        ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                              ("digest", feature_digest)
-                              ("earliest_time", f.subjective_restrictions.earliest_allowed_activation_time)
+                  ilog( "Support for builtin protocol feature '{}' (with digest of '{}') is enabled without preactivation required but with an earliest allowed activation time of {}",
+                        builtin_protocol_feature_codename(f.get_codename()),
+                        feature_digest,
+                        f.subjective_restrictions.earliest_allowed_activation_time
                   );
                }
             }
          } else {
-            ilog( "Recognized builtin protocol feature '${codename}' (with digest of '${digest}') but support for it is not enabled",
-                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                        ("digest", feature_digest)
+            ilog( "Recognized builtin protocol feature '{}' (with digest of '{}') but support for it is not enabled",
+                  builtin_protocol_feature_codename(f.get_codename()),
+                  feature_digest
             );
          }
       };
@@ -646,10 +644,10 @@ Example protocol feature. No functionality is triggered by this protocol feature
             auto res = found_builtin_protocol_features.emplace( f->get_codename(), file_path );
 
             SYS_ASSERT( res.second, plugin_exception,
-                        "Builtin protocol feature '${codename}' was already included from a previous_file",
-                        ("codename", builtin_protocol_feature_codename(f->get_codename()))
-                              ("current_file", file_path)
-                              ("previous_file", res.first->second)
+                        "Builtin protocol feature '{}' was already included from a previous_file {}, current file {}",
+                        builtin_protocol_feature_codename(f->get_codename()),
+                        res.first->second.string(),
+                        file_path.string()
             );
 
             const auto feature_digest = f->digest();
@@ -695,23 +693,23 @@ Example protocol feature. No functionality is triggered by this protocol feature
          auto file_path = p / filename;
 
          SYS_ASSERT( !std::filesystem::exists( file_path ), plugin_exception,
-                     "Could not save builtin protocol feature with codename '${codename}' because a file at "
-                     "the following path already exists: ${path}",
-                     ("codename", builtin_protocol_feature_codename( f.get_codename() ))
-                     ("path", file_path)
+                     "Could not save builtin protocol feature with codename '{}' because a file at "
+                     "the following path already exists: {}",
+                     builtin_protocol_feature_codename( f.get_codename() ),
+                     file_path.string()
          );
 
          if( fc::json::save_to_file( f, file_path ) ) {
-            ilog( "Saved default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
-                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                  ("digest", feature_digest)
-                  ("path", file_path)
+            ilog( "Saved default specification for builtin protocol feature '{}' (with digest of '{}') to: {}",
+                  builtin_protocol_feature_codename(f.get_codename()),
+                  feature_digest,
+                  file_path.string()
             );
          } else {
-            elog( "Error occurred while writing default specification for builtin protocol feature '${codename}' (with digest of '${digest}') to: ${path}",
-                  ("codename", builtin_protocol_feature_codename(f.get_codename()))
-                  ("digest", feature_digest)
-                  ("path", file_path)
+            elog( "Error occurred while writing default specification for builtin protocol feature '{}' (with digest of '{}') to: {}",
+                  builtin_protocol_feature_codename(f.get_codename()),
+                  feature_digest,
+                  file_path.string()
             );
          }
       };

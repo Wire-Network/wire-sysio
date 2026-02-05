@@ -45,7 +45,7 @@ namespace sysio::chain {
             }
             result |= uint64_t(precision);
             return result;
-         } FC_CAPTURE_LOG_AND_RETHROW((str))
+         } FC_CAPTURE_LOG_AND_RETHROW("{}", str)
       }
 
       struct symbol_code {
@@ -60,10 +60,10 @@ namespace sysio::chain {
             static constexpr uint8_t max_precision = 18;
 
             explicit symbol(uint8_t p, const char* s): m_value(string_to_symbol(p, s)) {
-               SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${s}", ("s",s));
+               SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", s);
             }
             explicit symbol(uint64_t v = CORE_SYMBOL): m_value(v) {
-               SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
+               SYS_ASSERT(valid(), symbol_type_exception, "invalid symbol: {}", name());
             }
             static symbol from_string(const string& from);
             uint64_t value() const { return m_value; }
@@ -80,7 +80,7 @@ namespace sysio::chain {
             uint8_t decimals() const { return m_value & 0xFF; }
             uint64_t precision() const
             {
-               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision ${p} should be <= 18", ("p", decimals()) );
+               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision {} should be <= 18", decimals() );
                uint64_t p10 = 1;
                uint64_t p = decimals();
                while( p > 0  ) {
@@ -121,8 +121,8 @@ namespace sysio::chain {
             }
 
             void reflector_init()const {
-               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision ${p} should be <= 18", ("p", decimals()) );
-               SYS_ASSERT( valid_name(name()), symbol_type_exception, "invalid symbol: ${name}", ("name",name()));
+               SYS_ASSERT( decimals() <= max_precision, symbol_type_exception, "precision {} should be <= 18", decimals() );
+               SYS_ASSERT( valid_name(name()), symbol_type_exception, "invalid symbol: {}", name() );
             }
 
          private:

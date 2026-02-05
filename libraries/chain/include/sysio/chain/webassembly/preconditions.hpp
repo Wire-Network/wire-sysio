@@ -115,7 +115,7 @@ namespace sysio { namespace chain { namespace webassembly {
    SYS_VM_PRECONDITION(privileged_check,
          SYS_VM_INVOKE_ONCE([&](auto&&...) {
             SYS_ASSERT(ctx.get_host().get_context().is_privileged(), unaccessible_api,
-                       "${code} does not have permission to call this API", ("code", ctx.get_host().get_context().get_receiver()));
+                       "{} does not have permission to call this API", ctx.get_host().get_context().get_receiver());
          }));
 
    namespace detail {

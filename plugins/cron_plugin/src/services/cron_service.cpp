@@ -122,7 +122,7 @@ void cron_service::cancel(job_id_t id) {
       try {
          j->timer->cancel();
       } catch (const std::exception& e) {
-         wlogf("cron_service::cancel() timer->cancel() threw: {}", e.what());
+         wlog("cron_service::cancel() timer->cancel() threw: {}", e.what());
       }
    }
 }
@@ -139,11 +139,11 @@ void cron_service::cancel_all() {
    }
    for (auto& j : to_cancel) {
       if (j->timer) {
-         dlogf("Cancelling job id {}", j->id);
+         dlog("Cancelling job id {}", j->id);
          try {
             j->timer->cancel();
          } catch (const std::exception& e) {
-            wlogf("cron_service::cancel() timer->cancel() threw: {}", e.what());
+            wlog("cron_service::cancel() timer->cancel() threw: {}", e.what());
          }
       }
    }
@@ -227,7 +227,7 @@ void cron_service::schedule_next(std::shared_ptr<job> job_ref, std::chrono::stea
    job_ref->timer->async_wait([this, job_id, job_ref](const boost::system::error_code& ec) {
       auto jobs = _jobs.readable();
       if (!jobs.contains(job_id)) {
-         ilogf("Job id ({}) is no longer valid", job_id);
+         ilog("Job id ({}) is no longer valid", job_id);
          return;
       }
 
@@ -255,13 +255,13 @@ void cron_service::schedule_next(std::shared_ptr<job> job_ref, std::chrono::stea
             try {
                job_work->fn();
             } catch (const fc::exception& e) {
-               elogf("JOB_ID({}) FAILED: {}", job_id, e.to_detail_string());
+               elog("JOB_ID({}) FAILED: {}", job_id, e.to_detail_string());
             } catch (const boost::exception& e) {
-               elogf("JOB_ID({}) FAILED: {}", job_id,boost::diagnostic_information(e));
+               elog("JOB_ID({}) FAILED: {}", job_id,boost::diagnostic_information(e));
             } catch (const std::runtime_error& e) {
-               elogf("JOB_ID({}) FAILED: {}", job_id,e.what());
+               elog("JOB_ID({}) FAILED: {}", job_id,e.what());
             } catch (const std::exception& e) {
-               elogf("JOB_ID({}) FAILED: {}", job_id,e.what());
+               elog("JOB_ID({}) FAILED: {}", job_id,e.what());
             } catch (...) {
                elog("unknown exception");
             }

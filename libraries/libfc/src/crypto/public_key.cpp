@@ -43,20 +43,19 @@ namespace fc { namespace crypto {
       case key_type::wa:
       case key_type::bls: {
          public_key k(parse_unknown_wire_public_key_str(str));
-         FC_ASSERT( k.type() == type, "Parsed type ${pt} does not match specified type ${t} for ${k}",
-                    ("pt", k.type())("t", type)("k", str));
+         FC_ASSERT( k.type() == type, "Parsed type {} does not match specified type {} for {}", k.type(), type, str);
          return k;
       }
       case key_type::em: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid public key prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid public key prefixes: {}", str);
          return from_native_string_to_public_key<chain_key_type_t::chain_key_type_ethereum>(key);
       }
       case key_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
-         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid public key prefixes: ${k}", ("k", str));
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid public key prefixes: {}", str);
          return from_native_string_to_public_key<chain_key_type_t::chain_key_type_solana>(key);
       }
       case key_type::unknown: {
@@ -64,7 +63,7 @@ namespace fc { namespace crypto {
             return public_key(parse_unknown_wire_public_key_str(str));
 
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-         FC_ASSERT(base_prefix == constants::public_key_base_prefix, "Invalid prefix to parse key type: ${k}", ("k", str));
+         FC_ASSERT(base_prefix == constants::public_key_base_prefix, "Invalid prefix to parse key type: {}", str);
          if (type_prefix == key_prefix(key_type::em)) {
             return from_native_string_to_public_key<chain_key_type_t::chain_key_type_ethereum>(data_str);
          } else if (type_prefix == key_prefix(key_type::ed)) {
@@ -74,7 +73,7 @@ namespace fc { namespace crypto {
       }
 
       default:
-         FC_ASSERT(false, "Unknown key type: ${type}", ("type", type));
+         FC_ASSERT(false, "Unknown key type: {}", type);
       };
    }
 
@@ -117,7 +116,7 @@ namespace fc { namespace crypto {
          break;
       }
 
-      FC_ASSERT(false, "public_key unknown key type ${t}", ("t", type()));
+      FC_ASSERT(false, "public_key unknown key type {}", type());
    }
 
    std::ostream& operator<<(std::ostream& s, const public_key& k) {

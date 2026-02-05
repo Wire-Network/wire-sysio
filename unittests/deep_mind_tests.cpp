@@ -21,24 +21,20 @@ struct deep_mind_log_fixture
    {
       auto cfg = fc::logging_config::default_config();
       tmp.file().close();
-
-      cfg.appenders.push_back(
-         appender_config( "deep-mind", "dmlog",
-            mutable_variant_object()
-               ( "file", tmp.file().get_file_path().c_str())
-         ) );
+      cfg.sinks.push_back(sink_config("dmlog", "dmlog_sink",
+                                      mutable_variant_object()("file", tmp.file().get_file_path().c_str())));
 
       fc::logger_config lc;
-      lc.name = "deep-mind";
+      lc.name = "dmlog";
       lc.level = fc::log_level::all;
-      lc.appenders.push_back("deep-mind");
+      lc.sinks.push_back("dmlog");
       cfg.loggers.push_back( lc );
 
       fc::configure_logging(cfg);
       setup_test_logging();
 
       deep_mind_logger.update_config(deep_mind_handler::deep_mind_config{.zero_elapsed = true});
-      deep_mind_logger.update_logger("deep-mind");
+      deep_mind_logger.update_logger("dmlog");
    }
    ~deep_mind_log_fixture()
    {

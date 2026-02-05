@@ -99,7 +99,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_fail_tests, T, validating_testers ) { t
 
    int64_t x; int64_t net; int64_t cpu;
    t.control->get_resource_limits_manager().get_account_limits( "testapi"_n, x, net, cpu );
-   wdump((net)(cpu));
 
    BOOST_CHECK_EXCEPTION( call_test( t, test_api_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
                                      5000, 200, 200, fc::raw::pack(10000000000000000000ULL) ),
@@ -266,7 +265,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_max_trx_cpu_extended_test, T, tes
    rl.get_account_limits( "pause"_n, ram_bytes, net, cpu );
    BOOST_CHECK_EQUAL( cpu, -1 );
    auto cpu_limit = rl.get_block_cpu_limit();
-   idump(("cpu_limit")(cpu_limit));
    BOOST_CHECK( cpu_limit <= 150'000 );
 
    // Test deadline is extended when max_transaction_cpu_time is the limiting factor
@@ -283,7 +281,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_max_trx_cpu_extended_test, T, tes
    auto after = fc::time_point::now();
    // Test that it runs longer than specified limit of 24'999 to allow for wasm load time.
    auto dur = (after - before).count();
-   dlog("elapsed ${e}us", ("e", dur) );
+   dlog("elapsed {}us", dur );
    BOOST_CHECK( dur >= 24'999 ); // should never fail
    BOOST_TEST( t.is_code_cached("pause"_n) );
    // This assumes that loading the WASM takes at least 0.750 ms
@@ -341,7 +339,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_max_trx_extended_test, T, testers
    auto after = fc::time_point::now();
    // Test that it runs longer than specified limit of 24'999 to allow for wasm load time.
    auto dur = (after - before).count();
-   dlog("elapsed ${e}us", ("e", dur) );
+   dlog("elapsed {}us", dur );
    BOOST_CHECK( dur >= 25'000 ); // should never fail
    BOOST_TEST( t.is_code_cached("pause"_n) );
    // This assumes that loading the WASM takes at least 0.750 ms
@@ -388,7 +386,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_block_deadline_not_extended_test,
    auto after = fc::time_point::now();
    // WASM load times on my machine are around 35ms
    auto dur = (after - before).count();
-   dlog("elapsed ${e}us", ("e", dur) );
+   dlog("elapsed {}us", dur );
    BOOST_CHECK( dur >= 75'000 ); // should never fail
    BOOST_TEST( t.is_code_cached("pause"_n) );
 
@@ -439,7 +437,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( checktime_pause_block_deadline_not_extended_while
    // Test that it runs longer than specified limit of 15ms to allow for wasm load time.
    // WASM load times on my machine are around 35ms
    auto dur = (after - before).count();
-   dlog("elapsed ${e}us", ("e", dur) );
+   dlog("elapsed {}us", dur );
    BOOST_CHECK( dur >= 15'000 ); // should never fail
    BOOST_TEST( t.is_code_cached("pause"_n) );
 

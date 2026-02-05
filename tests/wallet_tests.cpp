@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    auto keys = wm.list_keys("test", pw);
 
    auto pub_pri_pair = [](const char *key) -> auto {
-       private_key_type prikey = private_key_type(std::string(key));
+       private_key_type prikey = private_key_type::from_string(std::string(key));
        return std::pair<const public_key_type, private_key_type>(prikey.get_public_key(), prikey);
    };
 
@@ -115,18 +115,44 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    // key3 was not automatically imported
    BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key3)) == keys.cend());
 
-   wm.remove_key("test", pw, pub_pri_pair(key2).first.to_string({}));
+   wm.remove_key("test", pw, pub_pri_pair(key2).first.to_string({}, true));
    BOOST_CHECK_EQUAL(1u, wm.get_public_keys().size());
+   auto keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 1);
    keys = wm.list_keys("test", pw);
    BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key2)) == keys.cend());
+   BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key1)) != keys.cend());
    wm.import_key("test", key2);
    BOOST_CHECK_EQUAL(2u, wm.get_public_keys().size());
    keys = wm.list_keys("test", pw);
    BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key2)) != keys.cend());
+   BOOST_CHECK(std::find(keys.cbegin(), keys.cend(), pub_pri_pair(key1)) != keys.cend());
+   keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 2);
+   wm.set_key_name_with_public_key("test", pw, "key2", pub_pri_pair(key2).first.to_string({}, true));
+   keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 2);
+   BOOST_CHECK(keys_by_name.contains("key2"));
+   wm.set_key_name_with_private_key("test", pw, "key_two", pub_pri_pair(key2).second.to_string({}, true));
+   keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 2);
+   BOOST_CHECK(keys_by_name.contains("key_two"));
+   BOOST_CHECK(!keys_by_name.contains("key2"));
+   wm.set_key_name("test", pw, "key_2", "key_two");
+   keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 2);
+   BOOST_CHECK(!keys_by_name.contains("key_two"));
+   BOOST_CHECK(!keys_by_name.contains("key2"));
+   BOOST_CHECK(keys_by_name.contains("key_2"));
    BOOST_CHECK_THROW(wm.remove_key("test", pw, pub_pri_pair(key3).first.to_string({})), fc::exception);
    BOOST_CHECK_EQUAL(2u, wm.get_public_keys().size());
    BOOST_CHECK_THROW(wm.remove_key("test", "PWnogood", pub_pri_pair(key2).first.to_string({})), wallet_invalid_password_exception);
    BOOST_CHECK_EQUAL(2u, wm.get_public_keys().size());
+   wm.remove_name("test", pw, "key_2");
+   keys_by_name = wm.list_keys_by_name("test", pw);
+   BOOST_TEST(keys_by_name.size() == 1);
+   BOOST_CHECK(!keys_by_name.contains("key_2"));
+   wm.import_key("test", key2);
 
    wm.lock("test");
    BOOST_CHECK_THROW(wm.list_keys("test", pw), wallet_locked_exception);
@@ -134,6 +160,7 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
    wm.unlock("test", pw);
    BOOST_CHECK_EQUAL(2u, wm.get_public_keys().size());
    BOOST_CHECK_EQUAL(2u, wm.list_keys("test", pw).size());
+   BOOST_CHECK_EQUAL(2u, wm.list_keys_by_name("test", pw).size());
    wm.lock_all();
    BOOST_CHECK_THROW(wm.get_public_keys(), wallet_locked_exception);
    BOOST_CHECK(wm.list_wallets().at(0).find("*") == std::string::npos);
@@ -160,8 +187,8 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
 
    BOOST_CHECK_THROW(wm.list_keys("test2", "PWnogood"), wallet_invalid_password_exception);
 
-   private_key_type pkey1{std::string(key1)};
-   private_key_type pkey2{std::string(key2)};
+   private_key_type pkey1 = private_key_type::from_string(std::string(key1));
+   private_key_type pkey2 = private_key_type::from_string(std::string(key2));
 
    chain::signed_transaction trx;
    auto chain_id = genesis_state().compute_chain_id();
@@ -193,7 +220,7 @@ BOOST_AUTO_TEST_CASE(wallet_manager_test)
 
       //check that the public key returned looks legit through a string conversion
       // (would throw otherwise)
-      public_key_type create_key_pub(wm.create_key("testgen", key_type_to_create));
+      public_key_type create_key_pub = public_key_type::from_string(wm.create_key("testgen", key_type_to_create));
 
       //now pluck out the private key from the wallet and see if the public key of said
       // private key matches what was returned earlier from the create_key() call

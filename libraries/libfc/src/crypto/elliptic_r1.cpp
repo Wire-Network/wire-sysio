@@ -331,7 +331,7 @@ namespace fc { namespace crypto { namespace r1 {
          my->_key = o2i_ECPublicKey( &my->_key, (const unsigned char**)&front, sizeof(dat)  );
          if( !my->_key )
          {
-           FC_THROW_EXCEPTION( exception, "error decoding public key", ("s", ERR_error_string( ERR_get_error(), nullptr) ) );
+           FC_THROW_EXCEPTION( exception, "error decoding public key: {}", ERR_error_string( ERR_get_error(), nullptr) );
          }
       }
     }
@@ -345,7 +345,7 @@ namespace fc { namespace crypto { namespace r1 {
          my->_key = o2i_ECPublicKey( &my->_key, (const unsigned char**)&front, sizeof(public_key_data) );
          if( !my->_key )
          {
-           FC_THROW_EXCEPTION( exception, "error decoding public key", ("s", ERR_error_string( ERR_get_error(), nullptr) ) );
+           FC_THROW_EXCEPTION( exception, "error decoding public key: {}", ERR_error_string( ERR_get_error(), nullptr) );
          }
       }
     }
@@ -420,7 +420,7 @@ namespace fc { namespace crypto { namespace r1 {
           FC_THROW_EXCEPTION( exception, "Unable to sign" );
 
         return signature_from_ecdsa(my->_key, my_pub_key, sig, digest);
-      } FC_RETHROW_EXCEPTIONS( warn, "failed to sign ${digest}", ("digest", digest) );
+      } FC_RETHROW_EXCEPTIONS( warn, "failed to sign {}", digest );
     }
 
    private_key& private_key::operator=( private_key&& pk )

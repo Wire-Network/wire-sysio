@@ -9,6 +9,7 @@
 #include <sysio/chain/finalizer_authority.hpp>
 
 #include <fc/io/datastream.hpp>
+#include <fc/io/json.hpp>
 
 #include <vector>
 #include <set>
@@ -70,9 +71,9 @@ namespace sysio { namespace chain { namespace webassembly {
                unique_keys.insert(kw.key);
             }
 
-            SYS_ASSERT( a.keys.size() == unique_keys.size(), wasm_execution_error, "producer schedule includes a duplicated key for ${account}", ("account", p.producer_name));
-            SYS_ASSERT( a.threshold > 0, wasm_execution_error, "producer schedule includes an authority with a threshold of 0 for ${account}", ("account", p.producer_name));
-            SYS_ASSERT( sum_weights >= a.threshold, wasm_execution_error, "producer schedule includes an unsatisfiable authority for ${account}", ("account", p.producer_name));
+            SYS_ASSERT( a.keys.size() == unique_keys.size(), wasm_execution_error, "producer schedule includes a duplicated key for {}", p.producer_name);
+            SYS_ASSERT( a.threshold > 0, wasm_execution_error, "producer schedule includes an authority with a threshold of 0 for {}", p.producer_name);
+            SYS_ASSERT( sum_weights >= a.threshold, wasm_execution_error, "producer schedule includes an unsatisfiable authority for {}", p.producer_name);
          }, p.authority);
 
          unique_producers.insert(p.producer_name);
@@ -104,7 +105,7 @@ namespace sysio { namespace chain { namespace webassembly {
       uint32_t version;
       chain::wasm_config cfg;
       fc::raw::unpack(ds, version);
-      SYS_ASSERT(version == 0, wasm_config_unknown_version, "set_wasm_parameters_packed: Unknown version: ${version}", ("version", version));
+      SYS_ASSERT(version == 0, wasm_config_unknown_version, "set_wasm_parameters_packed: Unknown version: {}", version);
       fc::raw::unpack(ds, cfg);
       cfg.validate();
       context.db.modify( context.control.get_global_properties(),
@@ -181,23 +182,23 @@ namespace sysio { namespace chain { namespace webassembly {
       finpol.threshold = abi_finpol.threshold;
       for (auto& f: finalizers) {
          SYS_ASSERT( f.description.size() <= config::max_finalizer_description_size, wasm_execution_error,
-                     "Finalizer description greater than ${s}", ("s", config::max_finalizer_description_size) );
+                     "Finalizer description greater than {}", config::max_finalizer_description_size );
          SYS_ASSERT(std::numeric_limits<uint64_t>::max() - weight_sum >= f.weight, wasm_execution_error,
                     "sum of weights causes uint64_t overflow");
          weight_sum += f.weight;
          SYS_ASSERT(f.public_key.size() == 96, wasm_execution_error, "Invalid bls public key length");
          fc::crypto::bls::public_key pk(std::span<const uint8_t,96>(f.public_key.data(), 96));
          SYS_ASSERT( unique_finalizer_keys.insert(pk).second, wasm_execution_error,
-                     "Duplicate public key: ${pk}", ("pk", pk.to_string()) );
+                     "Duplicate public key: {}", fc::json::to_log_string(pk) );
          finpol.finalizers.push_back(chain::finalizer_authority{.description = std::move(f.description),
                                                                 .weight = f.weight,
                                                                 .public_key{pk}});
       }
 
       SYS_ASSERT( weight_sum >= finpol.threshold && finpol.threshold > weight_sum / 2, wasm_execution_error,
-                  "Finalizer policy threshold (${t}) must be greater than half of the sum of the weights (${w}), "
+                  "Finalizer policy threshold ({}) must be greater than half of the sum of the weights ({}), "
                   "and less than or equal to the sum of the weights",
-                  ("t", finpol.threshold)("w", weight_sum) );
+                  finpol.threshold, weight_sum );
 
       context.trx_context.set_proposed_finalizers( std::move(finpol) );
    }
@@ -241,7 +242,7 @@ namespace sysio { namespace chain { namespace webassembly {
 
       SYS_ASSERT(size <= packed_parameters.size(),
                  chain::config_parse_error,
-                 "get_parameters_packed: buffer size is smaller than ${size}", ("size", size));
+                 "get_parameters_packed: buffer size is smaller than {}", size);
       
       fc::datastream<char*> ds( packed_parameters.data(), size );
       fc::raw::pack( ds, config_range );
@@ -274,7 +275,7 @@ namespace sysio { namespace chain { namespace webassembly {
       const auto* account_metadata = context.db.find<account_metadata_object, by_name>( n );
       if (account_metadata == nullptr && !is_priv)
          return; // already not priv
-      SYS_ASSERT(account_metadata != nullptr, wasm_execution_error, "setcode must be called before setpriv for account ${a}", ("a", n));
+      SYS_ASSERT(account_metadata != nullptr, wasm_execution_error, "setcode must be called before setpriv for account {}", n);
       context.db.modify( *account_metadata, [&]( auto& ma ){
          ma.set_privileged( is_priv );
       });

@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(malformed_contract_names) {
    // test suffix cannot have '.'
    BOOST_CHECK_EXCEPTION(contract_action_match("s"_n, ".test"_n, contract_action_match::match_type::suffix), chain::producer_exception,
       [&](const fc::exception &e) {
-         return testing::expect_assert_message(e, "contract_match_name must be the desired suffix and should not contain any '.'.");
+         return testing::expect_assert_message(e, "contract_match_name '.test' must be the desired suffix and should not contain any '.'.");
       });
 
    // test doesn't support type of any

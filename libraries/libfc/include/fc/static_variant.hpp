@@ -1,10 +1,14 @@
 #pragma once
+
+#include <fc/exception/exception.hpp>
+#include <fc/variant.hpp>
+
+#include <boost/core/typeinfo.hpp>
+
+#include <variant>
 #include <stdexcept>
 #include <typeinfo>
 #include <type_traits>
-#include <fc/exception/exception.hpp>
-#include <boost/core/typeinfo.hpp>
-#include <variant>
 
 namespace fc {
 

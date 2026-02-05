@@ -18,9 +18,7 @@ set(fc_sources
         src/interprocess/file_mapping.cpp
         src/log/log_message.cpp
         src/log/logger.cpp
-        src/log/appender.cpp
-        src/log/console_appender.cpp
-        src/log/dmlog_appender.cpp
+        src/log/dmlog_sink.cpp
         src/log/logger_config.cpp
         src/crypto/_digest_common.cpp
         src/crypto/aes.cpp
@@ -36,6 +34,7 @@ set(fc_sources
         src/crypto/sha224.cpp
         src/crypto/sha512.cpp
         src/crypto/ethereum/ethereum_utils.cpp
+        src/crypto/solana/solana_crypto_utils.cpp
         src/crypto/elliptic_common.cpp
         src/crypto/elliptic_impl_priv.cpp
         src/crypto/elliptic_secp256k1.cpp
@@ -61,9 +60,15 @@ set(fc_sources
         src/network/ethereum/ethereum_rlp_encoder.cpp
         src/network/http/http_client.cpp
         src/network/json_rpc/json_rpc_client.cpp
+        src/network/solana/solana_types.cpp
+        src/network/solana/solana_borsh.cpp
+        src/network/solana/solana_idl.cpp
+        src/network/solana/solana_system_programs.cpp
+        src/network/solana/solana_client.cpp
         src/compress/zlib.cpp
-        src/log/gelf_appender.cpp
 )
+
+find_package(fmt CONFIG REQUIRED)
 
 file(GLOB_RECURSE fc_headers src/*.hpp src/*.h include/*.hpp include/*.h)
 add_library(fc ${fc_sources} ${fc_headers})
@@ -111,6 +116,7 @@ target_link_libraries(
         bls12-381::bls12-381
         bn256::bn256
         magic_enum::magic_enum
+        fmt::fmt
         ${PLATFORM_SPECIFIC_LIBS}
         ${CMAKE_DL_LIBS}
 )
@@ -131,5 +137,4 @@ install(
         DIRECTORY include/fc
         DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
 )
-
 

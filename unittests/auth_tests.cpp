@@ -123,32 +123,27 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
                           });
 
    auto original_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((original_auth));
 
    int64_t ram; int64_t net; int64_t cpu;
    chain.control->get_resource_limits_manager().get_account_limits( "alice"_n, ram, net, cpu );
-   wdump((cpu)(net)(ram));
+   wlog("cpu {}, net {}, ram {}", cpu, net, ram);
    BOOST_TEST(cpu == 10);
    BOOST_TEST(net == 10);
    BOOST_TEST(ram == 100000*104+base_tester::newaccount_ram); // provided by policy in create_account
    int64_t ram_usage = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
-   wdump((ram_usage));
    BOOST_TEST(ram_usage < base_tester::newaccount_ram); // ram used to create account
 
    chain.set_authority( "alice"_n, config::active_name,  delegated_auth );
    int64_t ram_usage_after = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
-   wdump((ram_usage_after));
    BOOST_TEST(ram_usage_after < ram_usage); // ram for delegated auth is less than a public key
 
    auto new_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((new_auth));
    BOOST_CHECK_EQUAL((new_auth == delegated_auth), true);
 
    chain.produce_block();
    chain.produce_block();
 
    auto auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((auth));
    BOOST_CHECK_EQUAL((new_auth == auth), true);
 
    /// execute nonce from alice signed by bob

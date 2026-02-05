@@ -216,7 +216,7 @@ struct base58_str_parser_impl<Result, Prefixes, Position, KeyType, Rem...> {
 template <typename Result, const char* const * Prefixes, int Position>
 struct base58_str_parser_impl<Result, Prefixes, Position> {
    static Result apply(const std::string& prefix_str, const std::string& data_str) {
-      FC_ASSERT(false, "No matching suite type for ${prefix}_${data}", ("prefix", prefix_str)("data",data_str));
+      FC_ASSERT(false, "No matching suite type for {}_{}", prefix_str, data_str);
    }
 };
 
@@ -233,12 +233,11 @@ template <const char* const * Prefixes, typename... Ts>
 struct base58_str_parser<std::variant<Ts...>, Prefixes> {
    static std::variant<Ts...> apply(const std::string& base58str) {
       const auto pivot = base58str.find('_');
-      FC_ASSERT(pivot != std::string::npos, "No delimiter in data, cannot determine suite type: ${str}",
-                ("str", base58str));
+      FC_ASSERT(pivot != std::string::npos, "No delimiter in data, cannot determine suite type: {}", base58str);
 
       const auto prefix_str = base58str.substr(0, pivot);
       auto data_str = base58str.substr(pivot + 1);
-      FC_ASSERT(!data_str.empty(), "Data only has suite type prefix: ${str}", ("str", base58str));
+      FC_ASSERT(!data_str.empty(), "Data only has suite type prefix: {}", base58str);
 
       // ** Original version **
       // return base58_str_parser_impl<fc::static_variant<Ts...>, Prefixes, 0, Ts...>::apply(prefix_str, data_str);
@@ -292,8 +291,7 @@ Data from_wif( const std::string& wif_key ) {
 
    FC_ASSERT(memcmp( (char*)&check, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 ||
              memcmp( (char*)&check2, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 );
-   FC_ASSERT(key_bytes.size() == sizeof(typename Data::data_type), "Invalid key size for type ${t}",
-             ("t", typeid(Data).name()));
+   FC_ASSERT(key_bytes.size() == sizeof(typename Data::data_type), "Invalid key size for type {}", typeid(Data).name());
 
    Data d{};
    memcpy(d._data.data(), key_bytes.data(), key_bytes.size());
@@ -329,8 +327,8 @@ inline private_key::storage_type parse_unknown_wire_private_key_str(const std::s
 
    constexpr auto prefix = fc::crypto::constants::private_key_base_prefix;
    auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-   FC_ASSERT(!base_prefix.empty(), "Invalid private key prefixes: ${k}", ("k", str.substr(0, 10) + "..."));
-   FC_ASSERT(prefix == base_prefix, "Private Key has invalid prefix: ${s}", ("s", base_prefix));
+   FC_ASSERT(!base_prefix.empty(), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
+   FC_ASSERT(prefix == base_prefix, "Private Key has invalid prefix: {}", base_prefix);
    if (type_prefix == private_key::key_prefix(private_key::key_type::k1) ||
       type_prefix == private_key::key_prefix(private_key::key_type::r1)) {
       return base58_str_parser<private_key::storage_type, fc::crypto::constants::private_key_prefix>::apply(type_prefix + '_' + data_str);
@@ -338,7 +336,7 @@ inline private_key::storage_type parse_unknown_wire_private_key_str(const std::s
    if (type_prefix == private_key::key_prefix(private_key::key_type::bls)) {
       return bls::private_key_shim(bls::private_key(str).get_secret());
    }
-   FC_ASSERT(false, "Unknown private key suite: ${s} in private_key", ("s", type_prefix));
+   FC_ASSERT(false, "Unknown private key suite: {} in private_key", type_prefix);
 }
 
 inline bool is_legacy_public_key_str(const std::string& str) {
@@ -361,8 +359,8 @@ inline public_key::storage_type parse_unknown_wire_public_key_str(const std::str
 
    constexpr auto prefix = fc::crypto::constants::public_key_base_prefix;
    auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-   FC_ASSERT(!base_prefix.empty(), "Invalid public key prefixes: ${k}", ("k", str));
-   FC_ASSERT(prefix == base_prefix, "Public Key has invalid prefix: ${str}", ("str", str));
+   FC_ASSERT(!base_prefix.empty(), "Invalid public key prefixes: {}", str);
+   FC_ASSERT(prefix == base_prefix, "Public Key has invalid prefix: {}", str);
    if (type_prefix == public_key::key_prefix(public_key::key_type::k1) ||
       type_prefix == public_key::key_prefix(public_key::key_type::r1) ||
       type_prefix == public_key::key_prefix(public_key::key_type::wa)) {
@@ -371,15 +369,15 @@ inline public_key::storage_type parse_unknown_wire_public_key_str(const std::str
    if (type_prefix == public_key::key_prefix(public_key::key_type::bls)) {
       return bls::deserialize_bls_base64url(str);
    }
-   FC_ASSERT(false, "Unknown public key suite: ${s} in ${str}", ("s", type_prefix)("str", str));
+   FC_ASSERT(false, "Unknown public key suite: {} in {}", type_prefix, str);
 }
 
 inline signature::storage_type parse_unknown_wire_signature_str(const std::string& str) {
    try {
       constexpr auto prefix = fc::crypto::constants::signature_base_prefix;
       auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
-      FC_ASSERT(!base_prefix.empty(), "Invalid signature prefixes: ${k}", ("k", str));
-      FC_ASSERT(prefix == base_prefix, "Signature has invalid prefix: ${str}", ("str", str));
+      FC_ASSERT(!base_prefix.empty(), "Invalid signature prefixes: {}", str);
+      FC_ASSERT(prefix == base_prefix, "Signature has invalid prefix: {}", str);
 
       if (type_prefix == signature::sig_prefix(signature::sig_type::k1) ||
          type_prefix == signature::sig_prefix(signature::sig_type::r1) ||
@@ -389,8 +387,8 @@ inline signature::storage_type parse_unknown_wire_signature_str(const std::strin
       if (type_prefix == signature::sig_prefix(signature::sig_type::bls)) {
          return bls::sig_parse_base64url(str);
       }
-      FC_ASSERT(false, "Unknown signture suite: ${s} in ${str}", ("s", type_prefix)("str", str));
-   } FC_RETHROW_EXCEPTIONS(warn, "error parsing signature", ("str", str ))
+      FC_ASSERT(false, "Unknown signture suite: {} in {}", type_prefix, str);
+   } FC_RETHROW_EXCEPTIONS(warn, "error parsing signature {}", str )
 }
 
 }

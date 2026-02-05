@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sysio/chain/types.hpp>
+#include <sysio/chain/block_header.hpp>
+#include <fc/log/logger.hpp>
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 
@@ -23,6 +25,13 @@ namespace sysio::chain {
    };
 
    using vote_message_ptr = std::shared_ptr<vote_message>;
+
+   constexpr auto format_as(const vote_message& vm) {
+      return fmt::format("vote_message{{block: #{}:{}.., {}, finalizer_key: {}..}}",
+                         block_header::num_from_id(vm.block_id), vm.block_id.str().substr(8, 16),
+                         vm.strong ? "strong" : "weak",
+                         vm.finalizer_key.to_string().substr(0, 10));
+   }
 
 } // namespace sysio::chain
 

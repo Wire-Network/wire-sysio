@@ -52,7 +52,8 @@ bfs::path get_build_root_path() {
       }
       current_path = current_path.parent_path();
    }
-   FC_THROW_EXCEPTION_FMT(fc::exception, "Unable to find build directory (exe_path={},dll_program_path={})", exe_path.string(), boost::dll::program_location().string());
+   FC_THROW_EXCEPTION(fc::exception, "Unable to find build directory (exe_path={},dll_program_path={})",
+                      exe_path.string(), boost::dll::program_location().string());
 }
 
 bfs::path get_source_root_path() {

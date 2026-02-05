@@ -53,8 +53,8 @@ namespace sysio { namespace chain {
       uint64_t h = static_cast<uint64_t>( std::hash<std::string_view>{}( name ) );
       auto itr = find_intrinsic( whitelisted_intrinsics, h, name );
       SYS_ASSERT( itr == whitelisted_intrinsics.end(), database_exception,
-                  "cannot add intrinsic '${name}' since it already exists in the whitelist",
-                  ("name", std::string(name))
+                  "cannot add intrinsic '{}' since it already exists in the whitelist",
+                  name
       );
 
       whitelisted_intrinsics.emplace( std::piecewise_construct,
@@ -68,8 +68,8 @@ namespace sysio { namespace chain {
       uint64_t h = static_cast<uint64_t>( std::hash<std::string_view>{}( name ) );
       auto itr = find_intrinsic( whitelisted_intrinsics, h, name );
       SYS_ASSERT( itr != whitelisted_intrinsics.end(), database_exception,
-                  "cannot remove intrinsic '${name}' since it does not exist in the whitelist",
-                  ("name", std::string(name))
+                  "cannot remove intrinsic '{}' since it does not exist in the whitelist",
+                  name
       );
 
       whitelisted_intrinsics.erase( itr );

@@ -8,11 +8,11 @@ namespace sysio::chain {
 
    void name::set( std::string_view str ) {
       const auto len = str.size();
-      SYS_ASSERT(len <= 13, name_type_exception, "Name is longer than 13 characters (${name}) ", ("name", std::string(str)));
+      SYS_ASSERT(len <= 13, name_type_exception, "Name is longer than 13 characters ({}) ", std::string(str));
       value = string_to_uint64_t(str);
       SYS_ASSERT(to_string() == str, name_type_exception,
-                 "Name not properly normalized (name: ${name}, normalized: ${normalized}) ",
-                 ("name", std::string(str))("normalized", to_string()));
+                 "Name not properly normalized (name: {}, normalized: {}) ",
+                 std::string(str), to_string());
    }
 
    // keep in sync with name::to_string() in contract definition for name

@@ -76,7 +76,7 @@ namespace sysio { namespace chain { namespace webassembly {
    int64_t interface::get_account_creation_time( account_name account ) const {
       const auto* acct = context.db.find<account_object, by_name>(account);
       SYS_ASSERT( acct != nullptr, action_validate_exception,
-                  "account '${account}' does not exist", ("account", account) );
+                  "account '{}' does not exist", account );
       return time_point(acct->creation_date).time_since_epoch().count();
    }
 }}} // ns sysio::chain::webassembly

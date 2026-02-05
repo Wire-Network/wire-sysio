@@ -149,7 +149,7 @@ public:
 
       error_code ec;
       socket->connect(local::stream_protocol::endpoint(*dest.host()), ec);
-      FC_ASSERT(!ec, "Failed to connect: ${message}", ("message",ec.message()));
+      FC_ASSERT(!ec, "Failed to connect: {}", ec.message());
 
       auto res = _connections.emplace(std::piecewise_construct,
                                       std::forward_as_tuple(key),
@@ -163,7 +163,7 @@ public:
       auto socket = std::make_unique<tcp::socket>(_ioc);
 
       error_code ec = sync_connect_with_timeout(*socket, *dest.host(), dest.port() ? std::to_string(*dest.port()) : "80", deadline);
-      FC_ASSERT(!ec, "Failed to connect: ${message}", ("message",ec.message()));
+      FC_ASSERT(!ec, "Failed to connect: {}", ec.message());
 
       auto res = _connections.emplace(std::piecewise_construct,
                                       std::forward_as_tuple(key),
@@ -178,7 +178,7 @@ public:
       } else if (dest.proto() == "unix") {
          return create_unix_connection(dest, deadline);
       } else {
-         FC_THROW("Unknown protocol ${proto}", ("proto", dest.proto()));
+         FC_THROW("Unknown protocol {}", dest.proto());
       }
    }
 
@@ -281,7 +281,7 @@ public:
 
       // Send the HTTP request to the remote host
       error_code ec = std::visit(write_request_visitor(this, req, deadline), conn_iter->second);
-      FC_ASSERT(!ec, "Failed to send request: ${message}", ("message",ec.message()));
+      FC_ASSERT(!ec, "Failed to send request: {}", ec.message());
 
       // This buffer is used for reading and must be persisted
       boost::beast::flat_buffer buffer;
@@ -291,7 +291,7 @@ public:
 
       // Receive the HTTP response
       ec = std::visit(read_response_visitor(this, buffer, res, deadline), conn_iter->second);
-      FC_ASSERT(!ec, "Failed to read response: ${message}", ("message",ec.message()));
+      FC_ASSERT(!ec, "Failed to read response: {}", ec.message());
 
       // if the connection can be kept open, keep it open
       if (res.keep_alive()) {
@@ -312,7 +312,7 @@ public:
 
             if (err_var.contains("details")) {
                for (const auto& dvar : err_var["details"].get_array()) {
-                  excp->append_log(FC_LOG_MESSAGE(error, dvar.get_object()["message"].as_string()));
+                  excp->append_log(FC_LOG_MESSAGE(error, "{}", dvar.get_object()["message"].as_string()));
                }
             }
          } catch( ... ) {
@@ -325,7 +325,7 @@ public:
             FC_THROW("Request failed with 500 response, but response was not parseable");
          }
       } else if (res.result() == http::status::not_found) {
-         FC_THROW("URL not found: ${url}", ("url", (std::string)dest));
+         FC_THROW("URL not found: {}", (std::string)dest);
       }
 
       return result;
@@ -350,7 +350,7 @@ public:
 
       std::filesystem::path socket_file(full_url);
       if(socket_file.is_relative())
-         FC_THROW_EXCEPTION( parse_error_exception, "socket url cannot be relative (${url})", ("url", socket_file.string()));
+         FC_THROW_EXCEPTION( parse_error_exception, "socket url cannot be relative ({})", socket_file.string());
       if(socket_file.empty())
          FC_THROW_EXCEPTION( parse_error_exception, "missing socket url");
       std::filesystem::path url_path;

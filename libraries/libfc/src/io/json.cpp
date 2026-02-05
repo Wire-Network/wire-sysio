@@ -95,9 +95,7 @@ namespace fc
          char c = in.peek();
 
          if( c != '"' )
-            FC_THROW_EXCEPTION( parse_error_exception,
-                                            "Expected '\"' but read '${char}'",
-                                            ("char", std::string(&c, (&c) + 1) ) );
+            FC_THROW_EXCEPTION( parse_error_exception, "Expected '\"' but read '{}'", std::string(&c, (&c) + 1) );
          in.get();
          while( !in.eof() )
          {
@@ -107,8 +105,7 @@ namespace fc
                   token += parse_escape( in );
                   break;
                case 0x04:
-                  FC_THROW_EXCEPTION( parse_error_exception, "EOF before closing '\"' in string '${token}'",
-                                                   ("token", token ) );
+                  FC_THROW_EXCEPTION( parse_error_exception, "EOF before closing '\"' in string '{}'", token );
                case '"':
                   in.get();
                   return token;
@@ -117,10 +114,8 @@ namespace fc
                   in.get();
             }
          }
-         FC_THROW_EXCEPTION( parse_error_exception, "EOF before closing '\"' in string '${token}'",
-                                          ("token", token ) );
-       } FC_RETHROW_EXCEPTIONS( warn, "while parsing token '${token}'",
-                                          ("token", token ) );
+         FC_THROW_EXCEPTION( parse_error_exception, "EOF before closing '\"' in string '{}'", token );
+       } FC_RETHROW_EXCEPTIONS( warn, "while parsing token '{}'", token );
    }
 
    template<typename T>
@@ -165,7 +160,7 @@ namespace fc
          return token;
       }
 
-      FC_RETHROW_EXCEPTIONS( warn, "while parsing token '${token}'", ("token", token) );
+      FC_RETHROW_EXCEPTIONS( warn, "while parsing token '{}'", token );
    }
 
    template<typename T, json::parse_type parser_type>
@@ -176,9 +171,7 @@ namespace fc
       {
          char c = in.peek();
          if( c != '{' )
-            FC_THROW_EXCEPTION( parse_error_exception,
-                                     "Expected '{', but read '${char}'",
-                                     ("char",std::string(&c, &c + 1)) );
+            FC_THROW_EXCEPTION( parse_error_exception, "Expected '{{', but read '{}'", std::string(&c, &c + 1) );
          in.get();
          while( in.peek() != '}' )
          {
@@ -192,8 +185,7 @@ namespace fc
             skip_white_space(in);
             if( in.peek() != ':' )
             {
-               FC_THROW_EXCEPTION( parse_error_exception, "Expected ':' after key \"${key}\"",
-                                        ("key", key) );
+               FC_THROW_EXCEPTION( parse_error_exception, "Expected ':' after key \"{}\"", key );
             }
             in.get();
             auto val = variant_from_stream<T, parser_type>( in, max_depth - 1 );
@@ -206,15 +198,15 @@ namespace fc
             in.get();
             return obj;
          }
-         FC_THROW_EXCEPTION( parse_error_exception, "Expected '}' after ${variant}", ("variant", std::move(obj) ) );
+         FC_THROW_EXCEPTION( parse_error_exception, "Expected '}}' after {}", fc::json::to_log_string(obj) );
       }
       catch( const fc::eof_exception& e )
       {
-         FC_THROW_EXCEPTION( parse_error_exception, "Unexpected EOF: ${e}", ("e", e.to_detail_string() ) );
+         FC_THROW_EXCEPTION( parse_error_exception, "Unexpected EOF: {}", e.to_detail_string() );
       }
       catch( const std::ios_base::failure& e )
       {
-         FC_THROW_EXCEPTION( parse_error_exception, "Unexpected EOF: ${e}", ("e", e.what() ) );
+         FC_THROW_EXCEPTION( parse_error_exception, "Unexpected EOF: {}", e.what() );
       } FC_RETHROW_EXCEPTIONS( warn, "Error parsing object" );
    }
 
@@ -241,12 +233,10 @@ namespace fc
            skip_white_space(in);
         }
         if( in.peek() != ']' )
-           FC_THROW_EXCEPTION( parse_error_exception, "Expected ']' after parsing ${variant}",
-                                    ("variant", ar) );
+           FC_THROW_EXCEPTION( parse_error_exception, "Expected ']' after parsing {}", fc::json::to_log_string(ar) );
 
         in.get();
-      } FC_RETHROW_EXCEPTIONS( warn, "Attempting to parse array ${array}",
-                                         ("array", ar ) );
+      } FC_RETHROW_EXCEPTIONS( warn, "Attempting to parse array {}", fc::json::to_log_string(ar) );
       return ar;
    }
 
@@ -308,7 +298,7 @@ namespace fc
       }
       const std::string& str = s;
       if (str == "-." || str == "." || str == "-") // check the obviously wrong things we could have encountered
-        FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"${token}\" as a JSON numeric constant", ("token", str));
+        FC_THROW_EXCEPTION(parse_error_exception, "Can't parse token \"{}\" as a JSON numeric constant", str);
       if( dot )
         return parser_type == json::parse_type::legacy_parser_with_string_doubles ? variant(str) : variant(to_double(str));
       if( neg )
@@ -434,8 +424,7 @@ namespace fc
             case '\0':
               FC_THROW_EXCEPTION( eof_exception, "unexpected end of file" );
             default:
-              FC_THROW_EXCEPTION( parse_error_exception, "Unexpected char '${c}' in \"${s}\"",
-                                 ("c", c)("s", string_from_token(in)) );
+              FC_THROW_EXCEPTION( parse_error_exception, "Unexpected char '{}' in \"{}\"", c, string_from_token(in) );
          }
       }
 	  return variant();
@@ -456,9 +445,9 @@ namespace fc
           case parse_type::relaxed_parser:
               return json_relaxed::variant_from_stream<stream_t, false>( in, max_depth );
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
-   } FC_RETHROW_EXCEPTIONS( warn, "", ("str",utf8_str) ) }
+   } FC_RETHROW_EXCEPTIONS( warn, "{}", utf8_str ) }
 
    /**
     *  Convert '\t', '\r', '\n', '\\' and '"'  to "\t\r\n\\\"" if escape_control_chars == true
@@ -643,7 +632,7 @@ namespace fc
               return;
            }
          default:
-            FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: " + std::to_string( v.get_type() ) );
+            FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: {}", std::to_string( v.get_type() ) );
       }
    }
 
@@ -787,7 +776,7 @@ namespace fc
           case json::parse_type::relaxed_parser:
               return json_relaxed::variant_from_stream<std::ifstream, false>( bi, max_depth );
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
    }
    /*
@@ -828,7 +817,7 @@ namespace fc
              json_relaxed::variant_from_stream<std::stringstream, false>( in, max_depth );
               break;
           default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", static_cast<int>(ptype)) );
+              FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
       try { in.peek(); } catch ( const eof_exception& e ) { return true; }
       return false;

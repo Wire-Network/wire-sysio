@@ -12,6 +12,8 @@
 #include <boost/multi_index_container_fwd.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 
+#include <fmt/format.h>
+
 #include <fc/container/deque_fwd.hpp>
 #include <fc/container/flat_fwd.hpp>
 #include <fc/int128.hpp>

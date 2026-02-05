@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE(std_array_types_short)
    // Check that providing the wrong number of values for a fixed size array type triggers an exception
    // -------------------------------------------------------------------------------------------------
    auto is_assert_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
 
    auto var = fc::json::from_string(test_data);
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_CASE(optional_std_array)
    auto abi = fc::json::from_string(test_abi).as<abi_def>();
 
    auto log_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    abi_serializer abis;
 
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE(optional_vector)
    auto abi = fc::json::from_string(test_abi).as<abi_def>();
 
    auto log_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    abi_serializer abis;
 
@@ -985,7 +985,7 @@ BOOST_AUTO_TEST_CASE(abi_cycle)
    auto abi = sysio_contract_abi(fc::json::from_string(typedef_cycle_abi).as<abi_def>());
 
    auto is_assert_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    BOOST_CHECK_EXCEPTION( abi_serializer abis(std::move(abi), yield_fn()), duplicate_abi_type_def_exception, is_assert_exception);
 

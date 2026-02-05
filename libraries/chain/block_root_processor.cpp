@@ -81,19 +81,18 @@ chain::checksum256_type block_root_processor::compute_curr_root_id(const chain::
    // Hash the serialized data to generate the new Root-ID
    chain::checksum256_type curr_root_id = chain::checksum256_type::hash(data);
 
-   dlog("Computed interim Root-ID: ${curr_root_id}", ("curr_root_id", curr_root_id));
+   dlog("Computed interim Root-ID: {}", curr_root_id);
    // Extract the block number from the previous Root-ID and increment it by 1
    const uint32_t prev_root_block_number = extract_root_block_number(prev_root_id);
    const uint32_t next_root_block_number = prev_root_block_number + 1;
 
-   dlog("Extracted prev_root_block_number from prev_root_id: ${prev_root_block_number}, next: ${next_root_block_number}",
-       ("prev_root_block_number", prev_root_block_number)("next_root_block_number", next_root_block_number));
+   dlog("Extracted prev_root_block_number from prev_root_id: {}, next: {}",
+        prev_root_block_number, next_root_block_number);
 
    // Modify the first 4 bytes directly
    uint32_t next_root_block_number_reversed = fc::endian_reverse_u32(next_root_block_number);
    std::memcpy(curr_root_id.data(), &next_root_block_number_reversed, sizeof(uint32_t)); // Modify the first 4 bytes
 
-   // ilog("Computed curr_root_id with block number embedded: ${c}", ("c", curr_root_id.str()));
    return curr_root_id;
 }
 

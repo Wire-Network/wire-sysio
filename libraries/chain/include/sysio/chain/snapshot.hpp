@@ -192,8 +192,8 @@ namespace sysio { namespace chain {
             auto orig = data.id;
             f();
             SYS_ASSERT(orig == data.id, snapshot_exception,
-                       "Snapshot for ${type} mutates row member \"id\" which is illegal",
-                       ("type",boost::core::demangle( typeid( T ).name() )));
+                       "Snapshot for {} mutates row member \"id\" which is illegal",
+                       boost::core::demangle( typeid( T ).name() ));
          }
 
          template<typename T, typename F>
@@ -457,7 +457,7 @@ namespace sysio { namespace chain {
       snapshot_written_row_counter(const size_t total, const char* name) : total(total), name(name) {}
       void progress() {
          if(++count % 50000 == 0 && time(NULL) - last_print >= 5) {
-            ilog("${n} creation ${pct}% complete", ("n", name)("pct",std::min((unsigned)(((double)count/total)*100),100u)));
+            ilog("{} creation {}% complete", name, std::min((unsigned)(((double)count/total)*100),100u));
             last_print = time(NULL);
          }
       }

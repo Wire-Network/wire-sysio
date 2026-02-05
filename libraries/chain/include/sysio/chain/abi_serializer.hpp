@@ -8,6 +8,7 @@
 #include <fc/variant_dynamic_bitset.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
+#include <fc/io/json.hpp>
 
 namespace sysio::chain {
 
@@ -124,17 +125,17 @@ struct abi_serializer {
       fc::time_point deadline = fc::time_point::now().safe_add(max_serialization_time);
       return [max_serialization_time, deadline](size_t recursion_depth) {
          SYS_ASSERT( recursion_depth < max_recursion_depth, abi_recursion_depth_exception,
-                     "recursive definition, max_recursion_depth ${r} ", ("r", max_recursion_depth) );
+                     "recursive definition, max_recursion_depth {} ", max_recursion_depth );
 
          SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
-                     "serialization time limit ${t}us exceeded", ("t", max_serialization_time) );
+                     "serialization time limit {}us exceeded", max_serialization_time );
       };
    }
 
    static yield_function_t create_depth_yield_function() {
       return [](size_t recursion_depth) {
          SYS_ASSERT( recursion_depth < max_recursion_depth, abi_recursion_depth_exception,
-                     "recursive definition, max_recursion_depth ${r} ", ("r", max_recursion_depth) );
+                     "recursive definition, max_recursion_depth {} ", max_recursion_depth );
       };
    }
 
@@ -277,7 +278,7 @@ namespace impl {
             yield = [deadline, y=yield, max=max_action_serialization_time](size_t depth) {
                y(depth); // call provided yield that might include an overall time limit or not
                SYS_ASSERT( fc::time_point::now() < deadline, abi_serialization_deadline_exception,
-                           "serialization action data time limit ${t}us exceeded", ("t", max) );
+                           "serialization action data time limit {}us exceeded", max );
             };
          }
       }
@@ -646,7 +647,7 @@ namespace impl {
                // future case XXX_extension::extension_id(): …
                default:
                   // Should never reach this as validate_and_extract_extensions() should only return known extensions
-                  SYS_ASSERT( false, invalid_transaction_extension, "Transaction extension with id type ${id} is not supported", ("id", id));
+                  SYS_ASSERT( false, invalid_transaction_extension, "Transaction extension with id type {} is not supported", id);
                   break;
             }
          }
@@ -871,7 +872,7 @@ namespace impl {
          }
 
          SYS_ASSERT(valid_empty_data || !act.data.empty(), packed_transaction_type_exception,
-                    "Failed to deserialize data for ${account}:${name}", ("account", act.account)("name", act.name));
+                    "Failed to deserialize data for {}:{}", act.account, act.name);
       }
 
       template<typename Resolver>
@@ -984,7 +985,7 @@ void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& re
    impl::abi_traverse_context ctx( yield, fc::microseconds{} );
    impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
    vo = std::move(mvo["_"]);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: ${type}", ("type", boost::core::demangle( typeid(o).name() ) ))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
@@ -992,7 +993,7 @@ void abi_serializer::to_variant( const T& o, fc::variant& vo, const Resolver& re
    impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
    impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
    vo = std::move(mvo["_"]);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: ${type}", ("type", boost::core::demangle( typeid(o).name() ) ))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const yield_function_t& yield ) try {
@@ -1001,7 +1002,7 @@ void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver
     ctx.logging();
     impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
     vo = std::move(mvo["_"]);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: ${type}", ("type", boost::core::demangle( typeid(o).name() ) ))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
@@ -1010,19 +1011,19 @@ void abi_serializer::to_log_variant( const T& o, fc::variant& vo, const Resolver
    ctx.logging();
    impl::abi_to_variant::add(mvo, "_", o, resolver, ctx);
    vo = std::move(mvo["_"]);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: ${type}", ("type", boost::core::demangle( typeid(o).name() ) ))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to serialize: {}", boost::core::demangle( typeid(o).name() ))
 
 template<typename T, typename Resolver>
 void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const yield_function_t& yield ) try {
    impl::abi_traverse_context ctx( yield, fc::microseconds{} );
    impl::abi_from_variant::extract(v, o, resolver, ctx);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant", ("variant",v))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant {}", fc::json::to_log_string(v))
 
 template<typename T, typename Resolver>
 void abi_serializer::from_variant( const fc::variant& v, T& o, const Resolver& resolver, const fc::microseconds& max_action_data_serialization_time ) try {
    impl::abi_traverse_context ctx( create_depth_yield_function(), max_action_data_serialization_time );
    impl::abi_from_variant::extract(v, o, resolver, ctx);
-} FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant", ("variant",v))
+} FC_RETHROW_EXCEPTIONS(error, "Failed to deserialize variant {}", fc::json::to_log_string(v))
 
 using abi_serializer_cache_t = std::unordered_map<account_name, std::optional<abi_serializer>>;
 using resolver_fn_t = std::function<std::optional<abi_serializer>(const account_name& name)>;

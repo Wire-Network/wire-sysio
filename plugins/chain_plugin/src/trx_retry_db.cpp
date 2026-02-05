@@ -107,7 +107,7 @@ struct trx_retry_db_impl {
 
    void track_transaction( packed_transaction_ptr ptrx, std::optional<uint16_t> num_blocks, next_function<std::unique_ptr<fc::variant>> next ) {
       SYS_ASSERT( _tracked_trxs.memory_size() < _max_mem_usage_size, tx_resource_exhaustion,
-                  "Transaction exceeded  transaction-retry-max-storage-size-gb limit: ${m} bytes", ("m", _tracked_trxs.memory_size()) );
+                  "Transaction exceeded  transaction-retry-max-storage-size-gb limit: {} bytes", _tracked_trxs.memory_size() );
       auto i = _tracked_trxs.index().get<by_trx_id>().find( ptrx->id() );
       if( i == _tracked_trxs.index().end() ) {
          _tracked_trxs.insert( {std::move(ptrx),
@@ -211,7 +211,7 @@ private:
       for( auto& i: to_process ) {
          _transaction_ack_channel.publish(
                appbase::priority::low, std::pair<fc::exception_ptr, packed_transaction_ptr>( nullptr, i->ptrx ) );
-         dlog( "retry send trx ${id}", ("id", i->ptrx->id()) );
+         dlog( "retry send trx {}", i->ptrx->id() );
          _tracked_trxs.modify( i, [&]( tracked_transaction& tt ) {
             tt.last_try = now;
          } );
@@ -264,9 +264,9 @@ private:
          }
          itr->next( std::static_pointer_cast<fc::exception>(
                std::make_shared<expired_tx_exception>(
-                     FC_LOG_MESSAGE( error, "expired retry transaction ${id}, expiration ${e}, block time ${bt}",
-                                     ("id", itr->id())("e", itr->ptrx->expiration())
-                                     ("bt", block_timestamp) ) ) ) );
+                     FC_LOG_MESSAGE( error, "expired retry transaction {}, expiration {}, block time {}",
+                                     itr->id(), itr->ptrx->expiration(),
+                                     block_timestamp) ) ) );
          _tracked_trxs.erase( _tracked_trxs.index().project<0>( itr ) );
       }
    }
@@ -306,25 +306,25 @@ size_t trx_retry_db::size()const {
 void trx_retry_db::on_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
    try {
       _impl->on_applied_transaction(trace, ptrx);
-   } FC_LOG_AND_DROP(("trx retry on_applied_transaction ERROR"));
+   } FC_LOG_AND_DROP("trx retry on_applied_transaction ERROR");
 }
 
 void trx_retry_db::on_block_start( uint32_t block_num ) {
    try {
       _impl->on_block_start(block_num);
-   } FC_LOG_AND_DROP(("trx retry block_start ERROR"));
+   } FC_LOG_AND_DROP("trx retry block_start ERROR");
 }
 
 void trx_retry_db::on_accepted_block( uint32_t block_num ) {
    try {
       _impl->on_accepted_block(block_num);
-   } FC_LOG_AND_DROP(("trx retry accepted_block ERROR"));
+   } FC_LOG_AND_DROP("trx retry accepted_block ERROR");
 }
 
 void trx_retry_db::on_irreversible_block(const chain::signed_block_ptr& block) {
    try {
       _impl->on_irreversible_block(block);
-   } FC_LOG_AND_DROP(("trx retry irreversible_block ERROR"));
+   } FC_LOG_AND_DROP("trx retry irreversible_block ERROR");
 }
 
 } // namespace sysio::chain_apis

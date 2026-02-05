@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_test) {
 
          std::thread app_thread([&]() {
             try {
-               fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+               fc::logger::default_logger().set_log_level(fc::log_level::debug);
                std::vector<const char*> argv =
                      {"test", "--data-dir", temp.c_str(), "--config-dir", temp.c_str(),
                       "-p", "sysio", "-e"};
@@ -209,7 +209,7 @@ BOOST_AUTO_TEST_CASE(snapshot_scheduler_old_json) {
 
    std::thread app_thread([&]() {
       try {
-         fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+         fc::logger::default_logger().set_log_level(fc::log_level::debug);
          std::vector<const char*> argv =
                {"test", "--data-dir", temp.c_str(), "--config-dir", temp.c_str(),
                 "-p", "sysio", "-e"};

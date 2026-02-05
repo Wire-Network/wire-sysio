@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
        // verify to/from string
        fc::crypto::public_key pubkey1(pk1);
        std::string pk1_str = pubkey1.to_string({});
-       dlog("pk1_str = ${k}", ("k", pk1_str));
+       dlog("pk1_str = {}", pk1_str);
        fc::crypto::public_key pubkey2 = fc::crypto::public_key::from_string(pk1_str, fc::crypto::public_key::key_type::ed);
        std::string pk2_str = pubkey2.to_string({});
        BOOST_TEST(pk1_str == pk2_str);

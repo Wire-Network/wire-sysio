@@ -22,7 +22,7 @@ struct signature_shim;
  */
 struct public_key_shim {
    static constexpr size_t size = crypto_sign_PUBLICKEYBYTES;
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    public_key_shim() = default;
@@ -36,15 +36,15 @@ struct public_key_shim {
    data_type serialize() const { return _data; }
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
    static public_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 44;
-      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 public key bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 public key bytes length {}", bytes.size());
       public_key_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
@@ -58,7 +58,7 @@ struct signature_shim {
    static constexpr size_t size = crypto_sign_BYTES;
    static constexpr bool is_recoverable = false;
 
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    signature_shim() = default;
@@ -80,15 +80,15 @@ struct signature_shim {
    bool verify(const sha256& digest, const public_key_shim& pub) const;
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
    static signature_shim from_base58_string(const std::string& str) {
       constexpr size_t max_sig_len = 88;
-      FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length {}", bytes.size());
       signature_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;
@@ -100,7 +100,7 @@ struct signature_shim {
  */
 struct private_key_shim {
    static constexpr size_t size = crypto_sign_SECRETKEYBYTES;
-   using data_type = std::array<unsigned char, size>;
+   using data_type = std::array<uint8_t, size>;
    data_type _data{};
 
    private_key_shim() = default;
@@ -111,20 +111,31 @@ struct private_key_shim {
    public_key_shim get_public_key() const;
    
    signature_shim  sign(const sha256& digest, bool require_canonical) const;
+
+   /**
+    * Sign raw bytes directly without any transformation (no hex encoding).
+    * This is required for Solana transaction signing where ED25519 signs
+    * the raw serialized message bytes.
+    * @param data Pointer to the data to sign
+    * @param len Length of the data
+    * @return ED25519 signature
+    */
+   signature_shim  sign_raw(const uint8_t* data, size_t len) const;
+
    sha512          generate_shared_secret(const public_key_shim&) const;
 
    data_type serialize() const { return _data; }
 
    std::string to_string(const fc::yield_function_t& yield)const {
-      static_assert(std::same_as<decltype(_data)::value_type, unsigned char>, "Evaluate reinterpret cast if type changes");
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
       return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
    }
 
    static private_key_shim from_base58_string(const std::string& str) {
       constexpr size_t max_key_len = 88;
-      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length ${s}", ("s", str.size()));
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length {}", str.size());
       auto bytes = from_base58(str);
-      FC_ASSERT(bytes.size() == size, "Invalid ED25519 private key bytes length ${s}", ("s", bytes.size()));
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 private key bytes length {}", bytes.size());
       private_key_shim result;
       memcpy(result._data.data(), bytes.data(), bytes.size());
       return result;

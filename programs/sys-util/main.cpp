@@ -14,7 +14,7 @@
 #include <memory>
 
 int main(int argc, char** argv) {
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
 
    CLI::App app{"sysio Command Line Utility"};
 

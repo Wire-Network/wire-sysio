@@ -54,17 +54,17 @@ public:
       std::error_code ec;
       if(!valid) {
          fs::remove(fs::path(pending_path), ec);
-         ilog("Snapshot created at block id ${id} invalidated because block was forked out", ("id", block_id));
+         ilog("Snapshot created at block id {} invalidated because block was forked out", block_id);
          SYS_THROW(chain::snapshot_finalization_exception,
-                   "Snapshotted block was forked out of the chain.  ID: ${id}", ("id", block_id));
+                   "Snapshotted block was forked out of the chain.  ID: {}", block_id);
       }
 
       fs::rename(fs::path(pending_path), fs::path(final_path), ec);
       SYS_ASSERT(!ec, chain::snapshot_finalization_exception,
-                 "Unable to finalize valid snapshot of block number ${bn}: [code: ${ec}] ${message}",
-                 ("bn", block_num)("ec", ec.value())("message", ec.message()));
+                 "Unable to finalize valid snapshot of block number {}: [code: {}] {}",
+                 block_num, ec.value(), ec.message());
 
-      ilog("Snapshot created at block ${bn} available at ${fn}", ("bn", block_num)("fn", final_path));
+      ilog("Snapshot created at block {} available at {}", block_num, final_path);
 
       return {block_id, block_num, timestamp, chain::chain_snapshot_header::current_version, final_path};
    }

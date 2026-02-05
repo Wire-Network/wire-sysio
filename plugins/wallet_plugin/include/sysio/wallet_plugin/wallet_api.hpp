@@ -123,7 +123,7 @@ public:
    /**
     * Imports a WIF Private Key into the wallet to be used to sign transactions by an account.
     *
-    * @example: import_key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+    * @example: import_key PUB_K1_4wcGz7MSrZjqKCdz8aynkj2xwnAjtbkbfn58pWX56xqnSpsDSt
     *
     * @note this is a simply shortcut to import_key(key_name, wif_key), which
     *   will use the generate unused alias function internally
@@ -135,7 +135,7 @@ public:
    /**
     * Imports a WIF Private Key into the wallet to be used to sign transactions by an account.
     *
-    * @example: import_key my-batch-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+    * @example: import_key my-batch-key PUB_K1_4wcGz7MSrZjqKCdz8aynkj2xwnAjtbkbfn58pWX56xqnSpsDSt
     *
     * @param key_name a unique name to identify this key
     * @param wif_key the WIF Private Key to import
@@ -145,11 +145,20 @@ public:
    /**
     * Removes a key from the wallet.
     *
+    * @example: remove_key PUB_K1_6Qhu55LYHHgBWExg3TQNXbK8PwfranWcrR3tFYMsZeeZtFEGtX
+    *
+    * @param key_str the public key
+    */
+   virtual bool remove_key(string key_str) = 0;
+
+   /**
+    * Removes a key from the wallet.
+    *
     * @example: remove_key my-batch-key
     *
-    * @param key_name the name assigned to the key
+    * @param name the name associated with the key set
     */
-   virtual bool remove_key(string key_name) = 0;
+   virtual bool remove_name(string name) = 0;
 
    /**
     * Removes a key from the wallet.

@@ -47,14 +47,12 @@ namespace sysio { namespace chain {
 
          auto match = decompose_t::extract<block_header_extension>( id, e.second, iter->second );
          SYS_ASSERT( match, invalid_block_header_extension,
-                     "Block header extension with id type ${id} is not supported",
-                     ("id", id)
+                     "Block header extension with id type {} is not supported",  id
          );
 
          if( match->enforce_unique ) {
             SYS_ASSERT( i == 0 || id > id_type_lower_bound, invalid_block_header_extension,
-                        "Block header extension with id type ${id} is not allowed to repeat",
-                        ("id", id)
+                        "Block header extension with id type {} is not allowed to repeat", id
             );
          }
 
@@ -84,8 +82,7 @@ namespace sysio { namespace chain {
 
          auto match = decompose_t::extract<block_header_extension>( id, e.second, ext );
          SYS_ASSERT( match, invalid_block_header_extension,
-                     "Block header extension with id type ${id} is not supported",
-                     ("id", id)
+                     "Block header extension with id type {} is not supported", id
          );
 
          return ext;

@@ -332,7 +332,7 @@ try {
       if (!result.first.has_value()) {
          const sysio::chain::transaction_trace& trace = *result.second;
          if (trace.except.has_value()) {
-            elog(trace.except->to_detail_string());
+            elog("{}", trace.except->to_detail_string());
          }
       }
       BOOST_REQUIRE(result.first.has_value());
@@ -345,7 +345,7 @@ try {
    {
       auto result = latest_block_batch_info(batch_start_height_offset, batch_size);
       if (result.has_error()) {
-         elog("require_latest_block_batch_info returned error: ${err}", ("err", result.get_error()));
+         elog("require_latest_block_batch_info returned error: {}", result.get_error());
       }
       BOOST_REQUIRE(!result.has_error());
 

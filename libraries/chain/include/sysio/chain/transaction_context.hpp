@@ -180,8 +180,6 @@ namespace sysio::chain {
          void validate_cpu_minimum()const;
          void validate_trx_billed_cpu()const;
 
-         void disallow_transaction_extensions( const char* error_msg )const;
-
          std::string get_tx_cpu_usage_exceeded_reason_msg(fc::microseconds& limit) const;
 
       /// Fields:
