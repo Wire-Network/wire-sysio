@@ -67,7 +67,7 @@ if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
       -DDST4="${ROA_ABI_DST}"
       -DCOUNT=4
       -DSTAMP_FILE="${CONTRACTS_COPY_STAMP}"
-      -P "${CMAKE_SOURCE_DIR}/cmake/copy_if_changed_and_stamp.cmake"
+      -P "${CMAKE_SOURCE_DIR}/cmake/scripts/contract_copy_if_changed_and_stamp.cmake"
     BYPRODUCTS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${CONTRACTS_COPY_STAMP}
     COMMENT "Checking and copying test contracts to testing libraries build directory"
   )
