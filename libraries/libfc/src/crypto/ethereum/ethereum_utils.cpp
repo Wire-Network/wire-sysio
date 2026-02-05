@@ -111,7 +111,9 @@ em::message_hash_type hash_user_message(const em::message_body_type& payload) {
       auto& payload_bytes = std::get<std::vector<std::uint8_t>>(payload);
       auto payload_str   = std::string{reinterpret_cast<const char*>(payload_bytes.data()), payload_bytes.size()};
       return hash_user_message(payload_str);
-   } else if (std::holds_alternative<std::string>(payload)) {
+   }
+
+   if (std::holds_alternative<std::string>(payload)) {
       auto& payload_str        = std::get<std::string>(payload);
       auto payload_length_str = std::to_string(payload_str.size());
 
