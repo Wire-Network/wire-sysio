@@ -23,8 +23,7 @@ int main(int argc, char** argv) {
 
    cron_plug.add_job(
       {
-         .milliseconds = {0},
-         .seconds = {5, 15, 25, 35, 45, 55}
+         .milliseconds = {cron_service::schedule::step_value{5000}}
       },
       [&]() {
          auto now = std::chrono::utc_clock::now();
