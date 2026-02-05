@@ -10,7 +10,6 @@
 #include <fc/crypto/elliptic_ed.hpp>
 #include <fc/crypto/bls_private_key.hpp>
 #include <fc/crypto/sha256.hpp>
-#include <fc/crypto/keccak256.hpp>
 #include <fc/reflect/reflect.hpp>
 #include <fc/static_variant.hpp>
 #include <fc/utility.hpp>

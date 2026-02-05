@@ -33,7 +33,7 @@ class sha256 : public add_packhash_to_hash<sha256>
     constexpr size_t data_size() const { return sha256::byte_size; }
 
     std::span<const uint8_t, byte_size> to_uint8_span() const {
-       return std::span<const uint8_t, byte_size>{reinterpret_cast<const uint8_t*>(data()), reinterpret_cast<const uint8_t*>(data()) + data_size()};
+       return std::span<const uint8_t, byte_size>{reinterpret_cast<const uint8_t*>(data()), data_size()};
     }
 
     byte_array_type to_uint8_array()  const {
