@@ -284,7 +284,7 @@ struct catalog_type {
    void update_prometheus_info() {
       info_details = info.Add({
             {"server_version", fc::itoh(static_cast<uint32_t>(app().version()))},
-            {"chain_id", app().get_plugin<chain_plugin>().get_chain_id()},
+            {"chain_id", app().get_plugin<chain_plugin>().get_chain_id().str()},
             {"server_version_string", app().version_string()},
             {"server_full_version_string", app().full_version_string()},
             {"earliest_available_block_num", to_string(app().get_plugin<chain_plugin>().chain().earliest_available_block_num())}

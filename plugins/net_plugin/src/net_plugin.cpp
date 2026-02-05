@@ -4365,7 +4365,7 @@ namespace sysio {
          }
          chain::public_key_type peer_key;
          try {
-            peer_key = crypto::public_key(msg.sig, msg.token, true);
+            peer_key = crypto::public_key::recover(msg.sig, msg.token);
          }
          catch (const std::exception& /*e*/) {
             fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);
@@ -4645,7 +4645,7 @@ namespace sysio {
          if ( options.count( "p2p-bp-gossip-endpoint" ) ) {
             set_bp_producer_peers(options.at( "p2p-bp-gossip-endpoint" ).as<vector<string>>());
             auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-            SYS_ASSERT(!sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).empty(), chain::plugin_config_exception,
+            SYS_ASSERT(!sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_t::wire).empty(), chain::plugin_config_exception,
                        "signature-provider of associated key required for p2p-bp-gossip-endpoint");
          }
 

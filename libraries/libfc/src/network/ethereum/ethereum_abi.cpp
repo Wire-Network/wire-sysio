@@ -711,10 +711,10 @@ std::string abi::to_contract_function_signature(const contract& contract) {
  * @return 32-byte Keccak-256 hash (first 4 bytes used as selector)
  * @throws fc::exception if contract is not a function type
  */
-keccak256_hash_t abi::to_contract_function_selector(const contract& contract) {
+fc::keccak256 abi::to_contract_function_selector(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    auto signature = abi::to_contract_function_signature(contract);
-   return fc::crypto::ethereum::keccak256(signature);
+   return fc::keccak256::hash(signature);
 }
 
 /**
@@ -771,7 +771,7 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
    auto selector = abi::to_contract_function_selector(contract);
 
    std::vector<uint8_t> out;
-   out.insert(out.end(), selector.begin(), selector.begin() + 4);
+   out.insert(out.end(), selector.data(), selector.data() + 4);
 
    std::vector<std::vector<uint8_t>> heads, tails;
    heads.reserve(inputs.size());

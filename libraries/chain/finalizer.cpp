@@ -141,9 +141,9 @@ vote_message_ptr finalizer::maybe_vote(const bls_public_key& pub_key,
          if (decision == vote_decision::weak_vote) {
             // if voting weak, the digest to sign should be a hash of the concatenation of the finalizer_digest
             // and the string "WEAK"
-            sig =  priv_key.sign(create_weak_digest(digest));
+            sig = priv_key.sign_raw(create_weak_digest(digest));
          } else {
-            sig =  priv_key.sign({(uint8_t*)digest.data(), (uint8_t*)digest.data() + digest.data_size()});
+            sig = priv_key.sign_sha256(digest);
          }
          return std::make_shared<vote_message>(bsp->id(), decision == vote_decision::strong_vote, pub_key, sig);
       } FC_LOG_AND_DROP() // bls_signature can throw if invalid signature

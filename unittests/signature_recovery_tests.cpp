@@ -19,7 +19,7 @@ using fc::crypto::public_key;
 BOOST_AUTO_TEST_SUITE(signature_recovery_tests)
 
 struct sig_fixture {
-   sig_fixture(): chain_id(fc::sha256()) {}
+   sig_fixture(): chain_id(fc::sha256().str()) {}
    chain_id_type chain_id;
 };
 

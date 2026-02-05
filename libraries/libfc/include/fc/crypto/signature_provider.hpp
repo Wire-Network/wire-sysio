@@ -4,7 +4,9 @@
 
 namespace fc::crypto {
 using signature_provider_id_t  = std::variant<std::string, fc::crypto::public_key>;
-using signature_provider_sign_fn = std::function<fc::crypto::signature(fc::sha256)>;
+
+/// Wire default signing function (sha256 digest)
+using sign_fn        = std::function<fc::crypto::signature(const sha256&)>;
 
 /**
  * `signature_provider_entry` constructed provider
@@ -25,7 +27,8 @@ struct signature_provider_t  {
 
    std::optional<fc::crypto::private_key> private_key;
 
-   signature_provider_sign_fn sign;
+   /// Wire default signing (always set for all key types)
+   sign_fn        sign;
 };
 
 using signature_provider_ptr = std::shared_ptr<signature_provider_t>;

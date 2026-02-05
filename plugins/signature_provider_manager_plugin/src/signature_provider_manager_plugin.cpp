@@ -36,12 +36,11 @@ public:
     */
    fc::microseconds _kiod_provider_timeout_us;
 
-   fc::crypto::signature_provider_sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
+   fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
       return [key](const chain::digest_type& digest) { return key.sign(digest); };
    }
 
-   fc::crypto::signature_provider_sign_fn make_kiod_signature_provider(const string& url_str,
-                                                                       const chain::public_key_type& pubkey) const {
+   fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
          // send the entire string after unix:// to http_plugin. It'll auto-detect which part
@@ -63,7 +62,7 @@ public:
       };
    }
 
-   std::pair<fc::crypto::signature_provider_sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
+   std::pair<fc::crypto::sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
       fc::crypto::chain_key_type_t key_type,
       const fc::crypto::public_key& public_key,
       const std::string& spec) {
@@ -73,28 +72,27 @@ public:
       auto spec_data = spec_parts[1];
 
       if (spec_type_str == "KEY") {
-         auto privkey_str = spec_data;
          chain::private_key_type privkey;
 
          switch (key_type) {
-         case chain_key_type_wire: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire>(spec_data);
+         case chain_key_type_t::wire: {
+            privkey = from_native_string_to_private_key<chain_key_type_t::wire>(spec_data);
             break;
          }
-         case chain_key_type_wire_bls: {
-            privkey = from_native_string_to_private_key<chain_key_type_wire_bls>(spec_data);
+         case chain_key_type_t::wire_bls: {
+            privkey = from_native_string_to_private_key<chain_key_type_t::wire_bls>(spec_data);
             break;
          }
 
-         case chain_key_type_ethereum: {
-            privkey = from_native_string_to_private_key<chain_key_type_ethereum>(spec_data);
+         case chain_key_type_t::ethereum: {
+            privkey = from_native_string_to_private_key<chain_key_type_t::ethereum>(spec_data);
             break;
          }
-         case chain_key_type_solana: {
-            privkey = from_native_string_to_private_key<chain_key_type_solana>(spec_data);
+         case chain_key_type_t::solana: {
+            privkey = from_native_string_to_private_key<chain_key_type_t::solana>(spec_data);
             break;
          }
-         case chain_key_type_sui: {
+         case chain_key_type_t::sui: {
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
                                chain_key_type_reflector::to_string(key_type));
          }
@@ -241,8 +239,8 @@ public:
    }
 
    void register_default_signature_providers(const vector<fc::crypto::chain_key_type_t>& key_types) {
-      static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_wire,
-                                                         fc::crypto::chain_key_type_wire_bls};
+      static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_t::wire,
+                                                         fc::crypto::chain_key_type_t::wire_bls};
 
       std::scoped_lock lock(_signing_providers_mutex);
       load_default_signature_provider_specs();
@@ -261,11 +259,11 @@ public:
             auto key_name = std::format("{}-default", fc::crypto::chain_key_type_reflector::to_string(key_type));
             fc::crypto::private_key privkey;
             switch (key_type) {
-            case fc::crypto::chain_key_type_wire: {
+            case fc::crypto::chain_key_type_t::wire: {
                privkey = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
                break;
             }
-            case fc::crypto::chain_key_type_wire_bls: {
+            case fc::crypto::chain_key_type_t::wire_bls: {
                privkey = fc::crypto::private_key::generate<fc::crypto::bls::private_key_shim>();
                break;
             }
@@ -276,7 +274,7 @@ public:
             }
             auto pub_key_str = privkey.get_public_key().to_string({});
             spec = fc::crypto::to_signature_provider_spec(key_name,
-                                                          fc::crypto::chain_kind_wire,
+                                                          fc::crypto::chain_kind_t::wire,
                                                           key_type,
                                                           pub_key_str,
                                                           std::format("KEY:{}", privkey.to_string({})));
@@ -335,23 +333,23 @@ public:
       chain::public_key_type pubkey;
 
       switch (key_type) {
-      case chain_key_type_wire: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire>(public_key_text);
+      case chain_key_type_t::wire: {
+         pubkey = from_native_string_to_public_key<chain_key_type_t::wire>(public_key_text);
          break;
       }
-      case chain_key_type_wire_bls: {
-         pubkey = from_native_string_to_public_key<chain_key_type_wire_bls>(public_key_text);
+      case chain_key_type_t::wire_bls: {
+         pubkey = from_native_string_to_public_key<chain_key_type_t::wire_bls>(public_key_text);
          break;
       }
-      case chain_key_type_ethereum: {
-         pubkey = from_native_string_to_public_key<chain_key_type_ethereum>(public_key_text);
+      case chain_key_type_t::ethereum: {
+         pubkey = from_native_string_to_public_key<chain_key_type_t::ethereum>(public_key_text);
          break;
       }
-      case chain_key_type_solana: {
-         pubkey = from_native_string_to_public_key<chain_key_type_solana>(public_key_text);
+      case chain_key_type_t::solana: {
+         pubkey = from_native_string_to_public_key<chain_key_type_t::solana>(public_key_text);
          break;
       }
-      case chain_key_type_sui: {
+      case chain_key_type_t::sui: {
          FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
                             chain_key_type_reflector::to_string(key_type));
       }
@@ -445,9 +443,9 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
    return my->create_provider(key_name, target_chain, key_type, public_key_text, private_key_provider_spec);
 }
 
-fc::crypto::signature_provider_sign_fn
+fc::crypto::sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
-   return my->make_key_signature_provider(priv);
+   return [priv](const fc::sha256& d) { return priv.sign(d); };
 }
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {

@@ -36,12 +36,12 @@ namespace fc {
            public_key(public_key&& k) noexcept;
            ~public_key();
 
-           bool verify( const fc::sha256& digest, const signature& sig );
            public_key_data serialize()const;
 
            public_key( const public_key_data& v );
            public_key( const public_key_point_data& v );
-           public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
+
+           static public_key recover( const compact_signature& c, const fc::sha256& digest );
 
            bool valid()const;
 
@@ -75,7 +75,7 @@ namespace fc {
            private_key( const private_key& pk );
            ~private_key();
 
-           private_key& operator=( private_key&& pk );
+           private_key& operator=( private_key&& pk ) noexcept;
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
@@ -83,14 +83,7 @@ namespace fc {
 
            private_key_secret get_secret()const; // get the private key secret
 
-           /**
-            *  Given a public key, calculatse a 512 bit shared secret between that
-            *  key and this private key.
-            */
-           fc::sha512 get_shared_secret( const public_key& pub )const;
-
-           signature         sign( const fc::sha256& digest )const;
-           compact_signature sign_compact( const fc::sha256& digest )const;
+           compact_signature sign_sha256( const fc::sha256& digest )const;
            bool              verify( const fc::sha256& digest, const signature& sig );
 
            public_key get_public_key()const;
@@ -123,8 +116,8 @@ namespace fc {
         using public_key_type = public_key_shim;
         using crypto::shim<compact_signature>::shim;
 
-        public_key_type recover(const sha256& digest, bool check_canonical) const {
-           return public_key_type(public_key(_data, digest, check_canonical).serialize());
+        public_key_type recover(const sha256& digest) const {
+           return public_key_type(public_key::recover(_data, digest).serialize());
         }
      };
 
@@ -133,19 +126,14 @@ namespace fc {
         using signature_type = signature_shim;
         using public_key_type = public_key_shim;
 
-        signature_type sign( const sha256& digest, bool require_canonical = true ) const
+        signature_type sign_sha256( const sha256& digest ) const
         {
-           return signature_type(private_key::regenerate(_data).sign_compact(digest));
+           return signature_type(private_key::regenerate(_data).sign_sha256(digest));
         }
 
-        public_key_type get_public_key( ) const
+        public_key_type get_public_key() const
         {
            return public_key_type(private_key::regenerate(_data).get_public_key().serialize());
-        }
-
-        sha512 generate_shared_secret( const public_key_type &pub_key ) const
-        {
-           return private_key::regenerate(_data).get_shared_secret(public_key(pub_key.serialize()));
         }
 
         static private_key_shim generate()

@@ -3,37 +3,13 @@
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
-#include <fc/static_variant.hpp>
 
 #include <variant>
 
+namespace fc::crypto {
 
-namespace fc { namespace crypto {
-   namespace {
-      struct recovery_visitor : fc::visitor<public_key::storage_type> {
-         recovery_visitor(const sha256& digest, bool check_canonical)
-         :_digest(digest)
-         ,_check_canonical(check_canonical)
-         {}
-
-         template<typename SignatureType>
-         public_key::storage_type operator()(const SignatureType& s) const {
-            return public_key::storage_type(s.recover(_digest, _check_canonical));
-         }
-
-         public_key::storage_type operator()(const bls::signature_shim& s) const {
-            FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS Signatures dont support recovery");
-         }
-
-         const sha256& _digest;
-         bool _check_canonical;
-      };
-
-   } // anonymous namespace
-
-   public_key::public_key( const signature& c, const sha256& digest, bool check_canonical )
-   :_storage(std::visit(recovery_visitor(digest, check_canonical), c._storage))
-   {
+   public_key public_key::recover( const signature& c, const sha256& digest ) {
+      return public_key(std::visit([&](const auto& s) { return public_key::storage_type(s.recover(digest)); }, c._storage));
    }
 
    public_key public_key::from_string(const std::string& str, key_type type) {
@@ -50,13 +26,13 @@ namespace fc { namespace crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid public key prefixes: {}", str);
-         return from_native_string_to_public_key<chain_key_type_t::chain_key_type_ethereum>(key);
+         return from_native_string_to_public_key<chain_key_type_t::ethereum>(key);
       }
       case key_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid public key prefixes: {}", str);
-         return from_native_string_to_public_key<chain_key_type_t::chain_key_type_solana>(key);
+         return from_native_string_to_public_key<chain_key_type_t::solana>(key);
       }
       case key_type::unknown: {
          if (is_legacy_public_key_str(str))
@@ -65,9 +41,9 @@ namespace fc { namespace crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          FC_ASSERT(base_prefix == constants::public_key_base_prefix, "Invalid prefix to parse key type: {}", str);
          if (type_prefix == key_prefix(key_type::em)) {
-            return from_native_string_to_public_key<chain_key_type_t::chain_key_type_ethereum>(data_str);
+            return from_native_string_to_public_key<chain_key_type_t::ethereum>(data_str);
          } else if (type_prefix == key_prefix(key_type::ed)) {
-            return from_native_string_to_public_key<chain_key_type_t::chain_key_type_solana>(data_str);
+            return from_native_string_to_public_key<chain_key_type_t::solana>(data_str);
          }
          return public_key(parse_unknown_wire_public_key_str(str));
       }
@@ -132,7 +108,7 @@ namespace fc { namespace crypto {
    {
       return less_comparator<public_key::storage_type>::apply(p1._storage, p2._storage);
    }
-} } // fc::crypto
+} // fc::crypto
 
 namespace fc
 {

@@ -33,6 +33,7 @@ set(fc_sources
         src/crypto/sha256.cpp
         src/crypto/sha224.cpp
         src/crypto/sha512.cpp
+        src/crypto/keccak256.cpp
         src/crypto/ethereum/ethereum_utils.cpp
         src/crypto/solana/solana_crypto_utils.cpp
         src/crypto/elliptic_common.cpp

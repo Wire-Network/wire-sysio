@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            protocol_feature_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_first_protocol_feature_digest) +
+                              reversed_first_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            subjective_block_production_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_second_protocol_feature_digest)+
+                              reversed_second_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );

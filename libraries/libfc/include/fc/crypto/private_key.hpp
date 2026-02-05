@@ -58,8 +58,8 @@ namespace fc { namespace crypto {
          key_type type()const { return static_cast<key_type>(_storage.index()); }
 
          public_key     get_public_key() const;
-         signature      sign( const sha256& digest, bool require_canonical = true ) const;
-         sha512         generate_shared_secret( const public_key& pub ) const;
+
+         signature sign(const sha256& digest) const;
 
          template< typename KeyType = ecc::private_key_shim >
          static private_key generate() {
@@ -96,6 +96,8 @@ namespace fc { namespace crypto {
 
          template<typename T>
          const T& get() const { return std::get<T>(_storage); }
+
+         const storage_type& storage() const { return _storage; }
 
       private:
          storage_type _storage{};

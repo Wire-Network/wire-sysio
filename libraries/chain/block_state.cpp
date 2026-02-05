@@ -24,11 +24,11 @@ namespace detail {
 
       using key_type = fc::crypto::public_key::key_type;
       std::set<public_key_type> keys;
-      auto [iter, _] = keys.emplace(fc::crypto::public_key(producer_signature, block_id, true));
+      auto [iter, _] = keys.emplace(fc::crypto::public_key::recover(producer_signature, block_id));
       SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
 
       for (const auto& s : additional_signatures) {
-         auto [iter, inserted] = keys.emplace(s, block_id, true);
+         auto [iter, inserted] = keys.emplace(fc::crypto::public_key::recover(s, block_id));
          SYS_ASSERT(inserted, wrong_signing_key, "block signed by same key twice: {}", fc::json::to_log_string(*iter));
          SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
       }

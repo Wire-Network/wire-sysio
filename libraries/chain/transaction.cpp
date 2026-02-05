@@ -93,7 +93,7 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
                   SYS_THROW(fc::unsupported_exception, "BLS signatures can not be used to recover public keys.");
                } else if constexpr( Shim::is_recoverable ) {
                   // If public key can be recovered from signature
-                  auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
+                  auto [itr, ok] = recovered_pub_keys.emplace(fc::crypto::public_key::recover(sig, digest));
                   SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key {}", to_pk_str(*itr) );
                } else {
                   // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.

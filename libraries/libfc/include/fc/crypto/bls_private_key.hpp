@@ -49,8 +49,8 @@ public:
 
    public_key get_public_key() const;
 
-   bls::signature sign(const fc::sha256& digest) const;
-   bls::signature sign(std::span<const uint8_t> msg) const;
+   bls::signature sign_sha256(const fc::sha256& digest) const;
+   bls::signature sign_raw(std::span<const uint8_t> msg) const;
    bls::signature proof_of_possession() const;
 
    static private_key generate();
@@ -127,12 +127,9 @@ struct signature_shim {
    }
 
    /**
-    * @brief Recovers the public key from a signature and message digest
-    * @param digest The message digest that was signed
-    * @param check_canonical Whether to verify signature canonicality
-    * @return The recovered public key
+    * Not supported, throws.
     */
-   public_key_type recover(const sha256& digest, bool check_canonical) const;
+   public_key_type recover(const sha256& digest) const;
 
    const data_type& serialize() const {
       return shim_ptr->_data;
@@ -168,13 +165,23 @@ struct private_key_shim : crypto::shim<private_key_secret> {
    using public_key_type = public_key_shim;
 
    /**
-    * @brief Signs a message digest using this private key
-    * @param digest The message digest to sign
-    * @param require_canonical Whether to enforce canonical signatures
+    * @brief Signs a SHA-256 digest using this private key
+    * @param digest The SHA-256 digest to sign
     * @return The generated signature
     */
-   signature_type sign(const sha256& digest, bool require_canonical = false) const {
-      return signature_type(private_key(_data).sign(digest).serialize());
+   signature_type sign_sha256(const sha256& digest) const {
+      return signature_type(private_key(_data).sign_sha256(digest).serialize());
+   }
+
+   /**
+    * @brief Signs raw bytes using this private key
+    * @param data Pointer to the data to sign
+    * @param len Length of the data
+    * @return The generated signature
+    */
+   signature_type sign_raw(const uint8_t* data, size_t len) const {
+      auto span = std::span<const uint8_t>(data, len);
+      return signature_type(private_key(_data).sign_raw(span).serialize());
    }
 
    /**
@@ -194,13 +201,6 @@ struct private_key_shim : crypto::shim<private_key_secret> {
       return pub_key_shim;
    }
 
-   /**
-    * @brief Generates a shared secret (not supported for BLS)
-    * @param pub_key The public key to generate shared secret with
-    * @return The generated shared secret
-    * @throws fc::unsupported_exception BLS does not support shared secrets
-    */
-   sha512 generate_shared_secret(const public_key_type& pub_key) const;
 
    /**
     * @brief Converts the private key to string format

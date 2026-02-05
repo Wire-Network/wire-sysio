@@ -700,7 +700,7 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
 
-   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
    chain::bls_pub_key_sig_provider_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
@@ -1366,10 +1366,10 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    // Get the signature provider plugin
    auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
 
-   // LOAD `chain_key_type_wire_bls` SIGNATURE PROVIDERS
+   // LOAD `chain_key_type_t::wire_bls` SIGNATURE PROVIDERS
    {
       auto finalizer_candidate_sig_providers = sig_plug.query_providers(
-        std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
+        std::nullopt,std::nullopt, crypto::chain_key_type_t::wire_bls);
 
       for (auto& candidate : finalizer_candidate_sig_providers) {
          SYS_ASSERT(candidate->private_key.has_value(), plugin_config_exception, "ALL BLS keys must be provided via command line arguments or config file.");
@@ -1380,9 +1380,9 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    }
 
    if (!_producers.empty()) {
-      // LOAD `chain_key_type_wire` SIGNATURE PROVIDERS
+      // LOAD `chain_key_type_t::wire` SIGNATURE PROVIDERS
       auto wire_sig_providers = sig_plug.query_providers(
-        std::nullopt,std::nullopt, crypto::chain_key_type_wire);
+        std::nullopt,std::nullopt, crypto::chain_key_type_t::wire);
 
       for (auto& sig_prov : wire_sig_providers) {
          SYS_ASSERT(sig_prov->private_key.has_value(), plugin_config_exception, "ALL signature provider keys must be provided via command line arguments or config file.");
@@ -1981,7 +1981,7 @@ producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplie
    }
 
    if (itr != ua.end()) {
-      result.more = itr->id();
+      result.more = itr->id().str();
    }
 
    return result;
@@ -2851,7 +2851,7 @@ void producer_plugin_impl::produce_block() {
 
    producer_authority::for_each_key(auth, [&](const public_key_type& key) {
       const auto& iter = _signature_providers.find(key);
-      if (iter->second->key_type == crypto::chain_key_type_wire && iter != _signature_providers.end()) {
+      if (iter->second->key_type == crypto::chain_key_type_t::wire && iter != _signature_providers.end()) {
 
          relevant_providers.emplace_back(iter->second);
       }

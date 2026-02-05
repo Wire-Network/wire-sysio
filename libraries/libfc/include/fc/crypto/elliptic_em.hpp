@@ -1,7 +1,7 @@
 #pragma once
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/sha256.hpp>
-#include <fc/crypto/sha512.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/hex.hpp>
 #include <fc/fwd.hpp>
 #include <fc/io/raw_fwd.hpp>
@@ -23,8 +23,7 @@ namespace fc {
     constexpr uint8_t public_key_prefix_uncompressed = 0x04;
     constexpr uint8_t public_key_prefix_compressed = 0x02;
 
-    using message_hash_type = std::array<uint8_t,32>;
-    using message_body_type = std::variant<std::string,fc::sha256,std::vector<uint8_t>>;
+    using message_body_type = std::variant<std::string, fc::sha256, std::vector<uint8_t>, fc::keccak256>;
 
     using public_key_data = std::array<char,33>;
     using public_key_data_uncompressed = std::array<char,65>;
@@ -48,8 +47,9 @@ namespace fc {
 
            explicit public_key( const public_key_data& v );
            explicit public_key( const public_key_data_uncompressed& v );
-           public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
-           public_key( const compact_signature& c, const unsigned char* digest, bool check_canonical = true );
+
+           static public_key recover( const compact_signature& c, const fc::sha256& digest, bool check_canonical );
+           static public_key recover( const compact_signature& c, const unsigned char* digest, bool check_canonical );
 
            bool valid()const;
 
@@ -101,15 +101,7 @@ namespace fc {
 
            const private_key_secret& get_secret()const; // get the private key secret
 
-           /**
-            *  Given a public key, calculatse a 512 bit shared secret between that
-            *  key and this private key.
-            */
-           fc::sha512 get_shared_secret( const public_key& pub )const;
-
-           compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
-
-           compact_signature sign_compact_ex(const message_body_type& digest, bool require_canonical) const;
+           compact_signature sign_compact(const fc::keccak256& digest) const;
 
            public_key get_public_key()const;
 
@@ -151,8 +143,11 @@ namespace fc {
          using public_key_type = public_key_shim;
          using crypto::shim<compact_signature>::shim;
 
-         public_key_type recover(const sha256& digest, bool check_canonical) const;
-         public_key_type recover_ex(const em::message_body_type& digest, bool check_canonical) const;
+         /// Recover public key from Wire transaction digest (applies EIP-191 prefix)
+         public_key_type recover(const sha256& digest) const;
+
+         /// Recover public key from raw Ethereum keccak256 digest (no prefix)
+         public_key_type recover_eth(const fc::keccak256& digest) const;
 
          std::string to_string()const {
             return to_hex(std::as_bytes(std::span(_data)), true);
@@ -164,19 +159,25 @@ namespace fc {
          using signature_type = signature_shim;
          using public_key_type = public_key_shim;
 
-         signature_type sign( const sha256& digest, bool require_canonical = true ) const
+         /// Sign Wire transaction digest (applies EIP-191 prefix, for MetaMask personal_sign)
+         signature_type sign_sha256( const sha256& digest ) const;
+
+         /// Sign raw Ethereum keccak256 digest (no prefix, for Ethereum transaction signing)
+         signature_type sign_keccak256( const fc::keccak256& digest ) const
          {
-           return signature_type(private_key::regenerate(_data).sign_compact(digest, require_canonical));
+            return signature_type(private_key::regenerate(_data).sign_compact(digest));
+         }
+
+         /// Sign raw bytes by hashing with keccak256 first (internal, used by ethereum_client)
+         signature_type sign_raw( const uint8_t* data, size_t len ) const
+         {
+            auto digest = fc::keccak256::hash(std::span(data, len));
+            return signature_type(private_key::regenerate(_data).sign_compact(digest));
          }
 
          public_key_type get_public_key( ) const
          {
            return public_key_type(private_key::regenerate(_data).get_public_key().serialize());
-         }
-
-         sha512 generate_shared_secret( const public_key_type &pub_key ) const
-         {
-           return private_key::regenerate(_data).get_shared_secret(public_key(pub_key.serialize()));
          }
 
          static private_key_shim generate()
