@@ -1138,7 +1138,7 @@ public:
          }
 
          if (!chain.is_building_block()) {
-            fc_dlog(_trx_log, "adding incoming trx ${id} to unapplied queue", ("id", id));
+            fc_dlog(_trx_log, "adding incoming trx {} to unapplied queue", id);
             _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
             trx_tracker.cancel();
             return true;
