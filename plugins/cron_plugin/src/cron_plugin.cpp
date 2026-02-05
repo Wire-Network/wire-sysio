@@ -1,3 +1,4 @@
+#include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
 #include <sysio/cron_plugin.hpp>
 
@@ -62,7 +63,9 @@ services::cron_service& cron_plugin::cron_service() {
    return my->cron_service();
 }
 
-void cron_plugin::update_job_metadata(cron_service::job_id_t id, const cron_service::job_metadata_t& metadata) {}
+void cron_plugin::update_job_metadata(cron_service::job_id_t id, const cron_service::job_metadata_t& metadata) {
+   my->cron_service().update_metadata(id, metadata);
+}
 std::vector<services::cron_service::job_id_t>
 cron_plugin::list_jobs(const std::vector<cron_service::job_query_t>& queries) {
    return my->cron_service().list(queries);
@@ -74,7 +77,7 @@ void cron_plugin::cancel_all_jobs() {
    my->cron_service().cancel_all();
 }
 
-cron_service::job_id_t cron_plugin::add_job(const services::cron_schedule& sched, cron_service::job_fn_t fn,
+cron_service::job_id_t cron_plugin::add_job(const cron_service::schedule& sched, cron_service::job_fn_t fn,
                                             const std::optional<cron_service::job_metadata_t>& metadata) {
    return cron_service().add(sched, fn, metadata);
 }

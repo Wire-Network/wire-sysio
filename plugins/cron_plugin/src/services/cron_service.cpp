@@ -1,23 +1,231 @@
 #include <boost/asio/post.hpp>
 #include <boost/exception/diagnostic_information.hpp>
-#include <ctime>
+#include <chrono>
+#include <fc/exception/exception.hpp>
+#include <fc/log/logger.hpp>
+#include <fc/log/logger_config.hpp>
 #include <ranges>
 #include <sysio/services/cron_service.hpp>
 
 namespace sysio::services {
 
+// ---------------------------------------------------------------------------
+// expand_field
+// ---------------------------------------------------------------------------
+
+std::set<std::uint64_t> cron_service::schedule::expand_field(const std::set<schedule::schedule_value>& field,
+                                                   std::uint64_t min_val,
+                                                   std::uint64_t max_val) {
+   if (field.empty())
+      return {}; // wildcard — caller must treat empty result as "match all"
+
+   std::set<std::uint64_t> result;
+   for (const auto& sv : field) {
+      std::visit(
+         [&](const auto& v) {
+            using T = std::decay_t<decltype(v)>;
+            if constexpr (std::is_same_v<T, exact_value>) {
+               if (v.value >= min_val && v.value <= max_val)
+                  result.insert(v.value);
+            } else if constexpr (std::is_same_v<T, step_value>) {
+               if (v.step == 0)
+                  return;
+               for (auto i = min_val; i <= max_val; i += v.step)
+                  result.insert(i);
+            } else if constexpr (std::is_same_v<T, range_value>) {
+               auto lo = std::max(v.from, min_val);
+               auto hi = std::min(v.to, max_val);
+               for (auto i = lo; i <= hi; ++i)
+                  result.insert(i);
+            }
+         },
+         sv);
+   }
+   return result;
+}
+
+// ---------------------------------------------------------------------------
+// next_fire_time — efficient field-by-field iteration
+// ---------------------------------------------------------------------------
+
 namespace {
 
-bool matches_field(const std::set<long>& allowed, long value) {
-   if (allowed.empty())
-      return true;
-   return allowed.contains(value);
+using schedule_value = cron_service::schedule::schedule_value;
+
+// Decomposed wall-clock time used for schedule matching.
+struct decomposed_time {
+   int year;
+   unsigned month;       // 1-12
+   unsigned day;         // 1-31
+   unsigned weekday;     // 0=Sun ... 6=Sat
+   unsigned hour;        // 0-23
+   unsigned minute;      // 0-59
+   unsigned millisecond; // 0-59999 (ms within the minute)
+};
+
+decomposed_time decompose(std::chrono::system_clock::time_point tp) {
+   using namespace std::chrono;
+
+   auto tp_days = floor<days>(tp);
+   year_month_day ymd{tp_days};
+   weekday wd{tp_days};
+   auto day_offset = tp - tp_days;
+
+   auto h = duration_cast<hours>(day_offset);
+   day_offset -= h;
+   auto m = duration_cast<minutes>(day_offset);
+   day_offset -= m;
+   auto ms_in_minute = duration_cast<milliseconds>(day_offset);
+
+   return {
+      static_cast<int>(ymd.year()),
+      static_cast<unsigned>(ymd.month()),
+      static_cast<unsigned>(ymd.day()),
+      wd.c_encoding(), // 0=Sun
+      static_cast<unsigned>(h.count()),
+      static_cast<unsigned>(m.count()),
+      static_cast<unsigned>(ms_in_minute.count()),
+   };
+}
+
+std::chrono::system_clock::time_point compose(const decomposed_time& dt) {
+   using namespace std::chrono;
+
+   auto ymd = year{dt.year} / month{dt.month} / day{dt.day};
+   auto tp = sys_days{ymd};
+   return tp + hours{dt.hour} + minutes{dt.minute} +
+          milliseconds{dt.millisecond};
+}
+
+// Return the set of valid values for a field, or all values in [min,max] if
+// the field is a wildcard (empty).
+std::set<std::uint64_t> field_values(const std::set<schedule_value>& field,
+                                     std::uint64_t min_val,
+                                     std::uint64_t max_val) {
+   auto expanded = cron_service::schedule::expand_field(field, min_val, max_val);
+   if (expanded.empty()) {
+      // wildcard: all values in range
+      for (auto i = min_val; i <= max_val; ++i)
+         expanded.insert(i);
+   }
+   return expanded;
+}
+
+// How many days in a given year/month.
+unsigned days_in_month(int year, unsigned month) {
+   using namespace std::chrono;
+   auto ymd_last = year_month_day_last{std::chrono::year{year} / std::chrono::month{month} / last};
+   return static_cast<unsigned>(ymd_last.day());
+}
+
+bool day_of_week_matches(int year, unsigned month, unsigned day_val,
+                         const std::set<std::uint64_t>& dow_set) {
+   using namespace std::chrono;
+   auto ymd = std::chrono::year{year} / std::chrono::month{month} / std::chrono::day{day_val};
+   if (!ymd.ok())
+      return false;
+   weekday wd{sys_days{ymd}};
+   auto enc = wd.c_encoding(); // 0=Sun
+   // day_of_week 7 also means Sunday
+   return dow_set.contains(enc) || (enc == 0 && dow_set.contains(7));
 }
 
 } // namespace
 
+cron_service::time_point
+cron_service::next_fire_time(const schedule& sched, time_point after) {
+   using namespace std::chrono;
 
-std::shared_ptr<cron_service> cron_service::create(const std::optional<cron_service::options>& options) {
+   // Advance by 1ms so we find a time strictly after `after`.
+   auto candidate_tp = after + milliseconds{1};
+   auto dt = decompose(candidate_tp);
+
+   auto months_set  = field_values(sched.month, 1, 12);
+   auto hours_set   = field_values(sched.hours, 0, 23);
+   auto minutes_set = field_values(sched.minutes, 0, 59);
+   // Wildcard milliseconds defaults to {0} (once per second) rather than
+   // materializing all 60 000 values.
+   auto ms_set = cron_service::schedule::expand_field(sched.milliseconds, 0, 59999);
+   if (ms_set.empty())
+      ms_set.insert(0);
+   auto dow_set     = field_values(sched.day_of_week, 0, 7);
+
+   // Cap at 4 years of scanning to prevent infinite loops.
+   int start_year = dt.year;
+   int max_year   = start_year + 4;
+
+   for (int y = dt.year; y <= max_year; ++y) {
+      unsigned month_start = (y == dt.year) ? dt.month : 1;
+      for (unsigned mo : months_set) {
+         if (y == dt.year && mo < month_start)
+            continue;
+
+         auto dom_set = field_values(sched.day_of_month, 1, days_in_month(y, mo));
+
+         unsigned day_start = (y == dt.year && mo == dt.month) ? dt.day : 1;
+         for (unsigned d : dom_set) {
+            if (y == dt.year && mo == dt.month && d < day_start)
+               continue;
+
+            // Validate day_of_week constraint
+            if (!day_of_week_matches(y, mo, d, dow_set))
+               continue;
+
+            unsigned hour_start = (y == dt.year && mo == dt.month && d == dt.day) ? dt.hour : 0;
+            for (unsigned h : hours_set) {
+               if (y == dt.year && mo == dt.month && d == dt.day && h < hour_start)
+                  continue;
+
+               unsigned min_start = (y == dt.year && mo == dt.month && d == dt.day && h == dt.hour)
+                                       ? dt.minute : 0;
+               for (unsigned mi : minutes_set) {
+                  if (y == dt.year && mo == dt.month && d == dt.day && h == dt.hour && mi < min_start)
+                     continue;
+
+                  unsigned ms_start =
+                     (y == dt.year && mo == dt.month && d == dt.day &&
+                      h == dt.hour && mi == dt.minute) ? dt.millisecond : 0;
+
+                  for (unsigned ms : ms_set) {
+                     if (ms < ms_start)
+                        continue;
+
+                     decomposed_time result{y, mo, d, 0, h, mi, ms};
+                     auto tp = compose(result);
+                     if (tp > after)
+                        return tp;
+                  }
+               }
+            }
+         }
+      }
+      // Reset dt fields for subsequent years so we scan from the start.
+      dt = {y + 1, 1, 1, 0, 0, 0, 0};
+   }
+
+   // Fallback: push far into the future.
+   return after + hours{24};
+}
+
+std::vector<cron_service::time_point>
+cron_service::compute_next_n_triggers(const schedule& sched,
+                                      time_point from, std::size_t n) {
+   std::vector<time_point> triggers;
+   triggers.reserve(n);
+   auto cursor = from;
+   for (std::size_t i = 0; i < n; ++i) {
+      cursor = next_fire_time(sched, cursor);
+      triggers.push_back(cursor);
+   }
+   return triggers;
+}
+
+// ---------------------------------------------------------------------------
+// Lifecycle
+// ---------------------------------------------------------------------------
+
+std::shared_ptr<cron_service>
+cron_service::create(const std::optional<cron_service::options>& options) {
    cron_service::options opts = options ? *options : cron_service::options{};
    return std::shared_ptr<cron_service>{new cron_service(opts)};
 }
@@ -32,6 +240,7 @@ cron_service::cron_service(const cron_service::options& options)
    if (options.autostart)
       start();
 }
+
 bool cron_service::is_running() const {
    return _running.load();
 }
@@ -42,13 +251,20 @@ bool cron_service::start() {
       wlog("cron_service already started");
       return false;
    }
-   _pool.start(_options.num_threads, nullptr /*on_except*/);
+   _pool = std::make_unique<boost::asio::thread_pool>(_options.num_threads);
 
-   auto now = std::chrono::steady_clock::now();
-   auto jobs = _jobs.writeable();
-   for (auto& job : jobs.values()) {
-      schedule_next(job, now);
+   // Compute initial triggers for any pre-existing jobs.
+   {
+      auto now = clock_t::now();
+      auto jobs = _jobs.writeable();
+      for (auto& [id, j] : jobs.map()) {
+         std::scoped_lock tlock(j->triggers_mutex);
+         j->upcoming_triggers = compute_next_n_triggers(
+            j->sched, now, schedule_trigger_count);
+      }
    }
+
+   start_scheduler();
    return true;
 }
 
@@ -59,35 +275,191 @@ void cron_service::stop() {
       wlog("cron_service already stopped");
       return;
    }
+   stop_scheduler();
    cancel_all();
-   _pool.stop();
+   if (_pool) {
+      _pool->stop();
+      _pool->join();
+      _pool.reset();
+   }
 }
 
-cron_service::job_id_t cron_service::add(const cron_schedule& sched, job_fn_t fn,
+// ---------------------------------------------------------------------------
+// Scheduler thread
+// ---------------------------------------------------------------------------
+
+void cron_service::start_scheduler() {
+   {
+      std::scoped_lock lock(_scheduler_mutex);
+      _scheduler_shutdown = false;
+      _schedule_requested = false;
+   }
+   _scheduler_thread = std::thread([this]() {
+      fc::set_thread_name("cron-sched");
+      scheduler_loop();
+   });
+}
+
+void cron_service::stop_scheduler() {
+   {
+      std::scoped_lock lock(_scheduler_mutex);
+      _scheduler_shutdown = true;
+   }
+   _scheduler_cv.notify_one();
+   if (_scheduler_thread.joinable())
+      _scheduler_thread.join();
+}
+
+void cron_service::scheduler_loop() {
+   while (true) {
+      std::unique_lock lock(_scheduler_mutex);
+
+      auto earliest = compute_earliest_trigger();
+
+      if (earliest.has_value()) {
+         _scheduler_cv.wait_until(lock, *earliest, [this] {
+            return _scheduler_shutdown || _schedule_requested;
+         });
+      } else {
+         _scheduler_cv.wait(lock, [this] {
+            return _scheduler_shutdown || _schedule_requested;
+         });
+      }
+
+      if (_scheduler_shutdown)
+         break;
+
+      _schedule_requested = false;
+      lock.unlock();
+
+      dispatch_ready_jobs();
+      replenish_triggers();
+   }
+}
+
+std::optional<cron_service::time_point> cron_service::compute_earliest_trigger() {
+   std::optional<time_point> earliest;
+   auto jobs = _jobs.readable();
+   for (const auto& [id, j] : jobs.map()) {
+      if (j->cancelled)
+         continue;
+      std::scoped_lock tlock(j->triggers_mutex);
+      if (!j->upcoming_triggers.empty()) {
+         auto first = j->upcoming_triggers.front();
+         if (!earliest || first < *earliest)
+            earliest = first;
+      }
+   }
+   return earliest;
+}
+
+void cron_service::dispatch_ready_jobs() {
+   auto now = clock_t::now();
+   auto jobs = _jobs.readable();
+   for (const auto& [id, j] : jobs.map()) {
+      if (j->cancelled)
+         continue;
+
+      std::scoped_lock tlock(j->triggers_mutex);
+      while (!j->upcoming_triggers.empty() && j->upcoming_triggers.front() <= now) {
+         j->upcoming_triggers.erase(j->upcoming_triggers.begin());
+
+         auto job_work = j;
+         auto job_id = j->id;
+         boost::asio::post(*_pool, [job_work, job_id] {
+            if (job_work->cancelled)
+               return;
+
+            bool should_run = true;
+            if (job_work->metadata.one_at_a_time) {
+               int expected = 0;
+               should_run = job_work->running.compare_exchange_strong(expected, 1);
+            } else {
+               job_work->running.fetch_add(1);
+            }
+
+            if (!should_run)
+               return;
+
+            try {
+               job_work->fn();
+            } catch (const fc::exception& e) {
+               elog("JOB_ID({}) FAILED: {}", job_id, e.to_detail_string());
+            } catch (const boost::exception& e) {
+               elog("JOB_ID({}) FAILED: {}", job_id, boost::diagnostic_information(e));
+            } catch (const std::runtime_error& e) {
+               elog("JOB_ID({}) FAILED: {}", job_id, e.what());
+            } catch (const std::exception& e) {
+               elog("JOB_ID({}) FAILED: {}", job_id, e.what());
+            } catch (...) {
+               elog("JOB_ID({}) unknown exception", job_id);
+            }
+            job_work->running.fetch_sub(1);
+         });
+      }
+   }
+}
+
+void cron_service::replenish_triggers() {
+   auto now = clock_t::now();
+   auto jobs = _jobs.readable();
+   for (const auto& [id, j] : jobs.map()) {
+      if (j->cancelled)
+         continue;
+      std::scoped_lock tlock(j->triggers_mutex);
+      if (j->upcoming_triggers.size() < schedule_trigger_count) {
+         auto from = j->upcoming_triggers.empty() ? now : j->upcoming_triggers.back();
+         auto additional = compute_next_n_triggers(
+            j->sched, from,
+            schedule_trigger_count - j->upcoming_triggers.size());
+         j->upcoming_triggers.insert(
+            j->upcoming_triggers.end(),
+            additional.begin(), additional.end());
+      }
+   }
+}
+
+void cron_service::wake_scheduler() {
+   {
+      std::scoped_lock lock(_scheduler_mutex);
+      _schedule_requested = true;
+   }
+   _scheduler_cv.notify_one();
+}
+
+// ---------------------------------------------------------------------------
+// Job management
+// ---------------------------------------------------------------------------
+
+cron_service::job_id_t cron_service::add(const schedule& sched, job_fn_t fn,
                                          const std::optional<job_metadata_t>& metadata) {
-   auto jobs = _jobs.writeable();
    auto j = std::make_shared<job>();
    j->id = _next_id++;
    j->sched = sched;
    j->metadata = metadata.value_or(job_metadata_t{});
    j->fn = std::move(fn);
-   j->timer = std::make_unique<boost::asio::steady_timer>(_pool.get_executor());
-
-   jobs.try_emplace(j->id, j);
 
    if (is_running()) {
-      auto now = std::chrono::steady_clock::now();
-      schedule_next(j, now);
+      auto now = clock_t::now();
+      std::scoped_lock tlock(j->triggers_mutex);
+      j->upcoming_triggers = compute_next_n_triggers(
+         sched, now, schedule_trigger_count);
    }
+
+   {
+      auto jobs = _jobs.writeable();
+      jobs.try_emplace(j->id, j);
+   }
+
+   if (is_running())
+      wake_scheduler();
 
    return j->id;
 }
 
 void cron_service::update_metadata(job_id_t id, const job_metadata_t& metadata) {
-
    auto jobs = _jobs.writeable();
    FC_ASSERT_FMT(jobs.contains(id), "cron_service::update_metadata() no job with id {}", id);
-
    jobs.get(id)->metadata = metadata;
 }
 
@@ -98,13 +470,14 @@ std::vector<cron_service::job_id_t> cron_service::list(const std::vector<job_que
          return std::any_of(queries.begin(), queries.end(), [&](auto& query_var) {
             if (std::holds_alternative<std::string>(query_var)) {
                auto& query = std::get<std::string>(query_var);
-               return j->label() == query || std::ranges::contains(j->tags(),query);
+               return j->label() == query || std::ranges::contains(j->tags(), query);
             }
             return j->id == std::get<job_id_t>(query_var);
          });
       }) | std::ranges::to<std::vector>();
 
-   return jobs | std::views::transform([](auto& j) { return j->id; }) | std::ranges::to<std::vector>();
+   return jobs | std::views::transform([](auto& j) { return j->id; }) |
+          std::ranges::to<std::vector>();
 }
 
 void cron_service::cancel(job_id_t id) {
@@ -118,163 +491,16 @@ void cron_service::cancel(job_id_t id) {
       j->cancelled = true;
       wv.map().erase(it);
    }
-   if (j && j->timer) {
-      try {
-         j->timer->cancel();
-      } catch (const std::exception& e) {
-         wlog("cron_service::cancel() timer->cancel() threw: {}", e.what());
-      }
-   }
+   if (is_running())
+      wake_scheduler();
 }
 
 void cron_service::cancel_all() {
-   std::vector<std::shared_ptr<job>> to_cancel;
-   {
-      auto wv = _jobs.writeable();
-      for (auto& val : wv.map() | std::views::values) {
-         val->cancelled = true;
-         to_cancel.push_back(val);
-      }
-      wv.clear();
+   auto wv = _jobs.writeable();
+   for (auto& [_, j] : wv.map()) {
+      j->cancelled = true;
    }
-   for (auto& j : to_cancel) {
-      if (j->timer) {
-         dlog("Cancelling job id {}", j->id);
-         try {
-            j->timer->cancel();
-         } catch (const std::exception& e) {
-            wlog("cron_service::cancel() timer->cancel() threw: {}", e.what());
-         }
-      }
-   }
-}
-
-std::chrono::steady_clock::time_point cron_service::next_fire_time(const cron_schedule& sched,
-                                                                   std::chrono::steady_clock::time_point now) {
-   using clock = std::chrono::steady_clock;
-   using namespace std::chrono;
-
-   auto tp = now;
-
-   // Split into seconds and milliseconds components
-   auto ms_since_epoch = duration_cast<milliseconds>(tp.time_since_epoch());
-   auto sec_since_epoch = duration_cast<seconds>(ms_since_epoch);
-   auto ms_in_sec = duration_cast<milliseconds>(ms_since_epoch - sec_since_epoch);
-
-   // Helper to check all non-ms fields for a given whole-second time_point
-   auto matches_non_ms = [&](const clock::time_point& t) -> bool {
-      auto ms_epoch = duration_cast<milliseconds>(t.time_since_epoch());
-      auto sec = duration_cast<seconds>(ms_epoch).count() % 60;
-      auto min = duration_cast<minutes>(ms_epoch).count() % 60;
-      auto hour = duration_cast<hours>(ms_epoch).count() % 24;
-
-      return matches_field(sched.seconds, sec) && matches_field(sched.minutes, min) &&
-             matches_field(sched.hours, hour);
-   };
-
-   // First consider current second: if non-ms fields match, see if a future millisecond in this second matches
-   clock::time_point sec_tp{sec_since_epoch};
-   // if (matches_non_ms(sec_tp))
-   //    return sec_tp + seconds(1);
-   if (matches_non_ms(sec_tp)) {
-      if (sched.milliseconds.empty()) {
-         // Wildcard ms means trigger at the next millisecond >= now
-         return tp + milliseconds(1); // ensure we don't fire in the past; minimal drift
-      }
-
-      int cur_ms = static_cast<int>(ms_in_sec.count());
-      for (int ms : sched.milliseconds) {
-         if (ms >= cur_ms) {
-            return sec_tp + milliseconds(ms);
-         }
-      }
-   }
-
-   // Otherwise, find the next whole second that matches the non-ms fields
-   // Iterate by seconds up to a reasonable bound (e.g., 400 days) to avoid infinite loops on invalid schedules
-   constexpr int max_seconds_scan = 400 * 24 * 60 * 60; // ~400 days
-   auto scan_tp = sec_tp + seconds(1);
-   for (int i = 0; i < max_seconds_scan; ++i, scan_tp += seconds(1)) {
-      if (matches_non_ms(scan_tp)) {
-         //return scan_tp; // trigger at start of that second
-         if (sched.milliseconds.empty()) {
-            return scan_tp; // trigger at start of that second
-         }
-         // Earliest millisecond in that second
-         return scan_tp + milliseconds(*sched.milliseconds.begin());
-      }
-   }
-
-   // If nothing found, just push far into the future to avoid tight reschedule loops
-   return now + hours(24);
-}
-
-void cron_service::schedule_next(std::shared_ptr<job> job_ref, std::chrono::steady_clock::time_point ref) {
-   if (!is_running() || job_ref->cancelled)
-      return;
-
-   auto next_tp = next_fire_time(job_ref->sched, ref);
-   auto now = std::chrono::steady_clock::now();
-   if (next_tp < now)
-      next_tp = now;
-
-   auto delay = std::chrono::duration_cast<std::chrono::milliseconds>(next_tp - now);
-   if (delay.count() < 0)
-      delay = std::chrono::milliseconds(0);
-
-   job_ref->timer->expires_after(delay);
-   auto job_id = job_ref->id;
-   job_ref->timer->async_wait([this, job_id, job_ref](const boost::system::error_code& ec) {
-      auto jobs = _jobs.readable();
-      if (!jobs.contains(job_id)) {
-         ilog("Job id ({}) is no longer valid", job_id);
-         return;
-      }
-
-      auto job_work = jobs.get(job_id);
-      if (ec || job_work->cancelled)
-         return; // cancelled or timer error
-
-      // Decide whether to run the job
-      bool should_run = true;
-      if (job_work->metadata.one_at_a_time) {
-         int expected = 0;
-         // Only run if currently not running
-         should_run = job_work->running.compare_exchange_strong(expected, 1);
-      } else {
-         job_work->running.fetch_add(1);
-      }
-
-      if (should_run) {
-         // Execute the job on the pool executor; then decrement running and reschedule
-         boost::asio::post(_pool.get_executor(), [this, job_work, job_id] {
-            if (job_work->cancelled) {
-               job_work->running.fetch_sub(1);
-               return;
-            }
-            try {
-               job_work->fn();
-            } catch (const fc::exception& e) {
-               elog("JOB_ID({}) FAILED: {}", job_id, e.to_detail_string());
-            } catch (const boost::exception& e) {
-               elog("JOB_ID({}) FAILED: {}", job_id,boost::diagnostic_information(e));
-            } catch (const std::runtime_error& e) {
-               elog("JOB_ID({}) FAILED: {}", job_id,e.what());
-            } catch (const std::exception& e) {
-               elog("JOB_ID({}) FAILED: {}", job_id,e.what());
-            } catch (...) {
-               elog("unknown exception");
-            }
-            job_work->running.fetch_sub(1);
-
-            // Reschedule from completion time
-            schedule_next(job_work, std::chrono::steady_clock::now());
-         });
-      } else {
-         // Skipped due to one_at_a_time; just reschedule from now
-         schedule_next(job_work, std::chrono::steady_clock::now());
-      }
-   });
+   wv.clear();
 }
 
 } // namespace sysio::services
