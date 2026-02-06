@@ -338,7 +338,8 @@ namespace finality_proof {
          // Extract genesis finality leaf from the genesis block's valid_t.
          // At this point head = genesis (block 1).
          {
-            const auto& genesis_bsp = block_handle_accessor::get_bsp(this->node0.control->head());
+            const auto genesis_head = this->node0.control->head(); // must outlive genesis_bsp
+            const auto& genesis_bsp = block_handle_accessor::get_bsp(genesis_head);
             BOOST_REQUIRE(genesis_bsp->valid.has_value());
             BOOST_REQUIRE(!genesis_bsp->valid->validation_mroots.empty());
 
