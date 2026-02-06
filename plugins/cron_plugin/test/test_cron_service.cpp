@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     std::atomic_int calls{0};
     auto service = cron_service_factory("cron_service_test_A", 2);
 
-    svc::schedule s;
-    s.milliseconds.insert(svc::schedule::step_value{1000}); // every second
+    svc::job_schedule s;
+    s.milliseconds.insert(svc::job_schedule::step_value{1000}); // every second
 
     auto id = service->add(
       s,
@@ -96,10 +96,10 @@ BOOST_AUTO_TEST_SUITE(cron_service)
 
     // Build a schedule for a few ms offsets
     auto now_ms = current_ms_in_minute();
-    svc::schedule s;
-    s.milliseconds.insert(svc::schedule::exact_value{static_cast<std::uint64_t>((now_ms + 100) % 60000)});
-    s.milliseconds.insert(svc::schedule::exact_value{static_cast<std::uint64_t>((now_ms + 200) % 60000)});
-    s.milliseconds.insert(svc::schedule::exact_value{static_cast<std::uint64_t>((now_ms + 300) % 60000)});
+    svc::job_schedule s;
+    s.milliseconds.insert(svc::job_schedule::exact_value{static_cast<std::uint64_t>((now_ms + 100) % 60000)});
+    s.milliseconds.insert(svc::job_schedule::exact_value{static_cast<std::uint64_t>((now_ms + 200) % 60000)});
+    s.milliseconds.insert(svc::job_schedule::exact_value{static_cast<std::uint64_t>((now_ms + 300) % 60000)});
 
     auto id = service->add(
       s,
@@ -128,8 +128,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     std::atomic_int a{0}, b{0};
     auto service = cron_service_factory("cron_service_test_cancel_all", 2);
 
-    svc::schedule s;
-    s.milliseconds.insert(svc::schedule::step_value{1000}); // every second
+    svc::job_schedule s;
+    s.milliseconds.insert(svc::job_schedule::step_value{1000}); // every second
     auto id1 = service->add(
       s,
       [&]() {
@@ -170,8 +170,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     std::atomic_int calls{0};
     {
       auto service = cron_service_factory("cron_service_test_dtor", 1);
-      svc::schedule s;
-      s.milliseconds.insert(svc::schedule::step_value{1000}); // every second
+      svc::job_schedule s;
+      s.milliseconds.insert(svc::job_schedule::step_value{1000}); // every second
       service->add(
         s,
         [&]() {
@@ -195,8 +195,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     std::atomic_int a{0}, b{0};
     auto service = cron_service_factory("cron_service_test_multi", 2);
 
-    svc::schedule fast;
-    fast.milliseconds.insert(svc::schedule::step_value{1000}); // every second
+    svc::job_schedule fast;
+    fast.milliseconds.insert(svc::job_schedule::step_value{1000}); // every second
 
     auto id_a = service->add(
       fast,
@@ -245,7 +245,7 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   BOOST_AUTO_TEST_CASE(list_filtering) try {
     auto service = cron_service_factory("cron_service_test_list", 1);
 
-    svc::schedule s;
+    svc::job_schedule s;
     auto id1 = service->add(s, [](){});
     auto id2 = service->add(s, [](){});
     auto id3 = service->add(s, [](){});
@@ -271,12 +271,12 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   // -----------------------------------------------------------------------
 
   BOOST_AUTO_TEST_CASE(test_expand_field_exact) try {
-    std::set<svc::schedule::schedule_value> field;
-    field.insert(svc::schedule::exact_value{5});
-    field.insert(svc::schedule::exact_value{10});
-    field.insert(svc::schedule::exact_value{15});
+    std::set<svc::job_schedule::schedule_value> field;
+    field.insert(svc::job_schedule::exact_value{5});
+    field.insert(svc::job_schedule::exact_value{10});
+    field.insert(svc::job_schedule::exact_value{15});
 
-    auto result = svc::schedule::expand_field(field, 0, 59);
+    auto result = svc::job_schedule::expand_field(field, 0, 59);
     BOOST_CHECK_EQUAL(result.size(), 3);
     BOOST_CHECK(result.contains(5));
     BOOST_CHECK(result.contains(10));
@@ -284,10 +284,10 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(test_expand_field_step) try {
-    std::set<svc::schedule::schedule_value> field;
-    field.insert(svc::schedule::step_value{15});
+    std::set<svc::job_schedule::schedule_value> field;
+    field.insert(svc::job_schedule::step_value{15});
 
-    auto result = svc::schedule::expand_field(field, 0, 59);
+    auto result = svc::job_schedule::expand_field(field, 0, 59);
     BOOST_CHECK_EQUAL(result.size(), 4);
     BOOST_CHECK(result.contains(0));
     BOOST_CHECK(result.contains(15));
@@ -296,18 +296,18 @@ BOOST_AUTO_TEST_SUITE(cron_service)
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(test_expand_field_range) try {
-    std::set<svc::schedule::schedule_value> field;
-    field.insert(svc::schedule::range_value{3, 7});
+    std::set<svc::job_schedule::schedule_value> field;
+    field.insert(svc::job_schedule::range_value{3, 7});
 
-    auto result = svc::schedule::expand_field(field, 1, 31);
+    auto result = svc::job_schedule::expand_field(field, 1, 31);
     BOOST_CHECK_EQUAL(result.size(), 5);
     for (std::uint64_t i = 3; i <= 7; ++i)
       BOOST_CHECK(result.contains(i));
   } FC_LOG_AND_RETHROW();
 
   BOOST_AUTO_TEST_CASE(test_expand_field_wildcard) try {
-    std::set<svc::schedule::schedule_value> field; // empty = wildcard
-    auto result = svc::schedule::expand_field(field, 0, 59);
+    std::set<svc::job_schedule::schedule_value> field; // empty = wildcard
+    auto result = svc::job_schedule::expand_field(field, 0, 59);
     BOOST_CHECK(result.empty()); // expand_field returns empty for wildcards
   } FC_LOG_AND_RETHROW();
 
@@ -317,8 +317,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     std::atomic_int calls{0};
     auto service = cron_service_factory("cron_svc_step", 2);
 
-    svc::schedule s;
-    s.milliseconds.insert(svc::schedule::step_value{250});
+    svc::job_schedule s;
+    s.milliseconds.insert(svc::job_schedule::step_value{250});
 
     auto id = service->add(
       s,
@@ -343,9 +343,9 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     // We verify that next_fire_time produces times within that range.
     using namespace std::chrono;
 
-    svc::schedule s;
-    s.minutes.insert(svc::schedule::range_value{0, 2});
-    s.milliseconds.insert(svc::schedule::exact_value{0});
+    svc::job_schedule s;
+    s.minutes.insert(svc::job_schedule::range_value{0, 2});
+    s.milliseconds.insert(svc::job_schedule::exact_value{0});
 
     auto now = system_clock::now();
     auto triggers = svc::compute_next_n_triggers(s, now, 5);
@@ -368,10 +368,10 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     // Schedule: minute 30, hour 14, ms 0, all other fields wildcard.
     // From any time before 14:30, the next fire should be today at 14:30:00.000.
     // From after 14:30, it should be tomorrow at 14:30:00.000.
-    svc::schedule s;
-    s.hours.insert(svc::schedule::exact_value{14});
-    s.minutes.insert(svc::schedule::exact_value{30});
-    s.milliseconds.insert(svc::schedule::exact_value{0});
+    svc::job_schedule s;
+    s.hours.insert(svc::job_schedule::exact_value{14});
+    s.minutes.insert(svc::job_schedule::exact_value{30});
+    s.milliseconds.insert(svc::job_schedule::exact_value{0});
 
     // Construct a known time: 2025-06-15 10:00:00.000 UTC
     auto base = sys_days{year{2025} / month{6} / day{15}} + hours{10};
@@ -402,9 +402,9 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     using namespace std::chrono;
 
     // Schedule: every hour at minute 0, second 0, ms 0.
-    svc::schedule s;
-    s.minutes.insert(svc::schedule::exact_value{0});
-    s.milliseconds.insert(svc::schedule::exact_value{0});
+    svc::job_schedule s;
+    s.minutes.insert(svc::job_schedule::exact_value{0});
+    s.milliseconds.insert(svc::job_schedule::exact_value{0});
 
     auto now = system_clock::now();
     auto triggers = svc::compute_next_n_triggers(s, now, 8);
@@ -423,8 +423,8 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     // Wait a bit, then add a job and verify it fires.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    svc::schedule s;
-    s.milliseconds.insert(svc::schedule::step_value{1000}); // every second
+    svc::job_schedule s;
+    s.milliseconds.insert(svc::job_schedule::step_value{1000}); // every second
     auto id = service->add(
       s,
       [&]() {
@@ -446,11 +446,11 @@ BOOST_AUTO_TEST_SUITE(cron_service)
     using namespace std::chrono;
 
     // Schedule constrained to Wednesdays (day_of_week = 3), at 12:00:00.000
-    svc::schedule s;
-    s.day_of_week.insert(svc::schedule::exact_value{3}); // Wednesday
-    s.hours.insert(svc::schedule::exact_value{12});
-    s.minutes.insert(svc::schedule::exact_value{0});
-    s.milliseconds.insert(svc::schedule::exact_value{0});
+    svc::job_schedule s;
+    s.day_of_week.insert(svc::job_schedule::exact_value{3}); // Wednesday
+    s.hours.insert(svc::job_schedule::exact_value{12});
+    s.minutes.insert(svc::job_schedule::exact_value{0});
+    s.milliseconds.insert(svc::job_schedule::exact_value{0});
 
     // Start from a known Monday: 2025-06-16 is a Monday
     auto base = sys_days{year{2025} / month{6} / day{16}} + hours{10};

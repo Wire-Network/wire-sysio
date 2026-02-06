@@ -13,7 +13,7 @@ namespace sysio::services {
 // expand_field
 // ---------------------------------------------------------------------------
 
-std::set<std::uint64_t> cron_service::schedule::expand_field(const std::set<schedule::schedule_value>& field,
+std::set<std::uint64_t> cron_service::job_schedule::expand_field(const std::set<job_schedule::schedule_value>& field,
                                                    std::uint64_t min_val,
                                                    std::uint64_t max_val) {
    if (field.empty())
@@ -50,7 +50,7 @@ std::set<std::uint64_t> cron_service::schedule::expand_field(const std::set<sche
 
 namespace {
 
-using schedule_value = cron_service::schedule::schedule_value;
+using schedule_value = cron_service::job_schedule::schedule_value;
 
 // Decomposed wall-clock time used for schedule matching.
 struct decomposed_time {
@@ -102,7 +102,7 @@ std::chrono::system_clock::time_point compose(const decomposed_time& dt) {
 std::set<std::uint64_t> field_values(const std::set<schedule_value>& field,
                                      std::uint64_t min_val,
                                      std::uint64_t max_val) {
-   auto expanded = cron_service::schedule::expand_field(field, min_val, max_val);
+   auto expanded = cron_service::job_schedule::expand_field(field, min_val, max_val);
    if (expanded.empty()) {
       // wildcard: all values in range
       for (auto i = min_val; i <= max_val; ++i)
@@ -133,7 +133,7 @@ bool day_of_week_matches(int year, unsigned month, unsigned day_val,
 } // namespace
 
 cron_service::time_point
-cron_service::next_fire_time(const schedule& sched, time_point after) {
+cron_service::next_fire_time(const job_schedule& sched, time_point after) {
    using namespace std::chrono;
 
    // Advance by 1ms so we find a time strictly after `after`.
@@ -145,7 +145,7 @@ cron_service::next_fire_time(const schedule& sched, time_point after) {
    auto minutes_set = field_values(sched.minutes, 0, 59);
    // Wildcard milliseconds defaults to {0} (once per second) rather than
    // materializing all 60 000 values.
-   auto ms_set = cron_service::schedule::expand_field(sched.milliseconds, 0, 59999);
+   auto ms_set = cron_service::job_schedule::expand_field(sched.milliseconds, 0, 59999);
    if (ms_set.empty())
       ms_set.insert(0);
    auto dow_set     = field_values(sched.day_of_week, 0, 7);
@@ -208,7 +208,7 @@ cron_service::next_fire_time(const schedule& sched, time_point after) {
 }
 
 std::vector<cron_service::time_point>
-cron_service::compute_next_n_triggers(const schedule& sched,
+cron_service::compute_next_n_triggers(const job_schedule& sched,
                                       time_point from, std::size_t n) {
    std::vector<time_point> triggers;
    triggers.reserve(n);
@@ -260,7 +260,7 @@ bool cron_service::start() {
       for (auto& [id, j] : jobs.map()) {
          std::scoped_lock tlock(j->triggers_mutex);
          j->upcoming_triggers = compute_next_n_triggers(
-            j->sched, now, schedule_trigger_count);
+            j->schedule, now, schedule_trigger_count);
       }
    }
 
@@ -410,7 +410,7 @@ void cron_service::replenish_triggers() {
       if (j->upcoming_triggers.size() < schedule_trigger_count) {
          auto from = j->upcoming_triggers.empty() ? now : j->upcoming_triggers.back();
          auto additional = compute_next_n_triggers(
-            j->sched, from,
+            j->schedule, from,
             schedule_trigger_count - j->upcoming_triggers.size());
          j->upcoming_triggers.insert(
             j->upcoming_triggers.end(),
@@ -431,11 +431,11 @@ void cron_service::wake_scheduler() {
 // Job management
 // ---------------------------------------------------------------------------
 
-cron_service::job_id_t cron_service::add(const schedule& sched, job_fn_t fn,
+cron_service::job_id_t cron_service::add(const job_schedule& sched, job_fn_t fn,
                                          const std::optional<job_metadata_t>& metadata) {
    auto j = std::make_shared<job>();
    j->id = _next_id++;
-   j->sched = sched;
+   j->schedule = sched;
    j->metadata = metadata.value_or(job_metadata_t{});
    j->fn = std::move(fn);
 

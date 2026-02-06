@@ -44,7 +44,7 @@ public:
     * @param metadata optional job metadata
     * @return job_id_t
     */
-   cron_service::job_id_t add_job(const cron_service::schedule& sched, cron_service::job_fn_t fn, const std::optional<cron_service::job_metadata_t>& metadata = std::nullopt);
+   cron_service::job_id_t add_job(const cron_service::job_schedule& sched, cron_service::job_fn_t fn, const std::optional<cron_service::job_metadata_t>& metadata = std::nullopt);
 
    /**
     * Update job metadata

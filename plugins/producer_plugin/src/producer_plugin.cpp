@@ -88,7 +88,6 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
-auto _producer_plugin = application::register_plugin<producer_plugin>();
 
 // track multiple failures on unapplied transactions
 class account_failures {

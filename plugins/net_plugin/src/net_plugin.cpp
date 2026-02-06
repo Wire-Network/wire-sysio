@@ -96,8 +96,6 @@ bool peer_sync_state::valid() const {
 FC_REFLECT_ENUM( sysio::peer_sync_state::sync_t, (peer_sync)(peer_catchup)(block_nack) )
 
 namespace sysio {
-   static auto _net_plugin = application::register_plugin<net_plugin>();
-
    using std::vector;
 
    using boost::asio::ip::tcp;

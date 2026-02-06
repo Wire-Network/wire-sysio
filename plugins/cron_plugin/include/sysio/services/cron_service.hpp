@@ -47,7 +47,7 @@ public:
     *   month        : 1..12
     *   day_of_week  : 0..7   (0 and 7 both represent Sunday)
     */
-   struct schedule {
+   struct job_schedule {
       /// An exact match for a single value (e.g. "30" in the minutes field).
       struct exact_value {
          std::uint64_t value;
@@ -117,7 +117,7 @@ public:
 
    struct job {
       cron_service::job_id_t id;
-      schedule sched;
+      cron_service::job_schedule schedule;
       job_metadata_t metadata;
       job_fn_t fn;
 
@@ -148,7 +148,7 @@ public:
     * @param metadata optional job metadata
     * @return job_id_t
     */
-   job_id_t add(const schedule& sched, job_fn_t fn,
+   job_id_t add(const job_schedule& sched, job_fn_t fn,
                 const std::optional<job_metadata_t>& metadata = std::nullopt);
 
    /**
@@ -195,10 +195,10 @@ public:
    void stop();
 
    // Compute the next fire time strictly after `after`.
-   static time_point next_fire_time(const schedule& sched, time_point after);
+   static time_point next_fire_time(const job_schedule& sched, time_point after);
 
    // Compute the next `n` trigger times starting strictly after `from`.
-   static std::vector<time_point> compute_next_n_triggers(const schedule& sched,
+   static std::vector<time_point> compute_next_n_triggers(const job_schedule& sched,
                                                           time_point from, std::size_t n);
 
 private:

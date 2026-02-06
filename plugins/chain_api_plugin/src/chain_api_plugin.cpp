@@ -6,8 +6,6 @@
 
 namespace sysio {
 
-   static auto _chain_api_plugin = application::register_plugin<chain_api_plugin>();
-
 using namespace sysio;
 
 class chain_api_plugin_impl {

@@ -32,8 +32,6 @@ private:
    std::unique_ptr<opservices::cron_service> _cron_service{nullptr};
 };
 
-static auto _cron_plugin = application::register_plugin<cron_plugin>();
-
 cron_plugin::cron_plugin()
    : my(std::make_unique<cron_plugin_impl>()) {}
 
@@ -77,7 +75,7 @@ void cron_plugin::cancel_all_jobs() {
    my->cron_service().cancel_all();
 }
 
-cron_service::job_id_t cron_plugin::add_job(const cron_service::schedule& sched, cron_service::job_fn_t fn,
+cron_service::job_id_t cron_plugin::add_job(const cron_service::job_schedule& sched, cron_service::job_fn_t fn,
                                             const std::optional<cron_service::job_metadata_t>& metadata) {
    return cron_service().add(sched, fn, metadata);
 }
