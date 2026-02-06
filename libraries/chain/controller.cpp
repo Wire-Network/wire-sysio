@@ -43,7 +43,6 @@
 #include <fc/scoped_exit.hpp>
 #include <fc/variant_object.hpp>
 #include <fc/variant_dynamic_bitset.hpp>
-#include <bls12-381/bls12-381.hpp>
 
 #include <future>
 #include <new>
@@ -452,8 +451,9 @@ struct building_block {
       auto [transaction_mroot, action_mroot] = std::visit(
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
-                       return std::make_pair(calculate_merkle(trx_receipts),
-                                             calculate_merkle(action_receipts.digests_s));
+                       auto trx_f = post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
+                       auto act_f = post_async_task(ioc, [&]() { return calculate_merkle(action_receipts.digests_s); });
+                       return std::make_pair(trx_f.get(), act_f.get());
                     },
                     [&](const checksum256_type& trx_checksum) {
                        return std::make_pair(trx_checksum,
@@ -2525,19 +2525,14 @@ struct controller_impl {
 #undef SYS_REPORT
    }
 
-   static std::optional<qc_data_t> extract_qc_data(const signed_block_ptr& b) {
-      std::optional<qc_data_t> qc_data;
-      auto hexts = b->validate_and_extract_header_extensions();
-      if (auto f_entry = hexts.find(finality_extension::extension_id()); f_entry != hexts.end()) {
-         auto& f_ext   = std::get<finality_extension>(f_entry->second);
-
-         // get the matching qc extension if present
-         auto exts = b->validate_and_extract_extensions();
-         if (auto entry = exts.find(quorum_certificate_extension::extension_id()); entry != exts.end()) {
-            auto& qc_ext = std::get<quorum_certificate_extension>(entry->second);
-            return qc_data_t{ std::move(qc_ext.qc), f_ext.qc_claim };
+   static std::optional<qc_data_t> extract_qc_data(const block_state_ptr& bsp) {
+      if (const auto* f_entry = bsp->header_extension<finality_extension>()) {
+         // block extensions previously validated as port of signature validation
+         if (bsp->block->contains_extension(quorum_certificate_extension::extension_id())) {
+            auto qc_ext = bsp->block->extract_extension<quorum_certificate_extension>();
+            return std::optional{qc_data_t{std::move(qc_ext.qc), f_entry->qc_claim}};
          }
-         return qc_data_t{ {}, f_ext.qc_claim };
+         return std::optional{qc_data_t{{}, f_entry->qc_claim}};
       }
       return {};
    }
@@ -2651,7 +2646,7 @@ struct controller_impl {
             }
 
             // assemble_block will mutate bsp by setting the valid structure
-            assemble_block(true, extract_qc_data(b), bsp);
+            assemble_block(true, extract_qc_data(bsp), bsp);
 
             // verify received finality digest in action_mroot is the same as the actual one
 
