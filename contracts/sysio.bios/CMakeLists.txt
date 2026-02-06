@@ -1,11 +1,4 @@
-if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.wasm)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.wasm COPYONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.abi COPYONLY)
-endif()
-
+bootstrap_contract(sysio.bios)
 if(BUILD_SYSTEM_CONTRACTS)
-    add_contract(sysio.bios sysio.bios sysio.bios.cpp)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.wasm ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.wasm COPYONLY)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/sysio.bios.abi ${CMAKE_CURRENT_BINARY_DIR}/sysio.bios.abi COPYONLY)
+   add_contract(sysio.bios sysio.bios sysio.bios.cpp)
 endif()
