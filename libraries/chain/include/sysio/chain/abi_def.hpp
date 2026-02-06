@@ -178,3 +178,25 @@ FC_REFLECT( sysio::chain::variant_def                      , (name)(types) )
 FC_REFLECT( sysio::chain::action_result_def                , (name)(result_type) )
 FC_REFLECT( sysio::chain::abi_def                          , (version)(types)(structs)(actions)(tables)
                                                              (ricardian_clauses)(error_messages)(abi_extensions)(variants)(action_results) )
+namespace sysio::chain {
+
+constexpr auto format_as(const type_def& td) {
+   return fmt::format("type_def{{new {}, type {}}}", td.new_type_name, td.type);
+}
+constexpr auto format_as(const field_def& fd) {
+   return fmt::format("field_def{{name {}, type {}}}", fd.name, fd.type);
+}
+constexpr auto format_as(const struct_def& sd) {
+   return fmt::format("struct_def{{name {}, base {}, fields {}}}", sd.name, sd.base, sd.fields);
+}
+constexpr auto format_as(const action_def& ad) {
+   return fmt::format("action_def{{name {}, type {}, ricardian_contract {}}}", ad.name, ad.type, ad.ricardian_contract);
+}
+constexpr auto format_as(const table_def& td) {
+   return fmt::format("table_def{{name {}, index_type {}, key_names {}, key_types {}, type {}}}", td.name, td.index_type, td.key_names, td.key_types, td.type);
+}
+constexpr auto format_as(const variant_def& vd) {
+   return fmt::format("variant_def{{name {}, types {}}}", vd.name, vd.types);
+}
+
+} // namespace sysio::chain

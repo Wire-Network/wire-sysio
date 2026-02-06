@@ -38,7 +38,7 @@ inline ethereum::address to_address(const address_compat_type& addr_var) {
    }
    em::public_key_data_uncompressed pub_key_data;
    if (std::holds_alternative<fc::crypto::public_key>(addr_var)) {
-      auto pub_key = std::get<fc::crypto::public_key>(addr_var);
+      const auto& pub_key = std::get<fc::crypto::public_key>(addr_var);
 
       FC_ASSERT(pub_key.contains<em::public_key_shim>());
 

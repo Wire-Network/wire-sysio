@@ -6,6 +6,7 @@
 #include <sysio/chain/genesis_state.hpp>
 
 #include <fc/crypto/bls_utils.hpp>
+#include <fc/io/json.hpp>
 
 namespace sysio::chain {
 
@@ -18,10 +19,8 @@ namespace detail {
       auto num_keys_in_authority = std::visit([](const auto& a) { return a.keys.size(); },
                                               valid_block_signing_authority);
       SYS_ASSERT(1 + additional_signatures.size() <= num_keys_in_authority, wrong_signing_key,
-                 "number of block signatures (${num_block_signatures}) exceeds number of keys (${num_keys}) in block"
-                 " signing authority: ${authority}",
-                 ("num_block_signatures", 1 + additional_signatures.size())("num_keys", num_keys_in_authority)
-                 ("authority", valid_block_signing_authority));
+                 "number of block signatures ({}) exceeds number of keys ({}) in block signing authority: {}",
+                 1 + additional_signatures.size(), num_keys_in_authority, fc::json::to_log_string(valid_block_signing_authority));
 
       using key_type = fc::crypto::public_key::key_type;
       std::set<public_key_type> keys;
@@ -30,19 +29,20 @@ namespace detail {
 
       for (const auto& s : additional_signatures) {
          auto [iter, inserted] = keys.emplace(s, block_id, true);
-         SYS_ASSERT(inserted, wrong_signing_key, "block signed by same key twice: ${key}", ("key", *iter));
+         SYS_ASSERT(inserted, wrong_signing_key, "block signed by same key twice: {}", fc::json::to_log_string(*iter));
          SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
       }
 
       auto [is_satisfied, relevant_sig_count] = producer_authority::keys_satisfy_and_relevant(keys, valid_block_signing_authority);
 
       SYS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
-                 "block signed by unexpected key: ${signing_keys}, expected: ${authority}. ${c} != ${s}",
-                 ("signing_keys", keys)("authority", valid_block_signing_authority)("c", relevant_sig_count)("s", keys. size()));
+                 "block signed by unexpected key: {}, expected: {}. {} != {}",
+                 fc::json::to_log_string(keys), fc::json::to_log_string(valid_block_signing_authority),
+                 relevant_sig_count, keys. size());
 
       SYS_ASSERT(is_satisfied, wrong_signing_key,
-                 "block signatures ${signing_keys} do not satisfy the block signing authority: ${authority}",
-                 ("signing_keys", keys)("authority", valid_block_signing_authority));
+                 "block signatures {} do not satisfy the block signing authority: {}",
+                 fc::json::to_log_string(keys), fc::json::to_log_string(valid_block_signing_authority));
    }
 
    // SYS_ASSERTs if signature does not validate
@@ -117,7 +117,7 @@ block_state::block_state(const block_header_state&                bhs,
    new_block->transactions = std::move(trx_receipts);
 
    if( qc ) {
-      fc_dlog(vote_logger, "integrate qc ${qc} into block ${bn} ${id}", ("qc", qc->to_qc_claim())("bn", block_num())("id", id()));
+      fc_dlog(vote_logger, "integrate qc {} into block {} {}", qc->to_qc_claim(), block_num(), id());
       emplace_extension(new_block->block_extensions,
                         quorum_certificate_extension::extension_id(), fc::raw::pack( *qc ));
    }
@@ -140,7 +140,7 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
    result.header.schedule_version = block_header::proper_svnn_schedule_version;
    result.block_id = result.header.calculate_id();
 
-   ilog("Using initial finalizer key: ${k}", ("k", g.initial_finalizer_key.to_string()));
+   ilog("Using initial finalizer key: {}", g.initial_finalizer_key.to_string());
    result.active_finalizer_policy = std::make_shared<finalizer_policy>( 1u, 1u, std::vector<finalizer_authority>{{"sysio", 1u, g.initial_finalizer_key}} );
    result.core = finality_core::create_core_for_genesis_block(result.block_id, result.timestamp());
    result.last_pending_finalizer_policy_digest = fc::sha256::hash(*result.active_finalizer_policy);
@@ -307,8 +307,8 @@ digest_type block_state::get_validation_mroot(block_num_type target_block_num) c
    auto low  = core.last_final_block_num();
    auto high = low + valid->validation_mroots.size();
    SYS_ASSERT(low <= target_block_num && target_block_num < high, block_validate_exception,
-              "target_block_num ${b} is outside of range of ${low} and ${high}",
-              ("b", target_block_num)("low", low)("high", high));
+              "target_block_num {} is outside of range of {} and {}",
+              target_block_num, low, high);
 
    return valid->validation_mroots[target_block_num - low];
 }

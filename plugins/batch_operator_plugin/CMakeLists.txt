@@ -4,5 +4,5 @@ plugin_target(
         appbase
         chainbase
         chain_plugin
-        operator_plugin
+        cron_plugin
         sysio_chain)

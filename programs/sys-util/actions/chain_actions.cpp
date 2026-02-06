@@ -25,6 +25,7 @@
 #include <fc/variant_object.hpp>
 #include <fc/log/logger_config.hpp>
 #include <chainbase/environment.hpp>
+#include <sysio/chain/app.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain_plugin/chain_plugin.hpp>
 #include <sysio/http_plugin/http_plugin.hpp>
@@ -194,7 +195,7 @@ namespace {
         result += v;
       }
     }
-    ilog("Non-default options: ${v}", ("v", result));
+    ilog("Non-default options: {}", result);
   }
 
 
@@ -210,11 +211,11 @@ namespace {
         throw;
       }
     } catch (const fc::exception& e) {
-      elog("${e}", ("e",e.to_detail_string()));
+      elog("{}", e.to_detail_string());
     } catch (const boost::exception& e) {
-      elog("${e}", ("e",boost::diagnostic_information(e)));
+      elog("{}", boost::diagnostic_information(e));
     } catch (const std::exception& e) {
-      elog("${e}", ("e",e.what()));
+      elog("{}", e.what());
     } catch (...) {
       // empty
     }
@@ -223,7 +224,6 @@ namespace {
   void logging_conf_handler() {
     auto config_path = app().get_logging_conf();
     configure_logging(config_path);
-    fc::log_config::initialize_appenders();
   }
 
   void initialize_logging() {
@@ -231,7 +231,6 @@ namespace {
     if (std::filesystem::exists(config_path))
       fc::configure_logging(config_path);
 
-    fc::log_config::initialize_appenders();
     app().set_sighup_callback(logging_conf_handler);
   }
 
@@ -325,9 +324,8 @@ int chain_actions::run_subcommand_sstate() {
 
   // default state dir, if none specified
   if (opt->sstate_state_dir.empty()) {
-    auto root = fc::app_path();
-    auto default_data_dir = root / "sysio" / "nodeop" / "data";
-    state_dir = default_data_dir / config::default_state_dir_name;
+    auto home = fc::home_path();
+    state_dir = default_data_path() / config::default_state_dir_name;
   } else {
     // adjust if path relative
     state_dir = opt->sstate_state_dir;
@@ -553,8 +551,8 @@ int chain_actions::run_subcommand_configure() {
     auto create_chain_account_detail = [&](const std::string& name) -> chain_account_detail& {
       // CREATE KEYs
       auto pk = private_key_type::generate();
-      auto privs = pk.to_native_string({});
-      auto pubs = pk.get_public_key().to_native_string({});
+      auto privs = pk.to_string({});
+      auto pubs = pk.get_public_key().to_string({});
       auto bls_priv = bls_private_key::generate();;
       auto bls_pub = bls_priv.get_public_key();
       auto bls_pop = bls_priv.proof_of_possession();
@@ -690,9 +688,9 @@ int chain_actions::run_subcommand_configure() {
     std::atomic_int app_thread_status{-1};
     std::mutex app_thread_mutex;
     std::condition_variable app_thread_cond;
-    if (!application::null_app_singleton()) {
-      application::instance().quit();
-      application::reset_app_singleton();
+    if (!appbase::application::null_app_singleton()) {
+      appbase::application::instance().quit();
+      appbase::application::reset_app_singleton();
     }
     appbase::scoped_app app;
 
@@ -707,10 +705,9 @@ int chain_actions::run_subcommand_configure() {
         auto exe_name = boost::dll::program_location().filename().generic_string();
 
         fc::scoped_exit<std::function<void()>> on_exit = [&]() {
-          ilog(
-            "${name} version ${ver} ${fv}",
-            ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string()
-              ? "" : app->full_version_string())
+          ilog("{} version {} {}",
+               exe_name, app->version_string(),
+               app->version_string() == app->full_version_string() ? "" : app->full_version_string()
           );
           log_non_default_options(app->get_parsed_options());
         };
@@ -723,7 +720,7 @@ int chain_actions::run_subcommand_configure() {
           }
         );
 
-        ilog("Starting kiod: ${dir}", ("dir", wallet_dir.generic_string()));
+        ilog("Starting kiod: {}", wallet_dir.generic_string());
         start_kiod(wallet_dir);
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
@@ -788,13 +785,12 @@ int chain_actions::run_subcommand_configure() {
           on_app_init(1);
           return 1;
         }
-        ilog(
-          "${name} version ${ver} ${fv}",
-          ("name", exe_name)("ver", app->version_string()) ("fv", app->version_string() == app->full_version_string() ?
-            "" : app->full_version_string())
+        ilog("{} version {} {}",
+             exe_name, app->version_string(),
+             app->version_string() == app->full_version_string() ? "" : app->full_version_string()
         );
-        ilog("${name} using configuration file ${c}", ("name", exe_name)("c", app->full_config_file_path().string()));
-        ilog("${name} data directory is ${d}", ("name", exe_name)("d", app->data_dir().string()));
+        ilog("{} using configuration file {}", exe_name, app->full_config_file_path().string());
+        ilog("{} data directory is {}", exe_name, app->data_dir().string());
         log_non_default_options(app->get_parsed_options());
         app->startup();
         app->set_thread_priority_max();
@@ -829,7 +825,7 @@ int chain_actions::run_subcommand_configure() {
     auto chain = app->find_plugin<chain_plugin>();
 
 
-    ilog("Got chain with id: ${chainId}", ("chainId",chain->get_chain_id()));
+    ilog("Got chain with id: {}", chain->get_chain_id());
 
     auto set_contract = [&](const std::string& contract_name, const std::string& contract_path_str) {
       auto rc = run_clio("set", "contract", contract_name, contract_path_str);

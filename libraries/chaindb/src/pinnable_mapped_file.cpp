@@ -6,9 +6,9 @@
 #include <fc/io/raw.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/reflect/variant.hpp>
+#include <fc/io/json.hpp>
 #include <iostream>
 #include <fstream>
-//#include <unistd.h>
 
 #ifdef __linux__
 #include <linux/mman.h>
@@ -120,10 +120,10 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
          BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::dirty)));
       }
       if(dbheader->dbenviron != environment()) {
-         elog("\"${dbname}\" database was created with a chainbase from a different environment\n"
-              "Current compiler environment: ${current}\n"
-              "DB created with compiler environment: ${createdby}",
-              ("dbname", _database_name)("current", environment())("createdby", dbheader->dbenviron));
+         elog("\"{}\" database was created with a chainbase from a different environment\n"
+              "Current compiler environment: {}\n"
+              "DB created with compiler environment: {}",
+              _database_name, fc::json::to_log_string(environment()), fc::json::to_log_string(dbheader->dbenviron));
          BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::incompatible)));
       }
    }
@@ -147,8 +147,8 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
          }
          else if(shared_file_size < existing_file_size) {
             _database_size = existing_file_size;
-            wlog("\"${dbname}\" requested size of ${reqsz} is less than existing size of ${existingsz}. This database will not be shrunk and will remain at ${existingsz}",
-               ("dbname", _database_name)("reqsz", shared_file_size)("existingsz", existing_file_size));
+            wlog("\"{}\" requested size of {} is less than existing size of {}. This database will not be shrunk and will remain at {}",
+                 _database_name, shared_file_size, existing_file_size, existing_file_size);
          }
          _file_mapping = bip::file_mapping(_data_file_path.generic_string().c_str(), bip::read_write);
          _file_mapped_region = bip::mapped_region(_file_mapping, bip::read_write);
@@ -244,7 +244,7 @@ pinnable_mapped_file::pinnable_mapped_file(const std::filesystem::path& dir, boo
             std::string what_str("Failed to mlock database \"" + _database_name + "\". " + details);
             BOOST_THROW_EXCEPTION(std::system_error(make_error_code(db_error_code::no_mlock), what_str));
          }
-         ilog("Database \"${dbname}\" has been successfully locked in memory", ("dbname", _database_name));
+         ilog("Database \"{}\" has been successfully locked in memory", _database_name);
       }
 #endif
 
@@ -339,7 +339,7 @@ void pinnable_mapped_file::setup_non_file_mapping() {
    _non_file_mapped_mapping = mmap(NULL, _non_file_mapped_mapping_size, PROT_READ|PROT_WRITE, common_map_opts|MAP_HUGETLB|MAP_HUGE_1GB, -1, 0);
    if(_non_file_mapped_mapping != MAP_FAILED) {
       round_up_mmaped_size(_1gb);
-      ilog("Database \"${dbname}\" using 1GB pages", ("dbname", _database_name));
+      ilog("Database \"{}\" using 1GB pages", _database_name);
       return;
    }
 #endif
@@ -350,7 +350,7 @@ void pinnable_mapped_file::setup_non_file_mapping() {
    _non_file_mapped_mapping = mmap(NULL, _non_file_mapped_mapping_size, PROT_READ|PROT_WRITE, common_map_opts|MAP_HUGETLB|MAP_HUGE_2MB, -1, 0);
    if(_non_file_mapped_mapping != MAP_FAILED) {
       round_up_mmaped_size(_2mb);
-      ilog("Database \"${dbname}\" using 2MB pages", ("dbname", _database_name));
+      ilog("Database \"{}\" using 2MB pages", _database_name);
       return;
    }
 #endif
@@ -359,7 +359,7 @@ void pinnable_mapped_file::setup_non_file_mapping() {
    round_up_mmaped_size(_2mb);
    _non_file_mapped_mapping = mmap(NULL, _non_file_mapped_mapping_size, PROT_READ|PROT_WRITE, common_map_opts, VM_FLAGS_SUPERPAGE_SIZE_2MB, 0);
    if(_non_file_mapped_mapping != MAP_FAILED) {
-      ilog("Database \"${dbname}\" using 2MB pages", ("dbname", _database_name));
+      ilog("Database \"{}\" using 2MB pages", _database_name);
       return;
    }
    _non_file_mapped_mapping_size = _file_mapped_region.get_size();  //restore to non 2MB rounded size
@@ -373,7 +373,7 @@ void pinnable_mapped_file::setup_non_file_mapping() {
 }
 
 void pinnable_mapped_file::load_database_file(boost::asio::io_context& sig_ios) {
-   ilog("Preloading \"${dbname}\" database file, this could take a moment...", ("dbname", _database_name));
+   ilog("Preloading \"{}\" database file, this could take a moment...", _database_name);
    char* const dst = (char*)_non_file_mapped_mapping;
    size_t offset = 0;
    time_t t = time(nullptr);
@@ -385,11 +385,11 @@ void pinnable_mapped_file::load_database_file(boost::asio::io_context& sig_ios) 
 
       if(time(nullptr) != t) {
          t = time(nullptr);
-         ilog("Preloading \"${dbname}\" database file, ${pct}% complete...", ("dbname", _database_name)("pct", offset/(_database_size/100)));
+         ilog("Preloading \"{}\" database file, {}% complete...", _database_name, offset/(_database_size/100));
       }
       sig_ios.poll();
    }
-   ilog("Preloading \"${dbname}\" database file, complete.", ("dbname", _database_name));
+   ilog("Preloading \"{}\" database file, complete.", _database_name);
 }
 
 bool pinnable_mapped_file::all_zeros(const std::byte* data, size_t sz) {
@@ -410,7 +410,7 @@ std::pair<std::byte*, size_t> pinnable_mapped_file::get_region_to_save() const {
 
 void pinnable_mapped_file::save_database_file(bool flush /* = true */) {
    assert(_writable);
-   ilog("Writing \"${dbname}\" database file, this could take a moment...", ("dbname", _database_name));
+   ilog("Writing \"{}\" database file, this could take a moment...", _database_name);
    size_t offset = 0;
    time_t t = time(nullptr);
    pagemap_accessor pagemap;
@@ -439,10 +439,10 @@ void pinnable_mapped_file::save_database_file(bool flush /* = true */) {
 
       if(time(nullptr) != t) {
          t = time(nullptr);
-         ilog("Writing \"${dbname}\" database file, ${pct}% complete...", ("dbname", _database_name)("pct", offset/(sz/100)));
+         ilog("Writing \"{}\" database file, {}% complete...", _database_name, offset/(sz/100));
       }
    }
-   ilog("Writing \"${dbname}\" database file, complete.", ("dbname", _database_name));
+   ilog("Writing \"{}\" database file, complete.", _database_name);
 }
 
 pinnable_mapped_file::pinnable_mapped_file(pinnable_mapped_file&& o) noexcept
@@ -473,7 +473,7 @@ pinnable_mapped_file::~pinnable_mapped_file() {
          save_database_file();
 #ifndef _WIN32
          if(munmap(_non_file_mapped_mapping, _non_file_mapped_mapping_size))
-            wlog("Database unmapping failed: ${err}", ("err",strerror(errno)));
+            wlog("Database unmapping failed: {}", strerror(errno));
 #endif
       } else {
          if (_sharable) {

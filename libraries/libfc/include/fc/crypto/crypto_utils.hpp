@@ -20,7 +20,7 @@ struct checksum_data {
    }
 };
 
-inline bool prefix_matches(const char* prefix, const std::string& str) {
+inline bool prefix_matches(const char* prefix, std::string_view str) {
    auto prefix_len = const_strlen(prefix);
    return str.size() > prefix_len && str.substr(0, prefix_len).compare(prefix) == 0;
 }

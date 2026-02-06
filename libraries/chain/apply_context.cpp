@@ -17,7 +17,7 @@ namespace sysio::chain {
 
 static inline void print_debug(account_name receiver, const action_trace& ar) {
    if (!ar.console.empty()) {
-      if (fc::logger::get(DEFAULT_LOGGER).is_enabled( fc::log_level::debug )) {
+      if (fc::logger::default_logger().is_enabled( fc::log_level::debug )) {
          std::string prefix;
          prefix.reserve(3 + 13 + 1 + 13 + 3 + 13 + 1);
          prefix += "\n[(";
@@ -35,7 +35,7 @@ static inline void print_debug(account_name receiver, const action_trace& ar) {
          output += ar.console;
          output += prefix;
          output += ": CONSOLE OUTPUT END   =====================";
-         dlog( std::move(output) );
+         dlog( "{}", std::move(output) );
       }
    }
 }
@@ -109,12 +109,13 @@ void apply_context::exec_one()
                // allow onblock and native actions when no sysio system contract by allowing no contract on sysio
                if (receiver != sysio::chain::config::system_account_name && act->account == receiver && get_sender().empty()) {
                   SYS_ASSERT(false, action_validate_exception,
-                             "No contract for action ${a} on account ${r}", ("a", act->name)("r", receiver));
+                             "No contract for action {} on account {}", act->name, receiver);
                }
             }
             validate_account_ram_deltas();
          }
-      } FC_RETHROW_EXCEPTIONS( warn, "${receiver} <= ${account}::${action} pending console output: ${console}", ("console", _pending_console_output)("account", act->account)("action", act->name)("receiver", receiver) )
+      } FC_RETHROW_EXCEPTIONS( warn, "{} <= {}::{} pending console output: {}",
+                               receiver, act->account, act->name, _pending_console_output )
 
       act_digest = generate_action_digest(*act, action_return_value);
    } catch ( const std::bad_alloc& ) {
@@ -184,12 +185,12 @@ void apply_context::validate_account_ram_deltas() {
       }
       if( !privileged && itr->delta > 0 && itr->account != receiver ) {
          SYS_ASSERT( not_in_notify_context, unauthorized_ram_usage_increase,
-                     "unprivileged contract cannot increase RAM usage of another account within a notify context: ${account}",
-                     ("account", itr->account)
+                     "unprivileged contract cannot increase RAM usage of another account within a notify context: {}",
+                     itr->account
          );
          SYS_ASSERT( has_authorization( itr->account ), unauthorized_ram_usage_increase,
-                     "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: ${account}",
-                     ("account", itr->account)
+                     "unprivileged contract cannot increase RAM usage of another account that has not authorized the action: {}",
+                     itr->account
          );
       }
       auto& payer = itr->account;
@@ -216,7 +217,7 @@ void apply_context::validate_account_ram_deltas() {
                }
             }
             SYS_ASSERT(payer_found, unsatisfied_authorization,
-                       "Requested payer ${p} did not authorize payment. Missing ${m}.", ("p", payer)("m", config::sysio_payer_name));
+                       "Requested payer {} did not authorize payment. Missing {}.", payer, config::sysio_payer_name);
          }
       }
    }
@@ -287,7 +288,7 @@ void apply_context::require_authorization( const account_name& account ) {
         return;
      }
    }
-   SYS_ASSERT( false, missing_auth_exception, "missing authority of ${account}", ("account",account));
+   SYS_ASSERT( false, missing_auth_exception, "missing authority of {}", account );
 }
 
 bool apply_context::has_authorization( const account_name& account )const {
@@ -305,8 +306,8 @@ void apply_context::require_authorization(const account_name& account,
            return;
         }
      }
-  SYS_ASSERT( false, missing_auth_exception, "missing authority of ${account}/${permission}",
-              ("account",account)("permission",permission) );
+  SYS_ASSERT( false, missing_auth_exception, "missing authority of {}/{}",
+              account, permission );
 }
 
 bool apply_context::has_recipient( account_name code )const {
@@ -348,7 +349,7 @@ void apply_context::require_recipient( account_name recipient ) {
 void apply_context::execute_inline( action&& a ) {
    auto* code = control.db().find<account_object, by_name>(a.account);
    SYS_ASSERT( code != nullptr, action_validate_exception,
-               "inline action's code account ${account} does not exist", ("account", a.account) );
+               "inline action's code account {} does not exist", a.account );
 
    bool enforce_actor_whitelist_blacklist = trx_context.enforce_whiteblacklist && control.is_speculative_block();
    flat_set<account_name> actors;
@@ -356,11 +357,10 @@ void apply_context::execute_inline( action&& a ) {
    for (const auto &auth: a.authorization) {
       auto *actor = control.db().find<account_object, by_name>(auth.actor);
       SYS_ASSERT(actor != nullptr, action_validate_exception,
-                 "inline action's authorizing actor ${account} does not exist", ("account", auth.actor));
+                 "inline action's authorizing actor {} does not exist", auth.actor);
       if (auth.permission != config::sysio_payer_name) {
          SYS_ASSERT(control.get_authorization_manager().find_permission(auth) != nullptr, action_validate_exception,
-                    "inline action's authorizations include a non-existent permission: ${permission}",
-                    ("permission", auth));
+                    "inline action's authorizations include a non-existent permission: {}", auth);
       }
       if (enforce_actor_whitelist_blacklist)
          actors.insert(auth.actor);
@@ -396,7 +396,7 @@ void apply_context::execute_inline( action&& a ) {
 void apply_context::execute_context_free_inline( action&& a ) {
    auto* code = control.db().find<account_object, by_name>(a.account);
    SYS_ASSERT( code != nullptr, action_validate_exception,
-               "inline action's code account ${account} does not exist", ("account", a.account) );
+               "inline action's code account {} does not exist", a.account );
 
    SYS_ASSERT( a.authorization.size() == 0, action_validate_exception,
                "inline context-free actions cannot have authorizations" );

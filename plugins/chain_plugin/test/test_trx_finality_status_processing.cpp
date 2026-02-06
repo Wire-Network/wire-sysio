@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    bn = 21;
    const auto b_21 = make_block(bn);
    status.signal_block_start(bn);
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
 
    add(trx_pairs_21, b_21);
    status.signal_accepted_block(b_21, b_21->calculate_id());
@@ -571,7 +571,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), block_21_time);
    BOOST_CHECK_EQUAL(ts->status, "FAILED");
 
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    ts = status.get_trx_state(std::get<1>(trx_pairs_22[0])->id());
    BOOST_REQUIRE(ts);
    BOOST_CHECK(ts->block_id == b_22->calculate_id());
@@ -679,7 +679,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), block_21_time);
    BOOST_CHECK_EQUAL(ts->status, "FORKED_OUT");
 
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    ts = status.get_trx_state(std::get<1>(trx_pairs_22[0])->id());
    BOOST_REQUIRE(ts);
    BOOST_CHECK(ts->block_id == b_22->calculate_id());
@@ -767,7 +767,7 @@ BOOST_AUTO_TEST_CASE(trx_finality_status_logic) { try {
    BOOST_CHECK_EQUAL(ts->received.to_iso_string(), block_21_time);
    BOOST_CHECK_EQUAL(ts->status, "FORKED_OUT");
 
-   fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+   fc::logger::default_logger().set_log_level(fc::log_level::debug);
    ts = status.get_trx_state(std::get<1>(trx_pairs_22[0])->id());
    BOOST_REQUIRE(ts);
    BOOST_CHECK(ts->block_id == b_22->calculate_id());

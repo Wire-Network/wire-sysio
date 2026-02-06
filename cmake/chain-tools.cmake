@@ -15,11 +15,15 @@ macro(chain_target TARGET)
             db_size_api_plugin
             net_api_plugin
             net_plugin
-            operator_plugin
+            cron_plugin
             producer_api_plugin
             prometheus_plugin
             resource_monitor_plugin
             state_history_plugin
+            signature_provider_manager_plugin
+            outpost_client_plugin
+            outpost_ethereum_client_plugin
+            outpost_solana_client_plugin
             test_control_api_plugin
             test_control_plugin
             trace_api_plugin
@@ -35,9 +39,6 @@ macro(chain_target TARGET)
             sysio_chain
             sysio_chain_wrap
             version
-            wallet_api_plugin
-            wallet_plugin
-
 
             gsl-lite::gsl-lite
             CLI11::CLI11

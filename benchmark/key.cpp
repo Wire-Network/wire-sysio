@@ -16,7 +16,7 @@ void k1_sign_benchmarking() {
    auto payload = "Test Cases";
    auto digest = sha256::hash(payload, const_strlen(payload));
    auto private_key_string = std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-   auto key = private_key(private_key_string);
+   auto key = private_key::from_string(private_key_string);
 
    auto sign_non_canonical_f = [&]() {
       key.sign(digest, false);

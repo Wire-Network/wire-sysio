@@ -97,7 +97,7 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
       boost::system::error_code ec;
       auto ep = acceptor_.local_endpoint(ec);
       if (ec) {
-         fc_wlog(logger_, "Unable to retrieve local_endpoint of acceptor, error: ${e}", ("e", ec.message()));
+         fc_wlog(logger_, "Unable to retrieve local_endpoint of acceptor, error: {}", ec.message());
       }
       acceptor_.async_accept(socket_executor_fn_(ep),
                              [self = this->shared_from_this()](boost::system::error_code ec, auto&& peer_socket) {
@@ -112,8 +112,8 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
          do_accept();
       } else if (ec == boost::system::errc::too_many_files_open) {
          // retry accept() after timeout to avoid cpu loop on accept
-         fc_elog(logger_, "open file limit reached: not accepting new connections for next ${timeout}ms",
-                 ("timeout", accept_timeout_.total_milliseconds()));
+         fc_elog(logger_, "open file limit reached: not accepting new connections for next {}ms",
+                 accept_timeout_.total_milliseconds());
          accept_error_timer_.expires_from_now(accept_timeout_);
          accept_error_timer_.async_wait([self = this->shared_from_this()](boost::system::error_code ec) {
             if (!ec)
@@ -132,10 +132,10 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
       ) {
          // according to https://man7.org/linux/man-pages/man2/accept.2.html, reliable application should
          // retry when these error codes are returned
-         fc_wlog(logger_, "closing connection, accept error: ${m}", ("m", ec.message()));
+         fc_wlog(logger_, "closing connection, accept error: {}", ec.message());
          do_accept();
       } else {
-         fc_elog(logger_, "Unrecoverable accept error, stop listening: ${m}", ("m", ec.message()));
+         fc_elog(logger_, "Unrecoverable accept error, stop listening: {}", ec.what());
       }
    }
 
@@ -147,7 +147,7 @@ struct listener : listener_base<Protocol>, std::enable_shared_from_this<listener
          info = "Unix socket " + local_address;
       }
       info += extra_listening_log_info_;
-      fc_ilog(logger_, "start listening on ${info}", ("info", info));
+      fc_ilog(logger_, "start listening on {}", info);
    }
 };
 
@@ -198,7 +198,7 @@ void create_listener(Executor& executor, logger& logger, boost::posix_time::time
    if constexpr (std::is_same_v<Protocol, tcp>) {
       auto [host, port] = split_host_port(address);
       if (port.empty()) {
-         fc_elog(logger, "port is not specified for address ${addr}", ("addr", address));
+         fc_elog(logger, "port is not specified for address {}", address);
          throw std::system_error(std::make_error_code(std::errc::bad_address));
       }
 
@@ -206,7 +206,7 @@ void create_listener(Executor& executor, logger& logger, boost::posix_time::time
       tcp::resolver             resolver(executor);
       auto                      endpoints = resolver.resolve(host, port, tcp::resolver::passive, ec);
       if (ec) {
-         fc_elog(logger, "failed to resolve address: ${msg}", ("msg", ec.message()));
+         fc_elog(logger, "failed to resolve address: {}", ec.message());
          throw std::system_error(ec);
       }
 
@@ -230,8 +230,8 @@ void create_listener(Executor& executor, logger& logger, boost::posix_time::time
             }
 
          } catch (boost::system::system_error& ex) {
-            fc_wlog(logger, "unable to listen on ${ip_addr}:${port} resolved from ${address}: ${msg}",
-                    ("ip_addr", ip_addr.to_string())("port", endpoint.port())("address", address)("msg", ex.what()));
+            fc_wlog(logger, "unable to listen on {}:{} resolved from {} {}",
+                    ip_addr.to_string(), endpoint.port(), address, ex.what());
          }
       };
 
@@ -252,7 +252,7 @@ void create_listener(Executor& executor, logger& logger, boost::posix_time::time
       }
 
       if (listened == 0) {
-         fc_elog(logger, "none of the addresses resolved from ${addr} can be listened to", ("addr", address));
+         fc_elog(logger, "none of the addresses resolved from {} can be listened to", address);
          throw std::system_error(std::make_error_code(std::errc::bad_address));
       }
    } else {
@@ -279,7 +279,7 @@ void create_listener(Executor& executor, logger& logger, boost::posix_time::time
 
       // looks like a service is already running on that socket, don't touch it... fail out
       if (ec == boost::system::errc::success) {
-         fc_elog(logger, "The unix socket path ${addr} is already in use", ("addr", address));
+         fc_elog(logger, "The unix socket path {} is already in use", address);
          throw std::system_error(std::make_error_code(std::errc::address_in_use));
       }
       else if (ec == boost::system::errc::connection_refused) {

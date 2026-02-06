@@ -66,6 +66,7 @@ namespace fc
       const variant& operator[]( const char* key )const;
       size_t size()const;
       bool   contains( const char* key ) const { return find(key) != end(); }
+      bool   contains( const std::string& key ) const { return contains(key.c_str()); }
       ///@}
 
       variant_object();
@@ -157,6 +158,7 @@ namespace fc
       iterator             find( const std::string& key );
       iterator             find( const char* key );
       bool                 contains( const char* key );
+      bool                 contains( const std::string& key );
 
       /** replaces the value at \a key with \a var or inserts \a key if not found */
       mutable_variant_object& set( std::string key, variant var ) &;

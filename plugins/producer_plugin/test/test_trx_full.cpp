@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       std::future<std::tuple<producer_plugin*, chain_plugin*>> plugin_fut = plugin_promise.get_future();
       std::thread app_thread( [&]() {
          try {
-            fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+            fc::logger::default_logger().set_log_level(fc::log_level::debug);
             std::vector<const char*> argv =
                   {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
                    "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       const size_t num_pushes = 4242;
       for( size_t i = 1; i <= num_pushes; ++i ) {
          auto ptrx = make_unique_trx( chain_id );
-         dlog( "posting ${id}", ("id", ptrx->id()) );
+         dlog( "posting {}", ptrx->id() );
          app->post( priority::low, [ptrx, &next_calls, &num_posts, &trace_with_except, &trx_match, &trxs, &app]() {
             ++num_posts;
             bool return_failure_traces = num_posts % 2;
@@ -172,13 +172,13 @@ BOOST_AUTO_TEST_CASE(producer) {
                      if( std::get<chain::transaction_trace_ptr>( result )->id == ptrx->id() ) {
                         trxs.push_back( ptrx );
                      } else {
-                        elog( "trace not for trx ${id}: ${t}",
-                              ("id", ptrx->id())("t", fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result))) );
+                        elog( "trace not for trx {}: {}",
+                              ptrx->id(), fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result)) );
                         trx_match = false;
                      }
                   } else if( !return_failure_traces && !std::holds_alternative<fc::exception_ptr>( result ) && std::get<chain::transaction_trace_ptr>( result )->except ) {
-                     elog( "trace with except ${e}",
-                           ("e", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) )) );
+                     elog( "trace with except {}",
+                           fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) ) );
                      ++trace_with_except;
                   }
                   ++next_calls;

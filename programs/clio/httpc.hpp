@@ -74,6 +74,7 @@ namespace sysio { namespace client { namespace http {
    const string wallet_unlock = wallet_func_base + "/unlock";
    const string wallet_import_key = wallet_func_base + "/import_key";
    const string wallet_remove_key = wallet_func_base + "/remove_key";
+   const string wallet_remove_name = wallet_func_base + "/remove_name";
    const string wallet_create_key = wallet_func_base + "/create_key";
    const string wallet_sign_trx = wallet_func_base + "/sign_transaction";
    const string kiod_stop = "/v1/" + string(client::config::key_store_executable_name) + "/stop";

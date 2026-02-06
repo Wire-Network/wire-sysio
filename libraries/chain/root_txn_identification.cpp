@@ -50,30 +50,30 @@ namespace sysio { namespace chain {
          // since a new block is started, no block state was received, so the speculative block did not get eventually produced
          _my->storage.clear();
          _my->current_block_num = block_num;
-      } FC_LOG_AND_DROP(("Failed to signal block start for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal block start for finality status");
    }
 
    void root_txn_identification::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
       try {
          _my->signal_applied_transaction(trace, ptrx);
-      } FC_LOG_AND_DROP(("Failed to signal applied transaction for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal applied transaction for finality status");
    }
 
    void root_txn_identification::signal_accepted_block( const chain::signed_block_ptr& block, const block_id_type& id ) {
       try {
          _my->signal_accepted_block(block, id);
-      } FC_LOG_AND_DROP(("Failed to signal accepted block for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal accepted block for finality status");
    }
 
    void root_txn_identification_impl::signal_accepted_block( const chain::signed_block_ptr& block, const block_id_type& ) {
       try {
          SYS_ASSERT(current_block_num.has_value() && *current_block_num == block->block_num(), chain::block_validate_exception,
-             "Received accepted block for a different block number than we were expecting",
-                      ("current_block_num", *current_block_num)("bsp_block_num", block->block_num()));
+                    "Received accepted block {} for a different block number than we were expecting {}",
+                    block->block_num(), *current_block_num);
          SYS_ASSERT(storage.empty(), chain::block_validate_exception,
-             "storage should have been retrieved and then emptied before receiving accepted block",
-                      ("bsp_block_num", block->block_num()));
-      } FC_LOG_AND_DROP(("Failed to signal accepted block for finality status"));
+                    "storage should have been retrieved and then emptied before receiving accepted block {}",
+                    block->block_num());
+      } FC_LOG_AND_DROP("Failed to signal accepted block for finality status");
    }
 
    void root_txn_identification_impl::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
@@ -83,8 +83,8 @@ namespace sysio { namespace chain {
       if (trace->producer_block_id) {
          if (current_block_num) {
             SYS_ASSERT(*current_block_num == trace->block_num,chain::block_validate_exception,
-               "Received transaction trace for a different block number than we were expecting",
-               ("current_block_num", *current_block_num)("trace_block_num", trace->block_num));
+                       "Received transaction trace for a different block number {} than we were expecting {}",
+                       trace->block_num, *current_block_num);
          } else {
             current_block_num = trace->block_num;
          }
@@ -94,7 +94,7 @@ namespace sysio { namespace chain {
    }
 
    root_txn_identification::root_storage root_txn_identification::retrieve_root_transactions(uint32_t block_num) {
-      dlog("Processing accepted block: ${block_num}", ("block_num", block_num));
+      dlog("Processing accepted block: {}", block_num);
       auto released_storage = std::move(_my->storage);
       _my->storage = root_txn_identification_impl::contract_storage{};
       return released_storage;

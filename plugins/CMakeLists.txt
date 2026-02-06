@@ -1,4 +1,4 @@
-add_subdirectory(operator_plugin)
+add_subdirectory(cron_plugin)
 add_subdirectory(batch_operator_plugin)
 add_subdirectory(net_plugin)
 add_subdirectory(net_api_plugin)

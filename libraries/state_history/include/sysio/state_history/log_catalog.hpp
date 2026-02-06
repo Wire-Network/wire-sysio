@@ -88,8 +88,8 @@ public:
       if(!retained_log_files.empty()) {
          //always make sure we are going to write to at least the very first block in the catalog
          SYS_ASSERT(block_num >= retained_log_files.begin()->begin_block_num, chain::plugin_exception,
-                     "block ${b} is before first block ${s} of ${name}.log",
-                     ("b", block_num)("s", retained_log_files.begin()->begin_block_num)("name", retained_log_files.begin()->path_and_basename.string()));
+                     "block {} is before first block {} of {}.log",
+                     block_num, retained_log_files.begin()->begin_block_num, retained_log_files.begin()->path_and_basename.string());
 
          //check if this log already has the same blockid at the given blocknum. This is indicative of a resync or replay and there is no need to write the
          // same log entry again. otherwise we risk unrotating and blowing away existing log files
@@ -216,15 +216,15 @@ private:
       if(retained_log_files.size() > 1)
          for(catalog_t::iterator it = retained_log_files.begin(); it != std::prev(retained_log_files.end()); ++it)
             SYS_ASSERT(it->end_block_num == std::next(it)->begin_block_num, chain::plugin_exception,
-                       "retained log file ${sf}.log has block range ${sb}-${se} but ${ef}.log has range ${eb}-${ee} which results in a hole",
-                       ("sf", it->path_and_basename.native())("sb", it->begin_block_num)("se", it->end_block_num-1)
-                       ("ef", std::next(it)->path_and_basename.native())("eb", std::next(it)->begin_block_num)("ee", std::next(it)->end_block_num-1));
+                       "retained log file {}.log has block range {}-{} but {}.log has range {}-{} which results in a hole",
+                       it->path_and_basename.native(), it->begin_block_num, it->end_block_num-1,
+                       std::next(it)->path_and_basename.native(), std::next(it)->begin_block_num, std::next(it)->end_block_num-1);
 
       if(!retained_log_files.empty() && !head_log->empty())
          SYS_ASSERT(retained_log_files.rbegin()->end_block_num == head_log->block_range().first, chain::plugin_exception,
-                    "retained log file ${sf}.log has block range ${sb}-${se} but head log has range ${eb}-${ee} which results in a hole",
-                    ("sf", retained_log_files.rbegin()->path_and_basename.native())("sb", retained_log_files.rbegin()->begin_block_num)("se", retained_log_files.rbegin()->end_block_num-1)
-                    ("eb", head_log->block_range().first)("ee", head_log->block_range().second-1));
+                    "retained log file {}.log has block range {}-{} but head log has range {}-{} which results in a hole",
+                    retained_log_files.rbegin()->path_and_basename.native(), retained_log_files.rbegin()->begin_block_num,
+                    retained_log_files.rbegin()->end_block_num-1, head_log->block_range().first, head_log->block_range().second-1);
    }
 
    void unrotate_log() {
@@ -251,7 +251,7 @@ private:
       } catch(std::bad_alloc&) {
          throw;
       } catch(std::exception& e) {
-         wlog("Failed to rotate log ${pbn}", ("pbn", head_log_path_and_basename.string()));
+         wlog("Failed to rotate log {}", head_log_path_and_basename.string());
          //remove any potentially created new head log files
          delete_bundle(head_log_path_and_basename);
          //rename old logs back, restore head_log instance that was never closed, and don't continue with rotation
@@ -307,7 +307,7 @@ private:
          std::filesystem::rename(old_name, new_name);
       } else {
          std::filesystem::remove(old_name);
-         wlog("${new_name} already exists, just removing ${old_name}", ("old_name", old_name.string())("new_name", new_name.string()));
+         wlog("{} already exists, just removing {}", new_name.string(), old_name.string());
       }
    }
 

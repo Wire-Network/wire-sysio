@@ -21,7 +21,7 @@ void trace_converter::pack(boost::iostreams::filtering_ostreambuf& obuf, bool tr
       const transaction_id_type& id = r.trx.id();
       auto it = cached_traces.find(id);
       SYS_ASSERT(it != cached_traces.end() && it->second.trace->receipt, chain::plugin_exception,
-                 "missing trace for transaction ${id}", ("id", id));
+                 "missing trace for transaction {}", id);
       traces.push_back(it->second);
    }
    cached_traces.clear();

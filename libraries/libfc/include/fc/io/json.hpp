@@ -66,6 +66,20 @@ namespace fc
          }
 
          template<typename T>
+         static std::string to_log_string( const T& v, const fc::time_point& deadline = fc::time_point::now() + fc::exception::format_time_limit, const output_formatting format = output_formatting::stringify_large_ints_and_doubles, const uint64_t max_len = max_length_limit )
+         {
+            try {
+               const auto yield = [&](size_t s) {
+                  FC_CHECK_DEADLINE(deadline);
+                  FC_ASSERT(s <= max_len);
+               };
+               return to_string( variant(v), yield, format );
+            } catch (...) {
+               return std::string("Unable to convert ") + typeid(T).name() + " to JSON";
+            }
+         }
+
+         template<typename T>
          static std::string to_pretty_string( const T& v, const fc::time_point& deadline = fc::time_point::maximum(), const output_formatting format = output_formatting::stringify_large_ints_and_doubles, const uint64_t max_len = max_length_limit )
          {
             const auto yield = [&](size_t s) {

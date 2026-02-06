@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <ctime>
 #include <string>
 #include <limits>
 
@@ -9,6 +10,8 @@
 #endif //// _MSC_VER
 
 namespace fc {
+  std::tm to_utc_tm(std::time_t tt);
+
   class microseconds {
     public:
         constexpr explicit microseconds( int64_t c = 0) :_count(c){}
@@ -127,6 +130,18 @@ namespace fc {
   std::string get_approximate_relative_time_string(const time_point& event_time,
                                                    const time_point& relative_to_time = fc::time_point::now(),
                                                    const std::string& ago = " ago");
+
+  constexpr auto format_as(const fc::microseconds& us) {
+     return us.count();
+  }
+
+  constexpr auto format_as(const fc::time_point& tp) {
+     return tp.to_iso_string();
+  }
+
+  constexpr auto format_as(const fc::time_point_sec& t) {
+     return t.to_iso_string();
+  }
 }
 
 #include <fc/reflect/reflect.hpp>

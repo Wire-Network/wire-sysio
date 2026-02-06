@@ -99,9 +99,9 @@ namespace fc {
       // this seems to be related to some sort of memory overrun possibly. By forcing an exit here, an
       // external watchdog can be used to restart the process and avoid hanging.
       if( buffers.size() != sanity_check || buffers.size() > 1000000) {
-         elog( "read_ind = ${r1}, ${r2} write_ind = ${w1}, ${w2}, buff.size = ${bs}, sanity = ${s}",
-               ( "r1", read_ind.first )( "r2", read_ind.second )( "w1", write_ind.first )( "w2", write_ind.second )
-               ( "bs", buffers.size() )( "s", sanity_check ) );
+         elog( "read_ind = {}, {} write_ind = {}, {}, buff.size = {}, sanity = {}",
+               read_ind.first, read_ind.second, write_ind.first, write_ind.second,
+               buffers.size(), sanity_check );
         elog("Buffer manager overwrite detected. Terminating to allow external restart");
         exit(1);
       }
@@ -206,8 +206,8 @@ namespace fc {
      */
     bool read(void* s, uint32_t size) {
       if (bytes_to_read() < size) {
-        FC_THROW_EXCEPTION( out_of_range_exception, "tried to read ${r} but only ${s} left",
-                            ("r", size)( "s", bytes_to_read() ) );
+        FC_THROW_EXCEPTION( out_of_range_exception, "tried to read {} but only {} left",
+                            size, bytes_to_read() );
       }
       if (read_ind.second + size <= buffer_len) {
         memcpy(s, read_ptr(), size);
@@ -227,8 +227,8 @@ namespace fc {
      */
     bool peek(void* s, uint32_t size, index_t& index) const {
       if (bytes_to_read_from_index(index) < size) {
-        FC_THROW_EXCEPTION( out_of_range_exception, "tried to peek ${r} but only ${s} left",
-                            ("r", size)( "s", bytes_to_read_from_index( index ) ) );
+        FC_THROW_EXCEPTION( out_of_range_exception, "tried to peek {} but only {} left",
+                            size, bytes_to_read_from_index( index ) );
       }
       if (index.second + size <= buffer_len) {
         memcpy(s, get_ptr(index), size);

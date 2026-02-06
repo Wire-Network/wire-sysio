@@ -206,7 +206,7 @@ public:
       ret = fcntl(fileno(), F_PUNCHHOLE, &puncher);
 #endif
       if(ret == -1)
-         wlog("Failed to punch hole in file ${f}: ${e}", ("f", _file_path)("e", strerror(errno)));
+         wlog("Failed to punch hole in file {}: {}", _file_path.generic_string(), strerror(errno));
 
       flush();
    }

@@ -25,25 +25,25 @@ BOOST_AUTO_TEST_SUITE(payer_choice_test)
         const auto &alice_account = account_name("alice");
         const auto &bob_account = account_name("bob");
 
-        ilog("Creating accounts: ${a}, ${b}, ${c}", ("a", tester1_account)("b", alice_account)("c", bob_account));
+        ilog("Creating accounts: {}, {}, {}", tester1_account, alice_account, bob_account);
         c.create_accounts({tester1_account, alice_account, bob_account}, false, true, false, true);
         c.produce_block();
 
         auto ram_restrictions_wasm = test_contracts::ram_restrictions_test_wasm();
-        ilog("Registering bob as node owner and assigning _just_ enough resources to tester1 to load the contract, wasm size ${w}",
-            ("w", ram_restrictions_wasm.size()));
+        ilog("Registering bob as node owner and assigning _just_ enough resources to tester1 to load the contract, wasm size {}",
+             ram_restrictions_wasm.size());
         c.register_node_owner(bob_account, 2);
         c.add_roa_policy(bob_account, tester1_account, "1.0000 SYS", "1.0000 SYS", "0.0835 SYS", 0, 0);
         c.produce_block();
 
-        ilog("Setting code and ABI for ${a}", ("a", tester1_account));
+        ilog("Setting code and ABI for {}", tester1_account);
         c.set_contract(tester1_account, ram_restrictions_wasm, test_contracts::ram_restrictions_test_abi());
         c.produce_block();
 
         auto tester1_ram_usage = c.control->get_resource_limits_manager().get_account_ram_usage(tester1_account);
-        dlog("{account} ram usage: ${ram}", ("account", tester1_account)("ram", tester1_ram_usage));
+        dlog("{} ram usage: {}", tester1_account, tester1_ram_usage);
         auto alice_ram_usage = c.control->get_resource_limits_manager().get_account_ram_usage(alice_account);
-        dlog("{account} ram usage: ${ram}", ("account", alice_account)("ram", alice_ram_usage));
+        dlog("{} ram usage: {}", alice_account, alice_ram_usage);
 
         ilog("No Resource Testing");
 

@@ -12,8 +12,8 @@ void snapshot_scheduler::on_start_block(uint32_t height, chain::controller& chai
    auto execute_snapshot_with_log = [this, height, &snapshot_executed, &chain](const auto& req) {
       // one snapshot per height
       if(!snapshot_executed) {
-         dlog("snapshot scheduler creating a snapshot from the request [start_block_num:${start_block_num}, end_block_num=${end_block_num}, block_spacing=${block_spacing}], height=${height}",
-              ("start_block_num", req.start_block_num)("end_block_num", req.end_block_num)("block_spacing", req.block_spacing)("height", height));
+         dlog("snapshot scheduler creating a snapshot from the request [start_block_num:{}, end_block_num={}, block_spacing={}], height={}",
+              req.start_block_num, req.end_block_num, req.block_spacing, height);
 
          execute_snapshot(req.snapshot_request_id, chain);
          snapshot_executed = true;
@@ -134,7 +134,7 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
    _inflight_sid = srid;
    auto next = [srid, this](const chain::next_function_variant<snapshot_information>& result) {
       if(std::holds_alternative<fc::exception_ptr>(result)) {
-         wlog("Snapshot creation error: ${d}", ("d", std::get<fc::exception_ptr>(result)->to_detail_string()));
+         wlog("Snapshot creation error: {}", std::get<fc::exception_ptr>(result)->to_detail_string());
       } else {
          // success, snapshot finalized
          auto snapshot_info = std::get<snapshot_information>(result);
@@ -162,7 +162,7 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
 
    // maintain legacy exception if the snapshot exists
    if(fs::is_regular_file(snapshot_path)) {
-      auto ex = snapshot_exists_exception(FC_LOG_MESSAGE(error, "snapshot named ${name} already exists", ("name", _snapshots_dir)));
+      auto ex = snapshot_exists_exception(FC_LOG_MESSAGE(error, "snapshot named {} already exists", _snapshots_dir.string()));
       next(ex.dynamic_copy_exception());
       return;
    }
@@ -181,15 +181,15 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
    // If in irreversible mode, create snapshot and return path to snapshot immediately.
    if(chain.get_read_mode() == db_read_mode::IRREVERSIBLE) {
       try {
-         ilog("Starting snapshot creation at block ${bn}", ("bn", head_block_num));
+         ilog("Starting snapshot creation at block {}", head_block_num);
          write_snapshot(temp_path);
          std::error_code ec;
          fs::rename(temp_path, snapshot_path, ec);
          SYS_ASSERT(!ec, snapshot_finalization_exception,
-                    "Unable to finalize valid snapshot of block number ${bn}: [code: ${ec}] ${message}",
-                    ("bn", head_block_num)("ec", ec.value())("message", ec.message()));
+                    "Unable to finalize valid snapshot of block number {}: [code: {}] {}",
+                    head_block_num, ec.value(), ec.message());
 
-         ilog("Snapshot creation at block ${bn} complete; snapshot placed at ${fn}", ("bn", head_block_num)("fn", snapshot_path));
+         ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
          next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string()});
       }
       CATCH_AND_CALL(next);
@@ -213,16 +213,16 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
       const auto& pending_path = pending_snapshot<snapshot_information>::get_pending_path(head_id, _snapshots_dir);
 
       try {
-         ilog("Starting snapshot creation at block ${bn}", ("bn", head_block_num));
+         ilog("Starting snapshot creation at block {}", head_block_num);
          write_snapshot(temp_path);// create a new pending snapshot
 
          std::error_code ec;
          fs::rename(temp_path, pending_path, ec);
          SYS_ASSERT(!ec, snapshot_finalization_exception,
-                    "Unable to promote temp snapshot ${t} to pending ${p} for block number ${bn}: [code: ${ec}] ${message}",
-                    ("t", temp_path.generic_string())("p", pending_path.generic_string())
-                    ("bn", head_block_num)("ec", ec.value())("message", ec.message()));
-         ilog("Snapshot creation at block ${bn} complete; snapshot will be available once block becomes irreversible", ("bn", head_block_num));
+                    "Unable to promote temp snapshot {} to pending {} for block number {}: [code: {}] {}",
+                    temp_path.generic_string(), pending_path.generic_string(),
+                    head_block_num, ec.value(), ec.message());
+         ilog("Snapshot creation at block {} complete; snapshot will be available once block becomes irreversible", head_block_num);
          _pending_snapshot_index.emplace(head_id, head_block_time, next, pending_path.generic_string(), snapshot_path.generic_string());
          add_pending_snapshot_info(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, pending_path.generic_string()});
       }

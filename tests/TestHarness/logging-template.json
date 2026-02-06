@@ -1,157 +1,124 @@
 {
   "includes": [],
-  "appenders": [{
-      "name": "stderr",
-      "type": "console",
-      "args": {
-        "format": "   :  ]  ",
-        "stream": "std_error",
-        "level_colors": [{
-            "level": "debug",
-            "color": "green"
-          },{
-            "level": "warn",
-            "color": "brown"
-          },{
-            "level": "error",
-            "color": "red"
-          }
-        ],
-        "flush": true
-      },
-      "enabled": true
-    },{
-      "name": "stdout",
-      "type": "console",
-      "args": {
-        "stream": "std_out",
-        "level_colors": [{
-            "level": "debug",
-            "color": "green"
-          },{
-            "level": "warn",
-            "color": "brown"
-          },{
-            "level": "error",
-            "color": "red"
-          }
-        ],
-        "flush": true
-      },
-      "enabled": true
+  "sinks": [{
+    "name": "stderr_color",
+    "type": "console_sink",
+    "args": {
+      "output_type": "stderr",
+      "color": true,
+      "level_colors": [{
+        "level": "debug",
+        "color": "green"
+      },{
+        "level": "info",
+        "color": "reset"
+      },{
+        "level": "warn",
+        "color": "yellow"
+      },{
+        "level": "error",
+        "color": "red"
+      }
+      ]
     }
-  ],
+  }],
   "loggers": [{
       "name": "default",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "net_plugin_impl",
       "level": "info",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "http_plugin",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "producer_plugin",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_success_tracing",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_failure_tracing",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "trace_api",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_trace_success",
       "level": "info",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transaction_trace_failure",
       "level": "info",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transient_trx_success_tracing",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
       "name": "transient_trx_failure_tracing",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     },{
        "name": "state_history",
        "level": "info",
        "enabled": true,
-       "additivity": false,
-       "appenders": [
-         "stderr"
-        ]
+      "sinks": [
+        "stderr_color"
+      ]
     },{
        "name": "vote",
        "level": "debug",
        "enabled": true,
-       "additivity": false,
-       "appenders": [
-         "stderr"
-       ]
+      "sinks": [
+        "stderr_color"
+      ]
     },{
       "name": "transaction",
       "level": "info",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     }
   ]

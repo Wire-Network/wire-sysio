@@ -51,26 +51,26 @@ namespace sysio::chain_apis {
       try {
          _my->_irr_block_id = id;
          _my->_irr_block_timestamp = block->timestamp;
-      } FC_LOG_AND_DROP(("Failed to signal irreversible block for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal irreversible block for finality status");
    }
 
    void trx_finality_status_processing::signal_block_start( uint32_t block_num ) {
       try {
          // since a new block is started, no block state was received, so the speculative block did not get eventually produced
          _my->_speculative_trxs.clear();
-      } FC_LOG_AND_DROP(("Failed to signal block start for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal block start for finality status");
    }
 
    void trx_finality_status_processing::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
       try {
          _my->signal_applied_transaction(trace, ptrx);
-      } FC_LOG_AND_DROP(("Failed to signal applied transaction for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal applied transaction for finality status");
    }
 
    void trx_finality_status_processing::signal_accepted_block( const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
       try {
          _my->signal_accepted_block(block, id);
-      } FC_LOG_AND_DROP(("Failed to signal accepted block for finality status"));
+      } FC_LOG_AND_DROP("Failed to signal accepted block for finality status");
    }
 
    void trx_finality_status_processing_impl::signal_applied_transaction( const chain::transaction_trace_ptr& trace, const chain::packed_transaction_ptr& ptrx ) {
@@ -165,8 +165,8 @@ namespace sysio::chain_apis {
          auto iter = _storage.find(trx_id);
          FC_ASSERT( iter != _storage.index().cend(),
                     "CODE ERROR: Should not have speculative transactions that have not already"
-                    "been identified prior to the block being accepted. trx id: ${trx_id}",
-                    ("trx_id", trx_id) );
+                    "been identified prior to the block being accepted. trx id: {}",
+                    trx_id );
          _storage.modify( iter, mod );
       }
       _speculative_trxs.clear();
@@ -226,9 +226,9 @@ namespace sysio::chain_apis {
       };
       // determine how much we need to free to get back to at least the desired percentage of the storage
       int64_t storage_to_free = _max_storage - percentage(_max_storage) - remaining_storage;
-      ilog("Finality Status exceeded max storage (${max_storage}GB) need to free up ${storage_to_free} GB",
-           ("max_storage",_max_storage/1024/1024/1024)
-           ("storage_to_free",storage_to_free/1024/1024/1024));
+      ilog("Finality Status exceeded max storage ({}GB) need to free up {} GB",
+           _max_storage/1024/1024/1024,
+           storage_to_free/1024/1024/1024);
       const auto& block_indx = _storage.index().get<by_block_num>();
       const auto& status_expiry_indx = _storage.index().get<by_status_expiry>();
       using index_iter_type = decltype(_storage.index().project<0>(block_indx.begin()));
@@ -250,21 +250,21 @@ namespace sysio::chain_apis {
          if (oldest_block_iter == block_indx.end()) {
             FC_ASSERT( oldest_failure_iter != oldest_failure_end,
                         "CODE ERROR: can not free more storage, but still exceeding limit. "
-                        "Total entries: ${total_entries}, storage memory to free: ${storage}, "
-                        "entries slated for removal: ${remove_entries}",
-                        ("total_entries", _storage.index().size())
-                        ("storage", storage_to_free)
-                        ("remove_entries", remove_trxs.size()));
+                        "Total entries: {}, storage memory to free: {}, "
+                        "entries slated for removal: {}",
+                        _storage.index().size(),
+                        storage_to_free,
+                        remove_trxs.size());
             for (; oldest_failure_iter != oldest_failure_end && storage_to_free > 0; ++oldest_failure_iter) {
                reduce_storage(oldest_failure_iter);
             }
             FC_ASSERT( storage_to_free < 1,
                         "CODE ERROR: can not free more storage, but still exceeding limit. "
-                        "Total entries: ${total_entries}, storage memory to free: ${storage}, "
-                        "entries slated for removal: ${remove_entries}",
-                        ("total_entries", _storage.index().size())
-                        ("storage", storage_to_free)
-                        ("remove_entries", remove_trxs.size()));
+                        "Total entries: {}, storage memory to free: {}, "
+                        "entries slated for removal: {}",
+                        _storage.index().size(),
+                        storage_to_free,
+                        remove_trxs.size());
             break;
          }
          else {
@@ -289,11 +289,11 @@ namespace sysio::chain_apis {
       }
 
       if (earliest_block != finality_status::no_block_num) {
-         ilog( "Finality Status dropped ${trx_count} transactions, which were removed from block # ${block_num_start} to block # ${block_num_end}",
-               ("trx_count", remove_trxs.size())("block_num_start", earliest_block)("block_num_end", block_upper_bound) );
+         ilog( "Finality Status dropped {} transactions, which were removed from block #{} to block #{}",
+               remove_trxs.size(), earliest_block, block_upper_bound );
       }
       else {
-         ilog( "Finality Status dropped ${trx_count} transactions, all were failed transactions", ("trx_count", remove_trxs.size()) );
+         ilog( "Finality Status dropped {} transactions, all were failed transactions", remove_trxs.size() );
       }
 
       return true;

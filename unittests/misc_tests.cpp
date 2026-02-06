@@ -1247,7 +1247,8 @@ BOOST_AUTO_TEST_CASE(named_thread_pool_test) {
          FC_ASSERT( false, "oops throw in thread pool" );
       });
       BOOST_TEST( (ef.wait_for( 100ms ) == std::future_status::ready) );
-      BOOST_TEST( ef.get().to_detail_string().find("oops throw in thread pool") != std::string::npos );
+      auto r = ef.get().to_detail_string();
+      BOOST_TEST( r.find("oops throw in thread pool") != std::string::npos );
 
       // we can restart, after a stop
       BOOST_REQUIRE_THROW( thread_pool.start( 5, [&ep](const fc::exception& e) { ep.set_value(e); } ), fc::assert_exception );
@@ -1266,9 +1267,9 @@ BOOST_AUTO_TEST_CASE(named_thread_pool_test) {
 BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    auto private_key_string = std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
    auto expected_public_key = std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
-   auto test_private_key = fc::crypto::private_key(private_key_string);
+   auto test_private_key = fc::crypto::private_key::from_string(private_key_string);
    auto test_public_key = test_private_key.get_public_key();
-   fc::crypto::public_key sys_pk(expected_public_key);
+   fc::crypto::public_key sys_pk = fc::crypto::public_key::from_string(expected_public_key);
 
    BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}));
    BOOST_CHECK_EQUAL(expected_public_key, test_public_key.to_string({}));
@@ -1280,7 +1281,7 @@ BOOST_AUTO_TEST_CASE(public_key_from_hash) {
    std::memcpy(&data[1], hash.data(), hash.data_size() );
    fc::ecc::public_key_shim shim(data);
    fc::crypto::public_key sys_unknown_pk(std::move(shim));
-   ilog( "public key with no known private key: ${k}", ("k", sys_unknown_pk) );
+   ilog( "public key with no known private key: {}", sys_unknown_pk.to_string({}, true) );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

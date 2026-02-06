@@ -152,7 +152,7 @@ BOOST_AUTO_TEST_CASE( vote_processor_test ) {
                           return fork_db[id];
                        }};
    vp.start(2, [](const fc::exception& e) {
-      edump((e));
+      elog("{}", e.to_detail_string());
       BOOST_REQUIRE(false);
    });
 

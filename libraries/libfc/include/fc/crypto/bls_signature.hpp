@@ -8,10 +8,6 @@
 
 namespace fc::crypto::bls {
 
-   namespace constants {
-      const std::string signature_prefix = "SIG_BLS_";
-   };
-
    // Immutable after construction (although operator= is provided).
    // Provides an efficient wrapper around bls12_381::g2.
    // Serialization form:
@@ -31,13 +27,14 @@ namespace fc::crypto::bls {
 
       // throws if unable to convert to valid bls12_381::g2
       explicit signature(const bls::signature_data& affine_non_montgomery_le);
-      explicit signature(std::span<const uint8_t, 192> affine_non_montgomery_le);
+      explicit signature(bls::signature_data_span affine_non_montgomery_le);
 
       // affine non-montgomery base64url with signature_prefix
       explicit signature(const std::string& base64urlstr);
 
       // affine non-montgomery base64url with signature_prefix
       std::string to_string() const;
+      static std::string to_string(const bls::signature_data& sig);
 
       const bls12_381::g2&            jacobian_montgomery_le() const { return _jacobian_montgomery_le; }
       const bls::signature_data&      affine_non_montgomery_le() const { return _affine_non_montgomery_le; }
@@ -78,6 +75,8 @@ namespace fc::crypto::bls {
       }
 
       size_t get_hash() const;
+      static size_t get_hash(const bls::signature_data& affine_non_montgomery_le);
+
       static bls12_381::g2 to_jacobian_montgomery_le(const bls::signature_data& affine_non_montgomery_le);
    private:
       bls::signature_data      _affine_non_montgomery_le{};

@@ -1,16 +1,18 @@
 #pragma once
 
 #include <map>
-#include <optional>
+#include <mutex>
+#include <ranges>
 #include <shared_mutex>
 #include <stdexcept>
 #include <utility>
+#include <vector>
 
 namespace fc {
-template <class K, class V, class Compare = std::less<K>>
+template <class K, class V, class Storage = std::map<K, V>>
 class threadsafe_map {
 public:
-   using map_type = std::map<K, V, Compare>;
+   using map_type = Storage;
 
 private:
    mutable std::shared_mutex _mtx;
@@ -57,12 +59,22 @@ public:
       const V& operator[](const K& key) const {
          return at(key);
       }
-
+      
+      std::size_t size() const { return _map->size(); }
+      
+      const std::vector<K> keys() const {
+         return *_map | std::views::keys | std::ranges::to<std::vector>();
+      }
+      
+      const std::vector<V> values() const {
+         return *_map | std::views::values | std::ranges::to<std::vector>();
+      }
+       
       const map_type& map() const { return *_map; }
 
       auto begin() const { return _map->cbegin(); }
       auto end() const { return _map->cend(); }
-      std::size_t size() const { return _map->size(); }
+      
       bool empty() const { return _map->empty(); }
    };
 
@@ -93,6 +105,16 @@ public:
       }
 
       const V& get(const K& key) const { return at(key); }
+
+      std::size_t size() const { return _map->size(); }
+
+      const std::vector<V> values() const {
+         return *_map | std::views::values | std::ranges::to<std::vector>();
+      }
+      
+      const std::vector<K> keys() const {
+         return *_map | std::views::keys | std::ranges::to<std::vector>();
+      }
 
       V get_copy(const K& key) const {
          return get(key);

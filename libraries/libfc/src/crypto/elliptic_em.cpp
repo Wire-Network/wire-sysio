@@ -1,13 +1,11 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
-#include <fc/crypto/base58.hpp>
-#include <fc/crypto/hmac.hpp>
 #include <fc/crypto/openssl.hpp>
 #include <fc/crypto/sha512.hpp>
 
-#include <fc/fwd_impl.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/fwd_impl.hpp>
 
 #include <fc-lite/traits.hpp>
 
@@ -75,7 +73,6 @@ fc::sha512 private_key::get_shared_secret(const public_key& other) const {
    return fc::sha512::hash(serialized_result.begin() + 1, serialized_result.size() - 1);
 }
 
-
 public_key::public_key() = default;
 public_key::public_key(const public_key& pk) = default;
 public_key::public_key(public_key&& pk) noexcept = default;
@@ -83,13 +80,12 @@ public_key::~public_key() = default;
 public_key& public_key::operator=(const public_key& pk) = default;
 public_key& public_key::operator=(public_key&& pk) noexcept = default;
 
-bool public_key::valid() const {
-   return my->_key != empty_pub;
+bool operator==(const public_key& a, const public_key& b) {
+   return a.my->_key == b.my->_key;
 }
 
-std::string public_key::to_base58() const {
-   FC_ASSERT(my->_key != empty_pub);
-   return to_base58(my->_key);
+bool public_key::valid() const {
+   return my->_key != empty_pub;
 }
 
 public_key_data public_key::serialize() const {
@@ -97,15 +93,15 @@ public_key_data public_key::serialize() const {
    return my->_key;
 }
 
-public_key_data_uncompressed public_key::serialize_uncompressed() const {
+public_key_data_uncompressed public_key::serialize_uncompressed(const public_key_data& key) {
    public_key_data_uncompressed pubkey_data{};
    secp256k1_pubkey pubkey{};
 
    FC_ASSERT(secp256k1_ec_pubkey_parse(
                 detail::_get_context(),
                 &pubkey,
-                reinterpret_cast<const unsigned char*>(my->_key.data()),
-                my->_key.size()
+                reinterpret_cast<const unsigned char*>(key.data()),
+                key.size()
              ), "Invalid public key data");
 
    size_t pubkey_len = pubkey_data.size();
@@ -118,6 +114,10 @@ public_key_data_uncompressed public_key::serialize_uncompressed() const {
              ), "Failed to serialize public key");
 
    return pubkey_data;
+}
+
+public_key_data_uncompressed public_key::serialize_uncompressed() const {
+   return serialize_uncompressed(my->_key);
 }
 
 public_key::public_key(const public_key_data_uncompressed& dat) {
@@ -200,38 +200,8 @@ public_key public_key::from_key_data(const public_key_data& data) {
    return public_key(data);
 }
 
-std::string public_key::to_base58(const public_key_data& key) {
-   uint32_t check = (uint32_t)sha256::hash(key.data(), sizeof(key))._hash[0];
-   // hack around gcc bug: key.size() should be constexpr, but isn't
-   static_assert(sizeof(key) + sizeof(check) == 37, "");
-
-   std::array<char, 37> data{};
-   memcpy(data.data(), key.begin(), key.size());
-   memcpy(data.begin() + key.size(), (const char*)&check, sizeof(check));
-   return fc::to_base58(data.begin(), data.size(), fc::yield_function_t());
-}
-
-public_key public_key::from_native_string(const std::string& pub_key_str) {
+public_key public_key::from_string(const std::string& pub_key_str) {
    return crypto::ethereum::to_em_public_key(pub_key_str);
-}
-
-public_key public_key::from_base58(const std::string& b58) {
-   std::array<char, 37> data;
-   size_t s = fc::from_base58(b58, (char*)&data, sizeof(data));
-   FC_ASSERT(s == sizeof(data));
-
-   public_key_data key{};
-   uint32_t check = (uint32_t)sha256::hash(data.data(), sizeof(key))._hash[0];
-   FC_ASSERT(memcmp( &check, data.data() + sizeof(key), sizeof(check) ) == 0);
-   memcpy(key.data(), data.data(), sizeof(key));
-   return from_key_data(key);
-}
-
-unsigned int public_key::fingerprint() const {
-   public_key_data key = serialize();
-   ripemd160 hash = ripemd160::hash(sha256::hash(key.begin(), key.size()));
-   unsigned char* fp = (unsigned char*)hash._hash;
-   return (fp[0] << 24) | (fp[1] << 16) | (fp[2] << 8) | fp[3];
 }
 
 bool public_key::is_canonical(const compact_signature& c) {
@@ -283,7 +253,7 @@ private_key private_key::generate() {
 
 namespace detail {
 
-private_key_impl::private_key_impl() noexcept {
+private_key_impl::private_key_impl() noexcept : _key{} {
    _init_lib();
 }
 
@@ -314,7 +284,7 @@ private_key private_key::regenerate(const private_key_secret& secret) {
    return self;
 }
 
-private_key_secret private_key::get_secret() const {
+const private_key_secret& private_key::get_secret() const {
    return my->_key;
 }
 

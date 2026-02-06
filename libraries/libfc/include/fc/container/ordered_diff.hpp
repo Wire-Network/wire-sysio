@@ -117,24 +117,24 @@ public:
       // Remove from the source based on diff.remove_indexes
       for (container_size_type i = 0; i < diff.remove_indexes.size(); ++i) {
          FC_ASSERT(i == 0 || diff.remove_indexes[i] > diff.remove_indexes[i-1],
-                   "diff.remove_indexes not strictly monotonically increasing: current index ${c}, previous index ${p}",
-                   ("c", diff.remove_indexes[i])("p", diff.remove_indexes[i-1]));
+                   "diff.remove_indexes not strictly monotonically increasing: current index {}, previous index {}",
+                   diff.remove_indexes[i], diff.remove_indexes[i-1]);
 
          assert(diff.remove_indexes[i] >= i);
          auto updated_index = diff.remove_indexes[i] - i;
-         FC_ASSERT(updated_index < container.size(), "diff.remove_indexes index ${idx} - i ${i} not in range ${s}",
-                   ("idx", diff.remove_indexes[i])("i", i)("s", container.size()));
+         FC_ASSERT(updated_index < container.size(), "diff.remove_indexes index {} - i {} not in range {}",
+                   diff.remove_indexes[i], i, container.size());
          container.erase(container.begin() + updated_index);
       }
 
       // Insert into the source based on diff.insert_indexes
       for (container_size_type i = 0; i < diff.insert_indexes.size(); ++i) {
          FC_ASSERT(i == 0 || diff.insert_indexes[i].first > diff.insert_indexes[i-1].first,
-                   "diff.insert_indexes not strictly monotonically increasing: current index ${c}, previous index ${p}",
-                   ("c", diff.insert_indexes[i].first)("p", diff.insert_indexes[i-1].first));
+                   "diff.insert_indexes not strictly monotonically increasing: current index {}, previous index {}",
+                   diff.insert_indexes[i].first, diff.insert_indexes[i-1].first);
          auto& [index, value] = diff.insert_indexes[i];
-         FC_ASSERT(index <= container.size(), "diff.insert_indexes index ${idx} not in range ${s}",
-                   ("idx", index)("s", container.size()));
+         FC_ASSERT(index <= container.size(), "diff.insert_indexes index {} not in range {}",
+                   index, container.size());
          container.insert(container.begin() + index, std::move(value));
       }
       return container;

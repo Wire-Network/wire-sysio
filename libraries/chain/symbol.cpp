@@ -13,9 +13,9 @@ namespace sysio::chain {
       auto prec_part = s.substr(0, comma_pos);
       uint8_t p = fc::to_int64(prec_part);
       string name_part = s.substr(comma_pos + 1);
-      SYS_ASSERT( p <= max_precision, symbol_type_exception, "precision ${p} should be <= 18", ("p", p));
+      SYS_ASSERT( p <= max_precision, symbol_type_exception, "precision {} should be <= 18", p);
       return symbol(string_to_symbol(p, name_part.c_str()));
-   } FC_CAPTURE_LOG_AND_RETHROW((from));
+   } FC_CAPTURE_LOG_AND_RETHROW("{}", from);
 }
    
 } // namespace sysio::chain

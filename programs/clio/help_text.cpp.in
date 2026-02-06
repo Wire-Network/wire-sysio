@@ -2,6 +2,7 @@
 #include "localize.hpp"
 #include <regex>
 #include <fc/io/json.hpp>
+#include <fc/variant_object.hpp>
 #include <sysio/chain/exceptions.hpp>
 
 using namespace sysio::client::localize;
@@ -283,14 +284,7 @@ bool print_recognized_errors(const fc::exception& e, const bool verbose_errors) 
 
       // Get explanation from log, if any
       for (auto &log : e.get_log()) {
-         // Check if there's a log to display
-         if (!log.get_format().empty()) {
-            // Localize the message as needed
-            explanation += "\n" + localized_with_variant(log.get_format().data(), log.get_data());
-         } else if (log.get_data().size() > 0 && verbose_errors) {
-            // Show data-only log only if verbose_errors option is enabled
-            explanation += "\n" + fc::json::to_string(log.get_data(), fc::time_point::maximum());
-         }
+         explanation += log.get_message();
          // Check if there's stack trace to be added
          if (!log.get_context().get_method().empty() && verbose_errors) {
             stack_trace += "\n" +

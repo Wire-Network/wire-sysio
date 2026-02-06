@@ -141,7 +141,7 @@ fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& ad
    auto from_addr_hex = to_hex(from_addr, true);
    fc::variants params{from_addr_hex, block_tag};
    auto res = execute("eth_getTransactionCount", params);
-   dlogf("tx_count: {}", res.as_string());
+   dlog("tx_count: {}", res.as_string());
    return to_uint256(res);
 }
 

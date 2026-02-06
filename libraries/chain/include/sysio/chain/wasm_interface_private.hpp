@@ -96,7 +96,7 @@ struct sysvmoc_tier {
             runtime_interface = std::make_unique<webassembly::sysvmoc::sysvmoc_runtime>(data_dir, sysvmoc_config, d);
 #endif
          if(!runtime_interface)
-            SYS_THROW(wasm_exception, "${r} wasm runtime not supported on this platform and/or configuration", ("r", vm));
+            SYS_THROW(wasm_exception, "{} wasm runtime not supported on this platform and/or configuration", vm);
 
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(sysvmoc_tierup != wasm_interface::vm_oc_enable::oc_none) {
@@ -122,7 +122,7 @@ struct sysvmoc_tier {
                if (ec)
                   return;
                if (executing_code_hash.load() == code_id) {
-                  ilog("SYS VM OC tier up interrupting ${id}", ("id", code_id));
+                  ilog("SYS VM OC tier up interrupting {}", code_id);
                   sys_vm_oc_compile_interrupt = true;
                   main_thread_timer.interrupt_timer();
                }
@@ -158,7 +158,7 @@ struct sysvmoc_tier {
             }
             if (cd) {
                if (!context.is_applying_block()) // read_only_trx_test.py looks for this log statement
-                  tlog("${a} speculatively executing ${h} with sys vm oc", ("a", context.get_receiver())("h", code_hash));
+                  tlog("{} speculatively executing {} with sys vm oc", context.get_receiver(), code_hash);
                sysvmoc->exec->execute(*cd, *sysvmoc->mem, context);
                return;
             }
@@ -187,12 +187,12 @@ struct sysvmoc_tier {
          } catch (const interrupt_exception& e) {
             if (allow_oc_interrupt && sys_vm_oc_compile_interrupt && main_thread_timer.timer_state() == platform_timer::state_t::interrupted) {
                ++sys_vm_oc_compile_interrupt_count;
-               dlog("SYS VM OC compile complete interrupt of ${r} <= ${a}::${act} code ${h}, interrupt #${c}",
-                    ("r", context.get_receiver())("a", context.get_action().account)
-                    ("act", context.get_action().name)("h", code_hash)("c", sys_vm_oc_compile_interrupt_count));
-               SYS_THROW(interrupt_oc_exception, "SYS VM OC compile complete interrupt of ${r} <= ${a}::${act} code ${h}, interrupt #${c}",
-                    ("r", context.get_receiver())("a", context.get_action().account)
-                    ("act", context.get_action().name)("h", code_hash)("c", sys_vm_oc_compile_interrupt_count));
+               dlog("SYS VM OC compile complete interrupt of {} <= {}::{} code {}, interrupt #{}",
+                    context.get_receiver(), context.get_action().account,
+                    context.get_action().name, code_hash, sys_vm_oc_compile_interrupt_count);
+               SYS_THROW(interrupt_oc_exception, "SYS VM OC compile complete interrupt of {} <= {}::{} code {}, interrupt #{}",
+                         context.get_receiver(), context.get_action().account,
+                         context.get_action().name, code_hash, sys_vm_oc_compile_interrupt_count);
             }
             throw;
          }

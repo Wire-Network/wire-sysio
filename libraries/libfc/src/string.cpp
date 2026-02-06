@@ -29,7 +29,7 @@ int64_t to_int64(const std::string& i) {
    } catch (const boost::bad_lexical_cast& e) {
       FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse int64_t");
    }
-   FC_RETHROW_EXCEPTIONS(warn, "${i} => int64_t", ("i", i))
+   FC_RETHROW_EXCEPTIONS(warn, "{} => int64_t", i)
 }
 
 uint64_t to_uint64(const std::string& i) {
@@ -39,9 +39,9 @@ uint64_t to_uint64(const std::string& i) {
       } catch (const boost::bad_lexical_cast& e) {
          FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse uint64_t");
       }
-      FC_RETHROW_EXCEPTIONS(warn, "${i} => uint64_t", ("i", i))
+      FC_RETHROW_EXCEPTIONS(warn, "{} => uint64_t", i)
    }
-   FC_CAPTURE_AND_RETHROW((i))
+   FC_CAPTURE_AND_RETHROW("{}", i)
 }
 
 double to_double(const std::string& i) {
@@ -50,7 +50,7 @@ double to_double(const std::string& i) {
    } catch (const boost::bad_lexical_cast& e) {
       FC_THROW_EXCEPTION(parse_error_exception, "Couldn't parse double");
    }
-   FC_RETHROW_EXCEPTIONS(warn, "${i} => double", ("i", i))
+   FC_RETHROW_EXCEPTIONS(warn, "{} => double", i)
 }
 
 std::pair<std::string&, bool> escape_str(std::string& str, escape_control_chars escape_ctrl, std::size_t max_len,
@@ -88,7 +88,7 @@ std::pair<std::string&, bool> escape_str(std::string& str, escape_control_chars 
    return std::make_pair(std::ref(str), modified);
 }
 
-std::vector<std::string> split(const std::string& str, char delim, std::size_t max_split) {
+std::vector<std::string> split(std::string_view str, char delim, std::size_t max_split) {
    std::vector<std::string> out;
    std::string delim_str{&delim, 1};
    for (auto&& token : std::views::split(str, delim)) {

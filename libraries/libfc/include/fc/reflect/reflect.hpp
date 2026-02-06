@@ -7,6 +7,7 @@
  */
 
 #include <fc/utility.hpp>
+#include <fmt/format.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/preprocessor/seq/for_each.hpp>
 #include <boost/preprocessor/seq/enum.hpp>
@@ -427,3 +428,15 @@ template<BOOST_PP_SEQ_ENUM(TEMPLATE_ARGS)> struct reflector<TYPE> {\
 namespace fc { \
   template<> struct get_typename<TYPE>  { static const char* name()  { return BOOST_PP_STRINGIZE(TYPE);  } }; \
 }
+
+namespace fmt {
+
+template<typename T>
+struct formatter<T, std::enable_if_t<fc::reflector<T>::is_enum::value, char>> : formatter<std::string_view> {
+   auto format( const T& v, format_context& ctx ) const {
+      return formatter<std::string_view>::format( fc::reflector<T>::to_string( v ), ctx );
+   }
+};
+
+} // namespace fmt
+

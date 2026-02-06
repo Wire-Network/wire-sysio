@@ -3,8 +3,6 @@
 #include <sysio/chain/types.hpp>
 #include <sysio/wallet_plugin/wallet_api.hpp>
 
-#include <fc/crypto/base58.hpp>
-
 using namespace std;
 using namespace sysio::chain;
 
@@ -12,7 +10,7 @@ namespace sysio::wallet {
 
 struct wallet_data {
    vector<char> cipher_keys; /** encrypted keys */
-   std::size_t  version {0};
+   std::size_t  version {1};
 };
 
 namespace detail {
@@ -157,7 +155,7 @@ public:
    /**
     * Imports a WIF Private Key into the wallet to be used to sign transactions by an account.
     *
-    * example: import_key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+    * example: import_key PUB_K1_5ZJjuND9W4GYvf7nJoQQ59VvbvFYdDsi3HCR46Z8mZUqBo6TRw
     *
     * @param wif_key the WIF Private Key to import
     */
@@ -177,14 +175,22 @@ public:
     *
     * example: remove_key my-key-1
     *
-    * @param key_name the name assigned to the key
+    * @param name the name assigned to the key
+    */
+   bool remove_name(string name) override;
+
+   /** Removes a key from the wallet.
+    *
+    * example: remove_key PUB_K1_5ZJjuND9W4GYvf7nJoQQ59VvbvFYdDsi3HCR46Z8mZUqBo6TRw
+    *
+    * @param key the Public Key to remove
     */
    bool remove_key(string key_name) override;
 
    /**
     * Removes a key from the wallet.
     *
-    * example: remove_key SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+    * example: remove_key PUB_K1_5ZJjuND9W4GYvf7nJoQQ59VvbvFYdDsi3HCR46Z8mZUqBo6TRw
     *
     * @param key the Public Key to remove
     */
@@ -217,12 +223,6 @@ public:
 
 };
 
-struct plain_keys_v0 {
-   fc::sha512                             checksum;
-   map<public_key_type, private_key_type> keys;
-};
-
-
 struct plain_keys_v1 {
    fc::sha512                             checksum;
    map<public_key_type, private_key_type> keys;
@@ -234,4 +234,3 @@ struct plain_keys_v1 {
 FC_REFLECT(sysio::wallet::wallet_data, (cipher_keys))
 
 FC_REFLECT(sysio::wallet::plain_keys_v1, (checksum)(keys)(key_by_name))
-FC_REFLECT(sysio::wallet::plain_keys_v0, (checksum)(keys))

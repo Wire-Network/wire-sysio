@@ -102,22 +102,19 @@ struct log_catalog {
 
          // check if index file matches the log file
          if (!index_matches_data(index_path, log)) {
-            ilog("Recreating index for: ${i}", ("i", index_path.string()));
+            ilog("Recreating index for: {}", index_path.string());
             log.construct_index( index_path );
          }
 
          auto existing_itr = collection.find(log.first_block_num());
          if (existing_itr != collection.end()) {
             if (log.last_block_num() <= existing_itr->second.last_block_num) {
-               wlog("${log_path} contains the overlapping range with ${existing_path}.log, dropping ${log_path} "
-                    "from catalog",
-                    ("log_path", log_path.string())("existing_path", existing_itr->second.filename_base.string()));
+               wlog("{0} contains the overlapping range with {1}.log, dropping {0} from catalog",
+                    log_path.string(), existing_itr->second.filename_base.string());
                return;
             } else {
-               wlog(
-                   "${log_path} contains the overlapping range with ${existing_path}.log, droping ${existing_path}.log "
-                   "from catelog",
-                   ("log_path", log_path.string())("existing_path", existing_itr->second.filename_base.string()));
+               wlog("{0} contains the overlapping range with {1}.log, dropping {1}.log from catalog",
+                   log_path.string(), existing_itr->second.filename_base.string());
             }
          }
 
@@ -224,8 +221,7 @@ struct log_catalog {
          std::filesystem::rename(old_name, new_name);
       } else {
          std::filesystem::remove(old_name);
-         wlog("${new_name} already exists, just removing ${old_name}",
-              ("old_name", old_name.string())("new_name", new_name.string()));
+         wlog("{} already exists, just removing {}", new_name.string(), old_name.string());
       }
    }
 

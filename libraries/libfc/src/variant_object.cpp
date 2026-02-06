@@ -85,7 +85,7 @@ namespace fc
    {
       auto itr = find( key );
       if( itr != end() ) return itr->value();
-      FC_THROW_EXCEPTION( key_not_found_exception, "Key ${key}", ("key",key) );
+      FC_THROW_EXCEPTION( key_not_found_exception, "Key {}", key );
    }
 
    size_t variant_object::size() const
@@ -238,7 +238,10 @@ namespace fc
       return end();
    }
 
-   bool   mutable_variant_object::contains( const char* key )  { return find(key) != end(); };
+   bool   mutable_variant_object::contains( const char* key )  { return find(key) != end(); }
+   bool mutable_variant_object::contains(const std::string& key) {
+      return contains(key.c_str());
+   };
 
    const variant& mutable_variant_object::operator[]( const std::string& key )const
    {
@@ -249,7 +252,7 @@ namespace fc
    {
       auto itr = find( key );
       if( itr != end() ) return itr->value();
-      FC_THROW_EXCEPTION( key_not_found_exception, "Key ${key}", ("key",key) );
+      FC_THROW_EXCEPTION( key_not_found_exception, "Key {}", key );
    }
    variant& mutable_variant_object::operator[]( const std::string& key )
    {

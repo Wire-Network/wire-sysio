@@ -63,7 +63,7 @@ struct response_test_fixture {
     */
    response_test_fixture()
    : response_impl(mock_logfile_provider(*this), mock_data_handler_provider(*this),
-                   [](const std::string& msg ){ fc_dlog( fc::logger::get(DEFAULT_LOGGER), msg );})
+                   [](const std::string& msg ){ fc_dlog( fc::logger::default_logger(), "{}", msg );})
    {
 
    }

@@ -3,31 +3,85 @@
 #include <fc/crypto/public_key.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/signature.hpp>
-#include <fc/utility.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/utility.hpp>
+#include <fc/variant.hpp>
 
 using namespace fc::crypto;
 using namespace fc;
 
 BOOST_AUTO_TEST_SUITE(cypher_suites)
+
+BOOST_AUTO_TEST_CASE(test_parse) try {
+
+} FC_LOG_AND_RETHROW();
+
 BOOST_AUTO_TEST_CASE(test_k1) try {
    auto private_key_string = std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
-   auto expected_public_key = std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
-   auto test_private_key = private_key(private_key_string);
+   auto expected_public_key_string = std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV");
+   auto test_private_key = private_key::from_string(private_key_string);
    auto test_public_key = test_private_key.get_public_key();
+   auto expected_public_key = public_key::from_string(expected_public_key_string);
 
    BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}));
-   BOOST_CHECK_EQUAL(expected_public_key, test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key_string, test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key.to_string({}), test_public_key.to_string({}));
+
+   fc::variant test_pubkey_variant{test_public_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(test_public_key.to_string({}), test_public_key2.to_string({}));
+
+   fc::variant test_privkey_variant{test_private_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(test_private_key.to_string({}), test_private_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_k1_alt) try {
+   auto private_key_string = std::string("PVT_K1_2Nb6TgdiEJopY3dCFYhrA46NzXC3DSWzznes1Dc71oWF29tJTt");
+   auto expected_public_key_string = std::string("PUB_K1_8mycTeevEWPgQhjMM9QcLyGmpc93pLQrhD9hJVmMiAP9WH6jd8");
+   auto test_private_key = private_key::from_string(private_key_string);
+   auto test_public_key = test_private_key.get_public_key();
+   auto expected_public_key = public_key::from_string(expected_public_key_string);
+
+   // to_string generates legacy format by default
+   BOOST_CHECK_EQUAL("5KBsg98ingso5YRuESzbwCoDbbM7FMJbiorS6BGMLtf9QgL2bS9", test_private_key.to_string({}));
+   BOOST_CHECK_EQUAL("SYS8mycTeevEWPgQhjMM9QcLyGmpc93pLQrhD9hJVmMiAP9WyPhdD", test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key_string, test_public_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(expected_public_key.to_string({}), test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key.to_string({}, true), test_public_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}, true));
+
+   fc::variant test_pubkey_variant{test_public_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(test_public_key.to_string({}, true), test_public_key2.to_string({}, true));
+
+   fc::variant test_privkey_variant{test_private_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(test_private_key.to_string({}, true), test_private_key2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_r1) try {
    auto private_key_string = std::string("PVT_R1_iyQmnyPEGvFd8uffnk152WC2WryBjgTrg22fXQryuGL9mU6qW");
-   auto expected_public_key = std::string("PUB_R1_6EPHFSKVYHBjQgxVGQPrwCxTg7BbZ69H9i4gztN9deKTEXYne4");
-   auto test_private_key = private_key(private_key_string);
+   auto expected_public_key_string = std::string("PUB_R1_6EPHFSKVYHBjQgxVGQPrwCxTg7BbZ69H9i4gztN9deKTEXYne4");
+   auto test_private_key = private_key::from_string(private_key_string);
    auto test_public_key = test_private_key.get_public_key();
+   auto expected_public_key = public_key::from_string(expected_public_key_string);
 
    BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}));
-   BOOST_CHECK_EQUAL(expected_public_key, test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key_string, test_public_key.to_string({}));
+   BOOST_CHECK_EQUAL(expected_public_key.to_string({}), test_public_key.to_string({}));
+   // always includes prefix
+   BOOST_CHECK_EQUAL(private_key_string, test_private_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(expected_public_key_string, test_public_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(expected_public_key.to_string({}), test_public_key.to_string({}, true));
+
+   fc::variant test_pubkey_variant{test_public_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(test_public_key.to_string({}), test_public_key2.to_string({}));
+
+   fc::variant test_privkey_variant{test_private_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(test_private_key.to_string({}), test_private_key2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_k1_recovery) try {
@@ -38,9 +92,15 @@ BOOST_AUTO_TEST_CASE(test_k1_recovery) try {
    auto sig = key.sign(digest);
 
    auto recovered_pub = public_key(sig, digest);
-   std::cout << recovered_pub.to_string({}) << std::endl;
 
    BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}), fc::crypto::signature::from_string(sig.to_string({})).to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}, true), fc::crypto::signature::from_string(sig.to_string({}, true)).to_string({}, true));
+
+   fc::variant sig_variant{sig};
+   signature sig2 = sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}, true), sig2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_r1_recovery) try {
@@ -51,18 +111,22 @@ BOOST_AUTO_TEST_CASE(test_r1_recovery) try {
    auto sig = key.sign(digest);
 
    auto recovered_pub = public_key(sig, digest);
-   std::cout << recovered_pub.to_string({}) << std::endl;
 
    BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}), fc::crypto::signature::from_string(sig.to_string({})).to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}, true), fc::crypto::signature::from_string(sig.to_string({}, true)).to_string({}, true));
+
+   fc::variant sig_variant{sig};
+   signature sig2 = sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}, true), sig2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_k1_recyle) try {
    auto key = private_key::generate<ecc::private_key_shim>();
    auto pub = key.get_public_key();
    auto pub_str = pub.to_string({});
-   auto recycled_pub = public_key(pub_str);
-
-   std::cout << pub.to_string({}) << " -> " << recycled_pub.to_string({}) << std::endl;
+   auto recycled_pub = public_key::from_string(pub_str);
 
    BOOST_CHECK_EQUAL(pub.to_string({}), recycled_pub.to_string({}));
 } FC_LOG_AND_RETHROW();
@@ -71,9 +135,7 @@ BOOST_AUTO_TEST_CASE(test_r1_recyle) try {
    auto key = private_key::generate<r1::private_key_shim>();
    auto pub = key.get_public_key();
    auto pub_str = pub.to_string({});
-   auto recycled_pub = public_key(pub_str);
-
-   std::cout << pub.to_string({}) << " -> " << recycled_pub.to_string({}) << std::endl;
+   auto recycled_pub = public_key::from_string(pub_str);
 
    BOOST_CHECK_EQUAL(pub.to_string({}), recycled_pub.to_string({}));
 } FC_LOG_AND_RETHROW();
@@ -84,13 +146,48 @@ BOOST_AUTO_TEST_CASE(test_em) try {
    auto priv_str = key.to_string({});
    auto pub_str = pub.to_string({});
 
-   auto recycled_priv = fc::crypto::private_key(priv_str);
+   auto recycled_priv = fc::crypto::private_key::from_string(priv_str, private_key::key_type::em);
    auto recycled_pub = recycled_priv.get_public_key();
+   auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::em);
 
    BOOST_CHECK_EQUAL(priv_str, recycled_priv.to_string({}));
    BOOST_CHECK_EQUAL(pub_str, recycled_pub.to_string({}));
-   BOOST_TEST(pub.to_string({}).starts_with("PUB_EM_"));
-   BOOST_TEST(key.to_string({}).starts_with("PVT_EM_"));
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}));
+   BOOST_TEST(pub.to_string({}).starts_with("0x"));
+   BOOST_TEST(key.to_string({}).starts_with("0x"));
+
+   fc::variant test_pubkey_variant{pub};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub.to_string({}), test_public_key2.to_string({}));
+
+   fc::variant test_privkey_variant{key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(key.to_string({}), test_private_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_em_alt) try {
+   auto key = fc::crypto::private_key::generate<em::private_key_shim>();
+   auto pub = key.get_public_key();
+   auto priv_str = key.to_string({}, true);
+   auto pub_str = pub.to_string({}, true);
+
+   auto recycled_priv = fc::crypto::private_key::from_string(priv_str);
+   auto recycled_pub = recycled_priv.get_public_key();
+   auto pub_key = fc::crypto::public_key::from_string(pub_str);
+
+   BOOST_CHECK_EQUAL(priv_str, recycled_priv.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_str, recycled_pub.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}, true));
+   BOOST_TEST(pub.to_string({}, true).starts_with("PUB_EM_"));
+   BOOST_TEST(key.to_string({}, true).starts_with("PVT_EM_"));
+
+   fc::variant test_pubkey_variant{pub};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub.to_string({}, true), test_public_key2.to_string({}, true));
+
+   fc::variant test_privkey_variant{key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(key.to_string({}, true), test_private_key2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em_recovery) try {
@@ -106,8 +203,15 @@ BOOST_AUTO_TEST_CASE(test_em_recovery) try {
    auto recovered_pub = public_key(em::public_key_shim(sig.get<em::signature_shim>().recover_ex(payload, true)));
 
    BOOST_CHECK_EQUAL(recovered_pub.to_string({}), pub.to_string({}));
-   BOOST_CHECK_EQUAL(sig_str, fc::crypto::signature(sig_str).to_string({}));
-   BOOST_TEST(sig_str.starts_with("SIG_EM_"));
+   BOOST_CHECK_EQUAL(sig_str, fc::crypto::signature::from_string(sig_str, fc::crypto::signature::sig_type::em).to_string({}));
+   auto alt_sig_str = sig.to_string({}, true);
+   BOOST_TEST(alt_sig_str.starts_with("SIG_EM_"));
+   BOOST_CHECK_EQUAL(alt_sig_str, fc::crypto::signature::from_string(alt_sig_str).to_string({}, true));
+
+   fc::variant sig_variant{sig};
+   signature sig2 = sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   BOOST_CHECK_EQUAL(sig.to_string({}, true), sig2.to_string({}, true));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
@@ -123,6 +227,84 @@ BOOST_AUTO_TEST_CASE(test_em_is_canonical) try {
 
    BOOST_TEST(em::public_key::is_canonical(sig.get<em::signature_shim>()._data));
    BOOST_TEST(!em::public_key::is_canonical(non_canonical.get<em::signature_shim>()._data));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_ed_pub_str) try {
+   auto pub_str = "5oNDL3swdJJF1g9DzJiZ4ynHXgszjAEpUkxVYejchzrY";
+   auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::ed);
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}));
+   BOOST_TEST(pub_key.to_string({}, true).starts_with("PUB_ED_"));
+   BOOST_TEST(pub_key.to_string({}, true).ends_with(pub_str));
+   auto pub_key2 = fc::crypto::public_key::from_string(pub_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), pub_key2.to_string({}));
+   fc::variant test_pubkey_variant{pub_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), test_public_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_ed_priv_str) try {
+   auto priv_str = "4YFq9y5f5hi77Bq8kDCE6VgqoAqKGSQN87yW9YeGybpNfqKUG4WxnwhboHGUeXjY7g8262mhL1kCCM9yy8uGvdj7";
+   auto priv_key = fc::crypto::private_key::from_string(priv_str, private_key::key_type::ed);
+   BOOST_CHECK_EQUAL(priv_str, priv_key.to_string({}));
+   BOOST_TEST(priv_key.to_string({}, true).starts_with("PVT_ED_"));
+   BOOST_TEST(priv_key.to_string({}, true).ends_with(priv_str));
+   auto priv_key2 = fc::crypto::private_key::from_string(priv_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), priv_key2.to_string({}));
+   fc::variant test_privkey_variant{priv_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), test_private_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_ed_sig_str) try {
+   auto sig_str = "4cdd1oX7cfVALfr26tP52BZ6cSzrgnNGtYD7BFhm6FFeZV5sPTnRvg6NRn8yC6DbEikXcrNChBM5vVJnTgKhGhVu";
+   auto sig = fc::crypto::signature::from_string(sig_str, signature::sig_type::ed);
+   BOOST_CHECK_EQUAL(sig_str, sig.to_string({}));
+   BOOST_TEST(sig.to_string({}, true).starts_with("SIG_ED_"));
+   BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
+   auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   fc::variant test_sig_variant{sig};
+   signature test_sig2 = test_sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_pub_str) try {
+   auto pub_str = "PUB_BLS_no1gZTuy-0iL_FVrc6q4ow5KtTtdv6ZQ3Cq73Jwl32qRNC9AEQaWsESaoN4Y9NAVRmRGnbEekzgo6YlwbztPeoWhWzvHiOALTFKegRXlRxVbM4naOg33cZOSdS25i_MXywteRA";
+   auto pub_key = fc::crypto::public_key::from_string(pub_str, public_key::key_type::bls);
+   BOOST_CHECK_EQUAL(pub_str, pub_key.to_string({}));
+   BOOST_TEST(pub_key.to_string({}, true).starts_with("PUB_BLS_"));
+   BOOST_TEST(pub_key.to_string({}, true).ends_with(pub_str));
+   auto pub_key2 = fc::crypto::public_key::from_string(pub_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), pub_key2.to_string({}));
+   fc::variant test_pubkey_variant{pub_key};
+   public_key test_public_key2 = test_pubkey_variant.as<public_key>();
+   BOOST_CHECK_EQUAL(pub_key.to_string({}), test_public_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_priv_str) try {
+   auto priv_str = "PVT_BLS_y_iMu9QYlZXK_Cdb-NEfSOQfJeWzm1-f-7p6V5MsiwsL1SQr";
+   auto priv_key = fc::crypto::private_key::from_string(priv_str, private_key::key_type::bls);
+   BOOST_CHECK_EQUAL(priv_str, priv_key.to_string({}));
+   BOOST_TEST(priv_key.to_string({}, true).starts_with("PVT_BLS_"));
+   BOOST_TEST(priv_key.to_string({}, true).ends_with(priv_str));
+   auto priv_key2 = fc::crypto::private_key::from_string(priv_key.to_string({}, true));
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), priv_key2.to_string({}));
+   fc::variant test_privkey_variant{priv_key};
+   private_key test_private_key2 = test_privkey_variant.as<private_key>();
+   BOOST_CHECK_EQUAL(priv_key.to_string({}), test_private_key2.to_string({}));
+} FC_LOG_AND_RETHROW();
+
+BOOST_AUTO_TEST_CASE(test_bls_sig_str) try {
+   auto sig_str = "SIG_BLS_Mo64VWr_Wxg6E1Tfsh0X_gTlBRce4P8qezw7-ylE6ydXDTzlzd8tmrKUMIEIN8YD2D0C68Fs0KrNuV_NVCDKn_lhnYuO6-X0WnwX6eIcQRdESO106gyTe-HPg13kAgUAV4sWdsR7ZNyEPft48-KWoTyyhpnhI0RPoy9ddooXob2jUAvICmQwwPpu_fTuJo8OQ02rBQdgux6jEw9b9TkVZCTrL3kznQvhbrbQxjhv3L-IPx6tthhiRKxgYKM8vFoF4aO-QQ";
+   auto sig = fc::crypto::signature::from_string(sig_str, signature::sig_type::bls);
+   BOOST_CHECK_EQUAL(sig_str, sig.to_string({}));
+   BOOST_TEST(sig.to_string({}, true).starts_with("SIG_BLS_"));
+   BOOST_TEST(sig.to_string({}, true).ends_with(sig_str));
+   auto sig2 = fc::crypto::signature::from_string(sig.to_string({}, true));
+   BOOST_CHECK_EQUAL(sig.to_string({}), sig2.to_string({}));
+   fc::variant test_sig_variant{sig};
+   signature test_sig2 = test_sig_variant.as<signature>();
+   BOOST_CHECK_EQUAL(sig.to_string({}), test_sig2.to_string({}));
 } FC_LOG_AND_RETHROW();
 
 BOOST_AUTO_TEST_SUITE_END()

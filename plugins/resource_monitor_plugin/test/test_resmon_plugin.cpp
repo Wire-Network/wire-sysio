@@ -2,6 +2,8 @@
 #include <boost/test/included/unit_test.hpp>
 
 #include <fc/variant_object.hpp>
+#include <fc/filesystem.hpp>
+#include <sysio/chain/exceptions.hpp>
 
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 
@@ -26,7 +28,7 @@ struct resmon_fixture {
       // We only have at most 3 arguments. OK to hardcodied in test
       // programs.
       const char* argv[10];
-      SYS_ASSERT(args.size() < 10, chain::plugin_exception, "number of arguments  (${size}) must be less than 10", ("size", args.size()));
+      SYS_ASSERT(args.size() < 10, chain::plugin_exception, "number of arguments ({}) must be less than 10", args.size());
 
       // argv[0] is program name, no need to fill in
       for (size_t i=0; i<args.size(); ++i) {
