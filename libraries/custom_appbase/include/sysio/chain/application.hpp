@@ -1,3 +1,5 @@
+#pragma once
+
 #include <sysio/chain/priority_queue_executor.hpp>
 
 namespace appbase {
