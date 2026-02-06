@@ -133,7 +133,7 @@ inline void generate_zsh_completion(const CLI::App& app) {
    gather(app, subs, opts, positionals);
 
    std::cout << "#compdef clio\n"
-      << "# Install: Place in a directory in your $fpath (e.g., ~/.config/zsh/completions/)\n\n"
+      << "# Install: Place in a directory in your $PATH (e.g., ~/.config/zsh/completions/)\n\n"
       << "_clio() {\n"
       << "    local -a commands\n"
       << "    commands=(\n";
