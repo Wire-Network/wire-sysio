@@ -32,7 +32,6 @@ using namespace sysio::resource_monitor;
 
 
 namespace sysio {
-   static auto _resource_monitor_plugin = application::register_plugin<resource_monitor_plugin>();
 
 class resource_monitor_plugin_impl {
 public:

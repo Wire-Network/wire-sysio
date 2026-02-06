@@ -13,8 +13,6 @@ namespace sysio {
 
    using namespace prometheus;
 
-   static auto _prometheus_plugin = application::register_plugin<prometheus_plugin>();
-
    struct prometheus_plugin_impl {
 
       sysio::chain::named_thread_pool<struct prom> _prometheus_thread_pool;

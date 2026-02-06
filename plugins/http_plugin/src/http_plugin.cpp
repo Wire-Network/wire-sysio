@@ -22,8 +22,6 @@ namespace sysio {
       }
    }
 
-   static auto _http_plugin = application::register_plugin<http_plugin>();
-
    using std::vector;
    using std::string;
    using std::regex;

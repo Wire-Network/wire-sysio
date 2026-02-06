@@ -3,9 +3,6 @@
 #include <sysio/batch_operator_plugin/batch_operator_plugin.hpp>
 
 namespace sysio {
-namespace {
-[[maybe_unused]] auto _batch_operator_plugin = application::register_plugin<batch_operator_plugin>();
-} // namespace
 
 void batch_operator_plugin::set_program_options(options_description &cli,
                                                 options_description &cfg) {}
