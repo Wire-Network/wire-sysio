@@ -296,7 +296,7 @@ namespace sysio::chain {
       }
 
       init();
-      if ( !is_read_only() ) {
+      if ( !is_read_only() && trx.expiration.to_time_point() >= control.pending_lib_time() ) {
          record_transaction( packed_trx.id(), trx.expiration );
       }
    }

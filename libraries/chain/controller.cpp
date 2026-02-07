@@ -687,6 +687,7 @@ struct controller_impl {
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
    named_thread_pool<chain>        thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
+   fc::time_point                  pending_lib_time;  // used to skip dedup for expired trxs
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
    async_t                         async_voting = async_t::yes;  // by default we post `create_and_send_vote_msg()` calls, used in tester
@@ -1018,7 +1019,8 @@ struct controller_impl {
                      lib_num, fork_db_root_block_num() );
       }
 
-      auto pending_lib_id = fork_db_.pending_savanna_lib_id();
+      auto [pending_lib_id, pending_lib_ts] = fork_db_.pending_savanna_lib();
+      pending_lib_time = pending_lib_ts.to_time_point();
 
       const block_id_type new_lib_id = pending_lib_id;
       const block_num_type new_lib_num = block_header::num_from_id(new_lib_id);
@@ -3518,8 +3520,8 @@ struct controller_impl {
       return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
    }
 
-   void set_savanna_lib_id(const block_id_type& id) {
-      fork_db_.set_pending_savanna_lib_id(id);
+   void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
+      fork_db_.set_pending_savanna_lib(id, timestamp);
    }
 
    std::optional<finality_data_t> head_finality_data() const {
@@ -4146,6 +4148,10 @@ time_point controller::pending_block_time()const {
    return my->pending_block_time();
 }
 
+time_point controller::pending_lib_time()const {
+   return my->pending_lib_time;
+}
+
 uint32_t controller::pending_block_num()const {
    SYS_ASSERT( my->pending, block_validate_exception, "no pending block" );
    return my->pending->block_num();
@@ -4170,8 +4176,8 @@ bool controller::is_head_descendant_of_pending_lib() const {
 }
 
 
-void controller::set_savanna_lib_id(const block_id_type& id) {
-   my->set_savanna_lib_id(id);
+void controller::set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
+   my->set_savanna_lib(id, timestamp);
 }
 
 bool controller::fork_db_has_root() const {

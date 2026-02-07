@@ -310,6 +310,7 @@ namespace sysio::chain {
 
          time_point                     pending_block_time()const;
          block_timestamp_type           pending_block_timestamp()const;
+         time_point                     pending_lib_time()const;
          account_name                   pending_block_producer()const;
          const block_signing_authority& pending_block_signing_authority()const;
          std::optional<block_id_type>   pending_producer_block_id()const;
@@ -342,7 +343,7 @@ namespace sysio::chain {
          bool is_head_descendant_of_pending_lib() const;
 
          // thread-safe
-         void set_savanna_lib_id(const block_id_type& id);
+         void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp);
 
          // thread-safe
          bool         fork_db_has_root() const;
