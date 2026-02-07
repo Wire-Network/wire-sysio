@@ -215,7 +215,9 @@ namespace sysio::chain {
          // validate account net with objective net_usage_leeway
          for (auto& [account, bill] : accounts_billing) {
             verify_net_usage(account, bill.net_usage, cfg.net_usage_leeway);
-            std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+            if (!explicit_billed_cpu_time) {
+               std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+            }
          }
       }
 
@@ -414,7 +416,9 @@ namespace sysio::chain {
       constexpr uint32_t net_leeway = 0;
       for (auto& [account, bill]: accounts_billing) {
          verify_net_usage(account, bill.net_usage, net_leeway);
-         std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+         if (!explicit_billed_cpu_time) {
+            std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+         }
       }
 
       auto now = fc::time_point::now();
