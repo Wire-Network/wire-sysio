@@ -452,12 +452,11 @@ struct building_block {
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
                        auto trx_f = post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
-                       auto act_f = post_async_task(ioc, [&]() { return calculate_merkle(action_receipts.digests_s); });
-                       return std::make_pair(trx_f.get(), act_f.get());
+                       auto act_mroot = calculate_merkle(action_receipts.digests_s);
+                       return std::make_pair(trx_f.get(), act_mroot);
                     },
                     [&](const checksum256_type& trx_checksum) {
-                       return std::make_pair(trx_checksum,
-                                             calculate_merkle(action_receipts.digests_s));
+                       return std::make_pair(trx_checksum, calculate_merkle(action_receipts.digests_s));
                     }},
          trx_mroot_or_receipt_digests());
 
