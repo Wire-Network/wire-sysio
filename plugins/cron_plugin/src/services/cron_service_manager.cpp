@@ -85,12 +85,12 @@ void cron_service_manager::start_all() {
    // This method exists for API symmetry with stop_all().
 }
 
-const std::vector<cron_service_ptr> cron_service_manager::all() const {
+std::vector<cron_service_ptr> cron_service_manager::all() const {
    auto rv = _services.readable();
    return rv.values();
 }
 
-const std::vector<std::string> cron_service_manager::all_names() const {
+std::vector<std::string> cron_service_manager::all_names() const {
    auto rv = _services.readable();
    return rv.keys();
 }

@@ -7,7 +7,6 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 
-// namespace solana_net = fc::network::solana;
 using namespace fc::network::solana;
 using namespace fc::crypto::solana;
 
