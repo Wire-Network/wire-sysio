@@ -50,22 +50,22 @@ public:
    struct job_schedule {
       /// An exact match for a single value (e.g. "30" in the minutes field).
       struct exact_value {
-         std::uint64_t value;
+         std::uint64_t value{};
          auto operator<=>(const exact_value&) const = default;
          bool operator==(const exact_value&) const = default;
       };
 
       /// A step expression representing "every N" (e.g. "*/15" in the minutes field).
       struct step_value {
-         std::uint64_t step;
+         std::uint64_t step{};
          auto operator<=>(const step_value&) const = default;
          bool operator==(const step_value&) const = default;
       };
 
       /// A range expression (e.g. "1-5" in the day_of_week field).
       struct range_value {
-         std::uint64_t from;
-         std::uint64_t to;
+         std::uint64_t from{};
+         std::uint64_t to{};
          auto operator<=>(const range_value&) const = default;
          bool operator==(const range_value&) const = default;
       };
@@ -128,8 +128,9 @@ public:
       std::atomic_bool cancelled{false};
 
       // Pre-computed upcoming trigger times (chronological order).
-      std::vector<time_point> upcoming_triggers;
-      std::mutex triggers_mutex;
+      std::mutex triggers_mutex{};
+      std::vector<time_point> upcoming_triggers{};
+
    };
 
    // -----------------------------------------------------------------------

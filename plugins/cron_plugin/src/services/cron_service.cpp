@@ -28,6 +28,8 @@ std::set<std::uint64_t> cron_service::job_schedule::expand_field(const std::set<
                if (v.value >= min_val && v.value <= max_val)
                   result.insert(v.value);
             } else if constexpr (std::is_same_v<T, step_value>) {
+               if (v.step <= 10)
+                  wlog("step value is <= 10ms, this may cause excessive CPU usage");
                if (v.step == 0)
                   return;
                for (auto i = min_val; i <= max_val; i += v.step)
