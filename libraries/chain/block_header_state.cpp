@@ -330,6 +330,7 @@ void finish_next(const block_header_state& prev,
                  block_header_state& next_header_state,
                  vector<digest_type> new_protocol_feature_activations,
                  finality_extension f_ext,
+                 const block_ref& parent_block_ref,
                  bool log) { // only log on assembled blocks, to avoid double logging
    // activated protocol features
    // ---------------------------
@@ -356,8 +357,7 @@ void finish_next(const block_header_state& prev,
 
    // finality_core
    // -------------
-   block_ref parent_block = prev.make_block_ref();
-   next_header_state.core = prev.core.next(parent_block, f_ext.qc_claim);
+   next_header_state.core = prev.core.next(parent_block_ref, f_ext.qc_claim);
 
    // finalizer policy
    // ----------------
@@ -437,7 +437,7 @@ void finish_next(const block_header_state& prev,
    }
 }
    
-block_header_state block_header_state::next(block_header_state_input& input) const {
+block_header_state block_header_state::next(block_header_state_input& input, const block_ref& parent_block_ref) const {
    block_header_state next_header_state;
 
    // header
@@ -489,7 +489,7 @@ block_header_state block_header_state::next(block_header_state_input& input) con
       );
    }
 
-   finish_next(*this, next_header_state, std::move(input.new_protocol_feature_activations), std::move(new_f_ext), true);
+   finish_next(*this, next_header_state, std::move(input.new_protocol_feature_activations), std::move(new_f_ext), parent_block_ref, true);
 
    return next_header_state;
 }
@@ -500,7 +500,7 @@ block_header_state block_header_state::next(block_header_state_input& input) con
  *  Given a signed block header, generate the expected template based upon the header time,
  *  then validate that the provided header matches the template.
  */
-block_header_state block_header_state::next(const signed_block_header& h, validator_t& validator) const {
+block_header_state block_header_state::next(const signed_block_header& h, validator_t& validator, const block_ref& parent_block_ref) const {
    auto producer = get_producer_for_block_at(h.timestamp).producer_name;
    
    SYS_ASSERT( h.previous == block_id, unlinkable_block_exception,
@@ -544,7 +544,7 @@ block_header_state block_header_state::next(const signed_block_header& h, valida
                  next_core_metadata.latest_qc_claim_block_num);
    };
 
-   finish_next(*this, next_header_state, std::move(new_protocol_feature_activations), f_ext, false);
+   finish_next(*this, next_header_state, std::move(new_protocol_feature_activations), f_ext, parent_block_ref, false);
 
    return next_header_state;
 }

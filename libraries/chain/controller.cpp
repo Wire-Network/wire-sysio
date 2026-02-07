@@ -498,7 +498,7 @@ struct building_block {
          std::move(bb.s_headers)
       };
 
-      auto bhs = bb.parent.next(bhs_input);
+      auto bhs = bb.parent.next(bhs_input, bb.parent.make_block_ref());
 
       std::optional<valid_t> valid; // used for producing
 
@@ -2951,7 +2951,8 @@ struct controller_impl {
                     const flat_set<digest_type>& cur_features,
                     const vector<digest_type>& new_features )
             { check_protocol_features( timestamp, cur_features, new_features ); },
-            skip_validate_signee
+            skip_validate_signee,
+            prev.make_block_ref()
       );
 
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
@@ -3081,7 +3082,7 @@ struct controller_impl {
             }
          }
 
-         auto bsp = std::make_shared<block_state>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
+         auto bsp = std::make_shared<block_state>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee, chain_head.internal()->make_block_ref());
 
          if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
             // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.

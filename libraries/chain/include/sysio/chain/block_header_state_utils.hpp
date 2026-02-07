@@ -45,8 +45,6 @@ namespace sysio::chain::detail {
       return producers[index];
    }
 
-   constexpr auto additional_sigs_eid = additional_block_signatures_extension::extension_id();
-
    /**
     * Given a complete signed block, extract the validated additional signatures if present;
     *
@@ -56,7 +54,7 @@ namespace sysio::chain::detail {
    inline vector<signature_type> extract_additional_signatures(const signed_block_ptr& b) {
       auto exts = b->validate_and_extract_extensions();
 
-      if (auto it = exts.find(additional_sigs_eid); it != exts.end()) {
+      if (auto it = exts.find(additional_block_signatures_extension::extension_id()); it != exts.end()) {
          auto& additional_sigs = std::get<additional_block_signatures_extension>(it->second);
          return std::move(additional_sigs.signatures);
       }

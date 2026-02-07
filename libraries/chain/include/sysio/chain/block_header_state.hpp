@@ -173,16 +173,11 @@ struct block_header_state : fc::reflect_init {
    const producer_authority_schedule& active_schedule_auth()  const { return active_proposer_policy->proposer_schedule; }
    const protocol_feature_activation_set_ptr& get_activated_protocol_features() const { return activated_protocol_features; }
 
-   block_header_state next(block_header_state_input& data) const;
-   block_header_state next(const signed_block_header& h, validator_t& validator) const;
+   block_header_state next(block_header_state_input& data, const block_ref& parent_block_ref) const;
+   block_header_state next(const signed_block_header& h, validator_t& validator, const block_ref& parent_block_ref) const;
 
    digest_type compute_base_digest() const;
    digest_type compute_finality_digest() const;
-
-   block_ref make_block_ref() const {
-      return block_ref{block_id, timestamp(), compute_finality_digest(), active_finalizer_policy->generation,
-                       pending_finalizer_policy ? pending_finalizer_policy->second->generation : 0};
-   }
 
    // Returns true if the block is a Savanna Genesis Block.
    // This method is applicable to any transition block which is re-classified as a Savanna block.
