@@ -15,7 +15,6 @@ int main(int argc, char** argv)
    chain::application exe{application_config{}};
 
    auto r = exe.init<
-      trace_api_plugin,
       resource_monitor_plugin,
       state_history_plugin,
       producer_plugin,
