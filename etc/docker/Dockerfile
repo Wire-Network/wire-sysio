@@ -191,7 +191,7 @@ RUN set -eux; \
       -DCMAKE_CXX_COMPILER="${CXX}" \
       -DCMAKE_AR="${CLANG_18_DIR}/bin/llvm-ar" \
       -DCMAKE_RANLIB="${CLANG_18_DIR}/bin/llvm-ranlib" \
-      -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+      -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
       -DENABLE_CCACHE=ON 
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
@@ -214,7 +214,7 @@ RUN env CC=${CC} CXX=${CXX} \
     -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DCMAKE_C_COMPILER=${CC} \
     -DCMAKE_CXX_COMPILER=${CXX} \
-    -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+    -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
     -DENABLE_CCACHE=ON
 
 RUN cmake --build . -- -j$(( $([[ "$(nproc)" -gt ${MAX_JOBS} ]] && echo ${MAX_JOBS} || nproc) - 1 ))
@@ -263,7 +263,7 @@ RUN env CC=${CC} CXX=${CXX} \
         -DCMAKE_TOOLCHAIN_FILE=${APP_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake \
         -DCMAKE_C_COMPILER=${CC} \
         -DCMAKE_CXX_COMPILER=${CXX} \
-        -DCMAKE_PREFIX_PATH="${LLVM_11_DIR};${CLANG_18_DIR}" \
+        -DCMAKE_PREFIX_PATH="${CLANG_18_DIR}" \
         -Dsysio_DIR=${APP_BUILD_DIR} \
         -DENABLE_CCACHE=ON
 
