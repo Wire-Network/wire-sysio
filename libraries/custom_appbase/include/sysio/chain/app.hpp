@@ -213,6 +213,9 @@ public:
 
          if (cfg_.enable_resource_monitor) {
 #if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
+            if (!app_->is_registered<resource_monitor_plugin>()) {
+               app_->register_plugin<resource_monitor_plugin>();
+            }
             if (auto resmon_plugin = app_->find_plugin<resource_monitor_plugin>()) {
                resmon_plugin->initialize(app_->get_options());
                resmon_plugin->monitor_directory(app_->data_dir());

@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(producer) {
             std::vector<const char*> argv =
                   {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
                    "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
-            app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
+            app->initialize<signature_provider_manager_plugin,chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
             app->startup();
             plugin_promise.set_value(
                   {app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()} );
