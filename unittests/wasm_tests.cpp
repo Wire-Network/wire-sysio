@@ -1787,7 +1787,12 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    auto ptrx = create_trx(0);
    // no limits, just verifying trx works
+#ifdef NDEBUG
    push_trx( ptrx, fc::time_point::maximum(), 0, false ); // non-explicit billing
+#else
+   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+   push_trx( ptrx, fc::time_point::maximum(), config::default_min_transaction_cpu_usage, true );
+#endif
 
    // setup account acc with large limits
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
@@ -2006,7 +2011,12 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    // first call will load wasm, pausing timer
    auto ptrx = create_trx(0);
    // no limits, verify trace values
+#ifdef NDEBUG
    auto trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
+#else
+   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+   auto trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage_t{100, 100, 100}, true );
+#endif
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
    // timer is paused while loading the contract, so elapsed is larger than billed
 
