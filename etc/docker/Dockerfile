@@ -1,22 +1,13 @@
 # Multi-stage Dockerfile
 # Stages:
 #   1) distro-deps   - Install OS-level toolchain and libraries (base for all other stages)
-#   2) source-deps   - Install source-built dependencies (CLANG 18 + LLVM 11) on top of distro-deps
+#   2) source-deps   - Build clang 18
 #   3) app-source-*  - Prepare application sources (from local context or remote repo)
 #   4) app-build-*   - Build the application from the chosen app-source-* stage
 #
 # Use `--target` at build time to select which final build stage to produce:
 #   docker build --target=app-build-local -t wire-sysio:local .
 #   docker build --target=app-build-repo  -t wire-sysio:repo  .
-
-# --- Stage 0: vendor-binutils-noble (Ubuntu 24.04) ---------------------------
-    # RUN apt-get update && \
-    #     apt-get install -y --download-only \
-    #         binutils \
-    #         binutils-x86-64-linux-gnu \
-    #         binutils-common && \
-    #     mkdir -p /opt/vendor/binutils && \
-    #     cp -v /var/cache/apt/archives/*.deb /opt/vendor/binutils/
 
 ARG UBUNTU_TAG=24.04
 FROM ubuntu:${UBUNTU_TAG} AS distro-deps
@@ -38,7 +29,6 @@ ENV APP_DEV_BUILD_DIR="${APP_DIR}/build/debug-docker"
 ENV CDT_DEV_BUILD_DIR="${CDT_DIR}/build/debug-docker"
 
 ENV CLANG_18_DIR=/opt/clang/clang-18
-ENV LLVM_11_DIR=/opt/llvm/llvm-11
 
 # vcpkg deterministic behavior (manifests/registries/versions + compiler tracking)
 ENV VCPKG_FEATURE_FLAGS=manifests,registries,versions,compilertracking
@@ -51,15 +41,6 @@ RUN apt-get update && \
         lsb-release \
         wget \
         software-properties-common
-
-# If we want to pin the same binutils version as Ubuntu 24 on Ubuntu 25+ we can add this back in.
-# Install identical Ubuntu-24 binutils on any base (24/25)
-# COPY --from=vendor-binutils-noble /opt/vendor/binutils /opt/vendor/binutils
-# RUN apt-get update && \
-#     apt-get install -y /opt/vendor/binutils/*.deb && \
-#     update-alternatives --set ld /usr/bin/ld.bfd || true && \
-#     apt-mark hold binutils binutils-x86-64-linux-gnu binutils-common && \
-#     ld --version | head -1 && ld.bfd -v
 
 # Build toolchain and development libraries (binutils intentionally omitted)
 RUN apt-get install -y \
@@ -99,8 +80,8 @@ RUN apt-get install -y \
 
 RUN mkdir -p /opt/ccache-storage && ccache -M 40GB -d /opt/ccache-storage
 
-# Stage 2a: clang18-build
-FROM distro-deps AS clang18-build
+# Stage 2: source-deps
+FROM distro-deps AS source-deps
 # Prepare build context for Clang 18 scripts
 RUN mkdir -p /opt/clang/scripts
 
@@ -128,21 +109,7 @@ ENV B2_TOOLSET=clang \
     VCPKG_CHAINLOAD_TOOLCHAIN_FILE=/opt/clang/clang18-vcpkg-toolchain.cmake \
     VCPKG_KEEP_ENV_VARS="CC;CXX;AR;RANLIB;B2_TOOLSET;VCPKG_CHAINLOAD_TOOLCHAIN_FILE"
 
-# Stage 2b: source-deps
-# Install dependencies built from source (LLVM 11) on top of clang-18-build.
-FROM clang18-build AS source-deps
-
-# Install LLVM 11 from provided scripts into /opt/llvm/llvm-11
-RUN mkdir -p /opt/llvm/scripts 
-# RUN mkdir -p LLVM_11_DIR
-
-# Build and install LLVM 11 using the helper script
-RUN --mount=type=bind,from=llvm-11-scripts,target=/opt/llvm/scripts \
-    BASE_DIR=/opt/llvm /opt/llvm/scripts/llvm-11-ubuntu-build-source.sh
-
 ENV MAX_JOBS=16
-ENV CC=${CLANG_18_DIR}/bin/clang
-ENV CXX=${CLANG_18_DIR}/bin/clang++
 
 # Stage 3a: app-source-local
 # Use local build context as the application source.
@@ -172,6 +139,8 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
+RUN sudo apt install -y gcc-10 g++-10
+
 RUN set -eux; \
   unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS || true; \
   rc=0; \

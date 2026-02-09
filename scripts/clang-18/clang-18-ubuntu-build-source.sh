@@ -12,7 +12,6 @@
 #   bash clang-18-ubuntu-build-source.sh
 #
 # Notes:
-#   * Mirrors style of llvm-11-ubuntu-build-source.sh (variables, Ninja, comments).
 set -euo pipefail
 
 BASE_DIR=${BASE_DIR:-$PWD}

@@ -60,8 +60,8 @@ cmake -S . \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_C_COMPILER=/opt/clang/clang-18/bin/clang-18 \
   -DCMAKE_CXX_COMPILER=/opt/clang/clang-18/bin/clang++ \
-  -DCMAKE_INSTALL_PREFIX=/opt/llvm/llvm-11 \
-  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18"
+  -DCMAKE_INSTALL_PREFIX=/opt/wire \
+  -DCMAKE_PREFIX_PATH="/opt/wire;/opt/clang/clang-18"
 
 cmake --build build/debug-docker -- -j"$(nproc)"
 
@@ -81,8 +81,8 @@ cmake -S . \
   -DCMAKE_BUILD_TYPE=Debug \
   -DCMAKE_C_COMPILER=/opt/clang/clang-18/bin/clang-18 \
   -DCMAKE_CXX_COMPILER=/opt/clang/clang-18/bin/clang++ \
-  -DCMAKE_INSTALL_PREFIX=/opt/llvm/llvm-11 \
-  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18"
+  -DCMAKE_INSTALL_PREFIX=/opt/wire \
+  -DCMAKE_PREFIX_PATH="/opt/wire;/opt/clang/clang-18"
 
 cmake --build build/debug-docker -- -j"$(nproc)"
 
