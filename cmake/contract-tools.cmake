@@ -51,5 +51,8 @@ function(contracts_target TARGET)
     INSTALL_COMMAND ""
     BUILD_ALWAYS 1
   )
+
+  # Expose the build step as a separate target for better dependency tracking
+  ExternalProject_Add_StepTargets(${TARGET} build)
 endfunction()
 
