@@ -14,12 +14,6 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-build \
     libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev
 
-
-# Build LLVM 11 from source (required for sys-vm-oc JIT)
-export BASE_DIR=/opt/llvm
-sudo mkdir -p "$BASE_DIR" && sudo chown "$USER":"$USER" "$BASE_DIR"
-./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-
 # Bootstrap vcpkg
 ./vcpkg/bootstrap-vcpkg.sh
 ```
@@ -42,7 +36,7 @@ cmake \
 -DENABLE_DISTCC=OFF \
 -DENABLE_TESTS=ON \
 -DCMAKE_INSTALL_PREFIX=/opt/prefixes/wire-001 \
--DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/prefixes/wire-001" \
+-DCMAKE_PREFIX_PATH="/opt/prefixes/wire-001" \
 -DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 export NUM_JOBS=$(echo $(($(nproc) - 2)))
@@ -149,7 +143,7 @@ Format code: `clang-format -i <file>`
 Three WASM execution runtimes available (x86_64 Linux):
 - `sys-vm` - Standard interpreter
 - `sys-vm-jit` - JIT compiled
-- `sys-vm-oc` - LLVM-optimized JIT (requires LLVM 11)
+- `sys-vm-oc` - LLVM-optimized JIT
 
 Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `-- --sys-vm-jit`, or `-- --sys-vm-oc`.
 

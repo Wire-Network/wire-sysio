@@ -32,12 +32,10 @@ cd wire-sysio
 You will need to build on a [supported operating system](README.md#supported-operating-systems) with the following tools and libraries available:
 
 - **Clang 18 (C++20 compiler)** – A C++20 capable compiler. Wire Sysio is developed and tested with Clang 18 (LLVM 18).
-- **LLVM 11 libraries** – If not available as a package (Ubuntu 24+), LLVM 11 must be built from source (see **Step 1c**).
 - **CMake 3.16+** – Build system generator.
 - **libcurl 7.40.0+** – HTTP client library.
 - **GMP** – Arbitrary precision arithmetic library.
 - **Python 3** – Python is needed for some build steps and tools.
-- **zlib** – Compression library.
 - **git** – Version control, used for fetching submodules.
 
 Other standard development tools and libraries (build essentials, SSL, Boost, etc.) are needed as well. These will be installed in the steps below.
@@ -124,30 +122,7 @@ command -v clang++-18 && clang++-18 --version
 export CC=$(command -v clang-18)
 export CXX=$(command -v clang++-18)
 ```
-
-### 1c. Install LLVM 11
-
-Wire Sysio depends on **LLVM 11**. On modern systems (Ubuntu 24.04+), you will need to build LLVM 11 from source, since it’s not available in the apt repositories.
-
-Use our helper script to build and install LLVM 11:
-
-```bash
-# Choose an installation base directory for LLVM 11
-export BASE_DIR=/opt/llvm    # (you can choose a different directory if desired)
-
-# Build and install LLVM 11 from source
-sudo mkdir -p "$BASE_DIR"; sudo chown "$USER":"$USER" "$BASE_DIR"
-./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-
-# or:
-sudo --preserve-env=BASE_DIR ./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
-```
-
-This will download the LLVM 11 source code, compile it, and install the libraries and tools to `$BASE_DIR/llvm-11`. (By default, the script places the final installation in `/opt/llvm/llvm-11` if `BASE_DIR=/opt/llvm`.) 
-
-> **IMPORTANT:** Remember the installation path of LLVM 11 – you will need to supply it to CMake in the build step. For example, `-DCMAKE_PREFIX_PATH=${BASE_DIR}/llvm-11`. 
-
-### 1d. Bootstrap vcpkg
+### 1c. Bootstrap vcpkg
 
 Wire Sysio uses the **vcpkg** package manager for managing third-party dependencies. After installing the required system packages above, you must bootstrap vcpkg from the root of the cloned `wire-sysio` repository:
 
@@ -185,7 +160,7 @@ cmake -B build -S . -G Ninja \
   -DCMAKE_CXX_COMPILER="$CXX" \
   -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18" \
+  -DCMAKE_PREFIX_PATH="/opt/clang/clang-18" \
   -DENABLE_CCACHE=ON
 ```
 
@@ -195,7 +170,7 @@ In the above command:
 - `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` are pointed to Clang 18 (from Step 1b).
 - `CMAKE_TOOLCHAIN_FILE` points to the vcpkg toolchain file, so CMake will integrate vcpkg dependencies automatically.
 - `CMAKE_BUILD_TYPE=Release` produces an optimized build. (You can use `Debug` for development, etc.)
-- **CMAKE_PREFIX_PATH** is set to the locations of LLVM 11 and Clang 18 installations. This is crucial so CMake can find LLVM 11's headers/libraries. Adjust the paths if you installed to a different prefix or if you installed Clang 18 via apt (e.g., apt installs might be under `/usr/lib/llvm-18`). Separate multiple paths with semicolons. In this example, we use `/opt/llvm/llvm-11` (from Step 1c) and `/opt/clang/clang-18` (from Step 1b).
+- `CMAKE_PREFIX_PATH` is set to install location where you plan to install the CDT tooling (if not the system prefix `/usr`).
 - `ENABLE_CCACHE=ON` will use **ccache** to cache compilation results (if `ccache` is installed). This can significantly speed up rebuilds. You can omit this or set `OFF` if you do not have ccache or do not want to use it.
 
 If CMake configuration is successful, it will generate the build files in the `build/` directory. Now proceed to compile:
@@ -248,7 +223,7 @@ Choose **either** method A or B according to your preference. Method A (deb pack
 
 # Docker Container
 
-Wire Sysio also provides a Docker-based build environment for convenience. This is the easiest way to build and run Wire Sysio without manually installing all dependencies, as the Dockerfile encapsulates all requirements (including Clang 18, LLVM 11, etc.) and build steps.
+Wire Sysio also provides a Docker-based build environment for convenience. This is the easiest way to build and run Wire Sysio without manually installing all dependencies, as the Dockerfile encapsulates all requirements (including Clang 18, etc.) and build steps.
 
 The provided Docker setup supports building on any modern 64-bit Linux or Apple Silicon (arm64) host that can run Docker (x86_64, arm64/aarch64). The container will produce Wire Sysio binaries for the same architecture as the host.
 
