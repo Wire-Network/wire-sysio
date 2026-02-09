@@ -16,6 +16,8 @@ trx_priority::~trx_priority() {
 
 void trx_priority::addtrxp(name receiver, name action_name, trx_match_type match_type, short priority) {
    require_auth( get_self() );
+   sysio::check(receiver.value != 0, "receiver cannot be empty");
+   sysio::check(match_type <= trx_match_type::any, "Invalid match type");
 
    trx_priority_table trx_priority_table(get_self(), get_self().value);
 

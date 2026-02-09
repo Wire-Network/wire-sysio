@@ -6,6 +6,9 @@
 
 #include <appbase/application_base.hpp>
 
+#include <vector>
+#include <cstring>
+
 namespace sysio {
 
 using namespace sysio::chain;
@@ -47,6 +50,7 @@ int trx_priority_db::get_trx_priority(const transaction& trx) const {
 }
 
 // -----------------------------------------------------------------------------------------------------------------
+namespace {
 
 std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
    vector<char> data;
@@ -82,6 +86,7 @@ block_timestamp_type get_last_trx_priority_update(const controller& control) {
    return {};
 }
 
+} // anonymous namespace
 // -----------------------------------------------------------------------------------------------------------------
 
 void trx_priority_db::load_trx_priority_map(const controller& control, trx_priority_map_t& m) {
@@ -120,29 +125,32 @@ void trx_priority_db::load_trx_priority_map(const controller& control, trx_prior
       const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
       auto lower = idx.lower_bound( lower_bound_lookup_tuple );
       auto upper = idx.upper_bound( upper_bound_lookup_tuple );
-      size_t s = std::distance( lower, upper );
-      m.reserve( s );
-      // walk by descending priority
-      walk_table_row_range( std::make_reverse_iterator(upper), std::make_reverse_iterator(lower) );
+      walk_table_row_range( lower, upper );
 
    } FC_LOG_AND_DROP()
 }
 
 // -----------------------------------------------------------------------------------------------------------------
 
-void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const block_id_type& block_id, const controller& chain) {
+void trx_priority_db::on_irreversible_block(const signed_block_ptr& lib, const block_id_type&, const controller& chain) {
    if (lib->block_num() % trx_priority_refresh_interval != 0)
       return;
 
    try {
-      if (_last_trx_priority_update.load() == get_last_trx_priority_update(chain))
-         return;
+      auto last_chain_update = get_last_trx_priority_update(chain);
+      if (last_chain_update == block_timestamp_type{})
+         return; // not available
+
+      if (_last_trx_priority_update == last_chain_update)
+         return; // not changed
 
       std::shared_ptr<trx_priority_map_t> new_map = std::make_shared<trx_priority_map_t>();
 
+      _last_trx_priority_update = last_chain_update; // reset in load_trx_priority_map on failure
       load_trx_priority_map(chain, *new_map);
 
-      _trx_priority_map = new_map; // atomic swap
+      if (_last_trx_priority_update == last_chain_update)
+         _trx_priority_map = new_map; // atomic swap
    } FC_LOG_AND_DROP();
 }
 

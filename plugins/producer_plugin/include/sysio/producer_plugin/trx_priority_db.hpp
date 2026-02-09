@@ -50,7 +50,7 @@ private:
 private:
 
    std::atomic<std::shared_ptr<trx_priority_map_t>>  _trx_priority_map{nullptr};
-   std::atomic<chain::block_timestamp_type>          _last_trx_priority_update{};
+   chain::block_timestamp_type                       _last_trx_priority_update{}; // only accessed on main thread
 
 private:
    void load_trx_priority_map(const chain::controller& control, trx_priority_map_t& m);

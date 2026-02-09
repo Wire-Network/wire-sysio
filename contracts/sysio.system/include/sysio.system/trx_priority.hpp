@@ -22,7 +22,7 @@ struct [[sysio::table("trxpriority"), sysio::contract("sysio.system")]] trx_prio
    name action_name{};
    trx_match_type match_type = only;
 
-   uint64_t primary_key() const { return priority; }
+   uint64_t primary_key() const { return priority; } // order doesn't matter just used for uniqueness
 
    SYSLIB_SERIALIZE(trx_prio, (priority)(receiver)(action_name)(match_type))
 };
