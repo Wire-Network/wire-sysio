@@ -1786,13 +1786,14 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    };
 
    auto ptrx = create_trx(0);
-   // no limits, just verifying trx works
-#ifdef NDEBUG
-   push_trx( ptrx, fc::time_point::maximum(), 0, false ); // non-explicit billing
-#else
-   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
-   push_trx( ptrx, fc::time_point::maximum(), config::default_min_transaction_cpu_usage, true );
-#endif
+   if (chain.get_config().wasm_runtime != wasm_interface::vm_type::sys_vm_oc) {
+      // no limits, just verifying trx works
+      push_trx( ptrx, fc::time_point::maximum(), 0, false ); // non-explicit billing
+   } else {
+      // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+      // execute with explicit billing so it can take as long as needed
+      push_trx( ptrx, fc::time_point::maximum(), config::default_min_transaction_cpu_usage, true );
+   }
 
    // setup account acc with large limits
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
@@ -2008,17 +2009,20 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
       return r;
    };
 
-   // first call will load wasm, pausing timer
    auto ptrx = create_trx(0);
-   // no limits, verify trace values
-#ifdef NDEBUG
-   auto trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
-#else
-   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
-   auto trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage_t{100, 100, 100}, true );
-#endif
+
+   transaction_trace_ptr trace;
+   if (chain.get_config().wasm_runtime != wasm_interface::vm_type::sys_vm_oc) {
+      // first call will load wasm, pausing timer
+      trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
+      // timer is paused while loading the contract, so elapsed is larger than billed
+      BOOST_TEST(trace->elapsed.count() > trace->total_cpu_usage_us);
+   } else {
+      // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+      // execute with explicit billing so it can take as long as needed
+      trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage_t{100, 100, 100}, true );
+   }
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
-   // timer is paused while loading the contract, so elapsed is larger than billed
 
    chain.produce_block();
    chain.produce_block( fc::days(1) ); // produce for one day to reset account cpu/net
