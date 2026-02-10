@@ -139,7 +139,6 @@ RUN if [ -f ./vcpkg/bootstrap-vcpkg.sh ]; then ./vcpkg/bootstrap-vcpkg.sh; else 
 FROM app-source-local AS app-build-local
 RUN mkdir -p ${APP_BUILD_DIR}
 WORKDIR ${APP_BUILD_DIR}
-RUN sudo apt install -y gcc-10 g++-10
 
 RUN set -eux; \
   unset CFLAGS CXXFLAGS LDFLAGS CPPFLAGS || true; \
