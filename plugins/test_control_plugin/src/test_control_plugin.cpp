@@ -3,8 +3,6 @@
 
 namespace sysio {
 
-   static auto _test_control_plugin = application::register_plugin<test_control_plugin>();
-
 class test_control_plugin_impl {
 public:
    explicit test_control_plugin_impl(chain::controller& c) : _chain(c) {}

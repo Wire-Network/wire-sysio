@@ -2,6 +2,7 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
+    "zstd",
     "gsl-lite",
     "bls12-381",
     "bn256",
@@ -55,9 +56,22 @@
       "name": "civetweb",
       "default-features": false
     },
-    "boost"
+    "boost",
+    {
+      "name": "llvm",
+      "default-features": false,
+      "features": [
+        "enable-rtti",
+        "target-aarch64",
+        "target-x86"
+      ]
+    }
   ],
   "overrides": [
+    {
+      "name": "llvm",
+      "version": "18.1.6#5"
+    },
     {
       "name": "gsl-lite",
       "version": "1.0.1"

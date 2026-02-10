@@ -16,8 +16,6 @@ FC_REFLECT(sysio::detail::wallet_api_plugin_empty, );
 
 namespace sysio {
 
-   static auto _wallet_api_plugin = application::register_plugin<wallet_api_plugin>();
-
 using namespace sysio;
 
 #define CALL_WITH_400(api_name, api_handle, call_name, INVOKE, http_response_code) \

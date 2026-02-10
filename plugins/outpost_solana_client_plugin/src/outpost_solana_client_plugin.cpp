@@ -5,8 +5,6 @@
 
 namespace sysio {
 
-static auto _outpost_solana_client_plugin = application::register_plugin<outpost_solana_client_plugin>();
-
 namespace {
 constexpr auto option_name_client = "outpost-solana-client";
 constexpr auto option_idl_file    = "solana-idl-file";

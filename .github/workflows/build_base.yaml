@@ -119,6 +119,13 @@ jobs:
               echo "----- $f -----"
               tail -n 40 "$f"
             done
+
+#        # REQUIRED FOR ACT, LOCAL RUNS OF GITHUB ACTIONS
+#        - name: Installing nodejs
+#          run: |
+#            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+#            sudo apt install -y nodejs
+
         - name: Upload builddir
           uses: actions/upload-artifact@v4
           with:

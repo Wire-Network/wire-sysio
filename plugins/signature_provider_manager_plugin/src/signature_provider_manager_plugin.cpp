@@ -20,7 +20,6 @@
 namespace sysio {
 namespace {
 constexpr auto option_name_kiod_timeout_us = "signature-provider-kiod-timeout-us";
-auto _signature_provider_manager_plugin = application::register_plugin<signature_provider_manager_plugin>();
 
 std::filesystem::path default_signature_provider_spec_file() {
    return app().config_dir() / "default_signature_providers.json";

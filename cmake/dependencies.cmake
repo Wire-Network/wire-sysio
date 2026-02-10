@@ -11,7 +11,19 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # LOAD CMAKE TOOLS
 find_package(PkgConfig REQUIRED)
 
+# ZLIB & zstd
+find_package(ZLIB REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+
 # FIND PACKAGES WITH VCPKG
+# LLVM
+find_package(LLVM CONFIG REQUIRED)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake at: ${LLVM_DIR}")
+if(LLVM_VERSION_MAJOR VERSION_LESS 18)
+    message(FATAL_ERROR "WIRE requires LLVM version 18 or later")
+endif()
+
 # BOOST
 include(dependencies.boost NO_POLICY_SCOPE)
 
@@ -29,7 +41,6 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
 # OTHER DEPENDENCIES
-find_package(ZLIB REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(boringssl-custom CONFIG REQUIRED)
 find_package(ethash CONFIG REQUIRED)

@@ -5,8 +5,6 @@
 
 namespace sysio {
 
-   static auto _test_control_api_plugin = application::register_plugin<test_control_api_plugin>();
-
 using namespace sysio;
 
 class test_control_api_plugin_impl {
