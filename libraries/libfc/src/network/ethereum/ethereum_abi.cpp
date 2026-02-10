@@ -711,10 +711,10 @@ std::string abi::to_contract_function_signature(const contract& contract) {
  * @return 32-byte Keccak-256 hash (first 4 bytes used as selector)
  * @throws fc::exception if contract is not a function type
  */
-fc::keccak256 abi::to_contract_function_selector(const contract& contract) {
+fc::crypto::keccak256 abi::to_contract_function_selector(const contract& contract) {
    FC_ASSERT(contract.type == invoke_target_type::function, "ABI contract must be a function");
    auto signature = abi::to_contract_function_signature(contract);
-   return fc::keccak256::hash(signature);
+   return fc::crypto::keccak256::hash(signature);
 }
 
 /**

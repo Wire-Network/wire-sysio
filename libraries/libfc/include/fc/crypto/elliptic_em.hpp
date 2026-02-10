@@ -23,7 +23,7 @@ namespace fc {
     constexpr uint8_t public_key_prefix_uncompressed = 0x04;
     constexpr uint8_t public_key_prefix_compressed = 0x02;
 
-    using message_body_type = std::variant<std::string, fc::sha256, std::vector<uint8_t>, fc::keccak256>;
+    using message_body_type = std::variant<std::string, fc::sha256, std::vector<uint8_t>, fc::crypto::keccak256>;
 
     using public_key_data = std::array<char,33>;
     using public_key_data_uncompressed = std::array<char,65>;
@@ -101,7 +101,7 @@ namespace fc {
 
            const private_key_secret& get_secret()const; // get the private key secret
 
-           compact_signature sign_compact(const fc::keccak256& digest) const;
+           compact_signature sign_compact(const crypto::keccak256& digest) const;
 
            public_key get_public_key()const;
 
@@ -147,7 +147,7 @@ namespace fc {
          public_key_type recover(const sha256& digest) const;
 
          /// Recover public key from raw Ethereum keccak256 digest (no prefix)
-         public_key_type recover_eth(const fc::keccak256& digest) const;
+         public_key_type recover_eth(const fc::crypto::keccak256& digest) const;
 
          std::string to_string()const {
             return to_hex(std::as_bytes(std::span(_data)), true);
@@ -163,7 +163,7 @@ namespace fc {
          signature_type sign_sha256( const sha256& digest ) const;
 
          /// Sign raw Ethereum keccak256 digest (no prefix, for Ethereum transaction signing)
-         signature_type sign_keccak256( const fc::keccak256& digest ) const
+         signature_type sign_keccak256( const fc::crypto::keccak256& digest ) const
          {
             return signature_type(private_key::regenerate(_data).sign_compact(digest));
          }
@@ -171,7 +171,7 @@ namespace fc {
          /// Sign raw bytes by hashing with keccak256 first (internal, used by ethereum_client)
          signature_type sign_raw( const uint8_t* data, size_t len ) const
          {
-            auto digest = fc::keccak256::hash(std::span(data, len));
+            auto digest = fc::crypto::keccak256::hash(std::span(data, len));
             return signature_type(private_key::regenerate(_data).sign_compact(digest));
          }
 

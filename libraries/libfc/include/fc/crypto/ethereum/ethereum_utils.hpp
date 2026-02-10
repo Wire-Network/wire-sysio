@@ -77,7 +77,7 @@ inline std::span<const uint8_t> to_uint8_span(std::string_view sv) {
  * @param payload The message payload to hash
  * @return The message hash
  */
-fc::keccak256 hash_message(std::span<const uint8_t> payload);
+fc::crypto::keccak256 hash_message(std::span<const uint8_t> payload);
 
 /**
  * Hashes a message with the EIP-191 personal-sign prefix:
@@ -88,7 +88,7 @@ fc::keccak256 hash_message(std::span<const uint8_t> payload);
  * @param payload The message payload to hash
  * @return The EIP-191 prefixed keccak256 hash
  */
-fc::keccak256 hash_user_message(std::span<const uint8_t> payload);
+fc::crypto::keccak256 hash_user_message(std::span<const uint8_t> payload);
 
 /**
  * Parses a hexadecimal public key string into a public key object

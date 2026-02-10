@@ -4,7 +4,7 @@
 #include <fc/variant.hpp>
 #include <ethash/keccak.hpp>
 
-namespace fc {
+namespace fc::crypto {
 
 keccak256::keccak256() {
    memset(_hash, 0, sizeof(_hash));
@@ -59,12 +59,16 @@ void keccak256::encoder::reset() {
    data.clear();
 }
 
-void to_variant(const keccak256& bi, variant& v) {
+} // namespace fc::crypto
+
+namespace fc {
+
+void to_variant(const crypto::keccak256& bi, variant& v) {
    v = bi.str();
 }
 
-void from_variant(const variant& v, keccak256& bi) {
-   bi = keccak256(v.as_string());
+void from_variant(const variant& v, crypto::keccak256& bi) {
+   bi = crypto::keccak256(v.as_string());
 }
 
-} // namespace fc
+} // namespace  fc

@@ -58,11 +58,11 @@ std::vector<uint8_t> hex_to_bytes(const std::string& hex) {
    return fc::from_hex(clean_hex);
 }
 
-fc::keccak256 hash_message(std::span<const uint8_t> payload) {
+fc::crypto::keccak256 hash_message(std::span<const uint8_t> payload) {
    return keccak256::hash(payload);
 }
 
-fc::keccak256 hash_user_message(std::span<const uint8_t> payload) {
+fc::crypto::keccak256 hash_user_message(std::span<const uint8_t> payload) {
    std::vector<uint8_t> eth_message;
    auto payload_length_str = std::to_string(payload.size());
 

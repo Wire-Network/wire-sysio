@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
    auto em_priv_key = fc::em::private_key::regenerate(
       fc::sha256(reinterpret_cast<const char*>(fixture_priv_key_bytes.data()), fixture_priv_key_bytes.size()).to_uint64_array());
 
-   auto em_sig_data = em_priv_key.sign_compact(fc::keccak256::hash(fixture.payload));
+   auto em_sig_data = em_priv_key.sign_compact(fc::crypto::keccak256::hash(fixture.payload));
    auto em_sig      = fc::to_hex(reinterpret_cast<const char*>(em_sig_data.data()), em_sig_data.size());
 
    // Compare generated signature against fixture
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
 
    // Recover public key data (uncompressed)
    auto em_pub_key_rec_ser =
-      fc::em::signature_shim(em_sig_data).recover_eth(fc::keccak256::hash(fixture.payload)).unwrapped().serialize_uncompressed();
+      fc::em::signature_shim(em_sig_data).recover_eth(fc::crypto::keccak256::hash(fixture.payload)).unwrapped().serialize_uncompressed();
 
    auto em_pub_key_rec_hex =
       fc::crypto::ethereum::trim_public_key(fc::to_hex(em_pub_key_rec_ser.data(), em_pub_key_rec_ser.size()));

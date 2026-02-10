@@ -134,7 +134,7 @@ public_key::public_key(const public_key_data& dat) {
 }
 
 public_key public_key::recover(const compact_signature& c, const fc::sha256& digest, bool check_canonical) {
-   return recover(c, keccak256::hash(digest.to_uint8_span()).data(), check_canonical);
+   return recover(c, crypto::keccak256::hash(digest.to_uint8_span()).data(), check_canonical);
 }
 
 public_key public_key::recover(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
@@ -285,7 +285,7 @@ public_key private_key::get_public_key() const {
    return public_key(pub);
 }
 
-fc::em::compact_signature private_key::sign_compact(const fc::keccak256& digest) const {
+fc::em::compact_signature private_key::sign_compact(const fc::crypto::keccak256& digest) const {
    // Sign the Keccak-256 hash ---
    const secp256k1_context* ctx = detail::_get_context();
    fc::em::compact_signature result;
@@ -322,7 +322,7 @@ signature_shim::public_key_type signature_shim::recover(const sha256& digest) co
    return recover_eth(eth_digest);
 }
 
-signature_shim::public_key_type signature_shim::recover_eth(const keccak256& digest) const {
+signature_shim::public_key_type signature_shim::recover_eth(const crypto::keccak256& digest) const {
    return public_key_type(public_key::recover(_data, digest.data(), false).serialize());
 }
 

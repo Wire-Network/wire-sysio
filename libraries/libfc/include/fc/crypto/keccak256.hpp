@@ -7,9 +7,7 @@
 #include <span>
 #include <vector>
 
-namespace fc {
-
-class variant;
+namespace fc { namespace crypto {
 
 /**
  * @brief Keccak-256 hash (used by Ethereum)
@@ -71,11 +69,13 @@ public:
 private:
    uint8_t _hash[byte_size];
 };
+} // namespace crypto
 
-void to_variant(const keccak256& bi, variant& v);
-void from_variant(const variant& v, keccak256& bi);
+class variant;
+void to_variant(const crypto::keccak256& bi, variant& v);
+void from_variant(const variant& v, crypto::keccak256& bi);
 
 } // namespace fc
 
 #include <fc/reflect/reflect.hpp>
-FC_REFLECT_TYPENAME(fc::keccak256)
+FC_REFLECT_TYPENAME(fc::crypto::keccak256)
