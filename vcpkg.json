@@ -59,7 +59,7 @@
     "boost",
     {
       "name": "llvm",
-      "default-features": true,
+      "default-features": false,
       "features": [
         "enable-rtti",
         "target-aarch64",
