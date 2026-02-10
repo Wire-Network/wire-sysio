@@ -30,8 +30,8 @@ inline std::pair<fc::crypto::bls::private_key, fc::crypto::signature_provider_pt
    if (key_name.empty())
       key_name = privkey.to_string();
    return std::make_pair(privkey, std::make_shared<fc::crypto::signature_provider_t>(
-                            fc::crypto::chain_kind_t::wire,
-                            fc::crypto::chain_key_type_t::wire_bls,
+                            fc::crypto::chain_kind_wire,
+                            fc::crypto::chain_key_type_wire_bls,
                             key_name,
                             fc::crypto::public_key{fc::crypto::bls::public_key_shim{privkey.get_public_key().serialize()}},
                             fc::crypto::private_key{fc::crypto::bls::private_key_shim{privkey.get_secret()}},

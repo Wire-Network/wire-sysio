@@ -492,15 +492,15 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
    try {
       ilog("initializing chain plugin");
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_t::wire})) {
-         sig_plug.register_default_signature_providers({crypto::chain_key_type_t::wire});
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire});
       }
-      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_t::wire_bls})) {
-         sig_plug.register_default_signature_providers({crypto::chain_key_type_t::wire_bls});
+      if (!sig_plug.has_signature_providers(std::array{crypto::chain_key_type_wire_bls})) {
+         sig_plug.register_default_signature_providers({crypto::chain_key_type_wire_bls});
       }
 
-      auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_t::wire).front();
-      auto finalizer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_t::wire_bls).front();
+      auto producer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire).front();
+      auto finalizer_sig_prov = sig_plug.query_providers(std::nullopt,std::nullopt,crypto::chain_key_type_wire_bls).front();
 
       chain_config = controller::config();
 

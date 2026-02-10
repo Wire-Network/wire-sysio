@@ -24,7 +24,7 @@ struct signer_traits;
 // Signs: keccak256(raw_bytes) via EM (secp256k1)
 // ---------------------------------------------------------------------------
 template<>
-struct signer_traits<chain_kind_t::ethereum, chain_key_type_t::ethereum> {
+struct signer_traits<chain_kind_ethereum, chain_key_type_ethereum> {
    using input_type    = std::span<const uint8_t>;
    using prepared_type = keccak256;
    static constexpr bool recoverable = true;
@@ -52,7 +52,7 @@ struct signer_traits<chain_kind_t::ethereum, chain_key_type_t::ethereum> {
 // Signs: keccak256(EIP-191 prefix + sha256_raw) via EM (secp256k1)
 // ---------------------------------------------------------------------------
 template<>
-struct signer_traits<chain_kind_t::wire, chain_key_type_t::ethereum> {
+struct signer_traits<chain_kind_wire, chain_key_type_ethereum> {
    using input_type    = sha256;
    using prepared_type = keccak256;
    static constexpr bool recoverable = true;
@@ -80,7 +80,7 @@ struct signer_traits<chain_kind_t::wire, chain_key_type_t::ethereum> {
 // Signs: raw_bytes via ED25519
 // ---------------------------------------------------------------------------
 template<>
-struct signer_traits<chain_kind_t::solana, chain_key_type_t::solana> {
+struct signer_traits<chain_kind_solana, chain_key_type_solana> {
    using input_type    = std::span<const uint8_t>;
    using prepared_type = std::span<const uint8_t>;
    static constexpr bool recoverable = false;
@@ -163,12 +163,12 @@ struct wire_signer {
 // ===========================================================================
 
 /// Signs Ethereum transactions (keccak256 hash of raw bytes)
-using eth_client_signer = signer<chain_kind_t::ethereum, chain_key_type_t::ethereum>;
+using eth_client_signer = signer<chain_kind_ethereum, chain_key_type_ethereum>;
 
 /// Signs Wire transactions with EM keys (EIP-191 prefixed keccak256)
-using wire_eth_signer = signer<chain_kind_t::wire, chain_key_type_t::ethereum>;
+using wire_eth_signer = signer<chain_kind_wire, chain_key_type_ethereum>;
 
 /// Signs Solana transactions (ED25519 over raw bytes)
-using sol_client_signer = signer<chain_kind_t::solana, chain_key_type_t::solana>;
+using sol_client_signer = signer<chain_kind_solana, chain_key_type_solana>;
 
 } // namespace fc::crypto

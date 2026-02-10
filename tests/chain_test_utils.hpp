@@ -53,11 +53,11 @@ inline private_key_type get_private_key( name keyname, string role ) {
    if (keyname == config::system_account_name)
    {
       auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
-      auto system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_t::wire);
+      auto system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
       if (system_keys.empty())
       {
-         sig_plug.register_default_signature_providers(std::vector{crypto::chain_key_type_t::wire});
-         system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_t::wire);
+         sig_plug.register_default_signature_providers(std::vector{crypto::chain_key_type_wire});
+         system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
       }
 
       FC_ASSERT(!system_keys.empty(), "No system keys registered");

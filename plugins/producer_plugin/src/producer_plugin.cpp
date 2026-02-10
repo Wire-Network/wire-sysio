@@ -1400,7 +1400,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    // LOAD `chain_key_type_t::wire_bls` SIGNATURE PROVIDERS
    {
       auto finalizer_candidate_sig_providers = sig_plug.query_providers(
-        std::nullopt,std::nullopt, crypto::chain_key_type_t::wire_bls);
+        std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
 
       for (auto& candidate : finalizer_candidate_sig_providers) {
          SYS_ASSERT(candidate->private_key.has_value(), plugin_config_exception, "ALL BLS keys must be provided via command line arguments or config file.");
@@ -1413,7 +1413,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    if (!_producers.empty()) {
       // LOAD `chain_key_type_t::wire` SIGNATURE PROVIDERS
       auto wire_sig_providers = sig_plug.query_providers(
-        std::nullopt,std::nullopt, crypto::chain_key_type_t::wire);
+        std::nullopt,std::nullopt, crypto::chain_key_type_wire);
 
       for (auto& sig_prov : wire_sig_providers) {
          SYS_ASSERT(sig_prov->private_key.has_value(), plugin_config_exception, "ALL signature provider keys must be provided via command line arguments or config file.");
@@ -2921,7 +2921,7 @@ void producer_plugin_impl::produce_block() {
 
    producer_authority::for_each_key(auth, [&](const public_key_type& key) {
       const auto& iter = _signature_providers.find(key);
-      if (iter->second->key_type == crypto::chain_key_type_t::wire && iter != _signature_providers.end()) {
+      if (iter->second->key_type == crypto::chain_key_type_wire && iter != _signature_providers.end()) {
 
          relevant_providers.emplace_back(iter->second);
       }

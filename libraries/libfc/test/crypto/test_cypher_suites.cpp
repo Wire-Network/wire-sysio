@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(test_verify_solana_rejects_non_ed_key) try {
    auto sig = signature(signature::storage_type(ed_sig));
 
    // do_verify should FC_ASSERT because em_pub doesn't contain ed::public_key_shim
-   using solana_traits = signer_traits<chain_kind_t::solana, chain_key_type_t::solana>;
+   using solana_traits = signer_traits<chain_kind_solana, chain_key_type_solana>;
    BOOST_CHECK_THROW(
       solana_traits::do_verify(em_pub, sig, ethereum::to_uint8_span("test")),
       fc::exception);
@@ -464,7 +464,7 @@ signature_provider_t make_provider(const private_key& key, chain_key_type_t key_
 BOOST_AUTO_TEST_CASE(test_eth_client_signer_sign_recover) try {
    auto key      = private_key::generate<em::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::ethereum);
+   auto provider = make_provider(key, chain_key_type_ethereum);
 
    eth_client_signer s(provider);
 
@@ -478,7 +478,7 @@ BOOST_AUTO_TEST_CASE(test_eth_client_signer_sign_recover) try {
 BOOST_AUTO_TEST_CASE(test_wire_eth_signer_sign_recover) try {
    auto key      = private_key::generate<em::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::ethereum);
+   auto provider = make_provider(key, chain_key_type_ethereum);
 
    wire_eth_signer s(provider);
 
@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_sign_recover) try {
 // --- wire_eth_signer must produce the same signature as em::sign_sha256 (the shim-level Wire signing path) ---
 BOOST_AUTO_TEST_CASE(test_wire_eth_signer_matches_sign_sha256) try {
    auto key      = private_key::generate<em::private_key_shim>();
-   auto provider = make_provider(key, chain_key_type_t::ethereum);
+   auto provider = make_provider(key, chain_key_type_ethereum);
    auto& em_key  = key.get<em::private_key_shim>();
 
    wire_eth_signer s(provider);
@@ -513,7 +513,7 @@ BOOST_AUTO_TEST_CASE(test_wire_eth_signer_matches_sign_sha256) try {
 BOOST_AUTO_TEST_CASE(test_sol_client_signer_sign_verify) try {
    auto key      = private_key::generate<ed::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::solana);
+   auto provider = make_provider(key, chain_key_type_solana);
 
    sol_client_signer s(provider);
 
@@ -530,7 +530,7 @@ BOOST_AUTO_TEST_CASE(test_sol_client_signer_sign_verify) try {
 BOOST_AUTO_TEST_CASE(test_wire_signer_k1) try {
    auto key      = private_key::generate<ecc::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::wire);
+   auto provider = make_provider(key, chain_key_type_wire);
 
    wire_signer s(provider);
 
@@ -545,7 +545,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_k1) try {
 BOOST_AUTO_TEST_CASE(test_wire_signer_ed) try {
    auto key      = private_key::generate<ed::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::solana);
+   auto provider = make_provider(key, chain_key_type_solana);
 
    wire_signer s(provider);
 
@@ -561,7 +561,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_ed) try {
 BOOST_AUTO_TEST_CASE(test_wire_signer_sol) try {
    auto key      = private_key::generate<ed::private_key_shim>();
    auto pub      = key.get_public_key();
-   auto provider = make_provider(key, chain_key_type_t::solana);
+   auto provider = make_provider(key, chain_key_type_solana);
 
    wire_signer s(provider);
 
@@ -585,7 +585,7 @@ BOOST_AUTO_TEST_CASE(test_wire_signer_sol) try {
 
 BOOST_AUTO_TEST_CASE(test_signer_rejects_wrong_key_type) try {
    auto key      = private_key::generate<ecc::private_key_shim>();
-   auto provider = make_provider(key, chain_key_type_t::wire);
+   auto provider = make_provider(key, chain_key_type_wire);
 
    // Trying to use a K1 provider with eth_client_signer should fail
    BOOST_CHECK_THROW(eth_client_signer{provider}, fc::exception);

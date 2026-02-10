@@ -75,24 +75,24 @@ public:
          chain::private_key_type privkey;
 
          switch (key_type) {
-         case chain_key_type_t::wire: {
-            privkey = from_native_string_to_private_key<chain_key_type_t::wire>(spec_data);
+         case chain_key_type_wire: {
+            privkey = from_native_string_to_private_key<chain_key_type_wire>(spec_data);
             break;
          }
-         case chain_key_type_t::wire_bls: {
-            privkey = from_native_string_to_private_key<chain_key_type_t::wire_bls>(spec_data);
+         case chain_key_type_wire_bls: {
+            privkey = from_native_string_to_private_key<chain_key_type_wire_bls>(spec_data);
             break;
          }
 
-         case chain_key_type_t::ethereum: {
-            privkey = from_native_string_to_private_key<chain_key_type_t::ethereum>(spec_data);
+         case chain_key_type_ethereum: {
+            privkey = from_native_string_to_private_key<chain_key_type_ethereum>(spec_data);
             break;
          }
-         case chain_key_type_t::solana: {
-            privkey = from_native_string_to_private_key<chain_key_type_t::solana>(spec_data);
+         case chain_key_type_solana: {
+            privkey = from_native_string_to_private_key<chain_key_type_solana>(spec_data);
             break;
          }
-         case chain_key_type_t::sui: {
+         case chain_key_type_sui: {
             FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type needs to be implemented: {}",
                                chain_key_type_reflector::to_string(key_type));
          }
@@ -239,8 +239,8 @@ public:
    }
 
    void register_default_signature_providers(const vector<fc::crypto::chain_key_type_t>& key_types) {
-      static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_t::wire,
-                                                         fc::crypto::chain_key_type_t::wire_bls};
+      static constexpr std::array supported_key_types = {fc::crypto::chain_key_type_wire,
+                                                         fc::crypto::chain_key_type_wire_bls};
 
       std::scoped_lock lock(_signing_providers_mutex);
       load_default_signature_provider_specs();
@@ -259,11 +259,11 @@ public:
             auto key_name = std::format("{}-default", fc::crypto::chain_key_type_reflector::to_string(key_type));
             fc::crypto::private_key privkey;
             switch (key_type) {
-            case fc::crypto::chain_key_type_t::wire: {
+            case fc::crypto::chain_key_type_wire: {
                privkey = fc::crypto::private_key::generate<fc::ecc::private_key_shim>();
                break;
             }
-            case fc::crypto::chain_key_type_t::wire_bls: {
+            case fc::crypto::chain_key_type_wire_bls: {
                privkey = fc::crypto::private_key::generate<fc::crypto::bls::private_key_shim>();
                break;
             }
@@ -274,7 +274,7 @@ public:
             }
             auto pub_key_str = privkey.get_public_key().to_string({});
             spec = fc::crypto::to_signature_provider_spec(key_name,
-                                                          fc::crypto::chain_kind_t::wire,
+                                                          fc::crypto::chain_kind_wire,
                                                           key_type,
                                                           pub_key_str,
                                                           std::format("KEY:{}", privkey.to_string({})));
@@ -333,23 +333,23 @@ public:
       chain::public_key_type pubkey;
 
       switch (key_type) {
-      case chain_key_type_t::wire: {
-         pubkey = from_native_string_to_public_key<chain_key_type_t::wire>(public_key_text);
+      case chain_key_type_wire: {
+         pubkey = from_native_string_to_public_key<chain_key_type_wire>(public_key_text);
          break;
       }
-      case chain_key_type_t::wire_bls: {
-         pubkey = from_native_string_to_public_key<chain_key_type_t::wire_bls>(public_key_text);
+      case chain_key_type_wire_bls: {
+         pubkey = from_native_string_to_public_key<chain_key_type_wire_bls>(public_key_text);
          break;
       }
-      case chain_key_type_t::ethereum: {
-         pubkey = from_native_string_to_public_key<chain_key_type_t::ethereum>(public_key_text);
+      case chain_key_type_ethereum: {
+         pubkey = from_native_string_to_public_key<chain_key_type_ethereum>(public_key_text);
          break;
       }
-      case chain_key_type_t::solana: {
-         pubkey = from_native_string_to_public_key<chain_key_type_t::solana>(public_key_text);
+      case chain_key_type_solana: {
+         pubkey = from_native_string_to_public_key<chain_key_type_solana>(public_key_text);
          break;
       }
-      case chain_key_type_t::sui: {
+      case chain_key_type_sui: {
          FC_THROW_EXCEPTION(sysio::chain::pending_impl_exception, "Key type: {}",
                             chain_key_type_reflector::to_string(key_type));
       }

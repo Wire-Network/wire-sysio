@@ -26,13 +26,13 @@ namespace fc::crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid public key prefixes: {}", str);
-         return from_native_string_to_public_key<chain_key_type_t::ethereum>(key);
+         return from_native_string_to_public_key<chain_key_type_ethereum>(key);
       }
       case key_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid public key prefixes: {}", str);
-         return from_native_string_to_public_key<chain_key_type_t::solana>(key);
+         return from_native_string_to_public_key<chain_key_type_solana>(key);
       }
       case key_type::unknown: {
          if (is_legacy_public_key_str(str))
@@ -41,9 +41,9 @@ namespace fc::crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          FC_ASSERT(base_prefix == constants::public_key_base_prefix, "Invalid prefix to parse key type: {}", str);
          if (type_prefix == key_prefix(key_type::em)) {
-            return from_native_string_to_public_key<chain_key_type_t::ethereum>(data_str);
+            return from_native_string_to_public_key<chain_key_type_ethereum>(data_str);
          } else if (type_prefix == key_prefix(key_type::ed)) {
-            return from_native_string_to_public_key<chain_key_type_t::solana>(data_str);
+            return from_native_string_to_public_key<chain_key_type_solana>(data_str);
          }
          return public_key(parse_unknown_wire_public_key_str(str));
       }

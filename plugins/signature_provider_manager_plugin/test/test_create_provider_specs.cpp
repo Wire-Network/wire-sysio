@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
 
    auto private_key_spec = to_private_key_spec(priv.to_string({}));
    auto provider_spec    =
-      fc::crypto::to_signature_provider_spec("wire_key-1", chain_kind_t::wire, chain_key_type_t::wire, pub.to_string({}), private_key_spec);
+      fc::crypto::to_signature_provider_spec("wire_key-1", chain_kind_wire, chain_key_type_wire, pub.to_string({}), private_key_spec);
    auto  tester = create_app();
    auto& mgr    = tester->plugin();
 
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
    // Public key should match the one provided in spec
    BOOST_CHECK_EQUAL(provider->public_key.to_string({}), pub.to_string({}));
    BOOST_CHECK_EQUAL(provider->public_key, pub);
-   BOOST_TEST((provider->key_type == fc::crypto::chain_key_type_t::wire));
+   BOOST_TEST((provider->key_type == fc::crypto::chain_key_type_wire));
 
    // Provider should be retrievable via its public key
    BOOST_CHECK(mgr.has_provider(provider->public_key));
@@ -166,14 +166,14 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_key_spec) {
    auto          private_key_spec = to_private_key_spec(fixture.private_key);
 
    // TODO: Now parse and create signature provider
-   auto key_type_eth_str = chain_key_type_reflector::to_fc_string(chain_key_type_t::ethereum);
+   auto key_type_eth_str = chain_key_type_reflector::to_fc_string(chain_key_type_ethereum);
    BOOST_CHECK_EQUAL(key_type_eth_str, "ethereum");
 
    auto  tester = create_app();
    auto& mgr    = tester->plugin();
 
    auto provider =
-      mgr.create_provider(fixture.key_name, chain_kind_t::ethereum, chain_key_type_t::ethereum, fixture.public_key,
+      mgr.create_provider(fixture.key_name, chain_kind_ethereum, chain_key_type_ethereum, fixture.public_key,
                           private_key_spec);
 
 
@@ -203,7 +203,7 @@ BOOST_AUTO_TEST_CASE(ethereum_signature_provider_spec_options) {
    auto  tester = create_app(args);
    auto& mgr    = tester->plugin();
 
-   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_t::ethereum);
+   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_ethereum);
    BOOST_CHECK(all_providers.size() >= 2);
 
    // Provider 1 should be retrievable
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(wire_signature_provider_spec_options) {
    auto  tester = create_app(args);
    auto& mgr    = tester->plugin();
 
-   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_t::wire);
+   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_wire);
    BOOST_CHECK(all_providers.size() >= 1);
 
    // Provider 1 should be retrievable
@@ -287,21 +287,21 @@ BOOST_AUTO_TEST_CASE(create_provider_solana_key_spec) {
    auto          private_key_spec = to_private_key_spec(fixture.private_key);
 
    // Verify chain type string conversion
-   auto key_type_sol_str = chain_key_type_reflector::to_fc_string(chain_key_type_t::solana);
+   auto key_type_sol_str = chain_key_type_reflector::to_fc_string(chain_key_type_solana);
    BOOST_CHECK_EQUAL(key_type_sol_str, "solana");
 
    auto  tester = create_app();
    auto& mgr    = tester->plugin();
 
    auto provider =
-      mgr.create_provider(fixture.key_name, chain_kind_t::solana, chain_key_type_t::solana, fixture.public_key,
+      mgr.create_provider(fixture.key_name, chain_kind_solana, chain_key_type_solana, fixture.public_key,
                           private_key_spec);
 
    // Provider should be retrievable
    BOOST_CHECK(mgr.has_provider(provider->public_key));
    auto found = mgr.get_provider(provider->public_key);
    BOOST_CHECK_EQUAL(found->public_key.to_string({}), provider->public_key.to_string({}));
-   BOOST_TEST((found->key_type == chain_key_type_t::solana));
+   BOOST_TEST((found->key_type == chain_key_type_solana));
 
    // Sign function should be set
    BOOST_CHECK(static_cast<bool>(provider->sign));
@@ -323,7 +323,7 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    auto  tester = create_app(args);
    auto& mgr    = tester->plugin();
 
-   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_t::solana);
+   auto all_providers = mgr.query_providers(std::nullopt, fc::crypto::chain_kind_solana);
    BOOST_CHECK(all_providers.size() >= 1);
 
    // Provider 1 should be retrievable
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    // Verify the provider has correct key type
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
-   BOOST_TEST((providers[0]->key_type == chain_key_type_t::solana));
+   BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

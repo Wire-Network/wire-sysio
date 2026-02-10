@@ -180,8 +180,8 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    auto sig_provider =
       sig_provider_mgr.create_provider(
          "eth-01",
-         chain_kind_t::ethereum,
-         chain_key_type_t::ethereum,
+         chain_kind_ethereum,
+         chain_key_type_ethereum,
          "0x8318535b54105d4a7aae60c08fc45f9687181b4fdfc625bd1a753fa7397fed753547f11ca8696646f2f3acb08e31016afac23e630c5d11f59f61fef57b0d2aa5",
          private_key_spec);
 
