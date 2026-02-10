@@ -40,15 +40,16 @@ BOOST_AUTO_TEST_CASE( wasm_interrupt_test ) { try {
    auto pre_count = t.control->get_wasm_interface().get_sys_vm_oc_compile_interrupt_count();
 
    // Use an infinite executing action. When oc compile completes it will kill the action and restart it under
-   // sysvmoc. That action will then fail when it hits the 5000ms deadline.
-   // 5000ms has to be long enough for oc compile to complete and kill the non-oc executing transaction
+   // sysvmoc. That action will then fail when it hits the deadline.
+   // The deadline has to be long enough for oc compile to complete and kill the non-oc executing transaction.
+   // LLVM 18 compilation is slower than LLVM 11, requiring a larger deadline.
    BOOST_CHECK_THROW( push_trx( t, test_api_action<WASM_TEST_ACTION("test_checktime", "checktime_failure")>{},
-                                0, 150, 5000, true, fc::raw::pack(10000000000000000000ULL) ),
+                                0, 150, 30000, true, fc::raw::pack(10000000000000000000ULL) ),
                       deadline_exception );
 
    auto post_count = t.control->get_wasm_interface().get_sys_vm_oc_compile_interrupt_count();
 
-   // if post_count == pre_count, then likely that 5000ms above was not long enough for oc compile to complete
+   // if post_count == pre_count, then likely that the deadline above was not long enough for oc compile to complete
    BOOST_TEST(post_count == pre_count + 1);
 
    BOOST_REQUIRE_EQUAL( t.validate(), true );
