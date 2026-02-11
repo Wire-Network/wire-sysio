@@ -23,6 +23,19 @@ message(STATUS "Using LLVMConfig.cmake at: ${LLVM_DIR}")
 if(LLVM_VERSION_MAJOR VERSION_LESS 18)
     message(FATAL_ERROR "WIRE requires LLVM version 18 or later")
 endif()
+if(DEBUG AND NOT DISABLE_LLVM_LINKAGE_OVERRIDE)
+    message(NOTICE "DEBUG build, and DISABLE_LLVM_LINKAGE_OVERRIDE=OFF, overriding LLVM linkage to Release")
+    foreach(llvm_target ${LLVM_AVAILABLE_LIBS})
+        if(TARGET ${llvm_target})
+            message(STATUS "LLVM target (${llvm_target}) to use release build")
+            set_target_properties(
+                    ${llvm_target}
+                    PROPERTIES
+                    MAP_IMPORTED_CONFIG_DEBUG Release
+            )
+        endif()
+    endforeach()
+endif()
 
 # BOOST
 include(dependencies.boost NO_POLICY_SCOPE)
