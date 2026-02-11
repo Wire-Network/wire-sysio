@@ -7,3 +7,4 @@ eth-hash[pycryptodome]
 eth_account
 pynacl
 numpy
+pre-commit
