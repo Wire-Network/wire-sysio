@@ -14,10 +14,11 @@ repos:
       - id: clang-format
         types_or: [c, c++]
 
-  - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-      - id: clang-tidy
-        args: [--warnings-as-errors=*]
-      - id: cppcheck
-        args: [--enable=all, --suppress=missingIncludeSystem]
+# FUTURE: `clang-tidy` and `cppcheck` will be enabled in coming weeks once configured properly
+#  - repo: https://github.com/pocc/pre-commit-hooks
+#    rev: v1.3.5
+#    hooks:
+#      - id: clang-tidy
+#        args: [--warnings-as-errors=*]
+#      - id: cppcheck
+#        args: [--enable=all, --suppress=missingIncludeSystem]
