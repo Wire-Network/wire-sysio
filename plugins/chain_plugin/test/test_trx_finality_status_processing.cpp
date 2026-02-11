@@ -880,7 +880,7 @@ namespace {
          const auto id = b ? b->calculate_id() : sysio::chain::transaction_id_type{};
          for (auto i = begin; i < end; ++i) {
             const auto& trx_pair = trx_pairs[i];
-            std::string msg = context + ": block_num==" + std::to_string(bn) + ", i==" + std::to_string(i) + ", id: " + std::string(std::get<1>(trx_pair)->id());
+            std::string msg = context + ": block_num==" + std::to_string(bn) + ", i==" + std::to_string(i) + ", id: " + std::get<1>(trx_pair)->id().str();
             auto ts = status.get_trx_state(std::get<1>(trx_pair)->id());
             BOOST_REQUIRE_MESSAGE(ts, msg);
             BOOST_CHECK_MESSAGE(ts->block_id == id, msg);

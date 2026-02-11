@@ -143,7 +143,7 @@ namespace sysio::testing {
             fc::sha256::encoder e;
             e.write((char*)auth_data.data(), auth_data.size());
             e.write(client_data_hash.data(), client_data_hash.data_size());
-            auto sig = priv_key.sign_compact(e.result());
+            auto sig = priv_key.sign_sha256(e.result());
 
             char serialized_sig[4096];
             datastream<char*> sig_ds(serialized_sig, sizeof(serialized_sig));

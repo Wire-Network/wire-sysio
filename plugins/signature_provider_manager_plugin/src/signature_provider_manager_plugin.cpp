@@ -35,12 +35,11 @@ public:
     */
    fc::microseconds _kiod_provider_timeout_us;
 
-   fc::crypto::signature_provider_sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
+   fc::crypto::sign_fn make_key_signature_provider(const chain::private_key_type& key) const {
       return [key](const chain::digest_type& digest) { return key.sign(digest); };
    }
 
-   fc::crypto::signature_provider_sign_fn make_kiod_signature_provider(const string& url_str,
-                                                                       const chain::public_key_type& pubkey) const {
+   fc::crypto::sign_fn make_kiod_signature_provider(const string& url_str, const chain::public_key_type& pubkey) const {
       fc::url kiod_url;
       if (boost::algorithm::starts_with(url_str, "unix://"))
          // send the entire string after unix:// to http_plugin. It'll auto-detect which part
@@ -62,7 +61,7 @@ public:
       };
    }
 
-   std::pair<fc::crypto::signature_provider_sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
+   std::pair<fc::crypto::sign_fn, std::optional<fc::crypto::private_key>> create_provider_from_spec(
       fc::crypto::chain_key_type_t key_type,
       const fc::crypto::public_key& public_key,
       const std::string& spec) {
@@ -72,7 +71,6 @@ public:
       auto spec_data = spec_parts[1];
 
       if (spec_type_str == "KEY") {
-         auto privkey_str = spec_data;
          chain::private_key_type privkey;
 
          switch (key_type) {
@@ -444,9 +442,9 @@ fc::crypto::signature_provider_ptr signature_provider_manager_plugin::create_pro
    return my->create_provider(key_name, target_chain, key_type, public_key_text, private_key_provider_spec);
 }
 
-fc::crypto::signature_provider_sign_fn
+fc::crypto::sign_fn
 signature_provider_manager_plugin::create_anonymous_provider_from_private_key(chain::private_key_type priv) const {
-   return my->make_key_signature_provider(priv);
+   return [priv](const fc::sha256& d) { return priv.sign(d); };
 }
 
 bool signature_provider_manager_plugin::has_provider(const fc::crypto::signature_provider_id_t& key) {

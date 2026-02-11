@@ -1,9 +1,11 @@
 #pragma once
 
+#include <fc/crypto/keccak256.hpp>
+#include <fc/crypto/elliptic_em.hpp>
+
 #include <string>
 #include <vector>
-
-#include <fc/crypto/public_key.hpp>
+#include <span>
 
 // Forward declarations in the case of circular dependencies
 namespace fc::em {
@@ -15,22 +17,6 @@ namespace fc::em {
  * Utilities for interacting with ethereum keys
  */
 namespace fc::crypto::ethereum {
-
-/**
- * Keccak-256 hash type used for Ethereum cryptography storage
- */
-using keccak256_hash_t = std::array<std::uint8_t, 32>;
-
-/**
- * Create a 32-byte keccak256 hash
- *
- * @param data to digest
- * @param size number of bytes to digest
- * @return 32 byte keccak256 hash
- */
-keccak256_hash_t keccak256(const uint8_t* data, size_t size);
-
-keccak256_hash_t keccak256(const std::string& digest);
 
 /**
  * Public key lengths
@@ -77,13 +63,32 @@ std::string bytes_to_hex(const std::vector<uint8_t>& bytes);
 std::vector<uint8_t> hex_to_bytes(const std::string& hex);
 
 /**
- * Creates an Ethereum signed message hash from a message payload
+ * Converts a string view to a span of const uint8_t
+ * @param sv The string view to convert
+ * @return Span of const uint8_t
+ */
+inline std::span<const uint8_t> to_uint8_span(std::string_view sv) {
+   return {reinterpret_cast<const uint8_t*>(sv.data()), sv.size()};
+}
+
+/**
+ * Creates an Ethereum signed message hash from a message payload.
+ * Calls keccak256::hash(payload)
  * @param payload The message payload to hash
  * @return The message hash
  */
-em::message_hash_type hash_message(const em::message_body_type& payload);
+fc::crypto::keccak256 hash_message(std::span<const uint8_t> payload);
 
-em::message_hash_type hash_user_message(const em::message_body_type& payload);
+/**
+ * Hashes a message with the EIP-191 personal-sign prefix:
+ *   keccak256("\x19Ethereum Signed Message:\n" + len(payload) + payload)
+ *
+ * This is the standard used by eth_sign / personal_sign (e.g. MetaMask).
+ *
+ * @param payload The message payload to hash
+ * @return The EIP-191 prefixed keccak256 hash
+ */
+fc::crypto::keccak256 hash_user_message(std::span<const uint8_t> payload);
 
 /**
  * Parses a hexadecimal public key string into a public key object

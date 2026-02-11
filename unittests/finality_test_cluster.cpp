@@ -71,7 +71,7 @@ vote_message_ptr finality_node_t::get_vote(size_t vote_index, vote_mode mode) {
       // fetch the strong digest
       auto strong_digest = control->get_strong_digest_by_id(vote->block_id);
       // convert the strong digest to weak and sign it
-      vote->sig = finkeys.privkeys.at(cur_key).sign(sysio::chain::create_weak_digest(strong_digest));
+      vote->sig = finkeys.privkeys.at(cur_key).sign_raw(sysio::chain::create_weak_digest(strong_digest));
    }
 
    return vote;

@@ -940,7 +940,7 @@ void transaction_tests(T& chain) {
    // test test_read_transaction
    // this is a bit rough, but I couldn't figure out a better way to compare the hashes
    auto tx_trace = CALL_TEST_FUNCTION( chain, "test_transaction", "test_read_transaction", {} );
-   string sha_expect = tx_trace->id;
+   string sha_expect = tx_trace->id.str();
    BOOST_TEST_MESSAGE( "tx_trace->action_traces.front().console: = " << tx_trace->action_traces.front().console );
    BOOST_TEST_MESSAGE( "sha_expect = " << sha_expect );
    BOOST_CHECK_EQUAL(tx_trace->action_traces.front().console == sha_expect, true);
@@ -976,7 +976,7 @@ void transaction_tests(T& chain) {
       auto ptrx = std::make_shared<packed_transaction>( signed_transaction(trx), packed_transaction::compression_type::none );
 
       // verify packed_transaction constructor
-      string sha_expect = ptrx->id();
+      string sha_expect = ptrx->id().str();
       auto packed = fc::raw::pack( static_cast<const transaction&>(ptrx->get_transaction()) );
       auto packed_copy = packed;
       vector<signature_type> psigs = ptrx->get_signatures();
@@ -1013,7 +1013,7 @@ void transaction_tests(T& chain) {
 
       auto ptrx = std::make_shared<packed_transaction>( signed_transaction(trx), packed_transaction::compression_type::none );
 
-      string sha_expect = ptrx->id();
+      string sha_expect = ptrx->id().str();
       auto packed = fc::raw::pack( static_cast<const transaction&>(ptrx->get_transaction()) );
       packed.push_back('7'); packed.push_back('7'); // extra ignored
       vector<signature_type> psigs = ptrx->get_signatures();

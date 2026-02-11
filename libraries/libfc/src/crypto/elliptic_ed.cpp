@@ -11,6 +11,16 @@ namespace fc { namespace crypto { namespace ed {
          FC_THROW_EXCEPTION(exception, "Failed to initialize libsodium");
    }
 
+   private_key_shim private_key_shim::generate() {
+      sodium_init_guard();
+      unsigned char pk[crypto_sign_PUBLICKEYBYTES];
+      private_key_shim sk;
+      if (crypto_sign_keypair(pk, sk._data.data()) != 0) {
+         FC_THROW_EXCEPTION(exception, "ed25519: failed to generate keypair");
+      }
+      return sk;
+   }
+
    // Derive public key from 64-byte secret key
    public_key_shim private_key_shim::get_public_key() const {
       sodium_init_guard();
@@ -23,7 +33,7 @@ namespace fc { namespace crypto { namespace ed {
    }
 
    // Sign a 32‑byte digest (treat digest as the “message”)
-   signature_shim private_key_shim::sign(const sha256& digest, bool require_canonical) const {
+   signature_shim private_key_shim::sign_sha256(const sha256& digest) const {
       // 1) Ensure libsodium is initialized
       sodium_init_guard();
 
@@ -91,8 +101,16 @@ namespace fc { namespace crypto { namespace ed {
       return out;
    }
 
-   // stub out ECDH for the visitor
-   sha512 private_key_shim::generate_shared_secret(const public_key_shim&) const {
-      FC_THROW_EXCEPTION(exception, "ED25519 shared_secret not supported");
+   // Verify raw bytes directly (for Solana transaction verification)
+   bool signature_shim::verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const {
+      sodium_init_guard();
+
+      return crypto_sign_verify_detached(
+         _data.data(),
+         data,
+         len,
+         pub._data.data()
+      ) == 0;
    }
+
 }}} // fc::crypto::ed

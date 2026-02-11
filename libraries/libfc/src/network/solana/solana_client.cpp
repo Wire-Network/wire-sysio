@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 #include <fc/crypto/base64.hpp>
+#include <fc/crypto/signer.hpp>
 #include <fc/int256.hpp>
 #include <fc/io/json.hpp>
 #include <fc/log/logger.hpp>
@@ -1402,17 +1403,11 @@ transaction solana_client::create_transaction(const std::vector<instruction>& in
 }
 
 transaction solana_client::sign_transaction(transaction& tx) {
-   // Serialize the message for signing
    auto msg_bytes = tx.msg.serialize();
 
-   // Solana signs the raw message bytes directly with ED25519
-   // (ED25519 internally handles its own SHA-512 hashing as part of the EdDSA algorithm)
-   FC_ASSERT(_signature_provider->private_key.has_value(), "Signature provider must have private key for signing");
-   auto& priv_key = _signature_provider->private_key.value();
-   FC_ASSERT(priv_key.contains<fc::crypto::ed::private_key_shim>(), "Private key must be ED25519 type for Solana");
-
-   auto& ed_priv_key = priv_key.get<fc::crypto::ed::private_key_shim>();
-   auto ed_sig = ed_priv_key.sign_raw(msg_bytes.data(), msg_bytes.size());
+   fc::crypto::sol_client_signer signer(*_signature_provider);
+   auto sig = signer.sign(msg_bytes);
+   auto& ed_sig = sig.get<fc::crypto::ed::signature_shim>();
 
    // Find the fee payer's position (should be index 0)
    for (size_t i = 0; i < tx.msg.account_keys.size(); ++i) {

@@ -53,21 +53,21 @@ namespace fc { namespace crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& sig = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::em), "Invalid signature prefixes: {}", str);
-         return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(sig);
+         return from_native_string_to_signature<chain_key_type_ethereum>(sig);
       }
       case sig_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& sig = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == sig_prefix(sig_type::ed), "Invalid signature prefixes: {}", str);
-         return from_native_string_to_signature<chain_key_type_t::chain_key_type_solana>(sig);
+         return from_native_string_to_signature<chain_key_type_solana>(sig);
       }
       case sig_type::unknown: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          FC_ASSERT(base_prefix == constants::signature_base_prefix, "Invalid prefix to parse signature type: {}", str);
          if (type_prefix == sig_prefix(sig_type::em)) {
-            return from_native_string_to_signature<chain_key_type_t::chain_key_type_ethereum>(data_str);
+            return from_native_string_to_signature<chain_key_type_ethereum>(data_str);
          } else if (type_prefix == sig_prefix(sig_type::ed)) {
-            return from_native_string_to_signature<chain_key_type_t::chain_key_type_solana>(data_str);
+            return from_native_string_to_signature<chain_key_type_solana>(data_str);
          }
          return signature(parse_unknown_wire_signature_str(str));
       }

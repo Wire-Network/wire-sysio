@@ -93,17 +93,27 @@ ctest -L "long_running_tests"            # Long-running integration tests
 - **tests/** - Python integration tests using TestHarness
 
 ### Key Libraries
-- **libfc** (`libraries/libfc/`) - Foundation library: crypto, serialization, HTTP/JSON-RPC clients, logging. Contains network clients for Ethereum and Solana.
+- **libfc** (`libraries/libfc/`) - Foundation library providing:
+  - Crypto: SHA256, RIPEMD160, Keccak256, secp256k1, NIST P-256 (R1), BLS, Ed25519, WebAuthn
+  - Serialization: JSON via `fc::variant`, binary packing
+  - Network clients: HTTP/JSON-RPC, Ethereum (ABI/RLP encoding), Solana (Borsh/IDL)
+  - Logging framework with configurable sinks
 - **chain** (`libraries/chain/`) - Blockchain core: block/transaction processing, WASM execution (sys-vm, sys-vm-jit, sys-vm-oc runtimes), authorization, resource limits
 - **appbase** (`libraries/appbase/`) - Application framework for plugin management
 
 ### Plugin Architecture
 Plugins are static libraries linked with whole-archive into the main executable. Each plugin directory contains:
-- `include/` - Public headers
+- `include/sysio/<plugin_name>/` - Public headers
 - `src/` - Implementation
 - `test/` (optional) - Plugin-specific tests with CMakeLists.txt
 
-Key plugins: chain_plugin, producer_plugin, net_plugin, http_plugin, wallet_plugin, state_history_plugin
+Key plugins: chain_plugin, producer_plugin, net_plugin, http_plugin, wallet_plugin, state_history_plugin, outpost_ethereum_client_plugin, outpost_solana_client_plugin
+
+Plugin lifecycle (see `plugins/usage_pattern.md` for details):
+1. **Registration** - `APPBASE_PLUGIN_REQUIRES` declares dependencies
+2. **Initialization** - Configure plugin from options, connect signals, create objects
+3. **Startup** - Activate io_contexts, thread pools, establish connections
+4. **Shutdown** - Stop threads, cancel timers (reverse order of startup)
 
 ### Serialization Patterns
 ```cpp
@@ -137,6 +147,7 @@ Format code: `clang-format -i <file>`
 | `BUILD_TEST_CONTRACTS` | OFF | Compile test smart contracts |
 | `DONT_SKIP_TESTS` | FALSE | Include currently failing tests |
 | `DISABLE_WASM_SPEC_TESTS` | OFF | Skip WASM spec compliance tests |
+| `ENABLE_OC` | ON | Enable sys-vm-oc LLVM JIT optimization (x86_64 Linux) |
 
 ## WASM Runtimes
 
@@ -156,3 +167,12 @@ Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `
 # Build from local source
 ./scripts/docker-build.sh --target=app-build-local
 ```
+
+## Python Integration Tests
+
+The `tests/` directory contains Python integration tests using TestHarness framework:
+- `TestHarness/Cluster.py` - Cluster orchestration
+- `TestHarness/Node.py` - Individual node control
+- `TestHarness/Launcher.py` - Test environment generation
+
+Run Python tests directly: `python3 tests/<test_name>.py`

@@ -264,7 +264,7 @@ namespace sysio::testing {
             acked_str         = acked.to_iso_string();
             ack_round_trip_us = acked - data._timestamp;
          }
-         out << std::string(data._trx_id) << "," << data._timestamp.to_iso_string() << "," << acked_str << ","
+         out << data._trx_id.str() << "," << data._timestamp.to_iso_string() << "," << acked_str << ","
              << ack_round_trip_us.count();
 
          acked_trx_trace_info info = _peer_connection->get_acked_trx_trace_info(data._trx_id);

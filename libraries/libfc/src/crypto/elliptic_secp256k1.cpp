@@ -2,7 +2,6 @@
 
 #include <fc/crypto/hmac.hpp>
 #include <fc/crypto/openssl.hpp>
-#include <fc/crypto/sha512.hpp>
 #include <fc/crypto/rand.hpp>
 
 #include <fc/fwd_impl.hpp>
@@ -26,7 +25,7 @@
 
 #include "_elliptic_impl_priv.hpp"
 
-namespace fc { namespace ecc {
+namespace fc::ecc {
     namespace detail
     {
         struct context_creator {
@@ -67,21 +66,6 @@ namespace fc { namespace ecc {
     static const public_key_data empty_pub{};
     
 
-    fc::sha512 private_key::get_shared_secret( const public_key& other )const
-    {
-      static const private_key_secret empty_priv{};
-      FC_ASSERT( my->_key != empty_priv );
-      FC_ASSERT( other.my->_key != empty_pub );
-      secp256k1_pubkey secp_pubkey{};
-      FC_ASSERT( secp256k1_ec_pubkey_parse( detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data(), other.serialize().size() ) );
-      FC_ASSERT( secp256k1_ec_pubkey_tweak_mul( detail::_get_context(), &secp_pubkey, (unsigned char*) my->_key.data() ) );
-      public_key_data serialized_result{};
-      size_t serialized_result_sz = sizeof(serialized_result);
-      secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result[0], &serialized_result_sz, &secp_pubkey, SECP256K1_EC_COMPRESSED );
-      FC_ASSERT( serialized_result_sz == sizeof(serialized_result) );
-      return fc::sha512::hash( serialized_result.begin() + 1, serialized_result.size() - 1 );
-    }
-
     private_key private_key::generate()
     {
        private_key ret;
@@ -109,10 +93,7 @@ namespace fc { namespace ecc {
         FC_ASSERT( my->_key != empty_pub );
         return my->_key;
     }
-    // TODO: WIRE-233:OpenSSL is implemented via boringssl in all versions of EOSIO, and does not SEEM to provide
-    //   `EC_KEY` curve related implementations, but I need to investigate.
-    //   this should likely be swapped out the same way that I resolved `fc::em::public_key`
-    //   support, via `libsecp256k1`
+
     public_key::public_key( const public_key_point_data& dat )
     {
         auto front = dat.begin();
@@ -134,16 +115,12 @@ namespace fc { namespace ecc {
         my->_key = dat;
     }
 
-    public_key::public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical )
+    public_key public_key::recover( const compact_signature& c, const fc::sha256& digest )
     {
+        public_key result;
         int nV = c[0];
         if (nV<27 || nV>=35)
             FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
-
-        if( check_canonical )
-        {
-            FC_ASSERT( is_canonical( c ), "signature is not canonical" );
-        }
 
         secp256k1_pubkey secp_pub{};
         secp256k1_ecdsa_recoverable_signature secp_sig{};
@@ -151,9 +128,10 @@ namespace fc { namespace ecc {
         FC_ASSERT( secp256k1_ecdsa_recoverable_signature_parse_compact( detail::_get_context(), &secp_sig, (unsigned char*)c.begin() + 1, (*c.begin() - 27) & 3) );
         FC_ASSERT( secp256k1_ecdsa_recover( detail::_get_context(), &secp_pub, &secp_sig, (unsigned char*) digest.data() ) );
 
-        size_t serialized_result_sz = my->_key.size();
-        secp256k1_ec_pubkey_serialize( detail::_get_context(), (unsigned char*)&my->_key[0], &serialized_result_sz, &secp_pub, SECP256K1_EC_COMPRESSED );
-        FC_ASSERT( serialized_result_sz == my->_key.size() );
+        size_t serialized_result_sz = result.my->_key.size();
+        secp256k1_ec_pubkey_serialize( detail::_get_context(), (unsigned char*)&result.my->_key[0], &serialized_result_sz, &secp_pub, SECP256K1_EC_COMPRESSED );
+        FC_ASSERT( serialized_result_sz == result.my->_key.size() );
+        return result;
     }
 
-} }
+} // namespace fc::ecc

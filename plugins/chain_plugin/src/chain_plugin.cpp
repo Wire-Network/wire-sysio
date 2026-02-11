@@ -1517,16 +1517,16 @@ string convert_to_string(const chain::key256_t& source, const string& key_type, 
       if (key_type == chain_apis::sha256 || (key_type == chain_apis::i256 && encode_type == chain_apis::hex)) {
          auto byte_array = fixed_bytes<32>(source).extract_as_byte_array();
          fc::sha256 val(reinterpret_cast<char *>(byte_array.data()), byte_array.size());
-         return std::string(val);
+         return val.str();
       } else if (key_type == chain_apis::i256) {
          auto byte_array = fixed_bytes<32>(source).extract_as_byte_array();
          fc::sha256 val(reinterpret_cast<char *>(byte_array.data()), byte_array.size());
-         return std::string("0x") + std::string(val);
+         return std::string("0x") + val.str();
       } else if (key_type == chain_apis::ripemd160) {
          auto byte_array = fixed_bytes<20>(source).extract_as_byte_array();
          fc::ripemd160 val;
          memcpy(val._hash, byte_array.data(), byte_array.size() );
-         return std::string(val);
+         return val.str();
       }
       SYS_ASSERT( false, chain_type_exception, "Incompatible key_type and encode_type for key256_t next_key" );
 

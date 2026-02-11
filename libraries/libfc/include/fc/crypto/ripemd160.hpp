@@ -16,7 +16,6 @@ class ripemd160 : public add_packhash_to_hash<ripemd160>
     explicit ripemd160( const std::string& hex_str );
 
     std::string str()const;
-    explicit operator std::string()const;
 
     char*    data()const;
     size_t data_size()const { return 160/8; }

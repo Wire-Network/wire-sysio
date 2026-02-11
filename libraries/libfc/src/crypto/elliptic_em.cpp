@@ -1,7 +1,6 @@
 #include <fc/crypto/elliptic_em.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
 #include <fc/crypto/openssl.hpp>
-#include <fc/crypto/sha512.hpp>
 
 #include <fc/exception/exception.hpp>
 #include <fc/log/logger.hpp>
@@ -56,22 +55,6 @@ public:
 } // namespace detail
 
 static const public_key_data empty_pub{};
-
-fc::sha512 private_key::get_shared_secret(const public_key& other) const {
-   static const private_key_secret empty_priv{};
-   FC_ASSERT(my->_key != empty_priv);
-   FC_ASSERT(other.my->_key != empty_pub);
-   secp256k1_pubkey secp_pubkey{};
-   FC_ASSERT(secp256k1_ec_pubkey_parse(detail::_get_context(), &secp_pubkey, (unsigned char*)other.serialize().data(),
-                                       other.serialize().size()));
-   FC_ASSERT(secp256k1_ec_pubkey_tweak_mul(detail::_get_context(), &secp_pubkey, (unsigned char*)my->_key.data()));
-   public_key_data serialized_result{};
-   size_t serialized_result_sz = sizeof(serialized_result);
-   secp256k1_ec_pubkey_serialize(detail::_get_context(), (unsigned char*)&serialized_result[0], &serialized_result_sz,
-                                 &secp_pubkey, SECP256K1_EC_COMPRESSED);
-   FC_ASSERT(serialized_result_sz == sizeof(serialized_result));
-   return fc::sha512::hash(serialized_result.begin() + 1, serialized_result.size() - 1);
-}
 
 public_key::public_key() = default;
 public_key::public_key(const public_key& pk) = default;
@@ -144,17 +127,18 @@ public_key::public_key(const public_key_data_uncompressed& dat) {
              ), "Failed to serialize public key");
 
    FC_ASSERT(pubkey_len == my->_key.size(), "Invalid public key size");
-
 }
 
 public_key::public_key(const public_key_data& dat) {
    my->_key = dat;
 }
 
-public_key::public_key(const compact_signature& c, const fc::sha256& digest, bool check_canonical) : public_key(
-   c, crypto::ethereum::hash_message(digest).data(), check_canonical) {}
+public_key public_key::recover(const compact_signature& c, const fc::sha256& digest, bool check_canonical) {
+   return recover(c, crypto::keccak256::hash(digest.to_uint8_span()).data(), check_canonical);
+}
 
-public_key::public_key(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
+public_key public_key::recover(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
+   public_key result;
    int nV = c[c.size() - 1];
    if (nV < 27 || nV >= 35) {
       FC_THROW_EXCEPTION(exception, "unable to reconstruct public key from signature");
@@ -184,16 +168,17 @@ public_key::public_key(const compact_signature& c, const unsigned char* digest, 
       digest));
 
    // Prepare to serialize the recovered public key
-   size_t serialized_result_sz = my->_key.size();
+   size_t serialized_result_sz = result.my->_key.size();
    secp256k1_ec_pubkey_serialize(
       detail::_get_context(),
-      (unsigned char*)&my->_key[0],
+      (unsigned char*)&result.my->_key[0],
       &serialized_result_sz,
       &secp_pub,
       SECP256K1_EC_COMPRESSED);
 
    // Verify the serialized public key size
-   FC_ASSERT(serialized_result_sz == my->_key.size());
+   FC_ASSERT(serialized_result_sz == result.my->_key.size());
+   return result;
 }
 
 public_key public_key::from_key_data(const public_key_data& data) {
@@ -300,70 +285,51 @@ public_key private_key::get_public_key() const {
    return public_key(pub);
 }
 
-/**
- * Creates a compact, recoverable signature formatted for eth_sign.
- *
- * @param digest The 32-byte *original message hash* (e.g., keccak256(message))
- * @param require_canonical
- */
-fc::ecc::compact_signature private_key::sign_compact(const fc::sha256& digest, bool require_canonical) const {
-   return sign_compact_ex(digest, require_canonical);
-}
-
-fc::ecc::compact_signature private_key::sign_compact_ex(const em::message_body_type& digest,
-                                                        bool require_canonical) const {
-   // --- 1. Prepare the eth_sign prefixed hash (same as in recover) ---
-   message_hash_type msg_digest;
-   if (std::holds_alternative<fc::sha256>(digest)) {
-      static_assert(sizeof(fc::sha256) == sizeof(message_hash_type), "fc::sha256 size expected to match message_hash_type size");
-      const auto& msg_hash = std::get<fc::sha256>(digest);
-      std::copy_n(msg_hash.data(), msg_hash.data_size(), msg_digest.begin());
-   } else {
-      msg_digest = crypto::ethereum::hash_message(digest);
-   }
-   // --- 2. Sign the new prefixed hash (msg_digest_result) ---
+fc::em::compact_signature private_key::sign_compact(const fc::crypto::keccak256& digest) const {
+   // Sign the Keccak-256 hash ---
    const secp256k1_context* ctx = detail::_get_context();
-   secp256k1_ecdsa_recoverable_signature sig;
+   fc::em::compact_signature result;
+   secp256k1_ecdsa_recoverable_signature secp_sig;
 
    if (secp256k1_ecdsa_sign_recoverable(
           ctx,
-          &sig,
-          msg_digest.data(), // <-- We sign the prefixed hash
+          &secp_sig,
+          digest.data(), // <-- We sign the Keccak-256 hash
           reinterpret_cast<const unsigned char*>(&my->_key), // The 32-byte private key
           nullptr,
           nullptr
           ) != 1) {
-      FC_THROW_EXCEPTION(exception, "Failed to sign prefixed digest with libsecp256k1");
+      FC_THROW_EXCEPTION(exception, "Failed to sign Keccak-256 digest with libsecp256k1");
    }
 
-   // --- 3. Serialize the signature (same as before) ---
-   unsigned char r_and_s[64]{};
-   int recovery_id = 0;
+   int recovery_id;
 
    secp256k1_ecdsa_recoverable_signature_serialize_compact(
       ctx,
-      r_and_s,
+      result.data(),
       &recovery_id,
-      &sig
+      &secp_sig
       );
 
-   fc::ecc::compact_signature compact_sig{};
-   compact_sig[64] = 27 + recovery_id; // V
-   memcpy(compact_sig.data(), r_and_s, sizeof(r_and_s)); // R and S
+   result[64] = 27 + recovery_id; // V
 
-   return compact_sig;
+   return result;
 }
 
-signature_shim::public_key_type signature_shim::recover(const sha256& digest, bool check_canonical) const {
-   return recover_ex(digest, check_canonical);
+signature_shim::public_key_type signature_shim::recover(const sha256& digest) const {
+   // Wire transaction signed by MetaMask: apply EIP-191 prefix before recovery
+   auto eth_digest = crypto::ethereum::hash_user_message(digest.to_uint8_span());
+   return recover_eth(eth_digest);
 }
 
-signature_shim::public_key_type signature_shim::recover_ex(const em::message_body_type& digest,
-                                                           bool check_canonical) const {
-   // --- 1. Prepare the eth_sign prefixed hash (same as in recover) ---
-   auto msg_digest = crypto::ethereum::hash_message(digest);
+signature_shim::public_key_type signature_shim::recover_eth(const crypto::keccak256& digest) const {
+   return public_key_type(public_key::recover(_data, digest.data(), false).serialize());
+}
 
-   return public_key_type(public_key(_data, msg_digest.data(), false).serialize());
+private_key_shim::signature_type private_key_shim::sign_sha256(const sha256& digest) const {
+   // Wire transaction signing via MetaMask: apply EIP-191 prefix before signing
+   auto eth_digest = crypto::ethereum::hash_user_message(digest.to_uint8_span());
+   return sign_keccak256(eth_digest);
 }
 
 } // namespace fc::em
