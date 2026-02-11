@@ -3,7 +3,6 @@
 #include <fc/io/cfile.hpp>
 #include <sysio/chain/deep_mind.hpp>
 
-#include <boost/algorithm/string/trim.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <deep-mind.hpp>
@@ -69,8 +68,6 @@ void compare_files(const std::string& filename1, const std::string& filename2)
          BOOST_TEST(false, "Unexpected end of input of file1 at line " << i);
          return;
       }
-      boost::algorithm::trim(line1);
-      boost::algorithm::trim(line2);
       if(line1 != line2)
       {
          BOOST_TEST(false, "Mismatch at line " << i << "\n+ " << line1 << "\n- " << line2);
