@@ -93,6 +93,7 @@ class PluginHttpTest(unittest.TestCase):
                         "http_plugin", "db_size_api_plugin", "prometheus_plugin"]
         nodeop_plugins = "--plugin sysio::" +  " --plugin sysio::".join(plugin_names)
         nodeop_flags = (" --data-dir=%s --config-dir=%s --trace-dir=%s --trace-no-abis --access-control-allow-origin=%s "
+                        "--signature-provider wire-1,wire,wire,SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV,KEY:5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3 "
                         "--contracts-console --http-validate-host=%s --verbose-http-errors --max-transaction-time -1 --abi-serializer-max-time-ms 30000 --http-max-response-time-ms 30000 "
                         "--p2p-peer-address localhost:9011 --resource-monitor-not-shutdown-on-threshold-exceeded ") % (self.data_dir, self.config_dir, self.data_dir, "\'*\'", "false")
         nodeop_flags += category_config.nodeopArgs()
@@ -1097,12 +1098,12 @@ class PluginHttpTest(unittest.TestCase):
         # get_unapplied_transactions with empty parameter
         command = "get_unapplied_transactions"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertIn("size", ret_json["payload"])
-        self.assertIn("incoming_size", ret_json["payload"])
+        self.assertIn("unapplied_size", ret_json["payload"])
+        self.assertIn("queued_size", ret_json["payload"])
         # get_unapplied_transactions with empty content parameter
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertIn("size", ret_json["payload"])
-        self.assertIn("incoming_size", ret_json["payload"])
+        self.assertIn("unapplied_size", ret_json["payload"])
+        self.assertIn("queued_size", ret_json["payload"])
         # get_unapplied_transactions with invalid parameter
         ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
         self.assertEqual(ret_json["code"], 400)
@@ -1110,7 +1111,8 @@ class PluginHttpTest(unittest.TestCase):
         # get_unapplied_transactions with valid parameter
         payload = {"lower_bound":"", "limit":1, "time_limit_ms":500}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertIn("trxs", ret_json["payload"])
+        self.assertIn("unapplied_trxs", ret_json["payload"])
+        self.assertIn("queued_trxs", ret_json["payload"])
 
         # place pause and resume tests at the end such that they are not impacted
         # by update_runtime_options

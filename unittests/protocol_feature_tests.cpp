@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            protocol_feature_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_first_protocol_feature_digest) +
+                              reversed_first_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            subjective_block_production_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_second_protocol_feature_digest)+
+                              reversed_second_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );
@@ -1149,15 +1149,41 @@ BOOST_AUTO_TEST_CASE( ram_restrictions_test ) { try {
 
 } FC_LOG_AND_RETHROW() }
 
-BOOST_AUTO_TEST_CASE( webauthn_producer ) { try {
+BOOST_AUTO_TEST_CASE( producer_keys ) { try {
    tester c( setup_policy::preactivate_feature_and_new_bios );
 
-   c.create_account("waprod"_n);
+   c.create_account("prod"_n);
    c.produce_block();
 
-   vector<legacy::producer_key> waprodsched = {{"waprod"_n, public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
+   { // webauthn key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // em key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("0x04e68acfc0253a10620dff706b0a1b1f1f5833ea3beb3bde2250d5f271f3563606672ebc45e0b7ea2e816ecb70ca03137b1c9476eec63d4632e990020b7b6fba39"s, public_key::key_type::em)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // ed key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("PUB_ED_7mHKCLbBMeMF7ew5C7teVeCrk8HvZafdAvmzfoecosrk"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
+   { // bls key
+      vector<legacy::producer_key> prodsched = {{"prod"_n, public_key_type::from_string("PUB_BLS_sGOyYNtpmmjfsNbQaiGJrPxeSg9sdx0nRtfhI_KnWoACXLL53FIf1HjpcN8wX0cYQyOE60NLSI9iPY8mIlT4GkiFMT3ez7j2IbBBzR0D1MthC0B_fYlgYWwjcbqCOowSaH48KA"s)}};
+      BOOST_CHECK_THROW(
+         c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", prodsched)),
+         sysio::chain::unactivated_key_type
+      );
+   }
 
-   c.push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, fc::mutable_variant_object()("schedule", waprodsched));
 } FC_LOG_AND_RETHROW() }
 
 BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
@@ -1165,7 +1191,7 @@ BOOST_AUTO_TEST_CASE( webauthn_create_account ) { try {
 
    signed_transaction trx;
    c.set_transaction_headers(trx);
-   authority auth = authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s));
+   authority auth = authority(public_key_type::from_string("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s));
 
    trx.actions.emplace_back(vector<permission_level>{{config::system_account_name,config::active_name}},
                               newaccount{
@@ -1188,7 +1214,7 @@ BOOST_AUTO_TEST_CASE( webauthn_update_account_auth ) { try {
    c.create_account("billy"_n);
    c.produce_block();
 
-   c.set_authority("billy"_n, config::active_name, authority(public_key_type("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)));
+   c.set_authority("billy"_n, config::active_name, authority(public_key_type::from_string("PUB_WA_WdCPfafVNxVMiW5ybdNs83oWjenQXvSt1F49fg9mv7qrCiRwHj5b38U3ponCFWxQTkDsMC"s)));
 } FC_LOG_AND_RETHROW() }
 
 /*

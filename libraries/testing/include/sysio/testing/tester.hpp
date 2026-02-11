@@ -122,7 +122,7 @@ namespace sysio::testing {
          webauthn_private_key(webauthn_private_key&&) = default;
          webauthn_private_key(const webauthn_private_key&) = default;
 
-         static auto regenerate(const fc::sha256& secret) {
+         static auto regenerate(const r1::private_key_secret& secret) {
             return webauthn_private_key(r1::private_key::regenerate(secret));
          }
 
@@ -143,7 +143,7 @@ namespace sysio::testing {
             fc::sha256::encoder e;
             e.write((char*)auth_data.data(), auth_data.size());
             e.write(client_data_hash.data(), client_data_hash.data_size());
-            auto sig = priv_key.sign_compact(e.result());
+            auto sig = priv_key.sign_sha256(e.result());
 
             char serialized_sig[4096];
             datastream<char*> sig_ds(serialized_sig, sizeof(serialized_sig));
@@ -275,7 +275,7 @@ namespace sysio::testing {
          {
             vector<transaction_trace_ptr> traces;
             traces.reserve(names.size());
-            for( auto n : names ) traces.emplace_back( create_account( n, config::system_account_name, multisig, include_code, include_roa_policy, include_ram_gift ) );
+            for( auto n : names ) traces.emplace_back( create_account( n, sysio::chain::config::system_account_name, multisig, include_code, include_roa_policy, include_ram_gift ) );
             return traces;
          }
 
@@ -348,7 +348,7 @@ namespace sysio::testing {
          void delete_authority( account_name account, permission_name perm );
 
          transaction_trace_ptr create_account( account_name name,
-                                               account_name creator = config::system_account_name,
+                                               account_name creator = sysio::chain::config::system_account_name,
                                                bool multisig = false,
                                                bool include_code = true,
                                                bool include_roa_policy = true,
@@ -389,9 +389,9 @@ namespace sysio::testing {
          static auto get_private_key( name keyname, string role = "owner" ) {
             auto secret = fc::sha256::hash(keyname.to_string() + role);
             if constexpr (std::is_same_v<KeyType, mock::webauthn_private_key>) {
-               return mock::webauthn_private_key::regenerate(secret);
+               return mock::webauthn_private_key::regenerate(secret.to_uint64_array());
             } else {
-               return private_key_type::regenerate<KeyType>(secret);
+               return private_key_type::regenerate<KeyType>(secret.to_uint64_array());
             }
          }
 
@@ -446,7 +446,7 @@ namespace sysio::testing {
                      }
                   }
                   return std::optional<abi_serializer>();
-               } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for ${name}", ("name", name))
+               } FC_RETHROW_EXCEPTIONS( error, "Failed to find or parse ABI for {}", name )
             };
          }
 
@@ -493,9 +493,9 @@ namespace sysio::testing {
 
          static genesis_state default_genesis() {
             genesis_state genesis;
-            genesis.initial_timestamp = fc::time_point::from_iso_string("2020-01-01T00:00:00.000");
-            genesis.initial_key = get_public_key( config::system_account_name, "active" );
-            std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore) = get_bls_key("finalizeraa"_n);
+            genesis.initial_timestamp = fc::time_point::from_iso_string("2025-01-01T00:00:00.000");
+            genesis.initial_key = get_public_key( sysio::chain::config::system_account_name, "active" );
+            std::tie(std::ignore, genesis.initial_finalizer_key, std::ignore, std::ignore) = get_bls_key("finalizeraa"_n);
             return genesis;
          }
 
@@ -726,7 +726,7 @@ namespace sysio::testing {
             if (!skip_validate && std::uncaught_exceptions() == 0)
                BOOST_CHECK_EQUAL( validate(), true );
          } catch( const fc::exception& e ) {
-            wdump((e.to_detail_string()));
+            wlog("{}", e.to_detail_string());
          }
       }
       controller::config vcfg;
@@ -801,7 +801,7 @@ namespace sysio::testing {
 
       void validate_push_block(const signed_block_ptr& sb) {
          auto [best_head, obh] = validating_node->accept_block( sb->calculate_id(), sb );
-         SYS_ASSERT(obh, unlinkable_block_exception, "block did not link ${b}", ("b", sb->calculate_id()));
+         SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}:{}", sb->block_num(), sb->calculate_id());
          validating_node->apply_blocks( {}, trx_meta_cache_lookup{} );
          _check_for_vote_if_needed(*validating_node, *obh);
       }
@@ -860,10 +860,10 @@ namespace sysio::testing {
          pubkeys.reserve(num_keys);
          privkeys.reserve(num_keys);
          for (size_t i=0; i<num_keys; ++i) {
-            account_name name { std::string("finalizer") + (char)('a' + i/26) + (char)('a' + i%26) };
+            account_name name { std::string("finalizer") + static_cast<char>('a' + i / 26) + static_cast<char>('a' + i % 26) };
             key_names.push_back(name);
 
-            auto [privkey, pubkey, pop] = get_bls_key(name);
+            auto [privkey, pubkey, pop, _] = get_bls_key(name);
             pubkeys.push_back(pubkey);
             privkeys.push_back(privkey);
          }

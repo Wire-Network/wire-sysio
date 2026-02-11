@@ -21,9 +21,9 @@ struct chain_snapshot_header {
       auto min = minimum_compatible_version;
       auto max = current_version;
       SYS_ASSERT(version >= min && version <= max,
-              snapshot_validation_exception,
-              "Unsupported version of chain snapshot: ${version}. Supported version must be between ${min} and ${max} inclusive.",
-              ("version",version)("min",min)("max",max));
+                 snapshot_validation_exception,
+                 "Unsupported version of chain snapshot: {}. Supported version must be between {} and {} inclusive.",
+                 version, min, max);
    }
 };
 

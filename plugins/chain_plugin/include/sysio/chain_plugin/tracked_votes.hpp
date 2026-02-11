@@ -40,7 +40,7 @@ namespace sysio::chain_apis {
       void on_accepted_block(const chain::signed_block_ptr& block, const chain::block_id_type& id);
 
       // Returns last vote information by a given finalizer
-      std::optional<vote_info> get_last_vote_info(const fc::crypto::blslib::bls_public_key& finalizer_pub_key) const;
+      std::optional<vote_info> get_last_vote_info(const fc::crypto::bls::public_key& finalizer_pub_key) const;
 
       // Sets tracking_enabled
       void set_tracking_enabled(bool enabled);

@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(finality_extension_uniqueness_test)
                                                 std::optional<proposer_policy_diff>{}} )
    );
 
-   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::blslib::bls_public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
+   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::bls::public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
    auto fin_policy = std::make_shared<finalizer_policy>();
    finalizer_policy_diff new_finalizer_policy_diff = fin_policy->create_diff(finalizer_policy{.generation = 1, .threshold = 100, .finalizers = finalizers});
 
@@ -71,11 +71,12 @@ BOOST_AUTO_TEST_CASE(finality_extension_with_values_test)
    constexpr uint32_t last_qc_block_num {10};
    constexpr bool     is_strong_qc {true};
    
-   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::blslib::bls_public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
+   std::vector<finalizer_authority> finalizers { {"test description", 50, fc::crypto::bls::public_key{"PUB_BLS_qVbh4IjYZpRGo8U_0spBUM-u-r_G0fMo4MzLZRsKWmm5uyeQTp74YFaMN9IDWPoVVT5rj_Tw1gvps6K9_OZ6sabkJJzug3uGfjA6qiaLbLh5Fnafwv-nVgzzzBlU2kwRrcHc8Q" }} };
    auto fin_policy = std::make_shared<finalizer_policy>();
    finalizer_policy_diff new_finalizer_policy_diff = fin_policy->create_diff(finalizer_policy{.generation = 1, .threshold = 100, .finalizers = finalizers});
 
-   proposer_policy_diff new_proposer_policy_diff = proposer_policy_diff{.version = 1, .proposal_time = block_timestamp_type{200}, .producer_auth_diff = {}};
+   constexpr uint32_t block_timestamp = 200;
+   proposer_policy_diff new_proposer_policy_diff = proposer_policy_diff{.version = 1, .proposal_time = block_timestamp_type{block_timestamp}, .producer_auth_diff = {}};
 
    emplace_extension(
       header.header_extensions,
@@ -100,7 +101,7 @@ BOOST_AUTO_TEST_CASE(finality_extension_with_values_test)
 
    BOOST_REQUIRE( !!f_ext.new_proposer_policy_diff );
    fc::time_point t = (fc::time_point)(f_ext.new_proposer_policy_diff->proposal_time);
-   BOOST_REQUIRE_EQUAL(t.time_since_epoch().to_seconds(), 946684900ll);
+   BOOST_REQUIRE_EQUAL(t.time_since_epoch().to_seconds(), config::block_timestamp_epoch/1000+(block_timestamp/(1000/config::block_interval_ms)));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

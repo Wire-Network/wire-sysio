@@ -3,10 +3,10 @@
 #include <fc/crypto/bls_public_key.hpp>
 #include <fc/crypto/bls_signature.hpp>
 
-namespace fc::crypto::blslib {
+namespace fc::crypto::bls {
 
-   bool verify(const bls_public_key& pubkey,
+   bool verify(const public_key& pubkey,
                std::span<const uint8_t> message,
-               const bls_signature& signature);
+               const signature& signature);
 
-} // fc::crypto::blslib
+} // fc::crypto::bls

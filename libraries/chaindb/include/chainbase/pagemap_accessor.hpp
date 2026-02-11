@@ -49,7 +49,7 @@ public:
             }
          }
 #endif
-         ilog("Soft-Dirty pagemap support: ${sd}", ("sd", _pagemap_supported ? "OK" : "Not supported"));
+         ilog("Soft-Dirty pagemap support: {}", _pagemap_supported ? "OK" : "Not supported");
       }
       return _pagemap_supported;
    }

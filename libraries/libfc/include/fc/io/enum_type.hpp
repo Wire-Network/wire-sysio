@@ -19,7 +19,7 @@ namespace fc
       
       explicit operator IntType()const     { return static_cast<IntType>(value);    }
       operator EnumType()const    { return value;                          }
-      operator std::string()const { return fc::reflector<EnumType>::to_string(value); }
+      std::string to_string()const { return fc::reflector<EnumType>::to_string(value); }
       
       enum_type& operator=( IntType i )  { value = (EnumType)i; return *this;}
       enum_type& operator=( EnumType i ) { value = i; return *this;}

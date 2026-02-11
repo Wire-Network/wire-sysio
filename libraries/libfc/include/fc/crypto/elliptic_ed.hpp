@@ -3,9 +3,8 @@
 #include <cstring>               // for memset
 #include <ostream>               // for std::ostream
 #include <sodium.h>              // for ED25519 methods
-#include <fc/array.hpp>          // for fc::array
 #include <fc/crypto/sha256.hpp>
-#include <fc/crypto/sha512.hpp>  // for generate_shared_secret return type
+#include <fc/crypto/base58.hpp>
 #include <fc/io/raw.hpp>         // for fc::raw::pack/unpack
 #include <fc/io/datastream.hpp>  // for fc::datastream
 #include <fc/io/cfile.hpp> // for fc::cfile_datastream
@@ -22,41 +21,78 @@ struct signature_shim;
  */
 struct public_key_shim {
    static constexpr size_t size = crypto_sign_PUBLICKEYBYTES;
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<uint8_t, size>;
+   data_type _data{};
 
-   public_key_shim() { memset(_data.data, 0, size); }
+   public_key_shim() = default;
    explicit public_key_shim(const data_type& d): _data(d) {}
 
    bool valid() const {
-      for(auto b : _data.data) if(b) return true;
+      for(auto b : _data) if(b) return true;
       return false;
    }
 
    data_type serialize() const { return _data; }
+
+   std::string to_string(const fc::yield_function_t& yield)const {
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
+      return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
+   }
+
+   static public_key_shim from_base58_string(const std::string& str) {
+      constexpr size_t max_key_len = 44;
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 public key string length {}", str.size());
+      auto bytes = from_base58(str);
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 public key bytes length {}", bytes.size());
+      public_key_shim result;
+      memcpy(result._data.data(), bytes.data(), bytes.size());
+      return result;
+   }
 };
 
 /**
- * ED25519 signature (64 bytes, padded to 65 for fc::signature compatibility)
+ * ED25519 signature (64 bytes)
  */
 struct signature_shim {
-   static constexpr size_t size = crypto_sign_BYTES + 1; // 65, 64 by default padded to 65 to match fc::signature
+   static constexpr size_t size = crypto_sign_BYTES;
    static constexpr bool is_recoverable = false;
 
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<uint8_t, size>;
+   data_type _data{};
 
-   signature_shim() { memset(_data.data, 0, size); }
+   signature_shim() = default;
    explicit signature_shim(const data_type& d): _data(d) {}
 
    data_type serialize() const { return _data; }
 
+   size_t get_hash() const {
+      size_t result;
+      std::memcpy(&result, _data.data(), sizeof(size_t));
+      return result;
+   }
+
    using public_key_type = public_key_shim;
-   public_key_shim recover(const sha256&, bool) const {
+   public_key_shim recover(const sha256&) const {
       FC_THROW_EXCEPTION(exception, "ED25519 signature recovery not supported");
    }
 
    bool verify(const sha256& digest, const public_key_shim& pub) const;
+   bool verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const;
+
+   std::string to_string(const fc::yield_function_t& yield)const {
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
+      return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
+   }
+
+   static signature_shim from_base58_string(const std::string& str) {
+      constexpr size_t max_sig_len = 88;
+      FC_ASSERT( str.size() <= max_sig_len, "Invalid ED25519 signature string length {}", str.size());
+      auto bytes = from_base58(str);
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 signature bytes length {}", bytes.size());
+      signature_shim result;
+      memcpy(result._data.data(), bytes.data(), bytes.size());
+      return result;
+   }
 };
 
 /**
@@ -64,20 +100,46 @@ struct signature_shim {
  */
 struct private_key_shim {
    static constexpr size_t size = crypto_sign_SECRETKEYBYTES;
-   using data_type = fc::array<unsigned char, size>;
-   data_type _data;
+   using data_type = std::array<uint8_t, size>;
+   data_type _data{};
 
-   private_key_shim() { memset(_data.data, 0, size); }
+   private_key_shim() = default;
    explicit private_key_shim(const data_type& d): _data(d) {}
 
    using public_key_type = public_key_shim;
+   using signature_type = signature_shim;
 
+   static private_key_shim generate();
    public_key_shim get_public_key() const;
    
-   signature_shim  sign(const sha256& digest, bool require_canonical) const;
-   sha512          generate_shared_secret(const public_key_shim&) const;
+   signature_shim  sign_sha256(const sha256& digest) const;
+
+   /**
+    * Sign raw bytes directly without any transformation (no hex encoding).
+    * This is required for Solana transaction signing where ED25519 signs
+    * the raw serialized message bytes.
+    * @param data Pointer to the data to sign
+    * @param len Length of the data
+    * @return ED25519 signature
+    */
+   signature_shim  sign_raw(const uint8_t* data, size_t len) const;
 
    data_type serialize() const { return _data; }
+
+   std::string to_string(const fc::yield_function_t& yield)const {
+      static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
+      return to_base58(reinterpret_cast<const char*>(_data.data()), _data.size(), yield);
+   }
+
+   static private_key_shim from_base58_string(const std::string& str) {
+      constexpr size_t max_key_len = 88;
+      FC_ASSERT( str.size() <= max_key_len, "Invalid ED25519 private key string length {}", str.size());
+      auto bytes = from_base58(str);
+      FC_ASSERT(bytes.size() == size, "Invalid ED25519 private key bytes length {}", bytes.size());
+      private_key_shim result;
+      memcpy(result._data.data(), bytes.data(), bytes.size());
+      return result;
+   }
 };
 
 }}} // namespace fc::crypto::ed
@@ -132,39 +194,37 @@ namespace fc::crypto::ed {
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::public_key_shim& pk) {
-   ds.write(reinterpret_cast<const char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+   ds.write(reinterpret_cast<const char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::public_key_shim& pk) {
-   ds.read(reinterpret_cast<char*>(pk._data.data), crypto_sign_PUBLICKEYBYTES);
+   ds.read(reinterpret_cast<char*>(pk._data.data()), crypto_sign_PUBLICKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::signature_shim& sig) {
-   ds.write(reinterpret_cast<const char*>(sig._data.data), crypto_sign_BYTES);
+   ds.write(reinterpret_cast<const char*>(sig._data.data()), crypto_sign_BYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::signature_shim& sig) {
-   ds.read(reinterpret_cast<char*>(sig._data.data), crypto_sign_BYTES);
-   // pad the extra byte to zero so serialize() remains correct
-   sig._data.data[crypto_sign_BYTES] = 0;
+   ds.read(reinterpret_cast<char*>(sig._data.data()), crypto_sign_BYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator<<(DataStream& ds, const crypto::ed::private_key_shim& sk) {
-   ds.write(reinterpret_cast<const char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+   ds.write(reinterpret_cast<const char*>(sk._data.data()), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 
 template <typename DataStream>
 DataStream& operator>>(DataStream& ds, crypto::ed::private_key_shim& sk) {
-   ds.read(reinterpret_cast<char*>(sk._data.data), crypto_sign_SECRETKEYBYTES);
+   ds.read(reinterpret_cast<char*>(sk._data.data()), crypto_sign_SECRETKEYBYTES);
    return ds;
 }
 

@@ -27,7 +27,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    issue_and_transfer( "alice1111111", core_sym::from_string("1000.0000"),  config::system_account_name );
 
    //fc::variant params = producer_parameters_example(1);
-   auto key =  fc::crypto::public_key( std::string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV") ); // cspell:disable-line
+   auto key =  fc::crypto::public_key::from_string("SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key )
@@ -51,11 +51,11 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( key, fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    BOOST_REQUIRE_EQUAL( "http://wire", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 1, info["location"].as_int64() );
 
-   auto key2 =  fc::crypto::public_key( std::string("SYS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6") ); // cspell:disable-line
+   auto key2 =  fc::crypto::public_key::from_string( "SYS5jnmSKrzdBHE9n8hw58y7yxFWBC8SNiG7m8S1crJH3KvAnf9o6" ); // cspell:disable-line
    BOOST_REQUIRE_EQUAL( success(), push_action("alice1111111"_n, "regproducer"_n, mvo()
                                                ("producer",  "alice1111111")
                                                ("producer_key", key2 )
@@ -65,7 +65,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
-   BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( key2, fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );
    BOOST_REQUIRE_EQUAL( 2, info["location"].as_int64() );
 
@@ -76,7 +76,7 @@ BOOST_FIXTURE_TEST_CASE( producer_register_unregister, sysio_system_tester ) try
    );
    info = get_producer_info( "alice1111111" );
    //key should be empty
-   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key(info["producer_key"].as_string()) );
+   BOOST_REQUIRE_EQUAL( fc::crypto::public_key(), fc::crypto::public_key::from_string(info["producer_key"].as_string()) );
    //everything else should stay the same
    BOOST_REQUIRE_EQUAL( "alice1111111", info["owner"].as_string() );
    BOOST_REQUIRE_EQUAL( "https://wire.network", info["url"].as_string() );
@@ -113,7 +113,6 @@ BOOST_FIXTURE_TEST_CASE( producer_wtmsig, sysio_system_tester ) try {
    block_signing_private_keys.emplace(get_public_key("alice1111111"_n, "bs1"), get_private_key("alice1111111"_n, "bs1"));
 
    auto alice_prod_info = get_producer_info( "alice1111111"_n );
-   wdump((alice_prod_info));
    BOOST_REQUIRE_EQUAL( alice_prod_info["is_active"], true );
 
    produce_block();
@@ -211,7 +210,7 @@ BOOST_FIXTURE_TEST_CASE(producers_upgrade_system_contract, sysio_system_tester) 
       std::copy( msg.begin(), msg.end(), it );
 
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)
@@ -340,7 +339,7 @@ BOOST_FIXTURE_TEST_CASE( setparams, sysio_system_tester ) try {
    transaction trx;
    {
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)
@@ -430,7 +429,7 @@ BOOST_FIXTURE_TEST_CASE( wasmcfg, sysio_system_tester ) try {
    transaction trx;
    {
       fc::variant pretty_trx = fc::mutable_variant_object()
-         ("expiration", "2020-01-01T00:30")
+         ("expiration", "2025-01-01T00:30")
          ("ref_block_num", 2)
          ("ref_block_prefix", 3)
          ("net_usage_words", 0)

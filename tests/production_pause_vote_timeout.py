@@ -197,9 +197,9 @@ try:
     # Check again after at least 1 round (6 seconds)
     time.sleep(7)
     assert producercNode.processUrllibRequest("producer", "paused", returnType=ReturnType.raw) == b'false', "producercNode (--production-pause-vote-timeout-ms 0) paused after finalizercNode was shutdown"
-    # Verify node0 and node1 still producing
-    assert node0.waitForHeadToAdvance(), "node0 paused after finalizercNode was shutdown"
-    assert node1.waitForHeadToAdvance(), "node1 paused after finalizercNode was shutdown"
+    # Verify node0 and node1 still producing, a fork switch can cause this to take a bit to see head moving
+    assert node0.waitForHeadToAdvance(timeout=30), "node0 paused after finalizercNode was shutdown"
+    assert node1.waitForHeadToAdvance(timeout=30), "node1 paused after finalizercNode was shutdown"
     
     ####################### test 4 ######################
     # shutdown node0 and make sure node1 does not pause

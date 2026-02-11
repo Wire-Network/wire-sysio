@@ -30,7 +30,6 @@ namespace sysio { namespace chain {
             set_time_point(t);
          }
 
-         static block_timestamp maximum() { return block_timestamp( 0xffff ); }
          static block_timestamp min() { return block_timestamp(0); }
 
          block_timestamp next() const {
@@ -74,7 +73,11 @@ namespace sysio { namespace chain {
       }
    }; // block_timestamp
 
-   typedef block_timestamp<config::block_interval_ms,config::block_timestamp_epoch> block_timestamp_type; 
+   typedef block_timestamp<config::block_interval_ms,config::block_timestamp_epoch> block_timestamp_type;
+
+   constexpr std::string format_as(const block_timestamp_type& t) {
+      return t.to_time_point().to_iso_string();
+   }
 
 } } /// sysio::chain
 

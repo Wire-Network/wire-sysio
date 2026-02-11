@@ -1,39 +1,43 @@
-# Use vcpkg’s BoostConfig.cmake (CONFIG mode), not FindBoost.
-unset(Boost_DIR CACHE)
-unset(BOOST_ROOT CACHE)
-# Make sure we don't force module-mode anywhere:
-# unset(Boost_NO_BOOST_CMAKE CACHE)
+set(BOOST_VERSION 1.89.0)
+# Ask for the version installed via vcpkg (or omit the version to accept any)
 set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 
-# Ask for the version installed via vcpkg (or omit the version to accept any)
-find_package(Boost 1.89.0 EXACT CONFIG REQUIRED
-  COMPONENTS
-    system
-    filesystem
-    iostreams
-    date_time
-    thread
-    chrono
-    context
-    coroutine
-    program_options
-    interprocess
-    process
-    unit_test_framework
-    dll
-    beast
-    bimap
-    multi_index
-    signals2
-    multiprecision 
-    hana
-    property_tree
-    lockfree
-    assign
-    accumulators
-    rational
-    format
+set(Boost_USE_STATIC_LIBS ON)
+set(BOOST_COMPONENTS
+        accumulators
+        asio
+        assign
+        atomic
+        beast
+        bimap
+        chrono
+        container
+        context
+        coroutine
+        date_time
+        dll
+        filesystem
+        format
+        hana
+        headers
+        interprocess
+        iostreams
+        lockfree
+        multi_index
+        multiprecision
+        process
+        program_options
+        property_tree
+        rational
+        regex
+        signals2
+        system
+        thread
+        unit_test_framework
 )
+foreach (COMPONENT ${BOOST_COMPONENTS})
+    find_package(boost_${COMPONENT} ${BOOST_VERSION} EXACT CONFIG REQUIRED)
+endforeach()
 
 # Keep uBLAS shim if code links Boost::numeric_ublas
 if (NOT TARGET boost_numeric_ublas)

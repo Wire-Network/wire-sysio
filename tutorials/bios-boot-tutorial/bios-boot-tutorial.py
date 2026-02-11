@@ -119,7 +119,7 @@ def startNode(nodeIndex, account):
         '    --access-control-allow-origin=*'
         '    --access-control-allow-headers="Origin, X-Requested-With, Content-Type, Accept"'
         '    --producer-name ' + account['name'] +
-        '    --signature-provider ' + account['pub'] + '=KEY:' + account['pvt'] +
+        '    --signature-provider wire-1,wire,wire,' + account['pub'] + ',KEY:' + account['pvt'] +
         # '    --s-chain-contract settle.wns'
         # '    --s-chain-actions batchw'
         # '    --s-chain-actions initcontract'

@@ -1,3 +1,4 @@
+#pragma once
 #include <chainbase/chainbase.hpp>
 #include <fc/filesystem.hpp>
 

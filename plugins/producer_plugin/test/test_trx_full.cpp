@@ -42,25 +42,25 @@ auto make_unique_trx( const chain_id_type& chain_id ) {
    static uint64_t nextid = 0;
    ++nextid;
 
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
 
    signed_transaction trx;
    // if a transaction expires after it was aborted then it will not be included in a block
    trx.expiration = fc::time_point_sec{fc::time_point::now() + fc::seconds( nextid % 20 == 0 ? 0 : 60 )}; // fail some transactions via expired
    if( nextid % 15 == 0 ) { // fail some for invalid unlinkauth
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 unlinkauth{} );
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 testit{nextid} );
    } else {
-      trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+      trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                                 testit{ nextid % 7 == 0 ? 0 : nextid} ); // fail some for duplicates
    }
    if( nextid % 13 == 0 ) { // fail some for invalid signature
-      auto bad_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("kevin")));
+      auto bad_priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("kevin")).to_uint64_array());
       trx.sign( bad_priv_key, chain_id );
    } else {
-      auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
+      auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")).to_uint64_array());
       trx.sign( priv_key, chain_id );
    }
 
@@ -109,11 +109,11 @@ BOOST_AUTO_TEST_CASE(producer) {
       std::future<std::tuple<producer_plugin*, chain_plugin*>> plugin_fut = plugin_promise.get_future();
       std::thread app_thread( [&]() {
          try {
-            fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+            fc::logger::default_logger().set_log_level(fc::log_level::debug);
             std::vector<const char*> argv =
                   {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
                    "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
-            app->initialize<chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
+            app->initialize<signature_provider_manager_plugin,chain_plugin, producer_plugin>( argv.size(), (char**) &argv[0] );
             app->startup();
             plugin_promise.set_value(
                   {app->find_plugin<producer_plugin>(), app->find_plugin<chain_plugin>()} );
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(producer) {
       const size_t num_pushes = 4242;
       for( size_t i = 1; i <= num_pushes; ++i ) {
          auto ptrx = make_unique_trx( chain_id );
-         dlog( "posting ${id}", ("id", ptrx->id()) );
+         dlog( "posting {}", ptrx->id() );
          app->post( priority::low, [ptrx, &next_calls, &num_posts, &trace_with_except, &trx_match, &trxs, &app]() {
             ++num_posts;
             bool return_failure_traces = num_posts % 2;
@@ -172,13 +172,13 @@ BOOST_AUTO_TEST_CASE(producer) {
                      if( std::get<chain::transaction_trace_ptr>( result )->id == ptrx->id() ) {
                         trxs.push_back( ptrx );
                      } else {
-                        elog( "trace not for trx ${id}: ${t}",
-                              ("id", ptrx->id())("t", fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result))) );
+                        elog( "trace not for trx {}: {}",
+                              ptrx->id(), fc::json::to_pretty_string(*std::get<chain::transaction_trace_ptr>(result)) );
                         trx_match = false;
                      }
                   } else if( !return_failure_traces && !std::holds_alternative<fc::exception_ptr>( result ) && std::get<chain::transaction_trace_ptr>( result )->except ) {
-                     elog( "trace with except ${e}",
-                           ("e", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) )) );
+                     elog( "trace with except {}",
+                           fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) ) );
                      ++trace_with_except;
                   }
                   ++next_calls;

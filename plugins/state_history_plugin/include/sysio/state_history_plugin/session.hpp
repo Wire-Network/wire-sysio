@@ -43,7 +43,7 @@ public:
     strand(s.get_executor()), stream(std::move(s)), wake_timer(strand), controller(controller),
     trace_log(trace_log), chain_state_log(chain_state_log), finality_data_log(finality_data_log),
     get_block_id(get_block_id), get_block(get_block), on_done(on_done), logger(logger), remote_endpoint_string(get_remote_endpoint_string()) {
-      fc_ilog(logger, "incoming state history connection from ${a}", ("a", remote_endpoint_string));
+      fc_ilog(logger, "incoming state history connection from {}", remote_endpoint_string);
 
       boost::asio::co_spawn(strand, read_loop(), [&](std::exception_ptr e) {check_coros_done(e);});
    }
@@ -104,19 +104,19 @@ private:
       }
       catch(fc::exception& e) {
          if(has_logged_exception.test_and_set() == false)
-            fc_ilog(logger, "state history connection from ${a} failed: ${w}", ("a", remote_endpoint_string)("w", e.top_message()));
+            fc_ilog(logger, "state history connection from {} failed: {}", remote_endpoint_string, e.top_message());
       }
       catch(boost::system::system_error& e) {
          if(has_logged_exception.test_and_set() == false)
-            fc_ilog(logger, "state history connection from ${a} failed: ${w}", ("a", remote_endpoint_string)("w", e.code().message()));
+            fc_ilog(logger, "state history connection from {} failed: {}", remote_endpoint_string, e.code().message());
       }
       catch(std::exception& e) {
          if(has_logged_exception.test_and_set() == false)
-            fc_ilog(logger, "state history connection from ${a} failed: ${w}", ("a", remote_endpoint_string)("w", e.what()));
+            fc_ilog(logger, "state history connection from {} failed: {}", remote_endpoint_string, e.what());
       }
       catch(...) {
          if(has_logged_exception.test_and_set() == false)
-            fc_ilog(logger, "state history connection from ${a} failed", ("a", remote_endpoint_string));
+            fc_ilog(logger, "state history connection from {} failed", remote_endpoint_string);
       }
 
       drop_exceptions([this](){ stream.next_layer().close(); });

@@ -1,10 +1,7 @@
-file(GLOB HEADERS "include/sysio/resource_monitor_plugin/*.hpp")
-add_library( resource_monitor_plugin
-             resource_monitor_plugin.cpp
-             system_file_space_provider.cpp
-             ${HEADERS} )
 
-target_link_libraries( resource_monitor_plugin appbase fc chain_plugin)
-target_include_directories( resource_monitor_plugin PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" )
+plugin_target(
+        resource_monitor_plugin
+        LIBRARIES
+        appbase
+        chain_plugin)
 
-add_subdirectory( test )

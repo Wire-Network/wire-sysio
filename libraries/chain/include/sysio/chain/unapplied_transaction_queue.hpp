@@ -97,9 +97,9 @@ public:
          if( itr->next ) {
             itr->next( std::static_pointer_cast<fc::exception>(
                   std::make_shared<expired_tx_exception>(
-                        FC_LOG_MESSAGE( error, "expired transaction ${id}, expiration ${e}, block time ${bt}",
-                                        ("id", itr->id())("e", itr->trx_meta->packed_trx()->expiration())
-                                        ("bt", pending_block_time) ) ) ) );
+                        FC_LOG_MESSAGE( error, "expired transaction {}, expiration {}, block time {}",
+                                        itr->id(), itr->trx_meta->packed_trx()->expiration(),
+                                        pending_block_time) ) ) );
          }
          removed( itr );
          persisted_by_expiry.erase( itr );
@@ -115,7 +115,7 @@ public:
          if( itr != idx.end() ) {
             if( itr->next ) {
                itr->next( std::static_pointer_cast<fc::exception>( std::make_shared<tx_duplicate>(
-                             FC_LOG_MESSAGE( info, "duplicate transaction ${id}", ("id", itr->trx_meta->id())))));
+                             FC_LOG_MESSAGE( info, "duplicate transaction {}", itr->trx_meta->id()))));
             }
             removed( itr );
             idx.erase( itr );
@@ -145,7 +145,7 @@ public:
          if( itr->trx_meta == trx ) return; // same trx meta pointer
          if( next ) {
             next( std::static_pointer_cast<fc::exception>( std::make_shared<tx_duplicate>(
-                  FC_LOG_MESSAGE( info, "duplicate transaction ${id}", ("id", trx->id()) ) ) ) );
+                  FC_LOG_MESSAGE( info, "duplicate transaction {}", trx->id() ) ) ) );
          }
       }
    }
@@ -181,10 +181,9 @@ private:
       if( itr->trx_type == trx_enum_type::incoming_p2p || itr->trx_type == trx_enum_type::incoming_api ) {
          ++incoming_count;
          SYS_ASSERT( size_in_bytes + size < max_transaction_queue_size, tx_resource_exhaustion,
-                     "Transaction ${id}, size ${s} bytes would exceed configured "
-                     "incoming-transaction-queue-size-mb ${qs}, current queue size ${cs} bytes",
-                     ("id", itr->trx_meta->id())("s", size)("qs", max_transaction_queue_size/(1024*1024))
-                     ("cs", size_in_bytes) );
+                     "Transaction {}, size {} bytes would exceed configured "
+                     "incoming-transaction-queue-size-mb {}, current queue size {} bytes",
+                     itr->trx_meta->id(), size, max_transaction_queue_size/(1024*1024), size_in_bytes );
       }
       size_in_bytes += size;
    }

@@ -1,127 +1,96 @@
 #include <fc/crypto/private_key.hpp>
 #include <fc/utility.hpp>
+#include <fc/crypto/key_serdes.hpp>
 #include <fc/exception/exception.hpp>
 
 namespace fc { namespace crypto {
    using namespace std;
 
-   struct public_key_visitor : visitor<public_key::storage_type> {
-      template<typename KeyType>
-      public_key::storage_type operator()(const KeyType& key) const
-      {
+   public_key private_key::get_public_key() const {
+      return public_key(std::visit([](const auto& key) {
          return public_key::storage_type(key.get_public_key());
+      }, _storage));
+   }
+
+   signature private_key::sign( const sha256& digest ) const {
+      return signature(std::visit([&digest](const auto& key) {
+         return signature::storage_type(key.sign_sha256(digest));
+      }, _storage));
+   }
+
+   private_key private_key::from_string(const std::string& str, key_type type) {
+      switch (type) {
+      case key_type::k1:
+      case key_type::r1:
+      case key_type::bls: {
+         private_key k(parse_unknown_wire_private_key_str(str));
+         FC_ASSERT( k.type() == type, "Parsed type {} does not match specified type {} for {}",
+                    k.type(), type, str.substr(0, 10) + "..." );
+         return k;
       }
-   };
-
-   public_key private_key::get_public_key() const
-   {
-      return public_key(std::visit(public_key_visitor(), _storage));
-   }
-
-   struct sign_visitor : visitor<signature::storage_type> {
-      sign_visitor( const sha256& digest, bool require_canonical )
-      :_digest(digest)
-      ,_require_canonical(require_canonical)
-      {}
-
-      template<typename KeyType>
-      signature::storage_type operator()(const KeyType& key) const
-      {
-         return signature::storage_type(key.sign(_digest, _require_canonical));
+      case key_type::em: {
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         const auto& key = base_prefix.empty() ? str : data_str;
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
+         return from_native_string_to_private_key<chain_key_type_ethereum>(key);
       }
-
-      const sha256&  _digest;
-      bool           _require_canonical;
-   };
-
-   signature private_key::sign( const sha256& digest, bool require_canonical ) const
-   {
-      return signature(std::visit(sign_visitor(digest, require_canonical), _storage));
-   }
-
-   struct generate_shared_secret_visitor : visitor<sha512> {
-      generate_shared_secret_visitor( const public_key::storage_type& pub_storage )
-      :_pub_storage(pub_storage)
-      {}
-
-      template<typename KeyType>
-      sha512 operator()(const KeyType& key) const
-      {
-         using PublicKeyType = typename KeyType::public_key_type;
-         return key.generate_shared_secret(std::template get<PublicKeyType>(_pub_storage));
+      case key_type::ed: {
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         const auto& key = base_prefix.empty() ? str : data_str;
+         FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
+         return from_native_string_to_private_key<chain_key_type_solana>(key);
       }
+      case key_type::unknown: {
+         if (str.find('_') == std::string::npos)
+            return private_key(parse_unknown_wire_private_key_str(str));
 
-      const public_key::storage_type&  _pub_storage;
-   };
-
-   sha512 private_key::generate_shared_secret( const public_key& pub ) const
-   {
-      return std::visit(generate_shared_secret_visitor(pub._storage), _storage);
-   }
-
-   template<typename Data>
-   string to_wif( const Data& secret, const fc::yield_function_t& yield )
-   {
-      const size_t size_of_data_to_hash = sizeof(typename Data::data_type) + 1;
-      const size_t size_of_hash_bytes = 4;
-      char data[size_of_data_to_hash + size_of_hash_bytes];
-      data[0] = (char)0x80; // this is the Bitcoin MainNet code
-      memcpy(&data[1], (const char*)&secret.serialize(), sizeof(typename Data::data_type));
-      sha256 digest = sha256::hash(data, size_of_data_to_hash);
-      digest = sha256::hash(digest);
-      memcpy(data + size_of_data_to_hash, (char*)&digest, size_of_hash_bytes);
-      return to_base58(data, sizeof(data), yield);
-   }
-
-   template<typename Data>
-   Data from_wif( const string& wif_key )
-   {
-      auto wif_bytes = from_base58(wif_key);
-      FC_ASSERT(wif_bytes.size() >= 5);
-      auto key_bytes = vector<char>(wif_bytes.begin() + 1, wif_bytes.end() - 4);
-      fc::sha256 check = fc::sha256::hash(wif_bytes.data(), wif_bytes.size() - 4);
-      fc::sha256 check2 = fc::sha256::hash(check);
-
-      FC_ASSERT(memcmp( (char*)&check, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 ||
-                memcmp( (char*)&check2, wif_bytes.data() + wif_bytes.size() - 4, 4 ) == 0 );
-
-      return Data(fc::variant(key_bytes).as<typename Data::data_type>());
-   }
-
-   static private_key::storage_type priv_parse_base58(const string& base58str)
-   {
-      const auto pivot = base58str.find('_');
-
-      if (pivot == std::string::npos) {
-         // wif import
-         using default_type = std::variant_alternative_t<0, private_key::storage_type>;
-         return private_key::storage_type(from_wif<default_type>(base58str));
-      } else {
-         constexpr auto prefix = config::private_key_base_prefix;
-         const auto prefix_str = base58str.substr(0, pivot);
-         FC_ASSERT(prefix == prefix_str, "Private Key has invalid prefix: ${str}", ("str", base58str)("prefix_str", prefix_str));
-
-         auto data_str = base58str.substr(pivot + 1);
-         FC_ASSERT(!data_str.empty(), "Private Key has no data: ${str}", ("str", base58str));
-         return base58_str_parser<private_key::storage_type, config::private_key_prefix>::apply(data_str);
-      }
-   }
-
-   private_key::private_key(const std::string& base58str)
-   :_storage(priv_parse_base58(base58str))
-   {}
-
-   std::string private_key::to_string(const fc::yield_function_t& yield) const
-   {
-      auto which = _storage.index();
-
-      if (which == 0) {
-         using default_type = std::variant_alternative_t<0, private_key::storage_type>;
-         return to_wif(std::template get<default_type>(_storage), yield);
+         auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
+         FC_ASSERT(base_prefix == constants::private_key_base_prefix, "Invalid prefix to parse key type: {}", str.substr(0, 10) + "...");
+         if (type_prefix == key_prefix(key_type::em)) {
+            return from_native_string_to_private_key<chain_key_type_ethereum>(data_str);
+         } else if (type_prefix == key_prefix(key_type::ed)) {
+            return from_native_string_to_private_key<chain_key_type_solana>(data_str);
+         }
+         return private_key(parse_unknown_wire_private_key_str(str));
       }
 
-      auto data_str = std::visit(base58str_visitor<storage_type, config::private_key_prefix>(yield), _storage);
-      return std::string(config::private_key_base_prefix) + "_" + data_str;
+      default:
+         FC_ASSERT(false, "Unknown key type: {}", type);
+      };
+
+   }
+
+   std::string private_key::to_string(const fc::yield_function_t& yield, bool include_prefix) const {
+      if (type() == key_type::k1 && !include_prefix) {
+         return to_wif(std::get<0>(_storage), yield);
+      }
+
+      switch (type()) {
+      case key_type::k1:
+      case key_type::r1: {
+         auto data_str = std::visit(base58str_visitor<storage_type, fc::crypto::constants::private_key_prefix>(yield), _storage);
+         return std::string(fc::crypto::constants::private_key_base_prefix) + "_" + data_str;
+      }
+      case key_type::em: {
+         std::string prefix = include_prefix
+                                 ? std::string(constants::private_key_base_prefix) + "_" + key_prefix(key_type::em) + "_"
+                                 : "";
+         return prefix + get<em::private_key_shim>().to_string();
+      }
+      case key_type::ed: {
+         std::string prefix = include_prefix
+                                 ? std::string(constants::private_key_base_prefix) + "_" + key_prefix(key_type::ed) + "_"
+                                 : "";
+         return prefix + get<ed::private_key_shim>().to_string(yield);
+      }
+      case key_type::bls: {
+         return std::get<bls::private_key_shim>(_storage).to_string();
+      }
+      case key_type::unknown:
+         break;
+      }
+
+      FC_ASSERT(false, "private_key unknown key type {}", type());
    }
 
    bool operator==( const private_key& p1, const private_key& p2 ) {
@@ -134,16 +103,13 @@ namespace fc { namespace crypto {
    }
 } } // fc::crypto
 
-namespace fc
-{
-   void to_variant(const fc::crypto::private_key& var, variant& vo, const fc::yield_function_t& yield)
-   {
-      vo = var.to_string(yield);
-   }
+namespace fc {
+void to_variant(const fc::crypto::private_key& var, variant& vo, const fc::yield_function_t& yield) {
+   vo = var.to_string(yield, true);
+}
 
-   void from_variant(const variant& var, fc::crypto::private_key& vo)
-   {
-      vo = fc::crypto::private_key(var.as_string());
-   }
+void from_variant(const variant& var, fc::crypto::private_key& vo) {
+   vo = fc::crypto::private_key::from_string(var.as_string());
+}
 
 } // fc

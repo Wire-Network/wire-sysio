@@ -32,6 +32,55 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( missing_sigs, TESTER, validating_testers ) { try 
 
 } FC_LOG_AND_RETHROW() } /// missing_sigs
 
+BOOST_AUTO_TEST_CASE( no_auth ) { try {
+   validating_tester chain;
+
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+
+   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, vector<permission_level>{}, {} ), tx_no_auths );
+   auto trace = chain.push_reqauth("alice"_n, "owner");
+
+   chain.produce_block();
+   BOOST_REQUIRE_EQUAL(true, chain.chain_has_transaction(trace->id));
+
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE( bls_key_not_allowed_for_trx ) { try {
+   validating_tester chain;
+
+   chain.create_accounts( {"alice"_n} );
+   chain.produce_block();
+   private_key_type bls_active_priv_key = private_key_type::generate<bls::private_key_shim>(); // bls sigs not allowed
+   public_key_type bls_active_pub_key = bls_active_priv_key.get_public_key();
+   BOOST_REQUIRE_THROW( chain.set_authority(name("alice"), name("active"), authority(bls_active_pub_key), name("owner"),
+                       { permission_level{name("alice"), name("active")} }, { chain.get_private_key(name("alice"), "active") }),
+                       unactivated_key_type );
+
+   {
+      signed_transaction trx;
+      authority active_auth( bls_active_pub_key );
+      authority owner_auth( chain.get_public_key( "test1"_n, "owner" ) );
+      trx.actions.emplace_back( vector<permission_level>{{config::system_account_name,config::active_name}},
+                                newaccount{
+                                      .creator  = config::system_account_name,
+                                      .name     = "test1"_n,
+                                      .owner    = owner_auth,
+                                      .active   = active_auth,
+                                });
+      chain.set_transaction_headers(trx);
+      trx.sign( chain.get_private_key( config::system_account_name, "active" ), chain.get_chain_id()  );
+      BOOST_REQUIRE_THROW(chain.push_transaction( trx ), unactivated_key_type);
+   }
+
+   BOOST_REQUIRE_THROW( chain.push_reqauth( "alice"_n, {permission_level{"alice"_n, config::active_name}}, {bls_active_priv_key} ), fc::unsupported_exception );
+   auto trace = chain.push_reqauth("alice"_n, "owner");
+
+   chain.produce_block();
+   BOOST_REQUIRE_EQUAL(true, chain.chain_has_transaction(trace->id));
+
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_CASE_TEMPLATE( missing_multi_sigs, TESTER, validating_testers ) { try {
     TESTER chain;
 
@@ -74,32 +123,27 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( delegate_auth, TESTER, validating_testers ) { try
                           });
 
    auto original_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((original_auth));
 
    int64_t ram; int64_t net; int64_t cpu;
    chain.control->get_resource_limits_manager().get_account_limits( "alice"_n, ram, net, cpu );
-   wdump((cpu)(net)(ram));
+   wlog("cpu {}, net {}, ram {}", cpu, net, ram);
    BOOST_TEST(cpu == 10);
    BOOST_TEST(net == 10);
-   BOOST_TEST(ram == 40000*104+base_tester::newaccount_ram); // provided by policy in create_account
+   BOOST_TEST(ram == 100000*104+base_tester::newaccount_ram); // provided by policy in create_account
    int64_t ram_usage = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
-   wdump((ram_usage));
    BOOST_TEST(ram_usage < base_tester::newaccount_ram); // ram used to create account
 
    chain.set_authority( "alice"_n, config::active_name,  delegated_auth );
    int64_t ram_usage_after = chain.control->get_resource_limits_manager().get_account_ram_usage( "alice"_n );
-   wdump((ram_usage_after));
    BOOST_TEST(ram_usage_after < ram_usage); // ram for delegated auth is less than a public key
 
    auto new_auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((new_auth));
    BOOST_CHECK_EQUAL((new_auth == delegated_auth), true);
 
    chain.produce_block();
    chain.produce_block();
 
    auto auth = chain.control->get_authorization_manager().get_permission({"alice"_n, config::active_name}).auth.to_authority();
-   wdump((auth));
    BOOST_CHECK_EQUAL((new_auth == auth), true);
 
    /// execute nonce from alice signed by bob
@@ -250,9 +294,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( update_auth_unknown_private_key, TESTER, validati
 
       // public key with no corresponding private key
       fc::ecc::public_key_data data;
-      data.data[0] = 0x80; // not necessary, 0 also works
+      data[0] = 0x80; // not necessary, 0 also works
       fc::sha256 hash = fc::sha256::hash("unknown key");
-      std::memcpy(&data.data[1], hash.data(), hash.data_size() );
+      std::memcpy(&data[1], hash.data(), hash.data_size() );
       fc::ecc::public_key_shim shim(data);
       fc::crypto::public_key new_owner_pub_key(std::move(shim));
 

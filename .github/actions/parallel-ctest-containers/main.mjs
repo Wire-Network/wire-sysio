@@ -41,7 +41,7 @@ async function main() {
       child_process.spawnSync("docker", [...dockerArgs, "rm", "-f", baseContainer], {stdio:"ignore"});
 
       console.log("Creating base container...");
-      if(child_process.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${process.cwd()}/build.tar.zst:/build.tar.zst`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "zstdcat /build.tar.zst | tar x"], {stdio:"inherit"}).status)
+      if(child_process.spawnSync("docker", [...dockerArgs, "run", "--name", baseContainer, "-v", `${process.cwd()}/build.tar.gz:/build.tar.gz`, "--workdir", `/__w/${repo_name}/${repo_name}`, container, "sh", "-c", "tar xzf /build.tar.gz"], {stdio:"inherit"}).status)
          throw new Error("Failed to create base container");
       
       console.log("Committing base image...");

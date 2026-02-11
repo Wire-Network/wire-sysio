@@ -51,9 +51,21 @@ struct reqactivated {
 
 inline private_key_type get_private_key( name keyname, string role ) {
    if (keyname == config::system_account_name)
-      return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
+   {
+      auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+      auto system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
+      if (system_keys.empty())
+      {
+         sig_plug.register_default_signature_providers(std::vector{crypto::chain_key_type_wire});
+         system_keys = sig_plug.query_providers(std::nullopt, std::nullopt, crypto::chain_key_type_wire);
+      }
 
-   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role));
+      FC_ASSERT(!system_keys.empty(), "No system keys registered");
+      auto& sys_key = system_keys[0];
+
+      return sys_key->private_key.value();
+   }
+   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role).to_uint64_array());
 }
 
 inline public_key_type  get_public_key( name keyname, string role ){
@@ -116,7 +128,7 @@ inline auto push_input_trx(appbase::scoped_app& app, sysio::chain::controller& c
 // Push setcode trx to controller and return trx trace
 inline auto set_code(appbase::scoped_app& app, sysio::chain::controller& control, account_name account, const vector<uint8_t>& wasm) {
    signed_transaction trx;
-   trx.actions.emplace_back(std::vector<permission_level>{{account, config::active_name}},
+   trx.actions.emplace_back(std::vector<permission_level>{{account, sysio::chain::config::active_name}},
                             chain::setcode{
                                .account = account,
                                .vmtype = 0,

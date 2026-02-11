@@ -2,7 +2,6 @@
 #include <fc/container/flat_fwd.hpp>
 #include <fc/container/deque_fwd.hpp>
 #include <fc/io/varint.hpp>
-#include <fc/array.hpp>
 #include <fc/safe.hpp>
 #include <deque>
 #include <vector>
@@ -124,11 +123,6 @@ namespace fc {
     template<typename Stream> inline void pack( Stream& s, const char* v );
     template<typename Stream> inline void pack( Stream& s, const std::vector<char>& value );
     template<typename Stream> inline void unpack( Stream& s, std::vector<char>& value );
-
-   template<typename Stream, TrivialScalar T, std::size_t N> inline void pack( Stream& s, const fc::array<T,N>& v);
-   template<typename Stream, NotTrivialScalar T, std::size_t N> inline void pack( Stream& s, const fc::array<T,N>& v);
-   template<typename Stream, TrivialScalar T, std::size_t N> inline void unpack( Stream& s, fc::array<T,N>& v);
-   template<typename Stream, NotTrivialScalar T, std::size_t N> inline void unpack( Stream& s, fc::array<T,N>& v);
 
     template<typename Stream> inline void pack( Stream& s, const bool& v );
     template<typename Stream> inline void unpack( Stream& s, bool& v );

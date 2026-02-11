@@ -1,8 +1,0 @@
-#include <sysio/chain/genesis_state.hpp>
-
-namespace sysio { namespace chain {
-
-const string genesis_state::sysio_root_key = "${SYSIO_ROOT_KEY}";
-const string genesis_state::sysio_root_finalizer_key = "${SYSIO_ROOT_FINALIZER_KEY}";
-
-} } // namespace sysio::chain

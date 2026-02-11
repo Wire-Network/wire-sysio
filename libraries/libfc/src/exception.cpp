@@ -1,9 +1,10 @@
 #include <fc/exception/exception.hpp>
-#include <boost/exception/all.hpp>
 #include <fc/log/logger.hpp>
+#include <fc/variant_object.hpp>
 #include <fc/io/json.hpp>
 
 #include <iostream>
+#include <boost/exception/diagnostic_information.hpp>
 
 namespace fc
 {
@@ -123,83 +124,46 @@ namespace fc
       my->_elog.emplace_back( std::move(m) );
    }
 
-   /**
-    *   Generates a detailed string including file, line, method,
-    *   and other information that is generally only useful for
-    *   developers.
-    */
-   std::string exception::to_detail_string( log_level ll  )const
+   std::string exception::to_detail_string()const
    {
       const auto deadline = fc::time_point::now() + format_time_limit;
-      std::stringstream ss;
+      std::string r;
       try {
-         try {
-            ss << variant( my->_code ).as_string();
-         } catch( std::bad_alloc& ) {
-            throw;
-         } catch( ... ) {
-            ss << "<- exception in to_detail_string.";
-         }
-         ss << " " << my->_name << ": " << my->_what << "\n";
-         for( auto itr = my->_elog.begin(); itr != my->_elog.end(); ++itr ) {
-            try {
-               ss << itr->get_message() << "\n"; //fc::format_string( itr->get_format(), itr->get_data() ) <<"\n";
-               ss << "    " << json::to_string( itr->get_data(), deadline ) << "\n";
-               ss << "    " << itr->get_context().to_string() << "\n";
-            } catch( std::bad_alloc& ) {
-               throw;
-            } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_detail_string: " << e.my->_what << "\n";
-               break;
-            } catch( ... ) {
-               ss << "<- exception in to_detail_string.\n";
-            }
-         }
-      } catch( std::bad_alloc& ) {
-         throw;
-      } catch( ... ) {
-         ss << "<- exception in to_detail_string.\n";
-      }
-      return ss.str();
-   }
-
-   /**
-    *   Generates a user-friendly error report.
-    */
-   std::string exception::to_string( log_level ll   )const
-   {
-      const auto deadline = fc::time_point::now() + format_time_limit;
-      std::stringstream ss;
-      try {
-         ss << my->_what;
-         try {
-            ss << " (" << variant( my->_code ).as_string() << ")\n";
-         } catch( std::bad_alloc& ) {
-            throw;
-         } catch( ... ) {
-            ss << "<- exception in to_string.\n";
-         }
+         r += std::to_string( my->_code );
+         r += " " + my->_name + ": " + my->_what + "\n";
          for( auto itr = my->_elog.begin(); itr != my->_elog.end(); ++itr ) {
             try {
                FC_CHECK_DEADLINE(deadline);
-               ss << fc::format_string( itr->get_format(), itr->get_data(), true) << "\n";
-               //      ss << "    " << itr->get_context().to_string() <<"\n";
+               r += itr->get_message() += "\n";
+               r += "    " + itr->get_message() + "\n";
+               r += "    " + itr->get_context().to_string() + "\n";
             } catch( std::bad_alloc& ) {
                throw;
             } catch( const fc::timeout_exception& e) {
-               ss << "<- timeout exception in to_string: " << e.my->_what;
+               r += "<- timeout exception in to_detail_string: " + e.my->_what + "\n";
                break;
             } catch( ... ) {
-               ss << "<- exception in to_string.\n";
+               r += "<- exception in to_detail_string.\n";
             }
          }
-         return ss.str();
       } catch( std::bad_alloc& ) {
          throw;
       } catch( ... ) {
-         ss << "<- exception in to_string.\n";
+         r += "<- exception in to_detail_string.\n";
       }
-      return ss.str();
+      return r;
+   }
+
+   std::string exception::to_string()const
+   {
+      std::string r;
+      r += my->_what;
+      r += " (" + std::to_string( my->_code ) + ") ";
+      for( auto itr = my->_elog.begin(); itr != my->_elog.end(); ) {
+         r += itr->get_limited_message();
+         break;
+      }
+      return r;
    }
 
    /**
@@ -209,7 +173,7 @@ namespace fc
    {
       for( auto itr = my->_elog.begin(); itr != my->_elog.end(); ++itr )
       {
-         auto s = fc::format_string( itr->get_format(), itr->get_data() );
+         auto s = itr->get_message();
          if (!s.empty()) {
             return s;
          }
@@ -230,14 +194,12 @@ namespace fc
    void throw_bad_enum_cast( int64_t i, const char* e )
    {
       FC_THROW_EXCEPTION( bad_cast_exception,
-                          "invalid index '${key}' in enum '${enum}'",
-                          ("key",i)("enum",e) );
+                          "invalid index '{}' in enum '{}'", i, e );
    }
    void throw_bad_enum_cast( const char* k, const char* e )
    {
       FC_THROW_EXCEPTION( bad_cast_exception,
-                          "invalid name '${key}' in enum '${enum}'",
-                          ("key",k)("enum",e) );
+                          "invalid name '{}' in enum '{}'", k, e );
    }
 
    bool assert_optional(bool is_valid )
@@ -270,15 +232,12 @@ namespace fc
          ("source_lineno", lineno)
          ("expr", expr)
          ;
-      /* TODO: restore this later
-      std::cout
+      std::cerr
          << "FC_ASSERT triggered:  "
-         << fc::json::to_string( assert_trip_info ) << "\n";
-         */
-      return;
+         << fc::json::to_string( assert_trip_info, fc::time_point::maximum() ) << "\n";
    }
 
-   bool enable_record_assert_trip = false;
+   const bool enable_record_assert_trip = false;
 
    std_exception_wrapper::std_exception_wrapper( log_message&& m, std::exception_ptr e,
                                                  const std::string& name_value,
@@ -290,7 +249,7 @@ namespace fc
 
    std_exception_wrapper std_exception_wrapper::from_current_exception(const std::exception& e)
    {
-     return std_exception_wrapper{FC_LOG_MESSAGE(warn, "rethrow ${what}: ", ("what",e.what())), 
+     return std_exception_wrapper{FC_LOG_MESSAGE(warn, "rethrow {}: ", e.what()),
                                   std::current_exception(), 
                                   BOOST_CORE_TYPEID(e).name(), 
                                   e.what()};

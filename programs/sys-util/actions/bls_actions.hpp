@@ -22,5 +22,5 @@ protected:
    int create_pop();
 
 private:
-   std::string generate_pop_str(const fc::crypto::blslib::bls_private_key& private_key);
+   std::string generate_pop_str(const fc::crypto::bls::private_key& private_key);
 };

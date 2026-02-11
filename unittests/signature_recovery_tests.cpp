@@ -19,7 +19,7 @@ using fc::crypto::public_key;
 BOOST_AUTO_TEST_SUITE(signature_recovery_tests)
 
 struct sig_fixture {
-   sig_fixture(): chain_id(fc::sha256()) {}
+   sig_fixture(): chain_id(fc::sha256().str()) {}
    chain_id_type chain_id;
 };
 
@@ -65,14 +65,41 @@ BOOST_FIXTURE_TEST_CASE(duplicate_sig_rejected, sig_fixture) {
    }
 }
 
-/// 3. Invalid recoverable (tampered) → any fc::exception
-BOOST_FIXTURE_TEST_CASE(invalid_sig_rejected, sig_fixture) {
+/// 3a. Invalid recovery byte → fc::exception
+/// The recovery byte encodes 27 + recid (recid 0-3). Setting it outside
+/// this range causes our code to reject before calling libsecp256k1.
+BOOST_FIXTURE_TEST_CASE(invalid_recovery_byte_rejected, sig_fixture) {
    auto p1  = private_key::generate();
    auto trx = test::make_signed_trx({p1}, chain_id, false);
 
-   // Tamper with the single signature blob
+   // packed[0] = variant index, packed[1] = recovery byte (27 + recid)
    auto packed = fc::raw::pack(trx.signatures[0]);
-   packed[2] ^= 0xFF;
+   packed[1] = 0;  // Invalid: must be 27-30 for k1
+   fc::crypto::signature bad;
+   fc::datastream<const char*> ds(packed.data(), packed.size());
+   fc::raw::unpack(ds, bad);
+   trx.signatures[0] = bad;
+
+   boost::container::flat_set<public_key> keys;
+   BOOST_CHECK_THROW(
+     trx.get_signature_keys(chain_id,
+                            fc::time_point::maximum(),
+                            keys,
+                            false),
+     fc::exception
+   );
+}
+
+/// 3b. Corrupted signature data → fc::exception from libsecp256k1
+/// Zeroing the R and S components makes secp256k1_ecdsa_recover fail.
+BOOST_FIXTURE_TEST_CASE(corrupted_sig_data_rejected, sig_fixture) {
+   auto p1  = private_key::generate();
+   auto trx = test::make_signed_trx({p1}, chain_id, false);
+
+   // packed[0] = variant index, packed[1] = recovery byte, packed[2..65] = R || S
+   auto packed = fc::raw::pack(trx.signatures[0]);
+   // Zero out R and S (64 bytes starting at offset 2)
+   std::memset(packed.data() + 2, 0, 64);
    fc::crypto::signature bad;
    fc::datastream<const char*> ds(packed.data(), packed.size());
    fc::raw::unpack(ds, bad);

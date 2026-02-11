@@ -39,7 +39,7 @@ namespace savanna_cluster {
             account_name name { std::string("finalizer") + (char)('a' + i/26) + (char)('a' + i%26) };
             key_names.push_back(name);
 
-            auto [privkey, pubkey, pop] = get_bls_key(name);
+            auto [privkey, pubkey, pop, _] = get_bls_key(name);
             pubkeys.push_back(pubkey);
             privkeys.push_back(privkey);
          }
@@ -253,7 +253,7 @@ namespace savanna_cluster {
       }
 
       std::string snapshot() const {
-         dlog("node ${i} - taking snapshot", ("i", _node_idx));
+         dlog("node {} - taking snapshot", _node_idx);
          auto writer = buffered_snapshot_suite::get_writer();
          control->abort_block();
          control->write_snapshot(writer);
@@ -261,12 +261,12 @@ namespace savanna_cluster {
       }
 
       void open_from_snapshot(const std::string& snapshot) {
-         dlog("node ${i} - restoring from snapshot", ("i", _node_idx));
+         dlog("node {} - restoring from snapshot", _node_idx);
          open(buffered_snapshot_suite::get_reader(snapshot));
       }
 
       std::vector<uint8_t> save_fsi() const {
-         dlog("node ${i} - saving fsi", ("i", _node_idx));
+         dlog("node {} - saving fsi", _node_idx);
          auto finalizer_path = get_fsi_path();
          std::ifstream file(finalizer_path.generic_string(), std::ios::binary | std::ios::ate);
          std::streamsize size = file.tellg();
@@ -279,7 +279,7 @@ namespace savanna_cluster {
       }
 
       void overwrite_fsi(const std::vector<uint8_t>& fsi) const {
-         dlog("node ${i} - overwriting fsi", ("i", _node_idx));
+         dlog("node {} - overwriting fsi", _node_idx);
          auto finalizer_path = get_fsi_path();
          std::ofstream file(finalizer_path.generic_string(), std::ios::binary);
          assert(!fsi.empty());
@@ -287,13 +287,13 @@ namespace savanna_cluster {
       }
 
       void remove_fsi() {
-         dlog("node ${i} - removing fsi", ("i", _node_idx));
+         dlog("node {} - removing fsi", _node_idx);
          remove_all(get_fsi_path());
       }
 
       void remove_state() {
          auto state_path = cfg.state_dir;
-         dlog("node ${i} - removing state data from: ${state_path}", ("i", _node_idx)("state_path", state_path));
+         dlog("node {} - removing state data from: {}", _node_idx, state_path.string());
          remove_all(state_path);
          fs::create_directories(state_path);
       }
@@ -311,7 +311,7 @@ namespace savanna_cluster {
          for (auto const& dir_entry : std::filesystem::directory_iterator{path}) {
             auto path = dir_entry.path();
             if (path.filename().generic_string() != "reversible") {
-               dlog("node ${i} - removing : ${path}", ("i", _node_idx)("path", path));
+               dlog("node {} - removing : {}", _node_idx, path.string());
                remove_all(path);
             }
          }
@@ -320,7 +320,7 @@ namespace savanna_cluster {
       const fsi_t& get_fsi(size_t idx = 0) const {
          assert(control);
          assert(idx < _node_finalizers.size());
-         auto [privkey, pubkey, pop] = get_bls_key(_node_finalizers[idx]);
+         auto [privkey, pubkey, pop,_] = get_bls_key(_node_finalizers[idx]);
          return control->get_node_finalizers().get_fsi(pubkey);
       }
 
@@ -338,7 +338,7 @@ namespace savanna_cluster {
       void remove_blocks(bool rm_blocks_log) {
          auto reversible_path = cfg.blocks_dir / config::reversible_blocks_dir_name;
          auto& path = rm_blocks_log ? cfg.blocks_dir : reversible_path;
-         dlog("node ${i} - removing : ${path}", ("i", _node_idx)("path", path));
+         dlog("node {} - removing : {}", _node_idx, path.string());
          remove_all(path);
          fs::create_directories(reversible_path);
       }
@@ -574,7 +574,7 @@ namespace savanna_cluster {
       bool                 _debug_mode{false};
 
       static constexpr fc::microseconds _block_interval_us =
-         fc::milliseconds(sysio::chain::config::block_interval_ms);
+         fc::milliseconds(config::block_interval_ms);
 
    private:
       peers_t    _peers;

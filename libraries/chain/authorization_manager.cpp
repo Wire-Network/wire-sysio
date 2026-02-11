@@ -9,6 +9,7 @@
 #include <sysio/chain/database_utils.hpp>
 #include <sysio/chain/protocol_state_object.hpp>
 #include <sysio/chain/deep_mind.hpp>
+#include <fc/io/json.hpp>
 #include <ranges>
 
 
@@ -123,9 +124,11 @@ namespace sysio { namespace chain {
                                                                       time_point initial_creation_time
                                                                     )
    {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when creating permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when creating permission");
+      }
 
       auto creation_time = initial_creation_time;
       if( creation_time == time_point() ) {
@@ -154,9 +157,11 @@ namespace sysio { namespace chain {
                                                                       time_point initial_creation_time
                                                                     )
    {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when creating permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when creating permission");
+      }
 
       auto creation_time = initial_creation_time;
       if( creation_time == time_point() ) {
@@ -178,9 +183,11 @@ namespace sysio { namespace chain {
    }
 
    void authorization_manager::modify_permission( const permission_object& permission, const authority& auth, bool is_trx_transient ) {
-      for(const key_weight& k: auth.keys)
-         SYS_ASSERT(k.key.which() < _db.get<protocol_state_object>().num_supported_key_types, unactivated_key_type,
-           "Unactivated key type used when modifying permission");
+      for(const key_weight& k: auth.keys) {
+         using key_type = fc::crypto::public_key::key_type;
+         SYS_ASSERT(k.key.contains_type(key_type::k1, key_type::r1, key_type::wa, key_type::em, key_type::ed), unactivated_key_type,
+                    "Unactivated key type used when modifying permission");
+      }
 
       _db.modify( permission, [&](permission_object& po) {
          auto dm_logger = _control.get_deep_mind_logger(is_trx_transient);
@@ -216,13 +223,13 @@ namespace sysio { namespace chain {
    { try {
       SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.find<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: {}", level ) }
 
    const permission_object&  authorization_manager::get_permission( const permission_level& level )const
    { try {
       SYS_ASSERT( !level.actor.empty() && !level.permission.empty(), invalid_permission, "Invalid permission" );
       return _db.get<permission_object, by_owner>( boost::make_tuple(level.actor,level.permission) );
-   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: ${level}", ("level", level) ) }
+   } SYS_RETHROW_EXCEPTIONS( chain::permission_query_exception, "Failed to retrieve permission: {}", level ) }
 
    std::optional<permission_name> authorization_manager::lookup_linked_permission( account_name authorizer_account,
                                                                                    account_name scope,
@@ -244,7 +251,7 @@ namespace sysio { namespace chain {
             return link->required_permission;
          }
          return std::optional<permission_name>();
-      } FC_CAPTURE_AND_RETHROW((authorizer_account)(scope)(act_name))
+      } FC_CAPTURE_AND_RETHROW("authorizer_account {}, scope {}, act_name {} ", authorizer_account, scope, act_name)
    }
 
    std::optional<permission_name> authorization_manager::lookup_minimum_permission( account_name authorizer_account,
@@ -253,7 +260,7 @@ namespace sysio { namespace chain {
                                                                                   )const
    {
       // Special case native actions cannot be linked to a minimum permission, so there is no need to check.
-      if( scope == config::system_account_name ) {
+      if( scope == sysio::chain::config::system_account_name ) {
           SYS_ASSERT( act_name != updateauth::get_name() &&
                      act_name != deleteauth::get_name() &&
                      act_name != linkauth::get_name() &&
@@ -266,13 +273,13 @@ namespace sysio { namespace chain {
       try {
          std::optional<permission_name> linked_permission = lookup_linked_permission(authorizer_account, scope, act_name);
          if( !linked_permission )
-            return config::active_name;
+            return sysio::chain::config::active_name;
 
          if( *linked_permission == config::sysio_any_name )
             return std::optional<permission_name>();
 
          return linked_permission;
-      } FC_CAPTURE_AND_RETHROW((authorizer_account)(scope)(act_name))
+      } FC_CAPTURE_AND_RETHROW("authorizer_account {}, scope {}, act_name {} ", authorizer_account, scope, act_name)
    }
 
    void authorization_manager::check_updateauth_authorization( const updateauth& update,
@@ -299,8 +306,8 @@ namespace sysio { namespace chain {
          SYS_ASSERT( get_permission(auth).satisfies( *min_permission,
                                                    _db.get_index<permission_index>().indices() ),
                      irrelevant_auth_exception,
-                     "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                     ("auth", auth)("min", permission_level{update.account, min_permission->name}) );
+                     "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                     auth, permission_level{update.account, min_permission->name} );
       }
    }
 
@@ -319,8 +326,8 @@ namespace sysio { namespace chain {
       SYS_ASSERT( get_permission(auth).satisfies( min_permission,
                                                   _db.get_index<permission_index>().indices() ),
                   irrelevant_auth_exception,
-                  "updateauth action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                  ("auth", auth)("min", permission_level{min_permission.owner, min_permission.name}) );
+                  "updateauth action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{min_permission.owner, min_permission.name} );
    }
 
    void authorization_manager::check_linkauth_authorization( const linkauth& link,
@@ -333,7 +340,7 @@ namespace sysio { namespace chain {
       SYS_ASSERT( auth.actor == link.account, irrelevant_auth_exception,
                   "the owner of the linked permission needs to be the actor of the declared authorization" );
 
-      if( link.code == config::system_account_name)
+      if( link.code == sysio::chain::config::system_account_name)
       {
          SYS_ASSERT( link.type != updateauth::get_name(),  action_validate_exception,
                      "Cannot link sysio::updateauth to a minimum permission" );
@@ -353,8 +360,8 @@ namespace sysio { namespace chain {
       SYS_ASSERT( get_permission(auth).satisfies( get_permission({link.account, *linked_permission_name}),
                                                   _db.get_index<permission_index>().indices()              ),
                   irrelevant_auth_exception,
-                  "link action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                  ("auth", auth)("min", permission_level{link.account, *linked_permission_name}) );
+                  "link action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{link.account, *linked_permission_name} );
    }
 
    void authorization_manager::check_unlinkauth_authorization( const unlinkauth& unlink,
@@ -369,8 +376,8 @@ namespace sysio { namespace chain {
 
       const auto unlinked_permission_name = lookup_linked_permission(unlink.account, unlink.code, unlink.type);
       SYS_ASSERT( unlinked_permission_name, transaction_exception,
-                  "cannot unlink non-existent permission link of account '${account}' for actions matching '${code}::${action}'",
-                  ("account", unlink.account)("code", unlink.code)("action", unlink.type) );
+                  "cannot unlink non-existent permission link of account '{}' for actions matching '{}::{}'",
+                  unlink.account, unlink.code, unlink.type );
 
       if( *unlinked_permission_name == config::sysio_any_name )
          return;
@@ -378,8 +385,8 @@ namespace sysio { namespace chain {
       SYS_ASSERT( get_permission(auth).satisfies( get_permission({unlink.account, *unlinked_permission_name}),
                                                   _db.get_index<permission_index>().indices()                  ),
                   irrelevant_auth_exception,
-                  "unlink action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                  ("auth", auth)("min", permission_level{unlink.account, *unlinked_permission_name}) );
+                  "unlink action declares irrelevant authority '{}'; minimum authority is {}",
+                  auth, permission_level{unlink.account, *unlinked_permission_name} );
    }
 
    void noop_checktime() {}
@@ -415,7 +422,7 @@ namespace sysio { namespace chain {
       for( const auto& act : actions ) {
          bool special_case = false;
 
-         if( act.account == config::system_account_name ) {
+         if( act.account == sysio::chain::config::system_account_name ) {
             special_case = true;
 
             if( act.name == updateauth::get_name() ) {
@@ -451,8 +458,8 @@ namespace sysio { namespace chain {
                   SYS_ASSERT( get_permission(declared_auth).satisfies( min_permission,
                                                                        _db.get_index<permission_index>().indices() ),
                               irrelevant_auth_exception,
-                              "action declares irrelevant authority '${auth}'; minimum authority is ${min}",
-                              ("auth", declared_auth)("min", permission_level{min_permission.owner, min_permission.name}) );
+                              "action declares irrelevant authority '{}'; minimum authority is {}",
+                              declared_auth, permission_level{min_permission.owner, min_permission.name} );
                }
             }
 
@@ -470,7 +477,7 @@ namespace sysio { namespace chain {
                   break;
                }
             }
-            SYS_ASSERT( foundPayer, unsatisfied_authorization, "Payer authorization for {name} not paired with matching auth", ("name", payer));
+            SYS_ASSERT( foundPayer, unsatisfied_authorization, "Payer authorization for {} not paired with matching auth", payer);
          }
       }
 
@@ -484,20 +491,20 @@ namespace sysio { namespace chain {
       for( const auto& p : permissions_to_satisfy ) {
          checktime(); // TODO: this should eventually move into authority_checker instead
          SYS_ASSERT( checker.satisfied( p ) || check_but_dont_fail, unsatisfied_authorization,
-                     "transaction declares authority '${auth}', "
+                     "transaction declares authority '{}', "
                      "but does not have signatures for it, "
-                     "provided permissions ${provided_permissions}, provided keys ${provided_keys}",
-                     ("auth", p)
-                     ("provided_permissions", provided_permissions)
-                     ("provided_keys", provided_keys)
+                     "provided permissions {}, provided keys {}",
+                     p,
+                     provided_permissions,
+                     fc::json::to_log_string(provided_keys)
                    );
 
       }
 
       if( !allow_unused_keys ) {
          SYS_ASSERT( checker.all_keys_used() || check_but_dont_fail, tx_irrelevant_sig,
-                     "transaction bears irrelevant signatures from these keys: ${keys}",
-                     ("keys", checker.unused_keys()) );
+                     "transaction bears irrelevant signatures from these keys: {}",
+                     fc::json::to_log_string(checker.unused_keys()) );
       }
    }
 
@@ -525,17 +532,17 @@ namespace sysio { namespace chain {
                                       );
 
       SYS_ASSERT( checker.satisfied({account, permission}), unsatisfied_authorization,
-                  "permission '${auth}' was not satisfied, "
-                  "provided permissions ${provided_permissions}, provided keys ${provided_keys}",
-                  ("auth", permission_level{account, permission})
-                  ("provided_permissions", provided_permissions)
-                  ("provided_keys", provided_keys)
+                  "permission '{}' was not satisfied, "
+                  "provided permissions {}, provided keys {}",
+                  permission_level{account, permission},
+                  provided_permissions,
+                  fc::json::to_log_string(provided_keys)
                 );
 
       if( !allow_unused_keys ) {
          SYS_ASSERT( checker.all_keys_used(), tx_irrelevant_sig,
-                     "irrelevant keys provided: ${keys}",
-                     ("keys", checker.unused_keys()) );
+                     "irrelevant keys provided: {}",
+                     fc::json::to_log_string(checker.unused_keys()) );
       }
    }
 
@@ -558,15 +565,15 @@ namespace sysio { namespace chain {
       for (const auto& act : trx.actions ) {
          for (const auto& declared_auth : act.authorization) {
             if (declared_auth.permission == config::sysio_payer_name) {
-               auto active_auth = permission_level{declared_auth.actor, config::active_name};
+               auto active_auth = permission_level{declared_auth.actor, sysio::chain::config::active_name};
                SYS_ASSERT( checker.satisfied(active_auth), unsatisfied_authorization,
-                           "transaction declares payer authority '${auth}', but does not have signatures for it.",
-                           ("auth", active_auth) );
+                           "transaction declares payer authority '{}', but does not have signatures for it.",
+                           active_auth );
 
             } else {
                SYS_ASSERT( checker.satisfied(declared_auth), unsatisfied_authorization,
-                           "transaction declares authority '${auth}', but does not have signatures for it.",
-                           ("auth", declared_auth) );
+                           "transaction declares authority '{}', but does not have signatures for it.",
+                           declared_auth );
             }
          }
       }

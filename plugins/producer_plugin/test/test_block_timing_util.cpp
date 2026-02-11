@@ -101,28 +101,28 @@ BOOST_AUTO_TEST_CASE(test_calculate_block_deadline) {
       // Ask for a deadline for current block but its deadline has already passed
       auto default_cpu_effort = fc::microseconds(block_interval.count() - (450000/12)); // 462,500
       // with the default_cpu_effort, the first block deadline would be 29.9625 (29.500 + 0.4625)
-      fc::mock_time_traits::set_now(fc::time_point::from_iso_string("2023-10-29T13:40:29.963")); // past first block interval
-      auto first_block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2023-10-29T13:40:30.000"));
+      fc::mock_time_traits::set_now(fc::time_point::from_iso_string("2025-10-29T13:40:29.963")); // past first block interval
+      auto first_block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2025-10-29T13:40:30.000"));
       // pass the first block deadline
       fc::time_point block_deadline = calculate_producing_block_deadline(default_cpu_effort, first_block_time);
       // not equal since block_deadline is 29.962500
-      BOOST_CHECK_NE(block_deadline, fc::time_point::from_iso_string("2023-10-29T13:40:29.962"));
-      BOOST_CHECK_EQUAL(block_deadline.to_iso_string(), fc::time_point::from_iso_string("2023-10-29T13:40:29.962").to_iso_string()); // truncates
+      BOOST_CHECK_NE(block_deadline, fc::time_point::from_iso_string("2025-10-29T13:40:29.962"));
+      BOOST_CHECK_EQUAL(block_deadline.to_iso_string(), fc::time_point::from_iso_string("2025-10-29T13:40:29.962").to_iso_string()); // truncates
 
       // second block has passed
-      fc::mock_time_traits::set_now(fc::time_point::from_iso_string("2023-10-29T13:40:30.426")); // past second block interval
-      auto second_block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2023-10-29T13:40:30.500"));
+      fc::mock_time_traits::set_now(fc::time_point::from_iso_string("2025-10-29T13:40:30.426")); // past second block interval
+      auto second_block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2025-10-29T13:40:30.500"));
       // pass the second block deadline
       block_deadline = calculate_producing_block_deadline(default_cpu_effort, second_block_time);
       // 29.962500 + (450000/12) = 30.425
-      BOOST_CHECK_EQUAL(block_deadline, fc::time_point::from_iso_string("2023-10-29T13:40:30.425"));
+      BOOST_CHECK_EQUAL(block_deadline, fc::time_point::from_iso_string("2025-10-29T13:40:30.425"));
    }
    {
       // Real scenario that caused multiple start blocks
       auto default_cpu_effort = fc::microseconds(block_interval.count() - (450000/12)); // 462,500
-      auto block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2023-10-31T13:37:35.000"));
+      auto block_time = sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2025-10-31T13:37:35.000"));
       fc::time_point block_deadline = calculate_producing_block_deadline(default_cpu_effort, block_time);
-      BOOST_CHECK_EQUAL(block_deadline.to_iso_string(), fc::time_point::from_iso_string("2023-10-31T13:37:34.587").to_iso_string());
+      BOOST_CHECK_EQUAL(block_deadline.to_iso_string(), fc::time_point::from_iso_string("2025-10-31T13:37:34.587").to_iso_string());
    }
 }
 
@@ -267,10 +267,10 @@ BOOST_AUTO_TEST_CASE(test_calculate_producer_wake_up_time) {
               {"inito"_n}, {"initp"_n}, {"initq"_n}, {"initr"_n}, {"inits"_n}, {"initt"_n}, {"initu"_n}
       };
       auto default_cpu_effort = fc::microseconds(block_interval.count() - (450000/12)); // 462,500
-      auto wake_time = calculate_producer_wake_up_time(default_cpu_effort, 106022362, sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2023-10-31T16:06:41.000")),
+      auto wake_time = calculate_producer_wake_up_time(default_cpu_effort, 106022362, sysio::chain::block_timestamp_type(fc::time_point::from_iso_string("2025-10-31T16:06:41.000")),
                                                        producers, active_schedule);
       BOOST_REQUIRE(!!wake_time);
-      BOOST_CHECK_EQUAL(wake_time->to_iso_string(), fc::time_point::from_iso_string("2023-10-31T16:06:40.587").to_iso_string());
+      BOOST_CHECK_EQUAL(wake_time->to_iso_string(), fc::time_point::from_iso_string("2025-10-31T16:06:40.587").to_iso_string());
    }
 
 }

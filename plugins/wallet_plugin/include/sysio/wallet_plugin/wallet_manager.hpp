@@ -78,6 +78,9 @@ public:
    /// @return A list of private keys from a wallet provided password is correct to said wallet
    map<public_key_type,private_key_type> list_keys(const string& name, const string& pw);
 
+   /// @return A list of human readable key names and the public/private keys from a wallet provided password is correct to said wallet
+   map<string,wallet_key_entry> list_keys_by_name(const string& name, const string& pw);
+
    /// @return A set of public keys from all unlocked wallets, use with chain_controller::get_required_keys.
    flat_set<public_key_type> get_public_keys();
 
@@ -101,7 +104,7 @@ public:
    /// Imports a WIF Private Key into specified wallet.
    /// Wallet must be opened and unlocked.
    /// @param name the name of the wallet to import into.
-   /// @param wif_key the WIF Private Key to import, e.g. 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+   /// @param wif_key the WIF Private Key to import, e.g. PUB_K1_5ZJjuND9W4GYvf7nJoQQ59VvbvFYdDsi3HCR46Z8mZUqBo6TRw
    /// @throws fc::exception if wallet not found or locked.
    void import_key(const std::string& name, const std::string& wif_key);
 
@@ -109,9 +112,17 @@ public:
    /// Wallet must be opened and unlocked.
    /// @param name the name of the wallet to remove the key from.
    /// @param password the plaintext password returned from ::create.
-   /// @param key the Public Key to remove, e.g. SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+   /// @param key the Public Key to remove, e.g. PUB_K1_5ZJjuND9W4GYvf7nJoQQ59VvbvFYdDsi3HCR46Z8mZUqBo6TRw
    /// @throws fc::exception if wallet not found or locked or key is not removed.
    void remove_key(const std::string& name, const std::string& password, const std::string& key);
+
+   /// Removes a key set from the specified wallet.
+   /// Wallet must be opened and unlocked.
+   /// @param wallet_name the name of the wallet to remove the key from.
+   /// @param password the plaintext password returned from ::create.
+   /// @param name the named key set to remove
+   /// @throws fc::exception if wallet not found or locked or key is not removed.
+   void remove_name(const std::string& wallet_name, const std::string& password, const std::string& name);
 
    /// Creates a key within the specified wallet.
    /// Wallet must be opened and unlocked
@@ -120,6 +131,34 @@ public:
    /// @throws fc::exception if wallet not found or locked, or if the wallet cannot create said type of key
    /// @return The public key of the created key
    string create_key(const std::string& name, const std::string& key_type);
+
+   /// Sets a name for the specified public key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to set key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the name/alias to set for the key
+   /// @param pub_key_str the public key string to set name for
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name_with_public_key(const string& name, const string& pw, const string& key_name, const string& pub_key_str);
+
+   /// Sets a name for the specified private key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to set key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the name/alias to set for the key
+   /// @param priv_key_str the private key string to set name for
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name_with_private_key(const string& name, const string& pw, const string& key_name,
+                                      const string& priv_key_str);
+
+   /// Updates the name/alias of an existing key in the given wallet
+   /// Wallet must be opened and unlocked
+   /// @param name the name of the wallet to update key name in
+   /// @param pw the plaintext password to unlock the wallet
+   /// @param key_name the new name/alias to set for the key
+   /// @param current_key_name the current name/alias of the key to update
+   /// @throws fc::exception if wallet not found or locked
+   void set_key_name(const string& name, const string& pw, const string& key_name, const string& current_key_name);
 
    /// Takes ownership of a wallet to use
    void own_and_use_wallet(const string& name, std::unique_ptr<wallet_api>&& wallet);

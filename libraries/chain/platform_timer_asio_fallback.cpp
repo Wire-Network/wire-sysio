@@ -34,7 +34,7 @@ platform_timer::platform_timer() {
       checktime_thread = std::thread([&p]() {
          fc::set_thread_name("checktime");
          checktime_ios = std::make_unique<boost::asio::io_context>();
-         boost::asio::io_context::work work(*checktime_ios);
+         auto work = boost::asio::make_work_guard(*checktime_ios);
          p.set_value();
 
          checktime_ios->run();
@@ -86,6 +86,12 @@ void platform_timer::expire_now(generation_t expired_generation) {
       call_expiration_callback();
       _state.store(timer_state_t{state_t::timed_out, false, expired_generation});
    }
+}
+
+void platform_timer::set_expired() {
+   const generation_t generation_running = _state.load().generation_running;
+   timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = generation_running};
+   _state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, false, generation});
 }
 
 void platform_timer::interrupt_timer() {

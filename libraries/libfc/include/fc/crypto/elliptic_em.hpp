@@ -1,17 +1,15 @@
 #pragma once
-#include <fc/crypto/bigint.hpp>
 #include <fc/crypto/common.hpp>
-#include <fc/crypto/openssl.hpp>
 #include <fc/crypto/sha256.hpp>
-#include <fc/crypto/sha512.hpp>
-#include <fc/fwd.hpp>
-#include <fc/array.hpp>
-#include <fc/io/raw_fwd.hpp>
 #include <fc/crypto/keccak256.hpp>
-#include <fc/crypto/elliptic.hpp>
-#include <fc/static_variant.hpp>
-#include <string>
+#include <fc/crypto/hex.hpp>
+#include <fc/fwd.hpp>
+#include <fc/io/raw_fwd.hpp>
 
+#include <array>
+#include <string>
+#include <variant>
+#include <vector>
 
 namespace fc {
 
@@ -22,15 +20,20 @@ namespace fc {
       class private_key_impl;
     }
 
-    typedef fc::array<char,33>          public_key_data;
-    typedef fc::sha256                  private_key_secret;
-    typedef fc::array<char,65>          public_key_point_data; ///< the full non-compressed version of the ECC point
-    typedef fc::array<char,72>          signature;
-    typedef fc::array<unsigned char,65> compact_signature;
+    constexpr uint8_t public_key_prefix_uncompressed = 0x04;
+    constexpr uint8_t public_key_prefix_compressed = 0x02;
+
+    using message_body_type = std::variant<std::string, fc::sha256, std::vector<uint8_t>, fc::crypto::keccak256>;
+
+    using public_key_data = std::array<char,33>;
+    using public_key_data_uncompressed = std::array<char,65>;
+    using private_key_secret = std::array<uint64_t, 4>;
+
+    using compact_signature = std::array<unsigned char,65>;
 
     /**
      *  @class public_key
-     *  @brief contains only the public point of an elliptic curve key.
+     *  @brief ethereum public key
      */
     class public_key
     {
@@ -39,14 +42,14 @@ namespace fc {
            public_key(const public_key& k);
            ~public_key();
            public_key_data serialize()const;
-
-           explicit operator public_key_data()const { return serialize(); }
-
+           public_key_data_uncompressed serialize_uncompressed()const;
+           static public_key_data_uncompressed serialize_uncompressed(const public_key_data& key);
 
            explicit public_key( const public_key_data& v );
-           explicit public_key( const public_key_point_data& v );
-           public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
-           public_key( const compact_signature& c, const unsigned char* digest, bool check_canonical = true );
+           explicit public_key( const public_key_data_uncompressed& v );
+
+           static public_key recover( const compact_signature& c, const fc::sha256& digest, bool check_canonical );
+           static public_key recover( const compact_signature& c, const unsigned char* digest, bool check_canonical );
 
            bool valid()const;
 
@@ -54,21 +57,15 @@ namespace fc {
            public_key& operator=( public_key&& pk ) noexcept;
            public_key& operator=( const public_key& pk );
 
-           inline friend bool operator==( const public_key& a, const public_key& b )
-           {
-            return a.serialize() == b.serialize();
-           }
-           inline friend bool operator!=( const public_key& a, const public_key& b )
-           {
-            return a.serialize() != b.serialize();
-           }
+           friend bool operator==( const public_key& a, const public_key& b );
 
-           /// Allows to convert current public key object into base58 number.
-           std::string to_base58() const;
-           static std::string to_base58( const public_key_data &key );
-           static public_key from_base58( const std::string& b58 );
+           /**
+            * @brief
+            * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
+            * @return public key
+            */
+           static public_key from_string( const std::string& pub_key_str );
 
-           unsigned int fingerprint() const;
            static bool is_canonical( const compact_signature& c );
 
         private:
@@ -79,7 +76,7 @@ namespace fc {
 
     /**
      *  @class private_key
-     *  @brief an elliptic curve private key.
+     *  @brief an ethereum private key.
      */
     class private_key
     {
@@ -93,45 +90,28 @@ namespace fc {
            private_key& operator=( const private_key& pk );
 
            static private_key generate();
-           static private_key regenerate( const fc::sha256& secret );
-
-           private_key child( const fc::sha256& offset )const;
+           static private_key regenerate( const private_key_secret& secret );
 
            /**
-            *  This method of generation enables creating a new private key in a deterministic manner relative to
-            *  an initial seed.   A public_key created from the seed can be multiplied by the offset to calculate
-            *  the new public key without having to know the private key.
+            * @brief
+            * @param pub_key_str Public key in ethereum format 0x<128 hex chars>
+            * @return public key
             */
-           static private_key generate_from_seed( const fc::sha256& seed, const fc::sha256& offset = fc::sha256() );
+           static private_key from_native_string( const std::string& priv_key_str );
 
-           private_key_secret get_secret()const; // get the private key secret
+           const private_key_secret& get_secret()const; // get the private key secret
 
-           explicit operator private_key_secret ()const { return get_secret(); }
-
-           /**
-            *  Given a public key, calculatse a 512 bit shared secret between that
-            *  key and this private key.
-            */
-           fc::sha512 get_shared_secret( const public_key& pub )const;
-
-           compact_signature sign_compact( const fc::sha256& digest, bool require_canonical = true )const;
+           compact_signature sign_compact(const crypto::keccak256& digest) const;
 
            public_key get_public_key()const;
 
-           inline friend bool operator==( const private_key& a, const private_key& b )
-           {
-            return a.get_secret() == b.get_secret();
-           }
-           inline friend bool operator!=( const private_key& a, const private_key& b )
-           {
-            return a.get_secret() != b.get_secret();
-           }
-           inline friend bool operator<( const private_key& a, const private_key& b )
-           {
-            return a.get_secret() < b.get_secret();
+           inline friend bool operator==(const private_key& a, const private_key& b) {
+              return a.get_secret() == b.get_secret();
            }
 
-           unsigned int fingerprint() const { return get_public_key().fingerprint(); }
+           inline friend bool operator<(const private_key& a, const private_key& b) {
+              return a.get_secret() < b.get_secret();
+           }
 
         private:
            fc::fwd<detail::private_key_impl,32> my;
@@ -146,6 +126,16 @@ namespace fc {
          bool valid()const {
             return public_key(_data).valid();
          }
+
+         public_key unwrapped()const { return public_key(_data); }
+
+         public_key_data_uncompressed serialize_uncompressed()const {
+            return public_key::serialize_uncompressed(_data);
+         }
+
+         std::string to_string()const {
+            return fc::to_hex(serialize_uncompressed(), true);
+         }
       };
 
       struct signature_shim : public crypto::shim<compact_signature> {
@@ -153,7 +143,15 @@ namespace fc {
          using public_key_type = public_key_shim;
          using crypto::shim<compact_signature>::shim;
 
-         public_key_type recover(const sha256& digest, bool check_canonical) const;
+         /// Recover public key from Wire transaction digest (applies EIP-191 prefix)
+         public_key_type recover(const sha256& digest) const;
+
+         /// Recover public key from raw Ethereum keccak256 digest (no prefix)
+         public_key_type recover_eth(const fc::crypto::keccak256& digest) const;
+
+         std::string to_string()const {
+            return to_hex(std::as_bytes(std::span(_data)), true);
+         }
       };
 
       struct private_key_shim : public crypto::shim<private_key_secret> {
@@ -161,9 +159,20 @@ namespace fc {
          using signature_type = signature_shim;
          using public_key_type = public_key_shim;
 
-         signature_type sign( const sha256& digest, bool require_canonical = true ) const
+         /// Sign Wire transaction digest (applies EIP-191 prefix, for MetaMask personal_sign)
+         signature_type sign_sha256( const sha256& digest ) const;
+
+         /// Sign raw Ethereum keccak256 digest (no prefix, for Ethereum transaction signing)
+         signature_type sign_keccak256( const fc::crypto::keccak256& digest ) const
          {
-           return signature_type(private_key::regenerate(_data).sign_compact(digest, require_canonical));
+            return signature_type(private_key::regenerate(_data).sign_compact(digest));
+         }
+
+         /// Sign raw bytes by hashing with keccak256 first (internal, used by ethereum_client)
+         signature_type sign_raw( const uint8_t* data, size_t len ) const
+         {
+            auto digest = fc::crypto::keccak256::hash(std::span(data, len));
+            return signature_type(private_key::regenerate(_data).sign_compact(digest));
          }
 
          public_key_type get_public_key( ) const
@@ -171,16 +180,14 @@ namespace fc {
            return public_key_type(private_key::regenerate(_data).get_public_key().serialize());
          }
 
-         sha512 generate_shared_secret( const public_key_type &pub_key ) const
-         {
-           return private_key::regenerate(_data).get_shared_secret(public_key(pub_key.serialize()));
-         }
-
          static private_key_shim generate()
          {
             return private_key_shim(private_key::generate().get_secret());
          }
 
+         std::string to_string()const {
+            return to_hex(std::as_bytes(std::span(_data)), true);
+         }
       };
 
   } // namespace em
@@ -194,7 +201,7 @@ namespace fc {
       template<typename Stream>
       void unpack( Stream& s, em::public_key& pk)
       {
-          em::public_key_data ser;
+          em::public_key_data ser{};
           fc::raw::unpack(s,ser);
           pk = em::public_key( ser );
       }
@@ -208,7 +215,7 @@ namespace fc {
       template<typename Stream>
       void unpack( Stream& s, em::private_key& pk)
       {
-          fc::sha256 sec;
+          fc::em::private_key_secret sec{};
           unpack( s, sec );
           pk = em::private_key::regenerate(sec);
       }

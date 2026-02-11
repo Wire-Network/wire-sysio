@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-# Silence warning about CMP0144 and ensure find_package() honors UPPERCASE <PKG>_ROOT vars
-# This is safe on older CMake versions due to the POLICY check.
-if(POLICY CMP0144)
-  cmake_policy(SET CMP0144 NEW)
-endif()
+
+# Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
-    CACHE STRING "Vcpkg toolchain file")
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/vcpkg/scripts/buildsystems/vcpkg.cmake"
+            CACHE STRING "Vcpkg toolchain file")
 endif()
+
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -27,11 +25,13 @@ endif()
 project(wire-sysio)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(build-init NO_POLICY_SCOPE)
 include(build-options NO_POLICY_SCOPE)
 include(compiler-config NO_POLICY_SCOPE)
 include(dependencies NO_POLICY_SCOPE)
 include(linker-config NO_POLICY_SCOPE)
 include(hardening-config NO_POLICY_SCOPE)
+include(plugin-tools NO_POLICY_SCOPE)
 include(chain-tools NO_POLICY_SCOPE)
 include(test-tools NO_POLICY_SCOPE)
 include(contract-tools NO_POLICY_SCOPE)
@@ -81,12 +81,6 @@ option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
 if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
     list(APPEND SYSIO_WASM_RUNTIMES sys-vm-oc)
-    # SYS VM OC requires LLVM, but move the check up here to a central location so that the SysioTester.cmakes
-    # can be created with the exact version found
-    find_package(LLVM REQUIRED CONFIG)
-    if(LLVM_VERSION_MAJOR VERSION_LESS 7)# OR LLVM_VERSION_MAJOR VERSION_GREATER_EQUAL 12)
-      message(FATAL_ERROR "WIRE requires an LLVM version 7 through 11")
-    endif()
   endif()
 endif()
 
@@ -170,16 +164,6 @@ if(CORE_SYMBOL_NAME_LENGTH GREATER 7)
 endif()
 
 message(STATUS "Using '${CORE_SYMBOL_NAME}' as CORE symbol name")
-
-if("${SYSIO_ROOT_KEY}" STREQUAL "")
-  set(SYSIO_ROOT_KEY "SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV")
-endif()
-if("${SYSIO_ROOT_FINALIZER_KEY}" STREQUAL "")
-    set(SYSIO_ROOT_FINALIZER_KEY "PUB_BLS_3igm9y-m3poDQL9IU-oE2E3rjKVD025aN5_Kpod8aVKjqtg4xOrP-jGtz4wLg_IFzc7gay9YghYwVgNafpxphE2xOY5gzEPa8li1rmtFfdpXguDFhNw2FpuLWSWami8WXgUo3A")
-endif()
-
-message(STATUS "Using '${SYSIO_ROOT_KEY}' as public key for 'sysio' account")
-message(STATUS "Using '${SYSIO_ROOT_FINALIZER_KEY}' as finalizer key for 'sysio' account")
 
 option(ENABLE_TCMALLOC "use tcmalloc (requires gperftools)" OFF)
 if(ENABLE_TCMALLOC)
@@ -266,12 +250,20 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.21)
 
   add_custom_target(link_target ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory lib/python3/dist-packages
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../../share/leap_testing/tests/TestHarness lib/python3/dist-packages/TestHarness
-    COMMAND ${CMAKE_COMMAND} -E make_directory share/leap_testing
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/leap_testing/bin)
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../../share/sysio_testing/tests/TestHarness lib/python3/dist-packages/TestHarness
+    COMMAND ${CMAKE_COMMAND} -E make_directory share/sysio_testing
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../bin share/sysio_testing/bin)
 
   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lib/python3/dist-packages/TestHarness DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}/python3/dist-packages COMPONENT dev EXCLUDE_FROM_ALL)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/share/leap_testing/bin/* DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/leap_testing COMPONENT dev EXCLUDE_FROM_ALL)
+  install(PROGRAMS
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/clio
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/kiod
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/nodeop
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/sys-util
+          ${CMAKE_CURRENT_BINARY_DIR}/bin/trace_api_util
+          DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/bin
+          COMPONENT dev
+          EXCLUDE_FROM_ALL)
 else()
   # The following install(SCRIPT ...) steps are necessary for `make dev-install` to work on cmake versions < 3.21.
   install(SCRIPT ${CMAKE_CURRENT_BINARY_DIR}/scripts/install_testharness_symlinks.cmake COMPONENT dev EXCLUDE_FROM_ALL)

@@ -105,7 +105,7 @@ try:
     # Configure the new key (using --signature-provider) and restart node0.
     # LIB should advance
     Print("Restart producer node0")
-    node0.relaunch(chainArg=" -e --signature-provider PUB_BLS_JzblSr2sf_UhxQjGxOtHbRCBkHgSB1RG4xUbKKl-fKtUjx6hyOHajnVQT4IvBF4PutlX7JTC14IqIjADlP-3_G2MXRhBlkB57r2u59OCwRQQEDqmVSADf6CoT8zFUXcSgHFw7w=KEY:PVT_BLS_QRxLAVbe2n7RaPWx2wHbur8erqUlAs-V_wXasGhjEA78KlBq")
+    node0.relaunch(chainArg=" -e --signature-provider wire-bls-1,wire,wire_bls,PUB_BLS_JzblSr2sf_UhxQjGxOtHbRCBkHgSB1RG4xUbKKl-fKtUjx6hyOHajnVQT4IvBF4PutlX7JTC14IqIjADlP-3_G2MXRhBlkB57r2u59OCwRQQEDqmVSADf6CoT8zFUXcSgHFw7w,KEY:PVT_BLS_QRxLAVbe2n7RaPWx2wHbur8erqUlAs-V_wXasGhjEA78KlBq")
 
     Print("Verify LIB advances after restart")
     assert node0.waitForLibToAdvance(), "node0 did not advance LIB"

@@ -64,12 +64,17 @@ namespace sysio { namespace client { namespace http {
    const string wallet_open = wallet_func_base + "/open";
    const string wallet_list = wallet_func_base + "/list_wallets";
    const string wallet_list_keys = wallet_func_base + "/list_keys";
+   const string wallet_list_keys_by_name = wallet_func_base + "/list_keys_by_name";
+   const string wallet_set_key_name_with_public_key = wallet_func_base + "/set_key_name_with_public_key";
+   const string wallet_set_key_name_with_private_key = wallet_func_base + "/set_key_name_with_private_key";
+   const string wallet_set_key_name = wallet_func_base + "/set_key_name";
    const string wallet_public_keys = wallet_func_base + "/get_public_keys";
    const string wallet_lock = wallet_func_base + "/lock";
    const string wallet_lock_all = wallet_func_base + "/lock_all";
    const string wallet_unlock = wallet_func_base + "/unlock";
    const string wallet_import_key = wallet_func_base + "/import_key";
    const string wallet_remove_key = wallet_func_base + "/remove_key";
+   const string wallet_remove_name = wallet_func_base + "/remove_name";
    const string wallet_create_key = wallet_func_base + "/create_key";
    const string wallet_sign_trx = wallet_func_base + "/sign_transaction";
    const string kiod_stop = "/v1/" + string(client::config::key_store_executable_name) + "/stop";

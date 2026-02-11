@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( abi_from_variant, T, validating_testers ) try {
             }
          }
          return std::optional<abi_serializer>();
-      } FC_RETHROW_EXCEPTIONS(error, "Failed to find or parse ABI for ${name}", ("name", name))
+      } FC_RETHROW_EXCEPTIONS(error, "Failed to find or parse ABI for {}", name)
    };
 
    fc::variant pretty_trx = mutable_variant_object()
@@ -1787,7 +1787,12 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
 
    auto ptrx = create_trx(0);
    // no limits, just verifying trx works
+#ifdef NDEBUG
    push_trx( ptrx, fc::time_point::maximum(), 0, false ); // non-explicit billing
+#else
+   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+   push_trx( ptrx, fc::time_point::maximum(), config::default_min_transaction_cpu_usage, true );
+#endif
 
    // setup account acc with large limits
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
@@ -1938,8 +1943,8 @@ BOOST_AUTO_TEST_CASE( billed_cpu_test ) try {
    BOOST_CHECK_EXCEPTION(push_trx( ptrx, fc::time_point::maximum(), billed_cpu_time_us, false ), tx_cpu_usage_exceeded,
                          [](const tx_cpu_usage_exceeded& e){ fc_exception_message_starts_with starts("estimated");
                                                              fc_exception_message_contains contains_reached("reached account cpu limit");
-                                                             fc_exception_message_contains contains_subjective("with a subjective cpu of");
-                                                             return starts(e) && contains_reached(e) && !contains_subjective(e); } );
+                                                             fc_exception_message_contains contains_subjective("with a subjective cpu of (0 us)");
+                                                             return starts(e) && contains_reached(e) && contains_subjective(e); } );
 
    // Test when cpu limit is 0
    chain.push_action( config::system_account_name, "setalimits"_n, config::system_account_name, fc::mutable_variant_object()
@@ -2006,7 +2011,12 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    // first call will load wasm, pausing timer
    auto ptrx = create_trx(0);
    // no limits, verify trace values
+#ifdef NDEBUG
    auto trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
+#else
+   // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
+   auto trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage_t{100, 100, 100}, true );
+#endif
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
    // timer is paused while loading the contract, so elapsed is larger than billed
 
@@ -2021,6 +2031,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    ptrx = create_trx(0);
    // no limits, verify trace values
    trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
+   BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
    BOOST_TEST(trace->net_usage == 340u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);
@@ -2071,6 +2082,7 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
    cpu_usage_t cpu_usage{321, 4242, 123};
    auto total_cpu = std::ranges::fold_left(cpu_usage, 0ul, std::plus());
    trace = push_trx( ptrx, fc::time_point::maximum(), cpu_usage, true );
+   BOOST_TEST_MESSAGE(fc::json::to_pretty_string(trace));
    BOOST_TEST(trace->elapsed.count() > 1);
    BOOST_TEST(trace->net_usage == 340u);
    BOOST_TEST_REQUIRE(trace->action_traces.size() == 3u);

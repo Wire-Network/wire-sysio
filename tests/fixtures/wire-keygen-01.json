@@ -1,0 +1,12 @@
+{
+  "key_name": "wire-01",
+  "chain_type": "wire",
+  "chain_key_type": "wire",
+  "chain_id": "42941c1cde93a94971982e1cad2eef7f2db10d8519b2eeaf1cad4ee13ec29a10",
+  "account_name": "alice",
+  "private_key": "5KCYNc6k47c6ECHNNkpd9uVJ4ivuEF6F6Qygpoq2BRLwSvpc2sh",
+  "public_key": "SYS7w91TTxaSLyfvKExvXD6wb9puzw4PCnq9Ew2CAApF8K4kXrj9P",
+  "address": "3773036822876127232",
+  "payload": "simple-text-payload",
+  "signature": "SIG_K1_K3A38WABQtTXrQaDkAyunwRbfaQUSxWmmSRbhwJhHyob9EWxgVwyVHnFcCVugLtY6v5zmeRcwfLL6D1vCY6kNhTf3sbThU"
+}

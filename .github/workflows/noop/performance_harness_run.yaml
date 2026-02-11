@@ -81,7 +81,7 @@ jobs:
           with:
             owner: AntelopeIO
             repo: sysio
-            file: build.tar.zst
+            file: build.tar.gz
             target: ${{github.sha}}
             artifact-name: ${{github.event.inputs.platform-choice}}-build
             fail-on-missing-target: false
@@ -91,7 +91,7 @@ jobs:
           uses: actions/upload-artifact@v4
           with:
             name: ${{github.event.inputs.platform-choice}}-build
-            path: build.tar.zst
+            path: build.tar.gz
             compression-level: 0
 
   build-base:
@@ -117,7 +117,7 @@ jobs:
           name: ${{github.event.inputs.platform-choice}}-build
       - name: Extract Build Directory
         run: |
-          zstdcat build.tar.zst | tar x
+          tar xzf build.tar.gz
       - if: ${{ needs.v.outputs.sysio-target != 'DEFAULT' }}
         name: Download Prev Leap Version
         uses: AntelopeIO/asset-artifact-download-action@v3

@@ -12,6 +12,7 @@ namespace sysio {
       string            peer;
       string            remote_ip;
       string            remote_port;
+      uint32_t          connection_id        = 0;
       bool              connecting           = false;
       bool              syncing              = false;
       bool              is_bp_peer           = false;
@@ -36,7 +37,7 @@ namespace sysio {
         net_plugin();
         virtual ~net_plugin();
 
-        APPBASE_PLUGIN_REQUIRES((chain_plugin)(producer_plugin))
+        APPBASE_PLUGIN_REQUIRES((chain_plugin)(producer_plugin)(signature_provider_manager_plugin))
         virtual void set_program_options(options_description& cli, options_description& cfg) override;
         void handle_sighup() override;
 

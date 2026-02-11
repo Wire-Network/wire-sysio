@@ -22,8 +22,6 @@ namespace sysio { namespace chain {
 
          res.whitelisted_intrinsics = convert_intrinsic_whitelist_to_set( value.whitelisted_intrinsics );
 
-         res.num_supported_key_types = value.num_supported_key_types;
-
          return res;
       }
 
@@ -37,8 +35,6 @@ namespace sysio { namespace chain {
          value.preactivated_protocol_features = row.preactivated_protocol_features;
 
          reset_intrinsic_whitelist( value.whitelisted_intrinsics, row.whitelisted_intrinsics );
-
-         value.num_supported_key_types = row.num_supported_key_types;
       }
 
    }

@@ -3,6 +3,7 @@
 #include <fc/crypto/hmac.hpp>
 #include <fc/crypto/openssl.hpp>
 #include <fc/crypto/ripemd160.hpp>
+#include <fc-lite/traits.hpp>
 
 #ifdef _WIN32
 # include <malloc.h>
@@ -20,7 +21,7 @@
 namespace fc { namespace ecc {
 
     namespace detail {
-        typedef fc::array<char,37> chr37;
+        typedef std::array<char,37> chr37;
 
         fc::sha256 _left( const fc::sha512& v )
         {
@@ -47,7 +48,7 @@ namespace fc { namespace ecc {
 
         static chr37 _derive_message( char first, const char* key32, int i )
         {
-            chr37 result;
+            chr37 result{};
             unsigned char* dest = (unsigned char*) result.begin();
             *dest++ = first;
             memcpy( dest, key32, 32 ); dest += 32;
@@ -74,8 +75,8 @@ namespace fc { namespace ecc {
             ssl_bignum order;
             FC_ASSERT( EC_GROUP_get_order( group, order, ctx ) );
             private_key_secret bin;
-            FC_ASSERT( BN_num_bytes( order ) == bin.data_size() );
-            FC_ASSERT( BN_bn2bin( order, (unsigned char*) bin.data() ) == bin.data_size() );
+            FC_ASSERT( BN_num_bytes( order ) == fc::data_size(bin) );
+            FC_ASSERT( BN_bn2bin( order, (unsigned char*) bin.data() ) == fc::data_size(bin) );
             return bin;
         }
 
@@ -93,8 +94,8 @@ namespace fc { namespace ecc {
             FC_ASSERT( EC_GROUP_get_order( group, order, ctx ) );
             BN_rshift1( order, order );
             private_key_secret bin;
-            FC_ASSERT( BN_num_bytes( order ) == bin.data_size() );
-            FC_ASSERT( BN_bn2bin( order, (unsigned char*) bin.data() ) == bin.data_size() );
+            FC_ASSERT( BN_num_bytes( order ) == fc::data_size(bin) );
+            FC_ASSERT( BN_bn2bin( order, (unsigned char*) bin.data() ) == fc::data_size(bin) );
             return bin;
         }
 
@@ -118,43 +119,20 @@ namespace fc { namespace ecc {
     }
 
     bool public_key::is_canonical( const compact_signature& c ) {
-        return !(c.data[1] & 0x80)
-               && !(c.data[1] == 0 && !(c.data[2] & 0x80))
-               && !(c.data[33] & 0x80)
-               && !(c.data[33] == 0 && !(c.data[34] & 0x80));
+        return !(c[1] & 0x80)
+               && !(c[1] == 0 && !(c[2] & 0x80))
+               && !(c[33] & 0x80)
+               && !(c[33] == 0 && !(c[34] & 0x80));
     }
 
-    private_key private_key::generate_from_seed( const fc::sha256& seed, const fc::sha256& offset )
-    {
-        ssl_bignum z;
-        BN_bin2bn((unsigned char*)&offset, sizeof(offset), z);
-
-        ec_group group(EC_GROUP_new_by_curve_name(NID_secp256k1));
-        bn_ctx ctx(BN_CTX_new());
-        ssl_bignum order;
-        EC_GROUP_get_order(group, order, ctx);
-
-        // secexp = (seed + z) % order
-        ssl_bignum secexp;
-        BN_bin2bn((unsigned char*)&seed, sizeof(seed), secexp);
-        BN_add(secexp, secexp, z);
-        BN_mod(secexp, secexp, order, ctx);
-
-        fc::sha256 secret;
-        FC_ASSERT(BN_num_bytes(secexp) <= int64_t(sizeof(secret)));
-        auto shift = sizeof(secret) - BN_num_bytes(secexp);
-        BN_bn2bin(secexp, ((unsigned char*)&secret)+shift);
-        return regenerate( secret );
-    }
-
-    fc::sha256 private_key::get_secret( const EC_KEY * const k )
+    private_key_secret private_key::get_secret( const EC_KEY * const k )
     {
        if( !k )
        {
-          return fc::sha256();
+          return {};
        }
 
-       fc::sha256 sec;
+       private_key_secret sec;
        const BIGNUM* bn = EC_KEY_get0_private_key(k);
        if( bn == NULL )
        {

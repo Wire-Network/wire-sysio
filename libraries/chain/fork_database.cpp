@@ -153,10 +153,10 @@ namespace sysio::chain {
 
       auto head = head_impl(include_root_t::no);
       if (head) {
-         ilog("Writing fork_database ${b} blocks with root ${rn}:${r} and head ${hn}:${h}",
-              ("b", head->block_num() - root->block_num())("rn", root->block_num())("r", root->id())("hn", head->block_num())("h", head->id()));
+         ilog("Writing fork_database {} blocks with root {}:{} and head {}:{}",
+              head->block_num() - root->block_num(), root->block_num(), root->id(), head->block_num(), head->id());
       } else {
-         ilog("Writing empty fork_database with root ${rn}:${r}", ("rn", root->block_num())("r", root->id()));
+         ilog("Writing empty fork_database with root {}:{}", root->block_num(), root->id());
       }
 
       fc::raw::pack( out, pending_savanna_lib_id );
@@ -258,7 +258,7 @@ namespace sysio::chain {
 
       auto prev_bh = get_block_impl( n->previous(), include_root_t::yes );
       SYS_ASSERT( prev_bh, unlinkable_block_exception,
-                  "fork_db unlinkable block ${id} previous ${p}", ("id", n->id())("p", n->previous()) );
+                  "fork_db unlinkable block {} previous {}", n->id(), n->previous() );
 
       if (validate) {
          try {
@@ -276,7 +276,7 @@ namespace sysio::chain {
 
       auto inserted = index.insert(n);
       SYS_ASSERT(ignore_duplicate == ignore_duplicate_t::yes || inserted.second, fork_database_exception,
-                 "duplicate block added: ${id}", ("id", n->id()));
+                 "duplicate block added: {}", n->id());
 
       if (!inserted.second)
          return fork_db_add_t::duplicate;
@@ -355,7 +355,7 @@ namespace sysio::chain {
       block_num_type new_lib = block_header::num_from_id(id);
       block_num_type old_lib = block_header::num_from_id(pending_savanna_lib_id);
       if (new_lib > old_lib) {
-         dlog("set fork db pending savanna lib ${bn}: ${id}", ("bn", block_header::num_from_id(id))("id", id));
+         dlog("set fork db pending savanna lib {}: {}", block_header::num_from_id(id), id);
          pending_savanna_lib_id = id;
          return true;
       }
@@ -552,18 +552,15 @@ namespace sysio::chain {
       auto first_branch = (first == root->id()) ? root : get_block_impl(first);
       auto second_branch = (second == root->id()) ? root : get_block_impl(second);
 
-      SYS_ASSERT(first_branch, fork_db_block_not_found, "block #${n} ${id} does not exist", ("n", block_header::num_from_id(first))("id", first));
-      SYS_ASSERT(second_branch, fork_db_block_not_found, "block #${n} ${id} does not exist", ("n", block_header::num_from_id(second))("id", second));
+      SYS_ASSERT(first_branch, fork_db_block_not_found, "block #{} {} does not exist", block_header::num_from_id(first), first);
+      SYS_ASSERT(second_branch, fork_db_block_not_found, "block #{} {} does not exist", block_header::num_from_id(second), second);
 
       while( first_branch->block_num() > second_branch->block_num() )
       {
          result.first.push_back(first_branch);
          const auto& prev = first_branch->previous();
          first_branch = (prev == root->id()) ? root : get_block_impl( prev );
-         SYS_ASSERT( first_branch, fork_db_block_not_found,
-                     "block ${id} does not exist",
-                     ("id", prev)
-         );
+         SYS_ASSERT( first_branch, fork_db_block_not_found, "block {} does not exist", prev);
       }
 
       while( second_branch->block_num() > first_branch->block_num() )
@@ -571,10 +568,7 @@ namespace sysio::chain {
          result.second.push_back( second_branch );
          const auto& prev = second_branch->previous();
          second_branch = (prev == root->id()) ? root : get_block_impl( prev );
-         SYS_ASSERT( second_branch, fork_db_block_not_found,
-                     "block ${id} does not exist",
-                     ("id", prev)
-         );
+         SYS_ASSERT( second_branch, fork_db_block_not_found, "block {} does not exist", prev);
       }
 
       if (first_branch->id() == second_branch->id()) return result;
@@ -587,14 +581,8 @@ namespace sysio::chain {
          first_branch = get_block_impl( first_prev );
          const auto &second_prev = second_branch->previous();
          second_branch = get_block_impl( second_prev );
-         SYS_ASSERT( first_branch, fork_db_block_not_found,
-                     "block ${id} does not exist",
-                     ("id", first_prev)
-         );
-         SYS_ASSERT( second_branch, fork_db_block_not_found,
-                     "block ${id} does not exist",
-                     ("id", second_prev)
-         );
+         SYS_ASSERT( first_branch, fork_db_block_not_found, "block {} does not exist", first_prev);
+         SYS_ASSERT( second_branch, fork_db_block_not_found, "block {} does not exist", second_prev);
       }
 
       if( first_branch && second_branch )
@@ -714,7 +702,7 @@ namespace sysio::chain {
          return;
       }
 
-      ilog("Persisting to fork_database file: ${f}", ("f", fork_db_file));
+      ilog("Persisting to fork_database file: {}", fork_db_file.generic_string());
       std::ofstream out( fork_db_file.generic_string().c_str(), std::ios::out | std::ios::binary | std::ofstream::trunc );
 
       fc::raw::pack( out, magic_number );
@@ -759,19 +747,19 @@ namespace sysio::chain {
             uint32_t totem = 0;
             fc::raw::unpack( ds, totem );
             SYS_ASSERT( totem == magic_number, fork_database_exception,
-                        "Fork database file '${filename}' has unexpected magic number: ${actual_totem}. Expected ${t}",
-                        ("filename", fork_db_file)("actual_totem", totem)("t", magic_number));
+                        "Fork database file '{}' has unexpected magic number: {}. Expected {}",
+                        fork_db_file.generic_string(), totem, magic_number);
 
             uint32_t version = 0;
             fc::raw::unpack( ds, version );
             SYS_ASSERT( version >= min_supported_version && version <= max_supported_version,
                         fork_database_exception,
-                       "Unsupported version of fork database file '${filename}'. "
-                       "Fork database version is ${version} while code supports version(s) [${min},${max}]",
-                       ("filename", fork_db_file)("version", version)("min", min_supported_version)("max", max_supported_version));
+                       "Unsupported version of fork database file '{}'. "
+                       "Fork database version is {} while code supports version(s) [{},{}]",
+                       fork_db_file.generic_string(), version, min_supported_version, max_supported_version);
 
             open("savanna", fork_db_file, ds, validator);
-         } FC_CAPTURE_AND_RETHROW( (fork_db_file) );
+         } FC_CAPTURE_AND_RETHROW( "{}", fork_db_file.generic_string() );
          std::filesystem::remove( fork_db_file );
       }
    }

@@ -1,0 +1,703 @@
+[
+  {
+    "method": "getAccountInfo",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "accounts",
+    "summary": "Returns all information associated with an account (lamports, owner program, executable flag, rent epoch, and data).",
+    "params_shape": ["pubkey: base58-string", "config?: { encoding?, commitment?, minContextSlot?, dataSlice? }"],
+    "result_shape": "RpcResponse<{ value: AccountInfo | null }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getaccountinfo"
+  },
+  {
+    "method": "getBalance",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "accounts",
+    "summary": "Returns the balance (lamports) for the provided account pubkey.",
+    "params_shape": ["pubkey: base58-string", "config?: { commitment?, minContextSlot? }"],
+    "result_shape": "RpcResponse<{ value: u64_lamports }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getbalance"
+  },
+  {
+    "method": "getBlock",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns a confirmed block, including transactions and metadata (config controls transaction details/encoding/rewards).",
+    "params_shape": ["slot: u64", "config?: { encoding?, transactionDetails?, rewards?, commitment?, maxSupportedTransactionVersion? }"],
+    "result_shape": "BlockResponse | null",
+    "docs_url": "https://solana.com/docs/rpc/http/getblock"
+  },
+  {
+    "method": "getBlockCommitment",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns the commitment for a particular block (slot), including confirmation counts by commitment level.",
+    "params_shape": ["slot: u64"],
+    "result_shape": "{ commitment?: [u64|null,...], totalStake?: u64 }",
+    "docs_url": "https://solana.com/docs/rpc/http/getblockcommitment"
+  },
+  {
+    "method": "getBlockHeight",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns the current block height of the node.",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/getblockheight"
+  },
+  {
+    "method": "getBlockProduction",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns recent block production information (by leader identity) for a slot range.",
+    "params_shape": ["config?: { range?: { firstSlot, lastSlot? }, identity?: string, commitment? }"],
+    "result_shape": "RpcResponse<{ byIdentity: { [identity: string]: [leaderSlotsProduced, leaderSlotsSkipped] }, range: { firstSlot, lastSlot } }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getblockproduction"
+  },
+  {
+    "method": "getBlocks",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns a list of confirmed block slots between two slots.",
+    "params_shape": ["startSlot: u64", "endSlot?: u64", "config?: { commitment? }"],
+    "result_shape": "u64[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getblocks"
+  },
+  {
+    "method": "getBlocksWithLimit",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns a list of confirmed block slots starting at a slot, limited by a maximum count.",
+    "params_shape": ["startSlot: u64", "limit: u64", "config?: { commitment? }"],
+    "result_shape": "u64[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getblockswithlimit"
+  },
+  {
+    "method": "getBlockTime",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns the estimated production time (unix timestamp) of a block (slot).",
+    "params_shape": ["slot: u64"],
+    "result_shape": "i64_unix_timestamp | null",
+    "docs_url": "https://solana.com/docs/rpc/http/getblocktime"
+  },
+  {
+    "method": "getClusterNodes",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns information about all the nodes participating in the cluster.",
+    "params_shape": [],
+    "result_shape": "ClusterNode[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getclusternodes"
+  },
+  {
+    "method": "getEpochInfo",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "epoch",
+    "summary": "Returns information about the current epoch (epoch number, slot index, slots in epoch, absolute slot, etc.).",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "EpochInfo",
+    "docs_url": "https://solana.com/docs/rpc/http/getepochinfo"
+  },
+  {
+    "method": "getEpochSchedule",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "epoch",
+    "summary": "Returns the epoch schedule used by the cluster.",
+    "params_shape": [],
+    "result_shape": "EpochSchedule",
+    "docs_url": "https://solana.com/docs/rpc/http/getepochschedule"
+  },
+  {
+    "method": "getFeeForMessage",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "fees",
+    "summary": "Returns the fee the network would charge for the provided (base64) message.",
+    "params_shape": ["message: base64-string", "config?: { commitment?, minContextSlot? }"],
+    "result_shape": "RpcResponse<{ value: u64_lamports | null }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getfeeformessage"
+  },
+  {
+    "method": "getFirstAvailableBlock",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blocks",
+    "summary": "Returns the slot of the lowest confirmed block that the node has available.",
+    "params_shape": [],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/getfirstavailableblock"
+  },
+  {
+    "method": "getGenesisHash",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the genesis hash of the ledger.",
+    "params_shape": [],
+    "result_shape": "string",
+    "docs_url": "https://solana.com/docs/rpc/http/getgenesishash"
+  },
+  {
+    "method": "getHealth",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the health status of the node.",
+    "params_shape": [],
+    "result_shape": "\"ok\" | error",
+    "docs_url": "https://solana.com/docs/rpc/http/gethealth"
+  },
+  {
+    "method": "getHighestSnapshotSlot",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the highest snapshot slots (full and incremental) known to the node.",
+    "params_shape": [],
+    "result_shape": "{ full: u64, incremental?: u64 }",
+    "docs_url": "https://solana.com/docs/rpc/http/gethighestsnapshotslot"
+  },
+  {
+    "method": "getIdentity",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the identity pubkey for the current node.",
+    "params_shape": [],
+    "result_shape": "{ identity: string }",
+    "docs_url": "https://solana.com/docs/rpc/http/getidentity"
+  },
+  {
+    "method": "getInflationGovernor",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "inflation",
+    "summary": "Returns the current inflation governor parameters.",
+    "params_shape": ["config?: { commitment? }"],
+    "result_shape": "InflationGovernor",
+    "docs_url": "https://solana.com/docs/rpc/http/getinflationgovernor"
+  },
+  {
+    "method": "getInflationRate",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "inflation",
+    "summary": "Returns the current inflation rate and parameters derived from it.",
+    "params_shape": [],
+    "result_shape": "InflationRate",
+    "docs_url": "https://solana.com/docs/rpc/http/getinflationrate"
+  },
+  {
+    "method": "getInflationReward",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "inflation",
+    "summary": "Returns inflation rewards for a set of addresses for a given epoch (or current).",
+    "params_shape": ["addresses: string[]", "config?: { epoch?: u64, commitment?, minContextSlot? }"],
+    "result_shape": "RpcResponse<{ value: (InflationReward|null)[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getinflationreward"
+  },
+  {
+    "method": "getLargestAccounts",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "supply",
+    "summary": "Returns the largest accounts on the network (by lamports), optionally filtered.",
+    "params_shape": ["config?: { filter?: \"circulating\"|\"nonCirculating\", commitment? }"],
+    "result_shape": "RpcResponse<{ value: LargestAccount[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getlargestaccounts"
+  },
+  {
+    "method": "getLatestBlockhash",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blockhash",
+    "summary": "Returns the latest blockhash and lastValidBlockHeight for transaction recentBlockhash selection.",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "RpcResponse<{ value: { blockhash: string, lastValidBlockHeight: u64 } }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getlatestblockhash"
+  },
+  {
+    "method": "getLeaderSchedule",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the leader schedule for an epoch (or the current epoch) keyed by identity.",
+    "params_shape": ["slot?: u64", "config?: { commitment? }"],
+    "result_shape": "{ [identity: string]: u64[] } | null",
+    "docs_url": "https://solana.com/docs/rpc/http/getleaderschedule"
+  },
+  {
+    "method": "getMaxRetransmitSlot",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the max retransmit slot seen by the node (useful for diagnosing propagation).",
+    "params_shape": [],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/getmaxretransmitslot"
+  },
+  {
+    "method": "getMaxShredInsertSlot",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the max shred insert slot seen by the node.",
+    "params_shape": [],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/getmaxshredinsertslot"
+  },
+  {
+    "method": "getMinimumBalanceForRentExemption",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "rent",
+    "summary": "Returns the minimum lamports required for rent exemption for a given data size.",
+    "params_shape": ["dataLength: u64", "config?: { commitment? }"],
+    "result_shape": "u64_lamports",
+    "docs_url": "https://solana.com/docs/rpc/http/getminimumbalanceforrentexemption"
+  },
+  {
+    "method": "getMultipleAccounts",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "accounts",
+    "summary": "Returns account info for multiple pubkeys in one request.",
+    "params_shape": ["pubkeys: string[]", "config?: { encoding?, commitment?, minContextSlot?, dataSlice? }"],
+    "result_shape": "RpcResponse<{ value: (AccountInfo|null)[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getmultipleaccounts"
+  },
+  {
+    "method": "getProgramAccounts",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "programs",
+    "summary": "Returns all accounts owned by the provided program id, optionally filtered by memcmp/dataSize, with configurable encoding.",
+    "params_shape": ["programId: base58-string", "config?: { filters?, encoding?, commitment?, minContextSlot?, dataSlice?, withContext? }"],
+    "result_shape": "RpcResponse<{ value: ProgramAccount[] }>|ProgramAccount[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getprogramaccounts"
+  },
+  {
+    "method": "getRecentPerformanceSamples",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "performance",
+    "summary": "Returns recent performance samples (e.g., numTransactions, numSlots, samplePeriodSecs).",
+    "params_shape": ["limit?: u64"],
+    "result_shape": "PerformanceSample[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getrecentperformancesamples"
+  },
+  {
+    "method": "getRecentPrioritizationFees",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "fees",
+    "summary": "Returns prioritization fee information from recent blocks; can be scoped to a set of writable accounts.",
+    "params_shape": ["accounts?: string[] (max 128)"],
+    "result_shape": "{ slot: u64, prioritizationFee: u64 }[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getrecentprioritizationfees"
+  },
+  {
+    "method": "getSignaturesForAddress",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Returns confirmed signatures for transactions involving an address (pagination via before/until/limit).",
+    "params_shape": ["address: base58-string", "config?: { before?, until?, limit?, commitment?, minContextSlot? }"],
+    "result_shape": "SignatureInfo[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getsignaturesforaddress"
+  },
+  {
+    "method": "getSignatureStatuses",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Returns status information for a list of signatures (optionally searching transaction history).",
+    "params_shape": ["signatures: string[]", "config?: { searchTransactionHistory?: boolean }"],
+    "result_shape": "RpcResponse<{ value: (SignatureStatus|null)[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getsignaturestatuses"
+  },
+  {
+    "method": "getSlot",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the current slot the node is processing at the given commitment.",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/getslot"
+  },
+  {
+    "method": "getSlotLeader",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the current slot leader.",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "string",
+    "docs_url": "https://solana.com/docs/rpc/http/getslotleader"
+  },
+  {
+    "method": "getSlotLeaders",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the slot leaders for a given slot range.",
+    "params_shape": ["startSlot: u64", "limit: u64"],
+    "result_shape": "string[]",
+    "docs_url": "https://solana.com/docs/rpc/http/getslotleaders"
+  },
+  {
+    "method": "getStakeMinimumDelegation",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "stake",
+    "summary": "Returns the stake minimum delegation, in lamports.",
+    "params_shape": ["config?: { commitment? }"],
+    "result_shape": "RpcResponse<{ value: u64_lamports }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getstakeminimumdelegation"
+  },
+  {
+    "method": "getSupply",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "supply",
+    "summary": "Returns total supply information (total, circulating, non-circulating, and related accounts).",
+    "params_shape": ["config?: { commitment?, excludeNonCirculatingAccountsList?: boolean }"],
+    "result_shape": "RpcResponse<{ value: Supply }>",
+    "docs_url": "https://solana.com/docs/rpc/http/getsupply"
+  },
+  {
+    "method": "getTokenAccountBalance",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "tokens",
+    "summary": "Returns the token balance of an SPL token account.",
+    "params_shape": ["tokenAccount: base58-string", "config?: { commitment? }"],
+    "result_shape": "RpcResponse<{ value: TokenAmount }>",
+    "docs_url": "https://solana.com/docs/rpc/http/gettokenaccountbalance"
+  },
+  {
+    "method": "getTokenAccountsByDelegate",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "tokens",
+    "summary": "Returns token accounts for which the given delegate has authority, optionally filtered by mint/program id.",
+    "params_shape": ["delegate: base58-string", "filter: { mint } | { programId }", "config?: { encoding?, commitment?, minContextSlot?, dataSlice? }"],
+    "result_shape": "RpcResponse<{ value: TokenAccountInfo[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/gettokenaccountsbydelegate"
+  },
+  {
+    "method": "getTokenAccountsByOwner",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "tokens",
+    "summary": "Returns token accounts owned by the given owner pubkey, optionally filtered by mint/program id.",
+    "params_shape": ["owner: base58-string", "filter: { mint } | { programId }", "config?: { encoding?, commitment?, minContextSlot?, dataSlice? }"],
+    "result_shape": "RpcResponse<{ value: TokenAccountInfo[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/gettokenaccountsbyowner"
+  },
+  {
+    "method": "getTokenLargestAccounts",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "tokens",
+    "summary": "Returns the largest token accounts for a given mint.",
+    "params_shape": ["mint: base58-string", "config?: { commitment? }"],
+    "result_shape": "RpcResponse<{ value: LargestTokenAccount[] }>",
+    "docs_url": "https://solana.com/docs/rpc/http/gettokenlargestaccounts"
+  },
+  {
+    "method": "getTokenSupply",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "tokens",
+    "summary": "Returns the total supply for a given token mint.",
+    "params_shape": ["mint: base58-string", "config?: { commitment? }"],
+    "result_shape": "RpcResponse<{ value: TokenAmount }>",
+    "docs_url": "https://solana.com/docs/rpc/http/gettokensupply"
+  },
+  {
+    "method": "getTransaction",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Returns details for a confirmed transaction by signature.",
+    "params_shape": ["signature: string", "config?: { encoding?, commitment?, maxSupportedTransactionVersion? }"],
+    "result_shape": "TransactionResponse | null",
+    "docs_url": "https://solana.com/docs/rpc/http/gettransaction"
+  },
+  {
+    "method": "getTransactionCount",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Returns the current transaction count from the ledger, at the given commitment.",
+    "params_shape": ["config?: { commitment?, minContextSlot? }"],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/gettransactioncount"
+  },
+  {
+    "method": "getVersion",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "cluster",
+    "summary": "Returns the Solana core version information for the node.",
+    "params_shape": [],
+    "result_shape": "{ solana-core: string, feature-set?: u32 }",
+    "docs_url": "https://solana.com/docs/rpc/http/getversion"
+  },
+  {
+    "method": "getVoteAccounts",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "vote",
+    "summary": "Returns the account info and stake delegation info for current and delinquent vote accounts.",
+    "params_shape": ["config?: { commitment?, votePubkey?, keepUnstakedDelinquents?, delinquentSlotDistance? }"],
+    "result_shape": "VoteAccounts",
+    "docs_url": "https://solana.com/docs/rpc/http/getvoteaccounts"
+  },
+  {
+    "method": "isBlockhashValid",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "blockhash",
+    "summary": "Checks whether a given blockhash is still valid for transaction processing.",
+    "params_shape": ["blockhash: base58-string", "config?: { commitment?, minContextSlot? }"],
+    "result_shape": "RpcResponse<{ value: boolean }>",
+    "docs_url": "https://solana.com/docs/rpc/http/isblockhashvalid"
+  },
+  {
+    "method": "minimumLedgerSlot",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "ledger",
+    "summary": "Returns the lowest slot that the node has information about in its ledger.",
+    "params_shape": [],
+    "result_shape": "u64",
+    "docs_url": "https://solana.com/docs/rpc/http/minimumledgerslot"
+  },
+  {
+    "method": "requestAirdrop",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Requests an airdrop of lamports to a pubkey (typically supported on devnet/testnet/localnet).",
+    "params_shape": ["pubkey: base58-string", "lamports: u64", "config?: { commitment? }"],
+    "result_shape": "string (signature)",
+    "docs_url": "https://solana.com/docs/rpc/http/requestairdrop"
+  },
+  {
+    "method": "sendTransaction",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Submits a signed transaction to the cluster.",
+    "params_shape": ["transaction: base64-string", "config?: { encoding?, skipPreflight?, preflightCommitment?, maxRetries?, minContextSlot? }"],
+    "result_shape": "string (signature)",
+    "docs_url": "https://solana.com/docs/rpc/http/sendtransaction"
+  },
+  {
+    "method": "simulateTransaction",
+    "transport": ["http"],
+    "http": { "path": "/", "verb": "POST" },
+    "category": "transactions",
+    "summary": "Simulates a transaction and returns logs, error, and optionally accounts, without submitting it.",
+    "params_shape": ["transaction: base64-string", "config?: { sigVerify?, replaceRecentBlockhash?, commitment?, encoding?, accounts? }"],
+    "result_shape": "RpcResponse<{ value: SimulationResult }>",
+    "docs_url": "https://solana.com/docs/rpc/http/simulatetransaction"
+  },
+  
+  {
+    "method": "accountSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to an account; receive notifications when lamports or account data changes.",
+    "params_shape": ["pubkey: base58-string", "config?: { commitment?, encoding? }"],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/accountsubscribe"
+  },
+  {
+    "method": "accountUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from account notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/accountunsubscribe"
+  },
+  {
+    "method": "blockSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to receive notifications for blocks (e.g., all blocks, with configurable transaction detail/encoding).",
+    "params_shape": ["filter: \"all\" | { mentionsAccountOrProgram?: string }", "config?: { commitment?, encoding?, transactionDetails?, showRewards?, maxSupportedTransactionVersion? }"],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/blocksubscribe"
+  },
+  {
+    "method": "blockUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from block notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/blockunsubscribe"
+  },
+  {
+    "method": "logsSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to transaction log outputs (e.g., all logs, or filtered by mentions).",
+    "params_shape": ["filter: \"all\" | \"allWithVotes\" | { mentions: string[] }", "config?: { commitment? }"],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/logssubscribe"
+  },
+  {
+    "method": "logsUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from logs notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/logsunsubscribe"
+  },
+  {
+    "method": "programSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to changes for all accounts owned by a program id (optionally filtered).",
+    "params_shape": ["programId: base58-string", "config?: { commitment?, encoding?, filters? }"],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/programsubscribe"
+  },
+  {
+    "method": "programUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from program account change notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/programunsubscribe"
+  },
+  {
+    "method": "rootSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to receive notifications when a new root is set by the validator.",
+    "params_shape": [],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/rootsubscribe"
+  },
+  {
+    "method": "rootUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from root notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/rootunsubscribe"
+  },
+  {
+    "method": "signatureSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to a signature to receive a notification when the transaction is processed/confirmed/finalized.",
+    "params_shape": ["signature: string", "config?: { commitment?, enableReceivedNotification? }"],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/signaturesubscribe"
+  },
+  {
+    "method": "signatureUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from signature notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/signatureunsubscribe"
+  },
+  {
+    "method": "slotSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to receive notifications of slot changes.",
+    "params_shape": [],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/slotsubscribe"
+  },
+  {
+    "method": "slotUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from slot notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/slotunsubscribe"
+  },
+  {
+    "method": "slotsUpdatesSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to receive detailed slot update notifications (e.g., created/optimisticConfirmation/root).",
+    "params_shape": [],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/slotsupdatessubscribe"
+  },
+  {
+    "method": "slotsUpdatesUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from slots updates notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/slotsupdatesunsubscribe"
+  },
+  {
+    "method": "voteSubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Subscribe to receive vote notifications observed by the node.",
+    "params_shape": [],
+    "result_shape": "subscriptionId: number",
+    "docs_url": "https://solana.com/docs/rpc/websocket/votesubscribe"
+  },
+  {
+    "method": "voteUnsubscribe",
+    "transport": ["ws"],
+    "ws": { "path": "/", "pattern": "ws://<RPC_HOST>:8900/" },
+    "category": "subscriptions",
+    "summary": "Unsubscribe from vote notifications.",
+    "params_shape": ["subscriptionId: number"],
+    "result_shape": "boolean",
+    "docs_url": "https://solana.com/docs/rpc/websocket/voteunsubscribe"
+  }
+]

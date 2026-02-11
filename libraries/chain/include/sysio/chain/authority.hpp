@@ -7,7 +7,9 @@
 
 namespace sysio { namespace chain {
 
-using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string, fc::em::public_key_shim, fc::crypto::ed::public_key_shim>;
+// bls string in affine_non_montgomery_le
+struct shared_bls_public_key : shared_string { using shared_string::shared_string; };
+using shared_public_key_data = std::variant<fc::ecc::public_key_shim, fc::crypto::r1::public_key_shim, shared_string, fc::em::public_key_shim, fc::crypto::ed::public_key_shim, shared_bls_public_key>;
 
 struct shared_public_key {
    explicit shared_public_key( shared_public_key_data&& p ) :
@@ -16,17 +18,23 @@ struct shared_public_key {
    public_key_type to_public_key() const {
       fc::crypto::public_key::storage_type public_key_storage;
       std::visit(overloaded {
-         [&](const auto& k1r1em) {
-            public_key_storage = k1r1em;
+         [&](const auto& pubkey_shim) {
+            public_key_storage = pubkey_shim;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());
             fc::crypto::webauthn::public_key pub;
             fc::raw::unpack(ds, pub);
             public_key_storage = pub;
+         },
+         [&](const shared_bls_public_key& spk) {
+            fc::crypto::bls::public_key_shim shim{};
+            assert(shim.shim_ptr->_data.size() == spk.size());
+            memcpy(shim.shim_ptr->_data.data(), spk.data(), spk.size());
+            public_key_storage = shim;
          }
       }, pubkey);
-      return std::move(public_key_storage);
+      return public_key_type(std::move(public_key_storage));
    }
 
    std::string to_string(const fc::yield_function_t& yield) const {
@@ -54,32 +62,39 @@ struct shared_public_key {
          },
          [&](const shared_string& wa) {
             return wa == std::get<shared_string>(rhs.pubkey);
+         },
+         [&](const shared_bls_public_key& spk) {
+            return spk == std::get<shared_bls_public_key>(rhs.pubkey);
          }
       }, lhs.pubkey);
    }
 
    friend bool operator==(const shared_public_key& l, const public_key_type& r) {
-      if(l.pubkey.index() != r._storage.index())
+      if(l.pubkey.index() != r.which())
          return false;
 
       return std::visit(overloaded {
          [&](const fc::ecc::public_key_shim& k1) {
-            return k1._data == std::get<fc::ecc::public_key_shim>(r._storage)._data;
+            return k1._data == r.get<fc::ecc::public_key_shim>()._data;
          },
          [&](const fc::em::public_key_shim& em) {
-            return em._data == std::get<fc::em::public_key_shim>(r._storage)._data;
+            return em._data == r.get<fc::em::public_key_shim>()._data;
          },
          [&](const fc::crypto::r1::public_key_shim& r1) {
-            return r1._data == std::get<fc::crypto::r1::public_key_shim>(r._storage)._data;
+            return r1._data == r.get<fc::crypto::r1::public_key_shim>()._data;
          },
          [&](const fc::crypto::ed::public_key_shim& edkey) {
-            return edkey._data == std::get<fc::crypto::ed::public_key_shim>(r._storage)._data;
+            return edkey._data == r.get<fc::crypto::ed::public_key_shim>()._data;
          },
          [&](const shared_string& wa) {
             fc::datastream<const char*> ds(wa.data(), wa.size());
             fc::crypto::webauthn::public_key pub;
             fc::raw::unpack(ds, pub);
-            return pub == std::get<fc::crypto::webauthn::public_key>(r._storage);
+            return pub == r.get<fc::crypto::webauthn::public_key>();
+         },
+         [&](const shared_bls_public_key& spk) {
+            const auto& data = r.get<fc::crypto::bls::public_key_shim>().serialize();
+            return spk.size() == data.size() && std::memcmp(spk.data(), data.data(), data.size()) == 0;
          }
       }, l.pubkey);
    }
@@ -130,8 +145,8 @@ struct shared_key_weight {
 
    shared_key_weight(const key_weight& k) : key(fc::ecc::public_key_shim()), weight(k.weight) {
       std::visit(overloaded {
-         [&]<class T>(const T& k1r1) {
-            key.pubkey.emplace<T>(k1r1);
+         [&]<class T>(const T& shim) {
+            key.pubkey.emplace<T>(shim);
          },
          [&](const fc::crypto::webauthn::public_key& wa) {
             size_t psz = fc::raw::pack_size(wa);
@@ -141,8 +156,16 @@ struct shared_key_weight {
             assert(s.mutable_data() && s.size() == psz);
             fc::datastream<char*> ds(s.mutable_data(), psz);
             fc::raw::pack(ds, wa);
+         },
+         [&](const fc::crypto::bls::public_key_shim& shim) {
+            const auto& data = shim.serialize();
+            // create a shared_string in the pubkey that we will write directly into.
+            key.pubkey.emplace<shared_bls_public_key>(data.size(),  boost::container::default_init_t());
+            auto& s = std::get<shared_bls_public_key>(key.pubkey);
+            assert(s.mutable_data() && s.size() == data.size());
+            s.assign(data.data(), data.size());
          }
-      }, k.key._storage);
+      }, k.key.storage());
    }
 
    shared_public_key key;

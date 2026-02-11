@@ -124,6 +124,12 @@ void platform_timer::expire_now(generation_t expired_generation) {
    }
 }
 
+void platform_timer::set_expired() {
+   const generation_t generation_running = _state.load().generation_running;
+   timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = generation_running};
+   _state.compare_exchange_strong(expected, timer_state_t{state_t::timed_out, false, generation});
+}
+
 void platform_timer::interrupt_timer() {
    const generation_t generation_running = _state.load().generation_running;
    timer_state_t expected{.state = state_t::running, .callback_in_flight = false, .generation_running = generation_running};

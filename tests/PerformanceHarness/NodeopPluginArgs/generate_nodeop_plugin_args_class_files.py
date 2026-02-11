@@ -18,7 +18,7 @@ Currently it generates the following scripts:
 - NetPluginArgs.py
 - ProducerPluginArgs.py
 - ResourceMonitorPluginArgs.py
-- SignatureProviderPluginArgs.py
+- SignatureProviderManagerPluginArgs.py
 - StateHistoryPluginArgs.py
 - TraceApiPluginArgs.py
 
@@ -187,7 +187,7 @@ if __name__ == '__main__':\n\
     writeDataclass(plugin="net_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
     writeDataclass(plugin="producer_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
     writeDataclass(plugin="resource_monitor_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
-    writeDataclass(plugin="signature_provider_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
+    writeDataclass(plugin="signature_provider_manager_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
     writeDataclass(plugin="state_history_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
     writeDataclass(plugin="trace_api_plugin:", dataFieldDict=newDict, pluginOptsDict=pluginOptsDict)
 

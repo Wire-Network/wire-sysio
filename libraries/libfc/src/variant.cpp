@@ -9,6 +9,7 @@
 #include <fc/io/json.hpp>
 #include <fc/utf8.hpp>
 #include <algorithm>
+#include <fc/int256.hpp>
 
 namespace fc
 {
@@ -77,6 +78,30 @@ variant::variant( int64_t val )
 {
    *reinterpret_cast<int64_t*>(this)  = val;
    set_variant_type( this, int64_type );
+}
+
+variant::variant(fc::uint128 val)
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, uint128_type );
+}
+
+variant::variant(fc::int128 val)
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, int128_type );
+}
+
+variant::variant( int256 val )
+{
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   // *reinterpret_cast<int256*>(this)  = val;
+   set_variant_type( this, int256_type );
+}
+
+variant::variant(fc::uint256 val) {
+   *reinterpret_cast<std::string**>(this)  = new std::string( val.str() );
+   set_variant_type( this, uint256_type );
 }
 
 variant::variant( float val )
@@ -278,6 +303,19 @@ void  variant::visit( const visitor& v )const
       case uint64_type:
          v.handle( *reinterpret_cast<const uint64_t*>(this) );
          return;
+      case int128_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case uint128_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case int256_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+      case uint256_type:
+         v.handle( **reinterpret_cast<const const_string_ptr*>(this) );
+         return;
+
       case double_type:
          v.handle( *reinterpret_cast<const double*>(this) );
          return;
@@ -327,6 +365,23 @@ bool variant::is_uint64()const
 {
    return get_type() == uint64_type;
 }
+
+bool variant::is_int128() const {
+   return get_type() == int128_type;
+}
+
+bool variant::is_uint128() const {
+   return get_type() == uint128_type;
+}
+
+bool variant::is_int256() const {
+   return get_type() == int256_type;
+}
+
+bool variant::is_uint256() const {
+   return get_type() == uint256_type;
+}
+
 bool variant::is_int64()const
 {
    return get_type() == int64_type;
@@ -338,6 +393,10 @@ bool variant::is_integer()const
    {
       case int64_type:
       case uint64_type:
+      case int128_type:
+      case uint128_type:
+      case int256_type:
+      case uint256_type:
       case bool_type:
          return true;
       default:
@@ -351,6 +410,8 @@ bool variant::is_numeric()const
    {
       case int64_type:
       case uint64_type:
+      case int256_type:
+      case uint256_type:
       case double_type:
       case bool_type:
          return true;
@@ -391,7 +452,7 @@ int64_t variant::as_int64()const
       case null_type:
           return 0;
       default:
-         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to int64", ("type", get_type()) );
+         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to int64", get_type() );
    }
 }
 
@@ -412,9 +473,102 @@ uint64_t variant::as_uint64()const
       case null_type:
           return 0;
       default:
-         FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from ${type} to uint64", ("type",get_type()));
+         FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from {} to uint64", get_type());
    }
-} FC_CAPTURE_AND_RETHROW( (*this) ) }
+} FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(*this) ) }
+
+fc::int128 variant::as_int128() const
+{
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::int128(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::int128(*reinterpret_cast<const uint64_t*>(this));
+   case int128_type:
+      return fc::int128(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint128_type:
+      return fc::int128(as_string());
+   case string_type:
+      return fc::int128(as_string());
+   case bool_type:
+      return int128(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to int128", get_type() );
+   }
+}
+
+fc::uint128 fc::variant::as_uint128()const
+{ try {
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::uint128(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::uint128(*reinterpret_cast<const uint64_t*>(this));
+   case int128_type:
+      return fc::uint128(as_string());//*reinterpret_cast<const int128*>(this);
+   case uint128_type:
+      return fc::uint128(as_string());
+   case string_type:
+      return fc::uint128(as_string());
+   case bool_type:
+      return uint128(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from {} to uint128", get_type());
+   }
+} FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(*this) ) }
+
+
+fc::int256 fc::variant::as_int256()const
+{
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::int256(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::int256(*reinterpret_cast<const uint64_t*>(this));
+   case int256_type:
+      return fc::int256(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint256_type:
+      return fc::int256(as_string());
+   case string_type:
+      return fc::int256(as_string());
+   case bool_type:
+      return int256(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to int256", get_type() );
+   }
+}
+
+fc::uint256 fc::variant::as_uint256()const
+{ try {
+   switch( get_type() )
+   {
+   case int64_type:
+      return fc::uint256(*reinterpret_cast<const int64_t*>(this));
+   case uint64_type:
+      return fc::uint256(*reinterpret_cast<const uint64_t*>(this));
+   case int256_type:
+      return fc::uint256(as_string());//*reinterpret_cast<const int256*>(this);
+   case uint256_type:
+      return fc::uint256(as_string());
+   case string_type:
+      return fc::uint256(as_string());
+   case bool_type:
+      return uint256(*reinterpret_cast<const bool*>(this));
+   case null_type:
+      return 0;
+   default:
+      FC_THROW_EXCEPTION( bad_cast_exception,"Invalid cast from {} to uint256", get_type());
+   }
+} FC_CAPTURE_AND_RETHROW( "{}", fc::json::to_log_string(*this) ) }
 
 
 double  variant::as_double()const
@@ -434,7 +588,7 @@ double  variant::as_double()const
       case null_type:
           return 0;
       default:
-         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to double", ("type",get_type()) );
+         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to double", get_type() );
    }
 }
 
@@ -462,7 +616,7 @@ bool  variant::as_bool()const
       case null_type:
           return false;
       default:
-         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to bool" , ("type",get_type()));
+         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to bool", get_type() );
    }
 }
 
@@ -478,6 +632,10 @@ std::string variant::as_string()const
 {
    switch( get_type() )
    {
+      case uint128_type:
+      case int128_type:
+      case uint256_type:
+      case int256_type:
       case string_type:
           return **reinterpret_cast<const const_string_ptr*>(this);
       case double_type:
@@ -495,7 +653,7 @@ std::string variant::as_string()const
       case null_type:
           return std::string();
       default:
-      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to string", ("type", get_type() ) );
+      FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to string", get_type() );
    }
 }
 
@@ -506,21 +664,21 @@ variants&         variant::get_array()
   if( get_type() == array_type )
      return **reinterpret_cast<variants**>(this);
 
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Array", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Array", get_type() );
 }
 blob&         variant::get_blob()
 {
   if( get_type() == blob_type )
      return **reinterpret_cast<blob**>(this);
 
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Blob", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Blob", get_type() );
 }
 const blob&         variant::get_blob()const
 {
   if( get_type() == blob_type )
      return **reinterpret_cast<const const_blob_ptr*>(this);
 
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Blob", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Blob", get_type() );
 }
 
 blob variant::as_blob()const
@@ -546,7 +704,7 @@ blob variant::as_blob()const
       }
       case object_type:
       case array_type:
-         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Blob", ("type",get_type()) );
+         FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Blob", get_type() );
       default:
          return blob( { std::vector<char>( (char*)&_data, (char*)&_data + sizeof(_data) ) } );
    }
@@ -558,7 +716,7 @@ const variants&       variant::get_array()const
 {
   if( get_type() == array_type )
      return **reinterpret_cast<const const_variants_ptr*>(this);
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Array", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Array", get_type() );
 }
 
 
@@ -567,7 +725,7 @@ variant_object&        variant::get_object()
 {
   if( get_type() == object_type )
      return **reinterpret_cast<variant_object**>(this);
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from ${type} to Object", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from {} to Object", get_type() );
 }
 
 const variant& variant::operator[]( const char* key )const
@@ -619,7 +777,7 @@ const std::string&        variant::get_string()const
 {
   if( get_type() == string_type )
      return **reinterpret_cast<const const_string_ptr*>(this);
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '${type}' to string", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '{}' to string", get_type() );
 }
 
 /// @throw if get_type() != object_type
@@ -627,7 +785,7 @@ const variant_object&  variant::get_object()const
 {
   if( get_type() == object_type )
      return **reinterpret_cast<const const_variant_object_ptr*>(this);
-  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '${type}' to Object", ("type",get_type()) );
+  FC_THROW_EXCEPTION( bad_cast_exception, "Invalid cast from type '{}' to Object", get_type() );
 }
 
 void from_variant( const variant& var,  variants& vo )
@@ -684,7 +842,7 @@ void from_variant( const variant& var,  unsigned __int128& vo )
    } else if( var.is_string() ) {
       vo = static_cast<unsigned __int128>( boost::multiprecision::uint128_t(var.as_string()) );
    } else {
-      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '${type}' into a uint128_t", ("type", var.get_type()) );
+      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '{}' into a uint128_t", var.get_type() );
    }
 }
 
@@ -699,7 +857,7 @@ void from_variant( const variant& var,  __int128& vo )
    } else if( var.is_string() ) {
       vo = static_cast<__int128>( boost::multiprecision::int128_t(var.as_string()) );
    } else {
-      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '${type}' into a int128_t", ("type", var.get_type()) );
+      FC_THROW_EXCEPTION( bad_cast_exception, "Cannot convert variant of type '{}' into a int128_t", var.get_type() );
    }
 }
 
@@ -711,6 +869,14 @@ void from_variant( const variant& var,  int64_t& vo )
 void from_variant( const variant& var,  uint64_t& vo )
 {
    vo = var.as_uint64();
+}
+
+void from_variant(const fc::variant& var, fc::int256& vo) {
+   vo = var.as_int256();
+}
+
+void from_variant(const fc::variant& var, fc::uint256& vo) {
+   vo = var.as_uint256();
 }
 
 void from_variant( const variant& var,  bool& vo )
@@ -964,7 +1130,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
       if( a.is_double()  || b.is_double() ) return a.as_double() + b.as_double();
       if( a.is_int64()   || b.is_int64() )  return a.as_int64() + b.as_int64();
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() + b.as_uint64();
-      FC_ASSERT( false, "invalid operation ${a} + ${b}", ("a",a)("b",b) );
+      FC_ASSERT( false, "invalid operation {} + {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
    }
 
    variant operator - ( const variant& a, const variant& b )
@@ -991,7 +1157,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
       if( a.is_double()  || b.is_double() ) return a.as_double() - b.as_double();
       if( a.is_int64()   || b.is_int64() )  return a.as_int64() - b.as_int64();
       if( a.is_uint64()  || b.is_uint64() ) return a.as_uint64() - b.as_uint64();
-      FC_ASSERT( false, "invalid operation ${a} + ${b}", ("a",a)("b",b) );
+      FC_ASSERT( false, "invalid operation {} + {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
    }
    variant operator * ( const variant& a, const variant& b )
    {
@@ -1016,7 +1182,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
          }
          return result;
       }
-      FC_ASSERT( false, "invalid operation ${a} * ${b}", ("a",a)("b",b) );
+      FC_ASSERT( false, "invalid operation {} * {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
    }
    variant operator / ( const variant& a, const variant& b )
    {
@@ -1041,6 +1207,6 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
          }
          return result;
       }
-      FC_ASSERT( false, "invalid operation ${a} / ${b}", ("a",a)("b",b) );
+      FC_ASSERT( false, "invalid operation {} / {}", fc::json::to_log_string(a), fc::json::to_log_string(b) );
    }
 } // namespace fc

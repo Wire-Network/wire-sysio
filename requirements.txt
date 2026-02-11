@@ -1,0 +1,9 @@
+click
+safe-pysha3
+pysha3
+eth-keys
+eth-utils
+eth-hash[pycryptodome]
+eth_account
+pynacl
+numpy

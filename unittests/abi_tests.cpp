@@ -602,7 +602,7 @@ BOOST_AUTO_TEST_CASE(std_array_types_short)
    // Check that providing the wrong number of values for a fixed size array type triggers an exception
    // -------------------------------------------------------------------------------------------------
    auto is_assert_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
 
    auto var = fc::json::from_string(test_data);
@@ -636,7 +636,7 @@ BOOST_AUTO_TEST_CASE(optional_std_array)
    auto abi = fc::json::from_string(test_abi).as<abi_def>();
 
    auto log_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    abi_serializer abis;
 
@@ -670,7 +670,7 @@ BOOST_AUTO_TEST_CASE(optional_vector)
    auto abi = fc::json::from_string(test_abi).as<abi_def>();
 
    auto log_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    abi_serializer abis;
 
@@ -985,7 +985,7 @@ BOOST_AUTO_TEST_CASE(abi_cycle)
    auto abi = sysio_contract_abi(fc::json::from_string(typedef_cycle_abi).as<abi_def>());
 
    auto is_assert_exception = [](const auto& e) -> bool {
-      wlog(e.to_string()); return true;
+      wlog("{}", e.to_string()); return true;
    };
    BOOST_CHECK_EXCEPTION( abi_serializer abis(std::move(abi), yield_fn()), duplicate_abi_type_def_exception, is_assert_exception);
 
@@ -1654,7 +1654,7 @@ void verify_action_equal(const chain::action& exp, const chain::action& act)
 }
 
 private_key_type get_private_key( name keyname, string role ) {
-   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role));
+   return private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(keyname.to_string()+role).to_uint64_array());
 }
 
 public_key_type  get_public_key( name keyname, string role ) {
@@ -2591,7 +2591,7 @@ BOOST_AUTO_TEST_CASE(abi_large_signature)
     )=====";
 
       std::string big_json(1 << 18, 'a');
-      signature_type::storage_type webauth_sig = fc::crypto::webauthn::signature(fc::crypto::r1::compact_signature(), {}, big_json);
+      signature_type::storage_type webauth_sig = fc::crypto::webauthn::signature(fc::crypto::r1::compact_signature{}, {}, big_json);
       signature_type sig;
 
       // signature( storage_type&& other_storage ) is private, pack/unpack as a way to convert from webauthn sig
@@ -3348,7 +3348,7 @@ inline std::pair<action_trace, std::string> generate_action_trace(const std::opt
       <<         "\"console\":\"console line\","
       <<         "\"trx_id\":\"5d039021cf3262c5036a6ad40a809ae1440ae6c6792a48e6e95abf083b108d5f\","
       <<         "\"block_num\":4,"
-      <<         "\"block_time\":\"2000-01-01T00:00:02.500\","
+      <<         "\"block_time\":\"2025-01-01T00:00:02.500\","
       <<         "\"producer_block_id\":null,"
       <<         "\"account_ram_deltas\":[],"
       <<         "\"except\":null,"

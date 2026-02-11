@@ -7,7 +7,7 @@ set(GEN_FILES
         NetPluginArgs.py
         ProducerPluginArgs.py
         ResourceMonitorPluginArgs.py
-        SignatureProviderPluginArgs.py
+        SignatureProviderManagerPluginArgs.py
         StateHistoryPluginArgs.py
         TraceApiPluginArgs.py)
 

@@ -3,6 +3,7 @@
 #include <fc/io/cfile.hpp>
 #include <sysio/chain/deep_mind.hpp>
 
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <deep-mind.hpp>
@@ -21,24 +22,20 @@ struct deep_mind_log_fixture
    {
       auto cfg = fc::logging_config::default_config();
       tmp.file().close();
-
-      cfg.appenders.push_back(
-         appender_config( "deep-mind", "dmlog",
-            mutable_variant_object()
-               ( "file", tmp.file().get_file_path().c_str())
-         ) );
+      cfg.sinks.push_back(sink_config("dmlog", "dmlog_sink",
+                                      mutable_variant_object()("file", tmp.file().get_file_path().c_str())));
 
       fc::logger_config lc;
-      lc.name = "deep-mind";
+      lc.name = "dmlog";
       lc.level = fc::log_level::all;
-      lc.appenders.push_back("deep-mind");
+      lc.sinks.push_back("dmlog");
       cfg.loggers.push_back( lc );
 
       fc::configure_logging(cfg);
       setup_test_logging();
 
       deep_mind_logger.update_config(deep_mind_handler::deep_mind_config{.zero_elapsed = true});
-      deep_mind_logger.update_logger("deep-mind");
+      deep_mind_logger.update_logger("dmlog");
    }
    ~deep_mind_log_fixture()
    {
@@ -50,7 +47,11 @@ struct deep_mind_log_fixture
 // We only test deep-mind in Savanna
 struct deep_mind_tester : deep_mind_log_fixture, savanna_validating_tester
 {
-   deep_mind_tester() : savanna_validating_tester({}, &deep_mind_logger, setup_policy::full) {}
+   // do not load roa, so test does not have to be updated everytime roa changes
+   deep_mind_tester() : savanna_validating_tester({}, &deep_mind_logger, setup_policy::preactivate_feature_only) {
+      set_bios_contract();
+      produce_block();
+   }
 };
 
 namespace {
@@ -68,6 +69,8 @@ void compare_files(const std::string& filename1, const std::string& filename2)
          BOOST_TEST(false, "Unexpected end of input of file1 at line " << i);
          return;
       }
+      boost::algorithm::trim(line1);
+      boost::algorithm::trim(line2);
       if(line1 != line2)
       {
          BOOST_TEST(false, "Mismatch at line " << i << "\n+ " << line1 << "\n- " << line2);

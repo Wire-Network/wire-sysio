@@ -65,16 +65,17 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
       }
    }
 
+   auto to_pk_str = [&](const auto& pk){ try { return pk.to_string([&]() {FC_CHECK_DEADLINE(deadline); }); } catch (...) { return std::string("unknown"); } };
    if( !allow_duplicate_keys ) {
       flat_set<public_key_type> seen;
       for( auto& pk : ed_pubkeys ) {
          auto [it, inserted] = seen.emplace(pk);
-         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key ${k}", ("k", pk) );
+         SYS_ASSERT( inserted, tx_duplicate_sig, "duplicate ED public-key extension for key {}", to_pk_str(pk) );
       }
    }
 
    // Prepare index for public key extensions.
-   size_t pk_index = 0;
+   size_t pubkey_idx = 0;
 
    if ( !signatures.empty() ) {
       const digest_type digest = sig_digest(chain_id, cfd);
@@ -82,36 +83,39 @@ fc::microseconds transaction::get_signature_keys( const vector<signature_type>& 
       for ( auto const& sig : signatures ) {
             auto now = fc::time_point::now();
             SYS_ASSERT( now < deadline, tx_cpu_usage_exceeded,
-                        "sig verification timed out ${t}us", ("t",now-start) );
+                        "sig verification timed out {}us", now-start );
 
             // dynamic dispatch into the correct path
             sig.visit([&](auto const& shim){
                using Shim = std::decay_t<decltype(shim)>;
 
-               if constexpr( Shim::is_recoverable ) {
+               if constexpr ( std::is_same_v<Shim, fc::crypto::bls::signature_shim>) {
+                  SYS_THROW(fc::unsupported_exception, "BLS signatures can not be used to recover public keys.");
+               } else if constexpr( Shim::is_recoverable ) {
                   // If public key can be recovered from signature
-                  auto [itr, ok] = recovered_pub_keys.emplace(sig, digest);
-                  SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key ${k}", ("k", *itr) );
+                  auto [itr, ok] = recovered_pub_keys.emplace(fc::crypto::public_key::recover(sig, digest));
+                  SYS_ASSERT( allow_duplicate_keys || ok, tx_duplicate_sig, "duplicate signature for key {}", to_pk_str(*itr) );
                } else {
                   // If public key cannot be recovered from signature, we need to get it from transaction extensions and use verify.
-                  SYS_ASSERT( pk_index < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{i}", ("i", pk_index) );
+                  SYS_ASSERT( pubkey_idx < ed_pubkeys.size(), unsatisfied_authorization, "missing ED pubkey extension for signature #{}", pubkey_idx );
 
-                  const auto& pkvar   = ed_pubkeys[pk_index++];
-                  const auto& pubshim = pkvar.template get<typename Shim::public_key_type>();
+                  const auto& pubkey   = ed_pubkeys[pubkey_idx++];
+                  const auto& pubkey_shim = pubkey.template get<typename Shim::public_key_type>();
 
-                  SYS_ASSERT( shim.verify(digest, pubshim), unsatisfied_authorization, "non-recoverable signature #${i} failed", ("i", pk_index-1) );
+                  SYS_ASSERT( shim.verify(digest, pubkey_shim), unsatisfied_authorization, "non-recoverable signature #{} failed", pubkey_idx-1 );
 
-                  recovered_pub_keys.emplace(pkvar);
+                  recovered_pub_keys.emplace(pubkey);
                }
             });
       }
    }
 
    // Ensure no extra ED pubkey extensions were provided
-   SYS_ASSERT( pk_index == ed_pubkeys.size(), unsatisfied_authorization, "got ${g} ED public-key extensions but only ${e} ED signatures", ("g", ed_pubkeys.size()) ("e", pk_index) );
+   SYS_ASSERT( pubkey_idx == ed_pubkeys.size(), unsatisfied_authorization,
+               "got {} ED public-key extensions but only {} ED signatures", ed_pubkeys.size(), pubkey_idx );
 
    return fc::time_point::now() - start;
-} FC_CAPTURE_AND_RETHROW() }
+} FC_CAPTURE_AND_RETHROW("") }
 
 account_name transaction::first_authorizer()const {
    for( const auto& a : actions ) {
@@ -169,14 +173,12 @@ flat_multimap<uint16_t, transaction_extension> transaction::validate_and_extract
 
       auto match = decompose_t::extract<transaction_extension>( id, e.second, iter->second );
       SYS_ASSERT( match, invalid_transaction_extension,
-                  "Transaction extension with id type ${id} is not supported",
-                  ("id", id)
+                  "Transaction extension with id type {} is not supported", id
       );
 
       if( match->enforce_unique ) {
          SYS_ASSERT( i == 0 || id > id_type_lower_bound, invalid_transaction_extension,
-                     "Transaction extension with id type ${id} is not allowed to repeat",
-                     ("id", id)
+                     "Transaction extension with id type {} is not allowed to repeat", id
          );
       }
 
@@ -399,8 +401,8 @@ void packed_transaction::init()
 {
    SYS_ASSERT( !unpacked_trx.actions.empty(), tx_no_action, "packed_transaction contains no actions" );
    SYS_ASSERT( unpacked_trx.context_free_data.empty() || unpacked_trx.context_free_data.size() == unpacked_trx.context_free_actions.size(), transaction_exception,
-              "Context free data size ${cfd} not equal to context free actions size ${cfa}",
-              ("cfd", unpacked_trx.context_free_data.size())("cfa", unpacked_trx.context_free_actions.size()) );
+              "Context free data size {} not equal to context free actions size {}",
+              unpacked_trx.context_free_data.size(), unpacked_trx.context_free_actions.size() );
 
    int64_t size = config::fixed_net_overhead_of_packed_trx;
    size += fc::raw::pack_size(signatures);
@@ -437,7 +439,7 @@ void packed_transaction::local_unpack_transaction(vector<bytes>&& context_free_d
             SYS_THROW( unknown_transaction_compression, "Unknown transaction compression algorithm" );
       }
       trx_id = unpacked_trx.id();
-   } FC_CAPTURE_AND_RETHROW( (compression) )
+   } FC_CAPTURE_AND_RETHROW( "{}", compression.to_string() )
 }
 
 void packed_transaction::local_unpack_context_free_data()
@@ -455,7 +457,7 @@ void packed_transaction::local_unpack_context_free_data()
          default:
             SYS_THROW( unknown_transaction_compression, "Unknown transaction compression algorithm" );
       }
-   } FC_CAPTURE_AND_RETHROW( (compression) )
+   } FC_CAPTURE_AND_RETHROW( "{}", compression.to_string() )
 }
 
 void packed_transaction::local_pack_transaction()
@@ -471,7 +473,7 @@ void packed_transaction::local_pack_transaction()
          default:
             SYS_THROW(unknown_transaction_compression, "Unknown transaction compression algorithm");
       }
-   } FC_CAPTURE_AND_RETHROW((compression))
+   } FC_CAPTURE_AND_RETHROW( "{}", compression.to_string() )
 }
 
 void packed_transaction::local_pack_context_free_data()
@@ -487,7 +489,7 @@ void packed_transaction::local_pack_context_free_data()
          default:
             SYS_THROW(unknown_transaction_compression, "Unknown transaction compression algorithm");
       }
-   } FC_CAPTURE_AND_RETHROW((compression))
+   } FC_CAPTURE_AND_RETHROW( "{}", compression.to_string() )
 }
 
 

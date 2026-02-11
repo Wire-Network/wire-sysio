@@ -74,12 +74,12 @@ void validate(const bytes& code, const whitelisted_intrinsics_type& intrinsics) 
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
          SYS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
                     is_intrinsic_whitelisted(intrinsics, std::string_view((char*)imports[i].field_str.raw(), imports[i].field_str.size())),
-                    wasm_serialization_error, "${module}.${fn} unresolveable",
-                    ("module", std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()))
-                    ("fn", std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size())));
+                    wasm_serialization_error, "{}.{} unresolveable",
+                    std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()),
+                    std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size()));
       }
    } catch(vm::exception& e) {
-      SYS_THROW(wasm_serialization_error, e.detail());
+      SYS_THROW(wasm_serialization_error, "{}", e.detail());
    }
 }
 
@@ -95,9 +95,9 @@ void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intr
       for(std::uint32_t i = 0; i < imports.size(); ++i) {
          SYS_ASSERT(std::string_view((char*)imports[i].module_str.raw(), imports[i].module_str.size()) == "env" &&
                     is_intrinsic_whitelisted(intrinsics, std::string_view((char*)imports[i].field_str.raw(), imports[i].field_str.size())),
-                    wasm_serialization_error, "${module}.${fn} unresolveable",
-                    ("module", std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()))
-                    ("fn", std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size())));
+                    wasm_serialization_error, "{}.{} unresolveable",
+                    std::string((char*)imports[i].module_str.raw(), imports[i].module_str.size()),
+                    std::string((char*)imports[i].field_str.raw(), imports[i].field_str.size()));
       }
       // check apply
       uint32_t apply_idx = bkend.get_module().get_exported_function("apply");
@@ -105,7 +105,7 @@ void validate( const bytes& code, const wasm_config& cfg, const whitelisted_intr
       const vm::func_type& apply_type = bkend.get_module().get_function_type(apply_idx);
       SYS_ASSERT((apply_type == vm::host_function{{vm::i64, vm::i64, vm::i64}, {}}), wasm_serialization_error, "apply has wrong type");
    } catch(vm::exception& e) {
-      SYS_THROW(wasm_serialization_error, e.detail());
+      SYS_THROW(wasm_serialization_error, "{}", e.detail());
    }
 }
 
@@ -158,11 +158,15 @@ class sys_vm_instantiated_module : public wasm_instantiated_module_interface {
             checktime_watchdog wd(context.trx_context.transaction_timer);
             _runtime->_bkend.timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
+            // timeout_exception is thrown when any of the threads timeout. It is possible for one of the thread timers
+            // to fire and cause another thread to arrive here before its timer has expired. Explicitly set expired
+            // so that checktime() will see the timeout.
+            context.trx_context.transaction_timer.set_expired();
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "access violation: ${d}", ("d", e.detail()));
+            FC_THROW_EXCEPTION(wasm_execution_error, "access violation: {}", e.detail());
          } catch(sysio::vm::exception& e) {
-            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure: ${d}", ("d", e.detail()));
+            FC_THROW_EXCEPTION(wasm_execution_error, "sys-vm system failure: {}", e.detail());
          }
       }
 
@@ -199,6 +203,10 @@ class sys_vm_profiling_module : public wasm_instantiated_module_interface {
             checktime_watchdog wd(context.trx_context.transaction_timer);
             _instantiated_module->timed_run(std::move(wd), std::move(fn));
          } catch(sysio::vm::timeout_exception&) {
+            // timeout_exception is thrown when any of the threads timeout. It is possible for one of the thread timers
+            // to fire and cause another thread to arrive here before its timer has expired. Explicitly set expired
+            // so that checktime() will see the timeout.
+            context.trx_context.transaction_timer.set_expired();
             context.trx_context.checktime();
          } catch(sysio::vm::wasm_memory_exception& e) {
             FC_THROW_EXCEPTION(wasm_execution_error, "access violation");
@@ -255,7 +263,7 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_runtime<Impl>::instan
       sys_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<sys_vm_instantiated_module<Impl>>(this, std::move(bkend));
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
+      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: {}", e.what());
    }
 }
 
@@ -277,7 +285,7 @@ std::unique_ptr<wasm_instantiated_module_interface> sys_vm_profile_runtime::inst
       sys_vm_host_functions_t::resolve(bkend->get_module());
       return std::make_unique<sys_vm_profiling_module>(std::move(bkend), code_bytes, code_size);
    } catch(sysio::vm::exception& e) {
-      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: ${e}", ("e", e.what()));
+      FC_THROW_EXCEPTION(wasm_execution_error, "Error building sys-vm interp: {}", e.what());
    }
 }
 #endif

@@ -1,6 +1,7 @@
 #include <fc/log/log_message.hpp>
 #include <fc/exception/exception.hpp>
 #include <fc/variant.hpp>
+#include <fc/variant_object.hpp>
 #include <fc/time.hpp>
 #include <fc/filesystem.hpp>
 #include <fc/io/json.hpp>
@@ -32,8 +33,7 @@ namespace fc
             log_message_impl() = default;
 
             log_context     context;
-            std::string     format;
-            variant_object  args;
+            std::string     msg;
       };
    }
 
@@ -142,8 +142,8 @@ namespace fc
         else if( v.as_string() == "off" ) e = log_level::off;
         else FC_THROW_EXCEPTION( bad_cast_exception, "Failed to cast from Variant to log_level" );
       } FC_RETHROW_EXCEPTIONS( error,
-                                   "Expected 'all|debug|info|warn|error|off', but got '${variant}'",
-                                   ("variant",v) );
+                                   "Expected 'all|debug|info|warn|error|off', but got '{}'",
+                                   fc::json::to_string(v, fc::time_point::now() + fc::exception::format_time_limit) );
    }
 
    std::string log_level::to_string()const {
@@ -197,40 +197,35 @@ namespace fc
    log_message::log_message()
    :my( std::make_shared<detail::log_message_impl>() ){}
 
-   log_message::log_message( log_context ctx, std::string format, variant_object args )
+   log_message::log_message( log_context ctx, std::string msg )
    :my( std::make_shared<detail::log_message_impl>(std::move(ctx)) )
    {
-      my->format  = std::move(format);
-      my->args    = std::move(args);
+      my->msg  = std::move(msg);
    }
 
    log_message::log_message( const variant& v )
    :my( std::make_shared<detail::log_message_impl>( log_context( v.get_object()["context"] ) ) )
    {
-      my->format = v.get_object()["format"].as_string();
-      my->args   = v.get_object()["data"].get_object();
+      my->msg = v.get_object()["msg"].as_string();
    }
 
    variant log_message::to_variant()const
    {
       return mutable_variant_object( "context", my->context )
-                          ( "format",  my->format )
-                          ( "data",    my->args   );
+                                   ( "msg",  my->msg );
    }
 
    log_context log_message::get_context()const { return my->context; }
-   std::string log_message::get_format()const { return my->format; }
-   variant_object log_message::get_data()const { return my->args; }
 
    std::string log_message::get_message()const
    {
-      return format_string( my->format, my->args );
+      return my->msg;
    }
 
    std::string log_message::get_limited_message()const
    {
-      const bool minimize = true;
-      return format_string( my->format, my->args, minimize );
+      constexpr size_t minimize_max_size = 1024;
+      return my->msg.substr(0, minimize_max_size) + "...";
    }
 
 

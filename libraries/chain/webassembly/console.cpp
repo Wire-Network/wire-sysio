@@ -1,6 +1,7 @@
-#include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/apply_context.hpp>
-#include <fc/uint128.hpp>
+#include <sysio/chain/webassembly/interface.hpp>
+
+#include <fc/int128.hpp>
 
 namespace sysio { namespace chain { namespace webassembly {
 
@@ -52,13 +53,13 @@ namespace sysio { namespace chain { namespace webassembly {
 			else
 				val_magnitude = static_cast<unsigned __int128>(*val);
 
-			fc::uint128 v(val_magnitude>>64, static_cast<uint64_t>(val_magnitude) );
+			fc::uint128 v = fc::to_uint128(val_magnitude>>64, static_cast<uint64_t>(val_magnitude) );
 
 			string s;
 			if( is_negative ) {
 				s += '-';
 			}
-			s += fc::variant(v).get_string();
+			s += fc::variant(v).as_string();
 
 			context.console_append( s );
       });
@@ -67,8 +68,8 @@ namespace sysio { namespace chain { namespace webassembly {
    void interface::printui128(legacy_ptr<const unsigned __int128> val) {
 		predicated_print(context,
       [&]() {
-			fc::uint128 v(*val>>64, static_cast<uint64_t>(*val) );
-			context.console_append(fc::variant(v).get_string());
+			fc::uint128 v = fc::to_uint128(*val>>64, static_cast<uint64_t>(*val) );
+			context.console_append(fc::variant(v).as_string());
       });
    }
 

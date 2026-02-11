@@ -230,7 +230,7 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
 
    //initial requirements were to skip packing field if it is not activated.
    //this approach allows to spam this function with big buffer so changing this behavior
-   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id ${id} is no allowed", ("id", entry.id));
+   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id {} is no allowed", entry.id);
    
    switch (entry.id){
       case chain_config_v0::max_block_net_usage_id:
@@ -285,7 +285,7 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
       fc::raw::pack(s, entry.config.max_authority_depth);
       break;
       default:
-      FC_THROW_EXCEPTION(config_parse_error, "DataStream& operator<<: no such id: ${id}", ("id", entry.id));
+      FC_THROW_EXCEPTION(config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
    return s;
 }
@@ -308,7 +308,7 @@ inline DataStream &operator<<(DataStream &s, const sysio::chain::data_entry<sysi
    //When the protocol feature is not activated, the old version of nodeop that doesn't know about 
    //the entry MUST behave the same as the new version of nodeop that does.
    //Skipping known but unactivated entries violates this.
-   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id ${id} is no allowed", ("id", entry.id));
+   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id {} is no allowed", entry.id);
    
    switch (entry.id){
       case chain_config_v1::max_action_return_value_size_id:
@@ -333,7 +333,7 @@ template <typename DataStream>
 inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::chain::chain_config_v0, sysio::chain::config_entry_validator> &entry){
    using namespace sysio::chain;
 
-   SYS_ASSERT(entry.is_allowed(), sysio::chain::unsupported_feature, "config id ${id} is no allowed", ("id", entry.id));
+   SYS_ASSERT(entry.is_allowed(), sysio::chain::unsupported_feature, "config id {} is no allowed", entry.id);
 
    switch (entry.id){
       case chain_config_v0::max_block_net_usage_id:
@@ -388,7 +388,7 @@ inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::cha
       fc::raw::unpack(s, entry.config.max_authority_depth);
       break;
       default:
-      FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: ${id}", ("id", entry.id));
+      FC_THROW_EXCEPTION(sysio::chain::config_parse_error, "DataStream& operator<<: no such id: {}", entry.id);
    }
    
    return s;
@@ -405,7 +405,7 @@ template <typename DataStream>
 inline DataStream &operator>>(DataStream &s, sysio::chain::data_entry<sysio::chain::chain_config_v1, sysio::chain::config_entry_validator> &entry){
    using namespace sysio::chain;
 
-   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id ${id} is no allowed", ("id", entry.id));
+   SYS_ASSERT(entry.is_allowed(), unsupported_feature, "config id {} is no allowed", entry.id);
 
    switch (entry.id){
       case chain_config_v1::max_action_return_value_size_id:
@@ -437,8 +437,8 @@ inline DataStream& operator<<( DataStream& s, const sysio::chain::data_range<T, 
    std::vector<bool> visited(T::PARAMS_COUNT, false);
    for (auto uid : selection.ids){
       uint32_t id = uid;
-      SYS_ASSERT(id < visited.size(), config_parse_error, "provided id ${id} should be less than ${size}", ("id", id)("size", visited.size()));
-      SYS_ASSERT(!visited[id], config_parse_error, "duplicate id provided: ${id}", ("id", id));
+      SYS_ASSERT(id < visited.size(), config_parse_error, "provided id {} should be less than {}", id, visited.size());
+      SYS_ASSERT(!visited[id], config_parse_error, "duplicate id provided: {}", id);
       visited[id] = true;
 
       fc::raw::pack(s, fc::unsigned_int(id));
@@ -468,8 +468,8 @@ inline DataStream& operator>>( DataStream& s, sysio::chain::data_range<T, sysio:
       fc::unsigned_int id;
       fc::raw::unpack(s, id);
       
-      SYS_ASSERT(id.value < visited.size(), config_parse_error, "provided id ${id} should be less than ${size}", ("id", id)("size", visited.size()));
-      SYS_ASSERT(!visited[id], config_parse_error, "duplicate id provided: ${id}", ("id", id));
+      SYS_ASSERT(id.value < visited.size(), config_parse_error, "provided id {} should be less than {}", id, visited.size());
+      SYS_ASSERT(!visited[id], config_parse_error, "duplicate id provided: {}", id);
       visited[id] = true;
 
       data_entry<T, config_entry_validator> cfg_entry(selection.config, id, selection.validator);

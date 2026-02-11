@@ -286,7 +286,7 @@ namespace sysio { namespace chain { namespace wasm_injections {
             return "_sysio_ui64_to_f64";
 
          default:
-            FC_THROW_EXCEPTION( sysio::chain::wasm_execution_error, "Error, unknown opcode in injection ${op}", ("op", opcode));
+            FC_THROW_EXCEPTION( sysio::chain::wasm_execution_error, "Error, unknown opcode in injection {}", opcode);
       }
    }
 

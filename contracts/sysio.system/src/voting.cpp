@@ -35,6 +35,9 @@ namespace sysiosystem {
             // if the producer_authority consists of a single key, use that key in the legacy producer_key field
             producer_key = auth.keys[0].key;
          }
+         for (const auto& kw : auth.keys) {
+            check( kw.key.index() < 2, "Only K1 & R1 keys allowed" );
+         }
       }, producer_authority );
 
       if ( prod != _producers.end() ) {

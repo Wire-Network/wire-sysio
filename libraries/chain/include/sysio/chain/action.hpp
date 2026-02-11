@@ -34,6 +34,10 @@ namespace sysio { namespace chain {
       return std::tie(lhs.actor, lhs.permission) >= std::tie(rhs.actor, rhs.permission);
    }
 
+   constexpr auto format_as(const permission_level& pl) {
+      return fmt::format("{}@{}", pl.actor, pl.permission);
+   }
+
    /**
     *  An action is performed by an actor, aka an account. It may
     *  be created explicitly and authorized by signatures or might be

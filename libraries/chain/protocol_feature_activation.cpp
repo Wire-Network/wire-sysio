@@ -19,8 +19,7 @@ namespace sysio { namespace chain {
       for( const auto& d : protocol_features ) {
          auto res = s.insert( d );
          SYS_ASSERT( res.second, ill_formed_protocol_feature_activation,
-                     "Protocol feature digest ${d} was repeated in the protocol feature activation extension",
-                     ("d", d)
+                     "Protocol feature digest {} was repeated in the protocol feature activation extension", d
          );
       }
    }

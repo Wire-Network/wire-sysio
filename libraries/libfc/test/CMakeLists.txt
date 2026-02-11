@@ -12,6 +12,8 @@ add_executable( test_fc
         io/test_random_access_file.cpp
         io/test_raw.cpp
         io/test_tracked_storage.cpp
+        network/ethereum/test_ethereum_client_and_rlp.cpp
+        network/solana/test_solana_client.cpp
         network/test_message_buffer.cpp
         scoped_exit/test_scoped_exit.cpp
         static_variant/test_static_variant.cpp
@@ -19,11 +21,12 @@ add_executable( test_fc
         variant/test_variant_dynamic_bitset.cpp
         variant_estimated_size/test_variant_estimated_size.cpp
         test_base64.cpp
+        test_traits.cpp
         test_escape_str.cpp
         test_bls.cpp
         test_ordered_diff.cpp
         main.cpp
         )
-target_link_libraries( test_fc fc )
+target_link_libraries( test_fc fc fc-test )
 
 add_test(NAME test_fc COMMAND test_fc WORKING_DIRECTORY ${CMAKE_BINARY_DIR})

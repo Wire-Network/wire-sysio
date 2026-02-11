@@ -2,7 +2,9 @@ set(APPBASE_INSTALL_COMPONENT "dev")
 set(SYSVM_INSTALL_COMPONENT "dev")
 
 
+add_subdirectory(libfc-lite)
 add_subdirectory(libfc)
+add_subdirectory(libfc-test)
 add_subdirectory(builtins)
 add_subdirectory(wasm-jit)
 add_subdirectory(chaindb)

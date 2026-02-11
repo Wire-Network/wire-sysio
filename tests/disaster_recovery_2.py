@@ -66,7 +66,9 @@ try:
 
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, totalProducers=pnodes, specificExtraNodeopArgs=specificExtraNodeopArgs,
                       topo="./tests/disaster_recovery_2_test_shape.json", delay=delay, loadSystemContract=False,
-                      activateIF=True, signatureProviderForNonProducer=True) is False:
+                      activateIF=True,
+                      biosFinalizer=False,
+                      signatureProviderForNonProducer=True) is False:
         errorExit("Failed to stand up sys cluster.")
 
     assert cluster.biosNode.getInfo(exitOnError=True)["head_block_producer"] != "sysio", "launch should have waited for production to change"

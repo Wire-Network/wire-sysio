@@ -38,8 +38,8 @@ namespace sysio { namespace chain {
 
          void validate() const {
             SYS_ASSERT(std::clamp(version, minimum_version, current_version) == version, bad_database_version_exception,
-                       "state database version is incompatible, please restore from a compatible snapshot or replay!",
-                       ("version", version)("minimum_version", minimum_version)("maximum_version", current_version));
+                       "state database version {} is incompatible {}-{}, please restore from a compatible snapshot or replay!",
+                       version, minimum_version, current_version);
          }
       };
 

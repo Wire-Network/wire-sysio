@@ -6,15 +6,20 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <variant>
 #include <vector>
 
-#include <fc/string.hpp>
-#include <fc/time.hpp>
-#include <fc/container/deque_fwd.hpp>
-#include <fc/container/flat_fwd.hpp>
 #include <boost/multi_index_container_fwd.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
-#include <variant>
+
+#include <fmt/format.h>
+
+#include <fc/container/deque_fwd.hpp>
+#include <fc/container/flat_fwd.hpp>
+#include <fc/int128.hpp>
+#include <fc/int256.hpp>
+#include <fc/string.hpp>
+#include <fc/time.hpp>
 
 namespace fc
 {
@@ -196,12 +201,16 @@ namespace fc
            null_type   = 0,
            int64_type  = 1,
            uint64_type = 2,
-           double_type = 3,
-           bool_type   = 4,
-           string_type = 5,
-           array_type  = 6,
-           object_type = 7,
-           blob_type   = 8
+           int128_type = 3,
+           uint128_type = 4,
+           int256_type = 5,
+           uint256_type = 6,
+           double_type = 7,
+           bool_type   = 8,
+           string_type = 9,
+           array_type  = 10,
+           object_type = 11,
+           blob_type   = 12
         };
 
         /// Constructs a null_type variant
@@ -223,6 +232,10 @@ namespace fc
         variant( int32_t val );
         variant( uint64_t val );
         variant( int64_t val );
+        variant( fc::uint128 val );
+        variant( fc::int128 val );
+        variant( fc::uint256 val );
+        variant( fc::int256 val );
         variant( double val );
         variant( bool val );
         variant( blob val );
@@ -245,6 +258,10 @@ namespace fc
               virtual void handle()const                         = 0;
               virtual void handle( const int64_t& v )const       = 0;
               virtual void handle( const uint64_t& v )const      = 0;
+              virtual void handle( const fc::int128_t& v )const       = 0;
+              virtual void handle( const fc::uint128_t& v )const      = 0;
+              virtual void handle( const fc::int256_t& v )const       = 0;
+              virtual void handle( const fc::uint256_t& v )const      = 0;
               virtual void handle( const double& v )const        = 0;
               virtual void handle( const bool& v )const          = 0;
               virtual void handle( const std::string& v )const   = 0;
@@ -262,6 +279,10 @@ namespace fc
         bool                        is_bool()const;
         bool                        is_int64()const;
         bool                        is_uint64()const;
+        bool                        is_int128() const;
+        bool                        is_uint128() const;
+        bool                        is_int256()const;
+        bool                        is_uint256()const;
         bool                        is_double()const;
         bool                        is_object()const;
         bool                        is_array()const;
@@ -277,6 +298,11 @@ namespace fc
 
         int64_t                     as_int64()const;
         uint64_t                    as_uint64()const;
+        fc::int128                  as_int128()const;
+        fc::uint128                 as_uint128()const;
+        fc::int256                  as_int256()const;
+        fc::uint256                 as_uint256()const;
+
         bool                        as_bool()const;
         double                      as_double()const;
 
@@ -377,6 +403,10 @@ namespace fc
    void from_variant( const fc::variant& var,  int64_t& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  uint64_t& vo );
+   /** @ingroup Serializable */
+   void from_variant( const fc::variant& var,  fc::int256& vo );
+   /** @ingroup Serializable */
+   void from_variant( const fc::variant& var,  fc::uint256& vo );
    /** @ingroup Serializable */
    void from_variant( const fc::variant& var,  bool& vo );
    /** @ingroup Serializable */
@@ -583,6 +613,26 @@ namespace fc
    }
 
    /** @ingroup Serializable */
+   template<size_t N>
+   void to_variant( const std::array<char,N>& bi, variant& v )
+   {
+      v = std::vector<char>( static_cast<const char*>(bi.data()), static_cast<const char*>(bi.data()) + sizeof(bi) );
+   }
+
+   /** @ingroup Serializable */
+   template<size_t N>
+   void from_variant( const variant& v, std::array<char,N>& bi )
+   {
+      std::vector<char> ve = v.as< std::vector<char> >();
+      if( ve.size() )
+      {
+         memcpy(bi.begin(), ve.data(), fc::min<size_t>(ve.size(),sizeof(bi)) );
+      }
+      else
+         memset( bi.begin(), char(0), sizeof(bi) );
+   }
+
+   /** @ingroup Serializable */
    template<typename T, std::size_t S>
    void to_variant( const std::array<T,S>& t, fc::variant& v )
    {
@@ -718,5 +768,5 @@ namespace fc
 
 #include <fc/reflect/reflect.hpp>
 FC_REFLECT_TYPENAME( fc::variant )
-FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
+FC_REFLECT_ENUM( fc::variant::type_id, (null_type)(int64_type)(uint64_type)(int128_type)(uint128_type)(int256_type)(uint256_type)(double_type)(bool_type)(string_type)(array_type)(object_type)(blob_type) )
 FC_REFLECT( fc::blob, (data) );

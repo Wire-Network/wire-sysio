@@ -16,6 +16,8 @@ endif()
 add_subdirectory(contracts)
 file(GLOB HEADERS "include/sysio/testing/*.hpp")
 
+# TODO: move src files to subdirectory `src` and then make this GLOB_RECURSIVE `src/*.cpp`
+file(GLOB SRC_FILES *.cpp)
 configure_file(contracts.hpp.in include/testing_contracts/contracts.hpp ESCAPE_QUOTES)
 add_library(sysio_testing_contracts INTERFACE)
 target_include_directories(sysio_testing_contracts INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/include/testing_contracts)
@@ -29,8 +31,7 @@ configure_file(contracts.cpp.in contracts.cpp ESCAPE_QUOTES)
 
 ## SORT .cpp by most likely to change / break compile
 add_library(sysio_testing
-  tester.cpp
-  tester_network.cpp
+  ${SRC_FILES}
   ${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp
   ${HEADERS}
 )
@@ -49,52 +50,64 @@ set(BIOS_ABI_DST  ${TESTING_DST_BIOS_DIR}/sysio.bios.abi)
 set(ROA_WASM_DST  ${TESTING_DST_ROA_DIR}/sysio.roa.wasm)
 set(ROA_ABI_DST   ${TESTING_DST_ROA_DIR}/sysio.roa.abi)
 
-add_custom_command(
-  OUTPUT ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_BIOS_DIR}
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_ROA_DIR}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BIOS_WASM_SRC} ${BIOS_WASM_DST}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${BIOS_ABI_SRC}  ${BIOS_ABI_DST}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ROA_WASM_SRC}  ${ROA_WASM_DST}
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${ROA_ABI_SRC}   ${ROA_ABI_DST}
-  DEPENDS ${BIOS_WASM_SRC} ${BIOS_ABI_SRC} ${ROA_WASM_SRC} ${ROA_ABI_SRC}
-  COMMENT "Copying test contracts to testing libraries build directory"
-)
+if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
+  # When building contracts from source, copy only if changed and update stamp file
+  # We use a custom target because external project dependencies don't work well with add_custom_command
+  set(CONTRACTS_COPY_STAMP ${CMAKE_CURRENT_BINARY_DIR}/contracts_copy.stamp)
 
-add_custom_target(sysio_testing_contracts_copy ALL
-  DEPENDS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
-)
-
-add_dependencies(sysio_testing sysio_testing_contracts_copy)
-
-# Could not figure out how to make this work correctly.
-# builds the wasm file and then the next build includes the wasm file in the library. Before the only
-# way to get it to work was to remove the contracts.o file. This is better than a clean everytime.
-if(BUILD_TEST_CONTRACTS)
-  set(CONTRACT_WASM_FILES
-    "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.wasm"
-    "${CMAKE_BINARY_DIR}/contracts/sysio.roa/sysio.roa.abi"
-    "${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"
-    "${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi"
-    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.wasm"
-    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios/sysio.bios.abi"
-    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.wasm"
-    "${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.roa/sysio.roa.abi"
+  add_custom_target(sysio_testing_contracts_copy ALL
+    COMMAND ${CMAKE_COMMAND}
+      -DSRC1="${BIOS_WASM_SRC}"
+      -DDST1="${BIOS_WASM_DST}"
+      -DSRC2="${BIOS_ABI_SRC}"
+      -DDST2="${BIOS_ABI_DST}"
+      -DSRC3="${ROA_WASM_SRC}"
+      -DDST3="${ROA_WASM_DST}"
+      -DSRC4="${ROA_ABI_SRC}"
+      -DDST4="${ROA_ABI_DST}"
+      -DCOUNT=4
+      -DSTAMP_FILE="${CONTRACTS_COPY_STAMP}"
+      -P "${CMAKE_SOURCE_DIR}/cmake/scripts/contract_copy_if_changed_and_stamp.cmake"
+    BYPRODUCTS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST} ${CONTRACTS_COPY_STAMP}
+    COMMENT "Checking and copying test contracts to testing libraries build directory"
   )
-
-  # Make the main testing library wait for the contracts to be built.
-  add_dependencies(sysio_testing sysio_testing_contracts contracts_project)
-
-  # Set the explicit dependency. This is the magic link.
-  #    It tells CMake: "If ${CONTRACT_WASM_FILE} is newer than contracts.cpp.o, recompile contracts.cpp".
-  #    Note: The source file is specified relative to the current CMakeLists.txt.
-  set_source_files_properties(
-    "contracts.cpp"
-    PROPERTIES OBJECT_DEPENDS "${CONTRACT_WASM_FILES}"
+  # Ensure contracts are built before copying
+  add_dependencies(sysio_testing_contracts_copy contracts_project)
+else()
+  # When using pre-built contracts, use add_custom_command for proper dependency tracking
+  add_custom_command(
+    OUTPUT ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_BIOS_DIR}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${TESTING_DST_ROA_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${BIOS_WASM_SRC} ${BIOS_WASM_DST}
+    COMMAND ${CMAKE_COMMAND} -E copy ${BIOS_ABI_SRC}  ${BIOS_ABI_DST}
+    COMMAND ${CMAKE_COMMAND} -E copy ${ROA_WASM_SRC}  ${ROA_WASM_DST}
+    COMMAND ${CMAKE_COMMAND} -E copy ${ROA_ABI_SRC}   ${ROA_ABI_DST}
+    DEPENDS ${BIOS_WASM_SRC} ${BIOS_ABI_SRC} ${ROA_WASM_SRC} ${ROA_ABI_SRC}
+    COMMENT "Copying test contracts to testing libraries build directory"
+  )
+  add_custom_target(sysio_testing_contracts_copy ALL
+    DEPENDS ${BIOS_WASM_DST} ${BIOS_ABI_DST} ${ROA_WASM_DST} ${ROA_ABI_DST}
   )
 endif()
 
-target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc chainbase Logging IR WAST WASM)
+add_dependencies(sysio_testing sysio_testing_contracts_copy)
+
+# When building contracts from source, ensure contracts.cpp.o is recompiled when contract files change
+if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
+  # Make the main testing library wait for the contracts to be built.
+  add_dependencies(sysio_testing sysio_testing_contracts contracts_project)
+
+  # Set explicit file-level dependencies on contracts.cpp object file.
+  # We depend on the stamp file which gets touched only when contracts actually change.
+  # This ensures contracts.cpp.o is rebuilt when contracts are updated, but not on every build.
+  set_source_files_properties(
+    "${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp"
+    PROPERTIES OBJECT_DEPENDS "${CONTRACTS_COPY_STAMP}"
+  )
+endif()
+
+target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc-lite fc fc-test chainbase Logging IR WAST WASM)
 target_include_directories(sysio_testing
   PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}/include"

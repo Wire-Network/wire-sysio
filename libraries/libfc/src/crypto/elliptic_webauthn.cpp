@@ -1,5 +1,6 @@
 #include <fc/crypto/elliptic_webauthn.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
+#include <fc/crypto/base64.hpp>
 #include <fc/crypto/openssl.hpp>
 
 #include <fc/fwd_impl.hpp>
@@ -91,7 +92,7 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog("String: current_state(${current_statea}) out of bound", ("current_state", current_state) );
+      elog("String: current_state({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
    }
 
@@ -116,7 +117,7 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog( "Key: current_state (${current_statea}) out of bound", ("current_state", current_state) );
+      elog( "Key: current_state ({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
    }
    bool Key(const char* str, rapidjson::SizeType length, bool copy) {
@@ -144,7 +145,7 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog( "Key: current_state (${current_statea}) out of bound", ("current_state", current_state) );
+      elog( "Key: current_state ({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
    }
    bool EndObject(rapidjson::SizeType memberCount) {
@@ -165,7 +166,7 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog( "EndObject: current_state (${current_statea}) out of bound", ("current_state", current_state) );
+      elog( "EndObject: current_state ({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
    }
 
@@ -188,7 +189,7 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog( "StartArray: current_state (${current_statea}) out of bound", ("current_state", current_state) );
+      elog( "StartArray: current_state ({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
 
    }
@@ -209,14 +210,16 @@ struct webauthn_json_handler : public rapidjson::BaseReaderHandler<rapidjson::UT
       }
       // Add elog to report the error and __builtin_unreachable to surpress
       // warning of control reaches end of non-void function.
-      elog( "EndArray: current_state (${current_statea}) out of bound", ("current_state", current_state) );
+      elog( "EndArray: current_state ({}) out of bound", fmt::underlying(current_state) );
       __builtin_unreachable();
    }
 };
 } //detail
 
 
-public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
+public_key public_key::recover(const signature& c, const fc::sha256& digest) {
+   public_key result;
+
    detail::webauthn_json_handler handler;
    detail::rapidjson::Reader reader;
    detail::rapidjson::StringStream ss(c.client_json.c_str());
@@ -230,17 +233,17 @@ public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
    char required_origin_scheme[] = "https://";
    size_t https_len = strlen(required_origin_scheme);
    FC_ASSERT(handler.found_origin.compare(0, https_len, required_origin_scheme) == 0, "webauthn origin must begin with https://");
-   rpid = handler.found_origin.substr(https_len, handler.found_origin.rfind(':')-https_len);
+   result.rpid = handler.found_origin.substr(https_len, handler.found_origin.rfind(':')-https_len);
 
    constexpr static size_t min_auth_data_size = 37;
    FC_ASSERT(c.auth_data.size() >= min_auth_data_size, "auth_data not as large as required");
    if(c.auth_data[32] & 0x01)
-      user_verification_type = user_presence_t::USER_PRESENCE_PRESENT;
+      result.user_verification_type = user_presence_t::USER_PRESENCE_PRESENT;
    if(c.auth_data[32] & 0x04)
-      user_verification_type = user_presence_t::USER_PRESENCE_VERIFIED;
+      result.user_verification_type = user_presence_t::USER_PRESENCE_VERIFIED;
 
    static_assert(min_auth_data_size >= sizeof(fc::sha256), "auth_data min size not enough to store a sha256");
-   FC_ASSERT(memcmp(c.auth_data.data(), fc::sha256::hash(rpid).data(), sizeof(fc::sha256)) == 0, "webauthn rpid hash doesn't match origin");
+   FC_ASSERT(memcmp(c.auth_data.data(), fc::sha256::hash(result.rpid).data(), sizeof(fc::sha256)) == 0, "webauthn rpid hash doesn't match origin");
 
    //the signature (and thus public key we need to return) will be over
    // sha256(auth_data || client_data_hash)
@@ -251,13 +254,13 @@ public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
    fc::sha256 signed_digest = e.result();
 
    //quite a bit of this copied from elliptic_r1, can probably commonize
-   int nV = c.compact_signature.data[0];
+   int nV = c.compact_signature[0];
    if (nV<31 || nV>=35)
       FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
    ecdsa_sig sig = ECDSA_SIG_new();
    BIGNUM *r = BN_new(), *s = BN_new();
-   BN_bin2bn(&c.compact_signature.data[1],32,r);
-   BN_bin2bn(&c.compact_signature.data[33],32,s);
+   BN_bin2bn(&c.compact_signature[1],32,r);
+   BN_bin2bn(&c.compact_signature[33],32,s);
    ECDSA_SIG_set0(sig, r, s);
 
    fc::ec_key key = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
@@ -266,9 +269,9 @@ public_key::public_key(const signature& c, const fc::sha256& digest, bool) {
    if (r1::ECDSA_SIG_recover_key_GFp(key, sig, (uint8_t*)signed_digest.data(), signed_digest.data_size(), nV - 27, 0) == 1) {
       const EC_POINT* point = EC_KEY_get0_public_key(key);
       const EC_GROUP* group = EC_KEY_get0_group(key);
-      size_t sz = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, (uint8_t*)public_key_data.data, public_key_data.size(), NULL);
-      if(sz == public_key_data.size())
-         return;
+      size_t sz = EC_POINT_point2oct(group, point, POINT_CONVERSION_COMPRESSED, (uint8_t*)result.public_key_data.data(), result.public_key_data.size(), NULL);
+      if(sz == result.public_key_data.size())
+         return result;
    }
    FC_THROW_EXCEPTION( exception, "unable to reconstruct public key from signature" );
 }

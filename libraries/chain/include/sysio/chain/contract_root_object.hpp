@@ -1,11 +1,12 @@
 #pragma once
-#include <sysio/chain/types.hpp>
-#include <fc/uint128.hpp>
-#include <sysio/chain/block_header.hpp>
 
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/mem_fun.hpp>
 
+#include <fc/int128.hpp>
+
+#include <sysio/chain/types.hpp>
+#include <sysio/chain/block_header.hpp>
 #include <sysio/chain/multi_index_includes.hpp>
 
 namespace sysio { namespace chain {

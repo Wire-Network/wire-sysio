@@ -28,33 +28,35 @@ max_start_time_secs=10 # time nodeop takes to start
 # We need debug level to get more information about nodeop process
 logging="""{
   "includes": [],
-  "appenders": [{
-      "name": "stderr",
-      "type": "console",
-      "args": {
-        "stream": "std_error",
-        "level_colors": [{
-            "level": "debug",
-            "color": "green"
-          },{
-            "level": "warn",
-            "color": "brown"
-          },{
-            "level": "error",
-            "color": "red"
-          }
-        ]
-      },
-      "enabled": true
+  "sinks": [{
+    "name": "stderr_color",
+    "type": "console_sink",
+    "args": {
+      "output_type": "stderr",
+      "color": true,
+      "level_colors": [{
+        "level": "debug",
+        "color": "green"
+      },{
+        "level": "info",
+        "color": "reset"
+      },{
+        "level": "warn",
+        "color": "yellow"
+      },{
+        "level": "error",
+        "color": "red"
+      }
+      ]
     }
+  }
   ],
   "loggers": [{
       "name": "default",
       "level": "debug",
       "enabled": true,
-      "additivity": false,
-      "appenders": [
-        "stderr"
+      "sinks": [
+        "stderr_color"
       ]
     }
   ]
@@ -114,7 +116,7 @@ def testCommon(title, extraNodeopArgs, expectedMsgs):
             errorExit ("Log should have contained \"%s\"" % (expectedMsgs))
 
 def extractTimestamp(msg):
-    matches = re.compile(r"\s+([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{3})\s").search(msg)
+    matches = re.compile(r"\s+([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6})\s").search(msg)
     return datetime.strptime(matches.group(0).strip(), '%Y-%m-%dT%H:%M:%S.%f')
 
 intervalTolerance = 0.15 # 15%

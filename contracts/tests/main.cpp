@@ -31,9 +31,9 @@ boost::unit_test::test_suite* init_unit_test_suite(int argc, char* argv[]) {
    }
    
    if(is_verbose) {
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+      fc::logger::default_logger().set_log_level(fc::log_level::debug);
    } else {
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::off);
+      fc::logger::default_logger().set_log_level(fc::log_level::off);
    }
 
    // Register fc::exception translator

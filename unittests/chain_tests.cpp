@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_over_limit, T, testers ) try {
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    sysio::chain::action act1(
-       std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
+       std::vector<sysio::chain::permission_level>{{"testapi"_n, config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());
@@ -101,14 +101,14 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( decompressed_size_under_limit, T, testers ) try {
    constexpr size_t num_cf_actions = 129;
    trx.context_free_actions.insert(trx.context_free_actions.end(), num_cf_actions, act);
    // this is a over limit size 4*129*1024 = ~2M < 10M
-   for(int i = 0; i < num_cf_actions; ++i){
+   for(size_t i = 0; i < num_cf_actions; ++i){
       vector<uint32_t> v(1024, 1);
       trx.context_free_data.emplace_back(fc::raw::pack<vector<uint32_t>>(v));
    }
    // add a normal action along with cfa
    dummy_action         da = {DUMMY_ACTION_DEFAULT_A, DUMMY_ACTION_DEFAULT_B, DUMMY_ACTION_DEFAULT_C};
    sysio::chain::action act1(
-       std::vector<sysio::chain::permission_level>{{"testapi"_n, sysio::chain::config::active_name}}, da);
+       std::vector<sysio::chain::permission_level>{{"testapi"_n, config::active_name}}, da);
    trx.actions.push_back(act1);
    chain.set_transaction_headers(trx);
    auto sig = trx.sign(chain.get_private_key("testapi"_n, "active"), chain.get_chain_id());

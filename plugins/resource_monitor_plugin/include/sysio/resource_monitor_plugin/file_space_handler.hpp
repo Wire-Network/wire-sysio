@@ -32,7 +32,7 @@ namespace sysio::resource_monitor {
 
          thread_pool.start(thread_pool_size,
             []( const fc::exception& e ) {
-              elog("Exception in resource monitor plugin thread pool, exiting: ${e}", ("e", e.to_detail_string()) );
+              elog("Exception in resource monitor plugin thread pool, exiting: {}", e.to_detail_string() );
               appbase::app().quit(); },
             [&](size_t) { space_monitor_loop(); }
          );
@@ -54,7 +54,8 @@ namespace sysio::resource_monitor {
       // set them together so it is simpler to check.
       void set_threshold(uint32_t new_threshold, uint32_t new_warning_threshold) {
          SYS_ASSERT(new_warning_threshold < new_threshold, chain::plugin_config_exception,
-                    "warning_threshold ${new_warning_threshold} must be less than threshold ${new_threshold}", ("new_warning_threshold", new_warning_threshold) ("new_threshold", new_threshold));
+                    "warning_threshold {} must be less than threshold {}",
+                    new_warning_threshold, new_threshold);
 
          shutdown_threshold = new_threshold;
          warning_threshold = new_warning_threshold;
@@ -62,7 +63,7 @@ namespace sysio::resource_monitor {
 
       void set_absolute(uint64_t new_v, uint64_t new_warning_v) {
          SYS_ASSERT(new_warning_v > new_v, chain::plugin_config_exception,
-                    "absolute warning value ${w} must be more than absolute threshold ${n}", ("w", new_warning_v)("n", new_v));
+                    "absolute warning value {} must be more than absolute threshold {}", new_warning_v, new_v);
 
          shutdown_absolute = new_v;
          warning_absolute = new_warning_v;
@@ -85,28 +86,25 @@ namespace sysio::resource_monitor {
                // As the system is running and this plugin is not a critical
                // part of the system, we should not exit.
                // Just report the failure and continue;
-               wlog( "Unable to get space info for ${path_name}: [code: ${ec}] ${message}. Ignore this failure.",
-                  ("path_name", fs.path_name.string())
-                  ("ec", ec.value())
-                  ("message", ec.message()));
+               wlog( "Unable to get space info for {}: [code: {}] {}. Ignore this failure.",
+                  fs.path_name.string(), ec.value(), ec.message());
 
                continue;
             }
 
             if ( info.available < fs.shutdown_available ) {
                if (output_threshold_warning || shutdown_on_exceeded) {
-                  elog("Space usage warning: ${path}'s file system exceeded threshold ${threshold_desc}, "
-                       "available: ${available} GiB, Capacity: ${capacity} GiB, shutdown_available: ${shutdown_available} GiB",
-                       ("path", fs.path_name.string())("threshold_desc", threshold_desc())
-                       ("available", to_gib(info.available))("capacity", to_gib(info.capacity))
-                       ("shutdown_available", to_gib(fs.shutdown_available)));
+                  elog("Space usage warning: {}'s file system exceeded threshold {}, "
+                       "available: {} GiB, Capacity: {} GiB, shutdown_available: {} GiB",
+                       fs.path_name.string(), threshold_desc(), to_gib(info.available),
+                       to_gib(info.capacity), to_gib(fs.shutdown_available));
                }
                return true;
             } else if ( info.available < fs.warning_available && output_threshold_warning ) {
-               wlog("Space usage warning: ${path}'s file system approaching threshold. available: ${available} GiB, warning_available: ${warning_available} GiB",
-                    ("path", fs.path_name.string())("available", to_gib(info.available))("warning_available", to_gib(fs.warning_available)));
+               wlog("Space usage warning: {}'s file system approaching threshold. available: {} GiB, warning_available: {} GiB",
+                    fs.path_name.string(), to_gib(info.available), to_gib(fs.warning_available));
                if ( shutdown_on_exceeded) {
-                  wlog("nodeop will shutdown when space usage exceeds threshold ${threshold_desc}", ("threshold_desc", threshold_desc()));
+                  wlog("nodeop will shutdown when space usage exceeds threshold {}", threshold_desc());
                }
             }
          }
@@ -119,15 +117,15 @@ namespace sysio::resource_monitor {
          struct stat statbuf{};
          auto status = space_provider.get_stat(path_name.string().c_str(), &statbuf);
          SYS_ASSERT(status == 0, chain::plugin_config_exception,
-                    "Failed to run stat on ${path} with status ${status}", ("path", path_name.string())("status", status));
+                    "Failed to run stat on {} with status {}", path_name.string(), status);
 
-         ilog("${path_name}'s file system to be monitored", ("path_name", path_name.string()));
+         ilog("{}'s file system to be monitored", path_name.string());
 
          // If the file system containing the path is already
          // in the filesystem list, do not add it again
          for (auto& fs: filesystems) {
             if (statbuf.st_dev == fs.st_dev) { // Two files belong to the same file system if their device IDs are the same.
-               dlog("${path_name}'s file system already monitored", ("path_name", path_name.string()));
+               dlog("{}'s file system already monitored", path_name.string());
 
                return;
             }
@@ -139,10 +137,8 @@ namespace sysio::resource_monitor {
          std::error_code ec;
          auto info = space_provider.get_space(path_name, ec);
          SYS_ASSERT(!ec, chain::plugin_config_exception,
-            "Unable to get space info for ${path_name}: [code: ${ec}] ${message}",
-            ("path_name", path_name.string())
-            ("ec", ec.value())
-            ("message", ec.message()));
+            "Unable to get space info for {}: [code: {}] {}",
+            path_name.string(), ec.value(), ec.message());
 
          uintmax_t shutdown_available = shutdown_absolute;
          uintmax_t warning_available = warning_absolute;
@@ -154,8 +150,8 @@ namespace sysio::resource_monitor {
          // Add to the list
          filesystems.emplace_back(statbuf.st_dev, shutdown_available, path_name, warning_available);
 
-         ilog("${path_name}'s file system monitored. shutdown_available: ${shutdown_available} GiB, capacity: ${capacity} GiB, threshold: ${threshold_desc}",
-              ("path_name", path_name.string())("shutdown_available", to_gib(shutdown_available)) ("capacity", to_gib(info.capacity))("threshold_desc", threshold_desc()) );
+         ilog("{}'s file system monitored. shutdown_available: {} GiB, capacity: {} GiB, threshold: {}",
+              path_name.string(), to_gib(shutdown_available), to_gib(info.capacity), threshold_desc());
       }
 
    // on resmon thread
@@ -174,9 +170,7 @@ namespace sysio::resource_monitor {
             // as cancel callback will never be make it here after thread_pool
             // is stopped, even though cancel is called in the timer's
             // destructor.
-            wlog("Exit due to error: ${ec}, message: ${message}",
-                 ("ec", ec.value())
-                 ("message", ec.message()));
+            wlog("Exit due to error: {}, message: {}", ec.value(), ec.message());
             return;
          } else {
             // Loop over

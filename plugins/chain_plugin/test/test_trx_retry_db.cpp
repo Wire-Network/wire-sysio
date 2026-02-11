@@ -87,7 +87,7 @@ private:
 
 auto get_private_key( chain::name keyname, std::string role = "owner" ) {
    auto secret = fc::sha256::hash( keyname.to_string() + role );
-   return chain::private_key_type::regenerate<fc::ecc::private_key_shim>( secret );
+   return chain::private_key_type::regenerate<fc::ecc::private_key_shim>( secret.to_uint64_array() );
 }
 
 auto get_public_key( chain::name keyname, std::string role = "owner" ) {
@@ -96,10 +96,10 @@ auto get_public_key( chain::name keyname, std::string role = "owner" ) {
 
 auto make_unique_trx( const chain_id_type& chain_id, const fc::microseconds& expiration, uint64_t id ) {
 
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
    signed_transaction trx;
    trx.expiration = fc::time_point_sec{fc::time_point::now() + expiration};
-   trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}},
+   trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}},
                              testit{ id } );
    trx.sign( get_private_key("test"_n), chain_id );
 
@@ -167,7 +167,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
 
    try {
       appbase::scoped_app app;
-      fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+      fc::logger::default_logger().set_log_level(fc::log_level::debug);
 
       // just need a controller for trx_retry_db, doesn't actually have to do anything
       std::optional<controller> chain;
@@ -185,7 +185,7 @@ BOOST_AUTO_TEST_CASE(trx_retry_logic) {
       }
 
       // control time by using set_now, call before spawning any threads
-      auto pnow = boost::posix_time::time_from_string("2022-04-04 4:44:44.000");
+      auto pnow = boost::posix_time::time_from_string("2025-04-04 4:44:44.000");
       fc::mock_time_traits::set_now(pnow);
 
       // run app() so that channels::transaction_ack work

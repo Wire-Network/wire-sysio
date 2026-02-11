@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_SUITE(finality_misc_tests)
 
 BOOST_AUTO_TEST_CASE(qc_state_transitions) try {
    using namespace sysio::chain;
-   using namespace fc::crypto::blslib;
+   using namespace fc::crypto::bls;
    using state_t = aggregating_qc_sig_t::state_t;
 
    digest_type d(fc::sha256("0000000000000000000000000000001"));
@@ -51,11 +51,11 @@ BOOST_AUTO_TEST_CASE(qc_state_transitions) try {
       pubkey.push_back(k.get_public_key());
 
    auto weak_vote = [&](aggregating_qc_sig_t& qc, const std::vector<uint8_t>& digest_to_sign, size_t index, uint64_t weight) {
-      return qc.add_vote(0, 0, false, index, sk[index].sign(digest_to_sign), weight);
+      return qc.add_vote(0, 0, false, index, sk[index].sign_raw(digest_to_sign), weight);
    };
 
    auto strong_vote = [&](aggregating_qc_sig_t& qc, const std::vector<uint8_t>& digest_to_sign, size_t index, uint64_t weight) {
-      return qc.add_vote(0, 0, true, index, sk[index].sign(digest_to_sign), weight);
+      return qc.add_vote(0, 0, true, index, sk[index].sign_raw(digest_to_sign), weight);
    };
 
    constexpr uint64_t weight = 1;

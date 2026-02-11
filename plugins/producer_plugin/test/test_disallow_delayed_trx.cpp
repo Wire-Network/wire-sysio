@@ -27,12 +27,12 @@ using namespace sysio::chain;
 using namespace sysio::test::detail;
 
 auto make_delayed_trx( const chain_id_type& chain_id ) {
-   account_name creator = config::system_account_name;
+   account_name creator = sysio::chain::config::system_account_name;
 
    signed_transaction trx;
-   trx.actions.emplace_back( vector<permission_level>{{creator, config::active_name}}, testit{0} );
+   trx.actions.emplace_back( vector<permission_level>{{creator, sysio::chain::config::active_name}}, testit{0} );
    trx.delay_sec = 10;
-   auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")));
+   auto priv_key = private_key_type::regenerate<fc::ecc::private_key_shim>(fc::sha256::hash(std::string("nathan")).to_uint64_array());
    trx.sign( priv_key, chain_id );
 
    return std::make_shared<packed_transaction>( std::move(trx) );
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
    std::future<std::tuple<producer_plugin*, chain_plugin*>> plugin_fut = plugin_promise.get_future();
    std::thread app_thread( [&]() {
       try {
-         fc::logger::get(DEFAULT_LOGGER).set_log_level(fc::log_level::debug);
+         fc::logger::default_logger().set_log_level(fc::log_level::debug);
          std::vector<const char*> argv =
             {"test", "--data-dir", temp_dir_str.c_str(), "--config-dir", temp_dir_str.c_str(),
                "-p", "sysio", "-e", "--disable-subjective-p2p-billing=true" };
@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(delayed_trx) {
             transaction_metadata::trx_type::input,
             return_failure_traces,
             [ptrx] (const next_function_variant<transaction_trace_ptr>& result) {
-               elog( "trace with except ${e}", ("e", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) )) );
+               elog( "trace with except {}", fc::json::to_pretty_string( *std::get<chain::transaction_trace_ptr>( result ) ) );
             }
          ),
          fc::exception,

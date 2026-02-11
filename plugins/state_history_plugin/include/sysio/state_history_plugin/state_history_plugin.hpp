@@ -2,8 +2,6 @@
 #include <sysio/chain/application.hpp>
 
 #include <sysio/chain_plugin/chain_plugin.hpp>
-#include <sysio/state_history/types.hpp>
-#include <sysio/state_history/log.hpp>
 
 namespace sysio {
 

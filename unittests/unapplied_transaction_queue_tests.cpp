@@ -28,7 +28,7 @@ struct test_block_state_accessor {
       for( auto& trx_meta : trx_metas ) {
          block->transactions.emplace_back( *trx_meta->packed_trx() );
       }
-      block->producer = sysio::chain::config::system_account_name;
+      block->producer = config::system_account_name;
 
       auto bsp = std::make_shared<block_state>();
       bsp->block = std::move( block );
