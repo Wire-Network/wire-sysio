@@ -2016,7 +2016,9 @@ BOOST_AUTO_TEST_CASE( more_billed_cpu_test ) try {
       // first call will load wasm, pausing timer
       trace = push_trx( ptrx, fc::time_point::maximum(), {}, false ); // non-explicit billing
       // timer is paused while loading the contract, so elapsed is larger than billed
-      BOOST_TEST(trace->elapsed.count() > trace->total_cpu_usage_us);
+      // total_cpu_usage_us includes rounded up values for each action, subtract out the rounding which can be more than the difference
+      BOOST_TEST(trace->total_cpu_usage_us.value >= trace->action_traces.size());
+      BOOST_TEST(trace->elapsed.count() >= trace->total_cpu_usage_us - trace->action_traces.size());
    } else {
       // debug builds: sys-vm-oc LLVM 18 compilation can exceed max_transaction_cpu_usage
       // execute with explicit billing so it can take as long as needed
