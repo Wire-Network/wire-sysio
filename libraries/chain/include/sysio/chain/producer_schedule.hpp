@@ -271,26 +271,6 @@ namespace sysio::chain {
       }
    };
 
-   /**
-    * Block Header Extension Compatibility
-    */
-   struct producer_schedule_change_extension : producer_authority_schedule {
-
-      static constexpr uint16_t extension_id() { return 1; }
-      static constexpr bool     enforce_unique() { return true; }
-
-      producer_schedule_change_extension() = default;
-      producer_schedule_change_extension(const producer_schedule_change_extension&) = default;
-      producer_schedule_change_extension( producer_schedule_change_extension&& ) = default;
-
-      producer_schedule_change_extension& operator=(const producer_schedule_change_extension&) = default;
-      producer_schedule_change_extension& operator=(producer_schedule_change_extension&&) = default;
-
-      producer_schedule_change_extension( const producer_authority_schedule& sched )
-      :producer_authority_schedule(sched) {}
-   };
-
-
    inline bool operator == ( const producer_authority& pa, const shared_producer_authority& pb )
    {
       if(pa.producer_name != pb.producer_name) return false;
@@ -314,7 +294,6 @@ FC_REFLECT( sysio::chain::legacy::producer_schedule_type, (version)(producers) )
 FC_REFLECT( sysio::chain::block_signing_authority_v0, (threshold)(keys))
 FC_REFLECT( sysio::chain::producer_authority, (producer_name)(authority) )
 FC_REFLECT( sysio::chain::producer_authority_schedule, (version)(producers) )
-FC_REFLECT_DERIVED( sysio::chain::producer_schedule_change_extension, (sysio::chain::producer_authority_schedule), )
 
 FC_REFLECT( sysio::chain::shared_block_signing_authority_v0, (threshold)(keys))
 FC_REFLECT( sysio::chain::shared_producer_authority, (producer_name)(authority) )
