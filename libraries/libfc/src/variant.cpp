@@ -1006,8 +1006,7 @@ std::string format_string( const std::string& frmt, const variant_object& args, 
                      const auto max_length = minimize ? minimize_sub_max_size : std::numeric_limits<uint64_t>::max();
                      try {
                         // clean_append not needed as to_string is valid utf8
-                        result += json::to_string( val->value(), fc::time_point::maximum(),
-                                                   json::output_formatting::stringify_large_ints_and_doubles, max_length );
+                        result += json::to_string( val->value(), fc::time_point::maximum(), max_length );
                      } catch (...) {
                         replaced = false;
                      }
