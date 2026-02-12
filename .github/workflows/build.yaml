@@ -15,6 +15,10 @@ on:
       - 'plugins/**'
       - 'unittests/**'
       - 'tests/**'
+      - '‎.pre-commit-config.yaml'
+      - 'cmake/**'
+      - 'CMakeLists.txt'
+      - '**/CMakeLists.txt'
   workflow_dispatch:
     inputs:
       override-cdt:
