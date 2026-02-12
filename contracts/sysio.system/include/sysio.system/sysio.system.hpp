@@ -122,6 +122,9 @@ namespace sysiosystem {
       time_point                                               last_claim_time;
       uint16_t                                                 location = 0;
       sysio::block_signing_authority                           producer_authority; // added in version 1.9.0
+      uint32_t  last_block_num       = std::numeric_limits<uint32_t>::max(); // sentinel: no previous block
+      uint16_t  current_round_blocks = 0;   // blocks produced in current (in-progress) round
+      uint16_t  eligible_rounds      = 0;   // completed rounds meeting >= 6 block threshold (per epoch)
 
       uint64_t primary_key()const { return owner.value;                             }
       uint64_t by_rank()const     { return rank; }
@@ -132,7 +135,8 @@ namespace sysiosystem {
          return producer_authority;
       }
 
-      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority) )
+      SYSLIB_SERIALIZE( producer_info, (owner)(producer_key)(rank)(is_active)(url)(unpaid_blocks)(last_claim_time)(location)(producer_authority)
+                         (last_block_num)(current_round_blocks)(eligible_rounds) )
    };
 
    typedef sysio::multi_index< "producers"_n, producer_info,
@@ -543,6 +547,33 @@ namespace sysiosystem {
           */
          [[sysio::action]]
          emissions::node_claim_result viewnodedist(const sysio::name &account_name);
+
+         /**
+          * Initialize the T5 treasury emissions system.
+          *
+          * @param start_time - when T5 epoch-based emissions begin
+          */
+         [[sysio::action]]
+         void initt5(const sysio::time_point_sec& start_time);
+
+         /**
+          * Process the next T5 epoch (permissionless). Distributes treasury
+          * emissions across four categories when the epoch duration has elapsed.
+          */
+         [[sysio::action]]
+         void processepoch();
+
+         /**
+          * Read-only action returning current T5 treasury emission state.
+          */
+         [[sysio::action]]
+         emissions::epoch_info_result viewepoch();
+
+         /**
+          * Read-only action returning all emission constants.
+          */
+         [[sysio::action]]
+         emissions::emission_config_result viewemitcfg();
 
          using init_action = sysio::action_wrapper<"init"_n, &system_contract::init>;
          using setacctram_action = sysio::action_wrapper<"setacctram"_n, &system_contract::setacctram>;
