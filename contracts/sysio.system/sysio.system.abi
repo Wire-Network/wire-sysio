@@ -259,72 +259,118 @@
             ]
         },
         {
+            "name": "emission_config_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t2_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t3_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t1_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "t5_distributable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_floor",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_duration_secs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "decay_numerator",
+                    "type": "int64"
+                },
+                {
+                    "name": "decay_denominator",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_initial_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_max_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_min_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capital_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capex_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "governance_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "producer_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "batch_op_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "active_producer_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "standby_start_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "standby_end_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "blocks_per_round",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "emission_state",
             "base": "",
             "fields": [
                 {
                     "name": "node_rewards_start",
                     "type": "time_point_sec"
-                }
-            ]
-        },
-        {
-            "name": "t5_state",
-            "base": "",
-            "fields": [
-                {
-                    "name": "start_time",
-                    "type": "time_point_sec"
-                },
-                {
-                    "name": "epoch_count",
-                    "type": "uint64"
-                },
-                {
-                    "name": "last_epoch_time",
-                    "type": "time_point_sec"
-                },
-                {
-                    "name": "last_epoch_emission",
-                    "type": "int64"
-                },
-                {
-                    "name": "total_distributed",
-                    "type": "int64"
-                }
-            ]
-        },
-        {
-            "name": "epoch_log",
-            "base": "",
-            "fields": [
-                {
-                    "name": "epoch_num",
-                    "type": "uint64"
-                },
-                {
-                    "name": "timestamp",
-                    "type": "time_point_sec"
-                },
-                {
-                    "name": "total_emission",
-                    "type": "int64"
-                },
-                {
-                    "name": "compute_amount",
-                    "type": "int64"
-                },
-                {
-                    "name": "capital_amount",
-                    "type": "int64"
-                },
-                {
-                    "name": "capex_amount",
-                    "type": "int64"
-                },
-                {
-                    "name": "governance_amount",
-                    "type": "int64"
                 }
             ]
         },
@@ -363,59 +409,37 @@
             ]
         },
         {
-            "name": "initt5",
+            "name": "epoch_log",
             "base": "",
             "fields": [
                 {
-                    "name": "start_time",
+                    "name": "epoch_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "timestamp",
                     "type": "time_point_sec"
+                },
+                {
+                    "name": "total_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capital_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capex_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "governance_amount",
+                    "type": "int64"
                 }
-            ]
-        },
-        {
-            "name": "processepoch",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "viewepoch",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "viewemitcfg",
-            "base": "",
-            "fields": []
-        },
-        {
-            "name": "emission_config_result",
-            "base": "",
-            "fields": [
-                { "name": "t1_allocation", "type": "asset" },
-                { "name": "t2_allocation", "type": "asset" },
-                { "name": "t3_allocation", "type": "asset" },
-                { "name": "t1_duration", "type": "uint32" },
-                { "name": "t2_duration", "type": "uint32" },
-                { "name": "t3_duration", "type": "uint32" },
-                { "name": "min_claimable", "type": "asset" },
-                { "name": "t5_distributable", "type": "int64" },
-                { "name": "t5_floor", "type": "int64" },
-                { "name": "epoch_duration_secs", "type": "uint32" },
-                { "name": "decay_numerator", "type": "int64" },
-                { "name": "decay_denominator", "type": "int64" },
-                { "name": "epoch_initial_emission", "type": "int64" },
-                { "name": "epoch_max_emission", "type": "int64" },
-                { "name": "epoch_min_emission", "type": "int64" },
-                { "name": "compute_bps", "type": "uint16" },
-                { "name": "capital_bps", "type": "uint16" },
-                { "name": "capex_bps", "type": "uint16" },
-                { "name": "governance_bps", "type": "uint16" },
-                { "name": "producer_bps", "type": "uint16" },
-                { "name": "batch_op_bps", "type": "uint16" },
-                { "name": "active_producer_count", "type": "uint32" },
-                { "name": "standby_start_rank", "type": "uint32" },
-                { "name": "standby_end_rank", "type": "uint32" },
-                { "name": "blocks_per_round", "type": "uint32" }
             ]
         },
         {
@@ -515,6 +539,16 @@
                 {
                     "name": "core",
                     "type": "symbol"
+                }
+            ]
+        },
+        {
+            "name": "initt5",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
                 }
             ]
         },
@@ -689,6 +723,11 @@
                     "type": "uint16"
                 }
             ]
+        },
+        {
+            "name": "processepoch",
+            "base": "",
+            "fields": []
         },
         {
             "name": "producer_authority",
@@ -1074,6 +1113,32 @@
             ]
         },
         {
+            "name": "t5_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "unlinkauth",
             "base": "",
             "fields": [
@@ -1130,6 +1195,16 @@
                     "type": "name$"
                 }
             ]
+        },
+        {
+            "name": "viewemitcfg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewepoch",
+            "base": "",
+            "fields": []
         },
         {
             "name": "viewnodedist",
@@ -1314,6 +1389,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "initt5",
+            "type": "initt5",
+            "ricardian_contract": ""
+        },
+        {
             "name": "limitauthchg",
             "type": "limitauthchg",
             "ricardian_contract": ""
@@ -1331,6 +1411,11 @@
         {
             "name": "onblock",
             "type": "onblock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processepoch",
+            "type": "processepoch",
             "ricardian_contract": ""
         },
         {
@@ -1434,18 +1519,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "viewnodedist",
-            "type": "viewnodedist",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "initt5",
-            "type": "initt5",
-            "ricardian_contract": ""
-        },
-        {
-            "name": "processepoch",
-            "type": "processepoch",
+            "name": "viewemitcfg",
+            "type": "viewemitcfg",
             "ricardian_contract": ""
         },
         {
@@ -1454,8 +1529,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "viewemitcfg",
-            "type": "viewemitcfg",
+            "name": "viewnodedist",
+            "type": "viewnodedist",
             "ricardian_contract": ""
         },
         {
@@ -1490,6 +1565,13 @@
         {
             "name": "emissionmngr",
             "type": "emission_state",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "epochlog",
+            "type": "epoch_log",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1537,22 +1619,15 @@
             "key_types": []
         },
         {
-            "name": "t5state",
-            "type": "t5_state",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "epochlog",
-            "type": "epoch_log",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
             "name": "producers",
             "type": "producer_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "t5state",
+            "type": "t5_state",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1592,20 +1667,20 @@
     ],
     "action_results": [
         {
-            "name": "viewnodedist",
-            "result_type": "node_claim_result"
-        },
-        {
-            "name": "getpeerkeys",
-            "result_type": "getpeerkeys_res_t"
+            "name": "viewemitcfg",
+            "result_type": "emission_config_result"
         },
         {
             "name": "viewepoch",
             "result_type": "epoch_info_result"
         },
         {
-            "name": "viewemitcfg",
-            "result_type": "emission_config_result"
+            "name": "viewnodedist",
+            "result_type": "node_claim_result"
+        },
+        {
+            "name": "getpeerkeys",
+            "result_type": "getpeerkeys_res_t"
         }
     ]
 }

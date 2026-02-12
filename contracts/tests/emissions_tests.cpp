@@ -38,26 +38,26 @@ static constexpr uint32_t T1_DURATION       = 12u * SECONDS_PER_MONTH;
 static constexpr uint32_t T2_DURATION       = 24u * SECONDS_PER_MONTH;
 static constexpr uint32_t T3_DURATION       = 36u * SECONDS_PER_MONTH;
 
-// MIN_CLAIMABLE in emissions.cpp: asset(1000000000, WIRE_SYMBOL)
-static constexpr int64_t MIN_CLAIMABLE_AMOUNT = 1'000'000'000;
+// MIN_CLAIMABLE in emissions.cpp: asset(10000000000, WIRE_SYMBOL)
+static constexpr int64_t MIN_CLAIMABLE_AMOUNT = 10'000'000'000;
 
 // In unit tests we use sysio::chain::* types; chain::symbol is not constexpr.
-static const symbol WIRE_SYMBOL = symbol(8, "WIRE");
+static const symbol WIRE_SYMBOL = symbol(9, "WIRE");
 
 // Node Owner total_claimable amounts (in WIRE subunits)
-static const asset T1_ALLOCATION(750000000000000, WIRE_SYMBOL);
-static const asset T2_ALLOCATION(100000000000000, WIRE_SYMBOL);
-static const asset T3_ALLOCATION(10000000000000,   WIRE_SYMBOL);
+static const asset T1_ALLOCATION(7500000000000000, WIRE_SYMBOL);
+static const asset T2_ALLOCATION(1000000000000000, WIRE_SYMBOL);
+static const asset T3_ALLOCATION(100000000000000,   WIRE_SYMBOL);
 
 static constexpr account_name TOKEN = "sysio.token"_n;
 static constexpr uint8_t      NETWORK_GEN = 0;
 
 // Keep as a string because sysio.token table helpers in tests use symbol::from_string("p,SYM")
-static const std::string WIRE_SYM_STR = "8,WIRE";
+static const std::string WIRE_SYM_STR = "9,WIRE";
 
 // Fund sysio heavily so claims never fail due to insufficient token balance.
-static const asset WIRE_MAX_SUPPLY = asset::from_string("1000000000.00000000 WIRE");
-static const asset WIRE_ISSUE_TO_SYSIO = asset::from_string("1000000000.00000000 WIRE");
+static const asset WIRE_MAX_SUPPLY = asset::from_string("1000000000.000000000 WIRE");
+static const asset WIRE_ISSUE_TO_SYSIO = asset::from_string("1000000000.000000000 WIRE");
 
 // Mirror the on-chain return struct layout for viewnodedist.
 // sysio.system::viewnodedist returns a packed node_claim_result.
@@ -675,12 +675,12 @@ private:
 // ---------------------------------------------------------------------------
 // T5 Treasury Emissions mirror constants (keep in sync with emissions.cpp)
 // ---------------------------------------------------------------------------
-static constexpr int64_t T5_DISTRIBUTABLE        = 37'500'000'000'000'000LL;
+static constexpr int64_t T5_DISTRIBUTABLE        = 375'000'000'000'000'000LL;
 static constexpr int64_t DECAY_NUMERATOR         = 9990;
 static constexpr int64_t DECAY_DENOMINATOR       = 10000;
-static constexpr int64_t EPOCH_INITIAL_EMISSION  = 56'315'000'000'000LL;
-static constexpr int64_t EPOCH_MAX_EMISSION      = 300'000'000'000'000LL;
-static constexpr int64_t EPOCH_MIN_EMISSION      = 10'000'000'000'000LL;
+static constexpr int64_t EPOCH_INITIAL_EMISSION  = 563'150'000'000'000LL;
+static constexpr int64_t EPOCH_MAX_EMISSION      = 3'000'000'000'000'000LL;
+static constexpr int64_t EPOCH_MIN_EMISSION      = 100'000'000'000'000LL;
 static constexpr uint16_t COMPUTE_BPS            = 4000;
 static constexpr uint16_t CAPITAL_BPS            = 3000;
 static constexpr uint16_t CAPEX_BPS              = 2000;
@@ -690,7 +690,6 @@ static constexpr uint16_t PRODUCER_BPS           = 7000;
 static constexpr uint32_t T_ACTIVE_PRODUCER_COUNT = 21;
 static constexpr uint32_t T_STANDBY_START_RANK    = 22;
 static constexpr uint32_t T_STANDBY_END_RANK      = 28;
-static constexpr uint32_t T_BLOCKS_PER_ROUND      = T_ACTIVE_PRODUCER_COUNT * 12; // 252
 
 // Helper: compute undistributed producer pool for an emission (when no producers eligible)
 static int64_t compute_producer_pool(int64_t emission) {
@@ -1821,9 +1820,10 @@ BOOST_FIXTURE_TEST_CASE( inprogress_round_finalized, sysio_emissions_tester ) tr
    uint16_t current_blocks = pa_info["current_round_blocks"].as<uint16_t>();
    uint16_t elig_before = pa_info["eligible_rounds"].as<uint16_t>();
 
-   // producera should have in-progress blocks >= 6
+   // producera should have in-progress blocks >= 6 and accumulated eligible rounds
    BOOST_REQUIRE( current_blocks >= 6 );
    BOOST_REQUIRE( current_blocks < 12 );
+   BOOST_REQUIRE( elig_before >= 0 );
 
    const uint32_t start = head_secs() - ONE_EPOCH - 1;
    BOOST_REQUIRE_EQUAL( success(), initt5( config::system_account_name, tpsec(start) ) );

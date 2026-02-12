@@ -7,14 +7,14 @@ namespace sysiosystem {
 
    // - - - - LOCAL EMISSIONS CONSTANTS - - - -
 
-   static constexpr sysio::symbol WIRE_SYMBOL = sysio::symbol("WIRE", 8);
+   static constexpr sysio::symbol WIRE_SYMBOL = sysio::symbol("WIRE", 9);
    // Minimum amount any claim action will allow.
-   static const sysio::asset MIN_CLAIMABLE = sysio::asset(1000000000, WIRE_SYMBOL);
+   static const sysio::asset MIN_CLAIMABLE = sysio::asset(10000000000, WIRE_SYMBOL);
 
    // Node Owner total_claimable amounts (in WIRE subunits)
-   static const sysio::asset T1_ALLOCATION(750000000000000, WIRE_SYMBOL);
-   static const sysio::asset T2_ALLOCATION(100000000000000, WIRE_SYMBOL);
-   static const sysio::asset T3_ALLOCATION(10000000000000,   WIRE_SYMBOL);
+   static const sysio::asset T1_ALLOCATION(7500000000000000, WIRE_SYMBOL);
+   static const sysio::asset T2_ALLOCATION(1000000000000000, WIRE_SYMBOL);
+   static const sysio::asset T3_ALLOCATION(100000000000000,   WIRE_SYMBOL);
 
    // Durations
    static constexpr uint32_t SECONDS_PER_MONTH = 30u * 24u * 60u * 60u;
@@ -24,9 +24,9 @@ namespace sysiosystem {
 
    // - - - - T5 TREASURY EMISSIONS CONSTANTS - - - -
 
-   // Total distributable and floor (8-decimal subunits)
-   static constexpr int64_t T5_DISTRIBUTABLE    = 37'500'000'000'000'000LL; // 375M WIRE
-   static constexpr int64_t T5_FLOOR            = 12'500'000'000'000'000LL; // 125M floor
+   // Total distributable and floor (9-decimal subunits)
+   static constexpr int64_t T5_DISTRIBUTABLE    = 375'000'000'000'000'000LL; // 375M WIRE
+   static constexpr int64_t T5_FLOOR            = 125'000'000'000'000'000LL; // 125M floor
 
    // Epoch duration
    static constexpr uint32_t EPOCH_DURATION_SECS = 24u * 60u * 60u; // 24 hours
@@ -36,11 +36,11 @@ namespace sysiosystem {
    static constexpr int64_t DECAY_DENOMINATOR   = 10000;
 
    // Initial epoch emission (E_0) - calibrated so sum ≈ 375M over 1095 epochs
-   static constexpr int64_t EPOCH_INITIAL_EMISSION = 56'315'000'000'000LL; // ~563,150 WIRE
+   static constexpr int64_t EPOCH_INITIAL_EMISSION = 563'150'000'000'000LL; // ~563,150 WIRE
 
    // Clamps
-   static constexpr int64_t EPOCH_MAX_EMISSION  = 300'000'000'000'000LL;  // 3M WIRE
-   static constexpr int64_t EPOCH_MIN_EMISSION  = 10'000'000'000'000LL;   // 100K WIRE
+   static constexpr int64_t EPOCH_MAX_EMISSION  = 3'000'000'000'000'000LL;  // 3M WIRE
+   static constexpr int64_t EPOCH_MIN_EMISSION  = 100'000'000'000'000LL;    // 100K WIRE
 
    // Category splits (basis points, must sum to 10000)
    static constexpr uint16_t COMPUTE_BPS    = 4000; // 40%
