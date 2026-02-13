@@ -20,7 +20,6 @@ namespace sysio::chain {
 
    using block_header_extension_types = detail::block_header_extension_types<
       protocol_feature_activation,
-      producer_schedule_change_extension,
       s_root_extension,
       finality_extension
    >;
