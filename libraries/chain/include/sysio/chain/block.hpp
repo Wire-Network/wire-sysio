@@ -28,24 +28,6 @@ namespace sysio { namespace chain {
       }
    };
 
-   struct additional_block_signatures_extension : fc::reflect_init {
-      static constexpr uint16_t extension_id() { return 2; }
-      static constexpr bool     enforce_unique() { return true; }
-
-      void reflector_init();
-
-      vector<signature_type> signatures;
-   };
-
-   struct quorum_certificate_extension : fc::reflect_init {
-      static constexpr uint16_t extension_id() { return 3; }
-      static constexpr bool     enforce_unique() { return true; }
-
-      void reflector_init();
-
-      qc_t qc;
-   };
-
    namespace detail {
       template<typename... Ts>
       struct block_extension_types {
@@ -54,9 +36,15 @@ namespace sysio { namespace chain {
       };
    }
 
+   // No block extensions remain. Keep the type infrastructure for future use.
+   // Remove when a block extension is needed
+   struct block_extension_placeholder {
+      static constexpr uint16_t extension_id() { return 0xFFFF; }
+      static constexpr bool     enforce_unique() { return true; }
+   };
+
    using block_extension_types = detail::block_extension_types<
-         additional_block_signatures_extension,
-         quorum_certificate_extension
+         block_extension_placeholder
    >;
 
    using block_extension = block_extension_types::block_extension_t;
@@ -82,6 +70,7 @@ namespace sysio { namespace chain {
       static signed_block_ptr  create_signed_block(mutable_block_ptr&& b) { b->pack(); return signed_block_ptr{std::move(b)}; }
 
       deque<transaction_receipt>   transactions; /// new or generated transactions
+      std::optional<qc_t>          qc;
       extensions_type              block_extensions;
 
       flat_multimap<uint16_t, block_extension> validate_and_extract_extensions()const;
@@ -116,9 +105,8 @@ FC_REFLECT_ENUM( sysio::chain::transaction_receipt::status_enum,
 
 FC_REFLECT(sysio::chain::transaction_receipt_header, (cpu_usage_us) )
 FC_REFLECT_DERIVED(sysio::chain::transaction_receipt, (sysio::chain::transaction_receipt_header), (trx) )
-FC_REFLECT(sysio::chain::additional_block_signatures_extension, (signatures));
-FC_REFLECT(sysio::chain::quorum_certificate_extension, (qc));
-FC_REFLECT_DERIVED(sysio::chain::signed_block, (sysio::chain::signed_block_header), (transactions)(block_extensions) )
+FC_REFLECT(sysio::chain::block_extension_placeholder, );
+FC_REFLECT_DERIVED(sysio::chain::signed_block, (sysio::chain::signed_block_header), (transactions)(qc)(block_extensions) )
 
 namespace fc::raw {
    template <typename Stream>

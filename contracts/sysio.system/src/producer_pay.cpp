@@ -15,11 +15,9 @@ namespace sysiosystem {
       // Deserialize needed fields from block header.
       block_timestamp timestamp;
       name            producer;
-      uint16_t        confirmed;
       checksum256     previous_block_id;
 
-      _ds >> timestamp >> producer >> confirmed >> previous_block_id;
-      (void)confirmed; // Only to suppress warning since confirmed is not used.
+      _ds >> timestamp >> producer >> previous_block_id;
 
       // Add latest block information to blockinfo table.
       add_to_blockinfo_table(previous_block_id, timestamp);

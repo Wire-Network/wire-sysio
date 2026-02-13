@@ -48,8 +48,8 @@ auto create_genesis_block_state() { // block 2
    finalizer_policy_diff new_finalizer_policy_diff = finalizer_policy{}.create_diff(new_finalizer_policy);
    qc_claim_t initial_if_claim { .block_num = 2,
                                  .is_strong_qc = false };
-   emplace_extension(block->header_extensions, finality_extension::extension_id(),
-                     fc::raw::pack(finality_extension{ initial_if_claim, new_finalizer_policy_diff, {} }));
+   block->qc_claim = initial_if_claim;
+   block->new_finalizer_policy_diff = new_finalizer_policy_diff;
 
    producer_authority_schedule schedule = { 0, { producer_authority{block->producer, block_signing_authority_v0{ 1, {{pub_key, 1}} } } } };
    auto genesis = std::make_shared<block_state>();
@@ -75,7 +75,7 @@ auto create_test_block_state(const block_state_ptr& prev) {
    auto pub_key  = sysio::testing::base_tester::get_public_key( block->producer, "active" );
 
    auto sig_digest = digest_type::hash("something");
-   block->producer_signature = priv_key.sign( sig_digest );
+   block->producer_signatures = {priv_key.sign( sig_digest )};
 
    vector<private_key_type> signing_keys;
    signing_keys.emplace_back( std::move( priv_key ) );
@@ -91,7 +91,7 @@ auto create_test_block_state(const block_state_ptr& prev) {
    bhs.header = *block;
    bhs.header.timestamp = timestamp;
    bhs.header.previous = prev->id();
-   bhs.header.schedule_version = block_header::proper_svnn_schedule_version;
+   // schedule_version removed - always Savanna mode
    bhs.block_id = block->calculate_id();
 
    auto bsp = std::make_shared<block_state>(bhs,
