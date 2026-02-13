@@ -66,6 +66,10 @@
   ],
   "overrides": [
     {
+      "name": "boost",
+      "version": "1.89.0#1"
+    },
+    {
       "name": "llvm",
       "version": "18.1.6#5"
     },
