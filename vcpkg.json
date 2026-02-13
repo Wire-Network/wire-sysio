@@ -2,6 +2,8 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
+    "bzip2",
+    "liblzma",
     "zstd",
     "gsl-lite",
     "bls12-381",
