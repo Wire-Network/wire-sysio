@@ -509,8 +509,15 @@ namespace sysio {
 
    private:
       alignas(hardware_destructive_interference_sz)
-      mutable fc::mutex             chain_info_mtx; // protects chain_info_t
+      mutable fc::mutex             chain_info_mtx; // protects chain_info_t (block IDs)
       chain_info_t                  chain_info GUARDED_BY(chain_info_mtx);
+
+      // Atomic scalars for lock-free reads on hot paths (every block/trx/vote receive).
+      // Updated only from main app thread via update_chain_info().
+      alignas(hardware_destructive_interference_sz)
+      std::atomic<uint32_t>         chain_fork_db_root_num{0};
+      std::atomic<uint32_t>         chain_head_num{0};
+      std::atomic<uint32_t>         chain_fork_db_head_num{0};
 
    public:
       void update_chain_info();
@@ -2070,15 +2077,16 @@ namespace sysio {
 
    // call with g_sync locked, called from conn's connection strand
    void sync_manager::request_next_chunk( const connection_ptr& conn ) REQUIRES(sync_mtx) {
-      auto chain_info = my_impl->get_chain_info();
+      uint32_t fork_db_head_num = my_impl->get_fork_db_head_num();
+      uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
 
       fc_dlog( p2p_blk_log, "sync_last_requested_num: {}, sync_next_expected_num: {}, sync_known_fork_db_root_num: {}, sync-fetch-span: {}, fhead: {}, froot: {}",
-               sync_last_requested_num, sync_next_expected_num, sync_known_fork_db_root_num, sync_fetch_span, chain_info.fork_db_head_num, chain_info.fork_db_root_num );
+               sync_last_requested_num, sync_next_expected_num, sync_known_fork_db_root_num, sync_fetch_span, fork_db_head_num, fork_db_root_num );
 
       if (conn) {
          // p2p_high_latency_test.py test depends on this exact log statement.
          peer_ilog(p2p_blk_log, conn, "Catching up with chain, our last req is {}, theirs is {}, next expected {}, fhead {}",
-                   sync_last_requested_num, sync_known_fork_db_root_num, sync_next_expected_num, chain_info.fork_db_head_num);
+                   sync_last_requested_num, sync_known_fork_db_root_num, sync_next_expected_num, fork_db_head_num);
       }
 
       /* ----------
@@ -2090,7 +2098,7 @@ namespace sysio {
 
       auto reset_on_failure = [&]() REQUIRES(sync_mtx) {
          sync_source.reset();
-         sync_known_fork_db_root_num = chain_info.fork_db_root_num;
+         sync_known_fork_db_root_num = fork_db_root_num;
          sync_last_requested_num = 0;
          sync_next_expected_num = std::max( sync_known_fork_db_root_num + 1, sync_next_expected_num );
          // not in sync, but need to be out of lib_catchup for start_sync to work
@@ -2116,7 +2124,7 @@ namespace sysio {
             sync_source = new_sync_source;
             request_sent = true;
             sync_active_time = std::chrono::steady_clock::now();
-            boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, fork_db_head_num=chain_info.fork_db_head_num, fork_db_root_num=chain_info.fork_db_root_num]() {
+            boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, fork_db_head_num, fork_db_root_num]() {
                peer_ilog( p2p_blk_log, new_sync_source, "requesting range {} to {}, fhead {}, froot {}", start, end, fork_db_head_num, fork_db_root_num );
                new_sync_source->request_sync_blocks( start, end );
             } );
@@ -2205,10 +2213,11 @@ namespace sysio {
          sync_known_fork_db_root_num = target;
       }
 
-      auto chain_info = my_impl->get_chain_info();
-      if( !is_sync_required( chain_info.fork_db_head_num ) || target <= chain_info.fork_db_root_num ) {
+      uint32_t fork_db_head_num = my_impl->get_fork_db_head_num();
+      uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
+      if( !is_sync_required( fork_db_head_num ) || target <= fork_db_root_num ) {
          peer_dlog( p2p_blk_log, c, "We are already caught up, my irr = {}, fhead = {}, target = {}",
-                  chain_info.fork_db_root_num, chain_info.fork_db_head_num, target );
+                  fork_db_root_num, fork_db_head_num, target );
          c->send_handshake(); // let peer know it is not syncing from us
          return;
       }
@@ -2219,7 +2228,7 @@ namespace sysio {
                    stage_str(current_sync_state), sync_next_expected_num);
          set_state( lib_catchup );
          sync_last_requested_num = 0;
-         sync_next_expected_num = chain_info.fork_db_root_num + 1;
+         sync_next_expected_num = fork_db_root_num + 1;
          request_next_chunk( c );
       } else if (sync_last_requested_num > 0 && is_sync_request_ahead_allowed(sync_next_expected_num-1)) {
          request_next_chunk();
@@ -3362,6 +3371,10 @@ namespace sysio {
          chain_info.fork_db_head_id = cc.fork_db_head().id();
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
+      // Update atomic scalars for lock-free reads on hot paths
+      chain_fork_db_root_num.store(fork_db_root_num, std::memory_order_release);
+      chain_head_num.store(head_num, std::memory_order_release);
+      chain_fork_db_head_num.store(fork_db_head_num, std::memory_order_release);
       head_block_time = head.block_time();
       fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
@@ -3381,6 +3394,10 @@ namespace sysio {
          chain_info.fork_db_head_id = cc.fork_db_head().id();
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
+      // Update atomic scalars for lock-free reads on hot paths
+      chain_fork_db_root_num.store(fork_db_root_num, std::memory_order_release);
+      chain_head_num.store(head_num, std::memory_order_release);
+      chain_fork_db_head_num.store(fork_db_head_num, std::memory_order_release);
       head_block_time = head.block_time();
       fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
@@ -3391,18 +3408,15 @@ namespace sysio {
    }
 
    uint32_t net_plugin_impl::get_fork_db_root_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.fork_db_root_num;
+      return chain_fork_db_root_num.load(std::memory_order_acquire);
    }
 
    uint32_t net_plugin_impl::get_chain_head_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.head_num;
+      return chain_head_num.load(std::memory_order_acquire);
    }
 
    uint32_t net_plugin_impl::get_fork_db_head_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.fork_db_head_num;
+      return chain_fork_db_head_num.load(std::memory_order_acquire);
    }
 
    bool connection::is_valid( const handshake_message& msg ) const {
