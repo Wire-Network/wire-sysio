@@ -608,7 +608,7 @@ namespace sysio {
          fc::lock_guard g( _mtx );
          _write_queue.clear();
          _sync_write_queue.clear();
-         _write_queue_size = 0;
+         _write_queue_size.store(0, std::memory_order_relaxed);
          _trx_write_queue.clear();
          _out_queue.clear();
       }
@@ -618,7 +618,7 @@ namespace sysio {
          _write_queue.clear();
          _sync_write_queue.clear();
          _trx_write_queue.clear();
-         _write_queue_size = 0;
+         _write_queue_size.store(0, std::memory_order_relaxed);
       }
 
       void clear_out_queue(boost::system::error_code ec, std::size_t number_of_bytes_written) {
@@ -628,8 +628,7 @@ namespace sysio {
       }
 
       uint32_t write_queue_size() const {
-         fc::lock_guard g( _mtx );
-         return _write_queue_size;
+         return _write_queue_size.load(std::memory_order_relaxed);
       }
 
       // called from connection strand
@@ -637,7 +636,7 @@ namespace sysio {
          fc::unique_lock g( _mtx );
          // if out_queue is not empty then async_write is in progress
          const bool async_write_in_progress = !_out_queue.empty();
-         const bool ready = !async_write_in_progress && _write_queue_size != 0;
+         const bool ready = !async_write_in_progress && _write_queue_size.load(std::memory_order_relaxed) != 0;
          g.unlock();
          if (async_write_in_progress) {
             fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
@@ -659,8 +658,8 @@ namespace sysio {
          } else {
             _write_queue.emplace_back( buff, std::move(callback) );
          }
-         _write_queue_size += buff->size();
-         if( _write_queue_size > 2 * def_max_write_queue_size ) {
+         auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
+         if( new_size > 2 * def_max_write_queue_size ) {
             return false;
          }
          return true;
@@ -674,7 +673,7 @@ namespace sysio {
             fill_out_buffer( bufs, _write_queue );
          } else {
             fill_out_buffer( bufs, _trx_write_queue );
-            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size == 0);
+            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size.load(std::memory_order_relaxed) == 0);
          }
       }
 
@@ -685,7 +684,7 @@ namespace sysio {
          while ( !w_queue.empty() ) {
             auto& m = w_queue.front();
             bufs.emplace_back( m.buff->data(), m.buff->size() );
-            _write_queue_size -= m.buff->size();
+            _write_queue_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
             _out_queue.emplace_back( m );
             w_queue.pop_front();
          }
@@ -704,8 +703,10 @@ namespace sysio {
       };
 
       alignas(hardware_destructive_interference_sz)
+      std::atomic<uint32_t> _write_queue_size{0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
+
+      alignas(hardware_destructive_interference_sz)
       mutable fc::mutex   _mtx;
-      uint32_t            _write_queue_size GUARDED_BY(_mtx) {0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
       deque<queued_write> _write_queue      GUARDED_BY(_mtx); // queued messages, all messages except sync & trxs
       deque<queued_write> _sync_write_queue GUARDED_BY(_mtx); // sync_write_queue blocks will be sent first
       deque<queued_write> _trx_write_queue  GUARDED_BY(_mtx); // queued trx messages, trx_write_queue will be sent last
