@@ -2838,14 +2838,12 @@ namespace sysio {
    // called from any thread
    void dispatch_manager::bcast_transaction(const packed_transaction_ptr& trx) {
       trx_buffer_factory buff_factory;
-      std::optional<connection_id_set> trx_connections;
+      const auto trx_connections = peer_connections(trx->id());
       my_impl->connections.for_each_connection( [&]( const connection_ptr& cp ) {
          if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
-         if (!trx_connections)
-            trx_connections = peer_connections(trx->id());
-         if( trx_connections->contains(cp->connection_id) ) {
+         if( trx_connections.contains(cp->connection_id) ) {
             return;
          }
 
