@@ -970,7 +970,7 @@ try:
         for headerExtension in headerExtensions:
             assert(headerExtension is not None)
             assert(len(headerExtension) == 2)
-            STATE_ROOT_HEADER_EXTENSION_ID=2 # the extension id that indicates this header extension is a state root
+            STATE_ROOT_HEADER_EXTENSION_ID=1 # the extension id that indicates this header extension is a state root
             ID_SLOT=0
             DATA_SLOT=1
             if headerExtension[ID_SLOT] != STATE_ROOT_HEADER_EXTENSION_ID:

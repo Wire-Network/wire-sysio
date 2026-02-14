@@ -314,7 +314,7 @@ class PluginHttpTest(unittest.TestCase):
         # get_block with valid parameter
         payload = {"block_num_or_id":1}
         ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertTrue("action_mroot" in ret_json["payload"])
+        self.assertTrue("finality_mroot" in ret_json["payload"])
 
         # get_block_header with empty parameter
         command = "get_block_header"
