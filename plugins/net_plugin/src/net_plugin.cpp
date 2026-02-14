@@ -31,6 +31,7 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/post.hpp>
+#include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/key.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
 
@@ -128,7 +129,7 @@ namespace sysio {
    typedef multi_index_container<
       node_transaction_state,
       indexed_by<
-         ordered_unique<
+         hashed_unique<
             tag<by_id>,
             member<node_transaction_state, transaction_id_type, &node_transaction_state::id>
          >,
