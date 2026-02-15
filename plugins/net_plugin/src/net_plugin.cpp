@@ -859,8 +859,8 @@ namespace sysio {
       string                  local_endpoint_ip;
       string                  local_endpoint_port;
       string                  short_agent_name;
-      // kept in sync with last_handshake_recv.fork_db_root_num, only accessed from connection strand
-      uint32_t                peer_fork_db_root_num = 0;
+      // kept in sync with last_handshake_recv.fork_db_root_num
+      std::atomic<uint32_t>   peer_fork_db_root_num{0};
 
       std::atomic<uint32_t>   sync_ordinal{0};
       // when syncing from a peer, the last block expected of the current range
@@ -1477,7 +1477,7 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
-      peer_fork_db_root_num = 0;
+      peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
       sent_handshake_count = 0;
@@ -1528,7 +1528,7 @@ namespace sysio {
                        block_header::num_from_id(last_handshake_recv.fork_db_head_id), last_handshake_recv.fork_db_head_id );
          }
       }
-      const auto fork_db_root_num = peer_fork_db_root_num;
+      const auto fork_db_root_num = peer_fork_db_root_num.load( std::memory_order_relaxed );
       if( fork_db_root_num == 0 ) return; // if fork_db_root_id is null (we have not received handshake or reset)
 
       auto msg_head_num = block_header::num_from_id(msg_head_id);
@@ -1999,17 +1999,20 @@ namespace sysio {
       }
       if( !c ) return;
       if( !closing ) {
-         if( c->peer_fork_db_root_num > sync_known_fork_db_root_num ) {
-            sync_known_fork_db_root_num = c->peer_fork_db_root_num;
+         uint32_t c_froot = c->peer_fork_db_root_num.load( std::memory_order_relaxed );
+         if( c_froot > sync_known_fork_db_root_num ) {
+            sync_known_fork_db_root_num = c_froot;
          }
       } else {
          // Closing connection, therefore its view of fork_db_root can no longer be considered as we will no longer be connected.
          // Determine current fork_db_root of remaining peers as our sync_known_fork_db_root_num.
          uint32_t highest_fork_db_root_num = 0;
          my_impl->connections.for_each_block_connection( [&highest_fork_db_root_num]( const auto& cc ) {
-            fc::lock_guard g_conn( cc->conn_mtx );
-            if( cc->current() && cc->last_handshake_recv.fork_db_root_num > highest_fork_db_root_num ) {
-               highest_fork_db_root_num = cc->last_handshake_recv.fork_db_root_num;
+            if( cc->current() ) {
+               uint32_t froot = cc->peer_fork_db_root_num.load( std::memory_order_relaxed );
+               if( froot > highest_fork_db_root_num ) {
+                  highest_fork_db_root_num = froot;
+               }
             }
          } );
          sync_known_fork_db_root_num = highest_fork_db_root_num;
@@ -2466,7 +2469,7 @@ namespace sysio {
          }
       } else if (msg.known_blocks.mode == last_irr_catch_up) {
          {
-            c->peer_fork_db_root_num = msg.known_trx.pending;
+            c->peer_fork_db_root_num.store( msg.known_trx.pending, std::memory_order_relaxed );
             fc::lock_guard g_conn( c->conn_mtx );
             c->last_handshake_recv.fork_db_root_num = msg.known_trx.pending;
          }
@@ -2814,7 +2817,7 @@ namespace sysio {
 
          boost::asio::post(cp->strand, [cp, bnum, sb]() {
             cp->latest_blk_time = std::chrono::steady_clock::now();
-            bool has_block = cp->peer_fork_db_root_num >= bnum;
+            bool has_block = cp->peer_fork_db_root_num.load( std::memory_order_relaxed ) >= bnum;
             if( !has_block ) {
                peer_dlog( p2p_blk_log, cp, "bcast block {}", bnum );
                cp->enqueue_buffer( msg_type_t::signed_block, bnum, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
@@ -3473,7 +3476,7 @@ namespace sysio {
       peer_dlog( p2p_msg_log, this, "received handshake gen {}, froot {}, fhead {}",
                  msg.generation, msg.fork_db_root_num, msg.fork_db_head_num );
 
-      peer_fork_db_root_num = msg.fork_db_root_num;
+      peer_fork_db_root_num.store( msg.fork_db_root_num, std::memory_order_relaxed );
       peer_fork_db_head_block_num = msg.fork_db_head_num;
       fc::unique_lock g_conn( conn_mtx );
       last_handshake_recv = msg;
