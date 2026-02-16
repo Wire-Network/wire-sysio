@@ -34,6 +34,7 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/key.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
+#include <boost/container/small_vector.hpp>
 
 #if __has_include(<sys/ioctl.h>)
 #include <sys/ioctl.h>
@@ -119,6 +120,7 @@ namespace sysio {
 
    using connection_id_t = uint32_t;
    using connection_id_set = boost::unordered_flat_set<connection_id_t>;
+   using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
    struct node_transaction_state {
       transaction_id_type        id;
       time_point_sec             expires;           // time after which this may be purged.
@@ -263,7 +265,7 @@ namespace sysio {
       };
       add_peer_txn_info add_peer_txn(const transaction_id_type& id, const time_point_sec& trx_expires, connection& c);
       size_t add_peer_txn_notice(const transaction_id_type& id, connection& c);
-      connection_id_set peer_connections(const transaction_id_type& id) const;
+      connection_id_vector peer_connections(const transaction_id_type& id) const;
       void expire_txns();
 
       void bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg );
@@ -2744,11 +2746,12 @@ namespace sysio {
       return c.trx_entries_size;
    }
 
-   connection_id_set dispatch_manager::peer_connections(const transaction_id_type& id) const {
+   connection_id_vector
+   dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
       auto& id_idx = local_txns.get<by_id>();
       if (auto tptr = id_idx.find(id); tptr != id_idx.end()) {
-         return tptr->connection_ids;
+         return {tptr->connection_ids.begin(), tptr->connection_ids.end()};
       }
       return {};
    }
@@ -2844,7 +2847,7 @@ namespace sysio {
          if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
-         if( trx_connections.contains(cp->connection_id) ) {
+         if( std::find(trx_connections.begin(), trx_connections.end(), cp->connection_id) != trx_connections.end() ) {
             return;
          }
 
