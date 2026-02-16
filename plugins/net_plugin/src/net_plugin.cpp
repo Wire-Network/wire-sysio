@@ -5,6 +5,7 @@
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/net_plugin/trx_dedup.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/controller.hpp>
@@ -266,6 +267,7 @@ namespace sysio {
       add_peer_txn_info add_peer_txn(const transaction_id_type& id, const time_point_sec& trx_expires, connection& c);
       size_t add_peer_txn_notice(const transaction_id_type& id, connection& c);
       connection_id_vector peer_connections(const transaction_id_type& id) const;
+      bool have_txn(const transaction_id_type& id) const;
       void expire_txns();
 
       void bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg );
@@ -954,6 +956,7 @@ namespace sysio {
 
       bool process_next_block_message(uint32_t message_length);
       bool process_next_trx_message(uint32_t message_length);
+      bool try_early_dedup(uint32_t message_length);
       bool process_next_trx_notice_message(uint32_t message_length);
       bool process_next_vote_message(uint32_t message_length);
       void update_endpoints(const tcp::endpoint& endpoint = tcp::endpoint());
@@ -2784,6 +2787,12 @@ namespace sysio {
       return c.trx_entries_size;
    }
 
+   bool dispatch_manager::have_txn(const transaction_id_type& id) const {
+      fc::lock_guard g(local_txns_mtx);
+      auto tptr = local_txns.get<by_id>().find(id);
+      return tptr != local_txns.get<by_id>().end() && tptr->have_trx;
+   }
+
    connection_id_vector
    dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
@@ -3261,6 +3270,25 @@ namespace sysio {
    }
 
    // called from connection strand
+   // Returns true if message was consumed as a duplicate (zero heap allocations).
+   // Returns false to proceed with the full unpack path.
+   bool connection::try_early_dedup(uint32_t message_length) {
+      auto peek_ds = pending_message_buffer.create_peek_datastream();
+      auto result = parse_trx_dedup_info(peek_ds);
+      if (!result)
+         return false; // couldn't parse or variable-size sigs/compression — use full path
+
+      auto& [trx_id, expiration] = *result;
+      if (!my_impl->dispatcher.have_txn(trx_id))
+         return false; // new transaction, need full path
+
+      // Duplicate confirmed — consume message with zero allocations
+      peer_dlog(p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id);
+      pending_message_buffer.advance_read_ptr(message_length);
+      return true;
+   }
+
+   // called from connection strand
    bool connection::process_next_trx_message(uint32_t message_length) {
       if( !my_impl->p2p_accept_transactions ) {
          peer_dlog( p2p_trx_log, this, "p2p-accept-transaction=false - dropping trx" );
@@ -3270,6 +3298,11 @@ namespace sysio {
       if (my_impl->sync_master->syncing_from_peer()) {
          peer_dlog(p2p_trx_log, this, "syncing, dropping trx");
          pending_message_buffer.advance_read_ptr( message_length );
+         return true;
+      }
+
+      // Fast path: check for duplicate without allocating packed_transaction
+      if (try_early_dedup(message_length)) {
          return true;
       }
 
