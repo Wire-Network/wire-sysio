@@ -621,12 +621,21 @@ namespace sysio {
          _sync_write_queue.clear();
          _trx_write_queue.clear();
          _write_queue_size.store(0, std::memory_order_relaxed);
+         _write_drain_pending.store(false, std::memory_order_relaxed);
       }
 
       void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
 
       uint32_t write_queue_size() const {
          return _write_queue_size.load(std::memory_order_relaxed);
+      }
+
+      // Returns true if caller wins the drain race; false if a drain is already pending.
+      bool try_claim_drain() {
+         return !_write_drain_pending.exchange(true, std::memory_order_acq_rel);
+      }
+      void release_drain() {
+         _write_drain_pending.store(false, std::memory_order_release);
       }
 
       // called from connection strand
@@ -643,12 +652,13 @@ namespace sysio {
       }
 
       enum class queue_t { block_sync, general };
-      bool add_write_queue(msg_type_t net_msg,
-                           queue_t queue,
-                           const send_buffer_type& buff,
-                           connection_id_t conn_id,
-                           go_away_reason close_after_send,
-                           std::optional<block_num_type> block_num) {
+      struct add_result { bool ok; bool needs_drain; };
+      add_result add_write_queue(msg_type_t net_msg,
+                                 queue_t queue,
+                                 const send_buffer_type& buff,
+                                 connection_id_t conn_id,
+                                 go_away_reason close_after_send,
+                                 std::optional<block_num_type> block_num) {
          fc::lock_guard g( _mtx );
          if( net_msg == msg_type_t::packed_transaction || net_msg == msg_type_t::transaction_notice_message ) {
             _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
@@ -658,10 +668,7 @@ namespace sysio {
             _write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          }
          auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
-         if( new_size > 2 * def_max_write_queue_size ) {
-            return false;
-         }
-         return true;
+         return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
       }
 
       void fill_out_buffer( std::vector<boost::asio::const_buffer>& bufs ) {
@@ -700,6 +707,7 @@ namespace sysio {
 
       alignas(hardware_destructive_interference_sz)
       std::atomic<uint32_t> _write_queue_size{0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
+      std::atomic<bool>     _write_drain_pending{false}; // coalesces queue_write_mt drain posts
 
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex   _mtx;
@@ -1026,6 +1034,11 @@ namespace sysio {
                        const send_buffer_type& buff,
                        go_away_reason close_after_send);
       void do_queue_write(std::optional<block_num_type> block_num);
+      // called from any thread; adds to write queue and conditionally posts a drain
+      void queue_write_mt(msg_type_t net_msg,
+                          queued_buffer::queue_t queue,
+                          const send_buffer_type& buff,
+                          go_away_reason close_after_send);
       void log_send_buffer_stats() const;
 
       bool is_valid( const handshake_message& msg ) const;
@@ -1716,12 +1729,37 @@ namespace sysio {
                                 queued_buffer::queue_t queue,
                                 const send_buffer_type& buff,
                                 go_away_reason close_after_send) {
-      if( !buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, block_num )) {
+      auto result = buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, block_num );
+      if( !result.ok ) {
          peer_wlog( p2p_conn_log, this, "write_queue full {} bytes, giving up on connection", buffer_queue.write_queue_size() );
          close();
          return;
       }
       do_queue_write(block_num);
+   }
+
+   // called from any thread; adds to write queue and conditionally posts a drain
+   void connection::queue_write_mt(msg_type_t net_msg,
+                                   queued_buffer::queue_t queue,
+                                   const send_buffer_type& buff,
+                                   go_away_reason close_after_send) {
+      auto result = buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, std::nullopt );
+      if( !result.ok ) {
+         boost::asio::post(strand, [c = shared_from_this()]() {
+            peer_wlog( p2p_conn_log, c, "write_queue full {} bytes, giving up on connection",
+                       c->buffer_queue.write_queue_size() );
+            c->close();
+         });
+         return;
+      }
+      if( result.needs_drain ) {
+         if( buffer_queue.try_claim_drain() ) {
+            boost::asio::post(strand, [c = shared_from_this()]() {
+               c->buffer_queue.release_drain();
+               c->do_queue_write(std::nullopt);
+            });
+         }
+      }
    }
 
    // called from connection strand
@@ -2827,14 +2865,12 @@ namespace sysio {
    }
 
    void dispatch_manager::bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg ) {
-      my_impl->connections.for_each_block_connection( [exclude_peer, msg]( auto& cp ) {
+      my_impl->connections.for_each_block_connection( [exclude_peer, &msg]( auto& cp ) {
          if( !cp->current() ) return true;
          if( cp->connection_id == exclude_peer ) return true;
          if (cp->protocol_version < proto_version_t::savanna) return true;
-         boost::asio::post(cp->strand, [cp, msg]() {
-            peer_dlog(vote_logger, cp, "sending vote msg");
-            cp->enqueue_buffer( msg_type_t::vote_message, std::nullopt, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
-         });
+         peer_dlog(vote_logger, cp, "sending vote msg");
+         cp->queue_write_mt( msg_type_t::vote_message, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
          return true;
       } );
    }
@@ -2853,9 +2889,7 @@ namespace sysio {
 
          const send_buffer_type& sb = buff_factory.get_send_buffer( trx );
          fc_dlog( p2p_trx_log, "sending trx: {}, to connection - {}, size {}", trx->id(), cp->connection_id, sb->size() );
-         boost::asio::post(cp->strand, [cp, sb]() {
-            cp->enqueue_buffer( msg_type_t::packed_transaction, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
-         } );
+         cp->queue_write_mt( msg_type_t::packed_transaction, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
       } );
    }
 
@@ -2869,9 +2903,7 @@ namespace sysio {
 
          const send_buffer_type& sb = buff_factory.get_notice_send_buffer( trx );
          fc_dlog( p2p_trx_log, "sending trx notice: {}, to connection - {}", trx->id(), cp->connection_id );
-         boost::asio::post(cp->strand, [cp, sb]() {
-            cp->enqueue_buffer( msg_type_t::transaction_notice_message, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
-         } );
+         cp->queue_write_mt( msg_type_t::transaction_notice_message, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
       } );
    }
 
