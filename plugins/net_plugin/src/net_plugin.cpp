@@ -621,11 +621,7 @@ namespace sysio {
          _write_queue_size.store(0, std::memory_order_relaxed);
       }
 
-      void clear_out_queue(boost::system::error_code ec, std::size_t number_of_bytes_written) {
-         fc::lock_guard g( _mtx );
-         out_callback( ec, number_of_bytes_written );
-         _out_queue.clear();
-      }
+      void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
 
       uint32_t write_queue_size() const {
          return _write_queue_size.load(std::memory_order_relaxed);
@@ -645,18 +641,19 @@ namespace sysio {
       }
 
       enum class queue_t { block_sync, general };
-      // @param callback must not callback into queued_buffer
       bool add_write_queue(msg_type_t net_msg,
                            queue_t queue,
                            const send_buffer_type& buff,
-                           std::function<void(boost::system::error_code, std::size_t)> callback) {
+                           connection_id_t conn_id,
+                           go_away_reason close_after_send,
+                           std::optional<block_num_type> block_num) {
          fc::lock_guard g( _mtx );
          if( net_msg == msg_type_t::packed_transaction || net_msg == msg_type_t::transaction_notice_message ) {
-            _trx_write_queue.emplace_back( buff, std::move(callback) );
+            _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else if (queue == queue_t::block_sync) {
-            _sync_write_queue.emplace_back( buff, std::move(callback) );
+            _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else {
-            _write_queue.emplace_back( buff, std::move(callback) );
+            _write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          }
          auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
          if( new_size > 2 * def_max_write_queue_size ) {
@@ -690,16 +687,13 @@ namespace sysio {
          }
       }
 
-      void out_callback( boost::system::error_code ec, std::size_t number_of_bytes_written ) REQUIRES(_mtx) {
-         for( auto& m : _out_queue ) {
-            m.callback( ec, number_of_bytes_written );
-         }
-      }
-
    private:
       struct queued_write {
-         send_buffer_type buff;
-         std::function<void( boost::system::error_code, std::size_t )> callback;
+         send_buffer_type             buff;
+         connection_id_t              connection_id{0};
+         go_away_reason               close_after_send{go_away_reason::no_reason};
+         msg_type_t                   net_msg{};
+         std::optional<block_num_type> block_num;
       };
 
       alignas(hardware_destructive_interference_sz)
@@ -1028,7 +1022,7 @@ namespace sysio {
                        std::optional<block_num_type> block_num,
                        queued_buffer::queue_t queue,
                        const send_buffer_type& buff,
-                       std::function<void(boost::system::error_code, std::size_t)> callback);
+                       go_away_reason close_after_send);
       void do_queue_write(std::optional<block_num_type> block_num);
       void log_send_buffer_stats() const;
 
@@ -1097,6 +1091,26 @@ namespace sysio {
          return !last_handshake_recv.p2p_address.empty();
       }
    }; // class connection
+
+   void queued_buffer::clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written) {
+      fc::lock_guard g( _mtx );
+      for( auto& m : _out_queue ) {
+         if( ec ) {
+            if( ec != boost::asio::error::operation_aborted && ec != boost::asio::error::connection_reset && conn->socket_is_open() ) {
+               fc_elog( p2p_conn_log, "Connection - {} - send failed with: {}", m.connection_id, ec.message() );
+            }
+         } else {
+            if( m.net_msg == msg_type_t::signed_block && m.block_num )
+               fc_dlog( p2p_conn_log, "Connection - {} - done sending block {}, bytes {}", m.connection_id, *m.block_num, number_of_bytes_written );
+            if( m.close_after_send != go_away_reason::no_reason ) {
+               fc_ilog( p2p_conn_log, "sent a go away message: {}, closing connection {}",
+                        reason_str( m.close_after_send ), m.connection_id );
+               conn->close();
+            }
+         }
+      }
+      _out_queue.clear();
+   }
 
    const string connection::unknown = "<unknown>";
 
@@ -1699,8 +1713,8 @@ namespace sysio {
                                 std::optional<block_num_type> block_num,
                                 queued_buffer::queue_t queue,
                                 const send_buffer_type& buff,
-                                std::function<void(boost::system::error_code, std::size_t)> callback) {
-      if( !buffer_queue.add_write_queue( net_msg, queue, buff, std::move(callback) )) {
+                                go_away_reason close_after_send) {
+      if( !buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, block_num )) {
          peer_wlog( p2p_conn_log, this, "write_queue full {} bytes, giving up on connection", buffer_queue.write_queue_size() );
          close();
          return;
@@ -1733,13 +1747,13 @@ namespace sysio {
             // May have closed connection and cleared buffer_queue
             if (!c->socket->is_open() && c->socket_is_open()) { // if socket_open then close not called
                peer_ilog(p2p_conn_log, c, "async write socket closed before callback");
-               c->buffer_queue.clear_out_queue(ec, w);
+               c->buffer_queue.clear_out_queue(c.get(), ec, w);
                c->close();
                return;
             }
             if (socket != c->socket ) { // different socket, c must have created a new socket, make sure previous is closed
                peer_ilog( p2p_conn_log, c, "async write socket changed before callback");
-               c->buffer_queue.clear_out_queue(ec, w);
+               c->buffer_queue.clear_out_queue(c.get(), ec, w);
                boost::system::error_code ignore_ec;
                socket->shutdown( tcp::socket::shutdown_both, ignore_ec );
                socket->close( ignore_ec );
@@ -1758,7 +1772,7 @@ namespace sysio {
             c->bytes_sent += w;
             c->last_bytes_sent = c->get_time();
 
-            c->buffer_queue.clear_out_queue(ec, w);
+            c->buffer_queue.clear_out_queue(c.get(), ec, w);
 
             c->enqueue_sync_block();
             c->do_queue_write(std::nullopt);
@@ -1887,24 +1901,7 @@ namespace sysio {
                                     const send_buffer_type& send_buffer,
                                     go_away_reason close_after_send)
    {
-      connection_ptr self = shared_from_this();
-      queue_write(net_msg, block_num, queue, send_buffer,
-            [conn{std::move(self)}, close_after_send, net_msg, block_num](boost::system::error_code ec, std::size_t s) {
-                        if (ec) {
-                           if (ec != boost::asio::error::operation_aborted && ec != boost::asio::error::connection_reset && conn->socket_is_open()) {
-                              fc_elog(p2p_conn_log, "Connection - {} - send failed with: {}", conn->connection_id, ec.message());
-                           }
-                           return;
-                        }
-                        if (net_msg == msg_type_t::signed_block && block_num)
-                           fc_dlog(p2p_conn_log, "Connection - {} - done sending block {}", conn->connection_id, *block_num);
-                        if (close_after_send != go_away_reason::no_reason) {
-                           fc_ilog( p2p_conn_log, "sent a go away message: {}, closing connection {}",
-                                    reason_str(close_after_send), conn->connection_id );
-                           conn->close();
-                           return;
-                        }
-                  });
+      queue_write(net_msg, block_num, queue, send_buffer, close_after_send);
    }
 
    // thread safe
