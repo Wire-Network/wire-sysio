@@ -4459,7 +4459,7 @@ namespace sysio {
             vote_buffer_factory buff_factory;
             const auto& send_buffer = buff_factory.get_send_buffer( *msg );
 
-            dispatcher.add_vote_id( compute_vote_id(*msg), block_header::num_from_id(msg->block_id) );
+            dispatcher.add_vote_id( buff_factory.get_vote_id(), block_header::num_from_id(msg->block_id) );
             dispatcher.bcast_vote_msg( exclude_peer, send_buffer );
       });
    }
