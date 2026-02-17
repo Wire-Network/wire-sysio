@@ -265,6 +265,7 @@ namespace sysio {
       };
       add_peer_txn_info add_peer_txn(const transaction_id_type& id, const time_point_sec& trx_expires, connection& c);
       size_t add_peer_txn_notice(const transaction_id_type& id, connection& c);
+      bool have_txn(const transaction_id_type& id) const;
       connection_id_vector peer_connections(const transaction_id_type& id) const;
       void expire_txns();
 
@@ -660,7 +661,7 @@ namespace sysio {
                                  go_away_reason close_after_send,
                                  std::optional<block_num_type> block_num) {
          fc::lock_guard g( _mtx );
-         if( net_msg == msg_type_t::packed_transaction || net_msg == msg_type_t::transaction_notice_message ) {
+         if( net_msg == msg_type_t::transaction_message || net_msg == msg_type_t::transaction_notice_message ) {
             _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else if (queue == queue_t::block_sync) {
             _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
@@ -1066,7 +1067,7 @@ namespace sysio {
       void handle_message( const sync_request_message& msg );
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
       void handle_message( const block_id_type& id, signed_block_ptr ptr );
-      void handle_message( const packed_transaction& msg ) = delete; // packed_transaction_ptr overload used instead
+      void handle_message( const transaction_message& msg ) = delete; // handled via process_next_trx_message
       void handle_message( const packed_transaction_ptr& trx );
       void handle_message( const vote_message_ptr& msg );
       void handle_message( const vote_message& msg ) = delete; // vote_message_ptr overload used instead
@@ -2784,6 +2785,13 @@ namespace sysio {
       return c.trx_entries_size;
    }
 
+   bool dispatch_manager::have_txn(const transaction_id_type& id) const {
+      fc::lock_guard g( local_txns_mtx );
+      auto& id_idx = local_txns.get<by_id>();
+      auto tptr = id_idx.find( id );
+      return tptr != id_idx.end() && tptr->have_trx;
+   }
+
    connection_id_vector
    dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
@@ -2889,7 +2897,7 @@ namespace sysio {
 
          const send_buffer_type& sb = buff_factory.get_send_buffer( trx );
          fc_dlog( p2p_trx_log, "sending trx: {}, to connection - {}, size {}", trx->id(), cp->connection_id, sb->size() );
-         cp->queue_write_mt( msg_type_t::packed_transaction, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
+         cp->queue_write_mt( msg_type_t::transaction_message, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
       } );
    }
 
@@ -3176,7 +3184,7 @@ namespace sysio {
          if( net_msg == msg_type_t::signed_block ) {
             latest_blk_time = now;
             return process_next_block_message( message_length );
-         } else if( net_msg == msg_type_t::packed_transaction ) {
+         } else if( net_msg == msg_type_t::transaction_message ) {
             return process_next_trx_message( message_length );
          } else if( net_msg == msg_type_t::transaction_notice_message ) {
             return process_next_trx_notice_message( message_length );
@@ -3273,15 +3281,37 @@ namespace sysio {
          return true;
       }
 
+      // Early dedup: check if we already have this transaction — zero heap allocations on the duplicate path.
+      // Peek the transaction ID (first field after variant which) for zero-allocation dedup.
+      // Wire format: [which (varint)][transaction_id (32 bytes)][packed_transaction ...]
+      auto peek_ds = pending_message_buffer.create_peek_datastream();
+      unsigned_int which{};
+      fc::raw::unpack( peek_ds, which );
+      transaction_id_type trx_id;
+      fc::raw::unpack( peek_ds, trx_id );
+      if( my_impl->dispatcher.have_txn( trx_id ) ) {
+         peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
+         pending_message_buffer.advance_read_ptr( message_length );
+         return true;
+      }
+
       const uint32_t trx_in_progress_sz = this->trx_in_progress_size.load();
 
       auto now = fc::time_point::now();
       auto ds = pending_message_buffer.create_datastream();
-      unsigned_int which{};
-      fc::raw::unpack( ds, which );
+      fc::raw::unpack( ds, which ); // consume which
+      fc::raw::unpack( ds, trx_id ); // consume trx_id
       // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
       std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
       fc::raw::unpack( ds, *ptr );
+
+      // Validate that the wire ID matches the actual transaction ID.
+      if( ptr->id() != trx_id ) {
+         peer_wlog( p2p_trx_log, this, "transaction_message ID mismatch: wire={} actual={}", trx_id, ptr->id() );
+         close();
+         return true;
+      }
+
       if( trx_in_progress_sz > def_max_trx_in_progress_size) {
          char reason[72];
          snprintf(reason, 72, "Dropping trx, too many trx in progress %u bytes", trx_in_progress_sz);

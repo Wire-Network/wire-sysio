@@ -144,6 +144,11 @@ namespace sysio {
       block_id_type id;
    };
 
+   struct transaction_message {
+      transaction_id_type   id;
+      packed_transaction    trx;
+   };
+
    struct transaction_notice_message {
       transaction_id_type id;
    };
@@ -183,7 +188,7 @@ namespace sysio {
                                     request_message,
                                     sync_request_message,
                                     signed_block,
-                                    packed_transaction,
+                                    transaction_message,
                                     vote_message,
                                     block_nack_message,
                                     block_notice_message,
@@ -200,7 +205,7 @@ namespace sysio {
       request_message        = fc::get_index<net_message, request_message>(),
       sync_request_message   = fc::get_index<net_message, sync_request_message>(),
       signed_block           = fc::get_index<net_message, signed_block>(),
-      packed_transaction     = fc::get_index<net_message, packed_transaction>(),
+      transaction_message    = fc::get_index<net_message, transaction_message>(),
       vote_message           = fc::get_index<net_message, vote_message>(),
       block_nack_message     = fc::get_index<net_message, block_nack_message>(),
       block_notice_message   = fc::get_index<net_message, block_notice_message>(),
@@ -239,6 +244,7 @@ FC_REFLECT( sysio::request_message, (req_trx)(req_blocks) )
 FC_REFLECT( sysio::sync_request_message, (start_block)(end_block) )
 FC_REFLECT( sysio::block_nack_message, (id) )
 FC_REFLECT( sysio::block_notice_message, (previous)(id) )
+FC_REFLECT( sysio::transaction_message, (id)(trx) )
 FC_REFLECT( sysio::transaction_notice_message, (id) )
 FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer_info_v1, (server_endpoint)(outbound_ip_address)(expiration) )
 FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer, (version)(producer_name)(bp_peer_info) )
