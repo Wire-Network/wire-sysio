@@ -53,21 +53,20 @@ int trx_priority_db::get_trx_priority(const transaction& trx) const {
 namespace {
 
 std::vector<char> get_row_by_id(const controller& control, name code, name scope, name table, uint64_t id ) {
-   vector<char> data;
    const auto& db = control.db();
    const auto* t_id = db.find<chain::table_id_object, chain::by_code_scope_table>( boost::make_tuple( code, scope, table ) );
    if ( !t_id ) {
-      return data;
+      return {};
    }
 
    const auto& idx = db.get_index<chain::key_value_index, chain::by_scope_primary>();
 
    auto itr = idx.lower_bound( boost::make_tuple( t_id->id, id ) );
    if ( itr == idx.end() || itr->t_id != t_id->id || id != itr->primary_key ) {
-      return data;
+      return {};
    }
 
-   data.resize( itr->value.size() );
+   vector<char> data( itr->value.size() );
    memcpy( data.data(), itr->value.data(), data.size() );
    return data;
 }

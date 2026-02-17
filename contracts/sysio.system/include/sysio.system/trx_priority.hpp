@@ -62,6 +62,7 @@ public:
     * @param action_name The action name (action.name). Empty matches any action of receiver.
     * @param match_type The transaction match type. See trx_match_type enum.
     * @param priority The transaction priority. -32,768 to 32,767. A negative value will prioritize less than default.
+    *                 Required to be unique.
     */
    [[sysio::action]]
    void addtrxp(name receiver, name action_name, trx_match_type match_type, short priority);
