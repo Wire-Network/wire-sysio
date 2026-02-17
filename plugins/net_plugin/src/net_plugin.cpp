@@ -69,8 +69,8 @@ namespace sysio {
 struct peer_sync_state {
    enum class sync_t {
       peer_sync,    // sync_request_message, syncing
-      peer_catchup, // head catchup, syncing request_message:catch_up
-      block_nack    // sync due to block nack (block_notice_message) request_message:normal
+      peer_catchup, // head catchup, syncing block_request_message
+      block_nack    // sync due to block nack (block_notice_message) block_nack_request_message
    };
    peer_sync_state(uint32_t start, uint32_t end, uint32_t last_acted, sync_t sync_type)
       :start_block( start ), end_block( end ), last( last_acted ), sync_type( sync_type )
@@ -226,7 +226,7 @@ namespace sysio {
       void sync_recv_block( const connection_ptr& c, const block_id_type& blk_id, uint32_t blk_num,
                             const fc::microseconds& blk_latency );
       void recv_handshake( const connection_ptr& c, const handshake_message& msg, uint32_t nblk_combined_latency );
-      void sync_recv_notice( const connection_ptr& c, const notice_message& msg );
+      void sync_recv_status( const connection_ptr& c, const peer_status_notice& msg );
       void send_handshakes_if_synced(const fc::microseconds& blk_latency);
    };
 
@@ -1061,8 +1061,9 @@ namespace sysio {
        */
       void handle_message( const time_message& msg );
       /** @} */
-      void handle_message( const notice_message& msg );
-      void handle_message( const request_message& msg );
+      void handle_message( const peer_status_notice& msg );
+      void handle_message( const block_request_message& msg );
+      void handle_message( const block_nack_request_message& msg );
       void handle_message( const sync_request_message& msg );
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
       void handle_message( const block_id_type& id, signed_block_ptr ptr );
@@ -1157,15 +1158,21 @@ namespace sysio {
          c->handle_message( msg );
       }
 
-      void operator()( const notice_message& msg ) const {
+      void operator()( const peer_status_notice& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle notice_message" );
+         peer_dlog( p2p_msg_log, c, "handle peer_status_notice" );
          c->handle_message( msg );
       }
 
-      void operator()( const request_message& msg ) const {
+      void operator()( const block_request_message& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle request_message" );
+         peer_dlog( p2p_msg_log, c, "handle block_request_message" );
+         c->handle_message( msg );
+      }
+
+      void operator()( const block_nack_request_message& msg ) const {
+         // continue call to handle_message on connection strand
+         peer_dlog( p2p_msg_log, c, "handle block_nack_request_message" );
          c->handle_message( msg );
       }
 
@@ -1537,9 +1544,7 @@ namespace sysio {
 
       peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
-         notice_message note;
-         note.known_blocks.mode = normal;
-         note.known_blocks.pending = 0;
+         peer_status_notice note;
          enqueue(note);
          return;
       }
@@ -2319,12 +2324,6 @@ namespace sysio {
       }
    }
 
-   inline block_id_type make_block_id( uint32_t block_num ) {
-      chain::block_id_type block_id;
-      block_id._hash[0] = fc::endian_reverse_u32(block_num);
-      return block_id;
-   }
-
    // called from c's connection strand
    void sync_manager::recv_handshake( const connection_ptr& c, const handshake_message& msg, uint32_t nblk_combined_latency ) {
 
@@ -2371,14 +2370,11 @@ namespace sysio {
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
-         notice_message note;
-         note.known_trx.pending = chain_info.fork_db_root_num;
-         note.known_trx.mode = last_irr_catch_up;
-         note.known_blocks.mode = last_irr_catch_up;
-         note.known_blocks.pending = chain_info.fork_db_head_num;
-         note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-         // begin, more efficient to encode a block num instead of retrieving actual block id
-         note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
+         peer_status_notice note;
+         note.lib_sync = true;
+         note.fork_db_root_id = chain_info.fork_db_root_id;
+         note.fork_db_head_id = chain_info.fork_db_head_id;
+         note.earliest_available_block_num = cc.earliest_available_block_num();
          c->enqueue( note );
          c->peer_syncing_from_us = true;
          return;
@@ -2396,22 +2392,17 @@ namespace sysio {
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
-         notice_message note;
-         note.known_trx.mode = none;
-         note.known_blocks.mode = catch_up;
-         note.known_blocks.pending = chain_info.fork_db_head_num;
-         note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-         // begin, more efficient to encode a block num instead of retrieving actual block id
-         note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
+         peer_status_notice note;
+         note.fork_db_root_id = chain_info.fork_db_root_id;
+         note.fork_db_head_id = chain_info.fork_db_head_id;
+         note.earliest_available_block_num = cc.earliest_available_block_num();
          c->enqueue( note );
          c->peer_syncing_from_us = false;
          try {
             auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_head_id); // thread safe
             if (on_fork) { // possible for fork_db_root to move and fork_db_head_num not be found if running with no block-log
-               peer_dlog(p2p_msg_log, c, "Sending catch_up request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
-               request_message req;
-               req.req_blocks.mode = catch_up;
-               req.req_trx.mode = none;
+               peer_dlog(p2p_msg_log, c, "Sending block_request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
+               block_request_message req; // my_head_id zero = send from root
                c->enqueue( req );
             }
          } catch( ... ) {}
@@ -2424,20 +2415,17 @@ namespace sysio {
 
    // called from c's connection strand
    bool sync_manager::verify_catchup(const connection_ptr& c, uint32_t num, const block_id_type& id) {
-      request_message req;
-      req.req_blocks.mode = catch_up;
-      auto is_fork_db_head_greater = [num, &id, &req]( const auto& cc ) {
+      bool already_have = false;
+      auto is_fork_db_head_greater = [num, &id, &already_have]( const auto& cc ) {
          fc::lock_guard g_conn( cc->conn_mtx );
          if( cc->conn_fork_db_head_num > num || cc->conn_fork_db_head == id ) {
-            req.req_blocks.mode = none;
+            already_have = true;
             return true;
          }
          return false;
       };
-      if (my_impl->connections.any_of_block_connections(is_fork_db_head_greater)) {
-         req.req_blocks.mode = none;
-      }
-      if( req.req_blocks.mode == catch_up ) {
+      my_impl->connections.any_of_block_connections(is_fork_db_head_greater);
+      if( !already_have ) {
          {
             fc::lock_guard g( sync_mtx );
             peer_ilog( p2p_blk_log, c, "catch_up while in {}, fhead = {} "
@@ -2457,47 +2445,43 @@ namespace sysio {
             c->conn_fork_db_head_num = num;
          }
 
-         req.req_blocks.ids.emplace_back( chain_info.fork_db_head_id );
+         block_request_message req;
+         req.my_head_id = chain_info.fork_db_head_id;
+         c->enqueue( req );
       } else {
-         peer_ilog( p2p_blk_log, c, "none notice while in {}, fhead = {}, id {}...",
+         peer_ilog( p2p_blk_log, c, "already have block while in {}, fhead = {}, id {}...",
                   stage_str( sync_state ), num, id.str().substr(8,16) );
          fc::lock_guard g_conn( c->conn_mtx );
          c->conn_fork_db_head = block_id_type();
          c->conn_fork_db_head_num = 0;
       }
-      req.req_trx.mode = none;
-      c->enqueue( req );
       return true;
    }
 
    // called from c's connection strand
-   void sync_manager::sync_recv_notice( const connection_ptr& c, const notice_message& msg) {
-      peer_dlog( p2p_blk_log, c, "sync_manager got {} block notice", modes_str( msg.known_blocks.mode ) );
-      SYS_ASSERT( msg.known_blocks.mode == catch_up || msg.known_blocks.mode == last_irr_catch_up, plugin_exception,
-                  "sync_recv_notice only called on catch_up" );
-      if (msg.known_blocks.mode == catch_up) {
-         if (msg.known_blocks.ids.empty()) {
-            peer_wlog( p2p_blk_log, c, "got a catch up with ids size = 0" );
-         } else {
-            const block_id_type& id = msg.known_blocks.ids.front();
-            peer_ilog( p2p_blk_log, c, "notice_message, pending {}, blk_num {}, id {}...",
-                     msg.known_blocks.pending, block_header::num_from_id(id), id.str().substr(8,16) );
-            if( !my_impl->dispatcher.have_block( id ) ) {
-               verify_catchup( c, msg.known_blocks.pending, id );
-            } else {
-               // we already have the block, so update peer with our view of the world
-               peer_dlog(p2p_blk_log, c, "Already have block, sending handshake");
-               c->send_handshake();
-            }
-         }
-      } else if (msg.known_blocks.mode == last_irr_catch_up) {
+   void sync_manager::sync_recv_status( const connection_ptr& c, const peer_status_notice& msg) {
+      uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
+      uint32_t root_num = block_header::num_from_id(msg.fork_db_root_id);
+      if (msg.lib_sync) {
+         peer_dlog( p2p_blk_log, c, "sync_manager got lib_sync peer_status_notice" );
+         c->peer_fork_db_root_num.store( root_num, std::memory_order_relaxed );
          {
-            c->peer_fork_db_root_num.store( msg.known_trx.pending, std::memory_order_relaxed );
             fc::lock_guard g_conn( c->conn_mtx );
-            c->last_handshake_recv.fork_db_root_num = msg.known_trx.pending;
+            c->last_handshake_recv.fork_db_root_num = root_num;
          }
          sync_reset_fork_db_root_num(c, false);
-         start_sync(c, msg.known_trx.pending);
+         start_sync(c, root_num);
+      } else {
+         peer_dlog( p2p_blk_log, c, "sync_manager got catch_up peer_status_notice" );
+         peer_ilog( p2p_blk_log, c, "peer_status_notice, head_num {}, id {}...",
+                  head_num, msg.fork_db_head_id.str().substr(8,16) );
+         if( !my_impl->dispatcher.have_block( msg.fork_db_head_id ) ) {
+            verify_catchup( c, head_num, msg.fork_db_head_id );
+         } else {
+            // we already have the block, so update peer with our view of the world
+            peer_dlog(p2p_blk_log, c, "Already have block, sending handshake");
+            c->send_handshake();
+         }
       }
    }
 
@@ -3769,108 +3753,33 @@ namespace sysio {
       }
    }
 
-   void connection::handle_message( const notice_message& msg ) {
-      // peer tells us about one or more blocks or txns. When done syncing, forward on
-      // notices of previously unknown blocks or txns,
-      //
+   void connection::handle_message( const peer_status_notice& msg ) {
       set_state(connection_state::connected);
-      if( msg.known_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_msg_log, this, "Invalid notice_message, known_blocks.ids.size {}, closing connection",
-                    msg.known_blocks.ids.size() );
-         close( false );
-         return;
-      }
-      if( msg.known_trx.mode != none ) {
-         if( p2p_msg_log.is_enabled( fc::log_level::debug ) ) {
-            const block_id_type& blkid = msg.known_blocks.ids.empty() ? block_id_type{} : msg.known_blocks.ids.front();
-            peer_dlog( p2p_msg_log, this, "this is a {} notice with {} pending blocks: {} {}...",
-                       modes_str(msg.known_blocks.mode), msg.known_blocks.pending,
-                       block_header::num_from_id( blkid ), blkid.str().substr( 8, 16 ) );
-         }
-      }
-      if (msg.known_trx.mode == none || msg.known_trx.mode == last_irr_catch_up) {
-         fc::lock_guard g_conn( conn_mtx );
-         last_handshake_recv.fork_db_head_num = std::max(msg.known_blocks.pending, last_handshake_recv.fork_db_head_num);
-      } else {
-         peer_wlog( p2p_msg_log, this, "unexpected notice_message known_trx.mode {}", static_cast<uint32_t>(msg.known_trx.mode) );
-         return;
-      }
-
-      if( msg.known_blocks.mode != none ) {
-         peer_dlog( p2p_msg_log, this, "this is a {} notice with {} blocks",
-                    modes_str( msg.known_blocks.mode ), msg.known_blocks.pending );
-      }
-      switch (msg.known_blocks.mode) {
-      case none : {
-         break;
-      }
-      case last_irr_catch_up:
-      case catch_up: {
-         if (msg.known_blocks.ids.size() > 1) {
-            peer_start_block_num = block_header::num_from_id(msg.known_blocks.ids[1]);
-         }
-         if (msg.known_blocks.ids.size() > 0) {
-            peer_fork_db_head_block_num = block_header::num_from_id(msg.known_blocks.ids[0]);
-         }
-         my_impl->sync_master->sync_recv_notice( shared_from_this(), msg );
-         break;
-      }
-      default: {
-         peer_wlog( p2p_msg_log, this, "bad notice_message : invalid known_blocks.mode {}",
-                    static_cast<uint32_t>(msg.known_blocks.mode) );
-      }
+      uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
+      fc::unique_lock g_conn(conn_mtx);
+      last_handshake_recv.fork_db_head_num = std::max(head_num, last_handshake_recv.fork_db_head_num);
+      g_conn.unlock();
+      if (head_num > 0) {
+         peer_start_block_num = msg.earliest_available_block_num;
+         peer_fork_db_head_block_num = head_num;
+         my_impl->sync_master->sync_recv_status(shared_from_this(), msg);
       }
    }
 
-   void connection::handle_message( const request_message& msg ) {
-      if( msg.req_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.ids.size {}, closing",
-                    msg.req_blocks.ids.size() );
-         close();
-         return;
-      }
+   void connection::handle_message( const block_request_message& msg ) {
+      peer_dlog(p2p_blk_log, this, "{} block_request_message #{}:{}",
+                is_blocks_connection() ? "received" : "ignoring",
+                block_header::num_from_id(msg.my_head_id), msg.my_head_id);
+      if (!is_blocks_connection()) return;
+      blk_send_branch(msg.my_head_id);
+   }
 
-      switch (msg.req_blocks.mode) {
-      case catch_up : {
-         const block_id_type& id = msg.req_blocks.ids.empty() ? block_id_type() : msg.req_blocks.ids.back();
-         peer_dlog( p2p_blk_log, this, "{} request_message:catch_up #{}:{}",
-                    is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(id), id );
-         if (!is_blocks_connection())
-            return;
-         blk_send_branch( id );
-         return;
-      }
-      case normal : {
-         if (msg.req_blocks.ids.size() == 2 && msg.req_trx.ids.empty()) {
-            const block_id_type& req_id = msg.req_blocks.ids[0]; // 0 - req_id, 1 - peer_head_id
-            peer_dlog( p2p_blk_log, this, "{} request_message:normal #{}:{}",
-                       is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(req_id), req_id );
-            if (!is_blocks_connection())
-               return;
-            const block_id_type& peer_head_id = msg.req_blocks.ids[1];
-            blk_send_branch_from_nack_request(req_id, peer_head_id);
-            return;
-         }
-         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.mode = normal" );
-         close();
-         return;
-      }
-      default:;
-      }
-
-
-      if( msg.req_trx.mode == none ) {
-         if( msg.req_blocks.mode == none ) {
-            peer_syncing_from_us = false;
-         }
-         if( !msg.req_trx.ids.empty() ) {
-            peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=none, req_trx.ids.size {}", msg.req_trx.ids.size() );
-            close();
-         }
-      } else if( msg.req_trx.mode != catch_up ) {
-         peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode={}", static_cast<uint32_t>(msg.req_trx.mode) );
-         close();
-      }
+   void connection::handle_message( const block_nack_request_message& msg ) {
+      peer_dlog(p2p_blk_log, this, "{} block_nack_request_message #{}:{}",
+                is_blocks_connection() ? "received" : "ignoring",
+                block_header::num_from_id(msg.target_id), msg.target_id);
+      if (!is_blocks_connection()) return;
+      blk_send_branch_from_nack_request(msg.target_id, msg.my_head_id);
    }
 
    void connection::handle_message( const sync_request_message& msg ) {
@@ -3954,22 +3863,21 @@ namespace sysio {
          my_impl->dispatcher.add_peer_block(msg.id, connection_id);
       } else if (!my_impl->dispatcher.have_block(msg.previous)) { // still don't have previous block
          peer_dlog(p2p_blk_log, this, "Received unknown block notice, checking already requested");
-         request_message req;
-         req.req_blocks.mode = normal;
-         req.req_blocks.ids.push_back(msg.previous);
-         bool already_requested = my_impl->connections.any_of_block_connections([&req](const auto& c) {
+         const block_id_type& target = msg.previous;
+         bool already_requested = my_impl->connections.any_of_block_connections([&target](const auto& c) {
             fc::lock_guard g_conn(c->conn_mtx);
-            return c->last_block_nack_request_message_id == req.req_blocks.ids[0];
+            return c->last_block_nack_request_message_id == target;
          });
          if (!already_requested) {
             peer_ilog(p2p_blk_log, this, "Received unknown block notice, requesting blocks from {}",
                       block_header::num_from_id(msg.previous));
-            block_id_type head_id = my_impl->get_chain_info().head_id;
-            req.req_blocks.ids.push_back(head_id);
+            block_nack_request_message req;
+            req.target_id = msg.previous;
+            req.my_head_id = my_impl->get_chain_info().head_id;
             send_block_nack({});
             {
                fc::lock_guard g_conn(conn_mtx);
-               last_block_nack_request_message_id = req.req_blocks.ids[0];
+               last_block_nack_request_message_id = target;
             }
             enqueue(req);
          }
