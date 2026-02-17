@@ -627,6 +627,8 @@ namespace sysio {
 
    static net_plugin_impl *my_impl;
 
+   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 16>;
+
    // thread safe
    class queued_buffer : boost::noncopyable {
    public:
@@ -695,7 +697,7 @@ namespace sysio {
          return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
       }
 
-      void fill_out_buffer( std::vector<boost::asio::const_buffer>& bufs ) {
+      void fill_out_buffer( small_buf_vector& bufs ) {
          fc::lock_guard g( _mtx );
          if (!_sync_write_queue.empty()) { // always send msgs from sync_write_queue first
             fill_out_buffer( bufs, _sync_write_queue );
@@ -709,7 +711,7 @@ namespace sysio {
 
    private:
       struct queued_write;
-      void fill_out_buffer( std::vector<boost::asio::const_buffer>& bufs,
+      void fill_out_buffer( small_buf_vector& bufs,
                             deque<queued_write>& w_queue ) REQUIRES(_mtx) {
          while ( !w_queue.empty() ) {
             auto& m = w_queue.front();
@@ -1799,7 +1801,7 @@ namespace sysio {
          return;
       }
 
-      std::vector<boost::asio::const_buffer> bufs;
+      small_buf_vector bufs;
       buffer_queue.fill_out_buffer( bufs );
 
       log_send_buffer_stats();
