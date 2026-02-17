@@ -14,20 +14,23 @@ namespace sysio::testing {
    using ip::tcp;
 
    constexpr auto message_header_size = sizeof(uint32_t);
-   constexpr uint32_t packed_trx_which = 8; // this is the "which" for packed_transaction in the net_message variant
+   constexpr uint32_t trx_msg_which = 8; // transaction_message in net_message variant
 
    static send_buffer_type create_send_buffer( const chain::packed_transaction& m ) {
-      const uint32_t which_size = fc::raw::pack_size(chain::unsigned_int(packed_trx_which));
-      const uint32_t payload_size = which_size + fc::raw::pack_size( m );
+      // Build wire bytes matching transaction_message: [size][which][trx_id][packed_transaction]
+      const auto& id = m.id();
+      const uint32_t which_size = fc::raw::pack_size(chain::unsigned_int(trx_msg_which));
+      const uint32_t id_size = fc::raw::pack_size( id );
+      const uint32_t payload_size = which_size + id_size + fc::raw::pack_size( m );
       const size_t buffer_size = message_header_size + payload_size;
 
       const char* const header = reinterpret_cast<const char* const>(&payload_size); // avoid variable size encoding of uint32_t
 
-
       auto send_buffer = std::make_shared<std::vector<char>>(buffer_size);
       fc::datastream<char*> ds( send_buffer->data(), buffer_size);
       ds.write( header, message_header_size );
-      fc::raw::pack( ds, fc::unsigned_int(packed_trx_which));
+      fc::raw::pack( ds, fc::unsigned_int(trx_msg_which));
+      fc::raw::pack( ds, id );
       fc::raw::pack( ds, m );
 
       return send_buffer;
