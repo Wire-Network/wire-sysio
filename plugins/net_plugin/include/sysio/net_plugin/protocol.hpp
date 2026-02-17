@@ -22,13 +22,6 @@ namespace sysio {
       return enc.result();
    }
 
-   struct chain_size_message {
-      uint32_t                   last_irreversible_block_num = 0;
-      block_id_type              last_irreversible_block_id;
-      uint32_t                   head_num = 0;
-      block_id_type              head_id;
-   };
-
    struct handshake_message {
       uint16_t                   network_version = 0; ///< incremental value above a computed base
       chain_id_type              chain_id; ///< used to identify chain
@@ -55,8 +48,6 @@ namespace sysio {
     wrong_chain, ///< the peer's chain id doesn't match
     wrong_version, ///< the peer's network version doesn't match
     forked, ///< the peer's irreversible blocks are different
-    unlinkable, ///< the peer sent a block we couldn't use
-    bad_transaction, ///< the peer sent a transaction that failed verification
     validation, ///< the peer sent a block that failed validation
     benign_other, ///< reasons such as a timeout. not fatal but warrant resetting
     fatal_other, ///< a catch-all for errors we don't have discriminated
@@ -71,8 +62,6 @@ namespace sysio {
     case go_away_reason::wrong_chain : return "wrong chain";
     case go_away_reason::wrong_version : return "wrong version";
     case go_away_reason::forked : return "chain is forked";
-    case go_away_reason::unlinkable : return "unlinkable block received";
-    case go_away_reason::bad_transaction : return "bad transaction";
     case go_away_reason::validation : return "invalid block";
     case go_away_reason::authentication : return "authentication failure";
     case go_away_reason::fatal_other : return "some other failure";
@@ -194,7 +183,6 @@ namespace sysio {
    };
 
    using net_message = std::variant<handshake_message,
-                                    chain_size_message,
                                     go_away_message,
                                     time_message,
                                     notice_message,
@@ -211,7 +199,6 @@ namespace sysio {
    // see protocol net_message
    enum class msg_type_t {
       handshake_message      = fc::get_index<net_message, handshake_message>(),
-      chain_size_message     = fc::get_index<net_message, chain_size_message>(),
       go_away_message        = fc::get_index<net_message, go_away_message>(),
       time_message           = fc::get_index<net_message, time_message>(),
       notice_message         = fc::get_index<net_message, notice_message>(),
@@ -241,9 +228,6 @@ namespace sysio {
 } // namespace sysio
 
 FC_REFLECT( sysio::select_ids<fc::sha256>, (mode)(pending)(ids) )
-FC_REFLECT( sysio::chain_size_message,
-            (last_irreversible_block_num)(last_irreversible_block_id)
-            (head_num)(head_id))
 FC_REFLECT( sysio::handshake_message,
             (network_version)(chain_id)(node_id)(key)
             (time)(token)(sig)(p2p_address)

@@ -271,7 +271,6 @@ namespace sysio {
       void bcast_block( const signed_block_ptr& b, const block_id_type& id );
 
       void expire_blocks( uint32_t fork_db_root_num );
-      void recv_notice(const connection_ptr& conn, const notice_message& msg, bool generated);
 
       bool add_peer_block( const block_id_type& blkid, connection_id_t connection_id );
       bool peer_has_block(const block_id_type& blkid, connection_id_t connection_id) const;
@@ -1046,7 +1045,6 @@ namespace sysio {
       bool is_valid( const handshake_message& msg ) const;
 
       void handle_message( const handshake_message& msg );
-      void handle_message( const chain_size_message& msg );
       void handle_message( const go_away_message& msg );
       /** \name Peer Timestamps
        *  Time message handling
@@ -1144,12 +1142,6 @@ namespace sysio {
       void operator()( const handshake_message& msg ) const {
          // continue call to handle_message on connection strand
          peer_dlog( p2p_msg_log, c, "handle handshake_message" );
-         c->handle_message( msg );
-      }
-
-      void operator()( const chain_size_message& msg ) const {
-         // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle chain_size_message" );
          c->handle_message( msg );
       }
 
@@ -2930,21 +2922,6 @@ namespace sysio {
       // keep rejected transaction around for awhile so we don't broadcast it, don't remove from local_txns
    }
 
-   // called from c's connection strand
-   void dispatch_manager::recv_notice(const connection_ptr& c, const notice_message& msg, bool generated) {
-      if (msg.known_trx.mode == normal) {
-      } else if (msg.known_trx.mode != none) {
-         peer_wlog( p2p_msg_log, c, "passed a notice_message with something other than a normal on none known_trx" );
-         return;
-      }
-      if (msg.known_blocks.mode == normal) {
-         return;
-      } else if (msg.known_blocks.mode != none) {
-         peer_wlog( p2p_msg_log, c, "passed a notice_message with something other than a normal on none known_blocks" );
-         return;
-      }
-   }
-
    //------------------------------------------------------------------------
 
    // called from connection strand
@@ -3556,10 +3533,6 @@ namespace sysio {
       return valid;
    }
 
-   void connection::handle_message( const chain_size_message& msg ) {
-      peer_dlog(p2p_msg_log, this, "received chain_size_message");
-   }
-
    // called from connection strand
    void connection::handle_message( const handshake_message& msg ) {
       if( !is_valid( msg ) ) {
@@ -3741,22 +3714,6 @@ namespace sysio {
       close( retry ); // reconnect if wrong_version
    }
 
-   // some clients before leap 5.0 provided microsecond epoch instead of nanosecond epoch
-   std::chrono::nanoseconds normalize_epoch_to_ns(int64_t x) {
-      //        1686211688888 milliseconds - 2023-06-08T08:08:08.888, 5yrs from SYS genesis 2018-06-08T08:08:08.888
-      //     1686211688888000 microseconds
-      //  1686211688888000000 nanoseconds
-      if (x >= 1686211688888000000) // nanoseconds
-         return std::chrono::nanoseconds{x};
-      if (x >= 1686211688888000) // microseconds
-         return std::chrono::nanoseconds{x*1000};
-      if (x >= 1686211688888) // milliseconds
-         return std::chrono::nanoseconds{x*1000*1000};
-      if (x >= 1686211688) // seconds
-         return std::chrono::nanoseconds{x*1000*1000*1000};
-      return std::chrono::nanoseconds{0}; // unknown or is zero
-   }
-
    void connection::handle_message( const time_message& msg ) {
       peer_dlog( p2p_msg_log, this, "received time_message: {}, org: {}", msg, org.count() );
 
@@ -3778,7 +3735,7 @@ namespace sysio {
          }
       }
 
-      auto msg_xmt = normalize_epoch_to_ns(msg.xmt);
+      std::chrono::nanoseconds msg_xmt{msg.xmt};
       if (msg_xmt == xmt)
          return; // duplicate packet
 
@@ -3790,7 +3747,7 @@ namespace sysio {
       }
 
       if (org != std::chrono::nanoseconds{0}) {
-         auto rec = normalize_epoch_to_ns(msg.rec);
+         std::chrono::nanoseconds rec{msg.rec};
          int64_t offset = (double((rec - org).count()) + double(msg_xmt.count() - msg.dst)) / 2.0;
 
          if (std::abs(offset) > block_interval_ns) {
@@ -3831,19 +3788,12 @@ namespace sysio {
                        block_header::num_from_id( blkid ), blkid.str().substr( 8, 16 ) );
          }
       }
-      switch (msg.known_trx.mode) {
-      case none:
-      case last_irr_catch_up: {
-         fc::unique_lock g_conn( conn_mtx );
+      if (msg.known_trx.mode == none || msg.known_trx.mode == last_irr_catch_up) {
+         fc::lock_guard g_conn( conn_mtx );
          last_handshake_recv.fork_db_head_num = std::max(msg.known_blocks.pending, last_handshake_recv.fork_db_head_num);
-         g_conn.unlock();
-         break;
-      }
-      case catch_up:
-         break;
-      case normal: {
-         my_impl->dispatcher.recv_notice( shared_from_this(), msg, false );
-      }
+      } else {
+         peer_wlog( p2p_msg_log, this, "unexpected notice_message known_trx.mode {}", static_cast<uint32_t>(msg.known_trx.mode) );
+         return;
       }
 
       if( msg.known_blocks.mode != none ) {
@@ -3863,10 +3813,6 @@ namespace sysio {
             peer_fork_db_head_block_num = block_header::num_from_id(msg.known_blocks.ids[0]);
          }
          my_impl->sync_master->sync_recv_notice( shared_from_this(), msg );
-         break;
-      }
-      case normal : {
-         my_impl->dispatcher.recv_notice( shared_from_this(), msg, false );
          break;
       }
       default: {
@@ -3913,10 +3859,7 @@ namespace sysio {
       }
 
 
-      switch (msg.req_trx.mode) {
-      case catch_up :
-         break;
-      case none :
+      if( msg.req_trx.mode == none ) {
          if( msg.req_blocks.mode == none ) {
             peer_syncing_from_us = false;
          }
@@ -3924,12 +3867,9 @@ namespace sysio {
             peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=none, req_trx.ids.size {}", msg.req_trx.ids.size() );
             close();
          }
-         break;
-      case normal :
-         peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=normal" );
+      } else if( msg.req_trx.mode != catch_up ) {
+         peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode={}", static_cast<uint32_t>(msg.req_trx.mode) );
          close();
-         break;
-      default:;
       }
    }
 
@@ -4171,13 +4111,6 @@ namespace sysio {
             return;
          controller& cc = my_impl->chain_plug->chain();
 
-         // proper_svnn_block_seen is for integration tests that verify low number of `unlinkable_blocks` logs.
-         // Because we now process blocks immediately into the fork database, during savanna transition the first proper
-         // savanna block will be reported as unlinkable when lib syncing. We will request that block again and by then
-         // the main thread will have finished transitioning and will be linkable. This is a bit of a hack but seems
-         // like an okay compromise for a condition, outside of testing, will rarely happen.
-         static bool proper_svnn_block_seen = false;
-
          std::optional<block_handle> obh;
          bool exception = false;
          fork_db_add_t fork_db_add_result = fork_db_add_t::failure;
@@ -4208,8 +4141,7 @@ namespace sysio {
                      cid, ptr->block_num(), id.str().substr(8,16));
          }
          if( exception || unlinkable) {
-            const bool first_proper_svnn_block = !proper_svnn_block_seen && ptr->is_proper_svnn_block();
-            if (unlinkable && !first_proper_svnn_block) {
+            if (unlinkable) {
                fc_dlog(p2p_blk_log, "unlinkable_block {} : {}, previous {} : {}",
                        ptr->block_num(), id, block_header::num_from_id(ptr->previous), ptr->previous);
             }
@@ -4222,7 +4154,6 @@ namespace sysio {
 
          assert(obh);
          uint32_t block_num = obh->block_num();
-         proper_svnn_block_seen = obh->header().is_proper_svnn_block();
 
          fc_dlog( p2p_blk_log, "validated block header, forkdb add {}, broadcasting immediately, connection - {}, blk num = {}, id = {}",
                   fork_db_add_result, cid, block_num, obh->id() );
