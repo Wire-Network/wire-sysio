@@ -157,6 +157,42 @@ namespace sysio {
       }
    };
 
+   struct vote_buffer_factory : public buffer_factory {
+
+      /// caches result for subsequent calls, only provide same vote_message instance for each invocation.
+      const send_buffer_type& get_send_buffer( const vote_message& msg ) {
+         if( !send_buffer ) {
+            send_buffer = create_send_buffer( msg );
+         }
+         return send_buffer;
+      }
+
+   private:
+
+      static send_buffer_type create_send_buffer( const vote_message& msg ) {
+         constexpr uint32_t vote_which = to_index(msg_type_t::vote_message);
+         const auto vid = compute_vote_id(msg);
+
+         // Build wire bytes: [size][which][vote_id][vote_message]
+         const uint32_t which_size = fc::raw::pack_size( unsigned_int( vote_which ) );
+         const uint32_t id_size = fc::raw::pack_size( vid );
+         const uint32_t msg_size = fc::raw::pack_size( msg );
+         const uint32_t payload_size = which_size + id_size + msg_size;
+
+         const char* const header = reinterpret_cast<const char* const>(&payload_size);
+         const size_t buffer_size = message_header_size + payload_size;
+
+         auto send_buffer = std::make_shared<vector<char>>( buffer_size );
+         fc::datastream<char*> ds( send_buffer->data(), buffer_size );
+         ds.write( header, message_header_size );
+         fc::raw::pack( ds, unsigned_int( vote_which ) );
+         fc::raw::pack( ds, vid );
+         fc::raw::pack( ds, msg );
+
+         return send_buffer;
+      }
+   };
+
    struct gossip_buffer_factory : public buffer_factory {
 
       /// caches result for subsequent calls

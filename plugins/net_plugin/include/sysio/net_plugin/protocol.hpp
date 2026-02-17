@@ -2,12 +2,25 @@
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/vote_message.hpp>
 #include <sysio/chain/types.hpp>
+#include <fc/io/raw.hpp>
 
 namespace sysio {
    using namespace chain;
    using namespace fc;
 
    constexpr auto message_header_size = sizeof(uint32_t);
+
+   using vote_id_type = fc::sha256;
+
+   /// Compute a deterministic vote ID from the non-signature fields of a vote_message.
+   /// vote_id = SHA-256(block_id || strong || serialized_finalizer_key)
+   inline vote_id_type compute_vote_id(const vote_message& v) {
+      auto enc = fc::sha256::encoder();
+      fc::raw::pack(enc, v.block_id);
+      fc::raw::pack(enc, v.strong);
+      fc::raw::pack(enc, v.finalizer_key);
+      return enc.result();
+   }
 
    struct chain_size_message {
       uint32_t                   last_irreversible_block_num = 0;

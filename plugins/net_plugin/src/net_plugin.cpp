@@ -239,6 +239,26 @@ namespace sysio {
       mutable fc::mutex      local_txns_mtx;
       node_transaction_index  local_txns GUARDED_BY(local_txns_mtx);
 
+      // Vote dedup cache: tracks recently seen vote IDs to avoid expensive BLS deserialization for duplicates.
+      // Indexed by vote_id for O(1) lookup and by block_num for LIB-based pruning.
+      struct vote_dedup_entry {
+         vote_id_type   id;
+         block_num_type block_num;
+      };
+      struct by_vote_id;
+      struct by_block_num;
+      using vote_dedup_index = multi_index_container<vote_dedup_entry,
+         indexed_by<
+            hashed_unique<tag<by_vote_id>,
+               member<vote_dedup_entry, vote_id_type, &vote_dedup_entry::id>, std::hash<vote_id_type>>,
+            ordered_non_unique<tag<by_block_num>,
+               member<vote_dedup_entry, block_num_type, &vote_dedup_entry::block_num>>
+         >>;
+
+      alignas(hardware_destructive_interference_sz)
+      mutable fc::mutex       vote_dedup_mtx;
+      vote_dedup_index        vote_dedup GUARDED_BY(vote_dedup_mtx);
+
    public:
       boost::asio::io_context::strand  strand;
 
@@ -268,6 +288,9 @@ namespace sysio {
       bool have_txn(const transaction_id_type& id) const;
       connection_id_vector peer_connections(const transaction_id_type& id) const;
       void expire_txns();
+
+      bool have_vote(const vote_id_type& id) const;
+      void add_vote_id(const vote_id_type& id, block_num_type block_num);
 
       void bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg );
    };
@@ -2820,9 +2843,26 @@ namespace sysio {
    }
 
    void dispatch_manager::expire_blocks( uint32_t fork_db_root_num ) {
-      fc::lock_guard g( blk_state_mtx );
-      auto& stale_blk = blk_state.get<by_connection_id>();
-      stale_blk.erase( stale_blk.lower_bound( 1 ), stale_blk.upper_bound( fork_db_root_num ) );
+      {
+         fc::lock_guard g( blk_state_mtx );
+         auto& stale_blk = blk_state.get<by_connection_id>();
+         stale_blk.erase( stale_blk.lower_bound( 1 ), stale_blk.upper_bound( fork_db_root_num ) );
+      }
+      {
+         fc::lock_guard g( vote_dedup_mtx );
+         auto& by_bn = vote_dedup.get<by_block_num>();
+         by_bn.erase( by_bn.begin(), by_bn.upper_bound( fork_db_root_num ) );
+      }
+   }
+
+   bool dispatch_manager::have_vote(const vote_id_type& id) const {
+      fc::lock_guard g( vote_dedup_mtx );
+      return vote_dedup.get<by_vote_id>().count(id) != 0;
+   }
+
+   void dispatch_manager::add_vote_id(const vote_id_type& id, block_num_type block_num) {
+      fc::lock_guard g( vote_dedup_mtx );
+      vote_dedup.insert( vote_dedup_entry{id, block_num} ); // no-op if already present
    }
 
    // thread safe
@@ -3391,13 +3431,37 @@ namespace sysio {
          return true;
       }
 
-      auto ds = pending_message_buffer.create_datastream();
+      // Early dedup: peek the vote_id (first field after variant which) for zero-allocation dedup.
+      // Wire format: [which (varint)][vote_id (32 bytes)][vote_message ...]
+      auto peek_ds = pending_message_buffer.create_peek_datastream();
       unsigned_int which{};
-      fc::raw::unpack( ds, which );
+      fc::raw::unpack( peek_ds, which );
       assert(to_msg_type_t(which) == msg_type_t::vote_message); // verified by caller
+      vote_id_type vote_id;
+      fc::raw::unpack( peek_ds, vote_id );
+
+      if( my_impl->dispatcher.have_vote( vote_id ) ) {
+         peer_dlog( vote_logger, this, "duplicate vote - dropping {}", vote_id );
+         pending_message_buffer.advance_read_ptr( message_length );
+         return true;
+      }
+
+      // Full deserialization path: consume which + vote_id, then unpack vote_message.
+      auto ds = pending_message_buffer.create_datastream();
+      fc::raw::unpack( ds, which ); // consume which
+      vote_id_type consumed_id;
+      fc::raw::unpack( ds, consumed_id ); // consume vote_id
       vote_message_ptr ptr = std::make_shared<vote_message>();
       fc::raw::unpack( ds, *ptr );
 
+      // Validate that the wire vote_id matches the actual computed vote_id.
+      if( compute_vote_id(*ptr) != vote_id ) {
+         peer_wlog( vote_logger, this, "vote_message ID mismatch: wire={} actual={}", vote_id, compute_vote_id(*ptr) );
+         close();
+         return true;
+      }
+
+      my_impl->dispatcher.add_vote_id( vote_id, block_header::num_from_id(ptr->block_id) );
       handle_message( ptr );
       return true;
    }
@@ -4392,9 +4456,10 @@ namespace sysio {
               msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8,16));
 
       boost::asio::post( thread_pool.get_executor(), [exclude_peer, msg, this]() mutable {
-            buffer_factory buff_factory;
+            vote_buffer_factory buff_factory;
             const auto& send_buffer = buff_factory.get_send_buffer( *msg );
 
+            dispatcher.add_vote_id( compute_vote_id(*msg), block_header::num_from_id(msg->block_id) );
             dispatcher.bcast_vote_msg( exclude_peer, send_buffer );
       });
    }
