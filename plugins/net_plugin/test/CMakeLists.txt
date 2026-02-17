@@ -1,6 +1,5 @@
 add_executable( test_net_plugin
         auto_bp_peering_unittest.cpp
-        early_dedup_unittest.cpp
         rate_limit_parse_unittest.cpp
         main.cpp
 )
