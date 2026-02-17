@@ -296,40 +296,16 @@ namespace sysio {
    };
 
    /**
-    *  For a while, network version was a 16 bit value equal to the second set of 16 bits
-    *  of the current build's git commit id. We are now replacing that with an integer protocol
-    *  identifier. Based on historical analysis of all git commit identifiers, the larges gap
-    *  between ajacent commit id values is shown below.
-    *  these numbers were found with the following commands on the master branch:
-    *
-    *  git log | grep "^commit" | awk '{print substr($2,5,4)}' | sort -u > sorted.txt
-    *  rm -f gap.txt; prev=0; for a in $(cat sorted.txt); do echo $prev $((0x$a - 0x$prev)) $a >> gap.txt; prev=$a; done; sort -k2 -n gap.txt | tail
-    *
-    *  DO NOT EDIT net_version_base OR net_version_range!
-    */
-   constexpr uint16_t net_version_base = 0x04b5;
-   constexpr uint16_t net_version_range = 106;
-   /**
-    *  If there is a change to network protocol or behavior, increment net version to identify
-    *  the need for compatibility hooks
+    *  Wire protocol version. Version 1 is the Wire genesis protocol.
+    *  Increment for future protocol changes that need compatibility hooks.
+    *  The version value is sent directly as handshake_message::network_version.
     */
    enum class proto_version_t : uint16_t {
-      base = 0,
-      explicit_sync = 1,       // version at time of sysio 1.0
-      block_id_notify = 2,     // reserved. feature was removed. next net_version should be 3
-      pruned_types = 3,        // sysio 2.1: supports new signed_block & packed_transaction types
-      heartbeat_interval = 4,        // sysio 2.1: supports configurable heartbeat interval
-      dup_goaway_resolution = 5,     // sysio 2.1: support peer address based duplicate connection resolution
-      dup_node_id_goaway = 6,        // sysio 2.1: support peer node_id based duplicate connection resolution
-      leap_initial = 7,              // leap client, needed because none of the 2.1 versions are supported
-      block_range = 8,               // include block range in notice_message
-      savanna = 9,                   // savanna, adds vote_message
-      block_nack = 10,               // adds block_nack_message & block_notice_message
-      gossip_bp_peers = 11,          // adds gossip_bp_peers_message
-      trx_notice = 12                // adds transaction_notice_message
+      base = 1      // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
    };
 
-   constexpr proto_version_t net_version_max = proto_version_t::trx_notice;
+   constexpr proto_version_t net_version_min = proto_version_t::base;
+   constexpr proto_version_t net_version_max = proto_version_t::base;
 
    /**
     * default value initializers
@@ -913,7 +889,7 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       std::atomic<bool>       peer_syncing_from_us{false};
 
-      std::atomic<proto_version_t>   protocol_version = proto_version_t::base;
+      std::atomic<proto_version_t>   protocol_version{static_cast<proto_version_t>(0)};
       proto_version_t                net_version = net_version_max;
       std::atomic<uint16_t>   consecutive_immediate_connection_close = 0;
       // bp_config = p2p-auto-bp-peer, bp_gossip = validated gossip connection,
@@ -2372,10 +2348,10 @@ namespace sysio {
       //
       // 0. my head block id == peer head id means we are all caught up block wise
       // 1. my head block num < peer froot then start sync locally by sending handshake
-      // 2. my froot > peer head num + nblk_combined_latency then send last_irr_catch_up notice if not the first generation
+      // 2. my froot > peer head num + nblk_combined_latency then send last_irr_catch_up notice
       //
       // 3  my head block num + nblk_combined_latency < peer head block num then update sync state and send a catchup request
-      // 4  my head block num >= peer block num + nblk_combined_latency send a notice catchup if this is not the first generation
+      // 4  my head block num >= peer block num + nblk_combined_latency send a notice catchup
       //    4.1 if peer appears to be on a different fork ( our_id_for( msg.head_num ) != msg.head_id )
       //        then request peer's blocks
       //
@@ -2402,21 +2378,17 @@ namespace sysio {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 2, fhead {}, froot {}",
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
-         if (msg.generation > 1 || c->protocol_version > proto_version_t::base) {
-            controller& cc = my_impl->chain_plug->chain();
-            notice_message note;
-            note.known_trx.pending = chain_info.fork_db_root_num;
-            note.known_trx.mode = last_irr_catch_up;
-            note.known_blocks.mode = last_irr_catch_up;
-            note.known_blocks.pending = chain_info.fork_db_head_num;
-            note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-            if (c->protocol_version >= proto_version_t::block_range) {
-               // begin, more efficient to encode a block num instead of retrieving actual block id
-               note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
-            }
-            c->enqueue( note );
-            c->peer_syncing_from_us = true;
-         }
+         controller& cc = my_impl->chain_plug->chain();
+         notice_message note;
+         note.known_trx.pending = chain_info.fork_db_root_num;
+         note.known_trx.mode = last_irr_catch_up;
+         note.known_blocks.mode = last_irr_catch_up;
+         note.known_blocks.pending = chain_info.fork_db_head_num;
+         note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
+         // begin, more efficient to encode a block num instead of retrieving actual block id
+         note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
+         c->enqueue( note );
+         c->peer_syncing_from_us = true;
          return;
       }
 
@@ -2431,19 +2403,15 @@ namespace sysio {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 4, fhead {}, froot {}",
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
-         if (msg.generation > 1 ||  c->protocol_version > proto_version_t::base) {
-            controller& cc = my_impl->chain_plug->chain();
-            notice_message note;
-            note.known_trx.mode = none;
-            note.known_blocks.mode = catch_up;
-            note.known_blocks.pending = chain_info.fork_db_head_num;
-            note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-            if (c->protocol_version >= proto_version_t::block_range) {
-               // begin, more efficient to encode a block num instead of retrieving actual block id
-               note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
-            }
-            c->enqueue( note );
-         }
+         controller& cc = my_impl->chain_plug->chain();
+         notice_message note;
+         note.known_trx.mode = none;
+         note.known_blocks.mode = catch_up;
+         note.known_blocks.pending = chain_info.fork_db_head_num;
+         note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
+         // begin, more efficient to encode a block num instead of retrieving actual block id
+         note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
+         c->enqueue( note );
          c->peer_syncing_from_us = false;
          try {
             auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_head_id); // thread safe
@@ -2886,7 +2854,7 @@ namespace sysio {
             return;
          }
 
-         if (cp->protocol_version >= proto_version_t::block_nack && !my_impl->p2p_disable_block_nack) {
+         if (!my_impl->p2p_disable_block_nack) {
             if (cp->consecutive_blocks_nacks > connection::consecutive_block_nacks_threshold) {
                // only send block_notice if we didn't produce the block, otherwise broadcast the block below
                if (!my_impl->producer_plug->producer_accounts().contains(b->producer)) {
@@ -2918,7 +2886,6 @@ namespace sysio {
       my_impl->connections.for_each_block_connection( [exclude_peer, &msg]( auto& cp ) {
          if( !cp->current() ) return true;
          if( cp->connection_id == exclude_peer ) return true;
-         if (cp->protocol_version < proto_version_t::savanna) return true;
          fc_dlog(vote_logger, "sending vote msg, connection - {}", cp->connection_id);
          cp->queue_write_mt( msg_type_t::vote_message, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
          return true;
@@ -2947,7 +2914,7 @@ namespace sysio {
    void dispatch_manager::bcast_transaction_notify(const packed_transaction_ptr& trx) {
       trx_buffer_factory buff_factory;
       my_impl->connections.for_each_connection( [&]( const connection_ptr& cp ) {
-         if( cp->protocol_version < proto_version_t::trx_notice || !cp->is_transactions_connection() || !cp->current() ) {
+         if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
 
@@ -3470,7 +3437,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::send_block_nack(const block_id_type& block_id) {
-      if (protocol_version < proto_version_t::block_nack || my_impl->p2p_disable_block_nack)
+      if (my_impl->p2p_disable_block_nack)
          return;
 
       if (my_impl->sync_master->syncing_from_peer())
@@ -3681,6 +3648,13 @@ namespace sysio {
             return;
          }
          protocol_version = net_plugin_impl::to_protocol_version(msg.network_version);
+         if( protocol_version < net_version_min ) {
+            peer_ilog( p2p_conn_log, this, "Peer protocol version {} below minimum {}, disconnecting",
+                       static_cast<uint16_t>(protocol_version.load()), static_cast<uint16_t>(net_version_min) );
+            no_retry = go_away_reason::wrong_version;
+            enqueue( go_away_message( go_away_reason::wrong_version ) );
+            return;
+         }
          if( protocol_version != net_version ) {
             peer_ilog( p2p_conn_log, this, "Local network version different: {} Remote version: {}",
                        static_cast<uint16_t>(net_version), static_cast<uint16_t>(protocol_version.load()) );
@@ -3717,14 +3691,6 @@ namespace sysio {
             } catch( ... ) {
                peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_fork_db_root_num );
             }
-         }
-
-         // we don't support the 2.1 packed_transaction & signed_block, so tell 2.1 clients we are 2.0
-         if( protocol_version >= proto_version_t::pruned_types && protocol_version < proto_version_t::leap_initial ) {
-            sent_handshake_count = 0;
-            net_version = proto_version_t::explicit_sync;
-            send_handshake();
-            return;
          }
 
          if( sent_handshake_count == 0 ) {
@@ -3929,17 +3895,15 @@ namespace sysio {
          return;
       }
       case normal : {
-         if (protocol_version >= proto_version_t::block_nack) {
-            if (msg.req_blocks.ids.size() == 2 && msg.req_trx.ids.empty()) {
-               const block_id_type& req_id = msg.req_blocks.ids[0]; // 0 - req_id, 1 - peer_head_id
-               peer_dlog( p2p_blk_log, this, "{} request_message:normal #{}:{}",
-                          is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(req_id), req_id );
-               if (!is_blocks_connection())
-                  return;
-               const block_id_type& peer_head_id = msg.req_blocks.ids[1];
-               blk_send_branch_from_nack_request(req_id, peer_head_id);
+         if (msg.req_blocks.ids.size() == 2 && msg.req_trx.ids.empty()) {
+            const block_id_type& req_id = msg.req_blocks.ids[0]; // 0 - req_id, 1 - peer_head_id
+            peer_dlog( p2p_blk_log, this, "{} request_message:normal #{}:{}",
+                       is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(req_id), req_id );
+            if (!is_blocks_connection())
                return;
-            }
+            const block_id_type& peer_head_id = msg.req_blocks.ids[1];
+            blk_send_branch_from_nack_request(req_id, peer_head_id);
+            return;
          }
          peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.mode = normal" );
          close();
@@ -4126,7 +4090,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::send_gossip_bp_peers_initial_message() {
-      if (protocol_version < proto_version_t::gossip_bp_peers || !my_impl->bp_gossip_enabled())
+      if (!my_impl->bp_gossip_enabled())
          return;
       peer_dlog(p2p_msg_log, this, "sending initial gossip_bp_peers_message");
       const auto& sb = my_impl->get_gossip_bp_initial_send_buffer();
@@ -4150,7 +4114,7 @@ namespace sysio {
       assert(my_impl->bp_gossip_enabled());
       my_impl->connections.for_each_connection([](const connection_ptr& c) {
          gossip_buffer_factory factory;
-         if (c->protocol_version >= proto_version_t::gossip_bp_peers && c->socket_is_open()) {
+         if (c->socket_is_open()) {
             if (c->bp_connection == bp_connection_type::bp_gossip) {
                const send_buffer_type& sb = my_impl->get_gossip_bp_send_buffer(factory);
                boost::asio::post(c->strand, [sb, c]() {
@@ -4552,7 +4516,7 @@ namespace sysio {
       // nothing as changed since last handshake and one was sent recently, so skip sending
       if (chain_info.fork_db_head_id == hello.fork_db_head_id && (hello.time + hs_delay > now))
          return false;
-      hello.network_version = net_version_base + static_cast<uint16_t>(net_version);
+      hello.network_version = static_cast<uint16_t>(net_version);
       hello.fork_db_root_num = chain_info.fork_db_root_num;
       hello.fork_db_root_id = chain_info.fork_db_root_id;
       hello.fork_db_head_num = chain_info.fork_db_head_num;
@@ -5007,11 +4971,9 @@ namespace sysio {
    }
 
    constexpr proto_version_t net_plugin_impl::to_protocol_version(uint16_t v) {
-      if (v >= net_version_base) {
-         v -= net_version_base;
-         return (v > net_version_range) ? proto_version_t::base : static_cast<proto_version_t>(v);
-      }
-      return proto_version_t::base;
+      if (v > static_cast<uint16_t>(net_version_max))
+         return static_cast<proto_version_t>(0);
+      return static_cast<proto_version_t>(v);
    }
 
    bool net_plugin_impl::is_lib_catchup() const {
