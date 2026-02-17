@@ -1746,8 +1746,8 @@ namespace sysio {
       auto result = buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, std::nullopt );
       if( !result.ok ) {
          boost::asio::post(strand, [c = shared_from_this()]() {
-            peer_wlog( p2p_conn_log, c, "write_queue full {} bytes, giving up on connection",
-                       c->buffer_queue.write_queue_size() );
+            fc_dlog( p2p_conn_log, "write_queue full {} bytes, giving up on connection - {}",
+                       c->buffer_queue.write_queue_size(), c->connection_id );
             c->close();
          });
          return;
@@ -2869,7 +2869,7 @@ namespace sysio {
          if( !cp->current() ) return true;
          if( cp->connection_id == exclude_peer ) return true;
          if (cp->protocol_version < proto_version_t::savanna) return true;
-         peer_dlog(vote_logger, cp, "sending vote msg");
+         fc_dlog(vote_logger, "sending vote msg, connection - {}", cp->connection_id);
          cp->queue_write_mt( msg_type_t::vote_message, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
          return true;
       } );
