@@ -21,7 +21,7 @@ static fc::crypto::webauthn::signature make_webauthn_sig(const fc::crypto::r1::p
    e.write((char*)auth_data.data(), auth_data.size());
    e.write(client_data_hash.data(), client_data_hash.data_size());
 
-   r1::compact_signature sig = priv_key.sign_compact(e.result());
+   r1::compact_signature sig = priv_key.sign_sha256(e.result());
 
    char buff[8192];
    datastream<char*> ds(buff, sizeof(buff));
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(good) try {
 
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //A valid signature but shouldn't match public key due to presence difference
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(mismatch_presence) try {
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
    auth_data[32] |= 0x04; //User presence verified
 
-   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //A valid signature but shouldn't match public key due to origin difference
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(mismatch_origin) try {
    fc::sha256 mallory_origin_hash = fc::sha256::hash("mallory.invalid"s);
    memcpy(auth_data.data(), mallory_origin_hash.data(), sizeof(mallory_origin_hash));
 
-   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //A valid signature but shouldn't recover because http was in use instead of https
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(non_https) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn origin must begin with https://") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(lacking_scheme) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn origin must begin with https://") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(empty_origin) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn origin must begin with https://") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(good_port) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //Good signature with an empty port
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(empty_port) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //valid signature but with misc junk in challenge
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(challenge_junk) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("sha256: size mismatch") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE(challenge_non_base64) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("encountered non-base64 character") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -184,7 +184,7 @@ BOOST_AUTO_TEST_CASE(challenge_wrong_base64_chars) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("encountered non-base64 character") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE(challenge_base64_dot_padding) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("encountered non-base64 character") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE(challenge_no_padding) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //valid signature but tack extra bytes in the challenge
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(challenge_extra_bytes) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("size mismatch") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(challenge_wrong) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("Wrong webauthn challenge") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(wrong_type) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn signature type not an assertion") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -276,7 +276,7 @@ BOOST_AUTO_TEST_CASE(auth_data_rpid_hash_bad) try {
    memcpy(auth_data.data(), origin_hash_corrupt.data(), sizeof(origin_hash_corrupt));
    auth_data[4]++;
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn rpid hash doesn't match origin") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -288,7 +288,7 @@ BOOST_AUTO_TEST_CASE(auth_data_too_short) try {
 
    std::vector<uint8_t> auth_data(1);
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("auth_data not as large as required") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(missing_origin) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn origin must begin with https://") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(missing_type) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("webauthn signature type not an assertion") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -327,7 +327,7 @@ BOOST_AUTO_TEST_CASE(missing_challenge) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("sha256: size mismatch") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -341,7 +341,7 @@ BOOST_AUTO_TEST_CASE(good_extrajunk) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //Good signature but it's not a JSON object!
@@ -352,7 +352,7 @@ BOOST_AUTO_TEST_CASE(not_json_object) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("Failed to parse client data JSON") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(damage_sig) try {
    webauthn::public_key recovered_pub;
 
    try {
-      recovered_pub = sig.recover(d, true);
+      recovered_pub = sig.recover(d);
       failed_compare = !(wa_pub == recovered_pub);
    }
    catch(fc::exception& e) {
@@ -410,7 +410,7 @@ BOOST_AUTO_TEST_CASE(damage_sig_idx) try {
    webauthn::public_key recovered_pub;
 
    try {
-      recovered_pub = sig.recover(d, true);
+      recovered_pub = sig.recover(d);
       failed_compare = !(wa_pub == recovered_pub);
    }
    catch(fc::exception& e) {
@@ -431,7 +431,7 @@ BOOST_AUTO_TEST_CASE(different_priv_key) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(other_priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_NE(wa_pub, make_webauthn_sig(other_priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //Good signature but has empty json
@@ -442,7 +442,7 @@ BOOST_AUTO_TEST_CASE(empty_json) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::assert_exception, [](const fc::assert_exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::assert_exception, [](const fc::assert_exception& e) {
       return e.to_detail_string().find("Failed to parse client data JSON") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(good_no_trailing_equal) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d, true));
+   BOOST_CHECK_EQUAL(wa_pub, make_webauthn_sig(priv, auth_data, json).recover(d));
 } FC_LOG_AND_RETHROW();
 
 //Before the base64 decoder was adjusted to throw in error (pre-webauthn-merge), it would simply stop when encountering
@@ -483,7 +483,7 @@ BOOST_AUTO_TEST_CASE(base64_wonky) try {
    std::vector<uint8_t> auth_data(37);
    memcpy(auth_data.data(), origin_hash.data(), sizeof(origin_hash));
 
-   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d, true), fc::exception, [](const fc::exception& e) {
+   BOOST_CHECK_EXCEPTION(make_webauthn_sig(priv, auth_data, json).recover(d), fc::exception, [](const fc::exception& e) {
       return e.to_detail_string().find("encountered non-base64 character") != std::string::npos;
    });
 } FC_LOG_AND_RETHROW();

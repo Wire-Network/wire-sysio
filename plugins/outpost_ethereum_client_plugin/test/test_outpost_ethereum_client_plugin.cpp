@@ -13,6 +13,7 @@
 
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/crypto/signer.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
@@ -151,9 +152,9 @@ BOOST_AUTO_TEST_SUITE(outpost_ethereum_client_plugin)
 BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    using namespace fc::crypto;
 
-   auto              empty_msg_hash = fc::crypto::ethereum::hash_message("");
+   auto              empty_msg_hash = fc::crypto::ethereum::hash_message(ethereum::to_uint8_span(""));
    std::stringstream ss;
-   for (auto byte : empty_msg_hash) {
+   for (auto byte : std::span(empty_msg_hash.data(), empty_msg_hash.data_size())) {
       ss << std::hex << std::setfill('0') << std::setw(2)
          << static_cast<unsigned>(byte);
    }
@@ -166,11 +167,6 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    BOOST_CHECK(std::memcmp(actual_unsigned.data(), test_tx_01_unsigned_result.data(), 81) == 0);
    auto actual_unsigned_hex = rlp::to_hex(actual_unsigned, false);
    BOOST_CHECK_EQUAL(actual_unsigned_hex, test_tx_01_result);
-
-   auto msg_hash_data = fc::crypto::ethereum::hash_message(actual_unsigned);
-   // auto msg_hash_data = fc::crypto::ethereum::hash_message(sample_data_01_raw);
-   // auto msg_hash_data = fc::crypto::keccak256_ethereum(actual_unsigned);
-   fc::sha256 msg_hash(reinterpret_cast<const char*>(msg_hash_data.data()), msg_hash_data.size());
 
    auto clean_app = gsl_lite::finally([]() {
       appbase::application::reset_app_singleton();
@@ -191,7 +187,9 @@ BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
 
 
    // Provider should be retrievable
-   auto sig = sig_provider->sign(msg_hash);
+   // Sign raw unsigned TX bytes — eth_client_signer hashes with keccak256 internally
+   fc::crypto::eth_client_signer eth_signer(*sig_provider);
+   auto sig = eth_signer.sign(std::span<const uint8_t>(actual_unsigned));
    BOOST_CHECK(sig.contains<fc::em::signature_shim>());
    auto&      sig_shim          = sig.get<fc::em::signature_shim>();
    auto&      sig_data          = sig_shim.serialize();

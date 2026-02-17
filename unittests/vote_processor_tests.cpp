@@ -118,7 +118,7 @@ vote_message_ptr make_vote_message(const block_state_ptr& bsp) {
    vm->strong = true;
    size_t i = bsp->block_num() % bls_priv_keys.size();
    vm->finalizer_key = bls_priv_keys.at(i).get_public_key();
-   vm->sig = bls_priv_keys.at(i).sign({(uint8_t*)bsp->strong_digest.data(), (uint8_t*)bsp->strong_digest.data() + bsp->strong_digest.data_size()});
+   vm->sig = bls_priv_keys.at(i).sign_sha256(bsp->strong_digest);
    return vm;
 }
 

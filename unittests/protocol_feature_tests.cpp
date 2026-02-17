@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            protocol_feature_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_first_protocol_feature_digest) +
+                              reversed_first_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );
@@ -306,7 +306,7 @@ BOOST_AUTO_TEST_CASE( subjective_restrictions_test ) try {
                            subjective_block_production_exception,
                            fc_exception_message_is(
                               std::string("protocol feature with digest '") +
-                              std::string(reversed_second_protocol_feature_digest)+
+                              reversed_second_protocol_feature_digest.str() +
                               "' is disabled"
                            )
    );
@@ -1366,25 +1366,6 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
 
    // propagate header awareness of the activation.
    auto first_new_block = c.produce_block();
-
-   {
-      // create a bad block that has the producer schedule change extension that is valid but not warranted by actions in the block
-      auto bad_block = first_new_block->clone();
-      emplace_extension(
-              bad_block->header_extensions,
-              producer_schedule_change_extension::extension_id(),
-              fc::raw::pack(std::make_pair(remote.control->active_producers().version + 1, std::vector<char>{}))
-      );
-
-      // re-sign the bad block, with an unneeded sig
-      bad_block->producer_signature = remote.get_private_key("test"_n, "active").sign(bad_block->calculate_id());
-
-      // ensure it is rejected because it doesn't match expected state (but the extention was accepted)
-      BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(signed_block::create_signed_block(std::move(bad_block))), wrong_signing_key,
-         fc_exception_message_starts_with( "block signed by unexpected key" )
-      );
-   }
 
    { // ensure that non-null new_producers is rejected
       // create a bad block that has the producer schedule change extension before the feature upgrade

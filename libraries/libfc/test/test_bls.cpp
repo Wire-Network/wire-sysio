@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(bls_sig_verif) try {
   bls::private_key sk = bls::private_key(seed_1);
   bls::public_key pk = sk.get_public_key();
 
-  bls::signature signature = sk.sign(message_1);
+  bls::signature signature = sk.sign_raw(message_1);
 
   // Verify the signature
   bool ok = verify(pk, message_1, signature);
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(bls_sig_verif_digest) try {
 
   std::vector<unsigned char> v = std::vector<unsigned char>(message_3.data(), message_3.data() + 32);
 
-  bls::signature signature = sk.sign(v);
+  bls::signature signature = sk.sign_raw(v);
 
   // Verify the signature
   bool ok = verify(pk, v, signature);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(bls_sig_verif_finality_types) try {
 
   std::vector<unsigned char> v = std::vector<unsigned char>(h2.data(), h2.data() + 32);
 
-  bls::signature signature = sk.sign(v);
+  bls::signature signature = sk.sign_raw(v);
 
   bls12_381::g1 agg_pk = pk.jacobian_montgomery_le();
   bls::aggregate_signature agg_signature{signature};
@@ -115,12 +115,12 @@ BOOST_AUTO_TEST_CASE(bls_agg_sig_verif) try {
   bls::private_key sk1 = bls::private_key(seed_1);
   bls::public_key pk1 = sk1.get_public_key();
 
-  bls::signature sig1 = sk1.sign(message_1);
+  bls::signature sig1 = sk1.sign_raw(message_1);
 
   bls::private_key sk2 = bls::private_key(seed_2);
   bls::public_key pk2 = sk2.get_public_key();
 
-  bls::signature sig2 = sk2.sign(message_1);
+  bls::signature sig2 = sk2.sign_raw(message_1);
 
   bls12_381::g1 agg_key = bls12_381::aggregate_public_keys(std::array{pk1.jacobian_montgomery_le(), pk2.jacobian_montgomery_le()});
   bls::aggregate_signature agg_sig;
@@ -141,12 +141,12 @@ BOOST_AUTO_TEST_CASE(bls_agg_tree_verif) try {
   bls::private_key sk1 = bls::private_key(seed_1);
   bls::public_key pk1 = sk1.get_public_key();
 
-  bls::signature sig1 = sk1.sign(message_1);
+  bls::signature sig1 = sk1.sign_raw(message_1);
 
   bls::private_key sk2 = bls::private_key(seed_2);
   bls::public_key pk2 = sk2.get_public_key();
 
-  bls::signature sig2 = sk2.sign(message_2);
+  bls::signature sig2 = sk2.sign_raw(message_2);
 
   bls::aggregate_signature agg_sig;
   agg_sig.aggregate(sig1);
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(bls_key_gen) try {
   bls::private_key sk = bls::private_key::generate();
   bls::public_key pk = sk.get_public_key();
 
-  bls::signature signature = sk.sign(message_1);
+  bls::signature signature = sk.sign_raw(message_1);
 
   // Verify the signature
   bool ok = verify(pk, message_1, signature);
@@ -184,12 +184,12 @@ BOOST_AUTO_TEST_CASE(bls_bad_sig_verif) try {
   bls::private_key sk1 = bls::private_key(seed_1);
   bls::public_key pk1 = sk1.get_public_key();
 
-  bls::signature sig1 = sk1.sign(message_1);
+  bls::signature sig1 = sk1.sign_raw(message_1);
 
   bls::private_key sk2 = bls::private_key(seed_2);
   bls::public_key pk2 = sk2.get_public_key();
 
-  bls::signature sig2 = sk2.sign(message_1);
+  bls::signature sig2 = sk2.sign_raw(message_1);
 
   // Verify the signature
   bool ok1 = verify(pk1, message_1, sig2); //verify wrong key / signature
@@ -212,7 +212,7 @@ BOOST_AUTO_TEST_CASE(bls_private_key_serialization) try {
 
   bls::private_key sk2 = bls::private_key(priv_base58_str);
 
-  bls::signature signature = sk2.sign(message_1);
+  bls::signature signature = sk2.sign_raw(message_1);
 
   // Verify the signature
   bool ok = verify(pk, message_1, signature);
@@ -228,7 +228,7 @@ BOOST_AUTO_TEST_CASE(bls_pub_key_sig_serialization) try {
   bls::private_key sk = bls::private_key(seed_1);
   bls::public_key pk = sk.get_public_key();
 
-  bls::signature signature = sk.sign(message_1);
+  bls::signature signature = sk.sign_raw(message_1);
 
   std::string pk_string = pk.to_string();
   std::string signature_string = signature.to_string();
@@ -261,7 +261,7 @@ BOOST_AUTO_TEST_CASE(bls_binary_keys_encoding_check) try {
 
   bool ok4 = bls::public_key(pub_str).to_string() == pub_str;
 
-  bls::signature sig = sk.sign(message_1);
+  bls::signature sig = sk.sign_raw(message_1);
 
   bool ok5 = bls::signature(sig.to_string()).equal(sig);
 

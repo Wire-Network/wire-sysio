@@ -4,6 +4,6 @@ plugin_target(
         ${TARGET_NAME}
         LIBRARIES
         appbase
-        chainbase
-        chain_plugin
-        sysio_chain)
+        custom_appbase
+        sysio_chain
+)

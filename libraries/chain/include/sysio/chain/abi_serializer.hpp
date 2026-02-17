@@ -691,10 +691,6 @@ namespace impl {
             }
             mvo("new_protocol_features", pf_array);
          }
-         if (auto it = header_exts.find(producer_schedule_change_extension::extension_id()); it != header_exts.end()) {
-            const auto& new_producer_schedule = std::get<producer_schedule_change_extension>(it->second);
-            mvo("new_producer_schedule", new_producer_schedule);
-         }
          add_block_header_finality_extension(mvo, header_exts);
 
          mvo("producer_signature", block.producer_signature);

@@ -48,7 +48,7 @@ Example cmake options for building the contracts with CDT:
 -DBUILD_SYSTEM_CONTRACTS=ON
 -DBUILD_TEST_CONTRACTS=ON
 -DENABLE_TEST=ON
--DCMAKE_PREFIX_PATH=/opt/llvm/llvm-11;/home/kevin/ext/wire-cdt/build
+-DCMAKE_PREFIX_PATH=/home/kevin/ext/wire-cdt/build
 -DCMAKE_TOOLCHAIN_FILE=/home/kevin/ext/wire-sysio/vcpkg/scripts/buildsystems/vcpkg.cmake
 ```
 

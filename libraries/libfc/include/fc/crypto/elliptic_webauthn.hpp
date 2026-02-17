@@ -1,9 +1,7 @@
 #pragma once
-#include <fc/crypto/bigint.hpp>
 #include <fc/crypto/common.hpp>
 #include <fc/crypto/sha256.hpp>
 #include <fc/crypto/elliptic_r1.hpp>
-#include <fc/crypto/openssl.hpp>
 #include <fc/fwd.hpp>
 #include <fc/io/raw_fwd.hpp>
 
@@ -30,13 +28,15 @@ class public_key {
       public_key() = default;
       public_key(const public_key&) = default;
       public_key(public_key&&) noexcept = default;
-      public_key(const public_key_data_type& p, const user_presence_t& t, const std::string& s) : 
+      public_key(const public_key_data_type& p, const user_presence_t& t, const std::string& s) :
          public_key_data(p), user_verification_type(t), rpid(s) {
             post_init();
          }
-      public_key(const signature& c, const fc::sha256& digest, bool check_canonical = true);
+
       public_key& operator=(const public_key&) = default;
       public_key& operator=(public_key&&) noexcept  = default;
+
+      static public_key recover(const signature& c, const fc::sha256& digest);
 
       bool operator==(const public_key& o) const {
          return        public_key_data == o.public_key_data        &&
@@ -85,8 +85,8 @@ class signature {
       signature(const fc::crypto::r1::compact_signature& s, const std::vector<uint8_t>& a, const std::string& j) :
          compact_signature(s), auth_data(a), client_json(j) {}
 
-      public_key recover(const sha256& digest, bool check_canonical) const {
-         return public_key(*this, digest, check_canonical);
+      public_key recover(const sha256& digest) const {
+         return public_key::recover(*this, digest);
       }
 
       size_t variable_size() const {

@@ -1419,7 +1419,7 @@ struct get_transaction_id_subcommand {
                if( id == transaction().id() ) {
                   std::cerr << "file/string does not represent a transaction" << std::endl;
                } else {
-                  std::cout << string( id ) << std::endl;
+                  std::cout << id.str() << std::endl;
                }
             } else {
                std::cerr << "file/string does not represent a transaction" << std::endl;
@@ -2304,7 +2304,7 @@ int main( int argc, char** argv ) {
          fc::sha256 hash;
          if(wasm_v.size())
             hash = fc::sha256::hash(wasm_v.data(), wasm_v.size());
-         code_hash = (string)hash;
+         code_hash = hash.str();
 
          wasm = string(wasm_v.begin(), wasm_v.end());
 

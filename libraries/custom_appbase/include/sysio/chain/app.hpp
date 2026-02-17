@@ -192,13 +192,6 @@ public:
    exit_code::exit_code init(int argc, char** argv) {
       try {
          auto init_logging = [cfg=cfg_]() { detail::initialize_logging(cfg); };
-         (
-            [] {
-               if (app().find_plugin<Plugin>() == nullptr) {
-                  appbase::application::register_plugin<Plugin>();
-               }
-            }(), ...
-         );
          if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {
@@ -213,6 +206,9 @@ public:
 
          if (cfg_.enable_resource_monitor) {
 #if __has_include(<sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>)
+            if (!app_->is_registered<resource_monitor_plugin>()) {
+               app_->register_plugin<resource_monitor_plugin>();
+            }
             if (auto resmon_plugin = app_->find_plugin<resource_monitor_plugin>()) {
                resmon_plugin->initialize(app_->get_options());
                resmon_plugin->monitor_directory(app_->data_dir());

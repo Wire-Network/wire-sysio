@@ -96,8 +96,6 @@ bool peer_sync_state::valid() const {
 FC_REFLECT_ENUM( sysio::peer_sync_state::sync_t, (peer_sync)(peer_catchup)(block_nack) )
 
 namespace sysio {
-   static auto _net_plugin = application::register_plugin<net_plugin>();
-
    using std::vector;
 
    using boost::asio::ip::tcp;
@@ -4365,7 +4363,7 @@ namespace sysio {
          }
          chain::public_key_type peer_key;
          try {
-            peer_key = crypto::public_key(msg.sig, msg.token, true);
+            peer_key = crypto::public_key::recover(msg.sig, msg.token);
          }
          catch (const std::exception& /*e*/) {
             fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);

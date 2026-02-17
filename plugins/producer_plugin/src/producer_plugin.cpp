@@ -89,7 +89,6 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
-auto _producer_plugin = application::register_plugin<producer_plugin>();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -705,7 +704,7 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
 
-   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
    chain::bls_pub_key_sig_provider_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
@@ -1402,7 +1401,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    // Get the signature provider plugin
    auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
 
-   // LOAD `chain_key_type_wire_bls` SIGNATURE PROVIDERS
+   // LOAD `chain_key_type_t::wire_bls` SIGNATURE PROVIDERS
    {
       auto finalizer_candidate_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
@@ -1416,7 +1415,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    }
 
    if (!_producers.empty()) {
-      // LOAD `chain_key_type_wire` SIGNATURE PROVIDERS
+      // LOAD `chain_key_type_t::wire` SIGNATURE PROVIDERS
       auto wire_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire);
 
@@ -2018,7 +2017,7 @@ producer_plugin_impl::get_unapplied_transactions(const producer_plugin::get_unap
    result.queued_size = readable_queue.size(exec_queue::trx_read_write);
 
    if (itr != ua.end()) {
-      result.more = itr->id();
+      result.more = itr->id().str();
       return result;
    }
 
@@ -2048,7 +2047,7 @@ producer_plugin_impl::get_unapplied_transactions(const producer_plugin::get_unap
    }
 
    if (qitr != qend) {
-      result.more = readable_queue.function_from_iter<trx_executor>(qitr).get_trx_meta()->id();
+      result.more = readable_queue.function_from_iter<trx_executor>(qitr).get_trx_meta()->id().str();
    }
 
    return result;

@@ -369,8 +369,7 @@ public:
             }
             std::optional<peer_info_t> peer_info = cc.get_peer_info(peer.producer_name);
             if (peer_info && peer_info->key) {
-               constexpr bool check_canonical = false;
-               public_key_type pk(peer.sig, peer.digest(self()->chain_id), check_canonical);
+               public_key_type pk = public_key_type::recover(peer.sig, peer.digest(self()->chain_id));
                if (pk != *peer_info->key) {
                   fc_dlog(p2p_msg_log, "Recovered peer key did not match on-chain {}, recovered: {} != expected: {}",
                           peer.producer_name, fc::json::to_log_string(pk), fc::json::to_log_string(*peer_info->key));
