@@ -152,7 +152,7 @@ target_link_libraries(
   Boost::lockfree
   Boost::assign
   Boost::accumulators
-  atomic
+  ${LIBATOMIC_STATIC}
 )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"

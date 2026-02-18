@@ -13,6 +13,10 @@
         {
             "new_type_name": "getpeerkeys_res_t",
             "type": "peerkeys_t[]"
+        },
+        {
+            "new_type_name": "trx_match_type",
+            "type": "uint8"
         }
     ],
     "structs": [
@@ -1015,6 +1019,70 @@
                     "type": "public_key?"
                 }
             ]
+        },
+        {
+            "name": "addtrxp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "receiver",
+                    "type": "name"
+                },
+                {
+                    "name": "action_name",
+                    "type": "name"
+                },
+                {
+                    "name": "match_type",
+                    "type": "trx_match_type"
+                },
+                {
+                    "name": "priority",
+                    "type": "int16"
+                }
+            ]
+        },
+        {
+            "name": "deltrxp",
+            "base": "",
+            "fields": [
+                {
+                    "name": "priority",
+                    "type": "int16"
+                }
+            ]
+        },
+        {
+            "name": "trx_prio",
+            "base": "",
+            "fields": [
+                {
+                    "name": "priority",
+                    "type": "int16"
+                },
+                {
+                    "name": "receiver",
+                    "type": "name"
+                },
+                {
+                    "name": "action_name",
+                    "type": "name"
+                },
+                {
+                    "name": "match_type",
+                    "type": "trx_match_type"
+                }
+            ]
+        },
+        {
+            "name": "trx_prio_global",
+            "base": "",
+            "fields": [
+                {
+                    "name": "last_trx_priority_update",
+                    "type": "block_timestamp_type"
+                }
+            ]
         }
     ],
     "actions": [
@@ -1177,6 +1245,16 @@
             "name": "regpeerkey",
             "type": "regpeerkey",
             "ricardian_contract": ""
+        },
+        {
+            "name": "addtrxp",
+            "type": "addtrxp",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "deltrxp",
+            "type": "deltrxp",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -1246,6 +1324,20 @@
         {
             "name": "peerkeys",
             "type": "peer_key",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "trxpglobal",
+            "type": "trx_prio_global",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "trxpriority",
+            "type": "trx_prio",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

@@ -11,9 +11,11 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # LOAD CMAKE TOOLS
 find_package(PkgConfig REQUIRED)
 
-# ZLIB & zstd
+# ZLIB, zstd, BZip2, LibLZMA (static via vcpkg, required by Boost::iostreams)
 find_package(ZLIB REQUIRED)
 find_package(zstd CONFIG REQUIRED)
+find_package(BZip2 REQUIRED)
+find_package(LibLZMA REQUIRED)
 
 # FIND PACKAGES WITH VCPKG
 # LLVM
@@ -23,11 +25,11 @@ message(STATUS "Using LLVMConfig.cmake at: ${LLVM_DIR}")
 if(LLVM_VERSION_MAJOR VERSION_LESS 18)
     message(FATAL_ERROR "WIRE requires LLVM version 18 or later")
 endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT DISABLE_LLVM_LINKAGE_OVERRIDE)
     message(NOTICE "DEBUG build, and DISABLE_LLVM_LINKAGE_OVERRIDE=OFF, overriding LLVM linkage to Release")
     foreach(llvm_target ${LLVM_AVAILABLE_LIBS})
         if(TARGET ${llvm_target})
-            message(STATUS "LLVM target (${llvm_target}) to use release build")
             set_target_properties(
                     ${llvm_target}
                     PROPERTIES
