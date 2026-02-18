@@ -443,7 +443,7 @@ struct building_block {
                                   std::optional<proposer_policy> new_proposer_policy,
                                   std::optional<finalizer_policy> new_finalizer_policy,
                                   bool validating,
-                                  std::optional<qc_data_t> validating_qc_data,
+                                  const qc_data_t& validating_qc_data,
                                   const block_state_ptr& validating_bsp) {
       auto& action_receipts = action_receipt_digests();
       // compute the action_mroot and transaction_mroot
@@ -459,25 +459,12 @@ struct building_block {
                     }},
          trx_mroot_or_receipt_digests());
 
-      qc_data_t qc_data;
-      digest_type finality_mroot_claim;
-
-      if (validating) {
-         // we are simulating a block received from the network. Use the embedded qc from the block
-         assert(validating_qc_data);
-         qc_data = *validating_qc_data;
-
-         assert(validating_bsp);
-         // Use the finality_mroot from received block's header for
-         // finality_mroot_claim at the first stage such that the next
-         // block's header and block id can be built. The actual
-         // finality_mroot will be validated by apply_block at the
-         // second stage
-         finality_mroot_claim = validating_bsp->header.finality_mroot;
-      } else {
-         qc_data = get_qc_data(fork_db, bb.parent);;
-         finality_mroot_claim = bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
-      }
+      // if validating then we are simulating a block received from the network. Use the embedded qc from the block.
+      // if validating Use the finality_mroot from received block's header for finality_mroot_claim at the first stage
+      // such that the next block's header and block id can be built. The actual finality_mroot will be validated by
+      // apply_block at the second stage
+      const qc_data_t& qc_data = validating ? validating_qc_data : get_qc_data(fork_db, bb.parent);
+      const digest_type&  finality_mroot_claim = validating ? validating_bsp->header.finality_mroot : bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
 
       building_block_input bb_input {
          .parent_id = bb.parent.id(),
@@ -519,7 +506,7 @@ struct building_block {
          std::move(bb.pending_trx_metas),
          std::move(bb.pending_trx_receipts),
          std::move(valid),
-         std::move(qc_data.qc),
+         qc_data.qc,
          action_mroot // caching for constructing finality_data.
       };
 
@@ -2236,7 +2223,7 @@ struct controller_impl {
       } FC_LOG_AND_DROP()
    }
 
-   void assemble_block(bool validating, std::optional<qc_data_t> validating_qc_data, const block_state_ptr& validating_bsp)
+   void assemble_block(bool validating, const qc_data_t& validating_qc_data, const block_state_ptr& validating_bsp)
    {
       SYS_ASSERT( pending, block_validate_exception, "it is not valid to finalize when there is no pending block");
       SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finish_block");
@@ -2285,7 +2272,7 @@ struct controller_impl {
                               protocol_features.get_protocol_feature_set(),
                               fork_db_, std::move(new_proposer_policy),
                               std::move(new_finalizer_policy),
-                              validating, std::move(validating_qc_data), validating_bsp);
+                              validating, validating_qc_data, validating_bsp);
 
          // Update TaPoS table:
          create_block_summary(  assembled_block.id() );
@@ -2510,7 +2497,7 @@ struct controller_impl {
 #undef SYS_REPORT
    }
 
-   static std::optional<qc_data_t> extract_qc_data(const signed_block_ptr& b) {
+   static qc_data_t extract_qc_data(const signed_block_ptr& b) {
       // qc_claim is now a direct header field, always present
       qc_data_t result{ {}, b->qc_claim };
       if (b->qc) {
@@ -2791,10 +2778,10 @@ struct controller_impl {
       if (prev.block_num() <= 1u)
          return std::nullopt;
 
-      SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions allowed");
+      SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions currently supported");
 
       const auto  new_qc_claim = b->qc_claim;
-      bool qc_present = b->qc.has_value();
+      const bool qc_present = b->qc.has_value();
       uint32_t block_num = b->block_num();
 
       if (!replaying && fc::logger::default_logger().is_enabled(fc::log_level::debug)) {
