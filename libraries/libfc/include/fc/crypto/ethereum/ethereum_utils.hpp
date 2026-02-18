@@ -71,6 +71,13 @@ inline std::span<const uint8_t> to_uint8_span(std::string_view sv) {
    return {reinterpret_cast<const uint8_t*>(sv.data()), sv.size()};
 }
 
+inline std::string hash_to_hex(const fc::crypto::keccak256& hash, bool add_prefix = false) {
+   auto hex = hash.str();
+   if (add_prefix && !hex.starts_with("0x"))
+      hex = "0x" + hex;
+   return hex;
+}
+
 /**
  * Creates an Ethereum signed message hash from a message payload.
  * Calls keccak256::hash(payload)
