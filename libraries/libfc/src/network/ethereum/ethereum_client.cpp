@@ -1,5 +1,7 @@
+#include <algorithm>
 #include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/crypto/keccak256.hpp>
 #include <fc/crypto/signer.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
@@ -16,7 +18,7 @@ using namespace fc::network::json_rpc;
 
 /**
  * @brief Checks if an ABI definition exists for the given contract name
- * 
+ *
  * @param contract_name Name of the contract function/event
  * @return true if ABI exists, false otherwise
  */
@@ -26,7 +28,7 @@ bool ethereum_contract_client::has_abi(const std::string& contract_name) {
 
 /**
  * @brief Retrieves the ABI definition for the given contract name
- * 
+ *
  * @param contract_name Name of the contract function/event
  * @return Reference to the ABI contract definition
  * @throws std::out_of_range if contract_name not found
@@ -37,11 +39,11 @@ const abi::contract& ethereum_contract_client::get_abi(const std::string& contra
 
 /**
  * @brief Constructs an ethereum_client instance
- * 
+ *
  * Initializes the client with a signature provider for transaction signing,
  * a JSON-RPC endpoint URL, and an optional chain ID. The Ethereum address
  * is derived from the signature provider's public key.
- * 
+ *
  * @param sig_provider Signature provider for signing transactions
  * @param url_source URL of the Ethereum node (string or fc::url)
  * @param chain_id Optional chain ID (if not provided, will be fetched from the node)
@@ -56,7 +58,7 @@ ethereum_client::ethereum_client(const signature_provider_ptr& sig_provider,
 
 /**
  * @brief Executes a JSON-RPC method call on the Ethereum node
- * 
+ *
  * @param method The RPC method name (e.g., "eth_blockNumber", "eth_call")
  * @param params The parameters for the RPC method as a variant
  * @return The response from the Ethereum node as a variant
@@ -68,10 +70,10 @@ fc::variant ethereum_client::execute(const std::string& method, const fc::varian
 
 /**
  * @brief Executes a contract view function (read-only call)
- * 
+ *
  * Encodes the function call according to the ABI, executes it via eth_call,
  * and returns the result. This does not create a transaction or modify state.
- * 
+ *
  * @param contract_address The address of the smart contract
  * @param abi The ABI definition of the function to call
  * @param block_tag The block at which to execute the call (e.g., "latest", "pending")
@@ -90,10 +92,10 @@ fc::variant ethereum_client::execute_contract_view_fn(const address& contract_ad
 
 /**
  * @brief Executes a contract transaction function (state-changing call)
- * 
+ *
  * Encodes the function call according to the ABI, creates a signed transaction,
  * and submits it to the network via eth_sendRawTransaction.
- * 
+ *
  * @param source_tx The base EIP-1559 transaction (with gas, nonce, etc.)
  * @param abi The ABI definition of the function to call
  * @param params The parameters to pass to the contract function
@@ -124,10 +126,10 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
 
 /**
  * @brief Retrieves the transaction count (nonce) for an address
- * 
+ *
  * Gets the number of transactions sent from the specified address at the given block.
  * This is commonly used to determine the nonce for the next transaction.
- * 
+ *
  * @param address The Ethereum address to query
  * @param block_tag The block at which to query (e.g., "latest", "pending")
  * @return The transaction count as a uint256
@@ -144,10 +146,10 @@ fc::uint256 ethereum_client::get_transaction_count(const address_compat_type& ad
 
 /**
  * @brief Retrieves the chain ID of the connected Ethereum network
- * 
+ *
  * Fetches the chain ID from the node on first call and caches it for subsequent calls.
  * The chain ID is used in EIP-155 replay protection for transactions.
- * 
+ *
  * @return The chain ID as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -166,9 +168,9 @@ fc::uint256 ethereum_client::get_chain_id() {
 
 /**
  * @brief Retrieves the network version of the connected Ethereum network
- * 
+ *
  * Gets the current network ID (e.g., 1 for mainnet, 3 for Ropsten).
- * 
+ *
  * @return The network version as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -179,10 +181,10 @@ fc::uint256 ethereum_client::get_network_version() {
 
 /**
  * @brief Checks if the Ethereum node is currently syncing
- * 
+ *
  * Returns false if the node is fully synced, or an object with sync status
  * information (startingBlock, currentBlock, highestBlock) if syncing.
- * 
+ *
  * @return Variant containing false or sync status object
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -193,13 +195,13 @@ fc::variant ethereum_client::get_syncing_status() {
 
 /**
  * @brief Creates a default EIP-1559 transaction with estimated gas and current fees
- * 
+ *
  * Constructs a complete EIP-1559 transaction by:
  * - Fetching current gas configuration (base fee, priority fee)
  * - Encoding the contract call data according to the ABI
  * - Estimating gas usage and adding a 20% buffer
  * - Setting the nonce from the pending transaction count
- * 
+ *
  * @param to The recipient address (contract address for contract calls)
  * @param contract The ABI contract definition for encoding the call data
  * @param params The parameters to pass to the contract function
@@ -228,11 +230,11 @@ eip1559_tx ethereum_client::create_default_tx(const address_compat_type& to, con
 
 /**
  * @brief Converts contract parameters to hex-encoded data string
- * 
+ *
  * Handles both raw hex string data and structured parameter variants.
  * If params contains fc::variants, encodes them according to the contract ABI.
  * If params contains a string, uses it directly as the data.
- * 
+ *
  * @param contract ABI contract definition for encoding
  * @param params Either a raw hex string or structured parameters (fc::variants)
  * @param add_prefix If true, ensures the result has "0x" prefix
@@ -254,9 +256,9 @@ std::string to_data_from_params(const abi::contract& contract, const data_or_par
 
 /**
  * @brief Retrieves the latest block number
- * 
+ *
  * Gets the number of the most recent block in the blockchain.
- * 
+ *
  * @return The latest block number as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -269,10 +271,10 @@ fc::uint256 ethereum_client::get_block_number() {
 
 /**
  * @brief Retrieves block information by block number or tag
- * 
+ *
  * Fetches detailed information about a block identified by its number or a tag
  * like "latest", "earliest", or "pending".
- * 
+ *
  * @param block_number_or_tag The block number (as string) or tag (e.g., "latest")
  * @param full_transaction_data If true, returns full transaction objects; if false, only transaction hashes
  * @return Block data as a variant_object
@@ -287,9 +289,9 @@ fc::variant_object ethereum_client::get_block_by_number(const block_tag_t& block
 
 /**
  * @brief Retrieves block information by block hash
- * 
+ *
  * Fetches detailed information about a block identified by its hash.
- * 
+ *
  * @param block_hash The block hash (hexadecimal string with "0x" prefix)
  * @param full_transaction_data If true, returns full transaction objects; if false, only transaction hashes
  * @return Block data as a variant_object
@@ -302,9 +304,9 @@ fc::variant_object ethereum_client::get_block_by_hash(const std::string& block_h
 
 /**
  * @brief Retrieves transaction information by transaction hash
- * 
+ *
  * Fetches detailed information about a transaction identified by its hash.
- * 
+ *
  * @param tx_hash The transaction hash (hexadecimal string with "0x" prefix)
  * @return Transaction data as a variant
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -316,10 +318,10 @@ fc::variant ethereum_client::get_transaction_by_hash(const std::string& tx_hash)
 
 /**
  * @brief Retrieves the base fee per gas from the latest block
- * 
+ *
  * Gets the base fee per gas (in wei) from the latest block. This is part of
  * EIP-1559 and represents the minimum fee required for transaction inclusion.
- * 
+ *
  * @return The base fee per gas as a uint256
  * @throws fc::exception if the block doesn't contain baseFeePerGas field
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -332,10 +334,10 @@ fc::uint256 ethereum_client::get_base_fee_per_gas() {
 
 /**
  * @brief Retrieves the suggested maximum priority fee per gas
- * 
+ *
  * Gets the suggested tip (priority fee) to pay to miners/validators for
  * transaction inclusion. This is part of EIP-1559 fee mechanism.
- * 
+ *
  * @return The suggested priority fee per gas as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -347,10 +349,10 @@ fc::uint256 ethereum_client::get_max_priority_fee_per_gas() {
 
 /**
  * @brief Estimates the gas required for a simple value transfer
- * 
+ *
  * Estimates the amount of gas needed to execute a transaction that transfers
  * value from one address to another.
- * 
+ *
  * @param to The recipient address
  * @param value The amount of wei to transfer (optional, defaults to 0)
  * @param gas_config Optional gas configuration (unused in this overload)
@@ -367,11 +369,11 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const s
 
 /**
  * @brief Retrieves current gas configuration for EIP-1559 transactions
- * 
+ *
  * Fetches the current base fee and priority fee, then calculates the
  * recommended max fee per gas as (base_fee * 2) + tip. This provides
  * a buffer for base fee increases between transaction submission and inclusion.
- * 
+ *
  * @return gas_config_t structure containing tip, base_fee, and max_fee_per_gas
  * @throws fc::network::json_rpc::json_rpc_exception if any RPC call fails
  */
@@ -389,11 +391,11 @@ ethereum_client::gas_config_t ethereum_client::get_gas_config() {
 
 /**
  * @brief Estimates the gas required for a contract function call
- * 
+ *
  * Estimates the amount of gas needed to execute a contract function call.
  * Encodes the call data according to the ABI and simulates the transaction
  * to determine gas usage.
- * 
+ *
  * @param to The contract address
  * @param contract The ABI contract definition for encoding the call data
  * @param data_or_params Either raw hex string data or structured parameters (fc::variants)
@@ -428,10 +430,10 @@ fc::uint256 ethereum_client::estimate_gas(const address_compat_type& to, const a
 
 /**
  * @brief Retrieves the current gas price
- * 
+ *
  * Gets the current gas price in wei. This is the legacy gas price mechanism
  * (pre-EIP-1559). For EIP-1559 transactions, use get_gas_config() instead.
- * 
+ *
  * @return The current gas price as a uint256
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
  */
@@ -443,11 +445,11 @@ fc::uint256 ethereum_client::get_gas_price() {
 
 /**
  * @brief Sends a transaction using eth_sendTransaction
- * 
+ *
  * Submits a transaction to the network. The node will sign the transaction
  * using its own account. This method is typically used with nodes that manage
  * private keys (e.g., local development nodes).
- * 
+ *
  * @param raw_tx_data The transaction data (hex-encoded)
  * @return The transaction hash as a string
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -460,10 +462,10 @@ std::string ethereum_client::send_transaction(const std::string& raw_tx_data) {
 
 /**
  * @brief Sends a signed raw transaction using eth_sendRawTransaction
- * 
+ *
  * Submits a pre-signed transaction to the network. The transaction must be
  * RLP-encoded and signed before calling this method.
- * 
+ *
  * @param raw_tx_data The signed, RLP-encoded transaction data (hex string with "0x" prefix)
  * @return The transaction hash as a string
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -476,10 +478,10 @@ std::string ethereum_client::send_raw_transaction(const std::string& raw_tx_data
 
 /**
  * @brief Retrieves logs matching the specified filter criteria
- * 
+ *
  * Fetches event logs from the blockchain based on filter parameters such as
  * address, topics, fromBlock, and toBlock.
- * 
+ *
  * @param params Filter parameters as a variant (typically a variant_object)
  * @return Array of log entries as a variant
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -490,11 +492,11 @@ fc::variant ethereum_client::get_logs(const fc::variant& params) {
 
 /**
  * @brief Retrieves the transaction receipt by transaction hash
- * 
+ *
  * Fetches the receipt for a transaction, which includes information about
  * the transaction execution such as status, gas used, logs, and contract address
  * (for contract creation transactions).
- * 
+ *
  * @param tx_hash The transaction hash (hexadecimal string with "0x" prefix)
  * @return Transaction receipt data as a variant
  * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
@@ -504,4 +506,145 @@ fc::variant ethereum_client::get_transaction_receipt(const std::string& tx_hash)
    return execute("eth_getTransactionReceipt", params);
 }
 
+/**
+ * @brief Queries event logs for a specific contract filtered by event names
+ *
+ * Builds an eth_getLogs filter using:
+ * - The contract address
+ * - topics[0] = array of keccak256 event signature hashes (OR filter)
+ * - fromBlock / toBlock range
+ *
+ * Each log entry is parsed into an ethereum_event_data struct. Non-indexed
+ * event parameters are decoded using the matching ABI definition when available.
+ *
+ * @param contract_addr The address of the contract to query events from
+ * @param event_names One or more event names to filter for
+ * @param event_abis ABI definitions for the events (must have type == event)
+ * @param from_block Starting block for the query range
+ * @param to_block Ending block for the query range
+ * @return Vector of ethereum_event_data structs sorted by block number and log index
+ */
+std::vector<ethereum_event_data> ethereum_client::get_events(const address_compat_type& contract_addr,
+                                                              const std::vector<std::string>& event_names,
+                                                              const std::vector<abi::contract>& event_abis,
+                                                              const block_tag_t& from_block,
+                                                              const block_tag_t& to_block) {
+   // Build a map from topic hash hex -> abi::contract for decoding and name lookup
+   std::map<std::string, const abi::contract*> topic_to_abi;
+   fc::variants topic_hashes;
+
+   for (const auto& event_abi : event_abis) {
+      if (event_abi.type != abi::invoke_target_type::event)
+         continue;
+      if (!event_names.empty() &&
+          std::ranges::find(event_names, event_abi.name) == event_names.end())
+         continue;
+
+      auto topic = abi::to_event_topic(event_abi);
+      auto topic_hex = hash_to_hex(topic, true);
+      topic_to_abi[topic_hex] = &event_abi;
+      topic_hashes.emplace_back(topic_hex);
+   }
+
+   FC_ASSERT(!topic_hashes.empty(), "No matching event ABIs found for the requested event names");
+
+   // Build the eth_getLogs filter object
+   auto addr = to_address(contract_addr);
+   fc::mutable_variant_object filter;
+   filter("address", to_hex(addr, true));
+   filter("fromBlock", to_block_tag(from_block));
+   filter("toBlock", to_block_tag(to_block));
+   // topics[0] is an OR-array of event signature hashes
+   filter("topics", fc::variants{topic_hashes});
+
+   auto logs_result = get_logs(fc::variants{filter});
+   FC_ASSERT(logs_result.is_array(), "eth_getLogs did not return an array");
+
+   const auto& logs = logs_result.get_array();
+   std::vector<ethereum_event_data> results;
+   results.reserve(logs.size());
+
+   for (const auto& log_var : logs) {
+      const auto& log = log_var.get_object();
+
+      ethereum_event_data evt;
+      evt.contract_address = addr;
+
+      // Parse block number
+      if (log.contains("blockNumber")) {
+         evt.block_number = to_uint256(log["blockNumber"]);
+      }
+
+      // Parse transaction hash
+      if (log.contains("transactionHash")) {
+         evt.transaction_hash = log["transactionHash"].as_string();
+      }
+
+      // Parse log index
+      if (log.contains("logIndex")) {
+         evt.log_index = static_cast<uint32_t>(to_uint256(log["logIndex"]));
+      }
+
+      // Parse transaction index
+      if (log.contains("transactionIndex")) {
+         evt.transaction_index = static_cast<uint32_t>(to_uint256(log["transactionIndex"]));
+      }
+
+      // Parse topics
+      if (log.contains("topics") && log["topics"].is_array()) {
+         for (const auto& topic : log["topics"].get_array()) {
+            evt.topics.push_back(topic.as_string());
+         }
+      }
+
+      // Parse raw data
+      if (log.contains("data")) {
+         auto data_hex = log["data"].as_string();
+         evt.data = fc::crypto::ethereum::hex_to_bytes(data_hex);
+      }
+
+      // Look up event name and store ABI for deferred decoding via decode<T>()
+      if (!evt.topics.empty()) {
+         auto it = topic_to_abi.find(evt.topics[0]);
+         if (it != topic_to_abi.end()) {
+            evt.event_name = it->second->name;
+            evt.event_abi = *it->second;
+         }
+      }
+
+      results.push_back(std::move(evt));
+   }
+
+   // Sort by block number, then log index
+   std::sort(results.begin(), results.end(), [](const ethereum_event_data& a, const ethereum_event_data& b) {
+      if (a.block_number != b.block_number)
+         return a.block_number < b.block_number;
+      return a.log_index < b.log_index;
+   });
+
+   return results;
+}
+
+/**
+ * @brief Queries event logs for this contract filtered by event names
+ *
+ * Collects matching ABI event definitions from the internal ABI map and
+ * delegates to ethereum_client::get_events.
+ */
+std::vector<ethereum_event_data> ethereum_contract_client::query_events(const std::vector<std::string>& event_names,
+                                                                        const block_tag_t& from_block,
+                                                                        const block_tag_t& to_block) {
+   std::vector<abi::contract> event_abis;
+   auto abi_map = _abi_map.readable();
+   for (const auto& name : event_names) {
+      FC_ASSERT(abi_map.contains(name), "Event ABI not found for: {}", name);
+      const auto& abi_entry = abi_map.at(name);
+      FC_ASSERT(abi_entry.type == abi::invoke_target_type::event,
+                "ABI entry '{}' is not an event type", name);
+      event_abis.push_back(abi_entry);
+   }
+   return client->get_events(contract_address, event_names, event_abis, from_block, to_block);
+}
+
 } // namespace fc::network::ethereum
+void fc::from_variant(const fc::variant& var, fc::network::ethereum::ethereum_event_data& vo) {}

@@ -2,10 +2,12 @@
 // SPDX-License-Identifier: MIT
 #pragma once
 
+#include <fc-lite/expected.hpp>
 #include <fc-lite/threadsafe_map.hpp>
 
 #include <fc/crypto/ethereum/ethereum_types.hpp>
 #include <fc/crypto/signature_provider.hpp>
+#include <fc/exception/exception.hpp>
 #include <fc/int256.hpp>
 #include <fc/network/ethereum/ethereum_abi.hpp>
 #include <fc/network/json_rpc/json_rpc_client.hpp>
@@ -17,7 +19,7 @@ using namespace fc::network::json_rpc;
 
 /**
  * @brief Type alias for Ethereum block tag or block number
- * 
+ *
  * Can hold either a string (for block numbers) or string_view (for tags like "latest", "pending")
  */
 using block_tag_t = std::variant<std::string, std::string_view>;
@@ -34,7 +36,7 @@ constexpr std::string_view block_tag_latest = "latest";
 
 /**
  * @brief Converts a block_tag_t variant to a string
- * 
+ *
  * @param tag Block tag variant (either string or string_view)
  * @return String representation of the block tag
  */
@@ -50,6 +52,40 @@ constexpr std::string to_block_tag(block_tag_t tag) {
  */
 using data_or_params_t  = std::variant<std::string, fc::variants>;
 
+/**
+ * @struct ethereum_event_data
+ * @brief Represents a decoded Ethereum event log entry
+ *
+ * Contains the raw event data and the matching ABI definition. Use the
+ * decode<T>() template to decode the non-indexed event parameters into
+ * a concrete type via fc::from_variant.
+ */
+struct ethereum_event_data {
+   fc::crypto::ethereum::address contract_address;
+   std::string event_name;
+   fc::crypto::ethereum::bytes data;
+   fc::uint256 block_number;
+   std::string transaction_hash;
+   uint32_t log_index{0};
+   uint32_t transaction_index{0};
+   std::vector<std::string> topics;
+   std::optional<abi::contract> event_abi;
+
+   /**
+    * @brief Decodes the non-indexed event parameters into the requested type
+    *
+    * Special handling for fc::variant and fc::variant_object: returns the ABI-decoded
+    * result directly. For other types, decodes to fc::variant first, then converts
+    * via fc::from_variant<T>.
+    *
+    * @tparam T Target type (must be convertible from fc::variant via from_variant)
+    * @return std::expected containing the decoded value, or an ethereum_abi_decode_exception on failure
+    */
+   template <typename T>
+   std::expected<T, fc::ethereum_abi_decode_exception> decode() const;
+};
+
+
 class ethereum_client;
 
 /**
@@ -59,7 +95,7 @@ using ethereum_client_ptr = std::shared_ptr<ethereum_client>;
 
 /**
  * @brief Function type for Ethereum contract view/call functions
- * 
+ *
  * @tparam RT Return type of the contract function
  * @tparam Args Argument types for the contract function
  */
@@ -68,7 +104,7 @@ using ethereum_contract_call_fn = std::function<RT(const std::string& block_tag,
 
 /**
  * @brief Function type for Ethereum contract transaction functions
- * 
+ *
  * @tparam RT Return type of the contract function
  * @tparam Args Argument types for the contract function
  */
@@ -78,7 +114,7 @@ using ethereum_contract_tx_fn = std::function<RT(Args&...)>;
 /**
  * @class ethereum_contract_client
  * @brief Base class for interacting with Ethereum smart contracts
- * 
+ *
  * Provides functionality to create typed contract call and transaction functions
  * based on ABI definitions. Manages contract ABIs and provides methods to execute
  * view functions and transactions.
@@ -90,22 +126,22 @@ public:
     * @brief The Ethereum address of the contract
     */
    const address contract_address;
-   
+
    /**
     * @brief Hexadecimal string representation of the contract address
     */
    const std::string contract_address_hex;
-   
+
    /**
     * @brief Shared pointer to the ethereum_client used for RPC calls
     */
    const ethereum_client_ptr client;
-   
+
    ethereum_contract_client() = delete;
-   
+
    /**
     * @brief Constructs an ethereum_contract_client instance
-    * 
+    *
     * @param client Shared pointer to the ethereum_client for RPC communication
     * @param contract_address_compat Contract address (can be address or hex string)
     * @param contracts Optional vector of ABI contract definitions to preload
@@ -125,7 +161,7 @@ public:
 
    /**
     * @brief Checks if an ABI definition exists for the given contract name
-    * 
+    *
     * @param contract_name Name of the contract function/event
     * @return true if ABI exists, false otherwise
     */
@@ -133,23 +169,38 @@ public:
 
    /**
     * @brief Retrieves the ABI definition for the given contract name
-    * 
+    *
     * @param contract_name Name of the contract function/event
     * @return Reference to the ABI contract definition
     * @throws std::out_of_range if contract_name not found
     */
    const abi::contract& get_abi(const std::string& contract_name);
 
+   /**
+    * @brief Queries event logs for this contract filtered by event names
+    *
+    * Uses the ABI definitions stored in this contract client to build topic filters
+    * and query event logs via the underlying ethereum_client.
+    *
+    * @param event_names One or more event names to filter for (must exist in the ABI map)
+    * @param from_block Starting block for the query range
+    * @param to_block Ending block for the query range
+    * @return Vector of ethereum_event_data structs sorted by block number and log index
+    * @throws std::out_of_range if an event name is not found in the ABI map
+    */
+   std::vector<ethereum_event_data> query_events(const std::vector<std::string>& event_names,
+                                                  const block_tag_t& from_block,
+                                                  const block_tag_t& to_block = block_tag_latest);
 
 protected:
 
 
    /**
     * @brief Creates a typed contract call function (view/pure function)
-    * 
+    *
     * Generates a callable function object that encodes parameters, executes
     * an eth_call RPC, and decodes the result according to the ABI.
-    * 
+    *
     * @tparam RT Return type of the contract function
     * @tparam Args Argument types for the contract function
     * @param contract ABI contract definition
@@ -160,10 +211,10 @@ protected:
 
    /**
     * @brief Creates a typed contract transaction function (state-changing function)
-    * 
+    *
     * Generates a callable function object that encodes parameters, creates a signed
     * transaction, and submits it to the network.
-    * 
+    *
     * @tparam RT Return type (typically transaction hash)
     * @tparam Args Argument types for the contract function
     * @param contract ABI contract definition
@@ -312,6 +363,27 @@ public:
    fc::variant get_logs(const fc::variant& params);
 
    /**
+    * @brief Queries event logs for a specific contract filtered by event names
+    *
+    * Builds an eth_getLogs filter using the contract address and event topic hashes
+    * derived from the provided ABI event definitions. Returns parsed event data
+    * including block metadata, topics, raw data, and optionally decoded parameters.
+    *
+    * @param contract_address The address of the contract to query events from
+    * @param event_names One or more event names to filter for
+    * @param event_abis ABI definitions for the events (must have type == event)
+    * @param from_block Starting block for the query range
+    * @param to_block Ending block for the query range
+    * @return Vector of ethereum_event_data structs sorted by block number and log index
+    * @throws fc::network::json_rpc::json_rpc_exception if the RPC call fails
+    */
+   std::vector<ethereum_event_data> get_events(const address_compat_type& contract_address,
+                                                const std::vector<std::string>& event_names,
+                                                const std::vector<abi::contract>& event_abis,
+                                                const block_tag_t& from_block,
+                                                const block_tag_t& to_block = block_tag_latest);
+
+   /**
     * @brief Retrieves the transaction receipt by transaction hash.
     * @param tx_hash The transaction hash.
     * @return The transaction receipt data in JSON format.
@@ -348,21 +420,21 @@ public:
 
    /**
     * @brief Gets the Ethereum address associated with this client
-    * 
+    *
     * @return The Ethereum address derived from the signature provider's public key
     */
    ethereum::address get_address() const { return _address; };
-   
+
    /**
     * @brief Gets the signer address (same as get_address)
-    * 
+    *
     * @return The Ethereum address used for signing transactions
     */
    ethereum::address get_signer_address() const { return _address; };
-   
+
    /**
     * @brief Creates a default EIP-1559 transaction with estimated gas and current fees
-    * 
+    *
     * @param to Recipient address (contract address for contract calls)
     * @param contract ABI contract definition for encoding the call data
     * @param params Parameters to pass to the contract function
@@ -373,10 +445,10 @@ public:
 
    /**
     * @brief Gets or creates a typed contract client instance
-    * 
+    *
     * Maintains a cache of contract clients by address. If a client for the given
     * address doesn't exist, creates a new instance of type C.
-    * 
+    *
     * @tparam C Contract client type (must derive from ethereum_contract_client)
     * @param address_compat Contract address (can be address or hex string)
     * @param contracts Optional vector of ABI contract definitions to preload
@@ -398,27 +470,27 @@ private:
     * @brief Signature provider for signing transactions
     */
    const signature_provider_ptr _signature_provider;
-   
+
    /**
     * @brief Ethereum address derived from the signature provider's public key
     */
    const ethereum::address _address;
-   
+
    /**
     * @brief JSON-RPC client for communicating with the Ethereum node
     */
    json_rpc_client _client;
-   
+
    /**
     * @brief Cached chain ID (fetched once and reused)
     */
    std::optional<fc::uint256> _chain_id;
-   
+
    /**
     * @brief Mutex for thread-safe access to _contracts_map
     */
    std::mutex _contracts_map_mutex{};
-   
+
    /**
     * @brief Cache of contract client instances by address
     */
@@ -427,11 +499,11 @@ private:
 
 /**
  * @brief Converts contract parameters to hex-encoded data string
- * 
+ *
  * Handles both raw hex string data and structured parameter variants.
  * If params is a string, uses it directly; if it's variants, encodes them
  * according to the contract ABI.
- * 
+ *
  * @param contract ABI contract definition for encoding
  * @param params Either a raw hex string or structured parameters (fc::variants)
  * @param add_prefix If true, ensures the result has "0x" prefix
@@ -481,4 +553,68 @@ ethereum_contract_tx_fn<RT, Args...> ethereum_contract_client::create_tx(const a
    };
 }
 
+template <typename T>
+std::expected<T, fc::ethereum_abi_decode_exception> ethereum_event_data::decode() const {
+   try {
+      FC_ASSERT(event_abi.has_value(), "No event ABI available for decoding");
+      FC_ASSERT(!data.empty(), "No event data to decode");
+
+      // Build a temporary function ABI with the event inputs as outputs
+      // so contract_decode_data can decode the non-indexed parameters
+      abi::contract decode_abi;
+      decode_abi.name = event_abi->name;
+      decode_abi.type = abi::invoke_target_type::function;
+      decode_abi.outputs = event_abi->inputs;
+
+      auto data_hex = fc::to_hex(data, true);
+      auto decoded = contract_decode_data(decode_abi, data_hex);
+
+      if constexpr (std::is_same_v<std::decay_t<T>, fc::variant>) {
+         return decoded;
+      } else if constexpr (std::is_same_v<std::decay_t<T>, fc::variant_object>) {
+         return decoded.get_object();
+      } else {
+         T value;
+         fc::from_variant(decoded, value);
+         return value;
+      }
+   } catch (const fc::exception& e) {
+      return std::unexpected(
+         fc::ethereum_abi_decode_exception(e.get_log(), ethereum_abi_decode_exception_code,
+                                           "ethereum_abi_decode_exception", e.what()));
+   } catch (const std::exception& e) {
+      return std::unexpected(fc::ethereum_abi_decode_exception(
+         fc::log_message(fc::log_context(), e.what()),
+         ethereum_abi_decode_exception_code, "ethereum_abi_decode_exception", e.what()));
+   }
+}
+
 } // namespace fc::network::ethereum
+
+// std::string event_name;
+// fc::crypto::ethereum::bytes data;
+// fc::uint256 block_number;
+// std::string transaction_hash;
+// uint32_t log_index{0};
+// uint32_t transaction_index{0};
+// std::vector<std::string> topics;
+// std::optional<abi::contract> event_abi;
+FC_REFLECT(fc::network::ethereum::ethereum_event_data,
+   (contract_address)
+   (event_name)
+   (data)
+   (block_number)
+   (transaction_hash)
+   (log_index)
+   (transaction_index)
+   (topics)
+   (event_abi))
+
+namespace fc {
+void from_variant(const fc::variant& var, fc::network::ethereum::ethereum_event_data& vo);
+
+/**
+ * Simple alias to the ethereum data type reflector
+ */
+using ethereum_event_data_reflector = reflector<fc::network::ethereum::ethereum_event_data>;
+} // namespace fc
