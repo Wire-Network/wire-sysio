@@ -548,7 +548,7 @@ namespace fc {
       FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
 
       // pack the size of the bitset, not the number of blocks
-      auto num_bits = value.size();
+      const auto num_bits = value.size();
       fc::raw::pack( s, unsigned_int(num_bits) );
       if (num_bits > 0) {
          // pack the blocks
@@ -562,7 +562,7 @@ namespace fc {
       // the packed size is the number of bits in the set, not the number of blocks
       unsigned_int size;
       fc::raw::unpack( s, size );
-      size_t num_blocks = bitset::calc_num_blocks(size);
+      const size_t num_blocks = bitset::calc_num_blocks(size);
       FC_ASSERT( num_blocks <= MAX_NUM_ARRAY_ELEMENTS );
       value.resize(size);
       if (size > 0) {
