@@ -99,11 +99,11 @@ namespace sysiosystem {
       using value_type = std::pair<sysio::producer_authority, uint16_t>;
       std::vector< value_type > top_producers;
       std::vector< finalizer_auth_info > proposed_finalizers;
-      top_producers.reserve(21);
-      proposed_finalizers.reserve(21);
+      top_producers.reserve(max_producers);
+      proposed_finalizers.reserve(max_producers);
 
-      for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21; ++it ) {
-         if( it->rank > 21 ) break;   // no more ranked producers
+      for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < max_producers; ++it ) {
+         if( it->rank > max_producers ) break;   // no more ranked producers
          if( !it->active() ) continue;
 
          // Require active finalizer key for all scheduled producers

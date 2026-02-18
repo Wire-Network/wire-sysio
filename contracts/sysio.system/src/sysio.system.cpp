@@ -182,7 +182,7 @@ namespace sysiosystem {
       auto idx = _producers.get_index<"prodrank"_n>();
       std::set<name> rm_sched_prods;
       for( auto i = idx.cbegin(); i != idx.cend(); ++i ) {
-         if( i->rank > 21 ) break;
+         if( i->rank > max_producers ) break;
          rm_sched_prods.insert(i->owner);
       }
       uint32_t rank = 0;
@@ -200,7 +200,7 @@ namespace sysiosystem {
          auto i = _producers.find(prod.value);
          if( i != _producers.end() ) {
             _producers.modify(i, same_payer, [&](auto& p) {
-               p.rank = p.rank + 21;
+               p.rank = p.rank + max_producers;
             });
          }
       }

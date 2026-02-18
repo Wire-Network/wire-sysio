@@ -53,6 +53,8 @@ namespace sysiosystem {
          return ( flags & ~static_cast<F>(field) );
    }
 
+
+   static constexpr size_t   max_producers         = 21;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
