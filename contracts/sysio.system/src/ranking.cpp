@@ -91,12 +91,10 @@ namespace sysiosystem {
       });
    }
 
-   void system_contract::update_elected_producers( const block_timestamp& block_time ) {
+   void system_contract::update_ranked_producers( const block_timestamp& block_time ) {
       _gstate.last_producer_schedule_update = block_time;
 
-      // TODO: this needs updated when producer change mechanism is defined
-/*
-      auto idx = _producers.get_index<"prototalvote"_n>();
+      auto idx = _producers.get_index<"prodrank"_n>();
 
       using value_type = std::pair<sysio::producer_authority, uint16_t>;
       std::vector< value_type > top_producers;
@@ -104,25 +102,17 @@ namespace sysiosystem {
       top_producers.reserve(21);
       proposed_finalizers.reserve(21);
 
-      bool is_savanna = is_savanna_consensus();
+      for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21; ++it ) {
+         if( it->rank > 21 ) break;   // no more ranked producers
+         if( !it->active() ) continue;
 
-      for( auto it = idx.cbegin(); it != idx.cend() && top_producers.size() < 21 && 0 < it->total_votes && it->active(); ++it ) {
-         if( is_savanna ) {
-            auto finalizer = _finalizers.find( it->owner.value );
-            if( finalizer == _finalizers.end() ) {
-               // The producer is not in finalizers table, indicating it does not have an
-               // active registered finalizer key. Try next one.
-               continue;
-            }
-
-            // This should never happen. Double check just in case
-            if( finalizer->active_key_binary.empty() ) {
-               continue;
-            }
-
-            proposed_finalizers.emplace_back(*finalizer);
+         // Require active finalizer key for all scheduled producers
+         auto finalizer = _finalizers.find( it->owner.value );
+         if( finalizer == _finalizers.end() || finalizer->active_key_binary.empty() ) {
+            continue;
          }
 
+         proposed_finalizers.emplace_back(*finalizer);
          top_producers.emplace_back(
             sysio::producer_authority{
                .producer_name = it->owner,
@@ -132,17 +122,16 @@ namespace sysiosystem {
          );
       }
 
-      if( top_producers.size() == 0 || top_producers.size() < _gstate.last_producer_schedule_size ) {
+      if( top_producers.empty() || top_producers.size() < _gstate.last_producer_schedule_size ) {
          return;
       }
 
+      // Sort by producer name for deterministic ordering
       std::sort( top_producers.begin(), top_producers.end(), []( const value_type& lhs, const value_type& rhs ) {
-         return lhs.first.producer_name < rhs.first.producer_name; // sort by producer name
-         // return lhs.second < rhs.second; // sort by location
+         return lhs.first.producer_name < rhs.first.producer_name;
       } );
 
       std::vector<sysio::producer_authority> producers;
-
       producers.reserve(top_producers.size());
       for( auto& item : top_producers )
          producers.push_back( std::move(item.first) );
@@ -151,12 +140,7 @@ namespace sysiosystem {
          _gstate.last_producer_schedule_size = static_cast<decltype(_gstate.last_producer_schedule_size)>( producers.size() );
       }
 
-      // set_proposed_finalizers() checks if last proposed finalizer policy
-      // has not changed, it will not call set_finalizers() host function.
-      if( is_savanna ) {
-         set_proposed_finalizers( std::move(proposed_finalizers) );
-      }
-*/
+      set_proposed_finalizers( std::move(proposed_finalizers) );
    }
 
 } /// namespace sysiosystem

@@ -327,26 +327,30 @@ public:
       msig_abi_ser.set_abi(msig_abi, abi_serializer::create_yield_function(abi_serializer_max_time));
    }
 
-   vector<name> activate_producers() {
+   vector<name> activate_producers( uint32_t count = 21 ) {
       //stake more than 15% of total SYS supply to activate chain
       transfer( "sysio"_n, "alice1111111"_n, core_sym::from_string("650000000.0000"), config::system_account_name );
-      // TODO: do the equivalent with ROA
-      // BOOST_REQUIRE_EQUAL( success(), stake( "alice1111111"_n, "alice1111111"_n, core_sym::from_string("300000000.0000"), core_sym::from_string("300000000.0000") ) );
 
-      // create accounts {defproducera, defproducerb, ..., defproducerz} and register as producers
+      // create accounts {defproducera, defproducerb, ..., } and register as producers
       std::vector<account_name> producer_names;
       {
-         producer_names.reserve('z' - 'a' + 1);
+         producer_names.reserve(count);
          const std::string root("defproducer");
-         for ( char c = 'a'; c < 'a'+21; ++c ) {
-            producer_names.emplace_back(root + std::string(1, c));
+         for ( uint32_t i = 0; i < count; ++i ) {
+            producer_names.emplace_back(root + std::string(1, static_cast<char>('a' + i)));
          }
          setup_producer_accounts(producer_names);
+         // Only the first 21 go into the initial schedule
+         uint32_t sched_count = std::min(count, uint32_t(21));
          std::vector<legacy::producer_key> schedule;
-         for (const auto& p: producer_names) {
-            BOOST_REQUIRE_EQUAL( success(), regproducer(p) );
-            auto key = get_public_key( p, "active" );
-            schedule.push_back(legacy::producer_key{p, key});
+         for ( uint32_t i = 0; i < sched_count; ++i ) {
+            BOOST_REQUIRE_EQUAL( success(), regproducer(producer_names[i]) );
+            auto key = get_public_key( producer_names[i], "active" );
+            schedule.push_back(legacy::producer_key{producer_names[i], key});
+         }
+         // Register remaining producers (not in initial schedule)
+         for ( uint32_t i = sched_count; i < count; ++i ) {
+            BOOST_REQUIRE_EQUAL( success(), regproducer(producer_names[i]) );
          }
          auto trace = TESTER::push_action(config::system_account_name, "setprodkeys"_n, config::system_account_name, mvo()("schedule", schedule));
          BOOST_REQUIRE(!!trace->receipt);
@@ -368,10 +372,17 @@ public:
       produce_blocks( 250 );
 
       auto producer_keys = control->active_producers().producers;
-      BOOST_REQUIRE_EQUAL( 21, producer_keys.size() );
+      uint32_t expected_active = std::min(count, uint32_t(21));
+      BOOST_REQUIRE_EQUAL( expected_active, producer_keys.size() );
       BOOST_REQUIRE_EQUAL( name("defproducera"), producer_keys[0].producer_name );
 
       return producer_names;
+   }
+
+   action_result setrank( const name& producer, uint32_t rank ) {
+      return push_action( config::system_account_name, "setrank"_n, mvo()
+                          ("producer", producer)
+                          ("rank", rank) );
    }
 
 

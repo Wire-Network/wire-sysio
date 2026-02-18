@@ -486,50 +486,19 @@ BOOST_FIXTURE_TEST_CASE(delete_last_finalizer_key_test, finalizer_key_tester) tr
 }
 FC_LOG_AND_RETHROW() // delete_last_finalizer_key_test
 
-/* Wire currently has no ranking of producers. Need to update when producer reg and finalizer key reg implemented
-
-BOOST_FIXTURE_TEST_CASE(switchtosvnn_success_tests, finalizer_key_tester) try {
-   // Register and vote 26 producers
-   auto producer_names = activate_producers();
-   // Register 21 finalizer keys for the first 21 producers
-   register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
-
-   // Verify finalizers_table and last_prop_fins_table match
-   verify_last_proposed_finalizers(producer_names);
-
-   // Produce enough blocks so transition to Savanna finishes
-   produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
-
-   // If head_finality_data has value, it means we are at least after or on
-   // Savanna Genesis Block
-   BOOST_REQUIRE_EQUAL( true, control->head_finality_data().has_value() );
-
-   // Cannot switch to Savanna multiple times
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "switchtosvnn can be run only once" ),
-                        push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
-}
-FC_LOG_AND_RETHROW()
-
-// Activate 3 keys after transition to Savanna
+// After registering keys and waiting for update_ranked_producers, test key activation
 BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {
-   // Register and vote 26 producers
    auto producer_names = activate_producers();
    // Register 21 finalizer keys for the first 21 producers
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+
+   // Wait for update_ranked_producers to run (triggers every ~60s in onblock)
+   produce_block( fc::minutes(2) );
 
    // Verify finalizers_table and last_prop_fins_table match
    verify_last_proposed_finalizers(producer_names);
 
-   // Produce enough blocks so transition to Savanna finishes
-   produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
-
-   // If head_finality_data has value, it means we are at least after or on
-   // Savanna Genesis Block
-   BOOST_REQUIRE_EQUAL( true, control->head_finality_data().has_value() );
-
-   // Register two more key for defproducera
+   // Register two more keys for defproducera
    account_name producera = "defproducera"_n;
    BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(producera, finalizer_key_1, pop_1) );
    BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(producera, finalizer_key_2, pop_2) );
@@ -572,42 +541,20 @@ BOOST_FIXTURE_TEST_CASE(multi_activation_tests, finalizer_key_tester) try {
 }
 FC_LOG_AND_RETHROW()
 
-BOOST_FIXTURE_TEST_CASE(switchtosvnn_missing_authority_tests, finalizer_key_tester) try {
-   BOOST_REQUIRE_EQUAL( error( "missing authority of sysio" ),
-                        push_action( alice, "switchtosvnn"_n, mvo()) );
-}
-FC_LOG_AND_RETHROW()
-
-BOOST_FIXTURE_TEST_CASE(switchtosvnn_not_enough_finalizer_keys_tests, finalizer_key_tester) try {
-   auto producer_names = activate_producers();
-
-   // Register 20 finalizer keys
-   register_finalizer_keys(producer_names, 20);
-
-   // Have only 20 finalizer keys, short by 1
-   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "not enough top producers have registered finalizer keys, has 20, require 21" ),
-                        push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
-}
-FC_LOG_AND_RETHROW()
-
 // Finalizers are not changed in current schedule rounds
-BOOST_FIXTURE_TEST_CASE(update_elected_producers_no_finalizers_changed_test, finalizer_key_tester) try {
+BOOST_FIXTURE_TEST_CASE(update_ranked_producers_no_finalizers_changed_test, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
 
-   // Produce enough blocks so transition to Savanna finishes
-   produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
-
-   // head_finality_data is available when nodoes is in Savanna
-   BOOST_REQUIRE_EQUAL( true, control->head_finality_data().has_value() );
+   // Wait for update_ranked_producers to run
+   produce_block( fc::minutes(2) );
 
    // Verify finalizers_table and last_prop_fins_table match
    verify_last_proposed_finalizers(producer_names);
 
    auto last_finkey_ids = get_last_prop_fin_ids();
 
-   // Produce for one round
+   // Produce for another round
    produce_block( fc::minutes(2) );
 
    // Since finalizer keys have not changed, last_finkey_ids should be the same
@@ -618,20 +565,15 @@ BOOST_FIXTURE_TEST_CASE(update_elected_producers_no_finalizers_changed_test, fin
 FC_LOG_AND_RETHROW()
 
 // An active finalizer activates another key. The change takes effect immediately.
-BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_changed_test, finalizer_key_tester) try {
+BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_changed_test, finalizer_key_tester) try {
    auto producer_names = activate_producers();
    register_finalizer_keys(producer_names, 21);
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
 
-   // Produce enough blocks so transition to Savanna finishes
-   produce_blocks(504); // 21 Producers * 12 Blocks per producer * 2 rounds to reach Legacy finality
-
-   // head_finality_data is available when nodoes is in Savanna
-   BOOST_REQUIRE_EQUAL( true, control->head_finality_data().has_value() );
+   // Wait for update_ranked_producers to populate lastpropfins
+   produce_block( fc::minutes(2) );
 
    // Verify finalizers_table and last_prop_fins_table match
    verify_last_proposed_finalizers(producer_names);
-   // Verify last finalizer key id table contains all finalzer keys
    auto last_finkey_ids = get_last_prop_fin_ids();
 
    // Pick a producer
@@ -645,8 +587,7 @@ BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_changed_test, finali
    BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(test_producer, finalizer_key_1, pop_1) );
    BOOST_REQUIRE_EQUAL( success(), activate_finalizer_key(test_producer, finalizer_key_1));
 
-   // Since producer is an active producer, the finalizer key change takes effective
-   // immediately.
+   // Since producer is an active producer, the finalizer key change takes effect immediately.
    auto last_finkey_ids_2 = get_last_prop_fin_ids();
    BOOST_REQUIRE_EQUAL( 21, last_finkey_ids_2.size() );
 
@@ -654,102 +595,163 @@ BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_changed_test, finali
    auto p_info_2 = get_finalizer_info(test_producer);
    uint64_t new_id = p_info_2["active_key_id"].as_uint64();
 
-   // After replace the old_id with new_id in last_finkey_ids,
+   // After replacing old_id with new_id in last_finkey_ids,
    // last_finkey_ids should be the same as last_finkey_ids_2
    last_finkey_ids.erase(old_id);
    last_finkey_ids.insert(new_id);
    BOOST_REQUIRE_EQUAL( true, last_finkey_ids == last_finkey_ids_2 );
 }
 FC_LOG_AND_RETHROW()
-*/
+
 // An active finalizer deletes its only key. It is replaced by another finalizer in next round.
-BOOST_FIXTURE_TEST_CASE(update_elected_producers_finalizers_replaced_test, finalizer_key_tester) try {
-   // Create and vote 26 producers
-//TODO: add functionality   auto producer_names = activate_producers(26);
-/*
-   // But only the first 21 producers (defproducera .. defproduceru) register finalizer
-   // keys at the beginning
+BOOST_FIXTURE_TEST_CASE(update_ranked_producers_finalizers_replaced_test, finalizer_key_tester) try {
+   // Create 26 producers (first 21 in schedule, 5 standby)
+   auto producer_names = activate_producers(26);
+
+   // Only the first 21 producers register finalizer keys at the beginning
    register_finalizer_keys(producer_names, 21);
 
-   // Transition to Savanna
-   BOOST_REQUIRE_EQUAL(success(),  push_action( config::system_account_name, "switchtosvnn"_n, mvo()) );
+   // Wait for update_ranked_producers to populate lastpropfins
+   produce_block( fc::minutes(2) );
 
    auto last_finkey_ids = get_last_prop_fin_ids();
-
-   // Produce enough blocks so transition to Savanna finishes
-   produce_blocks(2 * 21 * 12);
-   // head_finality_data is available when nodoes is in Savanna
-   BOOST_REQUIRE_EQUAL( true, control->head_finality_data().has_value() );
+   BOOST_REQUIRE_EQUAL( 21, last_finkey_ids.size() );
 
    // Verify finalizers_table and last_prop_fins_table match
    std::vector<name> producer_names_first_21(producer_names.begin(), producer_names.begin() + 21);
    verify_last_proposed_finalizers(producer_names_first_21);
 
-   // Test delete the first finalizer key
-
    // defproducerv registers its first finalizer key and is marked active
-   account_name  producerv_name = "defproducerv"_n;
+   account_name producerv_name = "defproducerv"_n;
    BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(producerv_name, finalizer_key_1, pop_1) );
    auto producerv_info = get_finalizer_info(producerv_name);
    uint64_t producerv_id = producerv_info["active_key_id"].as_uint64();
 
-   // Wait for two rounds of producer schedule so new finalizer policy takes effect
+   // Use setrank to promote defproducerv into top 21
+   // and demote defproducera out
+   BOOST_REQUIRE_EQUAL( success(), setrank("defproducerv"_n, 1) );
+   BOOST_REQUIRE_EQUAL( success(), setrank("defproducera"_n, 22) );
+
+   // Wait for update_ranked_producers to pick up new ranking
    produce_block( fc::minutes(2) );
-
-   // Delete defproducera's finalizer key
-   name producera_name = "defproducera"_n;
-   auto p_info = get_finalizer_info(producera_name);
-   uint64_t deleted_id = p_info["active_key_id"].as_uint64();
-   auto k_info = get_finalizer_key_info(deleted_id);
-   auto producera_id = k_info["finalizer_key"].as_string();
-   BOOST_REQUIRE_EQUAL( success(), delete_finalizer_key(producera_name, producera_id) );
-
-   // Wait for two rounds of producer schedule so defproducera is replaced by defproducerv
-   // because defproducera does not have an active finalizer key
-   produce_blocks(504);
 
    // find new last_finkey_ids
    auto last_finkey_ids_2 = get_last_prop_fin_ids();
    BOOST_REQUIRE_EQUAL( 21, last_finkey_ids_2.size() );
-   // Make sure new_id is in the new last_finkey_ids
+   // Make sure producerv's key is now in the finalizer set
    BOOST_REQUIRE_EQUAL( true, last_finkey_ids_2.contains(producerv_id) );
+}
+FC_LOG_AND_RETHROW()
 
-   // After replace the deleted_id with new_id in the old last_finkey_ids,
-   // last_finkey_ids should be the same as last_finkey_ids_2
-   last_finkey_ids.erase(deleted_id);
-   last_finkey_ids.insert(producerv_id);
-   BOOST_REQUIRE_EQUAL( true, last_finkey_ids == last_finkey_ids_2 );
+// Test that setrank correctly assigns individual producer rank
+BOOST_FIXTURE_TEST_CASE(setrank_test, finalizer_key_tester) try {
+   auto producer_names = activate_producers();
 
-   // Test delete last finalizer key
+   // Check initial ranks are assigned (1..21)
+   auto prod_info = get_producer_info("defproducera");
+   BOOST_REQUIRE_EQUAL( 1, prod_info["rank"].as<uint32_t>() );
 
-   // defproducerw registers its first finalizer key and is marked active
-   account_name  producerw_name = "defproducerw"_n;
-   BOOST_REQUIRE_EQUAL( success(), register_finalizer_key(producerw_name, finalizer_key_2, pop_2) );
-   auto producerw_info = get_finalizer_info(producerw_name);
-   uint64_t producerw_id = producerw_info["active_key_id"].as_uint64();
+   prod_info = get_producer_info("defproduceru");
+   BOOST_REQUIRE_EQUAL( 21, prod_info["rank"].as<uint32_t>() );
 
-   // Wait for two rounds of producer schedule so new finalizer policy takes effect
+   // setrank requires system authority
+   BOOST_REQUIRE_EQUAL( error( "missing authority of sysio" ),
+                        push_action( alice, "setrank"_n, mvo()
+                           ("producer", "defproducera")
+                           ("rank", 5)
+                        ) );
+
+   // setrank with rank=0 should fail
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "rank must be positive" ),
+                        setrank("defproducera"_n, 0) );
+
+   // setrank with nonexistent producer should fail
+   BOOST_REQUIRE_EQUAL( wasm_assert_msg( "producer not found" ),
+                        setrank("nonexistent1"_n, 1) );
+
+   // Promote defproduceru to rank 1, demote defproducera to rank 22
+   BOOST_REQUIRE_EQUAL( success(), setrank("defproduceru"_n, 1) );
+   BOOST_REQUIRE_EQUAL( success(), setrank("defproducera"_n, 22) );
+
+   prod_info = get_producer_info("defproduceru");
+   BOOST_REQUIRE_EQUAL( 1, prod_info["rank"].as<uint32_t>() );
+
+   prod_info = get_producer_info("defproducera");
+   BOOST_REQUIRE_EQUAL( 22, prod_info["rank"].as<uint32_t>() );
+}
+FC_LOG_AND_RETHROW()
+
+// Verify that update_ranked_producers correctly populates the controller's
+// active producer schedule and proposes the correct finalizer policy.
+//
+// Note: In a single-node test, the 21-finalizer policy can only become
+// "pending" at the controller level because the test node lacks the BLS
+// keys needed for the 21 finalizers to vote and reach quorum. We therefore
+// verify the producer schedule via head_active_producers() and the finalizer
+// policy via the contract's lastpropfins table + head_pending_finalizer_policy().
+BOOST_FIXTURE_TEST_CASE(verify_controller_schedule_and_policy_test, finalizer_key_tester) try {
+   auto producer_names = activate_producers();
+
+   // Register 21 finalizer keys for the first 21 producers
+   register_finalizer_keys(producer_names, 21);
+
+   // Wait for update_ranked_producers to propose the new schedule and finalizer policy
    produce_block( fc::minutes(2) );
 
-   // Delete defproducerv's finalizer key
-   BOOST_REQUIRE_EQUAL( success(), delete_finalizer_key(producerv_name, finalizer_key_1) );
-
-   // Wait for two rounds of producer schedule so defproducera is replaced by defproducerv
-   // because defproducera does not have an active finalizer key
+   // Produce enough blocks for the new producer schedule to become active
    produce_blocks(504);
 
-   // find new last_finkey_ids
-   auto last_finkey_ids_3 = get_last_prop_fin_ids();
-   BOOST_REQUIRE_EQUAL( 21, last_finkey_ids_3.size() );
-   // Make sure producerw_id is in the new last_finkey_ids
-   BOOST_REQUIRE_EQUAL( true, last_finkey_ids_3.contains(producerw_id) );
+   // --- Verify active producer schedule via controller ---
+   const auto& active_schedule = control->head_active_producers();
+   BOOST_REQUIRE_EQUAL( 21u, active_schedule.producers.size() );
 
-   // After replace producerv_id wth producerw_id in the old last_finkey_ids_2,
-   // last_finkey_ids should be the same as last_finkey_ids_3
-   last_finkey_ids_2.erase(producerv_id);
-   last_finkey_ids_2.insert(producerw_id);
-   BOOST_REQUIRE_EQUAL( true, last_finkey_ids_2 == last_finkey_ids_3 );
-*/
+   // Build a sorted set of expected producer names
+   std::set<account_name> expected_producers(producer_names.begin(), producer_names.end());
+   std::set<account_name> actual_producers;
+   for( const auto& p : active_schedule.producers ) {
+      actual_producers.insert(p.producer_name);
+   }
+   BOOST_REQUIRE_EQUAL( true, expected_producers == actual_producers );
+
+   // Verify schedule is sorted by producer name (deterministic ordering)
+   for( size_t i = 1; i < active_schedule.producers.size(); ++i ) {
+      BOOST_REQUIRE( active_schedule.producers[i-1].producer_name < active_schedule.producers[i].producer_name );
+   }
+
+   // --- Verify finalizer policy was proposed (contract-level) ---
+   // The lastpropfins table should contain 21 finalizers
+   auto last_proposed = get_last_prop_finalizers_info();
+   BOOST_REQUIRE_EQUAL( 21u, last_proposed.size() );
+
+   // Verify the contract table entries match the finalizers table
+   verify_last_proposed_finalizers(producer_names);
+
+   // --- Verify finalizer policy at controller level ---
+   // The active finalizer policy is still the genesis policy (1 finalizer)
+   // because the 21-key pending policy requires quorum from 21 BLS keys
+   // which aren't loaded in the single-node test environment.
+   auto active_fin_policy = control->head_active_finalizer_policy();
+   BOOST_REQUIRE( active_fin_policy != nullptr );
+
+   // The pending finalizer policy should contain our 21 finalizers.
+   // It was proposed by set_finalizers() and became pending when the proposing
+   // block reached finality under the genesis (1-finalizer) active policy.
+   auto pending_fin_policy = control->head_pending_finalizer_policy();
+   BOOST_REQUIRE( pending_fin_policy != nullptr );
+   BOOST_REQUIRE_EQUAL( 21u, pending_fin_policy->finalizers.size() );
+
+   // Threshold should be 2/3 + 1 of total weight (each finalizer has weight 1)
+   BOOST_REQUIRE_EQUAL( (21u * 2) / 3 + 1, pending_fin_policy->threshold );
+
+   // Each finalizer's description should be a producer name, with weight 1
+   std::set<std::string> finalizer_descriptions;
+   for( const auto& f : pending_fin_policy->finalizers ) {
+      BOOST_REQUIRE_EQUAL( 1u, f.weight );
+      finalizer_descriptions.insert(f.description);
+   }
+   for( const auto& p : producer_names ) {
+      BOOST_REQUIRE_EQUAL( true, finalizer_descriptions.contains(p.to_string()) );
+   }
 }
 FC_LOG_AND_RETHROW()
 

@@ -24,10 +24,6 @@ namespace sysiosystem {
       // Add latest block information to blockinfo table.
       add_to_blockinfo_table(previous_block_id, timestamp);
 
-      /** until activation, no new rewards are paid */
-      if( _gstate.thresh_activated_stake_time == time_point() )
-         return;
-
       if( _gstate.last_pervote_bucket_fill == time_point() )  /// start the presses
          _gstate.last_pervote_bucket_fill = current_time_point();
 
@@ -46,7 +42,7 @@ namespace sysiosystem {
 
       /// only update block producers once every minute, block_timestamp is in half seconds
       if( timestamp.slot - _gstate.last_producer_schedule_update.slot > 120 ) {
-         update_elected_producers( timestamp );
+         update_ranked_producers( timestamp );
       }
    }
 
