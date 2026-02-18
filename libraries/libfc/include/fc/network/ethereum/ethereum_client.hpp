@@ -591,14 +591,6 @@ std::expected<T, fc::ethereum_abi_decode_exception> ethereum_event_data::decode(
 
 } // namespace fc::network::ethereum
 
-// std::string event_name;
-// fc::crypto::ethereum::bytes data;
-// fc::uint256 block_number;
-// std::string transaction_hash;
-// uint32_t log_index{0};
-// uint32_t transaction_index{0};
-// std::vector<std::string> topics;
-// std::optional<abi::contract> event_abi;
 FC_REFLECT(fc::network::ethereum::ethereum_event_data,
    (contract_address)
    (event_name)
