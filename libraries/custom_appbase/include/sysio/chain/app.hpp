@@ -190,6 +190,14 @@ public:
       }
    }
 
+   const bpo::variables_map& get_options() const {
+      return app_->get_options();
+   }
+
+   const std::vector<bpo::basic_option<char>>& get_parsed_options() const {
+      return app_->get_parsed_options();
+   }
+
    template <typename... Plugin>
    exit_code::exit_code init(int argc, char** argv) {
       try {
