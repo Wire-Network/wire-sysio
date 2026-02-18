@@ -421,7 +421,7 @@ BOOST_FIXTURE_TEST_CASE( no_block_extensions_allowed_test, validating_tester ) {
    BOOST_REQUIRE_EXCEPTION(validate_push_block(signed_block::create_signed_block(std::move(copy_b))), fc::exception,
                            [] (const fc::exception& e)->bool {
                               return e.code() == invalid_block_extension::code_value &&
-                                     e.to_detail_string().find("No block extensions allowed") != std::string::npos;
+                                     e.to_detail_string().find("No block extensions currently supported") != std::string::npos;
                            });
 }
 
