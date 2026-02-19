@@ -11,7 +11,7 @@ if(BUILD_SYSTEM_CONTRACTS)
       ${CMAKE_CURRENT_SOURCE_DIR}/src/finalizer_key.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/peer_keys.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/trx_priority.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/block_info.cpp)
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/block_info.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/emissions.cpp)
 
    target_include_directories(sysio.system
