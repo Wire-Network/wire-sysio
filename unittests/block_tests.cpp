@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_test )
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
 
    // Re-sign the block
-   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
 
    // Push block with invalid transaction to other chain
    savanna_tester validator;
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE( block_with_invalid_tx_mroot_test )
    copy_b->transactions.back().trx = std::move(invalid_packed_tx);
 
    // Re-sign the block
-   copy_b->producer_signature = main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {main.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
 
    // Push block with invalid transaction to other chain
    savanna_tester validator;
@@ -117,7 +117,7 @@ std::pair<signed_block_ptr, signed_block_ptr> corrupt_trx_in_block(T& main, acco
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
 
    // Re-sign the block
-   copy_b->producer_signature = main.get_private_key(b->producer, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {main.get_private_key(b->producer, "active").sign(copy_b->calculate_id())};
 
    return std::pair<signed_block_ptr, signed_block_ptr>(b, signed_block::create_signed_block(std::move(copy_b)));
 }
@@ -330,7 +330,7 @@ BOOST_AUTO_TEST_CASE(no_onblock_test) { try {
    BOOST_TEST(!!r.onblock_trace->receipt);
    BOOST_TEST(!r.onblock_trace->except);
    BOOST_TEST(!r.onblock_trace->except_ptr);
-   BOOST_TEST(!r.block->action_mroot.empty());
+   BOOST_TEST(!r.block->finality_mroot.empty());
 
    // Deploy contract that rejects all actions dispatched to it with the following exceptions:
    //   * sysio::setcode to set code on the sysio is allowed (unless the rejectall account exists)
@@ -343,11 +343,10 @@ BOOST_AUTO_TEST_CASE(no_onblock_test) { try {
    BOOST_TEST(!!r.onblock_trace->except);
    BOOST_TEST(!!r.onblock_trace->except_ptr);
 
-   // In Savanna, action_mroot is the root of the Finality Tree
+   // finality_mroot is the root of the Finality Tree
    // associated with the block, i.e. the root of
    // validation_tree(core.latest_qc_claim().block_num).
-   BOOST_TEST(r.block->is_proper_svnn_block());
-   BOOST_TEST(!r.block->action_mroot.empty());
+   BOOST_TEST(!r.block->finality_mroot.empty());
    c.produce_empty_block();
 
 } FC_LOG_AND_RETHROW() }
@@ -363,25 +362,11 @@ BOOST_FIXTURE_TEST_CASE( invalid_qc_claim_block_num_test, validating_tester ) {
    // Make a copy of the valid block
    auto copy_b = b->clone();
 
-   // Retrieve finality extension
-   auto fin_ext_id = finality_extension::extension_id();
-   std::optional<block_header_extension> header_fin_ext = copy_b->extract_header_extension(fin_ext_id);
-
-   // Remove finality extension from header extensions
-   auto& h_exts = copy_b->header_extensions;
-   std::erase_if(h_exts, [&](const auto& ext) {
-      return ext.first == fin_ext_id;
-   });
-
    // Set QC claim block number to an invalid number (QC claim block number cannot be greater than previous block number)
-   auto& f_ext = std::get<finality_extension>(*header_fin_ext);
-   f_ext.qc_claim.block_num = copy_b->block_num(); // copy_b->block_num() is 1 greater than previous block number
-
-   // Add the corrupted finality extension back to header extensions
-   emplace_extension(h_exts, fin_ext_id, fc::raw::pack(f_ext));
+   copy_b->qc_claim.block_num = copy_b->block_num(); // copy_b->block_num() is 1 greater than previous block number
 
    // Re-sign the block
-   copy_b->producer_signature = get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
 
    // Push the corrupted block. It must be rejected.
    BOOST_REQUIRE_EXCEPTION(validate_push_block(signed_block::create_signed_block(std::move(copy_b))), fc::exception,
@@ -391,8 +376,8 @@ BOOST_FIXTURE_TEST_CASE( invalid_qc_claim_block_num_test, validating_tester ) {
                            }) ;
 }
 
-// Verify that a block with an invalid action mroot is rejected
-BOOST_FIXTURE_TEST_CASE( invalid_action_mroot_test, tester )
+// Verify that a block with an invalid finality mroot is rejected
+BOOST_FIXTURE_TEST_CASE( invalid_finality_mroot_test, tester )
 {
    produce_blocks(5);
 
@@ -400,20 +385,43 @@ BOOST_FIXTURE_TEST_CASE( invalid_action_mroot_test, tester )
    create_account("newacc"_n);
    auto b = produce_block();
 
-   // Make a copy of the block and corrupt its action mroot
+   // Make a copy of the block and corrupt its finality mroot
    auto copy_b = b->clone();
-   copy_b->action_mroot = digest_type::hash("corrupted");
+   copy_b->finality_mroot = digest_type::hash("corrupted");
 
    // Re-sign the block
-   copy_b->producer_signature = get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
 
-   // Push the block containing corrupted action mroot. It should fail
+   // Push the block containing corrupted finality mroot. It should fail
    BOOST_REQUIRE_EXCEPTION(push_block(signed_block::create_signed_block(std::move(copy_b))),
                            fc::exception,
                            [] (const fc::exception &e)->bool {
                               return e.code() == block_validate_exception::code_value &&
                                      e.to_detail_string().find("computed finality mroot") != std::string::npos &&
                                      e.to_detail_string().find("does not match supplied finality mroot") != std::string::npos;
+                           });
+}
+
+// Verify that a block with block_extensions is rejected
+BOOST_FIXTURE_TEST_CASE( no_block_extensions_allowed_test, validating_tester ) {
+   skip_validate = true;
+
+   // First we create a valid block
+   create_account("newacc"_n);
+   auto b = produce_block_no_validation();
+
+   // Make a copy and inject a dummy block extension
+   auto copy_b = b->clone();
+   copy_b->block_extensions.emplace_back(0xFFFF, std::vector<char>{0x00});
+
+   // Re-sign the block
+   copy_b->producer_signatures = {get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
+
+   // Push the block with extensions. It must be rejected.
+   BOOST_REQUIRE_EXCEPTION(validate_push_block(signed_block::create_signed_block(std::move(copy_b))), fc::exception,
+                           [] (const fc::exception& e)->bool {
+                              return e.code() == invalid_block_extension::code_value &&
+                                     e.to_detail_string().find("No block extensions currently supported") != std::string::npos;
                            });
 }
 

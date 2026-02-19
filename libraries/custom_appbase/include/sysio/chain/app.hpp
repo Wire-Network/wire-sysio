@@ -192,13 +192,6 @@ public:
    exit_code::exit_code init(int argc, char** argv) {
       try {
          auto init_logging = [cfg=cfg_]() { detail::initialize_logging(cfg); };
-         (
-            [] {
-               if (app().find_plugin<Plugin>() == nullptr) {
-                  appbase::application::register_plugin<Plugin>();
-               }
-            }(), ...
-         );
          if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {

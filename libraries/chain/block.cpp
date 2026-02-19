@@ -3,29 +3,6 @@
 #include <fc/io/json.hpp>
 
 namespace sysio::chain {
-   void additional_block_signatures_extension::reflector_init() {
-      static_assert( fc::raw::has_feature_reflector_init_on_unpacked_reflected_types,
-                     "additional_block_signatures_extension expects FC to support reflector_init" );
-
-      SYS_ASSERT( signatures.size() > 0, ill_formed_additional_block_signatures_extension,
-                  "Additional block signatures extension must contain at least one signature",
-      );
-
-      set<signature_type> unique_sigs;
-
-      for( const auto& s : signatures ) {
-         auto res = unique_sigs.insert( s );
-         SYS_ASSERT( res.second, ill_formed_additional_block_signatures_extension,
-                     "Signature {} was repeated in the additional block signatures extension",
-                     fc::json::to_log_string(s)
-         );
-      }
-   }
-
-   void quorum_certificate_extension::reflector_init() {
-      static_assert( fc::raw::has_feature_reflector_init_on_unpacked_reflected_types, "quorum_certificate_extension expects FC to support reflector_init" );
-      static_assert( extension_id() == 3, "extension id for quorum_certificate_extension must be 3" );
-   }
 
    flat_multimap<uint16_t, block_extension> signed_block::validate_and_extract_extensions()const {
       using decompose_t = block_extension_types::decompose_t;

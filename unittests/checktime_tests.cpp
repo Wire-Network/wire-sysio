@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE( checktime_interrupt_test) { try {
       trx_digests.emplace_back( a.digest() );
    copy_b->transaction_mroot = calculate_merkle( std::move(trx_digests) );
    // Re-sign the block
-   copy_b->producer_signature = t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {t.get_private_key(config::system_account_name, "active").sign(copy_b->calculate_id())};
 
    std::promise<bool> block_start_promise;
    std::future<bool> block_start_future = block_start_promise.get_future();

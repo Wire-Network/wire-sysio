@@ -111,16 +111,19 @@ BOOST_FIXTURE_TEST_CASE(fork_with_bad_block_savanna, savanna_cluster::cluster_t)
             auto copy_b = b->clone();
             if (j == i) {
                // Corrupt this block (forks[j].blocks[j] is corrupted).
-               // Do not corrupt the block by modifying action_mroot, as action_mroot is checked
+               // Do not corrupt the block by modifying finality_mroot, as finality_mroot is checked
                // by block header validation, _nodes[0].push_block(b) would fail.
-               copy_b->confirmed++;
+               emplace_extension(copy_b->header_extensions,
+                                 s_root_extension::extension_id(),
+                                 fc::raw::pack(s_root_extension()));
+
             } else if (j < i) {
                // link to a corrupted chain (fork.blocks[j] was corrupted)
                copy_b->previous = fork.blocks.back()->calculate_id();
             }
 
             // re-sign the block
-            copy_b->producer_signature = pk.sign(copy_b->calculate_id());
+            copy_b->producer_signatures = {pk.sign(copy_b->calculate_id())};
 
             // add this new block to our corrupted block merkle
             fork.blocks.emplace_back(signed_block::create_signed_block(std::move(copy_b)));

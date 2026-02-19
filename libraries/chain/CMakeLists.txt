@@ -33,8 +33,6 @@ if("sys-vm-oc" IN_LIST SYSIO_WASM_RUNTIMES)
                              webassembly/runtimes/sys-vm-oc.cpp
                              webassembly/runtimes/sys-vm-oc/default_real_main.cpp)
 
-   set_source_files_properties(webassembly/runtimes/sys-vm-oc/LLVMJIT.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
-   set_source_files_properties(webassembly/runtimes/sys-vm-oc/LLVMEmitIR.cpp PROPERTIES COMPILE_FLAGS "--std=gnu++17")
    set_source_files_properties(webassembly/runtimes/sys-vm-oc/switch_stack_linux.s PROPERTIES COMPILE_FLAGS "-Wno-unused-command-line-argument")
 
    llvm_map_components_to_libnames(LLVM_LIBS support core passes mcjit native orcjit orcshared orctargetprocess)
@@ -154,7 +152,7 @@ target_link_libraries(
   Boost::lockfree
   Boost::assign
   Boost::accumulators
-  atomic
+  ${LIBATOMIC_STATIC}
 )
 target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"

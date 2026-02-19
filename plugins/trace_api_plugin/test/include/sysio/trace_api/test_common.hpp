@@ -72,7 +72,7 @@ namespace sysio::trace_api {
 
          auto header_bmroot = chain::digest_type::hash( std::make_pair( block->digest(), chain::digest_type{}));
          auto sig_digest = chain::digest_type::hash( std::make_pair( header_bmroot, chain::digest_type{} ));
-         block->producer_signature = priv_key.sign( sig_digest );
+         block->producer_signatures = {priv_key.sign( sig_digest )};
 
          return block;
       }
@@ -126,16 +126,11 @@ namespace sysio::trace_api {
          lhs.account == rhs.account &&
          lhs.action == rhs.action &&
          lhs.authorization == rhs.authorization &&
-         lhs.data == rhs.data;
+         lhs.data == rhs.data &&
+         lhs.return_value == rhs.return_value;
    }
 
-   inline bool operator==(const transaction_trace_v0& lhs,  const transaction_trace_v0& rhs) {
-      return
-         lhs.id == rhs.id &&
-         lhs.actions == rhs.actions;
-   }
-
-   inline bool operator==(const transaction_trace_v2& lhs,  const transaction_trace_v2& rhs) {
+   inline bool operator==(const transaction_trace_v0& lhs, const transaction_trace_v0& rhs) {
       return
          lhs.id == rhs.id &&
          lhs.actions == rhs.actions &&
@@ -148,7 +143,10 @@ namespace sysio::trace_api {
          lhs.trx_header.ref_block_prefix == rhs.trx_header.ref_block_prefix &&
          lhs.trx_header.max_net_usage_words == rhs.trx_header.max_net_usage_words &&
          lhs.trx_header.max_cpu_usage_ms == rhs.trx_header.max_cpu_usage_ms &&
-         lhs.trx_header.delay_sec == rhs.trx_header.delay_sec ;
+         lhs.trx_header.delay_sec == rhs.trx_header.delay_sec &&
+         lhs.block_num == rhs.block_num &&
+         lhs.block_time == rhs.block_time &&
+         lhs.producer_block_id == rhs.producer_block_id;
    }
 
    inline bool operator==(const block_trace_v0 &lhs, const block_trace_v0 &rhs) {
@@ -158,28 +156,12 @@ namespace sysio::trace_api {
          lhs.previous_id == rhs.previous_id &&
          lhs.timestamp == rhs.timestamp &&
          lhs.producer == rhs.producer &&
-         lhs.transactions == rhs.transactions;
-   }
-
-   inline bool operator==(const block_trace_v2 &lhs, const block_trace_v2 &rhs) {
-      return
-         lhs.id == rhs.id &&
-         lhs.number == rhs.number &&
-         lhs.previous_id == rhs.previous_id &&
-         lhs.timestamp == rhs.timestamp &&
-         lhs.producer == rhs.producer &&
          lhs.transaction_mroot == rhs.transaction_mroot &&
-         lhs.action_mroot == rhs.action_mroot &&
-         lhs.schedule_version == rhs.schedule_version &&
+         lhs.finality_mroot == rhs.finality_mroot &&
          lhs.transactions == rhs.transactions;
    }
 
    inline std::ostream& operator<<(std::ostream &os, const block_trace_v0 &bt) {
-      os << fc::json::to_string( bt, fc::time_point::maximum() );
-      return os;
-   }
-
-   inline std::ostream& operator<<(std::ostream &os, const block_trace_v2 &bt) {
       os << fc::json::to_string( bt, fc::time_point::maximum() );
       return os;
    }

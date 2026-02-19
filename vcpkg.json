@@ -2,6 +2,8 @@
   "name": "wire-sysio",
   "version": "5.2.0-rc1",
   "dependencies": [
+    "bzip2",
+    "liblzma",
     "zstd",
     "gsl-lite",
     "bls12-381",
@@ -47,11 +49,6 @@
       "name": "nlohmann-json",
       "version>=": "3.12.0#1"
     },
-    { 
-      "name": "curl", 
-      "default-features": false, 
-      "features": [] 
-    },
     {
       "name": "civetweb",
       "default-features": false
@@ -68,6 +65,10 @@
     }
   ],
   "overrides": [
+    {
+      "name": "boost",
+      "version": "1.89.0#1"
+    },
     {
       "name": "llvm",
       "version": "18.1.6#5"
