@@ -80,7 +80,7 @@ namespace sysio::chain::webassembly {
       }
 
       // otherwise, fall back to the existing ECDSA‐style recover→compare path
-      auto check = fc::crypto::public_key( s, *digest, false );
+      auto check = fc::crypto::public_key::recover( s, *digest);
       SYS_ASSERT( check == p,
                   crypto_api_exception,
                   "Error expected key different than recovered key" );
@@ -101,7 +101,7 @@ namespace sysio::chain::webassembly {
          SYS_ASSERT(s.variable_size() <= context.control.configured_subjective_signature_length_limit(),
                     sig_variable_size_limit_exception, "signature variable length component size greater than subjective maximum");
 
-      auto recovered = fc::crypto::public_key(s, *digest, false);
+      auto recovered = fc::crypto::public_key::recover(s, *digest);
 
       // For variable length key types use a memcpy and return length
       if (!s.contains_type(sig_type::k1, sig_type::r1, sig_type::em)) {

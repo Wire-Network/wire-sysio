@@ -4,7 +4,6 @@
 #include <ostream>               // for std::ostream
 #include <sodium.h>              // for ED25519 methods
 #include <fc/crypto/sha256.hpp>
-#include <fc/crypto/sha512.hpp>  // for generate_shared_secret return type
 #include <fc/crypto/base58.hpp>
 #include <fc/io/raw.hpp>         // for fc::raw::pack/unpack
 #include <fc/io/datastream.hpp>  // for fc::datastream
@@ -73,11 +72,12 @@ struct signature_shim {
    }
 
    using public_key_type = public_key_shim;
-   public_key_shim recover(const sha256&, bool) const {
+   public_key_shim recover(const sha256&) const {
       FC_THROW_EXCEPTION(exception, "ED25519 signature recovery not supported");
    }
 
    bool verify(const sha256& digest, const public_key_shim& pub) const;
+   bool verify_solana(const uint8_t* data, size_t len, const public_key_shim& pub) const;
 
    std::string to_string(const fc::yield_function_t& yield)const {
       static_assert(std::same_as<decltype(_data)::value_type, uint8_t>, "Evaluate reinterpret cast if type changes");
@@ -107,10 +107,12 @@ struct private_key_shim {
    explicit private_key_shim(const data_type& d): _data(d) {}
 
    using public_key_type = public_key_shim;
+   using signature_type = signature_shim;
 
+   static private_key_shim generate();
    public_key_shim get_public_key() const;
    
-   signature_shim  sign(const sha256& digest, bool require_canonical) const;
+   signature_shim  sign_sha256(const sha256& digest) const;
 
    /**
     * Sign raw bytes directly without any transformation (no hex encoding).
@@ -121,8 +123,6 @@ struct private_key_shim {
     * @return ED25519 signature
     */
    signature_shim  sign_raw(const uint8_t* data, size_t len) const;
-
-   sha512          generate_shared_secret(const public_key_shim&) const;
 
    data_type serialize() const { return _data; }
 

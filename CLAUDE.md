@@ -12,17 +12,7 @@ Wire Sysio is a C++ implementation of the AntelopeIO protocol (a fork of Spring)
 ```bash
 # Install system packages (Ubuntu 24.04+)
 sudo apt-get install -y build-essential binutils ccache cmake curl git ninja-build \
-    libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip
-
-# Build Clang 18 from source
-export BASE_DIR=/opt/clang
-sudo mkdir -p "$BASE_DIR" && sudo chown "$USER":"$USER" "$BASE_DIR"
-./scripts/clang-18/clang-18-ubuntu-build-source.sh
-
-# Build LLVM 11 from source (required for sys-vm-oc JIT)
-export BASE_DIR=/opt/llvm
-sudo mkdir -p "$BASE_DIR" && sudo chown "$USER":"$USER" "$BASE_DIR"
-./scripts/llvm-11/llvm-11-ubuntu-build-source.sh
+    libcurl4-openssl-dev libgmp-dev zlib1g-dev python3 python3-pip clang-18 libclang-18-dev
 
 # Bootstrap vcpkg
 ./vcpkg/bootstrap-vcpkg.sh
@@ -31,48 +21,57 @@ sudo mkdir -p "$BASE_DIR" && sudo chown "$USER":"$USER" "$BASE_DIR"
 ### Configure and Build
 ```bash
 # Set compiler environment
-export CC=/opt/clang/clang-18/bin/clang
-export CXX=/opt/clang/clang-18/bin/clang++
+export CC=/usr/bin/clang-18
+export CXX=/usr/bin/clang++-18
 
 # Configure with CMake (Ninja recommended)
-cmake -B build -S . -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_PREFIX_PATH="/opt/llvm/llvm-11;/opt/clang/clang-18" \
-  -DCMAKE_TOOLCHAIN_FILE="$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-  -DENABLE_CCACHE=ON \
-  -DENABLE_TESTS=ON
+cmake \
+-B build/debug-claude \
+-S . \
+-G Ninja \
+-DCMAKE_BUILD_TYPE=Debug \
+-DBUILD_SYSTEM_CONTRACTS=ON \
+-DBUILD_TEST_CONTRACTS=ON \
+-DENABLE_CCACHE=ON \
+-DENABLE_DISTCC=OFF \
+-DENABLE_TESTS=ON \
+-DCMAKE_INSTALL_PREFIX=/opt/prefixes/wire-001 \
+-DCMAKE_PREFIX_PATH="/opt/prefixes/wire-001" \
+-DCMAKE_TOOLCHAIN_FILE=$PWD/vcpkg/scripts/buildsystems/vcpkg.cmake
 
-# Build (use -j4 to avoid memory exhaustion; some files need 4GB RAM)
-cmake --build build -- -j4
+export NUM_JOBS=$(echo $(($(nproc) - 2)))
+
+# Build (use -j${NUM_JOBS} to avoid memory exhaustion; some files need 4GB RAM)
+cmake --build build/debug-claude -- -j${NUM_JOBS}
 ```
 
 ### Building Specific Targets
 ```bash
-ninja -C build fc              # Build libfc library only
-ninja -C build test_fc         # Build fc tests
-ninja -C build nodeop          # Build main node executable
-ninja -C build unit_test       # Build unit tests
+ninja -C build/debug-claude fc              # Build libfc library only
+ninja -C build/debug-claude test_fc         # Build fc tests
+ninja -C build/debug-claude nodeop          # Build main node executable
+ninja -C build/debug-claude unit_test       # Build unit tests
 ```
 
 ## Testing Commands
 
 ### Run All Parallelizable Tests
 ```bash
-cd build && ctest -j "$(nproc)" -LE _tests
+cd build/debug-claude  && ctest -j "$(nproc)" -LE _tests
 ```
 
 ### Run Specific Test Suite
 ```bash
 # Run a single Boost.Test suite
-./build/libraries/libfc/test/test_fc --run_test=solana_client_tests
+./build/debug-claude/libraries/libfc/test/test_fc --run_test=solana_client_tests
 
 # Run specific test case
-./build/libraries/libfc/test/test_fc --run_test=solana_client_tests/test_pubkey_base58_roundtrip
+./build/debug-claude/libraries/libfc/test/test_fc --run_test=solana_client_tests/test_pubkey_base58_roundtrip
 
 # Run unit tests with specific WASM runtime
-./build/unittests/unit_test --run_test=block_tests -- --sys-vm
-./build/unittests/unit_test --run_test=block_tests -- --sys-vm-jit
-./build/unittests/unit_test --run_test=block_tests -- --sys-vm-oc
+./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm
+./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm-jit
+./build/debug-claude/unittests/unit_test --run_test=block_tests -- --sys-vm-oc
 ```
 
 ### Test Categories
@@ -94,17 +93,27 @@ ctest -L "long_running_tests"            # Long-running integration tests
 - **tests/** - Python integration tests using TestHarness
 
 ### Key Libraries
-- **libfc** (`libraries/libfc/`) - Foundation library: crypto, serialization, HTTP/JSON-RPC clients, logging. Contains network clients for Ethereum and Solana.
+- **libfc** (`libraries/libfc/`) - Foundation library providing:
+  - Crypto: SHA256, RIPEMD160, Keccak256, secp256k1, NIST P-256 (R1), BLS, Ed25519, WebAuthn
+  - Serialization: JSON via `fc::variant`, binary packing
+  - Network clients: HTTP/JSON-RPC, Ethereum (ABI/RLP encoding), Solana (Borsh/IDL)
+  - Logging framework with configurable sinks
 - **chain** (`libraries/chain/`) - Blockchain core: block/transaction processing, WASM execution (sys-vm, sys-vm-jit, sys-vm-oc runtimes), authorization, resource limits
 - **appbase** (`libraries/appbase/`) - Application framework for plugin management
 
 ### Plugin Architecture
 Plugins are static libraries linked with whole-archive into the main executable. Each plugin directory contains:
-- `include/` - Public headers
+- `include/sysio/<plugin_name>/` - Public headers
 - `src/` - Implementation
 - `test/` (optional) - Plugin-specific tests with CMakeLists.txt
 
-Key plugins: chain_plugin, producer_plugin, net_plugin, http_plugin, wallet_plugin, state_history_plugin
+Key plugins: chain_plugin, producer_plugin, net_plugin, http_plugin, wallet_plugin, state_history_plugin, outpost_ethereum_client_plugin, outpost_solana_client_plugin
+
+Plugin lifecycle (see `plugins/usage_pattern.md` for details):
+1. **Registration** - `APPBASE_PLUGIN_REQUIRES` declares dependencies
+2. **Initialization** - Configure plugin from options, connect signals, create objects
+3. **Startup** - Activate io_contexts, thread pools, establish connections
+4. **Shutdown** - Stop threads, cancel timers (reverse order of startup)
 
 ### Serialization Patterns
 ```cpp
@@ -138,13 +147,14 @@ Format code: `clang-format -i <file>`
 | `BUILD_TEST_CONTRACTS` | OFF | Compile test smart contracts |
 | `DONT_SKIP_TESTS` | FALSE | Include currently failing tests |
 | `DISABLE_WASM_SPEC_TESTS` | OFF | Skip WASM spec compliance tests |
+| `ENABLE_OC` | ON | Enable sys-vm-oc LLVM JIT optimization (x86_64 Linux) |
 
 ## WASM Runtimes
 
 Three WASM execution runtimes available (x86_64 Linux):
 - `sys-vm` - Standard interpreter
 - `sys-vm-jit` - JIT compiled
-- `sys-vm-oc` - LLVM-optimized JIT (requires LLVM 11)
+- `sys-vm-oc` - LLVM-optimized JIT
 
 Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `-- --sys-vm-jit`, or `-- --sys-vm-oc`.
 
@@ -157,3 +167,12 @@ Tests run against all runtimes by default. Specify runtime with `-- --sys-vm`, `
 # Build from local source
 ./scripts/docker-build.sh --target=app-build-local
 ```
+
+## Python Integration Tests
+
+The `tests/` directory contains Python integration tests using TestHarness framework:
+- `TestHarness/Cluster.py` - Cluster orchestration
+- `TestHarness/Node.py` - Individual node control
+- `TestHarness/Launcher.py` - Test environment generation
+
+Run Python tests directly: `python3 tests/<test_name>.py`

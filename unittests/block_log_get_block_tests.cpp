@@ -2,6 +2,7 @@
 #include <sysio/testing/tester.hpp> // for fc_exception_message_contains
 
 #include <fc/io/cfile.hpp>
+#include <fc/bitutil.hpp>
 
 #include <boost/test/unit_test.hpp>
 

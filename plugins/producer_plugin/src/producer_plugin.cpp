@@ -1,6 +1,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -88,7 +89,6 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
-auto _producer_plugin = application::register_plugin<producer_plugin>();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -686,6 +686,10 @@ public:
               chain_plug->chain().get_greylist_limit()};
    }
 
+   producer_plugin::get_unapplied_transactions_result
+   get_unapplied_transactions(const producer_plugin::get_unapplied_transactions_params& p,
+                              const fc::time_point& deadline);
+
    void schedule_protocol_feature_activations(const producer_plugin::scheduled_protocol_feature_activations& schedule);
 
    void plugin_shutdown();
@@ -700,7 +704,7 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
 
-   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
    chain::bls_pub_key_sig_provider_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
@@ -712,6 +716,7 @@ public:
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
+   trx_priority_db                                   _trx_priority_db;
    fc::microseconds                                  _max_irreversible_block_age_us;
    block_num_type                                    _max_reversible_blocks{3600}; // pause production when reached (30 minutes)
    // produce-block-offset is in terms of the complete round, internally use calculated value for each block of round
@@ -876,6 +881,7 @@ public:
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+      _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
 
    // called from multiple non-main threads
@@ -986,12 +992,57 @@ public:
       schedule_production_loop();
    }
 
+   struct trx_executor {
+      trx_executor(producer_plugin_impl* self,
+                   transaction_metadata_ptr trx_meta,
+                   bool is_transient,
+                   next_function<transaction_trace_ptr> next,
+                   bool api_trx,
+                   bool return_failure_traces)
+         : self(self)
+         , trx_meta(std::move(trx_meta))
+         , is_transient(is_transient)
+         , next(std::move(next))
+         , api_trx(api_trx)
+         , return_failure_traces(return_failure_traces)
+      {}
+
+      const transaction_metadata_ptr& get_trx_meta() const { return trx_meta; }
+
+      void operator()() {
+         auto start       = fc::time_point::now();
+         auto idle_time   = self->_time_tracker.add_idle_time(start);
+         fc_tlog(_log, "Time since last trx: {}us", idle_time);
+
+         auto exception_handler = [this](fc::exception_ptr ex) {
+            self->log_trx_results(trx_meta->packed_trx(), nullptr, ex, 0, is_transient);
+            next(std::move(ex));
+         };
+         try {
+            if (!self->process_incoming_transaction_async(trx_meta, api_trx, start, return_failure_traces, next)) {
+               if (self->in_producing_mode()) {
+                  self->schedule_maybe_produce_block(true);
+               } else {
+                  self->restart_speculative_block();
+               }
+            }
+         }
+         CATCH_AND_CALL(exception_handler);
+      }
+   private:
+      producer_plugin_impl* self;
+      transaction_metadata_ptr trx_meta;
+      bool is_transient;
+      next_function<transaction_trace_ptr> next;
+      bool api_trx;
+      bool return_failure_traces;
+   };
+
    void on_incoming_transaction_async(const packed_transaction_ptr&        trx,
                                       bool                                 api_trx,
                                       transaction_metadata::trx_type       trx_type,
                                       bool                                 return_failure_traces,
                                       next_function<transaction_trace_ptr> next) {
-
       const transaction& t = trx->get_transaction();
       SYS_ASSERT( t.delay_sec.value == 0, transaction_exception, "transaction cannot be delayed" );
 
@@ -1030,9 +1081,11 @@ public:
 
                  chain::controller& chain = chain_plug->chain();
                  transaction_metadata_ptr trx_meta;
+                 int priority = priority::low;
                  try {
                     trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type,
                                                                   chain.configured_subjective_signature_length_limit());
+                    priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
                     // use read_write when read is likely fine; maintains previous behavior of next() always being called from the main thread
                     app().executor().post(
@@ -1053,29 +1106,10 @@ public:
                     return;
                  }
 
-                 // key recovery complete, continue execution on the main thread
-                 app().executor().post(
-                         priority::low, exec_queue::read_write,
-                         [this, trx_meta{std::move(trx_meta)}, is_transient, next{std::move(next)}, api_trx, return_failure_traces]() {
-                            auto start       = fc::time_point::now();
-                            auto idle_time   = _time_tracker.add_idle_time(start);
-                            fc_tlog(_log, "Time since last trx: {}us", idle_time);
+                 trx_executor executor{this, std::move(trx_meta), is_transient, std::move(next), api_trx, return_failure_traces};
 
-                            auto exception_handler = [this, is_transient, &next, &trx_meta](fc::exception_ptr ex) {
-                               log_trx_results(trx_meta->packed_trx(), nullptr, ex, 0, is_transient);
-                               next(std::move(ex));
-                            };
-                            try {
-                               if (!process_incoming_transaction_async(trx_meta, api_trx, start, return_failure_traces, next)) {
-                                  if (in_producing_mode()) {
-                                     schedule_maybe_produce_block(true);
-                                  } else {
-                                     restart_speculative_block();
-                                  }
-                               }
-                            }
-                            CATCH_AND_CALL(exception_handler);
-                         });
+                 // key recovery complete, post to the trx queue
+                 app().executor().post(priority, exec_queue::trx_read_write, std::move(executor));
               });
    }
 
@@ -1108,6 +1142,7 @@ public:
          }
 
          if (!chain.is_building_block()) {
+            fc_dlog(_trx_log, "adding incoming trx {} to unapplied queue", id);
             _unapplied_transactions.add_incoming(trx, api_trx, return_failure_trace, next);
             trx_tracker.cancel();
             return true;
@@ -1366,7 +1401,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    // Get the signature provider plugin
    auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
 
-   // LOAD `chain_key_type_wire_bls` SIGNATURE PROVIDERS
+   // LOAD `chain_key_type_t::wire_bls` SIGNATURE PROVIDERS
    {
       auto finalizer_candidate_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
@@ -1380,7 +1415,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    }
 
    if (!_producers.empty()) {
-      // LOAD `chain_key_type_wire` SIGNATURE PROVIDERS
+      // LOAD `chain_key_type_t::wire` SIGNATURE PROVIDERS
       auto wire_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire);
 
@@ -1910,13 +1945,14 @@ fc::variants producer_plugin::get_supported_protocol_features(const get_supporte
    return results;
 }
 
-producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplied_transactions(const get_unapplied_transactions_params& p,
-                                                                                               const fc::time_point& deadline) const {
+producer_plugin::get_unapplied_transactions_result
+producer_plugin_impl::get_unapplied_transactions(const producer_plugin::get_unapplied_transactions_params& p,
+                                                 const fc::time_point& deadline) {
 
    fc::time_point params_deadline =
       p.time_limit_ms ? std::min(fc::time_point::now().safe_add(fc::milliseconds(*p.time_limit_ms)), deadline) : deadline;
 
-   auto& ua = my->_unapplied_transactions;
+   auto& ua = _unapplied_transactions;
 
    auto itr = ([&]() {
       if (!p.lower_bound.empty()) {
@@ -1951,15 +1987,12 @@ producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplie
       return "unknown type";
    };
 
-   get_unapplied_transactions_result result;
-   result.size          = ua.size();
-   result.incoming_size = ua.incoming_size();
+   producer_plugin::get_unapplied_transactions_result result;
+   result.unapplied_size = ua.size();
 
    uint32_t remaining = p.limit ? *p.limit : std::numeric_limits<uint32_t>::max();
-   if (deadline != fc::time_point::maximum() && remaining > 1000)
-      remaining = 1000;
    while (itr != ua.end() && remaining > 0) {
-      auto& r             = result.trxs.emplace_back();
+      auto& r             = result.unapplied_trxs.emplace_back();
       r.trx_id            = itr->id();
       r.expiration        = itr->expiration();
       const auto& pt      = itr->trx_meta->packed_trx();
@@ -1975,16 +2008,54 @@ producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplie
       r.size               = pt->get_estimated_size();
 
       ++itr;
-      remaining--;
+      --remaining;
       if (fc::time_point::now() >= params_deadline)
          break;
    }
 
+   auto readable_queue = app().executor().readable_queue();
+   result.queued_size = readable_queue.size(exec_queue::trx_read_write);
+
    if (itr != ua.end()) {
-      result.more = itr->id();
+      result.more = itr->id().str();
+      return result;
+   }
+
+   auto qitr = readable_queue.begin(exec_queue::trx_read_write);
+   auto qend = readable_queue.end(exec_queue::trx_read_write);
+   for (; qitr != qend && remaining > 0; ++qitr) {
+      auto& r             = result.queued_trxs.emplace_back();
+      const auto& f = readable_queue.function_from_iter<trx_executor>(qitr);
+      const auto& trx_meta = f.get_trx_meta();
+      const auto& pt = trx_meta->packed_trx();
+      r.trx_id            = pt->id();
+      r.expiration        = pt->expiration();
+      r.trx_type          = "input";
+      r.first_auth        = pt->get_transaction().first_authorizer();
+      const auto& actions = pt->get_transaction().actions;
+      if (!actions.empty()) {
+         r.first_receiver = actions[0].account;
+         r.first_action   = actions[0].name;
+      }
+      r.total_actions      = pt->get_transaction().total_actions();
+      r.accounts_billing   = trx_meta->prev_accounts_billing;
+      r.size               = pt->get_estimated_size();
+
+      --remaining;
+      if (fc::time_point::now() >= params_deadline)
+         break;
+   }
+
+   if (qitr != qend) {
+      result.more = readable_queue.function_from_iter<trx_executor>(qitr).get_trx_meta()->id().str();
    }
 
    return result;
+}
+
+producer_plugin::get_unapplied_transactions_result producer_plugin::get_unapplied_transactions(const get_unapplied_transactions_params& p,
+                                                                                               const fc::time_point& deadline) const {
+   return my->get_unapplied_transactions(p, deadline);
 }
 
 block_timestamp_type producer_plugin_impl::calculate_pending_block_time() const {
@@ -2204,8 +2275,10 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
    const block_num_type head_block_num    = head.block_num();
    const uint32_t       pending_block_num = head_block_num + 1;
 
-   fc_dlog(_log, "Starting block #{} {} producer {}, deadline {}",
-           pending_block_num, block_time, scheduled_producer.producer_name, _pending_block_deadline);
+   fc_dlog(_log, "Starting block #{} {} producer {}, deadline {}, unapplied trxs {}, queued trxs {}, queued tasks {}",
+           pending_block_num, block_time, scheduled_producer.producer_name, _pending_block_deadline,
+           _unapplied_transactions.size(), app().executor().readable_queue().size(exec_queue::trx_read_write),
+           app().executor().read_write_queue_size());
 
    try {
 
@@ -2257,6 +2330,7 @@ producer_plugin_impl::start_block_result producer_plugin_impl::start_block() {
    LOG_AND_DROP();
 
    if (chain.is_building_block()) {
+      app().executor().enable_trx_read_write_queue(true);
       const auto& pending_block_signing_authority = chain.pending_block_signing_authority();
 
       if (in_producing_mode() && pending_block_signing_authority != scheduled_producer.authority) {
@@ -2865,6 +2939,7 @@ void producer_plugin_impl::produce_block() {
       _protocol_features_signaled = false;
    }
 
+   app().executor().enable_trx_read_write_queue(false);
    // idump( (fc::time_point::now() - chain.pending_block_time()) );
    chain.assemble_and_complete_block([&](const digest_type& d) {
       auto debug_logger = maybe_make_debug_time_logger();

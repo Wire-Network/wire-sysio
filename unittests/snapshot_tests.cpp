@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    };
 
    const auto block = chain.control->fetch_block_by_number(chain.control->head().block_num());
-   BOOST_CHECK_EQUAL(1u, block->header_extensions.size());
+   BOOST_CHECK_EQUAL(0u, block->header_extensions.size()); // finality fields are now direct header members
 
    flat_multimap<uint16_t, block_header_extension> header_exts = block->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(0u, header_exts.count(s_root_extension::extension_id()));
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
    const auto block_snapshot = chain.control->fetch_block_by_number(block_with_snapshot->block_num());
 
-   BOOST_CHECK_EQUAL(2u, block_snapshot->header_extensions.size());
+   BOOST_CHECK_EQUAL(1u, block_snapshot->header_extensions.size());
    header_exts = block_snapshot->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 
@@ -374,7 +374,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
 
    const auto block_multiple = chain.control->fetch_block_by_number(block_with_multiple->block_num());
 
-   BOOST_CHECK_EQUAL(2u, block_multiple->header_extensions.size());
+   BOOST_CHECK_EQUAL(1u, block_multiple->header_extensions.size());
    header_exts = block_multiple->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 
@@ -406,7 +406,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    
    snap_chain.push_block(block_tom);
 
-   BOOST_CHECK_EQUAL(2u, block_tom->header_extensions.size());
+   BOOST_CHECK_EQUAL(1u, block_tom->header_extensions.size());
    header_exts = block_tom->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_s_root_in_snapshot, SNAPSHOT_SUITE, snapshot_
    
    const auto snap_block_tom = snap_chain.control->fetch_block_by_number(block_tom->block_num());
   
-   BOOST_CHECK_EQUAL(2u, snap_block_tom->header_extensions.size());
+   BOOST_CHECK_EQUAL(1u, snap_block_tom->header_extensions.size());
    header_exts = snap_block_tom->validate_and_extract_header_extensions();
    BOOST_CHECK_EQUAL(1u, header_exts.count(s_root_extension::extension_id()));
 

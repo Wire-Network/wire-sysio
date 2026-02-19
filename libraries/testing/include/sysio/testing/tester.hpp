@@ -143,7 +143,7 @@ namespace sysio::testing {
             fc::sha256::encoder e;
             e.write((char*)auth_data.data(), auth_data.size());
             e.write(client_data_hash.data(), client_data_hash.data_size());
-            auto sig = priv_key.sign_compact(e.result());
+            auto sig = priv_key.sign_sha256(e.result());
 
             char serialized_sig[4096];
             datastream<char*> sig_ds(serialized_sig, sizeof(serialized_sig));
@@ -824,7 +824,7 @@ namespace sysio::testing {
                hbh.previous == vn_hbh.previous &&
                hbh.timestamp == vn_hbh.timestamp &&
                hbh.transaction_mroot == vn_hbh.transaction_mroot &&
-               hbh.action_mroot == vn_hbh.action_mroot &&
+               hbh.finality_mroot == vn_hbh.finality_mroot &&
                hbh.producer == vn_hbh.producer;
 
         validating_node.reset();

@@ -1,7 +1,6 @@
 #include <sysio/template_plugin/template_plugin.hpp>
 
 namespace sysio {
-   static auto _template_plugin = application::register_plugin<template_plugin>();
 
 class template_plugin_impl {
    public:

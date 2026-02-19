@@ -75,7 +75,7 @@ private:
 
    void store_block_trace( const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
       try {
-         using transaction_trace_t = transaction_trace_v3;
+         using transaction_trace_t = transaction_trace_v0;
          auto bt = create_block_trace( block, id );
 
          std::vector<transaction_trace_t> traces;
@@ -83,12 +83,12 @@ private:
          block_trxs_entry tt;
          tt.ids.reserve(block->transactions.size() + 1);
          if( onblock_trace )
-            traces.emplace_back( to_transaction_trace<transaction_trace_t>( *onblock_trace ));
+            traces.emplace_back( to_transaction_trace( *onblock_trace ));
          for( const auto& r : block->transactions ) {
             const transaction_id_type& id = r.trx.id();
             const auto it = cached_traces.find( id );
             if( it != cached_traces.end() ) {
-               traces.emplace_back( to_transaction_trace<transaction_trace_t>( it->second ));
+               traces.emplace_back( to_transaction_trace( it->second ));
             }
             tt.ids.emplace_back(id);
          }

@@ -1,9 +1,12 @@
 #pragma once
+
 #include <cstdint>
 #include <tuple>
 #include <utility>
+
 namespace fc::crypto {
 
+// enum instead of enum class so they can be used in contracts (CDT supports enum but not enum class).
 enum chain_kind_t : uint8_t {
    chain_kind_unknown = 0,
    chain_kind_wire = 1,
@@ -32,7 +35,7 @@ constexpr std::size_t chain_address_size_ethereum = 20; // base 64 (Keccak256(pu
 constexpr std::size_t chain_address_size_wire     = key_size_sec256k1;
 
 constexpr auto chain_public_key_types = std::tuple{
-   std::pair{chain_kind_unknown,       std::pair{chain_key_type_unknown, std::size_t{0}}    },
+   std::pair{chain_kind_unknown,  std::pair{chain_key_type_unknown, std::size_t{0}}    },
    std::pair{chain_kind_wire,     std::pair{chain_key_type_wire, key_size_sec256k1}    },
    std::pair{chain_kind_ethereum, std::pair{chain_key_type_ethereum, key_size_sec256k1}},
    std::pair{chain_kind_solana,   std::pair{chain_key_type_solana, key_size_ed25519}   },
@@ -41,7 +44,7 @@ constexpr auto chain_public_key_types = std::tuple{
 
 // fc::lut<chain_kind_t, std::pair<chain_key_type_t, std::size_t>, chain_kind_count>
 constexpr auto chain_address_sizes = std::tuple{
-   std::pair{chain_kind_unknown,       std::pair{chain_key_type_unknown, chain_key_type_unknown}  },
+   std::pair{chain_kind_unknown,  std::pair{chain_key_type_unknown, chain_key_type_unknown}  },
    std::pair{chain_kind_wire,     std::pair{chain_key_type_wire, chain_key_type_wire}        },
    std::pair{chain_kind_ethereum, std::pair{chain_key_type_ethereum, chain_key_type_ethereum}},
    std::pair{chain_kind_solana,   std::pair{chain_key_type_solana, chain_key_type_solana}    },
@@ -49,12 +52,11 @@ constexpr auto chain_address_sizes = std::tuple{
 };
 
 constexpr auto chain_key_types = std::tuple{
-   std::pair{chain_kind_unknown, std::tuple{chain_key_type_unknown}},
-   std::pair{chain_kind_wire, std::tuple{chain_key_type_wire,chain_key_type_wire_bls}},
+   std::pair{chain_kind_unknown,  std::tuple{chain_key_type_unknown}},
+   std::pair{chain_kind_wire,     std::tuple{chain_key_type_wire, chain_key_type_wire_bls}},
    std::pair{chain_kind_ethereum, std::tuple{chain_key_type_ethereum}},
-   std::pair{chain_kind_solana, std::tuple{chain_key_type_solana}},
-   std::pair{chain_kind_sui, std::tuple{chain_key_type_sui}},
+   std::pair{chain_kind_solana,   std::tuple{chain_key_type_solana}},
+   std::pair{chain_kind_sui,      std::tuple{chain_key_type_sui}},
 };
 
-}
-
+} // namespace fc::crypto

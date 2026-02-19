@@ -81,12 +81,6 @@ option(ENABLE_OC "Enable sysvm-oc on supported platforms" ON)
 if(ENABLE_OC AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux" AND "${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
     list(APPEND SYSIO_WASM_RUNTIMES sys-vm-oc)
-    # SYS VM OC requires LLVM, but move the check up here to a central location so that the SysioTester.cmakes
-    # can be created with the exact version found
-    find_package(LLVM REQUIRED CONFIG)
-    if(LLVM_VERSION_MAJOR VERSION_LESS 7)# OR LLVM_VERSION_MAJOR VERSION_GREATER_EQUAL 12)
-      message(FATAL_ERROR "WIRE requires an LLVM version 7 through 11")
-    endif()
   endif()
 endif()
 
@@ -121,10 +115,6 @@ else()
   message(STATUS "Configuring WIRE on Linux")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   -Wall")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-  if(FULL_STATIC_BUILD)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libstdc++ -static-libgcc")
-  endif(FULL_STATIC_BUILD)
-
   if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     if(CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.0.0 OR CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 4.0.0)
       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-invalid-partial-specialization")

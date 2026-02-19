@@ -3,7 +3,6 @@
 #include <sysio/outpost_client_plugin.hpp>
 
 namespace sysio {
-  //static auto _outpost_client_plugin = application::register_plugin<outpost_client_plugin>();
 
   namespace {
   [[maybe_unused]] inline fc::logger& logger() {

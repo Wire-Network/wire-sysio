@@ -330,7 +330,7 @@ namespace sysio::testing {
       fileName << log_dir << "/first_trx_" << getpid() << ".txt";
       std::ofstream out(fileName.str());
 
-      out << std::string(trx.id()) << "\n";
+      out << trx.id().str() << "\n";
       out.close();
    }
 

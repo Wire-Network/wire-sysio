@@ -20,8 +20,7 @@ BOOST_AUTO_TEST_CASE(nothing_there) {
       chain.create_account("tommy"_n);
       auto block1 = chain.produce_block();
 
-      BOOST_CHECK_EQUAL(1u, block1->header_extensions.size());
-      BOOST_TEST(block1->contains_header_extension(finality_extension::extension_id())); // only finality_extension
+      BOOST_CHECK_EQUAL(0u, block1->header_extensions.size()); // no header extensions (finality fields are now direct members)
    } FC_LOG_AND_RETHROW()
 }
 
@@ -38,8 +37,7 @@ BOOST_AUTO_TEST_CASE(nothing_to_report) {
       chain.create_account("tommy"_n);
       auto block1 = chain.produce_block();
 
-      BOOST_CHECK_EQUAL(1u, block1->header_extensions.size());
-      BOOST_TEST(block1->contains_header_extension(finality_extension::extension_id())); // only finality_extension
+      BOOST_CHECK_EQUAL(0u, block1->header_extensions.size()); // no header extensions (finality fields are now direct members)
    } FC_LOG_AND_RETHROW()
 }
 

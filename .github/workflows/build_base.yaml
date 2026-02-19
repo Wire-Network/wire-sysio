@@ -36,7 +36,15 @@ jobs:
       credentials:
         username: dev-wire
         password: ${{ secrets.GH_TOKEN_DEV }}
+    env:
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
     steps:
+        - name: Export GitHub Actions cache environment variables
+          uses: actions/github-script@v7
+          with:
+            script: |
+              core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL);
+              core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN);
         - name: Force & debug DNS in job container
           run: |
             echo "=== /etc/resolv.conf ==="
@@ -119,6 +127,13 @@ jobs:
               echo "----- $f -----"
               tail -n 40 "$f"
             done
+
+#        # REQUIRED FOR ACT, LOCAL RUNS OF GITHUB ACTIONS
+#        - name: Installing nodejs
+#          run: |
+#            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+#            sudo apt install -y nodejs
+
         - name: Upload builddir
           uses: actions/upload-artifact@v4
           with:

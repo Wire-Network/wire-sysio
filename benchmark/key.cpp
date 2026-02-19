@@ -18,10 +18,10 @@ void k1_sign_benchmarking() {
    auto private_key_string = std::string("5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3");
    auto key = private_key::from_string(private_key_string);
 
-   auto sign_non_canonical_f = [&]() {
-      key.sign(digest, false);
+   auto sign_f = [&]() {
+      key.sign(digest);
    };
-   benchmarking("k1_sign_non_canonical", sign_non_canonical_f);
+   benchmarking("k1_sign", sign_f);
 }
 
 void k1_recover_benchmarking() {
@@ -51,7 +51,7 @@ void r1_benchmarking() {
 
    auto sig = key.sign(digest);
    auto recover_f = [&]() {
-      public_key(sig, digest);;
+      public_key::recover(sig, digest);
    };
    benchmarking("r1_recover", recover_f);
 }
@@ -66,7 +66,7 @@ static fc::crypto::webauthn::signature make_webauthn_sig(const fc::crypto::r1::p
    e.write((char*)auth_data.data(), auth_data.size());
    e.write(client_data_hash.data(), client_data_hash.data_size());
 
-   r1::compact_signature sig = priv_key.sign_compact(e.result());
+   r1::compact_signature sig = priv_key.sign_sha256(e.result());
 
    char buff[8192];
    datastream<char*> ds(buff, sizeof(buff));
@@ -96,7 +96,7 @@ void wa_benchmarking() {
 
    auto sig = make_webauthn_sig(priv, auth_data, json);
    auto recover= [&]() {
-      sig.recover(d, true);
+      sig.recover(d);
    };
    benchmarking("webauthn_recover", recover);
 }

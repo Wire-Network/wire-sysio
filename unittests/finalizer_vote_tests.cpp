@@ -101,7 +101,7 @@ bsp make_bsp(const proposal_t& p, const bsp& previous, finalizer_policy_ptr finp
 
    assert(claim);
    block_ref ref = previous ? previous->make_block_ref() : block_ref{};
-   bhs new_bhs { {}, p.calculate_id(), block_header{p.block_timestamp, {}, {}, previous->id()}, {}, previous->core.next(ref, *claim),
+   bhs new_bhs { {}, p.calculate_id(), block_header{p.block_timestamp, {}, previous->id()}, {}, previous->core.next(ref, *claim),
       std::move(finpol), std::make_shared<proposer_policy>() }; // proposer_policy needed for make_block_ref
    return makeit(std::move(new_bhs));
 }

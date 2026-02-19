@@ -106,6 +106,7 @@ Options:
 #include "localize.hpp"
 #include "config.hpp"
 #include "httpc.hpp"
+#include "generate_shell_completion.hpp"
 
 #include <ranges>
 
@@ -1418,7 +1419,7 @@ struct get_transaction_id_subcommand {
                if( id == transaction().id() ) {
                   std::cerr << "file/string does not represent a transaction" << std::endl;
                } else {
-                  std::cout << string( id ) << std::endl;
+                  std::cout << id.str() << std::endl;
                }
             } else {
                std::cerr << "file/string does not represent a transaction" << std::endl;
@@ -1861,6 +1862,18 @@ int main( int argc, char** argv ) {
    app.add_flag("--http-verbose", http_config.verbose, localized("Print HTTP verbose information to STDERR"));
    app.add_flag("--http-trace", http_config.trace, localized("Print HTTP debug trace information to STDERR"));
 
+   { // generate-completion subcommand
+      auto completion_cmd = app.add_subcommand("generate-completion", localized("Generate shell completion script"));
+      completion_cmd->require_subcommand();
+
+      auto gen_bash = [&]() { no_auto_kiod = true; generate_bash_completion(app); };
+      completion_cmd->add_subcommand("bash", localized("Generate bash completion script. clio generate-completion bash > ~/.local/share/bash-completion/completions/clio"))->callback(gen_bash);
+      auto gen_zsh = [&]() { no_auto_kiod = true; generate_zsh_completion(app); };
+      completion_cmd->add_subcommand("zsh", localized("Generate zsh completion script. clio generate-completion zsh > ~/.config/zsh/completions/_clio"))->callback(gen_zsh);
+      auto gen_fish = [&]() { no_auto_kiod = true; generate_fish_completion(app); };
+      completion_cmd->add_subcommand("fish", localized("Generate fish completion script. clio generate-completion fish > ~/.config/fish/completions/clio.fish"))->callback(gen_fish);
+   }
+
    auto version_cmd = app.add_subcommand("version", localized("Retrieve version information"));
    version_cmd->require_subcommand();
 
@@ -2291,7 +2304,7 @@ int main( int argc, char** argv ) {
          fc::sha256 hash;
          if(wasm_v.size())
             hash = fc::sha256::hash(wasm_v.data(), wasm_v.size());
-         code_hash = (string)hash;
+         code_hash = hash.str();
 
          wasm = string(wasm_v.begin(), wasm_v.end());
 

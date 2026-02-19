@@ -10,8 +10,6 @@ namespace {
 constexpr auto option_name_client     = "outpost-ethereum-client";
 constexpr auto option_abi_file     = "ethereum-abi-file";
 
-auto _register_outpost_ethereum_client_plugin = application::register_plugin<outpost_ethereum_client_plugin>();
-
 [[maybe_unused]] inline fc::logger& logger() {
    static fc::logger log{"outpost_ethereum_client_plugin"};
    return log;

@@ -11,7 +11,34 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 # LOAD CMAKE TOOLS
 find_package(PkgConfig REQUIRED)
 
+# ZLIB, zstd, BZip2, LibLZMA (static via vcpkg, required by Boost::iostreams)
+find_package(ZLIB REQUIRED)
+find_package(zstd CONFIG REQUIRED)
+find_package(BZip2 REQUIRED)
+find_package(LibLZMA REQUIRED)
+
 # FIND PACKAGES WITH VCPKG
+# LLVM
+find_package(LLVM CONFIG REQUIRED)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake at: ${LLVM_DIR}")
+if(LLVM_VERSION_MAJOR VERSION_LESS 18)
+    message(FATAL_ERROR "WIRE requires LLVM version 18 or later")
+endif()
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND NOT DISABLE_LLVM_LINKAGE_OVERRIDE)
+    message(NOTICE "DEBUG build, and DISABLE_LLVM_LINKAGE_OVERRIDE=OFF, overriding LLVM linkage to Release")
+    foreach(llvm_target ${LLVM_AVAILABLE_LIBS})
+        if(TARGET ${llvm_target})
+            set_target_properties(
+                    ${llvm_target}
+                    PROPERTIES
+                    MAP_IMPORTED_CONFIG_DEBUG Release
+            )
+        endif()
+    endforeach()
+endif()
+
 # BOOST
 include(dependencies.boost NO_POLICY_SCOPE)
 
@@ -29,7 +56,6 @@ set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
 # OTHER DEPENDENCIES
-find_package(ZLIB REQUIRED)
 find_package(magic_enum CONFIG REQUIRED)
 find_package(boringssl-custom CONFIG REQUIRED)
 find_package(ethash CONFIG REQUIRED)

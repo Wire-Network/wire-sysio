@@ -12,16 +12,10 @@ namespace fc { namespace crypto {
       }, _storage));
    }
 
-   signature private_key::sign( const sha256& digest, bool require_canonical ) const {
-      return signature(std::visit([&digest, require_canonical](const auto& key) {
-         return signature::storage_type(key.sign(digest, require_canonical));
+   signature private_key::sign( const sha256& digest ) const {
+      return signature(std::visit([&digest](const auto& key) {
+         return signature::storage_type(key.sign_sha256(digest));
       }, _storage));
-   }
-
-   sha512 private_key::generate_shared_secret( const public_key& pub ) const {
-      return std::visit([&_pub_storage = pub._storage]<typename T>(const T& key) {
-         return key.generate_shared_secret(std::get<typename T::public_key_type>(_pub_storage));
-      }, _storage);
    }
 
    private_key private_key::from_string(const std::string& str, key_type type) {
@@ -38,13 +32,13 @@ namespace fc { namespace crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::em), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
-         return from_native_string_to_private_key<chain_key_type_t::chain_key_type_ethereum>(key);
+         return from_native_string_to_private_key<chain_key_type_ethereum>(key);
       }
       case key_type::ed: {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          const auto& key = base_prefix.empty() ? str : data_str;
          FC_ASSERT(type_prefix.empty() || type_prefix == key_prefix(key_type::ed), "Invalid private key prefixes: {}", str.substr(0, 10) + "...");
-         return from_native_string_to_private_key<chain_key_type_t::chain_key_type_solana>(key);
+         return from_native_string_to_private_key<chain_key_type_solana>(key);
       }
       case key_type::unknown: {
          if (str.find('_') == std::string::npos)
@@ -53,9 +47,9 @@ namespace fc { namespace crypto {
          auto [base_prefix, type_prefix, data_str] = parse_base_prefixes(str);
          FC_ASSERT(base_prefix == constants::private_key_base_prefix, "Invalid prefix to parse key type: {}", str.substr(0, 10) + "...");
          if (type_prefix == key_prefix(key_type::em)) {
-            return from_native_string_to_private_key<chain_key_type_t::chain_key_type_ethereum>(data_str);
+            return from_native_string_to_private_key<chain_key_type_ethereum>(data_str);
          } else if (type_prefix == key_prefix(key_type::ed)) {
-            return from_native_string_to_private_key<chain_key_type_t::chain_key_type_solana>(data_str);
+            return from_native_string_to_private_key<chain_key_type_solana>(data_str);
          }
          return private_key(parse_unknown_wire_private_key_str(str));
       }

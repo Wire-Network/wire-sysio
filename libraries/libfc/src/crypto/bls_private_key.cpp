@@ -19,11 +19,11 @@ signature private_key::proof_of_possession() const {
    return signature(proof.toAffineBytesLE(from_mont::yes));
 }
 
-bls::signature private_key::sign(const fc::sha256& digest) const {
-   return sign(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(digest.data()), digest.data_size()));
+bls::signature private_key::sign_sha256(const fc::sha256& digest) const {
+   return sign_raw(digest.to_uint8_span());
 }
 
-signature private_key::sign(std::span<const uint8_t> message) const {
+signature private_key::sign_raw(std::span<const uint8_t> message) const {
    bls12_381::g2 sig = bls12_381::sign(_sk, message);
    return signature(sig.toAffineBytesLE(from_mont::yes));
 }
@@ -34,11 +34,7 @@ private_key private_key::generate() {
    return private_key(v);
 }
 
-sha512 private_key_shim::generate_shared_secret(const public_key_type& pub_key) const {
-   FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS does not support shared secrets");
-}
-
-signature_shim::public_key_type signature_shim::recover(const sha256& digest, bool check_canonical) const {
+signature_shim::public_key_type signature_shim::recover(const sha256&) const {
    FC_THROW_EXCEPTION(fc::unsupported_exception, "BLS Signature Recovery is not supported");
 }
 

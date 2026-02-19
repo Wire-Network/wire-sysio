@@ -113,10 +113,10 @@ BOOST_AUTO_TEST_CASE(validate_contract_function_signature_and_selector) try {
    auto selector2 = eth::abi::to_contract_function_selector(contract_abis[2]);
    auto selector3 = eth::abi::to_contract_function_selector(contract_abis[3]);
 
-   BOOST_CHECK_EQUAL(fc::to_hex(selector0), "6d8ea6459a37844aecf3275e70c542ca3c48d0beb70bdcd21b7c189278962ba5");
-   BOOST_CHECK_EQUAL(fc::to_hex(selector1), "abf88b141967fe7db2a93a75c696460f1d26e736bb943ef5b96e4fbd0abf6f97");
-   BOOST_CHECK_EQUAL(fc::to_hex(selector2), "034918bde7fbc6a2651f8bca060d7487f2c111355fcf04c1c97e89916b3cff69");
-   BOOST_CHECK_EQUAL(fc::to_hex(selector3), "790d4ee08a8ce53fca175ea82d26288d81d932b988c377e39c879410cf27eb45");
+   BOOST_CHECK_EQUAL(selector0.str(), "6d8ea6459a37844aecf3275e70c542ca3c48d0beb70bdcd21b7c189278962ba5");
+   BOOST_CHECK_EQUAL(selector1.str(), "abf88b141967fe7db2a93a75c696460f1d26e736bb943ef5b96e4fbd0abf6f97");
+   BOOST_CHECK_EQUAL(selector2.str(), "034918bde7fbc6a2651f8bca060d7487f2c111355fcf04c1c97e89916b3cff69");
+   BOOST_CHECK_EQUAL(selector3.str(), "790d4ee08a8ce53fca175ea82d26288d81d932b988c377e39c879410cf27eb45");
 
    // Test to_contract_component_signature directly
    BOOST_CHECK_EQUAL(eth::abi::to_contract_component_signature(contract_abis[0].inputs[0]), "(address,uint256,bytes32)");
@@ -313,13 +313,8 @@ FC_LOG_AND_RETHROW();
 BOOST_AUTO_TEST_CASE(can_encode_tx_01) try {
    using namespace fc::crypto;
 
-   auto empty_msg_hash = fc::crypto::ethereum::hash_message("");
-   std::stringstream ss;
-   for (auto byte : empty_msg_hash) {
-      ss << std::hex << std::setfill('0') << std::setw(2) << static_cast<unsigned>(byte);
-   }
-   // auto empty_msg_hash_hex = fc::to_hex(reinterpret_cast<const char*>(empty_msg_hash.data()), empty_msg_hash.size());
-   auto empty_msg_hash_hex = ss.str();
+   auto empty_msg_hash = fc::crypto::ethereum::hash_message(ethereum::to_uint8_span(""));
+   auto empty_msg_hash_hex = empty_msg_hash.str();
    BOOST_CHECK("c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470" == empty_msg_hash_hex);
 
    auto actual_unsigned = rlp::encode_eip1559_unsigned_typed(test_tx_01);

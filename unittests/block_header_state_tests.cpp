@@ -1,5 +1,6 @@
 #include "finality_test_cluster.hpp"
 #include <sysio/chain/block_header_state.hpp>
+#include <fc/bitutil.hpp>
 
 using namespace sysio::chain;
 using namespace sysio::testing;

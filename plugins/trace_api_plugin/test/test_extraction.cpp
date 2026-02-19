@@ -147,72 +147,66 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             make_transaction_trace( ptrx1.id(), 1, 1, chain::transaction_receipt_header::executed,
                   { actt1, actt2, actt3 } ),
             std::make_shared<packed_transaction>(ptrx1) );
-      
+
       // accept the block with one transaction
       auto bp1 = make_block( chain::block_id_type(), 1, 1, "bp.one"_n,
             { chain::packed_transaction(ptrx1) } );
       signal_accepted_block( bp1 );
 
-      const std::vector<action_trace_v1> expected_action_traces {
+      const std::vector<action_trace_v0> expected_action_traces {
          {
-            {
-               0,
-               "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-               {{"alice"_n, "active"_n}},
-               make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
-            },
+            0,
+            "sysio.token"_n, "sysio.token"_n, "transfer"_n,
+            {{"alice"_n, "active"_n}},
+            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
             {}
          },
          {
-            {
-               1,
-               "alice"_n, "sysio.token"_n, "transfer"_n,
-               {{"alice"_n, "active"_n}},
-               make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
-            },
+            1,
+            "alice"_n, "sysio.token"_n, "transfer"_n,
+            {{"alice"_n, "active"_n}},
+            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
             {}
          },
          {
-            {
-               2,
-               "bob"_n, "sysio.token"_n, "transfer"_n,
-               {{"alice"_n, "active"_n}},
-               make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
-            },
+            2,
+            "bob"_n, "sysio.token"_n, "transfer"_n,
+            {{"alice"_n, "active"_n}},
+            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
             {}
          }
       };
 
-      const transaction_trace_v3 expected_transaction_trace {
-         {
-            ptrx1.id(),
-            expected_action_traces,
-            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{0},
-            0,
-            0,
-            ptrx1.get_signatures(),
-            make_trx_header(ptrx1.get_transaction())
-         }
+      const transaction_trace_v0 expected_transaction_trace {
+         ptrx1.id(),
+         expected_action_traces,
+         fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{0},
+         0,
+         0,
+         ptrx1.get_signatures(),
+         make_trx_header(ptrx1.get_transaction()),
+         1,                              // block_num
+         chain::block_timestamp_type(1), // block_time
+         {}                              // producer_block_id
       };
 
-      const block_trace_v2 expected_block_trace {
+      const block_trace_v0 expected_block_trace {
          bp1->calculate_id(),
          1,
          bp1->previous,
          chain::block_timestamp_type(1),
          "bp.one"_n,
          bp1->transaction_mroot,
-         bp1->action_mroot,
-         bp1->schedule_version,
-         std::vector<transaction_trace_v3> {
+         bp1->finality_mroot,
+         std::vector<transaction_trace_v0> {
             expected_transaction_trace
          }
       };
 
       BOOST_REQUIRE_EQUAL(max_lib, 0u);
       BOOST_REQUIRE(data_log.size() == 1u);
-      BOOST_REQUIRE(std::holds_alternative<block_trace_v2>(data_log.at(0)));
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(data_log.at(0)), expected_block_trace);
+      BOOST_REQUIRE(std::holds_alternative<block_trace_v0>(data_log.at(0)));
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(data_log.at(0)), expected_block_trace);
       BOOST_REQUIRE_EQUAL(id_log.at(bp1->block_num()).size(),  bp1->transactions.size());
    }
 
@@ -245,94 +239,90 @@ BOOST_AUTO_TEST_SUITE(block_extraction)
             { chain::packed_transaction(ptrx1), chain::packed_transaction(ptrx2), chain::packed_transaction(ptrx3) } );
       signal_accepted_block( bp1 );
 
-      const std::vector<action_trace_v1> expected_action_trace1 {
+      const std::vector<action_trace_v0> expected_action_trace1 {
          {
-            {
-               0,
-               "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-               {{"alice"_n, "active"_n}},
-               make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!")
-            },
+            0,
+            "sysio.token"_n, "sysio.token"_n, "transfer"_n,
+            {{"alice"_n, "active"_n}},
+            make_transfer_data("alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!"),
             {}
          }
       };
 
-      const std::vector<action_trace_v1> expected_action_trace2 {
+      const std::vector<action_trace_v0> expected_action_trace2 {
          {
-            {
-               1,
-               "bob"_n, "sysio.token"_n, "transfer"_n,
-               {{ "bob"_n, "active"_n }},
-               make_transfer_data( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" )
-            },
+            1,
+            "bob"_n, "sysio.token"_n, "transfer"_n,
+            {{ "bob"_n, "active"_n }},
+            make_transfer_data( "bob"_n, "alice"_n, "0.0001 SYS"_t, "Memo!" ),
             {}
          }
       };
 
-      const std::vector<action_trace_v1> expected_action_trace3 {
+      const std::vector<action_trace_v0> expected_action_trace3 {
          {
-            {
-               2,
-               "fred"_n, "sysio.token"_n, "transfer"_n,
-               {{ "fred"_n, "active"_n }},
-               make_transfer_data( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
-            },
+            2,
+            "fred"_n, "sysio.token"_n, "transfer"_n,
+            {{ "fred"_n, "active"_n }},
+            make_transfer_data( "fred"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
             {}
          }
       };
 
-      const std::vector<transaction_trace_v3> expected_transaction_traces {
+      const std::vector<transaction_trace_v0> expected_transaction_traces {
          {
-            {
-               ptrx1.id(),
-               expected_action_trace1,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               0,
-               0,
-               ptrx1.get_signatures(),
-               make_trx_header(ptrx1.get_transaction())
-            }
+            ptrx1.id(),
+            expected_action_trace1,
+            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+            0,
+            0,
+            ptrx1.get_signatures(),
+            make_trx_header(ptrx1.get_transaction()),
+            1,                              // block_num
+            chain::block_timestamp_type(1), // block_time
+            {}                              // producer_block_id
          },
          {
-            {
-               ptrx2.id(),
-               expected_action_trace2,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               0,
-               0,
-               ptrx2.get_signatures(),
-               make_trx_header(ptrx2.get_transaction())
-            }
+            ptrx2.id(),
+            expected_action_trace2,
+            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+            0,
+            0,
+            ptrx2.get_signatures(),
+            make_trx_header(ptrx2.get_transaction()),
+            1,                              // block_num
+            chain::block_timestamp_type(1), // block_time
+            {}                              // producer_block_id
          },
          {
-            {
-               ptrx3.id(),
-               expected_action_trace3,
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               0,
-               0,
-               ptrx3.get_signatures(),
-               make_trx_header(ptrx3.get_transaction())
-            }
+            ptrx3.id(),
+            expected_action_trace3,
+            fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+            0,
+            0,
+            ptrx3.get_signatures(),
+            make_trx_header(ptrx3.get_transaction()),
+            1,                              // block_num
+            chain::block_timestamp_type(1), // block_time
+            {}                              // producer_block_id
          }
       };
 
-      const block_trace_v2 expected_block_trace {
+      const block_trace_v0 expected_block_trace {
          bp1->calculate_id(),
          1,
          bp1->previous,
          chain::block_timestamp_type(1),
          "bp.one"_n,
          bp1->transaction_mroot,
-         bp1->action_mroot,
-         bp1->schedule_version,
+         bp1->finality_mroot,
          expected_transaction_traces
       };
 
       BOOST_REQUIRE_EQUAL(max_lib, 0u);
       BOOST_REQUIRE(data_log.size() == 1u);
-      BOOST_REQUIRE(std::holds_alternative<block_trace_v2>(data_log.at(0)));
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(data_log.at(0)), expected_block_trace);
+      BOOST_REQUIRE(std::holds_alternative<block_trace_v0>(data_log.at(0)));
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(data_log.at(0)), expected_block_trace);
    }
 
 BOOST_AUTO_TEST_SUITE_END()
