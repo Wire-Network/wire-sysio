@@ -2613,7 +2613,7 @@ struct controller_impl {
             }
 
             // assemble_block will mutate bsp by setting the valid structure
-            assemble_block(true, extract_qc_data(bsp), bsp);
+            assemble_block(true, extract_qc_data(b), bsp);
 
             // verify received finality_mroot in block header is the same as the actual one
 
