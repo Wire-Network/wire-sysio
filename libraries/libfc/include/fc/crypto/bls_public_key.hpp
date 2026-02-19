@@ -43,8 +43,6 @@ namespace fc::crypto::bls {
 
       // affine non-montgomery base64url with bls_public_key_prefix
       explicit public_key(const std::string& base64urlstr);
-      public_key( const compact_signature& c, const fc::sha256& digest, bool check_canonical = true );
-      public_key( const compact_signature& c, const unsigned char* digest, bool check_canonical = true );
 
       bool valid()const;
       public_key_data serialize()const;

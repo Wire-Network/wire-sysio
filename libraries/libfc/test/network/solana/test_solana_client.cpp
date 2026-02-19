@@ -7,8 +7,7 @@
 #include <fc/network/solana/solana_system_programs.hpp>
 #include <fc/network/solana/solana_types.hpp>
 
-namespace solana = fc::network::solana;
-using namespace solana;
+using namespace fc::network::solana;
 using namespace fc::crypto::solana;
 
 BOOST_AUTO_TEST_SUITE(solana_client_tests)

@@ -16,8 +16,6 @@ FC_REFLECT(sysio::detail::producer_api_plugin_response, (result));
 
 namespace sysio {
 
-   static auto _producer_api_plugin = application::register_plugin<producer_api_plugin>();
-
 using namespace sysio;
 
 #define CALL_WITH_400(api_name, category, api_handle, call_name, INVOKE, http_response_code) \

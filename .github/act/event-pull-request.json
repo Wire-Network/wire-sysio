@@ -1,0 +1,15 @@
+{
+  "action": "opened",
+  "number": 190,
+  "pull_request": {
+    "number": 190,
+    "head": {
+      "ref": "feature/llvm11-to-llvm18-migration",
+      "sha": "641424b4a375d9617f0df45b0497b78a5286ed47"
+    },
+    "base": {
+      "ref": "master",
+      "sha": "33cd6256020bb2d19c3f59ddc49e94b5fdede57f"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -88,7 +89,6 @@ using namespace sysio::chain;
 using namespace sysio::chain::plugin_interface;
 
 namespace {
-auto _producer_plugin = application::register_plugin<producer_plugin>();
 
 // track multiple failures on unapplied transactions
 class account_failures {
@@ -704,7 +704,7 @@ public:
    sysio::chain::named_thread_pool<struct prod>      _timer_thread;
    boost::asio::system_timer                         _timer{_timer_thread.get_executor()};
 
-   using signature_provider_type = fc::crypto::signature_provider_sign_fn;
+   using signature_provider_type = fc::crypto::sign_fn;
    std::map<chain::public_key_type, fc::crypto::signature_provider_ptr> _signature_providers;
    chain::bls_pub_key_sig_provider_map_t                     _finalizer_keys; // public, private
    std::set<chain::account_name>                     _producers;
@@ -716,6 +716,7 @@ public:
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
+   trx_priority_db                                   _trx_priority_db;
    fc::microseconds                                  _max_irreversible_block_age_us;
    block_num_type                                    _max_reversible_blocks{3600}; // pause production when reached (30 minutes)
    // produce-block-offset is in terms of the complete round, internally use calculated value for each block of round
@@ -880,6 +881,7 @@ public:
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+      _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
 
    // called from multiple non-main threads
@@ -1079,9 +1081,11 @@ public:
 
                  chain::controller& chain = chain_plug->chain();
                  transaction_metadata_ptr trx_meta;
+                 int priority = priority::low;
                  try {
                     trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type,
                                                                   chain.configured_subjective_signature_length_limit());
+                    priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
                     // use read_write when read is likely fine; maintains previous behavior of next() always being called from the main thread
                     app().executor().post(
@@ -1105,7 +1109,7 @@ public:
                  trx_executor executor{this, std::move(trx_meta), is_transient, std::move(next), api_trx, return_failure_traces};
 
                  // key recovery complete, post to the trx queue
-                 app().executor().post(priority::low, exec_queue::trx_read_write, std::move(executor));
+                 app().executor().post(priority, exec_queue::trx_read_write, std::move(executor));
               });
    }
 
@@ -1397,7 +1401,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    // Get the signature provider plugin
    auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
 
-   // LOAD `chain_key_type_wire_bls` SIGNATURE PROVIDERS
+   // LOAD `chain_key_type_t::wire_bls` SIGNATURE PROVIDERS
    {
       auto finalizer_candidate_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire_bls);
@@ -1411,7 +1415,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    }
 
    if (!_producers.empty()) {
-      // LOAD `chain_key_type_wire` SIGNATURE PROVIDERS
+      // LOAD `chain_key_type_t::wire` SIGNATURE PROVIDERS
       auto wire_sig_providers = sig_plug.query_providers(
         std::nullopt,std::nullopt, crypto::chain_key_type_wire);
 
@@ -2013,7 +2017,7 @@ producer_plugin_impl::get_unapplied_transactions(const producer_plugin::get_unap
    result.queued_size = readable_queue.size(exec_queue::trx_read_write);
 
    if (itr != ua.end()) {
-      result.more = itr->id();
+      result.more = itr->id().str();
       return result;
    }
 
@@ -2043,7 +2047,7 @@ producer_plugin_impl::get_unapplied_transactions(const producer_plugin::get_unap
    }
 
    if (qitr != qend) {
-      result.more = readable_queue.function_from_iter<trx_executor>(qitr).get_trx_meta()->id();
+      result.more = readable_queue.function_from_iter<trx_executor>(qitr).get_trx_meta()->id().str();
    }
 
    return result;

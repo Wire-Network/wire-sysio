@@ -105,8 +105,8 @@ namespace sysio::testing {
 
       std::string to_string() const {
          std::ostringstream ss;
-         ss << " generator id: " << _generator_id << " chain id: " << std::string(_chain_id) << " contract owner account: " 
-            << _contract_owner_account << " trx expiration seconds: " << _trx_expiration_us.to_seconds() << " lib id: " << std::string(_last_irr_block_id)
+         ss << " generator id: " << _generator_id << " chain id: " << _chain_id.str() << " contract owner account: "
+            << _contract_owner_account << " trx expiration seconds: " << _trx_expiration_us.to_seconds() << " lib id: " << _last_irr_block_id.str()
             << " log dir: " << _log_dir << " stop on trx failed: " << _stop_on_trx_failed;
          return std::move(ss).str();
       };

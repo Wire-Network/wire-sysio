@@ -6,3 +6,5 @@ option(ENABLE_TESTS "Build tests" OFF)
 option(ENABLE_ADDRESS_SANITIZER "Use address sanitizer" OFF)
 option(ENABLE_UNDEFINED_BEHAVIOR_SANITIZER "Use UB sanitizer" OFF)
 option(ENABLE_PROFILE "Enable for profile builds" OFF)
+
+option(DISABLE_LLVM_LINKAGE_OVERRIDE "Disable LLVM linkage override" OFF)

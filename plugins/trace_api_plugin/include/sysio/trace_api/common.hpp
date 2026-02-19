@@ -43,8 +43,6 @@ namespace sysio::trace_api {
    using log_handler = fc::optional_delegate<void(const std::string&)>;
 
    struct block_trace_v0;
-   struct block_trace_v1;
-   struct block_trace_v2;
    // optional block trace and irreversibility paired data
    using get_block_t = std::optional<std::tuple<data_log_entry, bool>>;
 

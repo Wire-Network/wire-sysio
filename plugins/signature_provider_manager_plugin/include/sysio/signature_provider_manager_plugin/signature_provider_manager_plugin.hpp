@@ -78,8 +78,7 @@ public:
     * @param priv private key to use
     * @return an anonymous signature provider
     */
-   fc::crypto::signature_provider_sign_fn
-   create_anonymous_provider_from_private_key(fc::crypto::private_key priv) const;
+   fc::crypto::sign_fn create_anonymous_provider_from_private_key(fc::crypto::private_key priv) const;
 
    /**
     * Check for the existence of a provider

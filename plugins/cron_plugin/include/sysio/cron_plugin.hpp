@@ -1,10 +1,14 @@
 #pragma once
 
-#include <sysio/chain_plugin/chain_plugin.hpp>
+#include <sysio/chain/application.hpp>
 #include <sysio/services/cron_service_manager.hpp>
 #include <sysio/utils/event_emitter.hpp>
 
 namespace sysio {
+
+using appbase::application;
+using appbase::options_description;
+using appbase::variables_map;
 
 namespace opservices = sysio::services;
 using opservices::cron_service;
@@ -40,7 +44,7 @@ public:
     * @param metadata optional job metadata
     * @return job_id_t
     */
-   cron_service::job_id_t add_job(const services::cron_schedule& sched, cron_service::job_fn_t fn, const std::optional<cron_service::job_metadata_t>& metadata = std::nullopt);
+   cron_service::job_id_t add_job(const cron_service::job_schedule& sched, cron_service::job_fn_t fn, const std::optional<cron_service::job_metadata_t>& metadata = std::nullopt);
 
    /**
     * Update job metadata

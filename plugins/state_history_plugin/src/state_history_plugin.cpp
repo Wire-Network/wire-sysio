@@ -1,7 +1,10 @@
-#include "sysio/chain/block_header.hpp"
+#include <sysio/chain/block_header.hpp>
 #include <sysio/chain/config.hpp>
 #include <sysio/chain/thread_utils.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
+#include <sysio/state_history/types.hpp>
+#include <sysio/state_history/log.hpp>
+
 #include <sysio/state_history/create_deltas.hpp>
 #include <sysio/state_history/log_config.hpp>
 #include <sysio/state_history/log_catalog.hpp>
@@ -26,8 +29,6 @@ using namespace chain;
 using namespace state_history;
 using boost::signals2::scoped_connection;
 namespace bio = boost::iostreams;
-
-static auto _state_history_plugin = application::register_plugin<state_history_plugin>();
 
 const std::string logger_name("state_history");
 fc::logger        _log;

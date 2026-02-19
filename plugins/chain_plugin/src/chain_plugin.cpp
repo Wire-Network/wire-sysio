@@ -1517,16 +1517,16 @@ string convert_to_string(const chain::key256_t& source, const string& key_type, 
       if (key_type == chain_apis::sha256 || (key_type == chain_apis::i256 && encode_type == chain_apis::hex)) {
          auto byte_array = fixed_bytes<32>(source).extract_as_byte_array();
          fc::sha256 val(reinterpret_cast<char *>(byte_array.data()), byte_array.size());
-         return std::string(val);
+         return val.str();
       } else if (key_type == chain_apis::i256) {
          auto byte_array = fixed_bytes<32>(source).extract_as_byte_array();
          fc::sha256 val(reinterpret_cast<char *>(byte_array.data()), byte_array.size());
-         return std::string("0x") + std::string(val);
+         return std::string("0x") + val.str();
       } else if (key_type == chain_apis::ripemd160) {
          auto byte_array = fixed_bytes<20>(source).extract_as_byte_array();
          fc::ripemd160 val;
          memcpy(val._hash, byte_array.data(), byte_array.size() );
-         return std::string(val);
+         return val.str();
       }
       SYS_ASSERT( false, chain_type_exception, "Incompatible key_type and encode_type for key256_t next_key" );
 
@@ -1936,12 +1936,11 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
          ("id", id)
          ("timestamp", block->timestamp)
          ("producer", block->producer)
-         ("confirmed", block->confirmed)
          ("previous", block->previous)
          ("transaction_mroot", block->transaction_mroot)
-         ("action_mroot", block->action_mroot)
-         ("schedule_version", block->schedule_version)
-         ("producer_signature", block->producer_signature)
+         ("finality_mroot", block->finality_mroot)
+         ("qc_claim", block->qc_claim)
+         ("producer_signatures", block->producer_signatures)
          ("ref_block_prefix", ref_block_prefix);
 }
 
@@ -1968,7 +1967,6 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
       ("block_num", sbp->block_num())
       ("id", sbp->calculate_id())
       ("header", static_cast<const signed_block_header&>(*sbp))
-      ("additional_signatures", detail::extract_additional_signatures(sbp))
    ;
    return result;
 }

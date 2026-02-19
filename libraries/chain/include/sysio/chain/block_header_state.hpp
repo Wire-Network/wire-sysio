@@ -4,7 +4,6 @@
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/qc.hpp>
 #include <sysio/chain/finalizer_policy.hpp>
-#include <sysio/chain/finality_extension.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <future>
 
@@ -161,7 +160,7 @@ struct block_header_state : fc::reflect_init {
 
    // ------ functions -----------------------------------------------------------------
    const block_id_type&  id()             const { return block_id; }
-   const digest_type     finality_mroot() const { return header.is_proper_svnn_block() ? header.action_mroot : digest_type{}; }
+   const digest_type&    finality_mroot() const { return header.finality_mroot; }
    block_timestamp_type  timestamp()      const { return header.timestamp; }
    account_name          producer()       const { return header.producer; }
    const block_id_type&  previous()       const { return header.previous; }
@@ -180,11 +179,7 @@ struct block_header_state : fc::reflect_init {
    digest_type compute_finality_digest() const;
 
    // Returns true if the block is a Savanna Genesis Block.
-   // This method is applicable to any transition block which is re-classified as a Savanna block.
    bool is_savanna_genesis_block() const { return core.is_genesis_block_num(block_num()); }
-
-   // Returns true if the block is a Proper Savanna Block
-   bool is_proper_svnn_block() const { return header.is_proper_svnn_block(); }
 
    // block descending from this need the provided qc in the block extension
    bool is_needed(const qc_claim_t& qc_claim) const {

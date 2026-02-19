@@ -72,18 +72,16 @@ namespace fc { namespace ecc {
         return secp256k1_nonce_function_default( nonce32, msg32, key32, algo16, nullptr, *extra );
     }
 
-    compact_signature private_key::sign_compact( const fc::sha256& digest, bool require_canonical )const
+    compact_signature private_key::sign_compact( const fc::sha256& digest )const
     {
         FC_ASSERT( my->_key != empty_priv );
         compact_signature result;
         secp256k1_ecdsa_recoverable_signature secp_sig;
         int recid;
         unsigned int counter = 0;
-        do
-        {
-            FC_ASSERT( secp256k1_ecdsa_sign_recoverable( detail::_get_context(), &secp_sig, (unsigned char*) digest.data(), (unsigned char*) my->_key.data(), extended_nonce_function, &counter ));
-            secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data() + 1, &recid, &secp_sig);
-        } while( require_canonical && !public_key::is_canonical( result ) );
+
+        FC_ASSERT( secp256k1_ecdsa_sign_recoverable( detail::_get_context(), &secp_sig, (unsigned char*) digest.data(), (unsigned char*) my->_key.data(), extended_nonce_function, &counter ));
+        secp256k1_ecdsa_recoverable_signature_serialize_compact( detail::_get_context(), result.data() + 1, &recid, &secp_sig);
 
         result.begin()[0] = 27 + 4 + recid;
         return result;

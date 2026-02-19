@@ -46,23 +46,6 @@ namespace sysio::chain::detail {
    }
 
    /**
-    * Given a complete signed block, extract the validated additional signatures if present;
-    *
-    * @param b complete signed block
-    * @return the list of additional signatures
-    */
-   inline vector<signature_type> extract_additional_signatures(const signed_block_ptr& b) {
-      auto exts = b->validate_and_extract_extensions();
-
-      if (auto it = exts.find(additional_block_signatures_extension::extension_id()); it != exts.end()) {
-         auto& additional_sigs = std::get<additional_block_signatures_extension>(it->second);
-         return std::move(additional_sigs.signatures);
-      }
-
-      return {};
-   }
-
-   /**
     *  Reference cannot outlive header_exts. Assumes header_exts is not mutated after instantiation.
     */
    inline const vector<digest_type>& get_new_protocol_feature_activations(const header_extension_multimap& header_exts) {

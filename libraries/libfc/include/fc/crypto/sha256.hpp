@@ -20,20 +20,20 @@ class sha256 : public add_packhash_to_hash<sha256>
     using uint64_array_type = std::array<uint64_t, sha256::uint64_size>;
     using hash_array_type = uint64_array_type;
     using byte_array_type = std::array<uint8_t, sha256::byte_size>;
+
     sha256();
     explicit sha256( const std::string& hex_str );
     explicit sha256( const hash_array_type& hash_arr  );
     explicit sha256( const char *data, size_t size );
 
     std::string str()const;
-    operator std::string()const;
 
     const char* data()const;
     char*       data();
-    constexpr size_t      data_size() const { return sha256::byte_size; }
+    constexpr size_t data_size() const { return sha256::byte_size; }
 
-    std::span<const uint8_t> to_uint8_span() const {
-       return {reinterpret_cast<const uint8_t*>(data()),  reinterpret_cast<const uint8_t*>(data()) + data_size()};
+    std::span<const uint8_t, byte_size> to_uint8_span() const {
+       return std::span<const uint8_t, byte_size>{reinterpret_cast<const uint8_t*>(data()), data_size()};
     }
 
     byte_array_type to_uint8_array()  const {
@@ -53,8 +53,9 @@ class sha256 : public add_packhash_to_hash<sha256>
     }
 
     static sha256 hash( const char* d, uint32_t dlen );
-    static sha256 hash( const std::string& );
-    static sha256 hash( const sha256& );
+    static sha256 hash( std::span<const char> d ) { return hash(d.data(), d.size()); }
+    static sha256 hash( const std::string& s);
+    static sha256 hash( const sha256& s);
 
     template<typename T>
     static sha256 hash( const T& t ) 

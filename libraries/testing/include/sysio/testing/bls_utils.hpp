@@ -36,7 +36,7 @@ inline std::pair<fc::crypto::bls::private_key, fc::crypto::signature_provider_pt
                             fc::crypto::public_key{fc::crypto::bls::public_key_shim{privkey.get_public_key().serialize()}},
                             fc::crypto::private_key{fc::crypto::bls::private_key_shim{privkey.get_secret()}},
                             [privkey](const fc::sha256& digest) {
-                               return fc::crypto::signature{bls::signature_shim{privkey.sign(digest.to_uint8_array()).serialize()}};
+                               return fc::crypto::signature{bls::signature_shim{privkey.sign_sha256(digest).serialize()}};
                             }
                          ));
 }

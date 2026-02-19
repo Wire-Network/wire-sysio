@@ -23,10 +23,8 @@ ripemd160::ripemd160( const std::string& hex_str ) {
 std::string ripemd160::str()const {
   return fc::to_hex( (char*)_hash, sizeof(_hash) );
 }
-ripemd160::operator std::string()const { return  str(); }
 
 char* ripemd160::data()const { return (char*)&_hash[0]; }
-
 
 struct ripemd160::encoder::impl {
    impl()

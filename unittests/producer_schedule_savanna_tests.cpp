@@ -48,7 +48,6 @@ BOOST_FIXTURE_TEST_CASE( verify_producer_schedule_after_savanna_activation, vali
          }
 
          auto b = produce_block();
-         BOOST_TEST( b->confirmed == 0); // must be 0 after instant finality is enabled
 
          // Check if the producer is the same as what we expect
          const auto block_time = head().block_time();
@@ -137,9 +136,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    };
 
    auto verify_block_finality_ext_producer = [](const signed_block_ptr& block, uint32_t version, account_name new_producer) {
-      std::optional<block_header_extension> ext = block->extract_header_extension(finality_extension::extension_id());
-      BOOST_TEST(!!ext);
-      std::optional<proposer_policy_diff> policy_diff = std::get<finality_extension>(*ext).new_proposer_policy_diff;
+      auto& policy_diff = block->new_proposer_policy_diff;
       BOOST_TEST_REQUIRE(!!policy_diff);
       BOOST_TEST(policy_diff->version == version);
       bool new_producer_in_insert = std::ranges::find_if(policy_diff->producer_auth_diff.insert_indexes,
@@ -217,10 +214,7 @@ BOOST_FIXTURE_TEST_CASE( proposer_policy_progression_test, validating_tester ) t
    // test no change to active schedule
    set_producers( {"bob"_n,"alice"_n} ); // same as before, so no change
    b = produce_block();
-   std::optional<block_header_extension> ext = b->extract_header_extension(finality_extension::extension_id());
-   BOOST_TEST(!!ext);
-   std::optional<proposer_policy_diff> policy_diff = std::get<finality_extension>(*ext).new_proposer_policy_diff;
-   BOOST_TEST_REQUIRE(!policy_diff); // no diff
+   BOOST_TEST_REQUIRE(!b->new_proposer_policy_diff); // no diff
 
    produce_blocks(config::producer_repetitions-1, true);
    produce_blocks(config::producer_repetitions, true);

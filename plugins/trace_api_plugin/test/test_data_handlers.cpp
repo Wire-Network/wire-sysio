@@ -12,25 +12,9 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(empty_data)
    {
       auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {}
+         0, "alice"_n, "alice"_n, "foo"_n, {}, {}, {}
       };
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
-      abi_data_handler handler(exception_handler{});
-
-      auto expected = fc::variant();
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
-   }
-
-   BOOST_AUTO_TEST_CASE(empty_data_v1)
-   {
-      auto action = action_trace_v1 {
-         {0, "alice"_n, "alice"_n, "foo"_n, {}, {}},
-         {}
-      };
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
       abi_data_handler handler(exception_handler{});
 
       auto expected = fc::variant();
@@ -42,42 +26,44 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
 
    BOOST_AUTO_TEST_CASE(no_abi)
    {
-      auto action = action_trace_v0 {
-         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}
-      };
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
-      abi_data_handler handler(exception_handler{});
+      // Without return_value
+      {
+         auto action = action_trace_v0 {
+            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
+         };
+         std::variant<action_trace_v0> action_trace_t = action;
+         abi_data_handler handler(exception_handler{});
 
-      auto expected = fc::variant();
-      auto actual = handler.serialize_to_variant(action_trace_t);
+         auto expected = fc::variant();
+         auto actual = handler.serialize_to_variant(action_trace_t);
 
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
-   }
+         BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
+         BOOST_REQUIRE(!std::get<1>(actual));
+      }
 
-   BOOST_AUTO_TEST_CASE(no_abi_v1)
-   {
-      auto action = action_trace_v1 {
-         { 0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}},
-         {0x04, 0x05, 0x06, 0x07}
-      };
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
-      abi_data_handler handler(exception_handler{});
+      // With return_value
+      {
+         auto action = action_trace_v0 {
+            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
+         };
+         std::variant<action_trace_v0> action_trace_t = action;
+         abi_data_handler handler(exception_handler{});
 
-      auto expected = fc::variant();
-      auto actual = handler.serialize_to_variant(action_trace_t);
+         auto expected = fc::variant();
+         auto actual = handler.serialize_to_variant(action_trace_t);
 
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
+         BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
+         BOOST_REQUIRE(!std::get<1>(actual));
+      }
    }
 
    BOOST_AUTO_TEST_CASE(basic_abi)
    {
       auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}
+            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {}
       };
 
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
 
       auto abi = chain::abi_def ( {},
          {
@@ -105,14 +91,13 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
       BOOST_REQUIRE(!std::get<1>(actual));
    }
 
-   BOOST_AUTO_TEST_CASE(basic_abi_v1)
+   BOOST_AUTO_TEST_CASE(basic_abi_with_return_value)
    {
-      auto action = action_trace_v1 {
-         { 0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}},
-         {0x04, 0x05, 0x06}
+      auto action = action_trace_v0 {
+         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
       };
 
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
 
       auto abi = chain::abi_def ( {},
          {
@@ -150,40 +135,10 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(basic_abi_wrong_type)
    {
       auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}
+            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06, 0x07}
       };
 
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
-
-      auto abi = chain::abi_def ( {},
-         {
-            { "foo", "", { {"a", "varuint32"}, {"b", "varuint32"}, {"c", "varuint32"}, {"d", "varuint32"} } }
-         },
-         {
-            { "bar"_n, "foo", ""}
-         },
-         {}, {}, {}
-      );
-      abi.version = "sysio::abi/1.";
-
-      abi_data_handler handler(exception_handler{});
-      handler.add_abi("alice"_n, std::move(abi));
-
-      auto expected = fc::variant();
-
-      auto actual = handler.serialize_to_variant(action_trace_t);
-
-      BOOST_TEST(to_kv(expected) == to_kv(std::get<0>(actual)), boost::test_tools::per_element());
-      BOOST_REQUIRE(!std::get<1>(actual));
-   }
-
-   BOOST_AUTO_TEST_CASE(basic_abi_wrong_type_v1)
-   {
-      auto action = action_trace_v1 {
-         { 0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}},
-         {0x04, 0x05, 0x06, 0x07}
-      };
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
 
       auto abi = chain::abi_def ( {},
          {
@@ -210,10 +165,10 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    BOOST_AUTO_TEST_CASE(basic_abi_insufficient_data)
    {
       auto action = action_trace_v0 {
-            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02}
+            0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02}, {}
       };
 
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
 
       auto abi = chain::abi_def ( {},
          {
@@ -242,12 +197,11 @@ BOOST_AUTO_TEST_SUITE(abi_data_handler_tests)
    // If no ABI provided for return type then do not attempt to decode it
    BOOST_AUTO_TEST_CASE(basic_abi_no_return_abi_when_return_value_provided)
    {
-      auto action = action_trace_v1 {
-         { 0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}},
-         {0x04, 0x05, 0x06}
+      auto action = action_trace_v0 {
+         0, "alice"_n, "alice"_n, "foo"_n, {}, {0x00, 0x01, 0x02, 0x03}, {0x04, 0x05, 0x06}
       };
 
-      std::variant<action_trace_v0, action_trace_v1> action_trace_t = action;
+      std::variant<action_trace_v0> action_trace_t = action;
 
       auto abi = chain::abi_def ( {},
          {

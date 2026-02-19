@@ -124,13 +124,13 @@ public_key::storage_type from_native_string_to_public_key_shim(const std::string
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Public key string cannot be empty");
    }
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_ethereum)
       return em::public_key_shim(em::public_key::from_string(public_key_str).serialize());
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_solana)
       return ed::public_key_shim::from_base58_string(public_key_str);
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
    return parse_unknown_wire_public_key_str(public_key_str);
@@ -147,13 +147,13 @@ private_key::storage_type from_native_string_to_private_key_shim(const std::stri
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_ethereum)
       return em::private_key_shim(em::private_key::from_native_string(private_key_str).get_secret());
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_solana)
       return ed::private_key_shim::from_base58_string(private_key_str);
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
    return parse_unknown_wire_private_key_str(private_key_str);
@@ -170,13 +170,13 @@ signature::storage_type from_native_string_to_signature_shim(const std::string& 
       FC_THROW_EXCEPTION(fc::invalid_arg_exception, "Private key string cannot be empty");
    }
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_ethereum)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_ethereum)
       return em::signature_shim(ethereum::to_em_signature(signature_str));
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_solana)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_solana)
       return ed::signature_shim::from_base58_string(signature_str);
 
-   if constexpr (ChainKeyType == fc::crypto::chain_key_type_t::chain_key_type_sui)
+   if constexpr (ChainKeyType == fc::crypto::chain_key_type_sui)
       FC_THROW_EXCEPTION(fc::unsupported_exception, "SUI support is not yet implemented");
 
    return parse_unknown_wire_signature_str(signature_str);

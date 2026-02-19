@@ -62,7 +62,8 @@ namespace fc::crypto {
          public_key( const public_key& ) = default;
          public_key& operator= (const public_key& ) = default;
 
-         public_key( const signature& c, const sha256& digest, bool check_canonical = true );
+         /// Recover public key from Wire transaction signature
+         static public_key recover( const signature& c, const sha256& digest );
 
          explicit public_key( storage_type&& other_storage )
             :_storage(std::move(other_storage))

@@ -1,5 +1,6 @@
 #include <ethash/keccak.hpp>
 #include <fc/crypto/ethereum/ethereum_utils.hpp>
+#include <fc/crypto/signer.hpp>
 #include <fc/log/logger.hpp>
 #include <fc/network/ethereum/ethereum_client.hpp>
 #include <fc/network/ethereum/ethereum_rlp_encoder.hpp>
@@ -106,13 +107,9 @@ fc::variant ethereum_client::execute_contract_tx_fn(const eip1559_tx& source_tx,
    tx.data = from_hex(contract_encode_data(abi, params));
    auto tx_encoded = rlp::encode_eip1559_unsigned_typed(tx);
    if (sign) {
-      // auto tx_encoded_unsigned     = rlp::encode_eip1559_unsigned_typed(tx);
-      auto tx_hash_data = fc::crypto::ethereum::hash_message(tx_encoded);
-      fc::sha256 tx_hash(reinterpret_cast<const char*>(tx_hash_data.data()), tx_hash_data.size());
-      auto tx_sig = _signature_provider->sign(tx_hash);
-      FC_ASSERT(tx_sig.contains<fc::em::signature_shim>());
-      auto& tx_sig_shim = tx_sig.get<fc::em::signature_shim>();
-      auto& tx_sig_data = tx_sig_shim.serialize();
+      fc::crypto::eth_client_signer signer(*_signature_provider);
+      auto tx_sig = signer.sign(tx_encoded);
+      auto& tx_sig_data = tx_sig.get<fc::em::signature_shim>().serialize();
       std::copy_n(tx_sig_data.begin(), 32, tx.r.begin());
       std::copy_n(tx_sig_data.begin() + 32, 32, tx.s.begin());
       tx.v = tx_sig_data[64] - 27; // recovery id

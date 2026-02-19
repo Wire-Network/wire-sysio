@@ -4,6 +4,7 @@
 #include <fc/log/logger.hpp>
 //#include <utfcpp/utf8.h>
 #include <fc/utf8.hpp>
+#include <charconv>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -23,10 +24,6 @@ namespace fc
     template<typename T, json::parse_type parser_type> variants array_from_stream( T& in, uint32_t max_depth );
     template<typename T, json::parse_type parser_type> variant number_from_stream( T& in );
     template<typename T> variant token_from_stream( T& in );
-    template<typename T> void to_stream( T& os, const variants& a, const json::yield_function_t& yield, json::output_formatting format );
-    template<typename T> void to_stream( T& os, const variant_object& o, const json::yield_function_t& yield, json::output_formatting format );
-    template<typename T> void to_stream( T& os, const variant& v, const json::yield_function_t& yield, json::output_formatting format );
-    std::string pretty_print( const std::string& v, uint8_t indent );
 }
 
 #include <fc/io/json_relaxed.hpp>
@@ -450,320 +447,254 @@ namespace fc
    } FC_RETHROW_EXCEPTIONS( warn, "{}", utf8_str ) }
 
    /**
+    *  Append escaped JSON string to out.
     *  Convert '\t', '\r', '\n', '\\' and '"'  to "\t\r\n\\\"" if escape_control_chars == true
     *  Convert all other < 32 & 127 ascii to escaped unicode "\u00xx"
     *  Removes invalid utf8 characters
     *  Escapes Control sequence Introducer 0x9b to \u009b
     *  All other characters unmolested.
     */
-   std::string escape_string( const std::string_view& str, const json::yield_function_t& yield, bool escape_control_chars )
+   void escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars )
    {
-      std::string r;
       const auto init_size = str.size();
-      r.reserve( init_size + 13 ); // allow for a few escapes
+      const auto start_pos = out.size();
+      out.reserve( start_pos + init_size + 13 ); // allow for a few escapes
       size_t i = 0;
       for( auto itr = str.begin(); itr != str.end(); ++i,++itr )
       {
-         if( i % json::escape_string_yield_check_count == 0 ) yield( init_size + r.size() );
+         if( i % json::escape_string_yield_check_count == 0 ) yield( init_size + out.size() );
          switch( *itr )
          {
-            case '\x00': r += "\\u0000"; break;
-            case '\x01': r += "\\u0001"; break;
-            case '\x02': r += "\\u0002"; break;
-            case '\x03': r += "\\u0003"; break;
-            case '\x04': r += "\\u0004"; break;
-            case '\x05': r += "\\u0005"; break;
-            case '\x06': r += "\\u0006"; break;
-            case '\x07': r += "\\u0007"; break; // \a is not valid JSON
-            case '\x08': r += "\\u0008"; break; // \b
-         // case '\x09': r += "\\u0009"; break; // \t
-         // case '\x0a': r += "\\u000a"; break; // \n
-            case '\x0b': r += "\\u000b"; break;
-            case '\x0c': r += "\\u000c"; break; // \f
-         // case '\x0d': r += "\\u000d"; break; // \r
-            case '\x0e': r += "\\u000e"; break;
-            case '\x0f': r += "\\u000f"; break;
-            case '\x10': r += "\\u0010"; break;
-            case '\x11': r += "\\u0011"; break;
-            case '\x12': r += "\\u0012"; break;
-            case '\x13': r += "\\u0013"; break;
-            case '\x14': r += "\\u0014"; break;
-            case '\x15': r += "\\u0015"; break;
-            case '\x16': r += "\\u0016"; break;
-            case '\x17': r += "\\u0017"; break;
-            case '\x18': r += "\\u0018"; break;
-            case '\x19': r += "\\u0019"; break;
-            case '\x1a': r += "\\u001a"; break;
-            case '\x1b': r += "\\u001b"; break;
-            case '\x1c': r += "\\u001c"; break;
-            case '\x1d': r += "\\u001d"; break;
-            case '\x1e': r += "\\u001e"; break;
-            case '\x1f': r += "\\u001f"; break;
+            case '\x00': out += "\\u0000"; break;
+            case '\x01': out += "\\u0001"; break;
+            case '\x02': out += "\\u0002"; break;
+            case '\x03': out += "\\u0003"; break;
+            case '\x04': out += "\\u0004"; break;
+            case '\x05': out += "\\u0005"; break;
+            case '\x06': out += "\\u0006"; break;
+            case '\x07': out += "\\u0007"; break; // \a is not valid JSON
+            case '\x08': out += "\\u0008"; break; // \b
+         // case '\x09': out += "\\u0009"; break; // \t
+         // case '\x0a': out += "\\u000a"; break; // \n
+            case '\x0b': out += "\\u000b"; break;
+            case '\x0c': out += "\\u000c"; break; // \f
+         // case '\x0d': out += "\\u000d"; break; // \r
+            case '\x0e': out += "\\u000e"; break;
+            case '\x0f': out += "\\u000f"; break;
+            case '\x10': out += "\\u0010"; break;
+            case '\x11': out += "\\u0011"; break;
+            case '\x12': out += "\\u0012"; break;
+            case '\x13': out += "\\u0013"; break;
+            case '\x14': out += "\\u0014"; break;
+            case '\x15': out += "\\u0015"; break;
+            case '\x16': out += "\\u0016"; break;
+            case '\x17': out += "\\u0017"; break;
+            case '\x18': out += "\\u0018"; break;
+            case '\x19': out += "\\u0019"; break;
+            case '\x1a': out += "\\u001a"; break;
+            case '\x1b': out += "\\u001b"; break;
+            case '\x1c': out += "\\u001c"; break;
+            case '\x1d': out += "\\u001d"; break;
+            case '\x1e': out += "\\u001e"; break;
+            case '\x1f': out += "\\u001f"; break;
 
-            case '\x7f': r += "\\u007f"; break;
+            case '\x7f': out += "\\u007f"; break;
 
             // if escape_control_chars=true these fall-through to default
             case '\t':        // \x09
                if( escape_control_chars ) {
-                  r += "\\t";
+                  out += "\\t";
                   break;
                }
             case '\n':        // \x0a
                if( escape_control_chars ) {
-                  r += "\\n";
+                  out += "\\n";
                   break;
                }
             case '\r':        // \x0d
                if( escape_control_chars ) {
-                  r += "\\r";
+                  out += "\\r";
                   break;
                }
             case '\\':
                if( escape_control_chars ) {
-                  r += "\\\\";
+                  out += "\\\\";
                   break;
                }
             case '\"':
                if( escape_control_chars ) {
-                  r += "\\\"";
+                  out += "\\\"";
                   break;
                }
             default:
-               r += *itr;
+               out += *itr;
          }
       }
 
-      return is_valid_utf8( r ) ? r : prune_invalid_utf8( r );
+      std::string_view appended( out.data() + start_pos, out.size() - start_pos );
+      if( !is_valid_utf8( appended ) ) {
+         std::string pruned = prune_invalid_utf8( appended );
+         out.resize( start_pos );
+         out += pruned;
+      }
    }
 
-   template<typename T>
-   void to_stream( T& os, const variants& a, const json::yield_function_t& yield, const json::output_formatting format )
+   std::string escape_string( const std::string_view& str, const json::yield_function_t& yield, bool escape_control_chars )
    {
-      yield(os.tellp());
-      os << '[';
+      std::string r;
+      escape_string( str, r, yield, escape_control_chars );
+      return r;
+   }
+
+   // --- std::string-based serialization (indent=0 for compact, indent>0 for pretty) ---
+
+   void to_stream( std::string& os, const variants& a, const json::yield_function_t& yield, uint8_t indent, int level );
+   void to_stream( std::string& os, const variant_object& o, const json::yield_function_t& yield, uint8_t indent, int level );
+   void to_stream( std::string& os, const variant& v, const json::yield_function_t& yield, uint8_t indent, int level );
+
+   void to_stream( std::string& os, const variants& a, const json::yield_function_t& yield, const uint8_t indent, const int level )
+   {
+      yield(os.size());
+      os += '[';
+      if( indent && !a.empty() )
+         os += '\n';
       auto itr = a.begin();
 
       while( itr != a.end() )
       {
-         to_stream( os, *itr, yield, format );
+         if( indent )
+            os.append( (level + 1) * indent, ' ' );
+         to_stream( os, *itr, yield, indent, level + 1 );
          ++itr;
          if( itr != a.end() )
-            os << ',';
+            os += ',';
+         if( indent )
+            os += '\n';
       }
-      os << ']';
+      if( indent && !a.empty() )
+         os.append( level * indent, ' ' );
+      os += ']';
    }
 
-   template<typename T>
-   void to_stream( T& os, const variant_object& o, const json::yield_function_t& yield, const json::output_formatting format )
+   void to_stream( std::string& os, const variant_object& o, const json::yield_function_t& yield, const uint8_t indent, const int level )
    {
-       yield(os.tellp());
-       os << '{';
+       yield(os.size());
+       os += '{';
+       if( indent && o.size() )
+          os += '\n';
        auto itr = o.begin();
 
        while( itr != o.end() )
        {
-          os << '"' << escape_string( itr->key(), yield ) << '"';
-          os << ':';
-          to_stream( os, itr->value(), yield, format );
+          if( indent )
+             os.append( (level + 1) * indent, ' ' );
+          os += '"';
+          escape_string( itr->key(), os, yield );
+          os += '"';
+          os += indent ? ": " : ":";
+          to_stream( os, itr->value(), yield, indent, level + 1 );
           ++itr;
           if( itr != o.end() )
-             os << ',';
+             os += ',';
+          if( indent )
+             os += '\n';
        }
-       os << '}';
+       if( indent && o.size() )
+          os.append( level * indent, ' ' );
+       os += '}';
    }
 
-   template<typename T>
-   void to_stream( T& os, const variant& v, const json::yield_function_t& yield, const json::output_formatting format )
+   void to_stream( std::string& os, const variant& v, const json::yield_function_t& yield, const uint8_t indent, const int level )
    {
-      yield(os.tellp());
+      yield(os.size());
       switch( v.get_type() )
       {
          case variant::null_type:
-              os << "null";
+              os += "null";
               return;
          case variant::int64_type:
          {
               int64_t i = v.as_int64();
               constexpr int64_t max_value(0xffffffff);
-              if( format == json::output_formatting::stringify_large_ints_and_doubles &&
-                  (i > max_value || i < -max_value))
-                 os << '"'<<v.as_string()<<'"';
-              else
-                 os << i;
-
+              if( i > max_value || i < -max_value ) {
+                 os += '"';
+                 os += v.as_string();
+                 os += '"';
+              } else {
+                 char buf[21];
+                 auto [ptr, ec] = std::to_chars(buf, buf + sizeof(buf), i);
+                 os.append(buf, ptr);
+              }
               return;
          }
          case variant::uint64_type:
          {
               uint64_t i = v.as_uint64();
-              if( format == json::output_formatting::stringify_large_ints_and_doubles &&
-                  i > 0xffffffff )
-                 os << '"'<<v.as_string()<<'"';
-              else
-                 os << i;
-
+              if( i > 0xffffffff ) {
+                 os += '"';
+                 os += v.as_string();
+                 os += '"';
+              } else {
+                 char buf[21];
+                 auto [ptr, ec] = std::to_chars(buf, buf + sizeof(buf), i);
+                 os.append(buf, ptr);
+              }
               return;
          }
          case variant::double_type:
-              if (format == json::output_formatting::stringify_large_ints_and_doubles)
-                 os << '"'<<v.as_string()<<'"';
-              else
-                 os << v.as_string();
+              os += '"';
+              os += v.as_string();
+              os += '"';
               return;
          case variant::bool_type:
-              os << v.as_string();
+              os += v.as_bool() ? "true" : "false";
               return;
          case variant::string_type:
-              os << '"' << escape_string( v.get_string(), yield ) << '"';
+              os += '"';
+              escape_string( v.get_string(), os, yield );
+              os += '"';
               return;
          case variant::blob_type:
-              os << '"' << escape_string( v.as_string(), yield ) << '"';
+              os += '"';
+              escape_string( v.as_string(), os, yield );
+              os += '"';
               return;
          case variant::array_type:
-           {
-              const variants&  a = v.get_array();
-              to_stream( os, a, yield, format );
+              to_stream( os, v.get_array(), yield, indent, level );
               return;
-           }
          case variant::object_type:
-           {
-              const variant_object& o =  v.get_object();
-              to_stream(os, o, yield, format );
+              to_stream( os, v.get_object(), yield, indent, level );
               return;
-           }
          default:
             FC_THROW_EXCEPTION( fc::invalid_arg_exception, "Unsupported variant type: {}", std::to_string( v.get_type() ) );
       }
    }
 
-   std::string   json::to_string( const variant& v, const json::yield_function_t& yield, const json::output_formatting format )
+   std::string json::to_string( const variant& v, const json::yield_function_t& yield )
    {
-      std::stringstream ss;
-      fc::to_stream( ss, v, yield, format );
-      yield(ss.tellp());
-      return ss.str();
+      std::string s;
+      fc::to_stream( s, v, yield, 0, 0 );
+      yield(s.size());
+      return s;
    }
 
-   std::string pretty_print( const std::string& v, const uint8_t indent ) {
-      int level = 0;
-      std::stringstream ss;
-      bool first = false;
-      bool quote = false;
-      bool escape = false;
-      for( uint32_t i = 0; i < v.size(); ++i ) {
-         switch( v[i] ) {
-            case '\\':
-              if( !escape ) {
-                if( quote )
-                  escape = true;
-              } else { escape = false; }
-              ss<<v[i];
-              break;
-            case ':':
-              if( !quote ) {
-                ss<<": ";
-              } else {
-                ss<<':';
-              }
-              break;
-            case '"':
-              if( first ) {
-                 ss<<'\n';
-                 for( int i = 0; i < level*indent; ++i ) ss<<' ';
-                 first = false;
-              }
-              if( !escape ) {
-                quote = !quote;
-              }
-              escape = false;
-              ss<<'"';
-              break;
-            case '{':
-            case '[':
-              ss<<v[i];
-              if( !quote ) {
-                ++level;
-                first = true;
-              }else {
-                escape = false;
-              }
-              break;
-            case '}':
-            case ']':
-              if( !quote ) {
-                if( v[i-1] != '[' && v[i-1] != '{' ) {
-                  ss<<'\n';
-                }
-                --level;
-                if( !first ) {
-                  for( int i = 0; i < level*indent; ++i ) ss<<' ';
-                }
-                first = false;
-                ss<<v[i];
-                break;
-              } else {
-                escape = false;
-                ss<<v[i];
-              }
-              break;
-            case ',':
-              if( !quote ) {
-                ss<<',';
-                first = true;
-              } else {
-                escape = false;
-                ss<<',';
-              }
-              break;
-            case 'n':
-              //If we're in quotes and see a \n, \b, \f, \r, \t, or \u, just print it literally but unset the escape flag.
-            case 'b':
-            case 'f':
-            case 'r':
-            case 't':
-            case 'u':
-              if( quote && escape )
-                escape = false;
-              //No break; fall through to default case
-            default:
-              if( first ) {
-                 ss<<'\n';
-                 for( int i = 0; i < level*indent; ++i ) ss<<' ';
-                 first = false;
-              }
-              ss << v[i];
-         }
-      }
-      return ss.str();
-    }
-
-   std::string json::to_pretty_string( const variant& v, const json::yield_function_t& yield, const json::output_formatting format ) {
-
-      auto s = to_string(v, yield, format);
-      return pretty_print( std::move( s ), 2);
+   std::string json::to_pretty_string( const variant& v, const json::yield_function_t& yield ) {
+      std::string s;
+      fc::to_stream( s, v, yield, 2, 0 );
+      yield(s.size());
+      return s;
    }
 
-   bool json::save_to_file( const variant& v, const std::filesystem::path& fi, const bool pretty, const json::output_formatting format )
+   bool json::save_to_file( const variant& v, const std::filesystem::path& fi, const bool pretty )
    {
-      if( pretty ) {
-         auto str = json::to_pretty_string( v, fc::time_point::maximum(), format, max_length_limit );
-         std::ofstream o(fi.generic_string().c_str());
-         o.write( str.c_str(), str.size() );
-         return o.good();
-      } else {
-         std::ofstream o(fi.generic_string().c_str());
-         const auto yield = [&](size_t s) {
-            // no limitation
-         };
-         fc::to_stream( o, v, yield, format );
-         return o.good();
-      }
+      auto str = pretty ? json::to_pretty_string( v, fc::time_point::maximum(), max_length_limit )
+                        : json::to_string( v, fc::time_point::maximum() );
+      std::ofstream o(fi.generic_string().c_str());
+      o.write( str.c_str(), str.size() );
+      return o.good();
    }
    variant json::from_file( const std::filesystem::path& p, const json::parse_type ptype, const uint32_t max_depth )
    {
-      //auto tmp = std::make_shared<fc::ifstream>( p, ifstream::binary );
-      //auto tmp = std::make_shared<std::ifstream>( p.generic_string().c_str(), std::ios::binary );
-      //buffered_istream bi( tmp );
       std::ifstream bi( p.string(), std::ios::binary );
       switch( ptype )
       {
@@ -779,24 +710,6 @@ namespace fc
               FC_ASSERT( false, "Unknown JSON parser type {}", static_cast<int>(ptype) );
       }
    }
-   /*
-   variant json::from_stream( buffered_istream& in, parse_type ptype, uint32_t max_depth )
-   {
-      switch( ptype )
-      {
-          case legacy_parser:
-              return variant_from_stream<fc::buffered_istream, legacy_parser>( in, max_depth );
-          case legacy_parser_with_string_doubles:
-              return variant_from_stream<fc::buffered_istream, legacy_parser_with_string_doubles>( in, max_depth );
-          case strict_parser:
-              return json_relaxed::variant_from_stream<buffered_istream, true>( in, max_depth );
-          case relaxed_parser:
-              return json_relaxed::variant_from_stream<buffered_istream, false>( in, max_depth );
-          default:
-              FC_ASSERT( false, "Unknown JSON parser type {ptype}", ("ptype", ptype) );
-      }
-   }
-   */
 
    bool json::is_valid( const std::string& utf8_str, const json::parse_type ptype, const uint32_t max_depth )
    {

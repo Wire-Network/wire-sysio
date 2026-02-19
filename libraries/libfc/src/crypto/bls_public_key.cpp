@@ -36,14 +36,6 @@ namespace fc::crypto::bls {
       , _jacobian_montgomery_le(from_affine_bytes_le(_affine_non_montgomery_le)) {
    }
 
-   public_key::public_key(const compact_signature& c, const fc::sha256& digest, bool check_canonical) {
-     FC_ASSERT(false, "BLS public key recovery from a signature is unsupported");
-   }
-
-   public_key::public_key(const compact_signature& c, const unsigned char* digest, bool check_canonical) {
-     FC_ASSERT(false, "BLS public key recovery from a signature is unsupported");
-   }
-
    bool public_key::valid() const {
       return _affine_non_montgomery_le != empty_pub;
    }
@@ -53,8 +45,7 @@ namespace fc::crypto::bls {
    }
 
    std::string public_key::to_string(const public_key_data& key) {
-      std::string data_str = fc::crypto::bls::serialize_base64url(key);
-      return constants::bls_public_key_prefix + data_str;
+      return constants::bls_public_key_prefix + serialize_base64url(key);
    }
 
    std::string public_key::to_string() const {

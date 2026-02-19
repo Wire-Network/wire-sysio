@@ -13,7 +13,7 @@ genesis_state::genesis_state(const fc::crypto::public_key& producer_key, const f
 chain::chain_id_type genesis_state::compute_chain_id() const {
    digest_type::encoder enc;
    fc::raw::pack( enc, *this );
-   return chain_id_type{enc.result()};
+   return chain_id_type{enc.result().str()};
 }
 
 } } // namespace sysio::chain

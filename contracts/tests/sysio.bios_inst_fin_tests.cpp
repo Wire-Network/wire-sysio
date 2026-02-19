@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE( set_1_finalizer, sysio_bios_if_tester ) try {
     abi_serializer::to_variant( *cur_block, pretty_output, get_resolver(), fc::microseconds::maximum() );
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
-    BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
+    BOOST_TEST(output_json.find("new_finalizer_policy_diff") != std::string::npos);
     BOOST_TEST(output_json.find("\"generation\": 3") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 2") != std::string::npos);
     BOOST_TEST(output_json.find("set_1_finalizer") != std::string::npos);
@@ -88,7 +88,7 @@ BOOST_FIXTURE_TEST_CASE( set_2_finalizers, sysio_bios_if_tester ) try {
     abi_serializer::to_variant( *cur_block, pretty_output, get_resolver(), fc::microseconds::maximum() );
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
-    BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
+    BOOST_TEST(output_json.find("new_finalizer_policy_diff") != std::string::npos);
     BOOST_TEST(output_json.find("\"generation\": 3") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 5") != std::string::npos);
     BOOST_TEST(output_json.find("set_2_finalizer_2") != std::string::npos);

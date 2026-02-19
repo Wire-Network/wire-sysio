@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(hello_dynamic_key_signature_test) {
         BOOST_TEST_MESSAGE("SHA-256(\"hello\") = " << digest);
 
         // 5) Sign the digest
-        signature_shim sig = sk.sign(digest, /*require_canonical=*/false);
+        signature_shim sig = sk.sign_sha256(digest);
 
         // 6) Verify the signature using our shim
         bool ok = sig.verify(digest, pk);
@@ -120,13 +120,13 @@ BOOST_AUTO_TEST_CASE(sign_verify_sha256_roundtrip) {
         auto digest = fc::sha256::hash(payload);
 
         // 5) Sign & 6) Verify
-        signature_shim sig = sk.sign(digest, false);
+        signature_shim sig = sk.sign_sha256(digest);
         bool ok = sig.verify(digest, pk);
         BOOST_CHECK_MESSAGE(ok, "sign/verify round-trip failed; digest=" << digest);
     } FC_LOG_AND_RETHROW()
 }
 
-// Test 3: Shared-secret symmetry via X25519 (generate_shared_secret)
+// Test 3: Shared-secret symmetry via X25519
 BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
     try {
         // 1) Initialize libsodium
@@ -151,12 +151,6 @@ BOOST_AUTO_TEST_CASE(shared_secret_symmetry) {
         std::copy_n(sk2_raw,crypto_sign_SECRETKEYBYTES,sk2._data.data());
         std::copy_n(pk1_raw,crypto_sign_PUBLICKEYBYTES,pk1._data.data());
         std::copy_n(pk2_raw,crypto_sign_PUBLICKEYBYTES,pk2._data.data());
-
-        // 4) ED25519 shared-secret is currently unsupported → should throw
-        BOOST_CHECK_THROW(
-                sk1.generate_shared_secret(pk2),
-                fc::exception
-            );
 
        // verify to/from string
        fc::crypto::public_key pubkey1(pk1);
@@ -183,7 +177,7 @@ BOOST_AUTO_TEST_CASE(signature_recover_throws) {
         signature_shim sig;
         fc::sha256 dummy;
         // Recover is unsupported—should always throw
-        BOOST_CHECK_THROW(sig.recover(dummy, true), fc::exception);
+        BOOST_CHECK_THROW(sig.recover(dummy), fc::exception);
     } FC_LOG_AND_RETHROW()
 }
 

@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(create_provider_wire_key_from_example_spec) {
    // Public key should match the one provided in spec
    BOOST_CHECK_EQUAL(provider->public_key.to_string({}), pub.to_string({}));
    BOOST_CHECK_EQUAL(provider->public_key, pub);
-   BOOST_CHECK_EQUAL(provider->key_type, fc::crypto::chain_key_type_t::chain_key_type_wire);
+   BOOST_TEST((provider->key_type == fc::crypto::chain_key_type_wire));
 
    // Provider should be retrievable via its public key
    BOOST_CHECK(mgr.has_provider(provider->public_key));
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
    auto em_priv_key = fc::em::private_key::regenerate(
       fc::sha256(reinterpret_cast<const char*>(fixture_priv_key_bytes.data()), fixture_priv_key_bytes.size()).to_uint64_array());
 
-   auto em_sig_data = em_priv_key.sign_compact_ex(fixture.payload, false);
+   auto em_sig_data = em_priv_key.sign_compact(fc::crypto::keccak256::hash(fixture.payload));
    auto em_sig      = fc::to_hex(reinterpret_cast<const char*>(em_sig_data.data()), em_sig_data.size());
 
    // Compare generated signature against fixture
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(create_provider_ethereum_fixture_pub_priv_sig_interoperable
 
    // Recover public key data (uncompressed)
    auto em_pub_key_rec_ser =
-      fc::em::signature_shim(em_sig_data).recover_ex(fixture.payload, false).unwrapped().serialize_uncompressed();
+      fc::em::signature_shim(em_sig_data).recover_eth(fc::crypto::keccak256::hash(fixture.payload)).unwrapped().serialize_uncompressed();
 
    auto em_pub_key_rec_hex =
       fc::crypto::ethereum::trim_public_key(fc::to_hex(em_pub_key_rec_ser.data(), em_pub_key_rec_ser.size()));
@@ -301,7 +301,7 @@ BOOST_AUTO_TEST_CASE(create_provider_solana_key_spec) {
    BOOST_CHECK(mgr.has_provider(provider->public_key));
    auto found = mgr.get_provider(provider->public_key);
    BOOST_CHECK_EQUAL(found->public_key.to_string({}), provider->public_key.to_string({}));
-   BOOST_CHECK_EQUAL(found->key_type, chain_key_type_solana);
+   BOOST_TEST((found->key_type == chain_key_type_solana));
 
    // Sign function should be set
    BOOST_CHECK(static_cast<bool>(provider->sign));
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE(solana_signature_provider_spec_options) {
    // Verify the provider has correct key type
    auto providers = mgr.query_providers(fixture1.key_name);
    BOOST_REQUIRE(!providers.empty());
-   BOOST_CHECK_EQUAL(providers[0]->key_type, chain_key_type_solana);
+   BOOST_TEST((providers[0]->key_type == chain_key_type_solana));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -109,7 +109,7 @@ auto make_block( uint32_t block_num ) {
 
    auto header_bmroot = chain::digest_type::hash( std::make_pair( block->digest(), block_id_type{}));
    auto sig_digest = chain::digest_type::hash( std::make_pair( header_bmroot, digest_type{} ));
-   block->producer_signature = priv_key.sign( sig_digest );
+   block->producer_signatures = {priv_key.sign( sig_digest )};
 
    return block;
 }
@@ -880,7 +880,7 @@ namespace {
          const auto id = b ? b->calculate_id() : sysio::chain::transaction_id_type{};
          for (auto i = begin; i < end; ++i) {
             const auto& trx_pair = trx_pairs[i];
-            std::string msg = context + ": block_num==" + std::to_string(bn) + ", i==" + std::to_string(i) + ", id: " + std::string(std::get<1>(trx_pair)->id());
+            std::string msg = context + ": block_num==" + std::to_string(bn) + ", i==" + std::to_string(i) + ", id: " + std::get<1>(trx_pair)->id().str();
             auto ts = status.get_trx_state(std::get<1>(trx_pair)->id());
             BOOST_REQUIRE_MESSAGE(ts, msg);
             BOOST_CHECK_MESSAGE(ts->block_id == id, msg);

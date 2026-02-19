@@ -12,23 +12,20 @@ namespace sysio::chain {
 
 namespace detail {
 
-   inline void verify_signee(const signature_type& producer_signature, const block_id_type& block_id,
-                             const std::vector<signature_type>& additional_signatures,
+   inline void verify_signee(const std::vector<signature_type>& producer_signatures, const block_id_type& block_id,
                              const block_signing_authority& valid_block_signing_authority)
    {
       auto num_keys_in_authority = std::visit([](const auto& a) { return a.keys.size(); },
                                               valid_block_signing_authority);
-      SYS_ASSERT(1 + additional_signatures.size() <= num_keys_in_authority, wrong_signing_key,
+      SYS_ASSERT(producer_signatures.size() <= num_keys_in_authority, wrong_signing_key,
                  "number of block signatures ({}) exceeds number of keys ({}) in block signing authority: {}",
-                 1 + additional_signatures.size(), num_keys_in_authority, fc::json::to_log_string(valid_block_signing_authority));
+                 producer_signatures.size(), num_keys_in_authority, fc::json::to_log_string(valid_block_signing_authority));
 
       using key_type = fc::crypto::public_key::key_type;
       std::set<public_key_type> keys;
-      auto [iter, _] = keys.emplace(fc::crypto::public_key(producer_signature, block_id, true));
-      SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
 
-      for (const auto& s : additional_signatures) {
-         auto [iter, inserted] = keys.emplace(s, block_id, true);
+      for (const auto& s : producer_signatures) {
+         auto [iter, inserted] = keys.emplace(fc::crypto::public_key::recover(s, block_id));
          SYS_ASSERT(inserted, wrong_signing_key, "block signed by same key twice: {}", fc::json::to_log_string(*iter));
          SYS_ASSERT(iter->contains_type(key_type::k1, key_type::r1), unactivated_key_type, "Block signed with invalid key type, only R1 & K1 allowed");
       }
@@ -38,7 +35,7 @@ namespace detail {
       SYS_ASSERT(relevant_sig_count == keys.size(), wrong_signing_key,
                  "block signed by unexpected key: {}, expected: {}. {} != {}",
                  fc::json::to_log_string(keys), fc::json::to_log_string(valid_block_signing_authority),
-                 relevant_sig_count, keys. size());
+                 relevant_sig_count, keys.size());
 
       SYS_ASSERT(is_satisfied, wrong_signing_key,
                  "block signatures {} do not satisfy the block signing authority: {}",
@@ -48,36 +45,20 @@ namespace detail {
    // SYS_ASSERTs if signature does not validate
    inline bool verify_block_sig(const block_header_state& prev, const signed_block_ptr& block, bool skip_validate_signee) {
       if (!skip_validate_signee) {
-         auto sigs = detail::extract_additional_signatures(block);
          const auto& valid_block_signing_authority = prev.get_producer_for_block_at(block->timestamp).authority;
-         verify_signee(block->producer_signature, block->calculate_id(), sigs, valid_block_signing_authority);
+         verify_signee(block->producer_signatures, block->calculate_id(), valid_block_signing_authority);
       }
       return true;
    };
-
-   void inject_additional_signatures( signed_block& b, const std::vector<signature_type>& additional_signatures) {
-      if (!additional_signatures.empty()) {
-         // as an optimization we don't copy this out into the legitimate extension structure as it serializes
-         // the same way as the vector of signatures
-         static_assert(fc::reflector<additional_block_signatures_extension>::total_member_count == 1);
-         static_assert(std::is_same_v<decltype(additional_block_signatures_extension::signatures), std::vector<signature_type>>);
-
-         emplace_extension(b.block_extensions, additional_block_signatures_extension::extension_id(),
-                           fc::raw::pack(additional_signatures));
-      }
-   }
 
    void sign(signed_block& block, const block_id_type& block_id,
              const signer_callback_type& signer, const block_signing_authority& valid_block_signing_authority) {
       auto sigs = signer(block_id);
 
       SYS_ASSERT(!sigs.empty(), no_block_signatures, "Signer returned no signatures");
-      block.producer_signature = sigs.back();
-      // last is producer signature, rest are additional signatures to inject in the block extension
-      sigs.pop_back();
+      block.producer_signatures = std::move(sigs);
 
-      verify_signee(block.producer_signature, block_id, sigs, valid_block_signing_authority);
-      inject_additional_signatures(block, sigs);
+      verify_signee(block.producer_signatures, block_id, valid_block_signing_authority);
    }
 
 } // namespace detail
@@ -118,8 +99,7 @@ block_state::block_state(const block_header_state&                bhs,
 
    if( qc ) {
       fc_dlog(vote_logger, "integrate qc {} into block {} {}", qc->to_qc_claim(), block_num(), id());
-      emplace_extension(new_block->block_extensions,
-                        quorum_certificate_extension::extension_id(), fc::raw::pack( *qc ));
+      new_block->qc = *qc;
    }
 
    sign(*new_block, block_id, signer, valid_block_signing_authority);
@@ -132,12 +112,10 @@ std::shared_ptr<block_state> block_state::create_genesis_block(const genesis_sta
    auto& result = *result_ptr;
 
    // set block_header_state data ----
-   emplace_extension(result.header.header_extensions, finality_extension::extension_id(),
-                     fc::raw::pack(finality_extension{ {0, false}, {}, {} }));
+   result.header.qc_claim = {0, false};
 
    result.activated_protocol_features = std::make_shared<protocol_feature_activation_set>(); // no activated protocol features in genesis
    result.header.timestamp = g.initial_timestamp;
-   result.header.schedule_version = block_header::proper_svnn_schedule_version;
    result.block_id = result.header.calculate_id();
 
    ilog("Using initial finalizer key: {}", g.initial_finalizer_key.to_string());
@@ -257,9 +235,7 @@ void block_state::verify_qc(const qc_t& qc) const {
 }
 
 qc_claim_t block_state::extract_qc_claim() const {
-   if (auto itr = header_exts.find(finality_extension::extension_id()); itr != header_exts.end())
-      return std::get<finality_extension>(itr->second).qc_claim;
-   return {};
+   return header.qc_claim;
 }
 
 valid_t block_state::new_valid(const block_header_state& next_bhs, const digest_type& action_mroot, const digest_type& strong_digest) const {

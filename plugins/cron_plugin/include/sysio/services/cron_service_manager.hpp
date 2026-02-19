@@ -92,13 +92,13 @@ public:
     * Get all managed services.
     * @return Vector of all cron_service instances (snapshot)
     */
-   [[nodiscard]] const std::vector<cron_service_ptr> all() const;
+   [[nodiscard]] std::vector<cron_service_ptr> all() const;
 
    /**
     * Get names of all managed services.
     * @return Vector of service names (snapshot)
     */
-   [[nodiscard]] const std::vector<std::string> all_names() const;
+   [[nodiscard]] std::vector<std::string> all_names() const;
 
    /**
     * Get the number of managed services.
