@@ -822,6 +822,7 @@ public:
    fc::time_point                 _ro_read_window_start_time;
    fc::time_point                 _ro_window_deadline;    // only modified on app thread, read-window deadline or write-window deadline
    boost::asio::system_timer      _ro_timer{_timer_thread.get_executor()}; // only accessible from the main thread
+   std::atomic<uint32_t>          _ro_timer_corelation_id{0};              // written on main thread, read on read-only threads
    fc::microseconds               _ro_max_trx_time_us{0}; // calculated during option initialization
    ro_trx_queue_t                 _ro_exhausted_trx_queue;
    alignas(hardware_destructive_interference_sz)
@@ -3105,8 +3106,14 @@ void producer_plugin_impl::switch_to_read_window() {
    auto expire_time = std::chrono::microseconds(_ro_read_window_time_us.count());
    _ro_timer.expires_after(expire_time);
    // Needs to be on read_only because that is what is being processed until switch_to_write_window().
-   _ro_timer.async_wait([this](const boost::system::error_code& ec) {
-      app().executor().post(priority::high, exec_queue::read_only, [this, ec]() {
+   _ro_timer.async_wait([this, cid = _ro_timer_corelation_id.fetch_add(1, std::memory_order_release) + 1](const boost::system::error_code& ec) {
+      app().executor().post(priority::high, exec_queue::read_only, [this, ec, cid]() {
+         // Discard stale timer handler from a previous read window cycle. When all tasks finish
+         // before the timer, the last task's handler switches to write window and a new read/write
+         // cycle begins, incrementing _ro_timer_corelation_id. Without this check, this handler
+         // would operate on the new cycle's futures and assert in switch_to_write_window().
+         if (cid != _ro_timer_corelation_id.load(std::memory_order_acquire))
+            return;
          if (ec != boost::asio::error::operation_aborted) {
             // tests have seen to deadlock here, unable to reproduce so add a guard for it, also so we can log
             const fc::time_point safe_guard_deadline = _ro_window_deadline + _ro_read_window_effective_time_us; // give plenty of time

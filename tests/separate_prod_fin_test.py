@@ -67,17 +67,17 @@ try:
     info = cluster.biosNode.getInfo(exitOnError=True)
     assert (info["head_block_num"] - info["last_irreversible_block_num"]) < 9, "Instant finality enabled LIB diff should be small"
 
-    # Double check that's indeed the case in qc_extension
+    # Double check that's indeed the case in qc
     i = 0
     while i < 3: # slow ci/cd might not get all votes in time, try a few blocks
         # LIB has advanced, which indicate at least 2 of non-producer finalizers have voted.
         block_num = cluster.getNode(1).getIrreversibleBlockNum()
         block = cluster.getNode(1).getBlock(block_num)
-        if "qc_extension" in block:
-            qc_ext = block["qc_extension"]
-            Print(f'{qc_ext}')
+        if "qc" in block:
+            qc = block["qc"]
+            Print(f'{qc}')
             # "11111" is the representation of a bitset showing which finalizers have voted (we have five total finalizers)
-            if qc_ext["qc"]["active_policy_sig"]["strong_votes"] == "11111":
+            if qc["active_policy_sig"]["strong_votes"] == "11111":
                 break
         cluster.getNode(1).waitForLibToAdvance()
         i += 1

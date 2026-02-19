@@ -114,14 +114,9 @@ void test_control_plugin_impl::swap_action_in_block(const chain::signed_block_pt
    if (!found)
       return;
 
-   if (!b->is_proper_svnn_block()) {
-      elog("Block is not a Savanna block, swap_action failed.");
-      return;
-   }
-
    auto copy_b = b->clone();
    copy_b->previous = b->calculate_id();
-   copy_b->block_extensions.clear(); // remove QC extension since header will claim same as previous block
+   copy_b->qc.reset(); // remove QC since header will claim same as previous block
    copy_b->timestamp = b->timestamp.next();
    // swap out action
    for (auto& t : copy_b->transactions) {
@@ -146,7 +141,7 @@ void test_control_plugin_impl::swap_action_in_block(const chain::signed_block_pt
       trx_digests.emplace_back( tr.digest() );
    copy_b->transaction_mroot = chain::calculate_merkle( std::move(trx_digests) );
    // Re-sign the block
-   copy_b->producer_signature = _swap_on_options.blk_priv_key.sign(copy_b->calculate_id());
+   copy_b->producer_signatures = {_swap_on_options.blk_priv_key.sign(copy_b->calculate_id())};
    auto copy_b_signed = signed_block::create_signed_block(std::move(copy_b));
 
    // will be processed on the next start_block if is_new_best_head
