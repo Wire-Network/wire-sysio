@@ -284,7 +284,7 @@ namespace sysio {
       };
       add_peer_txn_info add_peer_txn(const transaction_id_type& id, const time_point_sec& trx_expires, connection& c);
       size_t add_peer_txn_notice(const transaction_id_type& id, connection& c);
-      bool have_txn(const transaction_id_type& id) const;
+      bool have_peer_txn(const transaction_id_type& id, connection& c);
       connection_id_vector peer_connections(const transaction_id_type& id) const;
       void expire_txns();
 
@@ -608,11 +608,8 @@ namespace sysio {
    class queued_buffer : boost::noncopyable {
    public:
       void reset() {
+         clear_write_queue();
          fc::lock_guard g( _mtx );
-         _write_queue.clear();
-         _sync_write_queue.clear();
-         _write_queue_size.store(0, std::memory_order_relaxed);
-         _trx_write_queue.clear();
          _out_queue.clear();
       }
 
@@ -2754,11 +2751,16 @@ namespace sysio {
       return c.trx_entries_size;
    }
 
-   bool dispatch_manager::have_txn(const transaction_id_type& id) const {
+   bool dispatch_manager::have_peer_txn(const transaction_id_type& id, connection& c) {
       fc::lock_guard g( local_txns_mtx );
       auto& id_idx = local_txns.get<by_id>();
       auto tptr = id_idx.find( id );
-      return tptr != id_idx.end() && tptr->have_trx;
+      if (tptr != id_idx.end() && tptr->have_trx) {
+         if (tptr->connection_ids.insert(c.connection_id).second)
+            c.trx_entries_size += connection::trx_conn_entry_size;
+         return true;
+      }
+      return false;
    }
 
    connection_id_vector
@@ -3259,7 +3261,7 @@ namespace sysio {
       fc::raw::unpack( peek_ds, which );
       transaction_id_type trx_id;
       fc::raw::unpack( peek_ds, trx_id );
-      if( my_impl->dispatcher.have_txn( trx_id ) ) {
+      if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
          pending_message_buffer.advance_read_ptr( message_length );
          return true;
@@ -3391,7 +3393,6 @@ namespace sysio {
          return true;
       }
 
-      my_impl->dispatcher.add_vote_id( vote_id, block_header::num_from_id(ptr->block_id) );
       handle_message( ptr );
       return true;
    }
