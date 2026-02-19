@@ -5,10 +5,12 @@ on:
     branches:
       - master
       - "release/*"
+      - develop
   pull_request:
     types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - master
+      - develop
   workflow_dispatch:
     inputs:
       override-cdt:
