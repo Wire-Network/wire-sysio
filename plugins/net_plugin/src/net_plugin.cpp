@@ -3465,7 +3465,6 @@ namespace sysio {
          return true;
       }
 
-      my_impl->dispatcher.add_vote_id( vote_id, block_header::num_from_id(ptr->block_id) );
       handle_message( ptr );
       return true;
    }
