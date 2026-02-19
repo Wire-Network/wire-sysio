@@ -23,7 +23,7 @@ namespace sysio {
    }
 
    struct handshake_message {
-      uint16_t                   network_version = 0; ///< incremental value above a computed base
+      uint16_t                   network_version = 0; ///< network protocol version
       chain_id_type              chain_id; ///< used to identify chain
       fc::sha256                 node_id; ///< used to identify peers and prevent self-connect
       chain::public_key_type     key; ///< authentication key; may be a producer or peer key, or empty
