@@ -307,7 +307,7 @@ namespace sysio {
    /**
     * default value initializers
     */
-   constexpr auto     def_send_buffer_size_mb = 4;
+   constexpr auto     def_send_buffer_size_mb = 8;
    constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
    constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
