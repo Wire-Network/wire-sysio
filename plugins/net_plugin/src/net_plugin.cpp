@@ -633,11 +633,8 @@ namespace sysio {
    class queued_buffer : boost::noncopyable {
    public:
       void reset() {
+         clear_write_queue();
          fc::lock_guard g( _mtx );
-         _write_queue.clear();
-         _sync_write_queue.clear();
-         _write_queue_size.store(0, std::memory_order_relaxed);
-         _trx_write_queue.clear();
          _out_queue.clear();
       }
 
