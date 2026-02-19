@@ -4062,12 +4062,7 @@ namespace sysio {
             return;
          controller& cc = my_impl->chain_plug->chain();
 
-         // proper_svnn_block_seen is for integration tests that verify low number of `unlinkable_blocks` logs.
-         // Because we now process blocks immediately into the fork database, during savanna transition the first proper
-         // savanna block will be reported as unlinkable when lib syncing. We will request that block again and by then
-         // the main thread will have finished transitioning and will be linkable. This is a bit of a hack but seems
-         // like an okay compromise for a condition, outside of testing, will rarely happen.
-         static bool proper_svnn_block_seen = false;
+         // Wire starts in Savanna at genesis, so all blocks are Savanna blocks.
 
          std::optional<block_handle> obh;
          bool exception = false;
@@ -4099,8 +4094,7 @@ namespace sysio {
                      cid, ptr->block_num(), id.str().substr(8,16));
          }
          if( exception || unlinkable) {
-            const bool first_proper_svnn_block = !proper_svnn_block_seen && ptr->is_proper_svnn_block();
-            if (unlinkable && !first_proper_svnn_block) {
+            if (unlinkable) {
                fc_dlog(p2p_blk_log, "unlinkable_block {} : {}, previous {} : {}",
                        ptr->block_num(), id, block_header::num_from_id(ptr->previous), ptr->previous);
             }
@@ -4113,8 +4107,6 @@ namespace sysio {
 
          assert(obh);
          uint32_t block_num = obh->block_num();
-         proper_svnn_block_seen = obh->header().is_proper_svnn_block();
-
          fc_dlog( p2p_blk_log, "validated block header, forkdb add {}, broadcasting immediately, connection - {}, blk num = {}, id = {}",
                   fork_db_add_result, cid, block_num, obh->id() );
          my_impl->dispatcher.add_peer_block( obh->id(), cid ); // no need to send back to sender

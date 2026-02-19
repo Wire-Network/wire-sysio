@@ -109,7 +109,7 @@ auto make_block( uint32_t block_num ) {
 
    auto header_bmroot = chain::digest_type::hash( std::make_pair( block->digest(), block_id_type{}));
    auto sig_digest = chain::digest_type::hash( std::make_pair( header_bmroot, digest_type{} ));
-   block->producer_signature = priv_key.sign( sig_digest );
+   block->producer_signatures = {priv_key.sign( sig_digest )};
 
    return block;
 }

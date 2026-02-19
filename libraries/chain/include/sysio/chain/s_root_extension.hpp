@@ -45,7 +45,7 @@ struct s_header {
 };
 
 struct s_root_extension {
-    static constexpr uint16_t extension_id() { return 2; } // Unique ID for the extension
+    static constexpr uint16_t extension_id() { return 1; } // Unique ID for the extension
     static constexpr bool enforce_unique() { return false; } // Allow each block to have more than one such extension
 
     s_header s_header_data;

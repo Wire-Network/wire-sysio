@@ -245,14 +245,13 @@ namespace sysio { namespace chain {
          }
 
          uint32_t block_num_at(uint64_t position) {
-            // to derive blknum_offset==14 see block_header.hpp and note on disk struct is packed
+            // to derive blknum_offset==12 see block_header.hpp and note on disk struct is packed
             //   block_timestamp_type timestamp;                  //bytes 0:3
             //   account_name         producer;                   //bytes 4:11
-            //   uint16_t             confirmed;                  //bytes 12:13
-            //   block_id_type        previous;                   //bytes 14:45, low 4 bytes is big endian block number
+            //   block_id_type        previous;                   //bytes 12:43, low 4 bytes is big endian block number
             //   of previous block
 
-            int blknum_offset = 14;
+            int blknum_offset = 12;
 
             SYS_ASSERT(position + blknum_offset + sizeof(uint32_t) <= size(), block_log_exception,
                        "Read outside of file: position {}, blknum_offset {}, file size {}",

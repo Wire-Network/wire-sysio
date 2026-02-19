@@ -824,7 +824,7 @@ namespace sysio::testing {
                hbh.previous == vn_hbh.previous &&
                hbh.timestamp == vn_hbh.timestamp &&
                hbh.transaction_mroot == vn_hbh.transaction_mroot &&
-               hbh.action_mroot == vn_hbh.action_mroot &&
+               hbh.finality_mroot == vn_hbh.finality_mroot &&
                hbh.producer == vn_hbh.producer;
 
         validating_node.reset();

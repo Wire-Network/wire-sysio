@@ -12,37 +12,31 @@ using open_state = slice_directory::open_state;
 namespace {
    struct test_fixture {
 
-      std::vector<action_trace_v1> actions = {
+      std::vector<action_trace_v0> actions = {
          {
-            {
-               1,
-               "receiver"_n, "contract"_n, "action"_n,
-               {{ "alice"_n, "active"_n }},
-               { 0x01, 0x01, 0x01, 0x01 }
-            },
+            1,
+            "receiver"_n, "contract"_n, "action"_n,
+            {{ "alice"_n, "active"_n }},
+            { 0x01, 0x01, 0x01, 0x01 },
             { 0x05, 0x05, 0x05, 0x05 }
          },
          {
-            {
-               0,
-               "receiver"_n, "contract"_n, "action"_n,
-               {{ "alice"_n, "active"_n }},
-               { 0x00, 0x00, 0x00, 0x00 }
-            },
+            0,
+            "receiver"_n, "contract"_n, "action"_n,
+            {{ "alice"_n, "active"_n }},
+            { 0x00, 0x00, 0x00, 0x00 },
             { 0x04, 0x04, 0x04, 0x04}
          },
          {
-            {
-               2,
-               "receiver"_n, "contract"_n, "action"_n,
-               {{ "alice"_n, "active"_n }},
-               { 0x02, 0x02, 0x02, 0x02 }
-            },
+            2,
+            "receiver"_n, "contract"_n, "action"_n,
+            {{ "alice"_n, "active"_n }},
+            { 0x02, 0x02, 0x02, 0x02 },
             { 0x06, 0x06, 0x06, 0x06 }
          }
       };
 
-      transaction_trace_v2 transaction_trace {
+      transaction_trace_v0 transaction_trace {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
@@ -52,7 +46,7 @@ namespace {
          { chain::time_point_sec(), 1, 0, 100, 50, 0 }
       };
 
-      block_trace_v2 block_trace1_v2 {
+      block_trace_v0 block_trace1 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          1,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -60,13 +54,12 @@ namespace {
          "bp.one"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             transaction_trace
          }
       };
 
-      block_trace_v2 block_trace2_v2 {
+      block_trace_v0 block_trace2 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          5,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -74,90 +67,19 @@ namespace {
          "bp.one"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             transaction_trace
          }
       };
 
-      const block_trace_v1 bt_v1 {
-         {
-            "0000000000000000000000000000000000000000000000000000000000000001"_h,
-            1,
-            "0000000000000000000000000000000000000000000000000000000000000003"_h,
-            chain::block_timestamp_type(1),
-            "bp.one"_n,
-            {}
-         },
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         {
-            {
-               {
-                  "0000000000000000000000000000000000000000000000000000000000000001"_h,
-                  {
-                     {
-                        0,
-                        "sysio.token"_n, "sysio.token"_n, "transfer"_n,
-                        {{ "alice"_n, "active"_n }},
-                        make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
-                     },
-                     {
-                        1,
-                        "alice"_n, "sysio.token"_n, "transfer"_n,
-                        {{ "alice"_n, "active"_n }},
-                        make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
-                     },
-                     {
-                        2,
-                        "bob"_n, "sysio.token"_n, "transfer"_n,
-                        {{ "alice"_n, "active"_n }},
-                        make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
-                     }
-                  }
-               },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               10,
-               5,
-               std::vector<chain::signature_type>{chain::signature_type()},
-               chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
-            }
-         }
-      };
-
-      const block_trace_v1 bt2_v1 {
-         {
-            "0000000000000000000000000000000000000000000000000000000000000002"_h,
-            5,
-            "0000000000000000000000000000000000000000000000000000000000000005"_h,
-            chain::block_timestamp_type(2),
-            "bp.two"_n
-         },
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         {
-            {
-               {
-                  "f000000000000000000000000000000000000000000000000000000000000004"_h,
-                  {}
-               },
-               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
-               10,
-               5,
-               std::vector<chain::signature_type>{chain::signature_type()},
-               chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
-            }
-         }
-      };
-
-      const block_trace_v0 bt_v0 {
+      const block_trace_v0 bt1 {
          "0000000000000000000000000000000000000000000000000000000000000001"_h,
          1,
          "0000000000000000000000000000000000000000000000000000000000000003"_h,
          chain::block_timestamp_type(1),
          "bp.one"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
          {
             {
                "0000000000000000000000000000000000000000000000000000000000000001"_h,
@@ -166,21 +88,50 @@ namespace {
                      0,
                      "sysio.token"_n, "sysio.token"_n, "transfer"_n,
                      {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
+                     {}
                   },
                   {
                      1,
                      "alice"_n, "sysio.token"_n, "transfer"_n,
                      {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
+                     {}
                   },
                   {
                      2,
                      "bob"_n, "sysio.token"_n, "transfer"_n,
                      {{ "alice"_n, "active"_n }},
-                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" )
+                     make_transfer_data( "alice"_n, "bob"_n, "0.0001 SYS"_t, "Memo!" ),
+                     {}
                   }
-               }
+               },
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               10,
+               5,
+               std::vector<chain::signature_type>{chain::signature_type()},
+               chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
+            }
+         }
+      };
+
+      const block_trace_v0 bt2 {
+         "0000000000000000000000000000000000000000000000000000000000000002"_h,
+         5,
+         "0000000000000000000000000000000000000000000000000000000000000005"_h,
+         chain::block_timestamp_type(2),
+         "bp.two"_n,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         "0000000000000000000000000000000000000000000000000000000000000000"_h,
+         {
+            {
+               "f000000000000000000000000000000000000000000000000000000000000004"_h,
+               {},
+               fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
+               10,
+               5,
+               std::vector<chain::signature_type>{chain::signature_type()},
+               chain::transaction_header{chain::time_point_sec(), 1, 0, 100, 50, 0}
             }
          }
       };
@@ -323,44 +274,19 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
    BOOST_FIXTURE_TEST_CASE(write_data_trace, test_fixture)
    {
       vslice vs;
-      const auto offset = append_store(bt_v1, vs );
+      const auto offset = append_store(bt1, vs );
       BOOST_REQUIRE_EQUAL(offset,0u);
 
-      const auto offset2 = append_store(bt2_v1, vs );
+      const auto offset2 = append_store(bt2, vs );
       BOOST_REQUIRE(offset < offset2);
-
-      vs._pos = offset;
-      const auto bt_returned = extract_store<block_trace_v1>( vs );
-      BOOST_REQUIRE(bt_returned == bt_v1);
-
-      vs._pos = offset2;
-      const auto bt_returned2 = extract_store<block_trace_v1>( vs );
-      BOOST_REQUIRE(bt_returned2 == bt2_v1);
-   }
-
-   BOOST_FIXTURE_TEST_CASE(write_data_multi_trace_version, test_fixture)
-   {
-      vslice vs;
-      const auto offset = append_store(bt_v0, vs );
-      BOOST_REQUIRE_EQUAL(offset,0u);
-
-      const auto offset2 = append_store(bt_v1, vs );
-      BOOST_REQUIRE(offset < offset2);
-
-      const auto offset3 = append_store(block_trace1_v2, vs );
-      BOOST_REQUIRE(offset2 < offset3);
 
       vs._pos = offset;
       const auto bt_returned = extract_store<block_trace_v0>( vs );
-      BOOST_REQUIRE(bt_returned == bt_v0);
+      BOOST_REQUIRE(bt_returned == bt1);
 
       vs._pos = offset2;
-      const auto bt_returned2 = extract_store<block_trace_v1>( vs );
-      BOOST_REQUIRE(bt_returned2 == bt_v1);
-
-      vs._pos = offset3;
-      const auto bt_returned3 = extract_store<block_trace_v2>( vs );
-      BOOST_REQUIRE(bt_returned3 == block_trace1_v2);
+      const auto bt_returned2 = extract_store<block_trace_v0>( vs );
+      BOOST_REQUIRE(bt_returned2 == bt2);
    }
 
    BOOST_FIXTURE_TEST_CASE(write_metadata_trace, test_fixture)
@@ -469,9 +395,9 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_REQUIRE(slice.is_open());
       BOOST_REQUIRE_EQUAL(std::filesystem::file_size(fp), 0u);
       BOOST_REQUIRE_EQUAL(slice.tellp(), 0u);
-      uint64_t offset = append_store(bt_v1, slice);
+      uint64_t offset = append_store(bt1, slice);
       BOOST_REQUIRE_EQUAL(offset, 0u);
-      auto data = fc::raw::pack(bt_v1);
+      auto data = fc::raw::pack(bt1);
       BOOST_REQUIRE(slice.tellp() > 0u);
       BOOST_REQUIRE_EQUAL(data.size(), slice.tellp());
       BOOST_REQUIRE_EQUAL(std::filesystem::file_size(fp), slice.tellp());
@@ -804,14 +730,14 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_REQUIRE_EQUAL(files.size(), 0u);
    }
 
-   BOOST_FIXTURE_TEST_CASE(store_provider_write_read_v1, test_fixture)
+   BOOST_FIXTURE_TEST_CASE(store_provider_write_read, test_fixture)
    {
       fc::temp_directory tempdir;
       test_store_provider sp(tempdir.path(), 100);
-      sp.append(bt_v1);
+      sp.append(block_trace1);
       sp.append_lib(54);
-      sp.append(bt2_v1);
-      const uint32_t bt_bn = bt_v1.number;
+      sp.append(block_trace2);
+      const uint32_t bt_bn = block_trace1.number;
       bool found_block = false;
       bool lib_seen = false;
       const uint64_t first_offset = sp.scan_metadata_log_from(9, 0, [&](const metadata_log_entry& e) -> bool {
@@ -851,112 +777,19 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       }, []() {});
       BOOST_REQUIRE(lib_seen);
       BOOST_REQUIRE_EQUAL(block_nums.size(), 2u);
-      BOOST_REQUIRE_EQUAL(block_nums[0], bt_v1.number);
-      BOOST_REQUIRE_EQUAL(block_nums[1], bt2_v1.number);
+      BOOST_REQUIRE_EQUAL(block_nums[0], block_trace1.number);
+      BOOST_REQUIRE_EQUAL(block_nums[1], block_trace2.number);
       BOOST_REQUIRE_EQUAL(block_offsets.size(), 2u);
       BOOST_REQUIRE(block_offsets[0] < block_offsets[1]);
       BOOST_REQUIRE(first_offset < offset);
 
       std::optional<data_log_entry> bt_data = sp.read_data_log(block_nums[0], block_offsets[0]);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v1>(*bt_data), bt_v1);
-
-      bt_data = sp.read_data_log(block_nums[1], block_offsets[1]);
-      BOOST_REQUIRE(bt_data);
-      auto v = std::variant<block_trace_v0, block_trace_v1, block_trace_v2>(*bt_data);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v1>(v), bt2_v1);
-
-      block_nums.clear();
-      block_offsets.clear();
-      lib_seen = false;
-      int counter = 0;
-      try {
-         offset = sp.scan_metadata_log_from(9, 0, [&](const metadata_log_entry& e) -> bool {
-            if (std::holds_alternative<block_entry_v0>(e)) {
-               const auto& block = std::get<block_entry_v0>(e);
-               block_nums.push_back(block.number);
-               block_offsets.push_back(block.offset);
-            } else if (std::holds_alternative<lib_entry_v0>(e)) {
-               auto best_lib = std::get<lib_entry_v0>(e);
-               BOOST_REQUIRE(!lib_seen);
-               BOOST_REQUIRE_EQUAL(best_lib.lib, 54u);
-               lib_seen = true;
-            }
-            return true;
-         }, [&counter]() {
-            if( ++counter == 3 ) {
-               throw yield_exception("");
-            }
-         });
-         BOOST_FAIL("Should not have completed scan");
-      } catch (const yield_exception& ex) {
-      }
-      BOOST_REQUIRE(lib_seen);
-      BOOST_REQUIRE_EQUAL(block_nums.size(), 1u);
-      BOOST_REQUIRE_EQUAL(block_nums[0], bt_v1.number);
-      BOOST_REQUIRE_EQUAL(block_offsets.size(), 1u);
-      BOOST_REQUIRE(first_offset < offset);
-   }
-
-   BOOST_FIXTURE_TEST_CASE(store_provider_write_read_v2, test_fixture)
-   {
-      fc::temp_directory tempdir;
-      test_store_provider sp(tempdir.path(), 100);
-      sp.append(block_trace1_v2);
-      sp.append_lib(54);
-      sp.append(block_trace2_v2);
-      const uint32_t bt_bn = block_trace1_v2.number;
-      bool found_block = false;
-      bool lib_seen = false;
-      const uint64_t first_offset = sp.scan_metadata_log_from(9, 0, [&](const metadata_log_entry& e) -> bool {
-         if (std::holds_alternative<block_entry_v0>(e)) {
-            const auto& block = std::get<block_entry_v0>(e);
-            if (block.number == bt_bn) {
-               BOOST_REQUIRE(!found_block);
-               found_block = true;
-            }
-         } else if (std::holds_alternative<lib_entry_v0>(e)) {
-            auto best_lib = std::get<lib_entry_v0>(e);
-            BOOST_REQUIRE(!lib_seen);
-            BOOST_REQUIRE_EQUAL(best_lib.lib, 54u);
-            lib_seen = true;
-            return false;
-         }
-         return true;
-      }, []() {});
-      BOOST_REQUIRE(found_block);
-      BOOST_REQUIRE(lib_seen);
-
-      std::vector<uint32_t> block_nums;
-      std::vector<uint64_t> block_offsets;
-      lib_seen = false;
-      uint64_t offset = sp.scan_metadata_log_from(9, 0, [&](const metadata_log_entry& e) -> bool {
-         if (std::holds_alternative<block_entry_v0>(e)) {
-            const auto& block = std::get<block_entry_v0>(e);
-            block_nums.push_back(block.number);
-            block_offsets.push_back(block.offset);
-         } else if (std::holds_alternative<lib_entry_v0>(e)) {
-            auto best_lib = std::get<lib_entry_v0>(e);
-            BOOST_REQUIRE(!lib_seen);
-            BOOST_REQUIRE_EQUAL(best_lib.lib, 54u);
-            lib_seen = true;
-         }
-         return true;
-      }, []() {});
-      BOOST_REQUIRE(lib_seen);
-      BOOST_REQUIRE_EQUAL(block_nums.size(), 2u);
-      BOOST_REQUIRE_EQUAL(block_nums[0], block_trace1_v2.number);
-      BOOST_REQUIRE_EQUAL(block_nums[1], block_trace2_v2.number);
-      BOOST_REQUIRE_EQUAL(block_offsets.size(), 2u);
-      BOOST_REQUIRE(block_offsets[0] < block_offsets[1]);
-      BOOST_REQUIRE(first_offset < offset);
-
-      std::optional<data_log_entry> bt_data = sp.read_data_log(block_nums[0], block_offsets[0]);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(*bt_data), block_trace1_v2);
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(*bt_data), block_trace1);
 
       bt_data = sp.read_data_log(block_nums[1], block_offsets[1]);
       BOOST_REQUIRE(bt_data);
       auto v = data_log_entry(*bt_data);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(v), block_trace2_v2);
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(v), block_trace2);
 
       block_nums.clear();
       block_offsets.clear();
@@ -985,18 +818,18 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       }
       BOOST_REQUIRE(lib_seen);
       BOOST_REQUIRE_EQUAL(block_nums.size(), 1u);
-      BOOST_REQUIRE_EQUAL(block_nums[0], block_trace1_v2.number);
+      BOOST_REQUIRE_EQUAL(block_nums[0], block_trace1.number);
       BOOST_REQUIRE_EQUAL(block_offsets.size(), 1u);
       BOOST_REQUIRE(first_offset < offset);
    }
 
-   BOOST_FIXTURE_TEST_CASE(test_get_block_v1, test_fixture)
+   BOOST_FIXTURE_TEST_CASE(test_get_block, test_fixture)
    {
       fc::temp_directory tempdir;
       store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
-      sp.append(bt_v1);
+      sp.append(block_trace1);
       sp.append_lib(1);
-      sp.append(bt2_v1);
+      sp.append(block_trace2);
       int count = 0;
       get_block_t block1 = sp.get_block(1, [&count]() {
          if (++count >= 3) {
@@ -1006,7 +839,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_REQUIRE(block1);
       BOOST_REQUIRE(std::get<1>(*block1));
       const auto block1_bt = std::get<0>(*block1);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v1>(block1_bt), bt_v1);
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block1_bt), block_trace1);
 
       count = 0;
       get_block_t block2 = sp.get_block(5, [&count]() {
@@ -1017,56 +850,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_REQUIRE(block2);
       BOOST_REQUIRE(!std::get<1>(*block2));
       const auto block2_bt = std::get<0>(*block2);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v1>(block2_bt), bt2_v1);
-
-      count = 0;
-      try {
-         sp.get_block(5,[&count]() {
-            if (++count >= 3) {
-               throw yield_exception("");
-            }
-         });
-         BOOST_FAIL("Should not have completed scan");
-      } catch (const yield_exception& ex) {
-      }
-
-      count = 0;
-      block2 = sp.get_block(2,[&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
-      BOOST_REQUIRE(!block2);
-   }
-
-   BOOST_FIXTURE_TEST_CASE(test_get_block_v2, test_fixture)
-   {
-      fc::temp_directory tempdir;
-      store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
-      sp.append(block_trace1_v2);
-      sp.append_lib(1);
-      sp.append(block_trace2_v2);
-      int count = 0;
-      get_block_t block1 = sp.get_block(1, [&count]() {
-         if (++count >= 3) {
-            throw yield_exception("");
-         }
-      });
-      BOOST_REQUIRE(block1);
-      BOOST_REQUIRE(std::get<1>(*block1));
-      const auto block1_bt = std::get<0>(*block1);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(block1_bt), block_trace1_v2);
-
-      count = 0;
-      get_block_t block2 = sp.get_block(5, [&count]() {
-         if (++count >= 4) {
-            throw yield_exception("");
-         }
-      });
-      BOOST_REQUIRE(block2);
-      BOOST_REQUIRE(!std::get<1>(*block2));
-      const auto block2_bt = std::get<0>(*block2);
-      BOOST_REQUIRE_EQUAL(std::get<block_trace_v2>(block2_bt), block_trace2_v2);
+      BOOST_REQUIRE_EQUAL(std::get<block_trace_v0>(block2_bt), block_trace2);
 
       count = 0;
       try {
@@ -1096,7 +880,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       uint32_t block_num1 = 1;
       uint32_t block_num2 = 2;
 
-      transaction_trace_v2 trx_trace1 {
+      transaction_trace_v0 trx_trace1 {
          trx_id1,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
@@ -1106,7 +890,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          { chain::time_point_sec(), 1, 0, 100, 50, 0 }
       };
 
-      transaction_trace_v2 trx_trace2 {
+      transaction_trace_v0 trx_trace2 {
          trx_id2,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
@@ -1117,7 +901,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       };
 
       // block 1 includes trx_trace1
-      block_trace_v2 block_trace1 {
+      block_trace_v0 block_trace_1 {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          block_num1,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -1125,14 +909,13 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          "test"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             trx_trace1
          }
       };
 
       // block 2 includes trx_trace2
-      block_trace_v2 block_trace2 {
+      block_trace_v0 block_trace_2 {
          "b000000000000000000000000000000000000000000000000000000000000003"_h,
          block_num2,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -1140,8 +923,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          "test"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             trx_trace2
          }
       };
@@ -1160,7 +942,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       store_provider sp(tempdir.path(), 100, std::optional<uint32_t>(), std::optional<uint32_t>(), 0);
 
       // on_accepted_block of block 1
-      sp.append(block_trace1);
+      sp.append(block_trace_1);
       sp.append_trx_ids(block_trxs_entry1);
 
       // block 1 is reversible and get_trx_block_number should find trx_id1 in block 1
@@ -1177,7 +959,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       BOOST_REQUIRE_EQUAL(*block_num, block_num1);
 
       // on_accepted_block of block 2
-      sp.append(block_trace2);
+      sp.append(block_trace_2);
       sp.append_trx_ids(block_trxs_entry2);
 
       // get_trx_block_number should find both trx_id1 and trx_id2
@@ -1211,7 +993,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       uint32_t initial_block_num = 1;
       uint32_t final_block_num   = 3;
 
-      transaction_trace_v2 trx_trace1 {
+      transaction_trace_v0 trx_trace1 {
          target_trx_id,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
@@ -1221,7 +1003,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          { chain::time_point_sec(), 1, 0, 100, 50, 0 }
       };
 
-      transaction_trace_v2 trx_trace2 {
+      transaction_trace_v0 trx_trace2 {
          "0000000000000000000000000000000000000000000000000000000000000002"_h,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{chain::transaction_receipt_header::status_enum::executed},
@@ -1232,7 +1014,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       };
 
       // Initial block including trx_trace1
-      block_trace_v2 initial_block_trace {
+      block_trace_v0 initial_block_trace {
          "b000000000000000000000000000000000000000000000000000000000000001"_h,
          initial_block_num,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -1240,19 +1022,18 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          "test"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             trx_trace1
          }
       };
 
       // Initial block is forked. The original trx_trace1 is forked out and
       // replaced by trx_trace2.
-      block_trace_v2 forked_block_trace = initial_block_trace;
-      forked_block_trace.transactions = std::vector<transaction_trace_v2> { trx_trace2 };
+      block_trace_v0 forked_block_trace = initial_block_trace;
+      forked_block_trace.transactions = std::vector<transaction_trace_v0> { trx_trace2 };
 
       // Final block including original trx_trace1
-      block_trace_v2 final_block_trace {
+      block_trace_v0 final_block_trace {
          "b000000000000000000000000000000000000000000000000000000000000003"_h,
          final_block_num,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -1260,8 +1041,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          "test"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             trx_trace1
          }
       };
@@ -1326,7 +1106,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       chain::transaction_id_type target_trx_id = "0000000000000000000000000000000000000000000000000000000000000001"_h;
       uint32_t trx_block_num = 10;
 
-      std::vector<block_trace_v2> empty_blocks;
+      std::vector<block_trace_v0> empty_blocks;
       for (uint32_t i = 1; i < trx_block_num; ++i) {
          empty_blocks.push_back({
                "b000000000000000000000000000000000000000000000000000000000000001"_h,
@@ -1336,13 +1116,12 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
                "test"_n,
                "0000000000000000000000000000000000000000000000000000000000000000"_h,
                "0000000000000000000000000000000000000000000000000000000000000000"_h,
-               0,
-               std::vector<transaction_trace_v2>{
+               std::vector<transaction_trace_v0>{
                }
             });
       }
 
-      transaction_trace_v2 trx_trace1 {
+      transaction_trace_v0 trx_trace1 {
          target_trx_id,
          actions,
          fc::enum_type<uint8_t, chain::transaction_receipt_header::status_enum>{
@@ -1354,7 +1133,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
       };
 
       // Block including trx_trace1
-      block_trace_v2 block_trace {
+      block_trace_v0 block_trace {
          "b000000000000000000000000000000000000000000000000000000000000010"_h,
          trx_block_num,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
@@ -1362,8 +1141,7 @@ BOOST_AUTO_TEST_SUITE(slice_tests)
          "test"_n,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
          "0000000000000000000000000000000000000000000000000000000000000000"_h,
-         0,
-         std::vector<transaction_trace_v2> {
+         std::vector<transaction_trace_v0> {
             trx_trace1
          }
       };

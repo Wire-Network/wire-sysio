@@ -5,7 +5,6 @@
 #include <sysio/chain/exceptions.hpp>
 #include <utility>
 #include <fc/variant_object.hpp>
-#include <fc/variant_dynamic_bitset.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/time.hpp>
 #include <fc/io/json.hpp>
@@ -352,7 +351,7 @@ namespace impl {
 
    struct abi_to_variant {
       /**
-       * template which overloads add for types which are not relvant to ABI information
+       * template which overloads add for types which are not relevant to ABI information
        * and can be degraded to the normal ::to_variant(...) processing
        */
       template<typename M, typename Resolver, not_require_abi_t<M> = 1>
@@ -655,8 +654,6 @@ namespace impl {
          out(name, std::move(mvo));
       }
 
-      static void add_block_header_finality_extension( mutable_variant_object& mvo, const header_extension_multimap& header_exts );
-
       /**
        * overload of to_variant_object for signed_block
        *
@@ -666,17 +663,17 @@ namespace impl {
       template<typename Resolver>
       static void add( mutable_variant_object &out, const char* name, const signed_block& block, const Resolver& resolver, abi_traverse_context& ctx )
       {
-         static_assert(fc::reflector<signed_block>::total_member_count == 12);
+         static_assert(fc::reflector<signed_block>::total_member_count == 13);
          auto h = ctx.enter_scope();
          mutable_variant_object mvo;
          mvo("timestamp", block.timestamp);
          mvo("producer", block.producer);
-         mvo("confirmed", block.confirmed);
          mvo("previous", block.previous);
          mvo("transaction_mroot", block.transaction_mroot);
-         mvo("action_mroot", block.action_mroot);
-         mvo("schedule_version", block.schedule_version);
-         // mvo("new_producers", block.new_producers); renamed to not_used. No need to export this as it will always be empty
+         mvo("finality_mroot", block.finality_mroot);
+         mvo("qc_claim", block.qc_claim);
+         mvo("new_finalizer_policy_diff", block.new_finalizer_policy_diff);
+         mvo("new_proposer_policy_diff", block.new_proposer_policy_diff);
 
          // process contents of block.header_extensions
          flat_multimap<uint16_t, block_header_extension> header_exts = block.validate_and_extract_header_extensions();
@@ -691,20 +688,12 @@ namespace impl {
             }
             mvo("new_protocol_features", pf_array);
          }
-         add_block_header_finality_extension(mvo, header_exts);
 
-         mvo("producer_signature", block.producer_signature);
+         mvo("producer_signatures", block.producer_signatures);
          add(mvo, "transactions", block.transactions, resolver, ctx);
 
-         // process contents of block.block_extensions
-         auto block_exts = block.validate_and_extract_extensions();
-         if (auto it = block_exts.find(additional_block_signatures_extension::extension_id()); it != block_exts.end()) {
-            const auto& additional_signatures = std::get<additional_block_signatures_extension>(it->second);
-            mvo("additional_signatures", additional_signatures);
-         }
-         if (auto it = block_exts.find(quorum_certificate_extension::extension_id()); it != block_exts.end()) {
-            const auto& qc_extension = std::get<quorum_certificate_extension>(it->second);
-            mvo("qc_extension", qc_extension);
+         if (block.qc) {
+            mvo("qc", *block.qc);
          }
 
          out(name, std::move(mvo));

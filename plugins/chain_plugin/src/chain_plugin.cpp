@@ -1936,12 +1936,11 @@ fc::variant read_only::get_block_info(const read_only::get_block_info_params& pa
          ("id", id)
          ("timestamp", block->timestamp)
          ("producer", block->producer)
-         ("confirmed", block->confirmed)
          ("previous", block->previous)
          ("transaction_mroot", block->transaction_mroot)
-         ("action_mroot", block->action_mroot)
-         ("schedule_version", block->schedule_version)
-         ("producer_signature", block->producer_signature)
+         ("finality_mroot", block->finality_mroot)
+         ("qc_claim", block->qc_claim)
+         ("producer_signatures", block->producer_signatures)
          ("ref_block_prefix", ref_block_prefix);
 }
 
@@ -1968,7 +1967,6 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
       ("block_num", sbp->block_num())
       ("id", sbp->calculate_id())
       ("header", static_cast<const signed_block_header&>(*sbp))
-      ("additional_signatures", detail::extract_additional_signatures(sbp))
    ;
    return result;
 }

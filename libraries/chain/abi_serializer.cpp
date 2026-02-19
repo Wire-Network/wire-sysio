@@ -1,8 +1,8 @@
 #include <sysio/chain/abi_serializer.hpp>
 #include <sysio/chain/asset.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <sysio/chain/finality_extension.hpp>
 #include <fc/io/raw.hpp>
+#include <fc/bitset.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/time.hpp>
 
@@ -125,6 +125,7 @@ namespace sysio::chain {
       built_in_types.emplace("symbol_code",               pack_unpack<symbol_code>());
       built_in_types.emplace("asset",                     pack_unpack<asset>());
       built_in_types.emplace("extended_asset",            pack_unpack<extended_asset>());
+      built_in_types.emplace("bitset",                    pack_unpack<fc::bitset>());
    }
 
    void abi_serializer::set_abi(abi_def abi, const yield_function_t& yield) {
@@ -647,13 +648,6 @@ namespace sysio::chain {
       impl::variant_to_binary_context ctx(*this, create_depth_yield_function(), max_action_data_serialization_time, type);
       ctx.short_path = short_path;
       _variant_to_binary(type, var, ds, ctx);
-   }
-
-   void impl::abi_to_variant::add_block_header_finality_extension( mutable_variant_object& mvo, const header_extension_multimap& header_exts ) {
-      if (auto it = header_exts.find(finality_extension::extension_id()); it != header_exts.end()) {
-         const auto& f_ext = std::get<finality_extension>(it->second);
-         mvo("finality_extension", f_ext);
-      }
    }
 
    type_name abi_serializer::get_action_type(name action)const {
