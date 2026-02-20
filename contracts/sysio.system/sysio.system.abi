@@ -803,9 +803,18 @@
             ]
         },
         {
-            "name": "switchtosvnn",
+            "name": "setrank",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "rank",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "sysio_global_state",
@@ -830,14 +839,6 @@
                 {
                     "name": "total_unpaid_blocks",
                     "type": "uint32"
-                },
-                {
-                    "name": "total_activated_stake",
-                    "type": "int64"
-                },
-                {
-                    "name": "thresh_activated_stake_time",
-                    "type": "time_point"
                 },
                 {
                     "name": "last_producer_schedule_size",
@@ -1207,8 +1208,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "switchtosvnn",
-            "type": "switchtosvnn",
+            "name": "setrank",
+            "type": "setrank",
             "ricardian_contract": ""
         },
         {

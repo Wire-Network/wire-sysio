@@ -6,7 +6,7 @@ if(BUILD_SYSTEM_CONTRACTS)
       ${CMAKE_CURRENT_SOURCE_DIR}/src/sysio.system.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/native.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/producer_pay.cpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/src/voting.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/src/ranking.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/limit_auth_changes.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/finalizer_key.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/src/peer_keys.cpp
