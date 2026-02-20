@@ -59,6 +59,20 @@
             ]
         },
         {
+            "name": "addnodeowner",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "tier",
+                    "type": "uint8"
+                }
+            ]
+        },
+        {
             "name": "authority",
             "base": "",
             "fields": [
@@ -115,24 +129,6 @@
                 {
                     "name": "new_producers",
                     "type": "producer_schedule?"
-                }
-            ]
-        },
-        {
-            "name": "block_info_record",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "block_height",
-                    "type": "uint32"
-                },
-                {
-                    "name": "block_timestamp",
-                    "type": "time_point"
                 }
             ]
         },
@@ -225,6 +221,16 @@
             ]
         },
         {
+            "name": "claimnodedis",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                }
+            ]
+        },
+        {
             "name": "deleteauth",
             "base": "",
             "fields": [
@@ -253,6 +259,190 @@
                 {
                     "name": "finalizer_key",
                     "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "emission_config_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "t1_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t2_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t3_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "t1_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t2_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "t3_duration",
+                    "type": "uint32"
+                },
+                {
+                    "name": "min_claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "t5_distributable",
+                    "type": "int64"
+                },
+                {
+                    "name": "t5_floor",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_duration_secs",
+                    "type": "uint32"
+                },
+                {
+                    "name": "decay_numerator",
+                    "type": "int64"
+                },
+                {
+                    "name": "decay_denominator",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_initial_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_max_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "epoch_min_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capital_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "capex_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "governance_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "producer_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "batch_op_bps",
+                    "type": "uint16"
+                },
+                {
+                    "name": "active_producer_count",
+                    "type": "uint32"
+                },
+                {
+                    "name": "standby_start_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "standby_end_rank",
+                    "type": "uint32"
+                },
+                {
+                    "name": "blocks_per_round",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "emission_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "node_rewards_start",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
+            "name": "epoch_info_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                },
+                {
+                    "name": "treasury_remaining",
+                    "type": "int64"
+                },
+                {
+                    "name": "next_emission_est",
+                    "type": "int64"
+                },
+                {
+                    "name": "seconds_until_next",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "epoch_log",
+            "base": "",
+            "fields": [
+                {
+                    "name": "epoch_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "timestamp",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "total_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "compute_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capital_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "capex_amount",
+                    "type": "int64"
+                },
+                {
+                    "name": "governance_amount",
+                    "type": "int64"
                 }
             ]
         },
@@ -357,6 +547,16 @@
             ]
         },
         {
+            "name": "initt5",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "key_weight",
             "base": "",
             "fields": [
@@ -447,6 +647,50 @@
             ]
         },
         {
+            "name": "node_claim_result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimable",
+                    "type": "asset"
+                },
+                {
+                    "name": "can_claim",
+                    "type": "bool"
+                }
+            ]
+        },
+        {
+            "name": "node_owner_distribution",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
+                },
+                {
+                    "name": "total_allocation",
+                    "type": "asset"
+                },
+                {
+                    "name": "claimed",
+                    "type": "asset"
+                },
+                {
+                    "name": "total_duration",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
             "name": "onblock",
             "base": "",
             "fields": [
@@ -483,6 +727,11 @@
                     "type": "uint16"
                 }
             ]
+        },
+        {
+            "name": "processepoch",
+            "base": "",
+            "fields": []
         },
         {
             "name": "producer_authority",
@@ -537,6 +786,18 @@
                 {
                     "name": "producer_authority",
                     "type": "block_signing_authority"
+                },
+                {
+                    "name": "last_block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "current_round_blocks",
+                    "type": "uint16"
+                },
+                {
+                    "name": "eligible_rounds",
+                    "type": "uint16"
                 }
             ]
         },
@@ -749,6 +1010,16 @@
             ]
         },
         {
+            "name": "setinittime",
+            "base": "",
+            "fields": [
+                {
+                    "name": "no_reward_init_time",
+                    "type": "time_point_sec"
+                }
+            ]
+        },
+        {
             "name": "setparams",
             "base": "",
             "fields": [
@@ -846,6 +1117,32 @@
             ]
         },
         {
+            "name": "t5_state",
+            "base": "",
+            "fields": [
+                {
+                    "name": "start_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "epoch_count",
+                    "type": "uint64"
+                },
+                {
+                    "name": "last_epoch_time",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "last_epoch_emission",
+                    "type": "int64"
+                },
+                {
+                    "name": "total_distributed",
+                    "type": "int64"
+                }
+            ]
+        },
+        {
             "name": "unlinkauth",
             "base": "",
             "fields": [
@@ -900,6 +1197,26 @@
                 {
                     "name": "authorized_by",
                     "type": "name$"
+                }
+            ]
+        },
+        {
+            "name": "viewemitcfg",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewepoch",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "viewnodedist",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account_name",
+                    "type": "name"
                 }
             ]
         },
@@ -1083,6 +1400,24 @@
                     "type": "block_timestamp_type"
                 }
             ]
+        },
+        {
+            "name": "block_info_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "block_height",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_timestamp",
+                    "type": "time_point"
+                }
+            ]
         }
     ],
     "actions": [
@@ -1094,6 +1429,16 @@
         {
             "name": "activate",
             "type": "activate",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "addnodeowner",
+            "type": "addnodeowner",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "claimnodedis",
+            "type": "claimnodedis",
             "ricardian_contract": ""
         },
         {
@@ -1109,6 +1454,11 @@
         {
             "name": "init",
             "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "initt5",
+            "type": "initt5",
             "ricardian_contract": ""
         },
         {
@@ -1129,6 +1479,11 @@
         {
             "name": "onblock",
             "type": "onblock",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "processepoch",
+            "type": "processepoch",
             "ricardian_contract": ""
         },
         {
@@ -1182,6 +1537,11 @@
             "ricardian_contract": ""
         },
         {
+            "name": "setinittime",
+            "type": "setinittime",
+            "ricardian_contract": ""
+        },
+        {
             "name": "setparams",
             "type": "setparams",
             "ricardian_contract": ""
@@ -1227,6 +1587,21 @@
             "ricardian_contract": ""
         },
         {
+            "name": "viewemitcfg",
+            "type": "viewemitcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewepoch",
+            "type": "viewepoch",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "viewnodedist",
+            "type": "viewnodedist",
+            "ricardian_contract": ""
+        },
+        {
             "name": "wasmcfg",
             "type": "wasmcfg",
             "ricardian_contract": ""
@@ -1266,8 +1641,15 @@
             "key_types": []
         },
         {
-            "name": "blockinfo",
-            "type": "block_info_record",
+            "name": "emissionmngr",
+            "type": "emission_state",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "epochlog",
+            "type": "epoch_log",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1308,8 +1690,22 @@
             "key_types": []
         },
         {
+            "name": "nodedist",
+            "type": "node_owner_distribution",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
             "name": "producers",
             "type": "producer_info",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "t5state",
+            "type": "t5_state",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1341,6 +1737,13 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
+        },
+        {
+            "name": "blockinfo",
+            "type": "block_info_record",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
         }
     ],
     "ricardian_clauses": [],
@@ -1355,6 +1758,18 @@
         }
     ],
     "action_results": [
+        {
+            "name": "viewemitcfg",
+            "result_type": "emission_config_result"
+        },
+        {
+            "name": "viewepoch",
+            "result_type": "epoch_info_result"
+        },
+        {
+            "name": "viewnodedist",
+            "result_type": "node_claim_result"
+        },
         {
             "name": "getpeerkeys",
             "result_type": "getpeerkeys_res_t"

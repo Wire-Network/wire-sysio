@@ -322,6 +322,10 @@ namespace sysiosystem {
       check( version.value == 0, "unsupported version for init action" );
 
       check(core == symbol("SYS", 4), "core symbol must be SYS.");
+
+      // Activate block production tracking (Wire uses ROA, not stake-based activation)
+      if( _gstate.thresh_activated_stake_time == time_point() )
+         _gstate.thresh_activated_stake_time = current_time_point();
    }
 
    // ** ON NOTIFY OF AUTH.MSG MODIFICATION **
