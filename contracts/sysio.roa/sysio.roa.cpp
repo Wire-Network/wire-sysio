@@ -54,7 +54,13 @@ namespace sysio {
                     row.net_weight.amount += net_weight.amount;
                     row.cpu_weight.amount += cpu_weight.amount;
                 }
-                row.ram_bytes += (uint64_t)ram_bytes;
+                if (ram_bytes >= 0) {
+                    row.ram_bytes += static_cast<uint64_t>(ram_bytes);
+                } else {
+                    uint64_t to_sub = static_cast<uint64_t>(-ram_bytes);
+                    check(row.ram_bytes >= to_sub, "reslimit ram underflow");
+                    row.ram_bytes -= to_sub;
+                }
             });
             return resources_t{
                 .net = res_itr->net_weight,
@@ -387,11 +393,13 @@ namespace sysio {
             check(reclaimed_ram_weight.amount <= ram_weight.amount, "Cannot reclaim more RAM than requested");
         }
 
+        int64_t new_net = (net_limit < 0) ? -1 : std::max((int64_t)0, net_limit - net_weight.amount);
+        int64_t new_cpu = (cpu_limit < 0) ? -1 : std::max((int64_t)0, cpu_limit - cpu_weight.amount);
         set_resource_limits(
             owner,
             ram_bytes - divisible_ram_to_reclaim,
-            net_limit - net_weight.amount,
-            cpu_limit - cpu_weight.amount
+            new_net,
+            new_cpu
         );
 
         // Update reslimit row
@@ -400,7 +408,7 @@ namespace sysio {
                 row.net_weight.amount -= net_weight.amount;
                 row.cpu_weight.amount -= cpu_weight.amount;
             }
-            row.ram_bytes += static_cast<uint64_t>(rl_row.ram_bytes - divisible_ram_to_reclaim);;
+            row.ram_bytes -= static_cast<uint64_t>(divisible_ram_to_reclaim);
         });
 
         // Update / remove the policies row
