@@ -2448,18 +2448,22 @@ namespace sysio {
       } else {
          peer_ilog( p2p_blk_log, c, "already have block while in {}, fhead = {}, id {}...",
                   stage_str( sync_state ), num, id.str().substr(8,16) );
-         fc::lock_guard g_conn( c->conn_mtx );
-         c->conn_fork_db_head = block_id_type();
-         c->conn_fork_db_head_num = 0;
+         {
+            fc::lock_guard g_conn( c->conn_mtx );
+            c->conn_fork_db_head = block_id_type();
+            c->conn_fork_db_head_num = 0;
+         }
+         // Send handshake so remote peer re-evaluates sync state and clears peer_syncing_from_us.
+         // Previously the old request_message with mode=none served this purpose.
+         c->send_handshake();
       }
       return true;
    }
 
    // called from c's connection strand
    void sync_manager::sync_recv_status( const connection_ptr& c, const peer_status_notice& msg) {
-      uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
-      uint32_t root_num = block_header::num_from_id(msg.fork_db_root_id);
       if (msg.lib_sync) {
+         uint32_t root_num = block_header::num_from_id(msg.fork_db_root_id);
          peer_dlog( p2p_blk_log, c, "sync_manager got lib_sync peer_status_notice" );
          c->peer_fork_db_root_num.store( root_num, std::memory_order_relaxed );
          {
@@ -2469,6 +2473,7 @@ namespace sysio {
          sync_reset_fork_db_root_num(c, false);
          start_sync(c, root_num);
       } else {
+         uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
          peer_dlog( p2p_blk_log, c, "sync_manager got catch_up peer_status_notice" );
          peer_ilog( p2p_blk_log, c, "peer_status_notice, head_num {}, id {}...",
                   head_num, msg.fork_db_head_id.str().substr(8,16) );
