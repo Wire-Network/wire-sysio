@@ -22,8 +22,8 @@ namespace sysio::chain {
     *            root is full `block_state`, not just the header.
     * Version 3: Spring 1.0.1 updated block_header_state (core with policy gen #)
     *            (two possible fork_db, one containing `block_state_legacy`, one containing `block_state`)
-    * version 4: Wire 6.0.0 - Only one fork database with Savanna block_state
- */
+    * version 4: Wire 6.0.0 - Only one fork database with Savanna block_state and pending lib timestamp
+    */
 
    std::string log_fork_comparison(const block_state& bs) {
       std::string r;
@@ -70,6 +70,7 @@ namespace sysio::chain {
       std::mutex             mtx;
       bsp_t                  root;
       block_id_type          pending_savanna_lib_id; // under Savanna the id of what will become root
+      block_timestamp_type   pending_savanna_lib_timestamp; // cached timestamp of pending_savanna_lib block
       fork_multi_index_type  index;
 
       explicit fork_database_impl(const std::filesystem::path& data_dir) : data_dir(data_dir) {}
@@ -87,7 +88,7 @@ namespace sysio::chain {
       void             remove_impl( const block_id_type& id );
       void             remove_impl( block_num_type block_num );
       bsp_t            head_impl(include_root_t include_root) const;
-      bool             set_pending_savanna_lib_id_impl(const block_id_type& id);
+      bool             set_pending_savanna_lib_impl(const block_id_type& id, block_timestamp_type timestamp);
       bool             is_descendant_of_pending_savanna_lib_impl(const block_id_type& id) const;
       bool             is_descendant_of_impl(const block_id_type& ancestor, const block_id_type& descendant) const;
       branch_t         fetch_branch_impl( const block_id_type& h, uint32_t trim_after_block_num ) const;
@@ -121,10 +122,12 @@ namespace sysio::chain {
    void fork_database_impl<BSP>::open_impl( const char* desc, const std::filesystem::path& fork_db_file, fc::cfile_datastream& ds, validator_t& validator ) {
       bsp_t _root = std::make_shared<bs_t>();
       block_id_type savanna_lib_id;
+      block_timestamp_type savanna_lib_timestamp;
       fc::raw::unpack( ds, savanna_lib_id );
+      fc::raw::unpack( ds, savanna_lib_timestamp );
       fc::raw::unpack( ds, *_root );
       reset_root_impl( _root ); // resets pending_savanna_lib_id
-      set_pending_savanna_lib_id_impl( savanna_lib_id );
+      set_pending_savanna_lib_impl( savanna_lib_id, savanna_lib_timestamp );
 
       unsigned_int size; fc::raw::unpack( ds, size );
       for( uint32_t i = 0, n = size.value; i < n; ++i ) {
@@ -160,6 +163,7 @@ namespace sysio::chain {
       }
 
       fc::raw::pack( out, pending_savanna_lib_id );
+      fc::raw::pack( out, pending_savanna_lib_timestamp );
       fc::raw::pack( out, *root );
 
       uint32_t num_blocks_in_fork_db = index.size();
@@ -186,6 +190,7 @@ namespace sysio::chain {
       root = root_bsp;
       root->set_valid(true);
       pending_savanna_lib_id = block_id_type{};
+      pending_savanna_lib_timestamp = block_timestamp_type{};
       index.clear();
    }
 
@@ -250,7 +255,7 @@ namespace sysio::chain {
                // is actually valid as it simply is used as a network message for this data.
                if (auto claimed = search_on_branch_impl(n->previous(), qc_claim.block_num, include_root_t::no)) {
                   auto& latest_qc_claim__block_ref = claimed->core.get_block_reference(claimed->core.latest_qc_claim().block_num);
-                  set_pending_savanna_lib_id_impl(latest_qc_claim__block_ref.block_id);
+                  set_pending_savanna_lib_impl(latest_qc_claim__block_ref.block_id, latest_qc_claim__block_ref.timestamp);
                }
             }
          }
@@ -339,24 +344,25 @@ namespace sysio::chain {
    }
 
    template<class BSP>
-   block_id_type fork_database_type<BSP>::pending_savanna_lib_id() const {
+   std::pair<block_id_type, block_timestamp_type> fork_database_type<BSP>::pending_savanna_lib() const {
       std::lock_guard g( my->mtx );
-      return my->pending_savanna_lib_id;
+      return {my->pending_savanna_lib_id, my->pending_savanna_lib_timestamp};
    }
 
    template<class BSP>
-   bool fork_database_type<BSP>::set_pending_savanna_lib_id(const block_id_type& id) {
+   bool fork_database_type<BSP>::set_pending_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
       std::lock_guard g( my->mtx );
-      return my->set_pending_savanna_lib_id_impl(id);
+      return my->set_pending_savanna_lib_impl(id, timestamp);
    }
 
    template<class BSP>
-   bool fork_database_impl<BSP>::set_pending_savanna_lib_id_impl(const block_id_type& id) {
+   bool fork_database_impl<BSP>::set_pending_savanna_lib_impl(const block_id_type& id, block_timestamp_type timestamp) {
       block_num_type new_lib = block_header::num_from_id(id);
       block_num_type old_lib = block_header::num_from_id(pending_savanna_lib_id);
       if (new_lib > old_lib) {
          dlog("set fork db pending savanna lib {}: {}", block_header::num_from_id(id), id);
          pending_savanna_lib_id = id;
+         pending_savanna_lib_timestamp = timestamp;
          return true;
       }
       return false;

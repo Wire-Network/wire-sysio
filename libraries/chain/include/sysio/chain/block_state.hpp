@@ -164,7 +164,7 @@ public:
    block_state(block_state&&) = default;
 
    block_state(const block_header_state& prev, signed_block_ptr b, const protocol_feature_set& pfs,
-               const validator_t& validator, bool skip_validate_signee);
+               const validator_t& validator, bool skip_validate_signee, const block_ref& parent_block_ref);
 
    block_state(const block_header_state&                bhs,
                deque<transaction_metadata_ptr>&&        trx_metas,
