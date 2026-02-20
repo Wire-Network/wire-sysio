@@ -735,7 +735,6 @@ public:
 
    compat::channels::transaction_ack::channel_type& _transaction_ack_channel;
 
-   incoming::methods::block_sync::method_type::handle        _incoming_block_sync_provider;
    incoming::methods::transaction_async::method_type::handle _incoming_transaction_async_provider;
 
    account_failures                 _account_fails;
@@ -1563,11 +1562,6 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
       app().executor().init_read_threads(_ro_thread_pool_size);
    }
-
-   _incoming_block_sync_provider = app().get_method<incoming::methods::block_sync>().register_provider(
-      [this](const signed_block_ptr& block, const block_id_type& block_id, const block_handle& bh) {
-         return on_incoming_block();
-      });
 
    _incoming_transaction_async_provider =
       app().get_method<incoming::methods::transaction_async>().register_provider(
