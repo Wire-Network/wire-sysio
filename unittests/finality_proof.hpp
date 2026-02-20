@@ -214,7 +214,7 @@ namespace finality_proof {
          //process votes and collect / compute the IBC-relevant data
          this->process_votes(1, this->num_needed_for_quorum); //enough to reach quorum threshold
 
-         finality_data_t finality_data = *this->node0.control->head_finality_data();
+         finality_data_t finality_data = this->node0.control->head_finality_data();
          digest_type action_mroot = finality_data.action_mroot;
          digest_type base_digest = finality_data.base_digest;
 
