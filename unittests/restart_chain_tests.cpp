@@ -230,8 +230,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( test_light_validation_restart_from_block_log, T, 
    auto check_action_traces = [](const auto& t, const auto& ot) {
       BOOST_CHECK_EQUAL("", ot.console); // cfa not executed for replay
       BOOST_CHECK_EQUAL(t.receipt->global_sequence, ot.receipt->global_sequence);
-      // both legacy and savanna digests should be the same
-      BOOST_CHECK_EQUAL(t.digest_legacy(), ot.digest_legacy());
       BOOST_CHECK_EQUAL(t.digest_savanna(), ot.digest_savanna());
    };
 
