@@ -2844,7 +2844,15 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
 
    _timer.async_wait([&chain, this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
       if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
-         app().executor().post(priority::high, exec_queue::read_write, [&chain, this]() {
+         app().executor().post(priority::high, exec_queue::read_write, [&chain, this, cid]() {
+            if (cid != _timer_corelation_id) {
+               // Check cid again. It is possible between the timer firing and this posted lambda executing that a stale
+               // schedule_production_loop (e.g. from a delayed timer in process_pending_blocks) could run first,
+               // changing _pending_block_mode to speculating. The now-stale maybe_produce_block lambda would then hit
+               // SYS_ASSERT(in_producing_mode(), producer_exception, "called produce_block while not actually producing")
+               fc_dlog(_log, "Produce block timer expired, skipping");
+               return;
+            }
             // pending_block_state expected, but can't assert inside async_wait
             auto block_num = chain.is_building_block() ? chain.head().block_num() + 1 : 0;
             fc_dlog(_log, "Produce block timer for {} running at {}", block_num, fc::time_point::now());
