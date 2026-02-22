@@ -1,0 +1,63 @@
+# {{name}}: library
+set(TARGET_NAME {{name}})
+
+file(GLOB_RECURSE SRC_FILES src/*.cpp src/*.hpp)
+file(GLOB_RECURSE HEADER_FILES include/*.hpp)
+
+add_library(
+        ${TARGET_NAME}
+        STATIC
+        ${SRC_FILES}
+        ${HEADER_FILES}
+)
+
+# Public include directory for consumers
+# The headers are under libraries/{{name}}/include/{{getNamespace0 namespace}}
+target_include_directories(
+        ${TARGET_NAME}
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+
+target_link_libraries(
+        ${TARGET_NAME}
+        PUBLIC
+        fc
+        fc-lite
+        magic_enum::magic_enum
+)
+
+if(ENABLE_TESTS)
+    file(GLOB_RECURSE TEST_FILES test/*.cpp test/*.hpp)
+    set(TEST_TARGET_NAME test_{{name}})
+    add_executable(
+            ${TEST_TARGET_NAME}
+            ${TEST_FILES}
+    )
+    target_link_libraries(
+            ${TEST_TARGET_NAME}
+            PRIVATE
+            ${TARGET_NAME}
+            sysio_testing
+            sysio_chain_wrap
+    )
+    add_test(
+            NAME ${TEST_TARGET_NAME}
+            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TEST_TARGET_NAME}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+endif()
+
+# Installation: headers to include/{{getNamespace0 namespace}}
+install(
+        DIRECTORY include/{{getNamespace0 namespace}}
+        DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+)
+
+# Install the INTERFACE target for completeness (no artifacts produced)
+install(
+        TARGETS ${TARGET_NAME}
+        EXPORT ${TARGET_NAME}-targets
+)
