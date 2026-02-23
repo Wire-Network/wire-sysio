@@ -3259,25 +3259,25 @@ namespace sysio {
       }
 
       // Early dedup: check if we already have this transaction — zero heap allocations on the duplicate path.
-      // Peek the transaction ID (first field after variant which) for zero-allocation dedup.
+      // Consume which + trx_id from buffer
       // Wire format: [which (varint)][transaction_id (32 bytes)][packed_transaction ...]
-      auto peek_ds = pending_message_buffer.create_peek_datastream();
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
+      auto ds = pending_message_buffer.create_datastream();
       unsigned_int which{};
-      fc::raw::unpack( peek_ds, which );
+      fc::raw::unpack( ds, which );
       transaction_id_type trx_id;
-      fc::raw::unpack( peek_ds, trx_id );
+      fc::raw::unpack( ds, trx_id );
+      const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
+
       if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
          peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
-         pending_message_buffer.advance_read_ptr( message_length );
+         pending_message_buffer.advance_read_ptr( message_length - header_bytes );
          return true;
       }
 
       const uint32_t trx_in_progress_sz = this->trx_in_progress_size.load();
 
       auto now = fc::time_point::now();
-      auto ds = pending_message_buffer.create_datastream();
-      fc::raw::unpack( ds, which ); // consume which
-      fc::raw::unpack( ds, trx_id ); // consume trx_id
       // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
       std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
       fc::raw::unpack( ds, *ptr );
@@ -3368,32 +3368,29 @@ namespace sysio {
          return true;
       }
 
-      // Early dedup: peek the vote_id (first field after variant which) for zero-allocation dedup.
+      // Early dedup: consume which + vote_id from buffer
       // Wire format: [which (varint)][vote_id (32 bytes)][vote_message ...]
-      auto peek_ds = pending_message_buffer.create_peek_datastream();
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
+      auto ds = pending_message_buffer.create_datastream();
       unsigned_int which{};
-      fc::raw::unpack( peek_ds, which );
+      fc::raw::unpack( ds, which );
       assert(to_msg_type_t(which) == msg_type_t::vote_message); // verified by caller
       vote_id_type vote_id;
-      fc::raw::unpack( peek_ds, vote_id );
+      fc::raw::unpack( ds, vote_id );
+      const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
 
       if( my_impl->dispatcher.have_vote( vote_id ) ) {
          peer_dlog( vote_logger, this, "duplicate vote - dropping {}", vote_id );
-         pending_message_buffer.advance_read_ptr( message_length );
+         pending_message_buffer.advance_read_ptr( message_length - header_bytes );
          return true;
       }
-
-      // Full deserialization path: consume which + vote_id, then unpack vote_message.
-      auto ds = pending_message_buffer.create_datastream();
-      fc::raw::unpack( ds, which ); // consume which
-      vote_id_type consumed_id;
-      fc::raw::unpack( ds, consumed_id ); // consume vote_id
       vote_message_ptr ptr = std::make_shared<vote_message>();
       fc::raw::unpack( ds, *ptr );
 
       // Validate that the wire vote_id matches the actual computed vote_id.
-      if( compute_vote_id(*ptr) != vote_id ) {
-         peer_wlog( vote_logger, this, "vote_message ID mismatch: wire={} actual={}", vote_id, compute_vote_id(*ptr) );
+      auto computed_vote_id = compute_vote_id(*ptr);
+      if( computed_vote_id != vote_id ) {
+         peer_wlog( vote_logger, this, "vote_message ID mismatch: wire={} actual={}", vote_id, computed_vote_id );
          close();
          return true;
       }
