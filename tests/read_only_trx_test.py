@@ -309,12 +309,12 @@ def mixedOpsTest(opt=None):
     readOnlyThread.start()
     sendTrxThread = threading.Thread(target = sendTrxsOnThread, args = (numRuns, numRuns, opt))
     sendTrxThread.start()
-    pushBlockThread = threading.Thread(target = doRpc, args = ("chain", "push_block", numRuns, None, None, 202, {"block":"signed_block"}))
-    pushBlockThread.start()
+    getRawThread = threading.Thread(target = doRpc, args = ("chain", "get_raw_code_and_abi", numRuns, "account_name", testAccountName, 200, {"account_name":testAccountName}))
+    getRawThread.start()
 
     readOnlyThread.join()
     sendTrxThread.join()
-    pushBlockThread.join()
+    getRawThread.join()
     assert(not errorInThread)
 
 def sendMulReadOnlyTrx(numThreads):
@@ -380,7 +380,6 @@ def chainApiTests():
     runReadOnlyTrxAndRpcInParallel("chain", "get_currency_stats", fieldIn="SYS", payload = {"code":"sysio.token", "symbol":"SYS"})
     runReadOnlyTrxAndRpcInParallel("chain", "get_required_keys", code=400)
     runReadOnlyTrxAndRpcInParallel("chain", "get_transaction_id", code=400, payload = {"ref_block_num":"1"})
-    runReadOnlyTrxAndRpcInParallel("chain", "push_block", code=202, payload = {"block":"signed_block"})
     runReadOnlyTrxAndRpcInParallel("chain", "get_producer_schedule", "active")
 
 def netApiTests():
