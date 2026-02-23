@@ -2883,7 +2883,7 @@ namespace sysio {
          if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
-         if( std::find(trx_connections.begin(), trx_connections.end(), cp->connection_id) != trx_connections.end() ) {
+         if( std::binary_search(trx_connections.begin(), trx_connections.end(), cp->connection_id) ) {
             return;
          }
 
