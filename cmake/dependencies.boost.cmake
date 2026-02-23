@@ -40,7 +40,7 @@ foreach (COMPONENT ${BOOST_COMPONENTS})
 endforeach()
 
 # Keep uBLAS shim if code links Boost::numeric_ublas
-if (NOT TARGET boost_numeric_ublas)
+if (NOT TARGET Boost::numeric_ublas)
   add_library(boost_numeric_ublas INTERFACE)
   add_library(Boost::numeric_ublas ALIAS boost_numeric_ublas)
 endif()

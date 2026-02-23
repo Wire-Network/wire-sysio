@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
