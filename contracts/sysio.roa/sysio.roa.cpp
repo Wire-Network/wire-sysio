@@ -54,13 +54,8 @@ namespace sysio {
                     row.net_weight.amount += net_weight.amount;
                     row.cpu_weight.amount += cpu_weight.amount;
                 }
-                if (ram_bytes >= 0) {
-                    row.ram_bytes += static_cast<uint64_t>(ram_bytes);
-                } else {
-                    uint64_t to_sub = static_cast<uint64_t>(-ram_bytes);
-                    check(row.ram_bytes >= to_sub, "reslimit ram underflow");
-                    row.ram_bytes -= to_sub;
-                }
+                check(ram_bytes >= 0, "increase_reslimit does not allow negative ram_bytes");
+                row.ram_bytes += static_cast<uint64_t>(ram_bytes);
             });
             return resources_t{
                 .net = res_itr->net_weight,
@@ -68,6 +63,16 @@ namespace sysio {
                 .ram_bytes = res_itr->ram_bytes
             };
         }
+    }
+
+    void roa::decrease_reslimit(const name& owner, uint64_t ram_bytes) {
+        reslimit_t reslimit(get_self(), get_self().value);
+        auto res_itr = reslimit.find(owner.value);
+        check(res_itr != reslimit.end(), "No resource limit exists for this account.");
+        check(res_itr->ram_bytes >= ram_bytes, "reslimit ram underflow");
+        reslimit.modify(res_itr, get_self(), [&](auto& row) {
+            row.ram_bytes -= ram_bytes;
+        });
     }
 
     void roa::activateroa(const asset& total_sys, const uint64_t& bytes_per_unit) {
@@ -803,9 +808,9 @@ namespace sysio {
             row.ram_weight.amount += ram_weight_amount;
         });
 
-        // Update reslimit for sysio/sysio.acct for the ram
+        // Update reslimit for sysio.acct (increase) and sysio (decrease) for the ram
         increase_reslimit("sysio.acct"_n, {0, sys_symbol}, {0, sys_symbol}, sysiosystem::newaccount_ram, true);
-        increase_reslimit("sysio"_n, {0, sys_symbol}, {0, sys_symbol}, -sysiosystem::newaccount_ram, true);
+        decrease_reslimit("sysio"_n, sysiosystem::newaccount_ram);
 
         return new_username;
     }
