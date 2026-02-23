@@ -2,12 +2,25 @@
 #include <sysio/chain/block.hpp>
 #include <sysio/chain/vote_message.hpp>
 #include <sysio/chain/types.hpp>
+#include <fc/io/raw.hpp>
 
 namespace sysio {
    using namespace chain;
    using namespace fc;
 
    constexpr auto message_header_size = sizeof(uint32_t);
+
+   using vote_id_type = fc::sha256;
+
+   /// Compute a deterministic vote ID from the non-signature fields of a vote_message.
+   /// vote_id = SHA-256(block_id || strong || serialized_finalizer_key)
+   inline vote_id_type compute_vote_id(const vote_message& v) {
+      auto enc = fc::sha256::encoder();
+      fc::raw::pack(enc, v.block_id);
+      fc::raw::pack(enc, v.strong);
+      fc::raw::pack(enc, v.finalizer_key);
+      return enc.result();
+   }
 
    struct chain_size_message {
       uint32_t                   last_irreversible_block_num = 0;
@@ -144,6 +157,11 @@ namespace sysio {
       block_id_type id;
    };
 
+   struct transaction_message {
+      transaction_id_type   id;
+      packed_transaction    trx;
+   };
+
    struct transaction_notice_message {
       transaction_id_type id;
    };
@@ -183,7 +201,7 @@ namespace sysio {
                                     request_message,
                                     sync_request_message,
                                     signed_block,
-                                    packed_transaction,
+                                    transaction_message,
                                     vote_message,
                                     block_nack_message,
                                     block_notice_message,
@@ -200,7 +218,7 @@ namespace sysio {
       request_message        = fc::get_index<net_message, request_message>(),
       sync_request_message   = fc::get_index<net_message, sync_request_message>(),
       signed_block           = fc::get_index<net_message, signed_block>(),
-      packed_transaction     = fc::get_index<net_message, packed_transaction>(),
+      transaction_message    = fc::get_index<net_message, transaction_message>(),
       vote_message           = fc::get_index<net_message, vote_message>(),
       block_nack_message     = fc::get_index<net_message, block_nack_message>(),
       block_notice_message   = fc::get_index<net_message, block_notice_message>(),
@@ -239,6 +257,7 @@ FC_REFLECT( sysio::request_message, (req_trx)(req_blocks) )
 FC_REFLECT( sysio::sync_request_message, (start_block)(end_block) )
 FC_REFLECT( sysio::block_nack_message, (id) )
 FC_REFLECT( sysio::block_notice_message, (previous)(id) )
+FC_REFLECT( sysio::transaction_message, (id)(trx) )
 FC_REFLECT( sysio::transaction_notice_message, (id) )
 FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer_info_v1, (server_endpoint)(outbound_ip_address)(expiration) )
 FC_REFLECT( sysio::gossip_bp_peers_message::bp_peer, (version)(producer_name)(bp_peer_info) )
