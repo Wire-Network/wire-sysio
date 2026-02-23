@@ -3539,6 +3539,13 @@ namespace sysio {
 
       set_state(connection_state::connected);
       if (msg.generation == 1) {
+         if( msg.chain_id != my_impl->chain_id ) {
+            peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
+            no_retry = go_away_reason::wrong_chain;
+            enqueue( go_away_message(go_away_reason::wrong_chain) );
+            return;
+         }
+
          if( msg.node_id == my_impl->node_id) {
             peer_ilog( p2p_conn_log, this, "Self connection detected node_id {}. Closing connection", msg.node_id);
             no_retry = go_away_reason::self;
@@ -3601,12 +3608,6 @@ namespace sysio {
             return;
          }
 
-         if( msg.chain_id != my_impl->chain_id ) {
-            peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
-            no_retry = go_away_reason::wrong_chain;
-            enqueue( go_away_message(go_away_reason::wrong_chain) );
-            return;
-         }
          protocol_version = net_plugin_impl::to_protocol_version(msg.network_version);
          if( protocol_version < net_version_min ) {
             peer_ilog( p2p_conn_log, this, "Peer protocol version {} below minimum {}, disconnecting",
