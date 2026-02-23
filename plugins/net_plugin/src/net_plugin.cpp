@@ -4316,8 +4316,7 @@ namespace sysio {
          chain::public_key_type peer_key;
          try {
             peer_key = crypto::public_key::recover(msg.sig, msg.token);
-         }
-         catch (const std::exception& /*e*/) {
+         } catch (...) {
             fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);
             return false;
          }
