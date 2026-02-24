@@ -11,6 +11,8 @@
 #include <fc/io/json.hpp>
 #include <fc/io/cfile.hpp>
 #include <sysio/chain/global_property_object.hpp>
+#include <sysio/chain/block_state.hpp>
+#include <sysio/chain/resource_limits.hpp>
 
 #include "test_cfd_transaction.hpp"
 
@@ -993,6 +995,349 @@ BOOST_AUTO_TEST_CASE(test_signed_block_abi_roundtrip) {
       chain.produce_block();
    auto qc_block = chain.produce_block();
    verify_block(qc_block, "later block with QC data");
+}
+
+// Verifies that the SHiP ABI definitions for transaction_trace_v0, action_trace_v1,
+// action_receipt_v0, and partial_transaction_v0 match the custom serialization
+// operators in serialization.hpp (history_context_wrapper).
+// Produces blocks with transactions, reads traces from the log (deserialized via ABI),
+// and compares each deserialized field against the original C++ trace objects.
+BOOST_AUTO_TEST_CASE(test_trace_abi_roundtrip) {
+   fc::temp_directory state_history_dir;
+   sysio::state_history::partition_config config{};
+
+   state_history_tester<savanna_tester> chain(state_history_dir.path(), config);
+
+   // Capture C++ traces for each accepted block via signals.
+   // pending_cpp_traces collects traces during block production;
+   // accepted_cpp_traces snapshots them when the block is accepted.
+   std::vector<std::pair<transaction_trace_ptr, packed_transaction_ptr>> pending_cpp_traces;
+   std::vector<std::pair<transaction_trace_ptr, packed_transaction_ptr>> accepted_cpp_traces;
+
+   chain.control->block_start().connect([&](uint32_t) {
+      pending_cpp_traces.clear();
+   });
+
+   chain.control->applied_transaction().connect(
+      [&](std::tuple<const transaction_trace_ptr&, const packed_transaction_ptr&> t) {
+         pending_cpp_traces.emplace_back(std::get<0>(t), std::get<1>(t));
+      }
+   );
+
+   chain.control->accepted_block().connect([&](block_signal_params) {
+      accepted_cpp_traces = pending_cpp_traces;
+   });
+
+   // Flush the pending block from tester setup so the next block's onblock
+   // fires after our signal handlers are connected.
+   chain.produce_block();
+
+   // Produce a block with user transactions
+   chain.create_accounts({"alice"_n});
+   auto b = chain.produce_block();
+
+   BOOST_TEST_MESSAGE("Verifying trace ABI roundtrip for block " << b->block_num());
+
+   // Read traces from the log (deserialized via the SHiP ABI)
+   auto abi_traces = get_traces(chain.traces_log, b->block_num());
+   BOOST_REQUIRE(!abi_traces.empty());
+   BOOST_REQUIRE_EQUAL(abi_traces.size(), accepted_cpp_traces.size());
+
+   for (size_t ti = 0; ti < abi_traces.size(); ++ti) {
+      auto& trace_v = abi_traces[ti];
+      BOOST_REQUIRE(trace_v.is_array());
+      BOOST_REQUIRE_EQUAL(trace_v.size(), 2u);
+      BOOST_REQUIRE_EQUAL(trace_v[0ul].get_string(), "transaction_trace_v0");
+
+      auto& t = trace_v[1ul].get_object();
+      auto& cpp = *accepted_cpp_traces[ti].first;
+      auto& cpp_ptrx = accepted_cpp_traces[ti].second;
+
+      // -- transaction_trace_v0 fields --
+      BOOST_CHECK_EQUAL(t["id"].as<transaction_id_type>(), cpp.id);
+      BOOST_CHECK_EQUAL(t["status"].as_uint64(), 0u); // executed
+      BOOST_CHECK_EQUAL(t["cpu_usage_us"].as_uint64(), (uint64_t)cpp.total_cpu_usage_us);
+      // net_usage_words is rounded up to the nearest multiple of 8 bytes
+      uint32_t expected_net_words = ((cpp.net_usage + 7) / 8) * 8;
+      BOOST_CHECK_EQUAL(t["net_usage_words"].as_uint64(), expected_net_words);
+      BOOST_CHECK_EQUAL(t["elapsed"].as_int64(), 0); // 0 in non-debug mode
+      BOOST_CHECK_EQUAL(t["net_usage"].as_uint64(), cpp.net_usage);
+      BOOST_CHECK_EQUAL(t["scheduled"].as_bool(), false);
+
+      // -- action_traces --
+      auto& abi_ats = t["action_traces"].get_array();
+      BOOST_REQUIRE_EQUAL(abi_ats.size(), cpp.action_traces.size());
+
+      for (size_t ai = 0; ai < abi_ats.size(); ++ai) {
+         auto& at_v = abi_ats[ai];
+         BOOST_REQUIRE(at_v.is_array());
+         BOOST_REQUIRE_EQUAL(at_v[0ul].get_string(), "action_trace_v1");
+
+         auto& at = at_v[1ul].get_object();
+         auto& cpp_at = cpp.action_traces[ai];
+
+         BOOST_CHECK_EQUAL(at["action_ordinal"].as_uint64(), (uint64_t)cpp_at.action_ordinal);
+         BOOST_CHECK_EQUAL(at["creator_action_ordinal"].as_uint64(), (uint64_t)cpp_at.creator_action_ordinal);
+         BOOST_CHECK_EQUAL(at["receiver"].as_string(), cpp_at.receiver.to_string());
+         BOOST_CHECK_EQUAL(at["context_free"].as_bool(), cpp_at.context_free);
+         BOOST_CHECK_EQUAL(at["elapsed"].as_int64(), 0); // 0 in non-debug mode
+
+         // action fields
+         auto& act = at["act"].get_object();
+         BOOST_CHECK_EQUAL(act["account"].as_string(), cpp_at.act.account.to_string());
+         BOOST_CHECK_EQUAL(act["name"].as_string(), cpp_at.act.name.to_string());
+         BOOST_CHECK_EQUAL(act["authorization"].get_array().size(), cpp_at.act.authorization.size());
+
+         // return_value (action_trace_v1 field)
+         BOOST_CHECK(at["return_value"].as<bytes>() == cpp_at.return_value);
+
+         // receipt
+         if (cpp_at.receipt) {
+            auto& receipt_v = at["receipt"];
+            BOOST_REQUIRE(receipt_v.is_array());
+            BOOST_REQUIRE_EQUAL(receipt_v[0ul].get_string(), "action_receipt_v0");
+
+            auto& r = receipt_v[1ul].get_object();
+            BOOST_CHECK_EQUAL(r["receiver"].as_string(), cpp_at.receipt->receiver.to_string());
+            BOOST_CHECK_EQUAL(r["global_sequence"].as_uint64(), cpp_at.receipt->global_sequence);
+            BOOST_CHECK_EQUAL(r["recv_sequence"].as_uint64(), cpp_at.receipt->recv_sequence);
+            BOOST_CHECK_EQUAL(r["code_sequence"].as_uint64(), (uint64_t)cpp_at.receipt->code_sequence.value);
+            BOOST_CHECK_EQUAL(r["abi_sequence"].as_uint64(), (uint64_t)cpp_at.receipt->abi_sequence.value);
+
+            // auth_sequence
+            auto& auth_seq = r["auth_sequence"].get_array();
+            BOOST_REQUIRE_EQUAL(auth_seq.size(), cpp_at.receipt->auth_sequence.size());
+         }
+
+         // account_ram_deltas
+         BOOST_CHECK_EQUAL(at["account_ram_deltas"].get_array().size(), cpp_at.account_ram_deltas.size());
+      }
+
+      // -- account_ram_delta (transaction-level) --
+      if (cpp.account_ram_delta) {
+         auto& delta = t["account_ram_delta"].get_object();
+         BOOST_CHECK_EQUAL(delta["account"].as_string(), cpp.account_ram_delta->account.to_string());
+         BOOST_CHECK_EQUAL(delta["delta"].as_int64(), cpp.account_ram_delta->delta);
+      }
+
+      // -- partial transaction --
+      if (cpp_ptrx) {
+         auto& partial_v = t["partial"];
+         if (partial_v.is_array() && partial_v.size() == 2) {
+            BOOST_REQUIRE_EQUAL(partial_v[0ul].get_string(), "partial_transaction_v0");
+            auto& p = partial_v[1ul].get_object();
+            auto& txn = cpp_ptrx->get_transaction();
+            auto& stxn = cpp_ptrx->get_signed_transaction();
+
+            BOOST_CHECK_EQUAL(p["ref_block_num"].as_uint64(), txn.ref_block_num);
+            BOOST_CHECK_EQUAL(p["ref_block_prefix"].as_uint64(), txn.ref_block_prefix);
+            BOOST_CHECK_EQUAL(p["max_cpu_usage_ms"].as_uint64(), txn.max_cpu_usage_ms);
+            BOOST_CHECK_EQUAL(p["max_net_usage_words"].as_uint64(), txn.max_net_usage_words.value);
+            BOOST_CHECK_EQUAL(p["delay_sec"].as_uint64(), txn.delay_sec.value);
+            BOOST_CHECK_EQUAL(p["signatures"].get_array().size(), stxn.signatures.size());
+            BOOST_CHECK_EQUAL(p["context_free_data"].get_array().size(), stxn.context_free_data.size());
+         }
+      }
+   }
+}
+
+// Verifies the SHiP ABI definition for finality_data matches the finality_data_t
+// C++ struct serialized via fc::raw::pack (FC_REFLECT). Packs the finality data
+// from the chain head, deserializes via the ABI, and compares every field.
+BOOST_AUTO_TEST_CASE(test_finality_data_abi_roundtrip) {
+   savanna_tester chain;
+
+   abi_serializer shipabi(
+      fc::json::from_string(sysio::state_history::ship_abi_without_tables()).as<abi_def>(),
+      null_yield_function
+   );
+
+   // Produce enough blocks for finality data to be fully populated
+   chain.produce_blocks(4);
+
+   auto fd = chain.control->head_finality_data();
+
+   // Pack via fc::raw::pack (uses FC_REFLECT fields)
+   auto packed = fc::raw::pack(fd);
+
+   // Deserialize via the SHiP ABI definition
+   fc::variant v = shipabi.binary_to_variant("finality_data", packed, null_yield_function);
+   auto obj = v.get_object();
+
+   BOOST_CHECK_EQUAL(obj["major_version"].as_uint64(), fd.major_version);
+   BOOST_CHECK_EQUAL(obj["minor_version"].as_uint64(), fd.minor_version);
+   BOOST_CHECK_EQUAL(obj["active_finalizer_policy_generation"].as_uint64(), fd.active_finalizer_policy_generation);
+   BOOST_CHECK_EQUAL(obj["action_mroot"].as_string(), fd.action_mroot.str());
+   BOOST_CHECK_EQUAL(obj["reversible_blocks_mroot"].as_string(), fd.reversible_blocks_mroot.str());
+   BOOST_CHECK_EQUAL(obj["latest_qc_claim_block_num"].as_uint64(), fd.latest_qc_claim_block_num);
+   BOOST_CHECK_EQUAL(obj["latest_qc_claim_finality_digest"].as_string(), fd.latest_qc_claim_finality_digest.str());
+   BOOST_CHECK_EQUAL(obj["latest_qc_claim_timestamp"].as<block_timestamp_type>(), fd.latest_qc_claim_timestamp);
+   BOOST_CHECK_EQUAL(obj["base_digest"].as_string(), fd.base_digest.str());
+   BOOST_CHECK_EQUAL(obj["last_pending_finalizer_policy_generation"].as_uint64(), fd.last_pending_finalizer_policy_generation);
+
+   // pending_finalizer_policy
+   if (fd.pending_finalizer_policy) {
+      auto& pfp = obj["pending_finalizer_policy"];
+      BOOST_REQUIRE(!pfp.is_null());
+      auto pfp_obj = pfp.get_object();
+      BOOST_CHECK_EQUAL(pfp_obj["generation"].as_uint64(), fd.pending_finalizer_policy->generation);
+      BOOST_CHECK_EQUAL(pfp_obj["threshold"].as_uint64(), fd.pending_finalizer_policy->threshold);
+      BOOST_CHECK_EQUAL(pfp_obj["finalizers"].get_array().size(), fd.pending_finalizer_policy->finalizers.size());
+
+      // Verify each finalizer authority
+      auto& abi_fins = pfp_obj["finalizers"].get_array();
+      for (size_t i = 0; i < abi_fins.size(); ++i) {
+         auto fin = abi_fins[i].get_object();
+         BOOST_CHECK_EQUAL(fin["description"].as_string(), fd.pending_finalizer_policy->finalizers[i].description);
+         BOOST_CHECK_EQUAL(fin["weight"].as_uint64(), fd.pending_finalizer_policy->finalizers[i].weight);
+         BOOST_CHECK_EQUAL(fin["public_key"].as_string(), fd.pending_finalizer_policy->finalizers[i].public_key);
+      }
+   } else {
+      BOOST_CHECK(obj["pending_finalizer_policy"].is_null());
+   }
+}
+
+// Verifies SHiP ABI definitions for table delta types (account_v0, account_metadata_v0,
+// code_v0, resource_limits_v0) by comparing ABI-deserialized values back to the actual
+// C++ chainbase objects. Uses full_snapshot=true to get all objects for comparison.
+BOOST_AUTO_TEST_CASE(test_delta_abi_roundtrip) {
+   table_deltas_tester chain;
+   chain.produce_block();
+
+   chain.create_account("newacc"_n, config::system_account_name, false, false, false, false);
+   chain.set_code("newacc"_n, test_contracts::get_table_test_wasm());
+   chain.set_abi("newacc"_n, test_contracts::get_table_test_abi());
+
+   chain.produce_block();
+
+   chain.push_action("newacc"_n, "addhashobj"_n, "newacc"_n, mutable_variant_object()("hashinput", "hello"));
+   chain.push_action("newacc"_n, "addnumobj"_n, "newacc"_n, mutable_variant_object()("input", 2));
+
+   // --- account_v0: compare against account_object in chainbase ---
+   {
+      auto [found, it] = chain.find_table_delta("account", true);
+      BOOST_REQUIRE(found);
+      auto accounts = chain.deserialize_data(it, "account_v0", "account");
+      BOOST_REQUIRE(!accounts.empty());
+
+      for (auto& acc : accounts) {
+         auto name = acc["name"].as<account_name>();
+         auto* obj = chain.control->db().find<account_object, by_name>(name);
+         BOOST_REQUIRE_MESSAGE(obj != nullptr, "Account " + name.to_string() + " not in chainbase");
+         BOOST_CHECK_EQUAL(acc["name"].as_string(), obj->name.to_string());
+         BOOST_CHECK_EQUAL(acc["creation_date"].as<block_timestamp_type>(), obj->creation_date);
+      }
+   }
+
+   // --- account_metadata_v0: compare against account_metadata_object ---
+   {
+      auto [found, it] = chain.find_table_delta("account_metadata", true);
+      BOOST_REQUIRE(found);
+      auto metadata = chain.deserialize_data(it, "account_metadata_v0", "account_metadata");
+      BOOST_REQUIRE(!metadata.empty());
+
+      for (auto& m : metadata) {
+         auto name = m["name"].as<account_name>();
+         auto* obj = chain.control->db().find<account_metadata_object, by_name>(name);
+         BOOST_REQUIRE_MESSAGE(obj != nullptr, "Account metadata for " + name.to_string() + " not in chainbase");
+         BOOST_CHECK_EQUAL(m["name"].as_string(), obj->name.to_string());
+         BOOST_CHECK_EQUAL(m["privileged"].as_bool(), obj->is_privileged());
+         BOOST_CHECK_EQUAL(m["last_code_update"].as<fc::time_point>(), obj->last_code_update);
+
+         // code_id optional field
+         bool has_code = obj->code_hash != digest_type();
+         if (has_code) {
+            BOOST_REQUIRE(!m["code"].is_null());
+            auto code_id = m["code"].get_object();
+            BOOST_CHECK_EQUAL(code_id["vm_type"].as_uint64(), (uint64_t)obj->vm_type);
+            BOOST_CHECK_EQUAL(code_id["vm_version"].as_uint64(), (uint64_t)obj->vm_version);
+            BOOST_CHECK_EQUAL(code_id["code_hash"].as<digest_type>(), obj->code_hash);
+         }
+      }
+   }
+
+   // --- code_v0: verify code_hash, vm_type, vm_version ---
+   {
+      auto [found, it] = chain.find_table_delta("code", true);
+      BOOST_REQUIRE(found);
+      auto codes = chain.deserialize_data(it, "code_v0", "code");
+      BOOST_REQUIRE(!codes.empty());
+
+      for (auto& c : codes) {
+         auto hash = c["code_hash"].as<digest_type>();
+         BOOST_CHECK(hash != digest_type());
+         BOOST_CHECK_EQUAL(c["vm_type"].as_uint64(), 0u);
+         BOOST_CHECK_EQUAL(c["vm_version"].as_uint64(), 0u);
+         // code bytes should be non-empty
+         auto code_bytes = c["code"].as<bytes>();
+         BOOST_CHECK(!code_bytes.empty());
+      }
+   }
+
+   // --- contract_row_v0: verify fields match table structure ---
+   {
+      auto [found, it] = chain.find_table_delta("contract_row");
+      BOOST_REQUIRE(found);
+      auto rows = chain.deserialize_data(it, "contract_row_v0", "contract_row");
+      BOOST_REQUIRE(!rows.empty());
+
+      for (auto& row : rows) {
+         // Verify all required fields are present and have the right types
+         BOOST_CHECK_EQUAL(row["code"].as_string(), "newacc");
+         BOOST_CHECK(!row["table"].as_string().empty());
+         BOOST_CHECK(row.get_object().contains("primary_key"));
+         BOOST_CHECK_EQUAL(row["payer"].as_string(), "newacc");
+         BOOST_CHECK(!row["value"].as<bytes>().empty());
+      }
+   }
+
+   // --- resource_limits_v0: compare against resource_limits_manager ---
+   {
+      auto [found, it] = chain.find_table_delta("resource_limits", true);
+      BOOST_REQUIRE(found);
+      auto limits = chain.deserialize_data(it, "resource_limits_v0", "resource_limits");
+      BOOST_REQUIRE(!limits.empty());
+
+      auto& rlm = chain.control->get_resource_limits_manager();
+      for (auto& l : limits) {
+         auto owner = l["owner"].as<account_name>();
+         int64_t ram, net, cpu;
+         rlm.get_account_limits(owner, ram, net, cpu);
+         BOOST_CHECK_EQUAL(l["ram_bytes"].as_int64(), ram);
+         BOOST_CHECK_EQUAL(l["net_weight"].as_int64(), net);
+         BOOST_CHECK_EQUAL(l["cpu_weight"].as_int64(), cpu);
+      }
+   }
+
+   // --- contract_index64_v0: verify secondary index fields ---
+   {
+      auto [found, it] = chain.find_table_delta("contract_index64");
+      if (found) {
+         auto indices = chain.deserialize_data(it, "contract_index64_v0", "contract_index64");
+         for (auto& idx : indices) {
+            BOOST_CHECK_EQUAL(idx["code"].as_string(), "newacc");
+            BOOST_CHECK(!idx["table"].as_string().empty());
+            BOOST_CHECK(idx.get_object().contains("primary_key"));
+            BOOST_CHECK(idx.get_object().contains("secondary_key"));
+            BOOST_CHECK_EQUAL(idx["payer"].as_string(), "newacc");
+         }
+      }
+   }
+
+   // --- contract_index256_v0: verify secondary index fields ---
+   {
+      auto [found, it] = chain.find_table_delta("contract_index256");
+      if (found) {
+         auto indices = chain.deserialize_data(it, "contract_index256_v0", "contract_index256");
+         for (auto& idx : indices) {
+            BOOST_CHECK_EQUAL(idx["code"].as_string(), "newacc");
+            BOOST_CHECK(!idx["table"].as_string().empty());
+            BOOST_CHECK(idx.get_object().contains("primary_key"));
+            BOOST_CHECK(idx.get_object().contains("secondary_key"));
+            BOOST_CHECK_EQUAL(idx["payer"].as_string(), "newacc");
+         }
+      }
+   }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
