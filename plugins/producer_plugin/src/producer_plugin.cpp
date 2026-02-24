@@ -3123,7 +3123,9 @@ void producer_plugin_impl::switch_to_read_window() {
          if (cid != _ro_timer_corelation_id.load(std::memory_order_acquire))
             return;
          if (ec != boost::asio::error::operation_aborted) {
-            // tests have seen to deadlock here, unable to reproduce so add a guard for it, also so we can log
+            // At one point the task.get() would hang in ci/cd. The issue is believed to be fixed by
+            // https://github.com/Wire-Network/wire-sysio/pull/202. Keep a large timeout with error
+            // to provide an error if this does ever hang/timeout again.
             const fc::time_point safe_guard_deadline = _ro_window_deadline + fc::seconds(3); // give plenty of time for slow ci
             const std::chrono::time_point<std::chrono::system_clock> deadline{
                std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
