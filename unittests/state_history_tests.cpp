@@ -905,4 +905,94 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_curropted_index_error, T, state_history_teste
    BOOST_CHECK(get_decompressed_entry(new_chain.chain_state_log,10).size());
 }
 
+// Verifies the state_history ABI for signed_block and all its nested types
+// (transaction_receipt_header, transaction_receipt, packed_transaction, qc_t, etc.)
+// match the actual binary layout from fc::raw::pack(signed_block).
+// Deserializes packed blocks using the ship ABI and cross-checks deserialized
+// values against the original C++ objects. If a C++ struct changes but the ABI
+// is not updated, the deserialized values will be wrong and this test will fail.
+BOOST_AUTO_TEST_CASE(test_signed_block_abi_roundtrip) {
+   savanna_tester chain;
+
+   abi_serializer shipabi(
+      fc::json::from_string(sysio::state_history::ship_abi_without_tables()).as<abi_def>(),
+      null_yield_function
+   );
+
+   auto verify_block = [&](const signed_block_ptr& b, const std::string& desc) {
+      BOOST_TEST_MESSAGE("Verifying signed_block ABI: " << desc);
+
+      auto packed = fc::raw::pack(*b);
+
+      // Deserialize packed block bytes using the ship ABI struct definitions.
+      // If the ABI field order/types don't match the C++ FC_REFLECT layout,
+      // either this will throw or the deserialized values will be wrong.
+      fc::variant deserialized = shipabi.binary_to_variant("signed_block", packed, null_yield_function);
+      auto obj = deserialized.get_object();
+
+      // -- block_header fields --
+      BOOST_CHECK_EQUAL(obj["producer"].as_string(), b->producer.to_string());
+      BOOST_CHECK_EQUAL(obj["previous"].as_string(), b->previous.str());
+      BOOST_CHECK_EQUAL(obj["transaction_mroot"].as_string(), b->transaction_mroot.str());
+      BOOST_CHECK_EQUAL(obj["finality_mroot"].as_string(), b->finality_mroot.str());
+
+      // qc_claim
+      auto qc_claim = obj["qc_claim"].get_object();
+      BOOST_CHECK_EQUAL(qc_claim["block_num"].as_uint64(), b->qc_claim.block_num);
+      BOOST_CHECK_EQUAL(qc_claim["is_strong_qc"].as_bool(), b->qc_claim.is_strong_qc);
+
+      // header_extensions count
+      BOOST_CHECK_EQUAL(obj["header_extensions"].get_array().size(), b->header_extensions.size());
+
+      // -- signed_block_header fields --
+      BOOST_CHECK_EQUAL(obj["producer_signatures"].get_array().size(), b->producer_signatures.size());
+
+      // -- signed_block fields --
+      auto& transactions = obj["transactions"].get_array();
+      BOOST_REQUIRE_EQUAL(transactions.size(), b->transactions.size());
+
+      // Verify each transaction_receipt against the C++ object
+      for (size_t i = 0; i < transactions.size(); ++i) {
+         auto receipt = transactions[i].get_object();
+
+         // transaction_receipt_header: cpu_usage_us must be an array (vector<unsigned_int>)
+         BOOST_REQUIRE(receipt.contains("cpu_usage_us"));
+         const auto& cpu_arr = receipt["cpu_usage_us"].get_array();
+         BOOST_REQUIRE_EQUAL(cpu_arr.size(), b->transactions[i].cpu_usage_us.size());
+         for (size_t j = 0; j < cpu_arr.size(); ++j) {
+            BOOST_CHECK_EQUAL(cpu_arr[j].as_uint64(), b->transactions[i].cpu_usage_us[j].value);
+         }
+
+         // transaction_receipt: trx must be a packed_transaction struct (not a variant)
+         BOOST_REQUIRE(receipt.contains("trx"));
+         auto trx = receipt["trx"].get_object();
+         BOOST_CHECK(trx.contains("signatures"));
+         BOOST_CHECK(trx.contains("compression"));
+         BOOST_CHECK(trx.contains("packed_context_free_data"));
+         BOOST_CHECK(trx.contains("packed_trx"));
+         BOOST_CHECK_EQUAL(trx["signatures"].get_array().size(),
+                           b->transactions[i].trx.get_signatures().size());
+      }
+
+      // block_extensions count
+      BOOST_CHECK_EQUAL(obj["block_extensions"].get_array().size(), b->block_extensions.size());
+   };
+
+   // Test 1: Block without user transactions (header fields, no receipts)
+   auto empty_block = chain.produce_block();
+   verify_block(empty_block, "block without user transactions");
+
+   // Test 2: Block with transaction receipts (exercises transaction_receipt ABI)
+   chain.create_accounts({"alice"_n});
+   auto trx_block = chain.produce_block();
+   BOOST_REQUIRE(!trx_block->transactions.empty());
+   verify_block(trx_block, "block with transaction receipts");
+
+   // Test 3: Later block with QC data
+   for (int i = 0; i < 4; ++i)
+      chain.produce_block();
+   auto qc_block = chain.produce_block();
+   verify_block(qc_block, "later block with QC data");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
