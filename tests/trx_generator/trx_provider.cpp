@@ -1,20 +1,23 @@
 #include <trx_provider.hpp>
 #include <http_client_async.hpp>
 
+#include <sysio/net_plugin/protocol.hpp>
+#include <sysio/chain/exceptions.hpp>
+
 #include <fc/io/raw.hpp>
 #include <fc/io/json.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <sysio/chain/exceptions.hpp>
 
 namespace sysio::testing {
    using namespace boost::asio;
    using namespace std::literals::string_literals;
-   using ip::tcp;
+   using boost::asio::ip::tcp;
 
    constexpr auto message_header_size = sizeof(uint32_t);
-   constexpr uint32_t trx_msg_which = 8; // transaction_message in net_message variant
+   constexpr uint32_t trx_msg_which = sysio::to_index(sysio::msg_type_t::transaction_message);
+   static_assert(trx_msg_which == fc::get_index<sysio::net_message, sysio::transaction_message>());
 
    static send_buffer_type create_send_buffer( const chain::packed_transaction& m ) {
       // Build wire bytes matching transaction_message: [size][which][trx_id][packed_transaction]

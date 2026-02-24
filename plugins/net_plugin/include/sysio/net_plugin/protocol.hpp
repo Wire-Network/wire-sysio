@@ -22,15 +22,8 @@ namespace sysio {
       return enc.result();
    }
 
-   struct chain_size_message {
-      uint32_t                   last_irreversible_block_num = 0;
-      block_id_type              last_irreversible_block_id;
-      uint32_t                   head_num = 0;
-      block_id_type              head_id;
-   };
-
    struct handshake_message {
-      uint16_t                   network_version = 0; ///< incremental value above a computed base
+      uint16_t                   network_version = 0; ///< network protocol version
       chain_id_type              chain_id; ///< used to identify chain
       fc::sha256                 node_id; ///< used to identify peers and prevent self-connect
       chain::public_key_type     key; ///< authentication key; may be a producer or peer key, or empty
@@ -55,8 +48,6 @@ namespace sysio {
     wrong_chain, ///< the peer's chain id doesn't match
     wrong_version, ///< the peer's network version doesn't match
     forked, ///< the peer's irreversible blocks are different
-    unlinkable, ///< the peer sent a block we couldn't use
-    bad_transaction, ///< the peer sent a transaction that failed verification
     validation, ///< the peer sent a block that failed validation
     benign_other, ///< reasons such as a timeout. not fatal but warrant resetting
     fatal_other, ///< a catch-all for errors we don't have discriminated
@@ -71,8 +62,6 @@ namespace sysio {
     case go_away_reason::wrong_chain : return "wrong chain";
     case go_away_reason::wrong_version : return "wrong version";
     case go_away_reason::forked : return "chain is forked";
-    case go_away_reason::unlinkable : return "unlinkable block received";
-    case go_away_reason::bad_transaction : return "bad transaction";
     case go_away_reason::validation : return "invalid block";
     case go_away_reason::authentication : return "authentication failure";
     case go_away_reason::fatal_other : return "some other failure";
@@ -97,46 +86,20 @@ namespace sysio {
     return fmt::format("time_message(org={}, rec={}, xmt={}, dst={})", tm.org, tm.rec, tm.xmt, tm.dst);
   }
 
-  enum id_list_modes {
-    none,
-    catch_up,
-    last_irr_catch_up,
-    normal
+  struct peer_status_notice {
+    bool          lib_sync{false};
+    block_id_type fork_db_root_id;
+    block_id_type fork_db_head_id;
+    uint32_t      earliest_available_block_num{0};
   };
 
-  constexpr auto modes_str( id_list_modes m ) {
-    switch( m ) {
-    case none : return "none";
-    case catch_up : return "catch up";
-    case last_irr_catch_up : return "last irreversible";
-    case normal : return "normal";
-    default: return "undefined mode";
-    }
-  }
-
-  template<typename T>
-  struct select_ids {
-    select_ids() : mode(none),pending(0),ids() {}
-    id_list_modes  mode{none};
-    uint32_t       pending{0};
-    vector<T>      ids;
-    bool           empty () const { return (mode == none || ids.empty()); }
-    bool operator==(const select_ids&) const noexcept = default;
+  struct block_request_message {
+    block_id_type my_head_id;
   };
 
-  using ordered_txn_ids = select_ids<transaction_id_type>;
-  using ordered_blk_ids = select_ids<block_id_type>;
-
-  struct notice_message {
-    notice_message() : known_trx(), known_blocks() {}
-    ordered_txn_ids known_trx;
-    ordered_blk_ids known_blocks;
-  };
-
-  struct request_message {
-    request_message() : req_trx(), req_blocks() {}
-    ordered_txn_ids req_trx;
-    ordered_blk_ids req_blocks;
+  struct block_nack_request_message {
+    block_id_type target_id;
+    block_id_type my_head_id;
   };
 
    struct sync_request_message {
@@ -194,34 +157,34 @@ namespace sysio {
    };
 
    using net_message = std::variant<handshake_message,
-                                    chain_size_message,
                                     go_away_message,
                                     time_message,
-                                    notice_message,
-                                    request_message,
+                                    peer_status_notice,
+                                    block_request_message,
                                     sync_request_message,
                                     signed_block,
                                     transaction_message,
                                     vote_message,
                                     block_nack_message,
+                                    block_nack_request_message,
                                     block_notice_message,
                                     gossip_bp_peers_message,
                                     transaction_notice_message>;
 
    // see protocol net_message
    enum class msg_type_t {
-      handshake_message      = fc::get_index<net_message, handshake_message>(),
-      chain_size_message     = fc::get_index<net_message, chain_size_message>(),
-      go_away_message        = fc::get_index<net_message, go_away_message>(),
-      time_message           = fc::get_index<net_message, time_message>(),
-      notice_message         = fc::get_index<net_message, notice_message>(),
-      request_message        = fc::get_index<net_message, request_message>(),
-      sync_request_message   = fc::get_index<net_message, sync_request_message>(),
-      signed_block           = fc::get_index<net_message, signed_block>(),
-      transaction_message    = fc::get_index<net_message, transaction_message>(),
-      vote_message           = fc::get_index<net_message, vote_message>(),
-      block_nack_message     = fc::get_index<net_message, block_nack_message>(),
-      block_notice_message   = fc::get_index<net_message, block_notice_message>(),
+      handshake_message          = fc::get_index<net_message, handshake_message>(),
+      go_away_message            = fc::get_index<net_message, go_away_message>(),
+      time_message               = fc::get_index<net_message, time_message>(),
+      peer_status_notice         = fc::get_index<net_message, peer_status_notice>(),
+      block_request_message      = fc::get_index<net_message, block_request_message>(),
+      sync_request_message       = fc::get_index<net_message, sync_request_message>(),
+      signed_block               = fc::get_index<net_message, signed_block>(),
+      transaction_message        = fc::get_index<net_message, transaction_message>(),
+      vote_message               = fc::get_index<net_message, vote_message>(),
+      block_nack_message         = fc::get_index<net_message, block_nack_message>(),
+      block_nack_request_message = fc::get_index<net_message, block_nack_request_message>(),
+      block_notice_message       = fc::get_index<net_message, block_notice_message>(),
       gossip_bp_peers_message    = fc::get_index<net_message, gossip_bp_peers_message>(),
       transaction_notice_message = fc::get_index<net_message, transaction_notice_message>(),
       unknown
@@ -240,10 +203,6 @@ namespace sysio {
 
 } // namespace sysio
 
-FC_REFLECT( sysio::select_ids<fc::sha256>, (mode)(pending)(ids) )
-FC_REFLECT( sysio::chain_size_message,
-            (last_irreversible_block_num)(last_irreversible_block_id)
-            (head_num)(head_id))
 FC_REFLECT( sysio::handshake_message,
             (network_version)(chain_id)(node_id)(key)
             (time)(token)(sig)(p2p_address)
@@ -252,8 +211,9 @@ FC_REFLECT( sysio::handshake_message,
             (os)(agent)(generation) )
 FC_REFLECT( sysio::go_away_message, (reason)(node_id) )
 FC_REFLECT( sysio::time_message, (org)(rec)(xmt)(dst) )
-FC_REFLECT( sysio::notice_message, (known_trx)(known_blocks) )
-FC_REFLECT( sysio::request_message, (req_trx)(req_blocks) )
+FC_REFLECT( sysio::peer_status_notice, (lib_sync)(fork_db_root_id)(fork_db_head_id)(earliest_available_block_num) )
+FC_REFLECT( sysio::block_request_message, (my_head_id) )
+FC_REFLECT( sysio::block_nack_request_message, (target_id)(my_head_id) )
 FC_REFLECT( sysio::sync_request_message, (start_block)(end_block) )
 FC_REFLECT( sysio::block_nack_message, (id) )
 FC_REFLECT( sysio::block_notice_message, (previous)(id) )
