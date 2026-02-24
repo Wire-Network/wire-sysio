@@ -27,7 +27,10 @@ struct finality_node_t : public sysio::testing::tester {
    sysio::testing::finalizer_keys<tester>  finkeys;
    size_t                                  cur_key{0}; // index of key used in current policy
 
-   finality_node_t() : sysio::testing::tester(sysio::testing::setup_policy::full_except_do_not_set_finalizers),  finkeys(*this) {}
+   static inline sysio::testing::setup_policy default_setup_policy =
+      sysio::testing::setup_policy::full_except_do_not_set_finalizers;
+
+   finality_node_t() : sysio::testing::tester(default_setup_policy), finkeys(*this) {}
 
    size_t last_vote_index() const {
       assert(!votes.empty());
@@ -75,6 +78,7 @@ struct finality_node_t : public sysio::testing::tester {
 
 struct finality_cluster_config_t {
    bool   transition_to_savanna;
+   bool   defer_setup = false;
 };
 
 // ------------------------------------------------------------------------------------
@@ -134,11 +138,15 @@ public:
       // -----------------------------------------------------------------------------------
       size_t split = finality_test_cluster::keys_per_node;
 
-      // set initial finalizer key for each node
-      // ---------------------------------------
+      // initialize keys for each node (but don't configure any local finalizer keys yet)
+      // ---------------------------------------------------------------------------------
       for (size_t i=0; i<nodes.size(); ++i) {
          nodes[i].finkeys.init_keys(split * num_finalizers, num_finalizers);
-         nodes[i].setup(i * split, split);
+         // Set up voted_block signal connection (normally done in setup())
+         nodes[i].control->voted_block().connect( [&node = nodes[i]]( const sysio::chain::vote_signal_params& v ) {
+            node.votes.emplace_back(std::get<2>(v));
+         });
+         // Don't call setup() yet - we'll configure keys later with only 1 key per node
       }
 
       // check that node0 aggregates votes correctly, and that after receiving a vote from another
@@ -149,13 +157,17 @@ public:
          last_connection_vote = std::get<0>(v);
       });
 
-      // set initial finalizer policy
-      // ----------------------------
+      // set initial finalizer policy indices
+      // -------------------------------------
       for (size_t i=0; i<nodes.size(); ++i)
          fin_policy_indices_0[i] = i * split;
-      fin_policy_pubkeys_0 = node0.finkeys.set_finalizer_policy(fin_policy_indices_0).pubkeys;
+
+      if (!config.defer_setup) {
+         setup_finalizer_policy();
+      }
 
       if (config.transition_to_savanna) {
+
          // Since Wire starts in Savanna at Genesis this "transition_to_savanna" just means setup the finalizer policy.
          // Produce enough blocks for finalizer policy to be active.
          produce_blocks(24);
@@ -251,6 +263,30 @@ public:
    void clear_votes_and_reset_lib() {
       for (auto& n : nodes)
          n.clear_votes_and_reset_lib();
+   }
+
+   // Set up the finalizer policy and configure each node's local finalizer key.
+   // Extracted as a separate method so proof_test_cluster can call it after
+   // deploying BIOS (when using defer_setup = true).
+   void setup_finalizer_policy() {
+      sysio::testing::base_tester::finalizer_policy_input policy_input;
+      policy_input.finalizers.reserve(nodes.size());
+      policy_input.local_finalizers = {};
+      for (size_t i = 0; i < nodes.size(); ++i) {
+         policy_input.finalizers.push_back({node0.finkeys.key_names[fin_policy_indices_0[i]], 1});
+      }
+      policy_input.threshold = (nodes.size() * 2) / 3 + 1;
+
+      auto result = node0.set_finalizers(policy_input);
+      fin_policy_pubkeys_0 = result.pubkeys;
+
+      for (size_t i=0; i<nodes.size(); ++i) {
+         nodes[i].cur_key = fin_policy_indices_0[i];
+         // Configure each node with its full range of keys (matching Spring's setup).
+         // This allows nodes to vote under pending policies that use different keys
+         // within their range (e.g., node0 with keys 0-9 can vote when policy rotates to key 1).
+         nodes[i].finkeys.set_node_finalizers(i * keys_per_node, keys_per_node);
+      }
    }
 
 private:

@@ -49,14 +49,13 @@ struct test_fixture {
    void corrupt_qc_signature_in_block_log() {
       const controller::config& config     = chain.get_config();
       auto                      blocks_dir = config.blocks_dir;
-      auto                      qc_ext_id  = quorum_certificate_extension::extension_id();
 
       block_log blog(blocks_dir, config.blog);
 
-      // find the first block which has QC extension starting from the end of
+      // find the first block which has a QC starting from the end of
       // block log and going backward
       uint32_t block_num = blog.head()->block_num();
-      while (!blog.read_block_by_num(block_num)->contains_extension(qc_ext_id)) {
+      while (!blog.read_block_by_num(block_num)->qc) {
          --block_num;
          BOOST_REQUIRE(block_num != 0);
       }
@@ -69,26 +68,12 @@ struct test_fixture {
       BOOST_REQUIRE_NO_THROW(block_log::trim_blocklog_end(blocks_dir, block_num-1));
       BOOST_REQUIRE_NO_THROW(block_log::smoke_test(blocks_dir, 1));
 
-      // retrieve QC block extension from QC block
-      auto block_exts = qc_block->validate_and_extract_extensions();
-      auto qc_ext_itr = block_exts.find(qc_ext_id);
-      auto& qc_ext    = std::get<quorum_certificate_extension>(qc_ext_itr->second);
-      auto& qc        = qc_ext.qc;
-
-      // remove QC block extension from QC block
-      auto& exts = qc_block->block_extensions;
-      std::erase_if(exts, [&](const auto& ext) {
-         return ext.first == qc_ext_id;
-      });
-
       // intentionally corrupt QC's signature.
+      auto& qc = *qc_block->qc;
       auto g2 = qc.active_policy_sig.sig.jacobian_montgomery_le();
       g2 = bls12_381::aggregate_signatures(std::array{g2, g2});
       auto affine = g2.toAffineBytesLE(bls12_381::from_mont::yes);
       qc.active_policy_sig.sig = bls::aggregate_signature(bls::signature(affine));
-
-      // add the corrupted QC block extension back to the block
-      emplace_extension(exts, qc_ext_id, fc::raw::pack(qc_ext));
 
       // add the corrupted block back to block log
       block_log new_blog(blocks_dir, config.blog);
@@ -96,12 +81,11 @@ struct test_fixture {
       new_blog.append(qc_signed_block, qc_signed_block->calculate_id());
    }
 
-   // Corrupts finality_extension in the last block of the blocks log
+   // Corrupts qc_claim in the last block of the blocks log
    // by setting the claimed block number to a different one.
    void corrupt_finality_extension_in_block_log(uint32_t new_qc_claim_block_num) {
       const controller::config& config     = chain.get_config();
       auto                      blocks_dir = config.blocks_dir;
-      auto                      fin_ext_id = finality_extension::extension_id();
 
       block_log blog(blocks_dir, config.blog);
 
@@ -114,22 +98,8 @@ struct test_fixture {
       BOOST_REQUIRE_NO_THROW(block_log::trim_blocklog_end(blocks_dir, last_block_num-1));
       BOOST_REQUIRE_NO_THROW(block_log::smoke_test(blocks_dir, 1));
 
-      // retrieve finality extension
-      std::optional<block_header_extension> head_fin_ext = last_block->extract_header_extension(fin_ext_id);
-      BOOST_TEST(!!head_fin_ext);
-
-      // remove finality extension from extensions
-      auto& exts = last_block->header_extensions;
-      std::erase_if(exts, [&](const auto& ext) {
-         return ext.first == fin_ext_id;
-      });
-
-      // intentionally corrupt finality extension by changing its block_num
-      auto& f_ext = std::get<finality_extension>(*head_fin_ext);
-      f_ext.qc_claim.block_num = new_qc_claim_block_num;
-
-      // add the corrupted finality extension back to last block
-      emplace_extension(exts, fin_ext_id, fc::raw::pack(f_ext));
+      // intentionally corrupt qc_claim by changing its block_num
+      last_block->qc_claim.block_num = new_qc_claim_block_num;
 
       // add the corrupted block to block log. Need to instantiate a
       // new_blog as a block has been removed from blocks log.

@@ -25,9 +25,7 @@ BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
    // this block contains the header extension for the instant finality, savanna activated when it is LIB
    auto block = t.produce_block();
 
-   std::optional<block_header_extension> ext = block->extract_header_extension(finality_extension::extension_id());
-   BOOST_TEST(!!ext);
-   std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
+   auto& fin_policy_diff = block->new_finalizer_policy_diff;
    BOOST_TEST(!!fin_policy_diff);
    BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == num_finalizers-1); // -1 because genesis has one finalizer
    BOOST_TEST(fin_policy_diff->generation == 3u);
@@ -44,8 +42,6 @@ BOOST_AUTO_TEST_CASE(initial_set_finalizer_test) { try {
    auto fb = t.fetch_block_by_id(t.lib_id);
    BOOST_REQUIRE(!!fb);
    BOOST_TEST(fb->calculate_id() == t.lib_id);
-   ext = fb->extract_header_extension(finality_extension::extension_id());
-   BOOST_REQUIRE(!!ext);
    BOOST_TEST(if_genesis_block_id == fb->calculate_id());
 
    auto lib_after_transition = t.lib_block->block_num();
@@ -73,12 +69,10 @@ void test_finality_transition(const vector<account_name>& accounts,
    // this block contains the header extension for the instant finality, savanna activated when it is LIB
    auto block = t.produce_block();
 
-   std::optional<block_header_extension> ext = block->extract_header_extension(finality_extension::extension_id());
-   BOOST_TEST(!!ext);
-   std::optional<finalizer_policy_diff> fin_policy_diff = std::get<finality_extension>(*ext).new_finalizer_policy_diff;
-   BOOST_TEST(!!fin_policy_diff);
-   BOOST_TEST(fin_policy_diff->finalizers_diff.insert_indexes.size() == accounts.size());
-   BOOST_TEST(fin_policy_diff->generation == 3u);
+   auto& fin_policy_diff2 = block->new_finalizer_policy_diff;
+   BOOST_TEST(!!fin_policy_diff2);
+   BOOST_TEST(fin_policy_diff2->finalizers_diff.insert_indexes.size() == accounts.size());
+   BOOST_TEST(fin_policy_diff2->generation == 3u);
    block_id_type if_genesis_block_id = block->calculate_id();
 
    block_num_type active_block_num = block->block_num();
@@ -90,8 +84,6 @@ void test_finality_transition(const vector<account_name>& accounts,
    auto fb = t.fetch_block_by_id(t.lib_id);
    BOOST_REQUIRE(!!fb);
    BOOST_TEST(fb->calculate_id() == t.lib_id);
-   ext = fb->extract_header_extension(finality_extension::extension_id());
-   BOOST_REQUIRE(!!ext);
    BOOST_TEST(if_genesis_block_id == fb->calculate_id());
 
    auto lib_after_transition = t.lib_block->block_num();
@@ -391,8 +383,8 @@ BOOST_FIXTURE_TEST_CASE(lost_votes, finality_test_cluster<4>) { try {
    auto b1 = produce_and_push_block();
    process_votes(1, num_needed_for_quorum);
    auto b2 = produce_and_push_block(); // this block contains a strong QC for the previous block
-   const auto& ext = b2->template extract_extension<quorum_certificate_extension>();
-   BOOST_REQUIRE_EQUAL(ext.qc.block_num, b1->block_num());
+   BOOST_REQUIRE(b2->qc);
+   BOOST_REQUIRE_EQUAL(b2->qc->block_num, b1->block_num());
 
    // The strong QC extension for prior block makes LIB advance on nodes
    BOOST_REQUIRE_EQUAL(num_lib_advancing(), num_nodes);

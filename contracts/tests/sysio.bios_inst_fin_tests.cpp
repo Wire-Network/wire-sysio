@@ -57,7 +57,7 @@ BOOST_FIXTURE_TEST_CASE( set_1_finalizer, sysio_bios_if_tester ) try {
     abi_serializer::to_variant( *cur_block, pretty_output, get_resolver(), fc::microseconds::maximum() );
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
-    BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
+    BOOST_TEST(output_json.find("new_finalizer_policy_diff") != std::string::npos);
     BOOST_TEST(output_json.find("\"generation\": 3") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 2") != std::string::npos);
     BOOST_TEST(output_json.find("set_1_finalizer") != std::string::npos);
@@ -88,7 +88,7 @@ BOOST_FIXTURE_TEST_CASE( set_2_finalizers, sysio_bios_if_tester ) try {
     abi_serializer::to_variant( *cur_block, pretty_output, get_resolver(), fc::microseconds::maximum() );
 
     std::string output_json = fc::json::to_pretty_string(pretty_output);
-    BOOST_TEST(output_json.find("finality_extension") != std::string::npos);
+    BOOST_TEST(output_json.find("new_finalizer_policy_diff") != std::string::npos);
     BOOST_TEST(output_json.find("\"generation\": 3") != std::string::npos);
     BOOST_TEST(output_json.find("\"threshold\": 5") != std::string::npos);
     BOOST_TEST(output_json.find("set_2_finalizer_2") != std::string::npos);
@@ -155,6 +155,44 @@ BOOST_FIXTURE_TEST_CASE( threshold_equal_to_half_weights, sysio_bios_if_tester )
                ("public_key", "PUB_BLS_lkixuIBmY1Xuc0GFnek0iDXitKAAQt87CL7Q1jZsjLid-9cruKfj_KjJk2P4GxsL7HnArD6F0lNAoxsLHISpsBBHqi-ET5JAYfKkS5lgG4To1vP48x6TtOPOslsr5D0YqKbtng")
                ("pop", "SIG_BLS_ubO3gsBLRuXg1UWLvNg54B4Xr2c1wKmwIVUzAxKOCAVKmOHabYdm222v3Go8bPkU7R9sRq2qYkhJQGh3wLbtcIhc2D6CPMpRIUB6mIcX18X2l-3ceXWdWfQBFWs1sUoXfp2UpmeMIPVcDKqgKWnJGyYyei-ekE86XnWaA8bBMzxAcJpEml4E--PRe48m27gVKqaTb6oY27oZHiHbjocZi1TU0RsDNGJAjaIapZkBKRUStQymTE6mmgdgLRHlR4EFjsiRUA")
             }))), sysio_assert_message_exception);
+} FC_LOG_AND_RETHROW()
+
+// Verifies threshold exceeding sum of weights is rejected
+BOOST_FIXTURE_TEST_CASE( threshold_exceeds_weight_sum, sysio_bios_if_tester ) try {
+   BOOST_REQUIRE_THROW(push_action("iftester"_n, "setfinalizer"_n, "iftester"_n, mvo()
+      ("finalizer_policy", mvo()
+         ("threshold", 11) // weight_sum is 10, threshold exceeds it
+         ("finalizers", std::vector<mvo>{
+            mvo()
+               ("description", "set_2_finalizer_1")
+               ("weight", 5)
+               ("public_key", "PUB_BLS_kV0d54mbPRbd65t4ttv_-CxNt8ktKmf8q4uKZzNTzFSHDSj5rLlP_hdovTsHAPQOAyyzJ4bRTheKjSUj-IoTW96v3VdlifgtDbSVmg4JZR8H_tlStQSWsTHGo8pTX8cR_HEVoA")
+               ("pop", "SIG_BLS_DsTwQvYa4uP51putCpLiZlJDyCL24l7bVu1kznc4X8GIYQdElYaCO88RFfCvncYFKwJfKZb-LNMW4GHZzhnyWu0Gp-ougZhSIq4mi1FrtM39uT6KP00-fYYPLOw5nzoLOl__f72qEkBluaaXKIiboWfQ-VnRdzvuE-8Y_m36u6d7bThWy1Lz27mUeelhLawEaKIW688HpFAQDEuvvKfAZYvsyPYXod6a_2KYS4rQkyAtjJXBWk4W0cuPU5n9lNYGyuzF4Q"),
+            mvo()
+               ("description", "set_2_finalizer_2")
+               ("weight", 5)
+               ("public_key", "PUB_BLS_lkixuIBmY1Xuc0GFnek0iDXitKAAQt87CL7Q1jZsjLid-9cruKfj_KjJk2P4GxsL7HnArD6F0lNAoxsLHISpsBBHqi-ET5JAYfKkS5lgG4To1vP48x6TtOPOslsr5D0YqKbtng")
+               ("pop", "SIG_BLS_ubO3gsBLRuXg1UWLvNg54B4Xr2c1wKmwIVUzAxKOCAVKmOHabYdm222v3Go8bPkU7R9sRq2qYkhJQGh3wLbtcIhc2D6CPMpRIUB6mIcX18X2l-3ceXWdWfQBFWs1sUoXfp2UpmeMIPVcDKqgKWnJGyYyei-ekE86XnWaA8bBMzxAcJpEml4E--PRe48m27gVKqaTb6oY27oZHiHbjocZi1TU0RsDNGJAjaIapZkBKRUStQymTE6mmgdgLRHlR4EFjsiRUA")
+            }))), sysio_assert_message_exception);
+} FC_LOG_AND_RETHROW()
+
+// Verifies threshold equal to sum of weights is accepted
+BOOST_FIXTURE_TEST_CASE( threshold_equal_to_weight_sum, sysio_bios_if_tester ) try {
+   BOOST_REQUIRE_NO_THROW(push_action("iftester"_n, "setfinalizer"_n, "iftester"_n, mvo()
+      ("finalizer_policy", mvo()
+         ("threshold", 10) // weight_sum is 10, threshold equals it
+         ("finalizers", std::vector<mvo>{
+            mvo()
+               ("description", "set_2_finalizer_1")
+               ("weight", 5)
+               ("public_key", "PUB_BLS_kV0d54mbPRbd65t4ttv_-CxNt8ktKmf8q4uKZzNTzFSHDSj5rLlP_hdovTsHAPQOAyyzJ4bRTheKjSUj-IoTW96v3VdlifgtDbSVmg4JZR8H_tlStQSWsTHGo8pTX8cR_HEVoA")
+               ("pop", "SIG_BLS_DsTwQvYa4uP51putCpLiZlJDyCL24l7bVu1kznc4X8GIYQdElYaCO88RFfCvncYFKwJfKZb-LNMW4GHZzhnyWu0Gp-ougZhSIq4mi1FrtM39uT6KP00-fYYPLOw5nzoLOl__f72qEkBluaaXKIiboWfQ-VnRdzvuE-8Y_m36u6d7bThWy1Lz27mUeelhLawEaKIW688HpFAQDEuvvKfAZYvsyPYXod6a_2KYS4rQkyAtjJXBWk4W0cuPU5n9lNYGyuzF4Q"),
+            mvo()
+               ("description", "set_2_finalizer_2")
+               ("weight", 5)
+               ("public_key", "PUB_BLS_lkixuIBmY1Xuc0GFnek0iDXitKAAQt87CL7Q1jZsjLid-9cruKfj_KjJk2P4GxsL7HnArD6F0lNAoxsLHISpsBBHqi-ET5JAYfKkS5lgG4To1vP48x6TtOPOslsr5D0YqKbtng")
+               ("pop", "SIG_BLS_ubO3gsBLRuXg1UWLvNg54B4Xr2c1wKmwIVUzAxKOCAVKmOHabYdm222v3Go8bPkU7R9sRq2qYkhJQGh3wLbtcIhc2D6CPMpRIUB6mIcX18X2l-3ceXWdWfQBFWs1sUoXfp2UpmeMIPVcDKqgKWnJGyYyei-ekE86XnWaA8bBMzxAcJpEml4E--PRe48m27gVKqaTb6oY27oZHiHbjocZi1TU0RsDNGJAjaIapZkBKRUStQymTE6mmgdgLRHlR4EFjsiRUA")
+            }))));
 } FC_LOG_AND_RETHROW()
 
 // Verifies threshold greater by one than half of the sum of the weights works

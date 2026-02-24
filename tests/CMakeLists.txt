@@ -104,6 +104,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nested_container_multi_index_test.py 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test.py ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_peering_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_peering_test_shape.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/auto_bp_gossip_peering_test.py ${CMAKE_CURRENT_BINARY_DIR}/auto_bp_gossip_peering_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/producer_rank_test.py ${CMAKE_CURRENT_BINARY_DIR}/producer_rank_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/split_blocklog_replay_test.py ${CMAKE_CURRENT_BINARY_DIR}/split_blocklog_replay_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/PerformanceHarnessScenarioRunner.py ${CMAKE_CURRENT_BINARY_DIR}/PerformanceHarnessScenarioRunner.py COPYONLY)
 
@@ -238,6 +239,8 @@ add_lr_test(NAME nodeop_retry_transaction_lr_test COMMAND tests/nodeop_retry_tra
 add_np_test(NAME cli_test COMMAND tests/cli_test.py)
 
 add_np_test(NAME lib_advance_test COMMAND tests/lib_advance_test.py -v ${UNSHARE})
+
+add_np_test(NAME producer_rank_test COMMAND tests/producer_rank_test.py -v ${UNSHARE})
 
 add_p_test(NAME sysio_util_bls_test COMMAND tests/sysio_util_bls_test.py)
 add_p_test(NAME sysio_util_snapshot_info_test COMMAND tests/sysio_util_snapshot_info_test.py)

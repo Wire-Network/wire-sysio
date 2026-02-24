@@ -172,14 +172,12 @@ namespace savanna_cluster {
          // Blocks after the critical block are proper IF blocks.
          // -----------------------------------------------------
          auto first_proper_block = produce_block();
-         BOOST_REQUIRE(first_proper_block->is_proper_svnn_block());
 
          // wait till the first proper block becomes irreversible. Transition will be done then
          // -----------------------------------------------------------------------------------
          signed_block_ptr pt_block  = nullptr;  // last value of this var is the first post-transition block
          while(first_proper_block->block_num() > lib_num()) {
             pt_block = produce_block();
-            BOOST_REQUIRE(pt_block->is_proper_svnn_block());
          }
 
          // lib must advance after num_chains_to_final blocks
@@ -548,13 +546,11 @@ namespace savanna_cluster {
       size_t num_nodes() const { return _num_nodes; }
 
       static qc_claim_t qc_claim(const signed_block_ptr& b) {
-         return b->extract_header_extension<finality_extension>().qc_claim;
+         return b->qc_claim;
       }
 
       static std::optional<qc_t> qc(const signed_block_ptr& b) {
-         if (b->contains_extension(quorum_certificate_extension::extension_id()))
-             return b->extract_extension<quorum_certificate_extension>().qc;
-         return {};
+         return b->qc;
       }
 
       peers_t& peers() { return _peers; }

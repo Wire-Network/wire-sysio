@@ -1,0 +1,28 @@
+{
+  "name": "wire-sysio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.27.0",
+  "devDependencies": {
+    "@3fv/guard": "^1.4.39",
+    "@3fv/prelude-ts": "^0.8.37",
+    "@types/lodash": "^4.17.21",
+    "@types/node": "^24.10.13",
+    "@types/shelljs": "^0.10.0",
+    "fs-extra": "^11.3.3",
+    "json5": "^2.2.3",
+    "lodash": "^4.17.21",
+    "node-plop": "^0.32.3",
+    "plop": "^4.0.4",
+    "shelljs": "^0.10.0",
+    "source-map-support": "^0.5.21",
+    "z": "^1.0.9"
+  }
+}

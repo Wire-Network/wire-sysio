@@ -641,6 +641,16 @@ namespace fc
               }
               return;
          }
+         case variant::int128_type:
+         case variant::uint128_type:
+         case variant::int256_type:
+         case variant::uint256_type: {
+            os += '"';
+            os += v.as_string();
+            os += '"';
+            return;
+         }
+
          case variant::double_type:
               os += '"';
               os += v.as_string();

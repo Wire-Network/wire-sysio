@@ -1,10 +1,21 @@
 #pragma once
 
 #include "finality_test_cluster.hpp"
+#include <sysio/chain/block_handle.hpp>
 
 using mvo = mutable_variant_object;
 
 using namespace sysio::chain;
+
+// Accessor to reach into block_handle's private internal() for test purposes.
+// block_handle declares `friend struct block_handle_accessor` (in sysio::chain).
+namespace sysio::chain {
+   struct block_handle_accessor {
+      static const block_state_ptr& get_bsp(const block_handle& h) {
+         return h.internal();
+      }
+   };
+}
 
 namespace finality_proof {
 
@@ -69,45 +80,19 @@ namespace finality_proof {
       return merkle_branches;
    }
 
-   //extract instant finality data from block header extension, as well as qc data from block extension
+   //extract qc data from block
    static qc_data_t extract_qc_data(const signed_block_ptr& b) {
       assert(b);
-      auto hexts = b->validate_and_extract_header_extensions();
-      if (auto f_entry = hexts.find(finality_extension::extension_id()); f_entry != hexts.end()) {
-         auto& f_ext   = std::get<finality_extension>(f_entry->second);
-
-         // get the matching qc extension if present
-         auto exts = b->validate_and_extract_extensions();
-         if (auto entry = exts.find(quorum_certificate_extension::extension_id()); entry != exts.end()) {
-            auto& qc_ext = std::get<quorum_certificate_extension>(entry->second);
-            return qc_data_t{ std::move(qc_ext.qc), f_ext.qc_claim };
-         }
-         return qc_data_t{ {}, f_ext.qc_claim };
-      }
-      return {};
+      return qc_data_t{ b->qc, b->qc_claim };
    }
 
    static bool has_finalizer_policy_diffs(const signed_block_ptr& block){
-
-      // extract new finalizer policy
-      finality_extension f_ext = block->extract_header_extension<finality_extension>();
-
-      return f_ext.new_finalizer_policy_diff.has_value();
-
+      return block->new_finalizer_policy_diff.has_value();
    }
 
    static finalizer_policy update_finalizer_policy(const signed_block_ptr block, const finalizer_policy& current_policy){
-
-      // extract new finalizer policy
-      finality_extension f_ext = block->extract_header_extension<finality_extension>();
-
-      assert(f_ext.new_finalizer_policy_diff.has_value());
-
-      finalizer_policy active_finalizer_policy =
-         current_policy.apply_diff(f_ext.new_finalizer_policy_diff.value());
-
-      return active_finalizer_policy;
-
+      assert(block->new_finalizer_policy_diff.has_value());
+      return current_policy.apply_diff(block->new_finalizer_policy_diff.value());
    }
 
    struct policy_count {
@@ -115,8 +100,20 @@ namespace finality_proof {
       int32_t blocks_since_proposed = 0;
    };
 
+   // RAII guard to temporarily change finality_node_t::default_setup_policy.
+   // Must be initialized before finality_test_cluster so that nodes created
+   // by the cluster use the desired setup_policy.
+   struct setup_policy_guard {
+      sysio::testing::setup_policy saved;
+      setup_policy_guard(sysio::testing::setup_policy p)
+         : saved(finality_node_t::default_setup_policy) {
+         finality_node_t::default_setup_policy = p;
+      }
+      ~setup_policy_guard() { finality_node_t::default_setup_policy = saved; }
+   };
+
    template<size_t NUM_NODES>
-   class proof_test_cluster : public finality_test_cluster<NUM_NODES> {
+   class proof_test_cluster : private setup_policy_guard, public finality_test_cluster<NUM_NODES> {
    public:
 
       /*****
@@ -126,11 +123,13 @@ namespace finality_proof {
          It has its own high-level produce_block function, which hides all the internal consensus details, and returns an extended struct containing data relevant for proof generation.
 
          It doesn't support forks or rollbacks, and always assumes the happy path in finality progression, which is sufficient for the purpose of generating finality proofs for testing.
-         
-         It also assumes a single producer pre-transition, resulting in only 2 transition blocks when IF is activated.
+
+         With Wire's Savanna-at-genesis, ALL blocks (including genesis) have finality leaves.
+         Using setup_policy::none ensures no blocks are produced during tester construction,
+         so every finality leaf is tracked through process_result().
 
       *****/
-         
+
       // cache last proposed, last pending and currently active finalizer policies + digests
       finalizer_policy last_proposed_finalizer_policy;
       digest_type last_proposed_finalizer_policy_digest;
@@ -149,10 +148,14 @@ namespace finality_proof {
       // counter to (optimistically) track internal policy changes
       std::unordered_map<digest_type, policy_count> blocks_since_proposed_policy;
 
-      // internal flag to indicate whether or not block is the IF genesis block
-      bool is_genesis = true;
-      // internal flag to indicate whether or not the transition is complete
-      bool is_transition = true;
+      // internal flag to indicate whether or not the first block has been processed
+      // (needed to initialize parent_timestamp and other state)
+      bool is_first_block = true;
+
+      // number of finality leaves produced during setup (genesis + setup blocks + activation)
+      size_t setup_leaf_count = 0;
+
+      size_t num_setup_leaves() const { return setup_leaf_count; }
 
       // returns finality leaves for construction of merkle proofs
       std::vector<digest_type> get_finality_leaves(const size_t cutoff){
@@ -172,8 +175,12 @@ namespace finality_proof {
 
          for (auto& p : blocks_since_proposed_policy) p.second.blocks_since_proposed++;
 
-         //skip this part on genesis
-         if (!is_genesis){
+         // On first block, initialize timestamps
+         if (is_first_block){
+            parent_timestamp = block->timestamp;
+            last_pending_finalizer_policy_start_timestamp = block->timestamp;
+            prev_last_pending_finalizer_policy_start_timestamp = block->timestamp;
+         } else {
             parent_timestamp = timestamp;
             last_pending_finalizer_policy_start_timestamp = prev_last_pending_finalizer_policy_start_timestamp;
             for (const auto& p : blocks_since_proposed_policy){
@@ -196,25 +203,12 @@ namespace finality_proof {
 
          timestamp = block->timestamp;
 
-         // if we have policy diffs, process them
+         // if we have policy diffs, process them (policy change proposals)
          if (has_finalizer_policy_diffs(block)){
-            if (is_genesis) {
-               // if block is genesis, the initial policy is the last proposed, last pending and currently active
-               last_proposed_finalizer_policy        = update_finalizer_policy(block, sysio::chain::finalizer_policy());
-               last_proposed_finalizer_policy_digest = fc::sha256::hash(last_proposed_finalizer_policy);
-               last_pending_finalizer_policy         = last_proposed_finalizer_policy;
-               last_pending_finalizer_policy_digest  = last_proposed_finalizer_policy_digest;
-               last_pending_finalizer_policy_start_timestamp = block->timestamp;
-               prev_last_pending_finalizer_policy_start_timestamp = block->timestamp;
-               active_finalizer_policy               = last_proposed_finalizer_policy;
-               active_finalizer_policy_digest        = last_proposed_finalizer_policy_digest;
-               blocks_since_proposed_policy[last_proposed_finalizer_policy_digest] = {last_proposed_finalizer_policy, 0};
-            } else {
-               // if block is not genesis, the new policy is proposed
-               last_proposed_finalizer_policy        = update_finalizer_policy(block, last_proposed_finalizer_policy);
-               last_proposed_finalizer_policy_digest = fc::sha256::hash(last_proposed_finalizer_policy);
-               blocks_since_proposed_policy[last_proposed_finalizer_policy_digest] = {last_proposed_finalizer_policy, 0};
-            }
+            // New policy is proposed
+            last_proposed_finalizer_policy        = update_finalizer_policy(block, last_proposed_finalizer_policy);
+            last_proposed_finalizer_policy_digest = fc::sha256::hash(last_proposed_finalizer_policy);
+            blocks_since_proposed_policy[last_proposed_finalizer_policy_digest] = {last_proposed_finalizer_policy, 0};
          }
 
          //process votes and collect / compute the IBC-relevant data
@@ -241,16 +235,13 @@ namespace finality_proof {
             .l3_commitments_digest = level_3_commitments_digest
          });
 
-         // during IF transition, finality_root is always set to an empty digest
-         digest_type finality_root = digest_type();
-
-         // after transition, finality_root can be obtained from the action_mroot field of the block header
-         if (!is_transition) finality_root = block->action_mroot;
+         // With Savanna active at genesis, finality_root can be obtained from the action_mroot field of the block header
+         digest_type finality_root = block->finality_mroot;
 
          // compute digest for verification purposes
          digest_type finality_digest = fc::sha256::hash(finality_digest_data_v1{
-            .active_finalizer_policy_generation       = is_genesis ? 1 : active_finalizer_policy.generation,
-            .last_pending_finalizer_policy_generation = is_genesis ? 1 : last_pending_finalizer_policy.generation,
+            .active_finalizer_policy_generation       = active_finalizer_policy.generation,
+            .last_pending_finalizer_policy_generation = last_pending_finalizer_policy.generation,
             .finality_tree_digest                     = finality_root,
             .l2_commitments_digest                    = level_2_commitments_digest
          });
@@ -267,8 +258,7 @@ namespace finality_proof {
          // add finality leaf to the internal list
          finality_leaves.push_back(finality_leaf);
 
-         if (is_transition && !is_genesis) is_transition = false; // if we are no longer in transition mode, set to false
-         if (is_genesis) is_genesis = false; // if IF genesis block, set to false 
+         if (is_first_block) is_first_block = false; // mark that first block has been processed
 
          qc_data_t qc_data = extract_qc_data(block);
 
@@ -291,7 +281,7 @@ namespace finality_proof {
             .level_3_commitments_digest = level_3_commitments_digest, 
             .level_2_commitments_digest = level_2_commitments_digest, 
             .finality_leaf = finality_leaf,
-            .finality_root = finality_root ,
+            .finality_root = finality_root,
             .parent_timestamp = parent_timestamp 
          };
 
@@ -311,9 +301,71 @@ namespace finality_proof {
          return result; //return last produced block
       }
 
-      proof_test_cluster(finality_cluster_config_t config = {.transition_to_savanna = false})
-      : finality_test_cluster<NUM_NODES>(config) {
+      proof_test_cluster(finality_cluster_config_t config = {.transition_to_savanna = true})
+      : setup_policy_guard(sysio::testing::setup_policy::none),
+        finality_test_cluster<NUM_NODES>({.transition_to_savanna = false, .defer_setup = true}) {
+         // With setup_policy::none, all nodes start at genesis (block 1) with
+         // no BIOS deployed. defer_setup=true skips set_finalizers in the base
+         // constructor. We manually set up everything here, producing ALL blocks
+         // through process_result() so every finality leaf is tracked.
 
+         // Extract genesis finality leaf from the genesis block's valid_t.
+         // At this point head = genesis (block 1).
+         {
+            const auto genesis_head = this->node0.control->head(); // must outlive genesis_bsp
+            const auto& genesis_bsp = block_handle_accessor::get_bsp(genesis_head);
+            BOOST_REQUIRE(genesis_bsp->valid.has_value());
+            BOOST_REQUIRE(!genesis_bsp->valid->validation_mroots.empty());
+
+            // For a single-leaf tree, root == the leaf itself
+            finality_leaves.push_back(genesis_bsp->valid->validation_mroots[0]);
+
+            // Initialize policy tracking state from the genesis BSP
+            active_finalizer_policy        = *genesis_bsp->active_finalizer_policy;
+            active_finalizer_policy_digest = fc::sha256::hash(active_finalizer_policy);
+
+            last_pending_finalizer_policy        = genesis_bsp->get_last_pending_finalizer_policy();
+            last_pending_finalizer_policy_digest = genesis_bsp->last_pending_finalizer_policy_digest;
+
+            last_proposed_finalizer_policy        = active_finalizer_policy;
+            last_proposed_finalizer_policy_digest = active_finalizer_policy_digest;
+
+            blocks_since_proposed_policy[active_finalizer_policy_digest] = {active_finalizer_policy, 0};
+
+            timestamp = genesis_bsp->timestamp();
+            prev_last_pending_finalizer_policy_start_timestamp =
+               genesis_bsp->last_pending_finalizer_policy_start_timestamp;
+
+            is_first_block = false;
+         }
+
+         if (config.transition_to_savanna) {
+            // Replicate execute_setup_policy(full_except_do_not_set_finalizers):
+            //   1. Produce an empty block (block 2)
+            //   2. Deploy BIOS contract and preactivate features
+            //   3. Produce block 3 (includes BIOS + features)
+            produce_block();
+            this->node0.set_bios_contract();
+            this->node0.preactivate_all_builtin_protocol_features();
+            produce_block();
+
+            // Now set up the 4-node finalizer policy (keys + set_finalizers action)
+            this->setup_finalizer_policy();
+
+            // Produce blocks for policy activation.
+            // The set_finalizers action is included in the next block.
+            // With num_chains_to_final=2, the policy becomes active ~4 blocks
+            // after proposal. We use 24 blocks for a comfortable margin.
+            produce_blocks(24);
+
+            this->fin_policy_0 = *this->node0.control->head_active_finalizer_policy();
+
+            // Record how many finality leaves are from setup
+            // (1 genesis + 2 BIOS setup + 24 activation = 27)
+            setup_leaf_count = finality_leaves.size();
+
+            this->clear_votes_and_reset_lib();
+         }
       }
 
    private:

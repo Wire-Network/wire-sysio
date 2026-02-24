@@ -243,10 +243,6 @@ namespace sysio::testing {
             produce_block();
             if( policy == setup_policy::full ) {
                init_roa();
-            }
-            // Do not transition to Savanna under full_except_do_not_transition_to_savanna or
-            // full_except_do_not_disable_deferred_trx
-            if( policy == setup_policy::full ) {
                // BLS voting is slow. Use only 1 finalizer for default testser.
                finalizer_keys fin_keys(*this, 1u /* num_keys */, 1u /* finset_size */);
                fin_keys.activate_savanna(0u /* first_key_idx */);

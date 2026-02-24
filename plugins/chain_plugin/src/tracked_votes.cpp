@@ -27,8 +27,6 @@ namespace sysio::chain_apis {
       // QC in the block and store it in last_votes.
       void on_accepted_block( const chain::signed_block_ptr& block, const chain::block_id_type& id ) {
          try {
-            if (!block->is_proper_svnn_block())
-               return;
             if (!tracking_enabled && !chain::vote_logger.is_enabled(fc::log_level::info))
                return;
 
@@ -37,10 +35,9 @@ namespace sysio::chain_apis {
             if (now - block->timestamp > fc::minutes(5) && (block->block_num() % 1000 != 0))
                return;
 
-            if (!block->contains_extension(chain::quorum_certificate_extension::extension_id())) {
+            if (!block->qc) {
                if (chain::vote_logger.is_enabled(fc::log_level::info)) {
-                  std::optional<chain::block_header_extension> fin_ext = block->extract_header_extension(chain::finality_extension::extension_id());
-                  chain::qc_claim_t claim = fin_ext ? std::get<chain::finality_extension>(*fin_ext).qc_claim : chain::qc_claim_t{};
+                  chain::qc_claim_t claim = block->qc_claim;
                   fc_ilog(chain::vote_logger, "Block {}... #{} @ {} produced by {}, latency: {}ms has no qc, claim: {}",
                           id.str().substr(8, 16), block->block_num(), block->timestamp, block->producer,
                           (now - block->timestamp).count() / 1000, claim);
@@ -48,10 +45,11 @@ namespace sysio::chain_apis {
                return;
             }
 
+            const auto& qc = *block->qc;
+
             if (tracking_enabled) {
                // Retrieve vote information from QC
-               const auto& qc_ext = block->extract_extension<chain::quorum_certificate_extension>();
-               chain::qc_vote_metrics_t vm = controller.vote_metrics(id, qc_ext.qc);
+               chain::qc_vote_metrics_t vm = controller.vote_metrics(id, qc);
 
                if (tracking_enabled) {
                   auto track_votes = [&](const chain::qc_vote_metrics_t::fin_auth_set_t& finalizers, bool is_strong) {
@@ -75,11 +73,10 @@ namespace sysio::chain_apis {
                   track_votes(vm.strong_votes, true);
                   track_votes(vm.weak_votes, false);
                }
-               log_missing_votes(block, id, vm.missing_votes, qc_ext.qc.block_num);
+               log_missing_votes(block, id, vm.missing_votes, qc.block_num);
             } else if (chain::vote_logger.is_enabled(fc::log_level::info)) {
-               const auto& qc_ext = block->extract_extension<chain::quorum_certificate_extension>();
-               auto missing = controller.missing_votes(id, qc_ext.qc);
-               log_missing_votes(block, id, missing, qc_ext.qc.block_num);
+               auto missing = controller.missing_votes(id, qc);
+               log_missing_votes(block, id, missing, qc.block_num);
             }
 
          } FC_LOG_AND_DROP("tracked_votes_impl on_accepted_block ERROR");

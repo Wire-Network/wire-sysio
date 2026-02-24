@@ -9,16 +9,6 @@ on:
     types: [ opened, synchronize, reopened, ready_for_review ]
     branches:
       - master
-    paths:
-      - 'libraries/**'
-      - 'programs/**'
-      - 'plugins/**'
-      - 'unittests/**'
-      - 'tests/**'
-      - '‎.pre-commit-config.yaml'
-      - 'cmake/**'
-      - 'CMakeLists.txt'
-      - '**/CMakeLists.txt'
   workflow_dispatch:
     inputs:
       override-cdt:
@@ -352,7 +342,7 @@ jobs:
           compression-level: 0
 
       - name: Cleanup Docker resources
-        if: always() 
+        if: always()
         env:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
@@ -361,7 +351,7 @@ jobs:
           echo "Removing containers matching: $JOB_PREFIX*"
           sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
             xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
-          
+
           echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
           sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
             grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
@@ -385,7 +375,7 @@ jobs:
           - cfg: {name: 'asserton',      base: 'asserton', builddir: 'asserton'}
           - cfg: {name: 'gcc',      base: 'gcc', builddir: 'gcc'}
     runs-on: ["self-hosted", "enf-x86-lowtier"]
-    
+
     steps:
       - name: Create ephemeral Docker context
         id: docker-context
@@ -458,7 +448,7 @@ jobs:
 
 
       - name: Cleanup Docker resources
-        if: always() 
+        if: always()
         env:
           DOCKER_CONTEXT: ${{ env.DOCKER_CONTEXT }}
         run: |
@@ -468,7 +458,7 @@ jobs:
           echo "Removing containers matching: $JOB_PREFIX*"
           sudo docker --context "$DOCKER_CONTEXT" ps -aq --filter "name=$JOB_PREFIX" | \
             xargs -r sudo docker --context "$DOCKER_CONTEXT" rm -f || true
-          
+
           echo "Removing base images matching: baseimage-${{ github.run_id }}-${{ github.job }}*"
           sudo docker --context "$DOCKER_CONTEXT" images --format "{{.Repository}}:{{.Tag}}" | \
             grep "baseimage-${{ github.run_id }}-${{ github.job }}" | \
@@ -596,4 +586,3 @@ jobs:
 
       - if: needs.tests.result != 'success' || needs.np-tests.result != 'success' || needs.lr-tests.result != 'success'
         run: false
-

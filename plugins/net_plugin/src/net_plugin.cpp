@@ -309,7 +309,7 @@ namespace sysio {
    /**
     * default value initializers
     */
-   constexpr auto     def_send_buffer_size_mb = 4;
+   constexpr auto     def_send_buffer_size_mb = 8;
    constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
    constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
@@ -4066,7 +4066,6 @@ namespace sysio {
 
          assert(obh);
          uint32_t block_num = obh->block_num();
-
          fc_dlog( p2p_blk_log, "validated block header, forkdb add {}, broadcasting immediately, connection - {}, blk num = {}, id = {}",
                   fork_db_add_result, cid, block_num, obh->id() );
          my_impl->dispatcher.add_peer_block( obh->id(), cid ); // no need to send back to sender

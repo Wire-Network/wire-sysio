@@ -1367,21 +1367,6 @@ BOOST_AUTO_TEST_CASE( producer_schedule_change_extension_test ) { try {
    // propagate header awareness of the activation.
    auto first_new_block = c.produce_block();
 
-   { // ensure that non-null new_producers is rejected
-      // create a bad block that has the producer schedule change extension before the feature upgrade
-      auto bad_block = first_new_block->clone();
-      bad_block->not_used = legacy::producer_schedule_type{remote.control->active_producers().version + 1, {}};
-
-      // re-sign the bad block
-      bad_block->producer_signature = remote.get_private_key("sysio"_n, "active").sign(bad_block->calculate_id());
-
-      // ensure it is rejected because the not_used field is not null
-      BOOST_REQUIRE_EXCEPTION(
-         remote.push_block(signed_block::create_signed_block(std::move(bad_block))), producer_schedule_exception,
-         fc_exception_message_is( "Block header contains legacy producer schedule, required to be empty on wire.network" )
-      );
-   }
-
    remote.push_block(first_new_block);
    remote.push_block(c.produce_block());
 } FC_LOG_AND_RETHROW() }

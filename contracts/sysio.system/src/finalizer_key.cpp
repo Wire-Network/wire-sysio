@@ -131,53 +131,6 @@ namespace sysiosystem {
       return next_id;
    }
 
-   /**
-   * Action to switch to Savanna
-   *
-   * @pre  Require the authority of the contract itself
-   * @pre  A sufficient numner of the top 21 block producers have registered a finalizer key
-   * @post is_savanna_consensus returns true
-   */
-   void system_contract::switchtosvnn() {
-      require_auth(get_self());
-
-      check(!is_savanna_consensus(), "switchtosvnn can be run only once");
-
-      std::vector< finalizer_auth_info > proposed_finalizers;
-      proposed_finalizers.reserve(_gstate.last_producer_schedule_size);
-
-      // Find a set of producers that meet all the normal requirements for
-      // being a proposer and also have an active finalizer key.
-      // The number of the producers must be equal to the number of producers
-      // in the last_producer_schedule.
-
-      // TODO: determine producers to use for switching to Savanna
-/*
-      auto idx = _producers.get_index<"prototalvote"_n>();
-      for( auto it = idx.cbegin(); it != idx.cend() && proposed_finalizers.size() < _gstate.last_producer_schedule_size && 0 < it->total_votes && it->active(); ++it ) {
-         auto finalizer = _finalizers.find( it->owner.value );
-         if( finalizer == _finalizers.end() ) {
-            // The producer is not in finalizers table, indicating it does not have an
-            // active registered finalizer key. Try next one.
-            continue;
-         }
-
-         // This should never happen. Double check the finalizer has an active key just in case
-         if( finalizer->active_key_binary.empty() ) {
-            continue;
-         }
-
-         proposed_finalizers.emplace_back(*finalizer);
-      }
-
-      check( proposed_finalizers.size() == _gstate.last_producer_schedule_size,
-            "not enough top producers have registered finalizer keys, has " + std::to_string(proposed_finalizers.size()) + ", require " + std::to_string(_gstate.last_producer_schedule_size) );
-
-      set_proposed_finalizers(std::move(proposed_finalizers));
-      check( is_savanna_consensus(), "switching to Savanna failed" );
-*/
-   }
-
    /*
     * Action to register a finalizer key
     *

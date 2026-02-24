@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -294,5 +294,4 @@ include(doxygen)
 option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
 option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
-include(package.cmake)
-include(CPack)
+include(cmake/package.cmake)

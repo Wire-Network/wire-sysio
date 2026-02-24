@@ -6,7 +6,7 @@
 #include <sysio/trace_api/common.hpp>
 
 namespace sysio::trace_api {
-   using data_handler_function = std::function<std::tuple<fc::variant, std::optional<fc::variant>>( const std::variant<action_trace_v0, action_trace_v1> & action_trace_t)>;
+   using data_handler_function = std::function<std::tuple<fc::variant, std::optional<fc::variant>>( const std::variant<action_trace_v0>& action)>;
 
    namespace detail {
       class response_formatter {
@@ -42,9 +42,9 @@ namespace sysio::trace_api {
             return {};
          }
 
-         auto data_handler = [this](const auto& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
-            return std::visit([&](const auto& action_trace_t) {
-               return data_handler_provider.serialize_to_variant(action_trace_t);
+         auto data_handler = [this](const std::variant<action_trace_v0>& action) -> std::tuple<fc::variant, std::optional<fc::variant>> {
+            return std::visit([&](const auto& a) {
+               return data_handler_provider.serialize_to_variant(a);
             }, action);
          };
 

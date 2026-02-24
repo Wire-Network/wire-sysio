@@ -42,8 +42,6 @@
 #include <fc/log/logger_config.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/variant_object.hpp>
-#include <fc/variant_dynamic_bitset.hpp>
-#include <bls12-381/bls12-381.hpp>
 
 #include <future>
 #include <new>
@@ -445,41 +443,28 @@ struct building_block {
                                   std::optional<proposer_policy> new_proposer_policy,
                                   std::optional<finalizer_policy> new_finalizer_policy,
                                   bool validating,
-                                  std::optional<qc_data_t> validating_qc_data,
+                                  const qc_data_t& validating_qc_data,
                                   const block_state_ptr& validating_bsp) {
       auto& action_receipts = action_receipt_digests();
       // compute the action_mroot and transaction_mroot
       auto [transaction_mroot, action_mroot] = std::visit(
          overloaded{[&](digests_t& trx_receipts) {
                        // calculate_merkle takes 3.2ms for 50,000 digests (legacy version took 11.1ms)
-                       return std::make_pair(calculate_merkle(trx_receipts),
-                                             calculate_merkle(action_receipts.digests_s));
+                       auto trx_f = post_async_task(ioc, [&]() { return calculate_merkle(trx_receipts); });
+                       auto act_mroot = calculate_merkle(action_receipts.digests_s);
+                       return std::make_pair(trx_f.get(), act_mroot);
                     },
                     [&](const checksum256_type& trx_checksum) {
-                       return std::make_pair(trx_checksum,
-                                             calculate_merkle(action_receipts.digests_s));
+                       return std::make_pair(trx_checksum, calculate_merkle(action_receipts.digests_s));
                     }},
          trx_mroot_or_receipt_digests());
 
-      qc_data_t qc_data;
-      digest_type finality_mroot_claim;
-
-      if (validating) {
-         // we are simulating a block received from the network. Use the embedded qc from the block
-         assert(validating_qc_data);
-         qc_data = *validating_qc_data;
-
-         assert(validating_bsp);
-         // Use the action_mroot from raceived block's header for
-         // finality_mroot_claim at the first stage such that the next
-         // block's header and block id can be built. The actual
-         // finality_mroot will be validated by apply_block at the
-         // second stage
-         finality_mroot_claim = validating_bsp->header.action_mroot;
-      } else {
-         qc_data = get_qc_data(fork_db, bb.parent);;
-         finality_mroot_claim = bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
-      }
+      // if validating then we are simulating a block received from the network. Use the embedded qc from the block.
+      // if validating Use the finality_mroot from received block's header for finality_mroot_claim at the first stage
+      // such that the next block's header and block id can be built. The actual finality_mroot will be validated by
+      // apply_block at the second stage
+      const qc_data_t& qc_data = validating ? validating_qc_data : get_qc_data(fork_db, bb.parent);
+      const digest_type&  finality_mroot_claim = validating ? validating_bsp->header.finality_mroot : bb.parent.get_finality_mroot_claim(qc_data.qc_claim);
 
       building_block_input bb_input {
          .parent_id = bb.parent.id(),
@@ -499,7 +484,7 @@ struct building_block {
          std::move(bb.s_headers)
       };
 
-      auto bhs = bb.parent.next(bhs_input);
+      auto bhs = bb.parent.next(bhs_input, bb.parent.make_block_ref());
 
       std::optional<valid_t> valid; // used for producing
 
@@ -521,7 +506,7 @@ struct building_block {
          std::move(bb.pending_trx_metas),
          std::move(bb.pending_trx_receipts),
          std::move(valid),
-         std::move(qc_data.qc),
+         qc_data.qc,
          action_mroot // caching for constructing finality_data.
       };
 
@@ -688,6 +673,7 @@ struct controller_impl {
    struct chain; // chain is a namespace so use an embedded type for the named_thread_pool tag
    named_thread_pool<chain>        thread_pool;
    deep_mind_handler*              deep_mind_logger = nullptr;
+   fc::time_point                  pending_lib_time;  // used to skip dedup for expired trxs
    bool                            okay_to_print_integrity_hash_on_stop = false;
    bool                            testing_allow_voting = false; // used in unit tests to create long forks or simulate not getting votes
    async_t                         async_voting = async_t::yes;  // by default we post `create_and_send_vote_msg()` calls, used in tester
@@ -1019,7 +1005,8 @@ struct controller_impl {
                      lib_num, fork_db_root_block_num() );
       }
 
-      auto pending_lib_id = fork_db_.pending_savanna_lib_id();
+      auto [pending_lib_id, pending_lib_ts] = fork_db_.pending_savanna_lib();
+      pending_lib_time = pending_lib_ts.to_time_point();
 
       const block_id_type new_lib_id = pending_lib_id;
       const block_num_type new_lib_num = block_header::num_from_id(new_lib_id);
@@ -2238,7 +2225,7 @@ struct controller_impl {
       } FC_LOG_AND_DROP()
    }
 
-   void assemble_block(bool validating, std::optional<qc_data_t> validating_qc_data, const block_state_ptr& validating_bsp)
+   void assemble_block(bool validating, const qc_data_t& validating_qc_data, const block_state_ptr& validating_bsp)
    {
       SYS_ASSERT( pending, block_validate_exception, "it is not valid to finalize when there is no pending block");
       SYS_ASSERT( std::holds_alternative<building_block>(pending->_block_stage), block_validate_exception, "already called finish_block");
@@ -2287,7 +2274,7 @@ struct controller_impl {
                               protocol_features.get_protocol_feature_set(),
                               fork_db_, std::move(new_proposer_policy),
                               std::move(new_finalizer_policy),
-                              validating, std::move(validating_qc_data), validating_bsp);
+                              validating, validating_qc_data, validating_bsp);
 
          // Update TaPoS table:
          create_block_summary(  assembled_block.id() );
@@ -2501,45 +2488,20 @@ struct controller_impl {
 
       SYS_REPORT( "timestamp", b.timestamp, ab.timestamp )
       SYS_REPORT( "producer", b.producer, ab.producer )
-      SYS_REPORT( "confirmed", b.confirmed, ab.confirmed )
       SYS_REPORT( "previous", b.previous, ab.previous )
       SYS_REPORT( "transaction_mroot", b.transaction_mroot, ab.transaction_mroot )
-      SYS_REPORT( "action_mroot", b.action_mroot, ab.action_mroot )
-      SYS_REPORT( "schedule_version", b.schedule_version, ab.schedule_version )
-      SYS_REPORT( "not_used", fc::json::to_log_string(b.not_used), fc::json::to_log_string(ab.not_used) )
+      SYS_REPORT( "finality_mroot", b.finality_mroot, ab.finality_mroot )
+      SYS_REPORT( "qc_claim", fc::json::to_log_string(b.qc_claim), fc::json::to_log_string(ab.qc_claim) )
+      SYS_REPORT( "new_finalizer_policy_diff", fc::json::to_log_string(b.new_finalizer_policy_diff), fc::json::to_log_string(ab.new_finalizer_policy_diff) )
+      SYS_REPORT( "new_proposer_policy_diff", fc::json::to_log_string(b.new_proposer_policy_diff), fc::json::to_log_string(ab.new_proposer_policy_diff) )
       SYS_REPORT( "header_extensions", fc::json::to_log_string(b.header_extensions), fc::json::to_log_string(ab.header_extensions) )
-
-      if (b.header_extensions != ab.header_extensions) {
-         header_extension_multimap bheader_exts = b.validate_and_extract_header_extensions();
-         if (auto it = bheader_exts.find(finality_extension::extension_id()); it != bheader_exts.end()) {
-            const auto& f_ext = std::get<finality_extension>(it->second);
-            elog("b  if: {}", fc::json::to_log_string(f_ext));
-         }
-         header_extension_multimap abheader_exts = ab.validate_and_extract_header_extensions();
-         if (auto it = abheader_exts.find(finality_extension::extension_id()); it != abheader_exts.end()) {
-            const auto& f_ext = std::get<finality_extension>(it->second);
-            elog("ab if: {}", fc::json::to_log_string(f_ext));
-         }
-      }
 
 #undef SYS_REPORT
    }
 
-   static std::optional<qc_data_t> extract_qc_data(const signed_block_ptr& b) {
-      std::optional<qc_data_t> qc_data;
-      auto hexts = b->validate_and_extract_header_extensions();
-      if (auto f_entry = hexts.find(finality_extension::extension_id()); f_entry != hexts.end()) {
-         auto& f_ext   = std::get<finality_extension>(f_entry->second);
-
-         // get the matching qc extension if present
-         auto exts = b->validate_and_extract_extensions();
-         if (auto entry = exts.find(quorum_certificate_extension::extension_id()); entry != exts.end()) {
-            auto& qc_ext = std::get<quorum_certificate_extension>(entry->second);
-            return qc_data_t{ std::move(qc_ext.qc), f_ext.qc_claim };
-         }
-         return qc_data_t{ {}, f_ext.qc_claim };
-      }
-      return {};
+   static qc_data_t extract_qc_data(const signed_block_ptr& b) {
+      // qc_claim is now a direct header field, always present
+      return qc_data_t{ b->qc, b->qc_claim };
    }
 
    controller::apply_blocks_result_t::status_t apply_block( const block_state_ptr& bsp, controller::block_status s,
@@ -2653,7 +2615,7 @@ struct controller_impl {
             // assemble_block will mutate bsp by setting the valid structure
             assemble_block(true, extract_qc_data(b), bsp);
 
-            // verify received finality digest in action_mroot is the same as the actual one
+            // verify received finality_mroot in block header is the same as the actual one
 
             // For proper IF blocks that do not have an associated Finality Tree defined,
             // its finality_mroot is empty
@@ -2811,51 +2773,25 @@ struct controller_impl {
    // -----------------------------------------------------------------------------
    std::optional<qc_t> verify_basic_proper_block_invariants( const block_id_type& id, const signed_block_ptr& b,
                                                              const block_state& prev ) {
-      assert(b->is_proper_svnn_block());
-
       if (prev.block_num() <= 1u)
          return std::nullopt;
 
-      auto qc_ext_id = quorum_certificate_extension::extension_id();
-      auto f_ext_id  = finality_extension::extension_id();
+      SYS_ASSERT( b->block_extensions.empty(), invalid_block_extension, "No block extensions currently supported");
 
-      // extract current block extension and previous header extension
-      auto block_exts = b->validate_and_extract_extensions();
-      const finality_extension* prev_finality_ext = prev.header_extension<finality_extension>();
-      std::optional<block_header_extension> finality_ext = b->extract_header_extension(f_ext_id);
-
-      const auto qc_ext_itr  = block_exts.find(qc_ext_id);
-      bool qc_extension_present = (qc_ext_itr != block_exts.end());
+      const auto  new_qc_claim = b->qc_claim;
+      const bool qc_present = b->qc.has_value();
       uint32_t block_num = b->block_num();
-
-      // This function is called only in Savanna. Finality block header
-      // extension must exist
-      SYS_ASSERT( finality_ext, block_validate_exception,
-                  "Proper Savanna block #{} does not have a finality header extension", block_num );
-
-      assert(finality_ext);
-      const auto& f_ext        = std::get<finality_extension>(*finality_ext);
-      const auto  new_qc_claim = f_ext.qc_claim;
 
       if (!replaying && fc::logger::default_logger().is_enabled(fc::log_level::debug)) {
          fc::time_point now = fc::time_point::now();
          if (now - b->timestamp < fc::minutes(5) || (b->block_num() % 1000 == 0)) {
             dlog("received block: #{} {} {} {}, qc claim: {}, qc {}, previous: {}",
                  b->block_num(), b->timestamp, b->producer, id, new_qc_claim,
-                 qc_extension_present ? "present" : "not present", b->previous);
+                 qc_present ? "present" : "not present", b->previous);
          }
       }
 
-      // The only time a block should have a finality block header extension but
-      // its parent block does not, is if it is a Savanna Genesis block (which is
-      // necessarily a Transition block). Since verify_proper_block_exts will not be called
-      // on Transition blocks, previous block may not be a Legacy block
-      // -------------------------------------------------------------------------------------------------
-      SYS_ASSERT( !prev.header.is_legacy_block(), block_validate_exception,
-                  "Proper Savanna block #{} may not have previous block that is a Legacy block", block_num );
-
-      assert(prev_finality_ext);
-      const auto& prev_qc_claim = prev_finality_ext->qc_claim;
+      const auto& prev_qc_claim = prev.header.qc_claim;
 
       // validate QC claim against previous block QC info
 
@@ -2872,12 +2808,12 @@ struct controller_impl {
 
       if( new_qc_claim.block_num == prev_qc_claim.block_num ) {
          if( new_qc_claim.is_strong_qc == prev_qc_claim.is_strong_qc ) {
-            // QC block extension is redundant
-            SYS_ASSERT( !qc_extension_present, invalid_qc_claim,
-                        "Block #{} should not provide a QC block extension since its QC claim is the same as the previous block's",
+            // QC is redundant
+            SYS_ASSERT( !qc_present, invalid_qc_claim,
+                        "Block #{} should not provide a QC since its QC claim is the same as the previous block's",
                         block_num );
 
-            // if previous block's header extension has the same claim, just return
+            // if previous block's header has the same claim, just return
             // (previous block already validated the claim)
             return {};
          }
@@ -2889,21 +2825,19 @@ struct controller_impl {
       }
 
       // At this point, we are making a new claim in this block, so it must include a QC to justify this claim.
-      SYS_ASSERT( qc_extension_present, block_validate_exception,
+      SYS_ASSERT( qc_present, block_validate_exception,
                   "Block #{} is making a new finality claim, but doesn't include a qc to justify this claim", block_num );
 
-      assert(qc_ext_itr != block_exts.end() );
-      const auto& qc_ext   = std::get<quorum_certificate_extension>(qc_ext_itr->second);
-      const auto& qc_proof = qc_ext.qc;
+      const auto& qc_proof = *b->qc;
 
-      // Check QC information in header extension and block extension match
+      // Check QC information in header and block match
       SYS_ASSERT( qc_proof.block_num == new_qc_claim.block_num, block_validate_exception,
-                  "Block #{}: Mismatch between qc.block_num ({}) in block extension and block_num ({}) in header extension",
+                  "Block #{}: Mismatch between qc.block_num ({}) and qc_claim.block_num ({})",
                   block_num, qc_proof.block_num, new_qc_claim.block_num );
 
       // Verify claimed strength is the same as in proof
       SYS_ASSERT( qc_proof.is_strong() == new_qc_claim.is_strong_qc, block_validate_exception,
-                  "QC is_strong ({}) in block extension does not match is_strong_qc ({}) in header extension. Block number: {}",
+                  "QC is_strong ({}) does not match qc_claim.is_strong_qc ({}). Block number: {}",
                   qc_proof.is_strong(), new_qc_claim.is_strong_qc, block_num );
 
       // `valid` structure can be modified while this function is running on net thread.
@@ -2914,9 +2848,9 @@ struct controller_impl {
 
          // compute finality mroot using previous block state and new qc claim
          auto        computed_finality_mroot = prev.get_finality_mroot_claim(new_qc_claim);
-         const auto& supplied_finality_mroot  = b->action_mroot;
+         const auto& supplied_finality_mroot  = b->finality_mroot;
          SYS_ASSERT( computed_finality_mroot == supplied_finality_mroot, block_validate_exception,
-                     "computed finality mroot ({}) does not match supplied finality mroot {} by header extension. Block number: {}, block id: {}",
+                     "computed finality mroot ({}) does not match supplied finality mroot {} by header. Block number: {}, block id: {}",
                      computed_finality_mroot, supplied_finality_mroot, block_num, id );
       }
 
@@ -2925,9 +2859,6 @@ struct controller_impl {
 
    // verify basic_block invariants
    std::optional<qc_t> verify_basic_block_invariants(const block_id_type& id, const signed_block_ptr& b, const block_state& prev) {
-      SYS_ASSERT( b->is_proper_svnn_block(), block_validate_exception,
-                  "create_block_state_i cannot be called on block #{} which is not a Proper Savanna block.",
-                  b->block_num() );
       return verify_basic_proper_block_invariants(id, b, prev);
    }
 
@@ -2957,7 +2888,8 @@ struct controller_impl {
                     const flat_set<digest_type>& cur_features,
                     const vector<digest_type>& new_features )
             { check_protocol_features( timestamp, cur_features, new_features ); },
-            skip_validate_signee
+            skip_validate_signee,
+            prev.make_block_ref()
       );
 
       SYS_ASSERT( id == bsp->id(), block_validate_exception,
@@ -3001,30 +2933,29 @@ struct controller_impl {
 
    // thread safe, QC already verified by verify_proper_block_exts
    void integrate_received_qc_to_block(const block_state_ptr& bsp_in) {
-      // extract QC from block extension
+      // extract QC from block
       assert(bsp_in->block);
-      if (!bsp_in->block->contains_extension(quorum_certificate_extension::extension_id()))
+      if (!bsp_in->block->qc)
          return;
 
-      auto qc_ext = bsp_in->block->extract_extension<quorum_certificate_extension>();
-      const qc_t& received_qc = qc_ext.qc;
+      const qc_t& received_qc = *bsp_in->block->qc;
 
-      block_state_ptr claimed_bsp = fork_db_fetch_bsp_on_branch_by_num( bsp_in->previous(), qc_ext.qc.block_num );
+      block_state_ptr claimed_bsp = fork_db_fetch_bsp_on_branch_by_num( bsp_in->previous(), received_qc.block_num );
       if( !claimed_bsp ) {
          dlog("block state of claimed qc not found in fork_db, qc: {} for block {} {}, previous {}",
-              qc_ext.qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id(), bsp_in->previous());
+              received_qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id(), bsp_in->previous());
          return;
       }
 
-      // Don't save the QC from block extension if the claimed block has a better or same received_qc
+      // Don't save the QC from block if the claimed block has a better or same received_qc
       if (claimed_bsp->set_received_qc(received_qc)) {
          dlog("set received qc: {} into claimed block {} {}",
-               qc_ext.qc.to_qc_claim(), claimed_bsp->block_num(), claimed_bsp->id());
+               received_qc.to_qc_claim(), claimed_bsp->block_num(), claimed_bsp->id());
       } else {
          dlog("qc not better, claimed->received: {} {}, strong={}, received: {}, for block {} {}",
               claimed_bsp->block_num(), claimed_bsp->id(),
               !received_qc.is_weak(), // use is_weak() to avoid mutex on received_qc_is_strong()
-              qc_ext.qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id());
+              received_qc.to_qc_claim(), bsp_in->block_num(), bsp_in->id());
       }
 
       if (received_qc.is_strong()) {
@@ -3087,7 +3018,7 @@ struct controller_impl {
             }
          }
 
-         auto bsp = std::make_shared<block_state>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee);
+         auto bsp = std::make_shared<block_state>(*chain_head.internal(), b, protocol_features.get_protocol_feature_set(), validator, skip_validate_signee, chain_head.internal()->make_block_ref());
 
          if (apply_block(bsp, controller::block_status::irreversible, trx_meta_cache_lookup{}) == controller::apply_blocks_result_t::status_t::complete) {
             // On replay, log_irreversible is not called and so no irreversible_block signal is emitted.
@@ -3523,8 +3454,8 @@ struct controller_impl {
       return fork_db_.is_descendant_of_pending_savanna_lib(chain_head.id());
    }
 
-   void set_savanna_lib_id(const block_id_type& id) {
-      fork_db_.set_pending_savanna_lib_id(id);
+   void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
+      fork_db_.set_pending_savanna_lib(id, timestamp);
    }
 
    std::optional<finality_data_t> head_finality_data() const {
@@ -4151,6 +4082,10 @@ time_point controller::pending_block_time()const {
    return my->pending_block_time();
 }
 
+time_point controller::pending_lib_time()const {
+   return my->pending_lib_time;
+}
+
 uint32_t controller::pending_block_num()const {
    SYS_ASSERT( my->pending, block_validate_exception, "no pending block" );
    return my->pending->block_num();
@@ -4175,8 +4110,8 @@ bool controller::is_head_descendant_of_pending_lib() const {
 }
 
 
-void controller::set_savanna_lib_id(const block_id_type& id) {
-   my->set_savanna_lib_id(id);
+void controller::set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp) {
+   my->set_savanna_lib(id, timestamp);
 }
 
 bool controller::fork_db_has_root() const {

@@ -37,7 +37,8 @@ namespace fc
        overflow_code                     = 19,
        underflow_code                    = 20,
        divide_by_zero_code               = 21,
-       unsupported_exception_code        = 22
+       unsupported_exception_code        = 22,
+       ethereum_abi_decode_exception_code = 23
    };
 
    /**
@@ -161,7 +162,7 @@ namespace fc
    };
 
    /**
-    *  @brief wrapper for std::exception 
+    *  @brief wrapper for std::exception
     *
     *  The original exception is captured as a std::exception_ptr
     *  which may be rethrown.  The std::exception_ptr does not
@@ -270,6 +271,7 @@ namespace fc
   FC_DECLARE_EXCEPTION( underflow_exception, underflow_code, "Integer Underflow" );
   FC_DECLARE_EXCEPTION( divide_by_zero_exception, divide_by_zero_code, "Integer Divide By Zero" );
   FC_DECLARE_EXCEPTION( unsupported_exception, unsupported_exception_code, "Unsupported Operation" );
+  FC_DECLARE_EXCEPTION( ethereum_abi_decode_exception, ethereum_abi_decode_exception_code, "Ethereum ABI Decode Error" );
 
   std::string except_str();
 

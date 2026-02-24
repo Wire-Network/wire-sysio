@@ -41,8 +41,9 @@ void bios::setfinalizer( const finalizer_policy& finalizer_policy ) {
    // use raw affine format (bls_g1 is std::array<char, 96>) for uniqueness check
    struct g1_hash {
       std::size_t operator()(const sysio::bls_g1& g1) const {
-         std::hash<const char*> hash_func;
-         return hash_func(g1.data());
+         std::size_t h = 0;
+         std::memcpy(&h, g1.data(), std::min(sizeof(h), g1.size()));
+         return h;
       }
    };
    struct g1_equal {
@@ -80,7 +81,8 @@ void bios::setfinalizer( const finalizer_policy& finalizer_policy ) {
       fin_policy.finalizers.emplace_back(sysio::finalizer_authority{f.description, f.weight, std::move(pk_vector)});
    }
 
-   check(finalizer_policy.threshold > weight_sum / 2, "finalizer policy threshold must be greater than half of the sum of the weights");
+   check(weight_sum >= finalizer_policy.threshold && finalizer_policy.threshold > weight_sum / 2,
+         "finalizer policy threshold must be greater than half of the sum of the weights, and less than or equal to the sum of the weights");
 
    set_finalizers(std::move(fin_policy));
 }

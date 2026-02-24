@@ -1,6 +1,7 @@
 #include <sysio/producer_plugin/producer_plugin.hpp>
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
+#include <sysio/producer_plugin/trx_priority_db.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -715,6 +716,7 @@ public:
    alignas(hardware_destructive_interference_sz)
    std::atomic<uint32_t>                             _received_block{0};       // modified by net_plugin thread pool
    implicit_production_pause_vote_tracker            _implicit_pause_vote_tracker;
+   trx_priority_db                                   _trx_priority_db;
    fc::microseconds                                  _max_irreversible_block_age_us;
    block_num_type                                    _max_reversible_blocks{3600}; // pause production when reached (30 minutes)
    // produce-block-offset is in terms of the complete round, internally use calculated value for each block of round
@@ -820,6 +822,7 @@ public:
    fc::time_point                 _ro_read_window_start_time;
    fc::time_point                 _ro_window_deadline;    // only modified on app thread, read-window deadline or write-window deadline
    boost::asio::system_timer      _ro_timer{_timer_thread.get_executor()}; // only accessible from the main thread
+   std::atomic<uint32_t>          _ro_timer_corelation_id{0};              // written on main thread, read on read-only threads
    fc::microseconds               _ro_max_trx_time_us{0}; // calculated during option initialization
    ro_trx_queue_t                 _ro_exhausted_trx_queue;
    alignas(hardware_destructive_interference_sz)
@@ -879,6 +882,7 @@ public:
       SYS_ASSERT(chain.is_write_window(), producer_exception, "write window is expected for on_irreversible_block signal");
       _irreversible_block_time = lib->timestamp.to_time_point();
       _snapshot_scheduler.on_irreversible_block(lib, block_id, chain);
+      _trx_priority_db.on_irreversible_block(lib, block_id, chain);
    }
 
    // called from multiple non-main threads
@@ -1078,9 +1082,11 @@ public:
 
                  chain::controller& chain = chain_plug->chain();
                  transaction_metadata_ptr trx_meta;
+                 int priority = priority::low;
                  try {
                     trx_meta = transaction_metadata::recover_keys(trx, chain.get_chain_id(), time_limit, trx_type,
                                                                   chain.configured_subjective_signature_length_limit());
+                    priority = _trx_priority_db.get_trx_priority(trx->get_transaction());
                  } catch (...) {
                     // use read_write when read is likely fine; maintains previous behavior of next() always being called from the main thread
                     app().executor().post(
@@ -1104,7 +1110,7 @@ public:
                  trx_executor executor{this, std::move(trx_meta), is_transient, std::move(next), api_trx, return_failure_traces};
 
                  // key recovery complete, post to the trx queue
-                 app().executor().post(priority::low, exec_queue::trx_read_write, std::move(executor));
+                 app().executor().post(priority, exec_queue::trx_read_write, std::move(executor));
               });
    }
 
@@ -2838,7 +2844,15 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
 
    _timer.async_wait([&chain, this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
       if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
-         app().executor().post(priority::high, exec_queue::read_write, [&chain, this]() {
+         app().executor().post(priority::high, exec_queue::read_write, [&chain, this, cid]() {
+            if (cid != _timer_corelation_id) {
+               // Check cid again. It is possible between the timer firing and this posted lambda executing that a stale
+               // schedule_production_loop (e.g. from a delayed timer in process_pending_blocks) could run first,
+               // changing _pending_block_mode to speculating. The now-stale maybe_produce_block lambda would then hit
+               // SYS_ASSERT(in_producing_mode(), producer_exception, "called produce_block while not actually producing")
+               fc_dlog(_log, "Produce block timer expired, skipping");
+               return;
+            }
             // pending_block_state expected, but can't assert inside async_wait
             auto block_num = chain.is_building_block() ? chain.head().block_num() + 1 : 0;
             fc_dlog(_log, "Produce block timer for {} running at {}", block_num, fc::time_point::now());
@@ -3100,8 +3114,14 @@ void producer_plugin_impl::switch_to_read_window() {
    auto expire_time = std::chrono::microseconds(_ro_read_window_time_us.count());
    _ro_timer.expires_after(expire_time);
    // Needs to be on read_only because that is what is being processed until switch_to_write_window().
-   _ro_timer.async_wait([this](const boost::system::error_code& ec) {
-      app().executor().post(priority::high, exec_queue::read_only, [this, ec]() {
+   _ro_timer.async_wait([this, cid = _ro_timer_corelation_id.fetch_add(1, std::memory_order_release) + 1](const boost::system::error_code& ec) {
+      app().executor().post(priority::high, exec_queue::read_only, [this, ec, cid]() {
+         // Discard stale timer handler from a previous read window cycle. When all tasks finish
+         // before the timer, the last task's handler switches to write window and a new read/write
+         // cycle begins, incrementing _ro_timer_corelation_id. Without this check, this handler
+         // would operate on the new cycle's futures and assert in switch_to_write_window().
+         if (cid != _ro_timer_corelation_id.load(std::memory_order_acquire))
+            return;
          if (ec != boost::asio::error::operation_aborted) {
             // tests have seen to deadlock here, unable to reproduce so add a guard for it, also so we can log
             const fc::time_point safe_guard_deadline = _ro_window_deadline + _ro_read_window_effective_time_us; // give plenty of time
