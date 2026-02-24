@@ -301,9 +301,8 @@ namespace sysio::chain {
          [[deprecated("Use head().header().")]]     const block_header&  head_block_header()const;
          [[deprecated("Use head().block().")]]      const signed_block_ptr& head_block()const;
 
-         // returns finality_data associated with chain head for SHiP when in Savanna,
-         // std::nullopt in Legacy
-         std::optional<finality_data_t> head_finality_data() const;
+         // returns finality_data associated with chain head for SHiP
+         finality_data_t head_finality_data() const;
 
          [[deprecated("Use fork_db_head().block_num().")]] uint32_t      fork_db_head_block_num()const;
          [[deprecated("Use fork_db_head().id().")]]        block_id_type fork_db_head_block_id()const;

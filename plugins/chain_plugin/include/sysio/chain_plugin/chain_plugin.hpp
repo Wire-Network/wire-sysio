@@ -841,10 +841,6 @@ public:
                                                                    : fc::time_point::now() + http_max_response_time;
    }
 
-   using push_block_params = chain::signed_block;
-   using push_block_results = empty;
-   void push_block(push_block_params&& params, chain::plugin_interface::next_function<push_block_results> next);
-
    using push_transaction_params = fc::variant_object;
    struct push_transaction_results {
       chain::transaction_id_type  transaction_id;

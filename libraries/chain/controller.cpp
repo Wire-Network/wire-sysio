@@ -3458,7 +3458,7 @@ struct controller_impl {
       fork_db_.set_pending_savanna_lib(id, timestamp);
    }
 
-   std::optional<finality_data_t> head_finality_data() const {
+   finality_data_t head_finality_data() const {
       return chain_head.internal()->get_finality_data();
    }
 
@@ -4058,7 +4058,7 @@ const block_header& controller::head_block_header()const {
    return my->chain_head.block();
 }
 
-std::optional<finality_data_t> controller::head_finality_data() const {
+finality_data_t controller::head_finality_data() const {
    return my->head_finality_data();
 }
 
