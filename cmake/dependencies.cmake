@@ -50,6 +50,9 @@ add_library(GMP::gmp ALIAS PkgConfig::gmp)
 find_package(Catch2 CONFIG REQUIRED)
 list(APPEND CMAKE_MODULE_PATH "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/catch2")
 
+# protobuf
+include(dependencies.protobuf NO_POLICY_SCOPE)
+
 # THREADS
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)

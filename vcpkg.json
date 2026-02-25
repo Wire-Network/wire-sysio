@@ -11,6 +11,7 @@
     "boringssl-custom",
     "cli11",
     "gmp",
+    "protobuf",
     "libsodium",
     "secp256k1-internal",
     "softfloat",
@@ -22,7 +23,9 @@
     "magic-enum",
     {
       "name": "curl",
-      "features": ["boringssl-custom"]
+      "features": [
+        "boringssl-custom"
+      ]
     },
     {
       "name": "catch2",
@@ -65,6 +68,10 @@
     }
   ],
   "overrides": [
+    {
+      "name": "protobuf",
+      "version": "6.33.4#1"
+    },
     {
       "name": "boost",
       "version": "1.89.0#1"

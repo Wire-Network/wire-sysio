@@ -1,0 +1,278 @@
+@startuml OPP_Entity_Diagram
+!theme plain
+
+title **Outpost Propagation Protocol — Entity Diagram**
+
+' ═══════════════════════════════════════════════════
+'  Types
+' ═══════════════════════════════════════════════════
+package opp.types #F5F5F5 {
+
+    enum chain_kind_t <<uint8_t>> {
+        unknown = 0,
+        wire = 1,
+        ethereum = 2,
+        solana = 3,
+        sui = 4,
+    }
+
+    entity chain_address {
+        * chain_kind : chain_kind_t
+        * address    : bytes
+    }
+
+    enum token_kind_t <<uint16>> {
+        wire = 0,
+        eth = 0x0100,
+        liqeth = 0x01F0,
+        sol = 0x0200,
+        liqsol = 0x02F0,
+    }
+
+    entity token_amount {
+        * kind : token_kind_t
+        * amount : int64 <<signed>>
+    }
+
+    enum encoding_flags_t <<uint8>> {
+        big_endian = 0x00
+        little_endian = 0x01
+        --
+        keccak256 = 0x00
+        sha256 = 0x02
+        reserved_alt_hash_1 = 0x04
+        reserved_alt_hash_2 = 0x06
+        --
+        varuint_encoding = 0x00
+        uint32_length = 0x08
+        --
+        reserved = 0xF0
+    }
+
+    enum attestation_type_t <<uint16>> {
+        reserve_balance_sheet = 0xAA00
+        stake               = 0x0BB9
+        unstake             = 0x0BBA
+        pretoken_purchase   = 0x0BBB
+        pretoken_yield      = 0x0BBE
+        --
+        stake_update        = 0xEE00
+        native_yield_reward = 0xEE01
+        wire_token_purchase = 0xEE02
+        operator_reg_dereg  = 0xEE03
+        challenge_response  = 0xEE04
+        slash_operator      = 0xEE05
+    }
+
+    enum stake_status_t <<uint8>> {
+        unknown = 0
+        warmup = 0x01
+        cooldown = 0x02
+        active = 0x03
+        terminated = 0xF0
+        slashed = 0xF1
+    }
+
+    enum operator_type_t <<uint8>> {
+        unknown = 0x00
+        producer = 0x01
+        batch = 0x02
+        underwriter = 0x03
+        challenger = 0x04
+
+    }
+
+    enum operator_status_t <<uint8>> {
+        unknown = 0x00
+        warmup = 0x01
+        cooldown = 0x02
+        active = 0x03
+        terminated = 0xF0
+        slashed = 0xF1
+    }
+}
+
+' ═══════════════════════════════════════════════════
+'  OPP MESSAGE
+' ═══════════════════════════════════════════════════
+
+package opp #E8EAF6 {
+
+    entity message_endpoints {
+        * start : opp.types.chain_kind_t
+        * end   : opp.types.chain_kind_t
+    }
+
+    entity message_header {
+        * endpoints           : message_endpoints
+        * message_id          : bytes32  // <i>(last 8B = seq#)</i>
+        * previous_message_id : bytes32
+        * encoding_flags      : opp.types.encoding_flags_t
+        * payload_size        : uint32
+        * payload_checksum    : bytes32
+        * timestamp           : uint64   // <i>(ms since epoch)</i>
+        * header_checksum     : bytes32
+    }
+
+    entity message_payload {
+        * version         : uint8  // <i>(MSB==0; 0x00–0x7F)</i>
+        * attestations      : list<attestation_entry>
+    }
+
+    entity attestation_entry {
+        * type   : attestation_type_t
+        * data_size : uint16
+        * data   : bytes
+    }
+
+    entity envelope {
+        * envelope_hash        : bytes32
+        * epoch_index         : uint32
+        * epoch_timestamp     : uint64
+        * previous_envelope_hash : bytes32
+        * merkle              : bytes32
+        * start_message_id    : bytes32
+        * end_message_id     : bytes32
+        --
+        * signatures          : list<bytes>
+    }
+}
+
+' ═══════════════════════════════════════════════════
+'  OUTPOST PRE-LAUNCH ASSERTIONS
+' ═══════════════════════════════════════════════════
+
+package opp.attestations #FCE4EC {
+
+    entity reserve_balance_sheet {
+        * chain_id : chain_kind_t
+        * amounts  : token_amount[]
+    }
+
+    entity stake {
+        * actor      : chain_address
+        * amount               : token_amount
+        * pretoken_count           : uint256
+        * index_at_mint : uint256
+    }
+
+    entity unstake {
+        * unstaker      : chain_address
+        * amount               : token_amount
+        * pretoken_count           : uint256
+        * index_at_burn    : uint256
+
+    }
+
+    entity pretoken_purchase {
+        * actor             : chain_address
+        * amount            : token_amount
+        * pretoken_count    : uint256
+        * index_at_mint     : uint256
+    }
+
+    entity pretoken_yield {
+        * actor         : chain_address
+        * amount        : token_amount
+        * index_at_mint : uint256
+    }
+
+    entity stake_update {
+        * actor         : chain_address
+        * status  : opp.types.stake_status_t
+        * amount  : token_amount
+    }
+
+    ' entity yield_reward {
+    '     <i>Per-staker reward distribution</i>
+    '     <i>scheduled to $WIRE accounts</i>
+    ' }
+
+    entity wire_token_purchase {
+        * account : bytes
+        * amounts : token_amount[]
+    }
+
+    entity operator_reg_dereg {
+        * account              : bytes
+        * type        : opp.types.operator_type_t
+        * status : opp.types.operator_status_t
+    }
+
+    ' entity challenge_response {
+    '     <i>Prioritized in next</i>
+    '     <i>message_chain build</i>
+    '     --
+    '     <i>Details TBD</i>
+    ' }
+
+    ' entity slash_operator {
+    '     <i>Reclaim collateral →</i>
+    '     <i>reward challengers</i>
+    '     --
+    '     <i>Details TBD</i>
+    ' }
+
+    entity reserve_disbursement {
+        * actor : chain_address
+        * amount : token_amount
+    }
+
+    entity protocol_state {
+        * chain_id           : uint32
+        * current_message_id    : bytes32
+        * processed_message_id  : bytes32
+        * incoming_messages  : list<tuple<stamp, message>>
+        * outgoing           : list<message>
+    }
+}
+
+' ═══════════════════════════════════════════════════
+'  RELATIONSHIPS
+' ═══════════════════════════════════════════════════
+
+' -- Message structure --
+' opp.message_header  ||--||  opp.message_payload          : contains >
+' opp.message_payload ||--o{
+'     attestation_entry   : "0..N"
+
+'     ' -- Enum references from message --
+'     opp.message_header  ..>  opp.types.chain_kind_t       : from_chain,\nto_chain
+'     opp.message_payload ..>  opp.types.encoding_flags_t     : encoding_flags_t
+
+'     ' -- Assertion discriminant --
+'     opp.attestation_entry --> opp.types.attestation_type_t : type\ndiscriminant
+
+'     ' -- Epoch spans messages --
+'     envelope ..> opp.message_header : spans >
+' }
+
+' -- Assertion entry resolves to concrete payloads --
+opp.attestation_entry ..> opp.attestations.reserve_balance_sheet
+opp.attestation_entry ..> opp.attestations.stake
+opp.attestation_entry ..> opp.attestations.unstake
+opp.attestation_entry ..> opp.attestations.pretoken_purchase
+opp.attestation_entry ..> opp.attestations.pretoken_yield
+opp.attestation_entry ..> opp.attestations.stake_update
+' opp.attestation_entry ..> opp.attestations.yield_reward          ' entity commented out
+opp.attestation_entry ..> opp.attestations.wire_token_purchase
+opp.attestation_entry ..> opp.attestations.operator_reg_dereg
+' opp.attestation_entry ..> opp.attestations.challenge_response   ' entity commented out
+' opp.attestation_entry ..> opp.attestations.slash_operator        ' entity commented out
+opp.attestation_entry ..> opp.attestations.reserve_disbursement
+
+' -- Sub-message composition --
+opp.attestations.wire_token_purchase  --> opp.types.token_amount : includes >
+opp.attestations.reserve_disbursement   --> opp.types.token_amount : includes >
+opp.attestations.reserve_balance_sheet            ..> opp.types.token_amount : includes >
+opp.attestations.reserve_balance_sheet            ..> opp.types.chain_kind_t
+
+' -- Enum usage in post-launch attestations --
+opp.attestations.stake_update --> opp.types.stake_status_t
+opp.attestations.operator_reg_dereg --> opp.types.operator_type_t
+opp.attestations.operator_reg_dereg --> opp.types.operator_status_t
+
+' -- State tracks message chain --
+opp.attestations.protocol_state ..> opp.message_header : tracks >
+
+@enduml
