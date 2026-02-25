@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package sysio.opp;
+
+import "sysio/opp/types/types.proto";
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Message routing
+// ---------------------------------------------------------------------------
+
+// Source and destination chain endpoints for a message.
+message Endpoints {
+   sysio.opp.types.ChainId start = 1;
+   sysio.opp.types.ChainId end   = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Message header
+// ---------------------------------------------------------------------------
+
+message MessageHeader {
+   Endpoints               endpoints           = 1;
+   bytes                          message_id          = 2; // 32 bytes; last 8 bytes = sequence number
+   bytes                          previous_message_id = 3; // 32 bytes
+   sysio.opp.types.EncodingFlags  encoding_flags      = 4;
+   uint32                         payload_size        = 5;
+   bytes                          payload_checksum    = 6; // 32 bytes
+   uint64                         timestamp           = 7; // milliseconds since epoch
+   bytes                          header_checksum     = 8; // 32 bytes
+}
+
+// ---------------------------------------------------------------------------
+//  Message payload
+// ---------------------------------------------------------------------------
+
+// Payload containing versioned attestation entries.
+message MessagePayload {
+   uint32                    version      = 1; // MSB == 0; valid range 0x00-0x7F
+   repeated AttestationEntry attestations = 2;
+}
+
+// Single attestation within a payload.
+message AttestationEntry {
+   sysio.opp.types.AttestationType type      = 1;
+   uint32                          data_size = 2;
+   bytes                           data      = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Complete message (header + payload)
+// ---------------------------------------------------------------------------
+
+message Message {
+   MessageHeader  header  = 1;
+   MessagePayload payload = 2;
+
+}
+
+// ---------------------------------------------------------------------------
+//  Epoch envelope
+// ---------------------------------------------------------------------------
+
+// Envelope that spans a range of messages within an epoch.
+message Envelope {
+   bytes          envelope_hash          = 1; // 32 bytes
+   Endpoints      endpoints              = 2;
+   uint64         epoch_timestamp        = 5;
+   uint32         epoch_index            = 6;
+   uint32         epoch_envelope_index   = 7;
+
+   bytes          merkle                 = 15; // 32 bytes
+
+   bytes          previous_envelope_hash = 20; // 32 bytes
+
+   bytes          start_message_id       = 30; // 32 bytes
+   bytes          end_message_id         = 31; // 32 bytes
+   repeated types.ChainSignature signatures = 50;
+}
