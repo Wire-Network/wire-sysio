@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package sysio.opp.types;
+
+option cc_enable_arenas = true;
+
+// ---------------------------------------------------------------------------
+//  Chain identifier
+// ---------------------------------------------------------------------------
+
+enum ChainKind  {
+   CHAIN_KIND_UNKNOWN  = 0;
+   CHAIN_KIND_WIRE     = 1;
+   CHAIN_KIND_ETHEREUM = 2;
+   CHAIN_KIND_SOLANA   = 3;
+   CHAIN_KIND_SUI      = 4;
+}
+
+message ChainId {
+   ChainKind kind = 1;
+   uint32    id   = 2;
+}
+
+enum ChainKeyType {
+   CHAIN_KEY_TYPE_UNKNOWN = 0;
+   CHAIN_KEY_TYPE_WIRE = 1;
+   CHAIN_KEY_TYPE_WIRE_BLS = 2;
+   CHAIN_KEY_TYPE_ETHEREUM = 3;
+   CHAIN_KEY_TYPE_SOLANA = 4;
+   CHAIN_KEY_TYPE_SUI = 5;
+}
+
+// Address on a specific chain.
+message ChainAddress {
+   ChainKind kind = 1;
+   bytes     address    = 2;
+}
+
+message ChainSignature {
+   ChainAddress actor = 1;
+   ChainKeyType key_type = 2;
+   bytes        signature = 3;
+}
+
+message WireAccount {
+   string name = 1;
+}
+
+message WirePermission {
+   WireAccount account = 1;
+   string permission = 2; // e.g. "active", "owner"
+}
+
+// ---------------------------------------------------------------------------
+//  Token types
+// ---------------------------------------------------------------------------
+
+// Token identifier (upper byte encodes chain family).
+enum TokenKind {
+   TOKEN_KIND_WIRE   = 0; // 0x0000
+   TOKEN_KIND_ETH    = 256; // 0x0100
+   TOKEN_KIND_ERC20 = 257; // 0x0101
+   TOKEN_KIND_ERC721 = 258; // 0x0102
+   TOKEN_KIND_ERC1155 = 259; // 0x0103
+   TOKEN_KIND_LIQETH = 496; // 0x01F0
+   TOKEN_KIND_SOL    = 512; // 0x0200
+   TOKEN_KIND_LIQSOL = 752; // 0x02F0
+}
+
+// Token type and signed amount.
+message TokenAmount {
+   TokenKind kind   = 1;
+   int64     amount = 2;
+}
+
+// ---------------------------------------------------------------------------
+//  Encoding flags  (originally a single uint8 bitfield)
+//
+//  Decomposed into discrete fields for protobuf compatibility.
+//  Wire-format packing: endianness | (hash_algorithm << 1)
+//                       | (length_encoding << 3) | reserved
+// ---------------------------------------------------------------------------
+
+enum Endianness {
+   ENDIANNESS_BIG    = 0; // 0x00
+   ENDIANNESS_LITTLE = 1; // 0x01
+}
+
+enum HashAlgorithm {
+   HASH_ALGORITHM_KECCAK256   = 0; // bits[2:1] = 00
+   HASH_ALGORITHM_SHA256      = 1; // bits[2:1] = 01
+   HASH_ALGORITHM_RESERVED_1  = 2; // bits[2:1] = 10
+   HASH_ALGORITHM_RESERVED_2  = 3; // bits[2:1] = 11
+}
+
+enum LengthEncoding {
+   LENGTH_ENCODING_VARUINT = 0; // bit[3] = 0
+   LENGTH_ENCODING_UINT32  = 1; // bit[3] = 1
+}
+
+// Structured representation of encoding_flags_t.
+message EncodingFlags {
+   Endianness     endianness      = 1;
+   HashAlgorithm  hash_algorithm  = 2;
+   LengthEncoding length_encoding = 3;
+}
+
+// ---------------------------------------------------------------------------
+//  Attestation discriminant
+// ---------------------------------------------------------------------------
+
+enum AttestationType {
+   ATTESTATION_TYPE_UNSPECIFIED          = 0;
+   ATTESTATION_TYPE_OPERATOR_ACTION     = 2001; // 0x0BB9
+   ATTESTATION_TYPE_STAKE               = 3001; // 0x0BB9
+   ATTESTATION_TYPE_UNSTAKE             = 3002; // 0x0BBA
+   ATTESTATION_TYPE_PRETOKEN_PURCHASE   = 3004; // 0x0BBB
+   ATTESTATION_TYPE_PRETOKEN_YIELD      = 3006; // 0x0BBE
+   ATTESTATION_TYPE_RESERVE_BALANCE_SHEET = 43520; // 0xAA00
+   ATTESTATION_TYPE_STAKE_UPDATE        = 60928; // 0xEE00
+   ATTESTATION_TYPE_NATIVE_YIELD_REWARD = 60929; // 0xEE01
+   ATTESTATION_TYPE_WIRE_TOKEN_PURCHASE = 60930; // 0xEE02
+   ATTESTATION_TYPE_OPERATOR_REG_DEREG  = 60931; // 0xEE03
+   ATTESTATION_TYPE_CHALLENGE_RESPONSE  = 60932; // 0xEE04
+   ATTESTATION_TYPE_SLASH_OPERATOR      = 60933; // 0xEE05
+}
+
+// ---------------------------------------------------------------------------
+//  Staker / Operator lifecycle
+// ---------------------------------------------------------------------------
+
+enum StakeStatus {
+   STAKE_STATUS_UNKNOWN    = 0;
+   STAKE_STATUS_WARMUP     = 1; // 0x01
+   STAKE_STATUS_COOLDOWN   = 2; // 0x02
+   STAKE_STATUS_ACTIVE     = 3; // 0x03
+   STAKE_STATUS_TERMINATED = 240; // 0xF0
+   STAKE_STATUS_SLASHED    = 241; // 0xF1
+}
+
+enum OperatorType {
+   OPERATOR_TYPE_UNKNOWN     = 0;
+   OPERATOR_TYPE_PRODUCER    = 1; // 0x01
+   OPERATOR_TYPE_BATCH       = 2; // 0x02
+   OPERATOR_TYPE_UNDERWRITER = 3; // 0x03
+   OPERATOR_TYPE_CHALLENGER  = 4; // 0x04
+}
+
+enum OperatorStatus {
+   OPERATOR_STATUS_UNKNOWN    = 0;
+   OPERATOR_STATUS_WARMUP     = 1; // 0x01
+   OPERATOR_STATUS_COOLDOWN   = 2; // 0x02
+   OPERATOR_STATUS_ACTIVE     = 3; // 0x03
+   OPERATOR_STATUS_TERMINATED = 240; // 0xF0
+   OPERATOR_STATUS_SLASHED    = 241; // 0xF1
+}
