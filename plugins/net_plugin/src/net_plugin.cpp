@@ -4263,12 +4263,12 @@ namespace sysio {
               exclude_peer ? "received" : "our", block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
               msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8,16));
 
-      boost::asio::post( thread_pool.get_executor(), [exclude_peer, msg, this]() mutable {
-            vote_buffer_factory buff_factory;
-            const auto& send_buffer = buff_factory.get_send_buffer( *msg );
+      vote_buffer_factory buff_factory;
+      auto send_buffer = buff_factory.get_send_buffer( *msg );
+      dispatcher.add_vote_id( buff_factory.get_vote_id(), block_header::num_from_id(msg->block_id) );
 
-            dispatcher.add_vote_id( buff_factory.get_vote_id(), block_header::num_from_id(msg->block_id) );
-            dispatcher.bcast_vote_msg( exclude_peer, send_buffer );
+      boost::asio::post( thread_pool.get_executor(), [exclude_peer, sb{std::move(send_buffer)}, this]() {
+            dispatcher.bcast_vote_msg( exclude_peer, sb );
       });
    }
 
