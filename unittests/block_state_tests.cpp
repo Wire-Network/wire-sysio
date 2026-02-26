@@ -978,7 +978,7 @@ BOOST_AUTO_TEST_CASE(verify_qc_dual_finalizers) try {
 
 } FC_LOG_AND_RETHROW();
 
-// Verify that aggregate_vote adds dual finalizer votes atomically to both
+// Verify that aggregate_vote adds dual finalizer votes to both
 // active and pending policies, and get_best_qc returns consistent state.
 BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {
    digest_type block_id(fc::sha256("0000000000000000000000000000001"));
@@ -1095,6 +1095,96 @@ BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {
       // duplicate before BLS signature verification.
       BOOST_REQUIRE(bsp->aggregate_vote(0, vote).result == vote_result_t::duplicate);
    }
+
+} FC_LOG_AND_RETHROW();
+
+// Concurrency test: verify that get_best_qc never observes a dual finalizer
+// vote in one policy without the other. One thread adds votes while another
+// repeatedly snapshots via get_best_qc and checks consistency.
+BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_concurrency) try {
+   digest_type block_id(fc::sha256("0000000000000000000000000000001"));
+   digest_type strong_digest(fc::sha256("0000000000000000000000000000002"));
+   auto weak_digest(create_weak_digest(strong_digest));
+
+   // Use enough finalizers so that each dual-finalizer vote individually does not
+   // reach quorum, requiring multiple votes before get_best_qc returns a QC.
+   const size_t num_finalizers = 21;
+
+   // Generate keys. Active and pending share the same keys (all are dual finalizers).
+   std::vector<bls_private_key> private_keys;
+   private_keys.reserve(num_finalizers);
+   for (size_t i = 0; i < num_finalizers; ++i) {
+      private_keys.emplace_back(bls_private_key::generate());
+   }
+
+   std::vector<finalizer_authority> finalizers(num_finalizers);
+   for (size_t i = 0; i < num_finalizers; ++i) {
+      finalizers[i] = finalizer_authority{ "test", 1, private_keys[i].get_public_key() };
+   }
+
+   constexpr uint32_t generation = 1;
+   // quorum = 15 out of 21 (> 2/3)
+   constexpr uint64_t threshold = 15;
+
+   constexpr int num_iterations = 100;
+   std::atomic<bool> saw_inconsistency{false};
+
+   for (int iter = 0; iter < num_iterations && !saw_inconsistency; ++iter) {
+      auto active_policy  = std::make_shared<finalizer_policy>(generation, threshold, finalizers);
+      auto pending_policy = std::make_shared<finalizer_policy>(generation + 1, threshold, finalizers);
+
+      block_state_ptr bsp = std::make_shared<block_state>();
+      bsp->active_finalizer_policy  = active_policy;
+      bsp->pending_finalizer_policy = { bsp->block_num(), pending_policy };
+      bsp->strong_digest = strong_digest;
+      bsp->weak_digest   = weak_digest;
+      bsp->aggregating_qc = aggregating_qc_t{ active_policy, pending_policy };
+
+      // Pre-sign all votes
+      std::vector<vote_message> votes(num_finalizers);
+      for (size_t i = 0; i < num_finalizers; ++i) {
+         votes[i] = { block_id, true, private_keys[i].get_public_key(),
+                       private_keys[i].sign_sha256(strong_digest) };
+      }
+
+      std::atomic<bool> stop_reader{false};
+      std::atomic<int>  qc_checked{0};
+
+      // Reader thread: repeatedly call get_best_qc and verify dual-finalizer consistency.
+      std::thread reader([&] {
+         while (!stop_reader.load(std::memory_order_relaxed)) {
+            auto qc = bsp->get_best_qc();
+            if (!qc || !qc->pending_policy_sig)
+               continue;
+
+            ++qc_checked;
+
+            // Every dual finalizer must have voted identically in both policies.
+            for (size_t i = 0; i < num_finalizers; ++i) {
+               bool active_strong  = qc->active_policy_sig.strong_votes  && (*qc->active_policy_sig.strong_votes)[i];
+               bool active_weak    = qc->active_policy_sig.weak_votes    && (*qc->active_policy_sig.weak_votes)[i];
+               bool pending_strong = qc->pending_policy_sig->strong_votes && (*qc->pending_policy_sig->strong_votes)[i];
+               bool pending_weak   = qc->pending_policy_sig->weak_votes  && (*qc->pending_policy_sig->weak_votes)[i];
+
+               if (active_strong != pending_strong || active_weak != pending_weak) {
+                  saw_inconsistency.store(true, std::memory_order_relaxed);
+                  break;
+               }
+            }
+         }
+      });
+
+      // Voter thread (this thread): add votes one at a time, giving the reader
+      // a window to snapshot between each aggregate_vote call.
+      for (size_t i = 0; i < num_finalizers; ++i) {
+         bsp->aggregate_vote(0, votes[i]);
+      }
+
+      stop_reader.store(true, std::memory_order_relaxed);
+      reader.join();
+   }
+
+   BOOST_CHECK_MESSAGE(!saw_inconsistency, "get_best_qc returned a QC with inconsistent dual-finalizer votes");
 
 } FC_LOG_AND_RETHROW();
 
