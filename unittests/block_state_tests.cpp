@@ -1090,6 +1090,10 @@ BOOST_AUTO_TEST_CASE(get_best_qc_dual_finalizer_consistency) try {
       auto sig = pending_private_keys[0].sign_sha256(strong_digest);
       vote_message vote{ block_id, true, pending_only_key, sig };
       BOOST_REQUIRE(bsp->aggregate_vote(0, vote).result == vote_result_t::success);
+
+      // Second identical vote from pending-only finalizer should be detected as
+      // duplicate before BLS signature verification.
+      BOOST_REQUIRE(bsp->aggregate_vote(0, vote).result == vote_result_t::duplicate);
    }
 
 } FC_LOG_AND_RETHROW();

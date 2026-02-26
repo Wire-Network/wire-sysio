@@ -454,8 +454,10 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
       return r;
    }
 
-   // Check has_voted, return duplicate if the vote is already present in applicable policies
-   bool active_dup = active_index >= 0 && active_policy_sig.has_voted(active_index);
+   // Check has_voted, return duplicate if the vote is already present in both policies.
+   // For dual finalizers both policies must have the vote; for single-policy finalizers only
+   // the applicable policy is checked. This rejects duplicates before the expensive BLS verify.
+   bool active_dup  = active_index  < 0 || active_policy_sig.has_voted(active_index);
    bool pending_dup = pending_index < 0 || pending_policy_sig->has_voted(pending_index);
    if (active_dup && pending_dup) {
       fc_tlog(vote_logger, "connection - {} block_num: {} block_id: {}, duplicate finalizer {}..",
