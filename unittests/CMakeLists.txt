@@ -75,6 +75,10 @@ foreach(TEST_SUITE ${UNIT_TESTS}) # create an independent target for each test s
       execute_process(COMMAND sh -c "echo ${SUITE_NAME} | sed -e 's/s$//' | sed -e 's/_test$//'" OUTPUT_VARIABLE TRIMMED_SUITE_NAME OUTPUT_STRIP_TRAILING_WHITESPACE) # trim "_test" or "_tests" from the end of ${SUITE_NAME}
       # to run unit_test with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
       foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
+        # Only register native-module tests when native contracts are built.
+        if(RUNTIME STREQUAL "native-module" AND NOT NATIVE_CDT_DIR)
+          continue()
+        endif()
         add_p_test(NAME ${TRIMMED_SUITE_NAME}_unit_test_${RUNTIME} COMMAND unit_test --run_test=${SUITE_NAME} --report_level=detailed --log_level=all --color_output -- --${RUNTIME})
         # add a duplicate test to run without fsgsbase instructions for a limited number of OC wasm tests
         if(RUNTIME STREQUAL "sys-vm-oc" AND TRIMMED_SUITE_NAME MATCHES "^wasm_part")
@@ -95,6 +99,9 @@ set(ctest_tests "'${ctest_tests}' -j8") # surround test list string in apostroph
 # The following tests are known to take the longest, bump up their cost (priority) so that they'll run first
 # even on fresh first time test runs before ctest auto-detects costs
 foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
+   if(RUNTIME STREQUAL "native-module" AND NOT NATIVE_CDT_DIR)
+      continue()
+   endif()
    set_tests_properties(api_part1_unit_test_${RUNTIME} PROPERTIES COST 5000)
    set_tests_properties(api_part2_unit_test_${RUNTIME} PROPERTIES COST 5000)
    set_tests_properties(api_part3_unit_test_${RUNTIME} PROPERTIES COST 5000)

@@ -103,9 +103,8 @@ macro(unittest_tests_add TARGET)
 
       # to run ${TARGET} with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
       foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-        # Skip native-module from the general test loop — only specific test suites
-        # with native .so contracts available should be registered for native-module.
-        if(NOT RUNTIME STREQUAL "native-module")
+        # Only register native-module tests when native contracts are built.
+        if(NOT RUNTIME STREQUAL "native-module" OR NATIVE_CDT_DIR)
           add_test(NAME ${TRIMMED_SUITE_NAME}_${TARGET}_${RUNTIME} COMMAND ${TARGET} --run_test=${SUITE_NAME} --report_level=detailed --color_output -- --${RUNTIME})
         endif()
       endforeach()

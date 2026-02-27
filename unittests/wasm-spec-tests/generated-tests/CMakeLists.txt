@@ -22,6 +22,9 @@ foreach(TEST_SUITE ${WASM_TESTS}) # create an independent target for each test s
     string(REPLACE "\n" ";" SN_LIST ${SUITE_NAME})
     foreach(SN ${SN_LIST})
       foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
+          if(RUNTIME STREQUAL "native-module" AND NOT NATIVE_CDT_DIR)
+            continue()
+          endif()
           get_test_property(${SN}_unit_test_${RUNTIME} LABELS TEST_LABEL)
           if ("NOTFOUND" STREQUAL "${TEST_LABEL}") # prevent duplicates
             add_wasmspec_test(NAME ${SN}_unit_test_${RUNTIME} COMMAND wasm_spec_test --run_test=${SN} --report_level=detailed --color_output -- --${RUNTIME})
