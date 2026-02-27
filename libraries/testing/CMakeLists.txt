@@ -29,12 +29,23 @@ endif()
 
 configure_file(contracts.cpp.in contracts.cpp ESCAPE_QUOTES)
 
-## SORT .cpp by most likely to change / break compile
+# native_intrinsic_exports.cpp must be linked with --whole-archive because its
+# extern "C" symbols are only referenced at dlopen-time by native contract .so files.
+# Remove it from the main library sources and build it as a separate static library.
+list(REMOVE_ITEM SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/native_intrinsic_exports.cpp")
+
 add_library(sysio_testing
   ${SRC_FILES}
   ${CMAKE_CURRENT_BINARY_DIR}/contracts.cpp
   ${HEADERS}
 )
+
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+  add_library(native_intrinsic_exports STATIC native_intrinsic_exports.cpp)
+  target_link_libraries(native_intrinsic_exports PRIVATE sysio_chain fc)
+  target_include_directories(native_intrinsic_exports PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include")
+endif()
 
 # Explicitly produce copied contract artifacts so cmake knows how to build them
 set(TESTING_DST_BIOS_DIR ${CMAKE_BINARY_DIR}/libraries/testing/contracts/sysio.bios)
@@ -107,6 +118,8 @@ if(BUILD_SYSTEM_CONTRACTS OR BUILD_TEST_CONTRACTS)
   )
 endif()
 
+target_compile_definitions(sysio_testing PRIVATE
+  "NATIVE_CONTRACTS_DIR=\"${CMAKE_BINARY_DIR}/contracts\"")
 target_link_libraries(sysio_testing sysio_testing_contracts sysio_chain fc-lite fc fc-test chainbase Logging IR WAST WASM)
 target_include_directories(sysio_testing
   PUBLIC

@@ -47,6 +47,12 @@ if("sys-vm" IN_LIST SYSIO_WASM_RUNTIMES OR "sys-vm-jit" IN_LIST SYSIO_WASM_RUNTI
    set(CHAIN_SYSVM_LIBRARIES sys-vm::sys-vm)
 endif()
 
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+   set(CHAIN_NATIVE_MODULE_SOURCES "webassembly/runtimes/native-module/native-module.cpp")
+   set(CHAIN_NATIVE_MODULE_LIBRARIES ${CMAKE_DL_LIBS})
+   set(CHAIN_NATIVE_MODULE_DEFINITIONS SYSIO_NATIVE_MODULE_RUNTIME_ENABLED)
+endif()
+
 set(CHAIN_WEBASSEMBLY_SOURCES
    webassembly/action.cpp
    webassembly/authorization.cpp
@@ -109,6 +115,7 @@ add_library( sysio_chain
 
              ${CHAIN_SYSVMOC_SOURCES}
              ${CHAIN_SYSVM_SOURCES}
+             ${CHAIN_NATIVE_MODULE_SOURCES}
              ${CHAIN_WEBASSEMBLY_SOURCES}
 
              authority.cpp
@@ -142,6 +149,7 @@ target_link_libraries(
   softfloat::softfloat
   builtins
   ${CHAIN_SYSVM_LIBRARIES}
+  ${CHAIN_NATIVE_MODULE_LIBRARIES}
   ${LLVM_LIBS}
   ${CHAIN_RT_LINKAGE}
   Boost::signals2
@@ -158,6 +166,7 @@ target_include_directories( sysio_chain
                             PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_CURRENT_BINARY_DIR}/include"
                                    "${CMAKE_CURRENT_SOURCE_DIR}/../wasm-jit/Include"
                             )
+target_compile_definitions( sysio_chain PUBLIC ${CHAIN_NATIVE_MODULE_DEFINITIONS} )
 
 add_library(sysio_chain_wrap INTERFACE )
 target_link_libraries(sysio_chain_wrap INTERFACE sysio_chain)

@@ -23,6 +23,10 @@
 #include <sysio/chain/webassembly/sys-vm.hpp>
 #include <sysio/vm/allocator.hpp>
 
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+#include <sysio/chain/webassembly/native-module/native-module.hpp>
+#endif
+
 #include <mutex>
 
 using namespace fc;
@@ -94,6 +98,13 @@ struct sysvmoc_tier {
 #ifdef SYSIO_SYS_VM_OC_RUNTIME_ENABLED
          if(vm == wasm_interface::vm_type::sys_vm_oc)
             runtime_interface = std::make_unique<webassembly::sysvmoc::sysvmoc_runtime>(data_dir, sysvmoc_config, d);
+#endif
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+         if(vm == wasm_interface::vm_type::native_module) {
+            // Create a sys-vm interpreter as fallback for contracts without native .so
+            auto fallback = std::make_unique<webassembly::sys_vm_runtime::sys_vm_runtime<sysio::vm::interpreter>>();
+            runtime_interface = std::make_unique<webassembly::native_module::native_runtime>(std::move(fallback));
+         }
 #endif
          if(!runtime_interface)
             SYS_THROW(wasm_exception, "{} wasm runtime not supported on this platform and/or configuration", vm);

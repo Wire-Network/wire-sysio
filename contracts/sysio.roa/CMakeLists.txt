@@ -6,3 +6,16 @@ if(BUILD_SYSTEM_CONTRACTS)
       PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include)
 endif()
+
+# Native .so for native-module runtime debugging
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND NATIVE_CDT_DIR)
+   native_contract_target(
+      TARGET         sysio.roa_native
+      SOURCES        ${CMAKE_CURRENT_SOURCE_DIR}/sysio.roa.cpp
+      INCLUDE_DIRS   ${CMAKE_CURRENT_SOURCE_DIR}
+                     ${CMAKE_CURRENT_SOURCE_DIR}/../sysio.system/include
+      CONTRACT_CLASS "sysio::roa"
+      HEADERS        "sysio.roa.hpp"
+      ABI_TARGET     sysio.roa
+   )
+endif()

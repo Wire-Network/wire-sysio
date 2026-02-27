@@ -107,6 +107,8 @@ std::istream& operator>>(std::istream& in, wasm_interface::vm_type& runtime) {
       runtime = sysio::chain::wasm_interface::vm_type::sys_vm_jit;
    else if (s == "sys-vm-oc-forced")
       runtime = sysio::chain::wasm_interface::vm_type::sys_vm_oc;
+   else if (s == "native-module")
+      runtime = sysio::chain::wasm_interface::vm_type::native_module;
    else
       in.setstate(std::ios_base::failbit);
    return in;

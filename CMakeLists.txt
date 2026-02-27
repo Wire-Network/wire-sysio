@@ -92,6 +92,11 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   endif()
 endif()
 
+option(DISABLE_NATIVE_RUNTIME "Disable native-module WASM runtime" OFF)
+if(NOT DISABLE_NATIVE_RUNTIME AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+  list(APPEND SYSIO_WASM_RUNTIMES native-module)
+endif()
+
 if(UNIX)
   if(APPLE)
     set(whole_archive_flag "-force_load")
