@@ -1,4 +1,5 @@
 include(CMakeParseArguments)
+include(native-exports)
 
 macro(chain_target TARGET)
     cmake_parse_arguments(ARG "" "" "SOURCE_FILES" ${ARGN})
@@ -47,6 +48,9 @@ macro(chain_target TARGET)
 
             -Wl,${build_id_flag}
     )
+
+    # Export intrinsic symbols for --native-contract .so loading.
+    link_native_exports(${TARGET})
 
     copy_bin(${TARGET})
     install(
