@@ -92,8 +92,8 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   endif()
 endif()
 
-option(DISABLE_NATIVE_RUNTIME "Disable native-module WASM runtime" OFF)
-if(NOT DISABLE_NATIVE_RUNTIME AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+# Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 
