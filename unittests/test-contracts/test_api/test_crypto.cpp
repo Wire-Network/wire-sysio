@@ -244,7 +244,7 @@ void test_crypto::test_recover_key() {
    auto pubkey = recover_key( digest, sig );
    auto ecc_pubkey = std::get<0>(pubkey);
    sysio_assert(ecc_pubkey.size() == sh->pk_len - 1, "public key does not match");
-   for ( uint32_t i=0; i < sh->pk_len; i++ )
+   for ( uint32_t i=0; i < sh->pk_len - 1; i++ )
      if ( ecc_pubkey[i] != sh->pk_base()[i+1] )
         sysio_assert( false, "public key does not match" );
 }
