@@ -4,20 +4,19 @@ The native-module runtime lets you debug smart contracts with standard C/C++ deb
 
 ## Prerequisites
 
-1. **wire-cdt** source tree checked out locally (e.g., `/path/to/wire-cdt`).
+1. **wire-cdt** built and available via `find_package(cdt)` (either installed or pointed to via `CMAKE_PREFIX_PATH`).
 
 2. **wire-sysio** configured with native-module support:
    ```bash
    cmake -B cmake-build-debug -S . -G Ninja \
      -DCMAKE_BUILD_TYPE=Debug \
-     -DNATIVE_CDT_DIR=/path/to/wire-cdt \
      -DBUILD_SYSTEM_CONTRACTS=ON \
      -DENABLE_TESTS=ON \
      # ... other flags as usual
    ```
-   The `NATIVE_CDT_DIR` variable points to the wire-cdt source root. CDT's
-   sysiolib headers and source files (`crypto.cpp`, `sysiolib.cpp`, `base64.cpp`)
-   are compiled directly into each native `.so` by the host compiler.
+   Native contracts are built automatically when `BUILD_SYSTEM_CONTRACTS=ON` and
+   the native-module runtime is enabled. CDT's `add_native_contract()` macro
+   handles compiling sysiolib sources with the host compiler.
 
 3. **Build** the test executables and native contracts:
    ```bash
@@ -225,26 +224,26 @@ To make another contract debuggable:
 
 ### 1. Add a CMake Target
 
-The dispatch file (the `apply()` entry point) is auto-generated from the contract's ABI at build time. Just add a `native_contract_target()` call in the contract's `CMakeLists.txt`:
+The dispatch file (the `apply()` entry point) is auto-generated from the contract's ABI at build time. Just add an `add_native_contract()` call in the contract's `CMakeLists.txt`:
 
 ```cmake
-if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND NATIVE_CDT_DIR)
-   native_contract_target(
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+   add_native_contract(
       TARGET         mycontract_native
       SOURCES        ${CMAKE_CURRENT_SOURCE_DIR}/mycontract.cpp
       INCLUDE_DIRS   ${CMAKE_CURRENT_SOURCE_DIR}
       CONTRACT_CLASS "myns::mycontract"
       HEADERS        "mycontract.hpp"
-      ABI_TARGET     mycontract
+      ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/mycontract/mycontract.abi
    )
 endif()
 ```
 
 - **CONTRACT_CLASS**: The fully-qualified C++ class name (as used in `SYSIO_DISPATCH`)
-- **HEADER**: The contract header file (used in the `#include` of the generated dispatch)
-- **ABI_TARGET**: The CMake target name that produces the `.abi` file (usually the contract name)
+- **HEADERS**: The contract header file(s) (used in the `#include` of the generated dispatch)
+- **ABI_FILE**: Path to the `.abi` JSON file (usually in the contract's build directory)
 
-The script `scripts/gen_native_dispatch.py` reads the `.abi` JSON, extracts all action names, and generates a dispatch `.cpp` with `SYSIO_DISPATCH`. This runs automatically whenever the ABI changes.
+CDT's `gen_native_dispatch.py` reads the `.abi` JSON, extracts all action names, and generates a dispatch `.cpp`. This runs automatically whenever the ABI changes.
 
 The naming convention `<name>_native.so` alongside `<name>.wasm` is important — the test framework auto-discovers native `.so` files by scanning the contracts build directory at startup. No manual registration is needed.
 

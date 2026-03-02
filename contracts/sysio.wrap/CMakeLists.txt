@@ -4,13 +4,13 @@ if(BUILD_SYSTEM_CONTRACTS)
 endif()
 
 # Native .so for native-module runtime debugging
-if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND NATIVE_CDT_DIR)
-   native_contract_target(
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+   add_native_contract(
       TARGET         sysio.wrap_native
       SOURCES        ${CMAKE_CURRENT_SOURCE_DIR}/sysio.wrap.cpp
       INCLUDE_DIRS   ${CMAKE_CURRENT_SOURCE_DIR}
       CONTRACT_CLASS "sysio::wrap"
       HEADERS        "sysio.wrap.hpp"
-      ABI_TARGET     sysio.wrap
+      ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/sysio.wrap/sysio.wrap.abi
    )
 endif()

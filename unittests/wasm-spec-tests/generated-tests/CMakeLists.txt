@@ -22,7 +22,7 @@ foreach(TEST_SUITE ${WASM_TESTS}) # create an independent target for each test s
     string(REPLACE "\n" ";" SN_LIST ${SUITE_NAME})
     foreach(SN ${SN_LIST})
       foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
-          if(RUNTIME STREQUAL "native-module" AND NOT NATIVE_CDT_DIR)
+          if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
             continue()
           endif()
           get_test_property(${SN}_unit_test_${RUNTIME} LABELS TEST_LABEL)

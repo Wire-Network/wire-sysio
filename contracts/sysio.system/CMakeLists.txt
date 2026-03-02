@@ -28,14 +28,14 @@ if(BUILD_SYSTEM_CONTRACTS)
 endif()
 
 # Native .so for native-module runtime debugging
-if("native-module" IN_LIST SYSIO_WASM_RUNTIMES AND NATIVE_CDT_DIR)
-   native_contract_target(
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+   add_native_contract(
       TARGET         sysio.system_native
       SOURCES        ${SYSIO_SYSTEM_SOURCES}
       INCLUDE_DIRS   ${SYSIO_SYSTEM_INCLUDE_DIRS}
       CONTRACT_CLASS "sysiosystem::system_contract"
       HEADERS        ${SYSIO_SYSTEM_HEADERS}
-      ABI_TARGET     sysio.system
+      ABI_FILE       ${CMAKE_BINARY_DIR}/contracts/sysio.system/sysio.system.abi
       EXTRA_DISPATCH "sysiosystem::peer_keys:regpeerkey,delpeerkey,getpeerkeys"
                      "sysiosystem::trx_priority:addtrxp,deltrxp"
    )
