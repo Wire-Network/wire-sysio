@@ -218,6 +218,64 @@ If using the Microsoft C/C++ extension (`cppdbg` type) with GDB instead:
 
 Open the contract source file, set breakpoints in the gutter, and press F5 to start debugging.
 
+## Debugging Contracts on a Running nodeop
+
+The `--native-contract` flag lets you attach a debugger to a running nodeop and step through contract execution on a live chain. Only the contracts you specify run natively; everything else uses the normal WASM runtime.
+
+### How It Works
+
+1. nodeop copies the state and blocks directories to `<dir>.native-debug/` so the original chain data is never modified
+2. At startup it looks up each account's on-chain code hash and loads the corresponding `.so`
+3. When a transaction hits one of those contracts, execution is routed through the native `.so` instead of the WASM runtime
+4. All other contracts continue to execute via WASM as normal
+
+### Usage
+
+```bash
+nodeop \
+  --native-contract sysio.token:/path/to/sysio.token_native.so \
+  --native-contract mycontract:/path/to/mycontract_native.so \
+  # ... other nodeop flags
+```
+
+The format is `account:/path/to/contract_native.so`. You can specify multiple `--native-contract` flags. The account must already have code deployed on-chain.
+
+### Step-by-Step Example
+
+1. Build nodeop and the native contract `.so` files:
+   ```bash
+   ninja -C cmake-build-debug nodeop sysio.token_native
+   ```
+
+2. Start nodeop under a debugger:
+   ```bash
+   lldb -- ./cmake-build-debug/programs/nodeop/nodeop \
+     --native-contract sysio.token:cmake-build-debug/contracts/sysio.token/sysio.token_native.so \
+     --data-dir /path/to/data --config-dir /path/to/config
+   ```
+
+3. Set a pending breakpoint on the contract source before running:
+   ```
+   (lldb) b sysio.token.cpp:42
+   (lldb) run
+   ```
+
+4. Send a transaction (from another terminal):
+   ```bash
+   clio push action sysio.token transfer '["alice","bob","1.0000 SYS",""]' -p alice
+   ```
+
+5. nodeop hits the breakpoint in the native `.so` — step through, inspect variables, etc.
+
+### State Isolation
+
+When `--native-contract` is used, nodeop automatically copies the chain state before starting:
+
+- `<state_dir>.native-debug/` — working copy of state
+- `<blocks_dir>.native-debug/` — working copy of blocks
+
+Previous debug copies are removed on each launch. The original data directory is untouched, so you can kill the debug session at any time without corrupting your chain. Delete the `.native-debug/` directories when done.
+
 ## Adding Native Builds for Other Contracts
 
 To make another contract debuggable:

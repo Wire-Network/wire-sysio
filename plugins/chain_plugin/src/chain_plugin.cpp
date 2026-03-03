@@ -23,10 +23,7 @@
 #include <chainbase/environment.hpp>
 
 #ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
-#include <sysio/chain/webassembly/native-module/dynamic_loaded_function.hpp>
-#include <sysio/chain/webassembly/native-module/native_context_stack.hpp>
-#include <sysio/chain/webassembly/interface.hpp>
-#include <sysio/chain/apply_context.hpp>
+#include <sysio/chain/webassembly/native-module/native_module_overlay.hpp>
 #endif
 
 #include <boost/signals2/connection.hpp>
@@ -200,8 +197,7 @@ public:
    // --native-contract mappings: account -> path to .so
    std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
 #ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
-   // code_hash -> dlopen'd apply function, populated during plugin_startup
-   std::map<digest_type, webassembly::native_module::dynamic_loaded_function> native_modules_;
+   webassembly::native_module::native_module_overlay native_overlay_;
 #endif
 
 
@@ -1269,31 +1265,17 @@ void chain_plugin_impl::plugin_startup()
          SYS_ASSERT( meta->code_hash != digest_type(), plugin_config_exception,
                      "Native contract account '{}' has no deployed code", acct );
 
-         auto hash = meta->code_hash;
-         auto fn = webassembly::native_module::dynamic_loaded_function(so_path, "apply");
-         ilog("Native debug: {} (code_hash={}) -> {}", acct, hash, so_path.string());
-         native_modules_.emplace(hash, std::move(fn));
+         ilog("Native debug: {} (code_hash={}) -> {}", acct, meta->code_hash, so_path.string());
+         native_overlay_.load(meta->code_hash, so_path);
       }
 
-      auto& wasmif = chain->get_wasm_interface();
-      wasmif.substitute_apply = [this](const digest_type& code_hash, uint8_t vm_type,
-                                       uint8_t vm_version, apply_context& context) -> bool {
-         auto it = native_modules_.find(code_hash);
-         if( it == native_modules_.end() )
-            return false;  // not a native-debug contract, use normal WASM
+      chain->get_wasm_interface().substitute_apply =
+         [this](const digest_type& code_hash, uint8_t vm_type,
+                uint8_t vm_version, apply_context& context) -> bool {
+            return native_overlay_(code_hash, vm_type, vm_version, context);
+         };
 
-         webassembly::interface iface(context);
-         webassembly::native_module::native_context_stack::push(&iface);
-         auto on_exit = fc::make_scoped_exit([]() {
-            webassembly::native_module::native_context_stack::pop();
-         });
-         it->second.exec(context.get_receiver().to_uint64_t(),
-                         context.get_action().account.to_uint64_t(),
-                         context.get_action().name.to_uint64_t());
-         return true;
-      };
-
-      ilog("Native debug: {} contract(s) configured for native execution", native_modules_.size());
+      ilog("Native debug: {} contract(s) configured for native execution", native_overlay_.size());
    }
 #endif
 
