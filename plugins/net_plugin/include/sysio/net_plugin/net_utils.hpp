@@ -4,6 +4,8 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+#include <boost/asio/ip/address_v6.hpp>
+
 #include <string>
 #include <sstream>
 #include <regex>
@@ -155,6 +157,19 @@ namespace detail {
       auto block_sync_rate_limit = detail::parse_connection_rate_limit(limit);
 
       return {std::move(listen_addr), block_sync_rate_limit};
+   }
+
+   /// Zero bits beyond prefix_len in a 16-byte IPv6 address.
+   /// For IPv4-mapped addresses (::ffff:a.b.c.d), the caller should map
+   /// an IPv4 prefix to IPv6 by adding 96 (e.g., IPv4 /24 → prefix_len 120).
+   inline boost::asio::ip::address_v6::bytes_type apply_prefix_mask(
+         boost::asio::ip::address_v6::bytes_type addr, uint8_t prefix_len) {
+      if (prefix_len > 128) prefix_len = 128;
+      // zero out bits after prefix_len
+      for (uint8_t i = prefix_len; i < 128; ++i) {
+         addr[i / 8] &= ~(0x80 >> (i % 8));
+      }
+      return addr;
    }
 
 } // namespace sysio::net_utils
