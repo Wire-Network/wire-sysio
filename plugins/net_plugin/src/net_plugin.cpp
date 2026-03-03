@@ -6,6 +6,7 @@
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
 #include <sysio/net_plugin/peer_auth.hpp>
+#include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/controller.hpp>
@@ -785,6 +786,10 @@ namespace sysio {
 
       uint64_t get_peer_ping_time_ns() const { return peer_ping_time_ns; }
 
+      int32_t get_peer_score() const { return peer_score_.get(); }
+      void adjust_peer_score(int32_t delta) { peer_score_.adjust(delta); }
+      void decay_peer_score() { peer_score_.decay(); }
+
    private:
       static const string unknown;
 
@@ -874,6 +879,9 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
+
+      alignas(hardware_destructive_interference_sz)
+      peer_scoring::peer_score peer_score_;
 
       alignas(hardware_destructive_interference_sz)
       fc::mutex                        sync_response_expected_timer_mtx;
@@ -1383,6 +1391,7 @@ namespace sysio {
    connection_status connection::get_status()const {
       connection_status stat;
       stat.connection_id = connection_id;
+      stat.peer_score = get_peer_score();
       stat.connecting = state() == connection_state::connecting;
       stat.syncing = peer_syncing_from_us;
       stat.is_bp_peer = bp_connection != bp_connection_type::non_bp;
@@ -1551,6 +1560,7 @@ namespace sysio {
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
       if( unknown_block ) {
          peer_ilog( p2p_blk_log, this, "Peer asked for unknown block {}, sending: benign_other go away", msg_head_num );
+         adjust_peer_score(peer_scoring::benign_close);
          no_retry = go_away_reason::benign_other;
          enqueue( go_away_message{ go_away_reason::benign_other } );
       } else {
@@ -1625,6 +1635,7 @@ namespace sysio {
    void connection::check_heartbeat( std::chrono::steady_clock::time_point current_time ) {
       if( latest_msg_time > std::chrono::steady_clock::time_point::min() ) {
          if( current_time > latest_msg_time + hb_timeout ) {
+            adjust_peer_score(peer_scoring::heartbeat_timeout);
             no_retry = go_away_reason::benign_other;
             if( !incoming() ) {
                peer_wlog(p2p_conn_log, this, "heartbeat timed out for peer address");
@@ -1645,6 +1656,8 @@ namespace sysio {
          }
 
       }
+
+      decay_peer_score();
 
       org = std::chrono::nanoseconds{0};
       send_time();
@@ -1896,6 +1909,7 @@ namespace sysio {
          block_sync_frame_bytes_sent = 0;
       } else {
          peer_ilog( p2p_blk_log, this, "enqueue peer sync, unable to fetch block {}, sending benign_other go away", num );
+         adjust_peer_score(peer_scoring::benign_close);
          peer_requested.reset(); // unable to provide requested blocks
          block_sync_send_start = 0ns;
          block_sync_frame_bytes_sent = 0;
@@ -2078,7 +2092,9 @@ namespace sysio {
       });
       if (conns.size() > sync_peer_limit) {
          std::partial_sort(conns.begin(), conns.begin() + sync_peer_limit, conns.end(), [](const connection_ptr& lhs, const connection_ptr& rhs) {
-            return lhs->get_peer_ping_time_ns() < rhs->get_peer_ping_time_ns();
+            auto ls = lhs->get_peer_score(), rs = rhs->get_peer_score();
+            if (ls != rs) return ls > rs; // higher score first
+            return lhs->get_peer_ping_time_ns() < rhs->get_peer_ping_time_ns(); // lower ping as tiebreaker
          });
          conns.resize(sync_peer_limit);
       }
@@ -2491,6 +2507,7 @@ namespace sysio {
    // called from connection strand
    void sync_manager::rejected_block( const connection_ptr& c, uint32_t blk_num, closing_mode mode ) {
       c->block_status_monitor_.rejected();
+      c->adjust_peer_score(peer_scoring::block_rejected);
       {
          // reset sync on rejected block
          fc::lock_guard g( sync_mtx );
@@ -2500,6 +2517,7 @@ namespace sysio {
          }
       }
       if( mode == closing_mode::immediately || c->block_status_monitor_.max_events_violated()) {
+         c->adjust_peer_score(peer_scoring::max_violated);
          peer_wlog(p2p_blk_log, c, "block {} not accepted, closing connection {}",
                    blk_num, mode == closing_mode::immediately ? "immediately" : "max violations reached");
          c->close(mode != closing_mode::immediately);
@@ -2958,12 +2976,22 @@ namespace sysio {
          const auto                paddr_port = rend.port();
          string                    paddr_str  = paddr_add.to_string();
          string                    paddr_desc = paddr_str + ":" + std::to_string(paddr_port);
-         connections.for_each_connection([&visitors, &from_addr, &paddr_str](const connection_ptr& conn) {
+
+         // mask incoming address to /24 (IPv4) or /48 (IPv6) for subnet-level counting
+         auto addr_v6 = paddr_add.is_v4()
+            ? boost::asio::ip::make_address_v6(boost::asio::ip::v4_mapped, paddr_add.to_v4())
+            : paddr_add.to_v6();
+         uint8_t effective_prefix = addr_v6.is_v4_mapped()
+            ? static_cast<uint8_t>(96 + 24)  // IPv4 /24
+            : static_cast<uint8_t>(48);       // IPv6 /48
+         auto incoming_masked = net_utils::apply_prefix_mask(addr_v6.to_bytes(), effective_prefix);
+
+         connections.for_each_connection([&visitors, &from_addr, &incoming_masked, effective_prefix](const connection_ptr& conn) {
             if (conn->socket_is_open()) {
                if (conn->incoming()) {
                   ++visitors;
                   fc::lock_guard g_conn(conn->conn_mtx);
-                  if (paddr_str == conn->remote_endpoint_ip) {
+                  if (net_utils::apply_prefix_mask(conn->remote_endpoint_ip_array, effective_prefix) == incoming_masked) {
                      ++from_addr;
                   }
                }
@@ -2992,17 +3020,55 @@ namespace sysio {
                }
             });
 
-         } else {
-            if (from_addr >= max_nodes_per_host) {
-               fc_dlog(p2p_conn_log, "Number of connections ({}) from {} exceeds limit {}, closing",
-                        from_addr + 1, paddr_desc, max_nodes_per_host);
-            } else {
-               fc_dlog(p2p_conn_log, "max_client_count {} exceeded, closing: {}", connections.get_max_client_count(), paddr_desc);
-            }
-            // new_connection never added to connections and start_session not called, lifetime will end
+         } else if (from_addr >= max_nodes_per_host) {
+            fc_dlog(p2p_conn_log, "Number of connections ({}) from subnet of {} exceeds limit {}, closing",
+                    from_addr + 1, paddr_desc, max_nodes_per_host);
             boost::system::error_code ec;
             socket.shutdown(tcp::socket::shutdown_both, ec);
             socket.close(ec);
+         } else {
+            // max_client_count exceeded, attempt score-based eviction
+            connection_ptr victim;
+            int32_t lowest_score = peer_scoring::eviction_threshold;
+            connections.for_each_connection([&victim, &lowest_score](const connection_ptr& conn) {
+               if (conn->socket_is_open() && conn->incoming() &&
+                     conn->bp_connection == connection::bp_connection_type::non_bp) {
+                  auto score = conn->get_peer_score();
+                  if (score < lowest_score) {
+                     lowest_score = score;
+                     victim = conn;
+                  }
+               }
+            });
+            if (victim) {
+               fc_ilog(p2p_conn_log, "Evicting low-score peer {} (score {}) to accept new connection: {}",
+                       victim->connection_id, lowest_score, paddr_desc);
+               victim->close();
+               fc_ilog(p2p_conn_log, "Accepted new connection (via eviction): {}", paddr_str);
+               connections.any_of_supplied_peers([&listen_address, &paddr_str, &paddr_desc, &limit](const string& peer_addr) {
+                  if (auto [host, port, type] = net_utils::split_host_port_type(peer_addr); host == paddr_str) {
+                     if (limit > 0) {
+                        fc_dlog(p2p_conn_log, "Connection inbound to {} from {} is a configured p2p-peer-address and will not be throttled",
+                                listen_address, paddr_desc);
+                     }
+                     limit = 0;
+                     return true;
+                  }
+                  return false;
+               });
+               connection_ptr new_connection = std::make_shared<connection>(std::move(socket), listen_address, limit);
+               boost::asio::post(new_connection->strand, [new_connection, this]() {
+                  if (new_connection->start_session()) {
+                     connections.add(new_connection);
+                  }
+               });
+            } else {
+               fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing: {}",
+                       connections.get_max_client_count(), paddr_desc);
+               boost::system::error_code ec;
+               socket.shutdown(tcp::socket::shutdown_both, ec);
+               socket.close(ec);
+            }
          }
       }
    }
@@ -3529,6 +3595,7 @@ namespace sysio {
    void connection::handle_message( const handshake_message& msg ) {
       if( !is_valid( msg ) ) {
          peer_wlog( p2p_msg_log, this, "bad handshake message");
+         adjust_peer_score(peer_scoring::fatal_violation);
          no_retry = go_away_reason::fatal_other;
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
@@ -3888,6 +3955,7 @@ namespace sysio {
       if (before_lib || my_impl->dispatcher.have_block(msg.id)) {
          if (block_num - 1 == block_header::num_from_id(last_block_nack)) {
             ++consecutive_blocks_nacks;
+            adjust_peer_score(peer_scoring::block_nack);
          } else {
             consecutive_blocks_nacks = 0;
          }
@@ -3964,6 +4032,7 @@ namespace sysio {
       const bool first_msg = msg.peers.size() == 1 && msg.peers[0].bp_peer_info.empty();
       if (!my_impl->validate_gossip_bp_peers_message(msg)) {
          peer_wlog( p2p_msg_log, this, "bad gossip_bp_peers_message, closing");
+         adjust_peer_score(peer_scoring::fatal_violation);
          no_retry = go_away_reason::fatal_other;
          enqueue( go_away_message( go_away_reason::fatal_other ) );
          return;
@@ -4120,6 +4189,7 @@ namespace sysio {
                   fork_db_add_result, cid, block_num, obh->id() );
          my_impl->dispatcher.add_peer_block( obh->id(), cid ); // no need to send back to sender
          c->block_status_monitor_.accepted();
+         c->adjust_peer_score(peer_scoring::block_accepted);
 
          if (my_impl->chain_plug->chain().get_read_mode() == db_read_mode::IRREVERSIBLE) {
             // non-irreversible notifies sync_manager when block is applied, call on dispatcher strand
@@ -4129,6 +4199,7 @@ namespace sysio {
 
          if (fork_db_add_result == fork_db_add_t::appended_to_head || fork_db_add_result == fork_db_add_t::fork_switch) {
             ++c->unique_blocks_rcvd_count;
+            c->adjust_peer_score(peer_scoring::unique_block);
 
             // ready to process immediately, so signal producer to interrupt start_block
             // call before process_blocks to avoid interrupting process_blocks
@@ -4292,6 +4363,7 @@ namespace sysio {
             if (c->connection_id == connection_id) {
                boost::asio::post(c->strand, [c]() {
                   c->block_status_monitor_.rejected();
+                  c->adjust_peer_score(peer_scoring::block_rejected);
                });
                return true;
             }
@@ -4428,7 +4500,7 @@ namespace sysio {
            "   p2p.sys.io:9876\n"
            "   p2p.trx.sys.io:9876:trx\n"
            "   p2p.blk.sys.io:9876:blk\n")
-         ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single IP address")
+         ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single /24 (IPv4) or /48 (IPv6) subnet")
          ( "p2p-accept-transactions", bpo::value<bool>()->default_value(true), "Allow transactions received over p2p network to be evaluated and relayed if valid.")
          ( "p2p-disable-block-nack", bpo::value<bool>()->default_value(false),
             "Disable block notice and block nack. All blocks received will be broadcast to all peers unless already received.")
@@ -5221,6 +5293,7 @@ namespace sysio {
             , .block_sync_bytes_sent = c->get_block_sync_bytes_sent()
             , .block_sync_throttling = c->get_block_sync_throttling()
             , .connection_start_time = c->connection_start_time
+            , .peer_score = c->get_peer_score()
             , .p2p_address = p2p_addr
             , .unique_conn_node_id = conn_node_id
          });
