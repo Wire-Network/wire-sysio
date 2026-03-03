@@ -55,6 +55,7 @@ message AttestationEntry {
 message Message {
    MessageHeader  header  = 1;
    MessagePayload payload = 2;
+
 }
 
 // ---------------------------------------------------------------------------

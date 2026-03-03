@@ -87,17 +87,12 @@ message ReserveDisbursement {
 //  Protocol state tracking
 // ---------------------------------------------------------------------------
 
-// Timestamped message wrapper for incoming message queues.
-message TimestampedMessage {
-  uint64            timestamp = 1; // milliseconds since epoch
-  sysio.opp.Message message = 2;
-}
 
 // Protocol state tracking for a message chain on a given chain.
 message ProtocolState {
   sysio.opp.types.ChainId       chain_id = 1;
   bytes                         current_message_id = 2; // 32 bytes
   bytes                         processed_message_id = 3; // 32 bytes
-  repeated TimestampedMessage   incoming_messages = 4;
-  repeated sysio.opp.Message    outgoing = 5;
+  repeated sysio.opp.Message   incoming_messages = 10;
+  repeated sysio.opp.Message    outgoing_messages = 11;
 }
