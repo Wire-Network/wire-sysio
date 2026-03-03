@@ -26,7 +26,8 @@ namespace sysio { namespace chain {
          enum class vm_type {
             sys_vm,
             sys_vm_jit,
-            sys_vm_oc
+            sys_vm_oc,
+            native_module
          };
 
          //return string description of vm_type
@@ -36,6 +37,8 @@ namespace sysio { namespace chain {
                 return "sys-vm";
              case vm_type::sys_vm_oc:
                 return "sys-vm-oc";
+             case vm_type::native_module:
+                return "native-module";
              default:
                  return "sys-vm-jit";
              }
@@ -104,4 +107,4 @@ namespace sysio{ namespace chain {
    }
 }}
 
-FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (sys_vm)(sys_vm_jit)(sys_vm_oc) )
+FC_REFLECT_ENUM( sysio::chain::wasm_interface::vm_type, (sys_vm)(sys_vm_jit)(sys_vm_oc)(native_module) )

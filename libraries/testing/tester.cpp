@@ -12,6 +12,7 @@
 #include <fstream>
 #include <array>
 #include <ranges>
+#include <filesystem>
 
 #include <contracts.hpp>
 
@@ -1143,6 +1144,11 @@ namespace sysio::testing {
 
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
+      // If native-module runtime, auto-register the native .so for this WASM
+      if (cfg.wasm_runtime == chain::wasm_interface::vm_type::native_module) {
+         native_module_context_holder::try_register_from_wasm(wasm);
+      }
+
       signed_transaction trx;
       trx.actions.emplace_back( vector<permission_level>{{account,sysio::chain::config::active_name}},
                                 setcode{

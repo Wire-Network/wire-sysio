@@ -92,6 +92,11 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   endif()
 endif()
 
+# Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+  list(APPEND SYSIO_WASM_RUNTIMES native-module)
+endif()
+
 if(UNIX)
   if(APPLE)
     set(whole_archive_flag "-force_load")

@@ -371,7 +371,6 @@ namespace sysio {
         reslimit_t reslimit(get_self(), get_self().value);
         auto res_itr = reslimit.find(owner.value);
         check(res_itr != reslimit.end(), "reslimit row does not exist for this owner");
-        auto rl_row = *res_itr;
 
         // Adjust resource limits
         int64_t ram_bytes, net_limit, cpu_limit;
