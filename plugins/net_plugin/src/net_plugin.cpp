@@ -3078,15 +3078,6 @@ namespace sysio {
          std::size_t minimum_read = outstanding_read_bytes != 0 ? outstanding_read_bytes : message_header_size;
          outstanding_read_bytes = 0;
 
-         const size_t max_socket_read_watermark = 4096;
-         std::size_t socket_read_watermark = std::min<std::size_t>(minimum_read, max_socket_read_watermark);
-         boost::asio::socket_base::receive_low_watermark read_watermark_opt(socket_read_watermark);
-         boost::system::error_code ec;
-         socket->set_option( read_watermark_opt, ec );
-         if( ec ) {
-            peer_elog( p2p_conn_log, this, "unable to set read watermark: {}", ec.message() );
-         }
-
          auto completion_handler = [minimum_read](boost::system::error_code ec, std::size_t bytes_transferred) -> std::size_t {
             if (ec || bytes_transferred >= minimum_read ) {
                return 0;
