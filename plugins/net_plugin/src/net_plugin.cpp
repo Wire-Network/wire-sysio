@@ -468,7 +468,6 @@ namespace sysio {
 
       chain_plugin*                         chain_plug = nullptr;
       producer_plugin*                      producer_plug = nullptr;
-      bool                                  use_socket_read_watermark = false;
       /** @} */
 
       alignas(hardware_destructive_interference_sz)
@@ -3079,15 +3078,13 @@ namespace sysio {
          std::size_t minimum_read = outstanding_read_bytes != 0 ? outstanding_read_bytes : message_header_size;
          outstanding_read_bytes = 0;
 
-         if (my_impl->use_socket_read_watermark) {
-            const size_t max_socket_read_watermark = 4096;
-            std::size_t socket_read_watermark = std::min<std::size_t>(minimum_read, max_socket_read_watermark);
-            boost::asio::socket_base::receive_low_watermark read_watermark_opt(socket_read_watermark);
-            boost::system::error_code ec;
-            socket->set_option( read_watermark_opt, ec );
-            if( ec ) {
-               peer_elog( p2p_conn_log, this, "unable to set read watermark: {}", ec.message() );
-            }
+         const size_t max_socket_read_watermark = 4096;
+         std::size_t socket_read_watermark = std::min<std::size_t>(minimum_read, max_socket_read_watermark);
+         boost::asio::socket_base::receive_low_watermark read_watermark_opt(socket_read_watermark);
+         boost::system::error_code ec;
+         socket->set_option( read_watermark_opt, ec );
+         if( ec ) {
+            peer_elog( p2p_conn_log, this, "unable to set read watermark: {}", ec.message() );
          }
 
          auto completion_handler = [minimum_read](boost::system::error_code ec, std::size_t bytes_transferred) -> std::size_t {
@@ -4537,7 +4534,6 @@ namespace sysio {
            "Number of blocks to retrieve in a chunk from any individual peer during synchronization")
          ( "sync-peer-limit", bpo::value<uint32_t>()->default_value(3),
            "Number of peers to sync from")
-         ( "use-socket-read-watermark", bpo::value<bool>()->default_value(false), "Enable experimental socket read watermark optimization")
          ( "peer-log-format", bpo::value<string>()->default_value( "[\"${_peer}\" - ${_cid} ${_ip}:${_port}] " ),
            "The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.\n"
            "Available Variables:\n"
@@ -4578,7 +4574,6 @@ namespace sysio {
          p2p_accept_transactions = options.at( "p2p-accept-transactions" ).as<bool>();
          p2p_disable_block_nack = options.at( "p2p-disable-block-nack" ).as<bool>();
 
-         use_socket_read_watermark = options.at( "use-socket-read-watermark" ).as<bool>();
          keepalive_interval = std::chrono::milliseconds( options.at( "p2p-keepalive-interval-ms" ).as<int>() );
          SYS_ASSERT( keepalive_interval.count() > 0, chain::plugin_config_exception,
                      "p2p-keepalive_interval-ms must be greater than 0" );
@@ -4956,9 +4951,7 @@ namespace sysio {
          // it was syncing and had processed blocks into the fork database but not yet applied them.
          // If the node was shutdown via terminate-at-block, the current expectation is that the node can be restarted
          // to examine the state at which it was shutdown. For now, we will only process these blocks if there are
-         // peers configured. This is a bit of a hack for Spring 1.0.0 until we can add a proper
-         // pause-at-block (issue #570) which could be used to explicitly request a node to not process beyond
-         // a specified block.
+         // peers configured.
          my_impl->producer_plug->process_blocks();
       }
    }
