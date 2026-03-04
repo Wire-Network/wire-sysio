@@ -315,6 +315,7 @@ namespace sysio {
    constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
    constexpr uint32_t def_max_trx_entries_per_conn_size = 100u*1024u*1024u; // 100 MB = ~100K TPS
+   constexpr uint32_t def_sync_fetch_batch_size = 32;
    constexpr auto     def_max_consecutive_immediate_connection_close = 9; // back off if client keeps closing
    constexpr auto     def_max_clients = 25; // 0 for unlimited clients
    constexpr auto     def_max_nodes_per_host = 1;
@@ -581,7 +582,7 @@ namespace sysio {
 
    static net_plugin_impl *my_impl;
 
-   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 16>;
+   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 32>;
 
    // thread safe
    class queued_buffer : boost::noncopyable {
@@ -1831,45 +1832,60 @@ namespace sysio {
       }
       uint32_t num = peer_requested->last + 1;
 
+      // Compute batch size: min of remaining blocks and batch limit
+      uint32_t remaining = peer_requested->end_block - num + 1;
+      uint32_t batch_count = std::min(remaining, def_sync_fetch_batch_size);
+
       controller& cc = my_impl->chain_plug->chain();
-      std::vector<char> sb;
+      std::vector<std::vector<char>> blocks;
       try {
-         sb = cc.fetch_serialized_block_by_number( num ); // thread-safe
+         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count ); // thread-safe
       } FC_LOG_AND_DROP();
-      if( !sb.empty() ) {
-         // Skip transmitting block this loop if threshold exceeded
-         if (block_sync_send_start == 0ns) { // start of enqueue blocks
+
+      if( !blocks.empty() ) {
+         // Initialize rate limit tracking at start of enqueue frame
+         if (block_sync_send_start == 0ns) {
             block_sync_send_start = get_time();
             block_sync_frame_bytes_sent = 0;
          }
-         if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
-            auto now = get_time();
-            auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
-            double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000; // convert from bytes/us => bytes/sec
-            peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
-                      block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
-            if( current_rate_sec >= block_sync_rate_limit ) {
-               block_sync_throttling = true;
-               peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
-               std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
-               throttle_timer->expires_after(std::chrono::milliseconds(100));
-               throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
-                  if (!ec)
-                    c->enqueue_sync_block();
-               }));
-               return false;
+
+         for (uint32_t i = 0; i < blocks.size(); ++i) {
+            uint32_t block_num = num + i;
+
+            // Check rate limit before each enqueue (preserves existing throttle behavior)
+            if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
+               auto now = get_time();
+               auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
+               double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000;
+               peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
+                         block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
+               if( current_rate_sec >= block_sync_rate_limit ) {
+                  block_sync_throttling = true;
+                  peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
+                  // Discard remaining pre-fetched blocks; timer callback re-fetches from peer_requested->last + 1
+                  std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
+                  throttle_timer->expires_after(std::chrono::milliseconds(100));
+                  throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
+                     if (!ec)
+                       c->enqueue_sync_block();
+                  }));
+                  return false;
+               }
             }
-         }
-         block_sync_throttling = false;
-         auto sent = enqueue_block( sb, num, queued_buffer::queue_t::block_sync );
-         block_sync_total_bytes_sent += sent;
-         block_sync_frame_bytes_sent += sent;
-         ++peer_requested->last;
-         if(num == peer_requested->end_block) {
-            peer_requested.reset();
-            block_sync_send_start = 0ns;
-            block_sync_frame_bytes_sent = 0;
-            peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", num );
+
+            block_sync_throttling = false;
+            auto sent = enqueue_block( blocks[i], block_num, queued_buffer::queue_t::block_sync );
+            block_sync_total_bytes_sent += sent;
+            block_sync_frame_bytes_sent += sent;
+            ++peer_requested->last;
+
+            if(block_num == peer_requested->end_block) {
+               peer_requested.reset();
+               block_sync_send_start = 0ns;
+               block_sync_frame_bytes_sent = 0;
+               peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", block_num );
+               break;
+            }
          }
       } else if (peer_requested->sync_type == peer_sync_state::sync_t::peer_catchup || peer_requested->sync_type == peer_sync_state::sync_t::block_nack) {
          // Do not have the block, likely because in the middle of a fork-switch. A fork-switch will send out
