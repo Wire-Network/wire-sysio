@@ -4328,7 +4328,6 @@ namespace sysio {
             peer_dlog( p2p_msg_log, this, "p2p-accept-transactions=false inform peer blocks only connection {}", hello.p2p_address );
          }
       }
-      hello.p2p_address += " - " + hello.node_id.str().substr(0,7);
       hello.agent = my_impl->user_agent_name;
 
       return true;
@@ -4407,7 +4406,7 @@ namespace sysio {
            "Number of blocks to retrieve in a chunk from any individual peer during synchronization")
          ( "sync-peer-limit", bpo::value<uint32_t>()->default_value(3),
            "Number of peers to sync from")
-         ( "peer-log-format", bpo::value<string>()->default_value( "[\"${_peer}\" - ${_cid} ${_ip}:${_port}] " ),
+         ( "peer-log-format", bpo::value<string>()->default_value( "[\"${_peer} - ${_sid}\" - ${_cid} ${_ip}:${_port}] " ),
            "The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.\n"
            "Available Variables:\n"
            "   _peer  \tendpoint name\n\n"
@@ -4889,10 +4888,15 @@ namespace sysio {
       connection_ptr c = shared_from_this();
 
       if (no_retry == go_away_reason::duplicate) {
-         if (auto other = my_impl->connections.is_other_connected(peer_address(), c); !!other) {
-            fc_dlog( p2p_conn_log, "Skipping connect to {} - {} due to existing connection {} - {}",
-                     peer_address(), connection_id, other->peer_address(), other->connection_id);
-            return true; // don't remvoe from valid connections
+         const auto& pa = peer_address();
+         if (my_impl->connections.any_of_connections([&pa, &c](const connection_ptr& check) {
+                if (check.get() == c.get() || !check->connected())
+                   return false;
+                fc::lock_guard g(check->conn_mtx);
+                return check->p2p_address == pa;
+             })) {
+            fc_dlog(p2p_conn_log, "Skipping connect to {} - {} due to existing inbound connection", pa, connection_id);
+            return true;
          }
       }
 
