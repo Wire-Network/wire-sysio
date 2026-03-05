@@ -231,17 +231,18 @@ try:
     success = verifyGossipConnections(scheduled_producers)
     assert(success)
 
-    Print("Verify manual connection still connected")
-    for i in range(3): # retry 3 times
+    Print("Verify manual connection still connected and stale gossip peer disconnected")
+    # After schedule change, defproducerh may still have an incoming gossip connection to
+    # node_19 from the old schedule. Multiple connection-cleanup-period cycles (5s each) may
+    # be needed before the stale gossip peer is fully pruned.
+    def checkNode19Connections():
         connections = cluster.nodes[19].processUrllibRequest("net", "connections")
         if Utils.Debug: Utils.Print(f"v1/net/connections: {connections}")
         found = connectedPeers(19, connections)
         Print(f"Found connections of Node_19: {found}")
-        if "defproducere" in found and "defproducerh" not in found:
-            break
-        time.sleep(7)
-    assert("defproducere" in found)     # still connected to manual connection
-    assert("defproducerh" not in found) # not connected to new schedule
+        return "defproducere" in found and "defproducerh" not in found
+    assert Utils.waitForBool(checkNode19Connections, timeout=60), \
+        "Expected node_19 to keep manual connection to defproducere and drop gossip connection to defproducerh"
 
     testSuccessful = success
 

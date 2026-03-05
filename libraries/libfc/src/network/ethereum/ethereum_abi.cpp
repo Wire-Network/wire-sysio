@@ -306,8 +306,7 @@ std::vector<uint8_t> encode_tuple(const abi::component_type& component, const fc
 
    std::vector<uint8_t> out;
    auto head_sizes = heads | std::views::transform([](const auto& h) { return h.size(); });
-   size_t head_size =
-      std::ranges::fold_left(head_sizes, 0UL, std::plus<>{});
+   size_t head_size = std::ranges::fold_left(head_sizes, 0UL, std::plus<>{});
    size_t offset = head_size;
 
    for (size_t i = 0; i < heads.size(); ++i) {
@@ -376,7 +375,7 @@ std::string be_int_to_decimal(const uint8_t* data) {
    boost::multiprecision::int256_t value = 0;
    // Check sign bit
    bool is_negative = (data[0] & 0x80) != 0;
-   
+
    if (is_negative) {
       // Two's complement: invert bits and add 1
       boost::multiprecision::uint256_t temp = 0;
@@ -391,6 +390,35 @@ std::string be_int_to_decimal(const uint8_t* data) {
       }
    }
    return value.str();
+}
+
+/**
+ * @brief Computes the number of bytes a component occupies in the ABI head section
+ *
+ * In Ethereum ABI encoding, the head contains either:
+ * - The full inline encoding for static types (32 bytes per scalar, recursively summed for static tuples)
+ * - A 32-byte offset pointer for dynamic types
+ *
+ * @param component ABI component type descriptor
+ * @return Number of bytes this component occupies in the head
+ */
+size_t abi_head_size(const abi::component_type& component) {
+   if (component.is_dynamic()) {
+      return 32;
+   }
+   if (component.is_list() && component.list_config.is_fixed_list()) {
+      abi::component_type elem = component;
+      elem.list_config = {};
+      return component.list_config.size * abi_head_size(elem);
+   }
+   if (component.is_container()) {
+      size_t total = 0;
+      for (const auto& child : component.components) {
+         total += abi_head_size(child);
+      }
+      return total;
+   }
+   return 32;
 }
 
 /**
@@ -409,7 +437,7 @@ fc::variant decode_value(const abi::component_type& component, const uint8_t* da
 fc::variant decode_static_value(const abi::component_type& component, const uint8_t* data, size_t& offset) {
    using dt = abi::data_type;
    const auto type = component.type;
-   
+
    FC_ASSERT(offset + 32 <= SIZE_MAX, "Offset overflow");
    const uint8_t* value_data = data + offset;
    offset += 32;
@@ -460,7 +488,8 @@ fc::variant decode_static_value(const abi::component_type& component, const uint
  * @param offset Current offset pointing to the length prefix
  * @return Decoded value as fc::variant
  */
-fc::variant decode_dynamic_data(const abi::component_type& component, const uint8_t* data, size_t data_size, size_t& offset) {
+fc::variant decode_dynamic_data(const abi::component_type& component, const uint8_t* data, size_t data_size,
+                                size_t& offset) {
    using dt = abi::data_type;
    const auto type = component.type;
 
@@ -468,7 +497,7 @@ fc::variant decode_dynamic_data(const abi::component_type& component, const uint
    FC_ASSERT(offset + 32 <= data_size, "Not enough data for dynamic length");
    auto length_str = be_uint_to_decimal(data + offset);
    offset += 32;
-   
+
    size_t length = std::stoull(length_str);
    FC_ASSERT(offset + length <= data_size, "Not enough data for dynamic content");
 
@@ -532,7 +561,7 @@ fc::variant decode_list(const abi::component_type& component, const uint8_t* dat
       std::vector<size_t> offsets;
       offsets.reserve(array_length);
       size_t base_offset = offset;
-      
+
       for (size_t i = 0; i < array_length; ++i) {
          FC_ASSERT(offset + 32 <= data_size, "Not enough data for array element offset");
          auto offset_str = be_uint_to_decimal(data + offset);
@@ -545,7 +574,7 @@ fc::variant decode_list(const abi::component_type& component, const uint8_t* dat
          size_t elem_offset = offsets[i];
          result.push_back(decode_value(elem_comp, data, data_size, elem_offset));
       }
-      
+
       // Update offset to end of last element
       if (!offsets.empty()) {
          offset = offsets.back();
@@ -718,6 +747,47 @@ fc::crypto::keccak256 abi::to_contract_function_selector(const contract& contrac
 }
 
 /**
+ * @brief Generates the canonical event signature string for an ABI event contract
+ *
+ * Creates the event signature in the format "EventName(type1,type2,...)" used
+ * for computing the event topic hash (topics[0] in log entries).
+ *
+ * @param contract ABI contract descriptor (must be of type event)
+ * @return Event signature string
+ * @throws fc::exception if contract is not an event type
+ */
+std::string abi::to_event_signature(const contract& contract) {
+   FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
+   std::stringstream ss;
+   ss << contract.name << '(';
+   std::ranges::for_each(contract.inputs | std::views::enumerate, [&](auto&& enum_item) {
+      auto& [i, input_comp] = enum_item;
+      if (i) {
+         ss << ',';
+      }
+      ss << abi::to_contract_component_signature(input_comp);
+   });
+   ss << ')';
+   return ss.str();
+}
+
+/**
+ * @brief Computes the 32-byte event topic hash for an ABI event contract
+ *
+ * Calculates the Keccak-256 hash of the event signature. This hash is used
+ * as topics[0] in Ethereum log entries to identify the event type.
+ *
+ * @param contract ABI contract descriptor (must be of type event)
+ * @return 32-byte Keccak-256 hash used as the event topic
+ * @throws fc::exception if contract is not an event type
+ */
+fc::crypto::keccak256 abi::to_event_topic(const contract& contract) {
+   FC_ASSERT(contract.type == invoke_target_type::event, "ABI contract must be an event");
+   auto signature = abi::to_event_signature(contract);
+   return fc::crypto::keccak256::hash(signature);
+}
+
+/**
  * @brief Parses multiple ABI contracts from a JSON file
  *
  * Reads and parses an Ethereum ABI JSON file containing an array of contract
@@ -729,12 +799,15 @@ fc::crypto::keccak256 abi::to_contract_function_selector(const contract& contrac
  */
 std::vector<abi::contract> abi::parse_contracts(const std::filesystem::path& json_abi_file) {
    auto json_var = fc::json::from_file(json_abi_file);
-   FC_ASSERT(json_var.is_array(), "ABI file must contain an array of contracts");
-   std::vector<abi::contract> contracts;
-   for (const auto& c : json_var.get_array()) {
-      contracts.push_back(abi::parse_contract(c.get_object()));
+   if (json_var.is_array()) {
+      return json_var.get_array() | std::views::transform([](auto& c) { return abi::parse_contract(c.get_object()); }) |
+             std::ranges::to<std::vector<abi::contract>>();
    }
-   return contracts;
+   FC_ASSERT(
+      json_var.is_object() && json_var.get_object().contains("abi") && json_var.get_object()["abi"].is_array(),
+      "ABI file must contain either an array of contracts or an object with a member (\"abi\") with an array value");
+   auto& json_obj = json_var.get_object();
+   return json_obj["abi"].as<std::vector<abi::contract>>();
 }
 
 /**
@@ -820,16 +893,18 @@ std::string contract_encode_data(const abi::contract& contract, const std::vecto
  *
  * @param contract ABI contract descriptor defining the function signature and inputs
  * @param encoded_invoke_data Hex-encoded call data string
- * @param use_inputs_instead_of_outputs it true, use contract.inputs to parse data (in which case, skip the first 4 bytes, the function selector), otherwise the default logic uses contract.outputs
+ * @param use_inputs_instead_of_outputs it true, use contract.inputs to parse data (in which case, skip the first 4
+ * bytes, the function selector), otherwise the default logic uses contract.outputs
  * @return Variant containing decoded parameters (array or object based on contract type)
  * @throws fc::exception if encoded data is too short or decoding fails
  */
-fc::variant contract_decode_data(const abi::contract& contract, const std::string& encoded_invoke_data, bool use_inputs_instead_of_outputs) {
+fc::variant contract_decode_data(const abi::contract& contract, const std::string& encoded_invoke_data,
+                                 bool use_inputs_instead_of_outputs) {
    auto bytes = fc::crypto::ethereum::hex_to_bytes(encoded_invoke_data);
-   
+
    // Determine which component list to use
    const auto& components = use_inputs_instead_of_outputs ? contract.inputs : contract.outputs;
-   
+
    // Determine starting offset
    size_t offset = 0;
    if (use_inputs_instead_of_outputs) {
@@ -837,10 +912,10 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
       FC_ASSERT(bytes.size() >= 4, "Encoded call data too short for function selector");
       offset = 4;
    }
-   
+
    const uint8_t* data = bytes.data();
    size_t data_size = bytes.size();
-   
+
    // If there's only one component, return it directly (not wrapped in an array)
    if (components.size() == 1) {
       const auto& comp = components[0];
@@ -853,46 +928,49 @@ fc::variant contract_decode_data(const abi::contract& contract, const std::strin
       }
       return decode_value(comp, data, data_size, offset);
    }
-   
-   // Decode multiple parameters
-   fc::variants results;
-   results.reserve(components.size());
-   
+
+   // Decode multiple parameters — return as a named object (like decode_tuple)
+   // when all components have names, otherwise as a positional array.
+   bool all_named = std::ranges::all_of(components, [](const auto& c) { return !c.name.empty(); });
+
    // Process each component using head/tail structure
    std::vector<size_t> offsets;
    offsets.reserve(components.size());
    size_t base_offset = offset;
-   
+
    // First pass: read heads (either static values or offset pointers)
    for (const auto& comp : components) {
 
       if (comp.is_dynamic()) {
-         // Dynamic component: read offset pointer
+         // Dynamic component: read offset pointer (always 32 bytes)
          FC_ASSERT(offset + 32 <= data_size, "Not enough data for parameter offset");
          auto offset_str = be_uint_to_decimal(data + offset);
          offsets.push_back(base_offset + std::stoull(offset_str));
          offset += 32;
       } else {
-         // Static component: decode directly
+         // Static component: inline data occupies its full encoded size
+         // (e.g., a static tuple of 4 fields occupies 4 × 32 = 128 bytes)
          offsets.push_back(offset);
-         offset += 32; // Static values are always 32 bytes
+         offset += abi_head_size(comp);
       }
    }
-   
-   // Second pass: decode each parameter
+
+   // Second pass: decode each parameter using the general dispatcher
+   if (all_named) {
+      fc::mutable_variant_object result;
+      for (size_t i = 0; i < components.size(); ++i) {
+         size_t param_offset = offsets[i];
+         result(components[i].name, decode_value(components[i], data, data_size, param_offset));
+      }
+      return fc::variant(std::move(result));
+   }
+
+   fc::variants results;
+   results.reserve(components.size());
    for (size_t i = 0; i < components.size(); ++i) {
-      const auto& comp = components[i];
       size_t param_offset = offsets[i];
-      
-      if (comp.is_dynamic()) {
-         // Decode from tail using the offset
-         results.push_back(decode_value(comp, data, data_size, param_offset));
-      } else {
-         // Decode static value (offset already points to the right place)
-         results.push_back(decode_static_value(comp, data, param_offset));
-      }
+      results.push_back(decode_value(components[i], data, data_size, param_offset));
    }
-   
    return fc::variant(std::move(results));
 }
 
@@ -919,7 +997,8 @@ void fc::from_variant(const fc::variant& var, fc::network::ethereum::abi::compon
 
    std::regex data_type_regex(R"(([a-zA-Z0-9_]+)(\[(\d*)\])?)");
    std::smatch data_type_match;
-   FC_ASSERT(std::regex_match(data_type_str, data_type_match, data_type_regex), "Invalid type format: {}", data_type_str);
+   FC_ASSERT(std::regex_match(data_type_str, data_type_match, data_type_regex), "Invalid type format: {}",
+             data_type_str);
 
    auto base_type_str = data_type_match[1].str();
    vo.name = obj["name"].as_string();

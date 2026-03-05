@@ -207,14 +207,12 @@ extern const char* const state_history_plugin_abi = R"({
         },
         {
             "name": "transaction_receipt_header", "fields": [
-                { "name": "status", "type": "uint8" },
-                { "name": "cpu_usage_us", "type": "uint32" },
-                { "name": "net_usage_words", "type": "varuint32" }
+                { "name": "cpu_usage_us", "type": "varuint32[]" }
             ]
         },
         {
             "name": "transaction_receipt", "base": "transaction_receipt_header", "fields": [
-                { "name": "trx", "type": "transaction_variant" }
+                { "name": "trx", "type": "packed_transaction" }
             ]
         },
         {
@@ -716,8 +714,6 @@ extern const char* const state_history_plugin_abi = R"({
         { "name": "action_trace", "types": ["action_trace_v0", "action_trace_v1"] },
         { "name": "partial_transaction", "types": ["partial_transaction_v0"] },
         { "name": "transaction_trace", "types": ["transaction_trace_v0"] },
-        { "name": "transaction_variant", "types": ["transaction_id", "packed_transaction"] },
-
         { "name": "table_delta", "types": ["table_delta_v0"] },
         { "name": "account", "types": ["account_v0"] },
         { "name": "account_metadata", "types": ["account_metadata_v0"] },

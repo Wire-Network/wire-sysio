@@ -13,6 +13,7 @@
 #include <boost/unordered/unordered_flat_map.hpp>
 
 #include <sysio/testing/bls_utils.hpp>
+#include <sysio/testing/native_module_context_holder.hpp>
 
 #include <iosfwd>
 #include <optional>
@@ -527,6 +528,13 @@ namespace sysio::testing {
                   cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_jit;
                else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--sys-vm-oc"))
                   cfg.wasm_runtime = chain::wasm_interface::vm_type::sys_vm_oc;
+               else if(boost::unit_test::framework::master_test_suite().argv[i] == std::string("--native-module"))
+                  cfg.wasm_runtime = chain::wasm_interface::vm_type::native_module;
+            }
+
+            // If native runtime selected, register known native contract .so files
+            if (cfg.wasm_runtime == chain::wasm_interface::vm_type::native_module) {
+               native_module_context_holder::init_native_contracts();
             }
             auto gen = default_genesis();
             if (genesis_max_inline_action_size) {

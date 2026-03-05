@@ -1971,21 +1971,6 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
    return result;
 }
 
-void read_write::push_block(read_write::push_block_params&& params, next_function<read_write::push_block_results> next) {
-   try {
-      auto b = std::make_shared<signed_block>( std::move(params) );
-      block_id_type id = b->calculate_id();
-      auto [best_head, obh] = db.accept_block( id, b );
-      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}", id);
-      app().get_method<incoming::methods::block_sync>()(b, id, *obh);
-   } catch ( boost::interprocess::bad_alloc& ) {
-      handle_db_exhaustion();
-   } catch ( const std::bad_alloc& ) {
-      handle_bad_alloc();
-   } FC_LOG_AND_DROP()
-   next(read_write::push_block_results{});
-}
-
 void read_write::push_transaction(const read_write::push_transaction_params& params, next_function<read_write::push_transaction_results> next) {
    try {
       auto ptrx = std::make_shared<packed_transaction>();

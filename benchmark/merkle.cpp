@@ -1,6 +1,5 @@
 #include <benchmark.hpp>
 #include <sysio/chain/incremental_merkle.hpp>
-#include <sysio/chain/incremental_merkle_legacy.hpp>
 #include <random>
 
 namespace sysio::benchmark {
@@ -27,7 +26,6 @@ void benchmark_calc_merkle(uint32_t size_boost) {
       num_str.insert(0, 1, ' ');
    auto msg_header = "Calc, "s + num_str + ",000 digests,  "s;
    uint32_t num_runs = std::min(get_num_runs(), std::max(1u, get_num_runs() / size_boost));
-   benchmarking(msg_header + "legacy: ", [&]() { calculate_merkle_legacy(deq); }, num_runs);
    benchmarking(msg_header + "savanna:", [&]() { calculate_merkle(digests.begin(), digests.end()); }, num_runs);
 }
 
@@ -50,7 +48,6 @@ void benchmark_incr_merkle(uint32_t size_boost) {
       return work_tree.get_root();
    };
 
-   benchmarking(msg_header + "legacy: ", [&]() { incr(incremental_merkle_tree_legacy()); }, num_runs);
    benchmarking(msg_header + "savanna:", [&]() { incr(incremental_merkle_tree()); }, num_runs);
 }
 
