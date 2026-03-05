@@ -1074,9 +1074,18 @@
             ]
         },
         {
-            "name": "switchtosvnn",
+            "name": "setrank",
             "base": "",
-            "fields": []
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "rank",
+                    "type": "uint32"
+                }
+            ]
         },
         {
             "name": "sysio_global_state",
@@ -1101,14 +1110,6 @@
                 {
                     "name": "total_unpaid_blocks",
                     "type": "uint32"
-                },
-                {
-                    "name": "total_activated_stake",
-                    "type": "int64"
-                },
-                {
-                    "name": "thresh_activated_stake_time",
-                    "type": "time_point"
                 },
                 {
                     "name": "last_producer_schedule_size",
@@ -1245,7 +1246,7 @@
             ]
         },
         {
-            "name": "limit_auth_change",
+            "name": "block_info_record",
             "base": "",
             "fields": [
                 {
@@ -1253,16 +1254,12 @@
                     "type": "uint8"
                 },
                 {
-                    "name": "account",
-                    "type": "name"
+                    "name": "block_height",
+                    "type": "uint32"
                 },
                 {
-                    "name": "allow_perms",
-                    "type": "name[]"
-                },
-                {
-                    "name": "disallow_perms",
-                    "type": "name[]"
+                    "name": "block_timestamp",
+                    "type": "time_point"
                 }
             ]
         },
@@ -1338,6 +1335,28 @@
             ]
         },
         {
+            "name": "limit_auth_change",
+            "base": "",
+            "fields": [
+                {
+                    "name": "version",
+                    "type": "uint8"
+                },
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "allow_perms",
+                    "type": "name[]"
+                },
+                {
+                    "name": "disallow_perms",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
             "name": "addtrxp",
             "base": "",
             "fields": [
@@ -1398,24 +1417,6 @@
                 {
                     "name": "last_trx_priority_update",
                     "type": "block_timestamp_type"
-                }
-            ]
-        },
-        {
-            "name": "block_info_record",
-            "base": "",
-            "fields": [
-                {
-                    "name": "version",
-                    "type": "uint8"
-                },
-                {
-                    "name": "block_height",
-                    "type": "uint32"
-                },
-                {
-                    "name": "block_timestamp",
-                    "type": "time_point"
                 }
             ]
         }
@@ -1567,8 +1568,8 @@
             "ricardian_contract": ""
         },
         {
-            "name": "switchtosvnn",
-            "type": "switchtosvnn",
+            "name": "setrank",
+            "type": "setrank",
             "ricardian_contract": ""
         },
         {
@@ -1711,8 +1712,8 @@
             "key_types": []
         },
         {
-            "name": "limitauthchg",
-            "type": "limit_auth_change",
+            "name": "blockinfo",
+            "type": "block_info_record",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1720,6 +1721,13 @@
         {
             "name": "peerkeys",
             "type": "peer_key",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "limitauthchg",
+            "type": "limit_auth_change",
             "index_type": "i64",
             "key_names": [],
             "key_types": []
@@ -1734,13 +1742,6 @@
         {
             "name": "trxpriority",
             "type": "trx_prio",
-            "index_type": "i64",
-            "key_names": [],
-            "key_types": []
-        },
-        {
-            "name": "blockinfo",
-            "type": "block_info_record",
             "index_type": "i64",
             "key_names": [],
             "key_types": []

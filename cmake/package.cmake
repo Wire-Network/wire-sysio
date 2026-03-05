@@ -84,3 +84,5 @@ set(CPACK_RPM_PACKAGE_DESCRIPTION "${CPACK_COMPONENT_BASE_DESCRIPTION}")
 #turn some knobs to try and make package paths cooperate with GNUInstallDirs a little better
 set(CPACK_SET_DESTDIR ON)
 set(CPACK_PACKAGE_RELOCATABLE OFF)
+
+include(CPack)

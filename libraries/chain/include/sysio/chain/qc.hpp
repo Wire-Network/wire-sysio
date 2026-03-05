@@ -273,6 +273,7 @@ namespace sysio::chain {
 
    private:
       friend struct fc::reflector<aggregating_qc_t>;
+      mutable std::unique_ptr<std::mutex> _mtx{std::make_unique<std::mutex>()}; // protects cross-policy atomicity between aggregate_vote and get_best_qc
       finalizer_policy_ptr                active_finalizer_policy;  // not modified after construction
       finalizer_policy_ptr                pending_finalizer_policy; // not modified after construction
       aggregating_qc_sig_t                active_policy_sig;

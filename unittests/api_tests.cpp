@@ -804,7 +804,6 @@ BOOST_AUTO_TEST_CASE(light_validation_skip_cfa) try {
    auto check_action_traces = [](const auto& t, const auto& ot) {
       BOOST_CHECK_EQUAL("", ot.console); // cfa not executed for light validation (trusted producer)
       BOOST_CHECK_EQUAL(t.receipt->global_sequence, ot.receipt->global_sequence);
-      BOOST_CHECK_EQUAL(t.digest_legacy(), ot.digest_legacy());
       BOOST_CHECK_EQUAL(t.digest_savanna(), ot.digest_savanna());
    };
 

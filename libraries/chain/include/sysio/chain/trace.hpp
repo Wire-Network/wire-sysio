@@ -76,21 +76,6 @@ namespace sysio::chain {
 
          return e.result();
       }
-
-      digest_type digest_legacy()const {
-         assert(!!receipt);
-         const action_receipt& r = *receipt;
-
-         digest_type::encoder e;
-         fc::raw::pack(e, r.receiver);
-         fc::raw::pack(e, r.act_digest);
-         fc::raw::pack(e, r.global_sequence);
-         fc::raw::pack(e, r.recv_sequence);
-         fc::raw::pack(e, r.auth_sequence);
-         fc::raw::pack(e, r.code_sequence);
-         fc::raw::pack(e, r.abi_sequence);
-         return e.result();
-      }
    };
 
    struct transaction_trace {

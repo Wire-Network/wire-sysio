@@ -215,7 +215,9 @@ namespace sysio::chain {
          // validate account net with objective net_usage_leeway
          for (auto& [account, bill] : accounts_billing) {
             verify_net_usage(account, bill.net_usage, cfg.net_usage_leeway);
-            std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+            if (!explicit_billed_cpu_time) {
+               std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+            }
          }
       }
 
@@ -294,7 +296,7 @@ namespace sysio::chain {
       }
 
       init();
-      if ( !is_read_only() ) {
+      if ( !is_read_only() && trx.expiration.to_time_point() >= control.pending_lib_time() ) {
          record_transaction( packed_trx.id(), trx.expiration );
       }
    }
@@ -364,7 +366,8 @@ namespace sysio::chain {
                   execute_action(i, 0);
                } catch (const fc::exception& e) {
                   if (!explicit_billed_cpu_time && e.code() != interrupt_oc_exception::code_value) {
-                     auto billed_time = fc::time_point::now() - action_start;
+                     // clamp to 0 due to possible clock skew
+                     auto billed_time = std::max(fc::time_point::now() - action_start, fc::microseconds(0));
                      assert(billed_cpu_us.size() == i-1);
                      billed_cpu_us.emplace_back(billed_time.count());
                   }
@@ -372,7 +375,8 @@ namespace sysio::chain {
                }
                if (enforce_deadline)
                   transaction_timer.stop();
-               auto billed_time = fc::time_point::now() - action_start;
+               // clamp to 0 due to possible clock skew
+               auto billed_time = std::max(fc::time_point::now() - action_start, fc::microseconds(0));
                if (explicit_billed_cpu_time) {
                   action_traces[i - 1].cpu_usage_us = billed_cpu_us[i - 1];
                } else {
@@ -398,7 +402,7 @@ namespace sysio::chain {
       // read-only transactions only need net_usage and elapsed in the trace
       if ( is_read_only() ) {
          auto now = fc::time_point::now();
-         trace->elapsed = now - start;
+         trace->elapsed = std::max(now - start, fc::microseconds(0));
          update_billed_cpu_time(now);
          return;
       }
@@ -414,11 +418,13 @@ namespace sysio::chain {
       constexpr uint32_t net_leeway = 0;
       for (auto& [account, bill]: accounts_billing) {
          verify_net_usage(account, bill.net_usage, net_leeway);
-         std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+         if (!explicit_billed_cpu_time) {
+            std::tie(bill.cpu_limit_us, bill.cpu_greylisted, std::ignore) = get_cpu_limit(account);
+         }
       }
 
       auto now = fc::time_point::now();
-      trace->elapsed = now - start;
+      trace->elapsed = std::max(now - start, fc::microseconds(0));
 
       // Update CPU time and validate CPU usage
       assert(billed_cpu_us.size() == packed_trx.get_transaction().total_actions());

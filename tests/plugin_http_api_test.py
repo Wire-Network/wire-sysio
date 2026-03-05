@@ -720,25 +720,6 @@ class PluginHttpTest(unittest.TestCase):
         # verify the returned transaction id.
         self.assertEqual(ret_str, "\"9b807e8b37cfb9e30aa9d68f257b3170addf5805b8bd1df2455f8893977c9f85\"")
 
-        # push_block with empty parameter
-        endpoint=self.endpoint("chain_rw")
-        command = "push_block"
-        ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # push_block with empty content parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.empty_content_dict, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # push_block with invalid parameter
-        ret_json = self.nodeop.processUrllibRequest(resource, command, self.http_post_invalid_param, endpoint=endpoint)
-        self.assertEqual(ret_json["code"], 400)
-        self.assertEqual(ret_json["error"]["code"], 3200006)
-        # push_block with valid parameter
-        payload = {"block":"signed_block"}
-        ret_json = self.nodeop.processUrllibRequest(resource, command, payload, endpoint=endpoint)
-        self.assertEqual(len(ret_json["payload"]), 0)
-
         # push_transaction with empty parameter
         command = "push_transaction"
         ret_json = self.nodeop.processUrllibRequest(resource, command, endpoint=endpoint)

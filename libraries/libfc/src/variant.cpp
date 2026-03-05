@@ -752,6 +752,10 @@ size_t variant::estimated_size()const
    case double_type:
    case bool_type:
       return sizeof(*this);
+   case int128_type:
+   case uint128_type:
+   case int256_type:
+   case uint256_type:
    case string_type:
       return as_string().length() + sizeof(std::string) + sizeof(*this);
    case array_type:

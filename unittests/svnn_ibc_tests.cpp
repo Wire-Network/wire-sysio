@@ -54,21 +54,26 @@ auto active_finalizers_string = [](const finality_proof::ibc_block_data_t& bd)  
 BOOST_AUTO_TEST_SUITE(svnn_ibc)
 
    BOOST_AUTO_TEST_CASE(ibc_test) { try {
-      SKIP_TEST // TODO: Update test. Savanna begins in genesis.
 
-      // cluster is set up with the head about to produce IF Genesis
-      finality_proof::proof_test_cluster<4> cluster;
+      // cluster is set up with Savanna active at genesis.
+      // transition_to_savanna = true sets up the finalizer policy and produces
+      // enough blocks for it to become active.
+      finality_proof::proof_test_cluster<4> cluster(finality_cluster_config_t{.transition_to_savanna = true});
 
-      // produce IF Genesis block
-      auto genesis_block_result = cluster.produce_block();
-
-      // ensure out of scope setup and initial cluster wiring is consistent
-      BOOST_CHECK_EQUAL(genesis_block_result.block->block_num(), 4u);
-      
       BOOST_CHECK_EQUAL(cluster.active_finalizer_policy.finalizers.size(), cluster.num_nodes);
-      BOOST_CHECK_EQUAL(cluster.active_finalizer_policy.generation, 1u);
+      BOOST_CHECK_EQUAL(cluster.active_finalizer_policy.generation, 2u);
 
-      // create the ibc account and deploy the ibc contract to it 
+      // B = number of finality leaves from setup (genesis + BIOS blocks + policy activation).
+      // All finality tree indices in this test are offset by B.
+      // Matches Spring's layout: index 0 = genesis, index 1 = transition (block_1_result),
+      // index 2 = block_2_result, etc.  Here: B+0 = dummy, B+1 = block_1_result, B+2 = block_2_result.
+      const size_t B = cluster.num_setup_leaves();
+
+      // One dummy block matching Spring's IF genesis block → finality_leaves[B+0]
+      cluster.produce_block();
+
+      // create the ibc account and deploy the ibc contract to it
+      // (these transactions will be included in the next produced block)
       cluster.node0.create_account( "ibc"_n );
       cluster.node0.set_code( "ibc"_n, sysio::testing::test_contracts::ibc_wasm());
       cluster.node0.set_abi( "ibc"_n, sysio::testing::test_contracts::ibc_abi());
@@ -78,25 +83,22 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
          ("policy", cluster.active_finalizer_policy)
       );
 
-      // Transition block. Finalizers are not expected to vote on this block.
-      // Note : block variable names are identified by ordinal number after IF genesis, and not by their block num
-      auto block_1_result = cluster.produce_block(); //block num : 5
+      // block_1_result matches Spring's transition block → finality_leaves[B+1]
+      // Contains the IBC contract deployment transactions.
+      auto block_1_result = cluster.produce_block();
 
-      // Proper IF Block. From now on, finalizers must vote.
-      // Moving forward, the header action_mroot field is reconverted to provide the finality_mroot.
-      // The action_mroot is instead provided via the finality data
-      auto block_2_result = cluster.produce_block(); //block num : 6
-      
+      auto block_2_result = cluster.produce_block();
+
       // block_3 contains a QC over block_2
-      auto block_3_result = cluster.produce_block(); //block num : 7
+      auto block_3_result = cluster.produce_block();
 
       // block_4 contains a QC over block_3, which completes the 2-chain for block_2 and
       // serves as a proof of finality for it
-      auto block_4_result = cluster.produce_block(); //block num : 8
+      auto block_4_result = cluster.produce_block();
 
       // block_5 contains a QC over block_4.
-      auto block_5_result = cluster.produce_block(); //block num : 9
-      auto block_6_result = cluster.produce_block(); //block num : 10
+      auto block_5_result = cluster.produce_block();
+      auto block_6_result = cluster.produce_block();
 
       BOOST_TEST(block_4_result.qc_data.qc.has_value());
       BOOST_TEST(block_5_result.qc_data.qc.has_value());
@@ -114,23 +116,23 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
+                  ("active_finalizer_policy_generation", block_3_result.active_finalizer_policy_generation)
                   ("witness_hash", block_3_result.level_2_commitments_digest)
                   ("finality_mroot", block_3_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_4_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_4_result)) 
+                  ("finalizers", active_finalizers_string(block_4_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 2)
-               ("final_block_index", 2)
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+2)
+               ("final_block_index", B+2)
                ("target", fc::variants{"extended_block_data", mvo() //target block #2
                   ("finality_data", mvo() 
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_2_result.active_finalizer_policy_generation)
                      ("witness_hash", block_2_result.level_2_commitments_digest)
                      ("finality_mroot", block_2_result.finality_root)
                   )
@@ -142,7 +144,7 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
                      ("action_mroot", block_2_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(2), 2))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+2), B+2))
             )
          );
 
@@ -153,7 +155,7 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
+                  ("active_finalizer_policy_generation", block_3_result.active_finalizer_policy_generation)
                   ("witness_hash", block_3_result.level_2_commitments_digest)
                   ("finality_mroot", block_3_result.finality_root)
                )
@@ -162,87 +164,87 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
                   ("finalizers", active_finalizers_string(block_4_result)) 
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 2)
-               ("final_block_index", 2)
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+2)
+               ("final_block_index", B+2)
                ("target", fc::variants{"simple_block_data", mvo() //target block #2
                   ("major_version", 1)
                   ("minor_version", 0)
                   ("finality_digest", block_2_result.finality_digest)
                   ("timestamp", block_2_result.block->timestamp)
                   ("parent_timestamp", block_2_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_2_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_2_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(2), 2))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+2), B+2))
             )
          );
 
       // heavy proof #2. Proving finality of block #2 using block #3 finality root
       mutable_variant_object heavy_proof_2 = mvo()
-         ("proof", mvo() 
+         ("proof", mvo()
             ("finality_proof", mvo()  //proves finality of block #3
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
+                  ("active_finalizer_policy_generation", block_4_result.active_finalizer_policy_generation)
                   ("witness_hash", block_4_result.level_2_commitments_digest)
                   ("finality_mroot", block_4_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_5_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_5_result)) 
+                  ("finalizers", active_finalizers_string(block_5_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 2)
-               ("final_block_index", 3)
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+2)
+               ("final_block_index", B+3)
                ("target", fc::variants{"extended_block_data", mvo() //target block #2
-                  ("finality_data", mvo() 
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_2_result.active_finalizer_policy_generation)
                      ("witness_hash", block_2_result.level_2_commitments_digest)
                      ("finality_mroot", block_2_result.finality_root)
                   )
                   ("timestamp", block_2_result.block->timestamp)
                   ("parent_timestamp", block_2_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_2_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_2_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(3), 2))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+3), B+2))
             )
          );
 
       // light proof #1. Attempt to prove finality of block #2 with previously proven finality root of block #2
       mutable_variant_object light_proof_1 = mvo()
-         ("proof", mvo() 
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 2)
-               ("final_block_index", 2)
-               ("target", fc::variants{"extended_block_data", mvo() 
-                  ("finality_data", mvo() 
+         ("proof", mvo()
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+2)
+               ("final_block_index", B+2)
+               ("target", fc::variants{"extended_block_data", mvo()
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_2_result.active_finalizer_policy_generation)
                      ("witness_hash", block_2_result.level_2_commitments_digest)
                      ("finality_mroot", block_2_result.finality_root)
                   )
                   ("timestamp", block_2_result.block->timestamp)
                   ("parent_timestamp", block_2_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_2_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_2_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(2), 2))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+2), B+2))
             )
          );
       
@@ -383,64 +385,64 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
 
       // proof to verify the inclusion of onblock action via heavy proof
       mutable_variant_object action_heavy_proof = mvo()
-         ("proof", mvo() 
+         ("proof", mvo()
             ("finality_proof", mvo() //proves finality of block #7
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
+                  ("active_finalizer_policy_generation", block_8_result.active_finalizer_policy_generation)
                   ("witness_hash", block_8_result.level_2_commitments_digest)
                   ("finality_mroot", block_8_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_9_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_9_result)) 
+                  ("finalizers", active_finalizers_string(block_9_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 7)
-               ("final_block_index", 7)
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+7)
+               ("final_block_index", B+7)
                ("target", fc::variants{"extended_block_data", mvo() //target block #7
-                  ("finality_data", mvo() 
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_7_result.active_finalizer_policy_generation)
                      ("witness_hash", block_7_result.level_2_commitments_digest)
                      ("finality_mroot", block_7_result.finality_root)
                   )
                   ("timestamp", block_7_result.block->timestamp)
                   ("parent_timestamp", block_7_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_7_result.block->block_num())
                      ("action_proofs", fc::variants({onblock_action_proof}))
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(7), 7))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+7), B+7))
             )
          );
 
       // proof to verify the inclusion of the first and second actions via light proof
       mutable_variant_object action_light_proof = mvo()
-         ("proof", mvo() 
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 7)
-               ("final_block_index", 7)
-               ("target", fc::variants{"extended_block_data", mvo() 
-                  ("finality_data", mvo() 
+         ("proof", mvo()
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+7)
+               ("final_block_index", B+7)
+               ("target", fc::variants{"extended_block_data", mvo()
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_7_result.active_finalizer_policy_generation)
                      ("witness_hash", block_7_result.level_2_commitments_digest)
                      ("finality_mroot", block_7_result.finality_root)
                   )
                   ("timestamp", block_7_result.block->timestamp)
                   ("parent_timestamp", block_7_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_7_result.block->block_num())
                      ("action_proofs", fc::variants({action_proof_1, action_proof_2}))
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(7), 7))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+7), B+7))
             )
          );
 
@@ -456,7 +458,7 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
       // verify that the new finalizer policy is now in force
       BOOST_TEST(previous_policy_digest!=cluster.active_finalizer_policy_digest);
 
-      auto block_13_result = cluster.produce_block(); 
+      auto block_13_result = cluster.produce_block();
 
       // we can verify that the blocks containing single policy QCs (#10 and #13) don't have a pending policy QC
       // and we can verify that policy transition blocks where another policy is pending (#11 and #12) also carry a QC from that policy
@@ -485,41 +487,41 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
       BOOST_TEST(block_17_result.qc_data.qc.has_value());
 
       mutable_variant_object heavy_proof_3 = mvo()
-         ("proof", mvo() 
+         ("proof", mvo()
             ("finality_proof", mvo()
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
-                  ("pending_finalizer_policy_generation", 2)
+                  ("active_finalizer_policy_generation", block_10_result.active_finalizer_policy_generation)
+                  ("pending_finalizer_policy_generation", block_10_result.last_pending_finalizer_policy_generation)
                   ("witness_hash", block_10_result.level_2_commitments_digest)
                   ("finality_mroot", block_10_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_11_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_11_result)) 
+                  ("finalizers", active_finalizers_string(block_11_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 9)
-               ("final_block_index", 9)
-               ("target",  fc::variants{"extended_block_data", mvo() 
-                  ("finality_data", mvo() 
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+9)
+               ("final_block_index", B+9)
+               ("target",  fc::variants{"extended_block_data", mvo()
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
+                     ("active_finalizer_policy_generation", block_9_result.active_finalizer_policy_generation)
                      ("witness_hash", block_9_result.level_2_commitments_digest)
                      ("finality_mroot", block_9_result.finality_root)
                   )
                   ("timestamp", block_9_result.block->timestamp)
                   ("parent_timestamp", block_9_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_9_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_9_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(9), 9))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+9), B+9))
             )
          );
 
@@ -544,34 +546,34 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
       // This allows us to prove this finalizer policy to the IBC contract, and use it to prove finality of subsequent blocks.
 
       mutable_variant_object heavy_proof_4 = mvo()
-         ("proof", mvo() 
+         ("proof", mvo()
             ("finality_proof", mvo()
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 1)
-                  ("last_pending_finalizer_policy_generation", 2)
+                  ("active_finalizer_policy_generation", block_11_result.active_finalizer_policy_generation)
+                  ("last_pending_finalizer_policy_generation", block_11_result.last_pending_finalizer_policy_generation)
                   ("witness_hash", block_11_result.level_2_commitments_digest)
                   ("finality_mroot", block_11_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_12_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_12_result)) 
+                  ("finalizers", active_finalizers_string(block_12_result))
                )
                ("pending_policy_qc", mvo()
                   ("signature", block_12_result.qc_data.qc.value().pending_policy_sig.value().sig.to_string())
-                  ("finalizers", active_finalizers_string(block_12_result)) 
+                  ("finalizers", active_finalizers_string(block_12_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 10)
-               ("final_block_index", 10)
-               ("target",  fc::variants{"extended_block_data", mvo() 
-                  ("finality_data", mvo() 
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+10)
+               ("final_block_index", B+10)
+               ("target",  fc::variants{"extended_block_data", mvo()
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
-                     ("last_pending_finalizer_policy_generation", 2)
+                     ("active_finalizer_policy_generation", block_10_result.active_finalizer_policy_generation)
+                     ("last_pending_finalizer_policy_generation", block_10_result.last_pending_finalizer_policy_generation)
                      ("pending_finalizer_policy", cluster.last_pending_finalizer_policy)
                      ("witness_hash", block_10_result.level_3_commitments_digest)
                      ("last_pending_finalizer_policy_start_timestamp", block_10_result.last_pending_finalizer_policy_start_timestamp )
@@ -579,13 +581,13 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
                   )
                   ("timestamp", block_10_result.block->timestamp)
                   ("parent_timestamp", block_10_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_10_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_10_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(10), 10))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+10), B+10))
             )
          );
 
@@ -598,41 +600,41 @@ BOOST_AUTO_TEST_SUITE(svnn_ibc)
       // heavy_proof_4 must be proven before we can prove heavy_proof_5.
 
       mutable_variant_object heavy_proof_5 = mvo()
-         ("proof", mvo() 
+         ("proof", mvo()
             ("finality_proof", mvo()
                ("qc_block", mvo()
                   ("major_version", 1)
                   ("minor_version", 0)
-                  ("active_finalizer_policy_generation", 2)
+                  ("active_finalizer_policy_generation", block_12_result.active_finalizer_policy_generation)
                   ("witness_hash", block_12_result.level_2_commitments_digest)
                   ("finality_mroot", block_12_result.finality_root)
                )
                ("active_policy_qc", mvo()
                   ("signature", block_13_result.qc_data.qc.value().active_policy_sig.sig.to_string())
-                  ("finalizers", active_finalizers_string(block_13_result)) 
+                  ("finalizers", active_finalizers_string(block_13_result))
                )
             )
-            ("target_block_proof_of_inclusion", mvo() 
-               ("target_block_index", 11)
-               ("final_block_index", 11)
-               ("target",  fc::variants{"extended_block_data", mvo() 
-                  ("finality_data", mvo() 
+            ("target_block_proof_of_inclusion", mvo()
+               ("target_block_index", B+11)
+               ("final_block_index", B+11)
+               ("target",  fc::variants{"extended_block_data", mvo()
+                  ("finality_data", mvo()
                      ("major_version", 1)
                      ("minor_version", 0)
-                     ("active_finalizer_policy_generation", 1)
-                     ("last_pending_finalizer_policy_generation", 2)
+                     ("active_finalizer_policy_generation", block_11_result.active_finalizer_policy_generation)
+                     ("last_pending_finalizer_policy_generation", block_11_result.last_pending_finalizer_policy_generation)
                      ("witness_hash", block_11_result.level_2_commitments_digest)
                      ("finality_mroot", block_11_result.finality_root)
                   )
                   ("timestamp", block_11_result.block->timestamp)
                   ("parent_timestamp", block_11_result.parent_timestamp)
-                  ("dynamic_data", mvo() 
+                  ("dynamic_data", mvo()
                      ("block_num", block_11_result.block->block_num())
                      ("action_proofs", fc::variants())
                      ("action_mroot", block_11_result.action_mroot)
                   )}
                )
-               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(11), 11))
+               ("merkle_branches", finality_proof::generate_proof_of_inclusion(cluster.get_finality_leaves(B+11), B+11))
             )
          );
 

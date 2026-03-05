@@ -1366,7 +1366,6 @@ struct get_schedule_subcommand {
          }
          print("active", result["active"]);
          print("pending", result["pending"]);
-         print("proposed", result["proposed"]);
       });
    }
 };

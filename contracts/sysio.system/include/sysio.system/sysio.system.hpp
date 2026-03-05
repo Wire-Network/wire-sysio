@@ -53,6 +53,8 @@ namespace sysiosystem {
          return ( flags & ~static_cast<F>(field) );
    }
 
+
+   static constexpr size_t   max_producers         = 21;
    static constexpr uint32_t seconds_per_year      = 52 * 7 * 24 * 3600;
    static constexpr uint32_t seconds_per_day       = 24 * 3600;
    static constexpr uint32_t seconds_per_hour      = 3600;
@@ -83,15 +85,13 @@ namespace sysiosystem {
       block_timestamp      last_producer_schedule_update;
       time_point           last_pervote_bucket_fill;
       uint32_t             total_unpaid_blocks = 0; /// all blocks which have been produced but not paid
-      int64_t              total_activated_stake = 0;
-      time_point           thresh_activated_stake_time;
       uint16_t             last_producer_schedule_size = 0;
 
       // explicit serialization macro is not necessary, used here only to improve compilation time
       SYSLIB_SERIALIZE_DERIVED( sysio_global_state, sysio::blockchain_parameters,
                                 (max_ram_size)(total_ram_bytes_reserved)
                                 (last_producer_schedule_update)(last_pervote_bucket_fill)
-                                (total_unpaid_blocks)(total_activated_stake)(thresh_activated_stake_time)
+                                (total_unpaid_blocks)
                                 (last_producer_schedule_size) )
    };
 
@@ -379,15 +379,18 @@ namespace sysiosystem {
          void unregprod( const name& producer );
 
          /**
-          * Action to permanently transition to Savanna consensus.
-          * Create the first generation of finalizer policy and activate
-          * the policy by using `set_finalizers` host function
+          * Set the rank of an individual producer. Rank determines scheduling
+          * priority — lower rank values are scheduled first. Producers with
+          * rank > 21 are considered standby.
+          *
+          * @param producer - registered producer account,
+          * @param rank - positive integer rank (1 = highest priority).
           *
           * @pre Require the authority of the contract itself
-          * @pre A sufficient numner of the top 21 block producers have registered a finalizer key
+          * @pre producer must be a registered producer
           */
          [[sysio::action]]
-         void switchtosvnn();
+         void setrank( const name& producer, uint32_t rank );
 
          /**
           * Action to register a finalizer key by a registered producer.
@@ -585,7 +588,10 @@ namespace sysiosystem {
 
          // defined in voting.cpp
          void register_producer( const name& producer, const sysio::block_signing_authority& producer_authority, const std::string& url, uint16_t location );
-         void update_elected_producers( const block_timestamp& timestamp );
+         void update_ranked_producers( const block_timestamp& timestamp );
+
+         // defined in sysio.system.cpp
+         void assign_producer_ranks( const std::vector<name>& producers );
 
          // defined in block_info.cpp
          void add_to_blockinfo_table(const sysio::checksum256& previous_block_id, const sysio::block_timestamp timestamp) const;
