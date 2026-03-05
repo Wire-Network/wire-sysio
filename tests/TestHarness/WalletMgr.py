@@ -41,7 +41,7 @@ class WalletMgr(object):
         return " --wallet-url http://%s:%d" % (self.host, self.port)
 
     def getArgs(self):
-        return " --url http://%s:%d%s %s" % (self.nodeopHost, self.nodeopPort, self.getWalletEndpointArgs(), Utils.MiscSysClientArgs)
+        return " --wallet-dir %s --url http://%s:%d%s %s" % (WalletMgr.__walletDataDir, self.nodeopHost, self.nodeopPort, self.getWalletEndpointArgs(), Utils.MiscSysClientArgs)
 
     def isLaunched(self):
         return self.walletPid is not None
@@ -86,8 +86,8 @@ class WalletMgr(object):
                     statusMsg+=" port %d is NOT available." % (self.port)
                 Utils.Print("Launching %s, note similar processes running. %s" % (Utils.SysWalletName, statusMsg))
 
-        cmd="%s --data-dir %s --config-dir %s --unlock-timeout=999999 --http-server-address=%s:%d --http-max-response-time-ms 99999 --verbose-http-errors" % (
-            Utils.SysWalletPath, WalletMgr.__walletDataDir, WalletMgr.__walletDataDir, self.host, self.port)
+        cmd="%s --wallet-dir %s --data-dir %s --config-dir %s --unlock-timeout=999999 --http-server-address=%s:%d --http-max-response-time-ms 99999 --verbose-http-errors" % (
+            Utils.SysWalletPath, WalletMgr.__walletDataDir, WalletMgr.__walletDataDir, WalletMgr.__walletDataDir, self.host, self.port)
         if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
         if not os.path.isdir(WalletMgr.__walletDataDir):
             if Utils.Debug: Utils.Print(f"Creating dir {WalletMgr.__walletDataDir} in dir: {os.getcwd()}")
