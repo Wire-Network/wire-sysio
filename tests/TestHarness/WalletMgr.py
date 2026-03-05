@@ -51,12 +51,13 @@ class WalletMgr(object):
 
     def findAvailablePort(self):
         for i in range(WalletMgr.__MaxPort):
-            port=self.port+i
+            port=self.port+i  # pyright: ignore[reportOptionalOperand]
             if port > WalletMgr.__MaxPort:
                 port-=WalletMgr.__MaxPort
             if Utils.arePortsAvailable(port):
                 return port
-            if Utils.Debug: Utils.Print("Port %d not available for %s" % (port, Utils.SysWalletPath))
+            if Utils.Debug:
+                Utils.Print("Port %d not available for %s" % (port, Utils.SysWalletPath))
 
         Utils.errorExit("Failed to find free port to use for %s" % (Utils.SysWalletPath))
 
@@ -88,9 +89,11 @@ class WalletMgr(object):
 
         cmd="%s --wallet-dir %s --data-dir %s --config-dir %s --unlock-timeout=999999 --http-server-address=%s:%d --http-max-response-time-ms 99999 --verbose-http-errors" % (
             Utils.SysWalletPath, WalletMgr.__walletDataDir, WalletMgr.__walletDataDir, WalletMgr.__walletDataDir, self.host, self.port)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         if not os.path.isdir(WalletMgr.__walletDataDir):
-            if Utils.Debug: Utils.Print(f"Creating dir {WalletMgr.__walletDataDir} in dir: {os.getcwd()}")
+            if Utils.Debug:
+                Utils.Print(f"Creating dir {WalletMgr.__walletDataDir} in dir: {os.getcwd()}")
             os.makedirs(WalletMgr.__walletDataDir)
         with open(WalletMgr.__walletLogOutFile, 'w') as sout, open(WalletMgr.__walletLogErrFile, 'w') as serr:
             self.popenProc=subprocess.Popen(cmd.split(), stdout=sout, stderr=serr)
@@ -100,9 +103,11 @@ class WalletMgr(object):
         time.sleep(2)
 
         try:
-            if Utils.Debug: Utils.Print("Checking if %s launched. %s" % (Utils.SysWalletName, pgrepCmd))
+            if Utils.Debug:
+                Utils.Print("Checking if %s launched. %s" % (Utils.SysWalletName, pgrepCmd))
             psOut=Utils.checkOutput(pgrepCmd.split())
-            if Utils.Debug: Utils.Print("Launched %s. {%s}" % (Utils.SysWalletName, psOut))
+            if Utils.Debug:
+                Utils.Print("Launched %s. {%s}" % (Utils.SysWalletName, psOut))
         except subprocess.CalledProcessError as ex:
             Utils.Print(f"STDOUT: {ex.output}")
             Utils.Print(f"STDERR: {ex.stderr}")
@@ -113,12 +118,14 @@ class WalletMgr(object):
     def create(self, name, accounts=None, exitOnError=True):
         wallet=self.wallets.get(name)
         if wallet is not None:
-            if Utils.Debug: Utils.Print("Wallet \"%s\" already exists. Returning same." % name)
+            if Utils.Debug:
+                Utils.Print("Wallet \"%s\" already exists. Returning same." % name)
             return wallet
         p = re.compile(r'\n\"(\w+)\"\n', re.MULTILINE)
         cmdDesc="wallet create"
         cmd="%s %s %s --name %s --to-console" % (Utils.SysClientPath, self.getArgs(), cmdDesc, name)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         retStr=None
         maxRetryCount=4
         retryCount=0
@@ -138,7 +145,8 @@ class WalletMgr(object):
                             portStatus="AVAILABLE"
                         else:
                             portStatus="NOT AVAILABLE"
-                    if Utils.Debug: Utils.Print("%s was not accepted, delaying for %d seconds and trying again. port %d is %s. %s - {%s}" % (cmdDesc, delay, self.port, pgrepCmd, psOut, portStatus))
+                    if Utils.Debug:
+                        Utils.Print("%s was not accepted, delaying for %d seconds and trying again. port %d is %s. %s - {%s}" % (cmdDesc, delay, self.port, pgrepCmd, psOut, portStatus))
                     time.sleep(delay)
                     continue
 
@@ -177,7 +185,8 @@ class WalletMgr(object):
         warningMsg="Key already in wallet"
         cmd="%s %s wallet import --name %s --private-key %s" % (
             Utils.SysClientPath, self.getArgs(), wallet.name, account.ownerPrivateKey)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         try:
             Utils.checkOutput(cmd.split())
         except subprocess.CalledProcessError as ex:
@@ -194,7 +203,8 @@ class WalletMgr(object):
         else:
             cmd="%s %s wallet import --name %s  --private-key %s" % (
                 Utils.SysClientPath, self.getArgs(), wallet.name, account.activePrivateKey)
-            if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+            if Utils.Debug:
+                Utils.Print("cmd: %s" % (cmd))
             try:
                 Utils.checkOutput(cmd.split())
             except subprocess.CalledProcessError as ex:
@@ -211,7 +221,8 @@ class WalletMgr(object):
 
     def lockWallet(self, wallet):
         cmd="%s %s wallet lock --name %s" % (Utils.SysClientPath, self.getArgs(), wallet.name)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
             Utils.Print("ERROR: Failed to lock wallet %s." % (wallet.name))
             return False
@@ -220,7 +231,8 @@ class WalletMgr(object):
 
     def unlockWallet(self, wallet):
         cmd="%s %s wallet unlock --name %s" % (Utils.SysClientPath, self.getArgs(), wallet.name)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         popen=subprocess.Popen(cmd.split(), stdout=Utils.FNull, stdin=subprocess.PIPE)
         _, errs = popen.communicate(input=wallet.password.encode("utf-8"))
         if 0 != popen.wait():
@@ -231,7 +243,8 @@ class WalletMgr(object):
 
     def lockAllWallets(self):
         cmd="%s %s wallet lock_all" % (Utils.SysClientPath, self.getArgs())
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         if 0 != subprocess.call(cmd.split(), stdout=Utils.FNull):
             Utils.Print("ERROR: Failed to lock all wallets.")
             return False
@@ -243,7 +256,8 @@ class WalletMgr(object):
 
         p = re.compile(r'\s+\"(\w+)\s\*\",?\n', re.MULTILINE)
         cmd="%s %s wallet list" % (Utils.SysClientPath, self.getArgs())
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         retStr=None
         try:
             retStr=Utils.checkOutput(cmd.split())
@@ -265,7 +279,8 @@ class WalletMgr(object):
 
         p = re.compile(r'\n\s+\"(\w+)\"\n', re.MULTILINE)
         cmd="%s %s wallet private_keys --name %s --password %s " % (Utils.SysClientPath, self.getArgs(), wallet.name, wallet.password)
-        if Utils.Debug: Utils.Print("cmd: %s" % (cmd))
+        if Utils.Debug:
+            Utils.Print("cmd: %s" % (cmd))
         retStr=None
         try:
             retStr=Utils.checkOutput(cmd.split())
