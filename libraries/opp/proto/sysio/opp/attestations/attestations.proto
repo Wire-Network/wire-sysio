@@ -70,9 +70,10 @@ message OperatorAction {
   };
   ActionType action_type = 1;
   sysio.opp.types.ChainAddress actor = 2;
-  sysio.opp.types.OperatorType   type = 3;
-  sysio.opp.types.OperatorStatus status = 4;
-  sysio.opp.types.TokenAmount   amount = 10;
+  sysio.opp.types.WireAccount wire_account = 3;
+  sysio.opp.types.OperatorType   type = 5;
+  sysio.opp.types.OperatorStatus status = 10;
+  sysio.opp.types.TokenAmount   amount = 20;
 }
 
 // Reserve fund disbursement.

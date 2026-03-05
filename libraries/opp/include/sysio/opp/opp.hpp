@@ -2,5 +2,5 @@
 
 namespace sysio::opp {
     struct opp {
-    }
+    };
 }

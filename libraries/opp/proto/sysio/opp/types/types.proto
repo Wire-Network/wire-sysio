@@ -41,6 +41,16 @@ message ChainSignature {
    ChainKeyType key_type = 2;
    bytes        signature = 3;
 }
+
+message WireAccount {
+   string name = 1;
+}
+
+message WirePermission {
+   WireAccount account = 1;
+   string permission = 2; // e.g. "active", "owner"
+}
+
 // ---------------------------------------------------------------------------
 //  Token types
 // ---------------------------------------------------------------------------
