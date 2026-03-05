@@ -1413,7 +1413,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::blk_send_branch( const block_id_type& msg_head_id ) {
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
 
       peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
@@ -1455,7 +1455,7 @@ namespace sysio {
    // called from connection strand
    void connection::blk_send_branch_from_nack_request( const block_id_type& msg_head_id, const block_id_type& req_id ) {
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
       // peer head might be unknown if our LIB has moved past it, so if unknown then just send the requested block
       if (on_fork) { // send from lib if we know they are on a fork
          // a more complicated better approach would be to find where the fork branches and send from there, for now use lib
