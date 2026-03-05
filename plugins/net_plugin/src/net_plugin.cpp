@@ -2303,6 +2303,13 @@ namespace sysio {
                peer_dlog(p2p_msg_log, c, "Sending block_request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
                block_request_message req; // my_head_id zero = send from root
                c->enqueue( req );
+            } else if (!unknown_block) {
+               // Peer is behind but not on fork; send missing blocks.
+               // This covers the case where the peer's earlier block_request_message was
+               // dropped because it arrived before this handshake set peer_fork_db_root_num.
+               peer_dlog(p2p_blk_log, c, "Peer behind, sending blocks {} - {}", msg_fhead_num + 1, chain_info.fork_db_head_num);
+               c->blk_send_branch(msg_fhead_num, chain_info.fork_db_root_num,
+                                  chain_info.fork_db_head_num, peer_sync_state::sync_t::peer_catchup);
             }
          } catch( ... ) {}
          return;
