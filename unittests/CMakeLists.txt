@@ -62,6 +62,11 @@ unittest_target(
 # No pkg-config cflags; keep flags minimal & portable
 target_compile_options(unit_test PUBLIC -DDISABLE_SYSLIB_SERIALIZE)
 
+if("native-module" IN_LIST SYSIO_WASM_RUNTIMES)
+  target_compile_definitions(unit_test PRIVATE
+    "NATIVE_CONTRACTS_DIR=\"${CMAKE_BINARY_DIR}/contracts\"")
+endif()
+
 # Link and include libsodium from vcpkg
 
 ### MARK TEST SUITES FOR EXECUTION ###
