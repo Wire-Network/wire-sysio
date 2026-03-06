@@ -9,8 +9,6 @@ namespace fc { class variant; }
 
 namespace sysio {
 
-static auto _wallet_plugin = application::register_plugin<wallet_plugin>();
-
 wallet_plugin::wallet_plugin() {}
 
 wallet_manager& wallet_plugin::get_wallet_manager() {
@@ -19,6 +17,7 @@ wallet_manager& wallet_plugin::get_wallet_manager() {
 
 void wallet_plugin::set_program_options(options_description& cli, options_description& cfg) {
    cfg.add_options()
+         // "." resolves to app().data_dir() in plugin_initialize which by default is ~/.config/wire/kiod/data
          ("wallet-dir", bpo::value<std::filesystem::path>()->default_value("."),
           "The path of the wallet files (absolute path or relative to application data dir)")
          ("unlock-timeout", bpo::value<int64_t>()->default_value(900),

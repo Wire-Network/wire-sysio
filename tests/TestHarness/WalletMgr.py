@@ -41,7 +41,7 @@ class WalletMgr(object):
         return " --wallet-url http://%s:%d" % (self.host, self.port)
 
     def getArgs(self):
-        return " --url http://%s:%d%s %s" % (self.nodeopHost, self.nodeopPort, self.getWalletEndpointArgs(), Utils.MiscSysClientArgs)
+        return " --wallet-dir %s --url http://%s:%d%s %s" % (WalletMgr.__walletDataDir, self.nodeopHost, self.nodeopPort, self.getWalletEndpointArgs(), Utils.MiscSysClientArgs)
 
     def isLaunched(self):
         return self.walletPid is not None
