@@ -328,3 +328,194 @@ The contract is compiled as native x86-64 code where `sizeof(void*)` is 8, not 4
 
 **`dlopen failed` errors**
 Check that the `.so` was built and the symlink exists. Run `ls -la /tmp/wire-sysio-native-contracts/` to verify. Also check `ldd cmake-build-debug/contracts/sysio.bios/sysio.bios_native.so` to ensure all shared library dependencies are available.
+
+## End-to-End Example: Debugging sysio.token on a Live Node
+
+This walkthrough shows the full debug cycle: build the native contract, start a local chain, stop it, relaunch under a debugger with `--native-contract`, set a breakpoint in the token transfer code, and step through execution.
+
+### 1. Build nodeop and the native contract
+
+```bash
+$ ninja -C build nodeop sysio.token_native
+[1/2] Building CXX object contracts/sysio.token/...
+[2/2] Linking CXX shared library contracts/sysio.token/sysio.token_native.so
+```
+
+### 2. Bootstrap a local single-producer chain
+
+Start nodeop normally to create accounts and deploy the token contract:
+
+```bash
+# Terminal 1 — start a fresh single-producer node
+$ build/programs/nodeop/nodeop \
+    --data-dir ./my-debug-chain/data \
+    --config-dir ./my-debug-chain/config \
+    --plugin sysio::chain_api_plugin \
+    --plugin sysio::http_plugin \
+    --plugin sysio::producer_plugin \
+    --plugin sysio::producer_api_plugin \
+    --http-server-address 127.0.0.1:8888 \
+    --p2p-listen-endpoint 127.0.0.1:9876 \
+    --producer-name sysio \
+    --enable-stale-production \
+    -e
+info  ... producer_plugin.cpp:...  Producing block ...
+
+# Terminal 2 — create accounts, deploy contract, issue tokens
+$ alias clio='build/programs/clio/clio'
+
+$ clio create account sysio sysio.token SYS6...pubkey SYS6...pubkey
+executed transaction: abc123...  200 bytes  300 us
+
+$ clio set contract sysio.token build/contracts/sysio.token \
+    sysio.token.wasm sysio.token.abi
+executed transaction: def456...  Reading WASM from build/contracts/sysio.token/sysio.token.wasm...
+
+$ clio push action sysio.token create \
+    '["sysio","1000000.0000 SYS"]' -p sysio.token
+executed transaction: 789abc...
+
+$ clio push action sysio.token issue \
+    '["sysio","10000.0000 SYS","initial"]' -p sysio
+executed transaction: bcd012...
+
+$ clio create account sysio alice SYS6...pubkey
+$ clio create account sysio bob   SYS6...pubkey
+
+$ clio push action sysio.token transfer \
+    '["sysio","alice","500.0000 SYS","fund alice"]' -p sysio
+executed transaction: cde345...
+```
+
+### 3. Stop the running node
+
+```bash
+# Graceful shutdown (SIGINT or SIGTERM)
+$ pkill -INT nodeop
+# Or: kill -INT <pid>
+```
+
+Wait for nodeop to exit cleanly (you should see `nodeop successfully exiting` in the log).
+
+### 4. Restart under a debugger with --native-contract
+
+```bash
+# Terminal 1 — launch nodeop under LLDB with the native token contract
+$ lldb -- build/programs/nodeop/nodeop \
+    --data-dir ./my-debug-chain/data \
+    --config-dir ./my-debug-chain/config \
+    --plugin sysio::chain_api_plugin \
+    --plugin sysio::http_plugin \
+    --plugin sysio::producer_plugin \
+    --plugin sysio::producer_api_plugin \
+    --http-server-address 127.0.0.1:8888 \
+    --p2p-listen-endpoint 127.0.0.1:9876 \
+    --producer-name sysio \
+    --enable-stale-production \
+    -e \
+    --native-contract sysio.token:build/contracts/sysio.token/sysio.token_native.so
+
+(lldb) target create "build/programs/nodeop/nodeop"
+Current executable set to 'build/programs/nodeop/nodeop' (x86_64).
+```
+
+### 5. Set a breakpoint and run
+
+Set a pending breakpoint on the token transfer action before starting:
+
+```
+(lldb) b sysio.token.cpp:134
+Breakpoint 1: no locations (pending).
+WARNING: Unable to resolve breakpoint to any currently loaded shared library.
+
+(lldb) run
+Process 12345 launched: 'build/programs/nodeop/nodeop' (x86_64)
+info  ... chain_plugin.cpp:...  Native debug mode: copying state data for safe debugging...
+info  ... chain_plugin.cpp:...  Native debug mode: operating on copied state data.
+    Original chain data is untouched. Debug copies:
+      state:  ./my-debug-chain/data/state.native-debug
+      blocks: ./my-debug-chain/data/blocks.native-debug
+info  ... chain_plugin.cpp:...  Native contract debug: sysio.token -> build/contracts/sysio.token/sysio.token_native.so
+info  ... producer_plugin.cpp:...  Producing block ...
+1 location added to breakpoint 1
+```
+
+The `1 location added to breakpoint 1` message confirms that the native `.so` was loaded and the breakpoint resolved.
+
+### 6. Send a transaction to hit the breakpoint
+
+```bash
+# Terminal 2 — send a transfer that will trigger the breakpoint
+$ clio push action sysio.token transfer \
+    '["alice","bob","1.0000 SYS","hello"]' -p alice
+```
+
+The debugger stops at the breakpoint:
+
+```
+Process 12345 stopped
+* thread #7, name = 'chain-0', stop reason = breakpoint 1.1
+    frame #0: sysio.token_native.so`sysio::token::transfer(
+        this=0x..., from=name{value=0x...}, to=name{value=0x...},
+        quantity=asset{amount=10000, sym=...}, memo="hello")
+        at sysio.token.cpp:134:4
+   131    void token::transfer( const name& from, const name& to,
+   132                          const asset& quantity, const string& memo )
+   133    {
+-> 134       check( from != to, "cannot transfer to self" );
+   135       require_auth( from );
+   136
+   137       check( is_account( to ), "to account does not exist" );
+```
+
+### 7. Inspect variables and step through
+
+```
+(lldb) p from
+(sysio::name) $0 = {value = 3607749779137757184}  ;; "alice"
+
+(lldb) p to
+(sysio::name) $1 = {value = 3574538305133010944}  ;; "bob"
+
+(lldb) p quantity
+(sysio::asset) $2 = {amount = 10000, symbol = ...} ;; "1.0000 SYS"
+
+(lldb) p memo
+(std::string) $3 = "hello"
+
+(lldb) n     ;; step over — passes the self-transfer check
+Process 12345 stopped
+    frame #0: sysio.token.cpp:135:4
+-> 135       require_auth( from );
+
+(lldb) n     ;; step over require_auth
+Process 12345 stopped
+    frame #0: sysio.token.cpp:137:4
+-> 137       check( is_account( to ), "to account does not exist" );
+
+(lldb) n     ;; step over — bob exists, passes
+(lldb) n     ;; ...continue stepping through balance checks, sub_balance, add_balance
+
+(lldb) c     ;; continue execution — transaction completes
+Process 12345 resuming
+```
+
+Back in Terminal 2, `clio` returns:
+
+```
+executed transaction: f01234...  128 bytes  850 us
+#  sysio.token <= sysio.token::transfer       {"from":"alice","to":"bob","quantity":"1.0000 SYS","memo":"hello"}
+#         alice <= sysio.token::transfer       {"from":"alice","to":"bob","quantity":"1.0000 SYS","memo":"hello"}
+#           bob <= sysio.token::transfer       {"from":"alice","to":"bob","quantity":"1.0000 SYS","memo":"hello"}
+```
+
+### 8. Clean up
+
+Kill the debug session (`Ctrl+C` then `quit` in LLDB), and remove the debug copies:
+
+```bash
+$ rm -rf ./my-debug-chain/data/state.native-debug \
+         ./my-debug-chain/data/blocks.native-debug
+```
+
+The original chain data in `./my-debug-chain/data/` is untouched and can be restarted normally.
