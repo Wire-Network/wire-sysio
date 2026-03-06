@@ -1430,7 +1430,13 @@ namespace sysio {
          }
       }
       const auto fork_db_root_num = peer_fork_db_root_num.load( std::memory_order_relaxed );
-      if( fork_db_root_num == 0 ) return; // if fork_db_root_id is null (we have not received handshake or reset)
+      if( fork_db_root_num == 0 ) {
+         // Peer handshake not yet received; send our handshake so the peer can establish
+         // our fork_db_root_num and retry the sync exchange with proper state.
+         peer_dlog( p2p_blk_log, this, "block_request received before peer handshake, sending handshake" );
+         send_handshake();
+         return;
+      }
 
       auto msg_head_num = block_header::num_from_id(msg_head_id);
       if (msg_head_num == 0) {
