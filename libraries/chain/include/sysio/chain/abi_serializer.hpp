@@ -9,6 +9,12 @@
 #include <fc/time.hpp>
 #include <fc/io/json.hpp>
 
+namespace google::protobuf {
+   class DescriptorPool;
+   class DynamicMessageFactory;
+   class Descriptor;
+}
+
 namespace sysio::chain {
 
 using std::map;
@@ -150,6 +156,16 @@ private:
 
    map<type_name, pair<unpack_function, pack_function>, std::less<>> built_in_types;
    void configure_built_in_types();
+
+   // Protobuf support — shared_ptr keeps abi_serializer copyable.
+   // These are never modified after set_abi(), so sharing is safe across threads.
+   std::shared_ptr<google::protobuf::DescriptorPool>        pb_pool;
+   std::shared_ptr<google::protobuf::DynamicMessageFactory> pb_factory;
+
+   bool is_protobuf_type(const std::string_view& type) const;
+   const google::protobuf::Descriptor* get_pb_descriptor(const std::string_view& type) const;
+   fc::variant pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const;
+   void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const;
 
    fc::variant _binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const;
    fc::variant _binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, impl::binary_to_variant_context& ctx )const;

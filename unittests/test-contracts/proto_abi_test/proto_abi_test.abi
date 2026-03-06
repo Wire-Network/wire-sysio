@@ -1,0 +1,78 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.3",
+    "types": [],
+    "structs": [],
+    "actions": [
+        {
+            "name": "hiproto",
+            "type": "protobuf::test.ActData",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "pbaction",
+            "type": "protobuf::test.ActData",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": [
+        {
+            "name": "hiproto",
+            "result_type": "protobuf::test.ActResult"
+        }
+    ],
+    "protobuf_types": {
+        "file": [
+            {
+                "name": "test.proto",
+                "package": "test",
+                "messageType": [
+                    {
+                        "name": "ActData",
+                        "field": [
+                            {
+                                "name": "id",
+                                "number": 1,
+                                "label": "LABEL_OPTIONAL",
+                                "type": "TYPE_INT32"
+                            },
+                            {
+                                "name": "type",
+                                "number": 2,
+                                "label": "LABEL_OPTIONAL",
+                                "type": "TYPE_INT32"
+                            },
+                            {
+                                "name": "note",
+                                "number": 3,
+                                "label": "LABEL_OPTIONAL",
+                                "type": "TYPE_STRING"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "ActResult",
+                        "field": [
+                            {
+                                "name": "value",
+                                "number": 1,
+                                "label": "LABEL_OPTIONAL",
+                                "type": "TYPE_INT32"
+                            },
+                            {
+                                "name": "str_value",
+                                "number": 2,
+                                "label": "LABEL_OPTIONAL",
+                                "type": "TYPE_STRING"
+                            }
+                        ]
+                    }
+                ],
+                "syntax": "proto3"
+            }
+        ]
+    }
+}
