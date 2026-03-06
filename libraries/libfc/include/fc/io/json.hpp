@@ -92,7 +92,8 @@ namespace fc
    };
 
    std::string escape_string( const std::string_view& str, const json::yield_function_t& yield, bool escape_control_chars = true );
-   void        escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars = true );
+   /// Returns true if any characters were escaped or invalid UTF-8 was pruned.
+   bool        escape_string( const std::string_view& str, std::string& out, const json::yield_function_t& yield, bool escape_control_chars = true );
 
 } // fc
 
