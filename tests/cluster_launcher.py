@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-from TestHarness import Cluster, TestHelper, Utils, WalletMgr
+from TestHarness.testUtils import Utils
+from TestHarness import Cluster, TestHelper, WalletMgr
 from TestHarness.TestHelper import AppArgs
 
 ###############################################################
@@ -48,7 +49,7 @@ try:
         extraNodeopArgs = ''.join([i+j for i,j in zip([' --plugin '] * len(args.plugin), args.plugin)])
     else:
         extraNodeopArgs = ''
-    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, topo=topo, delay=delay, 
+    if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, topo=topo, delay=delay,
                       activateIF=activateIF, extraNodeopArgs=extraNodeopArgs) is False:
         errorExit("Failed to stand up eos cluster.")
 
