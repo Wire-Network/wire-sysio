@@ -76,7 +76,10 @@ namespace fc::crypto {
          std::string prefix = include_prefix
                                  ? std::string(constants::public_key_base_prefix) + "_" + key_prefix(key_type::em) + "_"
                                  : "";
-         return prefix + get<em::public_key_shim>().to_string();
+         auto key_str = get<em::public_key_shim>().to_string();
+         if (key_str.starts_with("0x"))
+            key_str = key_str.substr(2);
+         return prefix + key_str;
       }
       case key_type::ed: {
          std::string prefix = include_prefix

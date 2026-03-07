@@ -652,7 +652,7 @@ REGISTER_CF_HOST_FUNCTION( bls_g1_map );
 REGISTER_CF_HOST_FUNCTION( bls_g2_map );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mod );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mul );
-REGISTER_CF_HOST_FUNCTION( bls_fp_exp ); 
+REGISTER_CF_HOST_FUNCTION( bls_fp_exp );
 
 } // namespace webassembly
 } // namespace chain

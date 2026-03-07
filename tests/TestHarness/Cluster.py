@@ -1144,7 +1144,7 @@ class Cluster(object):
             return trans
 
         # sysio.noop used by trx_generator for noop action
-        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'carl']
+        systemAccounts = ['sysio.noop', 'sysio.bpay', 'sysio.msig', 'sysio.names', 'sysio.token', 'sysio.vpay', 'sysio.wrap', 'sysio.roa', 'sysio.acct', 'sysio.authex', 'carl']
         acctTrans = list(map(createSystemAccount, systemAccounts))
 
         for trans in acctTrans:

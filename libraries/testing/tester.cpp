@@ -1320,6 +1320,7 @@ namespace sysio::testing {
       // Create the ROA account and mark it as privileged
       create_account(config::roa_account_name, sysio::chain::config::system_account_name, false, true, false, false);
       create_account("sysio.acct"_n, sysio::chain::config::system_account_name, false, false, false, false); // used for tracking account creation
+      create_account("sysio.authex"_n, sysio::chain::config::system_account_name, false, false, false, false); // used for account linking
       set_contract(config::roa_account_name, contracts::sysio_roa_wasm(), contracts::sysio_roa_abi().data());
       push_action(sysio::chain::config::system_account_name, "setpriv"_n,
                   sysio::chain::config::system_account_name,

@@ -1,0 +1,111 @@
+{
+    "____comment": "This file was generated with sysio-abigen. DO NOT EDIT ",
+    "version": "sysio::abi/1.2",
+    "types": [],
+    "structs": [
+        {
+            "name": "clearlinks",
+            "base": "",
+            "fields": []
+        },
+        {
+            "name": "createlink",
+            "base": "",
+            "fields": [
+                {
+                    "name": "chainName",
+                    "type": "name"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "sig",
+                    "type": "signature"
+                },
+                {
+                    "name": "pubKey",
+                    "type": "public_key"
+                },
+                {
+                    "name": "nonce",
+                    "type": "uint64"
+                }
+            ]
+        },
+        {
+            "name": "links_s",
+            "base": "",
+            "fields": [
+                {
+                    "name": "key",
+                    "type": "uint64"
+                },
+                {
+                    "name": "username",
+                    "type": "name"
+                },
+                {
+                    "name": "chain",
+                    "type": "name"
+                },
+                {
+                    "name": "pub_key",
+                    "type": "public_key"
+                },
+                {
+                    "name": "address",
+                    "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "onlinkauth",
+            "base": "",
+            "fields": [
+                {
+                    "name": "accountName",
+                    "type": "name"
+                },
+                {
+                    "name": "permission",
+                    "type": "name"
+                },
+                {
+                    "name": "pubKey",
+                    "type": "public_key"
+                }
+            ]
+        }
+    ],
+    "actions": [
+        {
+            "name": "clearlinks",
+            "type": "clearlinks",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "createlink",
+            "type": "createlink",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "onlinkauth",
+            "type": "onlinkauth",
+            "ricardian_contract": ""
+        }
+    ],
+    "tables": [
+        {
+            "name": "links",
+            "type": "links_s",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        }
+    ],
+    "ricardian_clauses": [],
+    "variants": [],
+    "action_results": []
+}
