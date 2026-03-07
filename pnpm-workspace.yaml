@@ -1,0 +1,7 @@
+packages:
+  - contracts/sysio.authex/tests/server
+
+overrides:
+  '@wireio/core': link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/core
+  '@wireio/sdk-core': link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/sdk-core
+  sdk-core: link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/sdk-core

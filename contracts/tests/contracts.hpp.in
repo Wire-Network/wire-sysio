@@ -16,6 +16,8 @@ struct contracts {
    static std::vector<char>    wrap_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.wrap/sysio.wrap.abi"); }
    static std::vector<uint8_t> bios_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.wasm"); }
    static std::vector<char>    bios_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.bios/sysio.bios.abi"); }
+   static std::vector<uint8_t> authex_wasm() { return read_wasm("${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.wasm"); }
+   static std::vector<char>    authex_abi() { return read_abi("${CMAKE_BINARY_DIR}/contracts/sysio.authex/sysio.authex.abi"); }
 
    struct util {
       static std::vector<uint8_t> reject_all_wasm() { return read_wasm("${CMAKE_SOURCE_DIR}/contracts/test_contracts/reject_all.wasm"); }
@@ -34,16 +36,16 @@ static std::vector<uint8_t> blockinfo_tester_wasm()
       "${CMAKE_BINARY_DIR}/contracts/test_contracts/blockinfo_tester/blockinfo_tester.wasm");
 }
 [[maybe_unused]]
-static std::vector<uint8_t> sendinline_wasm() 
+static std::vector<uint8_t> sendinline_wasm()
 {
    return sysio::testing::read_wasm(
-      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.wasm"); 
+      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.wasm");
 }
 [[maybe_unused]]
-static std::vector<char>    sendinline_abi() 
+static std::vector<char>    sendinline_abi()
 {
    return sysio::testing::read_abi(
-      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.abi"); 
+      "${CMAKE_BINARY_DIR}/contracts/test_contracts/sendinline/sendinline.abi");
 }
 
 

@@ -263,7 +263,7 @@ void apply_sysio_updateauth(apply_context& context) {
    auto update = context.get_action().data_as<updateauth>();
 
    // ** NEW ADDED IF STATEMENT **
-   if( update.permission.suffix() != name("ext")) {
+   if( update.permission.prefix() != name("ex")) {
       context.require_authorization(update.account); // only here to mark the single authority on this action as used
    }
 

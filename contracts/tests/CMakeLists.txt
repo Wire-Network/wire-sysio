@@ -14,10 +14,15 @@ enable_testing()
 file(GLOB UNIT_TESTS "*.cpp" "*.hpp") # find all unit test suites
 set(CONTRACT_UNIT_TEST_EXE contracts_unit_test)
 unittest_target(
-  ${CONTRACT_UNIT_TEST_EXE}
-  SOURCE_FILES
-  ${UNIT_TESTS}
+        ${CONTRACT_UNIT_TEST_EXE}
+        SOURCE_FILES
+        ${UNIT_TESTS}
 ) # build unit tests as one executable
 
+target_link_libraries(${CONTRACT_UNIT_TEST_EXE}
+        PRIVATE
+        fc-lite
+)
+
 # add_sysio_test_executable(${CONTRACT_UNIT_TEST_EXE} ${UNIT_TESTS}) # build unit tests as one executable
-add_test(NAME contracts_unit_test COMMAND contracts_unit_test WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
+add_test(NAME ${CONTRACT_UNIT_TEST_EXE} COMMAND ${CONTRACT_UNIT_TEST_EXE} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
