@@ -24,6 +24,7 @@ namespace sysio {
          MAKE_READ_WASM_ABI(sysio_system, sysio.system, contracts)
          MAKE_READ_WASM_ABI(sysio_token,  sysio.token,  contracts)
          MAKE_READ_WASM_ABI(sysio_wrap,   sysio.wrap,   contracts)
+         MAKE_READ_WASM_ABI(sysio_authlink, sysio.authlink, contracts)
 
          // Contracts in `unittests/test-contracts' directory
          MAKE_READ_WASM_ABI(asserter,              asserter,              unittests/test-contracts)

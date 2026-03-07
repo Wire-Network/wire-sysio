@@ -640,6 +640,8 @@ REGISTER_CF_HOST_FUNCTION( blake2_f );
 REGISTER_CF_HOST_FUNCTION( sha3 );
 REGISTER_CF_HOST_FUNCTION( k1_recover );
 REGISTER_CF_HOST_FUNCTION( blake2b_256 );
+REGISTER_CF_HOST_FUNCTION( base58_encode );
+REGISTER_CF_HOST_FUNCTION( base58_decode );
 
 // bls_primitives
 REGISTER_CF_HOST_FUNCTION( bls_g1_add );
@@ -651,7 +653,7 @@ REGISTER_CF_HOST_FUNCTION( bls_g1_map );
 REGISTER_CF_HOST_FUNCTION( bls_g2_map );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mod );
 REGISTER_CF_HOST_FUNCTION( bls_fp_mul );
-REGISTER_CF_HOST_FUNCTION( bls_fp_exp ); 
+REGISTER_CF_HOST_FUNCTION( bls_fp_exp );
 
 } // namespace webassembly
 } // namespace chain

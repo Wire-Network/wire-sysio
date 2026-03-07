@@ -1724,11 +1724,11 @@ namespace webassembly {
          int32_t alt_bn128_mul(span<const char> g1_point, span<const char> scalar, span<char> result) const;
 
          /**
-          * Host function for optimal ate pairing check on the elliptic curve alt_bn128 
+          * Host function for optimal ate pairing check on the elliptic curve alt_bn128
           *
           * @ingroup crypto
           * @param g1_g2_pairs - a span containing pairs of G1,G2 points. (2 * 32 bytes) + (2 * 64 bytes)
-          * @return -1 if there was an error, 1 if false and 0 if true 
+          * @return -1 if there was an error, 1 if false and 0 if true
          */
          int32_t alt_bn128_pair(span<const char> g1_g2_pairs) const;
 
@@ -1763,7 +1763,7 @@ namespace webassembly {
           * @return                -1 if there was an error, 0 otherwise
          */
          int32_t blake2_f( uint32_t rounds, span<const char> state, span<const char> message, span<const char> t0_offset, span<const char> t1_offset, int32_t final, span<char> result) const;
-         
+
          /**
           * BLAKE2b-256 hash
           *
@@ -1795,6 +1795,28 @@ namespace webassembly {
           * @return -1 if there was an error, 0 otherwise.
          */
          int32_t k1_recover( span<const char> signature, span<const char> digest, span<char> pub) const;
+
+         /**
+          * Encode binary data as a base58-encoded string.
+          *
+          * @ingroup crypto
+          * @param data - a span containing the binary data to encode.
+          * @param[out] result - output buffer for the base58 string (as raw chars, not null-terminated).
+          *
+          * @return the number of bytes written to result, or -1 if result buffer is too small.
+         */
+         int32_t base58_encode( span<const char> data, span<char> result) const;
+
+         /**
+          * Decode a base58-encoded string into binary data.
+          *
+          * @ingroup crypto
+          * @param base58_str - a span containing the base58 string to decode.
+          * @param[out] result - output buffer for the decoded binary data.
+          *
+          * @return the number of bytes written to result, or -1 on error.
+         */
+         int32_t base58_decode( span<const char> base58_str, span<char> result) const;
 
          /**
           * Host function for G1 addition on the elliptic curve bls12-381

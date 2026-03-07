@@ -7,6 +7,7 @@
 #include <fc/crypto/blake2.hpp>
 #include <fc/crypto/sha3.hpp>
 #include <fc/crypto/k1_recover.hpp>
+#include <fc/crypto/base58.hpp>
 #include <bn256/bn256.h>
 #include <bls12-381/bls12-381.hpp>
 #include <fc/crypto/elliptic_ed.hpp>
@@ -59,7 +60,7 @@ namespace sysio::chain::webassembly {
       // Check if the signature is ED25519
       if( s.contains<fc::crypto::ed::signature_shim>() ) {
          // a) Extract 32 raw bytes from fc::sha256
-         auto sha_data = digest->data(); 
+         auto sha_data = digest->data();
          const unsigned char* msgptr = reinterpret_cast<const unsigned char*>(sha_data);
 
          // b) Extract 64-byte signature (skip the 1-byte “which” prefix)
@@ -257,7 +258,7 @@ namespace sysio::chain::webassembly {
       // sanity‐check sizes
       if( result.size() != BLAKE2B256_DIGEST_LENGTH )
          return return_code::failure;
-  
+
       // BLAKE2B256 takes uint8_t*, so cast away const‐char
       auto in_bytes = reinterpret_cast<const uint8_t*>(data.data());
       auto out_bytes = reinterpret_cast<uint8_t*>(result.data());
@@ -304,6 +305,31 @@ namespace sysio::chain::webassembly {
 
       std::memcpy( pub.data(), res.data(), res.size() );
       return return_code::success;
+   }
+
+   int32_t interface::base58_encode( span<const char> data, span<char> result ) const {
+      try {
+         auto encoded = fc::to_base58( data.data(), data.size(), fc::yield_function_t{} );
+         if( result.size() < encoded.size() )
+            return return_code::failure;
+         std::memcpy( result.data(), encoded.data(), encoded.size() );
+         return static_cast<int32_t>(encoded.size());
+      } catch( ... ) {
+         return return_code::failure;
+      }
+   }
+
+   int32_t interface::base58_decode( span<const char> base58_str, span<char> result ) const {
+      try {
+         std::string input( base58_str.data(), base58_str.size() );
+         auto decoded = fc::from_base58( input );
+         if( result.size() < decoded.size() )
+            return return_code::failure;
+         std::memcpy( result.data(), decoded.data(), decoded.size() );
+         return static_cast<int32_t>(decoded.size());
+      } catch( ... ) {
+         return return_code::failure;
+      }
    }
 
    int32_t interface::bls_g1_add(span<const char> op1, span<const char> op2, span<char> result) const {
@@ -445,7 +471,7 @@ namespace sysio::chain::webassembly {
    int32_t interface::bls_fp_mod(span<const char> s, span<char> result) const {
       // s is scalar.
       if(s.size() != 64 ||  result.size() != 48)
-         return return_code::failure;  
+         return return_code::failure;
       std::array<uint64_t, 8> k = bls12_381::scalar::fromBytesLE<8>(std::span<const uint8_t, 64>((const uint8_t*)s.data(), 64));
       bls12_381::fp e = bls12_381::fp::modPrime<8>(k);
       e.toBytesLE(std::span<uint8_t, 48>((uint8_t*)result.data(), 48), from_mont::yes);
