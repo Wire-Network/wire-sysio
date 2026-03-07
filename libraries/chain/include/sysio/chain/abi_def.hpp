@@ -131,6 +131,7 @@ struct abi_def {
    extensions_type                           abi_extensions;
    may_not_exist<vector<variant_def>>        variants;
    may_not_exist<vector<action_result_def>>  action_results;
+   may_not_exist<string>                     protobuf_types; ///< FileDescriptorSet as JSON string
 };
 
 abi_def sysio_contract_abi(const abi_def& sysio_system_abi);
@@ -177,7 +178,14 @@ FC_REFLECT( sysio::chain::error_message                    , (error_code)(error_
 FC_REFLECT( sysio::chain::variant_def                      , (name)(types) )
 FC_REFLECT( sysio::chain::action_result_def                , (name)(result_type) )
 FC_REFLECT( sysio::chain::abi_def                          , (version)(types)(structs)(actions)(tables)
-                                                             (ricardian_clauses)(error_messages)(abi_extensions)(variants)(action_results) )
+                                                             (ricardian_clauses)(error_messages)(abi_extensions)(variants)(action_results)(protobuf_types) )
+
+namespace fc {
+/// Custom JSON conversion for abi_def to handle protobuf_types as JSON object in ABI files
+/// but stored as a JSON string internally for binary serialization compatibility.
+void to_variant(const sysio::chain::abi_def& abi, fc::variant& v);
+void from_variant(const fc::variant& v, sysio::chain::abi_def& abi);
+} // namespace fc
 namespace sysio::chain {
 
 constexpr auto format_as(const type_def& td) {
