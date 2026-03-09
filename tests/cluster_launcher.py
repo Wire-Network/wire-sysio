@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import signal
+
 from TestHarness.testUtils import Utils
 from TestHarness import Cluster, TestHelper, WalletMgr
 from TestHarness.TestHelper import AppArgs
@@ -17,6 +19,7 @@ errorExit=Utils.errorExit
 
 appArgs = AppArgs()
 appArgs.add(flag="--plugin",action='append',type=str,help="Run nodes with additional plugins")
+appArgs.add_bool(flag="--kill-bios",help="Kill biosNode after launch (sets biosFinalizer=False)")
 
 args=TestHelper.parse_args({"-p","-n","-d","-s","--keep-logs","--prod-count",
                             "--activate-if","--dump-error-details","-v","--leave-running"
@@ -30,6 +33,7 @@ prod_count = args.prod_count
 activateIF=args.activate_if
 total_nodes=args.n if args.n > 0 else pnodes
 dumpErrorDetails=args.dump_error_details
+killBios=args.kill_bios
 
 Utils.Debug=debug
 testSuccessful=False
@@ -49,9 +53,15 @@ try:
         extraNodeopArgs = ''.join([i+j for i,j in zip([' --plugin '] * len(args.plugin), args.plugin)])
     else:
         extraNodeopArgs = ''
+    biosFinalizer = not killBios
     if cluster.launch(pnodes=pnodes, totalNodes=total_nodes, prodCount=prod_count, topo=topo, delay=delay,
-                      activateIF=activateIF, extraNodeopArgs=extraNodeopArgs) is False:
+                      activateIF=activateIF, biosFinalizer=biosFinalizer, extraNodeopArgs=extraNodeopArgs) is False:
         errorExit("Failed to stand up eos cluster.")
+
+    if killBios and cluster.biosNode:
+        Print("Killing bios node as requested by --kill-bios")
+        cluster.biosNode.kill(signal.SIGTERM)
+        cluster.biosNode = None
 
     testSuccessful=True
 finally:

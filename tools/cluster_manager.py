@@ -289,9 +289,13 @@ def _create_cluster(
     _echo("Bootstrapping cluster...")
     _bootstrap(build_dir, bios_node, nodes, total_nodes, prod_count, activate_if)
 
-    # --- Persist state for 'run' ---
+    # --- Kill bios node (it is not needed after bootstrap) ---
+    _echo("Killing bios node (not needed after bootstrap)...")
+    bios_node.kill(signal.SIGTERM)
+
+    # --- Persist state for 'run' (bios excluded) ---
     node_states = []
-    for n in all_nodes:
+    for n in nodes:
         node_states.append(
             {
                 "nodeId": n.nodeId,
@@ -316,11 +320,10 @@ def _create_cluster(
         },
     )
 
-    # --- Shut down cleanly ---
+    # --- Shut down remaining nodes cleanly ---
     _echo("Shutting down nodes after bootstrap...")
     for n in nodes:
         n.kill(signal.SIGTERM)
-    bios_node.kill(signal.SIGTERM)
 
     _echo("Cluster created and bootstrapped successfully.")
     _echo(f"Chain directory: {chain_dir}")
@@ -396,7 +399,7 @@ def _bootstrap(  # noqa: C901, PLR0912, PLR0915
         if activate_if:
             _echo("Activating instant finality...")
             finalizer_nodes = []
-            for n in [*nodes, bios_node]:
+            for n in nodes:
                 if n and n.keys and n.keys[0].blspubkey and n.isProducer:
                     finalizer_nodes.append(n)
             if finalizer_nodes:
