@@ -48,6 +48,20 @@ Create and bootstrap a new cluster. This generates node configurations, starts a
 | `-n`, `--nodes INT` | same as `--pnodes` | Total number of nodes (includes non-producing nodes if larger than `--pnodes`). |
 | `--prod-count INT` | `21` | Number of producers (defproducerX accounts) registered across the cluster. |
 | `-s`, `--topology STR` | `mesh` | Network topology connecting the nodes. Options: `star`, `mesh`, `ring`, `line`. |
+| `--http-secure` | `false` | Skip adding permissive CORS and HTTP settings to each node's `config.ini` (see below). |
+
+#### `--http-secure`
+
+By default, permissive CORS and HTTP settings are appended to every node's `config.ini` after generation. This is useful when developing frontends or tools that make cross-origin requests to the node's HTTP API. Pass `--http-secure` to skip these settings and use nodeop's defaults instead.
+
+Default settings (applied unless `--http-secure` is given):
+
+```ini
+access-control-allow-origin = *
+access-control-allow-headers = *
+verbose-http-errors = true
+http-validate-host = false
+```
 
 #### Bootstrap Sequence
 
