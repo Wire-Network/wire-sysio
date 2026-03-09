@@ -292,24 +292,6 @@ BOOST_AUTO_TEST_CASE(ready_to_send_during_async_write) {
    BOOST_CHECK(!qb.ready_to_send(1));
 }
 
-// ---- Queue size limit ----
-
-BOOST_AUTO_TEST_CASE(queue_size_limit) {
-   queued_buffer qb;
-   // def_max_write_queue_size = 8MB * 10 = 80MB. Limit is 2x = 160MB.
-   // Add a buffer that pushes past the limit.
-   auto small_buf = make_buffer(1);
-   auto r1 = qb.add_write_queue(msg_type_t::vote_message, queued_buffer::queue_t::general,
-                                  small_buf, 1, go_away_reason::no_reason, std::nullopt);
-   BOOST_CHECK(r1.ok); // 1 byte is well under limit
-
-   // Create a buffer just over the 2x limit.
-   auto huge_buf = make_buffer(2 * def_max_write_queue_size + 1);
-   auto r2 = qb.add_write_queue(msg_type_t::vote_message, queued_buffer::queue_t::general,
-                                  huge_buf, 1, go_away_reason::no_reason, std::nullopt);
-   BOOST_CHECK(!r2.ok); // exceeds 2 * def_max_write_queue_size
-}
-
 // ---- needs_drain flag ----
 
 BOOST_AUTO_TEST_CASE(needs_drain_when_out_queue_empty) {

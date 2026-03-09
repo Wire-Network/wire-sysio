@@ -6,8 +6,10 @@
 #include <sysio/chain/thread_utils.hpp>
 #include <fc/mutex.hpp>
 
+#include <boost/asio/buffer.hpp>
 #include <boost/container/small_vector.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/system/error_code.hpp>
 
 #include <atomic>
 #include <deque>
