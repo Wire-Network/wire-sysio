@@ -171,6 +171,28 @@ def _load_state(chain_dir: Path) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
+_HTTP_INSECURE_CONFIG = """\
+
+# -- http-insecure settings (cluster_manager) --
+# Specify the Access-Control-Allow-Origin to be returned on each request (sysio::http_plugin)
+access-control-allow-origin = *
+# Specify the Access-Control-Allow-Headers to be returned on each request (sysio::http_plugin)
+access-control-allow-headers = *
+# Append the error log to HTTP responses (sysio::http_plugin)
+verbose-http-errors = true
+# If set to false, then any incoming "Host" header is considered valid (sysio::http_plugin)
+http-validate-host = false
+"""
+
+
+def _patch_configs_http_insecure(data_path: Path) -> None:
+    """Append HTTP insecure settings to every config.ini under data_path."""
+    for config_ini in data_path.glob("*/config.ini"):
+        _echo(f"  Patching {config_ini.name} with --http-insecure settings ({config_ini.parent.name})")
+        with config_ini.open("a") as f:
+            f.write(_HTTP_INSECURE_CONFIG)
+
+
 def _create_cluster(
     chain_dir: Path,
     build_dir: Path,
@@ -178,6 +200,7 @@ def _create_cluster(
     total_nodes: int,
     prod_count: int,
     topo: str,
+    http_insecure: bool = False,
 ) -> None:
     """Generate configs, start nodes, bootstrap, then shut down."""
     delay = 2
@@ -243,6 +266,10 @@ def _create_cluster(
     launcher = cluster_generator(args_arr)
     launcher.define_network()
     launcher.generate()
+
+    # Patch config.ini files if --http-insecure was requested
+    if http_insecure:
+        _patch_configs_http_insecure(data_path)
 
     # --- Start all nodes ---
     bios_node = None
@@ -902,6 +929,12 @@ def cli(ctx: click.Context, chain_dir: str, force: bool) -> None:
     default="mesh",
     help="Network topology (star, mesh, ring, line).",
 )
+@click.option(
+    "--http-secure",
+    is_flag=True,
+    default=False,
+    help="Skip adding permissive CORS and HTTP settings to each node's config.ini.",
+)
 @click.pass_context
 def create(
     ctx: click.Context,
@@ -910,6 +943,7 @@ def create(
     total_nodes: int,
     prod_count: int,
     topo: str,
+    http_secure: bool,
 ) -> None:
     """Create and bootstrap a new cluster.
 
@@ -943,7 +977,7 @@ def create(
     try:
         if total_nodes <= 0:
             total_nodes = pnodes
-        _create_cluster(chain_dir, build_path, pnodes, total_nodes, prod_count, topo)
+        _create_cluster(chain_dir, build_path, pnodes, total_nodes, prod_count, topo, not http_secure)
     finally:
         _release_lock(chain_dir)
 
