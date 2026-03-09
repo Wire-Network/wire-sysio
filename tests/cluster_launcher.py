@@ -61,7 +61,6 @@ try:
     if killBios and cluster.biosNode:
         Print("Killing bios node as requested by --kill-bios")
         cluster.biosNode.kill(signal.SIGTERM)
-        cluster.biosNode = None
 
     testSuccessful=True
 finally:
