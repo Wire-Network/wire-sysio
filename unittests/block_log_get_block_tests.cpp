@@ -195,7 +195,7 @@ BOOST_FIXTURE_TEST_CASE(batch_read_partitioned_log, block_log_get_block_fixture)
 
    // Batch read spanning the partition boundary
    uint32_t start = stride - 3;
-   uint32_t count = 8; // crosses from catalog into working file
+   uint32_t count = 8; // crosses the boundary between two catalog files
    auto batch = blog.read_serialized_blocks_by_num(start, count);
    BOOST_REQUIRE_EQUAL(batch.size(), count);
 

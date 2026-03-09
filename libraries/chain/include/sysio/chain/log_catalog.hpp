@@ -229,13 +229,13 @@ struct log_catalog {
       uint32_t available  = file_last - block_num + 1;
       uint32_t n          = std::min(count, available);
 
-      constexpr uint32_t pos_size = sizeof(uint64_t);
+      constexpr uint64_t pos_size = sizeof(uint64_t);
 
       // Batch-read index entries: n positions, plus one extra unless the range
       // includes the last block in the file (where we use file size instead).
       bool need_file_size_for_last = (block_num + n - 1 == file_last);
       uint32_t positions_to_read   = need_file_size_for_last ? n : n + 1;
-      uint32_t index_offset        = (block_num - file_first) * pos_size;
+      uint64_t index_offset        = (block_num - file_first) * pos_size;
 
       std::vector<uint64_t> positions(positions_to_read);
       log_index.file().seek(index_offset);
