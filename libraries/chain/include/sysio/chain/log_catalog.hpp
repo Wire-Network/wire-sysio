@@ -208,6 +208,60 @@ struct log_catalog {
       return nullptr;
    }
 
+   /// Batch-read block positions and sizes for a contiguous range starting at \c block_num.
+   /// Reads as many blocks as possible (up to \c count) from whichever catalog file contains
+   /// \c block_num, stopping at the file boundary. Returns the positions and sizes, and sets
+   /// \c blocks_read to the number actually read.
+   /// The caller can then use ro_stream_at() to read sequentially from the data file.
+   std::vector<block_pos_size_t> get_block_positions_and_sizes(uint32_t block_num, uint32_t count, uint32_t& blocks_read) {
+      blocks_read = 0;
+      if (count == 0)
+         return {};
+
+      // Ensure the file containing block_num is open
+      auto first_pos = get_block_position(block_num);
+      if (!first_pos)
+         return {};
+
+      // Clamp count to blocks available in the currently-open catalog file
+      uint32_t file_last  = log_data.last_block_num();
+      uint32_t file_first = log_data.first_block_num();
+      uint32_t available  = file_last - block_num + 1;
+      uint32_t n          = std::min(count, available);
+
+      constexpr uint32_t pos_size = sizeof(uint64_t);
+
+      // Batch-read index entries: n positions, plus one extra unless the range
+      // includes the last block in the file (where we use file size instead).
+      bool need_file_size_for_last = (block_num + n - 1 == file_last);
+      uint32_t positions_to_read   = need_file_size_for_last ? n : n + 1;
+      uint32_t index_offset        = (block_num - file_first) * pos_size;
+
+      std::vector<uint64_t> positions(positions_to_read);
+      log_index.file().seek(index_offset);
+      log_index.file().read(reinterpret_cast<char*>(positions.data()), positions_to_read * pos_size);
+
+      uint64_t end_pos;
+      if (need_file_size_for_last) {
+         end_pos = log_data.size();
+      } else {
+         end_pos = positions.back();
+      }
+
+      // Compute per-block position and size
+      constexpr uint32_t block_pos_field_size = sizeof(uint64_t); // trailing position field
+      std::vector<block_pos_size_t> result(n);
+      for (uint32_t i = 0; i < n; ++i) {
+         uint64_t block_start = positions[i];
+         uint64_t block_end   = (i + 1 < n) ? positions[i + 1] : end_pos;
+         result[i].position   = block_start;
+         result[i].size       = block_end - block_start - block_pos_field_size;
+      }
+
+      blocks_read = n;
+      return result;
+   }
+
    std::optional<block_id_type> id_for_block(uint32_t block_num) {
       auto pos = get_block_position(block_num);
       if (pos) {

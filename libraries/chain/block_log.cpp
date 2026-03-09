@@ -721,7 +721,7 @@ namespace sysio { namespace chain {
                constexpr uint32_t pos_size = sizeof(uint64_t);
                uint64_t index_offset = pos_size * (first_block_num - index_first_block_num());
                uint32_t positions_to_read = working_count;
-               bool need_file_size_for_last = (first_block_num + working_count - 1 == last_block_num);
+               const bool need_file_size_for_last = (first_block_num + working_count - 1 == last_block_num);
                if (!need_file_size_for_last)
                   positions_to_read += 1; // read one extra for next block's position
 
@@ -1191,14 +1191,20 @@ namespace sysio { namespace chain {
          std::vector<std::vector<char>> retry_read_serialized_blocks_by_num(uint32_t first_block_num, uint32_t count) final {
             std::vector<std::vector<char>> result;
             result.reserve(count);
-            for (uint32_t i = 0; i < count; ++i) {
-               uint64_t block_size = 0;
-               auto ds = catalog.ro_stream_and_size_for_block(first_block_num + i, block_size);
-               if (ds) {
-                  result.push_back(read_serialized_block(*ds, block_size));
-               } else {
+            uint32_t remaining   = count;
+            uint32_t current_num = first_block_num;
+            while (remaining > 0) {
+               uint32_t blocks_read = 0;
+               auto pos_sizes = catalog.get_block_positions_and_sizes(current_num, remaining, blocks_read);
+               if (blocks_read == 0)
                   break;
+               // Read all blocks sequentially from the same catalog data file
+               for (uint32_t i = 0; i < blocks_read; ++i) {
+                  auto& ds = catalog.log_data.ro_stream_at(pos_sizes[i].position);
+                  result.push_back(read_serialized_block(ds, pos_sizes[i].size));
                }
+               current_num += blocks_read;
+               remaining   -= blocks_read;
             }
             return result;
          }

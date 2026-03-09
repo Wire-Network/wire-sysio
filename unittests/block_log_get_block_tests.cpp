@@ -206,4 +206,50 @@ BOOST_FIXTURE_TEST_CASE(batch_read_partitioned_log, block_log_get_block_fixture)
    }
 } FC_LOG_AND_RETHROW()
 
+BOOST_FIXTURE_TEST_CASE(batch_read_multiple_catalog_files, block_log_get_block_fixture) try {
+   // Split into small strides to create multiple catalog files (stride=10 on 50 blocks
+   // yields 5 catalog files: 1-10, 11-20, 21-30, 31-40, 41-50).
+   uint32_t stride = 10;
+   auto retained_dir = block_dir / "retained";
+
+   block_log::split_blocklog(block_dir, retained_dir, stride);
+
+   std::filesystem::remove(block_dir / "blocks.log");
+   std::filesystem::remove(block_dir / "blocks.index");
+
+   block_log blog(block_dir, partitioned_blocklog_config{ .retained_dir = retained_dir });
+
+   // Batch read spanning multiple catalog file boundaries (blocks 8..33 crosses 3 files)
+   uint32_t start = 8;
+   uint32_t count = 26;
+   auto batch = blog.read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = blog.read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(!single.empty());
+      BOOST_REQUIRE(batch[i] == single);
+   }
+
+   // Batch read entirely within a single catalog file (blocks 12..18)
+   start = 12;
+   count = 7;
+   batch = blog.read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = blog.read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+
+   // Batch read all blocks from catalog
+   batch = blog.read_serialized_blocks_by_num(1, last_block_num);
+   BOOST_REQUIRE_EQUAL(batch.size(), last_block_num);
+
+   for (uint32_t i = 0; i < last_block_num; ++i) {
+      auto single = blog.read_serialized_block_by_num(i + 1);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()
