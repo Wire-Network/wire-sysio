@@ -1,16 +1,6 @@
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(native_overlay_tests)
-
-// When native-module runtime is not available, provide a placeholder so the
-// suite is never empty (ctest treats an empty suite as a failure).
-#ifndef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
-
-BOOST_AUTO_TEST_CASE(native_module_not_available) {
-   BOOST_TEST_MESSAGE("native-module runtime not enabled — skipping native overlay tests");
-}
-
-#else // SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
 
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/webassembly/native-module/native_module_overlay.hpp>
@@ -27,6 +17,19 @@ using namespace sysio::chain;
 using namespace fc;
 using namespace std;
 using mvo = fc::mutable_variant_object;
+#endif
+
+BOOST_AUTO_TEST_SUITE(native_overlay_tests)
+
+// When native-module runtime is not available, provide a placeholder so the
+// suite is never empty (ctest treats an empty suite as a failure).
+#ifndef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+
+BOOST_AUTO_TEST_CASE(native_module_not_available) {
+   BOOST_TEST_MESSAGE("native-module runtime not enabled — skipping native overlay tests");
+}
+
+#else // SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
 
 // Path to native contract .so files (set by CMake)
 #ifndef NATIVE_CONTRACTS_DIR
