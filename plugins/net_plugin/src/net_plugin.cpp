@@ -4890,8 +4890,9 @@ namespace sysio {
       if (no_retry == go_away_reason::duplicate) {
          const auto& pa = peer_address();
          if (my_impl->connections.any_of_connections([&pa, &c](const connection_ptr& check) {
-                if (check.get() == c.get() || !check->connected())
+                if (check.get() == c.get() || !check->connected()) {
                    return false;
+                }
                 fc::lock_guard g(check->conn_mtx);
                 return check->p2p_address == pa;
              })) {
