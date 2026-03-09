@@ -4352,9 +4352,6 @@ namespace sysio {
    // call from connection strand
    bool connection::populate_handshake( handshake_message& hello ) const {
       auto chain_info = my_impl->get_chain_info();
-      // nothing has changed since last handshake, skip sending
-      if (chain_info.fork_db_head_id == hello.fork_db_head_id && hello.generation != 0)
-         return false;
       hello.network_version = static_cast<uint16_t>(net_version);
       hello.chain_id = my_impl->chain_id;
       hello.node_id = my_impl->node_id;
