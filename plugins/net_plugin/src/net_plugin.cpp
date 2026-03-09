@@ -3478,6 +3478,7 @@ namespace sysio {
                   froot_num, fhead_num );
          valid = false;
       }
+
       if (msg.p2p_address.empty()) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address is null string" );
          valid = false;
@@ -3494,6 +3495,7 @@ namespace sysio {
             valid = false;
          }
       }
+
       if( msg.agent.length() > net_utils::max_handshake_str_length ) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: agent field too large: {}",
                     fc::escape_string(msg.agent.substr(0, 64), nullptr) + "..." );
