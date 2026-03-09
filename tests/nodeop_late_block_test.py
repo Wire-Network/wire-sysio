@@ -67,17 +67,22 @@ try:
     node4.kill(signal.SIGTERM)
     assert not node4.verifyAlive(), "Node4 did not shutdown"
 
-    Print("Wait until Node_03 starts to produce its second round ")
-    node3.waitForProducer("defproducerk", exitOnError=True)
+    Print("Wait until Node_03 is well into its isolated fork (defproducerl)")
+    node3.waitForProducer("defproducerl", exitOnError=True)
 
-    Print("Relaunch bridge to connection Node_02 and Node_03")
+    Print("Relaunch bridge to reconnect Node_02 and Node_03")
     node4.relaunch()
 
     Print("Verify Node_03 fork switches even though it is producing")
     node3.waitForProducer("defproduceri", exitOnError=True)
-    Print("Verify fork switch")
-    switchForkLineNum = node3.findInLog("switching forks .* defproducerk")
-    assert switchForkLineNum, "Expected to find 'switching forks' in node_03 log"
+
+    Print("Verify fork switch - poll for log entry in case sync is still settling")
+    # The fork switch log may reference any of node_03's producers (j, k, or l) depending
+    # on exactly when the bridge reconnects and blocks propagate.
+    def findForkSwitch():
+        return node3.findInLog("switching forks .* defproducer[jkl]")
+    switchForkLineNum = Utils.waitForBool(findForkSwitch, timeout=30)
+    assert switchForkLineNum, "Expected to find 'switching forks' from a node_03 producer in node_03 log"
 
     Print("Wait until Node_00 to produce")
     node3.waitForProducer("defproducera")
@@ -88,9 +93,9 @@ try:
         defprod=node3.getBlockProducerByNum(iProdBlockNum + i)
         assert defprod == "defproduceri", f"expected defproduceri for block {iProdBlockNum + i}, instead: {defprod}"
 
-    # verify that defproducerk blocks made it into the canonical chain as well
-    # It can take a while to resolve the fork, but should have at least one defproducerk block unless defproducerl
-    # wins the fork in which case there will be another fork switch
+    # verify that defproducerk or defproducerl blocks made it into the canonical chain
+    # It can take a while to resolve the fork, but should have at least one block from node_03's
+    # producers unless defproducera wins the fork
     expectedProd = "defproducerk"
     if node3.findInLog("switching forks .* defproducerl", switchForkLineNum):
         expectedProd = "defproducera"

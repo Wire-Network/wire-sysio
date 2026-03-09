@@ -56,3 +56,4 @@ function(contracts_target TARGET)
   ExternalProject_Add_StepTargets(${TARGET} build)
 endfunction()
 
+

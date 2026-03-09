@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.19)
 
 # Set vcpkg toolchain if not already set
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -90,6 +90,11 @@ if(CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
   else()
     list(APPEND SYSIO_WASM_RUNTIMES sys-vm)
   endif()
+endif()
+
+# Native-module runtime: only in Debug builds (used for debugger-attached contract execution)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug" AND CMAKE_SIZEOF_VOID_P EQUAL 8 AND NOT WIN32)
+  list(APPEND SYSIO_WASM_RUNTIMES native-module)
 endif()
 
 if(UNIX)
@@ -294,5 +299,4 @@ include(doxygen)
 option(ENABLE_SYSIO_DEV_DEB "Enable building the sysio-dev .deb package" OFF)
 option(ENABLE_SPRING_DEV_DEB "Enable building the spring-dev .deb package" OFF)
 
-include(package.cmake)
-include(CPack)
+include(cmake/package.cmake)

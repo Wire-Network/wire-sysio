@@ -31,8 +31,10 @@
 #include <boost/asio/ip/host_name.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/post.hpp>
+#include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/key.hpp>
 #include <boost/unordered/unordered_flat_set.hpp>
+#include <boost/container/small_vector.hpp>
 
 #if __has_include(<sys/ioctl.h>)
 #include <sys/ioctl.h>
@@ -67,8 +69,8 @@ namespace sysio {
 struct peer_sync_state {
    enum class sync_t {
       peer_sync,    // sync_request_message, syncing
-      peer_catchup, // head catchup, syncing request_message:catch_up
-      block_nack    // sync due to block nack (block_notice_message) request_message:normal
+      peer_catchup, // head catchup, syncing block_request_message
+      block_nack    // sync due to block nack (block_notice_message) block_nack_request_message
    };
    peer_sync_state(uint32_t start, uint32_t end, uint32_t last_acted, sync_t sync_type)
       :start_block( start ), end_block( end ), last( last_acted ), sync_type( sync_type )
@@ -118,6 +120,7 @@ namespace sysio {
 
    using connection_id_t = uint32_t;
    using connection_id_set = boost::unordered_flat_set<connection_id_t>;
+   using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
    struct node_transaction_state {
       transaction_id_type        id;
       time_point_sec             expires;           // time after which this may be purged.
@@ -128,7 +131,7 @@ namespace sysio {
    typedef multi_index_container<
       node_transaction_state,
       indexed_by<
-         ordered_unique<
+         hashed_unique<
             tag<by_id>,
             member<node_transaction_state, transaction_id_type, &node_transaction_state::id>
          >,
@@ -223,7 +226,7 @@ namespace sysio {
       void sync_recv_block( const connection_ptr& c, const block_id_type& blk_id, uint32_t blk_num,
                             const fc::microseconds& blk_latency );
       void recv_handshake( const connection_ptr& c, const handshake_message& msg, uint32_t nblk_combined_latency );
-      void sync_recv_notice( const connection_ptr& c, const notice_message& msg );
+      void sync_recv_status( const connection_ptr& c, const peer_status_notice& msg );
       void send_handshakes_if_synced(const fc::microseconds& blk_latency);
    };
 
@@ -235,6 +238,26 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex      local_txns_mtx;
       node_transaction_index  local_txns GUARDED_BY(local_txns_mtx);
+
+      // Vote dedup cache: tracks recently seen vote IDs to avoid expensive BLS deserialization for duplicates.
+      // Indexed by vote_id for O(1) lookup and by block_num for LIB-based pruning.
+      struct vote_dedup_entry {
+         vote_id_type   id;
+         block_num_type block_num;
+      };
+      struct by_vote_id;
+      struct by_block_num;
+      using vote_dedup_index = multi_index_container<vote_dedup_entry,
+         indexed_by<
+            hashed_unique<tag<by_vote_id>,
+               member<vote_dedup_entry, vote_id_type, &vote_dedup_entry::id>, std::hash<vote_id_type>>,
+            ordered_non_unique<tag<by_block_num>,
+               member<vote_dedup_entry, block_num_type, &vote_dedup_entry::block_num>>
+         >>;
+
+      alignas(hardware_destructive_interference_sz)
+      mutable fc::mutex       vote_dedup_mtx;
+      vote_dedup_index        vote_dedup GUARDED_BY(vote_dedup_mtx);
 
    public:
       boost::asio::io_context::strand  strand;
@@ -248,7 +271,6 @@ namespace sysio {
       void bcast_block( const signed_block_ptr& b, const block_id_type& id );
 
       void expire_blocks( uint32_t fork_db_root_num );
-      void recv_notice(const connection_ptr& conn, const notice_message& msg, bool generated);
 
       bool add_peer_block( const block_id_type& blkid, connection_id_t connection_id );
       bool peer_has_block(const block_id_type& blkid, connection_id_t connection_id) const;
@@ -262,52 +284,32 @@ namespace sysio {
       };
       add_peer_txn_info add_peer_txn(const transaction_id_type& id, const time_point_sec& trx_expires, connection& c);
       size_t add_peer_txn_notice(const transaction_id_type& id, connection& c);
-      connection_id_set peer_connections(const transaction_id_type& id) const;
+      bool have_peer_txn(const transaction_id_type& id, connection& c);
+      connection_id_vector peer_connections(const transaction_id_type& id) const;
       void expire_txns();
+
+      bool have_vote(const vote_id_type& id) const;
+      void add_vote_id(const vote_id_type& id, block_num_type block_num);
 
       void bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg );
    };
 
    /**
-    *  For a while, network version was a 16 bit value equal to the second set of 16 bits
-    *  of the current build's git commit id. We are now replacing that with an integer protocol
-    *  identifier. Based on historical analysis of all git commit identifiers, the larges gap
-    *  between ajacent commit id values is shown below.
-    *  these numbers were found with the following commands on the master branch:
-    *
-    *  git log | grep "^commit" | awk '{print substr($2,5,4)}' | sort -u > sorted.txt
-    *  rm -f gap.txt; prev=0; for a in $(cat sorted.txt); do echo $prev $((0x$a - 0x$prev)) $a >> gap.txt; prev=$a; done; sort -k2 -n gap.txt | tail
-    *
-    *  DO NOT EDIT net_version_base OR net_version_range!
-    */
-   constexpr uint16_t net_version_base = 0x04b5;
-   constexpr uint16_t net_version_range = 106;
-   /**
-    *  If there is a change to network protocol or behavior, increment net version to identify
-    *  the need for compatibility hooks
+    *  Wire protocol version. Version 1 is the Wire genesis protocol.
+    *  Increment for future protocol changes that need compatibility hooks.
+    *  The version value is sent directly as handshake_message::network_version.
     */
    enum class proto_version_t : uint16_t {
-      base = 0,
-      explicit_sync = 1,       // version at time of sysio 1.0
-      block_id_notify = 2,     // reserved. feature was removed. next net_version should be 3
-      pruned_types = 3,        // sysio 2.1: supports new signed_block & packed_transaction types
-      heartbeat_interval = 4,        // sysio 2.1: supports configurable heartbeat interval
-      dup_goaway_resolution = 5,     // sysio 2.1: support peer address based duplicate connection resolution
-      dup_node_id_goaway = 6,        // sysio 2.1: support peer node_id based duplicate connection resolution
-      leap_initial = 7,              // leap client, needed because none of the 2.1 versions are supported
-      block_range = 8,               // include block range in notice_message
-      savanna = 9,                   // savanna, adds vote_message
-      block_nack = 10,               // adds block_nack_message & block_notice_message
-      gossip_bp_peers = 11,          // adds gossip_bp_peers_message
-      trx_notice = 12                // adds transaction_notice_message
+      base = 1      // Wire genesis protocol (Savanna, block_nack, gossip_bp_peers, trx_notice, etc.)
    };
 
-   constexpr proto_version_t net_version_max = proto_version_t::trx_notice;
+   constexpr proto_version_t net_version_min = proto_version_t::base;
+   constexpr proto_version_t net_version_max = proto_version_t::base;
 
    /**
     * default value initializers
     */
-   constexpr auto     def_send_buffer_size_mb = 4;
+   constexpr auto     def_send_buffer_size_mb = 8;
    constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
    constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
@@ -509,8 +511,15 @@ namespace sysio {
 
    private:
       alignas(hardware_destructive_interference_sz)
-      mutable fc::mutex             chain_info_mtx; // protects chain_info_t
+      mutable fc::mutex             chain_info_mtx; // protects chain_info_t (block IDs)
       chain_info_t                  chain_info GUARDED_BY(chain_info_mtx);
+
+      // Atomic scalars for lock-free reads on hot paths (every block/trx/vote receive).
+      // Updated only from main app thread via update_chain_info().
+      alignas(hardware_destructive_interference_sz)
+      std::atomic<uint32_t>         chain_fork_db_root_num{0};
+      std::atomic<uint32_t>         chain_head_num{0};
+      std::atomic<uint32_t>         chain_fork_db_head_num{0};
 
    public:
       void update_chain_info();
@@ -593,15 +602,14 @@ namespace sysio {
 
    static net_plugin_impl *my_impl;
 
+   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 16>;
+
    // thread safe
    class queued_buffer : boost::noncopyable {
    public:
       void reset() {
+         clear_write_queue();
          fc::lock_guard g( _mtx );
-         _write_queue.clear();
-         _sync_write_queue.clear();
-         _write_queue_size = 0;
-         _trx_write_queue.clear();
          _out_queue.clear();
       }
 
@@ -610,18 +618,22 @@ namespace sysio {
          _write_queue.clear();
          _sync_write_queue.clear();
          _trx_write_queue.clear();
-         _write_queue_size = 0;
+         _write_queue_size.store(0, std::memory_order_relaxed);
+         _write_drain_pending.store(false, std::memory_order_relaxed);
       }
 
-      void clear_out_queue(boost::system::error_code ec, std::size_t number_of_bytes_written) {
-         fc::lock_guard g( _mtx );
-         out_callback( ec, number_of_bytes_written );
-         _out_queue.clear();
-      }
+      void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
 
       uint32_t write_queue_size() const {
-         fc::lock_guard g( _mtx );
-         return _write_queue_size;
+         return _write_queue_size.load(std::memory_order_relaxed);
+      }
+
+      // Returns true if caller wins the drain race; false if a drain is already pending.
+      bool try_claim_drain() {
+         return !_write_drain_pending.exchange(true, std::memory_order_acq_rel);
+      }
+      void release_drain() {
+         _write_drain_pending.store(false, std::memory_order_release);
       }
 
       // called from connection strand
@@ -629,7 +641,7 @@ namespace sysio {
          fc::unique_lock g( _mtx );
          // if out_queue is not empty then async_write is in progress
          const bool async_write_in_progress = !_out_queue.empty();
-         const bool ready = !async_write_in_progress && _write_queue_size != 0;
+         const bool ready = !async_write_in_progress && _write_queue_size.load(std::memory_order_relaxed) != 0;
          g.unlock();
          if (async_write_in_progress) {
             fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
@@ -638,27 +650,26 @@ namespace sysio {
       }
 
       enum class queue_t { block_sync, general };
-      // @param callback must not callback into queued_buffer
-      bool add_write_queue(msg_type_t net_msg,
-                           queue_t queue,
-                           const send_buffer_type& buff,
-                           std::function<void(boost::system::error_code, std::size_t)> callback) {
+      struct add_result { bool ok; bool needs_drain; };
+      add_result add_write_queue(msg_type_t net_msg,
+                                 queue_t queue,
+                                 const send_buffer_type& buff,
+                                 connection_id_t conn_id,
+                                 go_away_reason close_after_send,
+                                 std::optional<block_num_type> block_num) {
          fc::lock_guard g( _mtx );
-         if( net_msg == msg_type_t::packed_transaction || net_msg == msg_type_t::transaction_notice_message ) {
-            _trx_write_queue.emplace_back( buff, std::move(callback) );
+         if( net_msg == msg_type_t::transaction_message || net_msg == msg_type_t::transaction_notice_message ) {
+            _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else if (queue == queue_t::block_sync) {
-            _sync_write_queue.emplace_back( buff, std::move(callback) );
+            _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else {
-            _write_queue.emplace_back( buff, std::move(callback) );
+            _write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          }
-         _write_queue_size += buff->size();
-         if( _write_queue_size > 2 * def_max_write_queue_size ) {
-            return false;
-         }
-         return true;
+         auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
+         return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
       }
 
-      void fill_out_buffer( std::vector<boost::asio::const_buffer>& bufs ) {
+      void fill_out_buffer( small_buf_vector& bufs ) {
          fc::lock_guard g( _mtx );
          if (!_sync_write_queue.empty()) { // always send msgs from sync_write_queue first
             fill_out_buffer( bufs, _sync_write_queue );
@@ -666,38 +677,38 @@ namespace sysio {
             fill_out_buffer( bufs, _write_queue );
          } else {
             fill_out_buffer( bufs, _trx_write_queue );
-            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size == 0);
+            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size.load(std::memory_order_relaxed) == 0);
          }
       }
 
    private:
       struct queued_write;
-      void fill_out_buffer( std::vector<boost::asio::const_buffer>& bufs,
+      void fill_out_buffer( small_buf_vector& bufs,
                             deque<queued_write>& w_queue ) REQUIRES(_mtx) {
          while ( !w_queue.empty() ) {
             auto& m = w_queue.front();
             bufs.emplace_back( m.buff->data(), m.buff->size() );
-            _write_queue_size -= m.buff->size();
+            _write_queue_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
             _out_queue.emplace_back( m );
             w_queue.pop_front();
          }
       }
 
-      void out_callback( boost::system::error_code ec, std::size_t number_of_bytes_written ) REQUIRES(_mtx) {
-         for( auto& m : _out_queue ) {
-            m.callback( ec, number_of_bytes_written );
-         }
-      }
-
    private:
       struct queued_write {
-         send_buffer_type buff;
-         std::function<void( boost::system::error_code, std::size_t )> callback;
+         send_buffer_type             buff;
+         connection_id_t              connection_id{0};
+         go_away_reason               close_after_send{go_away_reason::no_reason};
+         msg_type_t                   net_msg{};
+         std::optional<block_num_type> block_num;
       };
 
       alignas(hardware_destructive_interference_sz)
+      std::atomic<uint32_t> _write_queue_size{0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
+      std::atomic<bool>     _write_drain_pending{false}; // coalesces queue_write_mt drain posts
+
+      alignas(hardware_destructive_interference_sz)
       mutable fc::mutex   _mtx;
-      uint32_t            _write_queue_size GUARDED_BY(_mtx) {0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
       deque<queued_write> _write_queue      GUARDED_BY(_mtx); // queued messages, all messages except sync & trxs
       deque<queued_write> _sync_write_queue GUARDED_BY(_mtx); // sync_write_queue blocks will be sent first
       deque<queued_write> _trx_write_queue  GUARDED_BY(_mtx); // queued trx messages, trx_write_queue will be sent last
@@ -850,8 +861,8 @@ namespace sysio {
       string                  local_endpoint_ip;
       string                  local_endpoint_port;
       string                  short_agent_name;
-      // kept in sync with last_handshake_recv.fork_db_root_num, only accessed from connection strand
-      uint32_t                peer_fork_db_root_num = 0;
+      // kept in sync with last_handshake_recv.fork_db_root_num
+      std::atomic<uint32_t>   peer_fork_db_root_num{0};
 
       std::atomic<uint32_t>   sync_ordinal{0};
       // when syncing from a peer, the last block expected of the current range
@@ -874,7 +885,7 @@ namespace sysio {
       alignas(hardware_destructive_interference_sz)
       std::atomic<bool>       peer_syncing_from_us{false};
 
-      std::atomic<proto_version_t>   protocol_version = proto_version_t::base;
+      std::atomic<proto_version_t>   protocol_version{static_cast<proto_version_t>(0)};
       proto_version_t                net_version = net_version_max;
       std::atomic<uint16_t>   consecutive_immediate_connection_close = 0;
       // bp_config = p2p-auto-bp-peer, bp_gossip = validated gossip connection,
@@ -1019,14 +1030,18 @@ namespace sysio {
                        std::optional<block_num_type> block_num,
                        queued_buffer::queue_t queue,
                        const send_buffer_type& buff,
-                       std::function<void(boost::system::error_code, std::size_t)> callback);
+                       go_away_reason close_after_send);
       void do_queue_write(std::optional<block_num_type> block_num);
+      // called from any thread; adds to write queue and conditionally posts a drain
+      void queue_write_mt(msg_type_t net_msg,
+                          queued_buffer::queue_t queue,
+                          const send_buffer_type& buff,
+                          go_away_reason close_after_send);
       void log_send_buffer_stats() const;
 
       bool is_valid( const handshake_message& msg ) const;
 
       void handle_message( const handshake_message& msg );
-      void handle_message( const chain_size_message& msg );
       void handle_message( const go_away_message& msg );
       /** \name Peer Timestamps
        *  Time message handling
@@ -1043,12 +1058,13 @@ namespace sysio {
        */
       void handle_message( const time_message& msg );
       /** @} */
-      void handle_message( const notice_message& msg );
-      void handle_message( const request_message& msg );
+      void handle_message( const peer_status_notice& msg );
+      void handle_message( const block_request_message& msg );
+      void handle_message( const block_nack_request_message& msg );
       void handle_message( const sync_request_message& msg );
       void handle_message( const signed_block& msg ) = delete; // signed_block_ptr overload used instead
       void handle_message( const block_id_type& id, signed_block_ptr ptr );
-      void handle_message( const packed_transaction& msg ) = delete; // packed_transaction_ptr overload used instead
+      void handle_message( const transaction_message& msg ) = delete; // handled via process_next_trx_message
       void handle_message( const packed_transaction_ptr& trx );
       void handle_message( const vote_message_ptr& msg );
       void handle_message( const vote_message& msg ) = delete; // vote_message_ptr overload used instead
@@ -1089,6 +1105,26 @@ namespace sysio {
       }
    }; // class connection
 
+   void queued_buffer::clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written) {
+      fc::lock_guard g( _mtx );
+      for( auto& m : _out_queue ) {
+         if( ec ) {
+            if( ec != boost::asio::error::operation_aborted && ec != boost::asio::error::connection_reset && conn->socket_is_open() ) {
+               fc_elog( p2p_conn_log, "Connection - {} - send failed with: {}", m.connection_id, ec.message() );
+            }
+         } else {
+            if( m.net_msg == msg_type_t::signed_block && m.block_num )
+               fc_dlog( p2p_conn_log, "Connection - {} - done sending block {}, bytes {}", m.connection_id, *m.block_num, number_of_bytes_written );
+            if( m.close_after_send != go_away_reason::no_reason ) {
+               fc_ilog( p2p_conn_log, "sent a go away message: {}, closing connection {}",
+                        reason_str( m.close_after_send ), m.connection_id );
+               conn->close();
+            }
+         }
+      }
+      _out_queue.clear();
+   }
+
    const string connection::unknown = "<unknown>";
 
    // called from connection strand
@@ -1107,12 +1143,6 @@ namespace sysio {
          c->handle_message( msg );
       }
 
-      void operator()( const chain_size_message& msg ) const {
-         // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle chain_size_message" );
-         c->handle_message( msg );
-      }
-
       void operator()( const go_away_message& msg ) const {
          // continue call to handle_message on connection strand
          peer_dlog( p2p_msg_log, c, "handle go_away_message" );
@@ -1125,15 +1155,21 @@ namespace sysio {
          c->handle_message( msg );
       }
 
-      void operator()( const notice_message& msg ) const {
+      void operator()( const peer_status_notice& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle notice_message" );
+         peer_dlog( p2p_msg_log, c, "handle peer_status_notice" );
          c->handle_message( msg );
       }
 
-      void operator()( const request_message& msg ) const {
+      void operator()( const block_request_message& msg ) const {
          // continue call to handle_message on connection strand
-         peer_dlog( p2p_msg_log, c, "handle request_message" );
+         peer_dlog( p2p_msg_log, c, "handle block_request_message" );
+         c->handle_message( msg );
+      }
+
+      void operator()( const block_nack_request_message& msg ) const {
+         // continue call to handle_message on connection strand
+         peer_dlog( p2p_msg_log, c, "handle block_nack_request_message" );
          c->handle_message( msg );
       }
 
@@ -1468,7 +1504,7 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
-      peer_fork_db_root_num = 0;
+      peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
       sent_handshake_count = 0;
@@ -1505,9 +1541,7 @@ namespace sysio {
 
       peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
-         notice_message note;
-         note.known_blocks.mode = normal;
-         note.known_blocks.pending = 0;
+         peer_status_notice note;
          enqueue(note);
          return;
       }
@@ -1519,7 +1553,7 @@ namespace sysio {
                        block_header::num_from_id(last_handshake_recv.fork_db_head_id), last_handshake_recv.fork_db_head_id );
          }
       }
-      const auto fork_db_root_num = peer_fork_db_root_num;
+      const auto fork_db_root_num = peer_fork_db_root_num.load( std::memory_order_relaxed );
       if( fork_db_root_num == 0 ) return; // if fork_db_root_id is null (we have not received handshake or reset)
 
       auto msg_head_num = block_header::num_from_id(msg_head_id);
@@ -1690,13 +1724,38 @@ namespace sysio {
                                 std::optional<block_num_type> block_num,
                                 queued_buffer::queue_t queue,
                                 const send_buffer_type& buff,
-                                std::function<void(boost::system::error_code, std::size_t)> callback) {
-      if( !buffer_queue.add_write_queue( net_msg, queue, buff, std::move(callback) )) {
+                                go_away_reason close_after_send) {
+      auto result = buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, block_num );
+      if( !result.ok ) {
          peer_wlog( p2p_conn_log, this, "write_queue full {} bytes, giving up on connection", buffer_queue.write_queue_size() );
          close();
          return;
       }
       do_queue_write(block_num);
+   }
+
+   // called from any thread; adds to write queue and conditionally posts a drain
+   void connection::queue_write_mt(msg_type_t net_msg,
+                                   queued_buffer::queue_t queue,
+                                   const send_buffer_type& buff,
+                                   go_away_reason close_after_send) {
+      auto result = buffer_queue.add_write_queue( net_msg, queue, buff, connection_id, close_after_send, std::nullopt );
+      if( !result.ok ) {
+         boost::asio::post(strand, [c = shared_from_this()]() {
+            fc_dlog( p2p_conn_log, "write_queue full {} bytes, giving up on connection - {}",
+                       c->buffer_queue.write_queue_size(), c->connection_id );
+            c->close();
+         });
+         return;
+      }
+      if( result.needs_drain ) {
+         if( buffer_queue.try_claim_drain() ) {
+            boost::asio::post(strand, [c = shared_from_this()]() {
+               c->buffer_queue.release_drain();
+               c->do_queue_write(std::nullopt);
+            });
+         }
+      }
    }
 
    // called from connection strand
@@ -1712,7 +1771,7 @@ namespace sysio {
          return;
       }
 
-      std::vector<boost::asio::const_buffer> bufs;
+      small_buf_vector bufs;
       buffer_queue.fill_out_buffer( bufs );
 
       log_send_buffer_stats();
@@ -1724,13 +1783,13 @@ namespace sysio {
             // May have closed connection and cleared buffer_queue
             if (!c->socket->is_open() && c->socket_is_open()) { // if socket_open then close not called
                peer_ilog(p2p_conn_log, c, "async write socket closed before callback");
-               c->buffer_queue.clear_out_queue(ec, w);
+               c->buffer_queue.clear_out_queue(c.get(), ec, w);
                c->close();
                return;
             }
             if (socket != c->socket ) { // different socket, c must have created a new socket, make sure previous is closed
                peer_ilog( p2p_conn_log, c, "async write socket changed before callback");
-               c->buffer_queue.clear_out_queue(ec, w);
+               c->buffer_queue.clear_out_queue(c.get(), ec, w);
                boost::system::error_code ignore_ec;
                socket->shutdown( tcp::socket::shutdown_both, ignore_ec );
                socket->close( ignore_ec );
@@ -1749,7 +1808,7 @@ namespace sysio {
             c->bytes_sent += w;
             c->last_bytes_sent = c->get_time();
 
-            c->buffer_queue.clear_out_queue(ec, w);
+            c->buffer_queue.clear_out_queue(c.get(), ec, w);
 
             c->enqueue_sync_block();
             c->do_queue_write(std::nullopt);
@@ -1878,24 +1937,7 @@ namespace sysio {
                                     const send_buffer_type& send_buffer,
                                     go_away_reason close_after_send)
    {
-      connection_ptr self = shared_from_this();
-      queue_write(net_msg, block_num, queue, send_buffer,
-            [conn{std::move(self)}, close_after_send, net_msg, block_num](boost::system::error_code ec, std::size_t s) {
-                        if (ec) {
-                           if (ec != boost::asio::error::operation_aborted && ec != boost::asio::error::connection_reset && conn->socket_is_open()) {
-                              fc_elog(p2p_conn_log, "Connection - {} - send failed with: {}", conn->connection_id, ec.message());
-                           }
-                           return;
-                        }
-                        if (net_msg == msg_type_t::signed_block && block_num)
-                           fc_dlog(p2p_conn_log, "Connection - {} - done sending block {}", conn->connection_id, *block_num);
-                        if (close_after_send != go_away_reason::no_reason) {
-                           fc_ilog( p2p_conn_log, "sent a go away message: {}, closing connection {}",
-                                    reason_str(close_after_send), conn->connection_id );
-                           conn->close();
-                           return;
-                        }
-                  });
+      queue_write(net_msg, block_num, queue, send_buffer, close_after_send);
    }
 
    // thread safe
@@ -1990,17 +2032,20 @@ namespace sysio {
       }
       if( !c ) return;
       if( !closing ) {
-         if( c->peer_fork_db_root_num > sync_known_fork_db_root_num ) {
-            sync_known_fork_db_root_num = c->peer_fork_db_root_num;
+         uint32_t c_froot = c->peer_fork_db_root_num.load( std::memory_order_relaxed );
+         if( c_froot > sync_known_fork_db_root_num ) {
+            sync_known_fork_db_root_num = c_froot;
          }
       } else {
          // Closing connection, therefore its view of fork_db_root can no longer be considered as we will no longer be connected.
          // Determine current fork_db_root of remaining peers as our sync_known_fork_db_root_num.
          uint32_t highest_fork_db_root_num = 0;
          my_impl->connections.for_each_block_connection( [&highest_fork_db_root_num]( const auto& cc ) {
-            fc::lock_guard g_conn( cc->conn_mtx );
-            if( cc->current() && cc->last_handshake_recv.fork_db_root_num > highest_fork_db_root_num ) {
-               highest_fork_db_root_num = cc->last_handshake_recv.fork_db_root_num;
+            if( cc->current() ) {
+               uint32_t froot = cc->peer_fork_db_root_num.load( std::memory_order_relaxed );
+               if( froot > highest_fork_db_root_num ) {
+                  highest_fork_db_root_num = froot;
+               }
             }
          } );
          sync_known_fork_db_root_num = highest_fork_db_root_num;
@@ -2070,15 +2115,16 @@ namespace sysio {
 
    // call with g_sync locked, called from conn's connection strand
    void sync_manager::request_next_chunk( const connection_ptr& conn ) REQUIRES(sync_mtx) {
-      auto chain_info = my_impl->get_chain_info();
+      uint32_t fork_db_head_num = my_impl->get_fork_db_head_num();
+      uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
 
       fc_dlog( p2p_blk_log, "sync_last_requested_num: {}, sync_next_expected_num: {}, sync_known_fork_db_root_num: {}, sync-fetch-span: {}, fhead: {}, froot: {}",
-               sync_last_requested_num, sync_next_expected_num, sync_known_fork_db_root_num, sync_fetch_span, chain_info.fork_db_head_num, chain_info.fork_db_root_num );
+               sync_last_requested_num, sync_next_expected_num, sync_known_fork_db_root_num, sync_fetch_span, fork_db_head_num, fork_db_root_num );
 
       if (conn) {
          // p2p_high_latency_test.py test depends on this exact log statement.
          peer_ilog(p2p_blk_log, conn, "Catching up with chain, our last req is {}, theirs is {}, next expected {}, fhead {}",
-                   sync_last_requested_num, sync_known_fork_db_root_num, sync_next_expected_num, chain_info.fork_db_head_num);
+                   sync_last_requested_num, sync_known_fork_db_root_num, sync_next_expected_num, fork_db_head_num);
       }
 
       /* ----------
@@ -2090,7 +2136,7 @@ namespace sysio {
 
       auto reset_on_failure = [&]() REQUIRES(sync_mtx) {
          sync_source.reset();
-         sync_known_fork_db_root_num = chain_info.fork_db_root_num;
+         sync_known_fork_db_root_num = fork_db_root_num;
          sync_last_requested_num = 0;
          sync_next_expected_num = std::max( sync_known_fork_db_root_num + 1, sync_next_expected_num );
          // not in sync, but need to be out of lib_catchup for start_sync to work
@@ -2116,7 +2162,7 @@ namespace sysio {
             sync_source = new_sync_source;
             request_sent = true;
             sync_active_time = std::chrono::steady_clock::now();
-            boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, fork_db_head_num=chain_info.fork_db_head_num, fork_db_root_num=chain_info.fork_db_root_num]() {
+            boost::asio::post(new_sync_source->strand, [new_sync_source, start, end, fork_db_head_num, fork_db_root_num]() {
                peer_ilog( p2p_blk_log, new_sync_source, "requesting range {} to {}, fhead {}, froot {}", start, end, fork_db_head_num, fork_db_root_num );
                new_sync_source->request_sync_blocks( start, end );
             } );
@@ -2205,10 +2251,11 @@ namespace sysio {
          sync_known_fork_db_root_num = target;
       }
 
-      auto chain_info = my_impl->get_chain_info();
-      if( !is_sync_required( chain_info.fork_db_head_num ) || target <= chain_info.fork_db_root_num ) {
+      uint32_t fork_db_head_num = my_impl->get_fork_db_head_num();
+      uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
+      if( !is_sync_required( fork_db_head_num ) || target <= fork_db_root_num ) {
          peer_dlog( p2p_blk_log, c, "We are already caught up, my irr = {}, fhead = {}, target = {}",
-                  chain_info.fork_db_root_num, chain_info.fork_db_head_num, target );
+                  fork_db_root_num, fork_db_head_num, target );
          c->send_handshake(); // let peer know it is not syncing from us
          return;
       }
@@ -2219,7 +2266,7 @@ namespace sysio {
                    stage_str(current_sync_state), sync_next_expected_num);
          set_state( lib_catchup );
          sync_last_requested_num = 0;
-         sync_next_expected_num = chain_info.fork_db_root_num + 1;
+         sync_next_expected_num = fork_db_root_num + 1;
          request_next_chunk( c );
       } else if (sync_last_requested_num > 0 && is_sync_request_ahead_allowed(sync_next_expected_num-1)) {
          request_next_chunk();
@@ -2274,12 +2321,6 @@ namespace sysio {
       }
    }
 
-   inline block_id_type make_block_id( uint32_t block_num ) {
-      chain::block_id_type block_id;
-      block_id._hash[0] = fc::endian_reverse_u32(block_num);
-      return block_id;
-   }
-
    // called from c's connection strand
    void sync_manager::recv_handshake( const connection_ptr& c, const handshake_message& msg, uint32_t nblk_combined_latency ) {
 
@@ -2295,10 +2336,10 @@ namespace sysio {
       //
       // 0. my head block id == peer head id means we are all caught up block wise
       // 1. my head block num < peer froot then start sync locally by sending handshake
-      // 2. my froot > peer head num + nblk_combined_latency then send last_irr_catch_up notice if not the first generation
+      // 2. my froot > peer head num + nblk_combined_latency then send last_irr_catch_up notice
       //
       // 3  my head block num + nblk_combined_latency < peer head block num then update sync state and send a catchup request
-      // 4  my head block num >= peer block num + nblk_combined_latency send a notice catchup if this is not the first generation
+      // 4  my head block num >= peer block num + nblk_combined_latency send a notice catchup
       //    4.1 if peer appears to be on a different fork ( our_id_for( msg.head_num ) != msg.head_id )
       //        then request peer's blocks
       //
@@ -2325,21 +2366,14 @@ namespace sysio {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 2, fhead {}, froot {}",
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
-         if (msg.generation > 1 || c->protocol_version > proto_version_t::base) {
-            controller& cc = my_impl->chain_plug->chain();
-            notice_message note;
-            note.known_trx.pending = chain_info.fork_db_root_num;
-            note.known_trx.mode = last_irr_catch_up;
-            note.known_blocks.mode = last_irr_catch_up;
-            note.known_blocks.pending = chain_info.fork_db_head_num;
-            note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-            if (c->protocol_version >= proto_version_t::block_range) {
-               // begin, more efficient to encode a block num instead of retrieving actual block id
-               note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
-            }
-            c->enqueue( note );
-            c->peer_syncing_from_us = true;
-         }
+         controller& cc = my_impl->chain_plug->chain();
+         peer_status_notice note;
+         note.lib_sync = true;
+         note.fork_db_root_id = chain_info.fork_db_root_id;
+         note.fork_db_head_id = chain_info.fork_db_head_id;
+         note.earliest_available_block_num = cc.earliest_available_block_num();
+         c->enqueue( note );
+         c->peer_syncing_from_us = true;
          return;
       }
 
@@ -2354,27 +2388,18 @@ namespace sysio {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 4, fhead {}, froot {}",
                     msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
-         if (msg.generation > 1 ||  c->protocol_version > proto_version_t::base) {
-            controller& cc = my_impl->chain_plug->chain();
-            notice_message note;
-            note.known_trx.mode = none;
-            note.known_blocks.mode = catch_up;
-            note.known_blocks.pending = chain_info.fork_db_head_num;
-            note.known_blocks.ids.push_back(chain_info.fork_db_head_id);
-            if (c->protocol_version >= proto_version_t::block_range) {
-               // begin, more efficient to encode a block num instead of retrieving actual block id
-               note.known_blocks.ids.push_back(make_block_id(cc.earliest_available_block_num()));
-            }
-            c->enqueue( note );
-         }
+         controller& cc = my_impl->chain_plug->chain();
+         peer_status_notice note;
+         note.fork_db_root_id = chain_info.fork_db_root_id;
+         note.fork_db_head_id = chain_info.fork_db_head_id;
+         note.earliest_available_block_num = cc.earliest_available_block_num();
+         c->enqueue( note );
          c->peer_syncing_from_us = false;
          try {
             auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_head_id); // thread safe
             if (on_fork) { // possible for fork_db_root to move and fork_db_head_num not be found if running with no block-log
-               peer_dlog(p2p_msg_log, c, "Sending catch_up request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
-               request_message req;
-               req.req_blocks.mode = catch_up;
-               req.req_trx.mode = none;
+               peer_dlog(p2p_msg_log, c, "Sending block_request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
+               block_request_message req; // my_head_id zero = send from root
                c->enqueue( req );
             }
          } catch( ... ) {}
@@ -2387,20 +2412,17 @@ namespace sysio {
 
    // called from c's connection strand
    bool sync_manager::verify_catchup(const connection_ptr& c, uint32_t num, const block_id_type& id) {
-      request_message req;
-      req.req_blocks.mode = catch_up;
-      auto is_fork_db_head_greater = [num, &id, &req]( const auto& cc ) {
+      bool already_have = false;
+      auto is_fork_db_head_greater = [num, &id, &already_have]( const auto& cc ) {
          fc::lock_guard g_conn( cc->conn_mtx );
          if( cc->conn_fork_db_head_num > num || cc->conn_fork_db_head == id ) {
-            req.req_blocks.mode = none;
+            already_have = true;
             return true;
          }
          return false;
       };
-      if (my_impl->connections.any_of_block_connections(is_fork_db_head_greater)) {
-         req.req_blocks.mode = none;
-      }
-      if( req.req_blocks.mode == catch_up ) {
+      my_impl->connections.any_of_block_connections(is_fork_db_head_greater);
+      if( !already_have ) {
          {
             fc::lock_guard g( sync_mtx );
             peer_ilog( p2p_blk_log, c, "catch_up while in {}, fhead = {} "
@@ -2420,47 +2442,48 @@ namespace sysio {
             c->conn_fork_db_head_num = num;
          }
 
-         req.req_blocks.ids.emplace_back( chain_info.fork_db_head_id );
+         block_request_message req;
+         req.my_head_id = chain_info.fork_db_head_id;
+         c->enqueue( req );
       } else {
-         peer_ilog( p2p_blk_log, c, "none notice while in {}, fhead = {}, id {}...",
+         peer_ilog( p2p_blk_log, c, "already have block while in {}, fhead = {}, id {}...",
                   stage_str( sync_state ), num, id.str().substr(8,16) );
-         fc::lock_guard g_conn( c->conn_mtx );
-         c->conn_fork_db_head = block_id_type();
-         c->conn_fork_db_head_num = 0;
+         {
+            fc::lock_guard g_conn( c->conn_mtx );
+            c->conn_fork_db_head = block_id_type();
+            c->conn_fork_db_head_num = 0;
+         }
+         // Send handshake so remote peer re-evaluates sync state and clears peer_syncing_from_us.
+         // Previously the old request_message with mode=none served this purpose.
+         c->send_handshake();
       }
-      req.req_trx.mode = none;
-      c->enqueue( req );
       return true;
    }
 
    // called from c's connection strand
-   void sync_manager::sync_recv_notice( const connection_ptr& c, const notice_message& msg) {
-      peer_dlog( p2p_blk_log, c, "sync_manager got {} block notice", modes_str( msg.known_blocks.mode ) );
-      SYS_ASSERT( msg.known_blocks.mode == catch_up || msg.known_blocks.mode == last_irr_catch_up, plugin_exception,
-                  "sync_recv_notice only called on catch_up" );
-      if (msg.known_blocks.mode == catch_up) {
-         if (msg.known_blocks.ids.empty()) {
-            peer_wlog( p2p_blk_log, c, "got a catch up with ids size = 0" );
-         } else {
-            const block_id_type& id = msg.known_blocks.ids.front();
-            peer_ilog( p2p_blk_log, c, "notice_message, pending {}, blk_num {}, id {}...",
-                     msg.known_blocks.pending, block_header::num_from_id(id), id.str().substr(8,16) );
-            if( !my_impl->dispatcher.have_block( id ) ) {
-               verify_catchup( c, msg.known_blocks.pending, id );
-            } else {
-               // we already have the block, so update peer with our view of the world
-               peer_dlog(p2p_blk_log, c, "Already have block, sending handshake");
-               c->send_handshake();
-            }
-         }
-      } else if (msg.known_blocks.mode == last_irr_catch_up) {
+   void sync_manager::sync_recv_status( const connection_ptr& c, const peer_status_notice& msg) {
+      if (msg.lib_sync) {
+         uint32_t root_num = block_header::num_from_id(msg.fork_db_root_id);
+         peer_dlog( p2p_blk_log, c, "sync_manager got lib_sync peer_status_notice" );
+         c->peer_fork_db_root_num.store( root_num, std::memory_order_relaxed );
          {
-            c->peer_fork_db_root_num = msg.known_trx.pending;
             fc::lock_guard g_conn( c->conn_mtx );
-            c->last_handshake_recv.fork_db_root_num = msg.known_trx.pending;
+            c->last_handshake_recv.fork_db_root_num = root_num;
          }
          sync_reset_fork_db_root_num(c, false);
-         start_sync(c, msg.known_trx.pending);
+         start_sync(c, root_num);
+      } else {
+         uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
+         peer_dlog( p2p_blk_log, c, "sync_manager got catch_up peer_status_notice" );
+         peer_ilog( p2p_blk_log, c, "peer_status_notice, head_num {}, id {}...",
+                  head_num, msg.fork_db_head_id.str().substr(8,16) );
+         if( !my_impl->dispatcher.have_block( msg.fork_db_head_id ) ) {
+            verify_catchup( c, head_num, msg.fork_db_head_id );
+         } else {
+            // we already have the block, so update peer with our view of the world
+            peer_dlog(p2p_blk_log, c, "Already have block, sending handshake");
+            c->send_handshake();
+         }
       }
    }
 
@@ -2733,11 +2756,24 @@ namespace sysio {
       return c.trx_entries_size;
    }
 
-   connection_id_set dispatch_manager::peer_connections(const transaction_id_type& id) const {
+   bool dispatch_manager::have_peer_txn(const transaction_id_type& id, connection& c) {
+      fc::lock_guard g( local_txns_mtx );
+      auto& id_idx = local_txns.get<by_id>();
+      auto tptr = id_idx.find( id );
+      if (tptr != id_idx.end() && tptr->have_trx) {
+         if (tptr->connection_ids.insert(c.connection_id).second)
+            c.trx_entries_size += connection::trx_conn_entry_size;
+         return true;
+      }
+      return false;
+   }
+
+   connection_id_vector
+   dispatch_manager::peer_connections(const transaction_id_type& id) const {
       fc::lock_guard g( local_txns_mtx );
       auto& id_idx = local_txns.get<by_id>();
       if (auto tptr = id_idx.find(id); tptr != id_idx.end()) {
-         return tptr->connection_ids;
+         return {tptr->connection_ids.begin(), tptr->connection_ids.end()};
       }
       return {};
    }
@@ -2760,9 +2796,26 @@ namespace sysio {
    }
 
    void dispatch_manager::expire_blocks( uint32_t fork_db_root_num ) {
-      fc::lock_guard g( blk_state_mtx );
-      auto& stale_blk = blk_state.get<by_connection_id>();
-      stale_blk.erase( stale_blk.lower_bound( 1 ), stale_blk.upper_bound( fork_db_root_num ) );
+      {
+         fc::lock_guard g( blk_state_mtx );
+         auto& stale_blk = blk_state.get<by_connection_id>();
+         stale_blk.erase( stale_blk.lower_bound( 1 ), stale_blk.upper_bound( fork_db_root_num ) );
+      }
+      {
+         fc::lock_guard g( vote_dedup_mtx );
+         auto& by_bn = vote_dedup.get<by_block_num>();
+         by_bn.erase( by_bn.begin(), by_bn.upper_bound( fork_db_root_num ) );
+      }
+   }
+
+   bool dispatch_manager::have_vote(const vote_id_type& id) const {
+      fc::lock_guard g( vote_dedup_mtx );
+      return vote_dedup.get<by_vote_id>().count(id) != 0;
+   }
+
+   void dispatch_manager::add_vote_id(const vote_id_type& id, block_num_type block_num) {
+      fc::lock_guard g( vote_dedup_mtx );
+      vote_dedup.insert( vote_dedup_entry{id, block_num} ); // no-op if already present
    }
 
    // thread safe
@@ -2784,7 +2837,7 @@ namespace sysio {
             return;
          }
 
-         if (cp->protocol_version >= proto_version_t::block_nack && !my_impl->p2p_disable_block_nack) {
+         if (!my_impl->p2p_disable_block_nack) {
             if (cp->consecutive_blocks_nacks > connection::consecutive_block_nacks_threshold) {
                // only send block_notice if we didn't produce the block, otherwise broadcast the block below
                if (!my_impl->producer_plug->producer_accounts().contains(b->producer)) {
@@ -2803,7 +2856,7 @@ namespace sysio {
 
          boost::asio::post(cp->strand, [cp, bnum, sb]() {
             cp->latest_blk_time = std::chrono::steady_clock::now();
-            bool has_block = cp->peer_fork_db_root_num >= bnum;
+            bool has_block = cp->peer_fork_db_root_num.load( std::memory_order_relaxed ) >= bnum;
             if( !has_block ) {
                peer_dlog( p2p_blk_log, cp, "bcast block {}", bnum );
                cp->enqueue_buffer( msg_type_t::signed_block, bnum, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
@@ -2813,14 +2866,11 @@ namespace sysio {
    }
 
    void dispatch_manager::bcast_vote_msg( connection_id_t exclude_peer, const send_buffer_type& msg ) {
-      my_impl->connections.for_each_block_connection( [exclude_peer, msg]( auto& cp ) {
+      my_impl->connections.for_each_block_connection( [exclude_peer, &msg]( auto& cp ) {
          if( !cp->current() ) return true;
          if( cp->connection_id == exclude_peer ) return true;
-         if (cp->protocol_version < proto_version_t::savanna) return true;
-         boost::asio::post(cp->strand, [cp, msg]() {
-            peer_dlog(vote_logger, cp, "sending vote msg");
-            cp->enqueue_buffer( msg_type_t::vote_message, std::nullopt, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
-         });
+         fc_dlog(vote_logger, "sending vote msg, connection - {}", cp->connection_id);
+         cp->queue_write_mt( msg_type_t::vote_message, queued_buffer::queue_t::general, msg, go_away_reason::no_reason );
          return true;
       } );
    }
@@ -2828,22 +2878,18 @@ namespace sysio {
    // called from any thread
    void dispatch_manager::bcast_transaction(const packed_transaction_ptr& trx) {
       trx_buffer_factory buff_factory;
-      std::optional<connection_id_set> trx_connections;
+      const auto trx_connections = peer_connections(trx->id());
       my_impl->connections.for_each_connection( [&]( const connection_ptr& cp ) {
          if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
-         if (!trx_connections)
-            trx_connections = peer_connections(trx->id());
-         if( trx_connections->contains(cp->connection_id) ) {
+         if( std::binary_search(trx_connections.begin(), trx_connections.end(), cp->connection_id) ) {
             return;
          }
 
          const send_buffer_type& sb = buff_factory.get_send_buffer( trx );
          fc_dlog( p2p_trx_log, "sending trx: {}, to connection - {}, size {}", trx->id(), cp->connection_id, sb->size() );
-         boost::asio::post(cp->strand, [cp, sb]() {
-            cp->enqueue_buffer( msg_type_t::packed_transaction, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
-         } );
+         cp->queue_write_mt( msg_type_t::transaction_message, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
       } );
    }
 
@@ -2851,15 +2897,13 @@ namespace sysio {
    void dispatch_manager::bcast_transaction_notify(const packed_transaction_ptr& trx) {
       trx_buffer_factory buff_factory;
       my_impl->connections.for_each_connection( [&]( const connection_ptr& cp ) {
-         if( cp->protocol_version < proto_version_t::trx_notice || !cp->is_transactions_connection() || !cp->current() ) {
+         if( !cp->is_transactions_connection() || !cp->current() ) {
             return;
          }
 
          const send_buffer_type& sb = buff_factory.get_notice_send_buffer( trx );
          fc_dlog( p2p_trx_log, "sending trx notice: {}, to connection - {}", trx->id(), cp->connection_id );
-         boost::asio::post(cp->strand, [cp, sb]() {
-            cp->enqueue_buffer( msg_type_t::transaction_notice_message, std::nullopt, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
-         } );
+         cp->queue_write_mt( msg_type_t::transaction_notice_message, queued_buffer::queue_t::general, sb, go_away_reason::no_reason );
       } );
    }
 
@@ -2867,21 +2911,6 @@ namespace sysio {
    void dispatch_manager::rejected_transaction(const packed_transaction_ptr& trx) {
       fc_dlog( p2p_trx_log, "not sending rejected transaction {}", trx->id() );
       // keep rejected transaction around for awhile so we don't broadcast it, don't remove from local_txns
-   }
-
-   // called from c's connection strand
-   void dispatch_manager::recv_notice(const connection_ptr& c, const notice_message& msg, bool generated) {
-      if (msg.known_trx.mode == normal) {
-      } else if (msg.known_trx.mode != none) {
-         peer_wlog( p2p_msg_log, c, "passed a notice_message with something other than a normal on none known_trx" );
-         return;
-      }
-      if (msg.known_blocks.mode == normal) {
-         return;
-      } else if (msg.known_blocks.mode != none) {
-         peer_wlog( p2p_msg_log, c, "passed a notice_message with something other than a normal on none known_blocks" );
-         return;
-      }
    }
 
    //------------------------------------------------------------------------
@@ -3132,7 +3161,7 @@ namespace sysio {
          if( net_msg == msg_type_t::signed_block ) {
             latest_blk_time = now;
             return process_next_block_message( message_length );
-         } else if( net_msg == msg_type_t::packed_transaction ) {
+         } else if( net_msg == msg_type_t::transaction_message ) {
             return process_next_trx_message( message_length );
          } else if( net_msg == msg_type_t::transaction_notice_message ) {
             return process_next_trx_notice_message( message_length );
@@ -3229,15 +3258,37 @@ namespace sysio {
          return true;
       }
 
-      const uint32_t trx_in_progress_sz = this->trx_in_progress_size.load();
-
-      auto now = fc::time_point::now();
+      // Early dedup: check if we already have this transaction — zero heap allocations on the duplicate path.
+      // Consume which + trx_id from buffer
+      // Wire format: [which (varint)][transaction_id (32 bytes)][packed_transaction ...]
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
       auto ds = pending_message_buffer.create_datastream();
       unsigned_int which{};
       fc::raw::unpack( ds, which );
+      transaction_id_type trx_id;
+      fc::raw::unpack( ds, trx_id );
+      const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
+
+      if( my_impl->dispatcher.have_peer_txn( trx_id, *this ) ) {
+         peer_dlog( p2p_trx_log, this, "got a duplicate transaction - dropping {}", trx_id );
+         pending_message_buffer.advance_read_ptr( message_length - header_bytes );
+         return true;
+      }
+
+      const uint32_t trx_in_progress_sz = this->trx_in_progress_size.load();
+
+      auto now = fc::time_point::now();
       // shared_ptr<packed_transaction> needed here because packed_transaction_ptr is shared_ptr<const packed_transaction>
       std::shared_ptr<packed_transaction> ptr = std::make_shared<packed_transaction>();
       fc::raw::unpack( ds, *ptr );
+
+      // Validate that the wire ID matches the actual transaction ID.
+      if( ptr->id() != trx_id ) {
+         peer_wlog( p2p_trx_log, this, "transaction_message ID mismatch: wire={} actual={}", trx_id, ptr->id() );
+         close();
+         return true;
+      }
+
       if( trx_in_progress_sz > def_max_trx_in_progress_size) {
          char reason[72];
          snprintf(reason, 72, "Dropping trx, too many trx in progress %u bytes", trx_in_progress_sz);
@@ -3317,12 +3368,32 @@ namespace sysio {
          return true;
       }
 
+      // Early dedup: consume which + vote_id from buffer
+      // Wire format: [which (varint)][vote_id (32 bytes)][vote_message ...]
+      const auto bytes_before = pending_message_buffer.bytes_to_read();
       auto ds = pending_message_buffer.create_datastream();
       unsigned_int which{};
       fc::raw::unpack( ds, which );
       assert(to_msg_type_t(which) == msg_type_t::vote_message); // verified by caller
+      vote_id_type vote_id;
+      fc::raw::unpack( ds, vote_id );
+      const auto header_bytes = bytes_before - pending_message_buffer.bytes_to_read();
+
+      if( my_impl->dispatcher.have_vote( vote_id ) ) {
+         peer_dlog( vote_logger, this, "duplicate vote - dropping {}", vote_id );
+         pending_message_buffer.advance_read_ptr( message_length - header_bytes );
+         return true;
+      }
       vote_message_ptr ptr = std::make_shared<vote_message>();
       fc::raw::unpack( ds, *ptr );
+
+      // Validate that the wire vote_id matches the actual computed vote_id.
+      auto computed_vote_id = compute_vote_id(*ptr);
+      if( computed_vote_id != vote_id ) {
+         peer_wlog( vote_logger, this, "vote_message ID mismatch: wire={} actual={}", vote_id, computed_vote_id );
+         close();
+         return true;
+      }
 
       handle_message( ptr );
       return true;
@@ -3330,7 +3401,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::send_block_nack(const block_id_type& block_id) {
-      if (protocol_version < proto_version_t::block_nack || my_impl->p2p_disable_block_nack)
+      if (my_impl->p2p_disable_block_nack)
          return;
 
       if (my_impl->sync_master->syncing_from_peer())
@@ -3362,6 +3433,10 @@ namespace sysio {
          chain_info.fork_db_head_id = cc.fork_db_head().id();
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
+      // Update atomic scalars for lock-free reads on hot paths
+      chain_fork_db_root_num.store(fork_db_root_num, std::memory_order_release);
+      chain_head_num.store(head_num, std::memory_order_release);
+      chain_fork_db_head_num.store(fork_db_head_num, std::memory_order_release);
       head_block_time = head.block_time();
       fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
@@ -3381,6 +3456,10 @@ namespace sysio {
          chain_info.fork_db_head_id = cc.fork_db_head().id();
          chain_info.fork_db_head_num = fork_db_head_num = block_header::num_from_id(chain_info.fork_db_head_id);
       }
+      // Update atomic scalars for lock-free reads on hot paths
+      chain_fork_db_root_num.store(fork_db_root_num, std::memory_order_release);
+      chain_head_num.store(head_num, std::memory_order_release);
+      chain_fork_db_head_num.store(fork_db_head_num, std::memory_order_release);
       head_block_time = head.block_time();
       fc_dlog( p2p_log, "updating chain info froot {} head {} fhead {}", fork_db_root_num, head_num, fork_db_head_num);
    }
@@ -3391,18 +3470,15 @@ namespace sysio {
    }
 
    uint32_t net_plugin_impl::get_fork_db_root_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.fork_db_root_num;
+      return chain_fork_db_root_num.load(std::memory_order_acquire);
    }
 
    uint32_t net_plugin_impl::get_chain_head_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.head_num;
+      return chain_head_num.load(std::memory_order_acquire);
    }
 
    uint32_t net_plugin_impl::get_fork_db_head_num() const {
-      fc::lock_guard g( chain_info_mtx );
-      return chain_info.fork_db_head_num;
+      return chain_fork_db_head_num.load(std::memory_order_acquire);
    }
 
    bool connection::is_valid( const handshake_message& msg ) const {
@@ -3444,10 +3520,6 @@ namespace sysio {
       return valid;
    }
 
-   void connection::handle_message( const chain_size_message& msg ) {
-      peer_dlog(p2p_msg_log, this, "received chain_size_message");
-   }
-
    // called from connection strand
    void connection::handle_message( const handshake_message& msg ) {
       if( !is_valid( msg ) ) {
@@ -3459,7 +3531,7 @@ namespace sysio {
       peer_dlog( p2p_msg_log, this, "received handshake gen {}, froot {}, fhead {}",
                  msg.generation, msg.fork_db_root_num, msg.fork_db_head_num );
 
-      peer_fork_db_root_num = msg.fork_db_root_num;
+      peer_fork_db_root_num.store( msg.fork_db_root_num, std::memory_order_relaxed );
       peer_fork_db_head_block_num = msg.fork_db_head_num;
       fc::unique_lock g_conn( conn_mtx );
       last_handshake_recv = msg;
@@ -3467,6 +3539,13 @@ namespace sysio {
 
       set_state(connection_state::connected);
       if (msg.generation == 1) {
+         if( msg.chain_id != my_impl->chain_id ) {
+            peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
+            no_retry = go_away_reason::wrong_chain;
+            enqueue( go_away_message(go_away_reason::wrong_chain) );
+            return;
+         }
+
          if( msg.node_id == my_impl->node_id) {
             peer_ilog( p2p_conn_log, this, "Self connection detected node_id {}. Closing connection", msg.node_id);
             no_retry = go_away_reason::self;
@@ -3529,13 +3608,14 @@ namespace sysio {
             return;
          }
 
-         if( msg.chain_id != my_impl->chain_id ) {
-            peer_ilog( p2p_conn_log, this, "Peer on a different chain. Closing connection" );
-            no_retry = go_away_reason::wrong_chain;
-            enqueue( go_away_message(go_away_reason::wrong_chain) );
+         protocol_version = net_plugin_impl::to_protocol_version(msg.network_version);
+         if( protocol_version < net_version_min ) {
+            peer_ilog( p2p_conn_log, this, "Peer protocol version {} below minimum {}, disconnecting",
+                       static_cast<uint16_t>(protocol_version.load()), static_cast<uint16_t>(net_version_min) );
+            no_retry = go_away_reason::wrong_version;
+            enqueue( go_away_message( go_away_reason::wrong_version ) );
             return;
          }
-         protocol_version = net_plugin_impl::to_protocol_version(msg.network_version);
          if( protocol_version != net_version ) {
             peer_ilog( p2p_conn_log, this, "Local network version different: {} Remote version: {}",
                        static_cast<uint16_t>(net_version), static_cast<uint16_t>(protocol_version.load()) );
@@ -3572,14 +3652,6 @@ namespace sysio {
             } catch( ... ) {
                peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_fork_db_root_num );
             }
-         }
-
-         // we don't support the 2.1 packed_transaction & signed_block, so tell 2.1 clients we are 2.0
-         if( protocol_version >= proto_version_t::pruned_types && protocol_version < proto_version_t::leap_initial ) {
-            sent_handshake_count = 0;
-            net_version = proto_version_t::explicit_sync;
-            send_handshake();
-            return;
          }
 
          if( sent_handshake_count == 0 ) {
@@ -3630,22 +3702,6 @@ namespace sysio {
       close( retry ); // reconnect if wrong_version
    }
 
-   // some clients before leap 5.0 provided microsecond epoch instead of nanosecond epoch
-   std::chrono::nanoseconds normalize_epoch_to_ns(int64_t x) {
-      //        1686211688888 milliseconds - 2023-06-08T08:08:08.888, 5yrs from SYS genesis 2018-06-08T08:08:08.888
-      //     1686211688888000 microseconds
-      //  1686211688888000000 nanoseconds
-      if (x >= 1686211688888000000) // nanoseconds
-         return std::chrono::nanoseconds{x};
-      if (x >= 1686211688888000) // microseconds
-         return std::chrono::nanoseconds{x*1000};
-      if (x >= 1686211688888) // milliseconds
-         return std::chrono::nanoseconds{x*1000*1000};
-      if (x >= 1686211688) // seconds
-         return std::chrono::nanoseconds{x*1000*1000*1000};
-      return std::chrono::nanoseconds{0}; // unknown or is zero
-   }
-
    void connection::handle_message( const time_message& msg ) {
       peer_dlog( p2p_msg_log, this, "received time_message: {}, org: {}", msg, org.count() );
 
@@ -3667,7 +3723,7 @@ namespace sysio {
          }
       }
 
-      auto msg_xmt = normalize_epoch_to_ns(msg.xmt);
+      std::chrono::nanoseconds msg_xmt{msg.xmt};
       if (msg_xmt == xmt)
          return; // duplicate packet
 
@@ -3679,7 +3735,7 @@ namespace sysio {
       }
 
       if (org != std::chrono::nanoseconds{0}) {
-         auto rec = normalize_epoch_to_ns(msg.rec);
+         std::chrono::nanoseconds rec{msg.rec};
          int64_t offset = (double((rec - org).count()) + double(msg_xmt.count() - msg.dst)) / 2.0;
 
          if (std::abs(offset) > block_interval_ns) {
@@ -3701,127 +3757,33 @@ namespace sysio {
       }
    }
 
-   void connection::handle_message( const notice_message& msg ) {
-      // peer tells us about one or more blocks or txns. When done syncing, forward on
-      // notices of previously unknown blocks or txns,
-      //
+   void connection::handle_message( const peer_status_notice& msg ) {
       set_state(connection_state::connected);
-      if( msg.known_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_msg_log, this, "Invalid notice_message, known_blocks.ids.size {}, closing connection",
-                    msg.known_blocks.ids.size() );
-         close( false );
-         return;
-      }
-      if( msg.known_trx.mode != none ) {
-         if( p2p_msg_log.is_enabled( fc::log_level::debug ) ) {
-            const block_id_type& blkid = msg.known_blocks.ids.empty() ? block_id_type{} : msg.known_blocks.ids.front();
-            peer_dlog( p2p_msg_log, this, "this is a {} notice with {} pending blocks: {} {}...",
-                       modes_str(msg.known_blocks.mode), msg.known_blocks.pending,
-                       block_header::num_from_id( blkid ), blkid.str().substr( 8, 16 ) );
-         }
-      }
-      switch (msg.known_trx.mode) {
-      case none:
-      case last_irr_catch_up: {
-         fc::unique_lock g_conn( conn_mtx );
-         last_handshake_recv.fork_db_head_num = std::max(msg.known_blocks.pending, last_handshake_recv.fork_db_head_num);
-         g_conn.unlock();
-         break;
-      }
-      case catch_up:
-         break;
-      case normal: {
-         my_impl->dispatcher.recv_notice( shared_from_this(), msg, false );
-      }
-      }
-
-      if( msg.known_blocks.mode != none ) {
-         peer_dlog( p2p_msg_log, this, "this is a {} notice with {} blocks",
-                    modes_str( msg.known_blocks.mode ), msg.known_blocks.pending );
-      }
-      switch (msg.known_blocks.mode) {
-      case none : {
-         break;
-      }
-      case last_irr_catch_up:
-      case catch_up: {
-         if (msg.known_blocks.ids.size() > 1) {
-            peer_start_block_num = block_header::num_from_id(msg.known_blocks.ids[1]);
-         }
-         if (msg.known_blocks.ids.size() > 0) {
-            peer_fork_db_head_block_num = block_header::num_from_id(msg.known_blocks.ids[0]);
-         }
-         my_impl->sync_master->sync_recv_notice( shared_from_this(), msg );
-         break;
-      }
-      case normal : {
-         my_impl->dispatcher.recv_notice( shared_from_this(), msg, false );
-         break;
-      }
-      default: {
-         peer_wlog( p2p_msg_log, this, "bad notice_message : invalid known_blocks.mode {}",
-                    static_cast<uint32_t>(msg.known_blocks.mode) );
-      }
+      uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
+      fc::unique_lock g_conn(conn_mtx);
+      last_handshake_recv.fork_db_head_num = std::max(head_num, last_handshake_recv.fork_db_head_num);
+      g_conn.unlock();
+      if (head_num > 0) {
+         peer_start_block_num = msg.earliest_available_block_num;
+         peer_fork_db_head_block_num = head_num;
+         my_impl->sync_master->sync_recv_status(shared_from_this(), msg);
       }
    }
 
-   void connection::handle_message( const request_message& msg ) {
-      if( msg.req_blocks.ids.size() > 2 ) {
-         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.ids.size {}, closing",
-                    msg.req_blocks.ids.size() );
-         close();
-         return;
-      }
+   void connection::handle_message( const block_request_message& msg ) {
+      peer_dlog(p2p_blk_log, this, "{} block_request_message #{}:{}",
+                is_blocks_connection() ? "received" : "ignoring",
+                block_header::num_from_id(msg.my_head_id), msg.my_head_id);
+      if (!is_blocks_connection()) return;
+      blk_send_branch(msg.my_head_id);
+   }
 
-      switch (msg.req_blocks.mode) {
-      case catch_up : {
-         const block_id_type& id = msg.req_blocks.ids.empty() ? block_id_type() : msg.req_blocks.ids.back();
-         peer_dlog( p2p_blk_log, this, "{} request_message:catch_up #{}:{}",
-                    is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(id), id );
-         if (!is_blocks_connection())
-            return;
-         blk_send_branch( id );
-         return;
-      }
-      case normal : {
-         if (protocol_version >= proto_version_t::block_nack) {
-            if (msg.req_blocks.ids.size() == 2 && msg.req_trx.ids.empty()) {
-               const block_id_type& req_id = msg.req_blocks.ids[0]; // 0 - req_id, 1 - peer_head_id
-               peer_dlog( p2p_blk_log, this, "{} request_message:normal #{}:{}",
-                          is_blocks_connection() ? "received" : "ignoring", block_header::num_from_id(req_id), req_id );
-               if (!is_blocks_connection())
-                  return;
-               const block_id_type& peer_head_id = msg.req_blocks.ids[1];
-               blk_send_branch_from_nack_request(req_id, peer_head_id);
-               return;
-            }
-         }
-         peer_wlog( p2p_blk_log, this, "Invalid request_message, req_blocks.mode = normal" );
-         close();
-         return;
-      }
-      default:;
-      }
-
-
-      switch (msg.req_trx.mode) {
-      case catch_up :
-         break;
-      case none :
-         if( msg.req_blocks.mode == none ) {
-            peer_syncing_from_us = false;
-         }
-         if( !msg.req_trx.ids.empty() ) {
-            peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=none, req_trx.ids.size {}", msg.req_trx.ids.size() );
-            close();
-         }
-         break;
-      case normal :
-         peer_wlog( p2p_msg_log, this, "Invalid request_message, req_trx.mode=normal" );
-         close();
-         break;
-      default:;
-      }
+   void connection::handle_message( const block_nack_request_message& msg ) {
+      peer_dlog(p2p_blk_log, this, "{} block_nack_request_message #{}:{}",
+                is_blocks_connection() ? "received" : "ignoring",
+                block_header::num_from_id(msg.target_id), msg.target_id);
+      if (!is_blocks_connection()) return;
+      blk_send_branch_from_nack_request(msg.target_id, msg.my_head_id);
    }
 
    void connection::handle_message( const sync_request_message& msg ) {
@@ -3905,22 +3867,21 @@ namespace sysio {
          my_impl->dispatcher.add_peer_block(msg.id, connection_id);
       } else if (!my_impl->dispatcher.have_block(msg.previous)) { // still don't have previous block
          peer_dlog(p2p_blk_log, this, "Received unknown block notice, checking already requested");
-         request_message req;
-         req.req_blocks.mode = normal;
-         req.req_blocks.ids.push_back(msg.previous);
-         bool already_requested = my_impl->connections.any_of_block_connections([&req](const auto& c) {
+         const block_id_type& target = msg.previous;
+         bool already_requested = my_impl->connections.any_of_block_connections([&target](const auto& c) {
             fc::lock_guard g_conn(c->conn_mtx);
-            return c->last_block_nack_request_message_id == req.req_blocks.ids[0];
+            return c->last_block_nack_request_message_id == target;
          });
          if (!already_requested) {
             peer_ilog(p2p_blk_log, this, "Received unknown block notice, requesting blocks from {}",
                       block_header::num_from_id(msg.previous));
-            block_id_type head_id = my_impl->get_chain_info().head_id;
-            req.req_blocks.ids.push_back(head_id);
+            block_nack_request_message req;
+            req.target_id = msg.previous;
+            req.my_head_id = my_impl->get_chain_info().head_id;
             send_block_nack({});
             {
                fc::lock_guard g_conn(conn_mtx);
-               last_block_nack_request_message_id = req.req_blocks.ids[0];
+               last_block_nack_request_message_id = target;
             }
             enqueue(req);
          }
@@ -3981,7 +3942,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::send_gossip_bp_peers_initial_message() {
-      if (protocol_version < proto_version_t::gossip_bp_peers || !my_impl->bp_gossip_enabled())
+      if (!my_impl->bp_gossip_enabled())
          return;
       peer_dlog(p2p_msg_log, this, "sending initial gossip_bp_peers_message");
       const auto& sb = my_impl->get_gossip_bp_initial_send_buffer();
@@ -4005,7 +3966,7 @@ namespace sysio {
       assert(my_impl->bp_gossip_enabled());
       my_impl->connections.for_each_connection([](const connection_ptr& c) {
          gossip_buffer_factory factory;
-         if (c->protocol_version >= proto_version_t::gossip_bp_peers && c->socket_is_open()) {
+         if (c->socket_is_open()) {
             if (c->bp_connection == bp_connection_type::bp_gossip) {
                const send_buffer_type& sb = my_impl->get_gossip_bp_send_buffer(factory);
                boost::asio::post(c->strand, [sb, c]() {
@@ -4061,8 +4022,6 @@ namespace sysio {
          if (app().is_quiting()) // large sync span can have many of these queued up, exit quickly
             return;
          controller& cc = my_impl->chain_plug->chain();
-
-         // Wire starts in Savanna at genesis, so all blocks are Savanna blocks.
 
          std::optional<block_handle> obh;
          bool exception = false;
@@ -4304,11 +4263,12 @@ namespace sysio {
               exclude_peer ? "received" : "our", block_header::num_from_id(msg->block_id), msg->block_id.str().substr(8,16),
               msg->strong ? "strong" : "weak", msg->finalizer_key.to_string().substr(8,16));
 
-      boost::asio::post( thread_pool.get_executor(), [exclude_peer, msg, this]() mutable {
-            buffer_factory buff_factory;
-            const auto& send_buffer = buff_factory.get_send_buffer( *msg );
+      vote_buffer_factory buff_factory;
+      auto send_buffer = buff_factory.get_send_buffer( *msg );
+      dispatcher.add_vote_id( buff_factory.get_vote_id(), block_header::num_from_id(msg->block_id) );
 
-            dispatcher.bcast_vote_msg( exclude_peer, send_buffer );
+      boost::asio::post( thread_pool.get_executor(), [exclude_peer, sb{std::move(send_buffer)}, this]() {
+            dispatcher.bcast_vote_msg( exclude_peer, sb );
       });
    }
 
@@ -4356,8 +4316,7 @@ namespace sysio {
          chain::public_key_type peer_key;
          try {
             peer_key = crypto::public_key::recover(msg.sig, msg.token);
-         }
-         catch (const std::exception& /*e*/) {
+         } catch (...) {
             fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);
             return false;
          }
@@ -4398,7 +4357,7 @@ namespace sysio {
       // nothing as changed since last handshake and one was sent recently, so skip sending
       if (chain_info.fork_db_head_id == hello.fork_db_head_id && (hello.time + hs_delay > now))
          return false;
-      hello.network_version = net_version_base + static_cast<uint16_t>(net_version);
+      hello.network_version = static_cast<uint16_t>(net_version);
       hello.fork_db_root_num = chain_info.fork_db_root_num;
       hello.fork_db_root_id = chain_info.fork_db_root_id;
       hello.fork_db_head_num = chain_info.fork_db_head_num;
@@ -4853,11 +4812,9 @@ namespace sysio {
    }
 
    constexpr proto_version_t net_plugin_impl::to_protocol_version(uint16_t v) {
-      if (v >= net_version_base) {
-         v -= net_version_base;
-         return (v > net_version_range) ? proto_version_t::base : static_cast<proto_version_t>(v);
-      }
-      return proto_version_t::base;
+      if (v > static_cast<uint16_t>(net_version_max))
+         return static_cast<proto_version_t>(0);
+      return static_cast<proto_version_t>(v);
    }
 
    bool net_plugin_impl::is_lib_catchup() const {

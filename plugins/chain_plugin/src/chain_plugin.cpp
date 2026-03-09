@@ -17,15 +17,21 @@
 #include <sysio/chain/permission_link_object.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/block_header_state_utils.hpp>
+#include <sysio/chain/account_object.hpp>
 #include <sysio/resource_monitor_plugin/resource_monitor_plugin.hpp>
 #include <sysio/signature_provider_manager_plugin/signature_provider_manager_plugin.hpp>
 #include <chainbase/environment.hpp>
+
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+#include <sysio/chain/webassembly/native-module/native_module_overlay.hpp>
+#endif
 
 #include <boost/signals2/connection.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <fc/io/json.hpp>
+#include <fc/scoped_exit.hpp>
 #include <fc/variant.hpp>
 #include <cstdlib>
 
@@ -188,6 +194,12 @@ public:
    fc::microseconds                  abi_serializer_max_time_us;
    std::optional<std::filesystem::path>          snapshot_path;
 
+   // --native-contract mappings: account -> path to .so
+   std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+   webassembly::native_module::native_module_overlay native_overlay_;
+#endif
+
 
    // retained references to channels for easy publication
    channels::accepted_block_header::channel_type&  accepted_block_header_channel;
@@ -289,6 +301,13 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
                wlog("sys-vm-oc-forced mode is not supported. It is for development purposes only");
          })->default_value(sysio::chain::config::default_wasm_runtime, default_wasm_runtime_str), wasm_runtime_opt.c_str()
          )
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+         ("native-contract", bpo::value<vector<string>>()->composing(),
+          "Route execution of a contract through a native .so for debugger support.\n"
+          "Format: account:/path/to/contract_native.so\n"
+          "May be specified multiple times. Normal WASM runtime handles all other contracts.\n"
+          "State data is automatically copied to .native-debug/ directories to protect originals.")
+#endif
          ("profile-account", boost::program_options::value<vector<string>>()->composing(),
           "The name of an account whose code will be profiled")
          ("abi-serializer-max-time-ms", bpo::value<uint32_t>()->default_value(config::default_abi_serializer_max_time_us / 1000),
@@ -622,6 +641,22 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          wasm_runtime = options.at( "wasm-runtime" ).as<vm_type>();
 
       LOAD_VALUE_SET( options, "profile-account", chain_config->profile_accounts );
+
+      if( options.count( "native-contract" )) {
+         const auto& nc_opts = options["native-contract"].as<std::vector<std::string>>();
+         for( const auto& nc : nc_opts ) {
+            auto colon = nc.find(':');
+            SYS_ASSERT( colon != std::string::npos && colon > 0 && colon + 1 < nc.size(),
+                        plugin_config_exception,
+                        "Invalid --native-contract format '{}'. Expected account:/path/to/contract.so", nc );
+            auto acct = chain::name( nc.substr(0, colon) );
+            auto so_path = std::filesystem::path( nc.substr(colon + 1) );
+            SYS_ASSERT( std::filesystem::exists(so_path), plugin_config_exception,
+                        "Native contract .so not found: {}", so_path.string() );
+            native_contracts.emplace_back( acct, std::move(so_path) );
+            ilog( "Native contract debug: {} -> {}", acct, native_contracts.back().second.string() );
+         }
+      }
 
       abi_serializer_max_time_us = fc::microseconds(options.at("abi-serializer-max-time-ms").as<uint32_t>() * 1000);
 
@@ -974,6 +1009,39 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
       chain_config->integrity_hash_on_start = options.at("integrity-hash-on-start").as<bool>();
       chain_config->integrity_hash_on_stop = options.at("integrity-hash-on-stop").as<bool>();
 
+      // Native debug mode: operate on copied state to protect originals
+      if( !native_contracts.empty() ) {
+         namespace fs = std::filesystem;
+         auto debug_state  = fs::path(chain_config->state_dir.string()  + ".native-debug");
+         auto debug_blocks = fs::path(chain_config->blocks_dir.string() + ".native-debug");
+
+         // Remove stale copies from previous debug sessions
+         if( fs::exists(debug_state) )  fs::remove_all(debug_state);
+         if( fs::exists(debug_blocks) ) fs::remove_all(debug_blocks);
+
+         ilog("Native debug mode: copying state data for safe debugging...");
+         if( fs::exists(chain_config->state_dir) )
+            fs::copy(chain_config->state_dir,  debug_state,  fs::copy_options::recursive);
+         else
+            fs::create_directories(debug_state);
+
+         if( fs::exists(chain_config->blocks_dir) )
+            fs::copy(chain_config->blocks_dir, debug_blocks, fs::copy_options::recursive);
+         else
+            fs::create_directories(debug_blocks);
+
+         chain_config->state_dir  = debug_state;
+         chain_config->blocks_dir = debug_blocks;
+         blocks_dir               = debug_blocks;
+
+         ilog("Native debug mode: operating on copied state data.\n"
+              "  Original chain data is untouched. Debug copies:\n"
+              "    state:  {}\n"
+              "    blocks: {}\n"
+              "  Delete these directories when done debugging.",
+              debug_state.string(), debug_blocks.string());
+      }
+
       chain.emplace( *chain_config, std::move(pfs), *chain_id );
 
       if( options.contains( "transaction-retry-max-storage-size-gb" )) {
@@ -1184,6 +1252,32 @@ void chain_plugin_impl::plugin_startup()
    else {
       ilog("Blockchain started; head block is #{}", chain->head().block_num());
    }
+
+#ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+   // Set up native contract dispatch via substitute_apply
+   if( !native_contracts.empty() ) {
+      const auto& db = chain->db();
+
+      for( const auto& [acct, so_path] : native_contracts ) {
+         const auto* meta = db.find<account_metadata_object, by_name>(acct);
+         SYS_ASSERT( meta, plugin_config_exception,
+                     "Native contract account '{}' not found on chain", acct );
+         SYS_ASSERT( meta->code_hash != digest_type(), plugin_config_exception,
+                     "Native contract account '{}' has no deployed code", acct );
+
+         ilog("Native debug: {} (code_hash={}) -> {}", acct, meta->code_hash, so_path.string());
+         native_overlay_.load(meta->code_hash, so_path);
+      }
+
+      chain->get_wasm_interface().substitute_apply =
+         [this](const digest_type& code_hash, uint8_t vm_type,
+                uint8_t vm_version, apply_context& context) -> bool {
+            return native_overlay_(code_hash, vm_type, vm_version, context);
+         };
+
+      ilog("Native debug: {} contract(s) configured for native execution", native_overlay_.size());
+   }
+#endif
 
    chain_config.reset();
 
@@ -1969,21 +2063,6 @@ fc::variant read_only::get_block_header_state(const get_block_header_state_param
       ("header", static_cast<const signed_block_header&>(*sbp))
    ;
    return result;
-}
-
-void read_write::push_block(read_write::push_block_params&& params, next_function<read_write::push_block_results> next) {
-   try {
-      auto b = std::make_shared<signed_block>( std::move(params) );
-      block_id_type id = b->calculate_id();
-      auto [best_head, obh] = db.accept_block( id, b );
-      SYS_ASSERT(obh, unlinkable_block_exception, "block did not link {}", id);
-      app().get_method<incoming::methods::block_sync>()(b, id, *obh);
-   } catch ( boost::interprocess::bad_alloc& ) {
-      handle_db_exhaustion();
-   } catch ( const std::bad_alloc& ) {
-      handle_bad_alloc();
-   } FC_LOG_AND_DROP()
-   next(read_write::push_block_results{});
 }
 
 void read_write::push_transaction(const read_write::push_transaction_params& params, next_function<read_write::push_transaction_results> next) {

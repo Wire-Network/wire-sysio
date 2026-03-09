@@ -12,6 +12,7 @@
 #include <fstream>
 #include <array>
 #include <ranges>
+#include <filesystem>
 
 #include <contracts.hpp>
 
@@ -243,10 +244,6 @@ namespace sysio::testing {
             produce_block();
             if( policy == setup_policy::full ) {
                init_roa();
-            }
-            // Do not transition to Savanna under full_except_do_not_transition_to_savanna or
-            // full_except_do_not_disable_deferred_trx
-            if( policy == setup_policy::full ) {
                // BLS voting is slow. Use only 1 finalizer for default testser.
                finalizer_keys fin_keys(*this, 1u /* num_keys */, 1u /* finset_size */);
                fin_keys.activate_savanna(0u /* first_key_idx */);
@@ -1147,6 +1144,11 @@ namespace sysio::testing {
 
 
    void base_tester::set_code( account_name account, const vector<uint8_t> wasm, const private_key_type* signer ) try {
+      // If native-module runtime, auto-register the native .so for this WASM
+      if (cfg.wasm_runtime == chain::wasm_interface::vm_type::native_module) {
+         native_module_context_holder::try_register_from_wasm(wasm);
+      }
+
       signed_transaction trx;
       trx.actions.emplace_back( vector<permission_level>{{account,sysio::chain::config::active_name}},
                                 setcode{

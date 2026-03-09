@@ -642,6 +642,605 @@ BOOST_FIXTURE_TEST_CASE( extend_policy_test, sysio_roa_tester ) try {
 
 } FC_LOG_AND_RETHROW()
 
+// Verifies that reducepolicy correctly decreases RAM bytes in the reslimit table.
+BOOST_FIXTURE_TEST_CASE( reducepolicy_ram_accounting, sysio_roa_tester ) try {
+   // Load system contract for newaccount + addpolicy/reducepolicy
+   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+   base_tester::push_action(config::system_account_name, "init"_n,
+                            config::system_account_name, mutable_variant_object()
+                            ("version", 0)
+                            ("core", symbol(CORE_SYMBOL).to_string()));
+   produce_block();
 
+   // Register node owners (need 21 for ROA activation)
+   std::array<account_name, 21> node_owners = { NODE_DADDY };
+   for (size_t i = 1; i < node_owners.size(); i++) {
+      std::string n = std::string("nodeowner").append(1, 'a' + i);
+      node_owners[i] = account_name(n);
+      create_accounts({node_owners[i]}, false, false, false, false);
+      register_node_owner(node_owners[i], 1);
+   }
+   produce_block();
+
+   // Create a user and add a policy with time_block=0 (immediately reducible)
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "32.0000 SYS", "32.0000 SYS", "32.0000 SYS", 0, 0);
+   produce_block();
+
+   // Record pre-reduce state
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   auto r = get_reslimit(user);
+   int64_t pre_reslimit_ram = r["ram_bytes"].as_int64();
+
+   // Verify initial state: newaccount_ram + policy RAM (320000 * 104 = 33,280,000)
+   BOOST_TEST(pre_reslimit_ram == ram);
+   BOOST_TEST(ram == (int64_t)(newaccount_ram + 320000l * 104));
+   BOOST_TEST(net == 320000);
+   BOOST_TEST(cpu == 320000);
+
+   // Reduce the policy by half
+   reduce_roa_policy(node_owners[2], user, "16.0000 SYS", "16.0000 SYS", "16.0000 SYS", 0);
+   produce_block();
+
+   // Verify post-reduce state
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   r = get_reslimit(user);
+   int64_t post_reslimit_ram = r["ram_bytes"].as_int64();
+
+   // C4 fix: reslimit ram_bytes should decrease, NOT nearly double
+   // Expected: pre_reslimit_ram - (160000 * 104)
+   int64_t expected_ram = pre_reslimit_ram - 160000l * 104;
+   BOOST_TEST(post_reslimit_ram == expected_ram);
+   BOOST_TEST(post_reslimit_ram == ram);  // reslimit table matches system limits
+   BOOST_TEST(post_reslimit_ram < pre_reslimit_ram);
+
+   // Verify NET/CPU decreased correctly
+   BOOST_TEST(net == 160000);
+   BOOST_TEST(cpu == 160000);
+
+   // Verify policy updated
+   auto p = get_policy(user, node_owners[2]);
+   BOOST_TEST(p["net_weight"].as_string() == "16.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "16.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "16.0000 SYS");
+
+} FC_LOG_AND_RETHROW()
+
+// Verifies that reducing an entire policy to zero correctly removes it and
+// that a second reducepolicy on a different policy also works correctly.
+BOOST_FIXTURE_TEST_CASE( reducepolicy_full_then_second, sysio_roa_tester ) try {
+   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+   base_tester::push_action(config::system_account_name, "init"_n,
+                            config::system_account_name, mutable_variant_object()
+                            ("version", 0)
+                            ("core", symbol(CORE_SYMBOL).to_string()));
+   produce_block();
+
+   std::array<account_name, 21> node_owners = { NODE_DADDY };
+   for (size_t i = 1; i < node_owners.size(); i++) {
+      std::string n = std::string("nodeowner").append(1, 'a' + i);
+      node_owners[i] = account_name(n);
+      create_accounts({node_owners[i]}, false, false, false, false);
+      register_node_owner(node_owners[i], 1);
+   }
+   produce_block();
+
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // Add two policies from different node owners
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   add_roa_policy(node_owners[3], user, "20.0000 SYS", "20.0000 SYS", "20.0000 SYS", 0, 0);
+   produce_block();
+
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   // newaccount_ram + (100000+200000)*104
+   BOOST_TEST(ram == (int64_t)(newaccount_ram + 100000l * 104 + 200000l * 104));
+   BOOST_TEST(net == 100000 + 200000);
+   BOOST_TEST(cpu == 100000 + 200000);
+
+   // Fully reduce the first policy
+   reduce_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0);
+   produce_block();
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   auto r = get_reslimit(user);
+
+   // Only the second policy's RAM remains plus newaccount_ram
+   BOOST_TEST(ram == (int64_t)(newaccount_ram + 200000l * 104));
+   BOOST_TEST(r["ram_bytes"].as_int64() == ram);
+   BOOST_TEST(net == 200000);
+   BOOST_TEST(cpu == 200000);
+
+   // First policy should be removed
+   auto p = get_policy(user, node_owners[2]);
+   BOOST_TEST(p.is_null());
+
+   // Second policy still intact
+   p = get_policy(user, node_owners[3]);
+   BOOST_TEST(p["net_weight"].as_string() == "20.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "20.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "20.0000 SYS");
+
+   // Now reduce the second policy partially
+   reduce_roa_policy(node_owners[3], user, "5.0000 SYS", "5.0000 SYS", "5.0000 SYS", 0);
+   produce_block();
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   r = get_reslimit(user);
+
+   BOOST_TEST(ram == (int64_t)(newaccount_ram + 150000l * 104));
+   BOOST_TEST(r["ram_bytes"].as_int64() == ram);
+   BOOST_TEST(net == 150000);
+   BOOST_TEST(cpu == 150000);
+
+} FC_LOG_AND_RETHROW()
+
+// Verifies that creating multiple users correctly decreases sysio's reslimit RAM.
+BOOST_FIXTURE_TEST_CASE( newuser_sysio_ram_decreases, sysio_roa_tester ) try {
+   set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+   set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+   base_tester::push_action(config::system_account_name, "init"_n,
+                            config::system_account_name, mutable_variant_object()
+                            ("version", 0)
+                            ("core", symbol(CORE_SYMBOL).to_string()));
+   produce_block();
+
+   std::array<account_name, 21> node_owners = { NODE_DADDY };
+   for (size_t i = 1; i < node_owners.size(); i++) {
+      std::string n = std::string("nodeowner").append(1, 'a' + i);
+      node_owners[i] = account_name(n);
+      create_accounts({node_owners[i]}, false, false, false, false);
+      register_node_owner(node_owners[i], 1);
+   }
+   produce_block();
+
+   // Record sysio's initial RAM
+   auto r = get_reslimit("sysio"_n);
+   int64_t sysio_ram_before = r["ram_bytes"].as_int64();
+   BOOST_TEST(sysio_ram_before > 0);
+
+   // Create 5 users - each should subtract newaccount_ram from sysio
+   for (int i = 0; i < 5; i++) {
+      create_newuser(node_owners[2]);
+      produce_block();
+   }
+
+   r = get_reslimit("sysio"_n);
+   int64_t sysio_ram_after = r["ram_bytes"].as_int64();
+
+   // Sysio's reslimit should have decreased by exactly 5 * newaccount_ram
+   BOOST_TEST(sysio_ram_after == sysio_ram_before - 5 * (int64_t)newaccount_ram);
+   BOOST_TEST(sysio_ram_after > 0);  // should still be positive
+
+   // sysio.acct's reslimit should have increased by 5 * newaccount_ram (plus its own)
+   r = get_reslimit("sysio.acct"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == (int64_t)((5 + 1) * newaccount_ram));  // 5 users + sysio.acct itself
+
+} FC_LOG_AND_RETHROW()
+
+// ---------------------------------------------------------------------------
+// Helper fixture: sysio_roa_tester with system contract + 21 node owners
+// ---------------------------------------------------------------------------
+class sysio_roa_full_tester : public sysio_roa_tester {
+public:
+   std::array<account_name, 21> node_owners;
+
+   sysio_roa_full_tester() {
+      set_code( config::system_account_name, test_contracts::sysio_system_wasm() );
+      set_abi( config::system_account_name, test_contracts::sysio_system_abi() );
+      base_tester::push_action(config::system_account_name, "init"_n,
+                               config::system_account_name, mutable_variant_object()
+                               ("version", 0)
+                               ("core", symbol(CORE_SYMBOL).to_string()));
+      produce_block();
+
+      node_owners[0] = NODE_DADDY;
+      for (size_t i = 1; i < node_owners.size(); i++) {
+         std::string n = std::string("nodeowner").append(1, 'a' + i);
+         node_owners[i] = account_name(n);
+         create_accounts({node_owners[i]}, false, false, false, false);
+         register_node_owner(node_owners[i], 1);
+      }
+      produce_block();
+   }
+};
+
+// ===== 1. addpolicy validation =====
+
+// Non-node-owner cannot issue a policy
+BOOST_FIXTURE_TEST_CASE( addpolicy_non_nodeowner, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // bob is not a node owner, so addpolicy should fail
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy("bob"_n, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Only Node Owners can issue policies for this generation."));
+} FC_LOG_AND_RETHROW()
+
+// Duplicate policy from same issuer should fail
+BOOST_FIXTURE_TEST_CASE( addpolicy_duplicate, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("A policy for this owner already exists from this issuer. Use expandpolicy instead."));
+} FC_LOG_AND_RETHROW()
+
+// All-zero allocation should fail
+BOOST_FIXTURE_TEST_CASE( addpolicy_all_zero, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], user, "0.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("At least one of NET, CPU, or RAM must be allocated."));
+} FC_LOG_AND_RETHROW()
+
+// Exceeding available SYS should fail
+BOOST_FIXTURE_TEST_CASE( addpolicy_insufficient_sys, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // Each T1 node owner gets ~4% of total SYS. Try to allocate way more than that.
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], user, "900000000.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Not enough unallocated SYS for this policy."));
+} FC_LOG_AND_RETHROW()
+
+// Cannot allocate CPU/NET to sysio.* accounts
+BOOST_FIXTURE_TEST_CASE( addpolicy_sysio_no_bw, sysio_roa_full_tester ) try {
+   create_accounts({"sysio.test1"_n}, false, false, false, false);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      add_roa_policy(node_owners[2], "sysio.test1"_n, "1.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Cannot allocate CPU/NET to sysio accounts."));
+} FC_LOG_AND_RETHROW()
+
+// RAM-only policy for sysio.* accounts should succeed
+BOOST_FIXTURE_TEST_CASE( addpolicy_sysio_ram_only, sysio_roa_full_tester ) try {
+   create_accounts({"sysio.test2"_n}, false, false, false, false);
+   produce_block();
+
+   add_roa_policy(node_owners[2], "sysio.test2"_n, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   auto p = get_policy("sysio.test2"_n, node_owners[2]);
+   BOOST_TEST(!p.is_null());
+   BOOST_TEST(p["ram_weight"].as_string() == "1.0000 SYS");
+   BOOST_TEST(p["net_weight"].as_string() == "0.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "0.0000 SYS");
+} FC_LOG_AND_RETHROW()
+
+// ===== 2. expandpolicy validation =====
+
+// Expand non-existent policy should fail
+BOOST_FIXTURE_TEST_CASE( expandpolicy_no_policy, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // No policy exists from node_owners[3] for this user
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[3], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("You have no policy for this owner."));
+} FC_LOG_AND_RETHROW()
+
+// Non-node-owner cannot expand
+BOOST_FIXTURE_TEST_CASE( expandpolicy_non_nodeowner, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy("bob"_n, user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Only Node Owners can manage policies."));
+} FC_LOG_AND_RETHROW()
+
+// All-zero expand should fail
+BOOST_FIXTURE_TEST_CASE( expandpolicy_all_zero, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[2], user, "0.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("At least one of NET, CPU, or RAM must be increased."));
+} FC_LOG_AND_RETHROW()
+
+// Expanding beyond available SYS should fail
+BOOST_FIXTURE_TEST_CASE( expandpolicy_insufficient_sys, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[2], user, "900000000.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Issuer does not have enough unallocated SYS for this policy expansion."));
+} FC_LOG_AND_RETHROW()
+
+// Cannot expand CPU/NET for sysio.* accounts
+BOOST_FIXTURE_TEST_CASE( expandpolicy_sysio_no_bw, sysio_roa_full_tester ) try {
+   create_accounts({"sysio.test3"_n}, false, false, false, false);
+   produce_block();
+
+   // First add a RAM-only policy
+   add_roa_policy(node_owners[2], "sysio.test3"_n, "0.0000 SYS", "0.0000 SYS", "1.0000 SYS", 0, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      expand_roa_policy(node_owners[2], "sysio.test3"_n, "1.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Cannot allocate CPU/NET to sysio accounts."));
+} FC_LOG_AND_RETHROW()
+
+// ===== 3. reducepolicy validation =====
+
+// Reduce non-existent policy should fail
+BOOST_FIXTURE_TEST_CASE( reducepolicy_no_policy, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[3], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("You have no policy for this owner."));
+} FC_LOG_AND_RETHROW()
+
+// Non-node-owner cannot reduce
+BOOST_FIXTURE_TEST_CASE( reducepolicy_non_nodeowner, sysio_roa_full_tester ) try {
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy("bob"_n, "alice"_n, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Only Node Owners can manage policies."));
+} FC_LOG_AND_RETHROW()
+
+// Cannot reduce NET below zero
+BOOST_FIXTURE_TEST_CASE( reducepolicy_below_zero, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   produce_block();
+
+   // Try to reduce more NET than allocated
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "11.0000 SYS", "0.0000 SYS", "0.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Cannot reduce NET below zero"));
+} FC_LOG_AND_RETHROW()
+
+// Cannot reduce before time_block
+BOOST_FIXTURE_TEST_CASE( reducepolicy_before_timeblock, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // Set time_block far in the future
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 999999999, 0);
+   produce_block();
+
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "5.0000 SYS", "5.0000 SYS", "5.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Cannot reduce policy before time_block"));
+} FC_LOG_AND_RETHROW()
+
+// ===== 8. Multi-node-owner policy interactions =====
+
+// Expand after reduce on the same policy
+BOOST_FIXTURE_TEST_CASE( expand_after_reduce, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "20.0000 SYS", "20.0000 SYS", "20.0000 SYS", 0, 0);
+   produce_block();
+
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   int64_t ram_after_add = ram;
+
+   // Reduce by half
+   reduce_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0);
+   produce_block();
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   BOOST_TEST(net == 100000);
+   BOOST_TEST(cpu == 100000);
+
+   // Expand back
+   expand_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0);
+   produce_block();
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   BOOST_TEST(ram == ram_after_add);
+   BOOST_TEST(net == 200000);
+   BOOST_TEST(cpu == 200000);
+
+   auto p = get_policy(user, node_owners[2]);
+   BOOST_TEST(p["net_weight"].as_string() == "20.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "20.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "20.0000 SYS");
+} FC_LOG_AND_RETHROW()
+
+// Reduce one issuer's policy doesn't affect another issuer's policy
+BOOST_FIXTURE_TEST_CASE( reduce_one_issuer_isolates_other, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // Two policies from different issuers
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   add_roa_policy(node_owners[3], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   produce_block();
+
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   BOOST_TEST(net == 200000);
+   BOOST_TEST(cpu == 200000);
+
+   // Reduce only node_owners[2]'s policy completely
+   reduce_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0);
+   produce_block();
+
+   // node_owners[3]'s policy should be unchanged
+   auto p = get_policy(user, node_owners[3]);
+   BOOST_TEST(p["net_weight"].as_string() == "10.0000 SYS");
+   BOOST_TEST(p["cpu_weight"].as_string() == "10.0000 SYS");
+   BOOST_TEST(p["ram_weight"].as_string() == "10.0000 SYS");
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   BOOST_TEST(net == 100000);
+   BOOST_TEST(cpu == 100000);
+
+   // Can still expand node_owners[3]'s policy
+   expand_roa_policy(node_owners[3], user, "5.0000 SYS", "5.0000 SYS", "5.0000 SYS", 0);
+   produce_block();
+
+   control->get_resource_limits_manager().get_account_limits(user, ram, net, cpu);
+   BOOST_TEST(net == 150000);
+   BOOST_TEST(cpu == 150000);
+} FC_LOG_AND_RETHROW()
+
+// ===== 9. newuser edge cases =====
+
+// Creating many users depletes sysio RAM predictably
+BOOST_FIXTURE_TEST_CASE( newuser_ram_depletion_tracking, sysio_roa_full_tester ) try {
+   auto r = get_reslimit("sysio"_n);
+   int64_t sysio_ram_start = r["ram_bytes"].as_int64();
+
+   // Create users from multiple node owners and verify accounting
+   auto user1 = create_newuser(node_owners[2]);
+   auto user2 = create_newuser(node_owners[3]);
+   auto user3 = create_newuser(node_owners[4]);
+   produce_block();
+
+   r = get_reslimit("sysio"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == sysio_ram_start - 3 * (int64_t)newaccount_ram);
+
+   // Each new user should have exactly newaccount_ram
+   int64_t ram, net, cpu;
+   control->get_resource_limits_manager().get_account_limits(user1, ram, net, cpu);
+   BOOST_TEST(ram == (int64_t)newaccount_ram);
+   control->get_resource_limits_manager().get_account_limits(user2, ram, net, cpu);
+   BOOST_TEST(ram == (int64_t)newaccount_ram);
+   control->get_resource_limits_manager().get_account_limits(user3, ram, net, cpu);
+   BOOST_TEST(ram == (int64_t)newaccount_ram);
+
+   // sysio.acct reslimit tracks all gifted RAM
+   r = get_reslimit("sysio.acct"_n);
+   BOOST_TEST(r["ram_bytes"].as_int64() == (int64_t)((3 + 1) * newaccount_ram));
+} FC_LOG_AND_RETHROW()
+
+// Non-tier-1 node owner cannot create users
+BOOST_FIXTURE_TEST_CASE( newuser_tier2_fails, sysio_roa_full_tester ) try {
+   create_accounts({"tier2owner"_n}, false, false, false, false);
+   register_node_owner("tier2owner"_n, 2);
+   produce_block();
+
+   BOOST_REQUIRE_EXCEPTION(
+      newuser("tier2owner"_n, "nonce1"_n, get_public_key("tier2owner"_n, "active")),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Creator is not a registered tier-1 node owner"));
+} FC_LOG_AND_RETHROW()
+
+// newuser correctly populates both policies table and reslimit for sysio.acct
+BOOST_FIXTURE_TEST_CASE( newuser_sysio_acct_policy_tracking, sysio_roa_full_tester ) try {
+   auto p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t initial_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   create_newuser(node_owners[2]);
+   create_newuser(node_owners[2]);
+   produce_block();
+
+   p = get_policy("sysio.acct"_n, "sysio"_n);
+   int64_t updated_ram_weight = p["ram_weight"].as<asset>().get_amount();
+
+   // Each newuser adds newaccount_ram / bytes_per_unit to the sysio.acct policy ram_weight
+   int64_t ram_weight_per_user = (int64_t)newaccount_ram / 104;  // bytes_per_unit = 104
+   BOOST_TEST(updated_ram_weight == initial_ram_weight + 2 * ram_weight_per_user);
+} FC_LOG_AND_RETHROW()
+
+// ===== 10. extendpolicy validation =====
+
+// Extend non-existent policy should fail
+BOOST_FIXTURE_TEST_CASE( extendpolicy_no_policy, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // No policy from node_owners[3] for this user
+   auto result = extend_policy(user, node_owners[3], 100);
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: Policy does not exist under this issuer for this owner"), result);
+} FC_LOG_AND_RETHROW()
+
+// Cannot reduce a policy's time_block via extend
+BOOST_FIXTURE_TEST_CASE( extendpolicy_cannot_reduce_timeblock, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 1000, 0);
+   produce_block();
+
+   // Try to set a lower time_block
+   auto result = extend_policy(user, node_owners[2], 500);
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: Cannot reduce a policies existing time_block"), result);
+} FC_LOG_AND_RETHROW()
+
+// Cannot set time_block lower than current block
+BOOST_FIXTURE_TEST_CASE( extendpolicy_past_timeblock, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   // time_block=0 means already expired
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   produce_block();
+
+   // Try to extend to block 1 which is in the past
+   auto result = extend_policy(user, node_owners[2], 1);
+   BOOST_REQUIRE_EQUAL(error("assertion failure with message: You cannot set a time_block lower than the current block"), result);
+} FC_LOG_AND_RETHROW()
+
+// Successful extend followed by reduce respects new time_block
+BOOST_FIXTURE_TEST_CASE( extendpolicy_blocks_reduce, sysio_roa_full_tester ) try {
+   auto user = create_newuser(node_owners[2]);
+   produce_block();
+
+   add_roa_policy(node_owners[2], user, "10.0000 SYS", "10.0000 SYS", "10.0000 SYS", 0, 0);
+   produce_block();
+
+   // Extend to far future
+   extend_policy(user, node_owners[2], 999999999);
+
+   // Now reduce should fail because of the new time_block
+   BOOST_CHECK_EXCEPTION(
+      reduce_roa_policy(node_owners[2], user, "5.0000 SYS", "5.0000 SYS", "5.0000 SYS", 0),
+      sysio_assert_message_exception,
+      sysio_assert_message_is("Cannot reduce policy before time_block"));
+
+   // But expand should still work
+   BOOST_REQUIRE_NO_THROW(
+      expand_roa_policy(node_owners[2], user, "1.0000 SYS", "1.0000 SYS", "1.0000 SYS", 0));
+} FC_LOG_AND_RETHROW()
 
 BOOST_AUTO_TEST_SUITE_END()

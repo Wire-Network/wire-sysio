@@ -14,9 +14,6 @@ int main(int argc, char** argv)
 {
    chain::application exe{application_config{.enable_resource_monitor = false}};
 
-   std::filesystem::path home = fc::home_path();
-   app().set_default_data_dir(home / "sysio-wallet");
-   app().set_default_config_dir(home / "sysio-wallet");
    http_plugin::set_defaults({
       .default_unix_socket_path = kiod::config::key_store_executable_name + ".sock",
       .default_http_port = 0,

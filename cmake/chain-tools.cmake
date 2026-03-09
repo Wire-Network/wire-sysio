@@ -1,4 +1,5 @@
 include(CMakeParseArguments)
+include(native-exports)
 
 macro(chain_target TARGET)
     cmake_parse_arguments(ARG "" "" "SOURCE_FILES" ${ARGN})
@@ -9,7 +10,6 @@ macro(chain_target TARGET)
 
     target_link_libraries(${TARGET}
             PRIVATE
-            -Wl,${whole_archive_flag}
             batch_operator_plugin
             chain_api_plugin
             db_size_api_plugin
@@ -29,7 +29,6 @@ macro(chain_target TARGET)
             trace_api_plugin
             chain_plugin
             appbase
-            -Wl,${no_whole_archive_flag}
             ${PLUGIN_DEFAULT_DEPENDENCIES}
 
             http_client_plugin
@@ -49,6 +48,9 @@ macro(chain_target TARGET)
 
             -Wl,${build_id_flag}
     )
+
+    # Export intrinsic symbols for --native-contract .so loading.
+    link_native_exports(${TARGET})
 
     copy_bin(${TARGET})
     install(

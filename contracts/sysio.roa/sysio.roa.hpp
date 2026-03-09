@@ -316,5 +316,10 @@ namespace sysio {
             resources_t increase_reslimit(const name& owner, const asset& net_weight, const asset& cpu_weight, int64_t ram_bytes,
                                           bool require_to_exist);
 
+            /**
+             * @brief Decrease ram_bytes on an existing reslimit entry
+             */
+            void decrease_reslimit(const name& owner, uint64_t ram_bytes);
+
     }; // namespace roa
 } // namespace sysio

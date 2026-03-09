@@ -110,10 +110,10 @@ namespace sysio::chain {
       bsp_t  head(include_root_t include_root = include_root_t::no) const;
 
       /**
-       * The calculated pending savanna LIB ID that will become LIB or is currently LIB
+       * The calculated pending savanna LIB ID and timestamp that will become LIB or is currently LIB
        */
-      block_id_type pending_savanna_lib_id() const;
-      bool set_pending_savanna_lib_id( const block_id_type& id );
+      std::pair<block_id_type, block_timestamp_type> pending_savanna_lib() const;
+      bool set_pending_savanna_lib( const block_id_type& id, block_timestamp_type timestamp );
 
       /**
        * @return true if id is built on top of pending savanna lib or id == pending_savanna_lib
