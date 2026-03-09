@@ -112,6 +112,7 @@ BOOST_AUTO_TEST_CASE(variant_type_checks) {
 BOOST_AUTO_TEST_CASE(variant_object_missing_key) {
    std::string raw = R"({"only_key":"value"})";
    variant v = json::from_string(raw);
+   BOOST_REQUIRE(v.is_object());
    auto obj = v.get_object();
 
    // operator[] throws key_not_found_exception for missing keys
