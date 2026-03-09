@@ -165,7 +165,7 @@ Protobuf support requires `libprotobuf` at build time. It is declared in `vcpkg.
 
 ```cmake
 find_package(protobuf CONFIG REQUIRED)
-target_link_libraries(chain PUBLIC protobuf::libprotobuf)
+target_link_libraries(sysio_chain PUBLIC protobuf::libprotobuf)
 ```
 
 No additional build flags are needed — protobuf support is always available when the dependency is present.

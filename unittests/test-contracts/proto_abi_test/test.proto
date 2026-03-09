@@ -9,6 +9,6 @@ message ActData {
 }
 
 message ActResult {
-    int32 value = 1;
-    string str_value = 2;
+  int32 value = 1;
+  string str_value = 2;
 }

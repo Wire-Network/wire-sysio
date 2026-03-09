@@ -197,14 +197,16 @@ namespace sysio::chain {
          gpb::FileDescriptorSet fds;
          gpb::util::JsonParseOptions opts;
          opts.ignore_unknown_fields = true;
-         auto status = gpb::util::JsonStringToMessage(abi.protobuf_types.value, &fds);
-         if( status.ok() ) {
-            pb_pool = std::make_shared<gpb::DescriptorPool>();
-            for( int i = 0; i < fds.file_size(); ++i ) {
-               pb_pool->BuildFile(fds.file(i));
-            }
-            pb_factory = std::make_shared<gpb::DynamicMessageFactory>(pb_pool.get());
+         auto status = gpb::util::JsonStringToMessage(abi.protobuf_types.value, &fds, opts);
+         SYS_ASSERT( status.ok(), invalid_type_inside_abi,
+                     "Failed to parse protobuf_types: {}", std::string(status.message()) );
+         pb_pool = std::make_shared<gpb::DescriptorPool>();
+         for( int i = 0; i < fds.file_size(); ++i ) {
+            auto* fd = pb_pool->BuildFile(fds.file(i));
+            SYS_ASSERT( fd != nullptr, invalid_type_inside_abi,
+                        "Failed to build protobuf file descriptor: {}", fds.file(i).name() );
          }
+         pb_factory = std::make_shared<gpb::DynamicMessageFactory>(pb_pool.get());
       }
 
       validate(ctx);
@@ -242,7 +244,7 @@ namespace sysio::chain {
       auto json = fc::json::to_string(var, fc::time_point::maximum());
       gpb::util::JsonParseOptions opts;
       opts.ignore_unknown_fields = true;
-      auto status = gpb::util::JsonStringToMessage(json, &msg);
+      auto status = gpb::util::JsonStringToMessage(json, &msg, opts);
       SYS_ASSERT( status.ok(), pack_exception, "Failed to convert JSON to protobuf message: {}", std::string(status.message()) );
    }
 
@@ -261,6 +263,13 @@ namespace sysio::chain {
       fc::datastream<const char*> inner_stream(stream.pos(), outer_len.value);
       fc::unsigned_int pb_len;
       fc::raw::unpack(inner_stream, pb_len);
+
+      SYS_ASSERT( pb_len.value <= inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': inner length {} exceeds available data {}",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
+      SYS_ASSERT( pb_len.value == inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': trailing data detected (inner length {} but {} bytes remain)",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
 
       auto prototype = pb_factory->GetPrototype(desc);
       std::unique_ptr<google::protobuf::Message> msg(prototype->New());
@@ -1063,8 +1072,10 @@ void to_variant(const sysio::chain::abi_def& abi, fc::variant& v) {
    fc::reflector<sysio::chain::abi_def>::visit(
       fc::to_variant_visitor<sysio::chain::abi_def>(mvo, abi)
    );
-   // Add protobuf_types as JSON object (not string)
-   if( !abi.protobuf_types.value.empty() ) {
+   // protobuf_types: omit when empty, otherwise replace string with JSON object
+   if( abi.protobuf_types.value.empty() ) {
+      mvo.erase("protobuf_types");
+   } else {
       mvo["protobuf_types"] = fc::json::from_string(abi.protobuf_types.value);
    }
    v = std::move(mvo);
