@@ -582,7 +582,7 @@ namespace sysio {
 
    static net_plugin_impl *my_impl;
 
-   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 32>;
+   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, def_sync_fetch_batch_size>;
 
    // thread safe
    class queued_buffer : boost::noncopyable {

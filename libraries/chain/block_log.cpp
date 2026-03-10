@@ -689,8 +689,8 @@ namespace sysio { namespace chain {
                if (!head)
                   return retry_read_serialized_blocks_by_num(first_block_num, count);
 
-               uint32_t last_block_num = block_header::num_from_id(head->id);
-               uint32_t working_first  = working_block_file_first_block_num();
+               const uint32_t last_block_num = block_header::num_from_id(head->id);
+               const uint32_t working_first  = working_block_file_first_block_num();
 
                // Determine how many blocks can be read from the working file
                uint32_t working_count = 0;
@@ -719,7 +719,7 @@ namespace sysio { namespace chain {
                // The extra position is needed to compute the size of the last block in batch.
                // For the very last block in the log, we use file size instead.
                constexpr uint32_t pos_size = sizeof(uint64_t);
-               uint64_t index_offset = pos_size * (first_block_num - index_first_block_num());
+               const uint64_t index_offset = pos_size * (first_block_num - index_first_block_num());
                uint32_t positions_to_read = working_count;
                const bool need_file_size_for_last = (first_block_num + working_count - 1 == last_block_num);
                if (!need_file_size_for_last)
@@ -729,20 +729,17 @@ namespace sysio { namespace chain {
                index_file.seek(index_offset);
                index_file.read(reinterpret_cast<char*>(positions.data()), positions_to_read * pos_size);
 
-               // Determine end-of-data for the last block in batch
-               uint64_t end_pos;
                if (need_file_size_for_last) {
                   block_file.seek_end(0);
-                  end_pos = block_file.tellp();
-               } else {
-                  end_pos = positions.back(); // next block's position
+                  positions.push_back(block_file.tellp());
                }
 
                // Read each block using computed positions and sizes
                constexpr uint32_t block_pos_field_size = sizeof(uint64_t); // trailing position field
+               assert(positions.size() == working_count + 1);
                for (uint32_t i = 0; i < working_count; ++i) {
-                  uint64_t block_start = positions[i];
-                  uint64_t block_end   = (i + 1 < working_count) ? positions[i + 1] : end_pos;
+                  const uint64_t block_start = positions[i];
+                  const uint64_t block_end   = positions[i + 1];
 
                   SYS_ASSERT(block_end > block_start + block_pos_field_size, block_log_exception,
                              "Invalid block boundaries: block_end {} should be greater than block_start {} plus {}",
