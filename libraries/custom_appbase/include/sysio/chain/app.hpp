@@ -41,6 +41,8 @@ struct application_config {
    bool sighup_loads_logging_config = true;
    bool log_on_exit = true;
    uint16_t default_http_port = 8888;
+
+   std::vector<application_base::extra_program_options_provider> extra_program_options_providers{};
 };
 
 // use namespace exit_code instead of enum class to allow simple conversion to int in main return statements
@@ -188,11 +190,19 @@ public:
       }
    }
 
+   const bpo::variables_map& get_options() const {
+      return app_->get_options();
+   }
+
+   const std::vector<bpo::basic_option<char>>& get_parsed_options() const {
+      return app_->get_parsed_options();
+   }
+
    template <typename... Plugin>
    exit_code::exit_code init(int argc, char** argv) {
       try {
          auto init_logging = [cfg=cfg_]() { detail::initialize_logging(cfg); };
-         if (!app_->initialize<Plugin...>(argc, argv, init_logging)) {
+         if (!app_->initialize<Plugin...>(argc, argv, init_logging, cfg_.extra_program_options_providers)) {
             const auto& opts = app_->get_options();
             if (opts.contains("help") || opts.contains("version") || opts.contains("full-version") || opts.contains("print-default-config")) {
                last_result_ = exit_code::NODE_MANAGEMENT_SUCCESS;

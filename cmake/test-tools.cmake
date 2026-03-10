@@ -1,4 +1,5 @@
 include(CMakeParseArguments)
+include(native-exports)
 
 macro(unittest_target TARGET)
   cmake_parse_arguments(ARG "" "" "SOURCE_FILES" ${ARGN})
@@ -33,6 +34,9 @@ macro(unittest_target TARGET)
     ${CMAKE_SOURCE_DIR}/plugins/http_plugin/include
     ${CMAKE_SOURCE_DIR}/plugins/chain_interface/include)
 
+  # Export intrinsic symbols for native-module contract .so loading.
+  link_native_exports(${TARGET})
+
 endmacro()
 
 macro(unittest_tests_add TARGET)
@@ -56,6 +60,9 @@ macro(unittest_tests_add TARGET)
 
       # to run ${TARGET} with all log from blockchain displayed, put "--verbose" after "--", i.e. "unit_test -- --verbose"
       foreach(RUNTIME ${SYSIO_WASM_RUNTIMES})
+        if(RUNTIME STREQUAL "native-module" AND NOT BUILD_SYSTEM_CONTRACTS)
+          continue()
+        endif()
         add_test(NAME ${TRIMMED_SUITE_NAME}_${TARGET}_${RUNTIME} COMMAND ${TARGET} --run_test=${SUITE_NAME} --report_level=detailed --color_output -- --${RUNTIME})
       endforeach()
 

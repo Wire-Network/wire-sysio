@@ -24,5 +24,3 @@ void wrap::exec( ignore<name>, ignore<transaction> ) {
 }
 
 } /// namespace sysio
-
-SYSIO_DISPATCH( sysio::wrap, (exec) )

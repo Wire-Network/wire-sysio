@@ -1,6 +1,5 @@
 #pragma once
 #include <sysio/chain/block_header.hpp>
-#include <sysio/chain/incremental_merkle_legacy.hpp>
 #include <sysio/chain/protocol_feature_manager.hpp>
 #include <sysio/chain/chain_snapshot.hpp>
 #include <sysio/chain/block_state.hpp>

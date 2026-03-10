@@ -301,15 +301,15 @@ namespace sysio::chain {
          [[deprecated("Use head().header().")]]     const block_header&  head_block_header()const;
          [[deprecated("Use head().block().")]]      const signed_block_ptr& head_block()const;
 
-         // returns finality_data associated with chain head for SHiP when in Savanna,
-         // std::nullopt in Legacy
-         std::optional<finality_data_t> head_finality_data() const;
+         // returns finality_data associated with chain head for SHiP
+         finality_data_t head_finality_data() const;
 
          [[deprecated("Use fork_db_head().block_num().")]] uint32_t      fork_db_head_block_num()const;
          [[deprecated("Use fork_db_head().id().")]]        block_id_type fork_db_head_block_id()const;
 
          time_point                     pending_block_time()const;
          block_timestamp_type           pending_block_timestamp()const;
+         time_point                     pending_lib_time()const;
          account_name                   pending_block_producer()const;
          const block_signing_authority& pending_block_signing_authority()const;
          std::optional<block_id_type>   pending_producer_block_id()const;
@@ -342,7 +342,7 @@ namespace sysio::chain {
          bool is_head_descendant_of_pending_lib() const;
 
          // thread-safe
-         void set_savanna_lib_id(const block_id_type& id);
+         void set_savanna_lib(const block_id_type& id, block_timestamp_type timestamp);
 
          // thread-safe
          bool         fork_db_has_root() const;

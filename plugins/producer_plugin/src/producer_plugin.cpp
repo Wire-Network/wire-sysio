@@ -735,7 +735,6 @@ public:
 
    compat::channels::transaction_ack::channel_type& _transaction_ack_channel;
 
-   incoming::methods::block_sync::method_type::handle        _incoming_block_sync_provider;
    incoming::methods::transaction_async::method_type::handle _incoming_transaction_async_provider;
 
    account_failures                 _account_fails;
@@ -1563,11 +1562,6 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
 
       app().executor().init_read_threads(_ro_thread_pool_size);
    }
-
-   _incoming_block_sync_provider = app().get_method<incoming::methods::block_sync>().register_provider(
-      [this](const signed_block_ptr& block, const block_id_type& block_id, const block_handle& bh) {
-         return on_incoming_block();
-      });
 
    _incoming_transaction_async_provider =
       app().get_method<incoming::methods::transaction_async>().register_provider(
@@ -2844,7 +2838,15 @@ void producer_plugin_impl::schedule_maybe_produce_block(bool exhausted) {
 
    _timer.async_wait([&chain, this, cid = ++_timer_corelation_id](const boost::system::error_code& ec) {
       if (ec != boost::asio::error::operation_aborted && cid == _timer_corelation_id) {
-         app().executor().post(priority::high, exec_queue::read_write, [&chain, this]() {
+         app().executor().post(priority::high, exec_queue::read_write, [&chain, this, cid]() {
+            if (cid != _timer_corelation_id) {
+               // Check cid again. It is possible between the timer firing and this posted lambda executing that a stale
+               // schedule_production_loop (e.g. from a delayed timer in process_pending_blocks) could run first,
+               // changing _pending_block_mode to speculating. The now-stale maybe_produce_block lambda would then hit
+               // SYS_ASSERT(in_producing_mode(), producer_exception, "called produce_block while not actually producing")
+               fc_dlog(_log, "Produce block timer expired, skipping");
+               return;
+            }
             // pending_block_state expected, but can't assert inside async_wait
             auto block_num = chain.is_building_block() ? chain.head().block_num() + 1 : 0;
             fc_dlog(_log, "Produce block timer for {} running at {}", block_num, fc::time_point::now());
@@ -3115,9 +3117,12 @@ void producer_plugin_impl::switch_to_read_window() {
          if (cid != _ro_timer_corelation_id.load(std::memory_order_acquire))
             return;
          if (ec != boost::asio::error::operation_aborted) {
-            // tests have seen to deadlock here, unable to reproduce so add a guard for it, also so we can log
-            const fc::time_point safe_guard_deadline = _ro_window_deadline + _ro_read_window_effective_time_us; // give plenty of time
-            std::chrono::time_point<std::chrono::system_clock> deadline{std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
+            // At one point the task.get() would hang in ci/cd. The issue is believed to be fixed by
+            // https://github.com/Wire-Network/wire-sysio/pull/202. Keep a large timeout with error
+            // to provide an error if this does ever hang/timeout again.
+            const fc::time_point safe_guard_deadline = _ro_window_deadline + fc::seconds(3); // give plenty of time for slow ci
+            const std::chrono::time_point<std::chrono::system_clock> deadline{
+               std::chrono::microseconds{safe_guard_deadline.time_since_epoch().count()}};
             // use future to make sure all read-only tasks finished before switching to write window
             for (auto& task : _ro_exec_tasks_fut) {
                if (std::future_status::timeout != task.wait_until(deadline)) {

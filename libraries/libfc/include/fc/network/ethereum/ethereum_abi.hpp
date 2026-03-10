@@ -177,6 +177,9 @@ std::string to_contract_component_signature(const component_type& component);
 std::string to_contract_function_signature(const contract& contract);
 fc::crypto::keccak256 to_contract_function_selector(const contract& contract);
 
+std::string to_event_signature(const contract& contract);
+fc::crypto::keccak256 to_event_topic(const contract& contract);
+
 std::vector<contract> parse_contracts(const std::filesystem::path& json_abi_file);
 
 contract parse_contract(const fc::variant& v);

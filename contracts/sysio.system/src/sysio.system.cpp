@@ -178,65 +178,61 @@ namespace sysiosystem {
       set_resource_limits( account, ram, current_net, current_cpu );
    }
 
-   void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
-      require_auth( get_self() );
-      uint32_t rank = 0;
+   void system_contract::assign_producer_ranks( const std::vector<name>& producers ) {
       auto idx = _producers.get_index<"prodrank"_n>();
       std::set<name> rm_sched_prods;
-      for (auto i = idx.cbegin(); i != idx.cend(); ++i) {
-         if (i->rank > 21)
-            break;
+      for( auto i = idx.cbegin(); i != idx.cend(); ++i ) {
+         if( i->rank > max_producers ) break;
          rm_sched_prods.insert(i->owner);
       }
-      for (const auto& prod : schedule) {
+      uint32_t rank = 0;
+      for( const auto& prod_name : producers ) {
          ++rank;
-         auto i = _producers.find(prod.producer_name.value);
-         if (i != _producers.end()) {
+         auto i = _producers.find(prod_name.value);
+         if( i != _producers.end() ) {
             _producers.modify(i, same_payer, [&](auto& p) {
                p.rank = rank;
             });
          }
-         rm_sched_prods.erase(prod.producer_name);
+         rm_sched_prods.erase(prod_name);
       }
-      for (const auto& prod : rm_sched_prods) {
+      for( const auto& prod : rm_sched_prods ) {
          auto i = _producers.find(prod.value);
-         if (i != _producers.end()) {
+         if( i != _producers.end() ) {
             _producers.modify(i, same_payer, [&](auto& p) {
-               p.rank = p.rank + 21;
+               p.rank = p.rank + max_producers;
             });
          }
       }
+   }
+
+   void system_contract::setrank( const name& producer, uint32_t rank ) {
+      require_auth( get_self() );
+      auto prod = _producers.find( producer.value );
+      check( prod != _producers.end(), "producer not found" );
+      check( rank > 0, "rank must be positive" );
+      _producers.modify( prod, same_payer, [&](auto& p) {
+         p.rank = rank;
+      });
+   }
+
+   void system_contract::setprods( const std::vector<sysio::producer_authority>& schedule ) {
+      require_auth( get_self() );
+      std::vector<name> names;
+      names.reserve(schedule.size());
+      for( const auto& prod : schedule )
+         names.push_back(prod.producer_name);
+      assign_producer_ranks(names);
       set_proposed_producers( schedule );
    }
 
    void system_contract::setprodkeys( const std::vector<sysio::producer_key>& schedule ) {
       require_auth( get_self() );
-      uint32_t rank = 0;
-      auto idx = _producers.get_index<"prodrank"_n>();
-      std::set<name> rm_sched_prods;
-      for (auto i = idx.cbegin(); i != idx.cend(); ++i) {
-         if (i->rank > 21)
-            break;
-         rm_sched_prods.insert(i->owner);
-      }
-      for (const auto& prod : schedule) {
-         ++rank;
-         auto i = _producers.find(prod.producer_name.value);
-         if (i != _producers.end()) {
-            _producers.modify(i, same_payer, [&](auto& p) {
-               p.rank = rank;
-            });
-         }
-         rm_sched_prods.erase(prod.producer_name);
-      }
-      for (const auto& prod : rm_sched_prods) {
-         auto i = _producers.find(prod.value);
-         if (i != _producers.end()) {
-            _producers.modify(i, same_payer, [&](auto& p) {
-               p.rank = p.rank + 21;
-            });
-         }
-      }
+      std::vector<name> names;
+      names.reserve(schedule.size());
+      for( const auto& prod : schedule )
+         names.push_back(prod.producer_name);
+      assign_producer_ranks(names);
       set_proposed_producers( schedule );
    }
 
@@ -322,10 +318,6 @@ namespace sysiosystem {
       check( version.value == 0, "unsupported version for init action" );
 
       check(core == symbol("SYS", 4), "core symbol must be SYS.");
-
-      // Activate block production tracking (Wire uses ROA, not stake-based activation)
-      if( _gstate.thresh_activated_stake_time == time_point() )
-         _gstate.thresh_activated_stake_time = current_time_point();
    }
 
    // ** ON NOTIFY OF AUTH.MSG MODIFICATION **

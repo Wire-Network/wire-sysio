@@ -1,4 +1,4 @@
-# .claude/solana/CLAUDE.md
+# .claude/connections/CLAUDE.md
 
 Session-specific guidance that supplements the root `CLAUDE.md`. This file
 captures conventions discovered during active development that are not yet

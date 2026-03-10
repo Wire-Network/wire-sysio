@@ -388,6 +388,7 @@ bool aggregating_qc_sig_t::is_quorum_met_no_lock() const {
 }
 
 std::optional<qc_t> aggregating_qc_t::get_best_qc(block_num_type block_num) const {
+   std::lock_guard g(*_mtx);
    std::optional<qc_sig_t> active_best_qc = active_policy_sig.get_best_qc();
    if (!active_best_qc) // active is always required
       return {};
@@ -404,6 +405,7 @@ std::optional<qc_t> aggregating_qc_t::get_best_qc(block_num_type block_num) cons
 }
 
 bool aggregating_qc_t::set_received_qc(const qc_t& qc) {
+   std::lock_guard g(*_mtx);
    // qc should have already been verified via verify_qc, this SYS_ASSERT should never fire
    SYS_ASSERT(!pending_policy_sig || qc.pending_policy_sig, invalid_qc,
               "qc {} expected to have a pending policy signature", qc.block_num);
@@ -428,56 +430,68 @@ aggregate_vote_result_t aggregating_qc_t::aggregate_vote(uint32_t connection_id,
    aggregate_vote_result_t r;
    block_num_type block_num = block_header::num_from_id(block_id);
 
-   bool verified_sig = false;
-   auto verify_sig = [&]() -> vote_result_t {
-      if (!verified_sig && !fc::crypto::bls::verify(vote.finalizer_key, finalizer_digest, vote.sig)) {
-         fc_wlog(vote_logger, "connection - {} block_num: {} block_id: {}, signature from finalizer {}.. cannot be verified, vote strong: {}",
-                 connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16), vote.strong);
-         return vote_result_t::invalid_signature;
-      }
-      verified_sig = true;
-      return vote_result_t::success;
-   };
-
-   auto add_vote = [&](finalizer_authority_ptr& auth, const finalizer_policy_ptr& finalizer_policy, aggregating_qc_sig_t& agg_qc_sig) -> vote_result_t {
-      const auto& finalizers = finalizer_policy->finalizers;
-      auto itr = std::ranges::find_if(finalizers, [&](const auto& finalizer) { return finalizer.public_key == vote.finalizer_key; });
-      vote_result_t s = vote_result_t::unknown_public_key;
+   // Find indices in both policies
+   auto find_index = [&](finalizer_authority_ptr& auth, const finalizer_policy_ptr& policy) -> ssize_t {
+      const auto& finalizers = policy->finalizers;
+      auto itr = std::ranges::find_if(finalizers, [&](const auto& f) { return f.public_key == vote.finalizer_key; });
       if (itr != finalizers.end()) {
-         auth = finalizer_authority_ptr{finalizer_policy, &(*itr)}; // use aliasing shared_ptr constructor
-         auto index = std::distance(finalizers.begin(), itr);
-         if (agg_qc_sig.has_voted(index)) {
-            fc_tlog(vote_logger, "connection - {} block_num: {} block_id: {}, duplicate finalizer {}..",
-                    connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16));
-            return vote_result_t::duplicate;
-         }
-         if (vote_result_t vs = verify_sig(); vs != vote_result_t::success)
-            return vs;
-         s = agg_qc_sig.add_vote(connection_id, block_num,
-                                 vote.strong,
-                                 index,
-                                 vote.sig,
-                                 finalizers[index].weight);
-
+         auth = finalizer_authority_ptr{policy, &(*itr)};
+         return std::distance(finalizers.begin(), itr);
       }
-      return s;
+      return -1;
    };
 
-   r.result = add_vote(r.active_authority, active_finalizer_policy, active_policy_sig);
-   if (r.result != vote_result_t::success && r.result != vote_result_t::unknown_public_key)
-      return r;
-
+   ssize_t active_index = find_index(r.active_authority, active_finalizer_policy);
+   ssize_t pending_index = -1;
    if (pending_finalizer_policy) {
+      pending_index = find_index(r.pending_authority, pending_finalizer_policy);
+   }
+
+   if (active_index < 0 && pending_index < 0) {
+      fc_wlog(vote_logger, "connection - {} finalizer_key {} in vote is not in finalizer policies",
+              connection_id, vote.finalizer_key.to_string().substr(8,16));
+      r.result = vote_result_t::unknown_public_key;
+      return r;
+   }
+
+   // Check has_voted, return duplicate if the vote is already present in both policies.
+   // For dual finalizers both policies must have the vote; for single-policy finalizers only
+   // the applicable policy is checked. This rejects duplicates before the expensive BLS verify.
+   bool active_dup  = active_index  < 0 || active_policy_sig.has_voted(active_index);
+   bool pending_dup = pending_index < 0 || pending_policy_sig->has_voted(pending_index);
+   if (active_dup && pending_dup) {
+      fc_tlog(vote_logger, "connection - {} block_num: {} block_id: {}, duplicate finalizer {}..",
+              connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16));
+      r.result = vote_result_t::duplicate;
+      return r;
+   }
+
+   // Verify BLS signature
+   if (!fc::crypto::bls::verify(vote.finalizer_key, finalizer_digest, vote.sig)) {
+      fc_wlog(vote_logger, "connection - {} block_num: {} block_id: {}, signature from finalizer {}.. cannot be verified, vote strong: {}",
+              connection_id, block_num, block_id, vote.finalizer_key.to_string().substr(8,16), vote.strong);
+      r.result = vote_result_t::invalid_signature;
+      return r;
+   }
+
+   // Add votes under outer lock for cross-policy atomicity
+   // Nested locking with per-policy _mtx is safe: ordering is always outer → inner.
+   std::lock_guard g(*_mtx);
+   if (active_index >= 0) {
+      r.result = active_policy_sig.add_vote(connection_id, block_num, vote.strong,
+                                            active_index, vote.sig,
+                                            active_finalizer_policy->finalizers[active_index].weight);
+   }
+   if (pending_index >= 0) {
       assert(pending_policy_sig);
-      vote_result_t ps = add_vote(r.pending_authority, pending_finalizer_policy, *pending_policy_sig);
-      if (ps != vote_result_t::unknown_public_key)
+      vote_result_t ps = pending_policy_sig->add_vote(connection_id, block_num, vote.strong,
+                                                      pending_index, vote.sig,
+                                                      pending_finalizer_policy->finalizers[pending_index].weight);
+      // Use pending result unless it was a duplicate (active result is more informative)
+      if (active_index < 0 || ps != vote_result_t::duplicate)
          r.result = ps;
    }
 
-   if (r.result == vote_result_t::unknown_public_key) {
-      fc_wlog(vote_logger, "connection - {} finalizer_key {} in vote is not in finalizer policies",
-              connection_id, vote.finalizer_key.to_string().substr(8,16));
-   }
    return r;
 }
 
