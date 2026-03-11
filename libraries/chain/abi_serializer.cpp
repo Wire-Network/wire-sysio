@@ -189,7 +189,7 @@ namespace sysio::chain {
       SYS_ASSERT( error_messages.size() == error_messages_size, duplicate_abi_err_msg_def_exception, "duplicate error message definition detected" );
       SYS_ASSERT( variants.size() == variants_size, duplicate_abi_variant_def_exception, "duplicate variant definition detected" );
       SYS_ASSERT( action_results.size() == action_results_size, duplicate_abi_action_results_def_exception, "duplicate action results definition detected" );
-      SYS_ASSERT( enums.size() == enums_size, duplicate_abi_type_def_exception, "duplicate enum definition detected" );
+      SYS_ASSERT( enums.size() == enums_size, duplicate_abi_enum_def_exception, "duplicate enum definition detected" );
 
       validate(ctx);
    }
@@ -352,8 +352,32 @@ namespace sysio::chain {
       } FC_CAPTURE_AND_RETHROW( "r: {}", r  ) }
       for( const auto& en : enums ) { try {
         ctx.check_deadline();
-        SYS_ASSERT(is_builtin_type(en.second.type), invalid_type_inside_abi,
-                   "enum '{}' has invalid underlying type '{}'", impl::limit_size(en.first), impl::limit_size(en.second.type) );
+        SYS_ASSERT(is_integer(en.second.type), invalid_type_inside_abi,
+                   "enum '{}' has invalid underlying type '{}' (must be an integer type)", impl::limit_size(en.first), impl::limit_size(en.second.type) );
+
+        int bit_width = get_integer_size(en.second.type);
+        bool is_signed_type = en.second.type.starts_with("int");
+
+        flat_set<string> seen_names;
+        flat_set<int64_t> seen_values;
+        for( const auto& ev : en.second.values ) {
+           SYS_ASSERT(seen_names.insert(ev.name).second, invalid_type_inside_abi,
+                      "enum '{}' has duplicate member name '{}'", impl::limit_size(en.first), impl::limit_size(ev.name) );
+           SYS_ASSERT(seen_values.insert(ev.value).second, invalid_type_inside_abi,
+                      "enum '{}' has duplicate value {} (member '{}')", impl::limit_size(en.first), ev.value, impl::limit_size(ev.name) );
+           if( is_signed_type ) {
+              int64_t lo = -(1LL << (bit_width - 1));
+              int64_t hi =  (1LL << (bit_width - 1)) - 1;
+              SYS_ASSERT(ev.value >= lo && ev.value <= hi, invalid_type_inside_abi,
+                         "enum '{}' value '{}' ({}) out of range for '{}'",
+                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
+           } else {
+              uint64_t hi = (bit_width == 64) ? UINT64_MAX : (1ULL << bit_width) - 1;
+              SYS_ASSERT(ev.value >= 0 && static_cast<uint64_t>(ev.value) <= hi, invalid_type_inside_abi,
+                         "enum '{}' value '{}' ({}) out of range for '{}'",
+                         impl::limit_size(en.first), impl::limit_size(ev.name), ev.value, impl::limit_size(en.second.type) );
+           }
+        }
       } FC_CAPTURE_AND_RETHROW( "enum: {}", en.first  ) }
    }
 

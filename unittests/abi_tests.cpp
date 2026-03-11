@@ -3549,16 +3549,56 @@ BOOST_AUTO_TEST_CASE(enum_types)
       ],
    })";
 
+   auto enum_abi_non_integer_type = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "string", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_out_of_range = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "TOO_BIG", "value": 999}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_name = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "X", "value": 1}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_value = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "A", "value": 0}, {"name": "B", "value": 0}]}
+      ],
+   })";
+
    try {
       // round-trip abi through multiple formats
       auto bin = fc::raw::pack(fc::json::from_string(enum_abi).as<abi_def>());
       abi_serializer abis(fc::variant(fc::raw::unpack<abi_def>(bin)).as<abi_def>(), yield_fn() );
 
       // duplicate enum definition detected
-      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(duplicate_enum_abi).as<abi_def>(), yield_fn() ), duplicate_abi_type_def_exception );
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(duplicate_enum_abi).as<abi_def>(), yield_fn() ), duplicate_abi_enum_def_exception );
 
-      // invalid underlying type
+      // invalid underlying type (not a known type at all)
       BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_invalid_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // non-integer underlying type (e.g. string)
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_non_integer_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // enum value out of range for underlying type
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_out_of_range).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate member name within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_name).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate value within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_value).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
 
       // Test binary -> variant (enum value to string name)
       // UNKNOWN=0 encoded as uint8 is 0x00
