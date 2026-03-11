@@ -2092,8 +2092,10 @@ namespace sysio {
       });
       if (conns.size() > sync_peer_limit) {
          std::partial_sort(conns.begin(), conns.begin() + sync_peer_limit, conns.end(), [](const connection_ptr& lhs, const connection_ptr& rhs) {
-            auto ls = lhs->get_peer_score(), rs = rhs->get_peer_score();
-            if (ls != rs) return ls > rs; // higher score first
+            const auto ls = lhs->get_peer_score();
+            const auto rs = rhs->get_peer_score();
+            if (ls != rs)
+               return ls > rs; // higher score first
             return lhs->get_peer_ping_time_ns() < rhs->get_peer_ping_time_ns(); // lower ping as tiebreaker
          });
          conns.resize(sync_peer_limit);
@@ -2978,13 +2980,13 @@ namespace sysio {
          string                    paddr_desc = paddr_str + ":" + std::to_string(paddr_port);
 
          // mask incoming address to /24 (IPv4) or /48 (IPv6) for subnet-level counting
-         auto addr_v6 = paddr_add.is_v4()
+         const auto addr_v6 = paddr_add.is_v4()
             ? boost::asio::ip::make_address_v6(boost::asio::ip::v4_mapped, paddr_add.to_v4())
             : paddr_add.to_v6();
-         uint8_t effective_prefix = addr_v6.is_v4_mapped()
+         const uint8_t effective_prefix = addr_v6.is_v4_mapped()
             ? static_cast<uint8_t>(96 + 24)  // IPv4 /24
             : static_cast<uint8_t>(48);       // IPv6 /48
-         auto incoming_masked = net_utils::apply_prefix_mask(addr_v6.to_bytes(), effective_prefix);
+         const auto incoming_masked = net_utils::apply_prefix_mask(addr_v6.to_bytes(), effective_prefix);
 
          connections.for_each_connection([&visitors, &from_addr, &incoming_masked, effective_prefix](const connection_ptr& conn) {
             if (conn->socket_is_open()) {
@@ -3046,7 +3048,8 @@ namespace sysio {
                victim->close();
                fc_ilog(p2p_conn_log, "Accepted new connection (via eviction): {}", paddr_str);
                connections.any_of_supplied_peers([&listen_address, &paddr_str, &paddr_desc, &limit](const string& peer_addr) {
-                  if (auto [host, port, type] = net_utils::split_host_port_type(peer_addr); host == paddr_str) {
+                  const auto [host, port, type] = net_utils::split_host_port_type(peer_addr);
+                  if (host == paddr_str) {
                      if (limit > 0) {
                         fc_dlog(p2p_conn_log, "Connection inbound to {} from {} is a configured p2p-peer-address and will not be throttled",
                                 listen_address, paddr_desc);
