@@ -222,6 +222,7 @@ void threaded_snapshot_writer::finalize() {
             while(remaining > 0) {
                const size_t to_read = std::min<uint64_t>(remaining, buf_size);
                in.read(buf.get(), to_read);
+               SYS_ASSERT(in.good(), snapshot_exception, "Failed to read section '{}' data for hashing", s.name);
                hasher.write(buf.get(), to_read);
                remaining -= to_read;
             }
@@ -237,7 +238,7 @@ void threaded_snapshot_writer::finalize() {
    {
       blake3_encoder root_hasher;
       for(const auto& s : sections_) {
-         root_hasher.write(s.hash.cdata(), s.hash.data_size());
+         root_hasher.write(s.hash.char_data(), s.hash.data_size());
       }
       root_hash_ = root_hasher.result();
    }
@@ -251,12 +252,12 @@ void threaded_snapshot_writer::finalize() {
       out_.write(reinterpret_cast<const char*>(&s.data_offset), sizeof(s.data_offset));
       out_.write(reinterpret_cast<const char*>(&s.data_size), sizeof(s.data_size));
       out_.write(reinterpret_cast<const char*>(&s.row_count), sizeof(s.row_count));
-      out_.write(s.hash.cdata(), s.hash.data_size());
+      out_.write(s.hash.char_data(), s.hash.data_size());
    }
 
    // Write footer: num_sections + root_hash + index_offset
    out_.write(reinterpret_cast<const char*>(&num_sections), sizeof(num_sections));
-   out_.write(root_hash_.cdata(), root_hash_.data_size());
+   out_.write(root_hash_.char_data(), root_hash_.data_size());
    out_.write(reinterpret_cast<const char*>(&index_offset), sizeof(index_offset));
 
    out_.flush();
@@ -442,7 +443,7 @@ void threaded_snapshot_reader::validate() {
 
       uint32_t num_sections;
       fds.read(reinterpret_cast<char*>(&num_sections), sizeof(num_sections));
-      fds.read(root_hash_.cdata(), root_hash_.data_size());
+      fds.read(root_hash_.char_data(), root_hash_.data_size());
       uint64_t index_offset;
       fds.read(reinterpret_cast<char*>(&index_offset), sizeof(index_offset));
 
@@ -470,7 +471,7 @@ void threaded_snapshot_reader::validate() {
          ids.read(reinterpret_cast<char*>(&entry.data_offset), sizeof(entry.data_offset));
          ids.read(reinterpret_cast<char*>(&entry.data_size), sizeof(entry.data_size));
          ids.read(reinterpret_cast<char*>(&entry.row_count), sizeof(entry.row_count));
-         ids.read(entry.hash.cdata(), entry.hash.data_size());
+         ids.read(entry.hash.char_data(), entry.hash.data_size());
 
          SYS_ASSERT(entry.data_offset + entry.data_size <= file_size, snapshot_exception,
                     "Section '{}' data extends beyond end of file", entry.name);
@@ -483,7 +484,7 @@ void threaded_snapshot_reader::validate() {
       {
          blake3_encoder root_hasher;
          for(const auto& entry : section_index_) {
-            root_hasher.write(entry.hash.cdata(), entry.hash.data_size());
+            root_hasher.write(entry.hash.char_data(), entry.hash.data_size());
          }
          computed_root = root_hasher.result();
       }
@@ -578,7 +579,7 @@ void integrity_hash_snapshot_writer::finalize() {
 
    blake3_encoder root_hasher;
    for(const auto& s : section_hashes_) {
-      root_hasher.write(s.hash.cdata(), s.hash.data_size());
+      root_hasher.write(s.hash.char_data(), s.hash.data_size());
    }
    root_hash_ = root_hasher.result();
 }

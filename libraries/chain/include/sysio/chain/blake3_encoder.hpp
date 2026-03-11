@@ -28,6 +28,9 @@ public:
    void write(const uint8_t* d, size_t len) { write(reinterpret_cast<const char*>(d), len); }
    void put(char c) { write(&c, 1); }
    void reset();
+
+   /// Finalize the hash and return the digest. One-shot: the hasher state
+   /// is consumed and must not be used again without calling reset() first.
    fc::crypto::blake3 result();
 
    /// One-shot convenience: hash a contiguous buffer.

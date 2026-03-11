@@ -192,7 +192,6 @@ namespace sysio { namespace chain {
          virtual ~snapshot_writer(){};
 
          virtual const char* name() const = 0;
-         virtual bool supports_threading() const { return false; }
 
       protected:
          virtual void write_start_section( const std::string& section_name ) = 0;
@@ -396,7 +395,6 @@ namespace sysio { namespace chain {
          explicit threaded_snapshot_writer(std::filesystem::path snapshot_path);
 
          const char* name() const override { return "snapshot"; }
-         bool supports_threading() const override { return true; }
 
          /// Hash sections in parallel, write index and footer.
          /// Must be called after all write_section() calls complete.

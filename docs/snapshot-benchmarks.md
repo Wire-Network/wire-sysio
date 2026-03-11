@@ -128,7 +128,7 @@ BLAKE3 is ~3-5x faster than SHA-256, especially on large data.
 ```
 [Header]  (8 bytes)
   magic:        uint32_t  (0x57495245 "WIRE")
-  version:      uint32_t  (2)
+  version:      uint32_t  (1)
 
 [Section Data]
   section 0 raw packed rows
