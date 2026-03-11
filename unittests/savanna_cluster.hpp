@@ -250,17 +250,17 @@ namespace savanna_cluster {
          return control->is_block_missing_finalizer_votes(head());
       }
 
-      std::string snapshot() const {
+      std::filesystem::path snapshot() const {
          dlog("node {} - taking snapshot", _node_idx);
-         auto writer = buffered_snapshot_suite::get_writer();
+         auto writer = threaded_snapshot_suite::get_writer();
          control->abort_block();
          control->write_snapshot(writer);
-         return buffered_snapshot_suite::finalize(writer);
+         return threaded_snapshot_suite::finalize(writer);
       }
 
-      void open_from_snapshot(const std::string& snapshot) {
+      void open_from_snapshot(const std::filesystem::path& snapshot) {
          dlog("node {} - restoring from snapshot", _node_idx);
-         open(buffered_snapshot_suite::get_reader(snapshot));
+         open(threaded_snapshot_suite::get_reader(snapshot));
       }
 
       std::vector<uint8_t> save_fsi() const {

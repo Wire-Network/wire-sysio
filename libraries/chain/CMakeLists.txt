@@ -109,6 +109,7 @@ add_library( sysio_chain
               apply_context.cpp
               abi_serializer.cpp
               asset.cpp
+              blake3_encoder.cpp
               snapshot.cpp
               snapshot_scheduler.cpp
               deep_mind.cpp

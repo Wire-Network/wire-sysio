@@ -833,11 +833,9 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
 
          // recover genesis information from the snapshot
          // used for validation code below
-         auto infile = std::ifstream(snapshot_path->generic_string(), (std::ios::in | std::ios::binary));
-         istream_snapshot_reader reader(infile);
+         threaded_snapshot_reader reader(*snapshot_path);
          reader.validate();
          chain_id = controller::extract_chain_id(reader);
-         infile.close();
 
          SYS_ASSERT(
            !options.contains( "genesis-timestamp" ),

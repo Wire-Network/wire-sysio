@@ -17,9 +17,16 @@
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/writer.h>
 
+#include <sysio/chain/blake3_encoder.hpp>
+#include <sysio/chain/thread_utils.hpp>
+
+#include <algorithm>
+
 using namespace sysio_rapidjson;
 
 namespace sysio { namespace chain {
+
+// ---- variant_snapshot_writer ----
 
 variant_snapshot_writer::variant_snapshot_writer(fc::mutable_variant_object& snapshot)
 : snapshot(snapshot)
@@ -44,6 +51,8 @@ void variant_snapshot_writer::write_end_section( ) {
 void variant_snapshot_writer::finalize() {
 
 }
+
+// ---- variant_snapshot_reader ----
 
 variant_snapshot_reader::variant_snapshot_reader(const fc::variant& snapshot)
 :snapshot(snapshot)
@@ -93,6 +102,16 @@ void variant_snapshot_reader::validate() {
    }
 }
 
+bool variant_snapshot_reader::has_section( const std::string& section_name ) const {
+   const auto& sections = snapshot["sections"].get_array();
+   for( const auto& section: sections ) {
+      if (section["name"].as_string() == section_name) {
+         return true;
+      }
+   }
+   return false;
+}
+
 void variant_snapshot_reader::set_section( const string& section_name ) {
    const auto& sections = snapshot["sections"].get_array();
    for( const auto& section: sections ) {
@@ -135,70 +154,116 @@ size_t variant_snapshot_reader::total_row_count() {
    return total;
 }
 
-ostream_snapshot_writer::ostream_snapshot_writer(std::ostream& snapshot)
-:snapshot(snapshot)
-,header_pos(snapshot.tellp())
-,section_pos(-1)
-,row_count(0)
+// ---- threaded_snapshot_writer (v1 binary format) ----
+
+threaded_snapshot_writer::threaded_snapshot_writer(std::filesystem::path snapshot_path)
+: snapshot_path_(std::move(snapshot_path))
+, out_(snapshot_path_, std::ios::binary)
+, wrapper_(out_)
 {
-   // write magic number
-   auto totem = magic_number;
-   snapshot.write((char*)&totem, sizeof(totem));
+   SYS_ASSERT(out_.good(), snapshot_exception, "Failed to open snapshot output file: {}", snapshot_path_.string());
 
-   // write version
-   auto version = current_snapshot_version;
-   snapshot.write((char*)&version, sizeof(version));
+   // Write header: magic(4) + version(4) = 8 bytes
+   const auto totem = magic_number;
+   out_.write(reinterpret_cast<const char*>(&totem), sizeof(totem));
+   uint32_t version = current_snapshot_version;
+   out_.write(reinterpret_cast<const char*>(&version), sizeof(version));
 }
 
-void ostream_snapshot_writer::write_start_section( const std::string& section_name )
-{
-   SYS_ASSERT(section_pos == std::streampos(-1), snapshot_exception, "Attempting to write a new section without closing the previous section");
-   section_pos = snapshot.tellp();
-   row_count = 0;
-
-   uint64_t placeholder = std::numeric_limits<uint64_t>::max();
-
-   // write a placeholder for the section size
-   snapshot.write((char*)&placeholder, sizeof(placeholder));
-
-   // write placeholder for row count
-   snapshot.write((char*)&placeholder, sizeof(placeholder));
-
-   // write the section name (null terminated)
-   snapshot.write(section_name.data(), section_name.size());
-   snapshot.put(0);
+void threaded_snapshot_writer::write_start_section(const std::string& section_name) {
+   current_section_name_ = section_name;
+   current_section_offset_ = static_cast<uint64_t>(out_.tellp());
+   current_row_count_ = 0;
 }
 
-void ostream_snapshot_writer::write_row( const detail::abstract_snapshot_row_writer& row_writer ) {
-   row_writer.write(snapshot);
-   row_count++;
+void threaded_snapshot_writer::write_row(const detail::abstract_snapshot_row_writer& row_writer) {
+   row_writer.write(wrapper_);
+   ++current_row_count_;
 }
 
-void ostream_snapshot_writer::write_end_section( ) {
-   auto restore = snapshot.tellp();
-
-   uint64_t section_size = restore - section_pos - sizeof(uint64_t);
-
-   snapshot.seekp(section_pos);
-
-   // write a the section size
-   snapshot.write((char*)&section_size, sizeof(section_size));
-
-   // write the row count
-   snapshot.write((char*)&row_count, sizeof(row_count));
-
-   snapshot.seekp(restore);
-
-   section_pos = std::streampos(-1);
-   row_count = 0;
+void threaded_snapshot_writer::write_end_section() {
+   section_info info;
+   info.name = std::move(current_section_name_);
+   info.data_offset = current_section_offset_;
+   info.data_size = static_cast<uint64_t>(out_.tellp()) - current_section_offset_;
+   info.row_count = current_row_count_;
+   // hash filled in by finalize()
+   sections_.push_back(std::move(info));
 }
 
-void ostream_snapshot_writer::finalize() {
-   uint64_t end_marker = std::numeric_limits<uint64_t>::max();
+void threaded_snapshot_writer::finalize() {
+   out_.flush();
 
-   // write a placeholder for the section size
-   snapshot.write((char*)&end_marker, sizeof(end_marker));
+   // Record where section data ends — index will be appended here
+   const uint64_t index_offset = static_cast<uint64_t>(out_.tellp());
+
+   // Sort sections by name for deterministic order
+   std::sort(sections_.begin(), sections_.end(),
+             [](const section_info& a, const section_info& b) { return a.name < b.name; });
+
+   // Hash each section in parallel using BLAKE3 (data is hot in page cache)
+   {
+      const uint32_t num_hash_threads = std::min<uint32_t>(max_threads, static_cast<uint32_t>(sections_.size()));
+
+      sync_threaded_work<struct snaphash> hash_workqueue;
+      auto& hash_ctx = hash_workqueue.io_context();
+
+      for(auto& s : sections_) {
+         boost::asio::post(hash_ctx, [this, &s]() {
+            std::ifstream in(snapshot_path_, std::ios::binary);
+            constexpr size_t buf_size = 4 * 1024 * 1024; // 4MB read buffer
+            auto buf = std::make_unique<char[]>(buf_size);
+
+            in.seekg(s.data_offset);
+
+            blake3_encoder hasher;
+
+            uint64_t remaining = s.data_size;
+            while(remaining > 0) {
+               const size_t to_read = std::min<uint64_t>(remaining, buf_size);
+               in.read(buf.get(), to_read);
+               hasher.write(buf.get(), to_read);
+               remaining -= to_read;
+            }
+
+            s.hash = hasher.result();
+         });
+      }
+
+      hash_workqueue.run(num_hash_threads);
+   }
+
+   // Compute root hash = BLAKE3(hash_0 || hash_1 || ... || hash_n)
+   {
+      blake3_encoder root_hasher;
+      for(const auto& s : sections_) {
+         root_hasher.write(s.hash.cdata(), s.hash.data_size());
+      }
+      root_hash_ = root_hasher.result();
+   }
+
+   const uint32_t num_sections = static_cast<uint32_t>(sections_.size());
+
+   // Write section index
+   for(const auto& s : sections_) {
+      out_.write(s.name.data(), s.name.size());
+      out_.put(0);
+      out_.write(reinterpret_cast<const char*>(&s.data_offset), sizeof(s.data_offset));
+      out_.write(reinterpret_cast<const char*>(&s.data_size), sizeof(s.data_size));
+      out_.write(reinterpret_cast<const char*>(&s.row_count), sizeof(s.row_count));
+      out_.write(s.hash.cdata(), s.hash.data_size());
+   }
+
+   // Write footer: num_sections + root_hash + index_offset
+   out_.write(reinterpret_cast<const char*>(&num_sections), sizeof(num_sections));
+   out_.write(root_hash_.cdata(), root_hash_.data_size());
+   out_.write(reinterpret_cast<const char*>(&index_offset), sizeof(index_offset));
+
+   out_.flush();
+   SYS_ASSERT(out_.good(), snapshot_exception, "Failed to write snapshot file: {}", snapshot_path_.string());
 }
+
+// ---- ostream_json_snapshot_writer ----
 
 ostream_json_snapshot_writer::ostream_json_snapshot_writer(std::ostream& snapshot)
       :snapshot(snapshot)
@@ -238,149 +303,7 @@ void ostream_json_snapshot_writer::finalize() {
    snapshot.inner.flush();
 }
 
-
-istream_snapshot_reader::istream_snapshot_reader(std::istream& snapshot)
-:snapshot(snapshot)
-,header_pos(snapshot.tellg())
-,num_rows(0)
-,cur_row(0)
-{
-
-}
-
-void istream_snapshot_reader::validate() {
-   // make sure to restore the read pos
-   auto restore_pos = fc::make_scoped_exit([this,pos=snapshot.tellg(),ex=snapshot.exceptions()](){
-      snapshot.seekg(pos);
-      snapshot.exceptions(ex);
-   });
-
-   snapshot.exceptions(std::istream::failbit|std::istream::eofbit);
-
-   try {
-      // validate totem
-      auto expected_totem = ostream_snapshot_writer::magic_number;
-      decltype(expected_totem) actual_totem;
-      snapshot.read((char*)&actual_totem, sizeof(actual_totem));
-      SYS_ASSERT(actual_totem == expected_totem, snapshot_exception,
-                 "Binary snapshot has unexpected magic number!");
-
-      // validate version
-      auto expected_version = current_snapshot_version;
-      decltype(expected_version) actual_version;
-      snapshot.read((char*)&actual_version, sizeof(actual_version));
-      SYS_ASSERT(actual_version == expected_version, snapshot_exception,
-                 "Binary snapshot is an unsupported version.  Expected : {}, Got: {}",
-                 expected_version, actual_version);
-
-      while (validate_section()) {}
-   } FC_LOG_AND_RETHROW()
-}
-
-bool istream_snapshot_reader::validate_section() const {
-   uint64_t section_size = 0;
-   snapshot.read((char*)&section_size,sizeof(section_size));
-
-   // stop when we see the end marker
-   if (section_size == std::numeric_limits<uint64_t>::max()) {
-      return false;
-   }
-
-   // seek past the section
-   snapshot.seekg(snapshot.tellg() + std::streamoff(section_size));
-
-   return true;
-}
-
-void istream_snapshot_reader::set_section( const string& section_name ) {
-   auto restore_pos = fc::make_scoped_exit([this,pos=snapshot.tellg()](){
-      snapshot.seekg(pos);
-   });
-
-   const std::streamoff header_size = sizeof(ostream_snapshot_writer::magic_number) + sizeof(current_snapshot_version);
-
-   auto next_section_pos = header_pos + header_size;
-
-   while (true) {
-      snapshot.seekg(next_section_pos);
-      uint64_t section_size = 0;
-      snapshot.read((char*)&section_size,sizeof(section_size));
-      if (section_size == std::numeric_limits<uint64_t>::max()) {
-         break;
-      }
-
-      next_section_pos = snapshot.tellg() + std::streamoff(section_size);
-
-      uint64_t row_count = 0;
-      snapshot.read((char*)&row_count,sizeof(row_count));
-
-      bool match = true;
-      for(auto c : section_name) {
-         if(snapshot.get() != c) {
-            match = false;
-            break;
-         }
-      }
-
-      if (match && snapshot.get() == 0) {
-         cur_row = 0;
-         num_rows = row_count;
-
-         // leave the stream at the right point
-         restore_pos.cancel();
-         return;
-      }
-   }
-
-   SYS_THROW(snapshot_exception, "Binary snapshot has no section named {}", section_name);
-}
-
-bool istream_snapshot_reader::read_row( detail::abstract_snapshot_row_reader& row_reader ) {
-   row_reader.provide(snapshot);
-   return ++cur_row < num_rows;
-}
-
-bool istream_snapshot_reader::empty ( ) {
-   return num_rows == 0;
-}
-
-void istream_snapshot_reader::clear_section() {
-   num_rows = 0;
-   cur_row = 0;
-}
-
-void istream_snapshot_reader::return_to_header() {
-   snapshot.seekg( header_pos );
-   clear_section();
-}
-
-size_t istream_snapshot_reader::total_row_count() {
-   size_t total = 0;
-
-   auto restore_pos = fc::make_scoped_exit([this,pos=snapshot.tellg()](){
-      snapshot.seekg(pos);
-   });
-
-   const std::streamoff header_size = sizeof(ostream_snapshot_writer::magic_number) + sizeof(current_snapshot_version);
-
-   std::streamoff next_section_pos = header_pos + header_size;
-
-   while(true) {
-      snapshot.seekg(next_section_pos);
-      uint64_t section_size = 0;
-      snapshot.read((char*)&section_size, sizeof(section_size));
-      if(section_size == std::numeric_limits<uint64_t>::max())
-         break;
-      next_section_pos = snapshot.tellg() + std::streamoff(section_size);
-
-      uint64_t row_count = 0;
-      snapshot.read((char*)&row_count, sizeof(row_count));
-
-      total += row_count;
-   }
-
-   return total;
-}
+// ---- istream_json_snapshot_reader ----
 
 struct istream_json_snapshot_reader_impl {
    uint64_t num_rows;
@@ -477,55 +400,119 @@ size_t istream_json_snapshot_reader::total_row_count() {
    return total;
 }
 
+// ---- threaded_snapshot_reader (v1 binary format) ----
+
 threaded_snapshot_reader::threaded_snapshot_reader(const std::filesystem::path& snapshot_path) :
   snapshot_file(snapshot_path, fc::random_access_file::read_only),
   mapped_snap(snapshot_file, boost::interprocess::read_only),
-  mapped_snap_addr((char*)mapped_snap.get_address()) {}
+  mapped_snap_addr((char*)mapped_snap.get_address())
+{
+   validate();
+}
 
 void threaded_snapshot_reader::validate() {
+   if(validated_)
+      return;
    try {
-      using magic_number_t = std::decay_t<decltype(ostream_snapshot_writer::magic_number)>;
-      using version_t = std::decay_t<decltype(current_snapshot_version)>;
+      const uint64_t file_size = mapped_snap.get_size();
+      // header = magic(uint32) + version(uint32), footer = num_sections(uint32) + root_hash(blake3) + index_offset(uint64)
+      constexpr uint64_t header_size = sizeof(uint32_t) + sizeof(uint32_t);
+      constexpr uint64_t footer_size = sizeof(uint32_t) + fc::crypto::blake3::byte_size + sizeof(uint64_t);
+      constexpr uint64_t min_file_size = header_size + footer_size;
 
-      SYS_ASSERT(snapshot_file.unpack_from<magic_number_t>(0) == ostream_snapshot_writer::magic_number, snapshot_exception, "Binary snapshot has unexpected magic number!");
+      SYS_ASSERT(file_size >= min_file_size, snapshot_exception, "Snapshot file too small");
 
-      const version_t actual_version = snapshot_file.unpack_from<version_t>(sizeof(magic_number_t));
+      // Read header
+      fc::datastream<const char*> hds(mapped_snap_addr, file_size);
+
+      uint32_t actual_magic;
+      hds.read(reinterpret_cast<char*>(&actual_magic), sizeof(actual_magic));
+      SYS_ASSERT(actual_magic == snapshot_writer::magic_number, snapshot_exception,
+                 "Binary snapshot has unexpected magic number!");
+
+      uint32_t actual_version;
+      hds.read(reinterpret_cast<char*>(&actual_version), sizeof(actual_version));
       SYS_ASSERT(actual_version == current_snapshot_version, snapshot_exception,
-                 "Binary snapshot is an unsuppored version.  Expected : {}, Got: {}",
+                 "Binary snapshot is an unsupported version. Expected: {}, Got: {}",
                  current_snapshot_version, actual_version);
 
-      uint64_t next_section_offs = sizeof(magic_number_t) + sizeof(version_t);
-      while(true) {
-         const uint64_t this_section_size = snapshot_file.unpack_from<uint64_t>(next_section_offs);
-         if(this_section_size == std::numeric_limits<uint64_t>::max())
-            break;
-         next_section_offs += sizeof(this_section_size) + this_section_size;
+      // Read footer from end of file
+      const char* footer_start = mapped_snap_addr + file_size - footer_size;
+      fc::datastream<const char*> fds(footer_start, footer_size);
+
+      uint32_t num_sections;
+      fds.read(reinterpret_cast<char*>(&num_sections), sizeof(num_sections));
+      fds.read(root_hash_.cdata(), root_hash_.data_size());
+      uint64_t index_offset;
+      fds.read(reinterpret_cast<char*>(&index_offset), sizeof(index_offset));
+
+      SYS_ASSERT(index_offset < file_size - footer_size, snapshot_exception,
+                 "Section index offset beyond file bounds");
+
+      // Parse section index at index_offset
+      fc::datastream<const char*> ids(mapped_snap_addr + index_offset, file_size - footer_size - index_offset);
+
+      section_index_.clear();
+      section_index_.reserve(num_sections);
+
+      for(uint32_t i = 0; i < num_sections; i++) {
+         section_entry entry;
+
+         // Read null-terminated section name
+         const char* name_start = ids.pos();
+         const char* p = name_start;
+         while(p < mapped_snap_addr + file_size && *p != '\0')
+            ++p;
+         SYS_ASSERT(p < mapped_snap_addr + file_size, snapshot_exception, "Section name not null-terminated");
+         entry.name.assign(name_start, p - name_start);
+         ids.skip(entry.name.size() + 1);
+
+         ids.read(reinterpret_cast<char*>(&entry.data_offset), sizeof(entry.data_offset));
+         ids.read(reinterpret_cast<char*>(&entry.data_size), sizeof(entry.data_size));
+         ids.read(reinterpret_cast<char*>(&entry.row_count), sizeof(entry.row_count));
+         ids.read(entry.hash.cdata(), entry.hash.data_size());
+
+         SYS_ASSERT(entry.data_offset + entry.data_size <= file_size, snapshot_exception,
+                    "Section '{}' data extends beyond end of file", entry.name);
+
+         section_index_.push_back(std::move(entry));
       }
+
+      // Verify root hash (BLAKE3)
+      fc::crypto::blake3 computed_root;
+      {
+         blake3_encoder root_hasher;
+         for(const auto& entry : section_index_) {
+            root_hasher.write(entry.hash.cdata(), entry.hash.data_size());
+         }
+         computed_root = root_hasher.result();
+      }
+      SYS_ASSERT(computed_root == root_hash_, snapshot_exception,
+                 "Snapshot root hash mismatch. File may be corrupted.");
+
+      validated_ = true;
    } FC_LOG_AND_RETHROW()
 }
 
+bool threaded_snapshot_reader::has_section(const std::string& section_name) const {
+   for(const auto& entry : section_index_) {
+      if(entry.name == section_name) {
+         return true;
+      }
+   }
+   return false;
+}
+
 void threaded_snapshot_reader::set_section(const string& section_name) {
-   using magic_number_t = std::decay_t<decltype(ostream_snapshot_writer::magic_number)>;
-   using version_t = std::decay_t<decltype(current_snapshot_version)>;
+   SYS_ASSERT(validated_, snapshot_exception, "Snapshot must be validated before reading sections");
 
-   uint64_t next_section_offs = sizeof(magic_number_t) + sizeof(version_t);
-   while(true) {
-      const uint64_t this_section_size      = snapshot_file.unpack_from<uint64_t>(next_section_offs);
-      const uint64_t this_section_row_count = snapshot_file.unpack_from<uint64_t>(next_section_offs + sizeof(uint64_t));
-      const uint64_t section_name_offset    = next_section_offs + sizeof(uint64_t) + sizeof(uint64_t);
-      const uint64_t section_data_offset    = section_name_offset + section_name.size() + 1;
-
-      //section size does not include the section size record itself, so + sizeof(uint64_t)
-      SYS_ASSERT(next_section_offs + this_section_size + sizeof(uint64_t) < mapped_snap.get_size(), snapshot_exception, "Binary snapshot section too short");
-
-      if(strncmp(section_name.c_str(), mapped_snap_addr+section_name_offset, section_name.size() + 1) == 0) {
+   for(const auto& entry : section_index_) {
+      if(entry.name == section_name) {
          cur_row = 0;
-         num_rows = this_section_row_count;
-         ds = fc::datastream<const char*>(mapped_snap_addr+section_data_offset, mapped_snap.get_size() - section_data_offset);
+         num_rows = entry.row_count;
+         ds = fc::datastream<const char*>(mapped_snap_addr + entry.data_offset, entry.data_size);
          return;
       }
-
-      next_section_offs += sizeof(this_section_size) + this_section_size;
    }
 
    SYS_THROW(snapshot_exception, "Binary snapshot has no section named {}",  section_name);
@@ -559,44 +546,44 @@ void threaded_snapshot_reader::return_to_header() {
 }
 
 size_t threaded_snapshot_reader::total_row_count() {
-   using magic_number_t = std::decay_t<decltype(ostream_snapshot_writer::magic_number)>;
-   using version_t = std::decay_t<decltype(current_snapshot_version)>;
+   SYS_ASSERT(validated_, snapshot_exception, "Snapshot must be validated before querying row count");
 
    size_t total = 0;
-   uint64_t next_section_offs = sizeof(magic_number_t) + sizeof(version_t);
-   while(true) {
-      const uint64_t this_section_size = snapshot_file.unpack_from<uint64_t>(next_section_offs);
-      if(this_section_size == std::numeric_limits<uint64_t>::max())
-         break;
-
-      total += snapshot_file.unpack_from<uint64_t>(next_section_offs + sizeof(uint64_t));
-      next_section_offs = next_section_offs + this_section_size + sizeof(uint64_t);
+   for(const auto& entry : section_index_) {
+      total += entry.row_count;
    }
-
    return total;
 }
 
-integrity_hash_snapshot_writer::integrity_hash_snapshot_writer(fc::sha256::encoder& enc)
-:enc(enc)
-{
-}
+// ---- integrity_hash_snapshot_writer ----
+// Produces the same root hash as threaded_snapshot_writer by hashing each
+// section independently with BLAKE3, sorting by name, then combining.
 
-void integrity_hash_snapshot_writer::write_start_section( const std::string& )
-{
-   // no-op for structural details
+void integrity_hash_snapshot_writer::write_start_section( const std::string& section_name ) {
+   current_section_name_ = section_name;
+   current_encoder_.reset();
 }
 
 void integrity_hash_snapshot_writer::write_row( const detail::abstract_snapshot_row_writer& row_writer ) {
-   row_writer.write(enc);
+   row_writer.write(current_encoder_);
 }
 
-void integrity_hash_snapshot_writer::write_end_section( ) {
-   // no-op for structural details
+void integrity_hash_snapshot_writer::write_end_section() {
+   section_hashes_.push_back({std::move(current_section_name_), current_encoder_.result()});
 }
 
 void integrity_hash_snapshot_writer::finalize() {
-   // no-op for structural details
+   std::sort(section_hashes_.begin(), section_hashes_.end(),
+             [](const section_hash& a, const section_hash& b) { return a.name < b.name; });
+
+   blake3_encoder root_hasher;
+   for(const auto& s : section_hashes_) {
+      root_hasher.write(s.hash.cdata(), s.hash.data_size());
+   }
+   root_hash_ = root_hasher.result();
 }
+
+// ---- snapshot_info ----
 
 fc::variant snapshot_info(snapshot_reader& snapshot) {
    chain_snapshot_header header;

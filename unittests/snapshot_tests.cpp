@@ -4,6 +4,7 @@
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
 #include <sysio/chain/s_root_extension.hpp>
+#include <sysio/chain/contract_table_objects.hpp>
 #include <sysio/testing/tester.hpp>
 #include "snapshot_suites.hpp"
 #include <snapshots.hpp>
@@ -507,24 +508,32 @@ void compatible_versions_test()
    std::string current_version = "v1";
 
    int ordinal = 0;
-   // No need to support old snapshots for Wire 6.0
-   for(std::string version : {"v1"})
-   {
-      if(save_snapshot && version == current_version) continue;
-      auto old_snapshot = SNAPSHOT_SUITE::load_from_file("snap_" + version);
-      BOOST_TEST_CHECKPOINT("loading snapshot: " << version);
+
+   // Load the reference v1 snapshot from disk and verify it matches the base chain
+   if(!save_snapshot) {
+      auto old_snapshot = SNAPSHOT_SUITE::load_from_file("snap_" + current_version);
+      BOOST_TEST_CHECKPOINT("loading reference snapshot: " << current_version);
       snapshotted_tester old_snapshot_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(old_snapshot), ordinal++);
       verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *old_snapshot_tester.control);
-
-      // create a latest snapshot
-      auto latest_writer = SNAPSHOT_SUITE::get_writer();
-      old_snapshot_tester.control->write_snapshot(latest_writer);
-      auto latest = SNAPSHOT_SUITE::finalize(latest_writer);
-
-      // load the latest snapshot
-      snapshotted_tester latest_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(latest), ordinal++);
-      verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *latest_tester.control);
    }
+
+   // Create a snapshot from the current chain
+   auto latest_writer = SNAPSHOT_SUITE::get_writer();
+   base_chain.control->write_snapshot(latest_writer);
+   auto latest = SNAPSHOT_SUITE::finalize(latest_writer);
+
+   // Load snapshot and verify integrity
+   snapshotted_tester latest_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(latest), ordinal++);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *latest_tester.control);
+
+   // Round-trip: create another snapshot from the loaded one
+   auto roundtrip_writer = SNAPSHOT_SUITE::get_writer();
+   latest_tester.control->write_snapshot(roundtrip_writer);
+   auto roundtrip = SNAPSHOT_SUITE::finalize(roundtrip_writer);
+
+   // Load and verify the round-tripped snapshot
+   snapshotted_tester roundtrip_tester(base_chain.get_config(), SNAPSHOT_SUITE::get_reader(roundtrip), ordinal++);
+   verify_integrity_hash<SNAPSHOT_SUITE>(*base_chain.control, *roundtrip_tester.control);
    // This isn't quite fully automated.  The snapshots still need to be gzipped and moved to
    // the correct place in the source tree.
    // -------------------------------------------------------------------------------------------------------------
@@ -539,9 +548,7 @@ void compatible_versions_test()
    // 5. add the 3 new snapshot files in git.
    // -------------------------------------------------------------------------------------------------------------
    // Only want to save one snapshot, use Savanna as that is the latest
-   // And skip the threaded_snapshot_suite: its saving-to-file ability isn't implemented and, besides, its snapshot
-   //  creation half just uses the ostream snapshot writer again (using writer_t = ostream_snapshot_writer)
-   if constexpr (std::is_same_v<TESTER, savanna_tester> && !std::is_same_v<SNAPSHOT_SUITE, threaded_snapshot_suite>) {
+   if constexpr (std::is_same_v<TESTER, savanna_tester>) {
       if (save_snapshot)
       {
          // create a latest snapshot
@@ -662,55 +669,37 @@ BOOST_AUTO_TEST_CASE_TEMPLATE( json_snapshot_validity_test, TESTER, testers )
    chain.produce_block();
    chain.control->abort_block();
 
-   auto pid_string = std::to_string(getpid());
-   auto bin_file = pid_string + "BinSnapshot";
-   auto json_file = pid_string + "JsonSnapshot";
-   auto bin_from_json_file = pid_string + "BinFromJsonSnapshot";
-
-   // create bin snapshot
-   auto writer_bin = buffered_snapshot_suite::get_writer();
+   // create binary snapshot
+   auto writer_bin = threaded_snapshot_suite::get_writer();
    chain.control->write_snapshot(writer_bin);
-   auto snapshot_bin = buffered_snapshot_suite::finalize(writer_bin);
-   buffered_snapshot_suite::write_to_file(bin_file, snapshot_bin);
+   auto snapshot_bin = threaded_snapshot_suite::finalize(writer_bin);
 
    // create json snapshot
    auto writer_json = json_snapshot_suite::get_writer();
    chain.control->write_snapshot(writer_json);
    auto snapshot_json = json_snapshot_suite::finalize(writer_json);
-   json_snapshot_suite::write_to_file(json_file, snapshot_json);
 
-   // load bin snapshot
-   auto snapshot_bin_read = buffered_snapshot_suite::load_from_file(bin_file);
-   auto reader_bin = buffered_snapshot_suite::get_reader(snapshot_bin_read);
+   // load binary snapshot
+   auto reader_bin = threaded_snapshot_suite::get_reader(snapshot_bin);
    snapshotted_tester tester_bin(chain.get_config(), reader_bin, ordinal++);
 
    // load json snapshot
-   auto snapshot_json_read = json_snapshot_suite::load_from_file(json_file);
-   auto reader_json = json_snapshot_suite::get_reader(snapshot_json_read);
+   auto reader_json = json_snapshot_suite::get_reader(snapshot_json);
    snapshotted_tester tester_json(chain.get_config(), reader_json, ordinal++);
 
-   // create bin snapshot from loaded json snapshot
-   auto writer_bin_from_json = buffered_snapshot_suite::get_writer();
+   // create binary snapshot from the JSON-loaded chain
+   auto writer_bin_from_json = threaded_snapshot_suite::get_writer();
    tester_json.control->write_snapshot(writer_bin_from_json);
-   auto snapshot_bin_from_json = buffered_snapshot_suite::finalize(writer_bin_from_json);
-   buffered_snapshot_suite::write_to_file(bin_from_json_file, snapshot_bin_from_json);
+   auto snapshot_bin_from_json = threaded_snapshot_suite::finalize(writer_bin_from_json);
 
-   // load new bin snapshot
-   auto snapshot_bin_from_json_read = buffered_snapshot_suite::load_from_file(bin_from_json_file);
-   auto reader_bin_from_json = buffered_snapshot_suite::get_reader(snapshot_bin_from_json_read);
+   // load the binary-from-json snapshot
+   auto reader_bin_from_json = threaded_snapshot_suite::get_reader(snapshot_bin_from_json);
    snapshotted_tester tester_bin_from_json(chain.get_config(), reader_bin_from_json, ordinal++);
 
-   // ensure all snapshots are equal
-   verify_integrity_hash<buffered_snapshot_suite>(*tester_bin_from_json.control, *tester_bin.control);
-   verify_integrity_hash<buffered_snapshot_suite>(*tester_bin_from_json.control, *tester_json.control);
-   verify_integrity_hash<buffered_snapshot_suite>(*tester_json.control, *tester_bin.control);
-
-   auto bin_snap_path = std::filesystem::path(snapshot_file<snapshot::binary>::base_path) / bin_file;
-   auto bin_from_json_snap_path = std::filesystem::path(snapshot_file<snapshot::binary>::base_path) / bin_from_json_file;
-   auto json_snap_path = std::filesystem::path(snapshot_file<snapshot::json>::base_path) / json_file;
-   remove(bin_snap_path);
-   remove(bin_from_json_snap_path);
-   remove(json_snap_path);
+   // ensure all three chains have identical integrity hashes
+   verify_integrity_hash<variant_snapshot_suite>(*tester_bin_from_json.control, *tester_bin.control);
+   verify_integrity_hash<variant_snapshot_suite>(*tester_bin_from_json.control, *tester_json.control);
+   verify_integrity_hash<variant_snapshot_suite>(*tester_json.control, *tester_bin.control);
 }
 
 template<typename TESTER, typename SNAPSHOT_SUITE>
@@ -746,5 +735,289 @@ void jumbo_row_test()
 
    snapshotted_tester sst(chain.get_config(), SNAPSHOT_SUITE::get_reader(snapshot), 0);
 }
+
+// Verify that two independently generated snapshots at the same block produce
+// identical root hashes (determinism test)
+BOOST_AUTO_TEST_CASE( snapshot_determinism_test )
+{
+   savanna_tester chain;
+
+   chain.create_account("snapshot"_n);
+   chain.produce_block();
+   chain.set_code("snapshot"_n, test_contracts::snapshot_test_wasm());
+   chain.set_abi("snapshot"_n, test_contracts::snapshot_test_abi());
+   chain.produce_block();
+
+   // push some actions to create contract state
+   for (int i = 0; i < 5; i++) {
+      chain.push_action("snapshot"_n, "increment"_n, "snapshot"_n,
+                        mutable_variant_object()("value", i + 1));
+      chain.produce_block();
+   }
+   chain.control->abort_block();
+
+   // Take two snapshots from the same chain state
+   auto writer1 = threaded_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer1);
+   auto snap1_path = threaded_snapshot_suite::finalize(writer1);
+
+   auto writer2 = threaded_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer2);
+   auto snap2_path = threaded_snapshot_suite::finalize(writer2);
+
+   // Read back and compare root hashes
+   auto reader1 = std::make_shared<threaded_snapshot_reader>(snap1_path);
+   auto reader2 = std::make_shared<threaded_snapshot_reader>(snap2_path);
+
+   BOOST_REQUIRE_EQUAL(reader1->get_root_hash().str(), reader2->get_root_hash().str());
+
+   // Verify that the integrity hash matches the snapshot root hash
+   auto integrity_hash = chain.control->calculate_integrity_hash();
+   BOOST_REQUIRE_EQUAL(integrity_hash.str(), reader1->get_root_hash().str());
+
+   // Also verify the snapshots produce working chains with matching integrity hashes
+   int ordinal = 0;
+   snapshotted_tester t1(chain.get_config(), reader1, ordinal++);
+   reader2 = std::make_shared<threaded_snapshot_reader>(snap2_path);
+   snapshotted_tester t2(chain.get_config(), reader2, ordinal++);
+
+   verify_integrity_hash<threaded_snapshot_suite>(*t1.control, *t2.control);
+   verify_integrity_hash<threaded_snapshot_suite>(*chain.control, *t1.control);
+}
+
+#ifdef RUN_PERF_BENCHMARKS
+// Performance benchmark: threaded (parallel) vs variant (sequential) snapshot write/read
+// Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_perf_benchmark -- --sys-vm
+BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
+{
+   // --- Configuration ---
+   constexpr uint32_t num_tables  = 1000;   // number of table_id entries
+   constexpr uint32_t rows_per_table = 1000; // key_value rows per table
+   constexpr uint32_t value_size  = 512;    // bytes per row value
+
+   const uint32_t total_rows = num_tables * rows_per_table;
+   const uint64_t estimated_data = uint64_t(total_rows) * (value_size + 40);
+   auto msg = [](const std::string& s) { BOOST_TEST_MESSAGE(s); };
+   msg(fmt::format("Benchmark: {} tables x {} rows x {} bytes = ~{} MB estimated data",
+       num_tables, rows_per_table, value_size, estimated_data / (1024*1024)));
+
+   // --- Setup chain with data ---
+   fc::temp_directory tempdir;
+   auto cfg = tester::default_config(tempdir);
+   cfg.first.state_size = 1024ull * 1024 * 1024; // 1GB state
+   savanna_tester chain(cfg.first, cfg.second);
+   chain.produce_block();
+
+   // Directly insert rows into chainbase (bypasses WASM, much faster)
+   {
+      auto& db = const_cast<chainbase::database&>(chain.control->db());
+
+      // Seed for deterministic pseudo-random data
+      uint64_t seed = 0x12345678ABCDEF01ULL;
+      auto next_seed = [&seed]() {
+         seed ^= seed << 13;
+         seed ^= seed >> 7;
+         seed ^= seed << 17;
+         return seed;
+      };
+
+      for (uint32_t tbl = 0; tbl < num_tables; tbl++) {
+         // Create a table_id_object
+         const auto& tid = db.create<table_id_object>([&](table_id_object& obj) {
+            obj.code  = account_name(tbl + 100); // unique code per table
+            obj.scope = name("benchmark");
+            obj.table = name("data");
+            obj.payer = config::system_account_name;
+            obj.count = rows_per_table;
+         });
+
+         // Create key_value rows for this table
+         for (uint32_t r = 0; r < rows_per_table; r++) {
+            db.create<key_value_object>([&](key_value_object& obj) {
+               obj.t_id = tid.id;
+               obj.primary_key = r;
+               obj.payer = config::system_account_name;
+               obj.value.resize_and_fill(value_size, [&](char* data, std::size_t sz) {
+                  for (std::size_t i = 0; i < sz; i += 8) {
+                     uint64_t v = next_seed();
+                     std::memcpy(data + i, &v, std::min<std::size_t>(8, sz - i));
+                  }
+               });
+            });
+         }
+      }
+   }
+
+   chain.produce_block();
+   chain.control->abort_block();
+
+   msg(fmt::format("Chain populated: {} key_value rows in {} tables", total_rows, num_tables));
+
+   // --- Benchmark: Threaded (parallel) snapshot write ---
+   auto tp0 = std::chrono::high_resolution_clock::now();
+   auto writer_thr = threaded_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer_thr);
+   auto snap_thr = threaded_snapshot_suite::finalize(writer_thr);
+   auto tp1 = std::chrono::high_resolution_clock::now();
+
+   auto write_thr_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp1 - tp0).count();
+   auto snap_size = std::filesystem::file_size(snap_thr);
+
+   msg(fmt::format("Threaded WRITE: {} ms, size: {} bytes ({} MB)", write_thr_ms, snap_size, snap_size / (1024*1024)));
+
+   // --- Benchmark: Threaded (parallel) snapshot read ---
+   auto tp2 = std::chrono::high_resolution_clock::now();
+   auto reader_thr = threaded_snapshot_suite::get_reader(snap_thr);
+   snapshotted_tester snap_chain_thr(chain.get_config(), reader_thr, 0);
+   auto tp3 = std::chrono::high_resolution_clock::now();
+
+   auto read_thr_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp3 - tp2).count();
+   msg(fmt::format("Threaded READ:  {} ms", read_thr_ms));
+
+   // --- Benchmark: Variant (sequential) snapshot write ---
+   auto tp4 = std::chrono::high_resolution_clock::now();
+   auto writer_var = variant_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer_var);
+   auto snap_var = variant_snapshot_suite::finalize(writer_var);
+   auto tp5 = std::chrono::high_resolution_clock::now();
+
+   auto write_var_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp5 - tp4).count();
+   msg(fmt::format("Variant WRITE:  {} ms (sequential, in-memory)", write_var_ms));
+
+   // --- Benchmark: Variant (sequential) snapshot read ---
+   auto tp6 = std::chrono::high_resolution_clock::now();
+   auto reader_var = variant_snapshot_suite::get_reader(snap_var);
+   snapshotted_tester snap_chain_var(chain.get_config(), reader_var, 1);
+   auto tp7 = std::chrono::high_resolution_clock::now();
+
+   auto read_var_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp7 - tp6).count();
+   msg(fmt::format("Variant READ:   {} ms (sequential, in-memory)", read_var_ms));
+
+   // --- Verify integrity ---
+   verify_integrity_hash<variant_snapshot_suite>(*chain.control, *snap_chain_thr.control);
+   verify_integrity_hash<variant_snapshot_suite>(*chain.control, *snap_chain_var.control);
+
+   // --- Summary ---
+   msg("=== BENCHMARK SUMMARY ===");
+   msg(fmt::format("Data: {} rows, {} tables, ~{} MB payload", total_rows, num_tables, estimated_data / (1024*1024)));
+   msg(fmt::format("Snapshot size: {} MB", snap_size / (1024*1024)));
+   double write_speedup = write_thr_ms > 0 ? (double)write_var_ms / write_thr_ms : 0.0;
+   double read_speedup  = read_thr_ms > 0 ? (double)read_var_ms / read_thr_ms : 0.0;
+   msg(fmt::format("Threaded write: {} ms | Variant write: {} ms | Speedup: {:.2f}x",
+       write_thr_ms, write_var_ms, write_speedup));
+   msg(fmt::format("Threaded read:  {} ms | Variant read:  {} ms | Speedup: {:.2f}x",
+       read_thr_ms, read_var_ms, read_speedup));
+}
+
+// Large-scale snapshot benchmark (~40GB, mimicking EOS mainnet proportions)
+// Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark -- --sys-vm
+// Requires ~60GB RAM. Skip variant (would need another 40GB+ for in-memory JSON).
+BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
+{
+   // EOS mainnet: 262M kv rows (20GB) + 20M tables + secondaries (16GB) ≈ 40GB
+   // Simplified: key_value rows only to match total size.
+   // 50M rows × 800 bytes ≈ 40GB
+   constexpr uint32_t num_tables     = 20000;
+   constexpr uint32_t rows_per_table = 2500;
+   constexpr uint32_t value_size     = 800;
+
+   const uint64_t total_rows = uint64_t(num_tables) * rows_per_table;
+   const uint64_t estimated_data = total_rows * (value_size + 40);
+   auto msg = [](const std::string& s) { BOOST_TEST_MESSAGE(s); };
+   msg(fmt::format("Large benchmark: {} tables x {} rows x {} bytes = ~{} GB estimated",
+       num_tables, rows_per_table, value_size, estimated_data / (1024*1024*1024)));
+
+   fc::temp_directory tempdir;
+   auto cfg = tester::default_config(tempdir);
+   cfg.first.state_size = 55ull * 1024 * 1024 * 1024; // 55GB state
+   savanna_tester chain(cfg.first, cfg.second);
+   chain.produce_block();
+
+   // Populate chainbase
+   auto pop_start = std::chrono::high_resolution_clock::now();
+   {
+      auto& db = const_cast<chainbase::database&>(chain.control->db());
+
+      uint64_t seed = 0x12345678ABCDEF01ULL;
+      auto next_seed = [&seed]() {
+         seed ^= seed << 13;
+         seed ^= seed >> 7;
+         seed ^= seed << 17;
+         return seed;
+      };
+
+      for (uint32_t tbl = 0; tbl < num_tables; tbl++) {
+         const auto& tid = db.create<table_id_object>([&](table_id_object& obj) {
+            obj.code  = account_name(tbl + 100);
+            obj.scope = name("benchmark");
+            obj.table = name("data");
+            obj.payer = config::system_account_name;
+            obj.count = rows_per_table;
+         });
+
+         for (uint32_t r = 0; r < rows_per_table; r++) {
+            db.create<key_value_object>([&](key_value_object& obj) {
+               obj.t_id = tid.id;
+               obj.primary_key = r;
+               obj.payer = config::system_account_name;
+               obj.value.resize_and_fill(value_size, [&](char* data, std::size_t sz) {
+                  for (std::size_t i = 0; i < sz; i += 8) {
+                     uint64_t v = next_seed();
+                     std::memcpy(data + i, &v, std::min<std::size_t>(8, sz - i));
+                  }
+               });
+            });
+         }
+
+         if (tbl % 2000 == 0 && tbl > 0)
+            msg(fmt::format("  populated {}/{} tables...", tbl, num_tables));
+      }
+   }
+
+   chain.produce_block();
+   chain.control->abort_block();
+
+   auto pop_end = std::chrono::high_resolution_clock::now();
+   auto pop_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pop_end - pop_start).count();
+   msg(fmt::format("Chain populated: {} rows in {} tables ({} ms)", total_rows, num_tables, pop_ms));
+
+   // --- Threaded WRITE ---
+   auto tp0 = std::chrono::high_resolution_clock::now();
+   auto writer_thr = threaded_snapshot_suite::get_writer();
+   chain.control->write_snapshot(writer_thr);
+   auto snap_path = threaded_snapshot_suite::finalize(writer_thr);
+   auto tp1 = std::chrono::high_resolution_clock::now();
+
+   auto write_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp1 - tp0).count();
+   auto snap_size = std::filesystem::file_size(snap_path);
+   double write_throughput = (double)snap_size / (1024*1024) / ((double)write_ms / 1000);
+
+   msg(fmt::format("Threaded WRITE: {} ms, size: {:.2f} GB, throughput: {:.0f} MB/s",
+       write_ms, (double)snap_size / (1024*1024*1024), write_throughput));
+
+   // --- Threaded READ ---
+   auto tp2 = std::chrono::high_resolution_clock::now();
+   auto reader_thr = threaded_snapshot_suite::get_reader(snap_path);
+   snapshotted_tester snap_chain(chain.get_config(), reader_thr, 0);
+   auto tp3 = std::chrono::high_resolution_clock::now();
+
+   auto read_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp3 - tp2).count();
+   double read_throughput = (double)snap_size / (1024*1024) / ((double)read_ms / 1000);
+
+   msg(fmt::format("Threaded READ:  {} ms, throughput: {:.0f} MB/s", read_ms, read_throughput));
+
+   // --- Verify ---
+   verify_integrity_hash<threaded_snapshot_suite>(*chain.control, *snap_chain.control);
+   msg("Integrity hash verified");
+
+   // --- Summary ---
+   msg("=== LARGE BENCHMARK SUMMARY ===");
+   msg(fmt::format("Snapshot: {:.2f} GB, {} rows, {} tables",
+       (double)snap_size / (1024*1024*1024), total_rows, num_tables));
+   msg(fmt::format("Populate: {:.1f}s", (double)pop_ms / 1000));
+   msg(fmt::format("Write:    {:.1f}s ({:.0f} MB/s)", (double)write_ms / 1000, write_throughput));
+   msg(fmt::format("Read:     {:.1f}s ({:.0f} MB/s)", (double)read_ms / 1000, read_throughput));
+}
+#endif // RUN_PERF_BENCHMARKS
 
 BOOST_AUTO_TEST_SUITE_END()
