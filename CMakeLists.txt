@@ -222,6 +222,10 @@ install(FILES ${CMAKE_BINARY_DIR}/lib/cmake/sysio/SysioCheckVersion.cmake DESTIN
 
 include(cmake/licenses.cmake)
 
+# Merge compile_commands.json from ExternalProject contract builds with the root
+# project's database so that IDEs (CLion, clangd) can navigate contract sources.
+add_merged_compile_commands_target()
+
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/licenses/sysio" DESTINATION "${CMAKE_INSTALL_FULL_DATAROOTDIR}/licenses/")
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libraries/testing/contracts DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/sysio_testing/libraries/testing COMPONENT dev EXCLUDE_FROM_ALL
