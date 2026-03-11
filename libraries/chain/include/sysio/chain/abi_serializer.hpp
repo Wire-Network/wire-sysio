@@ -147,7 +147,7 @@ private:
    map<name,type_name>                        tables;
    map<uint64_t, string>                      error_messages;
    map<type_name, variant_def, std::less<>>   variants;
-   map<type_name, enum_def, std::less<>>     enums;
+   map<type_name, enum_def, std::less<>>      enums;
    map<name,type_name>                        action_results;
 
    map<type_name, pair<unpack_function, pack_function>, std::less<>> built_in_types;
