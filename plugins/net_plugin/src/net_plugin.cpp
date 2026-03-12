@@ -1414,7 +1414,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::blk_send_branch( const block_id_type& msg_head_id ) {
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
 
       peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
@@ -1431,7 +1431,13 @@ namespace sysio {
          }
       }
       const auto fork_db_root_num = peer_fork_db_root_num.load( std::memory_order_relaxed );
-      if( fork_db_root_num == 0 ) return; // if fork_db_root_id is null (we have not received handshake or reset)
+      if( fork_db_root_num == 0 ) {
+         // Peer handshake not yet received; send our handshake so the peer can establish
+         // our fork_db_root_num and retry the sync exchange with proper state.
+         peer_dlog( p2p_blk_log, this, "block_request received before peer handshake, sending handshake" );
+         send_handshake();
+         return;
+      }
 
       auto msg_head_num = block_header::num_from_id(msg_head_id);
       if (msg_head_num == 0) {
@@ -1456,7 +1462,7 @@ namespace sysio {
    // called from connection strand
    void connection::blk_send_branch_from_nack_request( const block_id_type& msg_head_id, const block_id_type& req_id ) {
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
       // peer head might be unknown if our LIB has moved past it, so if unknown then just send the requested block
       if (on_fork) { // send from lib if we know they are on a fork
          // a more complicated better approach would be to find where the fork branches and send from there, for now use lib
@@ -2313,6 +2319,13 @@ namespace sysio {
                peer_dlog(p2p_msg_log, c, "Sending block_request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
                block_request_message req; // my_head_id zero = send from root
                c->enqueue( req );
+            } else if (!unknown_block) {
+               // Peer is behind but not on fork; send missing blocks.
+               // This covers the case where the peer's earlier block_request_message was
+               // dropped because it arrived before this handshake set peer_fork_db_root_num.
+               peer_dlog(p2p_blk_log, c, "Peer behind, sending blocks {} - {}", msg_fhead_num + 1, chain_info.fork_db_head_num);
+               c->blk_send_branch(msg_fhead_num, chain_info.fork_db_root_num,
+                                  chain_info.fork_db_head_num, peer_sync_state::sync_t::peer_catchup);
             }
          } catch( ... ) {}
          return;
