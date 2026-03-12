@@ -36,11 +36,11 @@ namespace sysio {
 
       void clear_write_queue() {
          fc::lock_guard g( _mtx );
-         _ctrl_write_queue.clear();
-         _block_write_queue.clear();
-         _sync_write_queue.clear();
-         _trx_write_queue.clear();
-         _write_queue_size.store(0, std::memory_order_relaxed);
+         _ctrl_wq.clear();
+         _block_wq.clear();
+         _sync_wq.clear();
+         _trx_wq.clear();
+         _wq_size.store(0, std::memory_order_relaxed);
          _write_drain_pending.store(false, std::memory_order_relaxed);
       }
 
@@ -48,7 +48,7 @@ namespace sysio {
       void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
 
       uint32_t write_queue_size() const {
-         return _write_queue_size.load(std::memory_order_relaxed);
+         return _wq_size.load(std::memory_order_relaxed);
       }
 
       // Returns true if caller wins the drain race; false if a drain is already pending.
@@ -64,7 +64,7 @@ namespace sysio {
          fc::unique_lock g( _mtx );
          // if out_queue is not empty then async_write is in progress
          const bool async_write_in_progress = !_out_queue.empty();
-         const bool ready = !async_write_in_progress && _write_queue_size.load(std::memory_order_relaxed) != 0;
+         const bool ready = !async_write_in_progress && _wq_size.load(std::memory_order_relaxed) != 0;
          g.unlock();
          if (async_write_in_progress) {
             fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
@@ -82,30 +82,30 @@ namespace sysio {
                                  std::optional<block_num_type> block_num) {
          fc::lock_guard g( _mtx );
          if( net_msg == msg_type_t::transaction_message || net_msg == msg_type_t::transaction_notice_message ) {
-            _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
+            _trx_wq.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else if (queue == queue_t::block_sync) {
-            _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
+            _sync_wq.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else if (net_msg == msg_type_t::signed_block) {
-            _block_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
+            _block_wq.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          } else {
-            _ctrl_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
+            _ctrl_wq.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
          }
-         auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
+         auto new_size = _wq_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
          return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
       }
 
       void fill_out_buffer( small_buf_vector& bufs ) {
          fc::lock_guard g( _mtx );
-         if (!_ctrl_write_queue.empty()) { // always send ctrl/consensus msgs first (votes, handshakes)
-            fill_out_buffer( bufs, _ctrl_write_queue );
-         } else if (!_sync_write_queue.empty()) { // then sync blocks
-            fill_out_buffer( bufs, _sync_write_queue );
-         } else if (!_block_write_queue.empty()) { // then head blocks
-            fill_out_buffer( bufs, _block_write_queue );
+         if (!_ctrl_wq.empty()) { // always send ctrl/consensus msgs first (votes, handshakes)
+            fill_out_buffer( bufs, _ctrl_wq );
+         } else if (!_sync_wq.empty()) { // then sync blocks
+            fill_out_buffer( bufs, _sync_wq );
+         } else if (!_block_wq.empty()) { // then head blocks
+            fill_out_buffer( bufs, _block_wq );
          } else {
-            fill_out_buffer( bufs, _trx_write_queue );
-            assert(_trx_write_queue.empty() && _block_write_queue.empty() && _sync_write_queue.empty() &&
-                   _ctrl_write_queue.empty() && _write_queue_size.load(std::memory_order_relaxed) == 0);
+            fill_out_buffer( bufs, _trx_wq );
+            assert(_trx_wq.empty() && _block_wq.empty() && _sync_wq.empty() &&
+                   _ctrl_wq.empty() && _wq_size.load(std::memory_order_relaxed) == 0);
          }
       }
 
@@ -123,23 +123,23 @@ namespace sysio {
          while ( !w_queue.empty() ) {
             auto& m = w_queue.front();
             bufs.emplace_back( m.buff->data(), m.buff->size() );
-            _write_queue_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
+            _wq_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
             _out_queue.emplace_back( m );
             w_queue.pop_front();
          }
       }
 
       alignas(hardware_destructive_interference_sz)
-      std::atomic<uint32_t> _write_queue_size{0}; // total size of all 4 write queues
+      std::atomic<uint32_t> _wq_size{0}; // total size of all 4 write queues
       std::atomic<bool>     _write_drain_pending{false}; // coalesces queue_write_mt drain posts
 
       alignas(hardware_destructive_interference_sz)
       mutable fc::mutex          _mtx;
-      std::deque<queued_write>   _ctrl_write_queue  GUARDED_BY(_mtx); // consensus/control msgs (votes, handshakes, go_away, etc.)
-      std::deque<queued_write>   _sync_write_queue  GUARDED_BY(_mtx); // sync blocks
-      std::deque<queued_write>   _block_write_queue GUARDED_BY(_mtx); // head blocks (signed_block via queue_t::general)
-      std::deque<queued_write>   _trx_write_queue   GUARDED_BY(_mtx); // transactions (lowest priority)
-      std::deque<queued_write>   _out_queue         GUARDED_BY(_mtx); // currently being async_written
+      std::deque<queued_write>   _ctrl_wq     GUARDED_BY(_mtx); // consensus/control msgs (votes, handshakes, go_away, etc.)
+      std::deque<queued_write>   _sync_wq     GUARDED_BY(_mtx); // sync blocks
+      std::deque<queued_write>   _block_wq    GUARDED_BY(_mtx); // head blocks (signed_block via queue_t::general)
+      std::deque<queued_write>   _trx_wq      GUARDED_BY(_mtx); // transactions (lowest priority)
+      std::deque<queued_write>   _out_queue   GUARDED_BY(_mtx); // currently being async_written
 
    }; // queued_buffer
 
