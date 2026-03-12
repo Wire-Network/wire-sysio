@@ -29,6 +29,7 @@ class log_index {
    }
 
    bool is_open() const { return file_.is_open(); }
+   fc::cfile& file() { return file_; }
 
    uint64_t back() { return nth_block_position(num_blocks()-1); }
    uint32_t num_blocks() const { return num_blocks_; }
