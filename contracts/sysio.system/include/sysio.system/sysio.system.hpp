@@ -10,6 +10,7 @@
 #include <sysio/instant_finality.hpp>
 
 #include <sysio.system/native.hpp>
+#include <sysio.system/snapshot_attest.hpp>
 
 #include <limits>
 #include <optional>

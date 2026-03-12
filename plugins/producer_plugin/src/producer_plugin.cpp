@@ -675,6 +675,82 @@ public:
       _snapshot_scheduler.create_snapshot(std::move(next), chain, predicate);
    }
 
+   void submit_snapshot_vote(const snapshot_scheduler::snapshot_information& si) {
+      if (_snapshot_provider_account.empty()) return;
+
+      try {
+         chain::controller& chain = chain_plug->chain();
+
+         auto snap_account_name = chain::name(_snapshot_provider_account);
+
+         // Build the votesnaphash action
+         chain::action vote_action;
+         vote_action.account = chain::config::system_account_name;
+         vote_action.name = chain::name("votesnaphash");
+         vote_action.authorization = {{snap_account_name, chain::config::active_name}};
+         vote_action.data = fc::raw::pack(
+            std::make_tuple(snap_account_name, si.head_block_id, si.root_hash));
+
+         // Build the transaction
+         chain::signed_transaction trx;
+         trx.actions.emplace_back(std::move(vote_action));
+         trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
+         trx.set_reference_block(chain.head().id());
+
+         // Sign with the snapshot provider account's key
+         auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
+         auto wire_sig_providers = sig_plug.query_providers(
+            std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
+
+         bool signed_ok = false;
+         for (auto& sig_prov : wire_sig_providers) {
+            if (sig_prov->private_key.has_value()) {
+               trx.sign(*sig_prov->private_key, chain.get_chain_id());
+               signed_ok = true;
+               break;
+            }
+         }
+
+         if (!signed_ok) {
+            elog("Snapshot provider: no signing key available for votesnaphash transaction");
+            return;
+         }
+
+         auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
+
+         // Submit via incoming transaction async method
+         app().get_method<chain::plugin_interface::incoming::methods::transaction_async>()(
+            packed_trx, true /*api_trx*/,
+            chain::transaction_metadata::trx_type::input,
+            false /*return_failure_traces*/,
+            [this](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+               if (std::holds_alternative<fc::exception_ptr>(result)) {
+                  auto& ex = std::get<fc::exception_ptr>(result);
+                  auto msg = ex->to_detail_string();
+                  if (msg.find("disagrees with attested record") != std::string::npos) {
+                     fc_elog(_log, "FATAL: Snapshot hash disagreement detected! This node's snapshot differs from the attested record. Shutting down.");
+                     app().quit();
+                  } else {
+                     fc_elog(_log, "Snapshot provider: votesnaphash transaction failed: {}", msg);
+                  }
+               } else {
+                  auto trace = std::get<chain::transaction_trace_ptr>(result);
+                  if (trace && trace->receipt) {
+                     fc_ilog(_log, "Snapshot provider: votesnaphash submitted successfully for block {}", trace->block_num);
+                  }
+               }
+            });
+
+         ilog("Snapshot provider: submitting votesnaphash for block {} with root hash {}",
+              si.head_block_num, si.root_hash.str());
+
+      } catch (const fc::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.to_detail_string());
+      } catch (const std::exception& e) {
+         elog("Snapshot provider: failed to submit vote: {}", e.what());
+      }
+   }
+
    void update_runtime_options(const producer_plugin::runtime_options& options);
 
    producer_plugin::runtime_options get_runtime_options() const {
@@ -764,6 +840,10 @@ public:
 
    // async snapshot scheduler
    snapshot_scheduler _snapshot_scheduler;
+
+   // snapshot provider configuration
+   std::string _snapshot_provider_account;
+   static constexpr uint32_t _snapshot_provider_block_spacing = 25000;
 
    std::function<void(speculative_block_metrics)> _update_speculative_block_metrics;
 
@@ -1353,6 +1433,8 @@ void producer_plugin::set_program_options(
           "Disable subjective CPU billing for API transactions")
          ("snapshots-dir", bpo::value<std::filesystem::path>()->default_value("snapshots"),
           "the location of the snapshots directory (absolute path or relative to application data dir)")
+         ("snapshot-provider-account", bpo::value<std::string>()->default_value(""),
+          "Account name used to sign and submit votesnaphash transactions. When set, enables snapshot provider mode. Cannot be used alongside producer-name.")
          ("read-only-threads", bpo::value<uint32_t>(),
          ("Number of worker threads in read-only execution thread pool. Defaults to 0 if configured as producer, otherwise defaults to "s + std::to_string(producer_plugin_impl::_ro_default_threads_nonproducer) + ". Max "s + std::to_string(producer_plugin_impl::_ro_max_threads_allowed) + "."s).c_str())
          ("read-only-write-window-time-us", bpo::value<uint32_t>()->default_value(my->_ro_write_window_time_us.count()),
@@ -1597,6 +1679,18 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
    _snapshot_scheduler.set_db_path(_snapshots_dir);
    _snapshot_scheduler.set_snapshots_path(_snapshots_dir);
 
+   // Snapshot provider configuration
+   _snapshot_provider_account = options.at("snapshot-provider-account").as<std::string>();
+   if (!_snapshot_provider_account.empty()) {
+      SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
+                 "snapshot-provider-account cannot be used alongside producer-name");
+
+      _snapshot_scheduler.set_snapshot_finalized_callback(
+         [this](const snapshot_scheduler::snapshot_information& si) {
+            submit_snapshot_vote(si);
+         });
+   }
+
    SYS_ASSERT(!is_configured_producer() || !irreversible_mode(), plugin_config_exception,
               "node cannot have any producer-name configured because block production is impossible when read_mode is \"irreversible\"");
 
@@ -1646,6 +1740,22 @@ void producer_plugin_impl::plugin_startup() {
             app().quit();
          }
       }));
+
+      // Auto-schedule periodic snapshots for snapshot provider mode.
+      // All providers use the same block_spacing so they snapshot at identical heights.
+      // The scheduler fires when (height - start_block_num - 1) % block_spacing == 0,
+      // so set start_block_num = block_spacing - 1 to trigger at exact multiples:
+      // blocks 25000, 50000, 75000, ...
+      if (!_snapshot_provider_account.empty()) {
+         snapshot_scheduler::snapshot_request_information sri;
+         sri.block_spacing = _snapshot_provider_block_spacing;
+         sri.start_block_num = _snapshot_provider_block_spacing - 1;
+         sri.end_block_num = std::numeric_limits<uint32_t>::max();
+         sri.snapshot_description = "snapshot-provider auto";
+         auto result = _snapshot_scheduler.schedule_snapshot(sri);
+         ilog("Snapshot provider mode: auto-scheduled snapshots every {} blocks (request id {})",
+              _snapshot_provider_block_spacing, result.snapshot_request_id);
+      }
 
       if (is_configured_producer()) { // track votes if producer to verify votes are being processed
          auto on_vote_signal = [this]( const vote_signal_params& vote_signal ) {
