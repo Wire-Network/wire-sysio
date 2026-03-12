@@ -53,6 +53,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/release-build.sh ${CMAKE_CURRENT_BINA
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/separate_prod_fin_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/separate_prod_fin_test_shape.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/separate_prod_fin_test.py ${CMAKE_CURRENT_BINARY_DIR}/separate_prod_fin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/snapshot_in_svnn_transition_test.py ${CMAKE_CURRENT_BINARY_DIR}/snapshot_in_svnn_transition_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/snapshot_attest_test.py ${CMAKE_CURRENT_BINARY_DIR}/snapshot_attest_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version-label.sh ${CMAKE_CURRENT_BINARY_DIR}/version-label.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/full-version-label.sh ${CMAKE_CURRENT_BINARY_DIR}/full-version-label.sh COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nodeop_producer_watermark_test.py ${CMAKE_CURRENT_BINARY_DIR}/nodeop_producer_watermark_test.py COPYONLY)
@@ -163,6 +164,7 @@ add_np_test(NAME ship_kill_client_test COMMAND tests/ship_kill_client_test.py -v
 
 add_np_test(NAME separate_prod_fin_test COMMAND tests/separate_prod_fin_test.py ${UNSHARE})
 add_np_test(NAME snapshot_in_svnn_transition_test COMMAND tests/snapshot_in_svnn_transition_test.py ${UNSHARE})
+add_np_test(NAME snapshot_attest_test COMMAND tests/snapshot_attest_test.py -v ${UNSHARE})
 add_np_test(NAME nodeop_protocol_feature_test COMMAND tests/nodeop_protocol_feature_test.py -v ${UNSHARE})
 add_np_test(NAME compute_transaction_test COMMAND tests/compute_transaction_test.py -v -p 2 -n 3 ${UNSHARE})
 add_np_test(NAME read-only-trx-basic-test COMMAND tests/read_only_trx_test.py -p 2 -n 3 --read-only-threads 1 ${UNSHARE})

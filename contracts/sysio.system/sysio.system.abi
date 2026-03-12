@@ -1084,6 +1084,148 @@
                     "type": "block_timestamp_type"
                 }
             ]
+        },
+        {
+            "name": "delsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "getsnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "regsnapprov",
+            "base": "",
+            "fields": [
+                {
+                    "name": "producer",
+                    "type": "name"
+                },
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_config",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_provider",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "producer",
+                    "type": "name"
+                }
+            ]
+        },
+        {
+            "name": "snap_record",
+            "base": "",
+            "fields": [
+                {
+                    "name": "block_num",
+                    "type": "uint64"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "attested_at_block",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "snap_vote",
+            "base": "",
+            "fields": [
+                {
+                    "name": "id",
+                    "type": "uint64"
+                },
+                {
+                    "name": "block_num",
+                    "type": "uint32"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "voters",
+                    "type": "name[]"
+                }
+            ]
+        },
+        {
+            "name": "setsnpcfg",
+            "base": "",
+            "fields": [
+                {
+                    "name": "min_providers",
+                    "type": "uint32"
+                },
+                {
+                    "name": "threshold_pct",
+                    "type": "uint32"
+                }
+            ]
+        },
+        {
+            "name": "votesnaphash",
+            "base": "",
+            "fields": [
+                {
+                    "name": "snap_account",
+                    "type": "name"
+                },
+                {
+                    "name": "block_id",
+                    "type": "checksum256"
+                },
+                {
+                    "name": "snapshot_hash",
+                    "type": "checksum256"
+                }
+            ]
         }
     ],
     "actions": [
@@ -1261,6 +1403,31 @@
             "name": "deltrxp",
             "type": "deltrxp",
             "ricardian_contract": ""
+        },
+        {
+            "name": "delsnapprov",
+            "type": "delsnapprov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "getsnaphash",
+            "type": "getsnaphash",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "regsnapprov",
+            "type": "regsnapprov",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "setsnpcfg",
+            "type": "setsnpcfg",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "votesnaphash",
+            "type": "votesnaphash",
+            "ricardian_contract": ""
         }
     ],
     "tables": [
@@ -1347,17 +1514,49 @@
             "index_type": "i64",
             "key_names": [],
             "key_types": []
+        },
+        {
+            "name": "snapconfig",
+            "type": "snap_config",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "snapprovs",
+            "type": "snap_provider",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "snaprecords",
+            "type": "snap_record",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
+        },
+        {
+            "name": "snapvotes",
+            "type": "snap_vote",
+            "index_type": "i64",
+            "key_names": [],
+            "key_types": []
         }
     ],
     "ricardian_clauses": [],
     "variants": [
         {
             "name": "variant_block_signing_authority_v0",
-            "types": ["block_signing_authority_v0"]
+            "types": [
+                "block_signing_authority_v0"
+            ]
         },
         {
             "name": "variant_v0_data",
-            "types": ["v0_data"]
+            "types": [
+                "v0_data"
+            ]
         }
     ],
     "action_results": [
