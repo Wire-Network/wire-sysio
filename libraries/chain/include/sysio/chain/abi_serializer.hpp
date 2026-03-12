@@ -9,6 +9,12 @@
 #include <fc/time.hpp>
 #include <fc/io/json.hpp>
 
+namespace google::protobuf {
+   class DescriptorPool;
+   class DynamicMessageFactory;
+   class Descriptor;
+}
+
 namespace sysio::chain {
 
 using std::map;
@@ -56,6 +62,7 @@ struct abi_serializer {
    bool      is_integer(const std::string_view& type) const;
    int       get_integer_size(const std::string_view& type) const;
    bool      is_struct(const std::string_view& type)const;
+   bool      is_enum(const std::string_view& type)const;
 
    /// @return string_view of `type`
    std::string_view fundamental_type(const std::string_view& type)const;
@@ -146,10 +153,21 @@ private:
    map<name,type_name>                        tables;
    map<uint64_t, string>                      error_messages;
    map<type_name, variant_def, std::less<>>   variants;
+   map<type_name, enum_def, std::less<>>      enums;
    map<name,type_name>                        action_results;
 
    map<type_name, pair<unpack_function, pack_function>, std::less<>> built_in_types;
    void configure_built_in_types();
+
+   // Protobuf support — shared_ptr keeps abi_serializer copyable.
+   // These are never modified after set_abi(), so sharing is safe across threads.
+   std::shared_ptr<google::protobuf::DescriptorPool>        pb_pool;
+   std::shared_ptr<google::protobuf::DynamicMessageFactory> pb_factory;
+
+   bool is_protobuf_type(const std::string_view& type) const;
+   const google::protobuf::Descriptor* get_pb_descriptor(const std::string_view& type) const;
+   fc::variant pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const;
+   void pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const;
 
    fc::variant _binary_to_variant( const std::string_view& type, const bytes& binary, impl::binary_to_variant_context& ctx )const;
    fc::variant _binary_to_variant( const std::string_view& type, fc::datastream<const char*>& binary, impl::binary_to_variant_context& ctx )const;

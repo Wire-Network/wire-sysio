@@ -74,10 +74,12 @@ try:
         f" --peer-private-key '{peer_private_key_json(KEY1_PUB, KEY1_PVT)}'"
         f" --p2p-peer-address localhost:9876"
     )
-    # Node2 (unauthorized): has its own identity but node0 does NOT trust KEY2
+    # Node2 (unauthorized): authenticates itself with KEY2 (not trusted by node0).
+    # Must trust node0's KEY0 so it doesn't preemptively reject node0 before
+    # node0 gets the chance to reject node2.
     specificExtraNodeopArgs[2] = (
         f"--allowed-connection specified"
-        f" --peer-key '{peer_key_json(KEY2_PUB)}'"
+        f" --peer-key '{peer_key_json(KEY0_PUB)}'"
         f" --peer-private-key '{peer_private_key_json(KEY2_PUB, KEY2_PVT)}'"
         f" --p2p-peer-address localhost:9876"
     )

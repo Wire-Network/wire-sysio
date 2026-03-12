@@ -19,7 +19,9 @@ namespace sysio {
 
    class connection; // forward declaration for clear_out_queue
 
-   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 32>;
+   constexpr uint32_t def_sync_fetch_batch_size = 32;
+
+   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, def_sync_fetch_batch_size>;
 
    constexpr auto     def_send_buffer_size_mb = 8;
    constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;

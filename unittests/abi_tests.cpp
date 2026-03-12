@@ -3496,4 +3496,573 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__no_return_value)
    }
 }
 
+BOOST_AUTO_TEST_CASE(enum_types)
+{
+   using sysio::testing::fc_exception_message_starts_with;
+
+   auto enum_abi = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [
+         {"name": "s", "base": "", "fields": [
+            {"name": "status", "type": "my_status"},
+            {"name": "user", "type": "name"}
+         ]}
+      ],
+      "enums": [
+         {"name": "my_status", "type": "uint8", "values": [
+            {"name": "UNKNOWN", "value": 0},
+            {"name": "ACTIVE", "value": 1},
+            {"name": "PAUSED", "value": 2},
+            {"name": "CLOSED", "value": 3}
+         ]}
+      ],
+   })";
+
+   auto enum_abi_uint16 = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [
+         {"name": "s", "base": "", "fields": [
+            {"name": "val", "type": "my_enum16"}
+         ]}
+      ],
+      "enums": [
+         {"name": "my_enum16", "type": "uint16", "values": [
+            {"name": "A", "value": 0},
+            {"name": "B", "value": 1},
+            {"name": "C", "value": 256}
+         ]}
+      ],
+   })";
+
+   auto duplicate_enum_abi = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}]},
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_invalid_type = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "bogus_type", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_non_integer_type = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "string", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_out_of_range = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "TOO_BIG", "value": 999}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_name = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "X", "value": 1}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_value = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "A", "value": 0}, {"name": "B", "value": 0}]}
+      ],
+   })";
+
+   try {
+      // round-trip abi through multiple formats
+      auto bin = fc::raw::pack(fc::json::from_string(enum_abi).as<abi_def>());
+      abi_serializer abis(fc::variant(fc::raw::unpack<abi_def>(bin)).as<abi_def>(), yield_fn() );
+
+      // duplicate enum definition detected
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(duplicate_enum_abi).as<abi_def>(), yield_fn() ), duplicate_abi_enum_def_exception );
+
+      // invalid underlying type (not a known type at all)
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_invalid_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // non-integer underlying type (e.g. string)
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_non_integer_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // enum value out of range for underlying type
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_out_of_range).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate member name within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_name).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate value within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_value).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // Test binary -> variant (enum value to string name)
+      // UNKNOWN=0 encoded as uint8 is 0x00
+      auto var1 = abis.binary_to_variant("my_status", {0x00}, yield_fn());
+      BOOST_CHECK_EQUAL(var1.as_string(), "UNKNOWN");
+
+      // ACTIVE=1 encoded as uint8 is 0x01
+      auto var2 = abis.binary_to_variant("my_status", {0x01}, yield_fn());
+      BOOST_CHECK_EQUAL(var2.as_string(), "ACTIVE");
+
+      // CLOSED=3 encoded as uint8 is 0x03
+      auto var3 = abis.binary_to_variant("my_status", {0x03}, yield_fn());
+      BOOST_CHECK_EQUAL(var3.as_string(), "CLOSED");
+
+      // Unknown value 0xFF falls back to integer
+      auto var4 = abis.binary_to_variant("my_status", bytes{static_cast<char>(0xFF)}, yield_fn());
+      BOOST_CHECK_EQUAL(var4.as_uint64(), 255u);
+
+      // Test variant -> binary (string name to enum value)
+      auto bytes1 = abis.variant_to_binary("my_status", fc::json::from_string(R"("ACTIVE")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes1), "01");
+
+      auto bytes2 = abis.variant_to_binary("my_status", fc::json::from_string(R"("PAUSED")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes2), "02");
+
+      auto bytes3 = abis.variant_to_binary("my_status", fc::json::from_string(R"("CLOSED")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes3), "03");
+
+      // Test variant -> binary (raw integer value)
+      auto bytes4 = abis.variant_to_binary("my_status", fc::json::from_string(R"(2)"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes4), "02");
+
+      // Test variant -> binary (invalid enum name)
+      BOOST_CHECK_EXCEPTION( abis.variant_to_binary("my_status", fc::json::from_string(R"("INVALID")"), yield_fn()),
+                             pack_exception, fc_exception_message_starts_with("Unknown enum value 'INVALID' for enum 'my_status'") );
+
+      // Test enum in struct context (round trip)
+      auto struct_json = R"({"status":"ACTIVE","user":"alice"})";
+      auto struct_bytes = abis.variant_to_binary("s", fc::json::from_string(struct_json), yield_fn());
+      auto struct_var = abis.binary_to_variant("s", struct_bytes, yield_fn());
+      BOOST_CHECK_EQUAL(struct_var["status"].as_string(), "ACTIVE");
+
+      // Test uint16 enum
+      auto bin16 = fc::raw::pack(fc::json::from_string(enum_abi_uint16).as<abi_def>());
+      abi_serializer abis16(fc::variant(fc::raw::unpack<abi_def>(bin16)).as<abi_def>(), yield_fn() );
+
+      // C=256 as uint16 little-endian is 0x0001
+      auto bytes_c = abis16.variant_to_binary("my_enum16", fc::json::from_string(R"("C")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes_c), "0001");
+
+      auto var_c = abis16.binary_to_variant("my_enum16", bytes_c, yield_fn());
+      BOOST_CHECK_EQUAL(var_c.as_string(), "C");
+
+      // is_enum check
+      BOOST_CHECK(abis.is_enum("my_status"));
+      BOOST_CHECK(!abis.is_enum("name"));
+      BOOST_CHECK(!abis.is_enum("nonexistent"));
+
+   } FC_LOG_AND_RETHROW()
+}
+
+// ===================== Protobuf ABI Serialization Tests =====================
+
+// A minimal ABI 1.3 with protobuf_types and protobuf-typed actions
+static const char* pb_test_abi = R"=====(
+{
+   "version": "sysio::abi/1.3",
+   "types": [],
+   "structs": [],
+   "actions": [
+      { "name": "hiproto", "type": "protobuf::test.ActData", "ricardian_contract": "" },
+      { "name": "pbaction", "type": "protobuf::test.ActData", "ricardian_contract": "" }
+   ],
+   "tables": [],
+   "ricardian_clauses": [],
+   "variants": [],
+   "action_results": [
+      { "name": "hiproto", "result_type": "protobuf::test.ActResult" }
+   ],
+   "protobuf_types": {
+      "file": [
+         {
+            "name": "test.proto",
+            "package": "test",
+            "messageType": [
+               {
+                  "name": "ActData",
+                  "field": [
+                     { "name": "id", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "type", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "note", "number": 3, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+                  ]
+               },
+               {
+                  "name": "ActResult",
+                  "field": [
+                     { "name": "value", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "str_value", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+                  ]
+               }
+            ],
+            "syntax": "proto3"
+         }
+      ]
+   }
+}
+)=====";
+
+// A non-protobuf ABI 1.2
+static const char* non_pb_test_abi = R"=====(
+{
+   "version": "sysio::abi/1.2",
+   "types": [],
+   "structs": [
+      {
+         "name": "transfer",
+         "base": "",
+         "fields": [
+            { "name": "from", "type": "name" },
+            { "name": "to", "type": "name" },
+            { "name": "amount", "type": "uint64" }
+         ]
+      }
+   ],
+   "actions": [
+      { "name": "transfer", "type": "transfer", "ricardian_contract": "" }
+   ],
+   "tables": [],
+   "ricardian_clauses": [],
+   "variants": [],
+   "action_results": []
+}
+)=====";
+
+BOOST_AUTO_TEST_CASE(protobuf_abi_version_13_loads)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   BOOST_TEST( abi.version == "sysio::abi/1.3" );
+   BOOST_TEST( !abi.protobuf_types.value.empty() );
+
+   abi_serializer abis(std::move(abi), yield_fn());
+   BOOST_TEST( abis.is_type("protobuf::test.ActData", yield_fn()) );
+   BOOST_TEST( abis.is_type("protobuf::test.ActResult", yield_fn()) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_abi_version_12_no_protobuf_types)
+{ try {
+   auto abi = fc::json::from_string(non_pb_test_abi).as<abi_def>();
+   BOOST_TEST( abi.version == "sysio::abi/1.2" );
+   BOOST_TEST( abi.protobuf_types.value.empty() );
+
+   abi_serializer abis(std::move(abi), yield_fn());
+   BOOST_TEST( !abis.is_type("protobuf::test.ActData", yield_fn()) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_variant_to_binary_and_back)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Serialize a protobuf message: JSON → binary
+   auto var = fc::json::from_string(R"({"id": 42, "type": 7, "note": "hello"})");
+   auto bytes = abis.variant_to_binary("protobuf::test.ActData", var, yield_fn());
+   BOOST_TEST( bytes.size() > 0 );
+
+   // Deserialize: binary → JSON
+   auto var2 = abis.binary_to_variant("protobuf::test.ActData", bytes, yield_fn());
+   BOOST_TEST( var2.is_object() );
+   BOOST_TEST( var2["id"].as_int64() == 42 );
+   BOOST_TEST( var2["type"].as_int64() == 7 );
+   BOOST_TEST( var2["note"].as_string() == "hello" );
+
+   // Round-trip: the re-serialized bytes should match
+   auto bytes2 = abis.variant_to_binary("protobuf::test.ActData", var2, yield_fn());
+   BOOST_TEST( fc::to_hex(bytes) == fc::to_hex(bytes2) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_action_struct_serialization)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // With flattened ABI, action type points directly to protobuf type.
+   // Resolve the action type and serialize using flat JSON (no wrapper struct).
+   auto action_type = abis.get_action_type("hiproto"_n);
+   BOOST_TEST( action_type == "protobuf::test.ActData" );
+
+   auto action_data = fc::json::from_string(R"({"id": 1, "type": 2, "note": "test"})");
+   auto bytes = abis.variant_to_binary(action_type, action_data, yield_fn());
+   BOOST_TEST( bytes.size() > 0 );
+
+   auto var2 = abis.binary_to_variant(action_type, bytes, yield_fn());
+   BOOST_TEST( var2.is_object() );
+   BOOST_TEST( var2["id"].as_int64() == 1 );
+   BOOST_TEST( var2["type"].as_int64() == 2 );
+   BOOST_TEST( var2["note"].as_string() == "test" );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_action_result_type)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Verify action result type resolution
+   auto result_type = abis.get_action_result_type("hiproto"_n);
+   BOOST_TEST( result_type == "protobuf::test.ActResult" );
+
+   // Serialize/deserialize the result type
+   auto var = fc::json::from_string(R"({"value": 42, "str_value": "success"})");
+   auto bytes = abis.variant_to_binary("protobuf::test.ActResult", var, yield_fn());
+   auto var2 = abis.binary_to_variant("protobuf::test.ActResult", bytes, yield_fn());
+   BOOST_TEST( var2["value"].as_int64() == 42 );
+   BOOST_TEST( var2["str_value"].as_string() == "success" );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_abi_json_roundtrip)
+{ try {
+   // Parse ABI from JSON, convert back to JSON, verify protobuf_types survives
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   fc::variant abi_var;
+   fc::to_variant(abi, abi_var);
+   auto json_str = fc::json::to_string(abi_var, get_deadline());
+
+   // protobuf_types should be a JSON object in output, not a string
+   BOOST_TEST( json_str.find("\"protobuf_types\"") != std::string::npos );
+   BOOST_TEST( json_str.find("\"messageType\"") != std::string::npos );
+   BOOST_TEST( json_str.find("ActData") != std::string::npos );
+
+   // Parse it back and verify it still works
+   auto abi2 = fc::json::from_string(json_str).as<abi_def>();
+   abi_serializer abis2(std::move(abi2), yield_fn());
+   BOOST_TEST( abis2.is_type("protobuf::test.ActData", yield_fn()) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_abi_binary_roundtrip)
+{ try {
+   // Test binary pack/unpack of abi_def with protobuf_types
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   auto packed = fc::raw::pack(abi);
+   auto abi2 = fc::raw::unpack<abi_def>(packed);
+
+   BOOST_TEST( abi2.version == "sysio::abi/1.3" );
+   BOOST_TEST( !abi2.protobuf_types.value.empty() );
+
+   // Verify the unpacked ABI still works for protobuf serialization
+   abi_serializer abis(std::move(abi2), yield_fn());
+   BOOST_TEST( abis.is_type("protobuf::test.ActData", yield_fn()) );
+
+   auto var = fc::json::from_string(R"({"id": 99, "type": 0, "note": "packed"})");
+   auto bytes = abis.variant_to_binary("protobuf::test.ActData", var, yield_fn());
+   auto var2 = abis.binary_to_variant("protobuf::test.ActData", bytes, yield_fn());
+   BOOST_TEST( var2["id"].as_int64() == 99 );
+   BOOST_TEST( var2["note"].as_string() == "packed" );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_empty_message)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Empty/default message should serialize and deserialize
+   auto var = fc::json::from_string(R"({})");
+   auto bytes = abis.variant_to_binary("protobuf::test.ActData", var, yield_fn());
+   auto var2 = abis.binary_to_variant("protobuf::test.ActData", bytes, yield_fn());
+   BOOST_TEST( var2.is_object() );
+} FC_LOG_AND_RETHROW() }
+
+// ABI with a wrapper struct mixing protobuf and regular fields (multi-parameter action)
+static const char* pb_mixed_test_abi = R"=====(
+{
+   "version": "sysio::abi/1.3",
+   "types": [],
+   "structs": [
+      {
+         "name": "process",
+         "base": "",
+         "fields": [
+            { "name": "request", "type": "protobuf::test.ActData" },
+            { "name": "authorized_by", "type": "name" },
+            { "name": "memo", "type": "string" }
+         ]
+      }
+   ],
+   "actions": [
+      { "name": "process", "type": "process", "ricardian_contract": "" }
+   ],
+   "tables": [],
+   "ricardian_clauses": [],
+   "variants": [],
+   "action_results": [],
+   "protobuf_types": {
+      "file": [
+         {
+            "name": "test.proto",
+            "package": "test",
+            "messageType": [
+               {
+                  "name": "ActData",
+                  "field": [
+                     { "name": "id", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "type", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "note", "number": 3, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+                  ]
+               }
+            ],
+            "syntax": "proto3"
+         }
+      ]
+   }
+}
+)=====";
+
+BOOST_AUTO_TEST_CASE(protobuf_mixed_struct_serialization)
+{ try {
+   auto abi = fc::json::from_string(pb_mixed_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Serialize a wrapper struct with protobuf + regular fields
+   auto action_data = fc::json::from_string(
+      R"({"request": {"id": 10, "type": 3, "note": "mixed"}, "authorized_by": "alice", "memo": "test memo"})");
+   auto bytes = abis.variant_to_binary("process", action_data, yield_fn());
+   BOOST_TEST( bytes.size() > 0 );
+
+   // Deserialize and verify all fields survived round-trip
+   auto var2 = abis.binary_to_variant("process", bytes, yield_fn());
+   BOOST_TEST( var2.is_object() );
+   BOOST_TEST( var2["request"]["id"].as_int64() == 10 );
+   BOOST_TEST( var2["request"]["type"].as_int64() == 3 );
+   BOOST_TEST( var2["request"]["note"].as_string() == "mixed" );
+   BOOST_TEST( var2["authorized_by"].as_string() == "alice" );
+   BOOST_TEST( var2["memo"].as_string() == "test memo" );
+
+   // Re-serialize and verify bytes match
+   auto bytes2 = abis.variant_to_binary("process", var2, yield_fn());
+   BOOST_TEST( fc::to_hex(bytes) == fc::to_hex(bytes2) );
+} FC_LOG_AND_RETHROW() }
+
+// ABI with nested messages and repeated fields
+static const char* pb_nested_test_abi = R"=====(
+{
+   "version": "sysio::abi/1.3",
+   "types": [],
+   "structs": [],
+   "actions": [
+      { "name": "nested", "type": "protobuf::test.Outer", "ricardian_contract": "" },
+      { "name": "withlist", "type": "protobuf::test.WithList", "ricardian_contract": "" }
+   ],
+   "tables": [],
+   "ricardian_clauses": [],
+   "variants": [],
+   "action_results": [],
+   "protobuf_types": {
+      "file": [
+         {
+            "name": "test.proto",
+            "package": "test",
+            "messageType": [
+               {
+                  "name": "Inner",
+                  "field": [
+                     { "name": "value", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "tag", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+                  ]
+               },
+               {
+                  "name": "Outer",
+                  "field": [
+                     { "name": "id", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_INT32" },
+                     { "name": "child", "number": 2, "label": "LABEL_OPTIONAL", "type": "TYPE_MESSAGE", "typeName": ".test.Inner" },
+                     { "name": "label", "number": 3, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" }
+                  ]
+               },
+               {
+                  "name": "WithList",
+                  "field": [
+                     { "name": "name", "number": 1, "label": "LABEL_OPTIONAL", "type": "TYPE_STRING" },
+                     { "name": "scores", "number": 2, "label": "LABEL_REPEATED", "type": "TYPE_INT32", "options": { "packed": true } },
+                     { "name": "tags", "number": 3, "label": "LABEL_REPEATED", "type": "TYPE_STRING" }
+                  ]
+               }
+            ],
+            "syntax": "proto3"
+         }
+      ]
+   }
+}
+)=====";
+
+BOOST_AUTO_TEST_CASE(protobuf_nested_message)
+{ try {
+   auto abi = fc::json::from_string(pb_nested_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Nested message: Outer contains Inner as a sub-message field
+   auto var = fc::json::from_string(
+      R"({"id": 5, "child": {"value": 42, "tag": "inner_tag"}, "label": "outer_label"})");
+   auto bytes = abis.variant_to_binary("protobuf::test.Outer", var, yield_fn());
+   BOOST_TEST( bytes.size() > 0 );
+
+   auto var2 = abis.binary_to_variant("protobuf::test.Outer", bytes, yield_fn());
+   BOOST_TEST( var2["id"].as_int64() == 5 );
+   BOOST_TEST( var2["child"].is_object() );
+   BOOST_TEST( var2["child"]["value"].as_int64() == 42 );
+   BOOST_TEST( var2["child"]["tag"].as_string() == "inner_tag" );
+   BOOST_TEST( var2["label"].as_string() == "outer_label" );
+
+   // Round-trip bytes should match
+   auto bytes2 = abis.variant_to_binary("protobuf::test.Outer", var2, yield_fn());
+   BOOST_TEST( fc::to_hex(bytes) == fc::to_hex(bytes2) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_repeated_fields)
+{ try {
+   auto abi = fc::json::from_string(pb_nested_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Repeated fields: packed int32 array and string array
+   auto var = fc::json::from_string(
+      R"({"name": "player1", "scores": [100, 200, 300], "tags": ["fast", "strong"]})");
+   auto bytes = abis.variant_to_binary("protobuf::test.WithList", var, yield_fn());
+   BOOST_TEST( bytes.size() > 0 );
+
+   auto var2 = abis.binary_to_variant("protobuf::test.WithList", bytes, yield_fn());
+   BOOST_TEST( var2["name"].as_string() == "player1" );
+
+   auto scores = var2["scores"].get_array();
+   BOOST_TEST( scores.size() == 3 );
+   BOOST_TEST( scores[0].as_int64() == 100 );
+   BOOST_TEST( scores[1].as_int64() == 200 );
+   BOOST_TEST( scores[2].as_int64() == 300 );
+
+   auto tags = var2["tags"].get_array();
+   BOOST_TEST( tags.size() == 2 );
+   BOOST_TEST( tags[0].as_string() == "fast" );
+   BOOST_TEST( tags[1].as_string() == "strong" );
+
+   // Round-trip
+   auto bytes2 = abis.variant_to_binary("protobuf::test.WithList", var2, yield_fn());
+   BOOST_TEST( fc::to_hex(bytes) == fc::to_hex(bytes2) );
+} FC_LOG_AND_RETHROW() }
+
+BOOST_AUTO_TEST_CASE(protobuf_known_bytes_format)
+{ try {
+   auto abi = fc::json::from_string(pb_test_abi).as<abi_def>();
+   abi_serializer abis(std::move(abi), yield_fn());
+
+   // Verify serialization matches CDT's zpp_bits size_varint format exactly.
+   // ActData{id=1, type=2, note="hello"} should produce:
+   //   0c          outer varint: 12 bytes follow (inner len + pb bytes)
+   //   0b          inner varint: 11 bytes of protobuf data
+   //   08 01       field 1 (id) varint = 1
+   //   10 02       field 2 (type) varint = 2
+   //   1a 05 68656c6c6f   field 3 (note) length-delimited "hello"
+   const std::string expected_hex = "0c0b080110021a0568656c6c6f";
+
+   auto var = fc::json::from_string(R"({"id": 1, "type": 2, "note": "hello"})");
+   auto bytes = abis.variant_to_binary("protobuf::test.ActData", var, yield_fn());
+   BOOST_TEST( fc::to_hex(bytes) == expected_hex );
+
+   // Also verify deserialization of these known bytes
+   auto var2 = abis.binary_to_variant("protobuf::test.ActData", bytes, yield_fn());
+   BOOST_TEST( var2["id"].as_int64() == 1 );
+   BOOST_TEST( var2["type"].as_int64() == 2 );
+   BOOST_TEST( var2["note"].as_string() == "hello" );
+} FC_LOG_AND_RETHROW() }
+
 BOOST_AUTO_TEST_SUITE_END()

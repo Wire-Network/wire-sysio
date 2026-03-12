@@ -430,6 +430,51 @@ def abi_file_with_nodeop_test():
 
         walletMgr.testFailed = not testSuccessful
 
+def clio_protobuf_abi_test():
+    """Test that clio can pack/unpack protobuf action data using --abi-file"""
+    proto_abi_path = os.path.abspath(os.getcwd() + '/unittests/test-contracts/proto_abi_test/proto_abi_test.abi')
+    if not os.path.exists(proto_abi_path):
+        Utils.Print("SKIP: proto_abi_test.abi not found at %s" % proto_abi_path)
+        return
+    proto_abi_file_arg = 'prototest' + ':' + proto_abi_path
+
+    # pack hiproto action data (flattened protobuf type)
+    account = 'prototest'
+    action = 'hiproto'
+    unpacked_action_data = '{"id":1,"type":2,"note":"hello"}'
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'pack_action_data', account, action, unpacked_action_data]
+    outs, errs = processClioCommand(cmd)
+    packed_data = outs.strip().decode('utf-8')
+    assert len(packed_data) > 0, "pack_action_data returned empty result for protobuf action"
+    Utils.Print("protobuf pack_action_data: %s -> %s" % (unpacked_action_data, packed_data))
+
+    # unpack the packed data and verify round-trip
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'unpack_action_data', account, action, packed_data]
+    outs, errs = processClioCommand(cmd)
+    assert b'"id": 1' in outs, "unpack missing id field"
+    assert b'"type": 2' in outs, "unpack missing type field"
+    assert b'"note": "hello"' in outs, "unpack missing note field"
+    Utils.Print("protobuf unpack_action_data round-trip OK")
+
+    # pack pbaction (different action, same protobuf type)
+    action = 'pbaction'
+    unpacked_action_data = '{"id":99,"type":0,"note":"test"}'
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'pack_action_data', account, action, unpacked_action_data]
+    outs, errs = processClioCommand(cmd)
+    packed_data2 = outs.strip().decode('utf-8')
+    assert len(packed_data2) > 0, "pack_action_data returned empty result for pbaction"
+
+    # unpack and verify
+    cmd = ['./programs/clio/clio', '-u', 'http://127.0.0.1:12345', '--abi-file', proto_abi_file_arg,
+           'convert', 'unpack_action_data', account, action, packed_data2]
+    outs, errs = processClioCommand(cmd)
+    assert b'"id": 99' in outs, "unpack missing id=99"
+    assert b'"note": "test"' in outs, "unpack missing note=test"
+    Utils.Print("protobuf pbaction round-trip OK")
+
 nodeop_help_test()
 
 clio_help_test(['--help'])
@@ -443,6 +488,7 @@ cli11_optional_option_arg_test()
 clio_sign_test()
 
 clio_abi_file_test()
+clio_protobuf_abi_test()
 abi_file_with_nodeop_test()
 
 errorCode = 0 if testSuccessful else 1

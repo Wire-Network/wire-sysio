@@ -159,7 +159,7 @@ namespace detail {
       return {std::move(listen_addr), block_sync_rate_limit};
    }
 
-   /// Zero bits beyond prefix_len in a 16-byte IPv6 address.
+   /// Zero out bits beyond prefix_len in a 16-byte IPv6 address.
    /// For IPv4-mapped addresses (::ffff:a.b.c.d), the caller should map
    /// an IPv4 prefix to IPv6 by adding 96 (e.g., IPv4 /24 → prefix_len 120).
    inline boost::asio::ip::address_v6::bytes_type apply_prefix_mask(
