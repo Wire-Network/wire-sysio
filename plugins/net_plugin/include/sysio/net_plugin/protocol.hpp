@@ -10,6 +10,7 @@ namespace sysio {
 
    constexpr auto message_header_size = sizeof(uint32_t);
 
+   using connection_id_t = uint32_t;
    using vote_id_type = fc::sha256;
 
    /// Compute a deterministic vote ID from the non-signature fields of a vote_message.

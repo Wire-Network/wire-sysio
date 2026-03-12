@@ -2,6 +2,7 @@
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/gossip_bps_index.hpp>
 #include <sysio/net_plugin/protocol.hpp>
+#include <sysio/net_plugin/queued_buffer.hpp>
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
@@ -120,7 +121,6 @@ namespace sysio {
    static constexpr int64_t block_interval_ns =
       std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(config::block_interval_ms)).count();
 
-   using connection_id_t = uint32_t;
    using connection_id_set = boost::unordered_flat_set<connection_id_t>;
    using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
    struct node_transaction_state {
@@ -311,12 +311,8 @@ namespace sysio {
    /**
     * default value initializers
     */
-   constexpr auto     def_send_buffer_size_mb = 8;
-   constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
-   constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
    constexpr uint32_t def_max_trx_entries_per_conn_size = 100u*1024u*1024u; // 100 MB = ~100K TPS
-   constexpr uint32_t def_sync_fetch_batch_size = 32;
    constexpr auto     def_max_consecutive_immediate_connection_close = 9; // back off if client keeps closing
    constexpr auto     def_max_clients = 25; // 0 for unlimited clients
    constexpr auto     def_max_nodes_per_host = 1;
@@ -581,121 +577,6 @@ namespace sysio {
    }
 
    static net_plugin_impl *my_impl;
-
-   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, def_sync_fetch_batch_size>;
-
-   // thread safe
-   class queued_buffer : boost::noncopyable {
-   public:
-      void reset() {
-         clear_write_queue();
-         fc::lock_guard g( _mtx );
-         _out_queue.clear();
-      }
-
-      void clear_write_queue() {
-         fc::lock_guard g( _mtx );
-         _write_queue.clear();
-         _sync_write_queue.clear();
-         _trx_write_queue.clear();
-         _write_queue_size.store(0, std::memory_order_relaxed);
-         _write_drain_pending.store(false, std::memory_order_relaxed);
-      }
-
-      void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
-
-      uint32_t write_queue_size() const {
-         return _write_queue_size.load(std::memory_order_relaxed);
-      }
-
-      // Returns true if caller wins the drain race; false if a drain is already pending.
-      bool try_claim_drain() {
-         return !_write_drain_pending.exchange(true, std::memory_order_acq_rel);
-      }
-      void release_drain() {
-         _write_drain_pending.store(false, std::memory_order_release);
-      }
-
-      // called from connection strand
-      bool ready_to_send(connection_id_t connection_id) const {
-         fc::unique_lock g( _mtx );
-         // if out_queue is not empty then async_write is in progress
-         const bool async_write_in_progress = !_out_queue.empty();
-         const bool ready = !async_write_in_progress && _write_queue_size.load(std::memory_order_relaxed) != 0;
-         g.unlock();
-         if (async_write_in_progress) {
-            fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
-         }
-         return ready;
-      }
-
-      enum class queue_t { block_sync, general };
-      struct add_result { bool ok; bool needs_drain; };
-      add_result add_write_queue(msg_type_t net_msg,
-                                 queue_t queue,
-                                 const send_buffer_type& buff,
-                                 connection_id_t conn_id,
-                                 go_away_reason close_after_send,
-                                 std::optional<block_num_type> block_num) {
-         fc::lock_guard g( _mtx );
-         if( net_msg == msg_type_t::transaction_message || net_msg == msg_type_t::transaction_notice_message ) {
-            _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         } else if (queue == queue_t::block_sync) {
-            _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         } else {
-            _write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         }
-         auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
-         return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
-      }
-
-      void fill_out_buffer( small_buf_vector& bufs ) {
-         fc::lock_guard g( _mtx );
-         if (!_sync_write_queue.empty()) { // always send msgs from sync_write_queue first
-            fill_out_buffer( bufs, _sync_write_queue );
-         } else if (!_write_queue.empty()) { // always send msgs from write_queue before trx queue
-            fill_out_buffer( bufs, _write_queue );
-         } else {
-            fill_out_buffer( bufs, _trx_write_queue );
-            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size.load(std::memory_order_relaxed) == 0);
-         }
-      }
-
-   private:
-      struct queued_write;
-      void fill_out_buffer( small_buf_vector& bufs,
-                            deque<queued_write>& w_queue ) REQUIRES(_mtx) {
-         while ( !w_queue.empty() ) {
-            auto& m = w_queue.front();
-            bufs.emplace_back( m.buff->data(), m.buff->size() );
-            _write_queue_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
-            _out_queue.emplace_back( m );
-            w_queue.pop_front();
-         }
-      }
-
-   private:
-      struct queued_write {
-         send_buffer_type             buff;
-         connection_id_t              connection_id{0};
-         go_away_reason               close_after_send{go_away_reason::no_reason};
-         msg_type_t                   net_msg{};
-         std::optional<block_num_type> block_num;
-      };
-
-      alignas(hardware_destructive_interference_sz)
-      std::atomic<uint32_t> _write_queue_size{0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
-      std::atomic<bool>     _write_drain_pending{false}; // coalesces queue_write_mt drain posts
-
-      alignas(hardware_destructive_interference_sz)
-      mutable fc::mutex   _mtx;
-      deque<queued_write> _write_queue      GUARDED_BY(_mtx); // queued messages, all messages except sync & trxs
-      deque<queued_write> _sync_write_queue GUARDED_BY(_mtx); // sync_write_queue blocks will be sent first
-      deque<queued_write> _trx_write_queue  GUARDED_BY(_mtx); // queued trx messages, trx_write_queue will be sent last
-      deque<queued_write> _out_queue        GUARDED_BY(_mtx); // currently being async_write
-
-   }; // queued_buffer
-
 
    /// monitors the status of blocks as to whether a block is accepted (sync'd) or
    /// rejected. It groups consecutive rejected blocks in a (configurable) time
