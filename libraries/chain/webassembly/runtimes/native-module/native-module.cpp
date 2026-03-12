@@ -3,15 +3,13 @@
 #include <sysio/chain/webassembly/interface.hpp>
 #include <sysio/chain/apply_context.hpp>
 #include <sysio/chain/exceptions.hpp>
-#include <fc/scoped_exit.hpp>
 #include <fc/log/logger.hpp>
 
 namespace sysio::chain::webassembly::native_module {
 
 void native_instantiated_module::apply(apply_context& context) {
    interface iface(context);
-   native_context_stack::push(&iface);
-   auto on_exit = fc::make_scoped_exit([]() { native_context_stack::pop(); });
+   native_context_stack::guard ctx_guard(&iface);
 
    apply_fun_.exec(context.get_receiver().to_uint64_t(),
                    context.get_action().account.to_uint64_t(),

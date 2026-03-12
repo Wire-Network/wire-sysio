@@ -3,6 +3,7 @@
 #include <sysio/net_plugin/peer_auth.hpp>
 #include <fc/crypto/private_key.hpp>
 #include <fc/crypto/public_key.hpp>
+#include <cstring>
 
 using namespace sysio;
 using namespace sysio::chain;
