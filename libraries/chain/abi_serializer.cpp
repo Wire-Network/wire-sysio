@@ -5,6 +5,10 @@
 #include <fc/bitset.hpp>
 #include <fc/io/varint.hpp>
 #include <fc/time.hpp>
+#include <google/protobuf/descriptor.h>
+#include <google/protobuf/descriptor.pb.h>
+#include <google/protobuf/dynamic_message.h>
+#include <google/protobuf/util/json_util.h>
 
 namespace sysio::chain {
 
@@ -191,11 +195,116 @@ namespace sysio::chain {
       SYS_ASSERT( action_results.size() == action_results_size, duplicate_abi_action_results_def_exception, "duplicate action results definition detected" );
       SYS_ASSERT( enums.size() == enums_size, duplicate_abi_enum_def_exception, "duplicate enum definition detected" );
 
+      // Initialize protobuf descriptors if protobuf_types is present
+      pb_pool.reset();
+      pb_factory.reset();
+      if( !abi.protobuf_types.value.empty() ) {
+         namespace gpb = google::protobuf;
+         gpb::FileDescriptorSet fds;
+         gpb::util::JsonParseOptions opts;
+         opts.ignore_unknown_fields = true;
+         auto status = gpb::util::JsonStringToMessage(abi.protobuf_types.value, &fds, opts);
+         SYS_ASSERT( status.ok(), invalid_type_inside_abi,
+                     "Failed to parse protobuf_types: {}", std::string(status.message()) );
+         pb_pool = std::make_shared<gpb::DescriptorPool>();
+         for( int i = 0; i < fds.file_size(); ++i ) {
+            auto* fd = pb_pool->BuildFile(fds.file(i));
+            SYS_ASSERT( fd != nullptr, invalid_type_inside_abi,
+                        "Failed to build protobuf file descriptor: {}", fds.file(i).name() );
+         }
+         pb_factory = std::make_shared<gpb::DynamicMessageFactory>(pb_pool.get());
+      }
+
       validate(ctx);
    }
 
    void abi_serializer::set_abi(const abi_def& abi, const fc::microseconds& max_serialization_time) {
       return set_abi(abi, create_yield_function(max_serialization_time));
+   }
+
+   bool abi_serializer::is_protobuf_type(const std::string_view& type) const {
+      return type.starts_with("protobuf::") && pb_pool;
+   }
+
+   const google::protobuf::Descriptor* abi_serializer::get_pb_descriptor(const std::string_view& type) const {
+      if( !pb_pool || !type.starts_with("protobuf::") ) return nullptr;
+      // type is "protobuf::package.MessageType" — extract "package.MessageType"
+      auto msg_name = type.substr(10); // skip "protobuf::"
+      return pb_pool->FindMessageTypeByName(std::string(msg_name));
+   }
+
+   // Helper: convert a protobuf message to fc::variant (JSON object)
+   static fc::variant pb_message_to_variant(const google::protobuf::Message& msg) {
+      namespace gpb = google::protobuf;
+      std::string json;
+      gpb::util::JsonPrintOptions opts;
+      opts.preserve_proto_field_names = true;
+      auto status = gpb::util::MessageToJsonString(msg, &json, opts);
+      SYS_ASSERT( status.ok(), unpack_exception, "Failed to convert protobuf message to JSON: {}", std::string(status.message()) );
+      return fc::json::from_string(json);
+   }
+
+   // Helper: populate a protobuf message from fc::variant (JSON object)
+   static void pb_variant_to_message(const fc::variant& var, google::protobuf::Message& msg) {
+      namespace gpb = google::protobuf;
+      auto json = fc::json::to_string(var, fc::time_point::maximum());
+      gpb::util::JsonParseOptions opts;
+      opts.ignore_unknown_fields = true;
+      auto status = gpb::util::JsonStringToMessage(json, &msg, opts);
+      SYS_ASSERT( status.ok(), pack_exception, "Failed to convert JSON to protobuf message: {}", std::string(status.message()) );
+   }
+
+   fc::variant abi_serializer::pb_binary_to_variant(const std::string_view& type, fc::datastream<const char*>& stream) const {
+      auto desc = get_pb_descriptor(type);
+      SYS_ASSERT( desc, unpack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
+
+      // Read outer varuint32 length prefix (covers inner length prefix + protobuf bytes)
+      fc::unsigned_int outer_len;
+      fc::raw::unpack(stream, outer_len);
+      SYS_ASSERT( stream.remaining() >= outer_len.value, unpack_exception,
+                  "Not enough data for protobuf message '{}': need {} bytes, have {}",
+                  impl::limit_size(type), outer_len.value, stream.remaining() );
+
+      // Read inner varuint32 length prefix (zpp_bits size_varint format)
+      fc::datastream<const char*> inner_stream(stream.pos(), outer_len.value);
+      fc::unsigned_int pb_len;
+      fc::raw::unpack(inner_stream, pb_len);
+
+      SYS_ASSERT( pb_len.value <= inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': inner length {} exceeds available data {}",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
+      SYS_ASSERT( pb_len.value == inner_stream.remaining(), unpack_exception,
+                  "Protobuf message '{}': trailing data detected (inner length {} but {} bytes remain)",
+                  impl::limit_size(type), pb_len.value, inner_stream.remaining() );
+
+      auto prototype = pb_factory->GetPrototype(desc);
+      std::unique_ptr<google::protobuf::Message> msg(prototype->New());
+      SYS_ASSERT( msg->ParseFromArray(inner_stream.pos(), pb_len.value), unpack_exception,
+                  "Failed to parse protobuf message '{}'", impl::limit_size(type) );
+      stream.skip(outer_len.value);
+
+      return pb_message_to_variant(*msg);
+   }
+
+   void abi_serializer::pb_variant_to_binary(const std::string_view& type, const fc::variant& var, fc::datastream<char*>& ds) const {
+      auto desc = get_pb_descriptor(type);
+      SYS_ASSERT( desc, pack_exception, "Unknown protobuf type '{}'", impl::limit_size(type) );
+
+      auto prototype = pb_factory->GetPrototype(desc);
+      std::unique_ptr<google::protobuf::Message> msg(prototype->New());
+      pb_variant_to_message(var, *msg);
+
+      std::string serialized;
+      SYS_ASSERT( msg->SerializeToString(&serialized), pack_exception,
+                  "Failed to serialize protobuf message '{}'", impl::limit_size(type) );
+
+      // Match CDT's zpp_bits size_varint format: outer_len + inner_varint_len + pb_bytes
+      // The inner varint length prefix is what zpp_bits::out with size_varint{} produces
+      fc::unsigned_int inner_len(serialized.size());
+      size_t inner_len_size = fc::raw::pack_size(inner_len);
+      fc::raw::pack(ds, fc::unsigned_int(inner_len_size + serialized.size()));
+      fc::raw::pack(ds, inner_len);
+      ds.write(serialized.data(), serialized.size());
    }
 
    bool abi_serializer::is_builtin_type(const std::string_view& type)const {
@@ -287,6 +396,7 @@ namespace sysio::chain {
       if( structs.find(type) != structs.end() ) return true;
       if( variants.find(type) != variants.end() ) return true;
       if( enums.find(type) != enums.end() ) return true;
+      if( is_protobuf_type(type) && get_pb_descriptor(type) ) return true;
       return false;
    }
 
@@ -471,6 +581,11 @@ namespace sysio::chain {
          } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack {} type '{}' while processing '{}'",
                                    is_array(rtype) ? "array of built-in" : is_optional(rtype) ? "optional of built-in" : "built-in",
                                    impl::limit_size(ftype), ctx.get_path_string() )
+      } else if( is_protobuf_type(ftype) ) {
+         try {
+            return pb_binary_to_variant(ftype, stream);
+         } SYS_RETHROW_EXCEPTIONS( unpack_exception, "Unable to unpack protobuf type '{}' while processing '{}'",
+                                   impl::limit_size(ftype), ctx.get_path_string() )
       }
       if ( is_array(rtype) ) {
          fc::unsigned_int size;
@@ -581,6 +696,11 @@ namespace sysio::chain {
          pack_array(vars);
       } else if( auto btype = built_in_types.find(fundamental_type(rtype)); btype != built_in_types.end() ) {
          btype->second.second(var, ds, is_array(rtype), is_optional(rtype), ctx.get_yield_function());
+      } else if( is_protobuf_type(fundamental_type(rtype)) ) {
+         try {
+            pb_variant_to_binary(fundamental_type(rtype), var, ds);
+         } SYS_RETHROW_EXCEPTIONS( pack_exception, "Unable to pack protobuf type '{}' while processing '{}'",
+                                   impl::limit_size(fundamental_type(rtype)), ctx.get_path_string() )
       } else if ( is_array(rtype) ) {
          ctx.hint_array_type_if_in_array();
          const vector<fc::variant>& vars = var.get_array();
@@ -1022,3 +1142,45 @@ namespace sysio::chain {
    }
 
 } // namespace sysio::chain
+
+namespace fc {
+
+void to_variant(const sysio::chain::abi_def& abi, fc::variant& v) {
+   fc::mutable_variant_object mvo;
+   fc::reflector<sysio::chain::abi_def>::visit(
+      fc::to_variant_visitor<sysio::chain::abi_def>(mvo, abi)
+   );
+   // protobuf_types: omit when empty, otherwise replace string with JSON object
+   if( abi.protobuf_types.value.empty() ) {
+      mvo.erase("protobuf_types");
+   } else {
+      mvo["protobuf_types"] = fc::json::from_string(abi.protobuf_types.value);
+   }
+   v = std::move(mvo);
+}
+
+void from_variant(const fc::variant& v, sysio::chain::abi_def& abi) {
+   // Strip protobuf_types before reflector visit (it's a JSON object but stored as string)
+   fc::variant clean_v;
+   if( v.is_object() && v.get_object().contains("protobuf_types") ) {
+      fc::mutable_variant_object mvo(v.get_object());
+      auto pt = mvo["protobuf_types"];
+      mvo.erase("protobuf_types");
+      clean_v = fc::variant(std::move(mvo));
+      fc::reflector<sysio::chain::abi_def>::visit(
+         fc::from_variant_visitor<sysio::chain::abi_def>(clean_v.get_object(), abi)
+      );
+      // Handle protobuf_types: accept JSON object or string and stringify it
+      if( pt.is_object() ) {
+         abi.protobuf_types.value = fc::json::to_string(pt, fc::time_point::maximum());
+      } else if( pt.is_string() ) {
+         abi.protobuf_types.value = pt.get_string();
+      }
+   } else {
+      fc::reflector<sysio::chain::abi_def>::visit(
+         fc::from_variant_visitor<sysio::chain::abi_def>(v.get_object(), abi)
+      );
+   }
+}
+
+} // namespace fc
