@@ -18,7 +18,6 @@
 #include <rapidjson/writer.h>
 
 #include <sysio/chain/blake3_encoder.hpp>
-#include <sysio/chain/thread_utils.hpp>
 
 #include <algorithm>
 
@@ -154,25 +153,101 @@ size_t variant_snapshot_reader::total_row_count() {
    return total;
 }
 
+// ---- threaded_snapshot_writer::hashing_streambuf ----
+
+void threaded_snapshot_writer::hashing_streambuf::init(std::streambuf* sink, size_t buf_size) {
+   sink_ = sink;
+   buf_.resize(buf_size);
+   setp(buf_.data(), buf_.data() + buf_.size());
+}
+
+bool threaded_snapshot_writer::hashing_streambuf::flush_buffer() {
+   const auto n = pptr() - pbase();
+   if(n > 0) {
+      hasher_.write(pbase(), n);
+      if(sink_->sputn(pbase(), n) != n)
+         return false;
+      setp(buf_.data(), buf_.data() + buf_.size());
+   }
+   return true;
+}
+
+threaded_snapshot_writer::hashing_streambuf::int_type
+threaded_snapshot_writer::hashing_streambuf::overflow(int_type ch) {
+   if(!sink_ || !flush_buffer())
+      return traits_type::eof();
+   if(!traits_type::eq_int_type(ch, traits_type::eof())) {
+      *pbase() = traits_type::to_char_type(ch);
+      pbump(1);
+   }
+   return ch;
+}
+
+int threaded_snapshot_writer::hashing_streambuf::sync() {
+   return flush_buffer() ? 0 : -1;
+}
+
+std::streamsize threaded_snapshot_writer::hashing_streambuf::xsputn(
+      const char_type* s, std::streamsize count) {
+   std::streamsize remaining = count;
+   while(remaining > 0) {
+      std::streamsize space = epptr() - pptr();
+      if(space == 0) {
+         if(!flush_buffer())
+            return count - remaining;
+         space = epptr() - pptr();
+      }
+      std::streamsize chunk = std::min(space, remaining);
+      std::memcpy(pptr(), s, chunk);
+      pbump(static_cast<int>(chunk));
+      s += chunk;
+      remaining -= chunk;
+   }
+   return count;
+}
+
+threaded_snapshot_writer::hashing_streambuf::pos_type
+threaded_snapshot_writer::hashing_streambuf::seekoff(
+      off_type off, std::ios_base::seekdir dir, std::ios_base::openmode which) {
+   if(!flush_buffer())
+      return pos_type(off_type(-1));
+   return sink_->pubseekoff(off, dir, which);
+}
+
+fc::crypto::blake3 threaded_snapshot_writer::hashing_streambuf::finalize_section() {
+   flush_buffer();
+   auto h = hasher_.result();
+   hasher_.reset();
+   return h;
+}
+
+void threaded_snapshot_writer::hashing_streambuf::reset_section() {
+   flush_buffer();
+   hasher_.reset();
+}
+
 // ---- threaded_snapshot_writer (v1 binary format) ----
 
 threaded_snapshot_writer::threaded_snapshot_writer(std::filesystem::path snapshot_path)
 : snapshot_path_(std::move(snapshot_path))
 , out_(snapshot_path_, std::ios::binary)
-, wrapper_(out_)
 {
    SYS_ASSERT(out_.good(), snapshot_exception, "Failed to open snapshot output file: {}", snapshot_path_.string());
 
+   hash_sbuf_.init(out_.rdbuf());
+
    // Write header: magic(4) + version(4) = 8 bytes
+   // Written through hash_os_; hash is discarded on first reset_section() call.
    const auto totem = magic_number;
-   out_.write(reinterpret_cast<const char*>(&totem), sizeof(totem));
+   hash_os_.write(reinterpret_cast<const char*>(&totem), sizeof(totem));
    uint32_t version = current_snapshot_version;
-   out_.write(reinterpret_cast<const char*>(&version), sizeof(version));
+   hash_os_.write(reinterpret_cast<const char*>(&version), sizeof(version));
 }
 
 void threaded_snapshot_writer::write_start_section(const std::string& section_name) {
    current_section_name_ = section_name;
-   current_section_offset_ = static_cast<uint64_t>(out_.tellp());
+   hash_sbuf_.reset_section();
+   current_section_offset_ = static_cast<uint64_t>(hash_os_.tellp());
    current_row_count_ = 0;
 }
 
@@ -185,56 +260,25 @@ void threaded_snapshot_writer::write_end_section() {
    section_info info;
    info.name = std::move(current_section_name_);
    info.data_offset = current_section_offset_;
-   info.data_size = static_cast<uint64_t>(out_.tellp()) - current_section_offset_;
+   info.data_size = static_cast<uint64_t>(hash_os_.tellp()) - current_section_offset_;
    info.row_count = current_row_count_;
-   // hash filled in by finalize()
+   info.hash = hash_sbuf_.finalize_section();
    sections_.push_back(std::move(info));
 }
 
 void threaded_snapshot_writer::finalize() {
-   out_.flush();
+   hash_os_.flush();
+   SYS_ASSERT(hash_os_.good(), snapshot_exception,
+              "Failed to write snapshot section data: {}", snapshot_path_.string());
 
-   // Record where section data ends — index will be appended here
-   const uint64_t index_offset = static_cast<uint64_t>(out_.tellp());
+   const uint64_t index_offset = static_cast<uint64_t>(hash_os_.tellp());
 
    // Sort sections by name for deterministic order
    std::sort(sections_.begin(), sections_.end(),
              [](const section_info& a, const section_info& b) { return a.name < b.name; });
 
-   // Hash each section in parallel using BLAKE3 (data is hot in page cache)
-   {
-      const uint32_t num_hash_threads = std::min<uint32_t>(max_threads, static_cast<uint32_t>(sections_.size()));
-
-      sync_threaded_work<struct snaphash> hash_workqueue;
-      auto& hash_ctx = hash_workqueue.io_context();
-
-      for(auto& s : sections_) {
-         boost::asio::post(hash_ctx, [this, &s]() {
-            std::ifstream in(snapshot_path_, std::ios::binary);
-            constexpr size_t buf_size = 4 * 1024 * 1024; // 4MB read buffer
-            auto buf = std::make_unique<char[]>(buf_size);
-
-            in.seekg(s.data_offset);
-
-            blake3_encoder hasher;
-
-            uint64_t remaining = s.data_size;
-            while(remaining > 0) {
-               const size_t to_read = std::min<uint64_t>(remaining, buf_size);
-               in.read(buf.get(), to_read);
-               SYS_ASSERT(in.good(), snapshot_exception, "Failed to read section '{}' data for hashing", s.name);
-               hasher.write(buf.get(), to_read);
-               remaining -= to_read;
-            }
-
-            s.hash = hasher.result();
-         });
-      }
-
-      hash_workqueue.run(num_hash_threads);
-   }
-
    // Compute root hash = BLAKE3(hash_0 || hash_1 || ... || hash_n)
+   // Section hashes were computed inline during writes.
    {
       blake3_encoder root_hasher;
       for(const auto& s : sections_) {
@@ -245,7 +289,7 @@ void threaded_snapshot_writer::finalize() {
 
    const uint32_t num_sections = static_cast<uint32_t>(sections_.size());
 
-   // Write section index
+   // Write section index directly to file (not hashed)
    for(const auto& s : sections_) {
       out_.write(s.name.data(), s.name.size());
       out_.put(0);
@@ -479,7 +523,14 @@ void threaded_snapshot_reader::validate() {
          section_index_.push_back(std::move(entry));
       }
 
-      // Verify root hash (BLAKE3)
+      // Verify per-section hashes by re-hashing each section's data from mmap
+      for(const auto& entry : section_index_) {
+         auto computed = blake3_encoder::hash(mapped_snap_addr + entry.data_offset, entry.data_size);
+         SYS_ASSERT(computed == entry.hash, snapshot_exception,
+                    "Section '{}' hash mismatch. Snapshot file may be corrupted.", entry.name);
+      }
+
+      // Verify root hash = BLAKE3(section_hash_0 || section_hash_1 || ...)
       fc::crypto::blake3 computed_root;
       {
          blake3_encoder root_hasher;

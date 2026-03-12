@@ -785,6 +785,11 @@ BOOST_AUTO_TEST_CASE( snapshot_determinism_test )
    verify_integrity_hash<threaded_snapshot_suite>(*chain.control, *t1.control);
 }
 
+//
+// Performance Tests. Enable via RUN_PERF_BENCHMARKS. Take too long for normal test runs.
+//
+
+//#define RUN_PERF_BENCHMARKS
 #ifdef RUN_PERF_BENCHMARKS
 // Performance benchmark: threaded (parallel) vs variant (sequential) snapshot write/read
 // Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_perf_benchmark -- --sys-vm
@@ -909,31 +914,53 @@ BOOST_AUTO_TEST_CASE( snapshot_perf_benchmark )
        read_thr_ms, read_var_ms, read_speedup));
 }
 
-// Large-scale snapshot benchmark (~40GB, mimicking EOS mainnet proportions)
+// Large-scale snapshot benchmark (~40GB, mimicking EOS mainnet section distribution)
 // Run with: ./unit_test --run_test=snapshot_part2_tests/snapshot_large_benchmark -- --sys-vm
 // Requires ~60GB RAM. Skip variant (would need another 40GB+ for in-memory JSON).
+//
+// EOS mainnet snapshot section distribution (from snapshot-2026-03-10-19-eos-v8):
+//   key_value_object:  262M rows, 20.6 GB (50.7%)  ~82 bytes/row
+//   index256_object:   356M rows, 16.3 GB (40.0%)  ~48 bytes/row
+//   permission_object:  13M rows,  1.1 GB  (2.7%)
+//   table_id_object:    20M rows,  0.7 GB  (1.7%)
+//   account_metadata:    6M rows,  0.5 GB  (1.2%)
+//   remaining 20 sections: < 1 GB combined
+//
+// This benchmark populates key_value + index256 + index64 to match the two
+// dominant sections while keeping total data ~40GB.
 BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
 {
-   // EOS mainnet: 262M kv rows (20GB) + 20M tables + secondaries (16GB) ≈ 40GB
-   // Simplified: key_value rows only to match total size.
-   // 50M rows × 800 bytes ≈ 40GB
-   constexpr uint32_t num_tables     = 20000;
-   constexpr uint32_t rows_per_table = 2500;
-   constexpr uint32_t value_size     = 800;
+   // Target: ~20.5 GB key_value + ~16 GB index256 + ~0.3 GB index64 ≈ ~37 GB
+   // key_value: 20000 tables × 13000 rows × 82 bytes/row ≈ 20 GB
+   // index256:  20000 tables × 18000 rows × 48 bytes/row ≈ 16 GB
+   // index64:   20000 tables × 650 rows  × 23 bytes/row  ≈ 0.3 GB
+   constexpr uint32_t num_tables          = 20000;
+   constexpr uint32_t kv_rows_per_table   = 13000;
+   constexpr uint32_t kv_value_size       = 50;    // ~82 bytes packed with overhead
+   constexpr uint32_t i256_rows_per_table = 18000;
+   constexpr uint32_t i64_rows_per_table  = 650;
 
-   const uint64_t total_rows = uint64_t(num_tables) * rows_per_table;
-   const uint64_t estimated_data = total_rows * (value_size + 40);
+   const uint64_t total_kv_rows   = uint64_t(num_tables) * kv_rows_per_table;
+   const uint64_t total_i256_rows = uint64_t(num_tables) * i256_rows_per_table;
+   const uint64_t total_i64_rows  = uint64_t(num_tables) * i64_rows_per_table;
+   const uint64_t total_rows      = total_kv_rows + total_i256_rows + total_i64_rows + num_tables;
+   const uint64_t est_kv_data     = total_kv_rows * 82;
+   const uint64_t est_i256_data   = total_i256_rows * 48;
+   const uint64_t est_i64_data    = total_i64_rows * 23;
+   const uint64_t estimated_data  = est_kv_data + est_i256_data + est_i64_data;
+
    auto msg = [](const std::string& s) { BOOST_TEST_MESSAGE(s); };
-   msg(fmt::format("Large benchmark: {} tables x {} rows x {} bytes = ~{} GB estimated",
-       num_tables, rows_per_table, value_size, estimated_data / (1024*1024*1024)));
+   msg(fmt::format("Large benchmark: {} tables, {} kv + {} i256 + {} i64 rows = ~{} GB estimated",
+       num_tables, total_kv_rows, total_i256_rows, total_i64_rows,
+       estimated_data / (1024*1024*1024)));
 
    fc::temp_directory tempdir;
    auto cfg = tester::default_config(tempdir);
-   cfg.first.state_size = 55ull * 1024 * 1024 * 1024; // 55GB state
+   cfg.first.state_size = 96ull * 1024 * 1024 * 1024; // 96GB state
    savanna_tester chain(cfg.first, cfg.second);
    chain.produce_block();
 
-   // Populate chainbase
+   // Populate chainbase directly (bypasses WASM)
    auto pop_start = std::chrono::high_resolution_clock::now();
    {
       auto& db = const_cast<chainbase::database&>(chain.control->db());
@@ -952,20 +979,46 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
             obj.scope = name("benchmark");
             obj.table = name("data");
             obj.payer = config::system_account_name;
-            obj.count = rows_per_table;
+            obj.count = kv_rows_per_table;
          });
 
-         for (uint32_t r = 0; r < rows_per_table; r++) {
+         // key_value rows (~82 bytes each packed)
+         for (uint32_t r = 0; r < kv_rows_per_table; r++) {
             db.create<key_value_object>([&](key_value_object& obj) {
                obj.t_id = tid.id;
                obj.primary_key = r;
                obj.payer = config::system_account_name;
-               obj.value.resize_and_fill(value_size, [&](char* data, std::size_t sz) {
+               obj.value.resize_and_fill(kv_value_size, [&](char* data, std::size_t sz) {
                   for (std::size_t i = 0; i < sz; i += 8) {
                      uint64_t v = next_seed();
                      std::memcpy(data + i, &v, std::min<std::size_t>(8, sz - i));
                   }
                });
+            });
+         }
+
+         // index256 rows (~48 bytes each packed)
+         for (uint32_t r = 0; r < i256_rows_per_table; r++) {
+            __uint128_t lo = next_seed(); lo |= __uint128_t(next_seed()) << 64;
+            __uint128_t hi = next_seed(); hi |= __uint128_t(next_seed()) << 64;
+            key256_t k256;
+            k256[0] = lo;
+            k256[1] = hi;
+            db.create<index256_object>([&](index256_object& obj) {
+               obj.t_id = tid.id;
+               obj.primary_key = r;
+               obj.payer = config::system_account_name;
+               obj.secondary_key = k256;
+            });
+         }
+
+         // index64 rows (~23 bytes each packed)
+         for (uint32_t r = 0; r < i64_rows_per_table; r++) {
+            db.create<index64_object>([&](index64_object& obj) {
+               obj.t_id = tid.id;
+               obj.primary_key = r;
+               obj.payer = config::system_account_name;
+               obj.secondary_key = next_seed();
             });
          }
 
@@ -979,7 +1032,16 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
 
    auto pop_end = std::chrono::high_resolution_clock::now();
    auto pop_ms = std::chrono::duration_cast<std::chrono::milliseconds>(pop_end - pop_start).count();
-   msg(fmt::format("Chain populated: {} rows in {} tables ({} ms)", total_rows, num_tables, pop_ms));
+   msg(fmt::format("Chain populated: {} total rows ({} kv, {} i256, {} i64) in {} tables ({} ms)",
+       total_rows, total_kv_rows, total_i256_rows, total_i64_rows, num_tables, pop_ms));
+
+   // --- Integrity Hash (run first while state pages are hot) ---
+   auto tp_ih0 = std::chrono::high_resolution_clock::now();
+   auto integrity_hash = chain.control->calculate_integrity_hash();
+   auto tp_ih1 = std::chrono::high_resolution_clock::now();
+
+   auto ihash_ms = std::chrono::duration_cast<std::chrono::milliseconds>(tp_ih1 - tp_ih0).count();
+   msg(fmt::format("Integrity HASH: {} ms (no I/O)", ihash_ms));
 
    // --- Threaded WRITE ---
    auto tp0 = std::chrono::high_resolution_clock::now();
@@ -1007,17 +1069,23 @@ BOOST_AUTO_TEST_CASE( snapshot_large_benchmark )
    msg(fmt::format("Threaded READ:  {} ms, throughput: {:.0f} MB/s", read_ms, read_throughput));
 
    // --- Verify ---
-   verify_integrity_hash<threaded_snapshot_suite>(*chain.control, *snap_chain.control);
+   auto snap_integrity_hash = snap_chain.control->calculate_integrity_hash();
+   BOOST_REQUIRE_EQUAL(integrity_hash.str(), snap_integrity_hash.str());
    msg("Integrity hash verified");
 
    // --- Summary ---
    msg("=== LARGE BENCHMARK SUMMARY ===");
-   msg(fmt::format("Snapshot: {:.2f} GB, {} rows, {} tables",
+   msg(fmt::format("Snapshot: {:.2f} GB, {} total rows, {} tables",
        (double)snap_size / (1024*1024*1024), total_rows, num_tables));
    msg(fmt::format("Populate: {:.1f}s", (double)pop_ms / 1000));
+   msg(fmt::format("IHash:    {:.1f}s (no I/O, serialization + BLAKE3 only)", (double)ihash_ms / 1000));
    msg(fmt::format("Write:    {:.1f}s ({:.0f} MB/s)", (double)write_ms / 1000, write_throughput));
    msg(fmt::format("Read:     {:.1f}s ({:.0f} MB/s)", (double)read_ms / 1000, read_throughput));
 }
+
 #endif // RUN_PERF_BENCHMARKS
+
+// --- ^^^^
+// --- End Performance Tests
 
 BOOST_AUTO_TEST_SUITE_END()

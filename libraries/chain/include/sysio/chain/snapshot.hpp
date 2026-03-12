@@ -15,10 +15,12 @@
 #include <boost/core/demangle.hpp>
 
 #include <atomic>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <ostream>
+#include <streambuf>
 
 
 namespace sysio { namespace chain {
@@ -157,7 +159,7 @@ namespace sysio { namespace chain {
    class snapshot_writer {
       public:
          static constexpr uint32_t magic_number = 0x57495245; // WIRE in ASCII
-         static constexpr uint32_t max_threads  = 8;
+         static constexpr uint32_t max_threads  = 4;
 
          class section_writer {
             public:
@@ -385,10 +387,10 @@ namespace sysio { namespace chain {
    /**
     * Snapshot writer for v1 format.
     *
-    * Writes sections sequentially to the output file (no temp files).
-    * After all sections are written, finalize() hashes each section in parallel
-    * by re-reading from the file (data is hot in page cache), then appends
-    * the section index and footer.
+    * Writes sections sequentially to the output file. Each section's BLAKE3
+    * hash is computed inline during writes via a buffering streambuf, so no
+    * post-write re-read pass is needed. finalize() computes the root hash
+    * and appends the section index and footer.
     */
    class threaded_snapshot_writer : public snapshot_writer {
       public:
@@ -396,7 +398,7 @@ namespace sysio { namespace chain {
 
          const char* name() const override { return "snapshot"; }
 
-         /// Hash sections in parallel, write index and footer.
+         /// Compute root hash, write index and footer.
          /// Must be called after all write_section() calls complete.
          void finalize();
 
@@ -414,12 +416,41 @@ namespace sysio { namespace chain {
             uint64_t     data_offset = 0;
             uint64_t     data_size = 0;
             uint64_t     row_count = 0;
-            fc::crypto::blake3 hash; // filled in by finalize()
+            fc::crypto::blake3 hash;
+         };
+
+         /// Buffering streambuf that incrementally BLAKE3-hashes all writes
+         /// before forwarding them to the underlying file streambuf.
+         class hashing_streambuf : public std::streambuf {
+         public:
+            hashing_streambuf() = default;
+            void init(std::streambuf* sink, size_t buf_size = 1024 * 1024);
+
+            /// Flush buffer, return accumulated section hash, and reset hasher.
+            fc::crypto::blake3 finalize_section();
+
+            /// Flush buffer and reset hasher (discards accumulated hash).
+            void reset_section();
+
+         protected:
+            int_type overflow(int_type ch) override;
+            int sync() override;
+            std::streamsize xsputn(const char_type* s, std::streamsize count) override;
+            pos_type seekoff(off_type, std::ios_base::seekdir,
+                             std::ios_base::openmode = std::ios_base::out) override;
+
+         private:
+            bool flush_buffer();
+            std::streambuf*    sink_ = nullptr;
+            blake3_encoder     hasher_;
+            std::vector<char>  buf_;
          };
 
          std::filesystem::path          snapshot_path_;
          std::ofstream                  out_;
-         detail::ostream_wrapper        wrapper_;
+         hashing_streambuf              hash_sbuf_;
+         std::ostream                   hash_os_{&hash_sbuf_};
+         detail::ostream_wrapper        wrapper_{hash_os_};
 
          std::string                    current_section_name_;
          uint64_t                       current_section_offset_ = 0;
