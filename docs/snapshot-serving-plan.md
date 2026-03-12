@@ -2,160 +2,155 @@
 
 ## Overview
 
-This plan covers the implementation of a trusted, BLS-signed snapshot distribution system. Snapshots are generated deterministically by designated node operators ("snapshot nodeops"), signed by the active finalizer policy, and served via HTTP for bootstrapping new nodes. New nodes verify snapshot integrity against on-chain attestations before syncing.
+This plan covers the implementation of a snapshot distribution system with on-chain attestation. Snapshots are generated deterministically by node operators, served via HTTP, and verified against on-chain records after a bootstrapping node syncs to head.
 
 ---
 
 ## Goals
 
 - Allow new nodes to bootstrap quickly from a verified snapshot rather than replaying all blocks
-- Ensure snapshot authenticity via BLS aggregate signatures from the active finalizer policy
-- Support deterministic, multi-threaded snapshot generation so all snapshot nodeops produce identical hashes
+- Ensure snapshot authenticity via on-chain attestation from a quorum of registered snapshot providers
+- Deterministic snapshot generation so all providers produce identical root hashes for the same block
 - Provide a simple HTTP endpoint for snapshot + peer list discovery
-- Immediately halt a node if its loaded snapshot hash does not match the on-chain attestation
+- Halt a node if its loaded snapshot hash does not match the on-chain attestation
 
 ---
 
-## Scope & Decisions
+## Phase 1 — Deterministic Snapshot Format (COMPLETE)
 
-### Who Generates Snapshots?
+**Status:** Implemented in `feature/snapshot-v2`. See `docs/snapshot-benchmarks.md` for full design evolution and benchmark results.
 
-- Introduce a dedicated **snapshot nodeop** role (configured via `config.ini` flag, e.g. `snapshot-provider = true`)
-- Snapshot and integrity hash generation is triggered by the **existing snapshot schedule mechanism**, fired every **25,000 blocks** — no new interval config is needed; the snapshot plugin hooks into this existing callback
-- Because snapshot signing uses the same BLS finalizer key as block finality, a node operator who is a finalizer must run **two separate nodeop processes** sharing the same finalizer key:
-    - A **proposer/finalizer nodeop** — participates in block production and finality voting as normal
-    - A **snapshot nodeop** — generates and signs snapshot hashes; serves snapshots over HTTP
-- These roles are **mutually exclusive on a single node** and nodeop enforces this at startup:
-    - A node configured with `snapshot-provider = true` (or `snapshot-hash-only = true`) **must not** be configured as a block producer or active finalizer; nodeop aborts startup if both are set
-    - A node configured as a block producer or active finalizer **must not** have `snapshot-provider` or `snapshot-hash-only` enabled; nodeop aborts startup if both are set
-- Non-finalizer node operators are not required to run a snapshot nodeop
+### What Was Built
 
-### Snapshot Format
+A new binary snapshot format (`v1`) with **sequential writes** and **buffered inline BLAKE3 hashing**. Every snapshot node that writes a snapshot at the same block produces an identical file with an identical root hash.
 
-Since the system is pre-launch, **the snapshot format can be changed**:
+**File format:**
 
-- Replace the current single-file format with a **multi-section container format**
-- Each logical section (accounts, contract tables, contract code, global state, producer schedule, finalizer policy) is written to a separate sub-file in parallel
-- Sub-files are bundled into a **tar + Zstandard (`.tar.zst`) container** for distribution
-- The container manifest records each section hash and the root hash derived from them in canonical order
-- **Determinism requirement:** section ordering, serialization, and compression parameters must be fully deterministic across all nodeops (fixed Zstandard compression level, no wall-clock timestamps in tar headers, sorted map/set iteration)
+```
+[Header]  (8 bytes)
+  magic:        uint32_t  (0x57495245 "WIRE")
+  version:      uint32_t  (1)
 
-### Integrity Hash
+[Section Data]
+  section 0 raw packed rows
+  section 1 raw packed rows
+  ...
 
-- Root hash is computed over the canonically serialized section hashes in manifest order (not over compressed bytes)
-- Hash input includes: block number, block ID, snapshot format version, block timestamp (not wall clock)
-- **Hash algorithm:** BLAKE3 preferred for speed; SHA-256 as fallback if ecosystem compatibility required
+[Section Index]  (sorted by section name)
+  name:         null-terminated string
+  data_offset:  uint64_t
+  data_size:    uint64_t
+  row_count:    uint64_t
+  hash:         char[32]  (BLAKE3 per-section hash)
 
----
-
-## Component Breakdown
-
-### 1. Multi-threaded Snapshot & Hash Generation
-
-**Files:** `libraries/chain/snapshot.cpp`, new `libraries/chain/snapshot_writer.cpp`
-
-**Tasks:**
-
-- Refactor snapshot serialization to split state into independent sections writable concurrently
-- Use a configurable thread pool; join all threads before finalizing the container
-- Implement per-section streaming hash; combine into root hash deterministically via manifest
-- Ensure all iterated data structures are traversed in stable sorted order
-- Add `snapshot_manifest` struct:
-
-```cpp
-struct snapshot_manifest {
-    block_num_type             block_num;
-    block_id_type              block_id;
-    uint32_t                   format_version;
-    block_timestamp_type       block_timestamp;
-    vector<section_hash_entry> sections;   // { name, hash } in canonical order
-    digest_type                root_hash;  // hash of canonically serialized section hashes
-};
+[Footer]  (44 bytes)
+  num_sections: uint32_t
+  root_hash:    char[32]  (BLAKE3 of concatenated section hashes in canonical order)
+  index_offset: uint64_t
 ```
 
-- Write unit tests confirming two independently generated snapshots at the same block produce identical `root_hash`
+**Key implementation details:**
 
-**New config options:**
+- **Writer (`threaded_snapshot_writer`):** Sequential single-threaded writes through a custom `hashing_streambuf` (1 MB buffer) that computes per-section BLAKE3 hashes inline. Section index written at end of file, enabling single-pass writes. Root hash computed by hashing concatenated per-section hashes in sorted order.
+- **Reader (`threaded_snapshot_reader`):** Memory-mapped file. Reads footer to locate section index, then uses indexed lookup for O(num_sections) section access. Supports concurrent reads from multiple threads via thread-local datastream state. `madvise(MADV_DONTNEED)` releases pages after reading each section.
+- **Integrity hash writer (`integrity_hash_snapshot_writer`):** Computes the same root hash as a full snapshot write but with no file I/O. Used for periodic verification.
+- **BLAKE3 via LLVM:** Uses `llvm-c/blake3.h` bundled with LLVM (already linked). No new dependency. Internal 64 KB buffer in `blake3_encoder` coalesces small writes.
+- **`load_index()` / `validate()` separation:** Lightweight `load_index()` parses header, footer, and section index without hash verification — used for quick metadata access (e.g. chain_id extraction). Full `validate()` re-hashes all sections from the memory map.
+
+**Design decisions (explored and rejected alternatives):**
+
+| Approach | Why Rejected |
+|----------|-------------|
+| Parallel writes with temp files | Extra I/O pass to assemble final file negates parallelism gains |
+| Sharded contract tables | Chainbase inserts must be sequential per index type; no read benefit |
+| Post-write parallel SHA-256 hash | SHA-256 too slow; ~20s overhead vs near-zero for inline BLAKE3 |
+| Unbuffered inline BLAKE3 | Per-call overhead on tiny `fc::raw::pack` writes (1-8 bytes) |
+
+**Performance (33 GB realistic EOS mainnet distribution, release build):**
+
+| | Integrity Hash | Write | Read |
+|---|---|---|---|
+| **Spring (no hash)** | — | 70.0s (476 MB/s) | 254.4s (131 MB/s) |
+| **Wire (inline BLAKE3)** | 34.1s | 63.3s (527 MB/s) | 226.4s (148 MB/s) |
+
+Wire writes are 10% faster than Spring's no-hash baseline (buffer consolidation compensates for BLAKE3 cost). Reads are 11% faster (indexed section lookup eliminates linear scan).
+
+---
+
+## Phase 2 — On-Chain Snapshot Attestation (NEXT)
+
+### Approach: On-Chain Voting Contract
+
+Rather than building a parallel BLS signing and P2P voting layer, snapshot attestation uses a simple on-chain voting contract. Producers register delegate accounts ("snapshot providers") that compute snapshot hashes and vote on-chain. Once a quorum of registered providers agree on a hash for a given block, the record is marked as attested.
+
+This approach was chosen over BLS aggregate signatures because:
+- No new P2P message types or vote accumulation logic needed
+- No requirement for BLS key sharing between producer and snapshot nodes
+- Producers opt in — not all need to run snapshot infrastructure
+- Uses existing transaction/action infrastructure entirely
+- The trust model is equivalent: you're trusting that a quorum of the active schedule honestly computed the hash
+
+### System Contract: `sysio.snapshot`
+
+**Actions:**
+
+```
+regsnapprov(producer, snap_account)       // producer auth — register a snapshot provider
+unregsnapprov(account)                    // account auth — works as snap_account or producer
+votesnaphash(snap_account, block_id, snapshot_hash)  // snap_account auth
+setconfig(min_providers, threshold_pct)   // sysio auth
+getsnaphash(block_num)                    // read-only — returns attested record for a block number
+```
+
+**Registration:**
+- A producer calls `regsnapprov` to designate a `snap_account` as their snapshot provider. This decouples authority — the producer's keys never need to be on the snapshot node.
+- Either party can sever the relationship: the `snap_account` can unregister itself, or the producer can remove its delegate. `unregsnapprov` accepts either account and looks up the mapping in both directions.
+
+**Voting:**
+- After computing a snapshot at a scheduled interval, the snapshot provider calls `votesnaphash(snap_account, block_id, snapshot_hash)`.
+- The contract verifies `snap_account` is a registered delegate of an active producer.
+- Votes are accumulated per `block_id`.
+
+**Attestation threshold:**
+- A snapshot hash is marked "attested" when: `votes >= max(min_providers, ceil(registered_count * 2/3) + 1)`
+- `min_providers` is a configurable floor (set via `setconfig` with `sysio` authority). Default: **1** for testnets, raised for mainnet.
+- `threshold_pct` is the quorum percentage of registered providers (default: 67%).
+- This ensures attestation scales with participation but never falls below the configured floor.
+
+**Storage:**
+- Votes accumulate per `(block_num, block_id, snapshot_hash)` tuple. The `block_num` is extracted from the `block_id`. Since snapshots are only produced at LIB (finalized) blocks, the `block_id` for a given `block_num` will always agree across honest providers. Attestation occurs when one tuple reaches quorum.
+- Attested records: `snapshot_record { block_num, block_id, snapshot_hash, attested_at_block }`
+- Once a `block_num` has an attested record, further votes for that `block_num` are no longer needed.
+- **Disagreement detection:** A provider won't know their vote is bad until a quorum forms without them. On the provider's *next* `votesnaphash` call (for a later block), the contract checks whether any previously attested record has a `block_num` where this provider voted differently. If so, the action returns an error indicating the mismatch. The snapshot provider node must treat this as a fatal condition and shut down — its state is inconsistent with network consensus.
+- **Purging:** Once a `block_num` is attested, vote records for previous (older) `block_num`s can be purged to free RAM. Only the attested `snapshot_record` needs to be retained. At ~200 bytes per record (72 bytes data + multi-index overhead) and ~2,523 snapshots per year (every 25,000 blocks at 0.5s block time), attested records consume ~500 KB/year — negligible. All attested records should be kept so any node can verify any historical snapshot.
+- Queryable via `get_table_rows` on the `snaprecords` table, or via the `getsnaphash` read-only action for use by block explorers and external clients via read-only transactions.
+
+### Snapshot Provider Node
+
+A snapshot provider is a syncing node (not a producer, not a finalizer) that:
+1. Generates snapshots at the configured schedule interval (every 25,000 blocks)
+2. Computes the deterministic root hash
+3. Submits `votesnaphash` transactions to the chain
+4. Optionally serves snapshots over HTTP (Phase 3)
+
+**Config:**
 
 ```ini
-snapshot-threads = 4       # worker threads for parallel section generation
-snapshot-dir = snapshots/  # output directory for snapshot files
-snapshot-provider = false  # set true to enable HTTP snapshot serving and hash voting
-snapshot-hash-only = false # vote on snapshot hash only, without storing the snapshot file
+snapshot-provider = true    # enable snapshot generation + hash voting
 ```
 
-Snapshot/hash generation interval is controlled by the **existing snapshot schedule**, configured at **every 25,000 blocks**. The snapshot plugin hooks into the existing schedule callback; no new interval option is introduced.
+Role exclusivity is enforced at startup: `snapshot-provider` cannot be enabled alongside `producer-name` or active finalizer configuration.
 
-**Role exclusivity enforcement (startup validation):**
+### Exit Criteria
 
-Add a startup check in `nodeop` / `chain_plugin` that aborts with a clear error if incompatible roles are configured together:
-
-```
-ERROR: Conflicting configuration detected.
-'snapshot-provider' (or 'snapshot-hash-only') cannot be enabled on the same node as
-block production ('producer-name') or active finalizer participation.
-Run a separate nodeop instance with the same finalizer key for snapshot duties.
-```
-
-Conversely, if `snapshot-provider` or `snapshot-hash-only` is absent but a finalizer key is configured, no error is raised — the node operates normally as a proposer/finalizer. The two roles share the same BLS finalizer key but must run as separate processes.
+- Contract deployed on devnet
+- Multiple snapshot providers register, compute hashes, vote
+- Attestation record created when quorum reached
+- Bootstrapping node can query attested hash after syncing
 
 ---
 
-### 2. Snapshot Hash Voting
-
-**Files:** `plugins/net_plugin/`, alongside existing finalizer vote logic in `libraries/chain/hotstuff/`
-
-**Tasks:**
-
-- Define new P2P message type `snapshot_hash_message`:
-
-```cpp
-struct snapshot_hash_message {
-    block_num_type   block_num;
-    block_id_type    block_id;
-    digest_type      snapshot_root_hash;
-    bls_signature    finalizer_sig;       // sig over (block_num || block_id || root_hash)
-    bls_public_key   finalizer_key;
-};
-```
-
-- After computing a root hash, broadcast `snapshot_hash_message` to peers
-- Receiving nodes: verify the finalizer key is in the active finalizer policy, verify the BLS signature, accumulate toward quorum weight **per the active finalizer policy for that block** (same weight threshold as block finality)
-- Once quorum is reached, produce a `snapshot_certificate`:
-
-```cpp
-struct snapshot_certificate {
-    block_num_type          block_num;
-    block_id_type           block_id;
-    digest_type             snapshot_root_hash;
-    bls_aggregate_sig       aggregate_sig;
-    vector<bls_public_key>  signers;
-};
-```
-
-- Store certificate as a sidecar `.cert` file alongside the snapshot container
-
----
-
-### 3. On-Chain Snapshot Attestation
-
-**Files:** New `contracts/sysio.snapshot/` system contract
-
-**Tasks:**
-
-- Define action `attestsnap` callable by snapshot nodeops once a certificate is produced:
-
-```
-action attestsnap(block_num, block_id, snapshot_root_hash, snapshot_certificate)
-```
-
-- Contract verifies BLS aggregate signature against the active finalizer policy **for the attested block**; rejects if the quorum weight threshold defined by that policy is not met
-- Stores immutable record: `snapshot_record { block_num, block_id, snapshot_root_hash, certified_at_block }`; first writer wins, duplicates rejected
-- Expose read-only chain API endpoint `get_snapshot_record(block_num)`
-
----
-
-### 4. HTTP Snapshot Server
+## Phase 3 — HTTP Snapshot Server
 
 **Files:** New `plugins/snapshot_plugin/`
 
@@ -166,25 +161,24 @@ action attestsnap(block_num, block_id, snapshot_root_hash, snapshot_certificate)
 
 ```
 GET /v1/snapshot/latest
-    Response: { block_num, block_id, snapshot_root_hash, certificate, download_url }
+    Response: { block_num, block_id, snapshot_root_hash, download_url }
 
 GET /v1/snapshot/by_block/{block_num}
     Response: same structure for a specific block
 
 GET /v1/snapshot/download/{block_num}
-    Response: binary stream of .tar.zst snapshot container
+    Response: binary stream of snapshot file
 
 GET /v1/snapshot/peers
     Response: { peers: ["host:port", ...] }
 ```
 
-- Include full `snapshot_certificate` in metadata responses so clients can verify before downloading
 - Support `Range` header for resumable downloads
 - Rate-limit the download endpoint
 
 ---
 
-### 5. Bootstrapping Node: Snapshot Load & Verification
+## Phase 4 — Bootstrap Node Verification & Integration
 
 **Files:** `plugins/chain_plugin/`, `programs/nodeop/main.cpp`
 
@@ -199,10 +193,11 @@ snapshot-block-num =                                 # optional: request a speci
 
 - Bootstrap flow when `snapshot-endpoint` is set and no existing chain data is present:
     1. Fetch metadata from `/v1/snapshot/latest` (or `by_block` if specified)
-    2. Verify the `snapshot_certificate` BLS aggregate signature against the known finalizer policy — abort if invalid
-    3. Download snapshot container; compute `root_hash` and verify it matches the certified hash — abort if mismatch
-    4. Query on-chain `get_snapshot_record(block_num)` and compare against both certificate and computed hash
-    5. **If any comparison fails:** log a fatal error and immediately shut down:
+    2. Download snapshot; compute `root_hash` locally and verify it matches the advertised hash — abort if mismatch
+    3. Load the snapshot and begin p2p sync
+    4. Once synced to head, query on-chain `snaprecords` table for the snapshot's `block_id`
+    5. Compare locally computed hash against the on-chain attested hash
+    6. **If mismatch:** log a fatal error and immediately shut down:
 
 ```
 FATAL: Snapshot hash mismatch detected.
@@ -211,72 +206,45 @@ Locally computed:  <computed_hash>
 This node may be loading untrusted state. Shutting down immediately.
 ```
 
-6. Load the verified snapshot and begin p2p sync using peers from `/v1/snapshot/peers`
-
----
-
-## Implementation Phases
-
-### Phase 1 — Deterministic Multi-threaded Snapshot Format
-- Refactor snapshot writer into parallel independent sections
-- Implement `snapshot_manifest` and root hash derivation
-- **Exit criteria:** Determinism test passes; measurable generation speedup with 4 threads vs single thread
-
-### Phase 2 — Hash Voting & Certificate Production
-- Implement `snapshot_hash_message` P2P message and signature accumulation
-- Reuse/extend existing BLS finalizer vote infrastructure
-- **Exit criteria:** Certificate produced on devnet with >= 2/3 weight finalizers participating
-
-### Phase 3 — On-Chain Attestation
-- Deploy `sysio.snapshot` contract with `attestsnap` action and BLS verification
-- **Exit criteria:** Attested hash queryable on-chain after certificate is produced
-
-### Phase 4 — HTTP Snapshot Server
-- Implement `snapshot_plugin` with all endpoints and resumable download support
-- **Exit criteria:** Full snapshot downloadable; certificate passes standalone verification via curl
-
-### Phase 5 — Bootstrap Node Verification & Integration
-- Implement bootstrap flow in `chain_plugin` with hard shutdown on mismatch
-- **Exit criteria:** Fresh node bootstraps from snapshot, verifies all hashes, joins devnet; tampered snapshot triggers clean fatal shutdown
+**Note:** Verification happens *after* sync, not before. The node loads the snapshot optimistically, syncs to head, then checks the on-chain record. This avoids a chicken-and-egg problem (can't query on-chain state before having chain state).
 
 ---
 
 ## Operator Deployment Model
 
-A finalizer node operator runs two nodeop processes on separate machines (or VMs), both configured with the same BLS finalizer key:
-
 ```
-[Proposer/Finalizer Node]          [Snapshot Node]
+[Producer Node]                    [Snapshot Provider Node]
   producer-name = <account>          snapshot-provider = true
-  finalizer-key = <bls-pub>          finalizer-key = <same-bls-pub>
   (no snapshot-provider)             (no producer-name)
 ```
 
-The snapshot node's finalizer key allows it to sign snapshot hashes that are recognized by the rest of the network as coming from a legitimate finalizer. It never participates in block production or block finality voting — its only use of the key is to sign `snapshot_hash_message` payloads.
+The producer registers the snapshot provider's account via `regsnapprov`. The snapshot provider node syncs the chain, generates snapshots at scheduled intervals, votes on hashes, and optionally serves snapshots over HTTP. No shared keys between the two nodes.
 
 ---
 
 ## Testing Requirements
 
-- **Unit:** Determinism test, BLS signature verify/aggregate, manifest hash computation, section ordering stability, startup role conflict detection (snapshot + producer config aborts, snapshot + finalizer config aborts)
-- **Integration:** Full cycle on local devnet — generate → vote → certify → attest on-chain → serve → bootstrap
+- **Unit:** Determinism test (two snapshots at same block produce identical root_hash), section ordering stability, startup role conflict detection
+- **Contract:** Registration/unregistration, vote accumulation, threshold logic, duplicate rejection, quorum edge cases (min_providers vs percentage)
+- **Integration:** Full cycle on local devnet — generate snapshot, vote hash, reach attestation, serve via HTTP, bootstrap new node, verify after sync
 - **Adversarial:**
-    - Tampered snapshot container → node halts with fatal error
-    - Invalid BLS signature on certificate → rejected at download
-    - On-chain hash mismatch after valid cert → node halts
-    - Wrong block num → rejected
-- **Performance:** Single-threaded vs. 4-thread generation time; target >= 2x speedup
+    - Tampered snapshot → computed hash doesn't match advertised hash → abort before loading
+    - On-chain hash mismatch after sync → node halts with fatal error
+    - Unregistered account votes → rejected
+    - Vote after attestation with different hash → rejected
+- **Performance:** Snapshot generation benchmarks (see Phase 1 results)
 
 ---
 
 ## Open Questions
 
 **Resolved:**
+- **Hash algorithm:** BLAKE3 — faster than SHA-256, uses LLVM's bundled implementation
+- **Snapshot format:** Single-file binary with section index at end (not tar.zst — simpler, deterministic, already 10% faster than Spring)
+- **Signing mechanism:** On-chain voting contract, not BLS aggregate signatures (simpler, equivalent trust model, no P2P changes needed)
 - **Snapshot interval:** Every 25,000 blocks using the existing snapshot schedule mechanism
-- **Minimum signers / quorum threshold:** Determined by the active finalizer policy for the block being attested — same policy and weight rules as block finality
+- **Attestation threshold:** `max(min_providers, ceil(registered_count * 2/3) + 1)` with configurable floor
 
 **Still open:**
-1. **Hash algorithm:** BLAKE3 vs. SHA-256 — confirm based on existing codebase conventions
-2. **Container format:** `.tar.zst` recommended (streaming-friendly); confirm Zstandard dependency is acceptable
-3. **Who calls `attestsnap`?** Recommend: first snapshot nodeop to reach quorum calls it; contract deduplicates by block_num
-4. **Hash-only nodeop incentives:** Leave participation optional for now; design message handling to support it from the start
+1. **Compression for distribution:** Add gzip or zstd compression layer for HTTP serving? Current format is uncompressed binary.
+2. **Snapshot retention:** How many snapshots should a provider node retain? Prune policy?
