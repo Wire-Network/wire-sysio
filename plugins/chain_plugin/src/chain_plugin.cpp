@@ -832,9 +832,9 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
                      "Cannot load snapshot, {} does not exist", snapshot_path->generic_string() );
 
          // recover genesis information from the snapshot
-         // used for validation code below
+         // used for validation code below; load_index() is cheap (no hash verification)
          threaded_snapshot_reader reader(*snapshot_path);
-         reader.validate();
+         reader.load_index();
          chain_id = controller::extract_chain_id(reader);
 
          SYS_ASSERT(

@@ -516,6 +516,10 @@ namespace sysio { namespace chain {
 
          bool has_section( const std::string& section_name ) const override;
 
+         /// Parse header, footer, and section index without verifying hashes.
+         /// Sufficient for lightweight operations like chain_id extraction.
+         void load_index();
+
          /// Returns the root hash read from the file header (valid after validate()).
          fc::crypto::blake3 get_root_hash() const { return root_hash_; }
 
@@ -534,6 +538,7 @@ namespace sysio { namespace chain {
 
          std::vector<section_entry>               section_index_;
          fc::crypto::blake3                       root_hash_;
+         bool                                     index_loaded_ = false;
          bool                                     validated_ = false;
 
          thread_local inline static fc::datastream<const char*> ds = fc::datastream<const char*>(nullptr, 0);

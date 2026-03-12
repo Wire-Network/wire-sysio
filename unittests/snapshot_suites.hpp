@@ -97,8 +97,11 @@ struct threaded_snapshot_suite {
    }
 
    static void write_to_file( const std::string& basename, const snapshot_t& snapshot ) {
-      // Copy the snapshot file to the output location
-      std::filesystem::copy_file(snapshot, basename + ".bin", std::filesystem::copy_options::overwrite_existing);
+      // Read the raw .bin file and write it gzip-compressed to the standard snapshots directory
+      std::ifstream in(snapshot, std::ios::binary);
+      std::string contents((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      snapshot_output_file<snapshot::binary> file(basename);
+      file.write(contents);
    }
 
    inline static fc::temp_directory threaded_snapshot_tempdir;

@@ -73,9 +73,9 @@ int snapshot_actions::run_tojson() {
    if(!opt->chain_id.empty()) { // override it
       chain_id = chain_id_type(opt->chain_id);
    }
-   else { // try to retrieve it
+   else { // try to retrieve it; load_index() is cheap (no hash verification)
       threaded_snapshot_reader reader(snapshot_path);
-      reader.validate();
+      reader.load_index();
       chain_id = controller::extract_chain_id(reader);
    }
 

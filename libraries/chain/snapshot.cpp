@@ -455,8 +455,8 @@ threaded_snapshot_reader::threaded_snapshot_reader(const std::filesystem::path& 
    validate();
 }
 
-void threaded_snapshot_reader::validate() {
-   if(validated_)
+void threaded_snapshot_reader::load_index() {
+   if(index_loaded_)
       return;
    try {
       const uint64_t file_size = mapped_snap.get_size();
@@ -505,10 +505,11 @@ void threaded_snapshot_reader::validate() {
 
          // Read null-terminated section name
          const char* name_start = ids.pos();
+         const char* name_end = name_start + ids.remaining();
          const char* p = name_start;
-         while(p < mapped_snap_addr + file_size && *p != '\0')
+         while(p < name_end && *p != '\0')
             ++p;
-         SYS_ASSERT(p < mapped_snap_addr + file_size, snapshot_exception, "Section name not null-terminated");
+         SYS_ASSERT(p < name_end, snapshot_exception, "Section name not null-terminated");
          entry.name.assign(name_start, p - name_start);
          ids.skip(entry.name.size() + 1);
 
@@ -523,6 +524,17 @@ void threaded_snapshot_reader::validate() {
          section_index_.push_back(std::move(entry));
       }
 
+      index_loaded_ = true;
+   } FC_LOG_AND_RETHROW()
+}
+
+void threaded_snapshot_reader::validate() {
+   if(validated_)
+      return;
+
+   load_index();
+
+   try {
       // Verify per-section hashes by re-hashing each section's data from mmap
       for(const auto& entry : section_index_) {
          auto computed = blake3_encoder::hash(mapped_snap_addr + entry.data_offset, entry.data_size);
@@ -556,7 +568,7 @@ bool threaded_snapshot_reader::has_section(const std::string& section_name) cons
 }
 
 void threaded_snapshot_reader::set_section(const string& section_name) {
-   SYS_ASSERT(validated_, snapshot_exception, "Snapshot must be validated before reading sections");
+   SYS_ASSERT(index_loaded_, snapshot_exception, "Snapshot index must be loaded before reading sections");
 
    for(const auto& entry : section_index_) {
       if(entry.name == section_name) {
@@ -598,7 +610,7 @@ void threaded_snapshot_reader::return_to_header() {
 }
 
 size_t threaded_snapshot_reader::total_row_count() {
-   SYS_ASSERT(validated_, snapshot_exception, "Snapshot must be validated before querying row count");
+   SYS_ASSERT(index_loaded_, snapshot_exception, "Snapshot index must be loaded before querying row count");
 
    size_t total = 0;
    for(const auto& entry : section_index_) {
