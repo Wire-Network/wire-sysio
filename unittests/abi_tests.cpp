@@ -3496,6 +3496,170 @@ BOOST_AUTO_TEST_CASE(abi_to_variant__add_action__no_return_value)
    }
 }
 
+BOOST_AUTO_TEST_CASE(enum_types)
+{
+   using sysio::testing::fc_exception_message_starts_with;
+
+   auto enum_abi = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [
+         {"name": "s", "base": "", "fields": [
+            {"name": "status", "type": "my_status"},
+            {"name": "user", "type": "name"}
+         ]}
+      ],
+      "enums": [
+         {"name": "my_status", "type": "uint8", "values": [
+            {"name": "UNKNOWN", "value": 0},
+            {"name": "ACTIVE", "value": 1},
+            {"name": "PAUSED", "value": 2},
+            {"name": "CLOSED", "value": 3}
+         ]}
+      ],
+   })";
+
+   auto enum_abi_uint16 = R"({
+      "version": "sysio::abi/1.1",
+      "structs": [
+         {"name": "s", "base": "", "fields": [
+            {"name": "val", "type": "my_enum16"}
+         ]}
+      ],
+      "enums": [
+         {"name": "my_enum16", "type": "uint16", "values": [
+            {"name": "A", "value": 0},
+            {"name": "B", "value": 1},
+            {"name": "C", "value": 256}
+         ]}
+      ],
+   })";
+
+   auto duplicate_enum_abi = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}]},
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_invalid_type = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "bogus_type", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_non_integer_type = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "string", "values": [{"name": "X", "value": 0}]}
+      ],
+   })";
+
+   auto enum_abi_out_of_range = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "TOO_BIG", "value": 999}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_name = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "X", "value": 0}, {"name": "X", "value": 1}]}
+      ],
+   })";
+
+   auto enum_abi_duplicate_value = R"({
+      "version": "sysio::abi/1.1",
+      "enums": [
+         {"name": "e1", "type": "uint8", "values": [{"name": "A", "value": 0}, {"name": "B", "value": 0}]}
+      ],
+   })";
+
+   try {
+      // round-trip abi through multiple formats
+      auto bin = fc::raw::pack(fc::json::from_string(enum_abi).as<abi_def>());
+      abi_serializer abis(fc::variant(fc::raw::unpack<abi_def>(bin)).as<abi_def>(), yield_fn() );
+
+      // duplicate enum definition detected
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(duplicate_enum_abi).as<abi_def>(), yield_fn() ), duplicate_abi_enum_def_exception );
+
+      // invalid underlying type (not a known type at all)
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_invalid_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // non-integer underlying type (e.g. string)
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_non_integer_type).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // enum value out of range for underlying type
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_out_of_range).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate member name within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_name).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // duplicate value within enum
+      BOOST_CHECK_THROW( abi_serializer( fc::json::from_string(enum_abi_duplicate_value).as<abi_def>(), yield_fn() ), invalid_type_inside_abi );
+
+      // Test binary -> variant (enum value to string name)
+      // UNKNOWN=0 encoded as uint8 is 0x00
+      auto var1 = abis.binary_to_variant("my_status", {0x00}, yield_fn());
+      BOOST_CHECK_EQUAL(var1.as_string(), "UNKNOWN");
+
+      // ACTIVE=1 encoded as uint8 is 0x01
+      auto var2 = abis.binary_to_variant("my_status", {0x01}, yield_fn());
+      BOOST_CHECK_EQUAL(var2.as_string(), "ACTIVE");
+
+      // CLOSED=3 encoded as uint8 is 0x03
+      auto var3 = abis.binary_to_variant("my_status", {0x03}, yield_fn());
+      BOOST_CHECK_EQUAL(var3.as_string(), "CLOSED");
+
+      // Unknown value 0xFF falls back to integer
+      auto var4 = abis.binary_to_variant("my_status", bytes{static_cast<char>(0xFF)}, yield_fn());
+      BOOST_CHECK_EQUAL(var4.as_uint64(), 255u);
+
+      // Test variant -> binary (string name to enum value)
+      auto bytes1 = abis.variant_to_binary("my_status", fc::json::from_string(R"("ACTIVE")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes1), "01");
+
+      auto bytes2 = abis.variant_to_binary("my_status", fc::json::from_string(R"("PAUSED")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes2), "02");
+
+      auto bytes3 = abis.variant_to_binary("my_status", fc::json::from_string(R"("CLOSED")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes3), "03");
+
+      // Test variant -> binary (raw integer value)
+      auto bytes4 = abis.variant_to_binary("my_status", fc::json::from_string(R"(2)"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes4), "02");
+
+      // Test variant -> binary (invalid enum name)
+      BOOST_CHECK_EXCEPTION( abis.variant_to_binary("my_status", fc::json::from_string(R"("INVALID")"), yield_fn()),
+                             pack_exception, fc_exception_message_starts_with("Unknown enum value 'INVALID' for enum 'my_status'") );
+
+      // Test enum in struct context (round trip)
+      auto struct_json = R"({"status":"ACTIVE","user":"alice"})";
+      auto struct_bytes = abis.variant_to_binary("s", fc::json::from_string(struct_json), yield_fn());
+      auto struct_var = abis.binary_to_variant("s", struct_bytes, yield_fn());
+      BOOST_CHECK_EQUAL(struct_var["status"].as_string(), "ACTIVE");
+
+      // Test uint16 enum
+      auto bin16 = fc::raw::pack(fc::json::from_string(enum_abi_uint16).as<abi_def>());
+      abi_serializer abis16(fc::variant(fc::raw::unpack<abi_def>(bin16)).as<abi_def>(), yield_fn() );
+
+      // C=256 as uint16 little-endian is 0x0001
+      auto bytes_c = abis16.variant_to_binary("my_enum16", fc::json::from_string(R"("C")"), yield_fn());
+      BOOST_CHECK_EQUAL(fc::to_hex(bytes_c), "0001");
+
+      auto var_c = abis16.binary_to_variant("my_enum16", bytes_c, yield_fn());
+      BOOST_CHECK_EQUAL(var_c.as_string(), "C");
+
+      // is_enum check
+      BOOST_CHECK(abis.is_enum("my_status"));
+      BOOST_CHECK(!abis.is_enum("name"));
+      BOOST_CHECK(!abis.is_enum("nonexistent"));
+
+   } FC_LOG_AND_RETHROW()
+}
+
 // ===================== Protobuf ABI Serialization Tests =====================
 
 // A minimal ABI 1.3 with protobuf_types and protobuf-typed actions

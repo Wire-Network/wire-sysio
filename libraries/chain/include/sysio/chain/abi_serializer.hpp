@@ -62,6 +62,7 @@ struct abi_serializer {
    bool      is_integer(const std::string_view& type) const;
    int       get_integer_size(const std::string_view& type) const;
    bool      is_struct(const std::string_view& type)const;
+   bool      is_enum(const std::string_view& type)const;
 
    /// @return string_view of `type`
    std::string_view fundamental_type(const std::string_view& type)const;
@@ -152,6 +153,7 @@ private:
    map<name,type_name>                        tables;
    map<uint64_t, string>                      error_messages;
    map<type_name, variant_def, std::less<>>   variants;
+   map<type_name, enum_def, std::less<>>      enums;
    map<name,type_name>                        action_results;
 
    map<type_name, pair<unpack_function, pack_function>, std::less<>> built_in_types;

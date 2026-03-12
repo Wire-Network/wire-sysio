@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 
 #ifdef SYSIO_NATIVE_MODULE_RUNTIME_ENABLED
+
 #include <sysio/chain/wasm_interface.hpp>
 #include <sysio/chain/webassembly/native-module/native_module_overlay.hpp>
 #include <sysio/testing/tester.hpp>
