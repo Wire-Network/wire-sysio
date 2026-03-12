@@ -4896,7 +4896,7 @@ namespace sysio {
                 fc::lock_guard g(check->conn_mtx);
                 return check->p2p_address == pa;
              })) {
-            fc_dlog(p2p_conn_log, "Skipping connect to {} - {} due to existing inbound connection", pa, connection_id);
+            fc_dlog(p2p_conn_log, "Skipping connect to {} - {} due to existing connection", pa, connection_id);
             return true;
          }
       }
