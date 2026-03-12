@@ -95,6 +95,17 @@ struct variant_def {
    vector<type_name>    types;
 };
 
+struct enum_value_def {
+   string    name;
+   int64_t   value;
+};
+
+struct enum_def {
+   type_name                  name;
+   type_name                  type;   // underlying type, e.g. "uint8"
+   vector<enum_value_def>     values;
+};
+
 struct action_result_def {
    action_result_def() = default;
    action_result_def(const action_name& name, const type_name& result_type)
@@ -131,6 +142,7 @@ struct abi_def {
    extensions_type                           abi_extensions;
    may_not_exist<vector<variant_def>>        variants;
    may_not_exist<vector<action_result_def>>  action_results;
+   may_not_exist<vector<enum_def>>           enums;
 };
 
 abi_def sysio_contract_abi(const abi_def& sysio_system_abi);
@@ -176,8 +188,10 @@ FC_REFLECT( sysio::chain::clause_pair                      , (id)(body) )
 FC_REFLECT( sysio::chain::error_message                    , (error_code)(error_msg) )
 FC_REFLECT( sysio::chain::variant_def                      , (name)(types) )
 FC_REFLECT( sysio::chain::action_result_def                , (name)(result_type) )
+FC_REFLECT( sysio::chain::enum_value_def                   , (name)(value) )
+FC_REFLECT( sysio::chain::enum_def                         , (name)(type)(values) )
 FC_REFLECT( sysio::chain::abi_def                          , (version)(types)(structs)(actions)(tables)
-                                                             (ricardian_clauses)(error_messages)(abi_extensions)(variants)(action_results) )
+                                                             (ricardian_clauses)(error_messages)(abi_extensions)(variants)(action_results)(enums) )
 namespace sysio::chain {
 
 constexpr auto format_as(const type_def& td) {
@@ -197,6 +211,9 @@ constexpr auto format_as(const table_def& td) {
 }
 constexpr auto format_as(const variant_def& vd) {
    return fmt::format("variant_def{{name {}, types {}}}", vd.name, vd.types);
+}
+constexpr auto format_as(const enum_def& ed) {
+   return fmt::format("enum_def{{name {}, type {}}}", ed.name, ed.type);
 }
 
 } // namespace sysio::chain
