@@ -7,7 +7,7 @@ export WALLET_DIR="$KIOD_ROOT/data"
 export SECRETS_DIR="$KIOD_ROOT/secrets"
 
 ACCT_AUTHEX="sysio.authex"
-ACCT_NODE_OWNER_1="node1"
+ACCT_NODE_OWNER_1="dev.owner1"
 DEFAULT_PUBLIC_KEY="SYS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV"
 
 PUBLIC_KEY=""
@@ -83,7 +83,7 @@ run() {
 }
 
 run-clio() {
-    ${CLIO} --wallet-dir "$WALLET_DIR" -u "$NODEOP_URL" $@ || die "An error occurred while executing: $*"
+    eval ${CLIO} --wallet-dir "$WALLET_DIR" -u "$NODEOP_URL" "$@" || die "An error occurred while executing: $*"
 }
 
 
@@ -102,27 +102,39 @@ fi
 
 # Now convert all pub key formats from public key
 CONVERT_OUTPUT=$(run-clio convert k1_public_key "${PUBLIC_KEY}")
-PUB_K1=$(echo "$CONVERT_OUTPUT" | sed -n '2s/^Public key: //p')
+# May have use in the future
+# PUB_K1=$(echo "$CONVERT_OUTPUT" | sed -n '2s/^Public key: //p')
 
 # CREATE ACCOUNTS
 create_account() {
    local name="$1"
+   echo "Creating account ${name}.."
    run-clio system newaccount sysio "$name" "$PUBLIC_KEY" "$PUBLIC_KEY" -p sysio@active
 }
 
 create_account_if_not_exists() {
    local name="$1"
-   if ! run-clio get account "$name" > /dev/null 2>&1; then
-      create_account "$name"
+   echo "Checking if account ${name} exists..."
+   if ! ${CLIO} get account "${name}" > /dev/null 2>&1; then
+      create_account "${name}"
    else
-      echo "Account $name already exists, skipping creation."
+      echo "Account ${name} already exists, skipping creation."
    fi
 }
 
 create_account_if_not_exists "${ACCT_NODE_OWNER_1}"
 create_account_if_not_exists "${LINK_USERNAME}"
 
-${CLIO} push action sysio.roa forcereg '["'"${ACCT_NODE_OWNER_1}"'", 1]' -p sysio.roa@active || die "forcereg failed"
+echo "Checking registration of node owner ${ACCT_NODE_OWNER_1}..."
+OWNER_REG_COUNT=$(clio get table sysio.roa 0 nodeowners -L ${ACCT_NODE_OWNER_1} -U ${ACCT_NODE_OWNER_1} | jq '.rows | length')
+
+echo "Node owner ${ACCT_NODE_OWNER_1} registration count: ${OWNER_REG_COUNT}"
+if [[ "$OWNER_REG_COUNT" -eq 0 ]]; then
+   echo "Account ${ACCT_NODE_OWNER_1} is not registered as a node owner. Registering now..."
+    ${CLIO} push action sysio.roa forcereg '["'"${ACCT_NODE_OWNER_1}"'", 1]' -p sysio.roa@active || die "forcereg failed"
+fi
+
+echo "Add Policy"
 ${CLIO} push action sysio.roa addpolicy '["'"${LINK_USERNAME}"'", "'"${ACCT_NODE_OWNER_1}"'", "200.0100 SYS", "0.0000 SYS", "200.1000 SYS", 0, 0]' -p "${ACCT_NODE_OWNER_1}@active" || die "addpolicy failed"
 
 echo "Setup complete. Account ${LINK_USERNAME} is ready to use with authex. The users private key is the same as the one provided: ${PRIVATE_KEY}"
