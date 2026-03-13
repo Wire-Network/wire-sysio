@@ -3,6 +3,7 @@
 #include <sysio/multi_index.hpp>
 #include <sysio/name.hpp>
 #include <sysio/time.hpp>
+#include <sysio.system/block_utils.hpp>
 
 #include <limits>
 #include <optional>

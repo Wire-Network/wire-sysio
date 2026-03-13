@@ -1,16 +1,9 @@
+
 #include <sysio.system/sysio.system.hpp>
 #include <sysio.system/snapshot_attest.hpp>
+#include <sysio.system/block_utils.hpp>
 
 #include <sysio/sysio.hpp>
-
-namespace {
-
-inline uint32_t block_height_from_id(const sysio::checksum256& block_id) {
-   auto arr = block_id.extract_as_byte_array();
-   return ((arr[0] << 0x18) | (arr[1] << 0x10) | (arr[2] << 0x08) | arr[3]);
-}
-
-} // namespace
 
 namespace sysiosystem {
 
@@ -71,7 +64,7 @@ void snapshot_attest::votesnaphash(name snap_account, checksum256 block_id, chec
    auto prov_itr = provs.find(snap_account.value);
    check(prov_itr != provs.end(), "snap_account is not a registered snapshot provider");
 
-   uint32_t block_num = block_height_from_id(block_id);
+   uint32_t block_num = block_info::block_height_from_id(block_id);
    check(block_num > 0, "invalid block_id");
 
    // Check for disagreement against attested records

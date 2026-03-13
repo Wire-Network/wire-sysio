@@ -212,8 +212,10 @@ try:
 
     Print("Verify gossip connections")
     scheduled_producers = cluster.nodes[0].getProducerSchedule()
-    success = verifyGossipConnections(scheduled_producers)
-    assert(success)
+    # Use retry loop since nodes restarted sequentially may still be catching up,
+    # causing temporary connection closures due to block rejection violations
+    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=60), \
+        "Timed out waiting for all gossip connections to be established"
 
     Print("Manual connect node_19 defproducert to node_04 defproducere")
     cluster.nodes[19].processUrllibRequest("net", "connect", payload="localhost:9880", exitOnError=True)
@@ -228,8 +230,8 @@ try:
     Print(f"Scheduled producers: {scheduled_producers}")
     assert(len(scheduled_producers) == 4)
     assert("defproducerb" in scheduled_producers and "defproducerh" in scheduled_producers and "defproducerm" in scheduled_producers and "defproducerr" in scheduled_producers)
-    success = verifyGossipConnections(scheduled_producers)
-    assert(success)
+    assert Utils.waitForBool(lambda: verifyGossipConnections(scheduled_producers), timeout=60), \
+        "Timed out waiting for new schedule gossip connections"
 
     Print("Verify manual connection still connected and stale gossip peer disconnected")
     # After schedule change, defproducerh may still have an incoming gossip connection to
@@ -244,7 +246,7 @@ try:
     assert Utils.waitForBool(checkNode19Connections, timeout=60), \
         "Expected node_19 to keep manual connection to defproducere and drop gossip connection to defproducerh"
 
-    testSuccessful = success
+    testSuccessful = True
 
 finally:
     TestHelper.shutdown(

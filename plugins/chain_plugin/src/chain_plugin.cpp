@@ -1541,37 +1541,31 @@ void chain_plugin_impl::verify_snapshot_attestation(uint32_t current_lib_num) {
          return;
       }
 
-      // Deserialize the snap_record row:
-      //   uint64_t block_num + checksum256 block_id + checksum256 snapshot_hash + uint32_t attested_at_block
-      // We need the snapshot_hash at offset 8+32 = 40, length 32
-      const auto& row = it->value;
-      constexpr size_t hash_offset = sizeof(uint64_t) + 32; // block_num(8) + block_id(32)
-      constexpr size_t hash_size = 32;
-
-      if (row.size() < hash_offset + hash_size) {
-         elog("FATAL: Snapshot attestation record for block #{} has unexpected format (size {}). "
-              "To continue syncing without snapshot verification, restart without the --snapshot option.",
-              snap_block_num, row.size());
-         app().quit();
+      // Deserialize the snap_record row via ABI to avoid hard-coded byte offsets
+      const auto* code_accnt = chain->find_account_metadata(config::system_account_name);
+      if (!code_accnt || code_accnt->abi.size() == 0) {
+         wlog("System contract ABI not found. Skipping snapshot attestation verification.");
          return;
       }
 
-      // Compare the on-chain snapshot_hash with our loaded root_hash
-      if (memcmp(row.data() + hash_offset, snapshot_loaded_root_hash.data(), hash_size) != 0) {
-         // Format the on-chain hash for the error message
-         std::string onchain_hex;
-         onchain_hex.reserve(hash_size * 2);
-         const char hex_chars[] = "0123456789abcdef";
-         for (size_t i = 0; i < hash_size; ++i) {
-            uint8_t byte = static_cast<uint8_t>(row.data()[hash_offset + i]);
-            onchain_hex += hex_chars[byte >> 4];
-            onchain_hex += hex_chars[byte & 0x0F];
-         }
+      chain::abi_def abi;
+      chain::abi_serializer::to_abi(code_accnt->abi, abi);
+      chain::abi_serializer abis(std::move(abi),
+         chain::abi_serializer::create_yield_function(abi_serializer_max_time_us));
 
+      vector<char> data;
+      chain_apis::read_only::copy_inline_row(*it, data);
+      auto row_var = abis.binary_to_variant("snap_record", data,
+         chain::abi_serializer::create_yield_function(abi_serializer_max_time_us));
+
+      auto snapshot_hash_str = row_var["snapshot_hash"].as_string();
+
+      // Compare the on-chain snapshot_hash with our loaded root_hash
+      if (snapshot_hash_str != snapshot_loaded_root_hash.str()) {
          elog("FATAL: Snapshot hash mismatch for block #{}! "
               "On-chain attested hash: {}, loaded snapshot hash: {}. "
               "The snapshot file may be corrupted or tampered with. Do NOT use this snapshot.",
-              snap_block_num, onchain_hex, snapshot_loaded_root_hash.str());
+              snap_block_num, snapshot_hash_str, snapshot_loaded_root_hash.str());
          app().quit();
          return;
       }

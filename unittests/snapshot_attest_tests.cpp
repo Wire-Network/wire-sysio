@@ -139,8 +139,10 @@ public:
       return true;
    }
 
-   // Create a snapshot and return (path, root_hash, block_num)
+   // Caller must keep the returned snapshot_info alive while using the snapshot path
+   // (temp_directory's destructor cleans up the directory)
    struct snapshot_info {
+      fc::temp_directory    tempdir;
       std::filesystem::path path;
       fc::crypto::blake3    root_hash;
       uint32_t              block_num;
@@ -149,13 +151,15 @@ public:
    snapshot_info create_test_snapshot() {
       control->abort_block();
 
-      fc::temp_directory tempdir;
-      auto snap_path = tempdir.path() / "test_snapshot.bin";
-      auto writer = std::make_shared<threaded_snapshot_writer>(snap_path);
+      snapshot_info info;
+      info.path = info.tempdir.path() / "test_snapshot.bin";
+      auto writer = std::make_shared<threaded_snapshot_writer>(info.path);
       control->write_snapshot(writer);
       writer->finalize();
+      info.root_hash = writer->get_root_hash();
+      info.block_num = control->head().block_num();
 
-      return {snap_path, writer->get_root_hash(), control->head().block_num()};
+      return info;
    }
 };
 
@@ -176,8 +180,9 @@ BOOST_FIXTURE_TEST_CASE(snapshot_hash_matches_attestation, snapshot_attest_fixtu
    auto block_num = control->head().block_num();
    auto block_id = control->head().id();
 
+   fc::temp_directory tempdir;
    auto writer = std::make_shared<threaded_snapshot_writer>(
-      fc::temp_directory().path() / "snap.bin");
+      tempdir.path() / "snap.bin");
    control->write_snapshot(writer);
    writer->finalize();
    auto root_hash = writer->get_root_hash();
@@ -280,8 +285,9 @@ BOOST_FIXTURE_TEST_CASE(snapshot_no_attestation_detected, snapshot_attest_fixtur
    control->abort_block();
    auto block_num = control->head().block_num();
 
+   fc::temp_directory tempdir;
    auto writer = std::make_shared<threaded_snapshot_writer>(
-      fc::temp_directory().path() / "no_attest_snap.bin");
+      tempdir.path() / "no_attest_snap.bin");
    control->write_snapshot(writer);
    writer->finalize();
 
@@ -340,20 +346,7 @@ BOOST_FIXTURE_TEST_CASE(attestation_survives_snapshot_load, snapshot_attest_fixt
 
    // The attestation record should survive the snapshot round-trip
    fc::sha256 loaded_on_chain_hash;
-   bool found = false;
-   {
-      const auto& db = snap_chain.control->db();
-      const auto* t_id = db.find<table_id_object, by_code_scope_table>(
-         boost::make_tuple(config::system_account_name, config::system_account_name, "snaprecords"_n));
-      if (t_id) {
-         const auto& kv_index = db.get_index<key_value_index, by_scope_primary>();
-         auto it = kv_index.find(boost::make_tuple(t_id->id, static_cast<uint64_t>(pre_snap_block_num)));
-         if (it != kv_index.end() && it->value.size() >= sizeof(uint64_t) + 32 + 32) {
-            memcpy(loaded_on_chain_hash.data(), it->value.data() + sizeof(uint64_t) + 32, 32);
-            found = true;
-         }
-      }
-   }
+   bool found = read_snap_record(snap_chain.control->db(), pre_snap_block_num, loaded_on_chain_hash);
 
    BOOST_REQUIRE(found);
    BOOST_REQUIRE_EQUAL(hash_as_sha256.str(), loaded_on_chain_hash.str());
