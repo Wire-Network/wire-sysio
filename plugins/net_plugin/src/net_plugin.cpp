@@ -2,9 +2,12 @@
 #include <sysio/net_plugin/buffer_factory.hpp>
 #include <sysio/net_plugin/gossip_bps_index.hpp>
 #include <sysio/net_plugin/protocol.hpp>
+#include <sysio/net_plugin/queued_buffer.hpp>
 #include <sysio/net_plugin/net_logger.hpp>
 #include <sysio/net_plugin/net_utils.hpp>
 #include <sysio/net_plugin/auto_bp_peering.hpp>
+#include <sysio/net_plugin/peer_auth.hpp>
+#include <sysio/net_plugin/peer_scoring.hpp>
 #include <sysio/chain/types.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/controller.hpp>
@@ -118,7 +121,6 @@ namespace sysio {
    static constexpr int64_t block_interval_ns =
       std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(config::block_interval_ms)).count();
 
-   using connection_id_t = uint32_t;
    using connection_id_set = boost::unordered_flat_set<connection_id_t>;
    using connection_id_vector = boost::container::small_vector<connection_id_t, 64>;
    struct node_transaction_state {
@@ -309,9 +311,6 @@ namespace sysio {
    /**
     * default value initializers
     */
-   constexpr auto     def_send_buffer_size_mb = 8;
-   constexpr auto     def_send_buffer_size = 1024*1024*def_send_buffer_size_mb;
-   constexpr auto     def_max_write_queue_size = def_send_buffer_size*10;
    constexpr uint32_t def_max_trx_in_progress_size = 100u*1024u*1024u; // 100 MB
    constexpr uint32_t def_max_trx_entries_per_conn_size = 100u*1024u*1024u; // 100 MB = ~100K TPS
    constexpr auto     def_max_consecutive_immediate_connection_close = 9; // back off if client keeps closing
@@ -447,16 +446,7 @@ namespace sysio {
       vector<string>                        p2p_server_addresses;
       const string&                         get_first_p2p_address() const;
 
-      vector<chain::public_key_type>        allowed_peers; ///< peer keys allowed to connect
-      std::map<chain::public_key_type,
-               chain::private_key_type>     private_keys; ///< overlapping with producer keys, also authenticating non-producing nodes
-      enum possible_connections : char {
-         None = 0,
-            Producers = 1 << 0,
-            Specified = 1 << 1,
-            Any = 1 << 2
-            };
-      possible_connections                  allowed_connections{None};
+      peer_auth::peer_auth_config           auth_config;
 
       boost::asio::steady_timer::duration   expire_timer_period{0};
       boost::asio::steady_timer::duration   resp_expected_period{0};
@@ -474,7 +464,6 @@ namespace sysio {
 
       chain_plugin*                         chain_plug = nullptr;
       producer_plugin*                      producer_plug = nullptr;
-      bool                                  use_socket_read_watermark = false;
       /** @} */
 
       alignas(hardware_destructive_interference_sz)
@@ -559,22 +548,9 @@ namespace sysio {
        *
        * \return False if the peer should not connect, true otherwise.
        */
-      bool authenticate_peer(const handshake_message& msg) const;
-      /** \brief Retrieve public key used to authenticate with peers.
-       *
-       * Finds a key to use for authentication.  If this node is a producer, use
-       * the front of the producer key map.  If the node is not a producer but has
-       * a configured private key, use it.  If the node is neither a producer nor has
-       * a private key, returns an empty key.
-       *
-       * \note On a node with multiple private keys configured, the key with the first
-       *       numerically smaller byte will always be used.
-       */
+      bool is_key_authorized(const chain::public_key_type& key) const;
+      bool needs_auth() const;
       chain::public_key_type get_authentication_key() const;
-      /** \brief Returns a signature of the digest using the corresponding private key of the signer.
-       *
-       * If there are no configured private keys, returns an empty signature.
-       */
       chain::signature_type sign_compact(const chain::public_key_type& signer, const fc::sha256& digest) const;
 
       constexpr static proto_version_t to_protocol_version(uint16_t v);
@@ -601,121 +577,6 @@ namespace sysio {
    }
 
    static net_plugin_impl *my_impl;
-
-   using small_buf_vector = boost::container::small_vector<boost::asio::const_buffer, 16>;
-
-   // thread safe
-   class queued_buffer : boost::noncopyable {
-   public:
-      void reset() {
-         clear_write_queue();
-         fc::lock_guard g( _mtx );
-         _out_queue.clear();
-      }
-
-      void clear_write_queue() {
-         fc::lock_guard g( _mtx );
-         _write_queue.clear();
-         _sync_write_queue.clear();
-         _trx_write_queue.clear();
-         _write_queue_size.store(0, std::memory_order_relaxed);
-         _write_drain_pending.store(false, std::memory_order_relaxed);
-      }
-
-      void clear_out_queue(connection* conn, boost::system::error_code ec, std::size_t number_of_bytes_written);
-
-      uint32_t write_queue_size() const {
-         return _write_queue_size.load(std::memory_order_relaxed);
-      }
-
-      // Returns true if caller wins the drain race; false if a drain is already pending.
-      bool try_claim_drain() {
-         return !_write_drain_pending.exchange(true, std::memory_order_acq_rel);
-      }
-      void release_drain() {
-         _write_drain_pending.store(false, std::memory_order_release);
-      }
-
-      // called from connection strand
-      bool ready_to_send(connection_id_t connection_id) const {
-         fc::unique_lock g( _mtx );
-         // if out_queue is not empty then async_write is in progress
-         const bool async_write_in_progress = !_out_queue.empty();
-         const bool ready = !async_write_in_progress && _write_queue_size.load(std::memory_order_relaxed) != 0;
-         g.unlock();
-         if (async_write_in_progress) {
-            fc_dlog(p2p_conn_log, "Connection - {} not ready to send data, async write in progress", connection_id);
-         }
-         return ready;
-      }
-
-      enum class queue_t { block_sync, general };
-      struct add_result { bool ok; bool needs_drain; };
-      add_result add_write_queue(msg_type_t net_msg,
-                                 queue_t queue,
-                                 const send_buffer_type& buff,
-                                 connection_id_t conn_id,
-                                 go_away_reason close_after_send,
-                                 std::optional<block_num_type> block_num) {
-         fc::lock_guard g( _mtx );
-         if( net_msg == msg_type_t::transaction_message || net_msg == msg_type_t::transaction_notice_message ) {
-            _trx_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         } else if (queue == queue_t::block_sync) {
-            _sync_write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         } else {
-            _write_queue.push_back( {buff, conn_id, close_after_send, net_msg, block_num} );
-         }
-         auto new_size = _write_queue_size.fetch_add(buff->size(), std::memory_order_relaxed) + buff->size();
-         return { new_size <= 2 * def_max_write_queue_size, _out_queue.empty() };
-      }
-
-      void fill_out_buffer( small_buf_vector& bufs ) {
-         fc::lock_guard g( _mtx );
-         if (!_sync_write_queue.empty()) { // always send msgs from sync_write_queue first
-            fill_out_buffer( bufs, _sync_write_queue );
-         } else if (!_write_queue.empty()) { // always send msgs from write_queue before trx queue
-            fill_out_buffer( bufs, _write_queue );
-         } else {
-            fill_out_buffer( bufs, _trx_write_queue );
-            assert(_trx_write_queue.empty() && _write_queue.empty() && _sync_write_queue.empty() && _write_queue_size.load(std::memory_order_relaxed) == 0);
-         }
-      }
-
-   private:
-      struct queued_write;
-      void fill_out_buffer( small_buf_vector& bufs,
-                            deque<queued_write>& w_queue ) REQUIRES(_mtx) {
-         while ( !w_queue.empty() ) {
-            auto& m = w_queue.front();
-            bufs.emplace_back( m.buff->data(), m.buff->size() );
-            _write_queue_size.fetch_sub(m.buff->size(), std::memory_order_relaxed);
-            _out_queue.emplace_back( m );
-            w_queue.pop_front();
-         }
-      }
-
-   private:
-      struct queued_write {
-         send_buffer_type             buff;
-         connection_id_t              connection_id{0};
-         go_away_reason               close_after_send{go_away_reason::no_reason};
-         msg_type_t                   net_msg{};
-         std::optional<block_num_type> block_num;
-      };
-
-      alignas(hardware_destructive_interference_sz)
-      std::atomic<uint32_t> _write_queue_size{0}; // size of _write_queue + _sync_write_queue + _trx_write_queue
-      std::atomic<bool>     _write_drain_pending{false}; // coalesces queue_write_mt drain posts
-
-      alignas(hardware_destructive_interference_sz)
-      mutable fc::mutex   _mtx;
-      deque<queued_write> _write_queue      GUARDED_BY(_mtx); // queued messages, all messages except sync & trxs
-      deque<queued_write> _sync_write_queue GUARDED_BY(_mtx); // sync_write_queue blocks will be sent first
-      deque<queued_write> _trx_write_queue  GUARDED_BY(_mtx); // queued trx messages, trx_write_queue will be sent last
-      deque<queued_write> _out_queue        GUARDED_BY(_mtx); // currently being async_write
-
-   }; // queued_buffer
-
 
    /// monitors the status of blocks as to whether a block is accepted (sync'd) or
    /// rejected. It groups consecutive rejected blocks in a (configurable) time
@@ -805,6 +666,10 @@ namespace sysio {
 
       uint64_t get_peer_ping_time_ns() const { return peer_ping_time_ns; }
 
+      int32_t get_peer_score() const { return peer_score_.get(); }
+      void adjust_peer_score(int32_t delta) { peer_score_.adjust(delta); }
+      void decay_peer_score() { peer_score_.decay(); }
+
    private:
       static const string unknown;
 
@@ -861,7 +726,7 @@ namespace sysio {
       string                  local_endpoint_ip;
       string                  local_endpoint_port;
       string                  short_agent_name;
-      // kept in sync with last_handshake_recv.fork_db_root_num
+      // derived from last_handshake_recv.fork_db_root_id via num_from_id
       std::atomic<uint32_t>   peer_fork_db_root_num{0};
 
       std::atomic<uint32_t>   sync_ordinal{0};
@@ -894,6 +759,10 @@ namespace sysio {
       std::atomic<bp_connection_type> bp_connection = bp_connection_type::non_bp;
       block_status_monitor    block_status_monitor_;
       std::atomic<time_point> last_vote_received;
+      std::atomic<bool>       peer_authenticated{true}; // set false in recv_handshake when needs_auth()
+
+      alignas(hardware_destructive_interference_sz)
+      peer_scoring::peer_score peer_score_;
 
       alignas(hardware_destructive_interference_sz)
       fc::mutex                        sync_response_expected_timer_mtx;
@@ -1073,6 +942,7 @@ namespace sysio {
       void handle_message( gossip_bp_peers_message& msg);
       void handle_message( const gossip_bp_peers_message& msg) = delete;
       void handle_message( const transaction_notice_message& msg);
+      void handle_message( const peer_auth_message& msg );
 
       // returns calculated number of blocks combined latency
       uint32_t calc_block_latency();
@@ -1194,6 +1064,11 @@ namespace sysio {
       void operator()( gossip_bp_peers_message& msg ) const {
          // continue call to handle_message on connection strand
          peer_dlog( p2p_msg_log, c, "handle gossip_bp_peers_message {}", fc::json::to_log_string(msg) );
+         c->handle_message( msg );
+      }
+
+      void operator()( const peer_auth_message& msg ) const {
+         peer_dlog( p2p_msg_log, c, "handle peer_auth_message" );
          c->handle_message( msg );
       }
    };
@@ -1397,6 +1272,7 @@ namespace sysio {
    connection_status connection::get_status()const {
       connection_status stat;
       stat.connection_id = connection_id;
+      stat.peer_score = get_peer_score();
       stat.connecting = state() == connection_state::connecting;
       stat.syncing = peer_syncing_from_us;
       stat.is_bp_peer = bp_connection != bp_connection_type::non_bp;
@@ -1504,6 +1380,7 @@ namespace sysio {
          conn_node_id = fc::sha256();
          last_block_nack_request_message_id = block_id_type{};
       }
+      peer_authenticated.store(true, std::memory_order_relaxed); // reset; will be set false on next handshake if auth required
       peer_fork_db_root_num.store( 0, std::memory_order_relaxed );
       peer_ping_time_ns = std::numeric_limits<decltype(peer_ping_time_ns)::value_type>::max();
       peer_requested.reset();
@@ -1537,7 +1414,7 @@ namespace sysio {
 
    // called from connection strand
    void connection::blk_send_branch( const block_id_type& msg_head_id ) {
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
 
       peer_dlog(p2p_blk_log, this, "head_num = {}", head_num);
       if(head_num == 0) {
@@ -1554,7 +1431,13 @@ namespace sysio {
          }
       }
       const auto fork_db_root_num = peer_fork_db_root_num.load( std::memory_order_relaxed );
-      if( fork_db_root_num == 0 ) return; // if fork_db_root_id is null (we have not received handshake or reset)
+      if( fork_db_root_num == 0 ) {
+         // Peer handshake not yet received; send our handshake so the peer can establish
+         // our fork_db_root_num and retry the sync exchange with proper state.
+         peer_dlog( p2p_blk_log, this, "block_request received before peer handshake, sending handshake" );
+         send_handshake();
+         return;
+      }
 
       auto msg_head_num = block_header::num_from_id(msg_head_id);
       if (msg_head_num == 0) {
@@ -1565,6 +1448,7 @@ namespace sysio {
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
       if( unknown_block ) {
          peer_ilog( p2p_blk_log, this, "Peer asked for unknown block {}, sending: benign_other go away", msg_head_num );
+         adjust_peer_score(peer_scoring::benign_close);
          no_retry = go_away_reason::benign_other;
          enqueue( go_away_message{ go_away_reason::benign_other } );
       } else {
@@ -1578,7 +1462,7 @@ namespace sysio {
    // called from connection strand
    void connection::blk_send_branch_from_nack_request( const block_id_type& msg_head_id, const block_id_type& req_id ) {
       auto [on_fork, unknown_block] = block_on_fork(msg_head_id);
-      uint32_t head_num = my_impl->get_chain_head_num();
+      uint32_t head_num = my_impl->get_fork_db_head_num();
       // peer head might be unknown if our LIB has moved past it, so if unknown then just send the requested block
       if (on_fork) { // send from lib if we know they are on a fork
          // a more complicated better approach would be to find where the fork branches and send from there, for now use lib
@@ -1627,8 +1511,9 @@ namespace sysio {
             g_conn.unlock();
             peer_dlog( p2p_msg_log, c, "Sending handshake generation {}, froot {}, fhead {}, id {}",
                        last_handshake.generation,
-                       last_handshake.fork_db_root_num,
-                       last_handshake.fork_db_head_num, last_handshake.fork_db_head_id.str().substr(8,16) );
+                       block_header::num_from_id(last_handshake.fork_db_root_id),
+                       block_header::num_from_id(last_handshake.fork_db_head_id),
+                       last_handshake.fork_db_head_id.str().substr(8,16) );
             c->enqueue( last_handshake );
          }
       });
@@ -1638,6 +1523,7 @@ namespace sysio {
    void connection::check_heartbeat( std::chrono::steady_clock::time_point current_time ) {
       if( latest_msg_time > std::chrono::steady_clock::time_point::min() ) {
          if( current_time > latest_msg_time + hb_timeout ) {
+            adjust_peer_score(peer_scoring::heartbeat_timeout);
             no_retry = go_away_reason::benign_other;
             if( !incoming() ) {
                peer_wlog(p2p_conn_log, this, "heartbeat timed out for peer address");
@@ -1646,6 +1532,13 @@ namespace sysio {
                peer_wlog(p2p_conn_log, this, "heartbeat timed out");
                close(false);
             }
+            return;
+         }
+         // Close peers that haven't authenticated within the heartbeat window
+         if( !peer_authenticated.load(std::memory_order_relaxed) ) {
+            peer_wlog( p2p_conn_log, this, "Peer did not authenticate in time, closing" );
+            no_retry = go_away_reason::authentication;
+            enqueue( go_away_message{go_away_reason::authentication} );
             return;
          }
          if (!my_impl->sync_master->syncing_from_peer()) {
@@ -1658,6 +1551,8 @@ namespace sysio {
          }
 
       }
+
+      decay_peer_score();
 
       org = std::chrono::nanoseconds{0};
       send_time();
@@ -1845,45 +1740,60 @@ namespace sysio {
       }
       uint32_t num = peer_requested->last + 1;
 
+      // Compute batch size: min of remaining blocks and batch limit
+      uint32_t remaining = peer_requested->end_block - num + 1;
+      uint32_t batch_count = std::min(remaining, def_sync_fetch_batch_size);
+
       controller& cc = my_impl->chain_plug->chain();
-      std::vector<char> sb;
+      std::vector<std::vector<char>> blocks;
       try {
-         sb = cc.fetch_serialized_block_by_number( num ); // thread-safe
+         blocks = cc.fetch_serialized_blocks_by_number( num, batch_count ); // thread-safe
       } FC_LOG_AND_DROP();
-      if( !sb.empty() ) {
-         // Skip transmitting block this loop if threshold exceeded
-         if (block_sync_send_start == 0ns) { // start of enqueue blocks
+
+      if( !blocks.empty() ) {
+         // Initialize rate limit tracking at start of enqueue frame
+         if (block_sync_send_start == 0ns) {
             block_sync_send_start = get_time();
             block_sync_frame_bytes_sent = 0;
          }
-         if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
-            auto now = get_time();
-            auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
-            double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000; // convert from bytes/us => bytes/sec
-            peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
-                      block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
-            if( current_rate_sec >= block_sync_rate_limit ) {
-               block_sync_throttling = true;
-               peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
-               std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
-               throttle_timer->expires_after(std::chrono::milliseconds(100));
-               throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
-                  if (!ec)
-                    c->enqueue_sync_block();
-               }));
-               return false;
+
+         for (uint32_t i = 0; i < blocks.size(); ++i) {
+            uint32_t block_num = num + i;
+
+            // Check rate limit before each enqueue (preserves existing throttle behavior)
+            if( block_sync_rate_limit > 0 && block_sync_frame_bytes_sent > 0 && peer_syncing_from_us ) {
+               auto now = get_time();
+               auto elapsed_us = std::chrono::duration_cast<std::chrono::microseconds>(now - block_sync_send_start);
+               double current_rate_sec = (double(block_sync_frame_bytes_sent) / elapsed_us.count()) * 100000;
+               peer_dlog(p2p_blk_log, this, "start enqueue block time {}, now {}, elapsed {}, rate {}, limit {}",
+                         block_sync_send_start.count(), now.count(), elapsed_us.count(), current_rate_sec, block_sync_rate_limit);
+               if( current_rate_sec >= block_sync_rate_limit ) {
+                  block_sync_throttling = true;
+                  peer_dlog( p2p_blk_log, this, "throttling block sync to peer {}:{}", log_remote_endpoint_ip, log_remote_endpoint_port);
+                  // Discard remaining pre-fetched blocks; timer callback re-fetches from peer_requested->last + 1
+                  std::shared_ptr<boost::asio::steady_timer> throttle_timer = std::make_shared<boost::asio::steady_timer>(my_impl->thread_pool.get_executor());
+                  throttle_timer->expires_after(std::chrono::milliseconds(100));
+                  throttle_timer->async_wait(boost::asio::bind_executor(strand, [c=shared_from_this(), throttle_timer](const boost::system::error_code& ec) {
+                     if (!ec)
+                       c->enqueue_sync_block();
+                  }));
+                  return false;
+               }
             }
-         }
-         block_sync_throttling = false;
-         auto sent = enqueue_block( sb, num, queued_buffer::queue_t::block_sync );
-         block_sync_total_bytes_sent += sent;
-         block_sync_frame_bytes_sent += sent;
-         ++peer_requested->last;
-         if(num == peer_requested->end_block) {
-            peer_requested.reset();
-            block_sync_send_start = 0ns;
-            block_sync_frame_bytes_sent = 0;
-            peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", num );
+
+            block_sync_throttling = false;
+            auto sent = enqueue_block( blocks[i], block_num, queued_buffer::queue_t::block_sync );
+            block_sync_total_bytes_sent += sent;
+            block_sync_frame_bytes_sent += sent;
+            ++peer_requested->last;
+
+            if(block_num == peer_requested->end_block) {
+               peer_requested.reset();
+               block_sync_send_start = 0ns;
+               block_sync_frame_bytes_sent = 0;
+               peer_dlog( p2p_blk_log, this, "completing enqueue_sync_block {}", block_num );
+               break;
+            }
          }
       } else if (peer_requested->sync_type == peer_sync_state::sync_t::peer_catchup || peer_requested->sync_type == peer_sync_state::sync_t::block_nack) {
          // Do not have the block, likely because in the middle of a fork-switch. A fork-switch will send out
@@ -1894,6 +1804,7 @@ namespace sysio {
          block_sync_frame_bytes_sent = 0;
       } else {
          peer_ilog( p2p_blk_log, this, "enqueue peer sync, unable to fetch block {}, sending benign_other go away", num );
+         adjust_peer_score(peer_scoring::benign_close);
          peer_requested.reset(); // unable to provide requested blocks
          block_sync_send_start = 0ns;
          block_sync_frame_bytes_sent = 0;
@@ -2076,7 +1987,11 @@ namespace sysio {
       });
       if (conns.size() > sync_peer_limit) {
          std::partial_sort(conns.begin(), conns.begin() + sync_peer_limit, conns.end(), [](const connection_ptr& lhs, const connection_ptr& rhs) {
-            return lhs->get_peer_ping_time_ns() < rhs->get_peer_ping_time_ns();
+            const auto ls = lhs->get_peer_score();
+            const auto rs = rhs->get_peer_score();
+            if (ls != rs)
+               return ls > rs; // higher score first
+            return lhs->get_peer_ping_time_ns() < rhs->get_peer_ping_time_ns(); // lower ping as tiebreaker
          });
          conns.resize(sync_peer_limit);
       }
@@ -2331,6 +2246,9 @@ namespace sysio {
 
       sync_reset_fork_db_root_num(c, false);
 
+      const uint32_t msg_froot_num = block_header::num_from_id(msg.fork_db_root_id);
+      const uint32_t msg_fhead_num = block_header::num_from_id(msg.fork_db_head_id);
+
       //--------------------------------
       // sync need checks; (froot == fork database root)
       //
@@ -2347,14 +2265,14 @@ namespace sysio {
 
       if (chain_info.fork_db_head_id == msg.fork_db_head_id) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 0, fhead {}, froot {}",
-                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          return;
       }
-      if (chain_info.fork_db_head_num < msg.fork_db_root_num) {
+      if (chain_info.fork_db_head_num < msg_froot_num) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 1, fhead {}, froot {}",
-                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
          if (c->sent_handshake_count > 0) {
@@ -2362,9 +2280,9 @@ namespace sysio {
          }
          return;
       }
-      if (chain_info.fork_db_root_num > msg.fork_db_head_num + nblk_combined_latency + min_blocks_distance) {
+      if (chain_info.fork_db_root_num > msg_fhead_num + nblk_combined_latency + min_blocks_distance) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 2, fhead {}, froot {}",
-                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
          peer_status_notice note;
@@ -2377,16 +2295,16 @@ namespace sysio {
          return;
       }
 
-      if (chain_info.fork_db_head_num + nblk_combined_latency < msg.fork_db_head_num ) {
+      if (chain_info.fork_db_head_num + nblk_combined_latency < msg_fhead_num ) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 3, fhead {}, froot {}",
-                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          c->peer_syncing_from_us = false;
-         verify_catchup(c, msg.fork_db_head_num, msg.fork_db_head_id);
+         verify_catchup(c, msg_fhead_num, msg.fork_db_head_id);
          return;
-      } else if(chain_info.fork_db_head_num >= msg.fork_db_head_num + nblk_combined_latency) {
+      } else if(chain_info.fork_db_head_num >= msg_fhead_num + nblk_combined_latency) {
          peer_dlog( p2p_blk_log, c, "handshake msg.froot {}, msg.fhead {}, msg.id {}.. sync 4, fhead {}, froot {}",
-                    msg.fork_db_root_num, msg.fork_db_head_num, msg.fork_db_head_id.str().substr(8,16),
+                    msg_froot_num, msg_fhead_num, msg.fork_db_head_id.str().substr(8,16),
                     chain_info.fork_db_head_num, chain_info.fork_db_root_num);
          controller& cc = my_impl->chain_plug->chain();
          peer_status_notice note;
@@ -2401,6 +2319,13 @@ namespace sysio {
                peer_dlog(p2p_msg_log, c, "Sending block_request_message sync 4, msg.fhead {} on fork", msg.fork_db_head_id);
                block_request_message req; // my_head_id zero = send from root
                c->enqueue( req );
+            } else if (!unknown_block) {
+               // Peer is behind but not on fork; send missing blocks.
+               // This covers the case where the peer's earlier block_request_message was
+               // dropped because it arrived before this handshake set peer_fork_db_root_num.
+               peer_dlog(p2p_blk_log, c, "Peer behind, sending blocks {} - {}", msg_fhead_num + 1, chain_info.fork_db_head_num);
+               c->blk_send_branch(msg_fhead_num, chain_info.fork_db_root_num,
+                                  chain_info.fork_db_head_num, peer_sync_state::sync_t::peer_catchup);
             }
          } catch( ... ) {}
          return;
@@ -2466,10 +2391,6 @@ namespace sysio {
          uint32_t root_num = block_header::num_from_id(msg.fork_db_root_id);
          peer_dlog( p2p_blk_log, c, "sync_manager got lib_sync peer_status_notice" );
          c->peer_fork_db_root_num.store( root_num, std::memory_order_relaxed );
-         {
-            fc::lock_guard g_conn( c->conn_mtx );
-            c->last_handshake_recv.fork_db_root_num = root_num;
-         }
          sync_reset_fork_db_root_num(c, false);
          start_sync(c, root_num);
       } else {
@@ -2490,6 +2411,7 @@ namespace sysio {
    // called from connection strand
    void sync_manager::rejected_block( const connection_ptr& c, uint32_t blk_num, closing_mode mode ) {
       c->block_status_monitor_.rejected();
+      c->adjust_peer_score(peer_scoring::block_rejected);
       {
          // reset sync on rejected block
          fc::lock_guard g( sync_mtx );
@@ -2499,6 +2421,7 @@ namespace sysio {
          }
       }
       if( mode == closing_mode::immediately || c->block_status_monitor_.max_events_violated()) {
+         c->adjust_peer_score(peer_scoring::max_violated);
          peer_wlog(p2p_blk_log, c, "block {} not accepted, closing connection {}",
                    blk_num, mode == closing_mode::immediately ? "immediately" : "max violations reached");
          c->close(mode != closing_mode::immediately);
@@ -2946,6 +2869,13 @@ namespace sysio {
    }
 
    void net_plugin_impl::create_session(tcp::socket&& socket, string listen_address, size_t limit) {
+      if( auth_config.allowed_connections == peer_auth::None ) {
+         fc_ilog( p2p_conn_log, "Rejecting inbound connection, allowed-connection=none" );
+         boost::system::error_code ec;
+         socket.shutdown(tcp::socket::shutdown_both, ec);
+         socket.close(ec);
+         return;
+      }
       boost::system::error_code rec;
       const auto&               rend = socket.remote_endpoint(rec);
       if (rec) {
@@ -2957,12 +2887,22 @@ namespace sysio {
          const auto                paddr_port = rend.port();
          string                    paddr_str  = paddr_add.to_string();
          string                    paddr_desc = paddr_str + ":" + std::to_string(paddr_port);
-         connections.for_each_connection([&visitors, &from_addr, &paddr_str](const connection_ptr& conn) {
+
+         // mask incoming address to /24 (IPv4) or /48 (IPv6) for subnet-level counting
+         const auto addr_v6 = paddr_add.is_v4()
+            ? boost::asio::ip::make_address_v6(boost::asio::ip::v4_mapped, paddr_add.to_v4())
+            : paddr_add.to_v6();
+         const uint8_t effective_prefix = addr_v6.is_v4_mapped()
+            ? static_cast<uint8_t>(96 + 24)  // IPv4 /24
+            : static_cast<uint8_t>(48);       // IPv6 /48
+         const auto incoming_masked = net_utils::apply_prefix_mask(addr_v6.to_bytes(), effective_prefix);
+
+         connections.for_each_connection([&visitors, &from_addr, &incoming_masked, effective_prefix](const connection_ptr& conn) {
             if (conn->socket_is_open()) {
                if (conn->incoming()) {
                   ++visitors;
                   fc::lock_guard g_conn(conn->conn_mtx);
-                  if (paddr_str == conn->remote_endpoint_ip) {
+                  if (net_utils::apply_prefix_mask(conn->remote_endpoint_ip_array, effective_prefix) == incoming_masked) {
                      ++from_addr;
                   }
                }
@@ -2991,17 +2931,56 @@ namespace sysio {
                }
             });
 
-         } else {
-            if (from_addr >= max_nodes_per_host) {
-               fc_dlog(p2p_conn_log, "Number of connections ({}) from {} exceeds limit {}, closing",
-                        from_addr + 1, paddr_desc, max_nodes_per_host);
-            } else {
-               fc_dlog(p2p_conn_log, "max_client_count {} exceeded, closing: {}", connections.get_max_client_count(), paddr_desc);
-            }
-            // new_connection never added to connections and start_session not called, lifetime will end
+         } else if (from_addr >= max_nodes_per_host) {
+            fc_dlog(p2p_conn_log, "Number of connections ({}) from subnet of {} exceeds limit {}, closing",
+                    from_addr + 1, paddr_desc, max_nodes_per_host);
             boost::system::error_code ec;
             socket.shutdown(tcp::socket::shutdown_both, ec);
             socket.close(ec);
+         } else {
+            // max_client_count exceeded, attempt score-based eviction
+            connection_ptr victim;
+            int32_t lowest_score = peer_scoring::eviction_threshold;
+            connections.for_each_connection([&victim, &lowest_score](const connection_ptr& conn) {
+               if (conn->socket_is_open() && conn->incoming() &&
+                     conn->bp_connection == connection::bp_connection_type::non_bp) {
+                  auto score = conn->get_peer_score();
+                  if (score < lowest_score) {
+                     lowest_score = score;
+                     victim = conn;
+                  }
+               }
+            });
+            if (victim) {
+               fc_ilog(p2p_conn_log, "Evicting low-score peer {} (score {}) to accept new connection: {}",
+                       victim->connection_id, lowest_score, paddr_desc);
+               victim->close();
+               fc_ilog(p2p_conn_log, "Accepted new connection (via eviction): {}", paddr_str);
+               connections.any_of_supplied_peers([&listen_address, &paddr_str, &paddr_desc, &limit](const string& peer_addr) {
+                  const auto [host, port, type] = net_utils::split_host_port_type(peer_addr);
+                  if (host == paddr_str) {
+                     if (limit > 0) {
+                        fc_dlog(p2p_conn_log, "Connection inbound to {} from {} is a configured p2p-peer-address and will not be throttled",
+                                listen_address, paddr_desc);
+                     }
+                     limit = 0;
+                     return true;
+                  }
+                  return false;
+               });
+               connection_ptr new_connection = std::make_shared<connection>(std::move(socket), listen_address, limit);
+               boost::asio::post(new_connection->strand, [new_connection, this]() {
+                  if (new_connection->start_session()) {
+                     connections.add(new_connection);
+                  }
+               });
+            } else {
+               fc_dlog(p2p_conn_log, "max_client_count {} exceeded, no evictable peer, closing: {}",
+                       connections.get_max_client_count(), paddr_desc);
+               boost::system::error_code ec;
+               socket.shutdown(tcp::socket::shutdown_both, ec);
+               socket.close(ec);
+            }
          }
       }
    }
@@ -3011,17 +2990,6 @@ namespace sysio {
       try {
          std::size_t minimum_read = outstanding_read_bytes != 0 ? outstanding_read_bytes : message_header_size;
          outstanding_read_bytes = 0;
-
-         if (my_impl->use_socket_read_watermark) {
-            const size_t max_socket_read_watermark = 4096;
-            std::size_t socket_read_watermark = std::min<std::size_t>(minimum_read, max_socket_read_watermark);
-            boost::asio::socket_base::receive_low_watermark read_watermark_opt(socket_read_watermark);
-            boost::system::error_code ec;
-            socket->set_option( read_watermark_opt, ec );
-            if( ec ) {
-               peer_elog( p2p_conn_log, this, "unable to set read watermark: {}", ec.message() );
-            }
-         }
 
          auto completion_handler = [minimum_read](boost::system::error_code ec, std::size_t bytes_transferred) -> std::size_t {
             if (ec || bytes_transferred >= minimum_read ) {
@@ -3157,6 +3125,19 @@ namespace sysio {
          fc::raw::unpack( peek_ds, which );
 
          msg_type_t net_msg = to_msg_type_t(which.value);
+
+         // When auth is required, only allow handshake/go_away/time/peer_auth until authenticated.
+         // All other messages are dropped until the peer proves its identity.
+         if( !peer_authenticated.load(std::memory_order_relaxed) ) {
+            if( net_msg != msg_type_t::handshake_message &&
+                net_msg != msg_type_t::go_away_message &&
+                net_msg != msg_type_t::time_message &&
+                net_msg != msg_type_t::peer_auth_message ) {
+               peer_wlog( p2p_conn_log, this, "Dropping {} message from unauthenticated peer", static_cast<uint32_t>(net_msg) );
+               pending_message_buffer.advance_read_ptr( message_length );
+               return true;
+            }
+         }
 
          if( net_msg == msg_type_t::signed_block ) {
             latest_blk_time = now;
@@ -3486,36 +3467,42 @@ namespace sysio {
       // that really aren't handshake messages can be quickly discarded without
       // affecting state.
       bool valid = true;
-      if (msg.fork_db_root_num > msg.fork_db_head_num) {
+      const uint32_t froot_num = block_header::num_from_id(msg.fork_db_root_id);
+      const uint32_t fhead_num = block_header::num_from_id(msg.fork_db_head_id);
+      if (froot_num > fhead_num) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: last irreversible ({}) is greater than fhead ({})",
-                  msg.fork_db_root_num, msg.fork_db_head_num );
+                  froot_num, fhead_num );
          valid = false;
       }
+
       if (msg.p2p_address.empty()) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address is null string" );
          valid = false;
       } else if( msg.p2p_address.length() > net_utils::max_handshake_str_length ) {
-         // see max_handshake_str_length comment in protocol.hpp
          peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address too large: {}",
-                    msg.p2p_address.substr(0, net_utils::max_handshake_str_length) + "..." );
+                    fc::escape_string(msg.p2p_address.substr(0, 64), nullptr) + "..." );
          valid = false;
+      } else {
+         // fc::escape_string returns true if control chars or invalid UTF-8 were found
+         std::string escaped;
+         if( fc::escape_string(msg.p2p_address, escaped, nullptr) ) {
+            peer_wlog( p2p_msg_log, this, "Handshake message validation: p2p_address contains unsafe characters: {}",
+                       escaped );
+            valid = false;
+         }
       }
-      if (msg.os.empty()) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: os field is null string" );
-         valid = false;
-      } else if( msg.os.length() > net_utils::max_handshake_str_length ) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: os field too large: {}",
-                    msg.os.substr(0, net_utils::max_handshake_str_length) + "..." );
-         valid = false;
-      }
+
       if( msg.agent.length() > net_utils::max_handshake_str_length ) {
          peer_wlog( p2p_msg_log, this, "Handshake message validation: agent field too large: {}",
-                    msg.agent.substr(0, net_utils::max_handshake_str_length) + "..." );
+                    fc::escape_string(msg.agent.substr(0, 64), nullptr) + "..." );
          valid = false;
-      }
-      if ((msg.sig != chain::signature_type() || msg.token != sha256()) && (msg.token != fc::sha256::hash(msg.time))) {
-         peer_wlog( p2p_msg_log, this, "Handshake message validation: token field invalid" );
-         valid = false;
+      } else {
+         std::string escaped;
+         if( fc::escape_string(msg.agent, escaped, nullptr) ) {
+            peer_wlog( p2p_msg_log, this, "Handshake message validation: agent contains unsafe characters: {}",
+                       escaped );
+            valid = false;
+         }
       }
       return valid;
    }
@@ -3524,15 +3511,20 @@ namespace sysio {
    void connection::handle_message( const handshake_message& msg ) {
       if( !is_valid( msg ) ) {
          peer_wlog( p2p_msg_log, this, "bad handshake message");
+         adjust_peer_score(peer_scoring::fatal_violation);
          no_retry = go_away_reason::fatal_other;
          enqueue( go_away_message{ go_away_reason::fatal_other } );
          return;
       }
-      peer_dlog( p2p_msg_log, this, "received handshake gen {}, froot {}, fhead {}",
-                 msg.generation, msg.fork_db_root_num, msg.fork_db_head_num );
 
-      peer_fork_db_root_num.store( msg.fork_db_root_num, std::memory_order_relaxed );
-      peer_fork_db_head_block_num = msg.fork_db_head_num;
+      const uint32_t peer_froot = block_header::num_from_id(msg.fork_db_root_id);
+      const uint32_t peer_fhead = block_header::num_from_id(msg.fork_db_head_id);
+
+      peer_dlog( p2p_msg_log, this, "received handshake gen {}, froot {}, fhead {}",
+                 msg.generation, peer_froot, peer_fhead );
+
+      peer_fork_db_root_num.store( peer_froot, std::memory_order_relaxed );
+      peer_fork_db_head_block_num = peer_fhead;
       fc::unique_lock g_conn( conn_mtx );
       last_handshake_recv = msg;
       g_conn.unlock();
@@ -3626,31 +3618,23 @@ namespace sysio {
          conn_node_id = msg.node_id;
          short_conn_node_id = conn_node_id.str().substr( 0, 7 );
 
-         if( !my_impl->authenticate_peer( msg ) ) {
-            peer_wlog( p2p_conn_log, this, "Peer not authenticated.  Closing connection." );
-            no_retry = go_away_reason::authentication;
-            enqueue( go_away_message( go_away_reason::authentication ) );
-            return;
-         }
-
-         uint32_t peer_fork_db_root_num = msg.fork_db_root_num;
          uint32_t fork_db_root_num = my_impl->get_fork_db_root_num();
 
-         peer_dlog( p2p_blk_log, this, "handshake check froot {}, peer_froot {}", fork_db_root_num, peer_fork_db_root_num );
+         peer_dlog( p2p_blk_log, this, "handshake check froot {}, peer_froot {}", fork_db_root_num, peer_froot );
 
-         if( peer_fork_db_root_num <= fork_db_root_num && peer_fork_db_root_num > 0 ) {
+         if( peer_froot <= fork_db_root_num && peer_froot > 0 ) {
             try {
                auto [on_fork, unknown_block] = block_on_fork(msg.fork_db_root_id); // thread safe
                if (unknown_block) {
                   // can be not found if running with a truncated block log
-                  peer_dlog( p2p_blk_log, this, "peer froot block {} is unknown", peer_fork_db_root_num );
+                  peer_dlog( p2p_blk_log, this, "peer froot block {} is unknown", peer_froot );
                } else if (on_fork) {
                   peer_wlog( p2p_conn_log, this, "Peer chain is forked, sending: forked go away" );
                   no_retry = go_away_reason::forked;
                   enqueue( go_away_message( go_away_reason::forked ) );
                }
             } catch( ... ) {
-               peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_fork_db_root_num );
+               peer_wlog( p2p_blk_log, this, "caught an exception getting block id for {}", peer_froot );
             }
          }
 
@@ -3658,11 +3642,84 @@ namespace sysio {
             send_handshake();
          }
 
+         // Send peer_auth_message AFTER our handshake so the peer has our node_id
+         // (via conn_node_id) before it needs to verify our auth signature.
+         // Must post to strand because send_handshake() above also posts, and we
+         // need the handshake to be enqueued first on the wire.
+         // Mark peer as unauthenticated until we receive their peer_auth_message.
+         if( my_impl->needs_auth() ) {
+            peer_authenticated.store(false, std::memory_order_relaxed);
+            auto auth_key = my_impl->get_authentication_key();
+            if( auth_key != chain::public_key_type() ) {
+               auto digest = peer_auth::compute_auth_digest(conn_node_id, my_impl->node_id, my_impl->chain_id);
+               auto sig = my_impl->sign_compact(auth_key, digest);
+               if( sig != chain::signature_type() ) {
+                  peer_auth_message auth_msg;
+                  auth_msg.key = auth_key;
+                  auth_msg.sig = sig;
+                  boost::asio::post(strand, [c = shared_from_this(), auth_msg]() {
+                     if( !c->closed() )
+                        c->enqueue( net_message(auth_msg) );
+                  });
+               }
+            }
+         }
+
          send_gossip_bp_peers_initial_message();
       }
 
-      uint32_t nblk_combined_latency = calc_block_latency();
-      my_impl->sync_master->recv_handshake( shared_from_this(), msg, nblk_combined_latency );
+      // Defer sync negotiation until peer is authenticated. The auth exchange
+      // must complete before sync requests are sent, otherwise they get dropped
+      // by the peer's message gate. handle_message(peer_auth_message) re-runs
+      // recv_handshake after authentication succeeds.
+      if( peer_authenticated.load(std::memory_order_relaxed) ) {
+         uint32_t nblk_combined_latency = calc_block_latency();
+         my_impl->sync_master->recv_handshake( shared_from_this(), msg, nblk_combined_latency );
+      }
+   }
+
+   // called from connection strand
+   void connection::handle_message( const peer_auth_message& msg ) {
+      if( !my_impl->needs_auth() ) {
+         peer_dlog( p2p_msg_log, this, "Ignoring peer_auth_message, allowed-connection=any" );
+         return;
+      }
+      auto digest = peer_auth::compute_auth_digest(my_impl->node_id, conn_node_id, my_impl->chain_id);
+      chain::public_key_type recovered;
+      try {
+         recovered = fc::crypto::public_key::recover(msg.sig, digest);
+      } catch (...) {
+         peer_wlog( p2p_conn_log, this, "Invalid auth signature" );
+         no_retry = go_away_reason::authentication;
+         enqueue( go_away_message{go_away_reason::authentication} );
+         return;
+      }
+      if( recovered != msg.key ) {
+         peer_wlog( p2p_conn_log, this, "Auth key mismatch" );
+         no_retry = go_away_reason::authentication;
+         enqueue( go_away_message{go_away_reason::authentication} );
+         return;
+      }
+      if( !my_impl->is_key_authorized(msg.key) ) {
+         peer_wlog( p2p_conn_log, this, "Unauthorized peer key" );
+         no_retry = go_away_reason::authentication;
+         enqueue( go_away_message{go_away_reason::authentication} );
+         return;
+      }
+      peer_ilog( p2p_conn_log, this, "Peer authenticated successfully" );
+      peer_authenticated.store(true, std::memory_order_relaxed);
+      // Re-process peer's handshake now that auth is complete. The initial
+      // recv_handshake sent sync requests that were dropped by the peer's
+      // message gate (we weren't authenticated yet), so re-trigger sync.
+      {
+         fc::unique_lock g_conn( conn_mtx );
+         if( last_handshake_recv.generation > 0 ) {
+            auto last_hs = last_handshake_recv;
+            g_conn.unlock();
+            uint32_t nblk_combined_latency = calc_block_latency();
+            my_impl->sync_master->recv_handshake( shared_from_this(), last_hs, nblk_combined_latency );
+         }
+      }
    }
 
    // called from connection strand
@@ -3760,9 +3817,6 @@ namespace sysio {
    void connection::handle_message( const peer_status_notice& msg ) {
       set_state(connection_state::connected);
       uint32_t head_num = block_header::num_from_id(msg.fork_db_head_id);
-      fc::unique_lock g_conn(conn_mtx);
-      last_handshake_recv.fork_db_head_num = std::max(head_num, last_handshake_recv.fork_db_head_num);
-      g_conn.unlock();
       if (head_num > 0) {
          peer_start_block_num = msg.earliest_available_block_num;
          peer_fork_db_head_block_num = head_num;
@@ -3838,6 +3892,7 @@ namespace sysio {
       if (before_lib || my_impl->dispatcher.have_block(msg.id)) {
          if (block_num - 1 == block_header::num_from_id(last_block_nack)) {
             ++consecutive_blocks_nacks;
+            adjust_peer_score(peer_scoring::block_nack);
          } else {
             consecutive_blocks_nacks = 0;
          }
@@ -3914,6 +3969,7 @@ namespace sysio {
       const bool first_msg = msg.peers.size() == 1 && msg.peers[0].bp_peer_info.empty();
       if (!my_impl->validate_gossip_bp_peers_message(msg)) {
          peer_wlog( p2p_msg_log, this, "bad gossip_bp_peers_message, closing");
+         adjust_peer_score(peer_scoring::fatal_violation);
          no_retry = go_away_reason::fatal_other;
          enqueue( go_away_message( go_away_reason::fatal_other ) );
          return;
@@ -4070,6 +4126,7 @@ namespace sysio {
                   fork_db_add_result, cid, block_num, obh->id() );
          my_impl->dispatcher.add_peer_block( obh->id(), cid ); // no need to send back to sender
          c->block_status_monitor_.accepted();
+         c->adjust_peer_score(peer_scoring::block_accepted);
 
          if (my_impl->chain_plug->chain().get_read_mode() == db_read_mode::IRREVERSIBLE) {
             // non-irreversible notifies sync_manager when block is applied, call on dispatcher strand
@@ -4079,6 +4136,7 @@ namespace sysio {
 
          if (fork_db_add_result == fork_db_add_t::appended_to_head || fork_db_add_result == fork_db_add_t::fork_switch) {
             ++c->unique_blocks_rcvd_count;
+            c->adjust_peer_score(peer_scoring::unique_block);
 
             // ready to process immediately, so signal producer to interrupt start_block
             // call before process_blocks to avoid interrupting process_blocks
@@ -4242,6 +4300,7 @@ namespace sysio {
             if (c->connection_id == connection_id) {
                boost::asio::post(c->strand, [c]() {
                   c->block_status_monitor_.rejected();
+                  c->adjust_peer_score(peer_scoring::block_rejected);
                });
                return true;
             }
@@ -4287,62 +4346,26 @@ namespace sysio {
       });
    }
 
-   bool net_plugin_impl::authenticate_peer(const handshake_message& msg) const {
-      if(allowed_connections == None)
-         return false;
-
-      if(allowed_connections == Any)
-         return true;
-
-      if(allowed_connections & (Producers | Specified)) {
-         auto allowed_it = std::find(allowed_peers.begin(), allowed_peers.end(), msg.key);
-         auto private_it = private_keys.find(msg.key);
-         bool found_producer_key = false;
-         if(producer_plug != nullptr)
-            found_producer_key = producer_plug->is_producer_key(msg.key);
-         if( allowed_it == allowed_peers.end() && private_it == private_keys.end() && !found_producer_key) {
-            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unauthorized key: {}.",
-                     msg.p2p_address, fc::json::to_log_string(msg.key));
-            return false;
-         }
-      }
-
-      if(msg.sig != chain::signature_type() && msg.token != sha256()) {
-         sha256 hash = fc::sha256::hash(msg.time);
-         if(hash != msg.token) {
-            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an invalid token.", msg.p2p_address);
-            return false;
-         }
-         chain::public_key_type peer_key;
-         try {
-            peer_key = crypto::public_key::recover(msg.sig, msg.token);
-         } catch (...) {
-            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unrecoverable key.", msg.p2p_address);
-            return false;
-         }
-         if((allowed_connections & (Producers | Specified)) && peer_key != msg.key) {
-            fc_wlog( p2p_conn_log, "Peer {} sent a handshake with an unauthenticated key.", msg.p2p_address);
-            return false;
-         }
-      }
-      else if(allowed_connections & (Producers | Specified)) {
-         fc_dlog( p2p_conn_log, "Peer sent a handshake with blank signature and token, but this node accepts only authenticated connections." );
+   bool net_plugin_impl::is_key_authorized(const chain::public_key_type& key) const {
+      if (!auth_config.is_key_authorized(key)) {
          return false;
       }
       return true;
    }
 
+   bool net_plugin_impl::needs_auth() const {
+      return auth_config.needs_auth();
+   }
+
    chain::public_key_type net_plugin_impl::get_authentication_key() const {
-      if(!private_keys.empty())
-         return private_keys.begin()->first;
-      return {};
+      return auth_config.get_authentication_key();
    }
 
    chain::signature_type net_plugin_impl::sign_compact(const chain::public_key_type& signer, const fc::sha256& digest) const
    {
-      auto private_key_itr = private_keys.find(signer);
-      if(private_key_itr != private_keys.end())
-         return private_key_itr->second.sign(digest);
+      auto sig = auth_config.sign_compact(signer, digest);
+      if (sig != chain::signature_type())
+         return sig;
       if(producer_plug != nullptr && producer_plug->get_state() == abstract_plugin::started)
          return producer_plug->sign_compact(signer, digest);
       return {};
@@ -4350,27 +4373,13 @@ namespace sysio {
 
    // call from connection strand
    bool connection::populate_handshake( handshake_message& hello ) const {
-      namespace sc = std::chrono;
       auto chain_info = my_impl->get_chain_info();
-      auto now = sc::duration_cast<sc::nanoseconds>(sc::system_clock::now().time_since_epoch()).count();
-      constexpr int64_t hs_delay = sc::duration_cast<sc::nanoseconds>(sc::milliseconds(50)).count();
-      // nothing as changed since last handshake and one was sent recently, so skip sending
-      if (chain_info.fork_db_head_id == hello.fork_db_head_id && (hello.time + hs_delay > now))
-         return false;
       hello.network_version = static_cast<uint16_t>(net_version);
-      hello.fork_db_root_num = chain_info.fork_db_root_num;
-      hello.fork_db_root_id = chain_info.fork_db_root_id;
-      hello.fork_db_head_num = chain_info.fork_db_head_num;
-      hello.fork_db_head_id = chain_info.fork_db_head_id;
       hello.chain_id = my_impl->chain_id;
       hello.node_id = my_impl->node_id;
-      hello.key = my_impl->get_authentication_key();
-      hello.time = sc::duration_cast<sc::nanoseconds>(sc::system_clock::now().time_since_epoch()).count();
-      hello.token = fc::sha256::hash(hello.time);
-      hello.sig = my_impl->sign_compact(hello.key, hello.token);
-      // If we couldn't sign, don't send a token.
-      if(hello.sig == chain::signature_type())
-         hello.token = sha256();
+      hello.fork_db_root_id = chain_info.fork_db_root_id;
+      hello.fork_db_head_id = chain_info.fork_db_head_id;
+      hello.chain_head_id = chain_info.head_id;
       hello.p2p_address = listen_address;
       if (incoming()) {
          if( is_transactions_only_connection() && hello.p2p_address.find(":trx") == std::string::npos ) hello.p2p_address += ":trx";
@@ -4382,16 +4391,6 @@ namespace sysio {
             peer_dlog( p2p_msg_log, this, "p2p-accept-transactions=false inform peer blocks only connection {}", hello.p2p_address );
          }
       }
-      hello.p2p_address += " - " + hello.node_id.str().substr(0,7);
-#if defined( __APPLE__ )
-      hello.os = "osx";
-#elif defined( __linux__ )
-      hello.os = "linux";
-#elif defined( _WIN32 )
-      hello.os = "win32";
-#else
-      hello.os = "other";
-#endif
       hello.agent = my_impl->user_agent_name;
 
       return true;
@@ -4433,7 +4432,7 @@ namespace sysio {
            "   p2p.sys.io:9876\n"
            "   p2p.trx.sys.io:9876:trx\n"
            "   p2p.blk.sys.io:9876:blk\n")
-         ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single IP address")
+         ( "p2p-max-nodes-per-host", bpo::value<int>()->default_value(def_max_nodes_per_host), "Maximum number of client nodes from any single /24 (IPv4) or /48 (IPv6) subnet")
          ( "p2p-accept-transactions", bpo::value<bool>()->default_value(true), "Allow transactions received over p2p network to be evaluated and relayed if valid.")
          ( "p2p-disable-block-nack", bpo::value<bool>()->default_value(false),
             "Disable block notice and block nack. All blocks received will be broadcast to all peers unless already received.")
@@ -4470,8 +4469,7 @@ namespace sysio {
            "Number of blocks to retrieve in a chunk from any individual peer during synchronization")
          ( "sync-peer-limit", bpo::value<uint32_t>()->default_value(3),
            "Number of peers to sync from")
-         ( "use-socket-read-watermark", bpo::value<bool>()->default_value(false), "Enable experimental socket read watermark optimization")
-         ( "peer-log-format", bpo::value<string>()->default_value( "[\"${_peer}\" - ${_cid} ${_ip}:${_port}] " ),
+         ( "peer-log-format", bpo::value<string>()->default_value( "[\"${_peer} - ${_sid}\" - ${_cid} ${_ip}:${_port}] " ),
            "The string used to format peers when logging messages about them.  Variables are escaped with ${<variable name>}.\n"
            "Available Variables:\n"
            "   _peer  \tendpoint name\n\n"
@@ -4511,7 +4509,6 @@ namespace sysio {
          p2p_accept_transactions = options.at( "p2p-accept-transactions" ).as<bool>();
          p2p_disable_block_nack = options.at( "p2p-disable-block-nack" ).as<bool>();
 
-         use_socket_read_watermark = options.at( "use-socket-read-watermark" ).as<bool>();
          keepalive_interval = std::chrono::milliseconds( options.at( "p2p-keepalive-interval-ms" ).as<int>() );
          SYS_ASSERT( keepalive_interval.count() > 0, chain::plugin_config_exception,
                      "p2p-keepalive_interval-ms must be greater than 0" );
@@ -4601,18 +4598,20 @@ namespace sysio {
          if( options.count( "allowed-connection" )) {
             const std::vector<std::string> allowed_remotes = options["allowed-connection"].as<std::vector<std::string>>();
             for( const std::string& allowed_remote : allowed_remotes ) {
+               using peer_auth::possible_connections;
+               auto& ac = auth_config.allowed_connections;
                if( allowed_remote == "any" )
-                  allowed_connections |= net_plugin_impl::Any;
+                  ac = static_cast<possible_connections>(ac | peer_auth::Any);
                else if( allowed_remote == "producers" )
-                  allowed_connections |= net_plugin_impl::Producers;
+                  ac = static_cast<possible_connections>(ac | peer_auth::Producers);
                else if( allowed_remote == "specified" )
-                  allowed_connections |= net_plugin_impl::Specified;
+                  ac = static_cast<possible_connections>(ac | peer_auth::Specified);
                else if( allowed_remote == "none" )
-                  allowed_connections = net_plugin_impl::None;
+                  ac = peer_auth::None;
             }
          }
 
-         if( allowed_connections & net_plugin_impl::Specified )
+         if( auth_config.allowed_connections & peer_auth::Specified )
             SYS_ASSERT( options.count( "peer-key" ),
                         plugin_config_exception,
                        "At least one peer-key must accompany 'allowed-connection=specified'" );
@@ -4620,7 +4619,7 @@ namespace sysio {
          if( options.count( "peer-key" )) {
             const std::vector<std::string> key_strings = options["peer-key"].as<std::vector<std::string>>();
             for( const std::string& key_string : key_strings ) {
-               allowed_peers.push_back( dejsonify<chain::public_key_type>( key_string ));
+               auth_config.allowed_peers.push_back( dejsonify<chain::public_key_type>( key_string ));
             }
          }
 
@@ -4629,7 +4628,7 @@ namespace sysio {
             for( const std::string& key_id_to_wif_pair_string : key_id_to_wif_pair_strings ) {
                auto key_id_to_wif_pair = dejsonify<std::pair<chain::public_key_type, std::string>>(
                      key_id_to_wif_pair_string );
-               private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key::from_string( key_id_to_wif_pair.second );
+               auth_config.private_keys[key_id_to_wif_pair.first] = fc::crypto::private_key::from_string( key_id_to_wif_pair.second );
             }
          }
 
@@ -4648,6 +4647,10 @@ namespace sysio {
 
       producer_plug = app().find_plugin<producer_plugin>();
       assert(producer_plug);
+
+      auth_config.is_producer_key_func = [prod_plug=producer_plug](const chain::public_key_type& key) {
+         return prod_plug->is_producer_key(key);
+      };
 
       thread_pool.start( thread_pool_size, []( const fc::exception& e ) {
          elog("Exception in net thread, exiting: {}", e.to_detail_string());
@@ -4883,9 +4886,7 @@ namespace sysio {
          // it was syncing and had processed blocks into the fork database but not yet applied them.
          // If the node was shutdown via terminate-at-block, the current expectation is that the node can be restarted
          // to examine the state at which it was shutdown. For now, we will only process these blocks if there are
-         // peers configured. This is a bit of a hack for Spring 1.0.0 until we can add a proper
-         // pause-at-block (issue #570) which could be used to explicitly request a node to not process beyond
-         // a specified block.
+         // peers configured.
          my_impl->producer_plug->process_blocks();
       }
    }
@@ -4950,10 +4951,16 @@ namespace sysio {
       connection_ptr c = shared_from_this();
 
       if (no_retry == go_away_reason::duplicate) {
-         if (auto other = my_impl->connections.is_other_connected(peer_address(), c); !!other) {
-            fc_dlog( p2p_conn_log, "Skipping connect to {} - {} due to existing connection {} - {}",
-                     peer_address(), connection_id, other->peer_address(), other->connection_id);
-            return true; // don't remvoe from valid connections
+         const auto& pa = peer_address();
+         if (my_impl->connections.any_of_connections([&pa, &c](const connection_ptr& check) {
+                if (check.get() == c.get() || !check->connected()) {
+                   return false;
+                }
+                fc::lock_guard g(check->conn_mtx);
+                return check->p2p_address == pa;
+             })) {
+            fc_dlog(p2p_conn_log, "Skipping connect to {} - {} due to existing connection", pa, connection_id);
+            return true;
          }
       }
 
@@ -5220,6 +5227,7 @@ namespace sysio {
             , .block_sync_bytes_sent = c->get_block_sync_bytes_sent()
             , .block_sync_throttling = c->get_block_sync_throttling()
             , .connection_start_time = c->connection_start_time
+            , .peer_score = c->get_peer_score()
             , .p2p_address = p2p_addr
             , .unique_conn_node_id = conn_node_id
          });

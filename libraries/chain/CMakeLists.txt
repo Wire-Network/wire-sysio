@@ -136,6 +136,8 @@ add_library( sysio_chain
              ${HEADERS}
              )
 
+find_package(protobuf CONFIG REQUIRED)
+
 target_link_libraries(
   sysio_chain
   PUBLIC
@@ -152,6 +154,7 @@ target_link_libraries(
   ${CHAIN_SYSVM_LIBRARIES}
   ${CHAIN_NATIVE_MODULE_LIBRARIES}
   ${LLVM_LIBS}
+  protobuf::libprotobuf
   ${CHAIN_RT_LINKAGE}
   Boost::signals2
   Boost::hana

@@ -111,4 +111,145 @@ BOOST_FIXTURE_TEST_CASE(corrupted_file_size, block_log_get_block_fixture) try {
                          fc_exception_message_contains("block log file size"));
 } FC_LOG_AND_RETHROW()
 
+// ------- Batch read tests -------
+
+BOOST_FIXTURE_TEST_CASE(batch_read_basic, block_log_get_block_fixture) try {
+   // Batch read a range of blocks and verify each matches single-read API
+   uint32_t start = 5;
+   uint32_t count = 10;
+   auto batch = log->read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = log->read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(!single.empty());
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_spanning_head, block_log_get_block_fixture) try {
+   // Batch read that includes the last block in the log (file-size edge case)
+   uint32_t start = last_block_num - 4;
+   uint32_t count = 5;
+   auto batch = log->read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = log->read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_partial_beyond_head, block_log_get_block_fixture) try {
+   // Request extends beyond head block; verify clamped result
+   uint32_t start = last_block_num - 2;
+   uint32_t count = 10; // asks for 10, only 3 available
+   auto batch = log->read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), 3u);
+
+   for (uint32_t i = 0; i < batch.size(); ++i) {
+      auto single = log->read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_count_zero, block_log_get_block_fixture) try {
+   auto batch = log->read_serialized_blocks_by_num(1, 0);
+   BOOST_REQUIRE(batch.empty());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_count_one, block_log_get_block_fixture) try {
+   auto batch = log->read_serialized_blocks_by_num(1, 1);
+   BOOST_REQUIRE_EQUAL(batch.size(), 1u);
+   auto single = log->read_serialized_block_by_num(1);
+   BOOST_REQUIRE(batch[0] == single);
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_all_blocks, block_log_get_block_fixture) try {
+   // Read all blocks in one batch
+   auto batch = log->read_serialized_blocks_by_num(1, last_block_num);
+   BOOST_REQUIRE_EQUAL(batch.size(), last_block_num);
+
+   for (uint32_t i = 0; i < last_block_num; ++i) {
+      auto single = log->read_serialized_block_by_num(i + 1);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_nonexisting_start, block_log_get_block_fixture) try {
+   // Start beyond the log's range
+   auto batch = log->read_serialized_blocks_by_num(last_block_num + 1, 5);
+   BOOST_REQUIRE(batch.empty());
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_partitioned_log, block_log_get_block_fixture) try {
+   uint32_t stride = last_block_num / 2;
+   auto retained_dir = block_dir / "retained";
+
+   block_log::split_blocklog(block_dir, retained_dir, stride);
+
+   std::filesystem::remove(block_dir / "blocks.log");
+   std::filesystem::remove(block_dir / "blocks.index");
+
+   block_log blog(block_dir, partitioned_blocklog_config{ .retained_dir = retained_dir });
+
+   // Batch read spanning the partition boundary
+   uint32_t start = stride - 3;
+   uint32_t count = 8; // crosses the boundary between two catalog files
+   auto batch = blog.read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = blog.read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(!single.empty());
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
+BOOST_FIXTURE_TEST_CASE(batch_read_multiple_catalog_files, block_log_get_block_fixture) try {
+   // Split into small strides to create multiple catalog files (stride=10 on 50 blocks
+   // yields 5 catalog files: 1-10, 11-20, 21-30, 31-40, 41-50).
+   uint32_t stride = 10;
+   auto retained_dir = block_dir / "retained";
+
+   block_log::split_blocklog(block_dir, retained_dir, stride);
+
+   std::filesystem::remove(block_dir / "blocks.log");
+   std::filesystem::remove(block_dir / "blocks.index");
+
+   block_log blog(block_dir, partitioned_blocklog_config{ .retained_dir = retained_dir });
+
+   // Batch read spanning multiple catalog file boundaries (blocks 8..33 crosses 3 files)
+   uint32_t start = 8;
+   uint32_t count = 26;
+   auto batch = blog.read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = blog.read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(!single.empty());
+      BOOST_REQUIRE(batch[i] == single);
+   }
+
+   // Batch read entirely within a single catalog file (blocks 12..18)
+   start = 12;
+   count = 7;
+   batch = blog.read_serialized_blocks_by_num(start, count);
+   BOOST_REQUIRE_EQUAL(batch.size(), count);
+
+   for (uint32_t i = 0; i < count; ++i) {
+      auto single = blog.read_serialized_block_by_num(start + i);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+
+   // Batch read all blocks from catalog
+   batch = blog.read_serialized_blocks_by_num(1, last_block_num);
+   BOOST_REQUIRE_EQUAL(batch.size(), last_block_num);
+
+   for (uint32_t i = 0; i < last_block_num; ++i) {
+      auto single = blog.read_serialized_block_by_num(i + 1);
+      BOOST_REQUIRE(batch[i] == single);
+   }
+} FC_LOG_AND_RETHROW()
+
 BOOST_AUTO_TEST_SUITE_END()

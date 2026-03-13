@@ -72,6 +72,8 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test.py ${CMAKE_CUR
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_sync_throttle_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/p2p_sync_throttle_test_shape.json COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_no_blocks_test_shape.json ${CMAKE_CURRENT_BINARY_DIR}/p2p_no_blocks_test_shape.json COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_auth_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_auth_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/p2p_peer_scoring_test.py ${CMAKE_CURRENT_BINARY_DIR}/p2p_peer_scoring_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/compute_transaction_test.py ${CMAKE_CURRENT_BINARY_DIR}/compute_transaction_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/subjective_billing_test.py ${CMAKE_CURRENT_BINARY_DIR}/subjective_billing_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/get_account_test.py ${CMAKE_CURRENT_BINARY_DIR}/get_account_test.py COPYONLY)
@@ -98,6 +100,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/read_only_trx_test.py ${CMAKE_CURRENT
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_read_only_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_read_only_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resource_monitor_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/resource_monitor_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/light_validation_sync_test.py ${CMAKE_CURRENT_BINARY_DIR}/light_validation_sync_test.py COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/proto_abi_test.py ${CMAKE_CURRENT_BINARY_DIR}/proto_abi_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interrupt_trx_test.py ${CMAKE_CURRENT_BINARY_DIR}/interrupt_trx_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/trace_plugin_test.py ${CMAKE_CURRENT_BINARY_DIR}/trace_plugin_test.py COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/nested_container_multi_index_test.py ${CMAKE_CURRENT_BINARY_DIR}/nested_container_multi_index_test.py COPYONLY)
@@ -201,6 +204,8 @@ add_np_test(NAME p2p_multiple_listen_test COMMAND tests/p2p_multiple_listen_test
 add_np_test(NAME p2p_no_listen_test COMMAND tests/p2p_no_listen_test.py -v ${UNSHARE})
 add_lr_test(NAME p2p_sync_throttle_test COMMAND tests/p2p_sync_throttle_test.py -v -d 2 ${UNSHARE})
 add_np_test(NAME p2p_no_blocks_if_test COMMAND tests/p2p_no_blocks_test.py -v -d 2 ${UNSHARE})
+add_np_test(NAME p2p_peer_auth_test COMMAND tests/p2p_peer_auth_test.py -v ${UNSHARE})
+add_np_test(NAME p2p_peer_scoring_test COMMAND tests/p2p_peer_scoring_test.py -v ${UNSHARE})
 
 # needs iproute-tc or iproute2 depending on platform
 #add_np_test(NAME p2p_high_latency_test COMMAND tests/p2p_high_latency_test.py -v)
@@ -261,6 +266,7 @@ add_lr_test(NAME resource_monitor_plugin_test COMMAND tests/resource_monitor_plu
 add_lr_test(NAME nodeop_repeat_transaction_lr_test COMMAND tests/nodeop_high_transaction_test.py -v -p 4 -n 8 --num-transactions 1000 --max-transactions-per-second 500 --send-duplicates ${UNSHARE})
 
 add_np_test(NAME light_validation_sync_test COMMAND tests/light_validation_sync_test.py -v ${UNSHARE})
+add_np_test(NAME proto_abi_test COMMAND tests/proto_abi_test.py -v ${UNSHARE})
 add_np_test(NAME interrupt_trx_test COMMAND tests/interrupt_trx_test.py -v ${UNSHARE})
 
 add_lr_test(NAME auto_bp_peering_test COMMAND tests/auto_bp_peering_test.py -v ${UNSHARE})
