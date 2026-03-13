@@ -723,7 +723,7 @@ public:
             packed_trx, true /*api_trx*/,
             chain::transaction_metadata::trx_type::input,
             false /*return_failure_traces*/,
-            [this](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
+            [](const chain::next_function_variant<chain::transaction_trace_ptr>& result) {
                if (std::holds_alternative<fc::exception_ptr>(result)) {
                   auto& ex = std::get<fc::exception_ptr>(result);
                   auto msg = ex->to_detail_string();

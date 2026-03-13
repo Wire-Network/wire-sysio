@@ -4176,6 +4176,18 @@ std::vector<char> controller::fetch_serialized_block_by_number( uint32_t block_n
    return my->blog.read_serialized_block_by_num(block_num);
 } FC_CAPTURE_AND_RETHROW( "{}", block_num ) }
 
+std::vector<std::vector<char>> controller::fetch_serialized_blocks_by_number( uint32_t first_block_num, uint32_t count)const  { try {
+   auto result = my->blog.read_serialized_blocks_by_num(first_block_num, count);
+   // Fill remainder from fork_db (near-head blocks during catchup)
+   for (uint32_t i = result.size(); i < count; ++i) {
+      if (signed_block_ptr b = my->fork_db_fetch_block_on_best_branch_by_num(first_block_num + i))
+         result.push_back(b->packed_signed_block());
+      else
+         break;
+   }
+   return result;
+} FC_CAPTURE_AND_RETHROW( "{}, {}", first_block_num, count ) }
+
 std::optional<signed_block_header> controller::fetch_block_header_by_number( uint32_t block_num )const  { try {
    auto b = my->fork_db_fetch_block_on_best_branch_by_num(block_num);
    if (b)
