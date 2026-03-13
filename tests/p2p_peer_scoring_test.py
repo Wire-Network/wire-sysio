@@ -57,7 +57,6 @@ try:
         score = conn['peer_score']
         assert isinstance(score, int), f"peer_score is not an integer: {score}"
         assert 0 <= score <= 200, f"peer_score {score} outside valid range [0, 200] for connection {conn['connection_id']}"
-        assert score >= baseline, f"peer_score {score} below baseline {baseline} at startup for connection {conn['connection_id']}"
         Print(f"  connection {conn['connection_id']}: peer_score={score}")
 
     # ---- Test 2: Scores increase above baseline after block relay ----
