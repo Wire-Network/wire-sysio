@@ -2833,7 +2833,7 @@ int main( int argc, char** argv ) {
       string wallet_key_str;
       auto import_wallet_cmd = wallet_cmd->add_subcommand("import", localized("Import private key into wallet"));
       import_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to import key into"));
-      import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key in WIF format to import"))->expected(0, 1);
+      import_wallet_cmd->add_option("--private-key", wallet_key_str, localized("Private key to import (WIF, PVT_K1_/PVT_R1_/PVT_EM_ prefixed, or 0x hex for EM)"))->expected(0, 1);
       import_wallet_cmd->callback([&wallet_name, &wallet_key_str] {
          if( wallet_key_str.size() == 0 ) {
             std::cout << localized("private key: ");
@@ -2895,7 +2895,7 @@ int main( int argc, char** argv ) {
       string wallet_create_key_type;
       auto create_key_in_wallet_cmd = wallet_cmd->add_subcommand("create_key", localized("Create private key within wallet"));
       create_key_in_wallet_cmd->add_option("-n,--name", wallet_name, localized("The name of the wallet to create key into"))->capture_default_str();
-      create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1)"))->type_name("K1/R1")->capture_default_str();
+      create_key_in_wallet_cmd->add_option("key_type", wallet_create_key_type, localized("Key type to create (K1/R1/EM/ED)"))->type_name("K1/R1/EM/ED")->capture_default_str();
       create_key_in_wallet_cmd->callback([&wallet_name, &wallet_create_key_type] {
          //an empty key type is allowed -- it will let the underlying wallet pick which type it prefers
          fc::variants vs = {fc::variant(wallet_name), fc::variant(wallet_create_key_type)};
