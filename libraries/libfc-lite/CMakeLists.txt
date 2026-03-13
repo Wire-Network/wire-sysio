@@ -19,10 +19,12 @@ endif ()
 install(
   DIRECTORY include/fc-lite
   DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}
+  COMPONENT dev EXCLUDE_FROM_ALL
 )
 
 # Install the INTERFACE target for completeness (no artifacts produced)
 install(
   TARGETS fc-lite
   EXPORT fc-lite-targets
+  COMPONENT dev EXCLUDE_FROM_ALL
 )
