@@ -1685,7 +1685,7 @@ void producer_plugin_impl::plugin_initialize(const boost::program_options::varia
       SYS_ASSERT(!is_configured_producer(), plugin_config_exception,
                  "snapshot-provider-account cannot be used alongside producer-name");
 
-      _snapshot_scheduler.set_snapshot_finalized_callback(
+      _snapshot_scheduler.add_snapshot_finalized_callback(
          [this](const snapshot_scheduler::snapshot_information& si) {
             submit_snapshot_vote(si);
          });
@@ -1983,6 +1983,14 @@ producer_plugin::unschedule_snapshot(const chain::snapshot_scheduler::snapshot_r
 
 chain::snapshot_scheduler::get_snapshot_requests_result producer_plugin::get_snapshot_requests() const {
    return my->_snapshot_scheduler.get_snapshot_requests();
+}
+
+void producer_plugin::add_snapshot_finalized_callback(chain::snapshot_scheduler::snapshot_finalized_callback_t cb) {
+   my->_snapshot_scheduler.add_snapshot_finalized_callback(std::move(cb));
+}
+
+std::filesystem::path producer_plugin::get_snapshots_dir() const {
+   return my->_snapshots_dir;
 }
 
 producer_plugin::scheduled_protocol_feature_activations producer_plugin::get_scheduled_protocol_feature_activations() const {

@@ -3,6 +3,9 @@
 #include <fc/scoped_exit.hpp>
 #include <fc/static_variant.hpp>
 
+#include <filesystem>
+#include <fstream>
+
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/beast/version.hpp>
@@ -366,6 +369,74 @@ public:
       return _unix_url_paths.emplace(full_url, fc::url("unix", socket_file.string(), ostring(), ostring(), url_path.string(), ostring(), ovariant_object(), std::optional<uint16_t>())).first->second;
    }
 
+   void post_to_file(const url& dest, const variant& payload, const std::filesystem::path& final_dest, const fc::time_point& deadline_time) {
+      static const deadline_type epoch(boost::gregorian::date(1970, 1, 1));
+      auto deadline = epoch + boost::posix_time::microseconds(deadline_time.time_since_epoch().count());
+      FC_ASSERT(dest.host(), "No host set on URL");
+
+      std::string path = dest.path() ? dest.path()->generic_string() : "/";
+      if (dest.query()) {
+         path = path + "?" + *dest.query();
+      }
+
+      std::string host_str = *dest.host();
+      if (dest.port()) {
+         auto port = *dest.port();
+         auto proto_iter = default_proto_ports.find(dest.proto());
+         if (proto_iter != default_proto_ports.end() && proto_iter->second != port) {
+            host_str = host_str + ":" + std::to_string(port);
+         }
+      }
+
+      http::request<http::string_body> req{http::verb::post, path, 11};
+      req.set(http::field::host, host_str);
+      req.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
+      req.set(http::field::content_type, "application/json");
+      req.keep_alive(false);
+      req.body() = json::to_string(payload, deadline_time);
+      req.prepare_payload();
+
+      auto conn_iter = get_connection(dest, deadline);
+      auto eraser = make_scoped_exit([this, &conn_iter](){
+         _connections.erase(conn_iter);
+      });
+
+      error_code ec = std::visit(write_request_visitor(this, req, deadline), conn_iter->second);
+      FC_ASSERT(!ec, "Failed to send POST request: {}", ec.message());
+
+      // Use string_body response — for very large files this buffers in memory.
+      // A streaming approach would be better for multi-GB files but requires
+      // more extensive Beast integration. For bootstrap (one-time operation), this works.
+      boost::beast::flat_buffer buffer;
+      http::response<http::string_body> res;
+
+      ec = std::visit(read_response_visitor(this, buffer, res, deadline), conn_iter->second);
+      FC_ASSERT(!ec, "Failed to read response: {}", ec.message());
+
+      FC_ASSERT(res.result() == http::status::ok || res.result() == http::status::partial_content,
+                "HTTP POST failed with status {}: {}", (int)res.result(), res.body().substr(0, 200));
+
+      // Write to temp file then rename
+      auto temp_path = final_dest;
+      temp_path += ".downloading";
+      auto cleanup = make_scoped_exit([&temp_path](){
+         std::error_code ec;
+         std::filesystem::remove(temp_path, ec);
+      });
+
+      {
+         std::ofstream ofs(temp_path, std::ios::binary);
+         FC_ASSERT(ofs.good(), "Failed to open temp file for writing: {}", temp_path.string());
+         ofs.write(res.body().data(), res.body().size());
+         FC_ASSERT(ofs.good(), "Failed to write snapshot data to: {}", temp_path.string());
+      }
+
+      std::error_code rename_ec;
+      std::filesystem::rename(temp_path, final_dest, rename_ec);
+      FC_ASSERT(!rename_ec, "Failed to rename downloaded file: {}", rename_ec.message());
+      cleanup.cancel();
+   }
+
    boost::asio::io_context  _ioc;
    connection_map           _connections;
    unix_url_split_map       _unix_url_paths;
@@ -376,6 +447,10 @@ http_client::http_client()
 :_my(new http_client_impl())
 {
 
+}
+
+void http_client::post_to_file(const url& dest, const variant& payload, const std::filesystem::path& output, const fc::time_point& deadline) {
+   _my->post_to_file(dest, payload, output, deadline);
 }
 
 variant http_client::post_sync(const url& dest, const variant& payload, const fc::time_point& deadline) {

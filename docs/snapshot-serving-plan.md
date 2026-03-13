@@ -183,56 +183,124 @@ This permissive approach for manual `--snapshot` allows operators to load their 
 
 ---
 
-## Phase 3 — HTTP Snapshot Server
+## Phase 3 — HTTP Snapshot Server (IMPLEMENTED)
 
-**Files:** New `plugins/snapshot_plugin/`
+**Status:** Implemented in `feature/snapshot-endpoint`. New `snapshot_api_plugin` with HTTP file serving extensions.
 
-**Tasks:**
+### Architecture
 
-- Create `snapshot_plugin` registering HTTP routes when `snapshot-provider-account` is set
-- Endpoints:
+A new `snapshot_api_plugin` (separate from the existing `producer_api_plugin`) provides public read-only endpoints for snapshot discovery and download. A new `snapshot_ro` API category (`1 << 11`) allows operators to expose these endpoints publicly via `--http-category-address` while keeping the admin `snapshot` category loopback-only.
 
-```
-GET /v1/snapshot/latest
-    Response: { block_num, block_id, snapshot_root_hash, download_url }
+**Key design decisions:**
 
-GET /v1/snapshot/by_block/{block_num}
-    Response: same structure for a specific block
+| Decision | Rationale |
+|----------|-----------|
+| Serve uncompressed via `file_body` (sendfile) | Zero-copy kernel sendfile maximizes throughput; compression breaks Range headers |
+| No custom download rate limiting | HTTP plugin's existing `max_bytes_in_flight` and `max_requests_in_flight` provide sufficient back-pressure; operators use reverse proxies for finer control |
+| POST with JSON body (not GET with path params) | Consistent with existing API pattern; avoids modifying HTTP dispatcher's exact-match routing |
+| Separate plugin from `producer_api_plugin` | Public-facing vs operator-only separation; different API categories and trust models |
 
-GET /v1/snapshot/download/{block_num}
-    Response: binary stream of snapshot file
+### Files
 
-GET /v1/snapshot/peers
-    Response: { peers: ["host:port", ...] }
-```
+**New:**
+- `plugins/snapshot_api_plugin/CMakeLists.txt`
+- `plugins/snapshot_api_plugin/include/sysio/snapshot_api_plugin/snapshot_api_plugin.hpp`
+- `plugins/snapshot_api_plugin/src/snapshot_api_plugin.cpp`
+- `plugins/http_plugin/include/sysio/http_plugin/abstract_conn_fwd.hpp` — forward declaration header for `sysio::detail::abstract_conn` (avoids `sysio::detail` vs `sysio::chain::detail` namespace ambiguity)
 
-- Support `Range` header for resumable downloads
-- Rate-limit the download endpoint
+**Modified:**
+- `plugins/http_plugin/include/sysio/http_plugin/api_category.hpp` — added `snapshot_ro = 1 << 11`
+- `plugins/http_plugin/include/sysio/http_plugin/common.hpp` — added `send_file_response()` and `get_request_header()` virtual methods to `abstract_conn`
+- `plugins/http_plugin/include/sysio/http_plugin/http_plugin.hpp` — added `raw_url_handler` type and `add_raw_handler()` method
+- `plugins/http_plugin/include/sysio/http_plugin/beast_http_session.hpp` — implemented `send_file_response()` using Beast's `http::file_body` with Range support
+- `plugins/http_plugin/src/http_plugin.cpp` — `snapshot_ro` in category maps, `add_raw_handler()` implementation
+- `libraries/chain/include/sysio/chain/snapshot_scheduler.hpp` — changed single callback to vector (`add_snapshot_finalized_callback`)
+- `libraries/chain/snapshot_scheduler.cpp` — iterate callback vector
+- `plugins/producer_plugin/include/sysio/producer_plugin/producer_plugin.hpp` — added `add_snapshot_finalized_callback()` and `get_snapshots_dir()`
+- `plugins/producer_plugin/src/producer_plugin.cpp` — implemented new public methods
+- `plugins/CMakeLists.txt` — added `add_subdirectory(snapshot_api_plugin)`
+- `cmake/chain-tools.cmake` — added `snapshot_api_plugin` to link libraries
+- `programs/nodeop/main.cpp` — registered `snapshot_api_plugin`
+
+### Endpoints
+
+All endpoints use `api_category::snapshot_ro` and are registered during `plugin_startup()`.
+
+| Endpoint | Registration | Request | Response |
+|----------|-------------|---------|----------|
+| `POST /v1/snapshot/latest` | `add_api` (read_only queue) | no params | `{ block_num, block_id, block_time, root_hash }` or 404 |
+| `POST /v1/snapshot/by_block` | `add_api` (read_only queue) | `{ block_num: N }` | same metadata or 404 |
+| `POST /v1/snapshot/download` | `add_raw_handler` | `{ block_num: N }` | Binary file with `Content-Disposition: attachment`, supports `Range` header (206 Partial Content) |
+
+### Implementation Details
+
+- **Snapshot catalog:** `std::shared_mutex`-protected `std::map<uint32_t, snapshot_entry>` mapping block_num → metadata (block_num, block_id, block_time, root_hash, file_path, file_size).
+- **Catalog init:** On startup, scans `snapshots_dir` for `snapshot-*.bin` files. Uses `threaded_snapshot_reader::load_index()` (fast — reads footer only) + `snapshot_info()` to extract block metadata.
+- **Catalog update:** Registers callback via `producer_plugin::add_snapshot_finalized_callback()`. New snapshots are automatically added to the catalog when finalized.
+- **File serving:** The download endpoint uses `conn->send_file_response()` which delegates to Beast's `http::file_body` for zero-copy file transfer. Range headers are parsed for resumable downloads.
+- **Raw handler pattern:** `add_raw_handler()` receives the `abstract_conn_ptr` directly (bypassing the `url_response_callback` layer) to support binary/file responses.
+
+### `/v1/snapshot/peers` — Deferred
+
+The peers endpoint is a separate feature and was not implemented in this phase.
 
 ---
 
-## Phase 4 — Bootstrap Node Verification & Integration
+## Phase 4 — Bootstrap from Snapshot Endpoint (IMPLEMENTED)
 
-**Files:** `plugins/chain_plugin/`, `programs/nodeop/main.cpp`
+**Status:** Implemented in `feature/snapshot-endpoint`. Bootstrap logic in `chain_plugin`, download support in `fc::http_client`.
 
-**Tasks:**
+### Configuration
 
-- Add bootstrap config options:
+A single CLI-only option (not config file — single-use bootstrap):
 
-```ini
-snapshot-endpoint = https://snapshots.example.com   # HTTP snapshot provider base URL
-snapshot-block-num =                                 # optional: request a specific block
+```
+--snapshot-endpoint URL    Fetch snapshot from URL and bootstrap.
+                           URL formats:
+                             https://snap.example.com          → fetches latest
+                             https://snap.example.com/50000    → fetches block 50000
 ```
 
-- Bootstrap flow when `snapshot-endpoint` is set and no existing chain data is present:
-    1. Fetch metadata from `/v1/snapshot/latest` (or `by_block` if specified)
-    2. Download snapshot; compute `root_hash` locally and verify it matches the advertised hash — abort if mismatch
-    3. Load the snapshot and begin p2p sync
-    4. Once synced to head, query on-chain `snaprecords` table for the snapshot's `block_num`
-    5. Compare locally computed hash against the on-chain attested hash
-    6. **If mismatch or no attestation found:** log a fatal error and immediately shut down
+The block number is encoded as a trailing path component of the URL. If the last path segment is a decimal number, it's treated as a specific block request (POST to `/v1/snapshot/by_block`); otherwise POST to `/v1/snapshot/latest`.
 
-**Note:** Auto-fetched snapshots use strict verification (fatal on missing attestation or mismatch), unlike manual `--snapshot` which only warns on missing attestation. This is because auto-fetched snapshots come from untrusted peers and must be verified against on-chain records.
+### Files
+
+**Modified:**
+- `libraries/libfc/include/fc/network/http/http_client.hpp` — added `post_to_file()` method
+- `libraries/libfc/src/network/http/http_client.cpp` — implemented `post_to_file()` (POST with JSON body, write binary response to temp file, rename on completion)
+- `plugins/chain_plugin/src/chain_plugin.cpp` — `--snapshot-endpoint` option, bootstrap flow, strict attestation verification
+
+### Bootstrap Flow (in `chain_plugin::plugin_initialize`)
+
+1. **Mutual exclusion:** `--snapshot-endpoint` is incompatible with `--snapshot` (error if both set).
+2. **Existing data check:** If chain data exists (`shared_memory.bin` / `chain_head.dat`), error with message:
+   ```
+   Cannot bootstrap from snapshot endpoint with existing chain data.
+   Rerun with --delete-all-blocks --snapshot-endpoint URL to remove
+   existing blocks and state before bootstrapping.
+   ```
+   This works naturally with `--delete-all-blocks` which clears state before snapshot handling.
+3. **Fetch metadata:** POST to `/v1/snapshot/latest` or `/v1/snapshot/by_block` depending on URL format.
+4. **Download snapshot:** Uses `fc::http_client::post_to_file()` to POST to `/v1/snapshot/download` and save binary response to local snapshots directory.
+5. **Root hash verification:** Uses `threaded_snapshot_reader::load_index()` to read the footer and compare the stored root hash against the advertised `root_hash`. This is a fast metadata-only check that catches download corruption. Full integrity verification (re-hashing all sections) happens during snapshot loading, and on-chain attestation verification happens after syncing.
+6. **Continue normal loading:** Sets `snapshot_path` to downloaded file and `snapshot_auto_fetched = true`. No `--genesis-json` needed — snapshot contains genesis.
+
+The bootstrap logic is encapsulated in `chain_plugin_impl::fetch_snapshot_from_endpoint()`.
+
+### Strict Attestation Verification
+
+When `snapshot_auto_fetched == true`, the attestation check in `verify_snapshot_attestation()` is upgraded from warnings to fatal errors:
+
+| Condition | Manual `--snapshot` | Auto-fetched (`--snapshot-endpoint`) |
+|-----------|-------------------|--------------------------------------|
+| No attestation table | Warning | **FATAL** — shutdown |
+| No record for block_num | Warning | **FATAL** — shutdown |
+| Hash mismatch | FATAL | FATAL |
+| Hash match | Success | Success |
+
+**Retry-based verification:** The attestation check (`verify_snapshot_attestation()`) runs on each irreversible block after the snapshot block. In the real-world flow, a snapshot is taken first, then providers independently generate their own snapshots (which can take minutes), submit votes, reach quorum, and the attestation becomes irreversible. The bootstrap node loads the snapshot, syncs forward, and eventually reaches the block containing the attestation record.
+
+The timeout is 12,500 blocks (~104 minutes at 0.5s block time), which is half the snapshot interval of 25,000 blocks. This provides ample time for providers to generate, vote, and reach quorum before the next snapshot is due.
 
 **Note:** Verification happens *after* sync, not before. The node loads the snapshot optimistically, syncs to head, then checks the on-chain record. This avoids a chicken-and-egg problem (can't query on-chain state before having chain state).
 
@@ -247,6 +315,8 @@ snapshot-block-num =                                 # optional: request a speci
 ```
 
 The producer registers the snapshot provider's account via `regsnapprov`. The snapshot provider node syncs the chain, automatically generates snapshots every 25,000 blocks, votes on hashes via `votesnaphash`, and optionally serves snapshots over HTTP. No shared keys between the two nodes.
+
+For a complete operator setup guide — including producer registration, provider account delegation, attestation quorum configuration, snapshot generation, attestation voting, and HTTP network configuration with `--http-category-address` — see [`plugins/snapshot_api_plugin/README.md`](../plugins/snapshot_api_plugin/README.md).
 
 ---
 
@@ -278,11 +348,22 @@ The producer registers the snapshot provider's account via `regsnapprov`. The sn
 - Load attested snapshot → sync from peers → verify attestation records on synced node
 - Provider deregistration via `delsnapprov`
 
-### Remaining Test Needs
+**Integration test** (`tests/snapshot_api_test.py` — 9 tests):
 
-- **Integration:** HTTP snapshot serving (Phase 3), auto-fetch + strict verification (Phase 4)
-- **Adversarial:** Tampered snapshot → hash mismatch → fatal on auto-fetch
-- **Performance:** Snapshot generation benchmarks at scale (see Phase 1 results)
+Phase 3 (API endpoints):
+- `/v1/snapshot/latest` returns 404 with empty catalog
+- Create snapshot and verify `/v1/snapshot/latest` metadata
+- `/v1/snapshot/by_block` returns correct metadata
+- `/v1/snapshot/by_block` returns 404 for non-existent block
+- `/v1/snapshot/download` serves binary file matching on-disk snapshot
+- Range header support (206 Partial Content with correct `Content-Range`)
+- Second snapshot updates catalog; first snapshot still accessible
+
+Phase 4 (bootstrap):
+- Bootstrap from latest snapshot endpoint — node syncs forward, finds attestation record in blocks after the snapshot
+- Bootstrap with specific block number in URL — uses `addSwapFlags` to avoid flag duplication across relaunches
+
+The Phase 4 tests use the realistic attestation flow: snapshot is taken first, then attested afterwards. The bootstrap node loads from the snapshot and syncs forward to find the attestation record, matching production behavior.
 
 ---
 
@@ -295,8 +376,12 @@ The producer registers the snapshot provider's account via `regsnapprov`. The sn
 - **Snapshot interval:** Every 25,000 blocks, constant (not configurable) — all providers must use the same interval
 - **Attestation threshold:** `max(min_providers, ceil(registered_count * threshold_pct / 100))` with configurable floor and percentage via `setsnpcfg`
 - **Contract location:** Actions added to `sysio.system` as a sub-contract class (not a separate `sysio.snapshot` contract) for direct access to the producers table and rank index
-- **Manual snapshot verification:** Warnings only for missing attestation table or record when using `--snapshot`. Strict enforcement reserved for future auto-fetch from peers.
+- **Manual snapshot verification:** Warnings only for missing attestation table or record when using `--snapshot`. Strict enforcement reserved for auto-fetch via `--snapshot-endpoint`.
+- **Compression for distribution:** Serve uncompressed via `file_body` (kernel sendfile). Compression breaks Range headers, adds CPU cost per download, and operators already handle this via reverse proxies (nginx `gzip_static` / CDN). If needed later, generate `.bin.zst` alongside `.bin` during snapshot finalization and serve via `Accept-Encoding` negotiation.
+- **Download rate limiting:** No custom limiting needed. HTTP plugin's existing `max_bytes_in_flight` and `max_requests_in_flight` provide sufficient back-pressure. Operators use reverse proxies for finer control.
+- **API style for snapshot endpoints:** POST with JSON body (not GET with path params) for consistency with existing API pattern and to avoid modifying the HTTP dispatcher's exact-match routing.
+- **Bootstrap config pattern:** Single CLI-only `--snapshot-endpoint` option with block number embedded in URL path (not separate `--snapshot-block-num` config option). CLI-only because bootstrap is a single-use operation.
 
 **Still open:**
-1. **Compression for distribution:** Add gzip or zstd compression layer for HTTP serving? Current format is uncompressed binary.
-2. **Snapshot retention:** How many snapshots should a provider node retain? Prune policy?
+1. **Snapshot retention:** How many snapshots should a provider node retain? Prune policy?
+2. **Peers endpoint:** `/v1/snapshot/peers` for peer discovery (deferred to separate feature).

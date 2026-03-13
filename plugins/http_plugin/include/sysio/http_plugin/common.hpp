@@ -29,6 +29,7 @@
 #include <boost/asio/detail/config.hpp>
 
 #include <atomic>
+#include <filesystem>
 #include <map>
 #include <optional>
 #include <regex>
@@ -63,6 +64,16 @@ struct abstract_conn {
    virtual void handle_exception() = 0;
 
    virtual void send_response(std::string&& json_body, unsigned int code) = 0;
+
+   /// Send a file as the HTTP response body using zero-copy I/O.
+   /// If byte_range is set, sends a 206 Partial Content response for the given [start, end] inclusive range.
+   virtual void send_file_response(const std::filesystem::path& file_path,
+                                   unsigned int code,
+                                   std::string_view content_type,
+                                   std::optional<std::pair<uint64_t,uint64_t>> byte_range = {}) = 0;
+
+   /// Return the value of an HTTP request header, or empty string if not present.
+   virtual std::string get_request_header(std::string_view field_name) const = 0;
 };
 
 using abstract_conn_ptr = std::shared_ptr<abstract_conn>;

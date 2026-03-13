@@ -33,6 +33,8 @@
 #include <fc/io/json.hpp>
 #include <fc/scoped_exit.hpp>
 #include <fc/variant.hpp>
+#include <fc/network/http/http_client.hpp>
+#include <fc/network/url.hpp>
 #include <cstdlib>
 
 
@@ -198,6 +200,7 @@ public:
    // checked once after syncing past the snapshot block.
    std::optional<uint32_t>    snapshot_loaded_block_num;
    fc::crypto::blake3         snapshot_loaded_root_hash;
+   bool                       snapshot_auto_fetched = false; // true when loaded via --snapshot-endpoint
 
    // --native-contract mappings: account -> path to .so
    std::vector<std::pair<chain::name, std::filesystem::path>> native_contracts;
@@ -237,7 +240,8 @@ public:
    void enable_accept_transactions();
    void plugin_initialize(const variables_map& options);
    void plugin_startup();
-   void verify_snapshot_attestation();
+   void verify_snapshot_attestation(uint32_t current_lib_num);
+   void fetch_snapshot_from_endpoint(const std::string& endpoint_url);
 
 private:
    static void log_guard_exception(const chain::guard_exception& e);
@@ -439,6 +443,12 @@ void chain_plugin::set_program_options(options_description& cli, options_descrip
           "Use RPC endpoint /v1/producer/pause_at_block to pause at a specific block instead. "
           "Combine with truncate-at-block to prune blocks beyond the specified number from the fork database on exit.")
          ("snapshot", bpo::value<std::filesystem::path>(), "File to read Snapshot State from")
+         ("snapshot-endpoint", bpo::value<std::string>(),
+          "Fetch snapshot from URL and bootstrap.\n"
+          "URL formats:\n"
+          "  http://host:port          - fetches latest snapshot\n"
+          "  http://host:port/50000    - fetches snapshot at block 50000\n"
+          "Requires empty database (use --delete-all-blocks to clear existing data).")
          ;
 
 }
@@ -831,9 +841,19 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
          clear_directory_contents( chain_config->state_dir );
       }
 
+      // --snapshot-endpoint: fetch snapshot from remote node and bootstrap
+      if (options.count("snapshot-endpoint")) {
+         SYS_ASSERT(!options.contains("snapshot"), plugin_config_exception,
+                    "--snapshot-endpoint is incompatible with --snapshot; use one or the other");
+         fetch_snapshot_from_endpoint(options.at("snapshot-endpoint").as<std::string>());
+      }
+
       std::optional<chain_id_type> chain_id;
-      if (options.contains( "snapshot" )) {
-         snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
+      if (options.contains( "snapshot" ) || snapshot_path) {
+         if (!snapshot_path) {
+            // Only read from CLI option if not already set by --snapshot-endpoint
+            snapshot_path = options.at( "snapshot" ).as<std::filesystem::path>();
+         }
          SYS_ASSERT( std::filesystem::exists(*snapshot_path), plugin_config_exception,
                      "Cannot load snapshot, {} does not exist", snapshot_path->generic_string() );
 
@@ -1171,9 +1191,10 @@ void chain_plugin_impl::plugin_initialize(const variables_map& options) {
             _get_info_db->on_irreversible_block(block, id);
          }
 
-         // One-time snapshot attestation verification after syncing past the snapshot block
+         // Snapshot attestation verification — check on each irreversible block until
+         // the attestation record is found (or max_blocks_to_wait exceeded for auto-fetched)
          if (snapshot_loaded_block_num && block->block_num() > *snapshot_loaded_block_num) {
-            verify_snapshot_attestation();
+            verify_snapshot_attestation(block->block_num());
          }
 
          irreversible_block_channel.publish( priority::low, t );
@@ -1367,14 +1388,105 @@ bool chain_plugin::accept_transactions() const {
    return my->accept_transactions;
 }
 
-void chain_plugin_impl::verify_snapshot_attestation() {
+void chain_plugin_impl::fetch_snapshot_from_endpoint(const std::string& endpoint_url) {
+   // Check for existing chain data
+   auto shared_mem_path = chain_config->state_dir / "shared_memory.bin";
+   auto chain_head_path = chain_config->state_dir / chain_head_filename;
+   SYS_ASSERT(!std::filesystem::is_regular_file(shared_mem_path) &&
+              !std::filesystem::is_regular_file(chain_head_path),
+              plugin_config_exception,
+              "Cannot bootstrap from snapshot endpoint with existing chain data in {}. "
+              "Rerun with --delete-all-blocks --snapshot-endpoint URL to remove "
+              "existing blocks and state before bootstrapping.",
+              chain_config->state_dir.generic_string());
+
+   // Parse block number from URL if present (trailing path component)
+   std::optional<uint32_t> request_block_num;
+   std::string base_url = endpoint_url;
+   {
+      while (!base_url.empty() && base_url.back() == '/') base_url.pop_back();
+      auto last_slash = base_url.rfind('/');
+      if (last_slash != std::string::npos && last_slash > 7) { // past http://
+         auto segment = base_url.substr(last_slash + 1);
+         bool all_digits = !segment.empty() && std::all_of(segment.begin(), segment.end(), ::isdigit);
+         if (all_digits) {
+            request_block_num = std::stoul(segment);
+            base_url = base_url.substr(0, last_slash);
+         }
+      }
+   }
+
+   ilog("Fetching snapshot metadata from endpoint: {}", endpoint_url);
+
+   fc::http_client http_client;
+   fc::variant metadata_response;
+   if (request_block_num) {
+      auto url = fc::url(base_url + "/v1/snapshot/by_block");
+      fc::mutable_variant_object payload;
+      payload("block_num", *request_block_num);
+      metadata_response = http_client.post_sync(url, fc::variant(payload));
+   } else {
+      auto url = fc::url(base_url + "/v1/snapshot/latest");
+      metadata_response = http_client.post_sync(url, fc::variant(fc::mutable_variant_object()));
+   }
+
+   auto snap_block_num = metadata_response["block_num"].as<uint32_t>();
+   auto snap_root_hash = metadata_response["root_hash"].as<fc::crypto::blake3>();
+
+   ilog("Snapshot metadata: block #{}, hash {}", snap_block_num, snap_root_hash.str());
+
+   // Determine snapshots directory (default alongside data-dir)
+   auto snapshots_dir = app().data_dir() / "snapshots";
+   if (!std::filesystem::exists(snapshots_dir)) {
+      std::filesystem::create_directories(snapshots_dir);
+   }
+
+   auto download_dest = snapshots_dir / ("snapshot-bootstrap-" + std::to_string(snap_block_num) + ".bin");
+
+   // Download the snapshot
+   ilog("Downloading snapshot for block #{} to {}", snap_block_num, download_dest.string());
+   {
+      auto download_url = fc::url(base_url + "/v1/snapshot/download");
+      fc::mutable_variant_object download_payload;
+      download_payload("block_num", snap_block_num);
+      http_client.post_to_file(download_url, fc::variant(download_payload), download_dest);
+   }
+
+   // Quick check: compare the root hash stored in the snapshot footer against
+   // the hash advertised by the endpoint. This catches download corruption but
+   // not sophisticated tampering (a tampered file could update the footer hash).
+   // Full integrity verification happens during snapshot loading (validate()),
+   // and on-chain attestation verification happens after syncing.
+   ilog("Verifying snapshot root hash...");
+   {
+      chain::threaded_snapshot_reader reader(download_dest);
+      reader.load_index(); // reads footer + section index (fast)
+      auto stored_hash = reader.get_root_hash();
+
+      SYS_ASSERT(stored_hash == snap_root_hash, plugin_config_exception,
+                 "Snapshot root hash mismatch! Endpoint advertised: {}, file contains: {}. "
+                 "The downloaded snapshot may be corrupted.",
+                 snap_root_hash.str(), stored_hash.str());
+   }
+
+   ilog("Snapshot hash verified successfully. Proceeding with bootstrap from block #{}", snap_block_num);
+
+   snapshot_path = download_dest;
+   snapshot_auto_fetched = true;
+   snapshot_loaded_root_hash = snap_root_hash;
+}
+
+void chain_plugin_impl::verify_snapshot_attestation(uint32_t current_lib_num) {
    if (!snapshot_loaded_block_num) return;
 
    auto snap_block_num = *snapshot_loaded_block_num;
-   // Clear so we only check once
-   snapshot_loaded_block_num.reset();
 
-   ilog("Verifying snapshot attestation for block #{}", snap_block_num);
+   // For auto-fetched snapshots, the attestation transaction was submitted AFTER the
+   // snapshot was taken. Multiple providers must independently generate the snapshot
+   // (which can take minutes), submit votes, reach quorum, and become irreversible.
+   // At 0.5s block time with snapshots every 25,000 blocks, attestation should always
+   // arrive well before the next snapshot interval. Use half the interval as timeout.
+   constexpr uint32_t max_blocks_to_wait = 12500;
 
    try {
       const auto& db = chain->db();
@@ -1384,10 +1496,23 @@ void chain_plugin_impl::verify_snapshot_attestation() {
          boost::make_tuple(config::system_account_name, config::system_account_name, "snaprecords"_n));
 
       if (!t_id) {
+         if (snapshot_auto_fetched) {
+            if (current_lib_num < snap_block_num + max_blocks_to_wait) {
+               return; // Keep checking on subsequent irreversible blocks
+            }
+            elog("FATAL: No snapshot attestation records table found on chain after syncing {} blocks past snapshot. "
+                 "Auto-fetched snapshots require on-chain attestation for security. "
+                 "The system contract on this chain may not support snapshot attestation.",
+                 current_lib_num - snap_block_num);
+            snapshot_loaded_block_num.reset();
+            app().quit();
+            return;
+         }
          wlog("No snapshot attestation records table found on chain. "
               "Skipping snapshot verification for block #{}. "
               "The system contract on this chain may not support snapshot attestation.",
               snap_block_num);
+         snapshot_loaded_block_num.reset();
          return;
       }
 
@@ -1396,10 +1521,23 @@ void chain_plugin_impl::verify_snapshot_attestation() {
       auto it = kv_index.find(boost::make_tuple(t_id->id, static_cast<uint64_t>(snap_block_num)));
 
       if (it == kv_index.end()) {
+         if (snapshot_auto_fetched) {
+            if (current_lib_num < snap_block_num + max_blocks_to_wait) {
+               return; // Keep checking — attestation may arrive in upcoming blocks
+            }
+            elog("FATAL: No attested snapshot record found for block #{} after syncing {} blocks. "
+                 "Auto-fetched snapshots require on-chain attestation for security. "
+                 "Only snapshots taken at attested block heights can be verified.",
+                 snap_block_num, current_lib_num - snap_block_num);
+            snapshot_loaded_block_num.reset();
+            app().quit();
+            return;
+         }
          wlog("No attested snapshot record found for block #{}. "
               "Skipping snapshot verification. "
               "Only snapshots taken at attested block heights can be verified.",
               snap_block_num);
+         snapshot_loaded_block_num.reset();
          return;
       }
 
@@ -1438,8 +1576,9 @@ void chain_plugin_impl::verify_snapshot_attestation() {
          return;
       }
 
-      ilog("Snapshot attestation verified successfully for block #{}: hash {} matches on-chain record",
-           snap_block_num, snapshot_loaded_root_hash.str());
+      ilog("Snapshot attestation verified successfully for block #{}: hash {} matches on-chain record at block #{}",
+           snap_block_num, snapshot_loaded_root_hash.str(), current_lib_num);
+      snapshot_loaded_block_num.reset();
 
    } catch (const fc::exception& e) {
       elog("Error verifying snapshot attestation for block #{}: {}. "

@@ -84,8 +84,14 @@ class beast_http_session : public detail::abstract_conn,
    // HTTP response object
    std::optional<http::response<http::string_body>> res_;
 
+   // HTTP file response object (for send_file_response)
+   std::optional<http::response<http::file_body>> file_res_;
+
    std::string remote_endpoint_;
    std::string local_address_;
+
+   // Store the last request's fields for header access by raw handlers
+   http::fields last_request_fields_;
 
    // whether response should be sent back to client when an exception occurs
    bool is_send_exception_response_ = true;
@@ -347,6 +353,9 @@ public:
       auto dt = handle_begin_ - read_begin_;
       read_time_us_ += std::chrono::duration_cast<std::chrono::microseconds>(dt).count();
 
+      // Store request fields for potential raw handler access
+      last_request_fields_ = req.base();
+
       // Send the response
       handle_request(std::move(req));
    }
@@ -459,6 +468,79 @@ public:
 
    void decrement_bytes_in_flight(size_t sz) {
       plugin_state_->bytes_in_flight -= sz;
+   }
+
+   virtual std::string get_request_header(std::string_view field_name) const final {
+      return std::string(last_request_fields_[field_name]);
+   }
+
+   virtual void send_file_response(const std::filesystem::path& file_path,
+                                   unsigned int code,
+                                   std::string_view content_type,
+                                   std::optional<std::pair<uint64_t,uint64_t>> byte_range = {}) final {
+      beast::error_code ec;
+      http::file_body::value_type body;
+      body.open(file_path.c_str(), beast::file_mode::scan, ec);
+      if (ec) {
+         error_results results{404, "File not found"};
+         send_response(fc::json::to_string(results, fc::time_point::maximum()), 404);
+         return;
+      }
+
+      auto const file_size = body.size();
+
+      file_res_.emplace();
+      file_res_->body() = std::move(body);
+
+      if (byte_range) {
+         auto [range_start, range_end] = *byte_range;
+         if (range_end >= file_size)
+            range_end = file_size - 1;
+         if (range_start > range_end) {
+            error_results results{416, "Range Not Satisfiable"};
+            send_response(fc::json::to_string(results, fc::time_point::maximum()), 416);
+            return;
+         }
+
+         auto range_len = range_end - range_start + 1;
+         file_res_->result(http::status::partial_content);
+         // Seek to the start of the range
+         file_res_->body().seek(range_start, ec);
+         if (ec) {
+            error_results results{500, "Seek failed"};
+            send_response(fc::json::to_string(results, fc::time_point::maximum()), 500);
+            return;
+         }
+         file_res_->set(http::field::content_range,
+            "bytes " + std::to_string(range_start) + "-" + std::to_string(range_end) + "/" + std::to_string(file_size));
+         file_res_->content_length(range_len);
+      } else {
+         file_res_->result(code);
+         file_res_->content_length(file_size);
+      }
+
+      file_res_->version(11);
+      file_res_->set(http::field::content_type, content_type);
+      file_res_->set(http::field::accept_ranges, "bytes");
+      file_res_->set(http::field::content_disposition, "attachment; filename=\"" + file_path.filename().string() + "\"");
+      if (plugin_state_->server_header.size())
+         file_res_->set(http::field::server, plugin_state_->server_header);
+      file_res_->keep_alive(false); // close after file transfer
+
+      auto tracked_size = byte_range ? (byte_range->second - byte_range->first + 1) : file_size;
+      increment_bytes_in_flight(tracked_size);
+      write_begin_ = steady_clock::now();
+      auto dt = write_begin_ - handle_begin_;
+      handle_time_us_ += std::chrono::duration_cast<std::chrono::microseconds>(dt).count();
+
+      http::async_write(
+         socket_,
+         *file_res_,
+         [self = this->shared_from_this(), tracked_size](beast::error_code ec, std::size_t bytes_transferred) {
+            self->decrement_bytes_in_flight(tracked_size);
+            self->file_res_.reset();
+            self->on_write(ec, bytes_transferred, true); // always close after file
+         });
    }
 
    virtual void send_response(std::string&& json, unsigned int code) final {
