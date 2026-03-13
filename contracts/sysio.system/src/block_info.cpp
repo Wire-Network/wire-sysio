@@ -1,23 +1,12 @@
 #include <sysio.system/block_info.hpp>
 #include <sysio.system/sysio.system.hpp>
 
-namespace {
-
-inline uint32_t block_height_from_id(const sysio::checksum256& block_id)
-{
-   auto arr = block_id.extract_as_byte_array();
-   // 32-bit block height is encoded in big endian as the sequence of bytes: arr[0], arr[1], arr[2], arr[3]
-   return ((arr[0] << 0x18) | (arr[1] << 0x10) | (arr[2] << 0x08) | arr[3]);
-}
-
-} // namespace
-
 namespace sysiosystem {
 
 void system_contract::add_to_blockinfo_table(const sysio::checksum256&    previous_block_id,
                                              const sysio::block_timestamp timestamp) const
 {
-   const uint32_t new_block_height    = block_height_from_id(previous_block_id) + 1;
+   const uint32_t new_block_height    = block_info::block_height_from_id(previous_block_id) + 1;
    const auto     new_block_timestamp = static_cast<sysio::time_point>(timestamp);
 
    block_info::block_info_table t(get_self(), 0);

@@ -2,6 +2,7 @@
 #include <sysio/producer_plugin/block_timing_util.hpp>
 #include <sysio/producer_plugin/production_pause_vote_tracker.hpp>
 #include <sysio/producer_plugin/trx_priority_db.hpp>
+#include <sysio/chain/authorization_manager.hpp>
 #include <sysio/chain/plugin_interface.hpp>
 #include <sysio/chain/global_property_object.hpp>
 #include <sysio/chain/snapshot.hpp>
@@ -697,23 +698,33 @@ public:
          trx.expiration = fc::time_point_sec(chain.head().block_time() + fc::seconds(30));
          trx.set_reference_block(chain.head().id());
 
-         // Sign with the snapshot provider account's key
+         // Determine the required signing keys for the snapshot provider account's active authority
          auto& sig_plug = app().get_plugin<signature_provider_manager_plugin>();
          auto wire_sig_providers = sig_plug.query_providers(
             std::nullopt, std::nullopt, chain::crypto::chain_key_type_wire);
 
-         bool signed_ok = false;
+         // Collect available public keys
+         flat_set<chain::public_key_type> candidate_keys;
+         std::map<chain::public_key_type, fc::crypto::private_key> key_map;
          for (auto& sig_prov : wire_sig_providers) {
             if (sig_prov->private_key.has_value()) {
-               trx.sign(*sig_prov->private_key, chain.get_chain_id());
-               signed_ok = true;
-               break;
+               candidate_keys.insert(sig_prov->public_key);
+               key_map[sig_prov->public_key] = *sig_prov->private_key;
             }
          }
 
-         if (!signed_ok) {
-            elog("Snapshot provider: no signing key available for votesnaphash transaction");
+         // Use authorization_manager to find which keys satisfy snap_account@active
+         auto required_keys = chain.get_authorization_manager().get_required_keys(
+            trx, candidate_keys);
+
+         if (required_keys.empty()) {
+            elog("Snapshot provider: no signing key available for {}@active votesnaphash transaction",
+                 _snapshot_provider_account);
             return;
+         }
+
+         for (const auto& key : required_keys) {
+            trx.sign(key_map.at(key), chain.get_chain_id());
          }
 
          auto packed_trx = std::make_shared<chain::packed_transaction>(std::move(trx));
