@@ -42,7 +42,19 @@ void snapshot_scheduler::on_irreversible_block(const signed_block_ptr& lib, cons
       auto next = pending->next;
 
       try {
-         next(pending->finalize(block_id, chain));
+         auto si = pending->finalize(block_id, chain);
+         next(si);
+
+         // Notify all registered finalized callbacks
+         for (const auto& cb : _snapshot_finalized_cbs) {
+            try {
+               cb(si);
+            } catch (const fc::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.to_detail_string());
+            } catch (const std::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.what());
+            }
+         }
       }
       CATCH_AND_CALL(next);
 
@@ -150,10 +162,10 @@ void snapshot_scheduler::execute_snapshot(uint32_t srid, chain::controller& chai
             });
          }
 
-         // Notify snapshot provider callback if registered
-         if (_snapshot_finalized_cb) {
+         // Notify all registered finalized callbacks
+         for (const auto& cb : _snapshot_finalized_cbs) {
             try {
-               _snapshot_finalized_cb(snapshot_info);
+               cb(snapshot_info);
             } catch (const fc::exception& e) {
                elog("Snapshot finalized callback error: {}", e.to_detail_string());
             } catch (const std::exception& e) {
@@ -201,7 +213,19 @@ void snapshot_scheduler::create_snapshot(next_function<snapshot_information> nex
                     head_block_num, ec.value(), ec.message());
 
          ilog("Snapshot creation at block {} complete; snapshot placed at {}", head_block_num, snapshot_path.string());
-         next(snapshot_information{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash});
+         snapshot_information si{head_id, head_block_num, head_block_time, chain_snapshot_header::current_version, snapshot_path.generic_string(), captured_root_hash};
+         next(si);
+
+         // Notify all registered finalized callbacks
+         for (const auto& cb : _snapshot_finalized_cbs) {
+            try {
+               cb(si);
+            } catch (const fc::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.to_detail_string());
+            } catch (const std::exception& e) {
+               elog("Snapshot finalized callback error: {}", e.what());
+            }
+         }
       }
       CATCH_AND_CALL(next);
       return;

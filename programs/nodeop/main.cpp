@@ -3,6 +3,7 @@
 #include <sysio/db_size_api_plugin/db_size_api_plugin.hpp>
 #include <sysio/net_api_plugin/net_api_plugin.hpp>
 #include <sysio/producer_api_plugin/producer_api_plugin.hpp>
+#include <sysio/snapshot_api_plugin/snapshot_api_plugin.hpp>
 #include <sysio/prometheus_plugin/prometheus_plugin.hpp>
 #include <sysio/state_history_plugin/state_history_plugin.hpp>
 #include <sysio/test_control_api_plugin/test_control_api_plugin.hpp>
@@ -26,6 +27,7 @@ int main(int argc, char** argv)
    application_base::register_plugin<http_plugin>();
    application_base::register_plugin<net_api_plugin>();
    application_base::register_plugin<producer_api_plugin>();
+   application_base::register_plugin<snapshot_api_plugin>();
    application_base::register_plugin<test_control_plugin>();
    application_base::register_plugin<test_control_api_plugin>();
    application_base::register_plugin<state_history_plugin>();

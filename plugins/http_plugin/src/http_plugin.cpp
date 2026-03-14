@@ -52,6 +52,7 @@ namespace sysio {
       if (name == "trace_api") return api_category::trace_api;
       if (name == "prometheus") return api_category::prometheus;
       if (name == "test_control") return api_category::test_control;
+      if (name == "snapshot_ro") return api_category::snapshot_ro;
       return api_category::unknown;
    }
 
@@ -67,6 +68,7 @@ namespace sysio {
       if (category == api_category::trace_api) return "trace_api";
       if (category == api_category::prometheus) return "prometheus";
       if (category == api_category::test_control) return "test_control";
+      if (category == api_category::snapshot_ro) return "snapshot_ro";
       if (category == api_category::node) return "node";
       // It's a programming error when the control flow reaches this point, 
       // please make sure all the category names are returned from above statements.
@@ -90,7 +92,9 @@ namespace sysio {
       if (api_category_set({api_category::producer_ro, api_category::producer_rw, api_category::snapshot})
               .contains(category))
          return "sysio::producer_api_plugin";
-      // It's a programming error when the control flow reaches this point, 
+      if (category == api_category::snapshot_ro)
+         return "sysio::snapshot_api_plugin";
+      // It's a programming error when the control flow reaches this point,
       // please make sure all the plugin names are returned from above statements.
       assert(false && "No corresponding plugin for the category value");
       return {};
@@ -99,7 +103,7 @@ namespace sysio {
    std::string category_names(api_category_set set) {
       if (set == api_category_set::all()) return "all";
       std::string result;
-      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::test_control); i<<=1) {
+      for (uint32_t i = 1; i <= static_cast<uint32_t>(api_category::snapshot_ro); i<<=1) {
          if (set.contains(api_category(i))) {
             result += from_category(api_category(i));
             result += " ";
@@ -302,7 +306,7 @@ namespace sysio {
              "    in addition, unix socket path must starts with '/', './' or '../'. When relative path\n"
              "    is used, it is relative to the data path.\n\n"
              "    Valid categories include chain_ro, chain_rw, db_size, net_ro, net_rw, producer_ro\n"
-             "    producer_rw, snapshot, trace_api, prometheus, and test_control.\n\n"
+             "    producer_rw, snapshot, trace_api, prometheus, test_control, and snapshot_ro.\n\n"
              "    A single `hostname:port` specification can be used by multiple categories\n" 
              "    However, two specifications having the same port with different hostname strings\n" 
              "    are always considered as configuration error regardless of whether they can be resolved\n"
@@ -534,6 +538,26 @@ namespace sysio {
       std::string path  = entry.path;
       auto p = my->plugin_state->url_handlers.emplace(path, my->make_http_thread_url_handler(std::move(entry), content_type));
       SYS_ASSERT( p.second, chain::plugin_config_exception, "http url {} is not unique", path );
+   }
+
+   void http_plugin::add_raw_handler(string path, api_category category, raw_url_handler handler) {
+      fc_ilog(logger(), "add {} api url: {} {}",
+              from_category(category), path,
+              my->addresses_for_category(category).empty() ? "disabled for category address not configured"
+                                                           : "on " + my->addresses_for_category(category));
+      detail::internal_url_handler internal_handler;
+      internal_handler.category = category;
+      internal_handler.content_type = http_content_type::json; // default, though raw handlers manage their own responses
+      auto handler_ptr = std::make_shared<raw_url_handler>(std::move(handler));
+      internal_handler.fn = [handler_ptr](detail::abstract_conn_ptr conn, string&& r, string&& b, url_response_callback&&) {
+         try {
+            (*handler_ptr)(std::move(conn), std::move(r), std::move(b));
+         } catch (...) {
+            conn->handle_exception();
+         }
+      };
+      auto p = my->plugin_state->url_handlers.emplace(std::move(path), std::move(internal_handler));
+      SYS_ASSERT(p.second, chain::plugin_config_exception, "http url {} is not unique", p.first->first);
    }
 
    void http_plugin::post_http_thread_pool(std::function<void()> f) {
