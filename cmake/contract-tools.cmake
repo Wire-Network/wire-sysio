@@ -45,15 +45,22 @@ function(contracts_target TARGET)
 
   cmake_parse_arguments(ARG "" "SOURCE_DIR;BINARY_DIR" "" ${ARGN})
 
-  # Collect all CMakeLists.txt files under the contract source tree so that
-  # switching branches (which may add/remove source files or entire contracts)
-  # triggers a re-configure of the ExternalProject.  CMAKE_CONFIGURE_DEPENDS
-  # tells the *parent* build system to re-run cmake when any of these files
-  # change, and the DEPENDS on the check_reconfigure step ensures the
-  # ExternalProject's own configure stamp is invalidated.
+  # Collect CMakeLists.txt files so the parent build re-runs cmake when
+  # contract build structure changes (e.g. new contracts added/removed).
   file(GLOB_RECURSE _contract_cmake_files "${ARG_SOURCE_DIR}/CMakeLists.txt"
                                           "${ARG_SOURCE_DIR}/*/CMakeLists.txt")
   set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${_contract_cmake_files})
+
+  # Also collect source files so the ExternalProject reconfigures when
+  # contract code changes on branch switch.  Without this, stale object
+  # files and ABIs from a previous branch persist and cause link errors
+  # (e.g. undefined symbols for actions that no longer exist).
+  # These are only added to the check_reconfigure step DEPENDS below,
+  # NOT to CMAKE_CONFIGURE_DEPENDS, to avoid re-running the parent cmake
+  # on every source edit.
+  file(GLOB_RECURSE _contract_source_files "${ARG_SOURCE_DIR}/*.cpp"
+                                           "${ARG_SOURCE_DIR}/*.hpp"
+                                           "${ARG_SOURCE_DIR}/*.h")
 
   ExternalProject_Add(
     ${TARGET}
@@ -67,12 +74,12 @@ function(contracts_target TARGET)
     BUILD_ALWAYS 1
   )
 
-  # Force the ExternalProject to re-configure when any contract CMakeLists.txt
-  # changes (e.g. source files added/removed on a different branch).
+  # Force the ExternalProject to re-configure when any contract file changes
+  # (e.g. source files added/removed or modified on a different branch).
   ExternalProject_Add_Step(${TARGET} check_reconfigure
     DEPENDEES download
     DEPENDERS configure
-    DEPENDS ${_contract_cmake_files}
+    DEPENDS ${_contract_cmake_files} ${_contract_source_files}
     COMMENT "Checking if ${TARGET} needs reconfiguration"
   )
 
