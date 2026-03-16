@@ -28,6 +28,7 @@
   "dependencies": {
     "@wireio/core": "link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/core",
     "@wireio/sdk-core": "link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/sdk-core",
+    "@wireio/wallet-ext-sdk": "link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/wallet-ext-sdk",
     "sdk-core": "link:../../../../../home/jglanz/.local/share/pnpm/global/5/node_modules/@wireio/sdk-core"
   }
 }

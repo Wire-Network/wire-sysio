@@ -1,20 +1,20 @@
 import {
-  ABI,
-  Action,
-  AnyAction,
-  API,
-  APIClient,
-  APIError,
-  getCompressedPublicKey,
-  KeyType,
-  Name,
-  PermissionLevel,
-  PrivateKey,
-  PublicKey,
-  Signature,
-  SignedTransaction,
-  Transaction
+    ABI,
+    Action,
+    AnyAction,
+    API,
+    APIClient,
+    APIError,
+    getCompressedPublicKey,
+    KeyType,
+    Name,
+    PermissionLevel, PrivateKey,
+    PublicKey,
+    Signature,
+    SignedTransaction,
+    Transaction
 } from "@wireio/sdk-core"
+import { WireWalletClient } from "@wireio/wallet-ext-sdk"
 import { ethers } from "ethers"
 import * as wallet from "./wallet"
 import { ChainKind, WireChain } from "../types"
@@ -56,14 +56,7 @@ export async function pushTransaction(
       api,
       Array.isArray(action) ? action : [action]
     )
-    actions.forEach(act => {
-      act.authorization = [
-        PermissionLevel.from({
-          actor: Name.from("jon.eth.link"),
-          permission: Name.from("active")
-        })
-      ]
-    })
+
     const info = await api.v1.chain.get_info()
     const header = info.getTransactionHeader()
     const transaction = Transaction.from({
@@ -72,12 +65,20 @@ export async function pushTransaction(
     })
     const { msgDigest } = transaction.signingDigest(info.chain_id)
 
-    const privKey = PrivateKey.fromString(process.env.AUTHEX_TEST_PRIVATE_KEY!)
-    const signature = privKey.signDigest(msgDigest)
+    const walletClient = new WireWalletClient()
+    const accounts = await walletClient.getAccounts()
+    if (!accounts.length) {
+      throw new Error("No accounts found in Wire Wallet. Please add an account and try again.")
+    }
+    const accountId = accounts[0].id
+    const result = await walletClient.signTransaction({
+      digest: msgDigest.hexString,
+      accountId
+    })
+
     const signedTrx = SignedTransaction.from({
       ...transaction,
-
-      signatures: [signature]
+      signatures: result.signatures
     })
 
     try {
@@ -151,6 +152,6 @@ export async function createLinkTransaction(
       nonce
     }
   }
-  console.log("actionData", actionData)
+
   return pushTransaction(api, actionData)
 }
