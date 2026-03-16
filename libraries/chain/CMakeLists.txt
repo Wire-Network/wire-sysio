@@ -171,6 +171,8 @@ target_include_directories( sysio_chain
                             )
 target_compile_definitions( sysio_chain PUBLIC ${CHAIN_NATIVE_MODULE_DEFINITIONS} )
 
+configure_chain_pch(sysio_chain)
+
 add_library(sysio_chain_wrap INTERFACE )
 target_link_libraries(sysio_chain_wrap INTERFACE sysio_chain)
 

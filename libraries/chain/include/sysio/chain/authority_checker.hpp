@@ -7,10 +7,9 @@
 
 #include <fc/scoped_exit.hpp>
 
-#include <boost/range/algorithm/find.hpp>
-#include <boost/algorithm/cxx11/all_of.hpp>
-
+#include <algorithm>
 #include <functional>
+#include <ranges>
 
 namespace sysio { namespace chain {
 
@@ -86,7 +85,7 @@ namespace detail {
             return satisfied( authority, *cached_perms, 0 );
          }
 
-         bool all_keys_used() const { return boost::algorithm::all_of_equal(_used_keys, true); }
+         bool all_keys_used() const { return std::ranges::all_of(_used_keys, std::identity{}); }
 
          flat_set<public_key_type> used_keys() const {
             auto range = filter_data_by_marker(provided_keys, _used_keys, true);
@@ -170,7 +169,7 @@ namespace detail {
 
             template<typename KeyWeight, typename = std::enable_if_t<detail::is_any_of_v<KeyWeight, shared_key_weight, key_weight>>>
             uint32_t operator()(const KeyWeight& permission) {
-               auto itr = boost::find( checker.provided_keys, permission.key );
+               auto itr = std::find( checker.provided_keys.begin(), checker.provided_keys.end(), permission.key );
                if( itr != checker.provided_keys.end() ) {
                   checker._used_keys[itr - checker.provided_keys.begin()] = true;
                   total_weight += permission.weight;
