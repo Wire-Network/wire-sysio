@@ -203,8 +203,6 @@ namespace sysio { namespace chain {
 
    using packed_transaction_ptr = std::shared_ptr<const packed_transaction>;
 
-   uint128_t transaction_id_to_sender_id( const transaction_id_type& tid );
-
 } } /// namespace sysio::chain
 
 FC_REFLECT( sysio::chain::transaction_header, (expiration)(ref_block_num)(ref_block_prefix)

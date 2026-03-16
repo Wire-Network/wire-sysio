@@ -24,11 +24,6 @@
 
 namespace sysio::chain {
 
-
-uint128_t transaction_id_to_sender_id( const transaction_id_type& tid ) {
-   return fc::to_uint128(tid._hash[3], tid._hash[2]);
-}
-
 void validate_authority_precondition( const apply_context& context, const authority& auth ) {
    for(const auto& a : auth.accounts) {
       auto* acct = context.db.find<account_object, by_name>(a.permission.actor);
