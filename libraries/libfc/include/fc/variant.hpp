@@ -10,14 +10,13 @@
 #include <vector>
 
 #include <boost/multi_index_container_fwd.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
 
 #include <fmt/format.h>
 
 #include <fc/container/deque_fwd.hpp>
 #include <fc/container/flat_fwd.hpp>
 #include <fc/int128.hpp>
-#include <fc/int256.hpp>
+#include <fc/int256_fwd.hpp>
 #include <fc/string.hpp>
 #include <fc/time.hpp>
 
@@ -53,28 +52,6 @@ namespace fc
    template<typename T, typename... Args> void to_variant( const boost::multi_index_container<T,Args...>& s, fc::variant& v );
    template<typename T, typename... Args> void from_variant( const fc::variant& v, boost::multi_index_container<T,Args...>& s );
 
-   template<size_t Size>
-   using UInt = boost::multiprecision::number<
-         boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void> >;
-   template<size_t Size>
-   using Int = boost::multiprecision::number<
-         boost::multiprecision::cpp_int_backend<Size, Size, boost::multiprecision::signed_magnitude, boost::multiprecision::unchecked, void> >;
-
-   void to_variant( const UInt<8>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<8>& n );
-
-   void to_variant( const UInt<16>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<16>& n );
-
-   void to_variant( const UInt<32>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<32>& n );
-
-   void to_variant( const UInt<64>& n, fc::variant& v );
-   void from_variant( const fc::variant& v, UInt<64>& n );
-
-   template<typename T> void to_variant( const boost::multiprecision::number<T>& n, fc::variant& v );
-   template<typename T> void from_variant( const fc::variant& v, boost::multiprecision::number<T>& n );
-
    template<typename T> void to_variant( const safe<T>& s, fc::variant& v );
    template<typename T> void from_variant( const fc::variant& v, safe<T>& s );
    template<typename T> void to_variant( const std::unique_ptr<T>& s, fc::variant& v );
@@ -98,10 +75,7 @@ namespace fc
    void to_variant( const int32_t& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  int32_t& vo );
 
-   void to_variant( const unsigned __int128& var,  fc::variant& vo );
-   void from_variant( const fc::variant& var,  unsigned __int128& vo );
-   void to_variant( const __int128& var,  fc::variant& vo );
-   void from_variant( const fc::variant& var,  __int128& vo );
+   // to_variant/from_variant for __int128 types declared in fc/int128.hpp
 
    void to_variant( const variant_object& var,  fc::variant& vo );
    void from_variant( const fc::variant& var,  variant_object& vo );
@@ -234,8 +208,8 @@ namespace fc
         variant( int64_t val );
         variant( fc::uint128 val );
         variant( fc::int128 val );
-        variant( fc::uint256 val );
-        variant( fc::int256 val );
+        variant( const fc::uint256& val );
+        variant( const fc::int256& val );
         variant( double val );
         variant( bool val );
         variant( blob val );
@@ -747,12 +721,7 @@ namespace fc
       for( const auto& item : vars )
          c.insert( item.as<T>() );
    }
-   template<typename T> void to_variant( const boost::multiprecision::number<T>& n, fc::variant& v ) {
-      v = n.str();
-   }
-   template<typename T> void from_variant( const fc::variant& v, boost::multiprecision::number<T>& n ) {
-      n = boost::multiprecision::number<T>(v.get_string());
-   }
+   // Generic boost::multiprecision to_variant/from_variant moved to fc/variant_multiprecision.hpp
 
    fc::variant operator + ( const fc::variant& a, const fc::variant& b );
    fc::variant operator - ( const fc::variant& a, const fc::variant& b );
